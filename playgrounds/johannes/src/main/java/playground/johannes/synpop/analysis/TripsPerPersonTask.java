@@ -38,7 +38,7 @@ public class TripsPerPersonTask {
 
         ValueProvider<Double, Person> weightsProvider = new NumericAttributeProvider<>(CommonKeys.PERSON_WEIGHT);
         EpisodePersonCollector<Double> weightsCollector = new EpisodePersonCollector<>(weightsProvider);
-        //weightsCollector.setPredicate(new ModePredicate(CommonValues.LEG_MODE_CAR));
+
         NumericAnalyzer analyzer = new NumericAnalyzer(collector, weightsCollector, "nTrips", writer);
 
         return analyzer;

@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.schedule;
 import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 
 import com.google.common.base.Predicate;
@@ -107,15 +108,21 @@ public class Schedules
     }
 
 
-    public static Task getNextTask(Task task)
+    public static <T extends Task> T getNextTask(Schedule<T> schedule)
     {
-        return (task.getSchedule()).getTasks().get(task.getTaskIdx() + 1);
+        int taskIdx = schedule.getStatus() == ScheduleStatus.PLANNED ? //
+                0 : schedule.getCurrentTask().getTaskIdx() + 1;
+        
+        return schedule.getTasks().get(taskIdx);
     }
 
 
-    public static Task getPreviousTask(Task task)
+    public static <T extends Task> T getPreviousTask(Schedule<T> schedule)
     {
-        return task.getSchedule().getTasks().get(task.getTaskIdx() - 1);
+        int taskIdx = schedule.getStatus() == ScheduleStatus.COMPLETED ? //
+                schedule.getTaskCount() - 1 : schedule.getCurrentTask().getTaskIdx() - 1;
+        
+        return schedule.getTasks().get(taskIdx);
     }
 
 

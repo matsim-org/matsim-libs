@@ -19,6 +19,7 @@
 
 package playground.johannes.synpop.matrix;
 
+import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 
@@ -118,7 +119,18 @@ public class MatrixOperations {
         return sum;
     }
 
-    public static <K> TObjectDoubleHashMap<K> marginalsCol(Matrix<K, Double> m) {
+    public static <K> double diagonalSum(Matrix<K, Double> m) {
+        double sum = 0;
+        Set<K> keys = m.keys();
+        for(K key : keys) {
+            Double val = m.get(key, key);
+            if(val != null) sum += val;
+        }
+
+        return sum;
+    }
+
+    public static <K> TObjectDoubleHashMap<K> columnMarginals(Matrix<K, Double> m) {
         TObjectDoubleHashMap<K> marginals = new TObjectDoubleHashMap<>();
         Set<K> keys = m.keys();
         for (K j : keys) {
@@ -131,6 +143,21 @@ public class MatrixOperations {
             }
             marginals.put(j, sum);
         }
+        return marginals;
+    }
+
+    public static <K> TObjectDoubleMap<K> rowMarginals(Matrix<K, Double> m) {
+        TObjectDoubleMap<K> marginals = new TObjectDoubleHashMap<>();
+        Set<K> keys = m.keys();
+        for(K i : keys) {
+            double sum = 0;
+            for(K j : keys) {
+                Double val = m.get(i, j);
+                if(val != null) sum += val;
+            }
+            marginals.put(i, sum);
+        }
+
         return marginals;
     }
 

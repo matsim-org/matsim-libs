@@ -59,11 +59,19 @@ public class HistogramWriter {
             String type = builders.get(i).getName();
 
             try {
-                TDoubleDoubleHashMap hist = Histogram.createHistogram(values, weights, discretizer, true);
+                TDoubleDoubleHashMap hist = Histogram.createHistogram(values, weights, discretizer, false);
                 StatsWriter.writeHistogram(hist, name, "frequency", String.format("%s/%s.%s.txt", ioContext.getPath(), name, type));
 
                 hist = Histogram.normalize(hist);
                 StatsWriter.writeHistogram(hist, name, "probability", String.format("%s/%s.%s.norm.txt", ioContext.getPath(), name, type));
+
+                hist = Histogram.createHistogram(values, weights, discretizer, true);
+                StatsWriter.writeHistogram(hist, name, "frequency", String.format("%s/%s.%s.w.txt", ioContext
+                        .getPath(), name, type));
+
+                hist = Histogram.normalize(hist);
+                StatsWriter.writeHistogram(hist, name, "probability", String.format("%s/%s.%s.w.norm.txt", ioContext
+                        .getPath(), name, type));
             } catch (IOException e) {
                 e.printStackTrace();
             }

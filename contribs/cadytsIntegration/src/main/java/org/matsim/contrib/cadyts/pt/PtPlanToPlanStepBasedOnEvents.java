@@ -78,7 +78,7 @@ import cadyts.demand.PlanBuilder;
 	private long plansNotFound = 0;
 
 	@Override
-	public final cadyts.demand.Plan<T> getPlanSteps(final Plan plan) {
+	public final cadyts.demand.Plan<T> getCadytsPlan(final Plan plan) {
 		@SuppressWarnings("unchecked") // getting stuff from custom attributes has to be untyped.  (Although I am not sure why it is necessary to put this
 		// there in the first place. kai, jul'13)
 		PlanBuilder<T> planStepFactory = (PlanBuilder<T>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);

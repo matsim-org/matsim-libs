@@ -33,6 +33,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.ikaddoura.noise2.data.NoiseContext;
@@ -50,7 +51,7 @@ import playground.ikaddoura.noise2.data.ReceiverPoint;
 public class NoiseWriter {
 	private static final Logger log = Logger.getLogger(NoiseWriter.class);
 
-	public static void writeReceiverPoints(NoiseContext noiseContext, String outputPath) {
+	public static void writeReceiverPoints(NoiseContext noiseContext, String outputPath, boolean useCompression) {
 
 		// csv file
 		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
@@ -73,7 +74,7 @@ public class NoiseWriter {
 		values.add(id2xCoord);
 		values.add(id2yCoord);
 		
-		write(outputPath, 3, headers, values);
+		write(outputPath, 3, headers, values, useCompression);
 		
 		// shape file	
 				
@@ -99,16 +100,18 @@ public class NoiseWriter {
 //		log.info("Writing receiver points to shapefile... Done. ");
 	}
 	
-	public static void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values) {
+	public static void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values, boolean useCompression) {
 		
 		File file = new File(fileName);
 		file.mkdirs();
 		
-		File file2 = new File(fileName + "receiverPoints.csv");
+		String file2 = fileName + "receiverPoints.csv" ;
+		if ( useCompression ) {
+			fileName += ".gz" ;
+		}
 			
 		// For all maps, the number of keys should be the same
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+		try ( BufferedWriter bw = IOUtils.getBufferedWriter(file2) ) {
 			bw.write(headers.get(0));
 			for(int i = 1 ; i < columns ; i++) {
 				bw.write(";"+headers.get(i));
@@ -131,7 +134,7 @@ public class NoiseWriter {
 		}
 	}
 
-	public static void writeNoiseEmissionStatsPerHour(NoiseContext noiseContext, String outputPath) {
+	public static void writeNoiseEmissionStatsPerHour(NoiseContext noiseContext, String outputPath, boolean useCompression) {
 		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 		
 		String outputPathEmissions = outputPath + "emissions/";
@@ -139,6 +142,9 @@ public class NoiseWriter {
 		dir.mkdirs();
 		
 		String fileName = outputPathEmissions + "emission_" + timeInterval + ".csv";
+		if ( useCompression ) {
+			fileName += ".gz" ;
+		}
 		File file = new File(fileName);
 		
 		try {

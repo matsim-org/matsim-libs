@@ -36,7 +36,7 @@ public final class PlanSelectionByCadyts<T> implements PlanSelector {
 		Vector choiceProbs = new Vector( person.getPlans().size() ) ;
 		int pos = 0 ;
 		for ( Plan plan : person.getPlans() ) {
-			plans.add( cContext.getPlansTranslator().getPlanSteps(plan) ) ;
+			plans.add( cContext.getPlansTranslator().getCadytsPlan(plan) ) ;
 
 			choiceProbs.add(pos, ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector(beta), plan.getPerson(), plan) );
 			// I guess these are supposed to be the prior probabilities. If so, than the above shoudl be correct (albeit a bit expensive).

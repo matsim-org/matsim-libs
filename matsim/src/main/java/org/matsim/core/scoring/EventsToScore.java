@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
@@ -70,7 +69,7 @@ public class EventsToScore implements BasicEventHandler {
 	public static EventsToScore createWithScoreUpdating(final Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final EventsManager eventsManager) {
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
 				new ScenarioByInstanceModule(scenario),
-				new ExperiencedPlanElementsModule(),
+				new ExperiencedPlansModule(),
 				new AbstractModule() {
 					@Override
 					public void install() {
@@ -86,7 +85,7 @@ public class EventsToScore implements BasicEventHandler {
 	public static EventsToScore createWithoutScoreUpdating(Scenario scenario, final ScoringFunctionFactory scoringFunctionFactory, final EventsManager eventsManager) {
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
 				new ScenarioByInstanceModule(scenario),
-				new ExperiencedPlanElementsModule(),
+				new ExperiencedPlansModule(),
 				new AbstractModule() {
 					@Override
 					public void install() {

@@ -18,9 +18,8 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.simTime;
 
+import java.io.File;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -39,11 +38,12 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.evac.EvacPatnaControler;
+import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
+import playground.agarwalamit.utils.plans.PersonsCloner;
 
 /**
  * @author amit
@@ -51,9 +51,11 @@ import playground.agarwalamit.utils.plans.BackwardCompatibilityForOldPlansType;
 
 public class PatnaSimulationTimeWriter {
 
+	private static final Logger LOG = Logger.getLogger(PatnaSimulationTimeWriter.class);
 	private final int [] randomNumbers = {4711, 6835, 1847, 4144, 4628, 2632, 5982, 3218, 5736, 7573,4389, 1344} ;
-	private static String outputFolder =  "../../../../repos/runs-svn/patnaIndia/run107/";
+	private static String outputFolder =  "../../../../repos/runs-svn/patnaIndia/run106/";
 	private static String inputFilesDir = "../../../../repos/runs-svn/patnaIndia/inputs/";
+	private static int cloningFactor = 10;
 	private static PrintStream writer;
 
 	public static void main(String[] args) {
@@ -65,12 +67,14 @@ public class PatnaSimulationTimeWriter {
 		if ( isUsingCluster ) {
 			outputFolder = args[0];
 			inputFilesDir = args[1];
+			cloningFactor = Integer.valueOf( args[2] );
 		}
 
 		PatnaSimulationTimeWriter pstw = new PatnaSimulationTimeWriter();
 
 		try {
-			writer = new PrintStream(outputFolder+"/simTime.txt");
+			new File(outputFolder+"/"+cloningFactor+"pct").mkdirs();
+			writer = new PrintStream(outputFolder+"/"+cloningFactor+"pct"+"/simTime.txt");
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason : "+e);
 		}
@@ -98,7 +102,7 @@ public class PatnaSimulationTimeWriter {
 			MatsimRandom.reset(randomSeed);
 			double startTime = System.currentTimeMillis();
 
-			String runSpecificOutputDir = outputFolder + "/output_"+ld+"_"+td+"_"+i+"/";
+			String runSpecificOutputDir = outputFolder+"/"+cloningFactor+"pct" + "/output_"+ld+"_"+td+"_"+i+"/";
 			runControler(ld, td, runSpecificOutputDir);
 			double endTime = System.currentTimeMillis();
 
@@ -109,11 +113,10 @@ public class PatnaSimulationTimeWriter {
 	}
 
 	private void runControler (QSimConfigGroup.LinkDynamics ld, QSimConfigGroup.TrafficDynamics td, String runSpecificOutputDir) {
-		Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
 		Config config = createBasicConfigSettings();
 		String outPlans = inputFilesDir + "/SelectedPlans_new.xml.gz";
 
-		BackwardCompatibilityForOldPlansType bcrt = new BackwardCompatibilityForOldPlansType(inputFilesDir+"/SelectedPlansOnly.xml", mainModes);
+		BackwardCompatibilityForOldPlansType bcrt = new BackwardCompatibilityForOldPlansType(inputFilesDir+"/SelectedPlansOnly.xml", PatnaUtils.URBAN_MAIN_MODES);
 		bcrt.extractPlansExcludingLinkInfo();
 		bcrt.writePopOut(outPlans);
 
@@ -135,8 +138,11 @@ public class PatnaSimulationTimeWriter {
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
-		Logger.getLogger(PatnaSimulationTimeWriter.class).error("Check the modes in the following call first. jan 16");
-//		PatnaUtils.createAndAddVehiclesToScenario(sc);
+		//clone persons here.
+		PersonsCloner pc = new PersonsCloner(sc);
+		pc.clonePersons(cloningFactor);
+		
+		PatnaUtils.createAndAddVehiclesToScenario(sc, PatnaUtils.URBAN_ALL_MODES);
 
 		final Controler controler = new Controler(sc);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -148,38 +154,42 @@ public class PatnaSimulationTimeWriter {
 			// following must be added in order to get travel time and travel disutility in the router for modes other than car
 			@Override
 			public void install() {
-				addTravelTimeBinding("bike").to(FreeSpeedTravelTime.class);
+				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
 				addTravelDisutilityFactoryBinding("bike").toInstance(builder);
-				// alternatively test -->  addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey()); after removing builder injection line.
-//				addTravelTimeBinding("bike").to(networkTravelTime());
-//				addTravelDisutilityFactoryBinding("bike").to(carTravelDisutilityFactoryKey());
 				addTravelTimeBinding("motorbike").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("motorbike").to(carTravelDisutilityFactoryKey());
 			}
 		});
 		controler.getScenario().getConfig().controler().setOutputDirectory(runSpecificOutputDir);
 		controler.run();
+
+		// delete unnecessary iterations folder here.
+		int firstIt = controler.getConfig().controler().getFirstIteration();
+		int lastIt = controler.getConfig().controler().getLastIteration();
+		for (int index =firstIt+1; index <lastIt; index ++){
+			String dirToDel = runSpecificOutputDir+"/ITERS/it."+index;
+			LOG.info("Deleting the directory "+dirToDel);
+			IOUtils.deleteDirectory(new File(dirToDel),false);
+		}
 	}
 
 	private Config createBasicConfigSettings(){
-		Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
 
 		Config config = ConfigUtils.createConfig();
 
-		config.counts().setWriteCountsInterval(0);
-		config.counts().setCountsScaleFactor(94.52); 
+		config.counts().setWriteCountsInterval(200);
+		config.counts().setCountsScaleFactor(100/cloningFactor); 
 
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(200);
 		//disable writing of the following data
-		config.controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
+		config.controler().setWriteEventsInterval(200);
+		config.controler().setWritePlansInterval(200);
 
-		config.qsim().setFlowCapFactor(0.011);		//1.06% sample
-		config.qsim().setStorageCapFactor(0.033);
+		config.qsim().setFlowCapFactor(0.01*cloningFactor);		
+		config.qsim().setStorageCapFactor(0.03*cloningFactor);
 		config.qsim().setEndTime(36*3600);
-		config.qsim().setMainModes(mainModes);
-
+		config.qsim().setMainModes(PatnaUtils.URBAN_MAIN_MODES);
 
 		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
 		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
@@ -241,7 +251,7 @@ public class PatnaSimulationTimeWriter {
 		walk.setMarginalUtilityOfTraveling(0.0);
 		config.planCalcScore().addModeParams(walk);
 
-		config.plansCalcRoute().setNetworkModes(mainModes);
+		config.plansCalcRoute().setNetworkModes(PatnaUtils.URBAN_MAIN_MODES);
 
 		{
 			ModeRoutingParams mrp = new ModeRoutingParams("walk");

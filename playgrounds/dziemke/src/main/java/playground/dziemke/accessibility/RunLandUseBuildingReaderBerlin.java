@@ -41,7 +41,7 @@ public class RunLandUseBuildingReaderBerlin {
 	//TODO write logger output somewhere
 
 	/**
-	 * Implementing the {@link LandUseBuildingReader} class. 
+	 * Implementing the {@link LandUseBuildingReader} class.
 	 * @param args The main method requires three arguments:
 	 * <ol>
 	 * 	<li> the OpenStreetMap file, *.osm;

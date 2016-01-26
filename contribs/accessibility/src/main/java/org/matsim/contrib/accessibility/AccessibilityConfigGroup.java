@@ -19,8 +19,7 @@
 
 package org.matsim.contrib.accessibility;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -54,7 +53,9 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation" ; 
 	public static enum AreaOfAccesssibilityComputation{ fromNetwork, fromBoundingBox, fromShapeFile } 
 	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork ;
+	private Set<Modes4Accessibility> isComputingMode = EnumSet.noneOf(Modes4Accessibility.class);
 
+	
 	// ===
 
 	public static final String TIME_OF_DAY = "timeOfDay";
@@ -62,8 +63,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 
 	public AccessibilityConfigGroup() {
 		super(GROUP_NAME);
-		// this class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13
-		// no longer.  kai, may'13
+		isComputingMode.add(Modes4Accessibility.freeSpeed);
 	}
 	
 	@Override
@@ -91,6 +91,18 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 		return map ;
 	}
 	
+	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {
+		if (val) {
+			this.isComputingMode.add(mode);
+		} else {
+			this.isComputingMode.remove(mode);
+		}
+	}
+
+	public Set<Modes4Accessibility> getIsComputingMode() {
+		return isComputingMode;
+	}
+
 	
 	// NOTE: It seems ok to have the string constants immediately here since having them separately really does not help
 	// keeping the code compact

@@ -68,20 +68,12 @@ public class RailSimulator {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		final Controler controler = new Controler(args);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		//		generateFacilities(services);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new MobsimConnectorFactory().createMobsim(controler.getScenario(), controler.getEvents());
-					}
-				});
+				bindMobsim().toProvider(MobsimConnectorFactory.class);
 			}
 		});
 
@@ -96,8 +88,7 @@ public class RailSimulator {
 		listener.lineAttribs = attribs;
 //		listener.builder = builder;
 		listener.task = task;
-		listener.controler = controler;
-		
+
 		controler.addControlerListener(listener);
 		
 //		PKmAnalyzer pkm = new PKmAnalyzer(TransitLineAttributes.createFromFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitLineAttributes.xml"));
@@ -128,8 +119,6 @@ public class RailSimulator {
 	
 	private static class AnalyzerListiner implements IterationEndsListener, IterationStartsListener, StartupListener {
 
-		private MatsimServices controler;
-		
 		private TrajectoryAnalyzerTask task;
 		
 		private TrajectoryEventsBuilder builder;
@@ -152,11 +141,11 @@ public class RailSimulator {
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			try {
-				TrajectoryAnalyzer.analyze(builder.trajectories(), task, controler.getControlerIO().getIterationPath(event.getIteration()));
+				TrajectoryAnalyzer.analyze(builder.trajectories(), task, event.getServices().getControlerIO().getIterationPath(event.getIteration()));
 				
 //				KMLCountsDiffPlot kmlplot = new KMLCountsDiffPlot();
 				KMLRailCountsWriter railCountsWriter = new KMLRailCountsWriter();
-				String file = controler.getControlerIO().getIterationPath(event.getIteration()) + "/counts.kmz";
+				String file = event.getServices().getControlerIO().getIterationPath(event.getIteration()) + "/counts.kmz";
 //				kmlplot.write(volAnalyzer, counts, 1.0, file, services.getNetwork());
 				RailCounts simCounts = countsCollector.getRailCounts();
 
@@ -181,14 +170,14 @@ public class RailSimulator {
 		 */
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			generateFacilities(controler);
+			generateFacilities(event.getServices());
 
-            Set<Person> person = new HashSet<Person>(controler.getScenario().getPopulation().getPersons().values());
+            Set<Person> person = new HashSet<Person>(event.getServices().getScenario().getPopulation().getPersons().values());
 			builder = new TrajectoryEventsBuilder(person);
-			controler.getEvents().addHandler(builder);
+			event.getServices().getEvents().addHandler(builder);
 			
 			countsCollector = new RailCountsCollector(lineAttribs);
-			controler.getEvents().addHandler(countsCollector);
+			event.getServices().getEvents().addHandler(countsCollector);
 //			volAnalyzer = new VolumesAnalyzer(Integer.MAX_VALUE, Integer.MAX_VALUE, services.getNetwork());
 //			services.getEvents().addHandler(volAnalyzer);
 			

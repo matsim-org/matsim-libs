@@ -14,8 +14,10 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
+import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -38,8 +40,8 @@ public class AccessibilityComputationNMBTest {
 	public static final Logger log = Logger.getLogger( AccessibilityComputationNMBTest.class ) ;
 
 //	private static final double cellSize = 1000.;
-//	private static final Double cellSize = 10000.;
-	private static final Double cellSize = 1000.;
+	private static final Double cellSize = 10000.;
+//	private static final Double cellSize = 1000.;
 	private static final double time = 8.*60*60;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
@@ -47,14 +49,13 @@ public class AccessibilityComputationNMBTest {
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
-//		public static void main( String[] args ) {
-//		String folderStructure = "../../../"; // local on dz's computer
-		String folderStructure = "../../"; // server
-			
+		// Input
+		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
 
-		PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
-
+		// adapt folder structure that may be different on different machines, esp. on server
+		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
+		
 		networkFile = folderStructure + networkFile ;
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
 		
@@ -67,6 +68,7 @@ public class AccessibilityComputationNMBTest {
 		String travelTimeMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
 		String travelDistanceMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
 		String ptStopsFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
+		
 		
 		// Parameters
 		boolean createQGisOutput = false;
@@ -109,6 +111,12 @@ public class AccessibilityComputationNMBTest {
 			config.strategy().addStrategySettings(stratSets);
 		}
 		
+		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+//		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 		
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 		
@@ -144,10 +152,9 @@ public class AccessibilityComputationNMBTest {
 		plansCalcRoute.addModeRoutingParams(bikeParameters );
 		
 		// pt matrix
-        BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
-		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
+//        BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+//		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
 
-		
 		assertNotNull(config);
 
 		
@@ -162,25 +169,26 @@ public class AccessibilityComputationNMBTest {
 		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
 
 
-		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
+//		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
 		
 		
 		Controler controler = new Controler(scenario) ;
 
-		final GeoserverUpdater geoserverUpdater = new GeoserverUpdater(crs, name);
-		geoserverUpdater.addAdditionalFacilityData(homes) ; 
+//		final GeoserverUpdater geoserverUpdater = new GeoserverUpdater(crs, name);
+//		geoserverUpdater.addAdditionalFacilityData(homes) ; 
 
-		List<Modes4Accessibility> modes = new ArrayList<>() ;
-		modes.add( Modes4Accessibility.freeSpeed ) ;
-		modes.add( Modes4Accessibility.car ) ;
-		modes.add( Modes4Accessibility.walk ) ;
-		modes.add( Modes4Accessibility.bike ) ;
+//		List<Modes4Accessibility> modes = new ArrayList<>() ;
+//		modes.add( Modes4Accessibility.freeSpeed ) ;
+//		modes.add( Modes4Accessibility.car ) ;
+//		modes.add( Modes4Accessibility.walk ) ;
+//		modes.add( Modes4Accessibility.bike ) ;
 //		modes.add( Modes4Accessibility.pt ) ;
-
+		
 		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, homes, crs, name, cellSize));
+		controler.addOverridingModule(new MatrixBasedPtModule());
 		controler.run();
 		
-		geoserverUpdater.setAndProcessSpatialGrids( modes ) ;
+//		geoserverUpdater.setAndProcessSpatialGrids(modes);
 
 		
 		if (createQGisOutput == true) {

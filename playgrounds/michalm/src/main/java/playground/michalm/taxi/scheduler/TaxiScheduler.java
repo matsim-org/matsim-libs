@@ -25,11 +25,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.router.DijkstraWithThinPath;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.core.router.*;
 import org.matsim.core.router.util.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
@@ -54,8 +54,15 @@ public class TaxiScheduler
         this.params = params;
         this.travelTime = travelTime;
 
-        router = new DijkstraWithThinPath(context.getScenario().getNetwork(), travelDisutility,
-                travelTime);
+        PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(travelDisutility);
+        preProcessEuclidean.run(context.getScenario().getNetwork());
+
+        FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
+        RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessEuclidean)
+                .createRoutingNetwork(context.getScenario().getNetwork());
+
+        router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility,
+                travelTime, params.AStarEuclideanOverdoFactor, fastRouterFactory);
 
         for (Vehicle veh : context.getVrpData().getVehicles().values()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(veh.getSchedule());
@@ -131,7 +138,8 @@ public class TaxiScheduler
                         //otherwise: IllegalStateException -- the schedule should end with STAY (or PICKUP if unfinished)
 
                     default:
-                        throw new IllegalStateException("Type of the last task is wrong: " + lastTask.getTaxiTaskType());
+                        throw new IllegalStateException(
+                                "Type of the last task is wrong: " + lastTask.getTaxiTaskType());
                 }
 
             case COMPLETED:
@@ -384,10 +392,8 @@ public class TaxiScheduler
                 case STAY: {
                     if (i == tasks.size() - 1) {// last task
                         task.setBeginTime(t);
-
-                        if (task.getEndTime() < t) {// may happen if the previous task is delayed
-                            task.setEndTime(t);//do not remove this task!!! A taxi schedule should end with WAIT
-                        }
+                        //even if endTime=beginTime, do not remove this task!!! A taxi schedule should end with WAIT 
+                        task.setEndTime(Math.max(t, schedule.getVehicle().getT1()));
                     }
                     else {
                         // if this is not the last task then some other task (e.g. DRIVE or PICKUP)
@@ -407,7 +413,7 @@ public class TaxiScheduler
                 }
 
                 case DRIVE_EMPTY:
-                case DRIVE_WITH_PASSENGER: {
+                case DRIVE_OCCUPIED: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
                     VrpPathWithTravelData path = (VrpPathWithTravelData) ((DriveTask)task)
@@ -527,7 +533,7 @@ public class TaxiScheduler
             case PICKUP:
                 return params.destinationKnown ? 2 : null;
 
-            case DRIVE_WITH_PASSENGER:
+            case DRIVE_OCCUPIED:
                 return 1;
 
             case DRIVE_EMPTY:

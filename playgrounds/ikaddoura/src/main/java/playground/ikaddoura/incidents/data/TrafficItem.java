@@ -26,6 +26,7 @@ package playground.ikaddoura.incidents.data;
 public class TrafficItem {
 	
 	private String id;
+	private double downloadTime;
 	private String originalId;
 	private String startTime;
 	private String endTime;
@@ -35,6 +36,9 @@ public class TrafficItem {
 	private TMCLocation to = new TMCLocation();
 	private TMCAlert alert = new TMCAlert();
 	
+	public TrafficItem(Long downloadTime) {
+		this.downloadTime = downloadTime;
+	}
 	public TMCLocation getOrigin() {
 		return origin;
 	}
@@ -83,11 +87,15 @@ public class TrafficItem {
 	public void setId(String id) {
 		this.id = id;
 	}
+	public double getDownloadTime() {
+		return downloadTime;
+	}
 	@Override
 	public String toString() {
-		return "TrafficItem [id=" + id + ", originalId=" + originalId + ", status=" + status + ", startTime="
-				+ startTime + ", endTime=" + endTime + ", origin=" + origin + ", to=" + to + ", alert=" + alert + "]";
+		return "TrafficItem [id=" + id + ", originalId=" + originalId
+				+ ", startTime=" + startTime + ", endTime=" + endTime + ", status=" + status + ", origin=" + origin
+				+ ", to=" + to + ", alert=" + alert + "]";
 	}
-
+	
 }
 

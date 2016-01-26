@@ -46,15 +46,6 @@
 		<param name="ensureActivityReachability" value ="true" />
 	</module>
 	
-	<module name="planscalcroute" >
-		<param name="beelineDistanceFactor" value="1.3" />
-		<param name="networkModes" value="car,ride" />
-		<param name="teleportedModeFreespeedFactor_pt" value="2.0" />
-		<param name="teleportedModeSpeed_bike" value="6.01" />
-		<param name="teleportedModeSpeed_undefined" value="13.88888888888889" />
-		<param name="teleportedModeSpeed_walk" value="1.34" />
-	</module>
-
 	<module name="planCalcScore">
 		<param name="learningRate" value="1.0" />
 		<param name="BrainExpBeta" value="2.0" />
@@ -94,7 +85,11 @@
 		<param name="Module_2" value="ReRoute" />
 	
 		<param name="ModuleProbability_3" value="0.1" />
-		<param name="Module_3" value="TimeAllocationMutator" />
+		<param name="Module_3"  value="TimeAllocationMutator" />
+	</module>
+
+	<module name="travelTimeCalculator">
+		<param name="filterModes" value="true" />
 	</module>
 
 </config>

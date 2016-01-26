@@ -80,7 +80,7 @@ public class QCALink extends AbstractQLink {
 				
 		double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
-				now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+				now, veh.getId(), this.getLink().getId()));
 		this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new CAAgentConstructEvent(
 				now, pedestrian));
 	}
@@ -88,9 +88,9 @@ public class QCALink extends AbstractQLink {
 	public void notifyMoveOverBorderNode(QVehicle vehicle, Id<Link> nextLinkId){
 		double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
-				now, vehicle.getDriver().getId(), this.link.getId(), vehicle.getId()));
+				now, vehicle.getId(), this.link.getId()));
 		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
-				now, vehicle.getDriver().getId(), nextLinkId, vehicle.getId()));
+				now, vehicle.getId(), nextLinkId));
 	}
 	
 	@Override

@@ -93,7 +93,7 @@ public class AdjustFacilitiesFromMatrix {
 		
 		Random random = new XORShiftRandom();
 		double c = MatrixOperations.sum(m) / scenario.getActivityFacilities().getFacilities().size();
-		TObjectDoubleHashMap<String> marginals = MatrixOperations.marginalsCol(m);
+		TObjectDoubleHashMap<String> marginals = MatrixOperations.columnMarginals(m);
 
 		for (Zone zone : zones.getZones()) {
 			String name = zone.getAttribute("nuts3_name");

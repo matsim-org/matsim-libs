@@ -69,7 +69,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		
 		assert(measuringPoints != null);
-		delegate = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+		delegate = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario, ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
 		delegate.setMeasuringPoints(measuringPoints);
 		assert(matsim4opusTempDirectory != null);
 		delegate.setPtMatrix(ptMatrix); // this could be zero of no input files for pseudo pt are given ...
@@ -78,7 +78,8 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
-		urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(matsim4opusTempDirectory);
+		String matsimOutputDirectory = scenario.getConfig().controler().getOutputDirectory();
+		urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(matsim4opusTempDirectory, matsimOutputDirectory);
 		delegate.addFacilityDataExchangeListener(urbanSimZoneCSVWriterV2);
 
 		delegate.initAccessibilityParameters(scenario.getConfig());
@@ -95,17 +96,8 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
 		delegate.initDefaultContributionCalculators();
-		
-		// make sure that that at least one tranport mode is selected
-		boolean problem = true ;
-		for ( Boolean bool : delegate.getIsComputingMode().values() ) {
-			if ( bool == true ) {
-				problem = false ;
-				break ;
-			}
-		}
-		
-		if( problem ) {
+
+		if(delegate.getIsComputingMode().isEmpty()) {
 			log.error("No transport mode for accessibility calculation is activated! For this reason no accessibilities can be calculated!");
 			log.info("Please activate at least one transport mode by using the corresponding method when initializing the accessibility listener to fix this problem:");
 			log.info("- useFreeSpeedGrid()");
@@ -119,25 +111,17 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		
 		// get the controller and scenario
 		MatsimServices controler = event.getServices();
-		try{
-			log.info("Computing and writing zone based accessibility measures ..." );
-			log.info(delegate.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
-			
-			AccessibilityConfigGroup moduleAPCM =
-					ConfigUtils.addOrGetModule(
-							controler.getScenario().getConfig(),
-							AccessibilityConfigGroup.GROUP_NAME,
-							AccessibilityConfigGroup.class);
+		log.info("Computing and writing zone based accessibility measures ..." );
+		log.info(delegate.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 
-			
-			delegate.computeAccessibilities(controler.getScenario(), moduleAPCM.getTimeOfDay() );
-			
-			// finalizing/closing csv file containing accessibility measures
-			String matsimOutputDirectory = event.getServices().getScenario().getConfig().controler().getOutputDirectory();
-			urbanSimZoneCSVWriterV2.close(matsimOutputDirectory);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		AccessibilityConfigGroup moduleAPCM =
+				ConfigUtils.addOrGetModule(
+						controler.getScenario().getConfig(),
+						AccessibilityConfigGroup.GROUP_NAME,
+						AccessibilityConfigGroup.class);
+
+
+		delegate.computeAccessibilities(controler.getScenario(), moduleAPCM.getTimeOfDay() );
 	}
 
 	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {

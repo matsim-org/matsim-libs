@@ -72,12 +72,12 @@ public final class FixBraessBehaviorTest{
 	
 	@Test
 	public void testBraessWoPricing() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.NONE, 19, 1916, 29, 3796032);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.NONE, 24, 1920, 21, 3805298);
 	}
 
 	@Test
 	public void testV3() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V3, 484, 1107, 409, 3163691);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V3, 457, 1135, 408, 3113939);
 	}
 	
 	/* V4 throws a runtime exception: 
@@ -93,12 +93,12 @@ public final class FixBraessBehaviorTest{
 
 	@Test
 	public void testV8() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V8, 564, 937, 499, 2787718);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V8, 572, 974, 454, 2992020);
 	}
 	
 	@Test
 	public void testV9() {
-		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V9, 616, 849, 535, 2864047);
+		fixRouteDistributionAndTT(RunBraessSimulation.PricingType.V9, 603, 863, 534, 2825507);
 	}
 	
 	@Test

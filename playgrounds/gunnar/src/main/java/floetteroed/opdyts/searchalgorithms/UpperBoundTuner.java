@@ -74,7 +74,7 @@ public class UpperBoundTuner {
 		double avgUnifGap = 0;
 		for (SamplingStage<U> stage : samplingStages) {
 			avgEquilGap += stage.getEquilibriumGap();
-			avgUnifGap += stage.getAlphaSquareNorm();
+			avgUnifGap += stage.getUniformityGap();
 		}
 		// {
 		// SamplingStage<U> stage = samplingStages.get(0);
@@ -97,7 +97,7 @@ public class UpperBoundTuner {
 				0.0));
 		for (SamplingStage<U> stage : samplingStages) {
 			constraints.add(new LinearConstraint(new double[] {
-					stage.getEquilibriumGap(), stage.getAlphaSquareNorm() },
+					stage.getEquilibriumGap(), stage.getUniformityGap() },
 					GEQ, finalObjectiveFunctionValue
 							- stage.getOriginalObjectiveFunctionValue()));
 		}

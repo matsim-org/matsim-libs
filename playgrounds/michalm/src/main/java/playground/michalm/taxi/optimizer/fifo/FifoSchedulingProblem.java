@@ -27,14 +27,14 @@ import playground.michalm.taxi.optimizer.*;
 
 public class FifoSchedulingProblem
 {
-    private final TaxiOptimizerConfiguration optimConfig;
+    private final TaxiOptimizerContext optimContext;
     private final BestDispatchFinder dispatchFinder;
 
 
-    public FifoSchedulingProblem(TaxiOptimizerConfiguration optimConfig,
+    public FifoSchedulingProblem(TaxiOptimizerContext optimContext,
             BestDispatchFinder vrpFinder)
     {
-        this.optimConfig = optimConfig;
+        this.optimContext = optimContext;
         this.dispatchFinder = vrpFinder;
     }
 
@@ -45,13 +45,16 @@ public class FifoSchedulingProblem
             TaxiRequest req = unplannedRequests.peek();
 
             BestDispatchFinder.Dispatch best = dispatchFinder.findBestVehicleForRequest(req,
-                    optimConfig.context.getVrpData().getVehicles().values());
+                    optimContext.context.getVrpData().getVehicles().values());
+            
+            //TODO search only through available vehicles
+            //TODO what about k-nearstvehicle filtering?
 
             if (best == null) {//TODO won't work with req filtering; use VehicleData to find out when to exit???
                 return;
             }
 
-            optimConfig.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
+            optimContext.scheduler.scheduleRequest(best.vehicle, best.request, best.path);
             unplannedRequests.poll();
         }
     }

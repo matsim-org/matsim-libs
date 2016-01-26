@@ -65,7 +65,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	private final boolean writeAnalysisFile;
 
 	private AnalyticalCalibrator<Link> calibrator;
-	private PlanToPlanStepBasedOnEvents planToPlanStep;
+	private PlansTranslatorBasedOnEvents plansTranslator;
 	private SimResults<Link> simResults;
 	private Scenario scenario;
 	private EventsManager eventsManager;
@@ -98,7 +98,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 
 	@Override
 	public PlansTranslator<Link> getPlansTranslator() {
-		return this.planToPlanStep;
+		return this.plansTranslator;
 	}
 	
 	@Override
@@ -106,23 +106,23 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.simResults = new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor);
 		
 		// this collects events and generates cadyts plans from it
-		this.planToPlanStep = new PlanToPlanStepBasedOnEvents(scenario);
-		this.eventsManager.addHandler(planToPlanStep);
+		this.plansTranslator = new PlansTranslatorBasedOnEvents(scenario);
+		this.eventsManager.addHandler(plansTranslator);
 
 		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
 	}
 
-    @Override
-    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		// Register demand for this iteration with Cadyts.
 		// Note that planToPlanStep will return null for plans which have never been executed.
 		// This is fine, since the number of these plans will go to zero in normal simulations,
 		// and Cadyts can handle this "noise". Checked this with Gunnar.
 		// mz 2015
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-            this.calibrator.addToDemand(planToPlanStep.getPlanSteps(person.getSelectedPlan()));
-        }
-    }
+			this.calibrator.addToDemand(plansTranslator.getCadytsPlan(person.getSelectedPlan()));
+		}
+	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {

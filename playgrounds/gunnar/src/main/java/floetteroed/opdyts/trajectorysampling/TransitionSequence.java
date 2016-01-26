@@ -110,7 +110,8 @@ public class TransitionSequence<U extends DecisionVariable> {
 		return this.lastState;
 	}
 
-	List<Transition<U>> getTransitions() {
+	// TODO is now public
+	public List<Transition<U>> getTransitions() {
 		return this.transitions;
 	}
 

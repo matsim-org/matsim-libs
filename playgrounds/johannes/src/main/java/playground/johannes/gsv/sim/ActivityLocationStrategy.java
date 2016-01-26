@@ -19,12 +19,13 @@
 
 package playground.johannes.gsv.sim;
 
-import com.google.inject.Inject;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.replanning.GenericPlanStrategy;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.QuadTree;
@@ -43,7 +44,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author johannes
  * 
  */
-public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Person> {
+public class ActivityLocationStrategy implements PlanStrategy, IterationStartsListener {
 
 	// private static final Logger logger =
 	// Logger.getLogger(ActivityLocationStrategy.class);
@@ -59,7 +60,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 
 	private ActivityFacilities facilities;
 
-	private ReplanningContext replanContext;
+//	private ReplanningContext replanContext;
 
 	private final ExecutorService executor;
 
@@ -94,7 +95,7 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 
 	@Override
 	public void init(ReplanningContext replanningContext) {
-		this.replanContext = replanningContext;
+//		this.replanContext = replanningContext;
 		futures = new LinkedList<Future<?>>();
 
 		if (quadTrees == null) {
@@ -172,6 +173,11 @@ public class ActivityLocationStrategy implements GenericPlanStrategy<Plan, Perso
 		int cnt = replanCnt.intValue();
 		replanCnt.set(0);
 		return cnt;
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+
 	}
 
 	private class Task implements Runnable {

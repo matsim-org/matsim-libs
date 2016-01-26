@@ -1,6 +1,5 @@
 package org.matsim.core.scoring;
 
-
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -21,8 +20,6 @@ public class ExperiencedPlanElementsModule extends AbstractModule {
 			}
 		});
 		bind(EventsToLegs.class).asEagerSingleton();
-		bind(ScoringFunctionsForPopulation.class).asEagerSingleton();
 		bind(ExperiencedPlanElementsService.class).to(ExperiencedPlanElementsServiceImpl.class).asEagerSingleton();
-		bind(ExperiencedPlansService.class).to(ScoringFunctionsForPopulation.class);
 	}
 }

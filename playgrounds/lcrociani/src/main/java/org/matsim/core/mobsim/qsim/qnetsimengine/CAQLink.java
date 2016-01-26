@@ -36,6 +36,6 @@ public class CAQLink {
 	public void notifyMoveOverBorderNode(QVehicle vehicle, Id<Link> leftLinkId){
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
-				now, vehicle.getDriver().getId(), leftLinkId, vehicle.getId()));
+				now, vehicle.getId(), leftLinkId));
 	}
 }

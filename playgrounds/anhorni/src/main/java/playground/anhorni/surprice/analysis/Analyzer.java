@@ -22,6 +22,7 @@ package playground.anhorni.surprice.analysis;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -32,7 +33,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
@@ -53,7 +53,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class Analyzer {
-	private ScenarioImpl scenario = null; 
+	private Scenario scenario = null; 
 	private Config config = null;
 	private final static Logger log = Logger.getLogger(Analyzer.class);
 	private double ttAvg[] = new double[8]; 
@@ -113,7 +113,7 @@ public class Analyzer {
 		incomesReader.parse(incomesFile);
 		
 		this.config = ConfigUtils.loadConfig(configFile);
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		this.scenario = ScenarioUtils.createScenario(config);
 		
 		if (this.finalIterations == null) {
 			this.finalIterations = new int[7];

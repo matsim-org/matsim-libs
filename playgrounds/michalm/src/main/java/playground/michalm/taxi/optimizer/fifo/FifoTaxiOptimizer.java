@@ -32,17 +32,17 @@ public class FifoTaxiOptimizer
 {
     private final BestDispatchFinder dispatchFinder;
 
-    public FifoTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
+    public FifoTaxiOptimizer(TaxiOptimizerContext optimContext)
     {
-        super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), true);
-        dispatchFinder = new BestDispatchFinder(optimConfig);
+        super(optimContext, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), true);
+        dispatchFinder = new BestDispatchFinder(optimContext);
     }
 
 
     @Override
     protected void scheduleUnplannedRequests()
     {
-        new FifoSchedulingProblem(optimConfig, dispatchFinder)
+        new FifoSchedulingProblem(optimContext, dispatchFinder)
                 .scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
     }
 }

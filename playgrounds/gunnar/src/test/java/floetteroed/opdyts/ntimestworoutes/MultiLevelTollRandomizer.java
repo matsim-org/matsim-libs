@@ -50,7 +50,6 @@ public class MultiLevelTollRandomizer implements DecisionVariableRandomizer {
 		return new NTimesTwoRoutesDecisionVariable(this.simulator, tollVector);
 	}
 
-	@Override
 	public DecisionVariable newRandomDecisionVariable() {
 		final Vector tollVector = new Vector(this.roadCnt);
 		for (int i = 0; i < this.roadCnt; i++) {

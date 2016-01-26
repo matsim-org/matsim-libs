@@ -20,11 +20,8 @@
 package org.matsim.contrib.matrixbasedptrouter.example;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
@@ -50,30 +47,9 @@ public class RunMatrixBasedPTRouterExample
         String path = "src/main/resources/example/";
         Config config = ConfigUtils.loadConfig(path+"example_config.xml", new MatrixBasedPtRouterConfigGroup());
         
-        //fetching relevant groups ot of the config
-        MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-        PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
-        
-
-        //setting up scenario
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-
-        // Bounding Box for PT Matrix - may be scaled down to a smaller area
-        BoundingBox nbb = BoundingBox.createBoundingBox(scenario.getNetwork());
-        // setting up PT Matrix
-        PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, mbpcg);
-        
-        //and finally setting up the controler
         Controler controler = new Controler(config);
-        // setting up routing 
-        controler.addOverridingModule(new MatrixBasedPtModule(ptMatrix));
-
+        controler.addOverridingModule(new MatrixBasedPtModule());
         controler.run();
-        
-
-        
-        
-        
     }
 
 }

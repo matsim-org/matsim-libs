@@ -20,31 +20,38 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>3.8</version>
+			<version>3.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>commons-configuration</groupId>
 			<artifactId>commons-configuration</artifactId>
-			<version>1.9</version>
+			<version>1.10</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.13</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
 			<artifactId>velocity</artifactId>
 			<version>1.7</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4.7</version>
+			<artifactId>javax.mail-api</artifactId>
+			<version>1.5.5</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>org.jgrapht</groupId>
+			<artifactId>jgrapht-core</artifactId>
+			<version>0.9.1</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -60,13 +67,9 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!--dependency>
-			<groupId>gurobi</groupId>
-			<artifactId>gurobi</artifactId>
-			<version>6.0.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/gurobi-6.0.0.jar</systemPath>
-		</dependency-->
+		<!--dependency> <groupId>gurobi</groupId> <artifactId>gurobi</artifactId> 
+			<version>6.0.0</version> <scope>system</scope> <systemPath>${basedir}/lib/gurobi-6.0.0.jar</systemPath> 
+			</dependency -->
 
 		<dependency>
 			<groupId>playground</groupId>

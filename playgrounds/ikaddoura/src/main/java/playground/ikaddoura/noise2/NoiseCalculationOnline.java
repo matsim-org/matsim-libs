@@ -61,7 +61,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		log.info("Initialization...");
 		
 		this.noiseContext.initialize();
-		NoiseWriter.writeReceiverPoints(noiseContext, event.getServices().getConfig().controler().getOutputDirectory() + "/receiverPoints/");
+		NoiseWriter.writeReceiverPoints(noiseContext, event.getServices().getConfig().controler().getOutputDirectory() + "/receiverPoints/", false);
 		
 		log.info("Initialization... Done.");
 	

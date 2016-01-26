@@ -86,17 +86,17 @@ public final class RunBraessSimulation {
 
 	/* population parameter */
 	
-	private static final int NUMBER_OF_PERSONS = 2000; // per hour
+	private static final int NUMBER_OF_PERSONS = 3600; // per hour
 	private static final int SIMULATION_PERIOD = 1; // in hours
 	
 	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ALL;
 	// initial score for all initial plans
-	private static final Double INIT_PLAN_SCORE = 110.;
+	private static final Double INIT_PLAN_SCORE = null;
 
 	/// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.GREEN_WAVE_Z;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_ONE_SECOND_Z;
 	// defines which kind of lanes should be used
-	private static final LaneType LANE_TYPE = LaneType.REALISTIC;
+	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
 	private static final PricingType PRICING_TYPE = PricingType.NONE;
@@ -110,7 +110,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/test/";
+	private static String OUTPUT_BASE_DIR = "../../../runs-svn/braess/abmtrans/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -238,7 +238,7 @@ public final class RunBraessSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		// set number of iterations
-		config.controler().setLastIteration( 10 );
+		config.controler().setLastIteration( 100 );
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes( LANE_TYPE.equals(LaneType.NONE)? false : true );
@@ -251,6 +251,7 @@ public final class RunBraessSimulation {
 		config.planCalcScore().setBrainExpBeta( 20 );
 
 		// choose between link to link and node to node routing
+		// (only has effect if lanes are used)
 		boolean link2linkRouting = false;
 		config.controler().setLinkToLinkRoutingEnabled(link2linkRouting);
 		
@@ -258,7 +259,7 @@ public final class RunBraessSimulation {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 		
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize( 900 );
+		config.travelTimeCalculator().setTraveltimeBinSize( 3 );
 		
 		config.travelTimeCalculator().setTravelTimeCalculatorType(
 				TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
@@ -269,7 +270,7 @@ public final class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultStrategy.ReRoute.toString() );
-			strat.setWeight( 0.0 ) ;
+			strat.setWeight( 0.1 ) ;
 			strat.setDisableAfter( config.controler().getLastIteration() - 50 );
 			config.strategy().addStrategySettings(strat);
 		}
@@ -283,7 +284,7 @@ public final class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
-			strat.setWeight( 1.0 ) ;
+			strat.setWeight( 0.9 ) ;
 			strat.setDisableAfter( config.controler().getLastIteration() );
 			config.strategy().addStrategySettings(strat);
 		}
@@ -303,7 +304,17 @@ public final class RunBraessSimulation {
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
-		config.strategy().setMaxAgentPlanMemorySize( 3 );
+//		switch(INIT_ROUTES_TYPE){
+//		case ALL:
+//			config.strategy().setMaxAgentPlanMemorySize(3);
+//			break;
+//		case ONLY_OUTER:
+//			config.strategy().setMaxAgentPlanMemorySize(2);
+//			break;
+//		default:
+			config.strategy().setMaxAgentPlanMemorySize( 5 );
+//		}
+		
 		
 		config.qsim().setStuckTime(3600 * 10.);
 		
@@ -342,10 +353,11 @@ public final class RunBraessSimulation {
 		
 		TtCreateBraessNetworkAndLanes netCreator = new TtCreateBraessNetworkAndLanes(scenario);
 		netCreator.setUseBTUProperties( false );
-		netCreator.setSimulateInflowCap( true );
+		netCreator.setSimulateInflowCap( false );
 		netCreator.setMiddleLinkExists( true );
 		netCreator.setLaneType(LANE_TYPE);
 		netCreator.setNumberOfPersonsPerHour(NUMBER_OF_PERSONS);
+		netCreator.setCapTolerance( 0. );
 		netCreator.createNetworkAndLanes();
 	}
 
@@ -383,16 +395,26 @@ public final class RunBraessSimulation {
 		
 		String runName = date;
 
-		runName += "_" + scenario.getPopulation().getPersons().size() + "p";
+		runName += "_" + NUMBER_OF_PERSONS + "p";
 		if (SIMULATION_PERIOD != 1){
 			runName += "_" + SIMULATION_PERIOD + "h";
 		}
 		
-		if (!INIT_ROUTES_TYPE.equals(InitRoutes.NONE)){
-			runName += "_" + INIT_ROUTES_TYPE + "-sel1+3";
-			if (INIT_PLAN_SCORE != null)
-				runName += "-score" + INIT_PLAN_SCORE;
+		switch(INIT_ROUTES_TYPE){
+		case ALL:
+			runName += "_ALL-sel1+3";
+			break;
+		case ONLY_OUTER:
+			runName += "_OUTER";
+			break;
+		case ONLY_MIDDLE:
+			runName += "_MIDDLE";
+			break;
+		default: // e.g. NONE
+			break;
 		}
+		if (INIT_PLAN_SCORE != null)
+			runName += "-score" + INIT_PLAN_SCORE;
 
 		runName += "_" + config.controler().getLastIteration() + "it";
 
@@ -401,7 +423,10 @@ public final class RunBraessSimulation {
 				.get(Id.createLinkId("3_4"));
 		Link slowLink = scenario.getNetwork().getLinks()
 				.get(Id.createLinkId("3_5"));
-		// note: use link 3_5 because it always exists
+		Link fastLink = scenario.getNetwork().getLinks().containsKey(Id.createLinkId("2_3"))? 
+				scenario.getNetwork().getLinks().get(Id.createLinkId("2_3")) : 
+					scenario.getNetwork().getLinks().get(Id.createLinkId("23_3"));
+		// note: link 3_5 always exists. link 2_3 only exists if inflow links are not used. it is 23_3 otherwise.
 		if (middleLink == null){
 			runName += "_woZ";
 		} else {
@@ -416,6 +441,9 @@ public final class RunBraessSimulation {
 		runName += "_cap" + (int)slowLink.getCapacity();
 		if (slowLink.getLength() != 200)
 			runName += "_l" + (int)slowLink.getLength() + "m";
+		if (slowLink.getLength() != fastLink.getLength()){
+			runName += "_l" + (int)fastLink.getLength() + "m";
+		}
 		
 		if (scenario.getNetwork().getNodes().containsKey(Id.createNodeId(23))){
 			runName += "_inflow";
@@ -423,7 +451,7 @@ public final class RunBraessSimulation {
 			Link inflowLink = scenario.getNetwork().getLinks()
 					.get(Id.createLinkId("2_23"));
 			if (inflowLink.getLength() != 7.5)
-				runName += "L" + inflowLink.getLength();
+				runName += inflowLink.getLength();
 		}
 		
 		StrategySettings[] strategies = config.strategy().getStrategySettings()
@@ -432,13 +460,16 @@ public final class RunBraessSimulation {
 			double weight = strategies[i].getWeight();
 			if (weight != 0.0){
 				String name = strategies[i].getStrategyName();
-				runName += "_" + name + weight;
-				if (name.equals(DefaultStrategy.ReRoute.toString())){
-					runName += "_tbs"
-							+ config.travelTimeCalculator().getTraveltimeBinSize();
-				}
 				if (name.equals(DefaultSelector.ChangeExpBeta.toString())){
+					runName += "_ChExp" + weight;
 					runName += "_beta" + (int)config.planCalcScore().getBrainExpBeta();
+				} else if (name.equals(DefaultSelector.KeepLastSelected.toString())){
+					runName += "_KeepLast" + weight;
+				} else if (name.equals(DefaultStrategy.ReRoute.toString())){
+					runName += "_ReRoute" + weight;
+					runName += "_tbs" + config.travelTimeCalculator().getTraveltimeBinSize();
+				} else {
+					runName += "_" + name + weight;
 				}
 			}
 		}
@@ -456,14 +487,32 @@ public final class RunBraessSimulation {
 			runName += "_lanes";
 		}
 
-		if (config.controler().isLinkToLinkRoutingEnabled())
-			runName += "_link2link";
-		else
-			runName += "_node2node";
+		// link 2 link vs node 2 node routing. this only has an effect if lanes are used
+		if (LANE_TYPE.equals(LaneType.REALISTIC)){
+			if (config.controler().isLinkToLinkRoutingEnabled())
+				runName += "_link";
+			else
+				runName += "_node";
+		}			
 
 		if (ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME,
 				SignalSystemsConfigGroup.class).isUseSignalSystems()) {
-			runName += "_" + SIGNAL_TYPE;
+			switch (SIGNAL_TYPE){
+			case ONE_SECOND_Z:
+				runName += "_1sZ";
+				break;
+			case ONE_SECOND_SO:
+				runName += "_1sSO";
+				break;
+			case SIGNAL4_ONE_SECOND_SO:
+				runName += "_S4_1sSO";
+				break;
+			case SIGNAL4_ONE_SECOND_Z:
+				runName += "_S4_1sZ";
+			default:
+				runName += "_" + SIGNAL_TYPE;
+				break;
+			}			
 		}
 		
 		if (!PRICING_TYPE.equals(PricingType.NONE)){

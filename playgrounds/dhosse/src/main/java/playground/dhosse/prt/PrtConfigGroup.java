@@ -152,7 +152,7 @@ public class PrtConfigGroup extends ConfigGroup {
 	}
 	
 	public boolean getUseOnlineVehicleTracker(){
-		return this.destinationKnown;
+		return this.onlineVehicleTracker;
 	}
 	
 	public double getFixedCost(){

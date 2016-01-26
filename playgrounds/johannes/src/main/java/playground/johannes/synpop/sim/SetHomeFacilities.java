@@ -154,6 +154,7 @@ public class SetHomeFacilities implements PersonsTask {
         for (int zoneIdx = 0; zoneIdx < probabilities.size(); zoneIdx++) {
             it.advance();
 
+            //FIXME: Adapt this with weights!
             // round number of inhabitants up to ensure that all persons are assigned
             int n = (int) Math.ceil(persons.size() * it.value());
 

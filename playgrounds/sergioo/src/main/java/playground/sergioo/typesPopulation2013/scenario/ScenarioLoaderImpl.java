@@ -29,7 +29,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.TimeVariantLinkFactory;
+import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -164,7 +164,7 @@ public class ScenarioLoaderImpl {
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 			if (this.config.network().isTimeVariantNetwork()) {
 				log.info("use TimeVariantLinks in NetworkFactory.");
-				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
+				network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 			}
 			new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
 			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {

@@ -251,7 +251,7 @@ public class CompareMain {
 
 
     public static double calcCadytsScore(final CadytsContext context, Plan plan) {
-		cadyts.demand.Plan<Link> currentPlanSteps = context.getPlansTranslator().getPlanSteps(plan);
+		cadyts.demand.Plan<Link> currentPlanSteps = context.getPlansTranslator().getCadytsPlan(plan);
         return context.getCalibrator().calcLinearPlanEffect(currentPlanSteps);
 	}
 	

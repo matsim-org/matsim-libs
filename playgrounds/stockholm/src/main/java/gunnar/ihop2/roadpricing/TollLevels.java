@@ -142,6 +142,8 @@ class TollLevels implements DecisionVariable {
 		final PSTricksDiagramWriter writer = new PSTricksDiagramWriter(12.0, 6.0);
 		writer.setEndLine("\n");
 		
+		// writer.setPlotAttrs("toll", "plotstyle=dots");
+		
 		writer.setLabelX("time [hrs]");
 		writer.setLabelY("toll [SEK]");
 		

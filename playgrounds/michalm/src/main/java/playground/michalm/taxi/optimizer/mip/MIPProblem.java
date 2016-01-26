@@ -71,7 +71,7 @@ public class MIPProblem
     };
 
 
-    private final TaxiOptimizerConfiguration optimConfig;
+    private final TaxiOptimizerContext optimContext;
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
 
     private SortedSet<TaxiRequest> unplannedRequests;
@@ -83,12 +83,13 @@ public class MIPProblem
 
     //static final Mode MODE = Mode.OFFLINE_INIT_OPTIM;
     static final Mode MODE = Mode.ONLINE_1;
+    private final String workingDirectory = "";
 
 
-    public MIPProblem(TaxiOptimizerConfiguration optimConfig,
+    public MIPProblem(TaxiOptimizerContext optimContext,
             PathTreeBasedTravelTimeCalculator pathTravelTimeCalc)
     {
-        this.optimConfig = optimConfig;
+        this.optimContext = optimContext;
         this.pathTravelTimeCalc = pathTravelTimeCalc;
     }
 
@@ -109,7 +110,7 @@ public class MIPProblem
             solveProblem();
         }
         else if (MODE.load) {
-            loadSolution(optimConfig.workingDirectory + "gurobi_solution.sol");
+            loadSolution(workingDirectory + "gurobi_solution.sol");
         }
         else if (MODE.init) {
             finalSolution = initialSolution;
@@ -124,12 +125,12 @@ public class MIPProblem
 
     private boolean initDataAndCheckIfSchedulingRequired()
     {
-        vData = new VehicleData(optimConfig);
+        vData = new VehicleData(optimContext);
         if (vData.dimension == 0) {
             return false;
         }
 
-        rData = new MIPRequestData(optimConfig, unplannedRequests, getPlanningHorizon());
+        rData = new MIPRequestData(optimContext, unplannedRequests, getPlanningHorizon());
         return rData.dimension > 0;
     }
 
@@ -139,30 +140,30 @@ public class MIPProblem
 
     private void findInitialSolution()
     {
-        initialSolution = new MIPSolutionFinder(optimConfig, rData, vData).findInitialSolution();
+        initialSolution = new MIPSolutionFinder(optimContext, rData, vData).findInitialSolution();
 
-        stats = new MIPTaxiStats(optimConfig.context.getVrpData());
+        stats = new MIPTaxiStats(optimContext.context.getVrpData());
         stats.calcInitial();
 
-        optimConfig.scheduler.removeAwaitingRequestsFromAllSchedules();
+        optimContext.scheduler.removeAwaitingRequestsFromAllSchedules();
     }
 
 
     private void solveProblem()
     {
-        finalSolution = new MIPGurobiSolver(optimConfig, pathTravelTimeCalc, rData, vData)
+        finalSolution = new MIPGurobiSolver(optimContext, pathTravelTimeCalc, rData, vData)
                 .solve(initialSolution);
     }
 
 
     private void scheduleSolution()
     {
-        new MIPSolutionScheduler(optimConfig, rData, vData).updateSchedules(finalSolution);
+        new MIPSolutionScheduler(optimContext, rData, vData).updateSchedules(finalSolution);
         unplannedRequests.removeAll(Arrays.asList(rData.requests));
 
         stats.calcSolved();
 
-        try (PrintWriter pw = new PrintWriter(optimConfig.workingDirectory + "MIP_stats")) {
+        try (PrintWriter pw = new PrintWriter(workingDirectory + "MIP_stats")) {
             stats.print(pw);
         }
         catch (FileNotFoundException e) {

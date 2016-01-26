@@ -54,7 +54,7 @@ class RoadInvestmentMain {
 				decisionVariable, objectiveFunction, convergenceCriterion);
 		system.run(sampler);
 
-		return sampler.getDecisionVariable2finalObjectiveFunctionValue()
+		return sampler.getDecisionVariable2finalObjectiveFunctionValueView()
 				.entrySet().iterator().next();
 	}
 
@@ -145,13 +145,12 @@ class RoadInvestmentMain {
 
 		Simulator system = new MATSimSimulator(// decisionVariables,
 				stateFactory, scenario, new TimeDiscretization(5 * 3600, 10 * 60, 18), null);
-		DecisionVariableRandomizer<RoadInvestmentDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadInvestmentDecisionVariable>() {
-			@Override
-			public RoadInvestmentDecisionVariable newRandomDecisionVariable() {
-				return new RoadInvestmentDecisionVariable(MatsimRandom
-						.getRandom().nextDouble(), MatsimRandom.getRandom()
-						.nextDouble(), link2freespeed, link2capacity);
-			}
+		DecisionVariableRandomizer<RoadInvestmentDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadInvestmentDecisionVariable>() {			
+//			public RoadInvestmentDecisionVariable newRandomDecisionVariable() {
+//				return new RoadInvestmentDecisionVariable(MatsimRandom
+//						.getRandom().nextDouble(), MatsimRandom.getRandom()
+//						.nextDouble(), link2freespeed, link2capacity);
+//			}
 
 			@Override
 			public List<RoadInvestmentDecisionVariable> newRandomVariations(
@@ -187,11 +186,14 @@ class RoadInvestmentMain {
 		int maxTransitions = Integer.MAX_VALUE;
 		int populationSize = 10;
 		RandomSearch<RoadInvestmentDecisionVariable> randomSearch = new RandomSearch<>(system, randomizer,
+				new RoadInvestmentDecisionVariable(MatsimRandom
+						.getRandom().nextDouble(), MatsimRandom.getRandom()
+						.nextDouble(), link2freespeed, link2capacity),
 				convergenceCriterion, 
 				//selfTuner, 
 				maxIterations, maxTransitions,
 				populationSize, MatsimRandom.getRandom(), interpolate,
-				keepBestSolution, objectiveFunction, maxMemoryLength, 0.95);
+				objectiveFunction, maxMemoryLength, false);
 		randomSearch.setLogFileName("./randomSearchLog.txt");
 		randomSearch.run();
 

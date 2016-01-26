@@ -44,13 +44,13 @@ public class ConcurrentAnalyzerTask<T> extends AnalyzerTaskComposite<T> {
                     task.analyze(object, concurrentContainers);
                 }
             });
-            logger.debug(String.format("Submitting analyzer task %s...", task.getClass().getSimpleName()));
+            logger.trace(String.format("Submitting analyzer task %s...", task.getClass().getSimpleName()));
         }
 
         Executor.submitAndWait(runnables);
 
         containers.addAll(concurrentContainers);
 
-        logger.debug("Tasks done.");
+        logger.trace("Tasks done.");
     }
 }

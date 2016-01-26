@@ -155,7 +155,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 
 		log.info("Initializing  ...");
 		spatialGridAggregator = new SpatialGridAggregator();
-		delegate = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario);
+		delegate = new AccessibilityCalculator(travelTimes, travelDisutilityFactories, scenario, ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class));
 		delegate.addFacilityDataExchangeListener(spatialGridAggregator);
 
 		delegate.setPtMatrix(ptMatrix);	// this could be zero if no input files for pseudo pt are given ...
@@ -231,11 +231,6 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 				AccessibilityConfigGroup.GROUP_NAME,
 				AccessibilityConfigGroup.class);
 		delegate.computeAccessibilities(scenario, moduleAPCM.getTimeOfDay());
-
-		if (urbansimAccessibilityWriter != null) {
-			urbansimAccessibilityWriter.close();
-		}
-		
 		
 		//
 		// do calculation of aggregate index values, e.g. gini coefficient
@@ -305,7 +300,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 				writer.writeField(time);
 				
 				for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-					if ( delegate.getIsComputingMode().get(mode) ) {
+					if ( delegate.getIsComputingMode().contains(mode) ) {
 						final SpatialGrid spatialGridOfMode = spatialGridAggregator.getAccessibilityGrids().get(mode);
 						final double value = spatialGridOfMode.getValue(x, y);
 						if ( !Double.isNaN(value ) ) { 
@@ -340,31 +335,28 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 		final SpatialGrid spatialGrid = spatialGridAggregator.getAccessibilityGrids().get(Modes4Accessibility.freeSpeed) ;
 		// yy for time being, have to assume that this is always there
 
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-			if (delegate.getIsComputingMode().get(mode)) {
-				
-				List<Double> valueList = new ArrayList<Double>();
+		for (Modes4Accessibility mode : delegate.getIsComputingMode()) {
+			List<Double> valueList = new ArrayList<Double>();
 
-				for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
-					for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
-						final SpatialGrid spatialGridOfMode = spatialGridAggregator.getAccessibilityGrids().get(mode);
-						final double value = spatialGridOfMode.getValue(x, y);
-						if ( !Double.isNaN(value ) ) { 
-							valueList.add(value);
-						} else {
-							new RuntimeException("Don't know how to calculate aggregate values properly if some are missing!");
-						}
-					} 
+			for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
+				for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
+					final SpatialGrid spatialGridOfMode = spatialGridAggregator.getAccessibilityGrids().get(mode);
+					final double value = spatialGridOfMode.getValue(x, y);
+					if ( !Double.isNaN(value ) ) {
+						valueList.add(value);
+					} else {
+						new RuntimeException("Don't know how to calculate aggregate values properly if some are missing!");
+					}
 				}
-				
-				double accessibilityValueSum = AccessibilityRunUtils.calculateSum(valueList);
-				double giniCoefficient = AccessibilityRunUtils.calculateGiniCoefficient(valueList);
-				
-				log.warn("mode = " + mode  + " -- accessibilityValueSum = " + accessibilityValueSum);
-				accessibilitySums.put(mode, accessibilityValueSum);
-				log.warn("accessibilitySum = " + accessibilitySums);
-				accessibilityGiniCoefficients.put(mode, giniCoefficient);
 			}
+
+			double accessibilityValueSum = AccessibilityRunUtils.calculateSum(valueList);
+			double giniCoefficient = AccessibilityRunUtils.calculateGiniCoefficient(valueList);
+
+			log.warn("mode = " + mode  + " -- accessibilityValueSum = " + accessibilityValueSum);
+			accessibilitySums.put(mode, accessibilityValueSum);
+			log.warn("accessibilitySum = " + accessibilitySums);
+			accessibilityGiniCoefficients.put(mode, giniCoefficient);
 		}
 		log.info("Done with caluclating aggregate values!");
 	}
@@ -392,7 +384,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 		Geometry boundary = GridUtils.getBoundary(shapeFileName);
 		delegate.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize));
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-			if ( delegate.getIsComputingMode().get(mode) ) {
+			if ( delegate.getIsComputingMode().contains(mode) ) {
 				spatialGridAggregator.getAccessibilityGrids().put(mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize)) ;
 			}
 		}
@@ -443,10 +435,8 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 	 */
 	private void generateGridsAndMeasuringPoints(double minX, double minY, double maxX, double maxY, double cellSize) {
 		delegate.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize));
-		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-			if ( delegate.getIsComputingMode().get(mode) ) {
-				spatialGridAggregator.getAccessibilityGrids().put(mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN)) ;
-			}
+		for ( Modes4Accessibility mode : delegate.getIsComputingMode()) {
+			spatialGridAggregator.getAccessibilityGrids().put(mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN)) ;
 		}
 		lockedForAdditionalFacilityData  = true ;
 		for ( ActivityFacilities facilities : this.additionalFacilityData ) {

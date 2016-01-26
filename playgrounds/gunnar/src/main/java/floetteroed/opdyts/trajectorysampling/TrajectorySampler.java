@@ -49,7 +49,11 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 
 	public int getTotalTransitionCnt();
 
-	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValue();
+	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValueView();
+
+	public Map<U, Double> getDecisionVariable2selfTunedEquilbriumGapWeightView();
+
+	public Map<U, Double> getDecisionVariable2selfTunedUniformityGapWeightView();
 
 	public void addStatistic(final String logFileName,
 			final Statistic<SamplingStage<U>> statistic);

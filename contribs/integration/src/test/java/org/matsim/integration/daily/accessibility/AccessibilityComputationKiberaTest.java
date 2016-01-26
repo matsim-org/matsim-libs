@@ -3,9 +3,7 @@ package org.matsim.integration.daily.accessibility;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Rule;
@@ -39,18 +37,18 @@ public class AccessibilityComputationKiberaTest {
 
 	@Test
 	public void doAccessibilityTest() throws IOException {
-		// Input and output
-		String folderStructure = "../../../"; // local on dz's computer
-//		String folderStructure = "../../"; // server
-		
+		// Input
+		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/ke/kibera/2015-11-05_network_paths_detailed.xml";
 
+		// adapt folder structure that may be different on different machines, esp. on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 
-		networkFile = folderStructure + networkFile ;	
+		networkFile = folderStructure + networkFile ;
 		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/kibera/2015-11-05_facilities.xml";
-		
+
 		// no pt input
+		
 		
 		// Parameters
 		boolean createQGisOutput = false;
@@ -66,7 +64,7 @@ public class AccessibilityComputationKiberaTest {
 
 		
 		// config and scenario
-		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
+		final Config config = ConfigUtils.createConfig(new MatrixBasedPtRouterConfigGroup());
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -82,13 +80,20 @@ public class AccessibilityComputationKiberaTest {
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 
 		{
-			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings stratSets = new StrategySettings();
 			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			stratSets.setWeight(1.);
 			config.strategy().addStrategySettings(stratSets);
 		}
+
+		AccessibilityConfigGroup accessibilityConfigGroup = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		
 		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
@@ -116,10 +121,18 @@ public class AccessibilityComputationKiberaTest {
 //		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
 
 
-		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
+//		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
 		
-		Controler controler = new Controler(scenario) ;
-		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, null, crs, name, cellSize));
+		// network density points
+		ActivityFacilities measuringPoints = 
+				AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);		
+		
+		double maximumAllowedDistance = 0.5 * cellSize;
+		final ActivityFacilities networkDensityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
+				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);		
+
+		final Controler controler = new Controler(scenario) ;
+		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, networkDensityFacilities, crs, name, cellSize));
 		controler.run();
 
 
@@ -131,7 +144,7 @@ public class AccessibilityComputationKiberaTest {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					if ( !actType.equals("drinking_water") ) {
+					if (!actType.equals("drinking_water")) {
 						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 						continue ;
 					}

@@ -37,7 +37,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.cadyts.car.PlanToPlanStepBasedOnEvents;
+import org.matsim.contrib.cadyts.car.PlansTranslatorBasedOnEvents;
 import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.LookUpItemFromId;
@@ -67,11 +67,11 @@ public class CadytsModule extends AbstractModule {
     public void install() {
         Multibinder<MeasurementLoader<Link>> measurementLoaderBinder = Multibinder.newSetBinder((Binder) binder(), new TypeLiteral<MeasurementLoader<Link>>(){});
         bind(AnalyticalCalibrator.class).toProvider(CalibratorProvider.class).in(Singleton.class);
-        bind(PlanToPlanStepBasedOnEvents.class).in(Singleton.class);
-        bind(PlansTranslator.class).to(PlanToPlanStepBasedOnEvents.class).in(Singleton.class);
+        bind(PlansTranslatorBasedOnEvents.class).in(Singleton.class);
+        bind(PlansTranslator.class).to(PlansTranslatorBasedOnEvents.class).in(Singleton.class);
         addControlerListenerBinding().to(CadytsControlerListener.class);
         addControlerListenerBinding().toProvider(MyControlerListenerProvider.class);
-        addEventHandlerBinding().to(PlanToPlanStepBasedOnEvents.class);
+        addEventHandlerBinding().to(PlansTranslatorBasedOnEvents.class);
     }
 
     static class CalibratorProvider implements Provider<AnalyticalCalibrator<Link>> {

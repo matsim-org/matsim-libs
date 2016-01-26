@@ -36,8 +36,7 @@ public class PoznanChainsProcessor
 
     private void processFile(String xlsFile)
     {
-        try (InputStream inp = new FileInputStream(xlsFile)) {
-            Workbook wb = new HSSFWorkbook(inp);
+        try (InputStream inp = new FileInputStream(xlsFile); Workbook wb = new HSSFWorkbook(inp)) {
             currentSheet = wb.getSheet("Arkusz1");
 
             int lastSurvey = 0;

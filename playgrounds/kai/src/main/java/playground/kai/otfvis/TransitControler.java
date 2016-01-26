@@ -42,6 +42,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -107,8 +108,7 @@ public class TransitControler {
 //		for ( Id<Person> pid : personIdsToRemove ) {
 //			pop.getPersons().remove( pid ) ;
 //		}
-
-
+		
 		final Controler controler = new Controler(scenario) ;
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
 //		controler.setDirtyShutdown(true);
@@ -134,6 +134,10 @@ public class TransitControler {
 
 //		controler.addOverridingModule(new OTFVisFileWriterModule());
 		//		tc.setCreateGraphs(false);
+		
+		ActivityParams params = new ActivityParams("pt interaction") ;
+		params.setScoringThisActivityAtAll(false);
+		controler.getConfig().planCalcScore().addActivityParams(params);
 
 		controler.run();
 	}

@@ -66,6 +66,8 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
     private boolean useWeights;
 
+//    private
+
     public MatrixAnalyzer(ActivityFacilities facilities, ZoneCollection zones, NumericMatrix refMatrix, String name) {
         this.refMatrix = refMatrix;
         this.matrixName = name;
