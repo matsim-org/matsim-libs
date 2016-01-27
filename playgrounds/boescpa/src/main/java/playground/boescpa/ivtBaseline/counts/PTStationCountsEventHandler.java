@@ -140,7 +140,7 @@ public class PTStationCountsEventHandler implements TransitDriverStartsEventHand
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if (!this.transitVehicles.contains(event.getVehicleId()) && !this.ptCounts.keySet().contains(event.getFacilityId())) {
+		if (!this.transitVehicles.contains(event.getVehicleId()) || !this.ptCounts.keySet().contains(event.getFacilityId())) {
 			return; // ignore non-transit vehicles and vehicles stopping at non-monitoring stops
 		}
 		vehStops.put(event.getVehicleId(), event.getFacilityId());
@@ -189,7 +189,7 @@ public class PTStationCountsEventHandler implements TransitDriverStartsEventHand
 						matsimVolumeLeaving += ptCounts.get(facilityId).getSecond()[i];
 					}
 					double countVolumeEntering = stationsToMonitor.get(station).getFirst()[i];
-					double countVolumeLeaving = stationsToMonitor.get(station).getFirst()[i];
+					double countVolumeLeaving = stationsToMonitor.get(station).getSecond()[i];
 					writer.write(station + "\t");
 					writer.write(i + "\t");
 					writer.write(matsimVolumeEntering + "\t" + countVolumeEntering + "\t");
