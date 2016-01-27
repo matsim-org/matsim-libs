@@ -19,6 +19,7 @@
 
 package playground.ikaddoura.incidents;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -26,90 +27,16 @@ import org.matsim.api.core.v01.network.Link;
 
 import playground.ikaddoura.incidents.data.TrafficItem;
 
-/**
- * so far decoded:
- * 
- * abcD: abc-Gefahr
- * abcE: abc erwartet
- * 
- * abc1: 1 km
- * abc2: 2 km
- * ...
- * 
- * 
- * 
- * A1: stationary traffic (Stau)
- * A2: queuing traffic (stockend)
- * A3: slow traffic (dicht)
- * A4: heavy traffic (rege)
- * A5: traffic flows freely
- * A6
- * A10: less traffic than normal
- * A11, A12: more traffic than normal
- * A10X: stationary traffic, x km
- * A50: traffic problem
- * B1: accident
- * B2: serious accident 
- * B3: multi-vehicle accident
- * B4: accident with truck
- * B5: accident with hazardous materials
- * B6: accident with fuel spillage
- * B7: accident with chemical spillage
- * B9: accident with bus
- * B11: broken down vehicle
- * B12: broken down truck
- * B13: vehicle fire
- * B14: incident (Verkehrsbehinderung)
- * B15 --> accident with oil spillage
- * B16: overturned vehicle
- * B17: overturned truck
- * B18: jackknifed trailer
- * B19: jackknifed caravan
- * B20: jackknifed truck
- * B21: vehicles spun around (Fahrzeug verunglückt)
- * B22: earlier accident
- * B23: accident investigation work
- * B24: secondary accidents (Folgeunfälle)
- * B25: broken down bus
- * C1: closed
- * C3: closed ahead
- * C4: blocked ahead
- * D1: certain number of lanes closed (see quantifier)
- * D2: certain number of right lanes closed
- * D3: certain number of center lanes closed
- * D4: certain number of left lanes closed
- * D5: hard shoulder closed (Standstreifen gesperrt)
- * D6: two lanes closed
- * D7: three lanes closed
- * D14: emergency lane closed (Notfallspur gesperrt)
- * D15: reduced to one lane
- * D16: reduced to two lanes
- * D17: reduced to three lanes
- * D18: contraflow (Verkehr über Gegenfahrbahn geleitet)
- * D19: narrow lanes
- * D24: one lane closed
- * D50: overtaking lane closed
- * E1: roadworks
- * E4: resurfacing work
- * E6: roadmarking work
- * E12: slow moving maintenance vehicles
- * F5: flooding
- * F18: clearance work affecting traffic
- * F29: rescue and recovery work
- * P1: major event
- * P2: sports event
- * P6: fair (Volksfest)
- * P15: security alert affecting traffic
- * P49: evacuation
- * T4: traffic lights not working
- * T6: rail crossing failure
- * 
- * 
+/** 
 * @author ikaddoura
 */
 
 public class TMCAlerts {
 	private static final Logger log = Logger.getLogger(TMCAlerts.class);
+	private Set<String> unconsideredCodes = new HashSet<>();
+	private Set<String> loggedCodeAssumedAsCapacityHalving = new HashSet<>();
+	private Set<String> loggedCodeAssumedAsMinusOneLane = new HashSet<>();
+	private int warnCnt = 0;
 	
 	private Object[] createIncidentObject(Object[] incidentObject, Link link, TrafficItem trafficItem,
 			Set<String> changedAllowedModes,
@@ -128,9 +55,9 @@ public class TMCAlerts {
 						
 					// start and end time
 					trafficItem.getStartTime(), trafficItem.getEndTime()
-			};
+			};			
 		} else {
-			log.warn("Alert phrase contains several codes: " + trafficItem.getTMCAlert().getPhraseCode() + " -- " + "Incident Object has already been created: " + incidentObject);
+			throw new RuntimeException("This should not happen. Aborting...");
 		}
 		
 		return incidentObject;
@@ -139,125 +66,217 @@ public class TMCAlerts {
 	public Object[] getIncidentObject(Link link, TrafficItem trafficItem) {
 		Object[] incidentObject = null;
 		
+//		log.info(trafficItem.getTMCAlert().getPhraseCode());
+		
 		if (trafficItem.getTMCAlert() != null && trafficItem.getTMCAlert().getPhraseCode() != null) {
 			
-			// ####### specific codes ########
+			// ####### cleared / cancelled #######
 			
-			if (containsOrEndsWith(trafficItem, "C1")) { // closed
-				incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-						link.getAllowedModes(),
-						1.0,
-						1.0,
-						0.22227
-				);
-			}
-
-			if (containsOrEndsWith(trafficItem, "D1") || containsOrEndsWith(trafficItem, "D2") || containsOrEndsWith(trafficItem, "D3") || containsOrEndsWith(trafficItem, "D5")) { // eine bestimmte Zahl an Fahrstreifen gesperrt
-				double remainingNumberOfLanes = 0.;
-				if (link.getNumberOfLanes() == 1.) {
-					remainingNumberOfLanes = 1.;
-					log.warn("Lane closed even though the road segment contains only one lane. Setting the lane number to 1.0.");
-				} else {
-					remainingNumberOfLanes = link.getNumberOfLanes() - 1.;
-				}
-				log.warn("Assuming that there is only one lane closed. Check the message: " + trafficItem.getTMCAlert().getDescription());
+			if (trafficItem.getTMCAlert().getPhraseCode().endsWith("87") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("88") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("89") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("90") ||
 				
-				incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-						link.getAllowedModes(),
-						remainingNumberOfLanes * (link.getCapacity() / link.getNumberOfLanes()),
-						remainingNumberOfLanes,
-						reduceSpeedToNextFreeSpeedLevel(link)
-				);
-			}
+					// Z91 is not a cancellation / clearance
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("C91") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("P91") ||
+					
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("92") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("93") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("94") ||
+					
+					// Z95 is not a cancellation / clearance 
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("Y95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("X95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("U95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("T95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("Q95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("P95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("L95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("H95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("G95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("F95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("E95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("D95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("C95") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("B95") ||
+								
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("96") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("97") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("98") ||
+					
+					// T99 is not a cancellation / clearance
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("F99") ||
+					trafficItem.getTMCAlert().getPhraseCode().endsWith("H99")
+					) {
+								
+				// incident / warning / ... cleared or no longer valid
+				// TODO: Check if the previous message's end time was right or updated. If not, use these messages to set the end time. 
 			
-			if (containsOrEndsWith(trafficItem, "D15")) { // reduction to one lane
-				incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-						link.getAllowedModes(),
-						(link.getCapacity() / link.getNumberOfLanes()),
-						1.0,
-						reduceSpeedToNextFreeSpeedLevel(link)
-				);
-			}
-			
-			if (containsOrEndsWith(trafficItem, "D16")) { // reduction to two lanes
-				incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-						link.getAllowedModes(),
-						2.0 * (link.getCapacity() / link.getNumberOfLanes()),
-						2.0,
-						reduceSpeedToNextFreeSpeedLevel(link)
-				);
-			}
-			
-			if (containsOrEndsWith(trafficItem, "E14")) { // abwechselnd in beide Richtungen nur ein Fahrstreifen frei // TODO: what about the other direction?
-				incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-						link.getAllowedModes(),
-						1.5 * (link.getCapacity() / link.getNumberOfLanes()),
-						1.0,
-						reduceSpeedToNextFreeSpeedLevel(link)
-				);
-			}
-			
-			if (containsOrEndsWith(trafficItem, "E15") || containsOrEndsWith(trafficItem, "E16") || containsOrEndsWith(trafficItem, "E17") || containsOrEndsWith(trafficItem, "E18")) { // water, gas, buried cables, buried services main work
-				incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-						link.getAllowedModes(),
-						link.getCapacity() / 2.0, // TODO: think about how to reduce the capacity here...
-						1.0,
-						reduceSpeedToNextFreeSpeedLevel(link)
-				);
-			}
-			
-			if (containsOrEndsWith(trafficItem, "F15")) { // water, gas, buried cables, buried services main work
-				incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-						link.getAllowedModes(),
-						link.getCapacity() / 2.0, // TODO: think about how to reduce the capacity here...
-						1.0,
-						reduceSpeedToNextFreeSpeedLevel(link)
-				);
-			}
-			
-			// ####### more general code categories ######## 
-			
-			// TODO: die Aufhebungen sollten hier ausgeschlossen werden
+			} else {
+				
+				// ####### specific codes ########
+				
+				if (containsOrEndsWith(trafficItem, "C1")) { // closed
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							1.0,
+							1.0,
+							0.22227
+					);
+				
+				} else if (containsOrEndsWith(trafficItem, "C31")) { // closed for cars
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							1.0,
+							1.0,
+							0.22227
+					);
+				
+				} else if (containsOrEndsWith(trafficItem, "D1") || containsOrEndsWith(trafficItem, "D2") || containsOrEndsWith(trafficItem, "D3") || containsOrEndsWith(trafficItem, "D4") || containsOrEndsWith(trafficItem, "D5")) { // eine bestimmte Zahl an Fahrstreifen gesperrt
+					double remainingNumberOfLanes = 0.;
+					if (link.getNumberOfLanes() == 1.) {
+						remainingNumberOfLanes = 1.;
+						if (warnCnt <= 2) {
+							log.warn("Lane closed even though the road segment contains only one lane. Setting the lane number to 1.0.");
+							if (warnCnt == 2) {
+								log.warn("Furhter messages of this type are not printed out.");
+							}
+							warnCnt++;
+						}
+					} else {
+						remainingNumberOfLanes = link.getNumberOfLanes() - 1.;
+					}
+					
+					if (loggedCodeAssumedAsMinusOneLane.contains(trafficItem.getTMCAlert().getDescription())) {
+						// warning for this message already logged
+					} else {
+						log.warn("Assuming that there is only one lane closed. Check the message: " + trafficItem.getTMCAlert().getDescription());
+						loggedCodeAssumedAsMinusOneLane.add(trafficItem.getTMCAlert().getDescription());
+					}
+					
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							remainingNumberOfLanes * (link.getCapacity() / link.getNumberOfLanes()),
+							remainingNumberOfLanes,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+					
+				} else if (containsOrEndsWith(trafficItem, "D15")) { // reduction to one lane
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							(link.getCapacity() / link.getNumberOfLanes()),
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+				
+				} else if (containsOrEndsWith(trafficItem, "D16")) { // reduction to two lanes
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							2.0 * (link.getCapacity() / link.getNumberOfLanes()),
+							2.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+				
+				} else if (containsOrEndsWith(trafficItem, "E1") || containsOrEndsWith(trafficItem, "E7") || containsOrEndsWith(trafficItem, "E11") ) { // construction work
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							link.getCapacity() / 2.0,
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+					
+					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
+					
+				} else if (containsOrEndsWith(trafficItem, "E14")) { // abwechselnd in beide Richtungen nur ein Fahrstreifen frei // TODO: what about the other direction?
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							1.5 * (link.getCapacity() / link.getNumberOfLanes()),
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+				
+				} else if (containsOrEndsWith(trafficItem, "E15") || containsOrEndsWith(trafficItem, "E16") || containsOrEndsWith(trafficItem, "E17") || containsOrEndsWith(trafficItem, "E18")) { // water, gas, buried cables, buried services main work
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							link.getCapacity() / 2.0,
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+				
+				} else if (containsOrEndsWith(trafficItem, "F15")) { // water, gas, buried cables, buried services main work
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							link.getCapacity() / 2.0,
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+				
+				// #######  other codes are decoded using more general code categories ######## 
+				
+				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("B")) { // accidents, e.g. B1: accident, .. TODO: Adjust according to type
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							link.getCapacity() / 2.0,
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+					
+					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
+					
+				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("E")) { // (other) construction work types
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							link.getCapacity() / 2.0,
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+					
+					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
+					
+				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("F")) { // obstruction hazards, e.g. F14 broken water pipe, F15 gas leak, F16 fire, F17 animals on road
+										
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							link.getCapacity() / 2.0,
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+					
+					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
+					
+				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("P")) { // dangerous situations, e.g. P39: Personen auf der Fahrbahn
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							link.getCapacity() / 2.0,
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
 
-			if (trafficItem.getTMCAlert().getPhraseCode().contains("B")) { // accidents, e.g. B1: accident, .. TODO: Adjust according to type
-				incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-						link.getAllowedModes(),
-						link.getCapacity() / 2.0,
-						1.0,
-						reduceSpeedToNextFreeSpeedLevel(link)
-				);
+					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
+
+					
+				} else {
+					if (unconsideredCodes.contains(trafficItem.getTMCAlert().getPhraseCode())) {
+						// warning for code already logged
+					} else {
+						log.warn("+++ Code " +  trafficItem.getTMCAlert().getPhraseCode() + " / message: " + trafficItem.getTMCAlert().getDescription() + " is not defined! Check if code is important and needs to be added. +++");
+						unconsideredCodes.add(trafficItem.getTMCAlert().getPhraseCode());
+					}				
+				}
 			}
-			
-			if (trafficItem.getTMCAlert().getPhraseCode().contains("E")) { // (other) construction work types
-				incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-						link.getAllowedModes(),
-						link.getCapacity() / 2.0,
-						1.0,
-						reduceSpeedToNextFreeSpeedLevel(link)
-				);
-			}
-			
-			if (trafficItem.getTMCAlert().getPhraseCode().contains("F")) { // obstruction hazards, e.g. F14 broken water pipe, F15 gas leak, F16 fire, ...
-				incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-						link.getAllowedModes(),
-						link.getCapacity() / 2.0,
-						1.0,
-						reduceSpeedToNextFreeSpeedLevel(link)
-				);
-			}
-			
-			if (trafficItem.getTMCAlert().getPhraseCode().contains("P")) { // dangerous situations, e.g. P39: Personen auf der Fahrbahn
-				incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-						link.getAllowedModes(),
-						link.getCapacity() / 2.0,
-						1.0,
-						reduceSpeedToNextFreeSpeedLevel(link)
-				);
-			}
-			
 		}
 		
 		return incidentObject;
+	}
+
+	private void logCodeConsideredAsCapacityAndSpeedReduction(String alertCode, String description) {
+		if (loggedCodeAssumedAsCapacityHalving.contains(alertCode)) {
+			// warning for code already logged
+		} else {
+			log.warn("Code " +  alertCode + " / message: " + description + " is interpreted as an incident where the capacity is halved, the speed is reduced and the number of lanes is set to 1 lane.");
+			loggedCodeAssumedAsCapacityHalving.add(alertCode);
+		}
 	}
 
 	private boolean containsOrEndsWith(TrafficItem trafficItem, String code) {
