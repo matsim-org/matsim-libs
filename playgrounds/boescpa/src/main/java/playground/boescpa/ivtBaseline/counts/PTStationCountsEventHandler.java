@@ -36,7 +36,6 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -60,9 +59,7 @@ public class PTStationCountsEventHandler implements TransitDriverStartsEventHand
 	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehStops = new HashMap<>();
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
-	@Inject
-	public Config config;
-	public Scenario scenario;
+	private Scenario scenario;
 
 	// Key String: General name of station (e.g. Zurich main station)
 	// Tuple first int array: 24h for each hour the counted people entering vehicles.
@@ -77,8 +74,9 @@ public class PTStationCountsEventHandler implements TransitDriverStartsEventHand
 	private final HashMap<Id<TransitStopFacility>, Tuple<int[],int[]>> ptCounts = new HashMap<>();
 
 	@Inject
-	private PTStationCountsEventHandler(@Named("pathToPTStationsToMonitor") final String pathToStationsList) {
+	private PTStationCountsEventHandler(@Named("pathToPTStationsToMonitor") final String pathToStationsList, Scenario scenario) {
 		setStationsToMonitor(pathToStationsList);
+		this.scenario = scenario;
 	}
 
 	private void setStationsToMonitor(final String pathToStationsList) {
