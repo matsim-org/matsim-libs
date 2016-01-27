@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.networkFromEmme;
+package tutorial.converter.networkFromEmme;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
