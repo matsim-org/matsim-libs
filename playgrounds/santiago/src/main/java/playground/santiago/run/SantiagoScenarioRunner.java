@@ -62,6 +62,8 @@ public class SantiagoScenarioRunner {
 	private static String inputPath = "../../../runs-svn/santiago/run40/input/";
 	private static boolean doModeChoice = true;
 	
+	private static String configFile;
+	
 	public static void main(String args[]){
 //		OTFVis.convert(new String[]{
 //						"",
@@ -72,7 +74,13 @@ public class SantiagoScenarioRunner {
 //		});
 //		OTFVis.playMVI(outputPath + "visualisation.mvi");
 		
-		Config config = ConfigUtils.loadConfig(inputPath + "config_final.xml");
+		if(args.length==0){
+			configFile = inputPath + "config_final.xml";
+		} else {
+			configFile = args[0];
+		}
+		
+		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 //		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
