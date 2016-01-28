@@ -26,7 +26,7 @@ public class ScenarioGenerator {
 	private static final int CA_ROWS = (int)Math.round((DOOR_WIDTH/Constants.CA_CELL_SIDE));
 	private static final int CA_COLS = (int)Math.round((CA_LENGTH/Constants.CA_CELL_SIDE));
 	private static Double TOTAL_DENSITY = 4.;
-	private static int POPULATION_SIZE = 10000;
+	private static int POPULATION_SIZE = 15000;
 
 	
 	public static void main(String [] args) {

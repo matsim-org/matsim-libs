@@ -108,7 +108,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 		if((iteration%2==0) && Constants.SAVE_FRAMES){
 			String pathName = Constants.PATH+"/videos/frames/it"+iteration;
 			FileUtility.deleteDirectory(new File(pathName));
-			fs = new FrameSaver(pathName, "png", 80);
+			fs = new FrameSaver(pathName, "png", 300);
 		}
 		this.vis.fs = fs;
 		this.keyControl.fs = fs;
@@ -163,13 +163,13 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 
 	private void drawTacticalDestinationCell(GridPoint gridPoint) {
 		Coordinates bottomLeft = new Coordinates(gridPoint);
-		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 0, 0, 255, 150, 0, true);
+		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 150, 150, 255, 150, 0, true);
 		
 	}
 
 	private void drawObstacle(GridPoint gridPoint) {
 		Coordinates bottomLeft = new Coordinates(gridPoint);
-		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 255, 0, 0, 192, 0, true);
+		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 80, 80, 80, 192, 0, true);
 	}
 
 	private void drawPedestrianGridBorders(PedestrianGrid pedestrianGrid) {
@@ -193,7 +193,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 			c0 = c1;
 			c1 = it.next();
 			if (pedestrianGrid instanceof TransitionArea)
-				this.vis.addDashedLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), 255,lp.g,lp.b,lp.a, 0, .3, 0.15);
+				this.vis.addDashedLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), 0,lp.g,lp.b,lp.a, 0, .3, 0.15);
 			else
 				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
 		}
@@ -405,13 +405,24 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 
 	private void updateColor(Pedestrian pedestrian) {
 		CircleProperty cp = this.circleProperties.get(pedestrian.getId());
-		int destLevel = 0;//pedestrian.getDestination().getLevel();
-		int origLevel = pedestrian.getOriginMarker().getLevel();
-		int color = (((destLevel+1)*origLevel)*100)%256;
-		cp.r = 255-color;//50;
-		cp.g = 255-color;//50;
-		cp.b = 255-color;//50;
-		cp.a = 255;
+		//int destLevel = 0;//pedestrian.getDestination().getLevel();
+		double xDest = pedestrian.getOriginMarker().getCoordinates().getX();
+		//int color;
+		//int origLevel = pedestrian.getOriginMarker().getLevel();
+		//int color = (((destLevel+1)*origLevel)*100)%256;
+		int brightness = 80;
+		if (xDest<0.4){
+			cp.r = 255;
+			cp.g = brightness;
+			cp.b = brightness;//255-color;
+			cp.a = 255;
+		}
+		else{
+			cp.r = brightness;
+			cp.g = brightness;
+			cp.b = 255;//255-color;
+			cp.a = 255;
+		}
 	}
 
 	@Override
