@@ -57,6 +57,10 @@ import com.vividsolutions.jts.geom.Coordinate;
 import playground.benjamin.utils.MergeNetworks;
 import playground.santiago.SantiagoScenarioConstants;
 
+/**
+ * @author dhosse, kturner, benjamin
+ *
+ */
 public class SantiagoNetworkBuilder {
 	private static final Logger log = Logger.getLogger(SantiagoNetworkBuilder.class);
 	
