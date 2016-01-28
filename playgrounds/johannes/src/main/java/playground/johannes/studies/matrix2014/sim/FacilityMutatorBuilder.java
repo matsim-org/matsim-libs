@@ -43,7 +43,7 @@ public class FacilityMutatorBuilder implements MutatorBuilder {
 
     private DataPool dataPool;
 
-    private double proximityProba = 0.1;
+    private double proximityProba = 0.5;
 
     public FacilityMutatorBuilder(DataPool dataPool, Random random) {
         this.facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
