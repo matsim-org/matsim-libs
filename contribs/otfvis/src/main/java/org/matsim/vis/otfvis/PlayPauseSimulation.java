@@ -20,7 +20,6 @@ package org.matsim.vis.otfvis;
 
 import java.util.concurrent.Semaphore;
 
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.interfaces.PlayPauseSimulationI;
 
 /**
@@ -57,6 +56,16 @@ public class PlayPauseSimulation implements PlayPauseSimulationI {
 		PAUSE, PLAY, STEP, FINISHED;
 	}
 
+	private volatile Status status = Status.PAUSE;
+	private Semaphore accessToQNetwork = new Semaphore(1, true);
+	private volatile int localTime = 0;
+	private volatile double stepToTime = 0;
+
+	private final Object paused = new Object();
+	private final Object stepDone = new Object();
+	private final Object updateFinished = new Object();
+	private AccessToBlockingEtc internalInterface = new AccessToBlockingEtc() ;
+	
 	public class AccessToBlockingEtc {
 		public final void blockOtherUpdates() {
 			try {			
@@ -90,16 +99,6 @@ public class PlayPauseSimulation implements PlayPauseSimulationI {
 			}
 		}
 	}
-
-	private volatile Status status = Status.PAUSE;
-	private Semaphore accessToQNetwork = new Semaphore(1, true);
-	private volatile int localTime = 0;
-	private volatile double stepToTime = 0;
-
-	private final Object paused = new Object();
-	private final Object stepDone = new Object();
-	private final Object updateFinished = new Object();
-	private AccessToBlockingEtc internalInterface = new AccessToBlockingEtc() ;
 	
 	@Override
 	public final void doStep(int time) {
