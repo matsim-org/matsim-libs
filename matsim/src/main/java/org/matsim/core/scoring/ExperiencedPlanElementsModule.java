@@ -20,6 +20,5 @@ public class ExperiencedPlanElementsModule extends AbstractModule {
 			}
 		});
 		bind(EventsToLegs.class).asEagerSingleton();
-		bind(ExperiencedPlanElementsService.class).to(ExperiencedPlanElementsServiceImpl.class).asEagerSingleton();
 	}
 }

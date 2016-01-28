@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -37,6 +36,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.EventsToActivities;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
+import org.matsim.core.scoring.PersonExperiencedActivity;
+import org.matsim.core.scoring.PersonExperiencedLeg;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
@@ -98,25 +99,25 @@ public class TripStatisticsCollectingEventHandler implements LegHandler, Activit
 	}
 
 	@Override
-	public void handleActivity(Id<Person> agentId, Activity activity) {
-		if ( !collectStatistics || !personsToTrack.contains( agentId ) ) return;
+	public void handleActivity(PersonExperiencedActivity personExperiencedActivity) {
+		if ( !collectStatistics || !personsToTrack.contains(personExperiencedActivity.getAgentId()) ) return;
 
 		if ( log.isTraceEnabled() ) {
-			log.trace( "handle activity "+activity+" for agent "+agentId );
+			log.trace( "handle activity "+ personExperiencedActivity.getActivity() +" for agent "+ personExperiencedActivity.getAgentId());
 		}
 
-		if ( stages.isStageActivity( activity.getType() ) ) {
-			currentTrips.get( agentId ).trip.add( activity );
+		if ( stages.isStageActivity(personExperiencedActivity.getActivity().getType() ) ) {
+			currentTrips.get(personExperiencedActivity.getAgentId()).trip.add(personExperiencedActivity.getActivity());
 			return;
 		}
 
-		final Record record = currentTrips.put( agentId, new Record( activity ) );
+		final Record record = currentTrips.put(personExperiencedActivity.getAgentId(), new Record(personExperiencedActivity.getActivity()) );
 		if ( record == null )  return;
-		record.destination = activity;
+		record.destination = personExperiencedActivity.getActivity();
 
 		try {
 			writer.newLine();
-			writer.write(agentId.toString());
+			writer.write(personExperiencedActivity.getAgentId().toString());
 			writer.write( "\t" );
 			writer.write( ""+record.origin.getEndTime() );
 			writer.write( "\t" );
@@ -138,7 +139,7 @@ public class TripStatisticsCollectingEventHandler implements LegHandler, Activit
 			throw new UncheckedIOException( e );
 		}
 		catch (RuntimeException e) {
-			log.error( "got exception handling "+activity+" for agent "+agentId , e );
+			log.error( "got exception handling "+ personExperiencedActivity.getActivity() +" for agent "+ personExperiencedActivity.getAgentId(), e );
 			throw e;
 		}
 	}
@@ -158,12 +159,12 @@ public class TripStatisticsCollectingEventHandler implements LegHandler, Activit
 	}
 
 	@Override
-	public void handleLeg(Id<Person> agentId, Leg leg) {
-		if ( !collectStatistics || !personsToTrack.contains( agentId ) ) return;
+	public void handleLeg(PersonExperiencedLeg personExperiencedLeg) {
+		if ( !collectStatistics || !personsToTrack.contains(personExperiencedLeg.getAgentId()) ) return;
 		if ( log.isTraceEnabled() ) {
-			log.trace( "handle leg "+leg+" for agent "+agentId );
+			log.trace( "handle leg "+ personExperiencedLeg.getLeg() +" for agent "+ personExperiencedLeg.getAgentId());
 		}
-		currentTrips.get( agentId ).trip.add(leg);
+		currentTrips.get(personExperiencedLeg.getAgentId()).trip.add(personExperiencedLeg.getLeg());
 	}
 
 	@Override

@@ -20,7 +20,9 @@
 
  package org.matsim.core.scoring;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -28,7 +30,6 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.ActivityImpl;
@@ -51,11 +52,11 @@ import javax.inject.Inject;
 public class EventsToActivities implements ActivityStartEventHandler, ActivityEndEventHandler {
 	
 	public interface ActivityHandler {
-	    void handleActivity(Id<Person> agentId, Activity activity);
+	    void handleActivity(PersonExperiencedActivity activity);
 	}
 
-    private Map<Id<Person>, ActivityImpl> activities = new HashMap<Id<Person>, ActivityImpl>();
-    private ActivityHandler activityHandler = null;
+    private Map<Id<Person>, ActivityImpl> activities = new HashMap<>();
+    private List<ActivityHandler> activityHandlers = new ArrayList<>();
 
     public EventsToActivities() {
 
@@ -75,7 +76,9 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
             activity = firstActivity;
         }
         activity.setEndTime(event.getTime());
-        activityHandler.handleActivity(event.getPersonId(), activity);
+        for (ActivityHandler activityHandler : activityHandlers) {
+            activityHandler.handleActivity(new PersonExperiencedActivity(event.getPersonId(), activity));
+        }
         activities.remove(event.getPersonId());
     }
 
@@ -92,13 +95,15 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
         activities.clear();
     }
 
-    public void setActivityHandler(ActivityHandler activityHandler) {
-        this.activityHandler = activityHandler;
+    public void addActivityHandler(ActivityHandler activityHandler) {
+        this.activityHandlers.add(activityHandler);
     }
 
     public void finish() {
         for (Map.Entry<Id<Person>, ActivityImpl> entry : activities.entrySet()) {
-            activityHandler.handleActivity(entry.getKey(), entry.getValue());
+            for (ActivityHandler activityHandler : activityHandlers) {
+                activityHandler.handleActivity(new PersonExperiencedActivity(entry.getKey(), entry.getValue()));
+            }
         }
     }
 

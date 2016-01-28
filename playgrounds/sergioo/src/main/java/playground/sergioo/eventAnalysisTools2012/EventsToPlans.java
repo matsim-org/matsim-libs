@@ -11,12 +11,13 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToActivities;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
+import org.matsim.core.scoring.PersonExperiencedActivity;
+import org.matsim.core.scoring.PersonExperiencedLeg;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,7 +25,7 @@ import java.util.TreeMap;
 
 public class EventsToPlans implements ActivityHandler, LegHandler {
 
-	private final Map<Id<Person>, Plan> agentRecords = new TreeMap<Id<Person>, Plan>();
+	private final Map<Id<Person>, Plan> agentRecords = new TreeMap<>();
 	
 	private final Scenario scenario;
 	
@@ -33,20 +34,21 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 		for (Person person : scenario.getPopulation().getPersons().values())
 			this.agentRecords.put(person.getId(), new PlanImpl());
 	}
+
 	@Override
-	public void handleLeg(Id<Person> agentId, Leg leg) {
-		if(agentRecords.get(agentId)!=null)
-			agentRecords.get(agentId).addLeg(leg);
+	public void handleLeg(PersonExperiencedLeg leg) {
+		if(agentRecords.get(leg.getAgentId())!=null)
+			agentRecords.get(leg.getAgentId()).addLeg(leg.getLeg());
 	}
 
 	@Override
-	public void handleActivity(Id<Person> agentId, Activity activity) {
-		if(agentRecords.get(agentId)!=null)
-			agentRecords.get(agentId).addActivity(activity);
+	public void handleActivity(PersonExperiencedActivity activity) {
+		if(agentRecords.get(activity.getAgentId())!=null)
+			agentRecords.get(activity.getAgentId()).addActivity(activity.getActivity());
 	}
 	
 	public void writeExperiencedPlans(String iterationFilename) {
-        Population population = PopulationUtils.createPopulation(((MutableScenario) scenario).getConfig(), ((MutableScenario) scenario).getNetwork());
+        Population population = PopulationUtils.createPopulation(scenario.getConfig(), scenario.getNetwork());
 		PopulationFactory factory = population.getFactory();
         for (Entry<Id<Person>, Plan> entry : agentRecords.entrySet()) {
 			Person person = factory.createPerson(entry.getKey());
@@ -71,9 +73,9 @@ public class EventsToPlans implements ActivityHandler, LegHandler {
 		EventsToPlans eventsToPlans = new EventsToPlans(scenario);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsToActivities eventsToActivities = new EventsToActivities();
-		eventsToActivities.setActivityHandler(eventsToPlans);
+		eventsToActivities.addActivityHandler(eventsToPlans);
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
-		eventsToLegs.setLegHandler(eventsToPlans);
+		eventsToLegs.addLegHandler(eventsToPlans);
 		eventsManager.addHandler(eventsToActivities);
 		eventsManager.addHandler(eventsToLegs);
 		new EventsReaderXMLv1(eventsManager).parse(args[2]);

@@ -45,7 +45,7 @@ import java.util.Map;
 /**
  * @author thibautd
  */
-public class EventsToPlans {
+public class EventsToPlans implements ActivityHandler, LegHandler {
 
 	private final IdFilter filter;
 
@@ -65,8 +65,8 @@ public class EventsToPlans {
 		});
 	}
 
-	@Subscribe
-	private void handleActivity(final PersonExperiencedActivity event) {
+	@Override
+	public void handleActivity(final PersonExperiencedActivity event) {
 		if ( !filter.accept( event.getAgentId()) ) return;
 		final Plan plan =
 				MapUtils.getArbitraryObject(
@@ -82,8 +82,8 @@ public class EventsToPlans {
 
 	}
 
-	@Subscribe
-	private void handleLeg(final PersonExperiencedLeg event) {
+	@Override
+	public void handleLeg(final PersonExperiencedLeg event) {
 		if ( !filter.accept( event.getAgentId()) ) return;
 		final Plan plan =
 				MapUtils.getArbitraryObject(

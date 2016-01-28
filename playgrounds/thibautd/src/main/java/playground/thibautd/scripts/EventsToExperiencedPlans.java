@@ -36,8 +36,9 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.EventsToActivities;
+import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.scoring.ExperiencedPlansModule;
-import org.matsim.core.scoring.ExperiencedPlanElementsService;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import playground.thibautd.utils.EventsToPlans;
 
@@ -74,8 +75,10 @@ public class EventsToExperiencedPlans {
 						}
 					});
 
-		ExperiencedPlanElementsService epeService = injector.getInstance(ExperiencedPlanElementsService.class);
-		epeService.register(eventsToPlans);
+		EventsToActivities eventsToActivities = injector.getInstance(EventsToActivities.class);
+		eventsToActivities.addActivityHandler(eventsToPlans);
+		EventsToLegs eventsToLegs = injector.getInstance(EventsToLegs.class);
+		eventsToLegs.addLegHandler(eventsToPlans);
 
 		injector.getInstance(ReplayEvents.class).playEventsFile( eventsFile, 1);
 

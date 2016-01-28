@@ -20,7 +20,6 @@
 
 package org.matsim.core.scoring;
 
-import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import gnu.trove.TDoubleCollection;
 import gnu.trove.iterator.TDoubleIterator;
@@ -61,7 +60,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author michaz
  *
  */
-class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPlansService {
+class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPlansService, EventsToActivities.ActivityHandler, EventsToLegs.LegHandler {
 
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
 	private final PlansConfigGroup plansConfigGroup;
@@ -84,7 +83,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
 
 	@Inject
-	ScoringFunctionsForPopulation(EventsManager eventsManager, ExperiencedPlanElementsService experiencedPlanElementsService, 
+	ScoringFunctionsForPopulation(EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
 			PlansConfigGroup plansConfigGroup, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
 		this.plansConfigGroup = plansConfigGroup;
 		this.network = network;
@@ -92,7 +91,8 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		reset();
 		eventsManager.addHandler(this);
-		experiencedPlanElementsService.register(this);
+		eventsToActivities.addActivityHandler(this);
+		eventsToLegs.addLegHandler(this);
 	}
 
 	private void reset() {
@@ -123,7 +123,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		return this.agentRecords;
 	}
 
-	@Subscribe
+	@Override
 	public void handleActivity(PersonExperiencedActivity event) {
 		Id<Person> agentId = event.getAgentId();
 		Activity activity = event.getActivity();
@@ -136,7 +136,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		}
 	}
 
-	@Subscribe
+	@Override
 	public void handleLeg(PersonExperiencedLeg event) {
 		Id<Person> agentId = event.getAgentId();
 		Leg leg = event.getLeg();
