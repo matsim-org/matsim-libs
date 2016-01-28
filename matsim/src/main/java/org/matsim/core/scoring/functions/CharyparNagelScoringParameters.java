@@ -32,7 +32,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.pt.PtConstants;
 
 public class CharyparNagelScoringParameters implements MatsimParameters {
 
@@ -152,13 +151,9 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
 					marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
 
-			utilParams = new TreeMap<String, ActivityUtilityParameters>() ;
+			utilParams = new TreeMap<>() ;
 			for (ActivityParams params : scoringParameterSet.getActivityParams()) {
 				ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
-				// the following was introduced in nov'12.  Also see setupTransitSimulation in Controler.  kai, nov'12
-				if (params.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-					factory.setScoreAtAll(false) ;
-				}
 				utilParams.put(params.getActivityType(), factory.create() ) ;
 			}
 
