@@ -1,0 +1,2 @@
+2016-01-29 11:48:28,552 ERROR BasicPlanAgentImpl:153 last activity of person driver agent id bike_home1_work1_9 has end time < infty; setting it to infty
+2016-01-29 11:48:28,553 ERROR BasicPlanAgentImpl:154  This message given only once.
