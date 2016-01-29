@@ -10,7 +10,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.demandde.counts.TSBASt2Count;
 
@@ -20,6 +23,8 @@ import playground.vsp.demandde.counts.TSBASt2Count;
  */
 public class LinkModifier {
 
+	private static String NETWORK = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/Demand_input/network_pt_modified_removed.xml";
+	private static String NETOUTPUT = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/Demand_input/network_pt_cap60.xml";
 	private Scenario scenario;
 	private Network net;
 	private static final Logger logger = Logger.getLogger(LinkModifier.class);
@@ -78,6 +83,26 @@ public class LinkModifier {
 		link.setFromNode(fromNode);
 	}
 	
+	public Network getNetwork(){
+		return this.net;
+	}
+	
+	public static void main(String[] args){
+		
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(NETWORK);
+		Scenario scen = ScenarioUtils.loadScenario(config);
+		LinkModifier mod = new LinkModifier(scen);
+		
+		for(Id<Link> id : mod.getNetwork().getLinks().keySet()){
+			if(id.toString().startsWith("pt")){
+				mod.modifyLinkCapacity(id, 60);
+			}
+		}
+		
+		NetworkWriter writer = new NetworkWriter(scen.getNetwork());
+		writer.write(NETOUTPUT);
+	}
 	
 	
 }

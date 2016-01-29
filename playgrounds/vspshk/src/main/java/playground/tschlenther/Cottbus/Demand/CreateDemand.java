@@ -58,13 +58,13 @@ import com.vividsolutions.jts.io.WKTReader;
 		private Map<String,Coord> shops;
 		private static final Random rnd = new Random(42);		
 //----- FILE PATHS ----------------------------------------------------------------------------------------------------//
-		private static final String NETWORKFILE = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/demand_input/network_pt_modified_removed.xml";
-		private static final String KREISE = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/demand_input/Landkreise/Kreise.shp";
-		private static final String BUILDINGS = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/demand_input/BuildingsCottbus/BuildingsCottbus.shp";
-		private static final String SHOPS = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/demand_input/shops.txt";
-		private static final String KINDERGARTEN = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/demand_input/kindergaerten.txt";
+		private static final String NETWORKFILE = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/ADDEDLINKS_cap60.xml";
+		private static final String KREISE = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/Landkreise/Kreise.shp";
+		private static final String BUILDINGS = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/BuildingsCottbus/BuildingsCottbus.shp";
+		private static final String SHOPS = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/shops.txt";
+		private static final String KINDERGARTEN = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/kindergaerten.txt";
 		
-		private static final String PLANSFILEOUTPUT = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/plans_scale" + SCALEFACTOR + ".xml";
+		private static final String PLANSFILEOUTPUT = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/plans_scale" + SCALEFACTOR + ".xml";
 //-------------------------------------------------------------------------------------------------------------------//
 		
 		

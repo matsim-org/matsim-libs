@@ -22,20 +22,20 @@ import playground.tschlenther.Cottbus.Network.LinkModifier;
 
 
 /**
- * @author Tille
+ * @author Tilmann Schlenther
  *
  */
 public class RunDummy {
 
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("C:/Users/Tille/WORK/Cottbus/Cottbus-pt/config_1.xml");
-		config.controler().setOutputDirectory("C:/Users/Tille/WORK/Cottbus/Cottbus-pt/modified_output");
+		Config config = ConfigUtils.loadConfig("C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/config_1.xml");
+		config.controler().setOutputDirectory("C:/Users/Tille/WORK/Cottbus/Cottbus-pt/ADDEDLINKS_output");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.transit().setUseTransit(true);
-		config.transit().setTransitScheduleFile("C:/Users/Tille/WORK/Cottbus/Cottbus-pt/schedule_m.xml");
-		config.network().setInputFile("C:/Users/Tille/WORK/Cottbus/Cottbus-pt/network_pt_modified_removed.xml");
-		config.plans().setInputFile("C:/Users/Tille/WORK/Cottbus/Cottbus-pt/plans_scale0.015.xml");
+		config.transit().setTransitScheduleFile("C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/schedule.xml");
+		config.network().setInputFile("C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/ADDEDLINKS_cap60.xml");
+		config.plans().setInputFile("C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/plans_scale0.015.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 //		LinkModifier mod = new LinkModifier(scenario);
