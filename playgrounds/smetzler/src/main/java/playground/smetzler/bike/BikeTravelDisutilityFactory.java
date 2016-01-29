@@ -9,7 +9,7 @@ public class BikeTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new BikeTravelDisutility(null);
+		return new BikeTravelDisutility();
 	}
 
 }

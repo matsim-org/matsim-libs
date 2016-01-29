@@ -4,23 +4,24 @@
 
 	<module name="global">
 		<param name="randomSeed" value="4711" />
-		<param name="coordinateSystem" value="GK4" />  <!--DHDN-->
+		<param name="coordinateSystem" value="DHDN" />  <!--GK4-->
 	</module>
  
 	<module name="network">
-		<param name="inputNetworkFile" value="input/network/skalitzer_MATsim.xml" />
+		<param name="inputNetworkFile" value="input/network/skalitzer_MATsim_bikeCarModeAllowed.xml" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="input/demand/skalitzer_pop.xml" />
+		<param name="inputPlansFile" value="input/demand/skalitzer_pop_bikeCar.xml" />
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output/skalitzerBike" />
-		<param name="lastIteration" value="0" />
+		<param name="outputDirectory" value="./output/skalitzerBike_2901_bikesCar" />
+		<param name="lastIteration" value="10" />
 	</module>
 
 	<module name="qsim">
+		<param name="mainMode" value="car,bike" />
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
@@ -33,6 +34,8 @@
 	
 	<module name="bike" >
 		<param name="inputSurfaceInformationFile" value="input/network/skalitzer_bikeatt.xml" />
+		<!--<param name="simulatedModes" value="bike,walk" />-->
+
 	</module>
 	
 	<module name="planCalcScore">

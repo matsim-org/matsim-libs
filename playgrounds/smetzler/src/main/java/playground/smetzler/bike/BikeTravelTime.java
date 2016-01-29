@@ -42,29 +42,31 @@ public class BikeTravelTime implements TravelTime {
 //		cobblestone: Kopfsteinpflaster
 //		gravel: Schotter	
 //		unpaved: unversiegelte Fläche
-//		sand	
-		if (surface == "asphalt")
+//		sand
+		if (surface != null) {
+		if (surface.equals("asphalt"))
 			factor= 1;
-		else if (surface == "paved")
+		else if (surface.equals("paved"))
 			factor= 1;		
-		else if (surface == "paving_stones")
+		else if (surface.equals("paving_stones"))
 			factor= 0.9;
-		else if (surface == "cobblestone")
+		else if (surface.equals("cobblestone"))
 			factor= 0.6;
-		else if (surface == "gravel")
+		else if (surface.equals("gravel"))
 			factor= 0.5;		
-		else if (surface == "unpaved")
+		else if (surface.equals("unpaved"))
 			factor= 0.5;
-		else if (surface == "sand")
+		else if (surface.equals("sand"))
 			factor= 0.3;
 		else {
 			factor=0.8;
 			log.info(surface + " not recognized");}
 		
-		biketravelTime= (link.getLength() / referenceBikeSpeed)*factor;
-
+		biketravelTime= (link.getLength() / (referenceBikeSpeed*factor));
+		}
 		
 		return biketravelTime;
+		
 	}
 
 }

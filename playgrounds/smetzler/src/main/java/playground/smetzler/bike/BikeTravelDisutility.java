@@ -14,12 +14,12 @@ public class BikeTravelDisutility implements TravelDisutility {
 	
 	ObjectAttributes bikeAttributes;
 	
-	@Inject
-	@Singleton
-	BikeTravelDisutility(BikeConfigGroup bikeConfigGroup) {
-		bikeAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(bikeAttributes).parse(bikeConfigGroup.getSurfaceInformationFile());
-	}
+//	@Inject
+//	@Singleton
+//	BikeTravelDisutility(BikeConfigGroup bikeConfigGroup) {
+//		bikeAttributes = new ObjectAttributes();
+//		new ObjectAttributesXmlReader(bikeAttributes).parse(bikeConfigGroup.getSurfaceInformationFile());
+//	}
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {

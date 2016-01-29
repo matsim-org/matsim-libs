@@ -92,13 +92,13 @@ public class PopGeneration implements Runnable {
 
 	private Activity createWork(Coord workLocation) {
 		Activity activity = population.getFactory().createActivityFromCoord("work", workLocation);
-		activity.setEndTime(17*60*60);
+		activity.setEndTime(14*60*60);
 		return activity;
 	}
 
 	private Activity createHome(Coord homeLocation) {
 		Activity activity = population.getFactory().createActivityFromCoord("home", homeLocation);
-		activity.setEndTime(9*60*60);
+		activity.setEndTime(10*60*60);
 		return activity;
 	}
 
