@@ -36,6 +36,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -59,7 +60,9 @@ public class PTStationCountsEventHandler implements TransitDriverStartsEventHand
 	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehStops = new HashMap<>();
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
+	private final double countsScaleFactor;
 	private Scenario scenario;
+
 
 	// Key String: General name of station (e.g. Zurich main station)
 	// Tuple first int array: 24h for each hour the counted people entering vehicles.
@@ -74,8 +77,9 @@ public class PTStationCountsEventHandler implements TransitDriverStartsEventHand
 	private final HashMap<Id<TransitStopFacility>, Tuple<int[],int[]>> ptCounts = new HashMap<>();
 
 	@Inject
-	private PTStationCountsEventHandler(@Named("pathToPTStationsToMonitor") final String pathToStationsList, Scenario scenario) {
+	private PTStationCountsEventHandler(@Named("pathToPTStationsToMonitor") final String pathToStationsList, Config config, Scenario scenario) {
 		setStationsToMonitor(pathToStationsList);
+		this.countsScaleFactor = config.ptCounts().getCountsScaleFactor();
 		this.scenario = scenario;
 	}
 
@@ -185,17 +189,17 @@ public class PTStationCountsEventHandler implements TransitDriverStartsEventHand
 					double matsimVolumeEntering = 0;
 					double matsimVolumeLeaving = 0;
 					for (Id<TransitStopFacility> facilityId : ptStopsToMonitor.get(station)) {
-						matsimVolumeEntering += ptCounts.get(facilityId).getFirst()[i];
-						matsimVolumeLeaving += ptCounts.get(facilityId).getSecond()[i];
+						matsimVolumeEntering += ptCounts.get(facilityId).getFirst()[i]*countsScaleFactor;
+						matsimVolumeLeaving += ptCounts.get(facilityId).getSecond()[i]*countsScaleFactor;
 					}
 					double countVolumeEntering = stationsToMonitor.get(station).getFirst()[i];
 					double countVolumeLeaving = stationsToMonitor.get(station).getSecond()[i];
+					double relativeEntering = countVolumeEntering > 0 ? matsimVolumeEntering/countVolumeEntering : matsimVolumeEntering*100;
+					double relativeLeaving = countVolumeLeaving > 0 ? matsimVolumeLeaving/countVolumeLeaving : matsimVolumeLeaving*100;
 					writer.write(station + "\t");
 					writer.write(i + "\t");
-					writer.write(matsimVolumeEntering + "\t" + countVolumeEntering + "\t");
-					writer.write((matsimVolumeEntering/countVolumeEntering) + "\t");
-					writer.write(matsimVolumeLeaving + "\t" + countVolumeLeaving + "\t");
-					writer.write(Double.toString(matsimVolumeLeaving/countVolumeLeaving));
+					writer.write(matsimVolumeEntering + "\t" + countVolumeEntering + "\t" + relativeEntering + "\t");
+					writer.write(matsimVolumeLeaving + "\t" + countVolumeLeaving + "\t" + relativeLeaving);
 					writer.newLine();
 				}
 			}
