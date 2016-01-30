@@ -106,7 +106,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 //					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork());
 					ela.preProcessData();
 					ela.postProcessData();
-					ela.writeTotalEmissions(dir+str+"/analysis/","MMA");
+					ela.writeTotalEmissions(dir+str+"/analysis/","cityArea");
 					writer.write(str+"\t"+ela.getTotalEmissionsCosts()+"\n");
 				}
 				writer.close();

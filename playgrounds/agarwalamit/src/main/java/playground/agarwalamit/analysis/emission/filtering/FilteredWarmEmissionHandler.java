@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.emission.filtering;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -32,6 +33,8 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import playground.agarwalamit.munich.analysis.userGroup.EmissionsPerPersonPerUserGroup;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.GeometryUtils;
@@ -44,10 +47,10 @@ import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarm
 
 public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	private static final Logger LOGGER = Logger.getLogger(FilteredWarmEmissionHandler.class.getName());
-
+	
 	private final EmissionsPerLinkWarmEventHandler delegate;
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
-	private final Collection<SimpleFeature> features ;
+	private final Collection<Geometry> zonalGeoms;
 	private Network network;
 	private final UserGroup ug ;
 
@@ -58,8 +61,11 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 			final Network network, final UserGroup userGroup){
 		this.delegate = new EmissionsPerLinkWarmEventHandler(simulationEndTime,noOfTimeBins);
 
-		if(shapeFile!=null) this.features = new ShapeFileReader().readFileAndInitialize(shapeFile);
-		else this.features = null;
+		if(shapeFile!=null) {
+			Collection<SimpleFeature> features = new ShapeFileReader().readFileAndInitialize(shapeFile);
+			this.zonalGeoms = GeometryUtils.getSimplifiedGeometries(features);
+		}
+		else this.zonalGeoms = new ArrayList<>();
 
 		this.network = network;
 		this.ug=userGroup;
@@ -97,9 +103,9 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 
 		if( this.ug != null ) {
 			Id<Person> driverId = Id.createPersonId(event.getVehicleId());
-			if ( this.features!=null ) { // filtering for both
+			if ( ! this.zonalGeoms.isEmpty()  ) { // filtering for both
 				Link link = network.getLinks().get(event.getLinkId());
-				if ( this.pf.isPersonIdFromUserGroup(driverId, ug)  && GeometryUtils.isLinkInsideCity(features, link) ) {
+				if ( this.pf.isPersonIdFromUserGroup(driverId, ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link) ) {
 					delegate.handleEvent(event);
 				}
 			} else { // filtering for user group only
@@ -108,9 +114,9 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 				}
 			}
 		} else { 
-			if( this.features!=null ) { // filtering for area only
+			if( ! this.zonalGeoms.isEmpty()  ) { // filtering for area only
 				Link link = network.getLinks().get(event.getLinkId());
-				if(GeometryUtils.isLinkInsideCity(features, link) ) {
+				if( GeometryUtils.isLinkInsideGeometries(zonalGeoms, link) ) {
 					delegate.handleEvent(event);
 				}
 			} else { // no filtering at all
