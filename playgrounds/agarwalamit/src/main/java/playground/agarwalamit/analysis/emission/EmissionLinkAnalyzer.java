@@ -39,7 +39,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.emission.filtering.FilteredColdEmissionPerLinkHandler;
+import playground.agarwalamit.analysis.emission.filtering.FilteredColdEmissionHandler;
 import playground.agarwalamit.analysis.emission.filtering.FilteredWarmEmissionHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
@@ -54,7 +54,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	private final String emissionEventsFile;
 	private final EmissionUtils emissionUtils = new EmissionUtils();;
 	private final FilteredWarmEmissionHandler warmHandler;
-	private final FilteredColdEmissionPerLinkHandler coldHandler;
+	private final FilteredColdEmissionHandler coldHandler;
 	private Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> link2WarmEmissions;
 	private Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> link2ColdEmissions;
 	private SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> link2TotalEmissions;
@@ -68,7 +68,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		this.emissionEventsFile = emissionEventFile;
 		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
 		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
-		this.coldHandler = new FilteredColdEmissionPerLinkHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
+		this.coldHandler = new FilteredColdEmissionHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
 	}
 
 	public EmissionLinkAnalyzer(final double simulationEndTime, final String emissionEventFile, final int noOfTimeBins) {
@@ -76,7 +76,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		this.emissionEventsFile = emissionEventFile;
 		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
 		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins);
-		this.coldHandler = new FilteredColdEmissionPerLinkHandler(simulationEndTime, noOfTimeBins);
+		this.coldHandler = new FilteredColdEmissionHandler(simulationEndTime, noOfTimeBins);
 	}
 
 	public static void main(String[] args) {
