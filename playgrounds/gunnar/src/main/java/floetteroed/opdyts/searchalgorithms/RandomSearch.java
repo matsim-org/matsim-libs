@@ -43,6 +43,7 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.SamplingStage;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
+import floetteroed.opdyts.trajectorysampling.WeightOptimizer2;
 import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
@@ -136,10 +137,20 @@ public class RandomSearch<U extends DecisionVariable> {
 	private int transitions = 0;
 
 	public void run() {
-		this.run(0.0, 0.0);
+		this.run(0.0, 0.0, true);
 	}
 
-	public void run(double equilibriumGapWeight, double uniformityGapWeight) {
+	public void run(double equilibriumGapWeight, double uniformityGapWeight,
+			final boolean adjustWeights) {
+
+		final WeightOptimizer2 weightOptimizer;
+		if (adjustWeights) {
+			weightOptimizer = new WeightOptimizer2(equilibriumGapWeight,
+					uniformityGapWeight);
+		} else {
+			weightOptimizer = null;
+		}
+
 		U bestDecisionVariable = this.initialDecisionVariable;
 		Double bestObjectiveFunctionValue = null;
 		SimulatorState newInitialState = null;
@@ -237,19 +248,32 @@ public class RandomSearch<U extends DecisionVariable> {
 						.get(newBestDecisionVariable);
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
-				final double msaInertia = 1.0 - 1.0 / (1.0 + it);
-				equilibriumGapWeight = msaInertia
-						* equilibriumGapWeight
-						+ (1.0 - msaInertia)
-						* sampler
-								.getDecisionVariable2selfTunedEquilbriumGapWeightView()
-								.get(newBestDecisionVariable);
-				uniformityGapWeight = msaInertia
-						* uniformityGapWeight
-						+ (1.0 - msaInertia)
-						* sampler
-								.getDecisionVariable2selfTunedUniformityGapWeightView()
-								.get(newBestDecisionVariable);
+				// if (adjustWeights) {
+				// final double msaInertia = 1.0 - 1.0 / (1.0 + it);
+				// equilibriumGapWeight = msaInertia
+				// * equilibriumGapWeight
+				// + (1.0 - msaInertia)
+				// * sampler
+				// .getDecisionVariable2selfTunedEquilbriumGapWeightView()
+				// .get(newBestDecisionVariable);
+				// uniformityGapWeight = msaInertia
+				// * uniformityGapWeight
+				// + (1.0 - msaInertia)
+				// * sampler
+				// .getDecisionVariable2selfTunedUniformityGapWeightView()
+				// .get(newBestDecisionVariable);
+				// }
+
+				if (weightOptimizer != null) {
+					final double[] newWeights = weightOptimizer.updateWeights(equilibriumGapWeight,
+							uniformityGapWeight, sampler.lastSamplingStage,
+							sampler.finalObjFctValue, sampler.finalEquilGap,
+							sampler.finalUnifGap,
+							sampler.finalSurrogateObjectiveFunction,
+							sampler.finalAlphas);
+					equilibriumGapWeight = newWeights[0];
+					uniformityGapWeight = newWeights[1];
+				}
 
 			} else {
 

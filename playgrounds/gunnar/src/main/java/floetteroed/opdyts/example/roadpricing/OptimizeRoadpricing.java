@@ -78,6 +78,13 @@ class OptimizeRoadpricing {
 		final int averageIterations = Integer.parseInt(myConfig.get("opdyts",
 				"simavgiterations"));
 
+		final double initialEquilibriumWeight = Double.parseDouble(myConfig
+				.get("opdyts", "equilibriumweight"));
+		final double initialUniformityWeight = Double.parseDouble(myConfig.get(
+				"opdyts", "uniformityweight"));
+		final boolean adjustWeights = Boolean.parseBoolean(myConfig.get(
+				"opdyts", "adjustweights"));
+
 		/*
 		 * Create the MATSim scenario.
 		 */
@@ -146,7 +153,8 @@ class OptimizeRoadpricing {
 		/*
 		 * Run it.
 		 */
-		randomSearch.run();
+		randomSearch.run(initialEquilibriumWeight, initialUniformityWeight,
+				adjustWeights);
 
 		System.out.println("... DONE.");
 	}
