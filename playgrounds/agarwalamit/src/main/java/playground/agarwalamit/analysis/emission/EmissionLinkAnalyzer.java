@@ -89,57 +89,58 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		this(simulationEndTime,emissionEventFile,noOfTimeBins,null,null);
 	}
 
-		public static void main(String[] args) {
-			String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
-			String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
-			String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-			String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
-			
-			Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(dir+"/bau/output_network.xml.gz");
-			BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_cityArea.txt");
-			try{
-				writer.write("scenario \t totalCostEUR \n");
-				for(String str : runCases){
-					String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
-	
-					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork());
-//					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork());
-					ela.preProcessData();
-					ela.postProcessData();
-					ela.writeTotalEmissions(dir+str+"/analysis/","cityArea");
-					writer.write(str+"\t"+ela.getTotalEmissionsCosts()+"\n");
-				}
-				writer.close();
-			} catch (IOException e){
-				throw new RuntimeException("Data is not written in the file. Reason - "+e);
-			}
-		}
-
-//	public static void main(String[] args) {
-//		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
-//		String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
-//		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-//		String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
-//
-//		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(dir+"/bau/output_network.xml.gz");
-//		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_cityArea_userGroup.txt");
-//		try{
-//			writer.write("scenario \t userGroup \t totalCostEUR \n");
-//			for(String str : runCases){
-//				for(UserGroup ug :UserGroup.values()) {
+//		public static void main(String[] args) {
+//			String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
+//			String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
+//			String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+//			String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+//			
+//			Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(dir+"/bau/output_network.xml.gz");
+//			BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_metroArea.txt");
+//			try{
+//				writer.write("scenario \t totalCostEUR \n");
+//				for(String str : runCases){
 //					String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
-//					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork(),ug);
+//	
+////					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork());
+//					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork());
 //					ela.preProcessData();
 //					ela.postProcessData();
-//					ela.writeTotalEmissions(dir+str+"/analysis/","MMA_"+ug.toString());
-//					writer.write(str+"\t"+ug.toString()+"\t"+ela.getTotalEmissionsCosts()+"\n");
+//					ela.writeTotalEmissions(dir+str+"/analysis/","MMA");
+//					writer.write(str+"\t"+ela.getTotalEmissionsCosts()+"\n");
 //				}
+//				writer.close();
+//			} catch (IOException e){
+//				throw new RuntimeException("Data is not written in the file. Reason - "+e);
 //			}
-//			writer.close();
-//		} catch (Exception e){
-//			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 //		}
-//	}
+
+	public static void main(String[] args) {
+		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
+		String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
+//		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+		String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+
+		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(dir+"/bau/output_network.xml.gz");
+		BufferedWriter writer = IOUtils.getBufferedWriter(dir+"/analysis/totalEmissionCosts_metroArea_userGroup.txt");
+		try{
+			writer.write("scenario \t userGroup \t totalCostEUR \n");
+			for(String str : runCases){
+				for(UserGroup ug :UserGroup.values()) {
+					String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
+					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork(), ug);
+//					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork(), ug);
+					ela.preProcessData();
+					ela.postProcessData();
+					ela.writeTotalEmissions(dir+str+"/analysis/","MMA_"+ug.toString());
+					writer.write(str+"\t"+ug.toString()+"\t"+ela.getTotalEmissionsCosts()+"\n");
+				}
+			}
+			writer.close();
+		} catch (Exception e){
+			throw new RuntimeException("Data is not written in the file. Reason - "+e);
+		}
+	}
 
 	@Override
 	public List<EventHandler> getEventHandler() {
