@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.emission.sorting;
+package playground.agarwalamit.analysis.emission.filtering;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -39,8 +39,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.emission.sorting.FilteredColdEmissionPerLinkHandler;
-import playground.agarwalamit.analysis.emission.sorting.FilteredWarmEmissionPerLinkHandler;
+import playground.agarwalamit.analysis.emission.filtering.FilteredColdEmissionPerLinkHandler;
+import playground.agarwalamit.analysis.emission.filtering.FilteredWarmEmissionHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
@@ -53,7 +53,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	private static final Logger LOG = Logger.getLogger(EmissionLinkAnalyzer.class);
 	private final String emissionEventsFile;
 	private final EmissionUtils emissionUtils = new EmissionUtils();;
-	private final FilteredWarmEmissionPerLinkHandler warmHandler;
+	private final FilteredWarmEmissionHandler warmHandler;
 	private final FilteredColdEmissionPerLinkHandler coldHandler;
 	private Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> link2WarmEmissions;
 	private Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> link2ColdEmissions;
@@ -67,7 +67,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
 		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
-		this.warmHandler = new FilteredWarmEmissionPerLinkHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
+		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
 		this.coldHandler = new FilteredColdEmissionPerLinkHandler(simulationEndTime, noOfTimeBins, shapeFile, network);
 	}
 
@@ -75,7 +75,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
 		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
-		this.warmHandler = new FilteredWarmEmissionPerLinkHandler(simulationEndTime, noOfTimeBins);
+		this.warmHandler = new FilteredWarmEmissionHandler(simulationEndTime, noOfTimeBins);
 		this.coldHandler = new FilteredColdEmissionPerLinkHandler(simulationEndTime, noOfTimeBins);
 	}
 

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.emission.sorting;
+package playground.agarwalamit.analysis.emission.filtering;
 
 import java.util.Collection;
 import java.util.Map;
@@ -46,40 +46,53 @@ import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarm
  * @author amit
  */
 
-public class FilteredWarmEmissionPerLinkHandler implements WarmEmissionEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
-	private static final Logger LOGGER = Logger.getLogger(FilteredWarmEmissionPerLinkHandler.class.getName());
+public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+	private static final Logger LOGGER = Logger.getLogger(FilteredWarmEmissionHandler.class.getName());
 	
 	private final EmissionsPerLinkWarmEventHandler delegate;
 	private final Vehicle2DriverEventHandler veh2DriverDelegate = new Vehicle2DriverEventHandler();
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private final Collection<SimpleFeature> features ;
 	private Network network;
-	private boolean isSortingForArea = false;
 	private final UserGroup ug ;
 
-	public FilteredWarmEmissionPerLinkHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, 
+	/**
+	 * Area and user group filtering will be used, links fall inside the given shape and persons belongs to the given user group will be considered.
+	 */
+	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, 
 			final Network network, final UserGroup userGroup){
 		this.delegate = new EmissionsPerLinkWarmEventHandler(simulationEndTime,noOfTimeBins);
-		this.features = new ShapeFileReader().readFileAndInitialize(shapeFile);
+		
+		if(shapeFile!=null) this.features = new ShapeFileReader().readFileAndInitialize(shapeFile);
+		else this.features = null;
+		
 		this.network = network;
-		this.isSortingForArea = true;
 		this.ug=userGroup;
 		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
 	}
-	
-	public FilteredWarmEmissionPerLinkHandler (final double simulationEndTime, final int noOfTimeBins, final UserGroup userGroup){
+
+	/**
+	 * User group filtering will be used, result will include all links but persons from given user group only. Another class 
+	 * {@link EmissionsPerPersonPerUserGroup} could give results for all user groups in one run only.
+	 */
+	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final UserGroup userGroup){
 		this(simulationEndTime,noOfTimeBins,null,null,userGroup);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
 		LOGGER.warn( "This could be achieved from the other class \"EmissionsPerPersonPerUserGroup\", alternatively verify your results with the other class.");
 	}
 	
-	
-	public FilteredWarmEmissionPerLinkHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, final Network network){
+	/**
+	 * Area filtering will be used, result will include links falls inside the given shape and persons from all user groups.
+	 */
+	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, final Network network){
 		this(simulationEndTime,noOfTimeBins,shapeFile,network,null);
-		LOGGER.info("Area filtering is used, result will include links falls inside given shape and all persons.");
+		LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
 	}
 	
-	public FilteredWarmEmissionPerLinkHandler (final double simulationEndTime, final int noOfTimeBins){
+	/**
+	 * No filtering will be used, result will include all links, all persons.
+	 */
+	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins){
 		this(simulationEndTime,noOfTimeBins,null,null);
 		LOGGER.info("No filtering is used, result will include all links, all persons.");
 	}
@@ -88,7 +101,7 @@ public class FilteredWarmEmissionPerLinkHandler implements WarmEmissionEventHand
 	public void handleEvent(WarmEmissionEvent event) {
 		
 		if( this.ug != null ) {
-			if(isSortingForArea) { // filtering for area only
+			if( this.features!=null ) { // filtering for area only
 				Link link = network.getLinks().get(event.getLinkId());
 				if(GeometryUtils.isLinkInsideCity(features, link) ) {
 					delegate.handleEvent(event);
@@ -97,7 +110,7 @@ public class FilteredWarmEmissionPerLinkHandler implements WarmEmissionEventHand
 				delegate.handleEvent(event);
 			}
 		} else { 
-			if (isSortingForArea) { // filtering for both
+			if ( this.features!=null ) { // filtering for both
 				Link link = network.getLinks().get(event.getLinkId());
 				Id<Person> driverId = this.veh2DriverDelegate.getDriverOfVehicle(event.getVehicleId());
 				 if ( this.pf.isPersonIdFromUserGroup(driverId, ug)  && GeometryUtils.isLinkInsideCity(features, link) ) {
