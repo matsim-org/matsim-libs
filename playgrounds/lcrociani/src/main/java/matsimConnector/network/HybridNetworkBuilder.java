@@ -59,6 +59,8 @@ public class HybridNetworkBuilder {
 				
 			Id <Link> linkId = IdUtility.createLinkId(fromId, toId);
 			if (!(linkIdBlackList.contains(linkId.toString()))){
+				if (edgeCA.isStairs())
+					Constants.stairsLinks.add(linkId.toString());
 				Link link = fac.createLink(linkId, from, to);
 				link.setLength(edgeCA.getLength());
 				link.setFreespeed(Constants.PEDESTRIAN_SPEED);

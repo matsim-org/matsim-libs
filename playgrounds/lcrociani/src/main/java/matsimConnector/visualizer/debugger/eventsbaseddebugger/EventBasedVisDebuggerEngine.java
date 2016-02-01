@@ -131,9 +131,19 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 			Node from = l.getFromNode();
 			Node to = l.getToNode();
 			
-			if (from!= null && to != null)
-				this.vis.addLineStatic(from.getCoord().getX(), from.getCoord().getY(), to.getCoord().getX(),
-					to.getCoord().getY(), 0, 0, 0, 255, 0);
+			if (from!= null && to != null){
+				boolean isStairs = false;
+				for (String stairId : Constants.stairsLinks){
+					if (stairId.equals(l.getId().toString()))
+						isStairs = true;
+				}
+				if (isStairs)
+					this.vis.addLineStatic(from.getCoord().getX(), from.getCoord().getY(), to.getCoord().getX(),
+							to.getCoord().getY(), 255, 255, 0, 255, 0);
+				else
+					this.vis.addLineStatic(from.getCoord().getX(), from.getCoord().getY(), to.getCoord().getX(),
+						to.getCoord().getY(), 0, 0, 0, 255, 0);
+			}
 		}
 	}
 
@@ -157,7 +167,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 			for(int x=0; x<environmentGrid.getColumns();x++)
 				if (environmentGrid.getCellValue(y, x)==pedCA.utility.Constants.ENV_OBSTACLE)
 					drawObstacle(new GridPoint(x,y));		
-				else if(environmentGrid.getCellValue(y, x)==pedCA.utility.Constants.ENV_TACTICAL_DESTINATION)
+				else if(environmentGrid.belongsToTacticalDestination(new GridPoint(x, y)))
 					drawTacticalDestinationCell(new GridPoint(x,y));
 	}
 

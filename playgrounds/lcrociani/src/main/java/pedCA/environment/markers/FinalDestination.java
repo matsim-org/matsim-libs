@@ -15,7 +15,7 @@ public class FinalDestination extends TacticalDestination  {
 	private TransitionArea transitionArea;
 	
 	public FinalDestination(Coordinates coordinates, ArrayList<GridPoint> cells) {
-		super(coordinates, cells);
+		super(coordinates, cells, false);
 		calculateRotationAndRef();
 	}
 

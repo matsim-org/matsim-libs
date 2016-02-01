@@ -24,9 +24,10 @@ public class CANetwork{
 		nodes.add(node);
 	}
 	
-	private void createBidirectionalEdge(CANode n1, CANode n2, double ffDistance){
-		edges.add(new CAEdge(n1,n2, ffDistance));
-		edges.add(new CAEdge(n2,n1, ffDistance));
+	private void createBidirectionalEdge(MarkerConfiguration markerConfiguration, CANode n1, CANode n2, double ffDistance){
+		boolean isStairs = ((TacticalDestination)markerConfiguration.getDestination(n1.getDestinationId())).isStairsBorder() && ((TacticalDestination)markerConfiguration.getDestination(n2.getDestinationId())).isStairsBorder();
+		edges.add(new CAEdge(n1,n2, ffDistance, isStairs));
+		edges.add(new CAEdge(n2,n1, ffDistance, isStairs));
 	}
 	
 	public void buildNetwork(MarkerConfiguration markerConfiguration, FloorFieldsGrid floorFieldsGrid){
@@ -50,7 +51,7 @@ public class CANetwork{
 				else if (i>1 && ffDistance!= Constants.MAX_FF_VALUE){*/
 				if (ffDistance!= Constants.MAX_FF_VALUE){
 					ffDistance = MathUtility.average(ffDistance, getFFDistance(nodes.get(j), nodes.get(i), markerConfiguration, floorFieldsGrid));
-					createBidirectionalEdge(nodes.get(i),nodes.get(j), ffDistance*Constants.CELL_SIZE);
+					createBidirectionalEdge(markerConfiguration, nodes.get(i),nodes.get(j), ffDistance*Constants.CELL_SIZE);
 				}
 			}
 	}

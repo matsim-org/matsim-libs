@@ -1,5 +1,8 @@
 package matsimConnector.utility;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Constants {
 
 	public static final String CA_MOBSIM_MODE = "MobsimCA";
@@ -17,8 +20,8 @@ public class Constants {
 	 * CAEnvironment until this time (in seconds). Keep to 0 if you want to run normal simulation.**/
 	public static Double CA_TEST_END_TIME = 0.; //1200.;
 	
-	public static double SIMULATION_DURATION = 12000;
-	public static int SIMULATION_ITERATIONS = 11;
+	public static double SIMULATION_DURATION = 20000;
+	public static int SIMULATION_ITERATIONS = 50;
 	public static boolean SAVE_FRAMES = false;
 	
 	/** name to use to add CAScenario to a matsim scenario as a scenario element **/ 
@@ -34,7 +37,7 @@ public class Constants {
 	public static final int TRANSITION_AREA_COLUMNS = (int)(TRANSITION_AREA_LENGTH/CA_CELL_SIDE);
 	
 	
-	public static boolean MARGINAL_SOCIAL_COST_OPTIMIZATION = false;
+	public static boolean MARGINAL_SOCIAL_COST_OPTIMIZATION = true;
 	
 	public static String PATH;
 	static {
@@ -50,7 +53,12 @@ public class Constants {
 	public static String INPUT_PATH = DEBUG_TEST_PATH+"/input";
 	public static String OUTPUT_PATH = DEBUG_TEST_PATH+"/output";
 	public static final String COORDINATE_SYSTEM = "EPSG:3395";
-	public static String ENVIRONMENT_FILE = "ABMUS_PG_station3.csv";
+	public static String ENVIRONMENT_FILE = "ABMUS_PG_station_separated.csv";
 	public static boolean BRAESS_WL = false;
 	public static boolean VIS = true;
+	
+	public static List<String> stairsLinks;
+	static{
+		stairsLinks = new ArrayList<String>();
+	}
 }

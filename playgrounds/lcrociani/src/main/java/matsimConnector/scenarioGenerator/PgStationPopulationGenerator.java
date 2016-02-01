@@ -71,7 +71,7 @@ public class PgStationPopulationGenerator {
 				population.addPerson(pers);
 				++generated;
 			}
-			h+=.75f;
+			h+=1.f;
 		}
 	}
 

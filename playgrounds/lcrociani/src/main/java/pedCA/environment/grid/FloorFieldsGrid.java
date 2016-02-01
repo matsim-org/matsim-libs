@@ -63,7 +63,7 @@ public class FloorFieldsGrid extends Grid <Double>{
 					newvalue+=1;
 				if((nvalue==Constants.MAX_FF_VALUE || nvalue>newvalue)){
 					setCellValue(fieldLevel,new GridPoint(x,y), newvalue);
-					if (environment.getCellValue(neighbour)!= Constants.ENV_TACTICAL_DESTINATION)
+					if (!environment.belongsToTacticalDestination(neighbour))
 						L.add(neighbour);
 				}	
 			}
