@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.projects.capeTownDiary;
+package playground.southafrica.population.capeTownTravelSurvey;
 
 import java.util.Random;
 
@@ -123,9 +123,9 @@ public class HouseholdEnums {
 
 		int getCode(){ return this.code; }
 
-		String getDescription(){ return this.description; }
+		public String getDescription(){ return this.description; }
 
-		static MonthlyIncome parseFromDescription(String descr){
+		public static MonthlyIncome parseFromDescription(String descr){
 			if(descr.equalsIgnoreCase("Unknown")){
 				return UNKNOWN;
 			} else if (descr.equalsIgnoreCase("No income")){
@@ -161,7 +161,7 @@ public class HouseholdEnums {
 			}
 		}
 
-		static MonthlyIncome parseFromCode(int code){
+		public static MonthlyIncome parseFromCode(int code){
 			switch (code) {
 			case 1: return NO_INCOME;
 			case 2:	return CLASS2;
@@ -346,9 +346,9 @@ public class HouseholdEnums {
 		
 		int getCode(){ return this.code; }
 		
-		String getDescription(){ return this.description; }
+		public String getDescription(){ return this.description; }
 		
-		static AssetClass1 parseFromDescription(String descr){
+		public static AssetClass1 parseFromDescription(String descr){
 			if(descr.equalsIgnoreCase("Unknown")){
 				return UNKNOWN;
 			} else if (descr.equalsIgnoreCase("Low income (R0 - R3200 monthly)")){
@@ -364,7 +364,7 @@ public class HouseholdEnums {
 			}
 		}
 		
-		static AssetClass1 parseFromCode(int code){
+		public static AssetClass1 parseFromCode(int code){
 			switch (code) {
 			case 1: return LOW;
 			case 2:	return LOWMIDDLE;
@@ -427,9 +427,9 @@ public class HouseholdEnums {
 		
 		int getCode(){ return this.code; }
 		
-		String getDescription(){ return this.description; }
+		public String getDescription(){ return this.description; }
 		
-		static AssetClass2 parseFromDescription(String descr){
+		public static AssetClass2 parseFromDescription(String descr){
 			if(descr.equalsIgnoreCase("Unknown")){
 				return UNKNOWN;
 			} else if (descr.equalsIgnoreCase("Low income (R0 - R3200 monthly)")){
@@ -445,7 +445,7 @@ public class HouseholdEnums {
 			}
 		}
 		
-		static AssetClass2 parseFromCode(int code){
+		public static AssetClass2 parseFromCode(int code){
 			switch (code) {
 			case 1: return LOW;
 			case 2:	return LOWMIDDLE;

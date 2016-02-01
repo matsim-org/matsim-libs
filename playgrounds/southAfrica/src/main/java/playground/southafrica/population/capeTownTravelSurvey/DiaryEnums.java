@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.jjoubert.projects.capeTownDiary;
+package playground.southafrica.population.capeTownTravelSurvey;
 
 
 /**

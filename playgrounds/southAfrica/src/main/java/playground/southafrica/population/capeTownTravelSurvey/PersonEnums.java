@@ -21,7 +21,9 @@
 /**
  * 
  */
-package playground.jjoubert.projects.capeTownDiary;
+package playground.southafrica.population.capeTownTravelSurvey;
+
+import org.apache.log4j.Logger;
 
 /**
  * Class to capture the various variable classes in the persons data provided
@@ -30,7 +32,81 @@ package playground.jjoubert.projects.capeTownDiary;
  * @author jwjoubert
  */
 public class PersonEnums {
+	final private static Logger LOG = Logger.getLogger(PersonEnums.class);
 
+	/**
+	 * This age group was not explicitly coded in the Travel Diary. Instead,
+	 * the year of birth was provided. To be compatible with the Census 2011 
+	 * data, we include it here so that we can deal with unknown birth years 
+	 * as well.
+	 *
+	 * @author jwjoubert
+	 */
+	public static enum AgeGroup{
+		UNKNOWN ("Unknown"),
+		INFANT ("Infant"),
+		CHILD ("Child"),
+		YOUNG ("Young"),
+		EARLYCAREER ("Early career"),
+		LATECAREER ("Late career"),
+		RETIRED ("Retired");
+		
+		private final String description;
+		
+		AgeGroup(String descr){
+			this.description = descr;
+		}
+		
+		public String getDescription(){ return this.description; }
+		
+		public static AgeGroup parseFromDescription(String descr){
+			if(descr.equalsIgnoreCase("Unknown")){
+				return UNKNOWN;
+			} else if(descr.equalsIgnoreCase("Infant")){
+				return INFANT;
+			} else if(descr.equalsIgnoreCase("Child")){
+				return CHILD;
+			} else if(descr.equalsIgnoreCase("Young")){
+				return YOUNG;
+			} else if(descr.equalsIgnoreCase("Early career")){
+				return EARLYCAREER;
+			} else if(descr.equalsIgnoreCase("Late career")){
+				return LATECAREER;
+			} else if (descr.equalsIgnoreCase("Retired")){
+				return RETIRED;
+			} else{
+				throw new RuntimeException("Cannot parse age from description: " + descr);
+			}
+		}
+		
+		public static AgeGroup parseFromBirthYear(String year){
+			if(year.equalsIgnoreCase("Unknown")){
+				return UNKNOWN;
+			}
+			try{
+				double birthYear = Double.parseDouble(year);
+				double age = Math.max(0.0, 2013.0 - birthYear);
+				if(age <= 5){
+					return INFANT;
+				} else if(age <= 12){
+					return CHILD;
+				} else if (age <= 23){
+					return YOUNG;
+				} else if (age <= 45){
+					return EARLYCAREER;
+				} else if (age <= 68){
+					return LATECAREER;
+				} else{
+					return RETIRED;
+				}
+			} catch (NumberFormatException e){
+				LOG.error("Cannot parse birth year from " + year + ". Returning UNKNOWN.");
+				return UNKNOWN;
+			}
+		}
+	}
+	
+	
 	public static enum Gender{
 		UNKNOWN (0, "Unknown"),
 		MALE (1, "Male"),
@@ -334,7 +410,7 @@ public class PersonEnums {
 		
 		String getDescription(){ return this.description; }
 		
-		static Employment parseFromDescription(String descr){
+		public static Employment parseFromDescription(String descr){
 			if(descr.equalsIgnoreCase("Unknown")){
 				return UNKNOWN;
 			} else if(descr.equalsIgnoreCase("Employed full time")){
