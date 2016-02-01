@@ -22,6 +22,7 @@ package playground.southafrica.utilities.containers;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -37,10 +38,12 @@ public class MyZone extends MultiPolygon implements Identifiable<MyZone>{
 	 */
 	private static final long serialVersionUID = 1L;
 	private final Id<MyZone> id;
+	private ObjectAttributes attr;
 
 	public MyZone(Polygon[] polygons, GeometryFactory factory, Id<MyZone> id) {
 		super(polygons, factory);
 		this.id = id;
+		this.attr = new ObjectAttributes();
 	}
 	
 	@Override
@@ -71,6 +74,10 @@ public class MyZone extends MultiPolygon implements Identifiable<MyZone>{
 		}
 		
 		return p;
+	}
+	
+	public ObjectAttributes getObjectAttributes(){
+		return this.attr;
 	}
 	
 }

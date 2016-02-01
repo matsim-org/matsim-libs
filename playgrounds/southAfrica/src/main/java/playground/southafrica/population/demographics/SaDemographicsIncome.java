@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.households.Income;
 
+import playground.southafrica.population.capeTownTravelSurvey.HouseholdEnums;
+import playground.southafrica.population.census2011.containers.HousingType2011;
 import playground.southafrica.population.census2011.containers.Income2011;
 import playground.southafrica.population.nmbmTravelSurvey.containers.IncomeTravelSurvey2004;
 import playground.southafrica.utilities.RandomVariateGenerator;
@@ -89,6 +91,71 @@ public enum SaDemographicsIncome {
 			return getIncomeClassFromValue(valueBaseYear);
 		}
 	}
+	
+	
+	public static SaDemographicsIncome convertCapeTown2013Income(String incomeString, String assetClass2){
+		HouseholdEnums.MonthlyIncome income = HouseholdEnums.MonthlyIncome.parseFromDescription(incomeString);
+		HouseholdEnums.AssetClass2 class2 = HouseholdEnums.AssetClass2.parseFromDescription(assetClass2);
+		
+		double value = 0.0;
+		switch (income) {
+		case REFUSE:
+		case UNKNOWN:
+		case NO_RESPONSE:
+			switch (class2) {
+			case UNKNOWN:
+				return Unknown;
+			default:
+				value = generateCapeTown2013IncomeValueFromAssetClass(class2);
+				break;
+			}
+			break;
+		case NO_INCOME:
+			value = 0.0;
+			break;
+		case CLASS2:
+		case CLASS3:
+		case CLASS4:
+		case CLASS5:
+		case CLASS6:
+		case CLASS7:
+		case CLASS8:
+		case CLASS9:
+		case CLASS10:
+		case CLASS11:
+		case CLASS12:
+			value = generateCapeTown2013IncomeValueFromReportedIncome(income);
+			break;
+		}
+		
+		double valueBaseYear = SouthAfricaInflationCorrector.convert(value, 2013, 2011);
+		return getIncomeClassFromValue(valueBaseYear);
+	}
+	
+	private static double generateCapeTown2013IncomeValueFromAssetClass(HouseholdEnums.AssetClass2 assetClass){
+		double value = 0.0;
+		switch (assetClass) {
+		case LOW:
+			value = RandomVariateGenerator.getTriangular(0.0, 3200.0, 3200.0);
+		case LOWMIDDLE:
+			value = 3200.0 + Math.random()*(25600.0 - 3200.0);
+		case HIGHMIDDLE:
+			value = 25600.0 + Math.random()*(51200.0-25601);
+		case HIGH:
+			value = RandomVariateGenerator.getTriangular(51201.0, 51201.0, 3.0*51201.0);
+		default:
+			break;
+		}
+		return 12.0*value;
+	}
+	
+	private static double generateCapeTown2013IncomeValueFromReportedIncome(HouseholdEnums.MonthlyIncome income){
+		double value = 0.0;
+		
+		
+		return value;
+	}
+	
 	
 	
 	private static double generateCensusIncomeValue(Income2011 income){
