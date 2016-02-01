@@ -52,6 +52,7 @@ public class TestRunIVTBaselineCalibration {
 	@Before
 	public void prepareTests() {
 		final String pathToPTLinksToMonitor = utils.getClassInputDirectory() + "ptLinksToMonitor.txt";
+		final String pathToPTStationsToMonitor = utils.getClassInputDirectory() + "ptStationsToMonitor.txt";
 
 		final String pathToOnlyStreetNetwork = utils.getClassInputDirectory() + "onlystreetnetwork.xml";
 		final String pathToNetwork = "test/scenarios/pt-tutorial/multimodalnetwork.xml";
@@ -61,7 +62,7 @@ public class TestRunIVTBaselineCalibration {
 		final String pathToFacilities = utils.getOutputDirectory() + "facilities.xml";
 		final String pathToF2L = utils.getOutputDirectory() + "f2l.f2l";
 		final String pathToConfig = utils.getOutputDirectory() + "config.xml";
-		final String pathToSchedule = "test/scenarios/pt-tutorial/transitschedule.xml";
+		final String pathToSchedule = utils.getClassInputDirectory() + "transitschedule.xml";
 		final String pathToVehicles = "test/scenarios/pt-tutorial/transitVehicles.xml";
 
 		Scenario tempScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -99,7 +100,7 @@ public class TestRunIVTBaselineCalibration {
 		config.ptCounts().setCountsScaleFactor(10);
 		new ConfigWriter(config).write(pathToConfig);
 
-		String[] argsSim = {pathToConfig, pathToPTLinksToMonitor};
+		String[] argsSim = {pathToConfig, pathToPTLinksToMonitor, pathToPTStationsToMonitor};
 		RunIVTBaselineCalibration.main(argsSim);
 	}
 

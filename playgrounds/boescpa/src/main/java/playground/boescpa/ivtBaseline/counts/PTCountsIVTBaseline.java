@@ -31,6 +31,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
  * Counts the daily passengers on a given link.
@@ -40,7 +41,8 @@ import org.matsim.core.controler.listener.StartupListener;
  */
 public class PTCountsIVTBaseline implements StartupListener, IterationEndsListener, IterationStartsListener {
 
-	private final PTLinkCountsEventHandler eventHandler;
+	private final PTLinkCountsEventHandler ptLinkCountsEventHandler;
+	private final PTStationCountsEventHandler ptStationCountsEventHandler;
 	private final EventsManager events;
 	private final OutputDirectoryHierarchy controlerIO;
 	private final Config config;
@@ -48,9 +50,10 @@ public class PTCountsIVTBaseline implements StartupListener, IterationEndsListen
 	private boolean recordCounts;
 
 	@Inject
-	private PTCountsIVTBaseline(PTLinkCountsEventHandler ptLinkCountsEventHandler, EventsManager events,
-								OutputDirectoryHierarchy controlerIO, Config config) {
-		this.eventHandler = ptLinkCountsEventHandler;
+	private PTCountsIVTBaseline(PTLinkCountsEventHandler ptLinkCountsEventHandler, PTStationCountsEventHandler ptStationCountsEventHandler,
+								EventsManager events, OutputDirectoryHierarchy controlerIO, Config config) {
+		this.ptLinkCountsEventHandler = ptLinkCountsEventHandler;
+		this.ptStationCountsEventHandler = ptStationCountsEventHandler;
 		this.events = events;
 		this.controlerIO = controlerIO;
 		this.config = config;
@@ -67,16 +70,20 @@ public class PTCountsIVTBaseline implements StartupListener, IterationEndsListen
 		//int countsInterval = event.getServices().getConfig().ptCounts().getPtCountsInterval();
 		if (event.getIteration() % countsInterval == 0) {
 			this.recordCounts = true;
-			this.events.addHandler(this.eventHandler);
-			this.eventHandler.reset(event.getIteration());
+			this.events.addHandler(this.ptLinkCountsEventHandler);
+			this.ptLinkCountsEventHandler.reset(event.getIteration());
+			this.events.addHandler(this.ptStationCountsEventHandler);
+			this.ptStationCountsEventHandler.reset(event.getIteration());
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.recordCounts) {
-			this.eventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "ptCounts.txt"));
-			this.events.removeHandler(this.eventHandler);
+			this.ptLinkCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "ptLinkCounts.txt"));
+			this.events.removeHandler(this.ptLinkCountsEventHandler);
+			this.ptStationCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "ptStationCounts.txt"));
+			this.events.removeHandler(this.ptStationCountsEventHandler);
 		}
 		this.recordCounts = false;
 	}
