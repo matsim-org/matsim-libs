@@ -58,7 +58,7 @@ public class GfipNetworkSplitter {
 		String networkFolder = args[0];
 		networkFolder += networkFolder.endsWith("/") ? "" : "/";
 		String inputNetwork = args[1];
-		String outputNetwork = args[2];
+		String outputNetworkPrefix = args[2];
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc.getNetwork()).parse(networkFolder + inputNetwork);
 		
@@ -70,7 +70,7 @@ public class GfipNetworkSplitter {
 		Network newNetwork = null;
 		for(double d : thresholds){
 			newNetwork = splitNetwork(sc.getNetwork(), d);
-			new NetworkWriter(newNetwork).write(networkFolder + outputNetwork);
+			new NetworkWriter(newNetwork).write(String.format("%s%s_%04.0f.xml.gz", networkFolder, outputNetworkPrefix, d));
 		}
 		
 		Header.printFooter();
