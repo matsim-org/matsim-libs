@@ -22,7 +22,7 @@ package org.matsim.vis.otfvis.interfaces;
  * @author nagel
  *
  */
-public interface PlayPauseSimulationI {
+public interface PlayPauseSimulationControlI {
 /*	Hallo Kai,
 
 	auch “main” läuft in einem Thread, welcher angehalten werden kann. 

@@ -37,7 +37,8 @@ import org.matsim.vis.otfvis.data.OTFServerQuadTree;
  */
 public interface OTFServer {
 
-	public enum TimePreference{EARLIER, LATER, RESTART}
+//	public enum TimePreference{EARLIER, LATER, RESTART}
+	public enum TimePreference{EARLIER, LATER }
 
 	public boolean requestNewTime(int time, TimePreference searchDirection);
 

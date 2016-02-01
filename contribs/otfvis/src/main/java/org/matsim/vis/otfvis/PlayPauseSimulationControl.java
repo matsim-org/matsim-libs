@@ -20,7 +20,7 @@ package org.matsim.vis.otfvis;
 
 import java.util.concurrent.Semaphore;
 
-import org.matsim.vis.otfvis.interfaces.PlayPauseSimulationI;
+import org.matsim.vis.otfvis.interfaces.PlayPauseSimulationControlI;
 
 /**
  * Extracted the play/pause functionality from otfvis to make it available for other purposes (specifically, RMITs 
@@ -28,7 +28,7 @@ import org.matsim.vis.otfvis.interfaces.PlayPauseSimulationI;
  * 
  * @author nagel
  */
-public class PlayPauseSimulation implements PlayPauseSimulationI {
+public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 /*	Hallo Kai,
 
 	auch “main” läuft in einem Thread, welcher angehalten werden kann.
@@ -57,14 +57,27 @@ public class PlayPauseSimulation implements PlayPauseSimulationI {
 	}
 
 	private volatile Status status = Status.PAUSE;
+	// "volatile" seems to mean "can be changed by more than one thread", and it hedges against that by
+	// ensuring that the object is changed as a whole before the next thread interferes.  The tutorial says
+	// that still bad things can happen, but does not say which.  Seems to me that they mean that
+	// there can still be race conditions, which is rather obvious. 
+	// Problems here can occur when multiple threads (here mostly: the playpausecontrol and the 
+	// mobsim itself) both try to modify state here. kai, jan'16
+	
 	private Semaphore accessToQNetwork = new Semaphore(1, true);
+	// why is this not volatile? Maybe is it synchronized by design? kai, jan'16 
+	
 	private volatile int localTime = 0;
 	private volatile double stepToTime = 0;
 
 	private final Object paused = new Object();
 	private final Object stepDone = new Object();
 	private final Object updateFinished = new Object();
-	private AccessToBlockingEtc internalInterface = new AccessToBlockingEtc() ;
+	private AccessToBlockingEtc myBarrier = new AccessToBlockingEtc() ;
+	
+	// synchronized methods seem to block the whole instance of the class until they are done.
+	// synchronized statements seem to block only the object the aquire.  I.e. other parts of the
+	// class can still be accessed and executed.
 	
 	public class AccessToBlockingEtc {
 		public final void blockOtherUpdates() {
@@ -82,8 +95,8 @@ public class PlayPauseSimulation implements PlayPauseSimulationI {
 			if ( status == Status.STEP) {
 				// Time and Iteration reached?
 				if ( stepToTime <= localTime ) {
-					synchronized (stepDone) {
-						stepDone.notifyAll();
+					synchronized (stepDone) { 
+						stepDone.notifyAll(); // releases all stepDone.wait() 
 						status = Status.PAUSE ;
 					}
 				}
@@ -102,9 +115,14 @@ public class PlayPauseSimulation implements PlayPauseSimulationI {
 	
 	@Override
 	public final void doStep(int time) {
+		// yy seems to me that this is packing two functionalities into one:
+		// (1) if time==0, step exactly one step.  For this, don't have to know the current time.
+		// (2) if time is something else, step until this time.
+		// ????
+		
 		// leave Status on pause but let one step run (if one is waiting)
 		synchronized(paused) {
-			setStepToTime(time);
+			this.stepToTime = time;
 			status = Status.STEP ;
 			paused.notifyAll();
 		}
@@ -137,26 +155,37 @@ public class PlayPauseSimulation implements PlayPauseSimulationI {
 		}
 	}
 
-	public final void setListener(PlayPauseMobsimListener queueSimulationFeature) {
-		queueSimulationFeature.setInternalInterface( internalInterface ) ;
+	public final void setNotificationListener(PlayPauseMobsimListener listener) {
+		// maybe better "aquireAccessToSemaphore/Barrier" and make it more generally useable. kai, jan'16
+		
+		listener.setBarrier( myBarrier ) ;
 	}
 	
 	// for everything below here, I am not yet sure which of these need to be there. kai, mar'15
 
+	@Deprecated // I am of the opinion that it should be possible to get rid of this method and call doStep(...) or pause(...)
+	// directly.  kai, jan'16
 	void setStepToTime(double stepToTime) {
 		this.stepToTime = stepToTime;
+	}
+
+	Semaphore getAccessToQNetwork() {
+		// yy seems to me that we should either give out the instance of AccessToBlocking OR the semaphore.
+		// but not both. kai, jan'16
+		
+		return accessToQNetwork;
+	}
+
+	// purely observational only below this line (probably not a problem)
+	
+	boolean isFinished() {
+		return ( status == Status.FINISHED ) ;
 	}
 
 	public int getLocalTime() {
 		return localTime;
 	}
 
-	Semaphore getAccessToQNetwork() {
-		return accessToQNetwork;
-	}
 
-	Status getStatus() {
-		return status;
-	}
 
 }

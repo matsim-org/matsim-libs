@@ -25,18 +25,18 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.vis.otfvis.PlayPauseSimulation.AccessToBlockingEtc;
+import org.matsim.vis.otfvis.PlayPauseSimulationControl.AccessToBlockingEtc;
 
 public class PlayPauseMobsimListener implements MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
 
-	private AccessToBlockingEtc internalInterface;
+	private AccessToBlockingEtc myBarrier;
 
 	public PlayPauseMobsimListener() {
 	}
 
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		if ( this.internalInterface==null ) {
+		if ( this.myBarrier==null ) {
 			throw new RuntimeException("internalInterface==null.  Syntax is not yet stable; find out where the corresponding "
 					+ "setter is.") ;
 		}
@@ -44,18 +44,18 @@ public class PlayPauseMobsimListener implements MobsimInitializedListener, Mobsi
 	
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent event) {
-		this.internalInterface.blockOtherUpdates();
+		this.myBarrier.blockOtherUpdates();
 	}
 	
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
 		double time = event.getSimulationTime();
-		this.internalInterface.unblockOtherUpdates();
-		this.internalInterface.updateStatus(time);
+		this.myBarrier.unblockOtherUpdates();
+		this.myBarrier.updateStatus(time);
 	}
 
-	public void setInternalInterface(AccessToBlockingEtc internalInterface) {
-		this.internalInterface = internalInterface ;
+	public void setBarrier(AccessToBlockingEtc myBarrier) {
+		this.myBarrier = myBarrier ;
 	}
 
 
