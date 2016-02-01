@@ -1,0 +1,14 @@
+2016-01-29 16:24:11,229  WARN QVehicle:74 No VehicleCapacity (= maximum number of passengers) set in Vehicle. Using default value of 4.  This is only a problem if you need vehicles with different capacities, e.g. for minibuses.
+2016-01-29 16:24:11,230  WARN QVehicle:74 No VehicleCapacity (= maximum number of passengers) set in Vehicle. Using default value of 4.  This is only a problem if you need vehicles with different capacities, e.g. for minibuses.
+2016-01-29 16:24:11,230  WARN QVehicle:74 No VehicleCapacity (= maximum number of passengers) set in Vehicle. Using default value of 4.  This is only a problem if you need vehicles with different capacities, e.g. for minibuses.
+2016-01-29 16:24:11,230  WARN QVehicle:74 No VehicleCapacity (= maximum number of passengers) set in Vehicle. Using default value of 4.  This is only a problem if you need vehicles with different capacities, e.g. for minibuses.
+2016-01-29 16:24:11,231  WARN QVehicle:74 No VehicleCapacity (= maximum number of passengers) set in Vehicle. Using default value of 4.  This is only a problem if you need vehicles with different capacities, e.g. for minibuses.
+2016-01-29 16:24:11,231  WARN QVehicle:74 No VehicleCapacity (= maximum number of passengers) set in Vehicle. Using default value of 4.  This is only a problem if you need vehicles with different capacities, e.g. for minibuses.
+2016-01-29 16:24:11,231  WARN QVehicle:74 No VehicleCapacity (= maximum number of passengers) set in Vehicle. Using default value of 4.  This is only a problem if you need vehicles with different capacities, e.g. for minibuses.
+2016-01-29 16:24:11,231  WARN QVehicle:74 No VehicleCapacity (= maximum number of passengers) set in Vehicle. Using default value of 4.  This is only a problem if you need vehicles with different capacities, e.g. for minibuses.
+2016-01-29 16:24:11,232  WARN QVehicle:74 No VehicleCapacity (= maximum number of passengers) set in Vehicle. Using default value of 4.  This is only a problem if you need vehicles with different capacities, e.g. for minibuses.
+2016-01-29 16:24:11,232  WARN QVehicle:74 No VehicleCapacity (= maximum number of passengers) set in Vehicle. Using default value of 4.  This is only a problem if you need vehicles with different capacities, e.g. for minibuses.
+2016-01-29 16:24:11,232  WARN QVehicle:79  Future occurences of this logging statement are suppressed.
+2016-01-29 16:24:12,234 ERROR BasicPlanAgentImpl:153 last activity of person driver agent id car_home1_work1_17 has end time < infty; setting it to infty
+2016-01-29 16:24:12,235 ERROR BasicPlanAgentImpl:154  This message given only once.
+2016-01-29 16:24:14,517  WARN ExpBetaPlanChanger:86 Would make sense to revise this once more.  See comments in code.  kai, nov08
