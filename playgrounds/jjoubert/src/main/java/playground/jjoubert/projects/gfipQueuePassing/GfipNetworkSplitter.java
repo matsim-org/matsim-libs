@@ -63,7 +63,7 @@ public class GfipNetworkSplitter {
 		new MatsimNetworkReader(sc.getNetwork()).parse(networkFolder + inputNetwork);
 		
 		List<Double> thresholds = new ArrayList<>();
-		for(int i = 2; i < args.length; i++){
+		for(int i = 3; i < args.length; i++){
 			thresholds.add(Double.parseDouble(args[i]));
 		}
 
