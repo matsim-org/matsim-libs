@@ -12,8 +12,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
 
-import playground.smetzler.bikeNetwork.BikeCustomizedOsmNetworkReader;
-
 public class BikeTravelTime implements TravelTime {
 
 	private final static Logger log = Logger.getLogger(BikeTravelTime.class);

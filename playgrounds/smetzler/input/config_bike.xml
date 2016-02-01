@@ -16,7 +16,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output/skalitzerBike_2901_bikesCar" />
+		<param name="outputDirectory" value="./output/skalitzerBike_2901_bikesCar_didntwork" />
 		<param name="lastIteration" value="10" />
 	</module>
 
@@ -28,15 +28,18 @@
 	
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		
-		<param name = "flowCapacityFactor" value="0.02" /> <!-- we simulate only 1% of the population, and reduce the network capacity to 2% -->
-		<param name = "storageCapacityFactor" value="0.05" />
+		<param name = "flowCapacityFactor" value="1" /> <!-- we simulate only 1% of the population, and reduce the network capacity to 2% -->
+		<param name = "storageCapacityFactor" value="1" />
 	</module>
 	
 	<module name="bike" >
 		<param name="inputSurfaceInformationFile" value="input/network/skalitzer_bikeatt.xml" />
 		<!--<param name="simulatedModes" value="bike,walk" />-->
-
 	</module>
+	
+	<module name="vehicles" >
+	<!--	<param name=" vehiclesFile " value="/path/to/vehicles.xml.gz" />-->
+	</module >
 	
 	<module name="planCalcScore">
 		<param name="learningRate" value="1.0" />
@@ -75,25 +78,22 @@
 
 		<param name="ModuleProbability_2" value="0.2" />
 		<param name="Module_2" value="ReRoute" />
-	
 	</module>
 
 	<module name="travelTimeCalculator">
 		<param name="filterModes" value="true" />
 	</module>
 	
+	
 	<module name="planscalcroute" >
-
 		<!-- All the modes for which the router is supposed to generate network routes (like car) -->
 		<param name="networkModes" value="car,bike" />
 		
 		<parameterset type="teleportedModeParameters" >
 			<param name="beelineDistanceFactor" value="1.3" />
 			<param name="mode" value="walk" />
-
 			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
 			<param name="teleportedModeFreespeedFactor" value="null" />
-
 			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
 			<param name="teleportedModeSpeed" value="0.8333333333333333" />
 		</parameterset>
