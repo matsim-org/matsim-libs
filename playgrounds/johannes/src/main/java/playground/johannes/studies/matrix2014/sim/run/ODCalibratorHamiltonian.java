@@ -21,11 +21,13 @@ package playground.johannes.studies.matrix2014.sim.run;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import playground.johannes.studies.matrix2014.config.ODCalibratorConfigurator;
+import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonian;
+import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonianConfigurator;
 import playground.johannes.studies.matrix2014.sim.CachedModePredicate;
-import playground.johannes.studies.matrix2014.sim.DelayedHamiltonian;
 import playground.johannes.studies.matrix2014.sim.ODCalibrator;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.sim.HamiltonianLogger;
 
 /**
  * @author jillenberger
@@ -38,15 +40,22 @@ public class ODCalibratorHamiltonian {
         ConfigGroup configGroup = config.getModule(MODULE_NAME);
         ODCalibrator hamiltonian = new ODCalibratorConfigurator(
                 engine.getDataPool())
-                .configure(config.getModule("tomtomCalibrator"));
+                .configure(configGroup);
 
-        hamiltonian.setUseWeights(true);
+        hamiltonian.setUseWeights(engine.getUseWeights());
         hamiltonian.setPredicate(new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
 
-        long delay = (long) Double.parseDouble(configGroup.getValue("delay"));
-        double theta = Double.parseDouble(configGroup.getValue("theta"));
-
-        engine.getHamiltonian().addComponent(new DelayedHamiltonian(hamiltonian, delay), theta);
+        AnnealingHamiltonian annealingHamiltonian = AnnealingHamiltonianConfigurator.configure(hamiltonian,
+                configGroup);
+        engine.getHamiltonian().addComponent(annealingHamiltonian);
         engine.getAttributeListeners().get(CommonKeys.ACTIVITY_FACILITY).addComponent(hamiltonian);
+        engine.getEngineListeners().addComponent(annealingHamiltonian);
+        /*
+        Add a hamiltonian logger.
+         */
+        engine.getEngineListeners().addComponent(new HamiltonianLogger(hamiltonian,
+                engine.getLoggingInterval(),
+                "odCalibrator",
+                engine.getIOContext().getRoot()));
     }
 }

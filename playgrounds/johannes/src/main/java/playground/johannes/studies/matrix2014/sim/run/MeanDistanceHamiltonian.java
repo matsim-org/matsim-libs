@@ -21,11 +21,14 @@ package playground.johannes.studies.matrix2014.sim.run;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonian;
+import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonianConfigurator;
 import playground.johannes.studies.matrix2014.sim.CopyPersonAttToLeg;
 import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.sim.BivariatMean;
+import playground.johannes.synpop.sim.HamiltonianLogger;
 import playground.johannes.synpop.sim.data.Converters;
 import playground.johannes.synpop.sim.data.DoubleConverter;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
@@ -65,10 +68,18 @@ public class MeanDistanceHamiltonian {
                 new LinearDiscretizer(1.0),
                 engine.getUseWeights());
 
-        double theta = Double.parseDouble(configGroup.getValue("theta"));
-        engine.getHamiltonian().addComponent(hamiltonian, theta);
-
+        AnnealingHamiltonian annealingHamiltonian = AnnealingHamiltonianConfigurator.configure(
+                hamiltonian,
+                configGroup);
+        engine.getHamiltonian().addComponent(annealingHamiltonian);
         engine.getAttributeListeners().get(CommonKeys.LEG_GEO_DISTANCE).addComponent(hamiltonian);
+        /*
+        Add a hamiltonian logger.
+         */
+        engine.getEngineListeners().addComponent(new HamiltonianLogger(hamiltonian,
+                engine.getLoggingInterval(),
+                "meanDistanceLAU2",
+                engine.getIOContext().getRoot()));
     }
 
     private static Set<Attributable> getCarLegs(Set<? extends Person> persons, Predicate<Segment> predicate) {

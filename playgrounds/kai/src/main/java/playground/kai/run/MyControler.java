@@ -17,6 +17,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -48,6 +49,7 @@ class MyControler {
 			config = ConfigUtils.loadConfig("examples/equil/config.xml") ;
 		}
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		// prepare the scenario
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;

@@ -44,7 +44,7 @@ public class Simulator {
 
     private static final Logger logger = Logger.getLogger(Simulator.class);
 
-    static final String MODULE_NAME = "spic";
+    static final String MODULE_NAME = "synPopSim";
 
     private static final boolean USE_WEIGHTS = true;
 
@@ -80,7 +80,7 @@ public class Simulator {
     }
 
     AnalyzerTaskComposite<Collection<? extends Person>> getHamiltonianAnalyzers() {
-        return null;
+        return hamiltonianAnalyzers;
     }
 
     HamiltonianComposite getHamiltonian() {
@@ -140,9 +140,6 @@ public class Simulator {
         analyzerTasks = new AnalyzerTaskComposite<>();
         engineListeners = new MarkovEngineListenerComposite();
         attributeListeners = new HashMap<>();
-
-        hamiltonianAnalyzers = new ConcurrentAnalyzerTask<>();
-        analyzerTasks.addComponent(new AnalyzerTaskGroup<>(hamiltonianAnalyzers, getIOContext(), "hamiltonian"));
         /*
         Load parameters...
          */
@@ -160,23 +157,9 @@ public class Simulator {
          */
         refPersons = RefPopulationBuilder.build(this, config);
         /*
-        Build default analyzer...
-         */
-        DefaultAnalyzerBuilder.build(this, config);
-
-        logger.info("Analyzing reference population...");
-        ioContext.append("ref");
-        AnalyzerTaskRunner.run(refPersons, analyzerTasks, ioContext);
-        /*
         Generate the simulation population...
          */
         simPersons = SimPopulationBuilder.build(this, config);
-        /*
-        Extend the analyzer
-         */
-        ExtendedAnalyzerBuilder.build(this, config);
-
-        engineListeners.addComponent(new AnalyzerListener(analyzerTasks, ioContext, dumpInterval));
         /*
 		Setup listeners for changes on facilities and geo distance.
 		 */
@@ -187,6 +170,10 @@ public class Simulator {
         geoDistanceUpdater.setPredicate(new CachedModePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR));
 
         attributeListeners.get(CommonKeys.ACTIVITY_FACILITY).addComponent(geoDistanceUpdater);
+        /*
+        Build default analyzer...
+         */
+        DefaultAnalyzerBuilder.build(this, config);
 		/*
         Build hamiltonians...
          */
@@ -195,8 +182,13 @@ public class Simulator {
             TaskRunner.run(new CopyPersonAttToLeg(CommonKeys.PERSON_WEIGHT), simPersons);
         }
 
+        hamiltonianAnalyzers = new ConcurrentAnalyzerTask<>();
+        analyzerTasks.addComponent(new AnalyzerTaskGroup<>(hamiltonianAnalyzers, ioContext, "hamiltonian"));
+
         GeoDistanceHamiltonian.build(this, config);
-        MeanDistanceHamiltonian.build(this, config);
+//        GeoDistanceLAU2Hamiltonian.build(this, config);
+//        MeanDistanceHamiltonian.build(this, config);
+        MeanZoneDistanceHamiltonian.build(this, config);
         ODCalibratorHamiltonian.build(this, config);
 
         engineListeners.addComponent(new HamiltonianLogger(hamiltonian,
@@ -204,6 +196,18 @@ public class Simulator {
                 "SystemTemperature",
                 ioContext.getRoot()));
         engineListeners.addComponent(new TransitionLogger(loggingInterval));
+        /*
+        Analyze reference population...
+         */
+        logger.info("Analyzing reference population...");
+        ioContext.append("ref");
+        AnalyzerTaskRunner.run(refPersons, analyzerTasks, ioContext);
+        /*
+        Extend the analyzer
+         */
+        ExtendedAnalyzerBuilder.build(this, config);
+
+        engineListeners.addComponent(new AnalyzerListener(analyzerTasks, ioContext, dumpInterval));
         /*
 		Setup the facility mutator...
 		 */

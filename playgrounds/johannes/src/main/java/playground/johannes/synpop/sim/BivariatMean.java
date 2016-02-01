@@ -20,6 +20,7 @@
 package playground.johannes.synpop.sim;
 
 import gnu.trove.iterator.TIntDoubleIterator;
+import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 import org.matsim.contrib.common.stats.Discretizer;
 import playground.johannes.synpop.data.Attributable;
@@ -83,6 +84,29 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
         // Calculate the initial hamiltonian value.
         initHamiltonian();
 
+    }
+
+    public BivariatMean(TIntDoubleMap reference, Set<? extends Attributable> simElements, String xAttrKey, String
+            yAttrKey, Discretizer xDataDiscr, boolean useWeights) {
+        this.xAttrKey = xAttrKey;
+        this.yAttrKey = yAttrKey;
+        this.xDataDiscr = xDataDiscr;
+        this.useWeights = useWeights;
+
+        if(useWeights) weightKey = Converters.register(CommonKeys.PERSON_WEIGHT, DoubleConverter.getInstance());
+
+//        initReferenceValues(refElements, xAttrKey, yAttrKey, useWeights);
+        referenceValues = new DynamicDoubleArray(1, Double.NaN);
+        TIntDoubleIterator it = reference.iterator();
+        for(int i = 0; i < reference.size(); i++) {
+            it.advance();
+            referenceValues.set(it.key(), it.value());
+        }
+
+        initSimulationValues(simElements, xAttrKey, yAttrKey, useWeights);
+
+        // Calculate the initial hamiltonian value.
+        initHamiltonian();
     }
 
     private void initHamiltonian() {

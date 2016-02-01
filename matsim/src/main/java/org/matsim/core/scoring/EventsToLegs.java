@@ -124,7 +124,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	}
 
 	public interface LegHandler {
-	    void handleLeg(Id<Person> agentId, Leg leg);
+	    void handleLeg(PersonExperiencedLeg leg);
 	}
 
 	private Network network;
@@ -139,7 +139,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	private Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
 	private Map<Id<Person>, PendingTransitTravel> transitTravels = new HashMap<>();
 	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
-	private LegHandler legHandler;
+	private List<LegHandler> legHandlers = new ArrayList<>();
 	
 
 	@Inject
@@ -281,7 +281,9 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	        }
 	        leg.setRoute(genericRoute);
 	    }
-	    legHandler.handleLeg(event.getPersonId(), leg);
+		for (LegHandler legHandler : legHandlers) {
+			legHandler.handleLeg(new PersonExperiencedLeg(event.getPersonId(), leg));
+		}
 	}
 
 	@Override
@@ -290,8 +292,8 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 		transitVehicle2currentRoute.put(event.getVehicleId(), lineAndRoute);
 	}
 
-	public void setLegHandler(LegHandler legHandler) {
-	    this.legHandler = legHandler;
+	public void addLegHandler(LegHandler legHandler) {
+	    this.legHandlers.add(legHandler);
 	}
 
 	@Override

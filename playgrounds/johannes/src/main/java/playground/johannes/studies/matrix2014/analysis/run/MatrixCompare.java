@@ -45,7 +45,8 @@ public class MatrixCompare {
     private static final Logger logger = Logger.getLogger(MatrixCompare.class);
 
     public static void main(String args[]) throws IOException {
-        String simFile = "/home/johannes/gsv/matrix2014/sim/output/1E8/matrix.txt.gz";
+//        String simFile = "/home/johannes/gsv/miv-matrix/simmatrices/miv.874.xml";
+        String simFile = "/home/johannes/sge/prj/matrix2014/runs/1059/output/2.7E10/matrix/matrix.txt.gz";
         String refFile = "/home/johannes/gsv/matrix2014/sim/data/matrices/itp.de.txt";
         String outDir = "/home/johannes/gsv/matrix2014/matrix-compare/";
         double volumeThreshold = 1;
@@ -93,6 +94,7 @@ public class MatrixCompare {
 
         MatrixDistanceCompare distTask = new MatrixDistanceCompare("matrix.dist", zones);
         distTask.setFileIoContext(ioContext);
+        distTask.setDiscretizer(new LinearDiscretizer(25000));
 
         MatrixMarginalsCompare marTask = new MatrixMarginalsCompare("matrix");
         marTask.setHistogramWriter(writer);

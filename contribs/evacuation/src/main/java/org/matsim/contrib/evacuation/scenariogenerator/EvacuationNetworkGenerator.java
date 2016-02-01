@@ -82,19 +82,23 @@ public class EvacuationNetworkGenerator {
 
 	/**
 	 * Creates links from all save nodes to the evacuation node A
-	 * 
-	 * @param network
+	 *
 	 */
 	private void createEvacuationNodsAndLinks() {
 
-		Coordinate cc = this.evacuationArea.getCentroid().getCoordinate();
-		cc.x += 10000;
-		cc.y += 10000;
-		Coord safeCoord = MGC.coordinate2Coord(cc);
+		Coordinate cc1 = this.evacuationArea.getCentroid().getCoordinate();
+		cc1.x += 10000;
+		cc1.y += 10000;
+		Coord safeCoord1 = MGC.coordinate2Coord(cc1);
 
-		Node safeNodeA = this.network.getFactory().createNode(this.safeNodeAId, safeCoord);
+		Coordinate cc2 = this.evacuationArea.getCentroid().getCoordinate();
+		cc2.x += 10010;
+		cc2.y += 10010;
+		Coord safeCoord2 = MGC.coordinate2Coord(cc2);
+
+		Node safeNodeA = this.network.getFactory().createNode(this.safeNodeAId, safeCoord1);
 		this.network.addNode(safeNodeA);
-		Node safeNodeB = this.network.getFactory().createNode(this.safeNodeBId, safeCoord);
+		Node safeNodeB = this.network.getFactory().createNode(this.safeNodeBId, safeCoord2);
 		this.network.addNode(safeNodeB);
 
 		double capacity = 1000000.;

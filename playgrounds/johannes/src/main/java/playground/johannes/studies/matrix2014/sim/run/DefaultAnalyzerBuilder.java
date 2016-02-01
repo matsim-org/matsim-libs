@@ -50,6 +50,7 @@ public class DefaultAnalyzerBuilder {
 
         HistogramWriter histogramWriter = new HistogramWriter(engine.getIOContext(), new StratifiedDiscretizerBuilder(100, 100));
         histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
+        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new LinearDiscretizer(25000), "linear25"));
         histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new FixedBordersDiscretizer(new double[]{-1,
                 100000, Integer.MAX_VALUE}), "100KM"));
 

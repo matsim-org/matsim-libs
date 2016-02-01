@@ -140,7 +140,7 @@ public class RunRoadClassification {
 				convergenceCriterion, 
 				// selfTuner, 
 				maxIterations, maxTransitions, populationSize,
-				MatsimRandom.getRandom(), interpolate, objectiveFunction, maxMemoryLength);
+				MatsimRandom.getRandom(), interpolate, objectiveFunction, maxMemoryLength, false);
 		randomSearch.setLogFileName(scenario.getConfig().controler().getOutputDirectory() + "optimization.log");
 		randomSearch.run();
 		for (DecisionVariable decisionVariable : randomSearch.getBestDecisionVariablesView()) {

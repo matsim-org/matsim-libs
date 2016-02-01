@@ -24,6 +24,8 @@ import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
+import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonian;
+import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonianConfigurator;
 import playground.johannes.synpop.analysis.AnalyzerTask;
 import playground.johannes.synpop.analysis.HistogramWriter;
 import playground.johannes.synpop.analysis.PassThroughDiscretizerBuilder;
@@ -50,11 +52,6 @@ public class GeoDistanceHamiltonian {
          */
         Set<Attributable> refLegs = getCarLegs(engine.getRefPersons(), engine.getLegPredicate());
         Set<Attributable> simLegs = getCarLegs(engine.getSimPersons(), engine.getLegPredicate());
-
-//        List<Double> values = new LegCollector(new NumericAttributeProvider(CommonKeys.LEG_GEO_DISTANCE)).collect(refPersons);
-//        double[] nativeValues = org.matsim.contrib.common.collections.CollectionUtils.toNativeArray(values);
-//        Discretizer disc = FixedSampleSizeDiscretizer.create(nativeValues, 50, 100);
-
         /*
         Create the geo distance discretizer.
          */
@@ -76,8 +73,11 @@ public class GeoDistanceHamiltonian {
                 discretizer,
                 engine.getUseWeights());
 
-        double theta = Double.parseDouble(configGroup.getValue("theta"));
-        engine.getHamiltonian().addComponent(hamiltonian, theta);
+//        double theta = Double.parseDouble(configGroup.getValue("theta"));
+        AnnealingHamiltonian annealingHamiltonian = AnnealingHamiltonianConfigurator.configure(
+                hamiltonian,
+                configGroup);
+        engine.getHamiltonian().addComponent(annealingHamiltonian);
         /*
         Add the hamiltonian to the geo distance attribute change listener.
          */
@@ -98,8 +98,10 @@ public class GeoDistanceHamiltonian {
         /*
         Add a hamiltonian logger.
          */
-        String name = String.format("hamiltonian.%s", CommonKeys.LEG_GEO_DISTANCE);
-        engine.getEngineListeners().addComponent(new HamiltonianLogger(hamiltonian, engine.getLoggingInterval(), name, engine.getIOContext().getRoot()));
+        engine.getEngineListeners().addComponent(new HamiltonianLogger(hamiltonian,
+                engine.getLoggingInterval(),
+                CommonKeys.LEG_GEO_DISTANCE,
+                engine.getIOContext().getRoot()));
     }
 
     private static Set<Attributable> getCarLegs(Set<? extends Person> persons, Predicate<Segment> predicate) {

@@ -46,7 +46,7 @@ public class RunEventsHandlingExample {
 
 		//create the handler and add it
 		MyEventHandler1 handler1 = new MyEventHandler1();
-		MyEventHandler2 handler2 = new MyEventHandler2(500);
+		MyEventHandler2 handler2 = new MyEventHandler2();
 		MyEventHandler3 handler3 = new MyEventHandler3();
 		events.addHandler(handler1);
 		events.addHandler(handler2);
@@ -56,7 +56,7 @@ public class RunEventsHandlingExample {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(inputFile);
 		
-		System.out.println("average travel time: " + handler2.getAverageTravelTime());
+		System.out.println("average travel time: " + handler2.getTotalTravelTime());
 		handler3.writeChart("output/departuresPerHour.png");
 		
 		System.out.println("Events file read!");

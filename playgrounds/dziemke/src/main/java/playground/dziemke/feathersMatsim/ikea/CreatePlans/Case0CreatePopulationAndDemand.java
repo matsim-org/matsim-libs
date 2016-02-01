@@ -13,8 +13,8 @@ public class Case0CreatePopulationAndDemand {
 	private final static Logger Log = Logger.getLogger(Case0CreatePopulationAndDemand.class);
 	private Scenario scenario;
 
-	private String networkFile = "./input/network/merged-network_UTM31N.xml";
-	private String dataFile ="./input/prdToAsciiRectifiedTAZ.csv";
+	private String networkFile = "C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/network/merged-network_UTM31N.xml";
+	private String dataFile ="C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/prdToAsciiRectifiedTAZ.csv";
 
 
 	public static void main(String[] args) {
@@ -44,7 +44,7 @@ public class Case0CreatePopulationAndDemand {
 
 	private void write() {
 		PopulationWriter populationWriter = new PopulationWriter(this.scenario.getPopulation(), this.scenario.getNetwork());
-		populationWriter.write("./output/Case0plans.xml.gz");
+		populationWriter.write("C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/output/Case0plans.xml.gz");
 		Log.info("Number of persons: " + this.scenario.getPopulation().getPersons().size());
 	}
 

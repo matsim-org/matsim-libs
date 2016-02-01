@@ -3,6 +3,8 @@ package playground.southafrica.population.demographics;
 import org.apache.log4j.Logger;
 import org.matsim.core.population.PersonImpl;
 
+import playground.southafrica.population.capeTownTravelSurvey.HouseholdEnums;
+import playground.southafrica.population.capeTownTravelSurvey.PersonEnums;
 import playground.southafrica.population.census2011.containers.Employment2011;
 import playground.southafrica.population.nmbmTravelSurvey.NmbmSurveyParser;
 
@@ -69,6 +71,36 @@ public enum SaDemographicsEmployment {
 		} else{
 			return Nonworking;
 		}
+	}
+	
+	/**
+	 * Converts the employment details from the Travel Diary conducted in the
+	 * City of Cape Town in 2013 into a generic employment status. In this 
+	 * case we consider the <code>employment</code> attribute that was captured
+	 * in the <code>personAttributes.xml</code> file when parsing the Travel
+	 * Survey.
+	 * 
+	 * @param employment
+	 * @return
+	 */
+	public static SaDemographicsEmployment convertCapeTown2011Employment(String employment){
+		PersonEnums.Employment emp = PersonEnums.Employment.parseFromDescription(employment);
+		switch (emp) {
+		case UNKNOWN:
+		case UNEMPLOYED_LOOKING:
+		case UNEMPLOYED_NOT_LOOKING:
+		case PENSIONER:
+		case STUDENT:
+		case SCHOLAR:
+		case HOUSEWIFE:
+			return Nonworking;
+		case FULLTIME:
+		case PARTTIME:
+		case SELFEMPLOYED:
+		case CONTRACT:
+			return Working;
+		}
+		return Nonworking;
 	}
 	
 	

@@ -193,7 +193,7 @@ class RoadInvestmentMain {
 				//selfTuner, 
 				maxIterations, maxTransitions,
 				populationSize, MatsimRandom.getRandom(), interpolate,
-				objectiveFunction, maxMemoryLength);
+				objectiveFunction, maxMemoryLength, false);
 		randomSearch.setLogFileName("./randomSearchLog.txt");
 		randomSearch.run();
 
