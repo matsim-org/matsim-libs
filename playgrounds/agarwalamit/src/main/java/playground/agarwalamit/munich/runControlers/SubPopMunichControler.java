@@ -112,7 +112,6 @@ public class SubPopMunichControler {
 			}
 		});
 
-
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		controler.getConfig().addModule(ecg);
 
@@ -203,5 +202,4 @@ public class SubPopMunichControler {
 
 		controler.run();
 	}
-
 }

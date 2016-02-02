@@ -183,7 +183,5 @@ public class MunichControler {
 			controler.addControlerListener(new MyEmissionCongestionMoneyEventControlerListner(emissionCostModule,emissionModule));
 		}
 		controler.run();	
-
 	}
-
 }
