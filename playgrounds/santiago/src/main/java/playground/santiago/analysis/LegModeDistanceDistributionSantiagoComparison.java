@@ -40,7 +40,8 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
 public class LegModeDistanceDistributionSantiagoComparison {
 	private final static Logger logger = Logger.getLogger(LegModeDistanceDistributionSantiagoComparison.class);
 	
-	static String baseFolder1 = "../../../runs-svn/santiago/run40/output/";
+//	static String baseFolder1 = "../../../runs-svn/santiago/run40/output/";
+	static String baseFolder1 = "../../../runs-svn/santiago/baseCase8/";
 	static String configFile1 = baseFolder1 + "output_config.xml.gz";
 	static String iteration1 = "0";
 	

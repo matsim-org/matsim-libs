@@ -65,6 +65,7 @@ public class SantiagoScenarioRunner {
 //	private static boolean doModeChoice = false;
 	private static String inputPath = "../../../runs-svn/santiago/run40/input/";
 	private static boolean doModeChoice = true;
+	private static boolean mapActs2Links = true;
 	
 	private static String configFile;
 	
@@ -82,6 +83,7 @@ public class SantiagoScenarioRunner {
 			configFile = inputPath + "config_final.xml";
 		} else {
 			configFile = args[0];
+			mapActs2Links = Boolean.parseBoolean(args[1]);
 		}
 		
 		Config config = ConfigUtils.loadConfig(configFile);
@@ -104,7 +106,7 @@ public class SantiagoScenarioRunner {
 		if(doModeChoice) setModeChoiceForSubpopulations(controler);
 		
 		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
-		mapActivities2properLinks(scenario);
+		if(mapActs2Links) mapActivities2properLinks(scenario);
 		
 		controler.run();
 	}
