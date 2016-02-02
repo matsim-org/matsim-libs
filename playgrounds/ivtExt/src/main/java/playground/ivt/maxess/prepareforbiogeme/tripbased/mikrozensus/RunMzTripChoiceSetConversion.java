@@ -151,7 +151,7 @@ public class RunMzTripChoiceSetConversion {
 						"========"
 						);
 
-				for ( MZ2010ExportChoiceSetRecordFiller.Codepage page : filler.getCodebook().getPages().values() ) {
+				for ( Codebook.Codepage page : filler.getCodebook().getPages().values() ) {
 					writer.write( page.getVariableName() );
 					writer.newLine();
 
