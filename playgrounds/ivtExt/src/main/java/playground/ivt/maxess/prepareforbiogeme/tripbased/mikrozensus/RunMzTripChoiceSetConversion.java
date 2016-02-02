@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.maxess.prepareforbiogeme.tripbased;
+package playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus;
 
 import com.google.inject.Provider;
 import org.apache.log4j.Level;
@@ -45,6 +45,12 @@ import org.matsim.pt.router.MultiNodeDijkstra;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 import playground.ivt.maxess.prepareforbiogeme.framework.Converter;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicConversionConfigGroup;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicDestinationSampler;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.RoutingChoiceSetSampler;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.TripChoiceSituation;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.TripChoicesIdentifier;
 import playground.ivt.router.CachingRoutingModuleWrapper;
 import playground.ivt.router.TripSoftCache;
 import playground.ivt.utils.MoreIOUtils;

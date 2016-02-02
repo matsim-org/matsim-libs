@@ -16,10 +16,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.maxess.prepareforbiogeme.tripbased;
+package playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 
 /**
  * @author thibautd

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.maxess.prepareforbiogeme.tripbased;
+package playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus;
 
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
@@ -30,6 +30,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
