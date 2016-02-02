@@ -52,7 +52,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		Coord defaultCoord = new Coord(0.0, 0.0);
 		ActivityFacilityImpl testFacility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(Id.create(0, ActivityFacility.class), defaultCoord);
 
-		ActivityOptionImpl ao = testFacility.createActivityOption("shop");
+		ActivityOptionImpl ao = testFacility.createAndAddActivityOption("shop");
 		ao.addOpeningTime(new OpeningTimeImpl(6.0 * 3600, 11.0 * 3600));
 		ao.addOpeningTime(new OpeningTimeImpl(13.0 * 3600, 19.0 * 3600));
 

@@ -332,7 +332,7 @@ class InputDataCollection implements Serializable {
 						double startCap = facility.getActivityOptions()
 								.get("home").getCapacity();
 						ActivityOptionImpl option = facility
-								.createActivityOption(activityType);
+								.createAndAddActivityOption(activityType);
 						option.addOpeningTime(new OpeningTimeImpl(
 								DayType.wkday, Time.parseTime("10:00:00"), Time
 										.parseTime("22:00:00")));
@@ -344,7 +344,7 @@ class InputDataCollection implements Serializable {
 
 					for (String activityType : secondaryCapacities.keySet()) {
 						ActivityOptionImpl option = facility
-								.createActivityOption(activityType);
+								.createAndAddActivityOption(activityType);
 						option.addOpeningTime(new OpeningTimeImpl(
 								DayType.wkday, Time.parseTime("10:00:00"), Time
 										.parseTime("22:00:00")));
@@ -487,7 +487,7 @@ class InputDataCollection implements Serializable {
 								.getDouble("y_utm48n")));
 				facility.setDesc(rs.getString("property_type"));
 				ActivityOptionImpl actOption = facility
-						.createActivityOption("home");
+						.createAndAddActivityOption("home");
 				actOption.setCapacity((double) rs.getInt("units"));
 
 			}

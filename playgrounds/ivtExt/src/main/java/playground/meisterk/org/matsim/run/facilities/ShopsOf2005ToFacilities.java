@@ -773,7 +773,7 @@ public class ShopsOf2005ToFacilities {
 
 				// yeah, we can use the open times
 
-				ActivityOptionImpl shopping = theCurrentPickpay.createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = theCurrentPickpay.createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 				openNumbers.clear();
 				closeNumbers.clear();
 
@@ -877,7 +877,7 @@ public class ShopsOf2005ToFacilities {
 
 			ActivityFacility theCurrentMigrosZH = facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentMigrosZH != null) {
-				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentMigrosZH).createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentMigrosZH).createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 				String openTimeString = tokens[6];
 				openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);
 				openDayTokens = openTimeString.split(ANYTHING_BUT_LETTERS);
@@ -1051,7 +1051,7 @@ public class ShopsOf2005ToFacilities {
 			ActivityFacilityImpl theCurrentMigrosOstschweiz = (ActivityFacilityImpl) facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentMigrosOstschweiz != null) {
 
-				ActivityOptionImpl shopping = theCurrentMigrosOstschweiz.createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = theCurrentMigrosOstschweiz.createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 
 				// extract numbers
 				for (int tokenPos = 2; tokenPos < openTimeTokens.length; tokenPos++) {
@@ -1145,7 +1145,7 @@ public class ShopsOf2005ToFacilities {
 			ActivityFacility theCurrentCoopZH = facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentCoopZH != null) {
 
-				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentCoopZH).createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentCoopZH).createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 
 				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
 
@@ -1226,7 +1226,7 @@ public class ShopsOf2005ToFacilities {
 			System.out.println(facilityId);
 			ActivityFacilityImpl theCurrentCoopTG = (ActivityFacilityImpl) facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentCoopTG != null) {
-				ActivityOptionImpl shopping = theCurrentCoopTG.createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = theCurrentCoopTG.createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 
 				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
 
@@ -1386,7 +1386,7 @@ public class ShopsOf2005ToFacilities {
 
 				ActivityFacility theCurrentDenner = facilities.getFacilities().get(Id.create(shopId.getShopId(), ActivityFacility.class));
 				if (theCurrentDenner != null) {
-					ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentDenner).createActivityOption(ACTIVITY_TYPE_SHOP);
+					ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentDenner).createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 					for (String openTimeString : new String[]{weekDayToken, saturdayToken}) {
 
 						openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);

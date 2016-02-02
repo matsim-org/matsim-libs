@@ -56,7 +56,7 @@ public class ActivityFacilityImpl implements ActivityFacility {
 		return CoordUtils.calcDistance(this.coord, otherCoord);
 	}
 
-	public final ActivityOptionImpl createActivityOption(final String type) {
+	public final ActivityOptionImpl createAndAddActivityOption(final String type) {
 		String type2 = type.intern();
 		ActivityOptionImpl a = new ActivityOptionImpl(type2);
 		addActivityOption(a);

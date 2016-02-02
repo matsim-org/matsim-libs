@@ -74,7 +74,7 @@ public class FacilitiesFileGenerator {
 			ActivityFacility facility = facilities.createAndAddFacility(Id.create(facilitiesResult.getInt(1), ActivityFacility.class), new Coord(facilitiesResult.getDouble(2), facilitiesResult.getDouble(3)));
 			int facilityId=facilitiesResult.getInt(4);
 			for(Tuple<String,Double> optionData:activityOptions.get(facilitiesResult.getInt(4))) {
-				ActivityOption option = ((ActivityFacilityImpl)facility).createActivityOption(optionData.getFirst());
+				ActivityOption option = ((ActivityFacilityImpl)facility).createAndAddActivityOption(optionData.getFirst());
 				option.setCapacity(optionData.getSecond());
 				Collection<Tuple<Double, Double>> times = openingTimes.get(optionData.getFirst()+"##"+facilityId);
 				for(Tuple<Double, Double> time:times)

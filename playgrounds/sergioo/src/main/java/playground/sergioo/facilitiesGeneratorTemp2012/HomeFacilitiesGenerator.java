@@ -38,7 +38,7 @@ public class HomeFacilitiesGenerator {
 				ActivityOption option = facility.getActivityOptions().get("home");
 				double capacity = 0;
 				if(option==null)
-					option = ((ActivityFacilityImpl) facility).createActivityOption("home");
+					option = ((ActivityFacilityImpl) facility).createAndAddActivityOption("home");
 				else
 					capacity = option.getCapacity();
 				option.setCapacity(capacity+homeFacilitiesResult.getDouble(2));
