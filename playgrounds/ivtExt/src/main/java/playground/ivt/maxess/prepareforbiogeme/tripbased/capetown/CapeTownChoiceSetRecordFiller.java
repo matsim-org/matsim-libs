@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.RecordFillerUtils;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus.Codebook;
 
@@ -44,12 +45,23 @@ public class CapeTownChoiceSetRecordFiller implements ChoiceDataSetWriter.Choice
 	public Map<String, ? extends Number> getFieldValues( ChoiceSet<Trip> cs ) {
 		final Map<String,Number> values = new LinkedHashMap<>();
 
+		values.put("P_ID", RecordFillerUtils.getId( cs ) );
 		put( "P_EDUCATION" , getEducation( cs.getDecisionMaker() ) , values );
 		put( "P_EMPLOYEMENT" , getEmployment( cs.getDecisionMaker() ) , values );
 		put( "P_LICENSE_CAR" , getLicense( cs.getDecisionMaker() ) , values );
 		put( "P_LICENSE_MOTO" , getLicenseMoto( cs.getDecisionMaker() ) , values );
 		put( "P_AGE" , getAge( cs.getDecisionMaker() ) , values );
 		put( "P_GENDER" , getGender( cs.getDecisionMaker() ) , values );
+
+		values.put("C_CHOICE", RecordFillerUtils.getChoice(cs));
+
+		for ( Map.Entry<String,Trip> alt : cs.getNamedAlternatives().entrySet() ) {
+			final String name = alt.getKey();
+			final Trip trip = alt.getValue();
+			final double distance_m = RecordFillerUtils.getDistance( trip );
+			values.put( "A_" + name + "_TT", RecordFillerUtils.getTravelTime( trip ) );
+			values.put( "A_" + name + "_TD_M", distance_m );
+		}
 
 		return values;
 	}
