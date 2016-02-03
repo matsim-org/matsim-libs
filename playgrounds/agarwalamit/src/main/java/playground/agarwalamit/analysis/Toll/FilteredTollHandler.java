@@ -59,8 +59,8 @@ public class FilteredTollHandler implements PersonMoneyEventHandler, PersonDepar
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private static final Logger LOGGER = Logger.getLogger(FilteredTollHandler.class.getName());
 
-	private TollInfoHandler delegate;
-	private Vehicle2DriverEventHandler veh2DriverDelegate = new Vehicle2DriverEventHandler();
+	private final TollInfoHandler delegate;
+	private final Vehicle2DriverEventHandler veh2DriverDelegate = new Vehicle2DriverEventHandler();
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private final Collection<Geometry> zonalGeoms;
 	private Network network;
@@ -82,8 +82,6 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	public FilteredTollHandler(final double simulationEndTime, final int numberOfTimeBins, final String userGroup){
 		this(simulationEndTime,numberOfTimeBins,null,null,userGroup);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
-		LOGGER.warn( "This could be achieved from the other class \"EmissionsPerPersonPerUserGroup\", alternatively verify your results with the other class.");
-
 	}
 
 	/**
@@ -92,7 +90,6 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	public FilteredTollHandler(final double simulationEndTime, final int numberOfTimeBins, final String shapeFile, final Network network){
 		this(simulationEndTime,numberOfTimeBins,shapeFile,network,null);
 		LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
-
 	}
 
 	/**
@@ -112,11 +109,11 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
 	}
 
-
 	@Override
 	public void reset(int iteration) {
 		this.person2DepartureLeaveLink.clear();
 		this.delegate.reset(iteration);
+		this.veh2DriverDelegate.reset(iteration);
 	}
 
 	@Override
@@ -138,7 +135,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			if( ! this.zonalGeoms.isEmpty()  ) { // filtering for area only
 				Id<Link> linkId = this.person2DepartureLeaveLink.remove(event.getPersonId());
 				Link link = network.getLinks().get(linkId);
-				if( GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
+				if( GeometryUtils.isLinkInsideGeometries(zonalGeoms, link) ) {
 					delegate.handleEvent(event);
 				}
 			} else { // no filtering at all
@@ -181,6 +178,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		this.veh2DriverDelegate.handleEvent(event);		
 	}
+	
 	/**
 	 * @return time bin to person id to toll value after filtering if any
 	 */
@@ -194,5 +192,4 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	public SortedMap<Double,Double> getTimeBin2Toll(){
 		return this.delegate.getTimeBin2Toll();
 	}
-	
 }

@@ -52,12 +52,7 @@ public class TollInfoHandler implements PersonMoneyEventHandler {
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
 
-		Double time = event.getTime(); 
-		if(time ==0.0) time = this.timeBinSize;
-		double endOfTimeInterval =  Math.ceil(time/timeBinSize)*timeBinSize;
-
-		if( endOfTimeInterval <= 0.0 ) endOfTimeInterval = timeBinSize;
-
+		double endOfTimeInterval = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) );
 
 		if( timeBin2Person2Toll.containsKey(endOfTimeInterval) ) {
 

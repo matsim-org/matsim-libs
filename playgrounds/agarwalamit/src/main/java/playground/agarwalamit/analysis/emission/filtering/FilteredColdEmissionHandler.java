@@ -50,7 +50,7 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 	private final EmissionsPerLinkColdEventHandler delegate;
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private final Collection<Geometry> zonalGeoms;
-	private Network network;
+	private final Network network;
 	private final String ug ;
 
 	/**
