@@ -38,7 +38,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import playground.agarwalamit.munich.analysis.userGroup.EmissionsPerPersonPerUserGroup;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.GeometryUtils;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 
 /**
@@ -52,13 +51,13 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private final Collection<Geometry> zonalGeoms;
 	private Network network;
-	private final UserGroup ug ;
+	private final String ug ;
 
 	/**
 	 * Area and user group filtering will be used, links fall inside the given shape and persons belongs to the given user group will be considered.
 	 */
 	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String shapeFile, 
-			final Network network, final UserGroup userGroup){
+			final Network network, final String userGroup){
 		this.delegate = new EmissionsPerLinkColdEventHandler(simulationEndTime,noOfTimeBins);
 
 		if(shapeFile!=null) {
@@ -76,7 +75,7 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 	 * User group filtering will be used, result will include all links but persons from given user group only. Another class 
 	 * {@link EmissionsPerPersonPerUserGroup} could give more detailed results based on person id for all user groups.
 	 */
-	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final UserGroup userGroup){
+	public FilteredColdEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String userGroup){
 		this(simulationEndTime,noOfTimeBins,null,null,userGroup);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
 		LOGGER.warn( "This could be achieved from the other class \"EmissionsPerPersonPerUserGroup\", alternatively verify your results with the other class.");
@@ -105,11 +104,11 @@ public class FilteredColdEmissionHandler implements ColdEmissionEventHandler{
 			Id<Person> driverId = Id.createPersonId(event.getVehicleId());
 			if ( ! this.zonalGeoms.isEmpty() ) { // filtering for both
 				Link link = network.getLinks().get(event.getLinkId());
-				if ( this.pf.isPersonIdFromUserGroup(driverId, ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
+				if ( this.pf.getMyUserGroupFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
 					delegate.handleEvent(event);
 				}
 			} else { // filtering for user group only
-				if ( this.pf.isPersonIdFromUserGroup(driverId, ug)  ) {
+				if ( this.pf.getMyUserGroupFromPersonId(driverId).equals(ug) ) {
 					delegate.handleEvent(event);
 				}
 			}

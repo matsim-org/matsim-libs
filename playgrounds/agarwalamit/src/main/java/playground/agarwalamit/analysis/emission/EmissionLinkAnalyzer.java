@@ -42,6 +42,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.emission.filtering.FilteredColdEmissionHandler;
 import playground.agarwalamit.analysis.emission.filtering.FilteredWarmEmissionHandler;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -66,7 +67,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	 * This will compute the emissions only from links falling inside the given shape and consider the persons belongs to the given user group.
 	 */
 	public EmissionLinkAnalyzer(final double simulationEndTime, final String emissionEventFile, final int noOfTimeBins, final String shapeFile, 
-			final Network network, final UserGroup userGroup ) {
+			final Network network, final String userGroup ) {
 		super(EmissionLinkAnalyzer.class.getSimpleName());
 		this.emissionEventsFile = emissionEventFile;
 		LOG.info("Aggregating emissions for each "+simulationEndTime/noOfTimeBins+" sec time bin.");
@@ -116,6 +117,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 //		}
 
 	public static void main(String[] args) {
+		ExtendedPersonFilter pf = new ExtendedPersonFilter();
 		String dir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
 		String [] runCases =  {"bau","ei","5ei","10ei","15ei","20ei","25ei"};
 //		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
@@ -128,7 +130,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 			for(String str : runCases){
 				for(UserGroup ug :UserGroup.values()) {
 					String emissionEventFile = dir+str+"/ITERS/it.1500/1500.emission.events.xml.gz";
-					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork(), ug);
+					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileMMA, sc.getNetwork(), pf.getMyUserGroup(ug));
 //					EmissionLinkAnalyzer ela = new EmissionLinkAnalyzer(30*3600, emissionEventFile, 1, shapeFileCity, sc.getNetwork(), ug);
 					ela.preProcessData();
 					ela.postProcessData();
