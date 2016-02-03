@@ -35,7 +35,7 @@ public final class MapUtils {
 	
 	private MapUtils(){}
 
-	public static int intSum(final Map<?, Integer> intMap){
+	public static int intValueSum(final Map<?, Integer> intMap){
 		if(intMap==null ) throw new NullPointerException("The map is null. Aborting ...");
 		int sum =0;
 		for(Integer i :intMap.values()){
@@ -44,7 +44,7 @@ public final class MapUtils {
 		return sum;
 	}
 
-	public static double doubleSum(final Map<?, Double> doubleMap){
+	public static double doubleValueSum(final Map<?, Double> doubleMap){
 		if(doubleMap==null ) throw new NullPointerException("The map is null. Aborting ...");
 		double sum =0;
 		for(Double i :doubleMap.values()){

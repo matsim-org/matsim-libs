@@ -137,7 +137,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 				}
 			}
 			writer.close();
-		} catch (Exception e){
+		} catch (IOException e){
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 		}
 	}

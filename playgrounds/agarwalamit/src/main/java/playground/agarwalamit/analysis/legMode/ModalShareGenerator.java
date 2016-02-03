@@ -56,7 +56,7 @@ public class ModalShareGenerator {
 
 		LOG.info("=====The following transport modes are used: " + usedModes+".=====");
 		Map<String, Integer> mode2NoOfLegs = getMode2NoOfLegs(population);
-		int totalNoOfLegs = MapUtils.intSum(mode2NoOfLegs);
+		int totalNoOfLegs = MapUtils.intValueSum(mode2NoOfLegs);
 		
 		for(String mode : mode2NoOfLegs.keySet()){
 			double noOfLegs = (double) mode2NoOfLegs.get(mode);
