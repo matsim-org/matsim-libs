@@ -149,9 +149,13 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	@Override
 	public void handleEvent(CongestionEvent event) {
+		if(! this.zonalGeoms.isEmpty() ) {
 		throw new RuntimeException("The methodology should work for congestion events as well, "
 				+ "by storing the link id from affected agent for causing agent."
 				+ "however, it is not implemented yet.");
+		} else {
+			// this should be fine, because areal filtering is not used.
+		}
 	}
 
 	@Override

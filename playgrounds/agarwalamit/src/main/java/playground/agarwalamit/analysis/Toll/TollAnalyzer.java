@@ -20,10 +20,12 @@ package playground.agarwalamit.analysis.Toll;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -37,6 +39,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.agarwalamit.utils.MapUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -84,26 +87,41 @@ public class TollAnalyzer extends AbstractAnalysisModule {
 	public static void main(String[] args) {
 		ExtendedPersonFilter pf = new ExtendedPersonFilter();
 
-		String scenario = "eci";
+		String scenario = "ei";
 		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
 		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/output_config.xml.gz";
 		String outputFolder = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/analysis/";
 		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
 
-		//		for( UserGroup ug : UserGroup.values() ) {
-		//			String myUg = pf.getMyUserGroup(ug);
-		//			
-		//			TollAnalyzer ata = new TollAnalyzer(eventsFile, simEndTime, 30, myUg);
-		//			ata.preProcessData();
-		//			ata.postProcessData();
-		//			ata.writeResults(outputFolder, myUg);
-		//			//		ata.writeRDataForBoxPlot(outputFolder,true);
-		//		}
+//		TollAnalyzer ata = new TollAnalyzer(eventsFile, simEndTime, 30);
+//		ata.preProcessData();
+//		ata.postProcessData();
+//		ata.writeResults(outputFolder);
 
-		TollAnalyzer ata = new TollAnalyzer(eventsFile, simEndTime, 30);
-		ata.preProcessData();
-		ata.postProcessData();
-		ata.writeResults(outputFolder);
+		SortedMap<String, Double> usrGrpToToll = new TreeMap<>();
+		for( UserGroup ug : UserGroup.values() ) {
+			String myUg = pf.getMyUserGroup(ug);
+			if(usrGrpToToll.containsKey(myUg)) continue;
+			TollAnalyzer ata = new TollAnalyzer(eventsFile, simEndTime, 30, myUg);
+			ata.preProcessData();
+			ata.postProcessData();
+			usrGrpToToll.put(myUg, MapUtils.doubleValueSum( ata.getTimeBin2Toll() ) );
+//			ata.writeResults(outputFolder, myUg);
+			//		ata.writeRDataForBoxPlot(outputFolder,true);
+		}
+
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/userGroupToToll.txt");
+		try {
+			writer.write("userGroup \t tollInEUR \n");
+			for(String s : usrGrpToToll.keySet()) {
+				writer.write(s+"\t"+usrGrpToToll.get(s)+"\n");
+			}
+			writer.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Data is not written. Reason "+e);
+		}
+		
+
 	}
 
 	@Override
