@@ -50,6 +50,7 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 
 import playground.santiago.SantiagoScenarioConstants;
 
@@ -107,6 +108,9 @@ public class SantiagoScenarioRunner {
 		
 		// mapping agents' activities to links on the road network to avoid being stuck on the transit network
 		if(mapActs2Links) mapActivities2properLinks(scenario);
+		
+		// adding roadpricing contrib for cordon policies
+		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 		
 		controler.run();
 	}
