@@ -23,9 +23,9 @@ public class RefugeeInitiativDataRetriever {
 
     private static final String WEBSITE_URL = "https://www.berlin.de/fluechtlinge/berlin-engagiert-sich/berliner-initiativen/";
 
-    public static void main(String[] args) {
-        String outputFile = "refugeeInitiativData.csv";
+    private static final String outputFile = "refugeeInitiativData.csv";
 
+    public static void main(String[] args) {
         try {
             URL url = new URL(WEBSITE_URL);
             try {
