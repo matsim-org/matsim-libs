@@ -62,32 +62,26 @@ import javax.inject.Provider;
  *
  */
 public class SantiagoScenarioRunner {
-//	private static String inputPath = "../../../runs-svn/santiago/run20/input/";
-//	private static boolean doModeChoice = false;
-	private static String inputPath = "../../../runs-svn/santiago/run40/input/";
+	private static String inputPath = "../../../runs-svn/santiago/triangleCordon/input/";
 	private static boolean doModeChoice = true;
-	private static boolean mapActs2Links = true;
+//	private static boolean mapActs2Links = true;
+	private static boolean mapActs2Links = false;
 	
 	private static String configFile;
 	
 	public static void main(String args[]){
-//		OTFVis.convert(new String[]{
-//						"",
-//						outputPath + "modeChoice.output_events.xml.gz",	//events
-//						outputPath + "modeChoice.output_network.xml.gz",	//network
-//						outputPath + "visualisation.mvi", 		//mvi
-//						"60" 									//snapshot period
-//		});
-//		OTFVis.playMVI(outputPath + "visualisation.mvi");
-		
+
 		if(args.length==0){
-			configFile = inputPath + "config_final.xml";
+//			configFile = inputPath + "config_final.xml";
+			configFile = inputPath + "config_triangleCordon.xml";
 		} else {
 			configFile = args[0];
 			mapActs2Links = Boolean.parseBoolean(args[1]);
 		}
 		
 		Config config = ConfigUtils.loadConfig(configFile);
+//		config.qsim().setNumberOfThreads(1);
+//		config.parallelEventHandling().setNumberOfThreads(1);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 //		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
