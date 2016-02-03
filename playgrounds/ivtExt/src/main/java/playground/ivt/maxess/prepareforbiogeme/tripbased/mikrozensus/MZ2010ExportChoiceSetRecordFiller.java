@@ -18,24 +18,17 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus;
 
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.collections.MapUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.RecordFillerUtils;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author thibautd
@@ -59,7 +52,7 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 		final Map<String,Number> values = new LinkedHashMap<>();
 
 		// This is awful, but BIOGEME does not understand anything else than numbers...
-		values.put("P_ID", getId( cs ) );
+		values.put("P_ID", RecordFillerUtils.getId( cs ) );
 		put( "P_AGE", getAge( cs.getDecisionMaker() ), values );
 		put( "P_GENDER", getGender( cs.getDecisionMaker() ), values );
 
@@ -77,13 +70,13 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 		put( "P_LICENSE", getLicense( cs.getDecisionMaker() ), values );
 		put( "P_EMPLOYMENT", getEmployment( cs.getDecisionMaker() ), values );
 
-		values.put("C_CHOICE", getChoice(cs));
+		values.put("C_CHOICE", RecordFillerUtils.getChoice(cs));
 
 		for ( Map.Entry<String,Trip> alt : cs.getNamedAlternatives().entrySet() ) {
 			final String name = alt.getKey();
 			final Trip trip = alt.getValue();
-			final double distance_m = SBBPricesUtils.getDistance( trip );
-			values.put("A_" + name + "_TT", getTravelTime( trip ));
+			final double distance_m = RecordFillerUtils.getDistance( trip );
+			values.put("A_" + name + "_TT", RecordFillerUtils.getTravelTime( trip ) );
 			values.put("A_" + name + "_TD_M", distance_m );
 
 			if ( name.endsWith( TransportMode.pt ) ) {
@@ -114,38 +107,6 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 		codebook.writeCoding( value );
 		map.put( name, value );
 		codebook.closePage();
-	}
-
-	private final TLongObjectMap<Id<Person>> idMappings = new TLongObjectHashMap<>();
-	private long getId( final ChoiceSet<Trip> cs ) {
-		final Id<Person> id = cs.getDecisionMaker().getId();
-		final Long longId = Long.getLong( id.toString() );
-
-		if ( longId != null ) return longId;
-
-		// TODO store table number to id
-		// (could also be done offline, as String hashCode should be stable according to documentation)
-		long value = id.toString().hashCode();
-
-		while ( idMappings.containsKey( value ) && !idMappings.get( value ).equals( id ) ) {
-			log.warn( "Already a numerical ID "+value+" (for id "+idMappings.get( value )+") when adding "+id );
-			value++;
-		}
-
-		idMappings.put( value , id );
-		return value;
-	}
-
-	private int getChoice(final ChoiceSet<Trip> cs) {
-		// Assuming the chosen destination is the first listed one, the choice index will always be between
-		// 0 and n_modes. So linear search should actually not be that bad for large number of alternatives,
-		// and actually scale BETTER than "smart" methods such as binary search...
-		int index = 0;
-		for ( String alt : cs.getNamedAlternatives().keySet() ) {
-			if ( alt.equals( cs.getChosenName() ) ) return index;
-			index++;
-		}
-		throw new RuntimeException( cs.getChosenName()+" not found in "+cs.getNamedAlternatives() );
 	}
 
 	private int getAge(final Person decisionMaker) {
@@ -421,20 +382,6 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 			default:
 				throw new IllegalArgumentException( "unhandled dow "+dow );
 		}
-	}
-
-	private double getTravelTime(final Trip alternative) {
-		double tt = 0;
-
-		for ( Leg l : alternative.getLegsOnly() ) {
-			if ( l.getTravelTime() == Time.UNDEFINED_TIME ) {
-				log.warn("undefined travel time for " + alternative);
-				return -99;
-			}
-			tt += l.getTravelTime();
-		}
-
-		return tt;
 	}
 
 }

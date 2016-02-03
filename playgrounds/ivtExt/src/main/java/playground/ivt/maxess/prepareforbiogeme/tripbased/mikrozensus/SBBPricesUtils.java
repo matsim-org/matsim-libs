@@ -19,7 +19,7 @@
 package playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Leg;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.RecordFillerUtils;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 
 /**
@@ -37,7 +37,7 @@ public class SBBPricesUtils {
 			final SBBClass klasse,
 			final boolean halbTax,
 			final Trip trip ) {
-		return computeSBBTripPrice( klasse , halbTax , getDistance( trip ) );
+		return computeSBBTripPrice( klasse , halbTax , RecordFillerUtils.getDistance( trip ) );
 	}
 
 	public static double computeSBBTripPrice(
@@ -126,17 +126,5 @@ public class SBBPricesUtils {
 		return (distance - min) * rate;
 	}
 
-	public static double getDistance( Trip trip ) {
-		double d = 0;
-
-		for ( Leg l : trip.getLegsOnly() ) {
-			if ( Double.isNaN( l.getRoute().getDistance() ) ) {
-				throw new IllegalArgumentException( "undefined distance in "+trip );
-			}
-			d += l.getRoute().getDistance();
-		}
-
-		return d;
-	}
 }
 
