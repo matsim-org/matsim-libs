@@ -129,4 +129,8 @@ public class CapeTownChoiceSetRecordFiller implements ChoiceDataSetWriter.Choice
 		map.put( name, value );
 		codebook.closePage();
 	}
+
+	public Codebook getCodebook() {
+		return codebook;
+	}
 }
