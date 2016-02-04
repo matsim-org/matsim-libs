@@ -111,6 +111,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	@Override
 	public void reset(int iteration) {
+		this.zonalGeoms.clear();
 		this.person2DepartureLeaveLink.clear();
 		this.delegate.reset(iteration);
 		this.veh2DriverDelegate.reset(iteration);

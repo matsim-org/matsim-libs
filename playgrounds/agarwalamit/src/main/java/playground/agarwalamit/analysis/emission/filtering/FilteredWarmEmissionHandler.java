@@ -134,6 +134,7 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 
 	@Override
 	public void reset(int iteration) {
+		this.zonalGeoms.clear();
 		delegate.reset(iteration);
 	}
 }

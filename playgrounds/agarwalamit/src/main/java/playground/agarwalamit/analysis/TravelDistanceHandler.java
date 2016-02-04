@@ -115,10 +115,10 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 	public static void main(String[] args) {
 		ExtendedPersonFilter pf = new ExtendedPersonFilter();
 		String scenario = "ei";
-		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
-		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/output_config.xml.gz";
-		String networkFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/output_network.xml.gz";
-		String outputFolder = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/analysis/";
+		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
+		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_config.xml.gz";
+		String networkFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_network.xml.gz";
+		String outputFolder = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/analysis/";
 
 		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 		String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
@@ -161,6 +161,7 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 
 	@Override
 	public void reset(int iteration) {
+		this.zonalGeoms.clear();
 		this.veh2DriverDelegate.reset(iteration);
 		this.timeBin2personId2travelledDistance.clear();
 	}
