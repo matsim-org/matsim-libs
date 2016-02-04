@@ -123,7 +123,7 @@ public class TollAnalyzer extends AbstractAnalysisModule {
 			writer.write("area \t userGroup \t tollInEUR \n");
 			for(String a : area2usrGrp2Toll.keySet()) {
 				for(String s : area2usrGrp2Toll.get(a).keySet()) {
-					writer.write(s+"\t"+area2usrGrp2Toll.get(a).get(s)+"\n");
+					writer.write(a+"\t"+s+"\t"+area2usrGrp2Toll.get(a).get(s)+"\n");
 				}
 			}
 			writer.close();
