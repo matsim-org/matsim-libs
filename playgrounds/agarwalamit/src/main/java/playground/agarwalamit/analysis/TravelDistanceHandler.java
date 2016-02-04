@@ -119,34 +119,46 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/output_config.xml.gz";
 		String networkFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/output_network.xml.gz";
 		String outputFolder = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/analysis/";
-		
-		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
-		
-		SortedMap<String, Double> usrGrp2Dist = new TreeMap<>();
-		for ( UserGroup ug : UserGroup.values() ) {
-			String myUg = pf.getMyUserGroup(ug);
-			if(usrGrp2Dist.containsKey(myUg)) continue;
-			
-			EventsManager em = EventsUtils.createEventsManager();
-			TravelDistanceHandler tdh = new TravelDistanceHandler(simEndTime, 1, LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork(), myUg);
-			em.addHandler(tdh);
-			MatsimEventsReader reader = new MatsimEventsReader(em);
-			reader.readFile(eventsFile);
-			usrGrp2Dist.put(myUg, MapUtils.doubleValueSum(tdh.getTimeBin2TravelDist() ) );
+
+		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+		String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+
+		String [] areas = {shapeFileCity, shapeFileMMA, null};
+		String [] areasName = {"city","MMA","complete"};
+		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);		
+
+		SortedMap<String, SortedMap<String, Double>> area2usrGrp2Dist = new TreeMap<>();
+
+		for(int ii=0; ii<areas.length;ii++) {
+			SortedMap<String, Double> usrGrp2Dist = new TreeMap<>();
+			for ( UserGroup ug : UserGroup.values() ) {
+				String myUg = pf.getMyUserGroup(ug);
+				if(area2usrGrp2Dist.containsKey(myUg)) continue;
+
+				EventsManager em = EventsUtils.createEventsManager();
+				TravelDistanceHandler tdh = new TravelDistanceHandler(simEndTime, 1, LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork(), areas[ii],  myUg);
+				em.addHandler(tdh);
+				MatsimEventsReader reader = new MatsimEventsReader(em);
+				reader.readFile(eventsFile);
+				usrGrp2Dist.put(myUg, MapUtils.doubleValueSum(tdh.getTimeBin2TravelDist() ) );
+			}
+			area2usrGrp2Dist.put(areasName[ii], usrGrp2Dist);
 		}
-		
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/userGroupToTotalTravelDistance.txt");
+
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/areaToUserGroupToTotalTravelDistance.txt");
 		try {
-			writer.write("userGroup \t totalTravelDistInMeter \n");
-			for(String s : usrGrp2Dist.keySet()) {
-				writer.write(s+"\t"+usrGrp2Dist.get(s)+"\n");
+			writer.write("area \t userGroup \t totalTravelDistInMeter \n");
+			for(String a : area2usrGrp2Dist.keySet()) {
+				for(String s : area2usrGrp2Dist.get(a).keySet()) {
+					writer.write(a+"\t"+s+"\t"+area2usrGrp2Dist.get(s)+"\n");
+				}
 			}
 			writer.close();
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not written. Reason "+e);
 		}
 	}
-	
+
 	@Override
 	public void reset(int iteration) {
 		this.veh2DriverDelegate.reset(iteration);
