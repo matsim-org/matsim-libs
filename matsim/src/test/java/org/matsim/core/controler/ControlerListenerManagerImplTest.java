@@ -12,11 +12,11 @@ import org.matsim.core.controler.listener.StartupListener;
 /**
  * @author mrieser / senozon
  */
-public class ControlerListenerManagerTest {
+public class ControlerListenerManagerImplTest {
 
 	@Test
 	public void testAddControlerListener_ClassHierarchy() {
-		ControlerListenerManager m = new ControlerListenerManager();
+		ControlerListenerManagerImpl m = new ControlerListenerManagerImpl();
 		CountingControlerListener ccl = new CountingControlerListener();
 		ExtendedControlerListener ecl = new ExtendedControlerListener();
 		m.addControlerListener(ccl);
@@ -53,7 +53,7 @@ public class ControlerListenerManagerTest {
 
 	@Test
 	public void testAddCoreControlerListener_ClassHierarchy() {
-		ControlerListenerManager m = new ControlerListenerManager();
+		ControlerListenerManagerImpl m = new ControlerListenerManagerImpl();
 		CountingControlerListener ccl = new CountingControlerListener();
 		ExtendedControlerListener ecl = new ExtendedControlerListener();
 		m.addCoreControlerListener(ccl);

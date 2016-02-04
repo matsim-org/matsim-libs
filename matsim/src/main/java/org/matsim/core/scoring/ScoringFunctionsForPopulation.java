@@ -51,6 +51,9 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.rx.ObservableUtils;
+import rx.Observable;
+import rx.functions.Action1;
 
 /**
  * This class helps EventsToScore by keeping ScoringFunctions for the entire Population - one per Person -, and dispatching Activities
@@ -60,7 +63,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author michaz
  *
  */
-class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPlansService, EventsToActivities.ActivityHandler, EventsToLegs.LegHandler {
+class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPlansService {
 
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
 	private final PlansConfigGroup plansConfigGroup;
@@ -90,9 +93,29 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		this.population = population;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		reset();
-		eventsManager.addHandler(this);
-		eventsToActivities.addActivityHandler(this);
-		eventsToLegs.addLegHandler(this);
+
+//		Observable<ControlerEvent> controlerEvents = ObservableUtils.fromControlerListenerManager(controlerListenerManager);
+		Observable<Event> events = ObservableUtils.fromEventsManager(eventsManager);
+		Observable<PersonExperiencedActivity> activities = ObservableUtils.fromEventsToActivities(eventsToActivities);
+		Observable<PersonExperiencedLeg> legs = ObservableUtils.fromEventsToLegs(eventsToLegs);
+
+		Observable<Object> allEvents = Observable.merge(events, activities, legs);
+		allEvents.subscribe(new Action1<Object>() {
+			@Override
+			public void call(Object o) {
+				if (o instanceof Event) {
+					handleMobsimEvent((Event) o);
+				} else if (o instanceof PersonExperiencedActivity) {
+					handleActivity((PersonExperiencedActivity) o);
+				} else if (o instanceof PersonExperiencedLeg) {
+					handleLeg((PersonExperiencedLeg) o);
+				}
+//				else if (o instanceof IterationEndsEvent) {
+//					reset();
+//				}
+			}
+		});
+		eventsManager.addHandler(this); // only so that I receive the reset() call!
 	}
 
 	private void reset() {
@@ -123,8 +146,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		return this.agentRecords;
 	}
 
-	@Override
-	public void handleActivity(PersonExperiencedActivity event) {
+	private void handleActivity(PersonExperiencedActivity event) {
 		Id<Person> agentId = event.getAgentId();
 		Activity activity = event.getActivity();
 		ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
@@ -136,8 +158,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		}
 	}
 
-	@Override
-	public void handleLeg(PersonExperiencedLeg event) {
+	private void handleLeg(PersonExperiencedLeg event) {
 		Id<Person> agentId = event.getAgentId();
 		Leg leg = event.getLeg();
 		ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
@@ -192,6 +213,9 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 
 	@Override
 	public void handleEvent(Event event) {
+	}
+
+	private void handleMobsimEvent(Event event) {
 		// this is for the stuff that is directly based on events.
 		// note that this passes on _all_ person events, even those already passed above.
 		// for the time being, not all PersonEvents may "implement HasPersonId".
