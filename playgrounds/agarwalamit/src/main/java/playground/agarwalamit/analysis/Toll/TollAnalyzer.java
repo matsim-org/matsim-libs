@@ -88,33 +88,43 @@ public class TollAnalyzer extends AbstractAnalysisModule {
 		ExtendedPersonFilter pf = new ExtendedPersonFilter();
 
 		String scenario = "ei";
-		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
-		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/output_config.xml.gz";
-		String outputFolder = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/analysis/";
+		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
+		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_config.xml.gz";
+		String outputFolder = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/analysis/";
+		String networkFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/"+scenario+"/output_network.xml.gz";
+
+		String shapeFileCity = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+		String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+
+		String [] areas = {shapeFileCity, shapeFileMMA, null};
+		String [] areasName = {"city","MMA","wholeArea"};
 		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
+		Network network = LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork();
 
-//		TollAnalyzer ata = new TollAnalyzer(eventsFile, simEndTime, 30);
-//		ata.preProcessData();
-//		ata.postProcessData();
-//		ata.writeResults(outputFolder);
+		SortedMap<String, SortedMap<String, Double>> area2usrGrp2Toll = new TreeMap<>();
 
-		SortedMap<String, Double> usrGrpToToll = new TreeMap<>();
-		for( UserGroup ug : UserGroup.values() ) {
-			String myUg = pf.getMyUserGroup(ug);
-			if(usrGrpToToll.containsKey(myUg)) continue;
-			TollAnalyzer ata = new TollAnalyzer(eventsFile, simEndTime, 30, myUg);
-			ata.preProcessData();
-			ata.postProcessData();
-			usrGrpToToll.put(myUg, MapUtils.doubleValueSum( ata.getTimeBin2Toll() ) );
-//			ata.writeResults(outputFolder, myUg);
-			//		ata.writeRDataForBoxPlot(outputFolder,true);
+		for(int ii=0; ii<areas.length;ii++) {
+			SortedMap<String, Double> usrGrpToToll = new TreeMap<>();
+			for( UserGroup ug : UserGroup.values() ) {
+				String myUg = pf.getMyUserGroup(ug);
+				if(usrGrpToToll.containsKey(myUg)) continue;
+
+				TollAnalyzer ata = new TollAnalyzer(eventsFile, simEndTime, 30, areas[ii], network, myUg);
+				ata.preProcessData();
+				ata.postProcessData();
+				usrGrpToToll.put(myUg, MapUtils.doubleValueSum( ata.getTimeBin2Toll() ) );
+			}
+			usrGrpToToll.put("allPersons", MapUtils.doubleValueSum(usrGrpToToll));
+			area2usrGrp2Toll.put(areasName[ii], usrGrpToToll);
 		}
 
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/userGroupToToll.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/areaToUserGroupToToll.txt");
 		try {
-			writer.write("userGroup \t tollInEUR \n");
-			for(String s : usrGrpToToll.keySet()) {
-				writer.write(s+"\t"+usrGrpToToll.get(s)+"\n");
+			writer.write("area \t userGroup \t tollInEUR \n");
+			for(String a : area2usrGrp2Toll.keySet()) {
+				for(String s : area2usrGrp2Toll.get(a).keySet()) {
+					writer.write(s+"\t"+area2usrGrp2Toll.get(a).get(s)+"\n");
+				}
 			}
 			writer.close();
 		} catch (IOException e) {

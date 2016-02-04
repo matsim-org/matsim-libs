@@ -124,8 +124,9 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 		String shapeFileMMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
 
 		String [] areas = {shapeFileCity, shapeFileMMA, null};
-		String [] areasName = {"city","MMA","complete"};
-		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);		
+		String [] areasName = {"city","MMA","wholeArea"};
+		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
+		Network network = LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork();
 
 		SortedMap<String, SortedMap<String, Double>> area2usrGrp2Dist = new TreeMap<>();
 
@@ -136,12 +137,13 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 				if(area2usrGrp2Dist.containsKey(myUg)) continue;
 
 				EventsManager em = EventsUtils.createEventsManager();
-				TravelDistanceHandler tdh = new TravelDistanceHandler(simEndTime, 1, LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork(), areas[ii],  myUg);
+				TravelDistanceHandler tdh = new TravelDistanceHandler(simEndTime, 1, network, areas[ii],  myUg);
 				em.addHandler(tdh);
 				MatsimEventsReader reader = new MatsimEventsReader(em);
 				reader.readFile(eventsFile);
 				usrGrp2Dist.put(myUg, MapUtils.doubleValueSum(tdh.getTimeBin2TravelDist() ) );
 			}
+			usrGrp2Dist.put("allPersons", MapUtils.doubleValueSum(usrGrp2Dist));
 			area2usrGrp2Dist.put(areasName[ii], usrGrp2Dist);
 		}
 
@@ -150,7 +152,7 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 			writer.write("area \t userGroup \t totalTravelDistInMeter \n");
 			for(String a : area2usrGrp2Dist.keySet()) {
 				for(String s : area2usrGrp2Dist.get(a).keySet()) {
-					writer.write(a+"\t"+s+"\t"+area2usrGrp2Dist.get(s)+"\n");
+					writer.write(a+"\t"+s+"\t"+area2usrGrp2Dist.get(a).get(s)+"\n");
 				}
 			}
 			writer.close();

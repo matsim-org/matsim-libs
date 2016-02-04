@@ -122,7 +122,9 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		if(this.ug!=null){ 
 			Id<Person> driverId = Id.createPersonId(event.getPersonId());
 			if ( ! this.zonalGeoms.isEmpty() ) { // filtering for both
-				Id<Link> linkId = this.person2DepartureLeaveLink.remove(event.getPersonId());
+//				removal will not work, because for a link levae event two (corresponding to warm and cold emission) personMoney events are possible.
+//				Id<Link> linkId = this.person2DepartureLeaveLink.remove(event.getPersonId());
+				Id<Link> linkId = this.person2DepartureLeaveLink.get(event.getPersonId());
 				Link link = network.getLinks().get(linkId);
 				if ( this.pf.getMyUserGroupFromPersonId(driverId).equals(ug)  && GeometryUtils.isLinkInsideGeometries(zonalGeoms, link)   ) {
 					delegate.handleEvent(event);
@@ -134,7 +136,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			}
 		} else {
 			if( ! this.zonalGeoms.isEmpty()  ) { // filtering for area only
-				Id<Link> linkId = this.person2DepartureLeaveLink.remove(event.getPersonId());
+				Id<Link> linkId = this.person2DepartureLeaveLink.get(event.getPersonId());
 				Link link = network.getLinks().get(linkId);
 				if( GeometryUtils.isLinkInsideGeometries(zonalGeoms, link) ) {
 					delegate.handleEvent(event);
@@ -148,9 +150,9 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	@Override
 	public void handleEvent(CongestionEvent event) {
 		if(! this.zonalGeoms.isEmpty() ) {
-		throw new RuntimeException("The methodology should work for congestion events as well, "
-				+ "by storing the link id from affected agent for causing agent."
-				+ "however, it is not implemented yet.");
+			throw new RuntimeException("The methodology should work for congestion events as well, "
+					+ "by storing the link id from affected agent for causing agent."
+					+ "however, it is not implemented yet.");
 		} else {
 			// this should be fine, because areal filtering is not used.
 		}
@@ -179,7 +181,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		this.veh2DriverDelegate.handleEvent(event);		
 	}
-	
+
 	/**
 	 * @return time bin to person id to toll value after filtering if any
 	 */
