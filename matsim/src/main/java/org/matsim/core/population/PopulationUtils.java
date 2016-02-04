@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -371,21 +373,19 @@ public final class PopulationUtils {
 		// the following might eventually become configurable by config. kai, feb'16
 		if ( act.getFacilityId()==null ) {
 			final Id<Link> linkIdFromActivity = act.getLinkId();
-			Gbl.assertIf( linkIdFromActivity!=null );
+			Gbl.assertNonNull( linkIdFromActivity );
 			return linkIdFromActivity ;
 		} else {
-			Gbl.assertIf( facs!=null ) ;
 			ActivityFacility facility = facs.getFacilities().get( act.getFacilityId() ) ;
-			Gbl.assertIf( facility!=null );
-			final Id<Link> linkIdFromFacility = facility.getLinkId();
-			if ( linkIdFromFacility!=null ) {
-				return linkIdFromFacility ;
-			} else {
+			if ( facility==null || facility.getLinkId()==null ) {
+				Logger.getLogger( PopulationUtils.class ).warn("we have a facility id, but can't find the facility; this should not really happen") ;
 				final Id<Link> linkIdFromActivity = act.getLinkId();
 				Gbl.assertIf( linkIdFromActivity!=null );
 				return linkIdFromActivity ;
-			}
-			// yy sorry, I am just trying to make explicit which seems to have been the logic so far implicitly.  kai, feb'16
+			} else {
+				return facility.getLinkId() ;
+			} 
+			// yy sorry about this mess, I am just trying to make explicit which seems to have been the logic so far implicitly.  kai, feb'16
 		}
 	}
 

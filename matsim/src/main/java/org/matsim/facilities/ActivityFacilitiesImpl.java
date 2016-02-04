@@ -23,6 +23,7 @@ package org.matsim.facilities;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -40,7 +41,6 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private long counter = 0;
 	private long nextMsg = 1;
 
 	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
@@ -79,10 +79,9 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 		this.facilities.put(f.getId(),f);
 
 		// show counter
-		this.counter++;
-		if (this.counter % this.nextMsg == 0) {
+		if (this.facilities.size() % this.nextMsg == 0) {
 			this.nextMsg *= 2;
-			printFacilitiesCount();
+			log.info("    facility # " + this.facilities.size() );
 		}
 
 		return f;
@@ -112,11 +111,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 		return facs;
 	}
 
-	public final void printFacilitiesCount() {
-		log.info("    facility # " + this.counter);
-	}
-
-	@Override
+	 @Override
 	public String getName() {
 		return this.name;
 	}
@@ -127,7 +122,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 	}
 
 	@Override
-	public void addActivityFacility(ActivityFacility facility) {
+	public final void addActivityFacility(ActivityFacility facility) {
 		// validation
 		if (this.facilities.containsKey(facility.getId())) {
 			throw new IllegalArgumentException("Facility with id=" + facility.getId() + " already exists.");
@@ -139,6 +134,19 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 	@Override
 	public ObjectAttributes getFacilityAttributes() {
 		return this.facilityAttributes;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder stb = new StringBuilder() ;
+		stb.append( super.toString() + "\n" ) ;
+		stb.append( "[number of facilities=" + this.facilities.size() + "]\n" ) ;
+		for ( Entry<Id<ActivityFacility>,? extends ActivityFacility> entry : this.facilities.entrySet() ) {
+			final ActivityFacility fac = entry.getValue();
+			stb.append( "[key=" + entry.getKey().toString() + "; value=" + fac.toString() + "]\n" ) ;
+		}
+		
+		return stb.toString() ;
 	}
 
 }
