@@ -120,8 +120,6 @@ public class TollAnalyzer extends AbstractAnalysisModule {
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not written. Reason "+e);
 		}
-		
-
 	}
 
 	@Override

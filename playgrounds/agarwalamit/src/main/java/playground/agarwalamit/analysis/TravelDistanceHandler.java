@@ -19,6 +19,8 @@
 
 package playground.agarwalamit.analysis;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,15 +39,21 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.GeometryUtils;
+import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
+import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * @author amit
@@ -104,6 +112,41 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 		LOGGER.info("No filtering is used, result will include all links, persons from all user groups.");
 	}
 
+	public static void main(String[] args) {
+		ExtendedPersonFilter pf = new ExtendedPersonFilter();
+		String scenario = "ei";
+		String eventsFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/ITERS/it.1500/1500.events.xml.gz";
+		String configFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/output_config.xml.gz";
+		String networkFile = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/output_network.xml.gz";
+		String outputFolder = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/iatbr/output/"+scenario+"/analysis/";
+		
+		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
+		
+		SortedMap<String, Double> usrGrp2Dist = new TreeMap<>();
+		for ( UserGroup ug : UserGroup.values() ) {
+			String myUg = pf.getMyUserGroup(ug);
+			if(usrGrp2Dist.containsKey(myUg)) continue;
+			
+			EventsManager em = EventsUtils.createEventsManager();
+			TravelDistanceHandler tdh = new TravelDistanceHandler(simEndTime, 1, LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork(), myUg);
+			em.addHandler(tdh);
+			MatsimEventsReader reader = new MatsimEventsReader(em);
+			reader.readFile(eventsFile);
+			usrGrp2Dist.put(myUg, MapUtils.doubleValueSum(tdh.getTimeBin2TravelDist() ) );
+		}
+		
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/userGroupToTotalTravelDistance.txt");
+		try {
+			writer.write("userGroup \t totalTravelDistInMeter \n");
+			for(String s : usrGrp2Dist.keySet()) {
+				writer.write(s+"\t"+usrGrp2Dist.get(s)+"\n");
+			}
+			writer.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Data is not written. Reason "+e);
+		}
+	}
+	
 	@Override
 	public void reset(int iteration) {
 		this.veh2DriverDelegate.reset(iteration);
