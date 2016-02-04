@@ -36,8 +36,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.PtConstants;
@@ -55,12 +53,8 @@ import playground.ivt.router.CachingRoutingModuleWrapper;
 import playground.ivt.router.TripSoftCache;
 import playground.ivt.utils.MoreIOUtils;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
 import java.util.Collections;
-import java.util.Date;
 
 /**
  * @author thibautd
@@ -129,54 +123,7 @@ public class RunMzTripChoiceSetConversion {
 							sc.getPopulation(),
 							group.getOutputPath() + "/data.dat");
 
-			try ( final BufferedWriter writer = IOUtils.getBufferedWriter( group.getOutputPath() +"/codebook.md"  ) ) {
-				MoreIOUtils.writeLines(
-						writer,
-						"Information",
-						"===========",
-						"This is metadata to dataset generated with:",
-						"",
-						"`"+RunMzTripChoiceSetConversion.class.getName()+"`",
-						"",
-						"Date: " + DateFormat.getDateInstance(
-								DateFormat.FULL ).format(
-										new Date() ),
-						"",
-						"",
-						"Conversion to pdf: use [pandoc](http://pandoc.org/README.html)",
-						"",
-						"Command: `pandoc Codebook.md -o Codebook.pdf`",
-						"",
-						"Codebook",
-						"========"
-						);
-
-				for ( Codebook.Codepage page : filler.getCodebook().getPages().values() ) {
-					writer.write( page.getVariableName() );
-					writer.newLine();
-
-					for ( int i=0; i < page.getVariableName().length(); i++ ) writer.write( "-" );
-					writer.newLine();
-					writer.newLine();
-
-					// Probably not supernice, one should adapt column width to some extent.
-					// on the other side, one can simply use pandoc to get a PDF version
-					writer.write( "| Code | Meaning | Count |" );
-					writer.newLine();
-					writer.write( "|------|---------|-------|" );
-					writer.newLine();
-					for ( Number code : page.getCodingToCount().keySet() ) {
-						writer.write( "| "+code );
-						writer.write( " | "+page.getCodingToMeaning().get( code ) );
-						writer.write( " | "+page.getCodingToCount().get( code )+" |" );
-						writer.newLine();
-					}
-					writer.newLine();
-				}
-			}
-			catch ( IOException e ) {
-				throw new UncheckedIOException( e );
-			}
+			CodebookUtils.writeCodebook( group.getOutputPath() + "/codebook.md", filler.getCodebook() );
 		}
 		finally {
 			MoreIOUtils.closeOutputDirLogging();
