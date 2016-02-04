@@ -18,7 +18,11 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased.capetown;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
+import org.matsim.households.Income;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
@@ -26,6 +30,7 @@ import playground.ivt.maxess.prepareforbiogeme.tripbased.RecordFillerUtils;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus.Codebook;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -36,9 +41,20 @@ public class CapeTownChoiceSetRecordFiller implements ChoiceDataSetWriter.Choice
 	private final Codebook codebook = new Codebook();
 
 	private final ObjectAttributes personAttributes;
+	private final Households households;
+	private final Map<Id<Person>, Id<Household>> person2household = new HashMap<>();
 
-	public CapeTownChoiceSetRecordFiller( ObjectAttributes personAttributes ) {
+	public CapeTownChoiceSetRecordFiller(
+			final ObjectAttributes personAttributes,
+			final Households households ) {
 		this.personAttributes = personAttributes;
+		this.households = households;
+
+		for ( Household hh : households.getHouseholds().values() ) {
+			for ( Id<Person> member : hh.getMemberIds() ) {
+				person2household.put( member , hh.getId() );
+			}
+		}
 	}
 
 	@Override
@@ -47,11 +63,16 @@ public class CapeTownChoiceSetRecordFiller implements ChoiceDataSetWriter.Choice
 
 		values.put("P_ID", RecordFillerUtils.getId( cs ) );
 		put( "P_EDUCATION" , getEducation( cs.getDecisionMaker() ) , values );
-		put( "P_EMPLOYEMENT" , getEmployment( cs.getDecisionMaker() ) , values );
+		put( "P_EMPLOYMENT" , getEmployment( cs.getDecisionMaker() ) , values );
 		put( "P_LICENSE_CAR" , getLicense( cs.getDecisionMaker() ) , values );
 		put( "P_LICENSE_MOTO" , getLicenseMoto( cs.getDecisionMaker() ) , values );
 		put( "P_AGE" , getAge( cs.getDecisionMaker() ) , values );
 		put( "P_GENDER" , getGender( cs.getDecisionMaker() ) , values );
+
+		put( "HH_INCOME" , getIncome( cs.getDecisionMaker() ) , values );
+		put( "HH_SIZE" , getHouseholdInteger( cs.getDecisionMaker(), "householdSize" ), values );
+		put( "HH_OWNED_CARS" , getHouseholdInteger( cs.getDecisionMaker() , "numberOfHouseholdCarsOwned" ) , values );
+		put( "HH_OWNED_MOTO" , getHouseholdInteger( cs.getDecisionMaker() , "numberOfHouseholdMotorcyclesOwned" ) , values );
 
 		values.put("C_CHOICE", RecordFillerUtils.getChoice(cs));
 
@@ -64,6 +85,23 @@ public class CapeTownChoiceSetRecordFiller implements ChoiceDataSetWriter.Choice
 		}
 
 		return values;
+	}
+
+	private Integer getHouseholdInteger( Person decisionMaker , String att ) {
+		final Id<Household> hh = person2household.get( decisionMaker.getId() );
+		return (Integer) households.getHouseholdAttributes().getAttribute( hh.toString() , att );
+	}
+
+	private Number getIncome( Person decisionMaker ) {
+		final Household hh = getHousehold( decisionMaker );
+		final Income income = hh.getIncome();
+		// no need to test currency and period, always ZAR and month
+		return income == null ? -99 : income.getIncome();
+	}
+
+	private Household getHousehold( Person decisionMaker ) {
+		final Id<Household> id = person2household.get( decisionMaker.getId() );
+		return households.getHouseholds().get( id );
 	}
 
 	private Number getAge( Person decisionMaker ) {

@@ -87,7 +87,10 @@ public class RunCapeTownTripChoiceSetConversion {
 
 		//Logger.getLogger(SoftCache.class).setLevel(Level.TRACE );
 		try {
-			final CapeTownChoiceSetRecordFiller filler = new CapeTownChoiceSetRecordFiller( sc.getPopulation().getPersonAttributes() );
+			final CapeTownChoiceSetRecordFiller filler =
+					new CapeTownChoiceSetRecordFiller(
+							sc.getPopulation().getPersonAttributes(),
+							sc.getHouseholds() );
 
 			Converter.<Trip, TripChoiceSituation>builder()
 					.withRecordFiller(
