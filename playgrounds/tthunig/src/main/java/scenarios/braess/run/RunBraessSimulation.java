@@ -89,12 +89,12 @@ public final class RunBraessSimulation {
 	private static final int NUMBER_OF_PERSONS = 3600; // per hour
 	private static final int SIMULATION_PERIOD = 1; // in hours
 	
-	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ALL;
+	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.NONE;
 	// initial score for all initial plans
 	private static final Double INIT_PLAN_SCORE = null;
 
 	/// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_ONE_SECOND_Z;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
@@ -259,7 +259,7 @@ public final class RunBraessSimulation {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 		
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize( 3 );
+		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
 		
 		config.travelTimeCalculator().setTravelTimeCalculatorType(
 				TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
