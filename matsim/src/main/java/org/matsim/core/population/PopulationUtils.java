@@ -370,12 +370,22 @@ public final class PopulationUtils {
 	public static Id<Link> computeLinkIdFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
 		if ( act.getFacilityId()==null ) {
-			return act.getLinkId() ;
+			final Id<Link> linkIdFromActivity = act.getLinkId();
+			Gbl.assertIf( linkIdFromActivity!=null );
+			return linkIdFromActivity ;
 		} else {
 			Gbl.assertIf( facs!=null ) ;
 			ActivityFacility facility = facs.getFacilities().get( act.getFacilityId() ) ;
 			Gbl.assertIf( facility!=null );
-			return facility.getLinkId() ;
+			final Id<Link> linkIdFromFacility = facility.getLinkId();
+			if ( linkIdFromFacility!=null ) {
+				return linkIdFromFacility ;
+			} else {
+				final Id<Link> linkIdFromActivity = act.getLinkId();
+				Gbl.assertIf( linkIdFromActivity!=null );
+				return linkIdFromActivity ;
+			}
+			// yy sorry, I am just trying to make explicit which seems to have been the logic so far implicitly.  kai, feb'16
 		}
 	}
 

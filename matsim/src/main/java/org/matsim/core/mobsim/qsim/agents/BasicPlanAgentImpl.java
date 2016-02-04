@@ -67,7 +67,9 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 		if (planElements.size() > 0) {
 			Activity firstAct = (Activity) planElements.get(0);				
 //			this.setCurrentLinkId( firstAct.getLinkId() ) ;
-			this.setCurrentLinkId( PopulationUtils.computeLinkIdFromActivity(firstAct, scenario.getActivityFacilities(), scenario.getConfig() ) );
+			final Id<Link> linkId = PopulationUtils.computeLinkIdFromActivity(firstAct, scenario.getActivityFacilities(), scenario.getConfig() );
+			Gbl.assertIf( linkId!=null );
+			this.setCurrentLinkId( linkId );
 			this.setState(MobsimAgent.State.ACTIVITY) ;
 			calculateAndSetDepartureTime(firstAct);
 		}
@@ -96,6 +98,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 
 	@Override
 	public final void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
+		Gbl.assertNonNull(linkId);
 		this.setCurrentLinkId( linkId ) ;
 	}
 
