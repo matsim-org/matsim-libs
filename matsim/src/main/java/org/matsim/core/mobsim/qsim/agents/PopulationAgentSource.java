@@ -23,10 +23,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -45,7 +48,7 @@ public final class PopulationAgentSource implements AgentSource {
 	private Map<Id<Vehicle>,Id<Link>> seenVehicleIds = new HashMap<>() ;
 
 	@Inject
-	public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim) {
+	public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim ) {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
@@ -129,7 +132,7 @@ public final class PopulationAgentSource implements AgentSource {
 	 *  than to ask agent.getCurrentLinkId() after creation.
 	 * @param leg TODO
 	 */
-	private static Id<Link> findVehicleLink(Person p ) {
+	private Id<Link> findVehicleLink(Person p ) {
 		/* Cases that come to mind:
 		 * (1) multiple persons share car located at home, but possibly brought to different place by someone else.  
 		 *      This is treated by the following algo.
@@ -140,8 +143,11 @@ public final class PopulationAgentSource implements AgentSource {
 		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
-				if (activity.getLinkId() != null) {
-					return activity.getLinkId();
+				ActivityFacilities facilities = this.qsim.getScenario().getActivityFacilities() ;
+				Config config = this.qsim.getScenario().getConfig() ;
+				final Id<Link> activityLinkId = PopulationUtils.computeLinkIdFromActivity(activity, facilities, config ) ;
+				if (activityLinkId != null) {
+					return activityLinkId;
 				}
 			} else if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;

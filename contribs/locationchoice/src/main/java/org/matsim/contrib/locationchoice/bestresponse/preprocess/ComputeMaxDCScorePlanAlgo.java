@@ -143,6 +143,12 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		@Override
 		public Id<ActivityFacility> getFacilityId() { return this.facilityId; }
 		
-		public void setFacilityId(Id<ActivityFacility> facilityId) { this.facilityId = facilityId; }	
+		public void setFacilityId(Id<ActivityFacility> facilityId) { this.facilityId = facilityId; }
+
+		@Override
+		public void setLinkId(Id<Link> id) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}	
 	}
 }

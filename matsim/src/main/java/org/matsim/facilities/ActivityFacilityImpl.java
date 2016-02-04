@@ -27,13 +27,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.internal.MatsimDataClassImplMarkerInterface;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * maintainer: mrieser / Senozon AG
  */
-public class ActivityFacilityImpl implements ActivityFacility {
+public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassImplMarkerInterface {
 	// After some thinking, we think that this design is ok:
 	// * all methods are final (reduce maintenance for upstream maintainers)
 	// * the class itself is not final
@@ -53,6 +54,12 @@ public class ActivityFacilityImpl implements ActivityFacility {
 
 	private Id<Link> linkId;
 
+	/**
+	 * Deliberately protected, see {@link MatsimDataClassImplMarkerInterface}
+	 * 
+	 * @param id
+	 * @param center
+	 */
 	protected ActivityFacilityImpl(final Id<ActivityFacility> id, final Coord center) {
 		this.id = id;
 		this.coord = center;

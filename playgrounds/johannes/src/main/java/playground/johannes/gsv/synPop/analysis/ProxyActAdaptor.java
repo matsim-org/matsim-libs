@@ -106,4 +106,16 @@ public class ProxyActAdaptor implements Activity {
 		return Id.create(delegate.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 	}
 
+	@Override
+	public void setLinkId(Id<Link> id) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setFacilityId(Id<ActivityFacility> id) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
 }
