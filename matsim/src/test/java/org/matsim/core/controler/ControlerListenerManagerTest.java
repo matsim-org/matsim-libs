@@ -16,12 +16,12 @@ public class ControlerListenerManagerTest {
 
 	@Test
 	public void testAddControlerListener_ClassHierarchy() {
-		ControlerListenerManager m = new ControlerListenerManager();
+		ControlerListenerManagerImpl m = new ControlerListenerManagerImpl();
 		CountingControlerListener ccl = new CountingControlerListener();
 		ExtendedControlerListener ecl = new ExtendedControlerListener();
 		m.addControlerListener(ccl);
 		m.addControlerListener(ecl);
-		
+
 		m.fireControlerStartupEvent();
 		Assert.assertEquals(1, ccl.nOfStartups);
 		Assert.assertEquals(0, ccl.nOfIterStarts);
@@ -53,7 +53,7 @@ public class ControlerListenerManagerTest {
 
 	@Test
 	public void testAddCoreControlerListener_ClassHierarchy() {
-		ControlerListenerManager m = new ControlerListenerManager();
+		ControlerListenerManagerImpl m = new ControlerListenerManagerImpl();
 		CountingControlerListener ccl = new CountingControlerListener();
 		ExtendedControlerListener ecl = new ExtendedControlerListener();
 		m.addCoreControlerListener(ccl);
