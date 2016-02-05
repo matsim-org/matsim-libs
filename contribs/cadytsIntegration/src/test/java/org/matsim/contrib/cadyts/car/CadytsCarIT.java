@@ -73,7 +73,7 @@ import javax.inject.Inject;
  * At this stage all original pt code is still included here, but outcommeted, to make the adaptations
  * from pt to car well traceable in case of any errors.
  */
-public class CadytsCarIntegrationTest {
+public class CadytsCarIT {
 	
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();

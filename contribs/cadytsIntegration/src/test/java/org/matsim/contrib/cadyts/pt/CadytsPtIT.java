@@ -74,7 +74,7 @@ import cadyts.utilities.misc.DynamicData;
 
 import javax.inject.Inject;
 
-public class CadytsIntegrationTest {
+public class CadytsPtIT {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -232,7 +232,7 @@ public class CadytsIntegrationTest {
 		// test resulting simulation volumes
 		{
 			String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".simCountCompareOccupancy.txt";
-			CountsReader reader = new CountsReader(outCounts);
+			CountsReaderPt reader = new CountsReaderPt(outCounts);
 			double[] simValues;
 			double[] realValues;
 
@@ -376,7 +376,7 @@ public class CadytsIntegrationTest {
 		// test resulting simulation volumes
 		{
 			String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".simCountCompareOccupancy.txt";
-			CountsReader reader = new CountsReader(outCounts);
+			CountsReaderPt reader = new CountsReaderPt(outCounts);
 			double[] simValues;
 			double[] realValues;
 
@@ -536,7 +536,7 @@ public class CadytsIntegrationTest {
 
 		// test resulting simulation volumes
 		String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".simCountCompareOccupancy.txt";
-		CountsReader reader = new CountsReader(outCounts);
+		CountsReaderPt reader = new CountsReaderPt(outCounts);
 		Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
 		{
 			double[] simValues = reader.getSimulatedValues(stopId1);

@@ -25,7 +25,7 @@ import java.net.URL;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.cadyts.pt.CadytsIntegrationTest;
+import org.matsim.contrib.cadyts.pt.CadytsPtIT;
 import org.matsim.testcases.MatsimTestUtils;
 
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
@@ -38,7 +38,7 @@ public class CalibrationStatReaderTest {
 	@Test
 	public void testReader() throws IOException {
 		TabularFileParser tabularFileParser = new TabularFileParser();
-		URL url = CadytsIntegrationTest.class.getClassLoader().getResource(this.utils.getInputDirectory() + "calibration-stats.txt");
+		URL url = CadytsPtIT.class.getClassLoader().getResource(this.utils.getInputDirectory() + "calibration-stats.txt");
 		String calibStatFile = url.getFile(); // hack to get the file loaded from classpath, which is not directly supported by Cadyts
 		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
 		tabularFileParser.parse(calibStatFile, calibrationStatReader);

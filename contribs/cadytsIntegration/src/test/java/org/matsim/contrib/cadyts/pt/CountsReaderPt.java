@@ -35,9 +35,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * this class is only there in order to read the column-oriented output back in for testing. 
  * It should not be used elsewhere without further thinking. kai, sep'14
  * */
-final class CountsReader {
+final class CountsReaderPt {
 
-	private final static Logger log = Logger.getLogger(CountsReader.class);
+	private final static Logger log = Logger.getLogger(CountsReaderPt.class);
 
 	final String STOP_ID_STRING_0 = "StopId :";
 	final String HEAD_STRING_0 = "hour";
@@ -46,7 +46,7 @@ final class CountsReader {
 	String countsTextFile;
 	Map<Id<TransitStopFacility>, Map<String, double[]>> count = new TreeMap<>();
 
-	CountsReader(final String countsTextFile){
+	CountsReaderPt(final String countsTextFile){
 		this.countsTextFile = countsTextFile;
 		readValues();
 	}
