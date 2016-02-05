@@ -32,9 +32,6 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.ControlerListenerManager;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.ActivityImpl;
 
 import javax.inject.Inject;
@@ -62,21 +59,11 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
     private List<ActivityHandler> activityHandlers = new ArrayList<>();
 
     public EventsToActivities() {
-        // FIXME: This is still here because of our unsolved data-flow problem:
-        // All interfaces like *Handler should have a finish() method.
-        // (See place where this constructor is used: the client only uses
-        // his own instance because he needs control over when it is finished,
-        // so that he can close a file afterwards.)
+
     }
 
     @Inject
-    EventsToActivities(ControlerListenerManager controlerListenerManager, EventsManager eventsManager) {
-        controlerListenerManager.addControlerListener(new AfterMobsimListener() {
-            @Override
-            public void notifyAfterMobsim(AfterMobsimEvent event) {
-                finish();
-            }
-        });
+    EventsToActivities(EventsManager eventsManager) {
         eventsManager.addHandler(this);
     }
 
