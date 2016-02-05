@@ -1,8 +1,10 @@
 package playground.dziemke.accessibility;
 
 import com.vividsolutions.jts.geom.Coordinate;
+
+import playground.dziemke.accessibility.ptmatrix.CSVFileWriter;
+
 import org.apache.log4j.Logger;
-import playground.vsp.demandde.unternehmen.CSVFileWriter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
