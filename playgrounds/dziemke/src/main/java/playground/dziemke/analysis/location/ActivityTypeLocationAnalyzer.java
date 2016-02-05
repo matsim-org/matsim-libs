@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -23,64 +24,74 @@ import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.dziemke.utils.LogToOutputSaver;
+
 /**
  * @author dziemke
  * based on "playground.dziemke.pots.analysis.disaggregatedPotsdamDisaggregatedAnalysis"
  */
 public class ActivityTypeLocationAnalyzer {
-	// Parameters
-	static String runId = "run_132";
-	static int iteration = 150;
+	private final static Logger log = Logger.getLogger(ActivityTypeLocationAnalyzer.class);
 	
-	// Input file and output directory
-	static String inputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + iteration 
-			+ "/" + runId + "." + iteration + ".plans.xml.gz";
-	private static String outputDirectory = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + iteration + "/";
-	
-	// Other objects
 	private static PointFeatureFactory pointFeatureFactory;
-	
+	// Parameters
+//	static final String runId = "run_132";
+//	static final int iteration = 150;
+	static final String CRS = "EPSG:26918";
+//	static final String CRS = TransformationFactory.DHDN_GK4
+//	
+//	// Input file and output directory
+//	static final String INPUT_PLANS_FILE = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + iteration 
+//			+ "/" + runId + "." + iteration + ".plans.xml.gz";
+//	private final static String OUTPUT_DIRECTORY = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + iteration + "/";
+	static final String INPUT_PLANS_FILE = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/"
+				+ "mstm_run/run_04/siloMatsim/population_2000.xml";
+	static final String OUTPUT_DIRECTORY = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/"
+			+ "mstm_run/run_04/siloMatsim/population_2000/";
+
 	
 	public static void main(String[] args) {
-		Map <Id, Coord> homeCoords = new HashMap <Id, Coord>();
+		LogToOutputSaver.setOutputDirectory(OUTPUT_DIRECTORY);
+
+		Map <Id<Person>, Coord> homeCoords = new HashMap <Id<Person>, Coord>();
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
-		reader.readFile(inputPlansFile);
+		reader.readFile(INPUT_PLANS_FILE);
 		Population population = scenario.getPopulation();
 		
-		int selectedStayHomePlans = 0;
+//		int selectedStayHomePlans = 0;
 		
 		for (Person person : population.getPersons().values()) {
 			Plan selectedPlan = person.getSelectedPlan();
-			int numberOfPlanElements = selectedPlan.getPlanElements().size();
+//			int numberOfPlanElements = selectedPlan.getPlanElements().size();
 			
-			if (numberOfPlanElements == 1) {
-				selectedStayHomePlans++;
+//			if (numberOfPlanElements == 1) {
+//				selectedStayHomePlans++;
 				//double score = selectedPlan.getScore();
 				//System.out.println("Score of stay-home plan is " + score);
 				
-				Id id = person.getId();
+				Id<Person> id = person.getId();
 				//TODO Now using 0th activity as home activity. Change it to what is specifically needed...
 				Activity activity = (Activity) selectedPlan.getPlanElements().get(0);
 				
 				homeCoords.put(id, activity.getCoord());
-			}
+//			}
 		}
-		writeShapeFilePoints(outputDirectory + "stayHome.shp", homeCoords);		
-		System.out.println("Number of selected stay-home plans is " + selectedStayHomePlans);
+		writeShapeFilePoints(OUTPUT_DIRECTORY + "home_activities.shp", homeCoords);		
+//		System.out.println("Number of selected stay-home plans is " + selectedStayHomePlans);
 	}
 	
 	
-	private static void writeShapeFilePoints(String outputShapeFile, Map <Id,Coord> coords) {
+	private static void writeShapeFilePoints(String outputShapeFile, Map <Id<Person>,Coord> coords) {
 		if (coords.isEmpty()==true) {
-			System.out.println("Map ist leer!");
+			throw new RuntimeException("Map is empty!");
 		} else {
 			initFeatureType();
 			Collection <SimpleFeature> features = createFeatures(coords);
 			ShapeFileWriter.writeGeometries(features, outputShapeFile);
-			System.out.println("ShapeFile with points wrtitten to " + outputShapeFile);
+			log.info("ShapeFile with points wrtitten to " + outputShapeFile);
 		}
 	}
 
@@ -88,27 +99,19 @@ public class ActivityTypeLocationAnalyzer {
 	private static void initFeatureType() {
 		// Before single feature can be created, the type has to be initialized here
 		
-		// NOTE: "TransformationFactory.DHDN_GK4" does not transform anything, but just returns the string "DHDN_GK4"
-		// Essentially, one could also just fill in the string, but then there is no check if one spelled it correctly.
-		
 		// Via "addAttribute" a attributes of the feature type can be added and its name specified.
 		// The value for this attribute can then be filled in when a single attribute of this type is created.
 		
 		// The effect of "setName" could not be retrieved yet.
 		
 		pointFeatureFactory = new PointFeatureFactory.Builder().
-		setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4)).
-		//setCrs(MGC.getCRS("DHDN_GK4")).
-		setName("points").
-		addAttribute("Agent_ID", String.class).
-		//addAttribute("Attribute2", String.class).
-		create();
+		setCrs(MGC.getCRS(CRS)).setName("Points").addAttribute("AgentId", String.class).create();
 	}	
 	
 	
-	private static Collection <SimpleFeature> createFeatures(Map<Id,Coord> coords) {
+	private static Collection <SimpleFeature> createFeatures(Map<Id<Person>, Coord> coords) {
 		List <SimpleFeature> features = new ArrayList <SimpleFeature>();
-		for (Id id : coords.keySet()){
+		for (Id<Person> id : coords.keySet()){
 			Coord coord = coords.get(id);
 			//features.add(getFeature(coords.get(i), i));
 			Object[] attributes = new Object[]{id};

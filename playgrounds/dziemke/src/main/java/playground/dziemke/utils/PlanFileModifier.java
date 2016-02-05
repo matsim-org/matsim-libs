@@ -2,6 +2,7 @@ package playground.dziemke.utils;
 
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -22,24 +23,31 @@ import org.matsim.core.scenario.ScenarioUtils;
  * configurable parameters. Then writes new plans file to a given location.
  */
 public class PlanFileModifier {
+	private final static Logger log = Logger.getLogger(PlanFileModifier.class);
+	
 	// Parameters
-	static double selectionProbability = 1.;
+	static double selectionProbability = 0.5;
 	static boolean onlyTransferSelectedPlan = true;
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
 	static boolean onlyConsiderPeopleAlwaysGoingByCar = false;
 	static int maxNumberOfAgentsConsidered = 1000000;
-	static String runId = "run_145";
-	static int iteration = 150;
+//	static String runId = "run_145";
+//	static int iteration = 150;
 	
 	
 	// Input and output files
-	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans.xml.gz";
-//	static String inputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap2matsim/28/plans.xml.gz";
-	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans_selected2.xml.gz";
-			
+//	static final String INPUT_PLANS_FILE = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plans.xml.gz";
+//	static final String OUTPUT_PLANS_FILE = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plans_selected2.xml.gz";
+	static final String INPUT_PLANS_FILE = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/"
+			+ "mstm_run/run_04/siloMatsim/population_2000.xml";
+	static final String OUTPUT_ROOT = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/"
+			+ "mstm_run/run_04/siloMatsim/population_2000_half/";
+	static final String OUTPUT_PLANS_FILE = OUTPUT_ROOT + "population.xml";
+	
+	
 //	if (onlyTransferSelectedPlan == true) {
 //		outputPlansFile = outputPlansFile + "_selected";
 //	}
@@ -49,10 +57,12 @@ public class PlanFileModifier {
 	
 	
 	public static void main(String[] args) {
+		LogToOutputSaver.setOutputDirectory(OUTPUT_ROOT);
+		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
-		reader.readFile(inputPlansFile);
+		reader.readFile(INPUT_PLANS_FILE);
 		Population population = scenario.getPopulation();
 		
 		
@@ -60,14 +70,14 @@ public class PlanFileModifier {
 		Scenario scenario2 = ScenarioUtils.createScenario(config2);
 		Population population2 = scenario2.getPopulation();
 		
-		int counter = 0;
+		int agentCounter = 0;
 		
 		for (Person person : population.getPersons().values()) {
 			
-			if (counter < maxNumberOfAgentsConsidered) {
-				Random random = new Random();
-				double randomNumber = random.nextDouble();
+			if (agentCounter < maxNumberOfAgentsConsidered) {
 				
+				// Handle filters
+				Random random = new Random();
 				boolean considerPerson = true;
 				
 				Plan selectedPlan = person.getSelectedPlan();
@@ -78,7 +88,6 @@ public class PlanFileModifier {
 					}
 				}
 				
-				// ------------------------------------------------------------------------------------
 				int numberOfPlans = person.getPlans().size();
 				
 				if (onlyConsiderPeopleAlwaysGoingByCar == true) {
@@ -97,16 +106,15 @@ public class PlanFileModifier {
 								}
 							}
 						}
-						
 					}
-				} else {
-					// do not switch "considerPerson"
 				}
 				
 				
-				// ------------------------------------------------------------------------------------
-				
-				if (randomNumber <= selectionProbability) {
+				/*
+				 * Create a copy of the person -- if selected according to all criteria -- and add it
+				 * to new population
+				 */
+				if (random.nextDouble() <= selectionProbability) {
 					if (considerPerson == true) {
 						Id<Person> id = person.getId();
 						
@@ -137,17 +145,16 @@ public class PlanFileModifier {
 							population2.addPerson(person2);
 						}
 					}
-				} else {
-					// do nothing
-				}
+				} 
 			}
-			counter ++;
+			agentCounter ++;
 		}
 						
 		
 		// write population file
-		new PopulationWriter(scenario2.getPopulation(), null).write(outputPlansFile);
+		new PopulationWriter(scenario2.getPopulation(), null).write(OUTPUT_PLANS_FILE);
 		
-		System.out.println("Minimized plans file " + outputPlansFile + " written.");
+		log.info("Modified plans file contains " + agentCounter + " agents.");
+		log.info("Modified plans file has been written to " + OUTPUT_PLANS_FILE);
 	}
 }
