@@ -27,122 +27,90 @@ import com.vividsolutions.jts.geom.Point;
  * @author dziemke
  * 
  */
-public class TripAnalyzer {
+public class GeneralTripAnalyzer {
 	public static void main(String[] args) {
 	    
 		// Parameters
-		String runId = "run_168a";
-//		String runId = "run791";
-		String usedIteration = "300"; // most frequently used value: 150
-//		String usedIteration = "600";
+		String overallId = "run_06";
+		String runId = "year_2001";
+		String usedIteration = "20";
 		
-		// TODO why was that necessary?
-		Integer planningAreaId = 11000000;
-		
-		boolean onlyCar = false; // "car"; new, should be used for runs with ChangeLedModes enabled
-		
-		boolean onlyInterior = false; // "int"
-		
-		boolean onlyBerlinBased = true; // "ber"; usually varied for analysis
-		
-		boolean distanceFilter = true; // "dist"; usually varied for analysis
-		//double minDistance = 0;
-		double maxDistance = 100;
-		
-		boolean onlyWorkTrips = false; // "work"
-				
-		boolean ageFilter = false; // "age"
-		Integer minAge = 80;
-		Integer maxAge = 119;	
-		
-		int maxBinDuration = 120;
+//		// TODO why was that necessary?
+//		Integer planningAreaId = 11000000;
+//		
+//		boolean onlyCar = false; // "car"; new, should be used for runs with ChangeLedModes enabled
+//		
+//		boolean onlyInterior = false; // "int"
+//		
+//		boolean onlyBerlinBased = true; // "ber"; usually varied for analysis
+//		
+//		boolean distanceFilter = true; // "dist"; usually varied for analysis
+//		//double minDistance = 0;
+//		double maxDistance = 100;
+//		
+//		boolean onlyWorkTrips = false; // "work"
+//				
+//		boolean ageFilter = false; // "age"
+//		Integer minAge = 80;
+//		Integer maxAge = 119;	
+//		
+		int maxBinDuration = 240;
 	    int binWidthDuration = 1;
 	    
 	    int maxBinTime = 23;
 	    int binWidthTime = 1;
 	    
-	    int maxBinDistance = 60;
+	    int maxBinDistance = 120;
 	    int binWidthDistance = 1;
 	    	    
-	    int maxBinSpeed = 60;
+	    int maxBinSpeed = 120;
 	    int binWidthSpeed = 1;
 	    
 	    
 	    // Input and output files
-//	    String networkFile = "/Users/dominik/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-	    String networkFile = "../../../../Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-//	    String networkFile = "D:/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-//	    String networkFile = "D:/Workspace/runs-svn/"  + runId + "/counts_network_merged.xml_cl.xml.gz";
-	    
-//	    String eventsFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + usedIteration + "/" 
-//	    String eventsFile = "D:/Workspace/runs-svn/" + runId + "/output_rerun/ITERS/it." + usedIteration + "/" 
-//	    		+ runId + "." + usedIteration + ".events.txt.gz";
-//	    String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
-//				+ runId + "." + usedIteration + ".events.xml.gz";
-	    String eventsFile = "../../../../Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
-//	    String eventsFile = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
-				+ runId + "." + usedIteration + ".events.xml.gz";
+	    String networkFile = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/mstm_run/input_additional/network_04/network.xml";
+	    String eventsFile = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/mstm_run/" + overallId + "/siloMatsim/"
+	    		+ runId + "/ITERS/it." + usedIteration + "/" + runId + "." + usedIteration + ".events.xml.gz";
+	    String outputDirectory = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/mstm_run/" + overallId + "/siloMatsim/analysis";
 
-//	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/19/persons1.dat"; // wrong!!!
-//	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/18/persons1.dat";
-//	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
+//	    String shapeFileBerlin = "../../../../Workspace/shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
 	    
-//	    String cemdapPersonFile = "../../../../Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
-	    String cemdapPersonFile = "../../../../Workspace/shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/21/persons1.dat";
-	    
-//	    String cemdapPersonFile = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
-	    
-	    //String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis";
-//	    String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
-	    String outputDirectory = "../../../../Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
-//	    String outputDirectory = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
-//	    String outputDirectory = "D:/Workspace/runs-svn/other/" + runId + "/analysis";
-	    
-//	    String shapeFileBerlin = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
-	    
-//	    String shapeFileBerlin = "../../../../Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
-	    String shapeFileBerlin = "../../../../Workspace/shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
-	    
-//	    String shapeFileBerlin = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
-	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(shapeFileBerlin, "NR");
-	    Geometry berlinGeometry = zoneGeometries.get(planningAreaId);
-	    
-	       
-	    // Systematic output naming
-	    Integer iteration4Analysis = Integer.parseInt(usedIteration);
-	    if (!iteration4Analysis.equals(150)) {
-	    	outputDirectory = outputDirectory + "_" + usedIteration;
-	    }
-	    
-	    if (onlyCar == true) {
-			outputDirectory = outputDirectory + "_car";
-		}
-	    
-	    if (onlyInterior == true) {
-			outputDirectory = outputDirectory + "_int";
-	    }
-	    
-		if (onlyBerlinBased == true) {
-			outputDirectory = outputDirectory + "_ber";
-		}
-		
-		if (distanceFilter == true) {
-			outputDirectory = outputDirectory + "_dist";
-		}
-		
-		if (onlyWorkTrips == true) {
-			outputDirectory = outputDirectory + "_work";
-		}
-	    
-		if (ageFilter == true) {
-			outputDirectory = outputDirectory + "_age_" + minAge.toString();
-			outputDirectory = outputDirectory + "_" + maxAge.toString();
-		}
-		
-		
-		// new 2015-12-09 for doublecheck
-		outputDirectory = outputDirectory + "_2";
-		// ----
+////	    String shapeFileBerlin = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
+//	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(shapeFileBerlin, "NR");
+//	    Geometry berlinGeometry = zoneGeometries.get(planningAreaId);
+//	    
+//	       
+//	    // Systematic output naming
+//	    Integer iteration4Analysis = Integer.parseInt(usedIteration);
+//	    if (!iteration4Analysis.equals(150)) {
+//	    	outputDirectory = outputDirectory + "_" + usedIteration;
+//	    }
+//	    
+//	    if (onlyCar == true) {
+//			outputDirectory = outputDirectory + "_car";
+//		}
+//	    
+//	    if (onlyInterior == true) {
+//			outputDirectory = outputDirectory + "_int";
+//	    }
+//	    
+//		if (onlyBerlinBased == true) {
+//			outputDirectory = outputDirectory + "_ber";
+//		}
+//		
+//		if (distanceFilter == true) {
+//			outputDirectory = outputDirectory + "_dist";
+//		}
+//		
+//		if (onlyWorkTrips == true) {
+//			outputDirectory = outputDirectory + "_work";
+//		}
+//	    
+//		if (ageFilter == true) {
+//			outputDirectory = outputDirectory + "_age_" + minAge.toString();
+//			outputDirectory = outputDirectory + "_" + maxAge.toString();
+//		}
+
 		
 		
 		// Create an EventsManager instance (MATSim infrastructure)
@@ -164,14 +132,14 @@ public class TripAnalyzer {
 	    
 	    
 	    // --------------------------------------------------------------------------------------------------
-	    CemdapPersonFileReader cemdapPersonFileReader = new CemdapPersonFileReader();
-	    if (ageFilter == true) {
-	    	// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
-	    	// so far age is the only one
-		    // parse person file
-		 	
-		 	cemdapPersonFileReader.parse(cemdapPersonFile);
-	    }
+//	    CemdapPersonFileReader cemdapPersonFileReader = new CemdapPersonFileReader();
+//	    if (ageFilter == true) {
+//	    	// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
+//	    	// so far age is the only one
+//		    // parse person file
+//		 	
+//		 	cemdapPersonFileReader.parse(cemdapPersonFile);
+//	    }
 	 	// --------------------------------------------------------------------------------------------------
 	    
 	    	    	    
@@ -223,7 +191,7 @@ public class TripAnalyzer {
 	    // do calculations
 	    for (Trip trip : handler.getTrips().values()) {
 	    	if(trip.getTripComplete()) {
-	    		boolean considerTrip = false;
+//	    		boolean considerTrip = false;
 	    		
 	    		
 	    		// get coordinates of links
@@ -254,78 +222,78 @@ public class TripAnalyzer {
     			
 	    		// choose if trip will be considered
     			// Note: Check of "interior"/"berlinBased" has to come first since this sets the "considerTrip"
-    			// variable to true.
-	    		if (onlyInterior == true) {
-	    			if (berlinGeometry.contains(arrivalLocation) && berlinGeometry.contains(departureLocation)) {
-	    				considerTrip = true;
-	    			}
-	    		} else if (onlyBerlinBased == true) {
-	    			if (berlinGeometry.contains(arrivalLocation) || berlinGeometry.contains(departureLocation)) {
-	    				considerTrip = true;
-	    			}
-	    		} else {
-	    			considerTrip = true;
-	    		}
-	    		
-	    		// --------------------------------------------------------------------------------------------------
-//				if (!trip.getMode().equals("car") && !trip.getMode().equals("pt")) {
-//					throw new RuntimeException("In current implementation leg mode must either be car or pt");
+//    			// variable to true.
+//	    		if (onlyInterior == true) {
+//	    			if (berlinGeometry.contains(arrivalLocation) && berlinGeometry.contains(departureLocation)) {
+//	    				considerTrip = true;
+//	    			}
+//	    		} else if (onlyBerlinBased == true) {
+//	    			if (berlinGeometry.contains(arrivalLocation) || berlinGeometry.contains(departureLocation)) {
+//	    				considerTrip = true;
+//	    			}
+//	    		} else {
+//	    			considerTrip = true;
+//	    		}
+//	    		
+//	    		// --------------------------------------------------------------------------------------------------
+////				if (!trip.getMode().equals("car") && !trip.getMode().equals("pt")) {
+////					throw new RuntimeException("In current implementation leg mode must either be car or pt");
+////				}
+//				
+//				if (onlyCar == true) {
+//					if (!trip.getMode().equals("car")) {
+//						considerTrip = false;
+//					}
 //				}
-				
-				if (onlyCar == true) {
-					if (!trip.getMode().equals("car")) {
-						considerTrip = false;
-					}
-				}
-			    // --------------------------------------------------------------------------------------------------
-	    		
-	    		if (distanceFilter == true && tripDistanceBeeline >= maxDistance) {
-	    			considerTrip = false;
-	    		}
-	    		
-//	    		if (distanceFilter == true && tripDistanceBeeline <= minDistance) {
+//			    // --------------------------------------------------------------------------------------------------
+//	    		
+//	    		if (distanceFilter == true && tripDistanceBeeline >= maxDistance) {
 //	    			considerTrip = false;
 //	    		}
-	    		
-	    		//--------------------------------------------------------------------------------------------------------------------
-	    		if (onlyWorkTrips == true) {
-		    		boolean doesWorkTrip = false;
-		    		if (trip.getActivityEndActType().equals("work")) {
-		    			doesWorkTrip = true;	    			
-		    		}
-		    		
-					if (doesWorkTrip == true) { // can be varied
-		    			considerTrip = false;
-		    		}
-		    	}
-				//--------------------------------------------------------------------------------------------------------------------
-	    		
-	    		// write person activity attributes
-//	    		if (trip.getActivityEndActType().equals("work")) {
-//	    			personActivityAttributes.putAttribute(trip.getDriverId(), "hasWorkActivity", true);
+//	    		
+////	    		if (distanceFilter == true && tripDistanceBeeline <= minDistance) {
+////	    			considerTrip = false;
+////	    		}
+//	    		
+//	    		//--------------------------------------------------------------------------------------------------------------------
+//	    		if (onlyWorkTrips == true) {
+//		    		boolean doesWorkTrip = false;
+//		    		if (trip.getActivityEndActType().equals("work")) {
+//		    			doesWorkTrip = true;	    			
+//		    		}
+//		    		
+//					if (doesWorkTrip == true) { // can be varied
+//		    			considerTrip = false;
+//		    		}
+//		    	}
+//				//--------------------------------------------------------------------------------------------------------------------
+//	    		
+//	    		// write person activity attributes
+////	    		if (trip.getActivityEndActType().equals("work")) {
+////	    			personActivityAttributes.putAttribute(trip.getDriverId(), "hasWorkActivity", true);
+////	    		}
+//	    		// TODO The plan was to claculated activity-chain frequencies here...
+//	    		
+//	    		// --------------------------------------------------------------------------------------------------
+//				// PERSON-SPECIFIC ATTRIBUTES
+//	    		if (ageFilter == true) {
+//	    	    	// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
+//	    	    	// so far age is the only one
+//		    		String personId = trip.getPersonId().toString();
+//				    int age = (int) cemdapPersonFileReader.getPersonAttributes().getAttribute(personId, "age");
+//				    
+//				    if (age < minAge) {
+//						considerTrip = false;
+//					}
+//				    if (age > maxAge) {
+//						considerTrip = false;
+//					}
 //	    		}
-	    		// TODO The plan was to claculated activity-chain frequencies here...
-	    		
-	    		// --------------------------------------------------------------------------------------------------
-				// PERSON-SPECIFIC ATTRIBUTES
-	    		if (ageFilter == true) {
-	    	    	// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
-	    	    	// so far age is the only one
-		    		String personId = trip.getPersonId().toString();
-				    int age = (int) cemdapPersonFileReader.getPersonAttributes().getAttribute(personId, "age");
-				    
-				    if (age < minAge) {
-						considerTrip = false;
-					}
-				    if (age > maxAge) {
-						considerTrip = false;
-					}
-	    		}
 			    // --------------------------------------------------------------------------------------------------
 	    		
 	    		
 	    		
-	    		if (considerTrip == true) {
+//	    		if (considerTrip == true) {
 		    		tripCounter++;
 		    		
 		    		// calculate travel times and store them in a map
@@ -389,7 +357,7 @@ public class TripAnalyzer {
 		    		} else {
 		    			numberOfTripsWithNoCalculableSpeed++;
 		    		}
-	    		}
+//	    		}
 			} else {
 	    		System.err.println("Trip is not complete!");
 	    		tripCounterIncomplete++;
