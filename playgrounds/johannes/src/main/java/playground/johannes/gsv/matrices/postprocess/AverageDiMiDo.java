@@ -107,5 +107,8 @@ public class AverageDiMiDo {
                 writer.newLine();
             }
         }
+
+        writer.close();
+        logger.info("Done.");
     }
 }

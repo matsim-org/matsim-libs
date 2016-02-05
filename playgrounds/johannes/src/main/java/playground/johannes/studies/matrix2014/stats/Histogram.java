@@ -20,14 +20,14 @@
 package playground.johannes.studies.matrix2014.stats;
 
 import gnu.trove.function.TDoubleFunction;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
+import gnu.trove.map.TObjectDoubleMap;
 
 /**
  * @author johannes
  */
 public class Histogram {
 
-    public static TObjectDoubleHashMap<?> normalize(TObjectDoubleHashMap<?> histogram) {
+    public static TObjectDoubleMap<?> normalize(TObjectDoubleMap<?> histogram) {
         double sum = 0;
         double[] values = histogram.values();
 
@@ -38,7 +38,7 @@ public class Histogram {
         return normalize(histogram, sum);
     }
 
-    public static TObjectDoubleHashMap<?> normalize(TObjectDoubleHashMap<?> histogram, double sum) {
+    public static TObjectDoubleMap<?> normalize(TObjectDoubleMap<?> histogram, double sum) {
         final double norm = 1 / sum;
 
         TDoubleFunction fct = new TDoubleFunction() {

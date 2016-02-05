@@ -53,9 +53,14 @@ public class ODCalibratorHamiltonian {
         /*
         Add a hamiltonian logger.
          */
+        long start = 0;
+        String value = configGroup.getValue("startIteration");
+        if(value != null) start = (long)Double.parseDouble(value);
+
         engine.getEngineListeners().addComponent(new HamiltonianLogger(hamiltonian,
                 engine.getLoggingInterval(),
                 "odCalibrator",
-                engine.getIOContext().getRoot()));
+                engine.getIOContext().getRoot(),
+                start));
     }
 }
