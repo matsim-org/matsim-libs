@@ -57,7 +57,7 @@ class MyControler {
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
 //		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles ) ;
-//		controler.addControlerListener(new KaiAnalysisListener()) ;
+		controler.addControlerListener(new KaiAnalysisListener()) ;
 //		controler.addOverridingModule(new OTFVisModule());
 //		controler.setMobsimFactory(new OldMobsimFactory()) ;
 		

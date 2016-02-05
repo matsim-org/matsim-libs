@@ -75,7 +75,7 @@ public class CarRoutingClaude {
 		plansWriter.startStreaming(outputPlansFile);
 		
 		// add algorithm to map coordinates to links
-		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
+		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network, null));
 
 		// add algorithm to estimate travel cost
 		// and which performs routing based on that

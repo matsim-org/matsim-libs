@@ -67,7 +67,7 @@ public class JointTripsModule extends AbstractModule {
 											tripRouterProvider.get());
 						final PlanAlgorithm checkJointRoutes =
 							new ImportedJointRoutesChecker(tripRouterProvider.get());
-						final PlanAlgorithm xy2link = new XY2Links( sc.getNetwork() );
+						final PlanAlgorithm xy2link = new XY2Links( sc.getNetwork(), null );
 						return new GenericPlanAlgorithm<ReplanningGroup>() {
 							@Override
 							public void run(final ReplanningGroup group) {

@@ -88,7 +88,7 @@ public class SimpleXY2Links {
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(this.plansfileOUT);
-		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
+		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network, null));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(scenario.getConfig().plans().getInputFile());
 		plans.printPlansCount();
