@@ -21,25 +21,32 @@
 	</module>
 
 	<module name="qsim">
-		<param name="mainMode" value="car,bike" />
+		<param name="mainMode" value="car, bike" />
+		
+		<!-- default: FIFO; options: FIFO PassingQ SeepageQ -->
+		<!-- 	<param name="linkDynamics" value="FIFO" /> -->
+		
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
 	
 		<param name = "snapshotperiod"	value = "00:00:00"/> <!-- 00:00:00 means NO snapshot writing -->
 		
+		<!-- so einstellen, dass es vielleicht noch ein bisschen Fahrzeitverluste gibt -->
 		<param name = "flowCapacityFactor" value="1" /> <!-- we simulate only 1% of the population, and reduce the network capacity to 2% -->
 		<param name = "storageCapacityFactor" value="1" />
 	</module>
 	
 	<module name="bike" >
 		<param name="inputSurfaceInformationFile" value="input/network/skalitzer_bikeatt.xml" />
-		<!--<param name="simulatedModes" value="bike,walk" />-->
+		<!-- macht keinen sinn<param name="simulatedModes" value="bike,walk" />-->
 	</module>
 	
+	<!--
 	<module name="vehicles" >
-	<!--	<param name=" vehiclesFile " value="/path/to/vehicles.xml.gz" />-->
+		<param name=" vehiclesFile " value="/path/to/vehicles.xml.gz" />
 	</module >
+	-->
 	
 	<module name="planCalcScore">
 		<param name="learningRate" value="1.0" />
@@ -87,8 +94,7 @@
 	
 	<module name="planscalcroute" >
 		<!-- All the modes for which the router is supposed to generate network routes (like car) -->
-		<param name="networkModes" value="car,bike" />
-		
+		<param name="networkModes" value="car, bike" />
 		<parameterset type="teleportedModeParameters" >
 			<param name="beelineDistanceFactor" value="1.3" />
 			<param name="mode" value="walk" />

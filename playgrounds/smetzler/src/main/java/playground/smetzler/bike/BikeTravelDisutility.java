@@ -21,6 +21,10 @@ public class BikeTravelDisutility implements TravelDisutility {
 //		new ObjectAttributesXmlReader(bikeAttributes).parse(bikeConfigGroup.getSurfaceInformationFile());
 //	}
 
+//	public BikeTravelDisutility() {
+//		// TODO Auto-generated constructor stub
+//	}
+
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 		//greife auf surface daten zu

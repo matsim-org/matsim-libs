@@ -27,7 +27,7 @@ public class BikeTravelTime implements TravelTime {
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		double factor= 0;
-		final double referenceBikeSpeed = 6.01;		// 6.01 according to Prakin and Rotheram
+		final double referenceBikeSpeed = 6.01;		// 6.01 according to Prakin and Rotheram // nochmal in die config einbauen
 		double biketravelTime = 0;
 		
 		//greife auf surface daten zu

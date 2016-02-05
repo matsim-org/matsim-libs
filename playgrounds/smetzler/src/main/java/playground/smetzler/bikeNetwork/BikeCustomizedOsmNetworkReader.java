@@ -109,8 +109,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
     private final static String TAG_CYCLEWAYTYPE= "cycleway";
     private final static String TAG_SURFACE = "surface";
 	private ObjectAttributes bikeAttributes = new ObjectAttributes();
-	private int ct = 0;
-	private int sf = 0;
+	private int countCyclewaytype = 0;
+	private int countSurface = 0;
     //
     
 	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS, TAG_CYCLEWAYTYPE, TAG_SURFACE};
@@ -234,8 +234,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		log.info("MATSim: # nodes created: " + this.network.getNodes().size());
 		log.info("MATSim: # links created: " + this.network.getLinks().size());
 		//new
-		log.info("BikeObjectAttributs for cyclewaytype created: " + ct);
-		log.info("BikeObjectAttributs for surface created: " + sf);
+		log.info("BikeObjectAttributs for cyclewaytype created: " + countCyclewaytype);
+		log.info("BikeObjectAttributs for surface created: " + countSurface);
 
 		if (this.unknownHighways.size() > 0) {
 			log.info("The following highway-types had no defaults set and were thus NOT converted:");
@@ -569,13 +569,13 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		
 		if (cyclewaytypeTag != null) {
 			bikeAttributes.putAttribute(matsimId, "cyclewaytype", cyclewaytypeTag);
-			ct++;
+			countCyclewaytype++;
 		};
 		
 		String surfaceTag = way.tags.get(TAG_SURFACE);
 		if (surfaceTag != null) {
 			bikeAttributes.putAttribute(matsimId, "surface", surfaceTag);
-			sf++;
+			countSurface++;
 		};
 		// new end
 		
