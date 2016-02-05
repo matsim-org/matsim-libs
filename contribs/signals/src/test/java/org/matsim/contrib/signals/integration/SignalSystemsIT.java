@@ -48,7 +48,7 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  * @author dgrether
  *
  */
-public class SignalSystemsIntegrationTest {
+public class SignalSystemsIT {
 
 	private final static String CONFIG_FILE_NAME = "signalSystemsIntegrationConfig.xml";
 

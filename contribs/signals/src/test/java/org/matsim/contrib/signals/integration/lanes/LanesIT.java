@@ -52,9 +52,9 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author dgrether
  *
  */
-public class LanesIntegrationTest {
+public class LanesIT {
 
-	private static final Logger log = Logger.getLogger(LanesIntegrationTest.class);
+	private static final Logger log = Logger.getLogger(LanesIT.class);
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

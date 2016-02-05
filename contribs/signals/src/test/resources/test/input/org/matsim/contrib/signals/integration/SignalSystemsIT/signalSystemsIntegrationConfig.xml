@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "./dtd/config_v1.dtd"
 	[
-		<!ENTITY INPUTBASE    "./test/input/org/matsim/contrib/signals/integration/SignalSystemsIntegrationTest">
+		<!ENTITY INPUTBASE    "./test/input/org/matsim/contrib/signals/integration/SignalSystemsIT">
 	]
 >
 
@@ -14,7 +14,7 @@
   
     <module name="network">
     <param name="inputNetworkFile" value="&INPUTBASE;/network.xml.gz" />
-    <param name="laneDefinitionsFile" value="./test/output/org/matsim/contrib/signals/integration/SignalSystemsIntegrationTest/testSignalSystems/testLaneDefinitions_v2.0.xml" />
+    <param name="laneDefinitionsFile" value="./test/output/org/matsim/contrib/signals/integration/SignalSystemsIT/testSignalSystems/testLaneDefinitions_v2.0.xml" />
   </module>
 
   <module name="plans">
