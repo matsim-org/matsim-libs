@@ -89,6 +89,7 @@ public class CapeTownChoiceSetRecordFiller implements ChoiceDataSetWriter.Choice
 
 	private Integer getHouseholdInteger( Person decisionMaker , String att ) {
 		final Id<Household> hh = person2household.get( decisionMaker.getId() );
+		if ( hh == null ) throw new IllegalStateException( "no household ID for person "+decisionMaker.getId() );
 		return (Integer) households.getHouseholdAttributes().getAttribute( hh.toString() , att );
 	}
 
@@ -101,6 +102,7 @@ public class CapeTownChoiceSetRecordFiller implements ChoiceDataSetWriter.Choice
 
 	private Household getHousehold( Person decisionMaker ) {
 		final Id<Household> id = person2household.get( decisionMaker.getId() );
+		if ( id == null ) throw new IllegalStateException( "no household ID for person "+decisionMaker.getId() );
 		return households.getHouseholds().get( id );
 	}
 
@@ -156,7 +158,7 @@ public class CapeTownChoiceSetRecordFiller implements ChoiceDataSetWriter.Choice
 						decisionMaker.getId().toString(),
 						"gender" );
 		codebook.writeMeaning( gender );
-		return PersonEnums.Education.parseFromDescription( gender ).getCode();
+		return PersonEnums.Gender.parseFromDescription( gender ).getCode();
 	}
 
 	private void put( final String name , final Number value, Map<String,Number> map ) {

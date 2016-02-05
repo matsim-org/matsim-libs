@@ -30,12 +30,18 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.FacilitiesWriter;
 import playground.ivt.maxess.gisutils.GlobCoverTypeIdentifier;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Script to generate fake facilities around a population, based on land cover types from the ESA (http://due.esrin.esa.int/page_globcover.php)
@@ -79,6 +85,11 @@ public class CreateGridOfDummyFacilitiesFromGlobCover {
 										"f-"+x+"-"+y,
 										ActivityFacility.class ),
 								coord );
+
+				for ( String type : configGroup.getActivityTypes() ) {
+					final ActivityOption activityOption = facilities.getFactory().createActivityOption( type );
+					f.addActivityOption( activityOption );
+				}
 				facilities.addActivityFacility( f );
 			}
 		}
@@ -137,6 +148,9 @@ public class CreateGridOfDummyFacilitiesFromGlobCover {
 		private String outputFacilities = null;
 		private double gridStepSize_m = 500;
 
+		// south african types by default
+		private Set<String> activityTypes = CollectionUtils.stringToSet( "h,s,v,o,w,e1,e2,m,e3,l" );
+
 		public GlobCoverFacilityCreationConfigGroup() {
 			super( GROUP_NAME );
 		}
@@ -179,6 +193,24 @@ public class CreateGridOfDummyFacilitiesFromGlobCover {
 		@StringSetter( "gridStepSize_m" )
 		public void setGridStepSize_m( double gridStepSize_m ) {
 			this.gridStepSize_m = gridStepSize_m;
+		}
+
+		@StringGetter( "activityTypes" )
+		private String getActivityTypesString() {
+			return CollectionUtils.setToString( getActivityTypes() );
+		}
+
+		@StringSetter( "activityTypes" )
+		private void setActivityTypesString( String activityTypes ) {
+			setActivityTypes( CollectionUtils.stringToSet( activityTypes ) );
+		}
+
+		public Set<String> getActivityTypes() {
+			return activityTypes;
+		}
+
+		public void setActivityTypes( Set<String> activityTypes ) {
+			this.activityTypes = activityTypes;
 		}
 	}
 }

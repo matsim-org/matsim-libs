@@ -181,7 +181,7 @@ public class PersonEnums {
 				return SECONDARY10;
 			} else if (descr.equalsIgnoreCase("Secondary, Grade 12")){
 				return SECONDARY12;
-			} else if (descr.equalsIgnoreCase("Tertiray")){
+			} else if (descr.equalsIgnoreCase("Tertiary")){
 				return TERTIARY;
 			} else{
 				throw new RuntimeException("Cannot parse education from description: " + descr);
