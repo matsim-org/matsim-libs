@@ -26,44 +26,55 @@ public class BikeTravelTime implements TravelTime {
 	
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		double factor= 0;
+		double factor= 0.9;
 		final double referenceBikeSpeed = 6.01;		// 6.01 according to Prakin and Rotheram // nochmal in die config einbauen
 		double biketravelTime = 0;
+		double reducedSpeed = 0;
 		
 		//greife auf surface daten zu
 		String surface= (String) bikeAttributes.getAttribute(link.getId().toString(), "surface");
 		
-		// surface eigenschaften : https://wiki.openstreetmap.org/wiki/DE:Key:surface
-//		asphalt
-//		paved: versiegelte Fläche
-//		paving_stones: Plasterstein
-//		cobblestone: Kopfsteinpflaster
-//		gravel: Schotter	
-//		unpaved: unversiegelte Fläche
-//		sand
-		if (surface != null) {
-		if (surface.equals("asphalt"))
-			factor= 1;
-		else if (surface.equals("paved"))
-			factor= 1;		
-		else if (surface.equals("paving_stones"))
-			factor= 0.9;
-		else if (surface.equals("cobblestone"))
-			factor= 0.6;
-		else if (surface.equals("gravel"))
-			factor= 0.5;		
-		else if (surface.equals("unpaved"))
-			factor= 0.5;
-		else if (surface.equals("sand"))
-			factor= 0.3;
-		else {
-			factor=0.8;
-			log.info(surface + " not recognized");}
+//		// surface eigenschaften : https://wiki.openstreetmap.org/wiki/DE:Key:surface
+////		asphalt
+////		paved: versiegelte Fläche
+////		paving_stones: Plasterstein
+////		cobblestone: Kopfsteinpflaster
+////		gravel: Schotter	
+////		unpaved: unversiegelte Fläche
+////		sand
+//		
+//		if (surface != null) {
+//		if (surface.equals("asphalt"))
+//			factor= 1;
+//		else if (surface.equals("paved"))
+//			factor= 1;		
+//		else if (surface.equals("paving_stones"))
+//			factor= 0.9;
+//		else if (surface.equals("cobblestone"))
+//			factor= 0.6;
+//		else if (surface.equals("gravel"))
+//			factor= 0.5;		
+//		else if (surface.equals("unpaved"))
+//			factor= 0.5;
+//		else if (surface.equals("sand")) {
+//			factor= 0.01;
+//			System.out.println("SAND");}
+//		else {
+//			factor= 0.8;
+//			log.info(surface + " not recognized");}
 		
-		biketravelTime= (link.getLength() / (referenceBikeSpeed*factor));
+		if (surface != null) {
+			if (surface.equals("sand"))
+				factor= 0.1;
+		
+		reducedSpeed= referenceBikeSpeed*factor;
+		biketravelTime= (link.getLength() / reducedSpeed);
 		}
 		
+		System.out.println(reducedSpeed);
+		
 		return biketravelTime;
+
 		
 	}
 

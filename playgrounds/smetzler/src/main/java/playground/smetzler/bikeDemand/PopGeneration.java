@@ -23,11 +23,11 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 public class PopGeneration implements Runnable {
 	
 	//String outputPop = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/demand/skalitzer/skalitzer_pop.xml";
-	String outputPop = "../smetzler/input/demand/skalitzer_pop.xml";
-	String DHDN = "EPSG:3068";
+	String outputPop = "../smetzler/input/demand/equil_bike.xml";
+	//String DHDN = "EPSG:3068";
 	private Map<String, Coord> zoneGeometries = new HashMap<>();
 
-	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, DHDN);
+	//private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, DHDN);
 
 	private Scenario scenario;
 
@@ -52,8 +52,10 @@ public class PopGeneration implements Runnable {
 		// Add the locations you want to use here.
 		// (with proper coordinates)
 		// 13.4310436,52.4944612,13.4520292,52.5024297
-		zoneGeometries.put("home1", new Coord((double) 13.4310436, (double) 52.4944612));
-		zoneGeometries.put("work1", new Coord((double) 13.4520292, (double) 52.5024297));
+//		zoneGeometries.put("home1", new Coord((double) 13.4310436, (double) 52.4944612));
+//		zoneGeometries.put("work1", new Coord((double) 13.4520292, (double) 52.5024297));
+		zoneGeometries.put("home1", new Coord((double) -20000, (double) -10000));
+		zoneGeometries.put("work1", new Coord((double) 5000, (double) -10000));
 	}
 
 	private void generatePopulation() {
@@ -67,8 +69,10 @@ public class PopGeneration implements Runnable {
 			Coord sink = zoneGeometries.get(to);
 			Person person = population.getFactory().createPerson(createId(from, to, i, TransportMode.bike));
 			Plan plan = population.getFactory().createPlan();
-			Coord homeLocation = shoot(ct.transform(source));
-			Coord workLocation = shoot(ct.transform(sink));
+//			Coord homeLocation = shoot(ct.transform(source));
+//			Coord workLocation = shoot(ct.transform(sink));
+			Coord homeLocation = shoot(source);
+			Coord workLocation = shoot(sink);
 			plan.addActivity(createHome(homeLocation));
 					plan.addLeg(createDriveLeg());
 			plan.addActivity(createWork(workLocation));

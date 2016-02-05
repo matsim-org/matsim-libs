@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE objectAttributes SYSTEM "http://matsim.org/files/dtd/objectattributes_v1.dtd">
+
+<objectAttributes>
+	<object id="1">
+		<attribute name="cyclewaytype" class="java.lang.String">track</attribute>
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+	</object>
+	<object id="2">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+	</object>
+	<object id="5">
+		<attribute name="surface" class="java.lang.String">asphalt</attribute>
+	</object>
+</objectAttributes>

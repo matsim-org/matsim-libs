@@ -11,7 +11,7 @@ public class BikeModule extends AbstractModule {
 		//früher zb controler.add...
 		addTravelDisutilityFactoryBinding("bike").to(BikeTravelDisutilityFactory.class);
 		
-		//analog zu RunMobsimWithMultipleModeVehiclesExample, brauch ich das überhaupt? was brauch ich überhaupt?
+		//analog zu RunMobsimWithMultipleModeVehiclesExample, sorgt momentan lediglich dafür dass die maxV und PCU eingestellt ist.
 		bindMobsim().toProvider(BikeQSimFactory.class);
 		
 		
