@@ -35,9 +35,9 @@ import org.matsim.testcases.MatsimTestCase;
 
 import java.util.EnumSet;
 
-public class ReRoutingTest extends MatsimTestCase {
+public class ReRoutingIT extends MatsimTestCase {
 
-	/*package*/ static final Logger log = Logger.getLogger(ReRoutingTest.class);
+	/*package*/ static final Logger log = Logger.getLogger(ReRoutingIT.class);
 
 	
 	private Scenario loadScenario() {

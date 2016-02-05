@@ -41,9 +41,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
-public class OnePercentBerlin10sTest extends MatsimTestCase {
+public class OnePercentBerlin10sIT extends MatsimTestCase {
 
-	private static final Logger log = Logger.getLogger(OnePercentBerlin10sTest.class);
+	private static final Logger log = Logger.getLogger(OnePercentBerlin10sIT.class);
 
 	public void testOnePercent10sQSim() {
 		Config config = loadConfig(null);

@@ -48,8 +48,8 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-public class RandomizedTransitRouterTest {
-	private static Logger log = Logger.getLogger( RandomizedTransitRouterTest.class ) ;
+public class RandomizedTransitRouterIT {
+	private static Logger log = Logger.getLogger( RandomizedTransitRouterIT.class ) ;
 	
 	private static final class MyObserver implements PersonEntersVehicleEventHandler {
 //		private enum ObservedVehicle{ pt_1009_1 /*direct, fast, with wait*/, pt_2009_1 /*direct, slow*/, pt_3009_1 /*with interchange*/} ;
