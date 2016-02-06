@@ -16,24 +16,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.congestionPricing;
-
-import java.io.BufferedWriter;
-import java.util.SortedMap;
+package playground.agarwalamit.analysis.modalShare;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.ModalShareGenerator;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit
  */
-public class ModalSplitCalculator {
-
-	private SortedMap<String, Double> pctModalShare ;
-	private SortedMap<String, Integer> mode2Legs;
+public class ModalShareExample {
 
 	public static void main(String[] args) {
 		
@@ -41,38 +33,16 @@ public class ModalSplitCalculator {
 		String [] runCases = {"bau","v3","v4","v6"};
 		
 		for(String runCase :runCases){
-			ModalSplitCalculator msUG = new ModalSplitCalculator();
+			ModalShareExample msUG = new ModalShareExample();
 			int it = 1000;
-			msUG.run(outputDir+runCase+"/ITERS/it."+it+"/"+it+".plans.xml.gz");
-			msUG.writeResults(outputDir+runCase+"/modalShare_it."+it+".txt");
+			msUG.run(outputDir+runCase+"/ITERS/it."+it+"/"+it+".plans.xml.gz", outputDir+runCase+"/modalShare_it."+it+".txt");
 		}
 	}
 
-	public void run(String populationFile){
-		ModalShareGenerator msg = new ModalShareGenerator();
+	public void run(final String populationFile, final String outputFile){
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(populationFile);
-
-		pctModalShare = msg.getMode2PctShareFromPlans(sc.getPopulation());
-		mode2Legs = msg.getMode2NoOfLegs(sc.getPopulation());
-	}
-
-	public void writeResults(String outputFile){
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
-		try {
-			for(String str:mode2Legs.keySet()){
-				writer.write(str+"\t");
-			}
-			writer.newLine();
-			for(String str:mode2Legs.keySet()){ // write Absolute No Of Legs
-				writer.write(mode2Legs.get(str)+"\t");
-			}
-			writer.newLine();
-			for(String str:pctModalShare.keySet()){ // write percentage no of legs
-				writer.write(pctModalShare.get(str)+"\t");
-			}
-			writer.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Data can not be written to file. Reason - "+e);
-		}
+		ModalShareFromPlans msg = new ModalShareFromPlans(sc.getPopulation());
+		msg.run();
+		msg.writeResults(outputFile);
 	}
 }

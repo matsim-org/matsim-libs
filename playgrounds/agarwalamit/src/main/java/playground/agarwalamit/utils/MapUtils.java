@@ -27,12 +27,14 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.benjamin.utils.BkNumberUtils;
+
 /**
  * @author amit
  */
 
 public final class MapUtils {
-	
+
 	private MapUtils(){}
 
 	public static int intValueSum(final Map<?, Integer> intMap){
@@ -68,7 +70,7 @@ public final class MapUtils {
 		}
 		return outMap;
 	}
-	
+
 	/**
 	 * @return m1+m2
 	 * <p> if key does not exist in either of map, value for that is assumed as <b>zero.
@@ -79,6 +81,17 @@ public final class MapUtils {
 		for (String str : m2.keySet()){
 			double existingValue = outMap.containsKey(str) ? outMap.get(str) : 0.;
 			outMap.put(str, m2.get(str)+existingValue);
+		}
+		return outMap;
+	}
+
+	public static SortedMap<String, Double> getPercentShare(final SortedMap<String, Integer> inMap){
+		SortedMap<String, Double> outMap = new TreeMap<>();
+		double valueSum = (double) MapUtils.intValueSum(inMap);
+		for(String str : inMap.keySet()) {
+			double legs = (double) inMap.get(str);
+			double pctShare = BkNumberUtils.roundDouble( legs*100 / valueSum, 3); 
+			outMap.put(str, pctShare);
 		}
 		return outMap;
 	}

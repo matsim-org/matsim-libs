@@ -16,37 +16,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
+package playground.agarwalamit.santiago;
 
-import playground.agarwalamit.analysis.modalShare.ModalShareFromPlans;
-import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 
 /**
  * @author amit
  */
 
-public class JointDemandModalSplit {
+public class SantiagoAnalyses {
+
+	private static final String RUN_DIR = "../../../../repos/runs-svn/santiago/output/";
+	private static final String [] RUN_CASES = {"ctd","outerCordon","triangleCordon"}; 
 
 	public static void main(String[] args) {
-		new JointDemandModalSplit().run();
+		SantiagoAnalyses sa = new SantiagoAnalyses();
+		sa.writeModalShare();
 	}
-	
-	private void run (){
-		String dir = "/Users/amit/Documents/cluster/ils4/agarwal/patnaIndia/run108/calibration/";
-		String folder = "c1/ITERS/it.";
-		String itNr = "100";
-		String plansFile = dir+folder+itNr+"/"+itNr+".plans.xml.gz";
-		
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(plansFile);
-		Population pop = sc.getPopulation();
-		ModalShareFromPlans msg = new ModalShareFromPlans(pop);
-		msg.run();
-		
-		String outFile = dir+folder+itNr+"/"+itNr+".modalSplit.txt";
-		
-		msg.writeResults(outFile);
+
+	public void writeModalShare(){
+		for(String rc :RUN_CASES) {
+			String eventsFile = RUN_DIR+rc+"/output_events.xml.gz";
+			String outputFile = RUN_DIR+"/analysis/modalSplit_"+rc+".txt";
+			ModalShareFromEvents msc = new ModalShareFromEvents(eventsFile);
+			msc.run();
+			msc.writeResults(outputFile);
+		}
 	}
 }

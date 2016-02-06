@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.ModalShareGenerator;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromPlans;
 import playground.agarwalamit.mixedTraffic.patnaIndia.subPop.PopulationFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -33,10 +33,10 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  * @author amit
  */
 
-public class ModalSplitSubPop {
+public class PatnaModalShareSubPop {
 
 	public static void main(String[] args) {
-		new ModalSplitSubPop().run();
+		new PatnaModalShareSubPop().run();
 	}
 	
 	private void run(){
@@ -45,33 +45,39 @@ public class ModalSplitSubPop {
 		String plansFile = "/Users/amit/Documents/repos/runs-svn/patnaIndia/run104/"+outFolder+"/output_plans.xml.gz";
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(plansFile);
 		Population pop = sc.getPopulation();
-		ModalShareGenerator msg = new ModalShareGenerator();
+		ModalShareFromPlans msg = new ModalShareFromPlans(pop);
 		
 		String outFile = "/Users/amit/Documents/repos/runs-svn/patnaIndia/run104/"+outFolder+"/"+outFolder+"_modalSplit.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
-		SortedMap<String, Double> wholePopModalSplot = msg.getMode2PctShareFromPlans(pop);
+		SortedMap<String, Double> wholePopModalSplit = msg.getModeToPercentOfLegs();
 		try {
 			writer.write("pop \t");
-			for(String mode : wholePopModalSplot.keySet()){
+			for(String mode : wholePopModalSplit.keySet()){
 				writer.write(mode+"\t");
 			}
 			writer.newLine();
 			
 			writer.write("wholePop \t");
-			for(String mode :wholePopModalSplot.keySet()){
-				writer.write(wholePopModalSplot.get(mode)+"\t");
+			for(String mode :wholePopModalSplit.keySet()){
+				writer.write(wholePopModalSplit.get(mode)+"\t");
 			}
 			writer.newLine();
+			
+			Population slumPop = PopulationFilter.getSlumPopulation(pop);
+			msg = new ModalShareFromPlans(slumPop);
 			
 			writer.write("slum \t");
-			for(String mode :wholePopModalSplot.keySet()){
-				writer.write(msg.getMode2PctShareFromPlans(PopulationFilter.getSlumPopulation(pop)).get(mode)+"\t");
+			for(String mode :wholePopModalSplit.keySet()){
+				writer.write(msg.getModeToPercentOfLegs().get(mode)+"\t");
 			}
 			writer.newLine();
 			
+			Population nonSlum = PopulationFilter.getNonSlumPopulation(pop);
+			msg = new ModalShareFromPlans(nonSlum);
+			
 			writer.write("nonSlum \t");
-			for(String mode :wholePopModalSplot.keySet()){
-				writer.write(msg.getMode2PctShareFromPlans(PopulationFilter.getNonSlumPopulation(pop)).get(mode)+"\t");
+			for(String mode :wholePopModalSplit.keySet()){
+				writer.write(msg.getModeToPercentOfLegs().get(mode)+"\t");
 			}
 			writer.close();
 		} catch (Exception e) {

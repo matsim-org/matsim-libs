@@ -16,37 +16,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Population;
+package playground.agarwalamit.analysis.modalShare;
 
-import playground.agarwalamit.analysis.modalShare.ModalShareFromPlans;
-import playground.agarwalamit.utils.LoadMyScenarios;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 /**
- * @author amit
- */
+* @author amit
+*/
 
-public class JointDemandModalSplit {
-
-	public static void main(String[] args) {
-		new JointDemandModalSplit().run();
-	}
+public interface ModalShare {
 	
-	private void run (){
-		String dir = "/Users/amit/Documents/cluster/ils4/agarwal/patnaIndia/run108/calibration/";
-		String folder = "c1/ITERS/it.";
-		String itNr = "100";
-		String plansFile = dir+folder+itNr+"/"+itNr+".plans.xml.gz";
-		
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(plansFile);
-		Population pop = sc.getPopulation();
-		ModalShareFromPlans msg = new ModalShareFromPlans(pop);
-		msg.run();
-		
-		String outFile = dir+folder+itNr+"/"+itNr+".modalSplit.txt";
-		
-		msg.writeResults(outFile);
-	}
+	public SortedSet<String> getUsedModes();
+	public SortedMap<String, Integer> getModeToNumberOfLegs();
+	public SortedMap<String, Double> getModeToPercentOfLegs();
+	public void writeResults(String outputFile);
 }
+
+
+	
