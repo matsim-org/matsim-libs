@@ -9,7 +9,29 @@
 	<object id="2">
 		<attribute name="surface" class="java.lang.String">sand</attribute>
 	</object>
+	<object id="3">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+	</object>
+	<object id="4">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+	</object>
 	<object id="5">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+	</object>
+	<object id="6">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+	</object>
+	<object id="7">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+	</object>
+	<object id="8">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+	</object>
+	<object id="9">
 		<attribute name="surface" class="java.lang.String">asphalt</attribute>
+	</object>
+	
+	<object id="20">
+		<attribute name="surface" class="java.lang.String">bla</attribute>
 	</object>
 </objectAttributes>

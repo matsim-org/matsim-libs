@@ -13,69 +13,67 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
 
 public class BikeTravelTime implements TravelTime {
+	
+	
+	/**
+	 * in this class traveltime is calculated depending on the following parameters:
+	 * surface, smoothness, slope/elevation, #junctions, cyclewaytype, size of street aside, weather/wind
+	 * 
+	 */
 
 	private final static Logger log = Logger.getLogger(BikeTravelTime.class);
 	ObjectAttributes bikeAttributes;
+	final double referenceBikeSpeed;	
 	
 	@Inject
 	@Singleton
 	BikeTravelTime(BikeConfigGroup bikeConfigGroup) {
+		//get infos from ObjectAttributes
 		bikeAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(bikeAttributes).parse(bikeConfigGroup.getSurfaceInformationFile());
+		//get speed
+		referenceBikeSpeed = Double.valueOf(bikeConfigGroup.getReferenceBikeSpeed()).doubleValue();
 	}
 	
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		double factor= 0.9;
-		final double referenceBikeSpeed = 6.01;		// 6.01 according to Prakin and Rotheram // nochmal in die config einbauen
-		double biketravelTime = 0;
-		double reducedSpeed = 0;
-		
-		//greife auf surface daten zu
+		double speedfactor;
 		String surface= (String) bikeAttributes.getAttribute(link.getId().toString(), "surface");
-		
-//		// surface eigenschaften : https://wiki.openstreetmap.org/wiki/DE:Key:surface
-////		asphalt
-////		paved: versiegelte Fläche
-////		paving_stones: Plasterstein
-////		cobblestone: Kopfsteinpflaster
-////		gravel: Schotter	
-////		unpaved: unversiegelte Fläche
-////		sand
-//		
-//		if (surface != null) {
-//		if (surface.equals("asphalt"))
-//			factor= 1;
-//		else if (surface.equals("paved"))
-//			factor= 1;		
-//		else if (surface.equals("paving_stones"))
-//			factor= 0.9;
-//		else if (surface.equals("cobblestone"))
-//			factor= 0.6;
-//		else if (surface.equals("gravel"))
-//			factor= 0.5;		
-//		else if (surface.equals("unpaved"))
-//			factor= 0.5;
-//		else if (surface.equals("sand")) {
-//			factor= 0.01;
-//			System.out.println("SAND");}
-//		else {
-//			factor= 0.8;
-//			log.info(surface + " not recognized");}
-		
+		// surface eigenschaften : https://wiki.openstreetmap.org/wiki/DE:Key:surface
+		//		asphalt
+		//		paved: versiegelte Fläche
+		//		paving_stones: Plasterstein
+		//		cobblestone: Kopfsteinpflaster
+		//		gravel: Schotter	
+		//		unpaved: unversiegelte Fläche
+		//		sand
 		if (surface != null) {
-			if (surface.equals("sand"))
-				factor= 0.1;
-		
-		reducedSpeed= referenceBikeSpeed*factor;
-		biketravelTime= (link.getLength() / reducedSpeed);
+			if (surface.equals("asphalt")) {
+				speedfactor= 1;
+			} else if (surface.equals("paved")) {
+				speedfactor= 1;		
+			} else if (surface.equals("paving_stones")) {
+				speedfactor= 0.9;
+			} else if (surface.equals("cobblestone")) {
+				speedfactor= 0.6;
+			} else if (surface.equals("gravel")) {
+				speedfactor= 0.5;		
+			} else if (surface.equals("unpaved")) {
+				speedfactor= 0.5;
+			} else if (surface.equals("sand")) {
+				speedfactor= 0.1;
+			} else {
+				speedfactor= 0.8;
+				log.info(surface + " surface not recognized");
+			}
 		}
-		
-		System.out.println(reducedSpeed);
-		
-		return biketravelTime;
-
-		
+		else {
+			speedfactor= 0.9;
+			//log.info("no surface info");
+		}
+		double reducedSpeed= referenceBikeSpeed*speedfactor;
+		double biketravelTime= (link.getLength() / reducedSpeed);			
+		return biketravelTime;	
 	}
 
 }

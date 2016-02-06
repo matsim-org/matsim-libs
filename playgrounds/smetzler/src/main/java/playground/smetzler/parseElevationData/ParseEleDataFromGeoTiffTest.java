@@ -12,7 +12,7 @@ import java.io.File;
 //to-do
 // pruefe ausmaße der inputdatei und und gib warning wenn anfragelocation ausserhalb ist
 
-public class ParseEleDataFromGeoTiff {
+public class ParseEleDataFromGeoTiffTest {
 
 	private static GridCoverage2D grid;
 	private static Raster gridData;
@@ -26,6 +26,9 @@ public class ParseEleDataFromGeoTiff {
 
 		System.out.println("alexanderplatz " + getValue(13.40993, 52.52191));
 		System.out.println("der kreuzberg " + getValue(13.379491, 52.487610));
+		
+		System.out.println("Herrmannplatz " + getValue(13.422301,52.486477));
+		System.out.println("U Boddinstr. " + getValue(13.423210,52.480278));
 
 	}
 

@@ -16,7 +16,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output/equil_bike_0502_wSand_capFac" />
+		<param name="outputDirectory" value="./output/equil_bike_0602_wSand_futherTesting" />
 		<param name="lastIteration" value="10" />
 	</module>
 
@@ -39,7 +39,7 @@
 	
 	<module name="bike" >
 		<param name="inputSurfaceInformationFile" value="input/network/equilNetwork_att.xml" />
-		<!-- macht keinen sinn<param name="simulatedModes" value="bike,walk" />-->
+		<param name="referenceBikeSpeed" value="1" /> <!-- 6.01 is gut -->
 	</module>
 	
 	<!--

@@ -33,10 +33,12 @@ public class BikeConfigGroup extends ConfigGroup {
 	public static final String GROUP_NAME = "bike";
 	
 	private static final String INPUT_SURFACE_INFORMATION_FILE = "inputSurfaceInformationFile";
-	//private static final String SIMULATED_MODES = "simulatedModes";
+	private static final String INPUT_REFERENCE_BIKE_SPEED = "referenceBikeSpeed";
 
-	//private String simulatedModes = "bike"; 
+	
+
 	private String surfaceInformationFile = null;
+	private String referenceBikeSpeed = null;
 
 
 	public BikeConfigGroup() {
@@ -50,8 +52,8 @@ public class BikeConfigGroup extends ConfigGroup {
 		
 		if (INPUT_SURFACE_INFORMATION_FILE.equals(key)) {
 			setSurfaceInformationFile(value);
-//		} else if (SIMULATED_MODES.equals(key)) {
-//			setSimulatedModes(value);
+		} else if (INPUT_REFERENCE_BIKE_SPEED.equals(key)) {
+			setReferenceBikeSpeed(value);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -63,8 +65,8 @@ public class BikeConfigGroup extends ConfigGroup {
 	public final String getValue(final String key) {
 		if (INPUT_SURFACE_INFORMATION_FILE.equals(key)) {
 			return getSurfaceInformationFile();
-//		} else if (SIMULATED_MODES.equals(key)) {
-//			return getSimulatedModes();
+		} else if (INPUT_REFERENCE_BIKE_SPEED.equals(key)) {
+			return getReferenceBikeSpeed();
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -76,7 +78,7 @@ public class BikeConfigGroup extends ConfigGroup {
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<>();
 		map.put(INPUT_SURFACE_INFORMATION_FILE, getValue(INPUT_SURFACE_INFORMATION_FILE));
-//		map.put(SIMULATED_MODES, getValue(SIMULATED_MODES));
+		map.put(INPUT_REFERENCE_BIKE_SPEED, getValue(INPUT_REFERENCE_BIKE_SPEED));
 		return map;
 	}
 	
@@ -84,7 +86,7 @@ public class BikeConfigGroup extends ConfigGroup {
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(INPUT_SURFACE_INFORMATION_FILE, "Path to a file containing surface information for the network's links (required file format: ObjectAttributes).");
-//		map.put(SIMULATED_MODES, "List the modes that should be simulated by the bike simulation (supported so far: bike).");
+		map.put(INPUT_REFERENCE_BIKE_SPEED, "ReferenceBikeSpeed // 6.01 according to Prakin and Rotheram");
 		return map;
 	}
 	void setSurfaceInformationFile(String file) {
@@ -95,14 +97,15 @@ public class BikeConfigGroup extends ConfigGroup {
 		return this.surfaceInformationFile;
 	}
 	
-//	public void setSimulatedModes(final String simulatedModes) {
-//		this.simulatedModes = simulatedModes;
-//	}
-//
-//	public String getSimulatedModes() {
-//		// used in core at following places:
-//		// (1) In the Controler where it may configure the router for "prepareForSim".
-//		// (2) In within-day
-//		return this.simulatedModes;
-//	}
+	public void setReferenceBikeSpeed(final String value) {
+		this.referenceBikeSpeed = value;
+	}
+
+	public String getReferenceBikeSpeed() {
+		// used in core at following places:
+		// (1) In the Controler where it may configure the router for "prepareForSim".
+		// (2) In within-day
+		return this.referenceBikeSpeed;
+	}
+	
 }
