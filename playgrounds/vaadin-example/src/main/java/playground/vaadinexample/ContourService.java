@@ -8,6 +8,7 @@ import com.vividsolutions.jts.triangulate.quadedge.Vertex;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.gis.ContourBuilder;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
