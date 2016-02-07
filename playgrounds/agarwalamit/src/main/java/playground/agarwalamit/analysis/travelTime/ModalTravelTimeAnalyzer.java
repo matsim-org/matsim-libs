@@ -32,7 +32,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.trip.ModalTripTravelTimeHandler;
 import playground.agarwalamit.utils.ListUtils;
 
 /**
