@@ -24,6 +24,11 @@
  */
 package floetteroed.opdyts.searchalgorithms;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -143,6 +148,13 @@ public class RandomSearch<U extends DecisionVariable> {
 	public void run(double equilibriumGapWeight, double uniformityGapWeight,
 			final boolean adjustWeights) {
 
+		if (this.logFileName != null) {
+			final File logFile = new File(this.logFileName);
+			if (logFile.exists()) {
+				logFile.delete();
+			}
+		}
+
 		final WeightOptimizer2 weightOptimizer;
 		if (adjustWeights) {
 			weightOptimizer = new WeightOptimizer2(equilibriumGapWeight,
@@ -248,25 +260,10 @@ public class RandomSearch<U extends DecisionVariable> {
 						.get(newBestDecisionVariable);
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
-				// if (adjustWeights) {
-				// final double msaInertia = 1.0 - 1.0 / (1.0 + it);
-				// equilibriumGapWeight = msaInertia
-				// * equilibriumGapWeight
-				// + (1.0 - msaInertia)
-				// * sampler
-				// .getDecisionVariable2selfTunedEquilbriumGapWeightView()
-				// .get(newBestDecisionVariable);
-				// uniformityGapWeight = msaInertia
-				// * uniformityGapWeight
-				// + (1.0 - msaInertia)
-				// * sampler
-				// .getDecisionVariable2selfTunedUniformityGapWeightView()
-				// .get(newBestDecisionVariable);
-				// }
-
 				if (weightOptimizer != null) {
-					final double[] newWeights = weightOptimizer.updateWeights(equilibriumGapWeight,
-							uniformityGapWeight, sampler.lastSamplingStage,
+					final double[] newWeights = weightOptimizer.updateWeights(
+							equilibriumGapWeight, uniformityGapWeight,
+							sampler.lastSamplingStage,
 							sampler.finalObjFctValue, sampler.finalEquilGap,
 							sampler.finalUnifGap,
 							sampler.finalSurrogateObjectiveFunction,
@@ -276,6 +273,25 @@ public class RandomSearch<U extends DecisionVariable> {
 				}
 
 			} else {
+
+				if (bestObjectiveFunctionValue != null) {
+					try {
+						final PrintWriter logWriter = new PrintWriter(
+								new BufferedWriter(new FileWriter(
+										this.logFileName, true)));
+						logWriter.print((new SimpleDateFormat(
+								"yyyy-MM-dd HH:mm:ss")).format(new Date(System
+								.currentTimeMillis())) + "\t");
+						logWriter.print(it + "\t");
+						logWriter.print(this.transitions + "\t");
+						logWriter.print(bestObjectiveFunctionValue + "\t");
+						logWriter.println(bestDecisionVariable);						
+						logWriter.flush();
+						logWriter.close();
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
 
 				final SimulatorState thisRoundsInitialState = newInitialState;
 

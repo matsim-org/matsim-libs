@@ -1,5 +1,8 @@
 package floetteroed.opdyts.example.roadpricing;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import opdytsintegration.MATSimSimulator;
@@ -24,7 +27,9 @@ import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.utilities.Units;
 import floetteroed.utilities.config.ConfigReader;
+import floetteroed.utilities.math.MathHelpers;
 
 /**
  * 
@@ -32,6 +37,33 @@ import floetteroed.utilities.config.ConfigReader;
  *
  */
 class OptimizeRoadpricing {
+
+	static TollLevels randomInitialTollLevels(final double deltaTime_s,
+			final double deltaCost_money, final Scenario scenario) {
+
+		final List<Double> times = new ArrayList<>();
+		{
+			final int timeBinCnt = MathHelpers.round(Units.S_PER_D
+					/ deltaTime_s);
+			for (int i = 0; i < 10; i++) {
+				times.add(deltaTime_s
+						* MatsimRandom.getRandom().nextInt(timeBinCnt + 1));
+			}
+			Collections.sort(times);
+		}
+
+		final List<Double> costs = new ArrayList<>();
+		{
+			final int costBinCnt = MathHelpers.round(5.0 / deltaCost_money);
+			for (int i = 0; i < 3; i++) {
+				costs.add(deltaCost_money
+						* MatsimRandom.getRandom().nextInt(costBinCnt + 1));
+			}
+			Collections.sort(costs);
+		}
+
+		return new TollLevels(times, costs, scenario);
+	}
 
 	public static void main(String[] args) {
 
@@ -77,6 +109,10 @@ class OptimizeRoadpricing {
 				"maxsimiterations"));
 		final int averageIterations = Integer.parseInt(myConfig.get("opdyts",
 				"simavgiterations"));
+		final boolean randomInitialPoint = Boolean.parseBoolean(myConfig.get(
+				"opdyts", "randominitialpoint"));
+		final boolean parallelSampling = Boolean.parseBoolean(myConfig.get(
+				"opdyts", "parallelsampling"));
 
 		final double initialEquilibriumWeight = Double.parseDouble(myConfig
 				.get("opdyts", "equilibriumweight"));
@@ -103,12 +139,18 @@ class OptimizeRoadpricing {
 		/*
 		 * Create initial toll levels.
 		 */
-		final TollLevels initialTollLevels = new TollLevels(8 * 3600, 9 * 3600,
-				10 * 3600, 11 * 3600, 12 * 3600, 14 * 3600, 15 * 3600,
-				16 * 3600, 17 * 3600, 18 * 3600, 0.0, 0.0, 0.0, scenario);
+		final double deltaTime_s = 1800;
+		final TollLevels initialTollLevels;
+		if (randomInitialPoint) {
+			initialTollLevels = randomInitialTollLevels(deltaTime_s,
+					deltaCost_money, scenario);
+		} else {
+			initialTollLevels = new TollLevels(8 * 3600, 9 * 3600, 10 * 3600,
+					11 * 3600, 12 * 3600, 14 * 3600, 15 * 3600, 16 * 3600,
+					17 * 3600, 18 * 3600, 0.0, 0.0, 0.0, scenario);
+		}
 		final double changeTimeProba = 2.0 / 3.0;
 		final double changeCostProba = 2.0 / 3.0;
-		final double deltaTime_s = 1800;
 		final DecisionVariableRandomizer<TollLevels> decisionVariableRandomizer = new TollLevelsRandomizer(
 				initialTollLevels, changeTimeProba, changeCostProba,
 				deltaTime_s, deltaCost_money);
@@ -139,14 +181,13 @@ class OptimizeRoadpricing {
 		 * RandomSearch specification.
 		 */
 		final int maxMemorizedTrajectoryLength = Integer.MAX_VALUE;
-		final boolean interpolate = true;
 		final int maxRandomSearchIterations = 1000;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer, initialTollLevels,
 				convergenceCriterion, maxRandomSearchIterations,
 				maxRandomSearchTransitions, randomSearchPopulationSize,
-				MatsimRandom.getRandom(), interpolate, objectiveFunction,
+				MatsimRandom.getRandom(), parallelSampling, objectiveFunction,
 				maxMemorizedTrajectoryLength, includeCurrentBest);
 		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
 
