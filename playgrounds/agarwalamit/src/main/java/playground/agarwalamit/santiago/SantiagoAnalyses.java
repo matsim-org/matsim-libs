@@ -40,8 +40,9 @@ public class SantiagoAnalyses {
 	}
 	
 	public void writeModalTravelTimes(){
-		// here leg counts do not include legs which are stuck at some point of time.
-		for(String rc :RUN_CASES) {
+		// I could sort it based on zone (outside/inside cordon) but, a trip may start inside and end outside or vice versa, 
+		// thus depends how would you define it. 
+		for(String rc :RUN_CASES) { // here leg counts do not include legs which are stuck at some point of time.
 			String eventsFile = RUN_DIR+rc+"/output_events.xml.gz";
 			String outputFile = RUN_DIR+"/analysis/modalTravelTimes_"+rc+".txt";
 			ModalTravelTimeAnalyzer fdta = new ModalTravelTimeAnalyzer(eventsFile);		
