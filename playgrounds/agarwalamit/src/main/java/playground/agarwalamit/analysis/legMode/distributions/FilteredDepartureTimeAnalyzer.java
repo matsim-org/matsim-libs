@@ -54,7 +54,7 @@ public class FilteredDepartureTimeAnalyzer {
 	 * Data will include persons from the given user group.
 	 */
 	public FilteredDepartureTimeAnalyzer (final String eventsFile, final double timeBinSize, final String userGroup){
-		this.handler = new FilteredDepartureTimeHandler(timeBinSize);
+		this.handler = new FilteredDepartureTimeHandler(timeBinSize, userGroup);
 		this.eventsFile = eventsFile;
 	}
 
@@ -98,7 +98,7 @@ public class FilteredDepartureTimeAnalyzer {
 			
 			for(String mode : mode2time2count.keySet()){
 				writer.write(mode+"\t");
-				for(double time : mode2time2count.get(mode).keySet()){
+				for(double time : timebins){
 					double count = 0;
 					if(mode2time2count.get(mode).containsKey(time)) count = mode2time2count.get(mode).get(time); 
 					writer.write(count + "\t");

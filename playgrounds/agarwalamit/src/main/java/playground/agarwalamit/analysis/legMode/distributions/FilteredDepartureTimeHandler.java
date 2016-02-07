@@ -24,7 +24,9 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 
@@ -32,7 +34,7 @@ import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 * @author amit
 */
 
-public class FilteredDepartureTimeHandler implements PersonDepartureEventHandler {
+public class FilteredDepartureTimeHandler implements PersonDepartureEventHandler, TransitDriverStartsEventHandler {
 
 	private final DepartureTimeHandler delegate ;
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
@@ -72,5 +74,10 @@ public class FilteredDepartureTimeHandler implements PersonDepartureEventHandler
 	}
 	public Map<String, SortedMap<Double, Integer>> getMode2TimeBin2Count() {
 		return this.delegate.getMode2TimeBin2Count();
+	}
+
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		this.delegate.handleEvent(event);
 	}
 }
