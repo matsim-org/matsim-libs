@@ -82,6 +82,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	public FilteredTollHandler(final double simulationEndTime, final int numberOfTimeBins, final String userGroup){
 		this(simulationEndTime,numberOfTimeBins,null,null,userGroup);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
+		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 	}
 
 	/**
@@ -107,6 +108,7 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 		this.network = network;
 		this.ug=userGroup;
 		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
+		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 	}
 
 	@Override

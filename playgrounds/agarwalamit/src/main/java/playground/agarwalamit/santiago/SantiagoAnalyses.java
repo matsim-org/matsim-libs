@@ -19,6 +19,7 @@
 
 package playground.agarwalamit.santiago;
 
+import playground.agarwalamit.analysis.legMode.distributions.FilteredDepartureTimeAnalyzer;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 
 /**
@@ -32,7 +33,20 @@ public class SantiagoAnalyses {
 
 	public static void main(String[] args) {
 		SantiagoAnalyses sa = new SantiagoAnalyses();
-		sa.writeModalShare();
+//		sa.writeModalShare();
+		sa.writeDepartureCounts();
+	}
+	
+	public void writeDepartureCounts(){
+		double timebinSize = 1800; // half hour time bin is used, because cordon pricing starts at 7:30
+		for(String rc :RUN_CASES) {
+			String eventsFile = RUN_DIR+rc+"/output_events.xml.gz";
+			String outputFile = RUN_DIR+"/analysis/modalDepartureCounts_"+rc+".txt";
+			FilteredDepartureTimeAnalyzer fdta = new FilteredDepartureTimeAnalyzer(eventsFile, timebinSize);		
+			fdta.run();
+			fdta.writeResults(outputFile);
+		}
+		
 	}
 
 	public void writeModalShare(){

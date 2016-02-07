@@ -41,7 +41,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.utils.MapUtils;
 
 /**
- * This excludes the mode (car) of transit driver departure.
+ * This excludes the departure of transit drivers.
  * @author amit
  */
 
@@ -109,8 +109,8 @@ public class ModalShareFromEvents implements ModalShare {
 
 	private class ModalShareEventHandler implements PersonDepartureEventHandler, TransitDriverStartsEventHandler {
 
-		private SortedMap<String, Integer> mode2numberOflegs = new TreeMap<>();
-		private List<Id<Person>> transitDriverPersons = new ArrayList<>();
+		private final SortedMap<String, Integer> mode2numberOflegs = new TreeMap<>();
+		private final List<Id<Person>> transitDriverPersons = new ArrayList<>();
 
 		@Override
 		public void reset(int iteration) {

@@ -69,6 +69,7 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 		this.network = network;
 		this.ug=userGroup;
 		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
+		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 	}
 
 	/**
@@ -78,6 +79,7 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	public FilteredWarmEmissionHandler (final double simulationEndTime, final int noOfTimeBins, final String userGroup){
 		this(simulationEndTime,noOfTimeBins,null,null,userGroup);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
+		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 		LOGGER.warn( "This could be achieved from the other class \"EmissionsPerPersonPerUserGroup\", alternatively verify your results with the other class.");
 	}
 

@@ -72,7 +72,7 @@ public class TripTollHandler implements PersonMoneyEventHandler, PersonDeparture
 			}
 			return ;
 		}
-		double time = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) );
+		double time = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) ) * this.timeBinSize;
 		Id<Person> personId = event.getPersonId();
 
 		// remove the person here (because some time congestion toll is charged after agent arrival

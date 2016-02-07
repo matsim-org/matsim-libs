@@ -85,7 +85,8 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 		else this.zonalGeoms = new ArrayList<>();
 
 		this.ug=userGroup;
-		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");		
+		LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the given user group will be considered.");
+		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 	}
 
 	/**
@@ -102,6 +103,7 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 	public TravelDistanceHandler(final double simulationEndTime, final int noOfTimeBins, final Network network, final String userGroup) {
 		this(simulationEndTime, noOfTimeBins, network, null, userGroup);
 		LOGGER.info("Usergroup filtering is used, result will include all links but persons from given user group only.");
+		LOGGER.warn("User group will be identified for Munich scenario only, i.e. Urban, (Rev)Commuter and Freight.");
 	}
 
 	/**
@@ -170,7 +172,7 @@ public class TravelDistanceHandler implements LinkLeaveEventHandler, VehicleEnte
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		double time = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) );
+		double time = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) ) * this.timeBinSize;
 		double dist = 0;
 		Id<Person> driverId = veh2DriverDelegate.getDriverOfVehicle(event.getVehicleId());
 		Link link = this.network.getLinks().get(event.getLinkId());
