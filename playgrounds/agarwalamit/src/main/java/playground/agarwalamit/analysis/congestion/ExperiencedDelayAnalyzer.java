@@ -18,10 +18,11 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.congestion;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -31,10 +32,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.utils.io.IOUtils;
 
-import playground.vsp.analysis.modules.AbstractAnalysisModule;
+import playground.agarwalamit.utils.MapUtils;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 /**
@@ -43,50 +44,44 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
  * 
  * @author amit
  */
-public class ExperiencedDelayAnalyzer extends AbstractAnalysisModule {
+public class ExperiencedDelayAnalyzer {
 	
 	private final static Logger LOGGER = Logger.getLogger(ExperiencedDelayAnalyzer.class);
 	private final String eventsFile;
 	private final ExperiencedDelayHandler congestionHandler;
 	private final Scenario scenario;
 
-	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins) {
-		this(eventFile, scenario, noOfTimeBins, false);
+	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, final double simulationEndTime) {
+		this(eventFile, scenario, noOfTimeBins, simulationEndTime, false);
 	}
 	
-	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, final boolean isSortingForInsideMunich) {
-		super(ExperiencedDelayAnalyzer.class.getSimpleName());
+	public ExperiencedDelayAnalyzer(final String eventFile, final Scenario scenario, final int noOfTimeBins, final double simulationEndTime, final boolean isSortingForInsideMunich) {
 		this.eventsFile = eventFile;
 		this.scenario = scenario;
-		this.congestionHandler = new ExperiencedDelayHandler(this.scenario, noOfTimeBins, isSortingForInsideMunich);
+		this.congestionHandler = new ExperiencedDelayHandler(this.scenario, noOfTimeBins, simulationEndTime, isSortingForInsideMunich);
 	}
 	
 	public void run(){
-		preProcessData();
-		postProcessData();
-		checkTotalDelayUsingAlternativeMethod();
-	}
-	
-	@Override
-	public List<EventHandler> getEventHandler() {
-		return new LinkedList<EventHandler>();
-	}
-
-	@Override
-	public void preProcessData() {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);
 		eventsManager.addHandler(this.congestionHandler);
 		eventsReader.readFile(this.eventsFile);
-	}
 
-	@Override
-	public void postProcessData() {
+//		checkTotalDelayUsingAlternativeMethod();
 	}
-
-	@Override
-	public void writeResults(String outputFolder) {
-		LOGGER.error("Not implemented yet.");
+	
+	public void writeResults(String outputFile) {
+		SortedMap<Double, Double> data = getTimeBin2Delay();
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
+		try {
+			writer.write("\timebin \t delayInMin \n");
+			for(double d : data.keySet()){
+				writer.write(d+"\t"+(data.get(d)/60)+"\n");
+			}
+			writer.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Data is not written to file. Reason "+ e);
+		}
 	}
 
 	public double getTotalDelaysInHours (){
@@ -103,6 +98,15 @@ public class ExperiencedDelayAnalyzer extends AbstractAnalysisModule {
 	
 	public Map<Double, Map<Id<Link>, Integer>> getTimeBin2LinkLeaveCount(){
 		return this.congestionHandler.getTime2linkIdLeaveCount();
+	}
+	
+	public SortedMap<Double, Double> getTimeBin2Delay(){
+		SortedMap<Double, Double> outData = new TreeMap<>();
+		for(double d : getTimeBin2LinkId2Delay().keySet()){
+			double delay= MapUtils.doubleValueSum(getTimeBin2LinkId2Delay().get(d));
+			outData.put(d,  delay);
+		}
+		return outData;
 	}
 	
 	public void checkTotalDelayUsingAlternativeMethod(){

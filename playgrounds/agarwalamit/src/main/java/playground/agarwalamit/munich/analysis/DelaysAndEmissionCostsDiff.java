@@ -147,9 +147,8 @@ public class DelaysAndEmissionCostsDiff {
 	}
 
 	private Map<Id<Person>, Double> getDelaysPerPerson(final String configFile, final String eventsFile, final Scenario sc){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile,sc,1);
-		personAnalyzer.preProcessData();
-		personAnalyzer.postProcessData();
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile,sc,1, sc.getConfig().qsim().getEndTime());
+		personAnalyzer.run();
 
 		Map<Id<Person>, Double> personId2DelaysCosts= new HashMap<Id<Person>, Double>();
 		Map<Id<Person>, Double> personId2DelaysInSec = personAnalyzer.getTimeBin2AffectedPersonId2Delay().get(sc.getConfig().qsim().getEndTime());

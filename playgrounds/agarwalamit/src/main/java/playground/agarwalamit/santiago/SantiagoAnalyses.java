@@ -19,9 +19,13 @@
 
 package playground.agarwalamit.santiago;
 
+import org.matsim.api.core.v01.Scenario;
+
+import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.analysis.legMode.distributions.FilteredDepartureTimeAnalyzer;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
  * @author amit
@@ -34,9 +38,21 @@ public class SantiagoAnalyses {
 
 	public static void main(String[] args) {
 		SantiagoAnalyses sa = new SantiagoAnalyses();
-//		sa.writeModalShare();
-//		sa.writeDepartureCounts();
+		sa.writeModalShare();
+		sa.writeDepartureCounts();
 		sa.writeModalTravelTimes();
+		sa.writeDelay();
+	}
+	
+	public void writeDelay(){
+		for(String rc :RUN_CASES) { // here leg counts do not include legs which are stuck at some point of time.
+			String eventsFile = RUN_DIR+rc+"/output_events.xml.gz";
+			String outputFile = RUN_DIR+"/analysis/delay_"+rc+".txt";
+			Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(RUN_DIR+rc+"/output_plans.xml.gz", RUN_DIR+rc+"/output_network.xml.gz");
+			ExperiencedDelayAnalyzer eda = new ExperiencedDelayAnalyzer(eventsFile, sc, 60, 30*3600);//half hour timebin		
+			eda.run();
+			eda.writeResults(outputFile);
+		}
 	}
 	
 	public void writeModalTravelTimes(){
@@ -45,9 +61,9 @@ public class SantiagoAnalyses {
 		for(String rc :RUN_CASES) { // here leg counts do not include legs which are stuck at some point of time.
 			String eventsFile = RUN_DIR+rc+"/output_events.xml.gz";
 			String outputFile = RUN_DIR+"/analysis/modalTravelTimes_"+rc+".txt";
-			ModalTravelTimeAnalyzer fdta = new ModalTravelTimeAnalyzer(eventsFile);		
-			fdta.run();
-			fdta.writeResults(outputFile);
+			ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(eventsFile);		
+			mtta.run();
+			mtta.writeResults(outputFile);
 		}
 	}
 	
@@ -60,7 +76,6 @@ public class SantiagoAnalyses {
 			fdta.run();
 			fdta.writeResults(outputFile);
 		}
-		
 	}
 
 	public void writeModalShare(){

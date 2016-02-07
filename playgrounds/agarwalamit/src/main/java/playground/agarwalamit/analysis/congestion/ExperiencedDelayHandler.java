@@ -18,7 +18,9 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.congestion;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -31,13 +33,20 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
@@ -46,10 +55,14 @@ import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
  * @author amit
  */
 public class ExperiencedDelayHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-PersonDepartureEventHandler, PersonArrivalEventHandler {
+PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, TransitDriverStartsEventHandler {
 
 	public final static Logger LOG = Logger.getLogger(ExperiencedDelayHandler.class);
+	
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
+	private final List<Id<Person>> transitDriverPersons = new ArrayList<>();
+	
 	private final SortedMap<Double, Map<Id<Person>, Double>> timebin2PersonId2Delay = new TreeMap<>();
 	private final Map<Double, Map<Id<Link>, Double>> timebin2LinkId2Delay = new HashMap<>();
 	private final Map<Id<Link>, Map<Id<Person>, Double>> linkId2PersonIdLinkEnterTime = new HashMap<>();
@@ -69,24 +82,20 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	 * @param scenario must have minimally network, plans and config file.
 	 * @param isSortingForInsideMunich true if outside Munich city area links are not included in analysis
 	 */
-	public ExperiencedDelayHandler(final Scenario scenario, final int noOfTimeBins, final boolean isSortingForInsideMunich){
+	public ExperiencedDelayHandler(final Scenario scenario, final int noOfTimeBins, final double simulationEndTime, final boolean isSortingForInsideMunich){
 		this.isSortingForInsideMunich = isSortingForInsideMunich;
 		pf = new ExtendedPersonFilter(isSortingForInsideMunich);
 		if(isSortingForInsideMunich) LOG.warn("Output data will only include links which fall inside the Munich city area");
-		initialize(scenario, noOfTimeBins);
+		initialize(scenario, noOfTimeBins, simulationEndTime);
 	}
 
-	/**
-	 * @param noOfTimeBins
-	 * @param simulationEndTime
-	 * @param scenario must have minimally network and plans file.
-	 */
-	public ExperiencedDelayHandler(final Scenario scenario, final int noOfTimeBins){
-		this(scenario, noOfTimeBins, false);
+	public ExperiencedDelayHandler(final Scenario scenario, final int noOfTimeBins, final double simulationEndtime){
+		this(scenario, noOfTimeBins, simulationEndtime, false);
+		
 	}
-
-	private void initialize(final Scenario scenario, final int noOfTimeBins){
-		this.timeBinSize = scenario.getConfig().qsim().getEndTime() / noOfTimeBins;
+	
+	private void initialize(final Scenario scenario, final int noOfTimeBins, final double simulationEndTime){
+		this.timeBinSize = simulationEndTime / noOfTimeBins;
 		this.network = scenario.getNetwork();
 
 		for (Link link : this.network.getLinks().values()) {
@@ -122,6 +131,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		this.linkId2PersonIdLinkEnterTime.clear();
 		this.linkId2FreeSpeedLinkTravelTime.clear();
 		this.timebin2LinkIdLeaveCount.clear();
+		this.transitDriverPersons.clear();
 		LOG.info("Resetting linkLeave counter to " + this.timebin2LinkIdLeaveCount);
 	}
 
@@ -129,6 +139,9 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	public void handleEvent(PersonDepartureEvent event) {
 		Id<Link> linkId = event.getLinkId();
 		Id<Person> personId = event.getPersonId();
+		
+		if(this.transitDriverPersons.contains(personId)) return;
+		
 		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
 			// Person is already on the link. Cannot happen.
 			throw new RuntimeException();
@@ -149,7 +162,9 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		if(endOfTimeInterval<=0.0)endOfTimeInterval=this.timeBinSize;
 
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = Id.createPersonId(event.getVehicleId());
+		Id<Person> personId = delegate.getDriverOfVehicle(event.getVehicleId());
+		
+		if (this.transitDriverPersons.contains(personId)) return;
 
 		double actualTravelTime = event.getTime()-this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId);
 		this.linkId2PersonIdLinkEnterTime.get(linkId).remove(personId);
@@ -179,7 +194,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	public void handleEvent(LinkEnterEvent event) {
 		double time = event.getTime();
 		Id<Link> linkId = event.getLinkId();
-		Id<Person> personId = Id.createPersonId(event.getVehicleId());
+		Id<Person> personId = delegate.getDriverOfVehicle(event.getVehicleId());
 
 		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId) && warnCount==0){
 			warnCount++;
@@ -197,6 +212,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
+		if(this.transitDriverPersons.remove(event.getPersonId())) return;
 		this.linkId2PersonIdLinkEnterTime.get(event.getLinkId()).remove(event.getPersonId());
 	}
 
@@ -214,5 +230,20 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	public Map<Double, Map<Id<Link>, Integer>> getTime2linkIdLeaveCount() {
 		return this.timebin2LinkIdLeaveCount;
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		transitDriverPersons.add(event.getDriverId());
 	}
 }
