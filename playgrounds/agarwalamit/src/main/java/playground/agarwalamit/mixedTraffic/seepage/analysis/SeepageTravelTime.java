@@ -24,13 +24,12 @@ import playground.agarwalamit.mixedTraffic.seepage.TestSetUp.SeepageControler;
 /**
  * @author amit
  */
-public class TravelTimeAnalyzer  {
+public class SeepageTravelTime  {
 
 	public static void main(String[] args) {
 		String outputDir = SeepageControler.OUTPUT_DIR;
 		ModalTravelTimeAnalyzer ptta = new ModalTravelTimeAnalyzer(outputDir+"/events.xml");
-		ptta.preProcessData();
-		ptta.postProcessData();
+		ptta.run();
 		ptta.writeResults(outputDir);
 	}
 }

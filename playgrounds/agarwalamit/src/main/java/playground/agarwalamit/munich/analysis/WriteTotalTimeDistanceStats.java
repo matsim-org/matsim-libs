@@ -21,6 +21,7 @@ package playground.agarwalamit.munich.analysis;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +36,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.StuckAgentsFilter;
 import playground.agarwalamit.analysis.legMode.distributions.LegModeRouteDistanceDistributionHandler;
-import playground.agarwalamit.analysis.trip.LegModeTripTravelTimeHandler;
+import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -46,7 +48,6 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class WriteTotalTimeDistanceStats {
 
-	private LegModeTripTravelTimeHandler timeHandler;
 	private LegModeRouteDistanceDistributionHandler distHandler;
 	private final String outputDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 	private final String cases [] = {"baseCaseCtd", "ei","ci","eci"};
@@ -84,8 +85,8 @@ public class WriteTotalTimeDistanceStats {
 //					timeHandler.getTravelMode2NumberOfLegs().get(mode)
 					writer.write(str+"\t"+mode+"\t"+"NA"+"\t"+travelTime+"\t"+travelDist+"\n");
 				}
-				if(str.equals("baseCaseCtd")) stuckPersonsListBAU.addAll(timeHandler.getStuckPersonsList());
-				else if(str.equals("ei")) stuckPersonsListEI.addAll(timeHandler.getStuckPersonsList());
+				if(str.equals("baseCaseCtd")) stuckPersonsListBAU = getStuckPersonsList(eventsFile);
+				else if(str.equals("ei")) stuckPersonsListEI = getStuckPersonsList(eventsFile);
 
 				for(Id<Person> id : stuckPersonsListBAU){
 					if(!stuckPersonsListEI.contains(id)) System.out.println("Stuck person "+id+" is not same in both scenarios.");
@@ -112,13 +113,17 @@ public class WriteTotalTimeDistanceStats {
 		return sum;
 	}
 	
+	private Set<Id<Person>> getStuckPersonsList(String eventsFile) {
+		StuckAgentsFilter saf = new StuckAgentsFilter(Arrays.asList(eventsFile));
+		saf.preProcessData();
+		saf.postProcessData();
+		return saf.getStuckPersonsFromEventsFiles();
+	}
+	
 	private SortedMap<String,Map<Id<Person>, Double>> getTravelTimes(String eventsFile){
-		timeHandler = new LegModeTripTravelTimeHandler();
-		EventsManager events = EventsUtils.createEventsManager();
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		events.addHandler(timeHandler);
-		reader.readFile(eventsFile);
-		return  timeHandler.getLegMode2PersonId2TotalTravelTime();
+		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(eventsFile);
+		mtta.run();
+		return  mtta.getMode2PersonId2TotalTravelTime();
 	}
 
 	private SortedMap<String,Map<Id<Person>, Double>> getRouteDistances(String eventsFile, Scenario scenario){

@@ -21,6 +21,7 @@ package playground.agarwalamit.santiago;
 
 import playground.agarwalamit.analysis.legMode.distributions.FilteredDepartureTimeAnalyzer;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
+import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 
 /**
  * @author amit
@@ -34,7 +35,19 @@ public class SantiagoAnalyses {
 	public static void main(String[] args) {
 		SantiagoAnalyses sa = new SantiagoAnalyses();
 //		sa.writeModalShare();
-		sa.writeDepartureCounts();
+//		sa.writeDepartureCounts();
+		sa.writeModalTravelTimes();
+	}
+	
+	public void writeModalTravelTimes(){
+		// here leg counts do not include legs which are stuck at some point of time.
+		for(String rc :RUN_CASES) {
+			String eventsFile = RUN_DIR+rc+"/output_events.xml.gz";
+			String outputFile = RUN_DIR+"/analysis/modalTravelTimes_"+rc+".txt";
+			ModalTravelTimeAnalyzer fdta = new ModalTravelTimeAnalyzer(eventsFile);		
+			fdta.run();
+			fdta.writeResults(outputFile);
+		}
 	}
 	
 	public void writeDepartureCounts(){
