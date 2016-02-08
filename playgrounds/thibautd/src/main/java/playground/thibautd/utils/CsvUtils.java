@@ -115,7 +115,7 @@ public class CsvUtils {
 		private final TObjectIntMap<String> map = new TObjectIntHashMap<>();
 		private final String[] names;
 
-		private TitleLine( final String[] names ) {
+		public TitleLine( final String[] names ) {
 			for ( int i = 0; i < names.length; i++ ) {
 				map.put( names[ i ] , i );
 			}

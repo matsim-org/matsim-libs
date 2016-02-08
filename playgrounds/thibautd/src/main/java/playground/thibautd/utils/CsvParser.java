@@ -45,7 +45,7 @@ public class CsvParser implements AutoCloseable {
 	}
 
 	public CsvUtils.TitleLine getTitleLine() {
-		return getTitleLine();
+		return titleLine;
 	}
 
 	public boolean nextLine() throws IOException {
