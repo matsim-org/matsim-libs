@@ -46,7 +46,6 @@ public class ActivityFacilitiesFactoryImplTest {
 
 		Assert.assertEquals("leisure", option.getType());
 		Assert.assertEquals(Integer.MAX_VALUE, option.getCapacity(), 1e-9);
-		Assert.assertNull(option.getFacility());
 	}
 
 }
