@@ -44,6 +44,10 @@ public class CsvParser implements AutoCloseable {
 		this.titleLine = CsvUtils.parseTitleLine( sep , quote , reader.readLine() );
 	}
 
+	public CsvUtils.TitleLine getTitleLine() {
+		return getTitleLine();
+	}
+
 	public boolean nextLine() throws IOException {
 		final String l = reader.readLine();
 		if ( l == null ) return false;

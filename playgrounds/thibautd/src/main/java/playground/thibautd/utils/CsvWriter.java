@@ -67,6 +67,7 @@ public class CsvWriter implements AutoCloseable {
 
 	@Override
 	public void close() throws IOException {
+		nextLine();
 		writer.close();
 	}
 }
