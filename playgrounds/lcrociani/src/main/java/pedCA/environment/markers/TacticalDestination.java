@@ -9,12 +9,14 @@ import pedCA.utility.Constants;
 public class TacticalDestination extends Destination {
 
 	private static final long serialVersionUID = 1L;
+	private boolean isStairsBorder;
 	private double width;
 	private final Coordinates coordinates;
 
-	public TacticalDestination(Coordinates coordinates, ArrayList<GridPoint> cells) {
+	public TacticalDestination(Coordinates coordinates, ArrayList<GridPoint> cells, boolean isStairsBorder) {
 		super(cells);
 		this.coordinates = coordinates;
+		this.isStairsBorder = isStairsBorder;
 		calculateWidth();
 	}
 
@@ -37,6 +39,10 @@ public class TacticalDestination extends Destination {
 	
 	public int getID(){
 		return getLevel();
+	}
+
+	public boolean isStairsBorder() {
+		return isStairsBorder;
 	}
 	
 }

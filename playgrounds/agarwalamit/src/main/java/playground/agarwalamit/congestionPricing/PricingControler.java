@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.agarwalamit.congestionPricing;
 
-import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -37,7 +36,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
+import com.google.inject.Provider;
+
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
@@ -128,8 +128,6 @@ class PricingControler {
 		default:
 			Logger.getLogger(PricingControler.class).info("Congestion pricing implementation does not match. No pricing implementation is introduced.");
 		}
-		
-		controler.addControlerListener(new WelfareAnalysisControlerListener(controler.getScenario()));
 		
 		if(usingMunich){
 			controler.addOverridingModule(new AbstractModule() {

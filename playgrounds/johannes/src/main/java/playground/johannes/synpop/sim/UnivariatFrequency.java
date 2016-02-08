@@ -20,8 +20,10 @@
 package playground.johannes.synpop.sim;
 
 import org.matsim.contrib.common.stats.Discretizer;
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.Converters;
@@ -57,6 +59,10 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     private boolean useWeights;
 
     private Object weightKey;
+
+    private Predicate<Segment> predicate;
+
+    private final Object PREDICATE_RESULT_KEY = new Object();
 
     public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements,
                               String attrKey, Discretizer discretizer) {
@@ -101,6 +107,10 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
         }
     }
 
+    public void setPredicate(Predicate<Segment> predicate) {
+        this.predicate = predicate;
+    }
+
     private DynamicDoubleArray initHistogram(Set<? extends Attributable> elements, String key, boolean useWeights) {
         DynamicDoubleArray array = new DynamicDoubleArray(1, 0);
 
@@ -128,7 +138,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement element) {
         if (this.dataKey == null) this.dataKey = Converters.getObjectKey(attrKey);
 
-        if (this.dataKey.equals(dataKey)) {
+        if (this.dataKey.equals(dataKey) && evaluatePredicate(element)) {
             double delta = 1.0;
             if(useWeights) delta = (Double)element.getData(weightKey);
 
@@ -139,6 +149,19 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
             double diff2 = changeBucketContent(bucket, delta);
 
             hamiltonianValue += (diff1 + diff2) / binCount;
+        }
+    }
+
+    private boolean evaluatePredicate(CachedElement element) {
+        if(predicate == null) return true;
+        else {
+            Boolean result = (Boolean) element.getData(PREDICATE_RESULT_KEY);
+            if(result != null) return result;
+            else {
+                result = predicate.test((Segment) element);
+                element.setData(PREDICATE_RESULT_KEY, result);
+                return result;
+            }
         }
     }
 

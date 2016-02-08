@@ -111,7 +111,7 @@ class PricingTestAnalyser {
 		int lastIt = sc.getConfig().controler().getLastIteration();
 		String eventsFile = outputDir+"/output/"+congestionImpl+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
 
-		ExperiencedDelayAnalyzer eda = new ExperiencedDelayAnalyzer(eventsFile, sc, 1);
+		ExperiencedDelayAnalyzer eda = new ExperiencedDelayAnalyzer(eventsFile, sc, 1, sc.getConfig().qsim().getEndTime());
 		eda.run();
 
 

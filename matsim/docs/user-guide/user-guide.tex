@@ -178,7 +178,7 @@ The MATSim team is currently working on a MATSim book.  The relation between the
 
 \newboolean{isDeprecated}
 \setboolean{isDeprecated}{true}
-\setboolean{isDeprecated}{false}
+%% \setboolean{isDeprecated}{false}
 
 \def\supertxt{Superseded by MATSim book and/or information in javadoc\\ \vfill\newpage}
 
@@ -209,11 +209,11 @@ The MATSim team is currently working on a MATSim book.  The relation between the
 \NextFile{RunningMATSim.html}
 \chapter{Running MATSim}
 \label{sec:Running}
-%% \ifthenelse{\boolean{isDeprecated}}{%
-%% \supertxt
-%% }{%
+\ifthenelse{\boolean{isDeprecated}}{%
+\supertxt
+}{%
 \input{chapters/running}
-%% }
+}
 %
 \NextFile{BuildingScenarios.html}
 \chapter{Building New Scenarios}
@@ -257,7 +257,7 @@ The MATSim team is currently working on a MATSim book.  The relation between the
 }
 %
 \NextFile{SystemRequirements.html}
-\chapter{System Requirements and performance}
+\chapter{System requirements and benchmark results}
 %% \ifthenelse{\boolean{isDeprecated}}{%
 %% \supertxt
 %% }{%

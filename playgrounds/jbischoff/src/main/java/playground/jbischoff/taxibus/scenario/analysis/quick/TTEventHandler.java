@@ -160,7 +160,7 @@ public class TTEventHandler implements ActivityStartEventHandler, PersonDepartur
 			writer.append("Activity\tLegs\tAveTT\n");
 			for (Entry<String, Double> e : this.ttToActivity.entrySet()) {
 			double legs = this.legsToActivity.get(e.getKey());
-			writer.append(e.getKey() + "\t" + legs + "\t" + WobDistanceAnalyzer.prettyPrintSeconds(e.getValue() / legs)+"\n");
+			writer.append(e.getKey() + "\t" + Math.round(legs) + "\t" + WobDistanceAnalyzer.prettyPrintSeconds(e.getValue() / legs)+"\n");
 			if (inboundLegs.contains(e.getKey())){
 				inboundLegCount += legs;
 				inboundTravelTime += e.getValue();

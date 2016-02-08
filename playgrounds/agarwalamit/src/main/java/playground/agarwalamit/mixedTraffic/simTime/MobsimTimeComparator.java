@@ -34,8 +34,10 @@ import org.matsim.core.utils.misc.Time;
 
 public class MobsimTimeComparator {
 
-	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run107/";
+	private String respectiveFileDirectory = "../../../../repos/runs-svn/patnaIndia/run106/10pct/";
 	private BufferedWriter writer;
+	private static final String FIRST_IT = "0";
+	private static final String LAST_IT = "200";
 
 	public static void main(String[] args) {
 		MobsimTimeComparator mtc = new MobsimTimeComparator();
@@ -86,27 +88,28 @@ public class MobsimTimeComparator {
 
 	private double readAndReturnMobsimTime(String stopwatchFile){
 
-		double totalMobsimTime = 0;
+		double mobsimTime = 0;
 
 		BufferedReader reader = IOUtils.getBufferedReader(stopwatchFile);
 		try {
 			String line = reader.readLine();
+			String mobsimStartTime = "0" ;
+			String mobsimEndTime = "0";
 			while(line!=null) {
 				if(line.startsWith("Iteration")) {
 					line = reader.readLine();
 					continue;
 				}
 				String [] parts = line.split("\t");
-				String mobsimStartTime = parts[8];
-				String mobsimEndTime = parts[9];
-				double mobsimTime = getMobsimTime(mobsimStartTime, mobsimEndTime);
-				totalMobsimTime += mobsimTime;
+				if(parts[0].equals(FIRST_IT)) mobsimStartTime = parts[8];
+				if(parts[0].equals(LAST_IT)) mobsimEndTime = parts[9];
 				line = reader.readLine();
 			} ;
+			mobsimTime = getMobsimTime(mobsimStartTime, mobsimEndTime);
 		} catch (Exception e) {
 			throw new RuntimeException("File not found. Reason "+ e);
 		}
-		return totalMobsimTime;
+		return mobsimTime;
 	}
 
 	private double getMobsimTime(String mobsimStartTime, String mobsimEndTime) {

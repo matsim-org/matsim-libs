@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.johannes.synpop.analysis;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.common.collections.Composite;
 
 import java.util.List;
@@ -27,10 +28,14 @@ import java.util.List;
  */
 public class AnalyzerTaskComposite<T> extends Composite<AnalyzerTask<T>> implements AnalyzerTask<T> {
 
+    private static final Logger logger = Logger.getLogger(AnalyzerTaskComposite.class);
+
     @Override
     public void analyze(T object, List<StatsContainer> containers) {
         for(AnalyzerTask<T> task : components) {
+            logger.trace(String.format("Executing task %s...", task.getClass().getSimpleName()));
             task.analyze(object, containers);
         }
+        logger.trace("All tasks executed.");
     }
 }

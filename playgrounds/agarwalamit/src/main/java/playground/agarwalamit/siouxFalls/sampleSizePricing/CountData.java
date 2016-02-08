@@ -140,7 +140,7 @@ public class CountData extends AbstractAnalysisModule {
 
 	private void getDesiredLinkVolumes (){
 		for(Id<Link> id :this.linkId2Vol.keySet()){
-			if(this.linkId2TimeSlot2Vol.containsKey(id)) this.linkId2Vol.put(id, this.countScaleFactor*MapUtils.doubleSum(this.linkId2TimeSlot2Vol.get(id)));
+			if(this.linkId2TimeSlot2Vol.containsKey(id)) this.linkId2Vol.put(id, this.countScaleFactor*MapUtils.doubleValueSum(this.linkId2TimeSlot2Vol.get(id)));
 			else this.linkId2Vol.put(id, 0.0);
 		}
 	}

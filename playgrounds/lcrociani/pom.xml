@@ -4,29 +4,37 @@
     <artifactId>playgrounds</artifactId>
     <version>0.8.0-SNAPSHOT</version>
   </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>playground</groupId>
+    <artifactId>lcrociani</artifactId>
+    <name>lcrociani</name>
+    <repositories>
+        <repository>
+            <id>extdeps</id>
+            <url>https://dl.bintray.com/gregor-laemmel/maven</url>
+        </repository>
+    </repositories>
   <dependencies>
-  <dependency>
-	<groupId>gicentre</groupId>
-	<artifactId>gicentreutils</artifactId>
-	<scope>system</scope>
-	<version>3.3.0</version>
-	<systemPath>${basedir}/libraries/gicentreutils/gicentreUtils.jar</systemPath>
-</dependency>
-<dependency>
-	<groupId>processing</groupId>
-	<artifactId>core</artifactId>
-	<scope>system</scope>
-	<version>2.2.1</version>
-	<systemPath>${basedir}/libraries/processing-2.2.1/core.jar</systemPath>
-</dependency>
-  	<dependency>
-  		<groupId>playground</groupId>
-  		<artifactId>vsp</artifactId>
-  		<version>0.8.0-SNAPSHOT</version>
-  	</dependency>
+    <dependency>
+      <groupId>gicentre</groupId>
+      <artifactId>gicentreutils</artifactId>
+      <version>3.3.0</version>
+      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.processing</groupId>
+      <artifactId>pdf</artifactId>
+      <version>2.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.lowagie</groupId>
+      <artifactId>itext</artifactId>
+      <version>2.1.7</version>
+    </dependency>
+    <dependency>
+      <groupId>playground</groupId>
+      <artifactId>vsp</artifactId>
+      <version>0.8.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>playground</groupId>
-  <artifactId>lcrociani</artifactId>
-  <name>lcrociani</name>
-</project>
+  </project>

@@ -58,7 +58,7 @@ public class FacilityValidator {
 			
 			Id<ActivityFacility> id = Id.create(HOME_PREFIX + person.getId().toString(), ActivityFacility.class);
 			ActivityFacilityImpl homeFac = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(id, MatsimCoordUtils.pointToCoord(v.getPoint()));
-			homeFac.createActivityOption("visit");
+			homeFac.createAndAddActivityOption("visit");
 			Link link = NetworkUtils.getNearestLink(network, homeFac.getCoord());
 			homeFac.setLinkId(link.getId());
 		}

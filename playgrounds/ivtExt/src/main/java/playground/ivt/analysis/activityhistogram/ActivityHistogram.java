@@ -24,11 +24,11 @@ import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
+import org.matsim.core.scoring.PersonExperiencedActivity;
 import org.matsim.core.utils.misc.Time;
 
 import javax.inject.Inject;
@@ -66,19 +66,19 @@ public class ActivityHistogram implements ActivityHandler, ActivityStartEventHan
 
 
 	@Override
-	public void handleActivity(Id<Person> agentId, Activity activity) {
+	public void handleActivity(PersonExperiencedActivity personExperiencedActivity) {
 		// cannot handle all starts from this method, because it would require calling "finish"
 		// on the EventsToActivity instance, which is complicated...
-		if ( activity.getStartTime() == Time.UNDEFINED_TIME  ) {
+		if (personExperiencedActivity.getActivity().getStartTime() == Time.UNDEFINED_TIME  ) {
 			handleStart( 0,
-					activity.getType(),
-					agentId);
+					personExperiencedActivity.getActivity().getType(),
+					personExperiencedActivity.getAgentId());
 		}
-		if ( activity.getEndTime() != Time.UNDEFINED_TIME ) {
+		if (personExperiencedActivity.getActivity().getEndTime() != Time.UNDEFINED_TIME ) {
 			handleEnd(
-					activity.getEndTime(),
-					activity.getType(),
-					agentId );
+					personExperiencedActivity.getActivity().getEndTime(),
+					personExperiencedActivity.getActivity().getType(),
+					personExperiencedActivity.getAgentId());
 		}
 	}
 

@@ -47,7 +47,7 @@ public class HybridNetworkBuilder {
 			Id<Node> id = IdUtility.createNodeId(nodeCA.getId());
 			double x = nodeCA.getCoordinates().getX();
 			double y = nodeCA.getCoordinates().getY();
-			Node node = fac.createNode(id, new Coord(x, y));
+			Node node = fac.createNode(id, new Coord(x,y));		
 			net.addNode(node);
 		}
 
@@ -59,16 +59,18 @@ public class HybridNetworkBuilder {
 				
 			Id <Link> linkId = IdUtility.createLinkId(fromId, toId);
 			if (!(linkIdBlackList.contains(linkId.toString()))){
+				if (edgeCA.isStairs())
+					Constants.stairsLinks.add(linkId.toString());
 				Link link = fac.createLink(linkId, from, to);
 				link.setLength(edgeCA.getLength());
 				link.setFreespeed(Constants.PEDESTRIAN_SPEED);
 				
 				//TODO FIX THE FLOW CAPACITY
 				double width = Constants.FAKE_LINK_WIDTH;
-				double lanes = width/net.getEffectiveLaneWidth();
+				//double lanes = width/net.getEffectiveLaneWidth();
 				double cap = width*Constants.FLOPW_CAP_PER_METER_WIDTH;
 				link.setCapacity(cap);
-				link.setNumberOfLanes(lanes);
+				link.setNumberOfLanes(1);
 				link.setAllowedModes(modes);
 				net.addLink(link);
 				scenarioCA.mapLinkToEnvironment(link, environmentCA);

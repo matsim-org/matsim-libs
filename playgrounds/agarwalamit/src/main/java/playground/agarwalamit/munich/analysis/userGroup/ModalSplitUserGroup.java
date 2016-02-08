@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.ModalShareGenerator;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromPlans;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -56,18 +56,20 @@ public class ModalSplitUserGroup {
 	}
 
 	public void run(String populationFile){
-		ModalShareGenerator msg = new ModalShareGenerator();
-		PersonFilter pf = new PersonFilter();
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(populationFile);
+		PersonFilter pf = new PersonFilter();
+		
+		ModalShareFromPlans msg = new ModalShareFromPlans(sc.getPopulation());
 
-		wholePopPctModalShare = msg.getMode2PctShareFromPlans(sc.getPopulation());
-		wholePopMode2Legs = msg.getMode2NoOfLegs(sc.getPopulation());
+		wholePopPctModalShare = msg.getModeToPercentOfLegs();
+		wholePopMode2Legs = msg.getModeToNumberOfLegs();
 
 		for(UserGroup ug:UserGroup.values()){
 			Population usrGrpPop = pf.getPopulation(sc.getPopulation(), ug);
-			SortedMap<String, Double> modalSplitPop = msg.getMode2PctShareFromPlans(usrGrpPop);
+			msg = new ModalShareFromPlans(usrGrpPop);
+			SortedMap<String, Double> modalSplitPop = msg.getModeToPercentOfLegs();
 			this.userGrp2ModalSplit.put(ug, modalSplitPop);
-			this.userGrp2Mode2Legs.put(ug, msg.getMode2NoOfLegs(usrGrpPop));
+			this.userGrp2Mode2Legs.put(ug, msg.getModeToNumberOfLegs());
 		}
 	}
 

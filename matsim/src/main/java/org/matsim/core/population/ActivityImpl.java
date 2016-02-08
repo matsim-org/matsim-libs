@@ -40,6 +40,9 @@ public final class ActivityImpl implements Activity {
 	// Case (0): comes with coord and linkId.  No problem.
 	// Case (1): comes with linkId but w/o coord.  Coord is (presumably) set in prepareForIterations.
 	// Case (2): comes with coord but w/o linkId.  LinkId is (presumably) set in prepareForIterations.
+	
+	// Case (X): facilityId inconsistent with linkId, coord.  Idea: mobsim takes the facilityId and (a) checks the other
+	// attribs or (b) ignores them.
 
 	private double endTime = Time.UNDEFINED_TIME;
 

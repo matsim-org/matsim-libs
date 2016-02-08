@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -85,9 +86,9 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 	private Map<Id<Person>, Integer> personRouteChoice;
 	// counts the number of route starts per second (gets filled when the agent
 	// arrives)
-	private Map<Double, double[]> routeStartsPerSecond;
+	private Map<Double, int[]> routeStartsPerSecond;
 	// counts the number of agents on each route per second
-	private Map<Double, double[]> onRoutePerSecond;
+	private Map<Double, int[]> onRoutePerSecond;
 
 	private Map<Double, double[]> totalRouteTTsByDepartureTime;
 	private Map<Double, int[]> routeUsersByDepartureTime;
@@ -224,7 +225,7 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 		// person is traveling on it
 		for (int i = 0; i < personTotalTT; i++) {
 			if (!this.onRoutePerSecond.containsKey(personDepartureTime + i)) {
-				this.onRoutePerSecond.put(personDepartureTime + i, new double[numberOfRoutes]);
+				this.onRoutePerSecond.put(personDepartureTime + i, new int[numberOfRoutes]);
 			}
 			this.onRoutePerSecond.get(personDepartureTime + i)[this.personRouteChoice
 					.get(event.getPersonId())]++;
@@ -232,7 +233,7 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 
 		// add one route start for the specific departure time
 		if (!this.routeStartsPerSecond.containsKey(personDepartureTime)) {
-			this.routeStartsPerSecond.put(personDepartureTime, new double[numberOfRoutes]);
+			this.routeStartsPerSecond.put(personDepartureTime, new int[numberOfRoutes]);
 		}
 		this.routeStartsPerSecond.get(personDepartureTime)[personRoute]++;
 
@@ -285,31 +286,78 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 	 * @return a map containing the number of route starts for each time step.
 	 * Thereby a route start is the departure event of an agent using this route.
 	 */
-	public Map<Double, double[]> getRouteDeparturesPerSecond() {
+	public Map<Double, int[]> getRouteDeparturesPerSecond() {
+		// determine minimum and maximum departure time
+		Tuple<Double, Double> firstLastDepartureTuple = determineMinMaxDoubleInSet(this.routeStartsPerSecond.keySet());
+		
 		// fill missing time steps between first and last departure with zero starts
-		long firstStart = Long.MAX_VALUE;
-		long lastStart = Long.MIN_VALUE;
-		for (Double d : this.routeStartsPerSecond.keySet()) {
-			// matsim departure start times are always integer
-			if (d < firstStart)
-				firstStart = d.longValue();
-			if (d > lastStart)
-				lastStart = d.longValue();
-		}
-		for (long l = firstStart; l <= lastStart; l++) {
+		// note: matsim departure times are always integer
+		for (long l = firstLastDepartureTuple.getFirst().longValue(); l <= firstLastDepartureTuple.getSecond().longValue(); l++) {
 			if (!this.routeStartsPerSecond.containsKey((double) l)) {
-				this.routeStartsPerSecond.put((double) l, new double[numberOfRoutes]);
+				this.routeStartsPerSecond.put((double) l, new int[numberOfRoutes]);
 			}
 		}
 
 		return routeStartsPerSecond;
+	}
+	
+	/**
+	 * @param set
+	 * @return minimum and maximum entry of the set of doubles
+	 */
+	private static Tuple<Double, Double> determineMinMaxDoubleInSet(Set<Double> set) {
+		double minEntry = Long.MAX_VALUE;
+		double maxEntry = Long.MIN_VALUE;
+		for (Double currentEntry : set) {
+			if (currentEntry < minEntry)
+				minEntry = currentEntry;
+			if (currentEntry > maxEntry)
+				maxEntry = currentEntry;
+		}
+		return new Tuple<Double, Double>(minEntry, maxEntry);
+	}
+
+	/** 
+	 * @return a map containing the number of bygone route starts for each time step.
+	 * Thereby a route start is the departure event of an agent using this route.
+	 * For each time step all bygone route starts are summed up.
+	 */
+	public Map<Double, int[]> getSummedRouteDeparturesPerSecond(){
+		
+		// determine minimum and maximum departure time
+		Tuple<Double, Double> firstLastDepartureTuple = determineMinMaxDoubleInSet(this.routeStartsPerSecond.keySet());
+		
+		Map<Double, int[]> summedRouteDeparturesPerSecond = new TreeMap<>();
+		
+		// create a map entry for each time step between minimum and maximum departure time
+		// note: matsim departure times are always integer. time steps are assumed to be 1
+		for (long second = firstLastDepartureTuple.getFirst().longValue(); 
+				second <= firstLastDepartureTuple.getSecond().longValue(); second++) {
+			
+			// initialize departure array as {0,...,0}
+			summedRouteDeparturesPerSecond.put((double) second, new int[numberOfRoutes]);
+			for (int i = 0; i < numberOfRoutes; i++){
+				// add value from the previous second if second > min
+				if (second > firstLastDepartureTuple.getFirst().longValue()){
+					summedRouteDeparturesPerSecond.get((double)second)[i] +=
+							summedRouteDeparturesPerSecond.get((double)second - 1)[i];
+				}
+				// increment for every departure in this second
+				if (this.routeStartsPerSecond.containsKey((double) second)) {
+					summedRouteDeparturesPerSecond.get((double) second)[i] += 
+							this.routeStartsPerSecond.get((double) second)[i];
+				}
+			}			
+		}
+		
+		return summedRouteDeparturesPerSecond;
 	}
 
 	/**
 	 * @return the number of agents on route (between departure and arrival
 	 * event) per time step.
 	 */
-	public Map<Double, double[]> getOnRoutePerSecond() {
+	public Map<Double, int[]> getOnRoutePerSecond() {
 		// already contains entries for all time steps (seconds)
 		// between first departure and last arrival
 		return onRoutePerSecond;

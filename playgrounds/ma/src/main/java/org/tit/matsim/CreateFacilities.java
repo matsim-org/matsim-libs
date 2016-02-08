@@ -123,7 +123,7 @@ public class CreateFacilities {
 	}
 	
 	private void addActivityOption(ActivityFacility facility, String type) {
-		((ActivityFacilityImpl) facility).createActivityOption(type);
+		((ActivityFacilityImpl) facility).createAndAddActivityOption(type);
 		
 		/*
 		 * [[ 1 ]] Specify the opening hours here for shopping and leisure. An example is given for the activities work and home.

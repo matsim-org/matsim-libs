@@ -53,6 +53,7 @@ import floetteroed.opdyts.logging.TotalMemory;
 import floetteroed.opdyts.logging.UniformityGap;
 import floetteroed.opdyts.logging.UniformityGapWeight;
 import floetteroed.utilities.math.MathHelpers;
+import floetteroed.utilities.math.Vector;
 import floetteroed.utilities.statisticslogging.Statistic;
 import floetteroed.utilities.statisticslogging.StatisticsMultiWriter;
 
@@ -303,7 +304,15 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 						this.currentDecisionVariable, result[0]);
 				this.decisionVariable2selfTunedUniformityGapWeight.put(
 						this.currentDecisionVariable, result[1]);
-			}
+				
+				this.lastSamplingStage = samplingStage;
+				this.finalObjFctValue = this.convergenceCriterion.getFinalObjectiveFunctionValue();
+				this.finalEquilGap = samplingStage.getEquilibriumGap();
+				this.finalUnifGap = samplingStage.getUniformityGap();
+				this.finalSurrogateObjectiveFunction = samplingStageEvaluator.getSurrogateObjectiveFunction();
+				this.finalAlphas = samplingStageEvaluator.lastAlphas.copy();
+
+			}			
 		}
 
 		/*
@@ -369,4 +378,18 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 
 		}
 	}
+	
+	// TODO EXPERIMENTAL
+	
+	public SamplingStage<U> lastSamplingStage;
+	
+	public double finalObjFctValue;
+	
+	public double finalEquilGap;
+	
+	public double finalUnifGap;
+	
+	public SurrogateObjectiveFunction<U> finalSurrogateObjectiveFunction;
+	
+	public Vector finalAlphas;
 }

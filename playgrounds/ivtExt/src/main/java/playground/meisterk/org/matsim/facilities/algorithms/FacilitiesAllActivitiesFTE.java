@@ -216,13 +216,13 @@ public class FacilitiesAllActivitiesFTE {
 
 					if (ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
 						// create the work activity and its capacity according to all the computation done before
-						a = f.createActivityOption("work");
+						a = f.createAndAddActivityOption("work");
 						a.setCapacity(tempFacilities.get(tempFacilityId));
 
 						// create the other activities
 						if (this.facilityActivities.containsKey(attributeId)) {
 							activityId = this.facilityActivities.get(attributeId);
-							a = f.createActivityOption(activityId);
+							a = f.createAndAddActivityOption(activityId);
 						}
 					} else if (ktiYear.equals(KTIYear.KTI_YEAR_2008)) {
 
@@ -237,20 +237,20 @@ public class FacilitiesAllActivitiesFTE {
 
 						// let's put the presence code in as an activity,
 						// so one can refer to it when modeling something with activities
-						a = f.createActivityOption(activityId);
+						a = f.createAndAddActivityOption(activityId);
 
 						// create the work activity, because the enterprise census is a directory of workplaces
 						// set the capacity to the number of fulltime equivalents revealed
 						if (sector.equals(ProductionSector.SECTOR2)) {
-							a = f.createActivityOption(FacilitiesProductionKTI.WORK_SECTOR2);
+							a = f.createAndAddActivityOption(FacilitiesProductionKTI.WORK_SECTOR2);
 						} else if(sector.equals(ProductionSector.SECTOR3)) {
-							a = f.createActivityOption(FacilitiesProductionKTI.WORK_SECTOR3);
+							a = f.createAndAddActivityOption(FacilitiesProductionKTI.WORK_SECTOR3);
 						}
 						a.setCapacity(tempFacilities.get(tempFacilityId));
 
 						// add more activities as planned for KTI Year 2008
 						if (this.facilityActivities.containsKey(activityId)) {
-							a = f.createActivityOption(this.facilityActivities.get(activityId));
+							a = f.createAndAddActivityOption(this.facilityActivities.get(activityId));
 							// for all activity types assume the same simple thing
 							// one worker (teacher, salesman, sports facility employee) can at maximum serve 10-20 clients (pupils, costumers, trainees)
 							// so capacity depends on the number of people working somewhere

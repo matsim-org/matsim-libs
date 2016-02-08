@@ -55,15 +55,15 @@ public class TravelTimeCalculatorModule extends AbstractModule {
         bind(TravelTimeCalculator.class).toProvider(TravelTimeCalculatorProvider.class).in(Singleton.class);
         if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
             for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
-                addTravelTimeBinding(mode).toProvider(FromTravelTimeCalculator.class);
+                addTravelTimeBinding(mode).toProvider(ObservedLinkTravelTimes.class);
             }
         }
         if (getConfig().travelTimeCalculator().isCalculateLinkToLinkTravelTimes()) {
-            bind(LinkToLinkTravelTime.class).toProvider(LinkToLinkTravelTimeProvider.class);
+            bind(LinkToLinkTravelTime.class).toProvider(ObservedLinkToLinkTravelTimes.class);
         }
     }
 
-    private static class FromTravelTimeCalculator implements Provider<TravelTime> {
+    private static class ObservedLinkTravelTimes implements Provider<TravelTime> {
 
         @Inject
         TravelTimeCalculator travelTimeCalculator;
@@ -75,7 +75,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
     }
 
-    private static class LinkToLinkTravelTimeProvider implements Provider<LinkToLinkTravelTime> {
+    private static class ObservedLinkToLinkTravelTimes implements Provider<LinkToLinkTravelTime> {
 
         @Inject
         TravelTimeCalculator travelTimeCalculator;

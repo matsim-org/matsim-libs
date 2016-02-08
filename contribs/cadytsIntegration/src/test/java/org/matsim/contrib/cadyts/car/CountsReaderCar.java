@@ -36,7 +36,7 @@ import org.matsim.core.utils.misc.StringUtils;
  * At this stage all original pt code is still included here, but outcommeted, to make the adaptions
  * from pt to car well traceable in case of any errors.
  */
-public class CountsReaderCar {
+class CountsReaderCar {
 
 	private final static Logger log = Logger.getLogger(CountsReaderCar.class);
 

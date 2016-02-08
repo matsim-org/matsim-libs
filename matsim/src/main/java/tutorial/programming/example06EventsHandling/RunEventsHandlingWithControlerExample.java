@@ -55,7 +55,7 @@ public class RunEventsHandlingWithControlerExample {
 		controler.addOverridingModule(new AbstractModule(){
 			@Override public void install() {
 				this.addEventHandlerBinding().toInstance( new MyEventHandler1() );
-				this.addEventHandlerBinding().toInstance( new MyEventHandler2( 500 ) );
+				this.addEventHandlerBinding().toInstance( new MyEventHandler2( ) );
 				this.addEventHandlerBinding().toInstance( new MyEventHandler3() );
 				this.addEventHandlerBinding().toInstance( new CongestionDetectionEventHandler( scenario.getNetwork() )  );
 			}

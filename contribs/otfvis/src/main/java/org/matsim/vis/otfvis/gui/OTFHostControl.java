@@ -106,9 +106,20 @@ public class OTFHostControl {
 
 
 	void gotoTime(int gotoTime, OTFAbortGoto progressBar) {
-		boolean restart = gotoTime < getSimTime();
-		if (restart){
-			requestTimeStep(gotoTime, OTFServer.TimePreference.RESTART);
+		// yy I have no clear idea what the following means.  Going backwards is only possible in file mode, 
+		// and in consequence there may have been the idea to go backwards in live situations by restarting
+		// at the beginning.  However, given our typically sizes this clearly does not make sense and
+		// thus was never implemented.  In consequence, TimePreference.RESTART is only used
+		// at two locations, one of them being here.  Where it is finally caught (in OnTheFlyServer), 
+		// the result with earlier times is the same as when called with another time preference except
+		// that the returned boolean may different, but I don't think that that is used in a consistent
+		// way.  
+		// I guess that the more complicated mechanics is necessary to "loop around" in file mode.
+		// kai, jan'16
+		
+		if (gotoTime < getSimTime()){
+//			requestTimeStep(gotoTime, OTFServer.TimePreference.RESTART);
+			// I don't think that this is doing anything at all. ??? kai, jan'16
 		} else if (!requestTimeStep(gotoTime, OTFServer.TimePreference.EARLIER)) {
 			requestTimeStep(gotoTime, OTFServer.TimePreference.LATER);
 		}

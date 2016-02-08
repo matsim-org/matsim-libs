@@ -84,7 +84,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 	
 	private final Map<Id<Vehicle>, LinkEnterEvent> linkEnterEvents;
 
-	private final Set<Id<Vehicle>> vehiclesToFilter;
+	private final Set<Id<Vehicle>> vehiclesToIgnore;
 	private final Set<String> analyzedModes;
 
 	private final boolean filterAnalyzedModes;
@@ -110,23 +110,28 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		}
 
 		AbstractTravelTimeAggregator travelTimeAggregator;
-		if ("optimistic".equals(group.getTravelTimeAggregatorType())) {
+		switch( group.getTravelTimeAggregatorType() ) {
+		case "optimistic":
 			travelTimeAggregator = new OptimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice);
-			calculator.setTravelTimeAggregator(travelTimeAggregator);
-		} else if ("experimental_LastMile".equals(group.getTravelTimeAggregatorType())) {
+			break ;
+		case "experimental_LastMile":
 			travelTimeAggregator = new PessimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice);
-			calculator.setTravelTimeAggregator(travelTimeAggregator);
 			log.warn("Using experimental TravelTimeAggregator! \nIf this was not intended please remove the travelTimeAggregator entry in the controler section in your config.xml!");
-		} else {
+			break ;
+		default:
 			throw new RuntimeException(group.getTravelTimeAggregatorType() + " is unknown!");
 		}
+		calculator.setTravelTimeAggregator(travelTimeAggregator);
 
 		TravelTimeGetter travelTimeGetter;
-		if ("average".equals(group.getTravelTimeGetterType())) {
+		switch( group.getTravelTimeGetterType() ) {
+		case "average":
 			travelTimeGetter = new AveragingTravelTimeGetter();
-		} else if ("linearinterpolation".equals(group.getTravelTimeGetterType())) {
+			break ;
+		case "linearinterpolation":
 			travelTimeGetter = new LinearInterpolatingTravelTimeGetter(calculator.numSlots, calculator.timeSlice);
-		} else {
+			break ;
+		default:
 			throw new RuntimeException(group.getTravelTimeGetterType() + " is unknown!");
 		}
 		travelTimeAggregator.connectTravelTimeGetter(travelTimeGetter);
@@ -137,6 +142,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 
 	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, ttconfigGroup.getTraveltimeBinSize(), 30*3600, ttconfigGroup); // default: 30 hours at most
+		// yyyy the hard-coded 30 hours seems a bit dangerous ... assume someone wants to run matsim for a week?? kai, jan'16
 	}
 
 	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
@@ -169,7 +175,11 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 			this.linkToLinkData = new ConcurrentHashMap<>((int) (network.getLinks().size() * 1.4 * 2));
 		}
 		this.linkEnterEvents = new ConcurrentHashMap<>();
-		this.vehiclesToFilter = new HashSet<>();
+
+		// if we just look at one mode, we need to ignore all vehicles with a different mode. However, the info re the mode is only in
+		// the vehicleEntersTraffic event.  So we need to memorize the ignored vehicles from there ...
+		this.vehiclesToIgnore = new HashSet<>();
+
 		this.analyzedModes = CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModes());
 	
 		this.reset(0);
@@ -179,7 +189,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 	public void handleEvent(final LinkEnterEvent e) {
 		/* if only some modes are analyzed, we check whether the vehicles
 		 * performs a trip with one of those modes. if not, we skip the event. */
-		if (filterAnalyzedModes && vehiclesToFilter.contains(e.getVehicleId())) return;
+		if (filterAnalyzedModes && vehiclesToIgnore.contains(e.getVehicleId())) return;
 
 		LinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getVehicleId());
 		if ((oldEvent != null) && this.calculateLinkToLinkTravelTimes) {
@@ -209,7 +219,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		 * starts a leg on a non analyzed transport mode, add the vehicle 
 		 * to the filtered vehicles set. */
 		if (filterAnalyzedModes && !analyzedModes.contains(event.getNetworkMode())) { 
-			this.vehiclesToFilter.add(event.getVehicleId());
+			this.vehiclesToIgnore.add(event.getVehicleId());
 		}
 	}
 
@@ -221,7 +231,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		this.linkEnterEvents.remove(event.getVehicleId());
 
 		// try to remove vehicles from set with filtered vehicles
-		if (filterAnalyzedModes) this.vehiclesToFilter.remove(event.getVehicleId());
+		if (filterAnalyzedModes) this.vehiclesToIgnore.remove(event.getVehicleId());
 	}
 
 	@Override
@@ -246,7 +256,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		}
 
 		// try to remove vehicle from set with filtered vehicles
-		if (filterAnalyzedModes) this.vehiclesToFilter.remove(event.getVehicleId());
+		if (filterAnalyzedModes) this.vehiclesToIgnore.remove(event.getVehicleId());
 	}
 
 	private DataContainer getLinkToLinkTravelTimeData(Tuple<Id<Link>, Id<Link>> fromLinkToLink, final boolean createIfMissing) {
@@ -297,7 +307,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 			}
 		}
 		this.linkEnterEvents.clear();
-		this.vehiclesToFilter.clear();
+		this.vehiclesToIgnore.clear();
 	}
 
 	public void setTravelTimeDataFactory(final TravelTimeDataFactory factory) {

@@ -69,9 +69,8 @@ public interface Activity extends PlanElement {
 
 	public Id<ActivityFacility> getFacilityId();
 
-	// the following should not come back since they cause headaches without end.  use builder methods instead.
-
-	//	public void setLinkId(final Id id);
-	//	public void setFacilityId(final Id id);
+	public void setLinkId(final Id<Link> id);
+	
+	public void setFacilityId(final Id<ActivityFacility> id);
 
 }

@@ -28,11 +28,9 @@ import playground.johannes.gsv.sim.GsvConfigGroup;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 import playground.johannes.synpop.matrix.NumericMatrix;
-import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
+import playground.johannes.synpop.matrix.NumericMatrixIO;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * @author johannes
@@ -65,23 +63,30 @@ public class ODAdjustorListener implements IterationStartsListener {
 	}
 
 	private NumericMatrix loadRefMatrix(String filename) {
-		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
-		reader.setValidating(false);
-		reader.parse(filename);
-		return reader.getMatrix();
+//		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
+//		reader.setValidating(false);
+//		reader.parse(filename);
+//		return reader.getMatrix();
+		return NumericMatrixIO.read(filename);
 	}
 
 	private ZoneCollection loadZones(String filename) {
-		ZoneCollection zones = new ZoneCollection();
-		String data;
+//		ZoneCollection zones = new ZoneCollection();
+//		String data;
+//		try {
+//			data = new String(Files.readAllBytes(Paths.get(filename)));
+//			zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
+//			zones.setPrimaryKey(ODAdjustor.ZONE_ID_KEY);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		return zones;
 		try {
-			data = new String(Files.readAllBytes(Paths.get(filename)));
-			zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
-			zones.setPrimaryKey(ODAdjustor.ZONE_ID_KEY);
+			return ZoneGeoJsonIO.readFromGeoJSON(filename, ODAdjustor.ZONE_ID_KEY);
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
-		return zones;
 	}
 
 	@Override

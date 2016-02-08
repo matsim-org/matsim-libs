@@ -1,6 +1,7 @@
 package matsimConnector.engine;
 
 import matsimConnector.utility.Constants;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -37,7 +38,7 @@ public class CAMobsimFactory implements MobsimFactory{
 		
 		qSim.addMobsimEngine(engineCA);
 		
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager);
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 	

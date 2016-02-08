@@ -182,7 +182,7 @@ class Talk_2015_09_03 {
 							// selfTuner,
 							maxIterations, maxTransitions, populationSize, rnd,
 							interpolate, objectiveFunction,
-							maxMemoryLength);
+							maxMemoryLength, false);
 
 					search.run();
 

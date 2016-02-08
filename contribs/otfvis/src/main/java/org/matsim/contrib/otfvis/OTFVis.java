@@ -187,7 +187,7 @@ public class OTFVis {
 
 		// this is the start/stop facility, which may be used outside of otfvis:
 		PlayPauseMobsimListener playPauseMobsimListener = new PlayPauseMobsimListener();
-		server.setListener( playPauseMobsimListener ) ;
+		server.setNotificationListener( playPauseMobsimListener ) ;
 		qSim.addQueueSimulationListeners(playPauseMobsimListener);
 		
 		server.setSimulation(qSim);

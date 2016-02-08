@@ -21,10 +21,15 @@
  */
 package tutorial.converter.completeEventFilesRegardingVehicleInformation;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -36,10 +41,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
 
 /**
  * This class reads and completes event files regarding vehicle ids.
@@ -61,6 +62,7 @@ public class EventsConverterXML extends MatsimXmlParser{
 	private final EventsReaderXMLv1 basicEventsReader;
 	private boolean containsVehicleLeavesTrafficEvents = false;
 	private Map<Id<Person>, Id<Vehicle>> driverToVeh = new HashMap<>();
+	private Map<Id<Person>, String> personToLegMode = new HashMap<>();
 
 	public EventsConverterXML(final EventsManager events) {
 		this.events = events;
@@ -88,6 +90,10 @@ public class EventsConverterXML extends MatsimXmlParser{
 			String eventType = atts.getValue("type");
 
 			switch (eventType){
+			case PersonDepartureEvent.EVENT_TYPE:
+				// remember person to (leg) mode relation
+				personToLegMode.put(Id.createPersonId(atts.getValue(PersonDepartureEvent.ATTRIBUTE_PERSON)), atts.getValue(PersonDepartureEvent.ATTRIBUTE_LEGMODE));
+				break;
 			case VehicleEntersTrafficEvent.EVENT_TYPE:
 			case "wait2link":
 				// (assumes that the reader has already converted the wait2link events)
@@ -101,11 +107,17 @@ public class EventsConverterXML extends MatsimXmlParser{
 				}
 				assert vehicleId != null;
 
+				String networkMode = atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE);
+				// use the (leg) mode from the departure event if this event does not contain a (network) mode
+				if (networkMode == null){
+					networkMode = personToLegMode.get(driverId);
+				}
+				
 				// remember driver to vehicle relation
 				driverToVeh.put(driverId, vehicleId);				
 				// process event with correct vehicleId
 				this.events.processEvent(new VehicleEntersTrafficEvent(time, driverId, Id.createLinkId(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK)), 
-						vehicleId, atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 1.0));
+						vehicleId, networkMode, 1.0));
 				break;
 			case LinkEnterEvent.EVENT_TYPE:
 				if (atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null || atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE).equals("null")){

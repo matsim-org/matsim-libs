@@ -86,7 +86,7 @@ public class SampleFromCommercialPlans {
 		// Network.
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sNew.getNetwork());
 		nr.parse(networkFile);
-		XY2Links xy = new XY2Links(sNew.getNetwork());
+		XY2Links xy = new XY2Links(sNew.getNetwork(), null);
 
 		int id = Integer.parseInt(firstId);
 		

@@ -36,7 +36,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.trip.LegModeTripTravelTimeHandler;
+import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
@@ -50,12 +50,12 @@ public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalysisModule 
 
 	private final SortedMap<String, SortedMap<Integer, Integer>> mode2timeClass2LegCount = new TreeMap<>();
 	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2tripTimes = new TreeMap<>();
-	private final LegModeTripTravelTimeHandler lmtth;
+	private final ModalTripTravelTimeHandler lmtth;
 	private String eventsFile;
 
 	public LegModeTripTimeDistributionAnalyzer() {
 		super(LegModeTripTimeDistributionAnalyzer.class.getSimpleName());
-		this.lmtth = new LegModeTripTravelTimeHandler();
+		this.lmtth = new ModalTripTravelTimeHandler();
 		LOG.info("enabled");
 	}
 

@@ -19,9 +19,17 @@
 
 package playground.johannes.studies.matrix2014.config;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.ConfigGroup;
-import playground.johannes.studies.matrix2014.analysis.MatrixAnalyzer;
+import playground.johannes.studies.matrix2014.analysis.MatrixComparator;
+import playground.johannes.studies.matrix2014.analysis.MatrixDistanceCompare;
+import playground.johannes.studies.matrix2014.analysis.MatrixMarginalsCompare;
+import playground.johannes.studies.matrix2014.analysis.MatrixVolumeCompare;
+import playground.johannes.synpop.analysis.AnalyzerTaskComposite;
 import playground.johannes.synpop.analysis.FileIOContext;
+import playground.johannes.synpop.analysis.HistogramWriter;
+import playground.johannes.synpop.analysis.PassThroughDiscretizerBuilder;
 import playground.johannes.synpop.gis.*;
 import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.matrix.NumericMatrixIO;
@@ -65,13 +73,35 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
         String path = config.getValue(MATRIX_FILE);
         String strThreshold = config.getValue(THRESHOLD);
         double threshold = 0;
-        if(strThreshold != null)
-         threshold = Double.parseDouble(strThreshold);
+        if (strThreshold != null)
+            threshold = Double.parseDouble(strThreshold);
 
         NumericMatrix m = NumericMatrixIO.read(path);
 
-        MatrixAnalyzer analyzer = new MatrixAnalyzer(facilityData.getAll(), zones, m, name);
-        analyzer.setFileIOContext(ioContext);
+//        MatrixAnalyzer analyzer = new MatrixAnalyzer(facilityData.getAll(), zones, m, name);
+//        analyzer.setFileIOContext(ioContext);
+//        analyzer.setVolumeThreshold(threshold);
+
+        AnalyzerTaskComposite<Pair<NumericMatrix, NumericMatrix>> composite = new AnalyzerTaskComposite<>();
+
+        HistogramWriter writer = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new
+                LinearDiscretizer(0.05), "linear"));
+
+        MatrixVolumeCompare volTask = new MatrixVolumeCompare(String.format("matrix.%s.vol", name));
+        volTask.setIoContext(ioContext);
+        volTask.setHistogramWriter(writer);
+
+        MatrixDistanceCompare distTask = new MatrixDistanceCompare(String.format("matrix.%s.dist", name), zones);
+        distTask.setFileIoContext(ioContext);
+
+        MatrixMarginalsCompare marTask = new MatrixMarginalsCompare(String.format("matrix.%s", name));
+        marTask.setHistogramWriter(writer);
+
+        composite.addComponent(volTask);
+        composite.addComponent(distTask);
+        composite.addComponent(marTask);
+
+        MatrixComparator analyzer = new MatrixComparator(m, facilityData.getAll(), zones, composite);
         analyzer.setVolumeThreshold(threshold);
 
         return analyzer;

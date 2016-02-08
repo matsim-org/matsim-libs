@@ -43,6 +43,8 @@ public class HamiltonianLogger implements MarkovEngineListener {
 
     private final long logInterval;
 
+    private final long startIteration;
+
     private AtomicLong iter = new AtomicLong();
 
     private BufferedWriter writer;
@@ -60,8 +62,13 @@ public class HamiltonianLogger implements MarkovEngineListener {
     }
 
     public HamiltonianLogger(Hamiltonian h, long logInterval, String name, String outdir) {
+        this(h, logInterval, name, outdir, 0);
+    }
+
+    public HamiltonianLogger(Hamiltonian h, long logInterval, String name, String outdir, long startIteration) {
         this.h = h;
         this.logInterval = logInterval;
+        this.startIteration = startIteration;
         this.outdir = outdir;
 
         if(name == null)
@@ -85,21 +92,25 @@ public class HamiltonianLogger implements MarkovEngineListener {
 
     @Override
     public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
-        if (iter.get() % logInterval == 0) {
+        if(iter.get() % logInterval == 0) {
             long iterNow = iter.get();
-            double hVal = h.evaluate(population);
-            logger.info(String.format("%s [%s]: %s", name, format.format(iterNow), hVal));
+            if (iterNow >= startIteration) {
+                double hVal = h.evaluate(population);
+                logger.info(String.format("%s [%s]: %s", name, format.format(iterNow), hVal));
 
-            if (writer != null) {
-                try {
-                    writer.write(String.valueOf(iterNow));
-                    writer.write(TAB);
-                    writer.write(String.valueOf(hVal));
-                    writer.newLine();
-                    writer.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (writer != null) {
+                    try {
+                        writer.write(String.valueOf(iterNow));
+                        writer.write(TAB);
+                        writer.write(String.valueOf(hVal));
+                        writer.newLine();
+                        writer.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
+            } else {
+                logger.info(String.format("%s [%s]: <<inactive>>", name, format.format(iterNow)));
             }
         }
 

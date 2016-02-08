@@ -58,6 +58,16 @@ public final class GeometryUtils {
 		return p;
 	}
 
+	public static boolean isLinkInsideGeometries(Collection<Geometry> features, Link link) {
+		Geometry linkGeo = GF.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
+		for(Geometry  geo: features){
+			if ( geo.contains(linkGeo) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static boolean isLinkInsideCity(Collection<SimpleFeature> features, Link link) {
 		Geometry geo = GF.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY()));
 		for(SimpleFeature sf : features){

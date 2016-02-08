@@ -27,11 +27,8 @@ import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
-import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
@@ -104,8 +101,6 @@ public class EvacPatnaControler {
 			});
 //			services.addControlerListener(new MarginalCongestionPricingContolerListener(services.getScenario(),tollHandler, new CongestionHandlerImplV6(services.getEvents(), (ScenarioImpl)services.getScenario()) ));
 		}
-		
-		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario)controler.getScenario()));
 		controler.run();
 	}
 }

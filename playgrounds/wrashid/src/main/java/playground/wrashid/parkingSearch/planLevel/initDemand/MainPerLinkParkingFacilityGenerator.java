@@ -65,7 +65,7 @@ public class MainPerLinkParkingFacilityGenerator {
 			int parkingCapacity = (int) Math.round(Math.ceil(link.getLength() / 2.0 / 5.0/100.0/2));
 			totalNumberOfParkingsAdded+=parkingCapacity;
 			ActivityFacilityImpl activityFacility = activityFacilities.createAndAddFacility(Id.create(parkPlatzId, ActivityFacility.class), link.getCoord());
-			activityFacility.createActivityOption("parking").setCapacity(parkingCapacity);
+			activityFacility.createAndAddActivityOption("parking").setCapacity(parkingCapacity);
 			parkPlatzId++;
 		}
 		

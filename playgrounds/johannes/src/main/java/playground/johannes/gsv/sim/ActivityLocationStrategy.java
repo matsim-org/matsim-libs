@@ -19,14 +19,12 @@
 
 package playground.johannes.gsv.sim;
 
-import com.google.inject.Inject;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
@@ -62,7 +60,7 @@ public class ActivityLocationStrategy implements PlanStrategy, IterationStartsLi
 
 	private ActivityFacilities facilities;
 
-	private ReplanningContext replanContext;
+//	private ReplanningContext replanContext;
 
 	private final ExecutorService executor;
 
@@ -97,7 +95,7 @@ public class ActivityLocationStrategy implements PlanStrategy, IterationStartsLi
 
 	@Override
 	public void init(ReplanningContext replanningContext) {
-		this.replanContext = replanningContext;
+//		this.replanContext = replanningContext;
 		futures = new LinkedList<Future<?>>();
 
 		if (quadTrees == null) {

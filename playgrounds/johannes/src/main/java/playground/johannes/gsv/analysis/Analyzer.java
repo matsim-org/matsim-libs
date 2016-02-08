@@ -95,7 +95,7 @@ public class Analyzer {
 					Activity act = (Activity) plan.getPlanElements().get(i);
 					Id<ActivityFacility> id = Id.create("autofacility_"+ i +"_" + person.getId().toString(), ActivityFacility.class);
 					ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, act.getCoord());
-					fac.createActivityOption(act.getType());
+					fac.createAndAddActivityOption(act.getType());
 					
 					((ActivityImpl)act).setFacilityId(id);
 				}

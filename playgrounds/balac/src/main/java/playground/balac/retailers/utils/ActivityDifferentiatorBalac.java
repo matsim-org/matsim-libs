@@ -113,7 +113,7 @@ public class ActivityDifferentiatorBalac {
 			//	SortedSet<OpeningTime> openingTimesFri = ao.getOpeningTimes(DayType.fri);
 				if (this.groceryFacilities.contains(af.getId())) {
 					
-					afi.createActivityOption("shopgrocery");
+					afi.createAndAddActivityOption("shopgrocery");
 					afi.getActivityOptions().get("shopgrocery").setCapacity(capacity);
 					
 					if  (!(openingTimesWkday==null)) {
@@ -155,7 +155,7 @@ public class ActivityDifferentiatorBalac {
 					
 				}
 				else { 
-					afi.createActivityOption("nongrocery");
+					afi.createAndAddActivityOption("nongrocery");
 				afi.getActivityOptions().get("nongrocery").setCapacity(capacity);
 				if  (!(openingTimesWkday==null)) {
 					for (OpeningTime openingTime: openingTimesWkday){

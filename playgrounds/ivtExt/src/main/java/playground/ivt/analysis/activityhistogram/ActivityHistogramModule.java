@@ -40,7 +40,7 @@ public class ActivityHistogramModule extends AbstractModule {
 					@Override
 					public EventHandler get() {
 						final EventsToActivities e2a = new EventsToActivities();
-						e2a.setActivityHandler( hist );
+						e2a.addActivityHandler(hist);
 						return e2a;
 					}
 				});

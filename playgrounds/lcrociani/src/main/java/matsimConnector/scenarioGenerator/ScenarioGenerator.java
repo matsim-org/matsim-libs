@@ -26,7 +26,7 @@ public class ScenarioGenerator {
 	private static final int CA_ROWS = (int)Math.round((DOOR_WIDTH/Constants.CA_CELL_SIDE));
 	private static final int CA_COLS = (int)Math.round((CA_LENGTH/Constants.CA_CELL_SIDE));
 	private static Double TOTAL_DENSITY = 4.;
-	private static int POPULATION_SIZE = 2000;
+	private static int POPULATION_SIZE = 15000;
 
 	
 	public static void main(String [] args) {
@@ -46,7 +46,7 @@ public class ScenarioGenerator {
 		Scenario scenario = ScenarioUtils.createScenario(c);
 		
 		Context contextCA = createCAScenario(calcFundDiag);
-		NetworkGenerator.createNetwork(scenario, contextCA);
+		PgStationNetworkGenerator.createNetwork(scenario, contextCA);
 		
 
 		
@@ -65,7 +65,7 @@ public class ScenarioGenerator {
 
 		c.controler().setOutputDirectory(outputDir);
 		c.controler().setLastIteration(200);
-		c.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
+		c.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks);
 
 		c.plans().setInputFile(inputDir + "/population.xml.gz");
 
@@ -103,7 +103,7 @@ public class ScenarioGenerator {
 		c.planCalcScore().setBrainExpBeta(1);
 		
 
-		PopulationGenerator.createPopulation(scenario, POPULATION_SIZE);
+		PgStationPopulationGenerator.createPopulation(scenario, POPULATION_SIZE);
 //		MyPopulationGenerator90deg.createPopulation(scenario);
 //		MyPopulationGenerator180deg.createPopulation(scenario);
 		

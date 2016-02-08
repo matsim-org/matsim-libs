@@ -243,7 +243,7 @@ public class WorkFacilitiesGenerator {
 							occupations.put(resultOccupations.getString(1), occupations.get(resultOccupations.getString(1))+resultOccupations.getInt(2));
 						totalQuantity += resultOccupations.getInt(2);
 						if(!facility.getActivityOptions().containsKey(resultOccupations.getString(1))) {
-							facility.createActivityOption(resultOccupations.getString(1));
+							facility.createAndAddActivityOption(resultOccupations.getString(1));
 							double random = Math.random()*times.get(resultOccupations.getString(1)).totalStarts;
 							double sum = 0;
 							for(Entry<Integer, Integer> timeS:times.get(resultOccupations.getString(1)).startTimes.entrySet()) {

@@ -116,7 +116,7 @@ public class DeriveSmallScenarioFromBigOne {
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);
 		final PopulationWriter plansWriter = new PopulationWriter(plans, network);
 		plansWriter.startStreaming(xy2linksOut);//config.plans().getOutputFile());
-		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network));
+		plans.addAlgorithm(new org.matsim.population.algorithms.XY2Links(network, null));
 		plans.addAlgorithm(plansWriter);
 		plansReader.readFile(config.plans().getInputFile());
 		plans.printPlansCount();

@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -50,9 +52,6 @@ import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTrave
 import playground.benjamin.scenarios.munich.exposure.GridTools;
 import playground.benjamin.scenarios.munich.exposure.InternalizeEmissionResponsibilityControlerListener;
 import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
-import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
-
-import javax.inject.Provider;
 
 /**
  * @author amit
@@ -175,8 +174,6 @@ public class SubPopMunichExposureControler {
 		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
 		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		
-		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario) controler.getScenario()));
-
 		if(isAveragingTollAfterRePlanning){
 			controler.addControlerListener(new MyTollAveragerControlerListner());
 		}
