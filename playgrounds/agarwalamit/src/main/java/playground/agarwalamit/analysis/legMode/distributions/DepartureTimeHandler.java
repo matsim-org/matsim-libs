@@ -69,6 +69,9 @@ public class DepartureTimeHandler implements PersonDepartureEventHandler, Transi
 	@Override
 	public void reset(int iteration) {
 		this.mode2TimeBin2Count.clear();
+		this.modesForTransitUsers.clear();
+		this.transitDriverPersons.clear();
+		this.modesForTransitUsers.clear();
 	}
 
 	@Override

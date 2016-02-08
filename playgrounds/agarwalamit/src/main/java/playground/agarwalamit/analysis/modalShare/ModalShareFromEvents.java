@@ -138,6 +138,7 @@ public class ModalShareFromEvents implements ModalShare {
 		public void reset(int iteration) {
 			this.mode2numberOflegs.clear();
 			this.transitDriverPersons.clear();
+			this.modesForTransitUsers.clear();
 		}
 
 		@Override
