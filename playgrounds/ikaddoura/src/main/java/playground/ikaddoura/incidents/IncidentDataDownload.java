@@ -19,6 +19,8 @@
 package playground.ikaddoura.incidents;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,6 +28,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -43,21 +47,25 @@ public class IncidentDataDownload extends TimerTask {
 
 	private static enum Area { germany, berlin } ;
 	
-	private final Area area = Area.berlin;
-//	private final Area area = Area.germany;
+//	private final Area area = Area.berlin;
+//	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/berlin/";
+
+	private final Area area = Area.germany;
+	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany/";
+
 	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss"); 
-	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/";
+	private final boolean zip = true;
 
 	public static void main(String[] args) throws XMLStreamException, IOException {
 		IncidentDataDownload incidentDownload = new IncidentDataDownload();
 		
-		// run in certain time intervals
-//		Timer t = new Timer();
-//		t.scheduleAtFixedRate(incidentDownload, 0, 900 * 1000);		
-//		incidentDownload.run();
+//		run in certain time intervals
+		Timer t = new Timer();
+		t.scheduleAtFixedRate(incidentDownload, 0, 60 * 1000);		
+		incidentDownload.run();
 		
 		// run it once
-		incidentDownload.run();
+//		incidentDownload.run();
 	}
 
 	@Override
@@ -86,14 +94,49 @@ public class IncidentDataDownload extends TimerTask {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		String fileName = outputDirectory + "incidentData_" + this.area.toString() + "_" + System.currentTimeMillis() + "_" + formatter.format(new Date());
-		String outputFileXML = fileName + ".xml";
+		String outputFile = "incidentData_" + this.area.toString() + "_" + System.currentTimeMillis() + "_" + formatter.format(new Date()) + ".xml";
+		String outputPathAndFile = outputDirectory + outputFile;
+
 		try {
-			FileUtils.copyURLToFile(url, new File(outputFileXML));
+			FileUtils.copyURLToFile(url, new File(outputPathAndFile));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		log.info("URL content copied to file " + outputFileXML);
+		log.info("URL content copied to file " + outputPathAndFile);
+		
+		if (zip) {
+			
+			byte[] buffer = new byte[1024];
+	    	
+	    	try{
+	    		
+	    		log.info("Zipping the file " + outputPathAndFile + "...");
+
+	    		FileOutputStream fos = new FileOutputStream(outputPathAndFile + ".zip");
+	    		ZipOutputStream zos = new ZipOutputStream(fos);
+	    		ZipEntry ze = new ZipEntry(outputFile);
+	    		zos.putNextEntry(ze);
+	    		FileInputStream in = new FileInputStream(outputPathAndFile);
+	   	   
+	    		int len;
+	    		while ((len = in.read(buffer)) > 0) {
+	    			zos.write(buffer, 0, len);
+	    		}
+
+	    		in.close();
+	    		zos.closeEntry();	           
+	    		zos.close();
+	          
+	    		log.info("Zipping the file " + outputPathAndFile + "... Done.");
+	    		
+	    		if (new File(outputPathAndFile).delete()) {
+	    			log.info("Original xml file deleted.");
+	    		}
+	    		
+	    	} catch(IOException ex){
+	    	   ex.printStackTrace();
+	    	}
+		}		
 	}
 
 }

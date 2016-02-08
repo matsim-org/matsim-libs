@@ -111,6 +111,8 @@ public class TMCAlerts {
 					) {
 								
 				// incident / warning / ... cleared or no longer valid
+				
+				log.warn("Cleared: " + trafficItem.toString());
 				// TODO: Check if the previous message's end time was right or updated. If not, use these messages to set the end time. 
 			
 			} else {

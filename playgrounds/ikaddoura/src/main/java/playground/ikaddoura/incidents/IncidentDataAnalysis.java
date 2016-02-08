@@ -65,8 +65,10 @@ import playground.ikaddoura.incidents.data.TrafficItem;
 public class IncidentDataAnalysis {
 	private static final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
  
-	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/";
+//	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
+	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
+	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany/";
+	private final boolean writeCSVFileForEachXMLFile = false;
 	
 	private Map<String, TrafficItem> trafficItems = new HashMap<>();
 	private Map<String, Path> trafficItemId2path = new HashMap<>();
@@ -190,10 +192,13 @@ public class IncidentDataAnalysis {
 				HereMapsTrafficItemXMLReader trafficItemReader = new HereMapsTrafficItemXMLReader();
 				trafficItemReader.readStream(inputXmlFile);
 				
-//				String outputCSVFile = inputXmlFile.substring(0, inputXmlFile.length() - 4) + ".csv";
-//				log.info("Output CSV File: " + outputCSVFile);
-//				TrafficItemWriter writer = new TrafficItemWriter();
-//				writer.writeCSVFile(trafficItemReader.getTrafficItems(), outputCSVFile);
+				// write out
+				if (writeCSVFileForEachXMLFile) {
+					String outputCSVFile = inputXmlFile.substring(0, inputXmlFile.length() - 4) + ".csv";
+					log.info("Writing xml file to csv file: " + outputCSVFile);
+					TrafficItemWriter writer = new TrafficItemWriter();
+					writer.writeCSVFile(trafficItemReader.getTrafficItems(), outputCSVFile);
+				}
 				
 				int counterNew = 0;
 				int counterUpdated = 0;
