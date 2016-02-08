@@ -21,15 +21,21 @@ package playground.agarwalamit.analysis.modalShare;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
@@ -37,11 +43,16 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.pt.PtConstants;
 
 import playground.agarwalamit.utils.MapUtils;
 
 /**
- * This excludes the departure of transit drivers.
+ * (1) This excludes the departure of transit drivers.
+ * (2) See followings
+ * transit_walk - transit_walk --> walk &
+ * transit_walk - pt - transit_walk --> pt &
+ * transit_walk - pt - transit_walk - pt - transit_walk --> pt 
  * @author amit
  */
 
@@ -64,6 +75,10 @@ public class ModalShareFromEvents implements ModalShare {
 		reader.readFile(this.eventsFile);
 		this.mode2numberOflegs = this.mseh.mode2numberOflegs;
 		this.mode2PctOflegs = MapUtils.getPercentShare(this.mode2numberOflegs);
+		if (! mseh.isAllPersonsUsingTransitHandeled()) {
+			Logger.getLogger(ModalShareFromEvents.class).warn("Not all persons using transit modes are handled, "
+					+ "because they could not start an activity. Most probable reason is stuck agents.");
+		}
 	}
 
 	@Override
@@ -107,10 +122,17 @@ public class ModalShareFromEvents implements ModalShare {
 		}
 	}
 
-	private class ModalShareEventHandler implements PersonDepartureEventHandler, TransitDriverStartsEventHandler {
+	/**
+	 * If someone starts with transit_walk leg, and do not use pt before starting a regular act (home/work/leis/shop); it is walk
+	 * else it is pt mode.
+	 * @author amit
+	 */
+	public class ModalShareEventHandler implements PersonDepartureEventHandler, TransitDriverStartsEventHandler, ActivityStartEventHandler {
 
 		private final SortedMap<String, Integer> mode2numberOflegs = new TreeMap<>();
 		private final List<Id<Person>> transitDriverPersons = new ArrayList<>();
+		// agents who first departs with transitWalk and their subsequent modes are stored here until it starts a regular act (home/work/leis/shop)
+		private final Map<Id<Person>, List<String>> transitWalkDepartuesModes = new HashMap<>(); 
 
 		@Override
 		public void reset(int iteration) {
@@ -121,14 +143,23 @@ public class ModalShareFromEvents implements ModalShare {
 		@Override
 		public void handleEvent(PersonDepartureEvent event) {
 			String legMode = event.getLegMode();
+			Id<Person> personId = event.getPersonId();
 
-			if( transitDriverPersons.remove(event.getPersonId()) ) {
+			if( transitDriverPersons.remove(personId) ) {
 				// transit driver drives "car" which should not be counted in the modal share.
 			} else {
-				if(mode2numberOflegs.containsKey(legMode)){
-					mode2numberOflegs.put(legMode, mode2numberOflegs.get(legMode) + 1 );
+				if(legMode.equals(TransportMode.transit_walk) || legMode.equals(TransportMode.pt) ) { 
+					// transit_walk - transit_walk || transit_walk - pt
+					if(transitWalkDepartuesModes.containsKey(personId)) {
+						List<String> modes = transitWalkDepartuesModes.get(personId);
+						modes.add(legMode);
+					} else {
+						List<String> modes = new ArrayList<>();
+						modes.add(legMode);
+						transitWalkDepartuesModes.put(personId, modes);
+					}
 				} else {
-					mode2numberOflegs.put(legMode, 1);
+					storeMode(legMode);
 				}
 			}
 		}
@@ -136,6 +167,34 @@ public class ModalShareFromEvents implements ModalShare {
 		@Override
 		public void handleEvent(TransitDriverStartsEvent event) {
 			transitDriverPersons.add(event.getDriverId());
+		}
+
+		@Override
+		public void handleEvent(ActivityStartEvent event) {
+			if( transitWalkDepartuesModes.containsKey(event.getPersonId()) ) {
+				if(! event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) ) { 
+					List<String> modes = transitWalkDepartuesModes.remove(event.getPersonId());
+					String legMode = null;
+					legMode = modes.contains(TransportMode.pt) ? TransportMode.pt : TransportMode.walk;
+					storeMode(legMode);
+				} else { 
+					// else continue
+				}
+			} else {
+				// nothing to do
+			}
+		}
+
+		private void storeMode(String legMode) {
+			if(mode2numberOflegs.containsKey(legMode)){
+				mode2numberOflegs.put(legMode, mode2numberOflegs.get(legMode) + 1 );
+			} else {
+				mode2numberOflegs.put(legMode, 1);
+			}
+		}
+		
+		public boolean isAllPersonsUsingTransitHandeled(){
+			return transitWalkDepartuesModes.isEmpty();
 		}
 	}
 }
