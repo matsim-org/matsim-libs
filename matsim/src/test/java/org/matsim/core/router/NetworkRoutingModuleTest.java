@@ -19,6 +19,8 @@
 
 package org.matsim.core.router;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -32,6 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -46,6 +49,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.facilities.Facility;
 
 public class NetworkRoutingModuleTest {
 
@@ -57,20 +61,22 @@ public class NetworkRoutingModuleTest {
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
-		Leg leg = new LegImpl(TransportMode.car);
 		Activity fromAct = new ActivityImpl("h", new Coord((double) 0, (double) 0));
 		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
 		Activity toAct = new ActivityImpl("h", new Coord((double) 0, (double) 3000));
 		((ActivityImpl) toAct).setLinkId(Id.create("3", Link.class));
 
-		double tt =
-                new NetworkRoutingModule(
-                        TransportMode.car,
-                        f.s.getPopulation().getFactory(),
-                        f.s.getNetwork(),
-                        routeAlgo,
-                        routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-		Assert.assertEquals(100.0, tt, 1e-8);
+		final NetworkRoutingModule routingModule = new NetworkRoutingModule(
+		            TransportMode.car,
+		            f.s.getPopulation().getFactory(),
+		            f.s.getNetwork(),
+		            routeAlgo,
+		            routeFactory);
+		Facility fromFacility = new ActivityWrapperFacility( fromAct ) ;
+		Facility toFacility = new ActivityWrapperFacility( toAct ) ;
+		List<? extends PlanElement> result = routingModule.calcRoute(fromFacility, toFacility, 7.0*3600, person) ;
+		Assert.assertEquals(1, result.size() );
+		Leg leg = (Leg)result.get(0) ;
 		Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
 		Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
 	}
@@ -80,7 +86,6 @@ public class NetworkRoutingModuleTest {
 		Fixture f = new Fixture();
 
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
-		Leg leg = new LegImpl(TransportMode.car);
 		Activity fromAct = new ActivityImpl("h", new Coord((double) 0, (double) 0));
 		((ActivityImpl) fromAct).setLinkId(Id.create("1", Link.class));
 		Activity toAct = new ActivityImpl("h", new Coord((double) 0, (double) 3000));
@@ -103,8 +108,10 @@ public class NetworkRoutingModuleTest {
 							routeAlgo,
 							routeFactory) ;
 
-			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-			Assert.assertEquals(100.0, tt, 1e-8);
+			List<? extends PlanElement> results = router.calcRoute(new ActivityWrapperFacility(fromAct), new ActivityWrapperFacility(toAct), 8.*3600, person) ;
+			Assert.assertEquals( 1, results.size() );
+			Leg leg = (Leg) results.get(0) ;
+			
 			Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
 			Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
 
@@ -129,8 +136,11 @@ public class NetworkRoutingModuleTest {
 							routeAlgo,
 							routeFactory) ;
 
-			double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0*3600);
-			Assert.assertEquals(100.0, tt, 1e-8);
+			List<? extends PlanElement> result = router.calcRoute(new ActivityWrapperFacility(fromAct), new ActivityWrapperFacility(toAct), 7.*3600, person ) ;
+			
+			Assert.assertEquals( 1, result.size() ) ; 
+			Leg leg = (Leg) result.get(0) ;
+			
 			Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
 			Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
 
