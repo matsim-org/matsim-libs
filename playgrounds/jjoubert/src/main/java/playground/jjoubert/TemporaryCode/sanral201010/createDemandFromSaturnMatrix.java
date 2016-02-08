@@ -117,7 +117,7 @@ public class createDemandFromSaturnMatrix {
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
 		nr.parse(networkFilename);
 		
-		XY2Links xy = new XY2Links(sc.getNetwork());
+		XY2Links xy = new XY2Links(sc.getNetwork(), null);
 		xy.run(sc.getPopulation());
 		
 		PopulationWriter pw = new PopulationWriter(sc.getPopulation(), sc.getNetwork());

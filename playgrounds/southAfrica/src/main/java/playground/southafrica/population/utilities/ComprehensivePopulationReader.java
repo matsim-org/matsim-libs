@@ -5,7 +5,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationReaderMatsimV5;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.households.IncomeImpl;

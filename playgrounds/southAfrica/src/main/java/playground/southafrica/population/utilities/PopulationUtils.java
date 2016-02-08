@@ -214,15 +214,17 @@ public class PopulationUtils {
 		LOG.info("Population parsed. Analysing activity types...");
 		Counter counter = new Counter(" person # ");
 		Map<String, Integer> map = new TreeMap<String, Integer>();
-		for(Id id : sc.getPopulation().getPersons().keySet()){
+		for(Id<Person> id : sc.getPopulation().getPersons().keySet()){
 			Plan plan = sc.getPopulation().getPersons().get(id).getSelectedPlan();
-			for(PlanElement pe : plan.getPlanElements()){
-				if(pe instanceof Activity){
-					Activity act = (Activity) pe;
-					if(!map.containsKey(act.getType())){
-						map.put(act.getType(), new Integer(1));
-					} else{
-						map.put(act.getType(), map.get(act.getType()) + 1 );
+			if(plan != null){
+				for(PlanElement pe : plan.getPlanElements()){
+					if(pe instanceof Activity){
+						Activity act = (Activity) pe;
+						if(!map.containsKey(act.getType())){
+							map.put(act.getType(), new Integer(1));
+						} else{
+							map.put(act.getType(), map.get(act.getType()) + 1 );
+						}
 					}
 				}
 			}
@@ -253,7 +255,7 @@ public class PopulationUtils {
 		LOG.info("Population parsed. Analysing employment types...");
 		
 		Counter counter = new Counter(" employed persons # ");
-		for(Id id : sc.getPopulation().getPersons().keySet()){
+		for(Id<Person> id : sc.getPopulation().getPersons().keySet()){
 			Person person = sc.getPopulation().getPersons().get(id);
 			if(PersonUtils.isEmployed(person)){
 				counter.incCounter();

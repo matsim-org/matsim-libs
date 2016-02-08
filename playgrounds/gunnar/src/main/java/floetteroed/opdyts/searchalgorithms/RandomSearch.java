@@ -24,8 +24,15 @@
  */
 package floetteroed.opdyts.searchalgorithms;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
@@ -41,6 +48,7 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.SamplingStage;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
+import floetteroed.opdyts.trajectorysampling.WeightOptimizer2;
 import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
@@ -51,6 +59,8 @@ import floetteroed.utilities.statisticslogging.Statistic;
 public class RandomSearch<U extends DecisionVariable> {
 
 	// -------------------- CONSTANTS --------------------
+
+	public static final String TIMESTAMP = "Timestamp";
 
 	public static final String RANDOM_SEARCH_ITERATION = "Random Search Iteration";
 
@@ -75,6 +85,8 @@ public class RandomSearch<U extends DecisionVariable> {
 	private final ObjectiveFunction objectBasedObjectiveFunction;
 
 	private final int maxMemoryLength;
+
+	private final boolean includeCurrentBest;
 
 	// -------------------- MEMBERS --------------------
 
@@ -104,7 +116,7 @@ public class RandomSearch<U extends DecisionVariable> {
 			final int populationSize, final Random rnd,
 			final boolean interpolate,
 			final ObjectiveFunction objectBasedObjectiveFunction,
-			final int maxMemoryLength) {
+			final int maxMemoryLength, final boolean includeCurrentBest) {
 		this.simulator = simulator;
 		this.randomizer = randomizer;
 		this.initialDecisionVariable = initialDecisionVariable;
@@ -116,6 +128,7 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.interpolate = interpolate;
 		this.objectBasedObjectiveFunction = objectBasedObjectiveFunction;
 		this.maxMemoryLength = maxMemoryLength;
+		this.includeCurrentBest = includeCurrentBest;
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -129,9 +142,26 @@ public class RandomSearch<U extends DecisionVariable> {
 	private int transitions = 0;
 
 	public void run() {
+		this.run(0.0, 0.0, true);
+	}
 
-		double equilibriumGapWeight = 0.0;
-		double uniformityGapWeight = 0.0;
+	public void run(double equilibriumGapWeight, double uniformityGapWeight,
+			final boolean adjustWeights) {
+
+		if (this.logFileName != null) {
+			final File logFile = new File(this.logFileName);
+			if (logFile.exists()) {
+				logFile.delete();
+			}
+		}
+
+		final WeightOptimizer2 weightOptimizer;
+		if (adjustWeights) {
+			weightOptimizer = new WeightOptimizer2(equilibriumGapWeight,
+					uniformityGapWeight);
+		} else {
+			weightOptimizer = null;
+		}
 
 		U bestDecisionVariable = this.initialDecisionVariable;
 		Double bestObjectiveFunctionValue = null;
@@ -151,6 +181,9 @@ public class RandomSearch<U extends DecisionVariable> {
 			this.offsets.add(Double.NaN);
 
 			final Set<U> candidates = new LinkedHashSet<U>();
+			if (this.includeCurrentBest) {
+				candidates.add(bestDecisionVariable);
+			}
 			while (candidates.size() < this.populationSize) {
 				candidates.addAll(this.randomizer
 						.newRandomVariations(bestDecisionVariable));
@@ -169,6 +202,21 @@ public class RandomSearch<U extends DecisionVariable> {
 				sampler.setMaxMemoryLength(this.maxMemoryLength);
 
 				if (this.logFileName != null) {
+					sampler.addStatistic(this.logFileName,
+							new Statistic<SamplingStage<U>>() {
+								@Override
+								public String label() {
+									return TIMESTAMP;
+								}
+
+								@Override
+								public String value(final SamplingStage<U> data) {
+									return (new SimpleDateFormat(
+											"yyyy-MM-dd HH:mm:ss"))
+											.format(new Date(System
+													.currentTimeMillis()));
+								}
+							});
 					final int currentIt = it; // inner class requires final
 					sampler.addStatistic(this.logFileName,
 							new Statistic<SamplingStage<U>>() {
@@ -212,21 +260,38 @@ public class RandomSearch<U extends DecisionVariable> {
 						.get(newBestDecisionVariable);
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
-				final double msaInertia = 1.0 - 1.0 / (1.0 + it);
-				equilibriumGapWeight = msaInertia
-						* equilibriumGapWeight
-						+ (1.0 - msaInertia)
-						* sampler
-								.getDecisionVariable2selfTunedEquilbriumGapWeightView()
-								.get(newBestDecisionVariable);
-				uniformityGapWeight = msaInertia
-						* uniformityGapWeight
-						+ (1.0 - msaInertia)
-						* sampler
-								.getDecisionVariable2selfTunedUniformityGapWeightView()
-								.get(newBestDecisionVariable);
+				if (weightOptimizer != null) {
+					final double[] newWeights = weightOptimizer.updateWeights(
+							equilibriumGapWeight, uniformityGapWeight,
+							sampler.lastSamplingStage,
+							sampler.finalObjFctValue, sampler.finalEquilGap,
+							sampler.finalUnifGap,
+							sampler.finalSurrogateObjectiveFunction,
+							sampler.finalAlphas);
+					equilibriumGapWeight = newWeights[0];
+					uniformityGapWeight = newWeights[1];
+				}
 
 			} else {
+
+				if (bestObjectiveFunctionValue != null) {
+					try {
+						final PrintWriter logWriter = new PrintWriter(
+								new BufferedWriter(new FileWriter(
+										this.logFileName, true)));
+						logWriter.print((new SimpleDateFormat(
+								"yyyy-MM-dd HH:mm:ss")).format(new Date(System
+								.currentTimeMillis())) + "\t");
+						logWriter.print(it + "\t");
+						logWriter.print(this.transitions + "\t");
+						logWriter.print(bestObjectiveFunctionValue + "\t");
+						logWriter.println(bestDecisionVariable);						
+						logWriter.flush();
+						logWriter.close();
+					} catch (IOException e) {
+						throw new RuntimeException(e);
+					}
+				}
 
 				final SimulatorState thisRoundsInitialState = newInitialState;
 

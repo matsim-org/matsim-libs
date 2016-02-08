@@ -31,6 +31,7 @@ public class SimulationEngine {
 		this(0,context);
 	}
 	
+	@Deprecated
 	private void step(){
 		agentGenerator.step();
 		agentUpdater.step();
@@ -61,6 +62,7 @@ public class SimulationEngine {
 		this.agentMover = agentMover;
 	}
 	
+	@Deprecated
 	public void run(){
 		while(step<=finalStep){
 			//Log.step(step);

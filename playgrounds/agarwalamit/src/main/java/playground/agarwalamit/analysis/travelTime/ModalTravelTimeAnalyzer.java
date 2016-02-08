@@ -19,6 +19,7 @@
 package playground.agarwalamit.analysis.travelTime;
 
 import java.io.BufferedWriter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -29,86 +30,122 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.trip.LegModeTripTravelTimeHandler;
-import playground.vsp.analysis.modules.AbstractAnalysisModule;
+import playground.agarwalamit.utils.ListUtils;
 
 /**
  * @author amit
  */
 
-public class ModalTravelTimeAnalyzer extends AbstractAnalysisModule {
+public class ModalTravelTimeAnalyzer {
 	private final SortedMap<String, Double> mode2AvgTripTime = new TreeMap<String, Double>();
+	private final SortedMap<String, Integer> mode2NumberOfLegs = new TreeMap<String, Integer>();
 	private final SortedMap<String, Double> mode2TotalTravelTime = new TreeMap<String, Double>();
-	private final LegModeTripTravelTimeHandler travelTimeHandler = new LegModeTripTravelTimeHandler();
-
-	private final String inputEventsFile;
-	private static final int ITERATION_NR = 100;
+	
+	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalTravelTime = new TreeMap<String, Map<Id<Person>,Double>>();
+	private final SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2AvgTravelTime = new TreeMap<String, Map<Id<Person>,Double>>();
+	
+	private final ModalTripTravelTimeHandler travelTimeHandler = new ModalTripTravelTimeHandler();
+	private final String eventsFile;
 	
 	public ModalTravelTimeAnalyzer(final String inputEventsFile) {
-		super(ModalTravelTimeAnalyzer.class.getSimpleName());
-		this.inputEventsFile = inputEventsFile;
+		this.eventsFile = inputEventsFile;
 	}
 	
 	public static void main(String[] args) {
+		int ITERATION_NR = 100;
 		String dir = "../../../repos/runs-svn/patnaIndia/run105/1pct/evac_passing/";
 		String eventFile = dir+"/ITERS/it."+ITERATION_NR+"/"+ITERATION_NR+".events.xml.gz";
 		String outputFolder = dir+"/analysis/";
 		ModalTravelTimeAnalyzer timeAnalyzer  = new ModalTravelTimeAnalyzer(eventFile);
-		timeAnalyzer.preProcessData();
-		timeAnalyzer.postProcessData();
-		timeAnalyzer.writeResults(outputFolder);
+		timeAnalyzer.run();
+		timeAnalyzer.writeResults(outputFolder+"/modalTravelTime_it."+ITERATION_NR+".txt");
 	}
 	
-	@Override
-	public List<EventHandler> getEventHandler() {
-		return null;
-	}
-	
-	@Override
-	public void preProcessData() {
+	public void run() {
 		EventsManager events = EventsUtils.createEventsManager();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 
 		events.addHandler(travelTimeHandler);
-		reader.readFile(inputEventsFile);
-
+		reader.readFile(eventsFile);
+		
+		storeModeData();
+		storePersonData();
 	}
-	@Override
-	public void postProcessData() {
-		SortedMap<String, Map<Id<Person>, List<Double>>> times = travelTimeHandler.getLegMode2PesonId2TripTimes();
-		for(String mode :times.keySet()){
-			double tripTimes =0;
-			double count = 0;
-			for(Id<Person> id : times.get(mode).keySet()){
-				for(Double d :times.get(mode).get(id)){
-					tripTimes+=d;
-					count++;
-				}
-			}
-			mode2TotalTravelTime.put(mode, tripTimes);
-			mode2AvgTripTime.put(mode, tripTimes/count);
-		}
-	}
-	@Override
-	public void writeResults(String outputFolder) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/modalTravelTime_it."+ITERATION_NR+".txt");
+	
+	public void writeResults(String outputFile) {
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
-			writer.write("mode \t avgTripTime(min) \t totalTripTime(hr) \n");
+			writer.write("mode \t totalTime(hr) \t numberOfLegs \t avgTripTime(min) \n");
 
 			for(String mode:mode2AvgTripTime.keySet()){
-				writer.write(mode+"\t"+mode2AvgTripTime.get(mode)/60+"\t"+mode2TotalTravelTime.get(mode)/3600+"\n");
+				writer.write(mode+"\t"+mode2TotalTravelTime.get(mode)/3600 +"\t"+ 
+						mode2NumberOfLegs.get(mode)+ "\t" + mode2AvgTripTime.get(mode)/60+ "\n");
 			}
 
 			writer.close();
 		} catch (Exception e) {
-			throw new RuntimeException("Data is not written in file. Reason: "
-					+ e);
+			throw new RuntimeException("Data is not written in file. Reason: "+ e);
 		}
 	}
-
+	
+	private void storeModeData() {
+		SortedMap<String, Map<Id<Person>, List<Double>>> times = travelTimeHandler.getLegMode2PesonId2TripTimes();
+		for(String mode :times.keySet()){
+			double tripTimes =0;
+			int count = 0;
+			for(Id<Person> id : times.get(mode).keySet()){
+				tripTimes += ListUtils.doubleSum(times.get(mode).get(id));
+				count += times.get(mode).get(id).size();
+			}
+			mode2TotalTravelTime.put(mode, tripTimes);
+			mode2NumberOfLegs.put(mode, count);
+			mode2AvgTripTime.put(mode, tripTimes/count);
+		}
+	}
+	
+	private void storePersonData(){
+		SortedMap<String, Map<Id<Person>, List<Double>>> times = travelTimeHandler.getLegMode2PesonId2TripTimes();
+		
+		for(String mode: times.keySet()){
+			Map<Id<Person>, Double> personId2TotalTravelTime = new HashMap<Id<Person>, Double>();
+			Map<Id<Person>, Double> personId2AvgTravelTime = new HashMap<Id<Person>, Double>();
+			
+			for(Id<Person> id: times.get(mode).keySet()){
+				double totalTravelTime = ListUtils.doubleSum(times.get(mode).get(id));
+				double meanTravelTime = ListUtils.doubleMean(times.get(mode).get(id));
+				
+				personId2TotalTravelTime.put(id, totalTravelTime);
+				personId2AvgTravelTime.put(id, meanTravelTime);
+			}
+			mode2PersonId2TotalTravelTime.put(mode, personId2TotalTravelTime);
+			mode2PersonId2AvgTravelTime.put(mode, personId2AvgTravelTime);
+		}
+	}
+	
+	/**
+	 * @return  Total travel time (summed for all trips for that person) for each person segregated w.r.t. travel modes.
+	 */
+	public SortedMap<String, Map<Id<Person>, Double>> getMode2PersonId2TotalTravelTime(){
+		return this.mode2PersonId2TotalTravelTime;
+	}
+	
+	public SortedMap<String, Map<Id<Person>, Double>> getMode2PersonId2AverageTravelTime(){
+		return this.mode2PersonId2AvgTravelTime;
+	}
+	
+	/**
+	 * @return  trip time for each trip of each person segregated w.r.t. travel modes.
+	 */
+	public SortedMap<String, Map<Id<Person>, List<Double>>> getMode2PesonId2TripTimes(){
+		return this.travelTimeHandler.getLegMode2PesonId2TripTimes();
+	}
+	
+	public SortedMap<String,Integer> getTravelMode2NumberOfLegs(){
+		return this.mode2NumberOfLegs;
+	}
+	
 	public SortedMap<String, Double> getMode2AvgTripTime() {
 		return mode2AvgTripTime;
 	}

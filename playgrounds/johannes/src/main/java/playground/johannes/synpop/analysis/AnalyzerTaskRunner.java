@@ -18,13 +18,10 @@
  * *********************************************************************** */
 package playground.johannes.synpop.analysis;
 
-import playground.johannes.synpop.data.Person;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Locale;
 
 /**
@@ -38,14 +35,14 @@ public class AnalyzerTaskRunner {
 
     private static final String TAB = "\t";
 
-    public static void run(Collection<? extends Person> persons, AnalyzerTask<Collection<? extends Person>> task, FileIOContext context) {
+    public static <T> void run(T persons, AnalyzerTask<T> task, FileIOContext context) {
         run(persons, task, String.format("%s/stats.txt", context.getPath()));
     }
 
-    public static void run(Collection<? extends Person> persons, AnalyzerTask<Collection<? extends Person>> task, String file) {
+    public static <T> void run(T persons, AnalyzerTask<T> task, String file) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write("dimension\tmean\tmin\tmax\tsize\tmedian\tvariance\tnullValues");
+            writer.write("dimension\tmean\tmin\tmax\tsize\twsum\tmedian\tvariance\tnullValues");
             writer.newLine();
 
             ArrayList<StatsContainer> containers = new ArrayList<>();
@@ -60,7 +57,9 @@ public class AnalyzerTaskRunner {
                 writer.write(TAB);
                 writer.write(doubleToString(container.getMax()));
                 writer.write(TAB);
-                writer.write(doubleToString(container.getN()));
+                writer.write(intToString(container.getN()));
+                writer.write(TAB);
+                writer.write(doubleToString(container.getWsum()));
                 writer.write(TAB);
                 writer.write(doubleToString(container.getMedian()));
                 writer.write(TAB);

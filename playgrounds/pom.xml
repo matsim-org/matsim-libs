@@ -101,7 +101,7 @@
 		<module>juliakern</module>
 		<module>kai</module>
 		<module>kturner</module>
-		<!--<module>lcrociani</module>-->
+		<module>lcrociani</module>
 		<module>lkroeger</module>
 		<module>ma</module>
 		<module>michalm</module>
@@ -133,6 +133,7 @@
 		<module>wrashid</module>
 		<module>yalcin</module>
 		<module>ucsb</module>
+		<module>vaadin-example</module>
 		<module>vsptelematics</module>
 		<module>vsp</module>
 		<module>vspshk</module>

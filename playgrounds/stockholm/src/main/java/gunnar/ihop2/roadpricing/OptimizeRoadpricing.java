@@ -74,11 +74,17 @@ class OptimizeRoadpricing {
 		// final TollLevels initialTollLevels = new TollLevels(25200.0, 25200.0,
 		// 28800.0, 30600.0, 32400.0, 55800.0, 59400.0, 59400.0, 61200.0,
 		// 63000.0, 0.0, 10.0, 30.0, scenario);
+		// THE ORIGINAL TIMES 10
+		// final TollLevels initialTollLevels = new TollLevels(6 * 3600 + 1800,
+		// 7 * 3600, 7 * 3600 + 1800, 8 * 3600 + 1800, 9 * 3600,
+		// 15 * 3600 + 1800, 16 * 3600, 17 * 3600 + 1800, 18 * 3600,
+		// 18 * 3600 + 1800, 10.0 * 10.0, 10.0 * 15.0, 10.0 * 20.0,
+		//	scenario);
 
 		final double changeTimeProba = 2.0 / 3.0;
 		final double changeCostProba = 2.0 / 3.0;
 		final double deltaTime_s = 1800;
-		final double deltaCost_money = 5.0;
+		final double deltaCost_money = 10.0; // doubled
 		final DecisionVariableRandomizer<TollLevels> decisionVariableRandomizer = new TollLevelsRandomizer(
 				initialTollLevels, changeTimeProba, changeCostProba,
 				deltaTime_s, deltaCost_money);
@@ -96,7 +102,7 @@ class OptimizeRoadpricing {
 						+ scenario.getNetwork().getLinks().size() + " links.");
 		final ObjectiveFunction objectiveFunction = new TotalScoreObjectiveFunction();
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				100, 10);
+				1000, 100);
 		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
 				new MATSimStateFactoryImpl<TollLevels>(), scenario,
 				timeDiscretization, relevantLinkIds, roadpricingModule);
@@ -104,17 +110,18 @@ class OptimizeRoadpricing {
 		/*
 		 * RandomSearch specification.
 		 */
-		final int maxMemorizedTrajectoryLength = 100;
+		final int maxMemorizedTrajectoryLength = 1000;
 		final boolean interpolate = true;
 		final int maxRandomSearchIterations = 1000;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-		final int randomSearchPopulationSize = 14;
+		final int randomSearchPopulationSize = 32;
+		final boolean includeCurrentBest = false;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer, initialTollLevels,
 				convergenceCriterion, maxRandomSearchIterations,
 				maxRandomSearchTransitions, randomSearchPopulationSize,
 				MatsimRandom.getRandom(), interpolate, objectiveFunction,
-				maxMemorizedTrajectoryLength);
+				maxMemorizedTrajectoryLength, includeCurrentBest);
 		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
 
 		/*

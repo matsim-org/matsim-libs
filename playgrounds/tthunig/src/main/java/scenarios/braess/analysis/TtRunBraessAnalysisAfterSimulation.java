@@ -57,8 +57,8 @@ public class TtRunBraessAnalysisAfterSimulation {
 	private double[] totalRouteTTs;
 	private double[] avgRouteTTs;
 	private int[] routeUsers;
-	private Map<Double, double[]> routeStartsPerSecond;
-	private Map<Double, double[]> onRoutePerSecond;
+	private Map<Double, int[]> routeStartsPerSecond;
+	private Map<Double, int[]> onRoutePerSecond;
 	private Map<Double, double[]> avgRouteTTsPerDeparture;
 
 	public TtRunBraessAnalysisAfterSimulation(String runDirectory, int lastIteration,
@@ -151,8 +151,8 @@ public class TtRunBraessAnalysisAfterSimulation {
 		stream.println(header);
 		for (Double time : this.routeStartsPerSecond.keySet()) {
 			StringBuffer line = new StringBuffer();
-			double[] routeStarts = this.routeStartsPerSecond.get(time);
-			double totalStarts = 0.0;
+			int[] routeStarts = this.routeStartsPerSecond.get(time);
+			int totalStarts = 0;
 			
 			line.append(time);
 			for (int i = 0; i < 3; i++) {
@@ -181,8 +181,8 @@ public class TtRunBraessAnalysisAfterSimulation {
 		stream.println(header);
 		for (Double time : this.onRoutePerSecond.keySet()) {
 			StringBuffer line = new StringBuffer();
-			double[] onRoutes = this.onRoutePerSecond.get(time);
-			double totalOnRoute = 0.0;
+			int[] onRoutes = this.onRoutePerSecond.get(time);
+			int totalOnRoute = 0;
 			
 			line.append(time);
 			for (int i = 0; i < 3; i++) {

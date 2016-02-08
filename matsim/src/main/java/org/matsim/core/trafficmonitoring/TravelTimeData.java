@@ -47,6 +47,10 @@ public interface TravelTimeData {
 	 * link of the network a TravelTimeData Object is created. Each of these objects would need one (Map implementation) 
 	 * or two (Array implementation) additional fields that hold the information that is required to calculate the time slot
 	 * from the time of day. dg, april'2013. </li>
+	 * <li> Well, one could insert the algo to compute the index from the time-of-day into the TravelTimeData implementing class. kai, jan'16
+	 * <li> The main reason by both are needed seems to be the getFreeSpeed(...) at some point, which needs "now" as an argument.  
+	 * We could, alternatively, return some "undefined" travel time (or an infinite standard deviation), and then now somewhere else
+	 * that we need to use free speed as the alternative.  kai, jan'16
 	 * </ul> 
 	 */
 	abstract double getTravelTime(final int timeSlot, final double now);

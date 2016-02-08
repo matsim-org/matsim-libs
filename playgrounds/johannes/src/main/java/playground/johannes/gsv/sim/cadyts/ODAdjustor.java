@@ -59,7 +59,7 @@ public class ODAdjustor {
 
 	private static final Logger logger = Logger.getLogger(ODAdjustor.class);
 
-	public static final String ZONE_ID_KEY = "gsvId";
+	public static final String ZONE_ID_KEY = "NO";
 
 	private final ActivityFacilities facilities;
 

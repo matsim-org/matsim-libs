@@ -119,7 +119,43 @@ public class TtAnalyzedResultsWriter {
 		writeFinalResults(outputDir, handler.getTotalTT(), handler.getTotalRouteTTs(), handler.calculateAvgRouteTTs(), handler.getRouteUsers(), handler.getNumberOfStuckedAgents());
 		writeOnRoutes(outputDir, handler.getOnRoutePerSecond());
 		writeRouteStarts(outputDir, handler.getRouteDeparturesPerSecond());
+		writeSummedRouteStarts(outputDir, handler.getSummedRouteDeparturesPerSecond());
 		writeAvgRouteTTs(outputDir, "Departure", handler.calculateAvgRouteTTsByDepartureTime());
+	}
+
+	private void writeSummedRouteStarts(String outputDir, Map<Double, int[]> summedRouteDeparturesPerSecond) {
+		PrintStream stream;
+		String filename = outputDir + "summedDeparturesPerRoute.txt";
+		try {
+			stream = new PrintStream(new File(filename));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		String header = "time";
+		for (int routeNr=0; routeNr < numberOfRoutes; routeNr++){
+			header += "\tsum_starts_" + routeNr;
+		}
+		header += "\tsum_starts_total";
+		stream.println(header);
+		for (Double time : summedRouteDeparturesPerSecond.keySet()) {
+			StringBuffer line = new StringBuffer();
+			int[] routeStarts = summedRouteDeparturesPerSecond.get(time);
+			int totalStarts = 0;
+			
+			line.append(time);
+			for (int routeNr = 0; routeNr < numberOfRoutes; routeNr++) {
+				line.append("\t" + routeStarts[routeNr]);
+				totalStarts += routeStarts[routeNr];
+			}
+			line.append("\t" + totalStarts);
+			stream.println(line.toString());
+		}
+
+		stream.close();
+		
+		log.info("output written to " + filename);
 	}
 
 	/**
@@ -174,7 +210,7 @@ public class TtAnalyzedResultsWriter {
 		log.info("output written to " + filename);
 	}
 
-	private void writeRouteStarts(String outputDir, Map<Double, double[]> routeStartsMap) {
+	private void writeRouteStarts(String outputDir, Map<Double, int[]> routeStartsMap) {
 		PrintStream stream;
 		String filename = outputDir + "startsPerRoute.txt";
 		try {
@@ -192,8 +228,8 @@ public class TtAnalyzedResultsWriter {
 		stream.println(header);
 		for (Double time : routeStartsMap.keySet()) {
 			StringBuffer line = new StringBuffer();
-			double[] routeStarts = routeStartsMap.get(time);
-			double totalStarts = 0.0;
+			int[] routeStarts = routeStartsMap.get(time);
+			int totalStarts = 0;
 			
 			line.append(time);
 			for (int routeNr = 0; routeNr < numberOfRoutes; routeNr++) {
@@ -209,7 +245,7 @@ public class TtAnalyzedResultsWriter {
 		log.info("output written to " + filename);
 	}
 
-	private void writeOnRoutes(String outputDir, Map<Double, double[]> onRoutesMap) {
+	private void writeOnRoutes(String outputDir, Map<Double, int[]> onRoutesMap) {
 		PrintStream stream;
 		String filename = outputDir + "onRoutes.txt";
 		try {
@@ -227,8 +263,8 @@ public class TtAnalyzedResultsWriter {
 		stream.println(header);
 		for (Double time : onRoutesMap.keySet()) {
 			StringBuffer line = new StringBuffer();
-			double[] onRoutes = onRoutesMap.get(time);
-			double totalOnRoute = 0.0;
+			int[] onRoutes = onRoutesMap.get(time);
+			int totalOnRoute = 0;
 			
 			line.append(time);
 			for (int routeNr = 0; routeNr < numberOfRoutes; routeNr++) {

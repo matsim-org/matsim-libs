@@ -41,7 +41,9 @@ public class StatsContainer {
 
     private Double max;
 
-    private Double N;
+    private Integer N;
+
+    private Double wsum;
 
     private Integer nullValues;
 
@@ -88,7 +90,7 @@ public class StatsContainer {
         median = calculateMedian(values);
         min = StatUtils.min(values);
         max = StatUtils.max(values);
-        N = new Double(values.length);
+        N = values.length;
         variance = StatUtils.variance(values);
     }
 
@@ -103,7 +105,8 @@ public class StatsContainer {
 
         min = StatUtils.min(values);
         max = StatUtils.max(values);
-        N = StatUtils.sum(weights);
+        N = values.length;
+        wsum = StatUtils.sum(weights);
     }
 
     public String getName() {
@@ -130,8 +133,12 @@ public class StatsContainer {
         return max;
     }
 
-    public Double getN() {
+    public Integer getN() {
         return N;
+    }
+
+    public Double getWsum() {
+        return wsum;
     }
 
     public Integer getNullValues() {
@@ -146,10 +153,14 @@ public class StatsContainer {
     This is not a precise calculation of the median, yet should be ok for large samples sizes.
      */
     private double calculateMedian(double[] values) {
-        double[] tempValues = Arrays.copyOf(values, values.length);
-        Arrays.sort(tempValues);
+        if(values.length > 0) {
+            double[] tempValues = Arrays.copyOf(values, values.length);
+            Arrays.sort(tempValues);
 
-        return tempValues[tempValues.length / 2];
+            return tempValues[tempValues.length / 2];
+        } else {
+            return Double.NaN;
+        }
     }
 
     private double calculateWeightedMedian(double[] values, double[] weights) {

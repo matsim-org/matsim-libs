@@ -107,8 +107,5 @@ public class MatrixVolumeCompare implements AnalyzerTask<Pair<NumericMatrix, Num
                 e.printStackTrace();
             }
         }
-
-        container = new StatsContainer(name, errors);
-        containers.add(container);
     }
 }

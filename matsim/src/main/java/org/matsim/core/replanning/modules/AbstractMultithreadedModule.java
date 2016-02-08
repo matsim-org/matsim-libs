@@ -31,7 +31,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An abstract strategy module for running multiple plan algorithms in parallel.
@@ -67,7 +67,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 
 	private int count = 0;
 
-	private final AtomicBoolean hadException = new AtomicBoolean(false);
+	private final AtomicReference<Throwable> hadException = new AtomicReference<>(null);
 	private final ExceptionHandler exceptionHandler = new ExceptionHandler(this.hadException);
 
 	private ReplanningContext replanningContext;
@@ -154,8 +154,9 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 				throw new RuntimeException(e);
 			}
 			log.info("[" + this.name + "] all " + this.threads.length + " threads finished.");
-			if (this.hadException.get()) {
-				throw new RuntimeException("Some threads crashed, thus not all plans may have been handled.");
+			Throwable throwable = this.hadException.get();
+			if (throwable != null) {
+				throw new RuntimeException("Some threads crashed, thus not all plans may have been handled.", throwable);
 			}
 		}
 		// reset
@@ -172,7 +173,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 			throw new RuntimeException("threads are already initialized");
 		}
 
-		this.hadException.set(false);
+		this.hadException.set(null);
 		this.threads = new Thread[this.numOfThreads];
 		this.algothreads = new PlanAlgoThread[this.numOfThreads];
 
@@ -198,16 +199,16 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 
 	private final static class ExceptionHandler implements UncaughtExceptionHandler {
 
-		private final AtomicBoolean hadException;
+		private final AtomicReference<Throwable> hadException;
 
-		public ExceptionHandler(final AtomicBoolean hadException) {
+		public ExceptionHandler(final AtomicReference<Throwable> hadException) {
 			this.hadException = hadException;
 		}
 
 		@Override
 		public void uncaughtException(Thread t, Throwable e) {
 			log.error("Thread " + t.getName() + " died with exception. Will stop after all threads finished.", e);
-			this.hadException.set(true);
+			this.hadException.set(e);
 		}
 
 	}

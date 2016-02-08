@@ -66,7 +66,10 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 		List<PlanElement> planElements = this.getCurrentPlan().getPlanElements();
 		if (planElements.size() > 0) {
 			Activity firstAct = (Activity) planElements.get(0);				
-			this.setCurrentLinkId( firstAct.getLinkId() ) ;
+//			this.setCurrentLinkId( firstAct.getLinkId() ) ;
+			final Id<Link> linkId = PopulationUtils.computeLinkIdFromActivity(firstAct, scenario.getActivityFacilities(), scenario.getConfig() );
+			Gbl.assertIf( linkId!=null );
+			this.setCurrentLinkId( linkId );
 			this.setState(MobsimAgent.State.ACTIVITY) ;
 			calculateAndSetDepartureTime(firstAct);
 		}
@@ -95,6 +98,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 
 	@Override
 	public final void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
+		Gbl.assertNonNull(linkId);
 		this.setCurrentLinkId( linkId ) ;
 	}
 
@@ -163,7 +167,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
 		Activity act = (Activity) this.getCurrentPlanElement() ;
-		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType()));
 	
 		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 		advancePlan(now);

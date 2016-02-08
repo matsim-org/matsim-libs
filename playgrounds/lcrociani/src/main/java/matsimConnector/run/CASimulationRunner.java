@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.google.inject.Provider;
 import matsimConnector.congestionpricing.MSACongestionHandler;
 import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
 import matsimConnector.congestionpricing.MSATollDisutilityCalculatorFactory;
@@ -23,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -35,13 +35,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import pedCA.output.FundamentalDiagramWriter;
 
+import com.google.inject.Provider;
+
 public class CASimulationRunner implements IterationStartsListener{
 
 	//MATSim Logger
 	private static final Logger log = Logger.getLogger(CASimulationRunner.class);
-
-
-
 
 	//private Controler controller;
 	private static EventBasedVisDebuggerEngine dbg;
@@ -63,43 +62,95 @@ public class CASimulationRunner implements IterationStartsListener{
 
 		Network net = scenario.getNetwork();
 		
+//		FOR THE ABMUS SCENARIO WITH SEPARATE FLOWS
+		net.removeLink(Id.createLinkId("HybridNode_9-->HybridNode_8"));
+		net.removeLink(Id.createLinkId("HybridNode_9-->HybridNode_10"));
+		net.removeLink(Id.createLinkId("HybridNode_10-->HybridNode_9"));
+		net.removeLink(Id.createLinkId("HybridNode_6-->HybridNode_10"));
+		net.removeLink(Id.createLinkId("HybridNode_10-->HybridNode_6"));
+		net.removeLink(Id.createLinkId("HybridNode_6-->HybridNode_9"));
+		net.removeLink(Id.createLinkId("HybridNode_6-->HybridNode_14"));
+		net.removeLink(Id.createLinkId("HybridNode_14-->HybridNode_6"));
+		net.removeLink(Id.createLinkId("HybridNode_12-->HybridNode_13"));
+		net.removeLink(Id.createLinkId("HybridNode_13-->HybridNode_17"));
+		net.removeLink(Id.createLinkId("HybridNode_17-->HybridNode_13"));
+		net.removeLink(Id.createLinkId("HybridNode_13-->HybridNode_10"));
+		net.removeLink(Id.createLinkId("HybridNode_10-->HybridNode_13"));
+		net.removeLink(Id.createLinkId("HybridNode_14-->HybridNode_10"));
+		net.removeLink(Id.createLinkId("HybridNode_10-->HybridNode_14"));		
+		
+		net.removeLink(Id.createLinkId("HybridNode_21-->HybridNode_22"));
+		net.removeLink(Id.createLinkId("HybridNode_22-->HybridNode_21"));
+		net.removeLink(Id.createLinkId("HybridNode_19-->HybridNode_22"));
+		net.removeLink(Id.createLinkId("HybridNode_22-->HybridNode_19"));
+		net.removeLink(Id.createLinkId("HybridNode_19-->HybridNode_21"));
+		net.removeLink(Id.createLinkId("HybridNode_23-->HybridNode_19"));
+		net.removeLink(Id.createLinkId("HybridNode_19-->HybridNode_23"));
+		net.removeLink(Id.createLinkId("HybridNode_23-->HybridNode_21"));
+		net.removeLink(Id.createLinkId("HybridNode_21-->HybridNode_23"));
+		net.removeLink(Id.createLinkId("HybridNode_21-->HybridNode_1"));
+		net.removeLink(Id.createLinkId("HybridNode_1-->HybridNode_21"));
+		net.removeLink(Id.createLinkId("HybridNode_23-->HybridNode_22"));
+		net.removeLink(Id.createLinkId("HybridNode_22-->HybridNode_23"));
+		net.removeLink(Id.createLinkId("HybridNode_20-->HybridNode_22"));
+		net.removeLink(Id.createLinkId("HybridNode_22-->HybridNode_20"));
+		net.removeLink(Id.createLinkId("HybridNode_26-->HybridNode_23"));
+		net.removeLink(Id.createLinkId("HybridNode_23-->HybridNode_26"));
+		net.removeLink(Id.createLinkId("HybridNode_25-->HybridNode_23"));
+		net.removeLink(Id.createLinkId("HybridNode_23-->HybridNode_25"));
+		net.removeLink(Id.createLinkId("HybridNode_24-->HybridNode_22"));
+		net.removeLink(Id.createLinkId("HybridNode_22-->HybridNode_24"));
+		net.removeLink(Id.createLinkId("HybridNode_25-->HybridNode_21"));
+		net.removeLink(Id.createLinkId("HybridNode_21-->HybridNode_25"));
+		net.removeLink(Id.createLinkId("HybridNode_25-->HybridNode_1"));
+		net.removeLink(Id.createLinkId("HybridNode_1-->HybridNode_25"));
+		
+		
 		if (Constants.BRAESS_WL) {
 			//Breass experiment
 			net.removeLink(Id.createLinkId("HybridNode_53-->HybridNode_12"));
 		}
-		//new NetworkWriter(scenario.getNetwork()).write(c.network().getInputFile());
-
+		//new NetworkWriter(scenario.getNetwork()).write("c:/temp/net.xml");
+		
 		c.controler().setWriteEventsInterval(1);
 		c.controler().setLastIteration(Constants.SIMULATION_ITERATIONS-1);
 		c.qsim().setEndTime(Constants.SIMULATION_DURATION);
 
 		final Controler controller = new Controler(scenario);
-
+		final MSATollHandler tollHandler = new MSATollHandler(controller.getScenario());
+		final MSATollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new MSATollDisutilityCalculatorFactory(tollHandler);
 
 		if (Constants.MARGINAL_SOCIAL_COST_OPTIMIZATION) {
 			//////////////------------THIS IS FOR THE SYSTEM OPTIMUM SEARCH
-			MSATollHandler tollHandler = new MSATollHandler(controller.getScenario());
-			final MSATollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new MSATollDisutilityCalculatorFactory(tollHandler);
-			controller.addOverridingModule(new AbstractModule() {
+			//controller.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+			controller.addOverridingModule(new AbstractModule(){
 				@Override
 				public void install() {
-					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+					this.bindCarTravelDisutilityFactory().toInstance( tollDisutilityCalculatorFactory );
 				}
-			});
+			}); 
+			
 			controller.addControlerListener(new MSAMarginalCongestionPricingContolerListener(controller.getScenario(), tollHandler, new MSACongestionHandler(controller.getEvents(), controller.getScenario())));
 			//////////////------------
 		}
 
 
-		controller.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addRoutingModuleBinding(Constants.CAR_LINK_MODE).toProvider(CATripRouterFactory.class);
+			}
+		});
+		/*
 		CATripRouterFactory tripRouterFactoryCA = new CATripRouterFactory(scenario);
 		controller.setTripRouterFactory(tripRouterFactoryCA);
-
+		 */
+		
+		
 		final CAMobsimFactory factoryCA = new CAMobsimFactory();
+		//controller.addMobsimFactory(Constants.CA_MOBSIM_MODE, factoryCA);
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -130,7 +181,10 @@ public class CASimulationRunner implements IterationStartsListener{
 		}else{
 			controller.getEvents().addHandler(new FundamentalDiagramWriter(Double.parseDouble(args[0]),scenario.getPopulation().getPersons().size(), Constants.FD_TEST_PATH+"fd_data.csv"));
 		}
-
+		
+		//controller.getEvents().addHandler(new LinksAnalyzer(net));
+		//controller.getEvents().addHandler(new ComputationalTimesAnalyzer(Constants.OUTPUT_PATH+"/compTimes.csv"));
+		
 		CASimulationRunner runner = new CASimulationRunner();
 		controller.addControlerListener(runner);
 		controller.run();

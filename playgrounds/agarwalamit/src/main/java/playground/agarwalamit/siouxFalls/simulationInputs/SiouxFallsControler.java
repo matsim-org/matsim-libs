@@ -35,7 +35,6 @@ import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEm
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
 import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
-import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -132,7 +131,6 @@ public class SiouxFallsControler {
 		controler.getConfig().controler().setCreateGraphs(true);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.addOverridingModule(new OTFVisFileWriterModule());
-		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario) controler.getScenario()));
 		
 		if(Boolean.valueOf(args[0])==false && Boolean.valueOf(args[2])==false){
 			controler.addControlerListener(new EmissionControlerListener());

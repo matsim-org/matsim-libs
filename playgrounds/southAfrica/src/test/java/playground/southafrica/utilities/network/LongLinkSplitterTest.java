@@ -22,7 +22,6 @@ package playground.southafrica.utilities.network;
 
 import org.junit.Assert;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +37,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class LongLinkSplitterTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testBuildNetwork() {
@@ -56,18 +54,18 @@ public class LongLinkSplitterTest {
 		
 		/* Node AB_n0001 */
 		Assert.assertTrue("Node AB_n0001 not found", newNetwork.getNodes().containsKey(Id.createNodeId("AB_n0001")));
-		Assert.assertEquals("Node AB_n0001 has wrong X", 50.0, newNetwork.getNodes().get(Id.createNodeId("AB_n0001")).getCoord().getX(), utils.EPSILON);
-		Assert.assertEquals("Node AB_n0001 has wrong Y", 50.0, newNetwork.getNodes().get(Id.createNodeId("AB_n0001")).getCoord().getY(), utils.EPSILON);
+		Assert.assertEquals("Node AB_n0001 has wrong X", 50.0, newNetwork.getNodes().get(Id.createNodeId("AB_n0001")).getCoord().getX(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Node AB_n0001 has wrong Y", 50.0, newNetwork.getNodes().get(Id.createNodeId("AB_n0001")).getCoord().getY(), MatsimTestUtils.EPSILON);
 
 		/* Node BC_n0001 */
 		Assert.assertTrue("Node BC_n0001 not found", newNetwork.getNodes().containsKey(Id.createNodeId("BC_n0001")));
-		Assert.assertEquals("Node BC_n0001 has wrong X", 166.0 + 2.0/3.0, newNetwork.getNodes().get(Id.createNodeId("BC_n0001")).getCoord().getX(), utils.EPSILON);
-		Assert.assertEquals("Node BC_n0001 has wrong Y", 66.0 + 2.0/3.0, newNetwork.getNodes().get(Id.createNodeId("BC_n0001")).getCoord().getY(), utils.EPSILON);
+		Assert.assertEquals("Node BC_n0001 has wrong X", 166.0 + 2.0/3.0, newNetwork.getNodes().get(Id.createNodeId("BC_n0001")).getCoord().getX(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Node BC_n0001 has wrong Y", 66.0 + 2.0/3.0, newNetwork.getNodes().get(Id.createNodeId("BC_n0001")).getCoord().getY(), MatsimTestUtils.EPSILON);
 		
 		/* Node BC_n0002 */
 		Assert.assertTrue("Node BC_n0002 not found", newNetwork.getNodes().containsKey(Id.createNodeId("BC_n0002")));
-		Assert.assertEquals("Node BC_n0002 has wrong X", 233.0 + 1.0/3.0, newNetwork.getNodes().get(Id.createNodeId("BC_n0002")).getCoord().getX(), utils.EPSILON);
-		Assert.assertEquals("Node BC_n0002 has wrong Y", 33.0 + 1.0/3.0, newNetwork.getNodes().get(Id.createNodeId("BC_n0002")).getCoord().getY(), utils.EPSILON);
+		Assert.assertEquals("Node BC_n0002 has wrong X", 233.0 + 1.0/3.0, newNetwork.getNodes().get(Id.createNodeId("BC_n0002")).getCoord().getX(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Node BC_n0002 has wrong Y", 33.0 + 1.0/3.0, newNetwork.getNodes().get(Id.createNodeId("BC_n0002")).getCoord().getY(), MatsimTestUtils.EPSILON);
 
 		/* Number of links. */
 		Assert.assertEquals("Wrong number of links.", 10l, newNetwork.getLinks().size());
@@ -76,18 +74,18 @@ public class LongLinkSplitterTest {
 		Assert.assertTrue("Link AB_l0001 not found", newNetwork.getLinks().containsKey(Id.createLinkId("AB_l0001")));
 		Assert.assertTrue("Link AB_l0002 not found", newNetwork.getLinks().containsKey(Id.createLinkId("AB_l0002")));
 		Assert.assertEquals("Wrong length for link AB_l0001", nw.getLinks().get(Id.createLinkId("AB")).getLength() / 2.0, 
-				newNetwork.getLinks().get(Id.createLinkId("AB_l0001")).getLength(), utils.EPSILON);
+				newNetwork.getLinks().get(Id.createLinkId("AB_l0001")).getLength(), MatsimTestUtils.EPSILON);
 		
 		/* Link BC */
 		Assert.assertTrue("Link BC_l0001 not found", newNetwork.getLinks().containsKey(Id.createLinkId("BC_l0001")));
 		Assert.assertTrue("Link BC_l0002 not found", newNetwork.getLinks().containsKey(Id.createLinkId("BC_l0002")));
 		Assert.assertTrue("Link BC_l0003 not found", newNetwork.getLinks().containsKey(Id.createLinkId("BC_l0003")));
 		Assert.assertEquals("Wrong length for link BC_l0001", nw.getLinks().get(Id.createLinkId("BC")).getLength() / 3.0, 
-				newNetwork.getLinks().get(Id.createLinkId("BC_l0001")).getLength(), utils.EPSILON);
+				newNetwork.getLinks().get(Id.createLinkId("BC_l0001")).getLength(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong length for link BC_l0002", nw.getLinks().get(Id.createLinkId("BC")).getLength() / 3.0, 
-				newNetwork.getLinks().get(Id.createLinkId("BC_l0002")).getLength(), utils.EPSILON);
+				newNetwork.getLinks().get(Id.createLinkId("BC_l0002")).getLength(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong length for link BC_l0003", nw.getLinks().get(Id.createLinkId("BC")).getLength() / 3.0, 
-				newNetwork.getLinks().get(Id.createLinkId("BC_l0003")).getLength(), utils.EPSILON);
+				newNetwork.getLinks().get(Id.createLinkId("BC_l0003")).getLength(), MatsimTestUtils.EPSILON);
 	}
 	
 	@Test

@@ -53,7 +53,7 @@ public class FacilitiesCombine {
 		while (a_it.hasNext()) {
 			ActivityOptionImpl a = (ActivityOptionImpl) a_it.next();
 			if (f2.getActivityOptions().get(a.getType()) == null) {
-				ActivityOptionImpl a2 = f2.createActivityOption(a.getType());
+				ActivityOptionImpl a2 = f2.createAndAddActivityOption(a.getType());
 				a2.setCapacity(a.getCapacity());
 			}
 			else {

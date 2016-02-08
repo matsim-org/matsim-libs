@@ -366,7 +366,7 @@ public class CreateFreightTraffic {
 	
 	private void addFreightActivity2Facility(ActivityFacility facility) {
 		if (facility.getActivityOptions().get("freight") == null) {
-			((ActivityFacilityImpl)facility).createActivityOption("freight");
+			((ActivityFacilityImpl)facility).createAndAddActivityOption("freight");
 			OpeningTime ot = new OpeningTimeImpl(DayType.wk, 5.0 * 3600.0, 20.0 * 3600.0);
 			((ActivityFacilityImpl)facility).getActivityOptions().get("freight").addOpeningTime(ot);
 		}	
@@ -374,7 +374,7 @@ public class CreateFreightTraffic {
 	
 	private void addActivity2FacilityWithoutOpeningHours(ActivityFacility facility, String type) {
 		if (facility.getActivityOptions().get(type) == null) {
-			((ActivityFacilityImpl)facility).createActivityOption(type);
+			((ActivityFacilityImpl)facility).createAndAddActivityOption(type);
 			OpeningTime ot = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600.0);
 			((ActivityFacilityImpl)facility).getActivityOptions().get(type).addOpeningTime(ot);
 		}	

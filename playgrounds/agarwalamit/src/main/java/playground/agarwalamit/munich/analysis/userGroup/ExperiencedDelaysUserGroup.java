@@ -91,9 +91,8 @@ public class ExperiencedDelaysUserGroup {
 		for(String runCase:runCases){
 			init(runCase);
 			String eventFile = this.outputDir+runCase+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz";//"/events.xml";//
-			ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventFile, this.scenario,1);
-			personAnalyzer.preProcessData();
-			personAnalyzer.postProcessData();
+			ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventFile, this.scenario, 1, scenario.getConfig().qsim().getEndTime());
+			personAnalyzer.run();
 			personAnalyzer.checkTotalDelayUsingAlternativeMethod();
 			this.time2linkIdDelays = personAnalyzer.getTimeBin2AffectedPersonId2Delay();
 

@@ -2,6 +2,7 @@ package matsimConnector.engine;
 
 import matsimConnector.agents.Pedestrian;
 import matsimConnector.environment.TransitionArea;
+import matsimConnector.events.CAAgentChangeLinkEvent;
 import matsimConnector.events.CAAgentEnterEnvironmentEvent;
 import matsimConnector.events.CAAgentLeaveEnvironmentEvent;
 import matsimConnector.events.CAAgentMoveEvent;
@@ -22,6 +23,7 @@ public class CAAgentMover extends AgentMover {
 
 	private CAEngine engineCA;
 	private EventsManager eventManager;
+	private boolean stairs = true;
 
 	public CAAgentMover(CAEngine engineCA, Context context, EventsManager eventManager) {
 		super(context);
@@ -30,17 +32,24 @@ public class CAAgentMover extends AgentMover {
 	}
 
 	public void step(double now){
+		stairs = !stairs;
 		for(int index=0; index<getPopulation().size(); index++){
 			Pedestrian pedestrian = (Pedestrian)getPopulation().getPedestrian(index);
 			if (pedestrian.isArrived()){
 				//Log.log(pedestrian.toString()+" Exited.");
 				delete(pedestrian);
 				index--;
-			}else{
+			} 
+			else{
 				GridPoint oldPosition = pedestrian.getRealPosition();
+				if (stairs && isOnStairs(pedestrian)){
+					eventManager.processEvent(new CAAgentMoveEvent(now, pedestrian, oldPosition, oldPosition));
+					continue;
+				}				
 				GridPoint newPosition = pedestrian.getRealNewPosition();
 				moveAgent(pedestrian, now);
-				eventManager.processEvent(new CAAgentMoveEvent(now, pedestrian, oldPosition, newPosition));
+				if (Constants.VIS)
+					eventManager.processEvent(new CAAgentMoveEvent(now, pedestrian, oldPosition, newPosition));
 				if(!pedestrian.isWaitingToSwap() && pedestrian.isEnteringEnvironment()){
 					moveToCA(pedestrian, now);
 				}else if (!pedestrian.isWaitingToSwap()&& pedestrian.isFinalDestinationReached() && !pedestrian.hasLeftEnvironment()){
@@ -105,10 +114,29 @@ public class CAAgentMover extends AgentMover {
 		nextLinkCA.notifyMoveOverBorderNode(pedestrian.getVehicle(), currentLinkId);
 		pedestrian.getVehicle().getDriver().notifyMoveOverNode(nextLinkId);
 			
-		//TODO CHANGE THE COLOR OF THE AGENT
+		eventManager.processEvent(new CAAgentChangeLinkEvent(time, pedestrian, currentLinkId.toString(), nextLinkId.toString()));
+		
+		//TODO CHANGE THE COLOR OF THE AGENT LC
 		//eventManager.processEvent(new CAAgentLeaveEnvironmentEvent(time, pedestrian));
 		
 		//TODO CHANGE THE DESTINATION OF THE AGENT
 		pedestrian.refreshDestination();
 	}	
+	
+	private boolean isOnStairs(Pedestrian pedestrian){
+		try{
+			Id<Link> currentLinkId = pedestrian.getVehicle().getDriver().getCurrentLinkId();
+			if (currentLinkId != null){
+				String linkId = currentLinkId.toString();
+				for (String stairId : Constants.stairsLinks){
+					if (stairId.equals(linkId))
+						return true;
+				}
+			}
+			return false;
+		}catch(NullPointerException e){
+			return false;
+		}
+		
+	}
 }

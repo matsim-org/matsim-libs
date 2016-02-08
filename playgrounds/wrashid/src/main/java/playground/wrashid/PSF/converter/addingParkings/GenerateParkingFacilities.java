@@ -58,9 +58,9 @@ public class GenerateParkingFacilities {
 					if (!facilities.getFacilities().containsKey(facilityId)){
 						ActivityFacilityImpl facility = (ActivityFacilityImpl) facilities.getFactory().createActivityFacility(facilityId, act.getCoord());
 						facilities.addActivityFacility(facility);
-						facility.createActivityOption(act.getType());
-						facility.createActivityOption("parkingArrival");
-						facility.createActivityOption("parkingDeparture");
+						facility.createAndAddActivityOption(act.getType());
+						facility.createAndAddActivityOption("parkingArrival");
+						facility.createAndAddActivityOption("parkingDeparture");
 					}
 					
 					//facilities.getFacilities().put(facilityId, facility);

@@ -36,7 +36,6 @@ import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.matrix.NumericMatrixIO;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * @author johannes
@@ -46,7 +45,8 @@ public class MatrixCompare {
     private static final Logger logger = Logger.getLogger(MatrixCompare.class);
 
     public static void main(String args[]) throws IOException {
-        String simFile = "/home/johannes/gsv/matrix2014/sim/output/1E8/matrix.txt.gz";
+//        String simFile = "/home/johannes/gsv/miv-matrix/simmatrices/miv.874.xml";
+        String simFile = "/home/johannes/sge/prj/matrix2014/runs/1059/output/2.7E10/matrix/matrix.txt.gz";
         String refFile = "/home/johannes/gsv/matrix2014/sim/data/matrices/itp.de.txt";
         String outDir = "/home/johannes/gsv/matrix2014/matrix-compare/";
         double volumeThreshold = 1;
@@ -87,12 +87,14 @@ public class MatrixCompare {
 
         HistogramWriter writer = new HistogramWriter(ioContext, new PassThroughDiscretizerBuilder(new
                 LinearDiscretizer(0.05), "linear"));
+
         MatrixVolumeCompare volTask = new MatrixVolumeCompare("matrix.vol");
         volTask.setIoContext(ioContext);
         volTask.setHistogramWriter(writer);
 
         MatrixDistanceCompare distTask = new MatrixDistanceCompare("matrix.dist", zones);
         distTask.setFileIoContext(ioContext);
+        distTask.setDiscretizer(new LinearDiscretizer(25000));
 
         MatrixMarginalsCompare marTask = new MatrixMarginalsCompare("matrix");
         marTask.setHistogramWriter(writer);
@@ -101,6 +103,6 @@ public class MatrixCompare {
         composite.addComponent(distTask);
         composite.addComponent(marTask);
 
-        composite.analyze(new ImmutablePair<>(refMatrix, simMatrix), new ArrayList<StatsContainer>());
+        AnalyzerTaskRunner.run(new ImmutablePair<>(refMatrix, simMatrix), composite, ioContext);
     }
 }

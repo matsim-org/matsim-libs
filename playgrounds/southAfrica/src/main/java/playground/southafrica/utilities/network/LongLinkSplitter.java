@@ -64,8 +64,11 @@ public class LongLinkSplitter {
 	private LongLinkSplitter() {
 	}
 	
+	public static Network  splitNetwork(Network network, double longestLink){
+		return splitNetwork(network, longestLink, true);
+	}
 	
-	public static Network splitNetwork(Network network, double longestLink){
+	public static Network splitNetwork(Network network, double longestLink, boolean verbose){
 		Network newNetwork = null;
 		newNetwork = NetworkUtils.createNetwork();
 		NetworkFactory nf = new NetworkFactoryImpl(newNetwork);
@@ -73,9 +76,11 @@ public class LongLinkSplitter {
 		Map<Integer, Integer> splitCount = new TreeMap<Integer, Integer>();
 		splitCount.put(0, 0);
 		
-		/* Copy all the current nodes. */
+		/* 'Copy' all the current nodes. But do NOT just add the complete node 
+		 * from the original network, otherwise all the in- and out-links will
+		 * also be copied, causing the code to crash due to duplicate links. */
 		for(Node node : network.getNodes().values()){
-			newNetwork.addNode(node);
+			newNetwork.addNode(nf.createNode(node.getId(), node.getCoord()));
 		}
 		
 		/* Work through all the links. */
@@ -83,6 +88,7 @@ public class LongLinkSplitter {
 			if(link.getLength() <= longestLink){
 				/* Add the link as it is right now. */
 				splitCount.put(0, splitCount.get(0) + 1);
+				newNetwork.addLink(link);
 			} else{
 				/* Splitting it up. */
 				int units = (int) Math.ceil(link.getLength() / longestLink);
@@ -110,12 +116,14 @@ public class LongLinkSplitter {
 					dummyLink.setFreespeed(link.getFreespeed());
 					dummyLink.setNumberOfLanes(link.getNumberOfLanes());
 					if(!newNetwork.getLinks().containsKey(dummyLink.getId())){
-						newNetwork.addLink(dummyLink);
+						try{
+							newNetwork.addLink(dummyLink);
+						} catch(IllegalArgumentException e){
+							LOG.debug("Why is a duplicate link added?!");
+						}
+						fromNode = toNode;
 					}
-					
-					fromNode = toNode;
 				}
-				
 				/* Now add the last portion. */
 				Link lastLink = nf.createLink(
 						Id.createLinkId(String.format("%s_l%04d", link.getId().toString(), units)), 
@@ -145,9 +153,11 @@ public class LongLinkSplitter {
 		LOG.info("   New network:");
 		LOG.info("      # nodes: " + newNetwork.getNodes().size());
 		LOG.info("      # links: " + newNetwork.getLinks().size());
-		LOG.info("   Number of splits:");
-		for(Integer i : splitCount.keySet()){
-			LOG.info("      " + i + ": " + splitCount.get(i));
+		if(verbose){
+			LOG.info("   Number of splits:");
+			for(Integer i : splitCount.keySet()){
+				LOG.info("      " + i + ": " + splitCount.get(i));
+			}
 		}
 		LOG.info("=======================================================");
 		return newNetwork;

@@ -34,7 +34,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.trip.LegModeTripTravelTimeHandler;
+import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -46,7 +46,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
 public class LegModeTravelTimeDistribution extends AbstractAnalysisModule {
 
 	private final Logger logger = Logger.getLogger(LegModeTravelTimeDistribution.class);
-	private LegModeTripTravelTimeHandler lmth;
+	private ModalTripTravelTimeHandler lmth;
 	private Map<String, Map<Id<Person>, List<Double>>> mode2PersonId2TravelTimes;
 	private List<Integer> travelTimeClasses;
 	private List<String> travelModes;
@@ -60,19 +60,13 @@ public class LegModeTravelTimeDistribution extends AbstractAnalysisModule {
 		this.eventsFile = eventsFile;
 		this.travelTimeClasses=new ArrayList<Integer>();
 		this.travelModes = new ArrayList<String>();
-		this.lmth=new LegModeTripTravelTimeHandler();
+		this.lmth=new ModalTripTravelTimeHandler();
 		this.lmth.reset(0);
 		this.userGroup = userGroup;
 	}
 	
 	public LegModeTravelTimeDistribution(String eventsFile) {
-		super(LegModeTravelTimeDistribution.class.getSimpleName());
-
-		this.eventsFile = eventsFile;
-		this.travelTimeClasses=new ArrayList<Integer>();
-		this.travelModes = new ArrayList<String>();
-		this.lmth=new LegModeTripTravelTimeHandler();
-		this.lmth.reset(0);
+		this(eventsFile, null);
 	}
 
 	public static void main(String[] args) {

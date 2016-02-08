@@ -112,7 +112,7 @@ public class FacilitiesGenerator {
 				String activityType = resultBDTypeXActivityType.getString(2);
 				if(((PlanCalcScoreConfigGroup)scenario.getConfig().getModule(PlanCalcScoreConfigGroup.GROUP_NAME)).getActivityTypes().contains(activityType))
 					if(!facility.getActivityOptions().containsKey(activityType))
-						facility.createActivityOption(activityType);
+						facility.createAndAddActivityOption(activityType);
 			}
 			resultBDTypeXActivityType.close();
 			if(facility.getActivityOptions().size()==0) {

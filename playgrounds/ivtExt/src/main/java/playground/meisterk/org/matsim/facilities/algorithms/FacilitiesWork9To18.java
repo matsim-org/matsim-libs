@@ -80,7 +80,7 @@ public class FacilitiesWork9To18 {
 
 			for (int i=0; i<B01S2; i++) {
 				f = facilities.createAndAddFacility(Id.create(facilityCnt++, ActivityFacility.class), new Coord(Double.parseDouble(X), Double.parseDouble(Y)));
-				a = f.createActivityOption("work");
+				a = f.createAndAddActivityOption("work");
 
 				// equally distribute jobs among facilities
 				// as a test here, not exactly the number of avail workplaces :-)
@@ -94,7 +94,7 @@ public class FacilitiesWork9To18 {
 
 			for (int i=0; i<B01S3; i++) {
 				f = facilities.createAndAddFacility(Id.create(facilityCnt++, ActivityFacility.class), new Coord(Double.parseDouble(X), Double.parseDouble(Y)));
-				a = f.createActivityOption("work");
+				a = f.createAndAddActivityOption("work");
 
 				// equally distribute jobs among facilities
 				// as a test here, not exactly the number of avail workplaces :-)

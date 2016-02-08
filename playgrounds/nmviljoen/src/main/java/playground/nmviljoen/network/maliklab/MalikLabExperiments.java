@@ -43,7 +43,7 @@ public class MalikLabExperiments {
 	private String path;
 	private int[][] assocList;
 	
-	public MalikLabExperiments(String path, int ModeSwitch, int SimDim, int fullPathSize, int segSize) {       
+	public MalikLabExperiments(String path, int ModeSwitch, int SimDim, int fullPathSize, int segSize, int segPathLength) {       
 		this.path = path;
 		if (ModeSwitch == 0){
 			this.myGraphMalik = TriGraphConstructor.constructMalikGraph(path);
@@ -51,7 +51,7 @@ public class MalikLabExperiments {
 			this.myGraphGrid = TriGraphConstructor.constructGridGraph(path);
 			LOG.info("Grid Graph created");
 			assocList = TriGraphConstructor.layerMalik(path,myGraphMalik,myGraphGrid);
-			this.myGraphGhost = TriGraphConstructor.constructGhostGraph(path, assocList,fullPathSize, segSize );
+			this.myGraphGhost = TriGraphConstructor.constructGhostGraph(path, assocList,fullPathSize, segSize, segPathLength );
 			LOG.info("The ghost lives");
 		}else{
 			this.myGraphMalik = TriGraphConstructor.constructMalikGraph(path);
@@ -59,7 +59,7 @@ public class MalikLabExperiments {
 			this.myGraphGrid = TriGraphConstructor.constructGridGraphSim(path,SimDim);
 			LOG.info("Grid Graph created");
 			assocList = TriGraphConstructor.layerMalikSim(path);
-			this.myGraphGhost = TriGraphConstructor.constructGhostGraph(path, assocList,fullPathSize , segSize);
+			this.myGraphGhost = TriGraphConstructor.constructGhostGraph(path, assocList,fullPathSize , segSize,segPathLength);
 			LOG.info("The ghost lives");	
 		}
 		
@@ -123,6 +123,7 @@ public class MalikLabExperiments {
 		int SimDim = Integer.parseInt(args[5]);
 		int fullPathSize = Integer.parseInt(args[6]);
 		int segSize = Integer.parseInt(args[7]);
+		int segPathLength = Integer.parseInt(args[8]);
 		for (int y = runStart; y<=runEnd;y++){
 			String path = args[0];
 			String sim =args[1];
@@ -132,7 +133,7 @@ public class MalikLabExperiments {
 				path = path+y+"/"+sim+y+"/";
 			}
 			
-			MalikLabExperiments mle = new MalikLabExperiments(path, ModeSwitch, SimDim,fullPathSize,segSize);
+			MalikLabExperiments mle = new MalikLabExperiments(path, ModeSwitch, SimDim,fullPathSize,segSize,segPathLength);
 			mle.runThisSpecificExperiment();
 		}
 		

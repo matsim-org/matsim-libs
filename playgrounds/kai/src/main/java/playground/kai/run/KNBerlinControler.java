@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -138,7 +139,7 @@ class KNBerlinControler {
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
 
-		//		controler.addControlerListener(new KaiAnalysisListener()) ;
+		controler.addControlerListener(new KaiAnalysisListener()) ;
 		//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		//		controler.setMobsimFactory(new OldMobsimFactory()) ;
 

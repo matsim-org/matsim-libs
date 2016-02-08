@@ -122,8 +122,8 @@ VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 			}
 			return ;
 		}
-
-		double time = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) );
+		// if time bin is less than 1 hour, than only integer does not make much sense.
+		double time = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) ) * this.timeBinSize; 
 		Id<Person> personId = event.getPersonId();
 
 		this.personId2TripDepartTimeBin.put(personId, time);

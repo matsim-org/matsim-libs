@@ -204,7 +204,7 @@ public class CreateNewZHScenario {
 	// mapping the activities to this.network
 	// the normal plans v2 are already mapped
 	private void map2Network(Population population) {
-		XY2Links mapper = new XY2Links(this.scenario.getNetwork());
+		XY2Links mapper = new XY2Links(this.scenario.getNetwork(), null);
 		for (Person p : population.getPersons().values()){
 			mapper.run(p);
 		}

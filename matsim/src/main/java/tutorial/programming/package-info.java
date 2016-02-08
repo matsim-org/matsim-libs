@@ -7,7 +7,7 @@ buttons in javadoc.) </p>
 
 <h1>Network generation</h1>
 
-<p> create network from EMME data: {@link tutorial.programming.networkFromEmme} </p> 
+<p> create network from EMME data: {@link tutorial.converter.networkFromEmme} </p> 
  
 <h1>Initial demand generation</h1>
 

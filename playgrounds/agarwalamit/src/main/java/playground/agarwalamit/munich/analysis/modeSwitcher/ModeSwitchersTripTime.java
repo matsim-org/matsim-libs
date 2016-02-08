@@ -28,12 +28,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.agarwalamit.analysis.trip.LegModeTripTravelTimeHandler;
+import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 
 /**
  *This will first find mode switchers and then returns trip times in groups. 
@@ -108,15 +105,10 @@ public class ModeSwitchersTripTime {
 
 	private Map<Id<Person>, List<Tuple<String, Double>>> getPerson2mode2TripTimes(final String eventsFile){
 
-		EventsManager events = EventsUtils.createEventsManager();
-		MatsimEventsReader reader = new MatsimEventsReader(events);
+		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(eventsFile);
+		mtta.run();
 
-		LegModeTripTravelTimeHandler timeHandler = new LegModeTripTravelTimeHandler();
-		events.addHandler(timeHandler);
-
-		reader.readFile(eventsFile);
-
-		SortedMap<String,Map<Id<Person>,List<Double>>> mode2Person2TripTimes = timeHandler.getLegMode2PesonId2TripTimes();
+		SortedMap<String,Map<Id<Person>,List<Double>>> mode2Person2TripTimes = mtta.getMode2PesonId2TripTimes();
 
 		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelTimes = new HashMap<>();
 

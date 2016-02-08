@@ -27,24 +27,19 @@ public class ExperiencedPlanElementsModuleTest {
 				new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)),
 				new ReplayEvents.Module());
 		Subscriber subscriber = new Subscriber();
-		injector.getInstance(ExperiencedPlanElementsService.class).register(subscriber);
+		injector.getInstance(EventsToActivities.class).addActivityHandler(subscriber);
 		ReplayEvents replayEvents = injector.getInstance(ReplayEvents.class);
 		replayEvents.playEventsFile(matsimTestUtils.getClassInputDirectory() + "events.xml", 0);
 		Assert.assertEquals("There are two activities.", 2, subscriber.activityCount);
 	}
 
 
-	private static class Subscriber {
+	private static class Subscriber implements EventsToActivities.ActivityHandler {
 
 		int activityCount = 0;
 
-		@Subscribe
-		public void throwException(PersonExperiencedActivity activity) {
-			throw new RuntimeException("This is to show that exceptions in this kind of event handler are not propagated.");
-		}
-
-		@Subscribe
-		public void count(PersonExperiencedActivity activity) {
+		@Override
+		public void handleActivity(PersonExperiencedActivity activity) {
 			activityCount++;
 		}
 

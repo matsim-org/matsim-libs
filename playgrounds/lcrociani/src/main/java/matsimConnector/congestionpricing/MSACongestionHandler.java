@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.congestion.events.CongestionEvent;
 
@@ -71,7 +72,7 @@ public class MSACongestionHandler implements LinkEnterEventHandler,
 			return;
 		}
 		li.agentsOnLink--;
-		AgentInfo ai = li.ais.remove(event.getDriverId());
+		AgentInfo ai = li.ais.remove(event.getVehicleId());
 		ai.leftTime = event.getTime();
 		double att = event.getTime() - ai.enterTime;
 		if (li.agentsOnLink == 0 || att <= li.freespeedTT) {
@@ -101,7 +102,7 @@ public class MSACongestionHandler implements LinkEnterEventHandler,
 		li.agentsOnLink++;
 		AgentInfo ai = new AgentInfo();
 		ai.enterTime = event.getTime();
-		ai.p = event.getDriverId();
+		ai.p = Id.createPersonId(event.getVehicleId());
 		li.ais.put(ai.p, ai);
 	}
 	

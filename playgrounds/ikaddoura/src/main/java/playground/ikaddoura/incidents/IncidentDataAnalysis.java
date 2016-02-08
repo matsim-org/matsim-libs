@@ -57,20 +57,25 @@ import com.vividsolutions.jts.geom.Coordinate;
 import playground.ikaddoura.incidents.data.TrafficItem;
 
 /**
- * @author ikaddoura this class requests incident data from HERE Maps.
+ * @author ikaddoura
+ * 
+ * This class analyzes incidents and writes them into a csv and a shapefile.
  *
  */
 public class IncidentDataAnalysis {
 	private static final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
  
-	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/";
+//	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
+	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
+	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany/";
+	private final boolean writeCSVFileForEachXMLFile = false;
 	
 	private Map<String, TrafficItem> trafficItems = new HashMap<>();
 	private Map<String, Path> trafficItemId2path = new HashMap<>();
 	private Scenario scenario = null;
 	private Network carNetwork = null;
-
+	private TMCAlerts tmc = new TMCAlerts();
+	
 	public static void main(String[] args) throws XMLStreamException, IOException {
 		IncidentDataAnalysis incidentAnalysis = new IncidentDataAnalysis();
 		incidentAnalysis.run();	
@@ -151,8 +156,6 @@ public class IncidentDataAnalysis {
 						
 		for (String id : this.trafficItemId2path.keySet()) {
 			
-			TMCAlerts tmc = new TMCAlerts();
-			
 			for (Link link : this.trafficItemId2path.get(id).links) {
 				if (tmc.getIncidentObject(link, this.trafficItems.get(id)) != null) {
 					SimpleFeature feature = factory.createPolyline(
@@ -189,15 +192,19 @@ public class IncidentDataAnalysis {
 				HereMapsTrafficItemXMLReader trafficItemReader = new HereMapsTrafficItemXMLReader();
 				trafficItemReader.readStream(inputXmlFile);
 				
-//				String outputCSVFile = inputXmlFile.substring(0, inputXmlFile.length() - 4) + ".csv";
-//				log.info("Output CSV File: " + outputCSVFile);
-//				TrafficItemWriter writer = new TrafficItemWriter();
-//				writer.writeCSVFile(trafficItemReader.getTrafficItems(), outputCSVFile);
+				// write out
+				if (writeCSVFileForEachXMLFile) {
+					String outputCSVFile = inputXmlFile.substring(0, inputXmlFile.length() - 4) + ".csv";
+					log.info("Writing xml file to csv file: " + outputCSVFile);
+					TrafficItemWriter writer = new TrafficItemWriter();
+					writer.writeCSVFile(trafficItemReader.getTrafficItems(), outputCSVFile);
+				}
 				
 				int counterNew = 0;
 				int counterUpdated = 0;
 				int counterIgnored = 0;
 				for (TrafficItem item : trafficItemReader.getTrafficItems()) {
+					
 					if (trafficItems.containsKey(item.getId())) {
 						// Item with same ID is already in the map.
 						
@@ -270,6 +277,7 @@ public class IncidentDataAnalysis {
 			if (path == null || path.links.size() == 0) {
 				log.warn("No path identified for incident " + this.trafficItems.get(id).toString());
 			}
+			
 			this.trafficItemId2path.put(id, path);
 		}
 		

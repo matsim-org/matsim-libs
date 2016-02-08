@@ -272,7 +272,6 @@ public class VehicleType2ScenarioTest {
 
 			return qSim ;
 		}	
-
 	}
 
 	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {

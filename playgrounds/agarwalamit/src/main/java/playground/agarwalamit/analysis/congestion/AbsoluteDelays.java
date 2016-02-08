@@ -86,7 +86,7 @@ public class AbsoluteDelays  {
 		int lastIt = sc.getConfig().controler().getLastIteration();
 		String eventFile = outputDir+runCase+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
 
-		ExperiencedDelayAnalyzer congestionHandler = new ExperiencedDelayAnalyzer(eventFile, sc, 1);
+		ExperiencedDelayAnalyzer congestionHandler = new ExperiencedDelayAnalyzer(eventFile, sc, 1, sc.getConfig().qsim().getEndTime());
 		congestionHandler.run();
 
 		return congestionHandler.getTotalDelaysInHours();

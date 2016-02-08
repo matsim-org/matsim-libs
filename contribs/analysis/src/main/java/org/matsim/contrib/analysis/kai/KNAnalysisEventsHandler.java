@@ -87,7 +87,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 	
 	private Set<Id<Link>> otherTolledLinkIds = new HashSet<Id<Link>>() ;
 
-	private Vehicle2DriverEventHandler delegate;
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
 	// to avoid under- or over-counting with respect to loops.

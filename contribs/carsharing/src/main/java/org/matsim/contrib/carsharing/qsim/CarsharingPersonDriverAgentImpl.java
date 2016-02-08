@@ -327,8 +327,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	
 	private void insertRoundTripCarsharingTrip(double now) {
 		
-		//TODO: throw exception if the next planElement is not a leg
-		
+		//TODO: throw exception if the next planElement is not a leg		
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((Leg)this.basicAgentDelegate.getNextPlanElement()).getRoute();
 
 		List<PlanElement> planElements = this.basicAgentDelegate.getCurrentPlan().getPlanElements();
@@ -337,11 +336,11 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 		if (hasCSVehicleAtLink(route.getStartLinkId())) {
-			log.info("person has available tw car :" + basicAgentDelegate.getPerson().getId());
+			//log.info("person has available tw car :" + basicAgentDelegate.getPerson().getId());
 			
 			if (willUseTheVehicleLater(route.getEndLinkId())) {
 				
-				log.info("person will use the car later:" + basicAgentDelegate.getPerson().getId());
+				//log.info("person will use the car later:" + basicAgentDelegate.getPerson().getId());
 
 				double travelTime = 0.0;
 				List<Id<Link>> ids = new ArrayList<Id<Link>>();
@@ -384,7 +383,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			}
 			
 			else {
-				log.info("person will not use the car later:" + basicAgentDelegate.getPerson().getId());
+				//log.info("person will not use the car later:" + basicAgentDelegate.getPerson().getId());
 
 				double travelTime = 0.0;
 				List<Id<Link>> ids = new ArrayList<Id<Link>>();
@@ -445,8 +444,8 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			
 			if (willUseTheVehicleLater(route.getEndLinkId())) {
 			
-				log.info("Person with an id: "   + basicAgentDelegate.getPerson().getId()
-						+ " does not have a tw car.");
+				//log.info("Person with an id: "   + basicAgentDelegate.getPerson().getId()
+				//		+ " does not have a tw car.");
 	
 				final Leg legWalkEnd = new LegImpl( "walk_rb" );
 				
@@ -506,7 +505,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
 				routeCar.setTravelTime( travelTime);
 	
-				log.info("Rented twowaycarsharing car has an id: " + pickUpStation.getIDs().get(0));
+				//log.info("Rented twowaycarsharing car has an id: " + pickUpStation.getIDs().get(0));
 				Id<Vehicle> vehId = Id.create("TW_" + (pickUpStation.getIDs().get(0)), Vehicle.class);
 				this.carSharingVehicles.getTwoWayVehicles().removeVehicle(pickUpStation, pickUpStation.getIDs().get(0));
 	
@@ -517,7 +516,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			
 			else {
 				
-				log.info("Two way carsharing trip is assigned to a leg between the same locations!");
+				//log.info("Two way carsharing trip is assigned to a leg between the same locations!");
 				
 				final Leg legWalkStart = new LegImpl( "walk_rb" );
 				
@@ -577,7 +576,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
 				routeCar.setTravelTime( travelTime);
 	
-				log.info("Rented twowaycarsharing car has an id: " + pickUpStation.getIDs().get(0));
+				//log.info("Rented twowaycarsharing car has an id: " + pickUpStation.getIDs().get(0));
 				Id<Vehicle> vehId = Id.create("TW_" + (pickUpStation.getIDs().get(0)), Vehicle.class);
 				this.carSharingVehicles.getTwoWayVehicles().removeVehicle(pickUpStation, pickUpStation.getIDs().get(0));
 	
@@ -649,11 +648,8 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
-		if (this.getVehicle()!=null && (this.getVehicle().getId().toString().startsWith("TW") ||
-				this.getVehicle().getId().toString().startsWith("OW") || 
-				this.getVehicle().getId().toString().startsWith("FF")))
-
-			parkCSVehicle( );			
+		
+		parkCSVehicle( );			
 
 		this.basicAgentDelegate.endLegAndComputeNextState(now);
 		

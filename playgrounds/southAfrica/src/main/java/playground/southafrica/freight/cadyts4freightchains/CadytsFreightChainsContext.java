@@ -45,6 +45,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.demand.Plan;
 
 class Item implements Identifiable<Item>, Comparable<Item> {
 	private final Id<Item> id;
@@ -77,17 +78,14 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 	 * this is the method which is able to tell cadyts in which way a particular plan contributes to measurements.  Essentially, it
 	 * follows the plan and registers every time the plan touches a measurement.  Here, there is only one measurement,
 	 * so this is boring (and overkill).
+	 * 
+	 * JWJ, 28/01/2016: Errors occurred, so I just fixed it by applying the quick-fix recommendations.
 	 */
 	private final PlansTranslator<Item> plansTranslator = new PlansTranslator<Item>() {
 		@Override
-		public cadyts.demand.Plan<Item> getCadytsPlan(org.matsim.api.core.v01.population.Plan plan) {
-			cadyts.demand.PlanBuilder<Item> planBuilder = new cadyts.demand.PlanBuilder<Item>() ;
-			int time = 0 ; // there is no time here but we need to set something 
-			final Item item = getCorrectItemFromPlan(plan);
-			planBuilder.addTurn( item, time);
-			// (the meaning of this is that this plan contributes one counts unit to this item)
-
-			return planBuilder.getResult();
+		public Plan<Item> getCadytsPlan(org.matsim.api.core.v01.population.Plan arg0) {
+			// TODO Auto-generated method stub
+			return null;
 		}
 	} ;
 

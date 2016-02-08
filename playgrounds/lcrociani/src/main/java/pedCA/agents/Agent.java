@@ -77,8 +77,22 @@ public class Agent extends PhysicalObject{
 	}
 
 	public double calculatePerceivedDensity() {
-		double pedestrianDensity = getUsedPedestrianGrid().getPedestrianDensity(position);
-		return pedestrianDensity;
+		return getUsedPedestrianGrid().getPedestrianDensity(position);		
+		/* THIS IS FOR THE SHIFT OF THE DENSITY PERCEPTION
+		GridPoint shiftedPosition = getShiftedPosition();
+		double pedestrianDensity = getUsedPedestrianGrid().getPedestrianDensity(shiftedPosition);
+		return pedestrianDensity;*/
+	}
+	
+	public GridPoint getShiftedPosition(){
+		GridPoint direction = DirectionUtility.convertHeadingToGridPoint(this.heading);
+		System.out.println(this.Id + "pos: " + position.toString());
+		GridPoint shiftedPosition = new GridPoint(position.getX() + direction.getX(),position.getY() + direction.getY());
+		System.out.println(this.Id + "shifted: " + shiftedPosition.toString());
+		if (this.getUsedPedestrianGrid().isWalkable(shiftedPosition))
+			return shiftedPosition;
+		else
+			return position;
 	}
 	
 	public void startBidirectionalSwitch(int stepToPerformSwap){

@@ -1,0 +1,8 @@
+.classpath
+.project
+.settings
+target
+src/main/webapp/VAADIN/widgetsets/**
+bin
+output
+
