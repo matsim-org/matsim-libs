@@ -26,6 +26,7 @@ import playground.thibautd.utils.CsvUtils;
 import playground.thibautd.utils.CsvWriter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author thibautd
@@ -65,7 +66,18 @@ public class AddHouseholdAttributesInMZBiogemeDataset {
 	}
 
 	private static CsvUtils.TitleLine expand( CsvUtils.TitleLine titleLine ) {
-		return null;
+		final String[] newTitleLine = new String[ titleLine.getNField() + 2 ];
+		final int index = titleLine.getIndexOfField( "C_CHOICE" );
+
+		for ( int i = 0; i < titleLine.getNField(); i++ ) {
+			if ( i < index ) newTitleLine[ i ] = titleLine.getNames()[ i ];
+			else newTitleLine[ i + 2 ] = titleLine.getNames()[ i ];
+		}
+
+		newTitleLine[ index ] = "HH_SIZE";
+		newTitleLine[ index + 1 ] = "HH_MONTHINCOME";
+
+		return new CsvUtils.TitleLine( newTitleLine );
 	}
 
 	private static String getHouseholdIncome( String personId, ObjectAttributes personAttributes ) {
@@ -103,6 +115,7 @@ public class AddHouseholdAttributesInMZBiogemeDataset {
 		final Integer size = ( Integer ) personAttributes.getAttribute(
 				personId,
 				"householdSize" );
+		if ( size == null ) throw new NullPointerException( "null hh size for "+personId );
 		return size.toString();
 	}
 }
