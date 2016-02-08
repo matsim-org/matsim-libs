@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -94,6 +95,7 @@ public class EquilEmissionTest {
 		return Arrays.asList(considerCO2);
 	}
 
+	@Ignore
 	@Test
 	public void emissionTollTest () {
 
