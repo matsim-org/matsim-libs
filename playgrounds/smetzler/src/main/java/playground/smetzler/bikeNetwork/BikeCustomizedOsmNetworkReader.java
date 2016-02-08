@@ -47,9 +47,10 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+
+import playground.smetzler.parseElevationData.ParseEleDataFromGeoTiff;
 
 /**
  * Reads in an OSM-File, exported from <a href="http://openstreetmap.org/" target="_blank">OpenStreetMap</a>,
@@ -108,12 +109,15 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
     // new
     private final static String TAG_CYCLEWAYTYPE= "cycleway";
     private final static String TAG_SURFACE = "surface";
+    private final static String TAG_SMOOTHNESS = "smoothness";
 	private ObjectAttributes bikeAttributes = new ObjectAttributes();
 	private int countCyclewaytype = 0;
 	private int countSurface = 0;
+	private int countSmoothness = 0;
+	boolean firsttimeParseGeoTiff = true;
     //
     
-	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS, TAG_CYCLEWAYTYPE, TAG_SURFACE};
+	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS, TAG_CYCLEWAYTYPE, TAG_SURFACE, TAG_SMOOTHNESS};
 
 	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
 	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
@@ -236,6 +240,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		//new
 		log.info("BikeObjectAttributs for cyclewaytype created: " + countCyclewaytype);
 		log.info("BikeObjectAttributs for surface created: " + countSurface);
+		log.info("BikeObjectAttributs for smoothness created: " + countSmoothness);
+		
 
 		if (this.unknownHighways.size() > 0) {
 			log.info("The following highway-types had no defaults set and were thus NOT converted:");
@@ -562,22 +568,60 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 
 		
 		////////////////////////////////////////////////////////////////////////////////////new
-		// cycleway
-		String cyclewaytypeTag = way.tags.get(TAG_CYCLEWAYTYPE);
-	//	String orgOSMId = Long.toString(way.id);
-		String matsimId = Long.toString(id);
+
+	//	bikeLinkAtts(way, fromNode, toNode, length, true, this.id);
 		
-		if (cyclewaytypeTag != null) {
-			bikeAttributes.putAttribute(matsimId, "cyclewaytype", cyclewaytypeTag);
-			countCyclewaytype++;
-		};
+//		String matsimId = Long.toString(id); 		// MAsim Link ID
+//		//		String orgOSMId = Long.toString(way.id);	// Original OSM LinkID
+//
+//		bikeAttributes.putAttribute(matsimId, "test", "test");
+//
+//
+//		// cyclewaytype
+//		String cyclewaytypeTag = way.tags.get(TAG_CYCLEWAYTYPE);
+//		if (cyclewaytypeTag != null) {
+//			bikeAttributes.putAttribute(matsimId, "cyclewaytype", cyclewaytypeTag);
+//			countCyclewaytype++;
+//		};
+//
+//		//surfacetype
+//		String surfaceTag = way.tags.get(TAG_SURFACE);
+//		if (surfaceTag != null) {
+//			bikeAttributes.putAttribute(matsimId, "surface", surfaceTag);
+//			countSurface++;
+//		};
+//
+//		//smoothness
+//		String smoothnessTag = way.tags.get(TAG_SMOOTHNESS);
+//		if (smoothnessTag != null) {
+//			bikeAttributes.putAttribute(matsimId, "smoothness", smoothnessTag);
+//			countSmoothness++;
+//		};
+//
+//		//crossing info is in den nodes
+//		//String smoothnessTag = node.tags.get(TAG_SMOOTHNESS);???
+//
+//
+//
+//		//elevation:
+//		ParseEleDataFromGeoTiff tiffObject = new ParseEleDataFromGeoTiff();
+//		try {
+//			double heightFrom = tiffObject.parseGeoTiff(fromNode.coord.getX(), fromNode.coord.getY(), firsttimeParseGeoTiff);
+//			double heightTo = tiffObject.parseGeoTiff(toNode.coord.getX(), toNode.coord.getY(), firsttimeParseGeoTiff);
+//			double eleDiff = heightTo - heightFrom;
+//			bikeAttributes.putAttribute(matsimId, "eleDiff", eleDiff);
+//			firsttimeParseGeoTiff = false;
+//
+//			double slope = eleDiff/length;
+//			//System.out.println("length and ID" + length + "   " + id);
+//			bikeAttributes.putAttribute(matsimId, "slope", slope);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 		
-		String surfaceTag = way.tags.get(TAG_SURFACE);
-		if (surfaceTag != null) {
-			bikeAttributes.putAttribute(matsimId, "surface", surfaceTag);
-			countSurface++;
-		};
-		// new end
+		
+		
+		//////////////////////////////////////////////// new end
 		
 		
 		// create the link(s)
@@ -603,6 +647,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 					((LinkImpl) l).setOrigId(origId);
 				}
 				network.addLink(l);
+				////new
+				bikeLinkAtts(way, fromNode, toNode, length, true, this.id);
 				this.id++;
 			}
 			if (!oneway) {
@@ -615,19 +661,84 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 					((LinkImpl) l).setOrigId(origId);
 				}
 				network.addLink(l);
+				////new
+				bikeLinkAtts(way, fromNode, toNode, length, false, this.id);
 				this.id++;
 			}
 
 		}
 	}
 	
+	
+	//////////////////////////new
+	
+	private void bikeLinkAtts(final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length, boolean hinweg, long matsimID) {
+		
+				String matsimId = Long.toString(matsimID); 		// MAsim Link ID
+		//		String orgOSMId = Long.toString(way.id);	// Original OSM LinkID
+
+
+		// cyclewaytype
+		String cyclewaytypeTag = way.tags.get(TAG_CYCLEWAYTYPE);
+		if (cyclewaytypeTag != null) {
+			bikeAttributes.putAttribute(matsimId, "cyclewaytype", cyclewaytypeTag);
+			countCyclewaytype++;
+		};
+
+		//surfacetype
+		String surfaceTag = way.tags.get(TAG_SURFACE);
+		if (surfaceTag != null) {
+			bikeAttributes.putAttribute(matsimId, "surface", surfaceTag);
+			countSurface++;
+		};
+
+		//smoothness
+		String smoothnessTag = way.tags.get(TAG_SMOOTHNESS);
+		if (smoothnessTag != null) {
+			bikeAttributes.putAttribute(matsimId, "smoothness", smoothnessTag);
+			countSmoothness++;
+		};
+
+		//crossing info is in den nodes
+		//String crossingsTag = node.tags.get(TAG_CROSSING);???
+		//String crossingsTag = way.tags.get(TAG_HIGHWAY) == crossing;???
+
+
+
+
+		//elevation:
+		ParseEleDataFromGeoTiff tiffObject = new ParseEleDataFromGeoTiff();
+		try {
+			double heightFrom = tiffObject.parseGeoTiff(fromNode.coord.getX(), fromNode.coord.getY(), firsttimeParseGeoTiff);
+			firsttimeParseGeoTiff = false;
+			double heightTo = tiffObject.parseGeoTiff(toNode.coord.getX(), toNode.coord.getY(), firsttimeParseGeoTiff);
+			double eleDiff = heightTo - heightFrom;
+			double slope = eleDiff/length;
+
+			if (hinweg){
+				System.out.println("hinweg soll true " + hinweg);
+				bikeAttributes.putAttribute(matsimId, "eleDiff", eleDiff);
+				bikeAttributes.putAttribute(matsimId, "slope", slope);
+			}
+			else
+			{
+				System.out.println("hinweg soll false " + hinweg);
+				bikeAttributes.putAttribute(matsimId, "eleDiff", -1*eleDiff);
+				bikeAttributes.putAttribute(matsimId, "slope", -1*slope);
+			}
+			
+			System.out.println("matsimId " + matsimId);
+			System.out.println("eleDiff " + eleDiff);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+	}
+
 	//new 
 	public ObjectAttributes getBikeAttributes() {
 		return this.bikeAttributes;
 	}
-	
-
-	
 	//new end
 	
 	private static class OsmFilter {
