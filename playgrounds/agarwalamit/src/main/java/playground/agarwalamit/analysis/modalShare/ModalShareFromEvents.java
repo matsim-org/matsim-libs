@@ -34,9 +34,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -75,10 +77,8 @@ public class ModalShareFromEvents implements ModalShare {
 		reader.readFile(this.eventsFile);
 		this.mode2numberOflegs = this.mseh.mode2numberOflegs;
 		this.mode2PctOflegs = MapUtils.getPercentShare(this.mode2numberOflegs);
-		if (! mseh.isAllPersonsUsingTransitHandeled()) {
-			Logger.getLogger(ModalShareFromEvents.class).warn("Not all persons using transit modes are handled, "
-					+ "because they could not start an activity. Most probable reason is stuck agents.");
-		}
+		
+		this.mseh.handleRemainingTransitUsers();
 	}
 
 	@Override
@@ -127,12 +127,12 @@ public class ModalShareFromEvents implements ModalShare {
 	 * else it is pt mode.
 	 * @author amit
 	 */
-	public class ModalShareEventHandler implements PersonDepartureEventHandler, TransitDriverStartsEventHandler, ActivityStartEventHandler {
+	public class ModalShareEventHandler implements PersonDepartureEventHandler, TransitDriverStartsEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 
 		private final SortedMap<String, Integer> mode2numberOflegs = new TreeMap<>();
 		private final List<Id<Person>> transitDriverPersons = new ArrayList<>();
 		// agents who first departs with transitWalk and their subsequent modes are stored here until it starts a regular act (home/work/leis/shop)
-		private final Map<Id<Person>, List<String>> transitWalkDepartuesModes = new HashMap<>(); 
+		private final Map<Id<Person>, List<String>> modesForTransitUsers = new HashMap<>(); 
 
 		@Override
 		public void reset(int iteration) {
@@ -150,13 +150,13 @@ public class ModalShareFromEvents implements ModalShare {
 			} else {
 				if(legMode.equals(TransportMode.transit_walk) || legMode.equals(TransportMode.pt) ) { 
 					// transit_walk - transit_walk || transit_walk - pt
-					if(transitWalkDepartuesModes.containsKey(personId)) {
-						List<String> modes = transitWalkDepartuesModes.get(personId);
+					if(modesForTransitUsers.containsKey(personId)) {
+						List<String> modes = modesForTransitUsers.get(personId);
 						modes.add(legMode);
 					} else {
 						List<String> modes = new ArrayList<>();
 						modes.add(legMode);
-						transitWalkDepartuesModes.put(personId, modes);
+						modesForTransitUsers.put(personId, modes);
 					}
 				} else {
 					storeMode(legMode);
@@ -171,11 +171,10 @@ public class ModalShareFromEvents implements ModalShare {
 
 		@Override
 		public void handleEvent(ActivityStartEvent event) {
-			if( transitWalkDepartuesModes.containsKey(event.getPersonId()) ) {
+			if( modesForTransitUsers.containsKey(event.getPersonId()) ) {
 				if(! event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) ) { 
-					List<String> modes = transitWalkDepartuesModes.remove(event.getPersonId());
-					String legMode = null;
-					legMode = modes.contains(TransportMode.pt) ? TransportMode.pt : TransportMode.walk;
+					List<String> modes = modesForTransitUsers.remove(event.getPersonId());
+					String legMode = modes.contains(TransportMode.pt) ? TransportMode.pt : TransportMode.walk;
 					storeMode(legMode);
 				} else { 
 					// else continue
@@ -183,6 +182,12 @@ public class ModalShareFromEvents implements ModalShare {
 			} else {
 				// nothing to do
 			}
+		}
+		
+		@Override
+		public void handleEvent(PersonStuckEvent event) {
+			List<String> modes = modesForTransitUsers.get(event.getPersonId());
+			modes.add(event.getLegMode());
 		}
 
 		private void storeMode(String legMode) {
@@ -193,8 +198,16 @@ public class ModalShareFromEvents implements ModalShare {
 			}
 		}
 		
-		public boolean isAllPersonsUsingTransitHandeled(){
-			return transitWalkDepartuesModes.isEmpty();
+		public void handleRemainingTransitUsers(){
+			if(!modesForTransitUsers.isEmpty()) {
+				Logger.getLogger(ModalShareFromEvents.class).warn("A few transit users are not handle due to stuckAndAbort. Handling them now.");
+				for(Id<Person> pId : modesForTransitUsers.keySet()){
+					List<String> modes = modesForTransitUsers.get(pId);
+					String legMode = modes.contains(TransportMode.pt) ? TransportMode.pt : TransportMode.walk;
+					storeMode(legMode);
+				}
+				modesForTransitUsers.clear();
+			}
 		}
 	}
 }
