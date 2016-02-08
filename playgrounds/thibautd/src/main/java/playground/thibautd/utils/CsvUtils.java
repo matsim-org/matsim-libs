@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +58,14 @@ public class CsvUtils {
 		return fields.toArray( new String[ fields.size() ] );
 	}
 
+	public static TitleLine parseTitleLine(
+			final char sep,
+			final char quote,
+			final String line ) {
+		final String[] names = parseCsvLine( sep , quote , line );
+		return new TitleLine( names );
+	}
+
 	public static String buildCsvLine(
 			final String... fields) {
 		return buildCsvLine( ',' , '"' , fields );
@@ -83,6 +94,20 @@ public class CsvUtils {
 		// TODO: quote only if contains sep or white space.
 		// TODO: escape quotes!
 		return quote+string+quote;
+	}
+
+	public static class TitleLine {
+		private TObjectIntMap<String> map = new TObjectIntHashMap<>();
+
+		private TitleLine( final String[] names ) {
+			for ( int i = 0; i < names.length; i++ ) {
+				map.put( names[ i ] , i );
+			}
+		}
+
+		public int getIndexOfField( final String name ) {
+			return map.get( name );
+		}
 	}
 }
 
