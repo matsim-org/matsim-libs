@@ -23,6 +23,7 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -111,16 +112,26 @@ public class CsvUtils {
 	}
 
 	public static class TitleLine {
-		private TObjectIntMap<String> map = new TObjectIntHashMap<>();
+		private final TObjectIntMap<String> map = new TObjectIntHashMap<>();
+		private final String[] names;
 
 		private TitleLine( final String[] names ) {
 			for ( int i = 0; i < names.length; i++ ) {
 				map.put( names[ i ] , i );
 			}
+			this.names = names;
+		}
+
+		public String[] getNames() {
+			return names;
 		}
 
 		public int getIndexOfField( final String name ) {
 			return map.get( name );
+		}
+
+		public int getNField() {
+			return map.size();
 		}
 	}
 }
