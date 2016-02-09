@@ -327,7 +327,8 @@ public class M4UConfigUtils {
 		qsimCG.setFlowCapFactor( popSampling );	
 		
 			
-		qsimCG.setStorageCapFactor( popSampling * Math.pow(popSampling, -0.25) ) ;   // same as: popSampling / Math.sqrt(Math.sqrt(sample))
+		qsimCG.setStorageCapFactor( popSampling * Math.pow(popSampling, -0.25) ) ;   // same as: sample / Math.sqrt(Math.sqrt(sample))
+		// yy and same as Math.pow( popSampling, 0.75 ), isn't it? 
 
 		qsimCG.setRemoveStuckVehicles( false );
 		qsimCG.setStuckTime(10.);
