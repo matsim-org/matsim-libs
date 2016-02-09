@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package scenarios.braess.conversion;
+package scenarios.illustrative.braess.conversion;
 
 import java.util.Calendar;
 

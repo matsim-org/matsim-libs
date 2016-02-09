@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package scenarios.parallel.createInput;
+package scenarios.illustrative.parallel.createInput;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

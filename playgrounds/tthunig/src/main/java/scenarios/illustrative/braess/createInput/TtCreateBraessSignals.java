@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package scenarios.braess.createInput;
+package scenarios.illustrative.braess.createInput;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -51,7 +51,7 @@ import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
-import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
+import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
 
 /**
  * Class to create signals (signal systems, signal groups and signal control)

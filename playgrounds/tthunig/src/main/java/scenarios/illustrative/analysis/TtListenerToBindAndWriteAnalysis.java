@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package scenarios.analysis;
+package scenarios.illustrative.analysis;
 
 import java.io.BufferedReader;
 import java.io.IOException;

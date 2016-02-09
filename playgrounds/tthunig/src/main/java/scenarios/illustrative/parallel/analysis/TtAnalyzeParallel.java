@@ -19,39 +19,60 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package scenarios.braess.analysis;
+package scenarios.illustrative.parallel.analysis;
 
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 
-import scenarios.analysis.TtAbstractAnalysisTool;
+import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
 
 /**
- * This class extends the abstract analysis tool for the specific scenario of
- * Braess' example.
+ * This class extends the abstract analysis tool for the specific scenario that
+ * we called parallel scenario.
  * 
- * @see scenarios.analysis.TtAbstractAnalysisTool
+ * @see scenarios.illustrative.analysis.TtAbstractAnalysisTool
  * 
  * @author tthunig
  * 
  */
-public final class TtAnalyzeBraess extends TtAbstractAnalysisTool {
+public final class TtAnalyzeParallel extends TtAbstractAnalysisTool {
 	
 	@Override
 	protected int determineRoute(LinkEnterEvent linkEnterEvent) {
-		// in the braess scenario the route is unique if one gets a link enter
-		// event of link 2_4, 3_4 or 3_5.
+		// in the parallel scenario the route is unique if one gets a link enter
+		// event of link 2_3, 2_7, 5_4, 5_8, 10_3, 10_4, 11_7, 11_8
 		int route = -1;
 		switch (linkEnterEvent.getLinkId().toString()) {
-		case "2_4":
-		case "2_24":
-			// the person uses the lower route
-			route = 2;
+		case "2_3":
+			// upper route of A-B relation
+			route = 0;
 			break;
-		case "3_4": // the person uses the middle route
+		case "2_7":
+			// lower route of A-B relation
 			route = 1;
 			break;
-		case "3_5": // the person uses the upper route
-			route = 0;
+		case "5_4":
+			// upper route of B-A relation
+			route = 2;
+			break;
+		case "5_8":
+			// lower route of B-A relation
+			route = 3;
+			break;
+		case "10_3":
+			// left route of C-D relation
+			route = 4;
+			break;
+		case "10_4":
+			// right route of C-D relation
+			route = 5;
+			break;
+		case "11_7":
+			// left route of D-C relation
+			route = 6;
+			break;
+		case "11_8":
+			// right route of D-C relation
+			route = 7;
 			break;
 		default:
 			break;
@@ -61,7 +82,7 @@ public final class TtAnalyzeBraess extends TtAbstractAnalysisTool {
 
 	@Override
 	protected void defineNumberOfRoutes() {
-		setNumberOfRoutes(3);
+		setNumberOfRoutes(8);
 	}
 
 }

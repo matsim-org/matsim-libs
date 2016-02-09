@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package scenarios.braess.createInput;
+package scenarios.illustrative.braess.createInput;
 
 import java.util.ArrayList;
 import java.util.Arrays;

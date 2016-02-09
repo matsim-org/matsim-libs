@@ -19,7 +19,7 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package scenarios.braess.analysis;
+package scenarios.illustrative.braess.analysis;
 
 import java.io.File;
 import java.io.FileNotFoundException;
