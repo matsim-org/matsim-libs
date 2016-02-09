@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.Coord;
 
 //	Criteria:
 //	- dailyShopping
-//	- opening hours (1000-2155)
+//	- opening hours (1000-1955)
 //	- car
 //	- radius: 35km
 
@@ -37,15 +37,16 @@ public class Case2DeterminePotentialIKEAAgents {
 
 	private static int numberOfIkeaAgents=2250;
 	private static int radius=35000;
-	private static Random random = new Random();
+	private static HashMap<String,Coord> agentsHomeCoords = new HashMap<String,Coord>();
+	private static HashMap<String,Double> agentsPreviousActivityDistance = new HashMap<String,Double>();
+
 
 	// IntArray with distribution of distances 'Agents home - IKEA' of Agents fulfilling criteria (see above)
-	private static int[] distributionOfPotentialIkeaVisitors= new int[(radius/1000)+4];
+	private static int[] distributionOfPotentialIkeaVisitors= new int[(radius/1000)+1];
 	// IntArray with distribution of distances 'Agents home - IKEA' of Agents fulfilling criteria & distribution formula
-	private static int[] agentsPerZone= new int[(radius/1000)+4];
+	private static int[] agentsPerZone= new int[(radius/1000)+1];
 	// IntArray with distribution of distances 'Agents home - IKEA' of chosen Agents
-	private static int[] chosenAgents= new int[(radius/1000)+4];
-
+	private static int[] chosenAgents= new int[(radius/1000)+1];
 	//IKEA Coordinates
 	private static Double xIKEA = 662741.5;
 	private static Double yIKEA = 5643343.5366;
@@ -60,7 +61,7 @@ public class Case2DeterminePotentialIKEAAgents {
 	int index_activityDuration = 16;
 	int index_journeyDuration = 18;
 	static int index_mode=19;
-	int index_journeyDistance=20;
+	static int index_journeyDistance=20;
 	static int countAgents=0;
 
 	public static void main(String[] args) throws IOException {
@@ -108,18 +109,20 @@ public class Case2DeterminePotentialIKEAAgents {
 						&&Integer.parseInt(parts[index_activityType])==4
 						&&Integer.parseInt(parts[index_mode])==1
 						&&Integer.parseInt(parts[index_beginningTime])>=1000
-						&&Integer.parseInt(parts[index_beginningTime])<=2155
+						&&Integer.parseInt(parts[index_beginningTime])<=1955
 						&&Integer.parseInt(parts[index_activityLocation])!=-1){
-					Coord CoordHome=coordTazManager.randomCoordinates(Integer.parseInt(parts[index_homeLocation]));
+					Coord CoordHome=agentsHomeCoords.get(parts[index_agentID]);
 
 					double distanceHomeIKEA=Math.sqrt(
 							Math.pow(CoordHome.getX()-CoordIKEA.getX(),2)
 							+Math.pow(CoordHome.getY()-CoordIKEA.getY(), 2)
 							);
-					if(distanceHomeIKEA<=radius+3000){
+					if(distanceHomeIKEA<=radius){
 						parts[index_activityLocation]="IKEA";
+						parts[index_journeyDistance]=agentsPreviousActivityDistance.get(parts[index_agentID]).toString();
 						line=parts[0];
-						chosenAgents[(int) Math.round(distanceHomeIKEA/1000)]++;
+				//		chosenAgents2[(int) Math.round(distanceHomeIKEA/1000)]++;
+						countAgents++;
 						for(int i=1;i<21;i++){
 							String lineOLD=line+";";
 							line=lineOLD+parts[i];
@@ -132,6 +135,7 @@ public class Case2DeterminePotentialIKEAAgents {
 						bufferedwriter1.write(line);
 						bufferedwriter1.newLine();
 					}
+					else{System.out.println("Distance "+distanceHomeIKEA);}
 				}
 				bufferedwriter2.write(line);
 				bufferedwriter2.newLine();				
@@ -140,18 +144,18 @@ public class Case2DeterminePotentialIKEAAgents {
 				consider=false;
 				alreadyIKEAvisitor=false;
 			}
-
-			if(IkeaVisitors.contains(parts[index_agentID])
-					&&!parts[index_agentID].equals(previousAgent)
-					&&!consider){
+			// IKEA agent found, rename and copy first line
+			if(IkeaVisitors.contains(parts[index_agentID])&&
+					!parts[index_agentID].equals(previousAgent)
+					&&	!consider){
 				previousAgent=parts[index_agentID];
 				consider=true;
-				countAgents++;
 				String oldAgentID=parts[index_agentID];
 				String newAgentID=oldAgentID+"_IKEA";
 				line=line.replace(oldAgentID, newAgentID);
 				bufferedwriter2.write(line);
 				bufferedwriter2.newLine();
+
 			}
 
 			bufferedwriter3.write(line);
@@ -161,7 +165,7 @@ public class Case2DeterminePotentialIKEAAgents {
 		System.out.println("Statistics:");
 		System.out.println(Arrays.toString(distributionOfPotentialIkeaVisitors));
 		System.out.println(Arrays.toString(agentsPerZone));
-		System.out.println(Arrays.toString(chosenAgents));
+//		System.out.println("chosen agents2"+Arrays.toString(chosenAgents2));
 		bufferedwriter4.write(Arrays.toString(distributionOfPotentialIkeaVisitors));
 		bufferedwriter4.newLine();
 		bufferedwriter4.write(Arrays.toString(agentsPerZone));
@@ -185,7 +189,6 @@ public class Case2DeterminePotentialIKEAAgents {
 
 	public static HashMap<Integer,List<String>> potentialAgents() throws IOException{
 		HashMap<Integer,List<String>> agents = new HashMap<Integer,List<String>>();
-		//List<String> agentList=new ArrayList<String>();
 		BufferedReader reader=new BufferedReader(new FileReader(dataFile));
 		String line=reader.readLine();
 		Coord CoordPriorActivity=null;
@@ -195,7 +198,7 @@ public class Case2DeterminePotentialIKEAAgents {
 			if(Integer.parseInt(parts[index_activityType])==4
 					&&Integer.parseInt(parts[index_mode])==1
 					&&Integer.parseInt(parts[index_beginningTime])>=1000
-					&&Integer.parseInt(parts[index_beginningTime])<=2155
+					&&Integer.parseInt(parts[index_beginningTime])<=1955
 					){
 				Coord CoordHome=coordTazManager.randomCoordinates(Integer.parseInt(parts[index_homeLocation]));
 
@@ -212,6 +215,8 @@ public class Case2DeterminePotentialIKEAAgents {
 						agentList=agents.get((int)Math.round(distanceHomeIKEA/1000));
 					}
 					agentList.add(parts[index_agentID]);
+					agentsHomeCoords.put(parts[index_agentID], CoordHome);
+					agentsPreviousActivityDistance.put(parts[index_agentID], distancePriorActivityIKEA/1000);
 					agents.put((int)Math.round(distanceHomeIKEA/1000),agentList);
 					distributionOfPotentialIkeaVisitors[(int) Math.round(distanceHomeIKEA/1000)]++;}
 			}
@@ -230,7 +235,7 @@ public class Case2DeterminePotentialIKEAAgents {
 	public static int[] tripDistribution(){
 		// deterrence function: exp(-0.05*d)
 
-		// determina alpha:
+		// determine alpha:
 		// 1. Sum of all O(d)*deterrence function:
 		double Sum=0;
 		for (int d=0;d<=(radius/1000)-1;d++){
@@ -243,12 +248,12 @@ public class Case2DeterminePotentialIKEAAgents {
 		//determine distribution:
 		int checkSum=0;
 		for(int i=0; i<=(radius/1000)-1;i++){
-			//calculate T(i)=number of trips from zone i directed at IKEA=numberOfIkeaAgents*alpha*O(i)*deterrence function
+			//calculate T(i)=number of trips from zone i directed to IKEA=numberOfIkeaAgents*alpha*O(i)*deterrence function
 			int T=(int)Math.round(numberOfIkeaAgents*alpha*distributionOfPotentialIkeaVisitors[i]*Math.exp(-0.05*i));
 			agentsPerZone[i]=T;
 			checkSum=checkSum+T;
 		}
-		System.out.println(Arrays.toString(agentsPerZone));
+		System.out.println("Departures per zone: "+Arrays.toString(agentsPerZone));
 		System.out.println(checkSum+" agents distributed");
 
 		return agentsPerZone;
@@ -257,17 +262,22 @@ public class Case2DeterminePotentialIKEAAgents {
 	public static List<String> determineIkeaVisitors(){
 		List<String> IkeaVisitors=new ArrayList<String>();
 		Random random=new Random();
-		for(int i=0;i<=(radius/1000)-1;i++){
-			for(int j=0;j<=TripDistribution[i];j++){
+		for(int i=0;i<(radius/1000);i++){
+			for(int j=0;j<TripDistribution[i];j++){
 				List<String>PotentialAgents=potentialIkeaAgents.get(i);
-				int k=random.nextInt(PotentialAgents.size());
-				String IkeavisitorID=PotentialAgents.get(k);
+				String IkeavisitorID="nA";
+				int k=0;
+				while(IkeaVisitors.contains(IkeavisitorID)){
+					k=random.nextInt(PotentialAgents.size());
+					IkeavisitorID=PotentialAgents.get(k);
+				}
 				IkeaVisitors.add(IkeavisitorID);
 				PotentialAgents.remove(k);
 				potentialIkeaAgents.put(i, PotentialAgents);
-				//	chosenAgents[i]++;
+				chosenAgents[i]++;
 			}
 		}
+		System.out.println("chosen agents: "+Arrays.toString(chosenAgents));
 		return IkeaVisitors;
 	}
 

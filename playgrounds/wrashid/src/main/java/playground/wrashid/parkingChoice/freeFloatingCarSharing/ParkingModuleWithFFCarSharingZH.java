@@ -153,7 +153,10 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		eventsManager = EventsUtils.createEventsManager();
 		eventsWriter = new EventWriterXML(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
 		eventsManager.addHandler(eventsWriter);
-		
+		parkingGroupOccupanciesZH = new ParkingGroupOccupanciesZH(getControler());
+		eventsManager.addHandler(parkingGroupOccupanciesZH);
+		averageWalkDistanceStatsZH = new AverageWalkDistanceStatsZH(parkingInfrastructureManager.getAllParkings());
+		eventsManager.addHandler(averageWalkDistanceStatsZH);
 		eventsManager.resetHandlers(0);
 		eventsWriter.init(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
 		
@@ -169,10 +172,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		super.notifyStartup(event);
-		parkingGroupOccupanciesZH = new ParkingGroupOccupanciesZH(getControler());
-		getControler().getEvents().addHandler(parkingGroupOccupanciesZH);
-		averageWalkDistanceStatsZH = new AverageWalkDistanceStatsZH(parkingInfrastructureManager.getAllParkings());
-		getControler().getEvents().addHandler(averageWalkDistanceStatsZH);
+		
 	}
 	
 	@Override

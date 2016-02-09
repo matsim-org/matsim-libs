@@ -16,36 +16,52 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.thibautd.utils;
 
-package org.matsim.facilities;
+import org.matsim.core.utils.io.IOUtils;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
+import java.io.BufferedReader;
+import java.io.IOException;
 
 /**
- * @author mrieser / Senozon AG
+ * @author thibautd
  */
-public class ActivityFacilitiesFactoryImplTest {
+public class CsvParser implements AutoCloseable {
+	private final char sep, quote;
+	private final BufferedReader reader;
 
-	@Test
-	public void testCreateActivityFacility() {
-		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
-		ActivityFacility facility = factory.createActivityFacility(Id.create(1980, ActivityFacility.class), new Coord((double) 5, (double) 11));
+	private final CsvUtils.TitleLine titleLine;
 
-		Assert.assertEquals("1980", facility.getId().toString());
-		Assert.assertEquals(5.0, facility.getCoord().getX(), 1e-9);
-		Assert.assertEquals(11.0, facility.getCoord().getY(), 1e-9);
+	private String[] currentLine = null;
+
+	public CsvParser(
+			final char sep,
+			final char quote,
+			final String file ) throws IOException {
+		this.sep = sep;
+		this.quote = quote;
+		this.reader = IOUtils.getBufferedReader( file );
+		this.titleLine = CsvUtils.parseTitleLine( sep , quote , reader.readLine() );
 	}
 
-	@Test
-	public void testCreateActivityOption() {
-		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
-		ActivityOption option = factory.createActivityOption("leisure");
-
-		Assert.assertEquals("leisure", option.getType());
-		Assert.assertEquals(Integer.MAX_VALUE, option.getCapacity(), 1e-9);
+	public CsvUtils.TitleLine getTitleLine() {
+		return titleLine;
 	}
 
+	public boolean nextLine() throws IOException {
+		final String l = reader.readLine();
+		if ( l == null ) return false;
+		currentLine = CsvUtils.parseCsvLine( sep , quote , l );
+		return true;
+	}
+
+	public String getField( final String name ) {
+		// no check of validity. Assume users of this class know what they are doing, or are able to understand what goes wrong
+		return currentLine[ titleLine.getIndexOfField( name ) ];
+	}
+
+	@Override
+	public void close() throws IOException {
+		reader.close();
+	}
 }

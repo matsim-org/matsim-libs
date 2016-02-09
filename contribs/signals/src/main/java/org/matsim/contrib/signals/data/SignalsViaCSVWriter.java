@@ -79,7 +79,7 @@ public class SignalsViaCSVWriter {
 	
 	public void writeSignalsCSV(String filename){		
 		try{
-			log.info("Initializing SignalsCSVWriter ...");
+//			log.info("Initializing SignalsCSVWriter ...");
 			BufferedWriter signalsCSVWriter = IOUtils.getBufferedWriter( filename );
 			log.info("Writing signals csv data for via to " + filename + " ...");
 			
@@ -107,7 +107,7 @@ public class SignalsViaCSVWriter {
 								// use start time of the simulation
 								time = scenario.getConfig().qsim().getStartTime() + signalPlan.getOffset();
 							}
-							log.info("Writing signal states for signal " + signal.getId() + " for the whole simulation time ...");
+//							log.info("Writing signal states for signal " + signal.getId() + " for the whole simulation time ...");
 							Double endTime = signalPlan.getEndTime();
 							if (endTime == null) {
 								// use end time of the simulation
@@ -121,7 +121,7 @@ public class SignalsViaCSVWriter {
 
 								time += signalPlan.getCycleTime();
 							}
-							log.info("... done!");
+//							log.info("... done!");
 						}
 					}
 				}
@@ -137,7 +137,7 @@ public class SignalsViaCSVWriter {
 	}
 	
 	private Coord calculateSignalCoordinate(Id<SignalSystem> signalSystemId, Id<Signal> signalId){
-		log.info("Calculating coordinate for signal " + signalId + " of signal system " + signalSystemId + " ...");
+//		log.info("Calculating coordinate for signal " + signalId + " of signal system " + signalSystemId + " ...");
 		
 		SignalData signalData = signalsData.getSignalSystemsData().getSignalSystemData().get(signalSystemId).getSignalData().get(signalId);
 		Id<Link> signalLinkId = signalData.getLinkId();
@@ -178,7 +178,7 @@ public class SignalsViaCSVWriter {
 		double x = toNodeCoord.getX() - deltaX + stepNumber * deltaY * (SIGNAL_COORD_LINK_OFFSET / SIGNAL_COORD_NODE_OFFSET);
 		double y = toNodeCoord.getY() - deltaY - stepNumber * deltaX * (SIGNAL_COORD_LINK_OFFSET / SIGNAL_COORD_NODE_OFFSET);
 		
-		log.info("... done!");
+//		log.info("... done!");
 		return new Coord(x, y);
 	}
 }

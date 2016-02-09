@@ -18,18 +18,32 @@
  * *********************************************************************** */
 package tutorial.programming.facilitiesAndOpenTimes;
 
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+
 /**
  * @author nagel
  *
  */
-final class RunFacilitiesExample {
+public class RunWithFacilitiesExampleTest {
+	private static final double EPS=0.001 ;
 
 	/**
-	 * @param args
+	 * Test method for {@link tutorial.programming.facilitiesAndOpenTimes.RunWithFacilitiesExample#run()}.
 	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented");
+	@SuppressWarnings({ "static-method", "javadoc" })
+	@Test
+	public final void testRun() {
+		RunWithFacilitiesExample example = new RunWithFacilitiesExample() ;
+		example.run();
+		Scenario scenario = example.getScenario() ;
+		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons() ;
+		Assert.assertEquals( 124.84230476216275, persons.get(Id.createPersonId(1)).getSelectedPlan().getScore() , EPS ) ;
+		Assert.assertEquals( 112.84230476216275, persons.get(Id.createPersonId(2)).getSelectedPlan().getScore() , EPS ) ;
 	}
-
 }

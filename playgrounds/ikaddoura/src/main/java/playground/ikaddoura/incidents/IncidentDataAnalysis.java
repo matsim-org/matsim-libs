@@ -66,9 +66,14 @@ public class IncidentDataAnalysis {
 	private static final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
  
 //	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
+//	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/berlin-test/";
+
 	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
-	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany/";
+	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany-test/";
+	
 	private final boolean writeCSVFileForEachXMLFile = false;
+	
+// ##################################################################
 	
 	private Map<String, TrafficItem> trafficItems = new HashMap<>();
 	private Map<String, Path> trafficItemId2path = new HashMap<>();
@@ -185,7 +190,8 @@ public class IncidentDataAnalysis {
 		File[] fileList = new File(outputDirectory).listFiles();
 
 		for(File f : fileList) {
-			if (f.getName().endsWith(".xml")) {
+			
+			if (f.getName().endsWith(".xml") || f.getName().endsWith(".xml.gz")) {
 				
 				String inputXmlFile = f.toString();
 								

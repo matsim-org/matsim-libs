@@ -178,7 +178,7 @@ public class Case0CreateDemand {
 							counter=counter+1;
 							bw.newLine();
 						}
-						System.out.println("-------------------------------------------------- Distance: "+distance+" Difference: "+diff+" margin: "+(diff/distance)*100+"% mode: "+parts[index_mode]);
+						System.out.println("--------------------------------- Distance: "+distance+" Difference: "+diff+" margin: "+(diff/distance)*100+"% mode: "+parts[index_mode]);
 					}
 
 					// Add activity

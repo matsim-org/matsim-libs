@@ -77,6 +77,7 @@ public class FilteredDepartureTimeAnalyzer {
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		events.addHandler(this.handler);
 		reader.readFile(eventsFile);
+		this.handler.handleRemainingTransitUsers();
 	}
 	
 	public void writeResults(String outputFile) {
