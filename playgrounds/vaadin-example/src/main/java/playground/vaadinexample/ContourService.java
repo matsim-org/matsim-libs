@@ -25,18 +25,25 @@ public class ContourService {
 
 	private final LeastCostPathTree leastCostPathTree;
 	private final Network network;
+	private final ConformingDelaunayTriangulator conformingDelaunayTriangulator;
 
-	ContourService() {
-		network = NetworkUtils.createNetwork();
-		try {
-			new MatsimNetworkReader(network).parse(new URL("https://raw.githubusercontent.com/matsim-org/matsimExamples/master/countries/ke/nairobi/2015-10-15_network.xml"));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	ContourService(Network network, Node startNode) {
+		this.network = network;
 		FreespeedTravelTimeAndDisutility freeSpeedTravelTime = new FreespeedTravelTimeAndDisutility(0.0, 6.0, 0.0);
 		leastCostPathTree = new LeastCostPathTree(freeSpeedTravelTime, freeSpeedTravelTime);
-		Node startNode = network.getNodes().values().iterator().next();
 		leastCostPathTree.calculate(network, startNode, 0.0);
+		Collection<ConstraintVertex> sites = new ArrayList<>();
+		for (Map.Entry<Id<Node>, LeastCostPathTree.NodeData> entry : leastCostPathTree.getTree().entrySet()) {
+			Node node = network.getNodes().get(entry.getKey());
+			ConstraintVertex vertex = new ConstraintVertex(MGC.coord2Coordinate(node.getCoord()));
+			vertex.setConstraint(true);
+			vertex.setConstraint(node);
+			vertex.setZ(entry.getValue().getTime());
+			sites.add(vertex);
+		}
+		conformingDelaunayTriangulator = new ConformingDelaunayTriangulator(sites, 0.0);
+		conformingDelaunayTriangulator.setConstraints(new ArrayList(), new ArrayList());
+		conformingDelaunayTriangulator.formInitialDelaunay();
 	}
 
 	public Collection<NodeWithCost> getNodes() {
@@ -53,18 +60,6 @@ public class ContourService {
 	}
 
 	public Contour getContour(double seconds, String color) {
-		Collection<ConstraintVertex> sites = new ArrayList<>();
-		for (Map.Entry<Id<Node>, LeastCostPathTree.NodeData> entry : leastCostPathTree.getTree().entrySet()) {
-			Node node = network.getNodes().get(entry.getKey());
-			ConstraintVertex vertex = new ConstraintVertex(MGC.coord2Coordinate(node.getCoord()));
-			vertex.setConstraint(true);
-			vertex.setConstraint(node);
-			vertex.setZ(entry.getValue().getTime());
-			sites.add(vertex);
-		}
-		ConformingDelaunayTriangulator conformingDelaunayTriangulator = new ConformingDelaunayTriangulator(sites, 0.0);
-		conformingDelaunayTriangulator.setConstraints(new ArrayList(), new ArrayList());
-		conformingDelaunayTriangulator.formInitialDelaunay();
 		QuadEdgeSubdivision subdivision = conformingDelaunayTriangulator.getSubdivision();
 		for (Vertex vertex : (Collection<Vertex>) subdivision.getVertices(true)) {
 			if (subdivision.isFrameVertex(vertex)) {

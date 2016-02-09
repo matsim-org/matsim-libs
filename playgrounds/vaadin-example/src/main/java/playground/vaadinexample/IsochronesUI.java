@@ -3,21 +3,21 @@ package playground.vaadinexample;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TreeTable;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.*;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.FactoryException;
@@ -28,12 +28,21 @@ import org.vaadin.addon.leaflet.*;
 import org.vaadin.addon.leaflet.util.JTSUtil;
 
 import javax.servlet.annotation.WebServlet;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
 @Theme("mytheme")
 @SuppressWarnings("serial")
 public class IsochronesUI extends UI {
+
+    private MathTransform coordinateTransformation;
+    private LLayerGroup isochronesLayer;
+    private LLayerGroup nodesLayer;
+    private HierarchicalContainer container;
+    private LMap map;
+    private Network network;
 
     @WebServlet(value = "/*", asyncSupported = true)
     @VaadinServletConfiguration(productionMode = false, ui = IsochronesUI.class, widgetset = "playground.vaadinexample.AppWidgetSet")
@@ -44,19 +53,60 @@ public class IsochronesUI extends UI {
         TRAVEL_TIME, AREA, N_GEOMETRIES;
     }
 
+    ContourService contourService;
+
     @Override
     protected void init(VaadinRequest request) {
+        network = NetworkUtils.createNetwork();
+        try {
+            new MatsimNetworkReader(network).parse(new URL("https://raw.githubusercontent.com/matsim-org/matsimExamples/master/countries/ke/nairobi/2015-10-15_network.xml"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         CoordinateReferenceSystem sourceCRS = MGC.getCRS("EPSG:21037");
         CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.WGS84);
 
-        MathTransform coordinateTransformation;
         try {
             coordinateTransformation = CRS.findMathTransform(sourceCRS, targetCRS, true);
         } catch (FactoryException e) {
             throw new RuntimeException(e);
         }
 
-        HierarchicalContainer container = new HierarchicalContainer();
+        map = new LMap();
+        LTileLayer osmTiles = new LTileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+        osmTiles.setAttributionString("© OpenStreetMap Contributors");
+
+        LLayerGroup originLayer = new LLayerGroup();
+        final Node startNode = network.getNodes().values().iterator().next();
+        try {
+            final LMarker origin = new LMarker((Point) JTS.transform(MGC.coord2Point(startNode.getCoord()), coordinateTransformation));
+            origin.addDragEndListener(new LMarker.DragEndListener() {
+                @Override
+                public void dragEnd(LMarker.DragEndEvent dragEndEvent) {
+                    try {
+                        Point point = (Point) JTS.transform(origin.getGeometry(), coordinateTransformation.inverse());
+                        Node nearestNode = ((NetworkImpl) network).getNearestNode(MGC.coordinate2Coord(point.getCoordinate()));
+                        compute(nearestNode);
+                    } catch (TransformException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+            originLayer.addComponent(origin);
+        } catch (TransformException e) {
+            throw new RuntimeException(e);
+        }
+
+        nodesLayer = new LLayerGroup();
+        isochronesLayer = new LLayerGroup();
+
+        map.addBaseLayer(osmTiles, "OSM");
+        map.addOverlay(originLayer, "Origin");
+        map.addOverlay(nodesLayer, "Nodes");
+        map.addOverlay(isochronesLayer, "Isochrones");
+
+        container = new HierarchicalContainer();
         container.addContainerProperty(ContainerProperties.TRAVEL_TIME, Double.class, 0.0);
         container.addContainerProperty(ContainerProperties.AREA, Double.class, 0.0);
         container.addContainerProperty(ContainerProperties.N_GEOMETRIES, Integer.class, 0);
@@ -66,26 +116,59 @@ public class IsochronesUI extends UI {
         table.setColumnHeader(ContainerProperties.AREA, "Area [m^2]");
         table.setColumnHeader(ContainerProperties.N_GEOMETRIES, "Number of sub-geometries");
 
-        ContourService contourService = new ContourService();
+        VerticalLayout layout = new VerticalLayout();
+        layout.setMargin(true);
 
-        LLayerGroup nodesLayer = new LLayerGroup();
-        Collection<NodeWithCost> nodes = contourService.getNodes();
-        for (final NodeWithCost node : nodes) {
-            try {
-                LCircleMarker layer = new LCircleMarker((Point) JTS.transform(node.getGeometry(), coordinateTransformation), 2.0);
-                layer.setPopup(String.format("z: %.2f", node.getTime()));
-                nodesLayer.addComponent(layer);
-            } catch (TransformException e) {
-                throw new RuntimeException(e);
+        HorizontalLayout options = new HorizontalLayout();
+
+        // I need my own checkbox for turning on and off nodes. The box in the Leaflet
+        // control is only for the client side - the nodes are still all transferred to
+        // the browser when that checkbox is turned off.
+        CheckBox nodes = new CheckBox("Nodes");
+        nodes.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                if ((Boolean) event.getProperty().getValue()) {
+                    Collection<NodeWithCost> nodes = contourService.getNodes();
+                    for (final NodeWithCost node : nodes) {
+                        try {
+                            LCircleMarker layer = new LCircleMarker((Point) JTS.transform(node.getGeometry(), coordinateTransformation), 2.0);
+                            layer.setPopup(String.format("z: %.2f", node.getTime()));
+                            nodesLayer.addComponent(layer);
+                        } catch (TransformException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                } else {
+                    nodesLayer.removeAllComponents();
+                }
             }
-        }
+        });
+        options.addComponent(nodes);
 
-        Collection<Contour> contours = new ArrayList<Contour>();
+        layout.addComponents(options, map, table);
+        layout.setExpandRatio(map, 0.8f);
+        layout.setExpandRatio(table, 0.2f);
+        table.setSizeFull();
+        layout.setSizeFull();
+        setContent(layout);
+
+        compute(startNode);
+        map.zoomToContent();
+    }
+
+    private void compute(Node startNode) {
+        container.removeAllItems();
+        nodesLayer.removeAllComponents();
+        isochronesLayer.removeAllComponents();
+
+        contourService = new ContourService(network, startNode);
+
+        Collection<Contour> contours = new ArrayList<>();
         contours.add(contourService.getContour(10.0 * 60.0, "green"));
         contours.add(contourService.getContour(20.0 * 60.0, "yellow"));
         contours.add(contourService.getContour(30.0 * 60.0, "red"));
 
-        LLayerGroup isochronesLayer = new LLayerGroup();
         for (final Contour contour : contours) {
             Object contourId = container.addItem();
             Item contourItem = container.getItem(contourId);
@@ -125,6 +208,7 @@ public class IsochronesUI extends UI {
                     lPolygon.addClickListener(new LeafletClickListener() {
                         @Override
                         public void onClick(LeafletClickEvent event) {
+                            // Polygons are clickable
                             double area = polygon.getArea();
                             Notification contourInfo = new Notification(Double.toString(area), "Area");
                             contourInfo.show(Page.getCurrent());
@@ -137,23 +221,6 @@ public class IsochronesUI extends UI {
             }
         }
 
-        LTileLayer osmTiles = new LTileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-        osmTiles.setAttributionString("© OpenStreetMap Contributors");
-
-        LMap map = new LMap();
-        map.addBaseLayer(osmTiles, "OSM");
-        map.addOverlay(nodesLayer, "Nodes");
-        map.addOverlay(isochronesLayer, "Isochrones");
-        map.zoomToContent();
-
-        VerticalLayout layout = new VerticalLayout();
-        layout.setMargin(true);
-        layout.addComponents(map, table);
-        layout.setExpandRatio(map, 0.8f);
-        layout.setExpandRatio(table, 0.2f);
-        table.setSizeFull();
-        layout.setSizeFull();
-        setContent(layout);
     }
 
 }
