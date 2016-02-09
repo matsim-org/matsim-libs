@@ -40,13 +40,13 @@ import java.util.Set;
 import static playground.boescpa.ivtBaseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
 
 /**
- * WHAT IS IT FOR?
+ * Counts the daily vehicles on a given link.
  *
  * @author boescpa
  */
 public class StreetLinkDailyCountsEventHandler implements LinkEnterEventHandler{
 
-	public Config config;
+	private final Config config;
 
 	private final Map<String, Tuple<String, Double>> linksToMonitor = new HashMap<>();
 	private final Set<String> linksToMonitorCache = new HashSet<>();
@@ -109,7 +109,7 @@ public class StreetLinkDailyCountsEventHandler implements LinkEnterEventHandler{
 				String countStationDescr = linksToMonitor.get(linkId).getFirst();
 				double countVolume = linksToMonitor.get(linkId).getSecond();
 				double matsimVolume = linkCounts.get(linkId)*config.counts().getCountsScaleFactor();
-				double relVolume = countVolume != 0 ? matsimVolume/countVolume : matsimVolume*100;
+				double relVolume = countVolume > 0 ? matsimVolume/countVolume : matsimVolume*100;
 				writer.write(linkId + COUNTS_DELIMITER + countStationDescr + COUNTS_DELIMITER +
 						Long.toString((long)countVolume) + COUNTS_DELIMITER +
 						Long.toString((long)matsimVolume) + COUNTS_DELIMITER +
