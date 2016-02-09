@@ -40,7 +40,7 @@ import java.util.Set;
 import static playground.boescpa.ivtBaseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
 
 /**
- * WHAT IS IT FOR?
+ * Counts the hourly vehicles on a given link.
  *
  * @author boescpa
  */
