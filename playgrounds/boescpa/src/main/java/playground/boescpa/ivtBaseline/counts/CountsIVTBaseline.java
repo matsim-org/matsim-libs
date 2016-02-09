@@ -33,16 +33,22 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Counts the daily passengers on a given link.
  *
  * This is a customized version of org.matsim.pt.counts.OccupancyAnalyzer by yChen and mrieser
  * @author boescpa
  */
-public class PTCountsIVTBaseline implements StartupListener, IterationEndsListener, IterationStartsListener {
+public class CountsIVTBaseline implements StartupListener, IterationEndsListener, IterationStartsListener {
+
+	public static final String COUNTS_DELIMITER = ";";
 
 	private final PTLinkCountsEventHandler ptLinkCountsEventHandler;
 	private final PTStationCountsEventHandler ptStationCountsEventHandler;
+	private final StreetLinkDailyCountsEventHandler streetLinkDailyCountsEventHandler;
 	private final EventsManager events;
 	private final OutputDirectoryHierarchy controlerIO;
 	private final Config config;
@@ -50,10 +56,12 @@ public class PTCountsIVTBaseline implements StartupListener, IterationEndsListen
 	private boolean recordCounts;
 
 	@Inject
-	private PTCountsIVTBaseline(PTLinkCountsEventHandler ptLinkCountsEventHandler, PTStationCountsEventHandler ptStationCountsEventHandler,
-								EventsManager events, OutputDirectoryHierarchy controlerIO, Config config) {
+	private CountsIVTBaseline(PTLinkCountsEventHandler ptLinkCountsEventHandler, PTStationCountsEventHandler ptStationCountsEventHandler,
+							  StreetLinkDailyCountsEventHandler streetLinkDailyCountsEventHandler,
+							  EventsManager events, OutputDirectoryHierarchy controlerIO, Config config) {
 		this.ptLinkCountsEventHandler = ptLinkCountsEventHandler;
 		this.ptStationCountsEventHandler = ptStationCountsEventHandler;
+		this.streetLinkDailyCountsEventHandler = streetLinkDailyCountsEventHandler;
 		this.events = events;
 		this.controlerIO = controlerIO;
 		this.config = config;
@@ -67,23 +75,25 @@ public class PTCountsIVTBaseline implements StartupListener, IterationEndsListen
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		int countsInterval = this.config.ptCounts().getPtCountsInterval();
-		//int countsInterval = event.getServices().getConfig().ptCounts().getPtCountsInterval();
 		if (event.getIteration() % countsInterval == 0) {
 			this.recordCounts = true;
 			this.events.addHandler(this.ptLinkCountsEventHandler);
 			this.ptLinkCountsEventHandler.reset(event.getIteration());
 			this.events.addHandler(this.ptStationCountsEventHandler);
 			this.ptStationCountsEventHandler.reset(event.getIteration());
+			this.events.addHandler(this.streetLinkDailyCountsEventHandler);
+			this.streetLinkDailyCountsEventHandler.reset(event.getIteration());
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.recordCounts) {
-			this.ptLinkCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "ptLinkCounts.txt"));
+			this.ptLinkCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "ptLinkCounts.csv"));
 			this.events.removeHandler(this.ptLinkCountsEventHandler);
-			this.ptStationCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "ptStationCounts.txt"));
+			this.ptStationCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "ptStationCounts.csv"));
 			this.events.removeHandler(this.ptStationCountsEventHandler);
+			this.streetLinkDailyCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "streetDailyCounts.csv"));
 		}
 		this.recordCounts = false;
 	}

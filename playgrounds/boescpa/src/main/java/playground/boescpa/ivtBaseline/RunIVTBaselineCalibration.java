@@ -33,8 +33,9 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import playground.boescpa.ivtBaseline.counts.PTLinkCountsEventHandler;
-import playground.boescpa.ivtBaseline.counts.PTCountsIVTBaseline;
+import playground.boescpa.ivtBaseline.counts.CountsIVTBaseline;
 import playground.boescpa.ivtBaseline.counts.PTStationCountsEventHandler;
+import playground.boescpa.ivtBaseline.counts.StreetLinkDailyCountsEventHandler;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 
@@ -54,6 +55,7 @@ public class RunIVTBaselineCalibration {
 		final String configFile = args[0];
 		final String pathToPTLinksMonitorList = args[1];
 		final String pathToPTStationsMonitorList = args[2];
+		final String pathToStreetLinksDailyToMonitor = args[3];
 
 		// This allows to get a log file containing the log messages happening
 		// before controler init.
@@ -81,7 +83,7 @@ public class RunIVTBaselineCalibration {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.addControlerListenerBinding().to(PTCountsIVTBaseline.class);
+				this.addControlerListenerBinding().to(CountsIVTBaseline.class);
 				this.bind(PTLinkCountsEventHandler.class);
 				bind(String.class)
 						.annotatedWith(Names.named("pathToPTLinksToMonitor"))
@@ -90,6 +92,10 @@ public class RunIVTBaselineCalibration {
 				bind(String.class)
 						.annotatedWith(Names.named("pathToPTStationsToMonitor"))
 						.toInstance(pathToPTStationsMonitorList);
+				this.bind(StreetLinkDailyCountsEventHandler.class);
+				bind(String.class)
+						.annotatedWith(Names.named("pathToStreetLinksDailyToMonitor"))
+						.toInstance(pathToStreetLinksDailyToMonitor);
 			}
 		});
 

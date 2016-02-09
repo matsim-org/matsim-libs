@@ -53,6 +53,7 @@ public class TestRunIVTBaselineCalibration {
 	public void prepareTests() {
 		final String pathToPTLinksToMonitor = utils.getClassInputDirectory() + "ptLinksToMonitor.txt";
 		final String pathToPTStationsToMonitor = utils.getClassInputDirectory() + "ptStationsToMonitor.txt";
+		final String pathToStreetLinksDailyToMonitor = utils.getClassInputDirectory() + "streetLinksDailyToMonitor.txt";
 
 		final String pathToOnlyStreetNetwork = utils.getClassInputDirectory() + "onlystreetnetwork.xml";
 		final String pathToNetwork = "test/scenarios/pt-tutorial/multimodalnetwork.xml";
@@ -100,7 +101,7 @@ public class TestRunIVTBaselineCalibration {
 		config.ptCounts().setCountsScaleFactor(10);
 		new ConfigWriter(config).write(pathToConfig);
 
-		String[] argsSim = {pathToConfig, pathToPTLinksToMonitor, pathToPTStationsToMonitor};
+		String[] argsSim = {pathToConfig, pathToPTLinksToMonitor, pathToPTStationsToMonitor, pathToStreetLinksDailyToMonitor};
 		RunIVTBaselineCalibration.main(argsSim);
 	}
 
