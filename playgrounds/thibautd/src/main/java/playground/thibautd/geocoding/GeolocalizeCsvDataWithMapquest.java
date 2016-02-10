@@ -461,7 +461,8 @@ public class GeolocalizeCsvDataWithMapquest {
 				final int index ) {
 			try {
 				return
-					fields[ index ].isEmpty() ||
+					index == -1 ||
+						fields[ index ].isEmpty() ||
 					fields[ index ].equals( "NULL" ) ||
 					fields[ index ].equals( "NA" )?
 						null :
