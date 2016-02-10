@@ -26,15 +26,22 @@ package playground.jjoubert.projects.capeTownFreight.moveFacilities;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -356,6 +363,7 @@ public class CTUtilities {
 		String belconPopulation = args[6];
 		String kraaiconPopulation = args[7];
 		String outputFile = args[8];
+		int numberOfThreads = Integer.parseInt(args[9]);
 		
 		Map<Id<Person>, Double[]> map = new TreeMap<>();
 		BufferedReader br = IOUtils.getBufferedReader(affectedFile);
@@ -393,61 +401,110 @@ public class CTUtilities {
 		LOG.info("Ready to process different scenarios (" + map.size() + " affected)...");
 		Counter counter = new Counter("  affected # ");
 		
-		/* Read in the original population. */
+		/*================= Base =================*/
 		LOG.info("Reading base case...");
 		Scenario scBase = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(scBase).parse(basePopulation);
 		LOG.info("Processing base case...");
+		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
+		Map<Id<Person>, Future<Double>> mapOfJobs = new TreeMap<>();
 		for(Person person : scBase.getPopulation().getPersons().values()){
 			if(map.containsKey(person.getId())){
 				Plan plan = person.getSelectedPlan();
-				double d = VktEstimator.estimateVktFromLegs(sc.getNetwork(), plan, geom);
-				Double[] da = map.get(person.getId());
-				da[0] = d;
-				map.put(person.getId(), da);
-				counter.incCounter();
+				Callable<Double> job = new VktEstimatorCallable(sc.getNetwork(), plan, geom, counter);
+				Future<Double> submit = threadExecutor.submit(job);
+				mapOfJobs.put(person.getId(), submit);
 			}
 		}
-		counter.printCounter();
 		scBase = null;
+		LOG.info("Waiting for parallel handling of base case...");
+		threadExecutor.shutdown();
+		while(!threadExecutor.isTerminated()){
+		}
+		counter.printCounter();
+		LOG.info("Populating base case results...");
+		for(Id<Person> id : mapOfJobs.keySet()){
+			try {
+				double d = mapOfJobs.get(id).get();
+				Double[] da = map.get(id);
+				da[0] = d;
+				map.put(id, da);
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Could not get callable results for person " + id.toString());
+			}
+		}
 		
-		/* Read in the Belcon population. */
+		
+		/*================= Belcon =================*/
 		LOG.info("Reading Belcon case...");
 		counter.reset();
 		Scenario scBelcon = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(scBelcon).parse(belconPopulation);
 		LOG.info("Processing Belcon case...");
+		threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
+		mapOfJobs = new TreeMap<>();
 		for(Person person : scBelcon.getPopulation().getPersons().values()){
 			if(map.containsKey(person.getId())){
 				Plan plan = person.getSelectedPlan();
-				double d = VktEstimator.estimateVktFromLegs(sc.getNetwork(), plan, geom);
-				Double[] da = map.get(person.getId());
-				da[1] = d;
-				map.put(person.getId(), da);
-				counter.incCounter();
+				Callable<Double> job = new VktEstimatorCallable(sc.getNetwork(), plan, geom, counter);
+				Future<Double> submit = threadExecutor.submit(job);
+				mapOfJobs.put(person.getId(), submit);
 			}
 		}
-		counter.printCounter();
 		scBelcon = null;
+		LOG.info("Waiting for parallel handling of belcon case...");
+		threadExecutor.shutdown();
+		while(!threadExecutor.isTerminated()){
+		}
+		counter.printCounter();
+		LOG.info("Populating belcon case results...");
+		for(Id<Person> id : mapOfJobs.keySet()){
+			try {
+				double d = mapOfJobs.get(id).get();
+				Double[] da = map.get(id);
+				da[1] = d;
+				map.put(id, da);
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Could not get callable results for person " + id.toString());
+			}
+		}
 		
-		/* Read in the Kraaicon population. */
+		/*================= Kraaicon =================*/
 		LOG.info("Reading Kraaicon case...");
 		counter.reset();
 		Scenario scKraaicon = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(scKraaicon).parse(kraaiconPopulation);
 		LOG.info("Processing Kraaicon case...");
+		threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
+		mapOfJobs = new TreeMap<>();
 		for(Person person : scKraaicon.getPopulation().getPersons().values()){
 			if(map.containsKey(person.getId())){
 				Plan plan = person.getSelectedPlan();
-				double d = VktEstimator.estimateVktFromLegs(sc.getNetwork(), plan, geom);
-				Double[] da = map.get(person.getId());
-				da[2] = d;
-				map.put(person.getId(), da);
-				counter.incCounter();
+				Callable<Double> job = new VktEstimatorCallable(sc.getNetwork(), plan, geom, counter);
+				Future<Double> submit = threadExecutor.submit(job);
+				mapOfJobs.put(person.getId(), submit);
 			}
 		}
-		counter.printCounter();
 		scKraaicon = null;
+		LOG.info("Waiting for parallel handling of kraaicon case...");
+		threadExecutor.shutdown();
+		while(!threadExecutor.isTerminated()){
+		}
+		counter.printCounter();
+		LOG.info("Populating kraaicon case results...");
+		for(Id<Person> id : mapOfJobs.keySet()){
+			try {
+				double d = mapOfJobs.get(id).get();
+				Double[] da = map.get(id);
+				da[2] = d;
+				map.put(id, da);
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Could not get callable results for person " + id.toString());
+			}
+		}
 		
 		/* Write the results. */
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
@@ -473,4 +530,23 @@ public class CTUtilities {
 	}
 	
 	
+	private static class VktEstimatorCallable implements Callable<Double>{
+		final Network network;
+		final Geometry geom;
+		final Plan plan;
+		private Counter counter;
+		
+		public VktEstimatorCallable(Network network, Plan plan, Geometry geom, Counter counter) {
+			this.network = network;
+			this.plan = plan;
+			this.geom = geom;
+		}
+		
+		@Override
+		public Double call() throws Exception {
+			double d = VktEstimator.estimateVktFromLegs(network, plan, geom);
+			counter.incCounter();
+			return d;
+		}
+	}
 }
