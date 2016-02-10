@@ -40,13 +40,21 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 
@@ -76,6 +84,9 @@ import org.xml.sax.InputSource;
  * osm data, they overwrite the default values. Using {@link #setHierarchyLayer(double, double, double, double, int) hierarchy layers},
  * multiple overlapping areas can be specified, each with a different denseness, e.g. one only containing motorways,
  * a second one containing every link down to footways.
+ * 
+ * ADDITIONS:
+ * Checks for bicycle and pt usage for osm ways in order to create a multimodal network out of the box. dhosse Feb'16
  *
  * @author mrieser, aneumann
  */
@@ -95,17 +106,25 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
     private static final String TAG_CYCLEWAY = "cycleway";
     private static final String TAG_RAILWAY = "railway";
     private static final String TAG_TRACKS = "tracks";
+    private static final String TAG_TYPE = "type";
+    private static final String TAG_REF = "ref";
+    private static final String TAG_TO = "to";
+    private static final String TAG_NAME = "name";
     
-	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS,
-		TAG_BUS, TAG_BICYCLE, TAG_CYCLEWAY, TAG_RAILWAY, TAG_TRACKS};
+	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, 
+		TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS, TAG_BUS, TAG_BICYCLE, TAG_CYCLEWAY, TAG_RAILWAY, TAG_TRACKS,
+		TAG_TYPE, TAG_REF, TAG_TO, TAG_NAME};
 
 	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
 	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
+	private final Map<Long, OsmRelation> reations = new HashMap<Long, OsmRelation>();
 	private final Set<String> unknownHighways = new HashSet<String>();
 	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
 	private final Set<String> unknownLanesTags = new HashSet<String>();
 	private long id = 0;
-	/*package*/ final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
+	/*package*/ final Map<String, OsmHighwayDefaults> highwayDefaults = 
+			new HashMap<String, OsmHighwayDefaults>();
+	final Map<String, OsmHighwayDefaults> railwayDefaults = new HashMap<>();
 	private final Network network;
 	private final CoordinateTransformation transform;
 	private boolean keepPaths = false;
@@ -113,28 +132,38 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 
 	private boolean slowButLowMemory = false;
 	
+	private final TransitSchedule schedule;
+	private int transitRoutesCounter = 0;
+	private Map<Long, Id<Link>> wayId2LinkId = new HashMap<>();
+	
 	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
 
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
 	 *
 	 * @param network An empty network where the converted OSM data will be stored.
-	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
+	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84,
+	 * 			which is often not optimal for MATSim.
 	 */
-	public CustomizedOsmNetworkReader(final Network network, final CoordinateTransformation transformation) {
-		this(network, transformation, true);
+	public CustomizedOsmNetworkReader(final Network network, final TransitSchedule schedule,
+			final CoordinateTransformation transformation) {
+		this(network, schedule, transformation, true);
 	}
 
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
 	 *
 	 * @param network An empty network where the converted OSM data will be stored.
-	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
+	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, 
+	 * 			which is often not optimal for MATSim.
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
-	public CustomizedOsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
+	public CustomizedOsmNetworkReader(final Network network, final TransitSchedule schedule,
+			final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
 		this.network = network;
 		this.transform = transformation;
+		
+		this.schedule = schedule;
 
 		if (useHighwayDefaults) {
 			log.info("Falling back to default values.");
@@ -151,15 +180,15 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 			this.setHighwayDefaults(6, "residential",   1,  30.0/3.6, 0.6,  600);
 			this.setHighwayDefaults(6, "living_street", 1,  15.0/3.6, 1.0,  300);
 			//customization:
-//			this.setHighwayDefaults(7, "pedestrian", 1, 10/3.6, 1.0, 100);
-//			this.setHighwayDefaults(7, "footway", 1, 10/3.6, 1.0, 100);
+			this.setHighwayDefaults(7, "pedestrian", 1, 10/3.6, 1.0, 100);
+			this.setHighwayDefaults(7, "footway", 1, 10/3.6, 1.0, 100);
 			this.setHighwayDefaults(6, "service", 1,  30.0/3.6, 0.6,  300);
 			
-			this.setHighwayDefaults(1, "light_rail", 1, 50 / 3.6, 0.6, 30);
-			this.setHighwayDefaults(1, "narrow_gauge", 1, 120 / 3.6, 1.0, 30);
-			this.setHighwayDefaults(1, "rail", 1, 120 / 3.6, 1.0, 30);
-			this.setHighwayDefaults(1, "subway", 1, 40 / 3.6, 1.0, 30);
-			this.setHighwayDefaults(1, "tram", 1, 50 / 3.6, 0.6, 30);
+//			this.setHighwayDefaults(1, "light_rail", 1, 50 / 3.6, 0.6, 30);
+//			this.setHighwayDefaults(1, "narrow_gauge", 1, 120 / 3.6, 1.0, 30);
+			this.setRailwayDefaults(1, "rail", 1, 120 / 3.6, 1.0, 30);
+//			this.setRailwayDefaults(1, "subway", 1, 40 / 3.6, 1.0, 30);
+//			this.setRailwayDefaults(1, "tram", 1, 50 / 3.6, 0.6, 30);
 			//railways:
 			/*
 			 * light_rail
@@ -207,7 +236,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		OsmXmlParser parser = null;
 		if (this.slowButLowMemory) {
 			log.info("parsing osm file first time: identifying nodes used by ways");
-			parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
+			parser = new OsmXmlParser(this.nodes, this.ways, this.reations, this.transform);
 			parser.enableOptimization(1);
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
@@ -223,7 +252,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 			}
 			log.info("done loading data");
 		} else {
-			parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
+			parser = new OsmXmlParser(this.nodes, this.ways, this.reations, this.transform);
 			if (stream != null) {
 				parser.parse(new InputSource(stream));
 			} else {
@@ -232,10 +261,14 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		}
 		convert();
 		log.info("= conversion statistics: ==========================");
-		log.info("osm: # nodes read:       " + parser.nodeCounter.getCounter());
-		log.info("osm: # ways read:        " + parser.wayCounter.getCounter());
-		log.info("MATSim: # nodes created: " + this.network.getNodes().size());
-		log.info("MATSim: # links created: " + this.network.getLinks().size());
+		log.info("osm: # nodes read:                " + parser.nodeCounter.getCounter());
+		log.info("osm: # ways read:                 " + parser.wayCounter.getCounter());
+		log.info("osm: # relations read:            " + parser.relationCounter.getCounter());
+		log.info("MATSim: # nodes created:          " + this.network.getNodes().size());
+		log.info("MATSim: # links created:          " + this.network.getLinks().size());
+		log.info("MATSim: # stops created:          " + this.schedule.getFacilities().size());
+		log.info("MATSim: # transit lines created:  " + this.schedule.getTransitLines().size());
+		log.info("MATSim: # transit routes created: " + this.transitRoutesCounter);
 
 		if (this.unknownHighways.size() > 0) {
 			log.info("The following highway-types had no defaults set and were thus NOT converted:");
@@ -245,7 +278,11 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		}
 		log.info("= end of conversion statistics ====================");
 	}
-
+	
+	public void setRailwayDefaults(final int hierarchy , final String highwayType, final double lanesPerDirection, final double freespeed, final double freespeedFactor, final double laneCapacity_vehPerHour) {
+		this.railwayDefaults.put(highwayType, new OsmHighwayDefaults(hierarchy, lanesPerDirection, freespeed, freespeedFactor, laneCapacity_vehPerHour, false));
+	}
+	
 	/**
 	 * Sets defaults for converting OSM highway paths into MATSim links, assuming it is no oneway road.
 	 *
@@ -337,7 +374,19 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		if (this.network instanceof NetworkImpl) {
 			((NetworkImpl) this.network).setCapacityPeriod(3600);
 		}
-
+		
+		Iterator<Entry<Long, OsmRelation>> rIt = this.reations.entrySet().iterator();
+		while(rIt.hasNext()){
+			
+			Entry<Long, OsmRelation> entry = rIt.next();
+			for(Long wayId : entry.getValue().ways){
+				if(this.ways.get(wayId) == null){
+					rIt.remove();
+					break;
+				}
+			}
+		}
+		
 		Iterator<Entry<Long, OsmWay>> it = this.ways.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<Long, OsmWay> entry = it.next();
@@ -351,7 +400,10 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 
 		// check which nodes are used
 		for (OsmWay way : this.ways.values()) {
-			String highway = way.tags.get(TAG_HIGHWAY) != null ? way.tags.get(TAG_HIGHWAY) : way.tags.get(TAG_RAILWAY);
+			String highway = way.tags.get(TAG_HIGHWAY);
+			
+			String railway = way.tags.get(TAG_RAILWAY);
+			
 			if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
 				// check to which level a way belongs
 				way.hierarchy = this.highwayDefaults.get(highway).hierarchy;
@@ -375,6 +427,31 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 						}
 					}
 				}
+			} else if(railway != null && this.railwayDefaults.containsKey(railway)){
+				
+				// check to which level a way belongs
+				way.hierarchy = this.railwayDefaults.get(railway).hierarchy;
+
+				// first and last are counted twice, so they are kept in all cases
+				this.nodes.get(way.nodes.get(0)).ways++;
+				this.nodes.get(way.nodes.get(way.nodes.size()-1)).ways++;
+
+				for (Long nodeId : way.nodes) {
+					OsmNode node = this.nodes.get(nodeId);
+					if (this.hierarchyLayers.isEmpty()) {
+						node.used = true;
+						node.ways++;
+					} else {
+						for (OsmFilter osmFilter : this.hierarchyLayers) {
+							if(osmFilter.coordInFilter(node.coord, way.hierarchy)){
+								node.used = true;
+								node.ways++;
+								break;
+							}
+						}
+					}
+				}
+				
 			}
 		}
 
@@ -388,7 +465,9 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 			// verify we did not mark nodes as unused that build a loop
 			for (OsmWay way : this.ways.values()) {
 				String highway = way.tags.get(TAG_HIGHWAY);
-				if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
+				String railway = way.tags.get(TAG_RAILWAY);
+				if (((highway != null) && (this.highwayDefaults.containsKey(highway))) ||
+						(railway != null && this.railwayDefaults.containsKey(railway))) {
 					int prevRealNodeIndex = 0;
 					OsmNode prevRealNode = this.nodes.get(way.nodes.get(prevRealNodeIndex));
 
@@ -430,8 +509,9 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		// create the links
 		this.id = 1;
 		for (OsmWay way : this.ways.values()) {
-			String highway = way.tags.get(TAG_HIGHWAY) != null ? way.tags.get(TAG_HIGHWAY) : way.tags.get(TAG_RAILWAY);
-			if (highway != null) {
+			String highway = way.tags.get(TAG_HIGHWAY);
+			String railway = way.tags.get(TAG_RAILWAY);
+			if (highway != null || railway != null) {
 				OsmNode fromNode = this.nodes.get(way.nodes.get(0));
 				double length = 0.0;
 				OsmNode lastToNode = fromNode;
@@ -466,28 +546,125 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 				}
 			}
 		}
+		
+//		for(OsmNode node : this.nodes.values()){
+//			
+//			String railwayType = node.tags.get(TAG_RAILWAY);
+//			if(railwayType != null){
+//				createTransitStopFacility(this.schedule, node);
+//			}
+//			
+//		}
+//		
+//		for(OsmRelation relation : this.reations.values()){
+//			createTransitSchedule(this.schedule, relation);
+//		}
 
 		// free up memory
 		this.nodes.clear();
 		this.ways.clear();
 	}
+	
+	private void createTransitStopFacility(final TransitSchedule schedule, OsmNode node){
+		
+//		if("station".equals(node.tags.get(TAG_RAILWAY)) || "halt".equals(node.tags.get(TAG_RAILWAY))
+//				|| "platform".equals(node.tags.get(TAG_RAILWAY))){
+			
+			String origId = Long.toString(node.id);
+			Id<TransitStopFacility> id = Id.create(origId, TransitStopFacility.class);
+			String name = node.tags.get(TAG_NAME);
+			
+			TransitStopFacility facility = schedule.getFactory().createTransitStopFacility(id, node.coord, false);
+			facility.setName(name);
+			facility.setStopPostAreaId(origId);
+			schedule.addStopFacility(facility);
+			
+//		}
+		
+	}
+	
+	private void createTransitSchedule(final TransitSchedule schedule, final OsmRelation relation){
+		
+		String routeType = relation.tags.get(TAG_TYPE);
+		
+		if("route_master".equals(routeType)){
+			
+			//it's a transit line
+			TransitLine line = schedule.getFactory().createTransitLine(Id.create(relation.id, TransitLine.class));
+			schedule.addTransitLine(line);
+			
+		} else if("route".equals(routeType)){
+			
+			//it's a transit route
+			
+			String refId = relation.tags.get(TAG_REF);
+			
+			if(refId == null){
+				refId = Integer.toString(MatsimRandom.getLocalInstance().nextInt(10000));
+			}
+			
+			Id<TransitLine> transitLineRefId = Id.create(refId, TransitLine.class);
+			TransitLine line = schedule.getTransitLines().containsKey(transitLineRefId) ? schedule.getTransitLines().get(transitLineRefId) :
+					schedule.getFactory().createTransitLine(Id.create(transitLineRefId, TransitLine.class));
+			
+			if(!schedule.getTransitLines().containsKey(transitLineRefId)){
+				
+				schedule.addTransitLine(line);
+				
+			}
+			
+			ArrayList<TransitRouteStop> stops = new ArrayList<>();
+			
+			for(Long nodeId : relation.nodes) {
+				
+				if(this.nodes.get(nodeId).tags.get(TAG_RAILWAY) != null){
+					
+					TransitStopFacility facility = schedule.getFacilities().get(Id.create(nodeId, TransitStopFacility.class));
+					TransitRouteStop stop = schedule.getFactory().createTransitRouteStop(facility, 0.0, 0.0);
+					stops.add(stop);
+					
+				}
+				
+			}
+			
+			ArrayList<Id<Link>> linkIds = new ArrayList<>();
+			for(Long wayId : relation.ways){
+
+				linkIds.add(this.wayId2LinkId.get(wayId));
+				
+			}
+			
+			NetworkRoute networkRoute = linkIds.size() > 1 ? 
+					RouteUtils.createNetworkRoute(linkIds, this.network) : null;
+			
+			TransitRoute route = schedule.getFactory().createTransitRoute(Id.create(refId + "==to==" + relation.tags.get(TAG_TO), TransitRoute.class), networkRoute, stops, "train");
+			if(route.getRoute() != null && route.getStops().size() > 0){
+				line.addRoute(route);
+			}
+			this.transitRoutesCounter++;
+			
+		}
+		
+	}
 
 	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode,
 			final OsmNode toNode, final double length) {
 		
-		String highway = way.tags.get(TAG_HIGHWAY) != null ? way.tags.get(TAG_HIGHWAY) : way.tags.get(TAG_RAILWAY);
+		String highway = way.tags.get(TAG_HIGHWAY);
+		String railway = way.tags.get(TAG_RAILWAY);
 
         if ("no".equals(way.tags.get(TAG_ACCESS))) {
              return;
         }
-		
+        
 		// load defaults
-		OsmHighwayDefaults defaults = this.highwayDefaults.get(highway);
+		OsmHighwayDefaults defaults = this.highwayDefaults.get(highway) != null ?
+				this.highwayDefaults.get(highway) : this.railwayDefaults.get(railway);
 		if (defaults == null) {
 			this.unknownHighways.add(highway);
 			return;
 		}
-
+		
 		double nofLanes = defaults.lanesPerDirection;
 		double laneCapacity = defaults.laneCapacity;
 		double freespeed = defaults.freespeed;
@@ -524,11 +701,15 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 
         // In case trunks, primary and secondary roads are marked as oneway,
         // the default number of lanes should be two instead of one.
-        if(highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary") ||
-        		highway.equalsIgnoreCase("secondary")){
-            if((oneway || onewayReverse) && nofLanes == 1.0){
-                nofLanes = 2.0;
-            }
+		if(highway != null){
+			
+			if(highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary") ||
+	        		highway.equalsIgnoreCase("secondary")){
+	            if((oneway || onewayReverse) && nofLanes == 1.0){
+	                nofLanes = 2.0;
+	            }
+			}
+			
 		}
 
 		String maxspeedTag = way.tags.get(TAG_MAXSPEED);
@@ -544,7 +725,8 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		}
 
 		// check tag "lanes"
-		String lanesTag = way.tags.get(TAG_LANES) != null ? way.tags.get(TAG_LANES) : way.tags.get(TAG_TRACKS);
+		String lanesTag = way.tags.get(TAG_LANES);
+		String tracksTag = way.tags.get(TAG_TRACKS);
 		if (lanesTag != null) {
 			try {
 				double totalNofLanes = Double.parseDouble(lanesTag);
@@ -565,6 +747,16 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 					log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
 				}
 			}
+		} else if(tracksTag != null) {
+			
+			//the number of tracks is directly applied to the link
+			//all railway links should be oneway and thus we do not need
+			//to divide here
+			double totalNofTracks = Double.parseDouble(tracksTag);
+			if(totalNofTracks > 0){
+				nofLanes = totalNofTracks;
+			}
+			
 		}
 		
 		Set<String> allowedModes = new HashSet<>();
@@ -575,7 +767,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 			
 		} else {
 			
-			if(way.tags.get(TAG_HIGHWAY).equals("footpath") || way.tags.get(TAG_HIGHWAY).equals("pedestrian")){
+			if(way.tags.get(TAG_HIGHWAY).equals("footway") || way.tags.get(TAG_HIGHWAY).equals("pedestrian")){
 				
 				allowedModes.add(TransportMode.walk);
 				
@@ -613,11 +805,17 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 			freespeed = freespeed * freespeedFactor;
 		}
 
+		boolean networkModes = false;
+		if(allowedModes.contains(TransportMode.car) || allowedModes.contains(TransportMode.pt)){
+			networkModes = true;
+		}
+		
 		// only create link, if both nodes were found, node could be null, since nodes outside a layer
 		//were dropped
 		Id<Node> fromId = Id.create(fromNode.id, Node.class);
 		Id<Node> toId = Id.create(toNode.id, Node.class);
-		if(network.getNodes().get(fromId) != null && network.getNodes().get(toId) != null){
+		if(network.getNodes().get(fromId) != null && network.getNodes().get(toId) != null &&
+				networkModes){
 			String origId = Long.toString(way.id);
 
 			if (!onewayReverse) {
@@ -632,6 +830,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 					((LinkImpl) l).setOrigId(origId);
 				}
 				network.addLink(l);
+				this.wayId2LinkId.put(way.id, l.getId());
 				this.id++;
 			}
 			if (!oneway) {
@@ -678,6 +877,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		public boolean used = false;
 		public int ways = 0;
 		public final Coord coord;
+		public final Map<String, String> tags = new HashMap<String, String>(4);
 
 		public OsmNode(final long id, final Coord coord) {
 			this.id = id;
@@ -694,6 +894,22 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		public OsmWay(final long id) {
 			this.id = id;
 		}
+	}
+	
+	private static class OsmRelation {
+		
+		public final long id;
+		public final List<Long> nodes = new ArrayList<Long>();
+		public final List<Long> ways = new ArrayList<Long>();
+		public final List<Long> relations = new ArrayList<Long>();
+		public final Map<String, String> tags = new HashMap<String, String>(4);
+		
+		public OsmRelation(final long id){
+			
+			this.id = id;
+			
+		}
+		
 	}
 
 	private static class OsmHighwayDefaults {
@@ -716,24 +932,31 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 			this.oneway = oneway;
 		}
 	}
-
+	
 	private class OsmXmlParser extends MatsimXmlParser {
 
+		private OsmNode currentNode = null;
 		private OsmWay currentWay = null;
+		private OsmRelation currentRelation = null;
 		private final Map<Long, OsmNode> nodes;
 		private final Map<Long, OsmWay> ways;
+		private final Map<Long, OsmRelation> relations;
+		private final Stack<OsmRelation> activeRelations = new Stack<OsmRelation>();
 		/*package*/ final Counter nodeCounter = new Counter("node ");
 		/*package*/ final Counter wayCounter = new Counter("way ");
+		/*package*/ final Counter relationCounter = new Counter("relation ");
 		private final CoordinateTransformation transform;
 		private boolean loadNodes = true;
 		private boolean loadWays = true;
 		private boolean mergeNodes = false;
 		private boolean collectNodes = false;
 
-		public OsmXmlParser(final Map<Long, OsmNode> nodes, final Map<Long, OsmWay> ways, final CoordinateTransformation transform) {
+		public OsmXmlParser(final Map<Long, OsmNode> nodes, final Map<Long, OsmWay> ways, final Map<Long, OsmRelation> relations,
+				final CoordinateTransformation transform) {
 			super();
 			this.nodes = nodes;
 			this.ways = ways;
+			this.relations = relations;
 			this.transform = transform;
 			this.setValidating(false);
 		}
@@ -763,8 +986,11 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 					Long id = Long.valueOf(atts.getValue("id"));
 					double lat = Double.parseDouble(atts.getValue("lat"));
 					double lon = Double.parseDouble(atts.getValue("lon"));
-					this.nodes.put(id, new OsmNode(id, this.transform.transform(new Coord(lon, lat))));
+					OsmNode node = new OsmNode(id, this.transform.transform(new Coord(lon, lat)));
+					this.nodes.put(id, node);
 					this.nodeCounter.incCounter();
+					this.currentNode = node;
+					
 				} else if (this.mergeNodes) {
 					OsmNode node = this.nodes.get(Long.valueOf(atts.getValue("id")));
 					if (node != null) {
@@ -773,6 +999,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 						Coord c = this.transform.transform(new Coord(lon, lat));
 						node.coord.setXY(c.getX(), c.getY());
 						this.nodeCounter.incCounter();
+						this.currentNode = node;
 					}
 				}
 			} else if ("way".equals(name)) {
@@ -790,7 +1017,58 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 							break;
 						}
 					}
+				} else if(this.currentRelation != null){
+					
+					String key = StringCache.get(atts.getValue("k"));
+					for(String tag : ALL_TAGS) {
+						
+						if(tag.equals(key)){
+							this.currentRelation.tags.put(key, StringCache.get(atts.getValue("v")));
+						}
+						
+					}
+					
+				} else if(this.currentNode != null){
+					
+					String key = StringCache.get(atts.getValue("k"));
+					for(String tag : ALL_TAGS) {
+						
+						if(tag.equals(key)){
+							this.currentNode.tags.put(key, StringCache.get(atts.getValue("v")));
+						}
+						
+					}
+					
 				}
+			} else if ("relation".equals(name)){
+				
+				if(this.currentRelation != null){
+				
+					this.activeRelations.add(this.currentRelation);
+					
+				}
+				
+				this.currentRelation = new OsmRelation(Long.parseLong(atts.getValue("id")));
+				
+			} else if("member".equals(name)){
+				
+				String type = atts.getValue("type");
+				long refId = Long.parseLong(atts.getValue("ref"));
+				
+				if("node".equals(type)){
+					
+					this.currentRelation.nodes.add(refId);
+					
+				} else if("way".equals(type)){
+					
+					this.currentRelation.ways.add(refId);
+					
+				} else if("relation".equals(type)){
+					
+					this.currentRelation.relations.add(refId);
+					
+				}
+				
 			}
 		}
 
@@ -801,7 +1079,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 					boolean used = false;
 					OsmHighwayDefaults osmHighwayDefaults = CustomizedOsmNetworkReader.this.highwayDefaults.get(this.currentWay.tags.get(TAG_HIGHWAY));
 					if(osmHighwayDefaults == null){
-						osmHighwayDefaults = CustomizedOsmNetworkReader.this.highwayDefaults.get(this.currentWay.tags.get(TAG_RAILWAY));
+						osmHighwayDefaults = CustomizedOsmNetworkReader.this.railwayDefaults.get(this.currentWay.tags.get(TAG_RAILWAY));
 					}
 					if (osmHighwayDefaults != null) {
 						int hierarchy = osmHighwayDefaults.hierarchy;
@@ -838,6 +1116,16 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 					}
 				}
 				this.currentWay = null;
+			} else if("relation".equals(name)){
+				if(!this.currentRelation.nodes.isEmpty() || !this.currentRelation.ways.isEmpty() || !this.currentRelation.relations.isEmpty()){
+					
+					this.relations.put(this.currentRelation.id, this.currentRelation);
+					this.relationCounter.incCounter();
+					this.currentRelation = null;
+					
+				}
+			} else if("node".equals(name)){
+				this.currentNode = null;
 			}
 		}
 
