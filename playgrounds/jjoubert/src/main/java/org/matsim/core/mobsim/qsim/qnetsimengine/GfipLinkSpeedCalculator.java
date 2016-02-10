@@ -46,8 +46,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.GfipMultimodalQSimFactory.QueueType;
 import org.matsim.core.mobsim.qsim.qnetsimengine.GfipQueuePassingControler.GfipMode;
-import org.matsim.core.mobsim.qsim.qnetsimengine.GfipQueuePassingQSimFactory.QueueType;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -66,10 +66,10 @@ public class GfipLinkSpeedCalculator implements LinkSpeedCalculator {
 	final private QueueType queueType;
 	private int infoCount = 0;
 	
-	public GfipLinkSpeedCalculator(final Vehicles vehicles, final QSim qsim, final QueueType queueType) {
+	public GfipLinkSpeedCalculator(final Vehicles vehicles, final QSim qsim, final QueueType queueType2) {
 		this.vehicles = vehicles;
 		this.qsim = qsim;
-		this.queueType = queueType;
+		this.queueType = queueType2;
 	}
 	
 	
@@ -193,6 +193,11 @@ public class GfipLinkSpeedCalculator implements LinkSpeedCalculator {
 //		if(mode == GfipMode.GFIP_A1 && link.getId().toString().equalsIgnoreCase("81")){
 //			log.info(String.format(" gfip_a1 on 81; pcu: %d; rho: %.2f; speed: %.2f", numberOfVehiclesAhead, rho, uberPassingVelocity*3.6));
 //		}
+		/*FIXME Remove after debugging. */
+		if(velocity > classSpeed){
+			log.error("Velocity?!");
+			throw new RuntimeException("Something wrong.");
+		}
 		
 		return velocity;
 	}
