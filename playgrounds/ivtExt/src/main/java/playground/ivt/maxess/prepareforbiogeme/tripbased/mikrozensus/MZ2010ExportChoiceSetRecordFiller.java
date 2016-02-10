@@ -109,23 +109,23 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 			case "do not know":
 				return -97;
 			case "less than CHF 2000":
-				return 1;
+				return 1000;
 			case "CHF 2000 to 4000":
-				return 2;
+				return 3000;
 			case "CHF 4001 to 6000":
-				return 3;
+				return 5000;
 			case "CHF 6001 to 8000":
-				return 4;
+				return 7000;
 			case "CHF 8001 to 10000":
-				return 5;
+				return 8000;
 			case "CHF 10001 to 12000":
-				return 6;
+				return 11000;
 			case "CHF 12001 to 14000":
-				return 7;
+				return 13000;
 			case "CHF 14001 to 16000":
-				return 8;
+				return 15000;
 			case "greater than CHF 16000":
-				return 9;
+				return 17000;
 		}
 		throw new IllegalArgumentException( income );
 	}
