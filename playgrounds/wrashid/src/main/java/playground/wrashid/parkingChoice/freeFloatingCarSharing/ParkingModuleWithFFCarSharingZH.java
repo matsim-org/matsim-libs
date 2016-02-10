@@ -16,6 +16,8 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkImpl;
@@ -29,7 +31,8 @@ import java.util.Collection;
 import java.util.HashMap;
 
 //TODO: move this to my playground and rename to Zurich
-public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implements ParkingModuleWithFreeFloatingCarSharing {
+public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule 
+implements ParkingModuleWithFreeFloatingCarSharing, IterationStartsListener, IterationEndsListener {
 
 	private Collection<ParkingCoordInfo> initialDesiredVehicleCoordinates;
 	private HashMap<Id, PC2Parking> currentVehicleLocation;
@@ -64,7 +67,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		
 		
 		PC2Parking parking=currentVehicleLocation.get(vehicleId);
-		parkingInfrastructureManager.unParkVehicle(parking, departureTime, personId);
+		getParkingInfrastructureManager().unParkVehicle(parking, departureTime, personId);
 		
 		vehicleLocations.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 
@@ -95,7 +98,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
         NetworkImpl network = (NetworkImpl) getControler().getScenario().getNetwork();
 		
 		String groupName = getAcceptableParkingGroupName();
-		PC2Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(destCoord, groupName, personId, getAverageActDuration(), arrivalTime);
+		PC2Parking parking=getParkingInfrastructureManager().parkAtClosestPublicParkingNonPersonalVehicle(destCoord, groupName, personId, getAverageActDuration(), arrivalTime);
 	//	currentVehicleLocation.put(vehicleId, parking);
 	//	vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 		
@@ -119,8 +122,8 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		currentVehicleLocation=new HashMap<Id, PC2Parking>();
 		
 		for (ParkingCoordInfo parkInfo : initialDesiredVehicleCoordinates) {
-			PC2Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(parkInfo.getParkingCoordinate(), groupName);
-			parkingInfrastructureManager.logArrivalEventAtTimeZero(parking);
+			PC2Parking parking=getParkingInfrastructureManager().parkAtClosestPublicParkingNonPersonalVehicle(parkInfo.getParkingCoordinate(), groupName);
+			getParkingInfrastructureManager().logArrivalEventAtTimeZero(parking);
 			currentVehicleLocation.put(parkInfo.getVehicleId(), parking);
 			vehicleLocationsRect.registerCoord(parking.getCoordinate());
 		}
@@ -146,16 +149,12 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		super.notifyIterationStarts(event);
-		//resetForNewIterationStart();
-		// already called by free floating code
-		
 		eventsManager = EventsUtils.createEventsManager();
 		eventsWriter = new EventWriterXML(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
 		eventsManager.addHandler(eventsWriter);
 		parkingGroupOccupanciesZH = new ParkingGroupOccupanciesZH(getControler());
 		eventsManager.addHandler(parkingGroupOccupanciesZH);
-		averageWalkDistanceStatsZH = new AverageWalkDistanceStatsZH(parkingInfrastructureManager.getAllParkings());
+		averageWalkDistanceStatsZH = new AverageWalkDistanceStatsZH(getParkingInfrastructureManager().getAllParkings());
 		eventsManager.addHandler(averageWalkDistanceStatsZH);
 		eventsManager.resetHandlers(0);
 		eventsWriter.init(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
@@ -177,7 +176,6 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		super.notifyIterationEnds(event);
 		
 		parkingGroupOccupanciesZH.savePlot(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingGroupOccupancy.png"));
 		averageWalkDistanceStatsZH.printStatistics();
