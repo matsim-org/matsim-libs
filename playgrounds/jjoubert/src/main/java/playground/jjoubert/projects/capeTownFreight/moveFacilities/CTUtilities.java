@@ -26,7 +26,6 @@ package playground.jjoubert.projects.capeTownFreight.moveFacilities;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -540,6 +539,7 @@ public class CTUtilities {
 			this.network = network;
 			this.plan = plan;
 			this.geom = geom;
+			this.counter = counter;
 		}
 		
 		@Override
