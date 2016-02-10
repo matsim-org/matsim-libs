@@ -26,6 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 /**
  * @author nagel
@@ -43,9 +44,14 @@ public class RunParkingExampleTest {
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.vspExperimental().setWritingOutputEvents(true);
 		RunParkingExample.run(config);
-		long expected = CRCChecksum.getCRCFromFile( utils.getInputDirectory() + "/output_events.xml.gz" ) ;
-		long actual = CRCChecksum.getCRCFromFile( utils.getOutputDirectory() + "/output_events.xml.gz" ) ;
+		final String filenameExpected = utils.getInputDirectory() + "/output_events.xml.gz";
+		long expected = CRCChecksum.getCRCFromFile( filenameExpected ) ;
+		final String filenameActual = utils.getOutputDirectory() + "/output_events.xml.gz";
+		long actual = CRCChecksum.getCRCFromFile( filenameActual ) ;
 		Logger.getLogger( RunParkingExampleTest.class ).info( "expected=" + expected + "; actual=" + actual ); 
+		if ( actual != expected ) {
+			EventsFileComparator.compare(filenameExpected, filenameActual) ;
+		}
 		Assert.assertEquals(expected, actual);
 	}
 
