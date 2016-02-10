@@ -1,5 +1,0 @@
-pattern	0+	5+	10+	15+	20+	25+	30+	35+	40+	45+	50+	55+	60+
-home---work	0	0	0	0	0	0	0	0	0	0	0	0	20
-work---home	0	0	0	0	0	0	0	0	0	0	0	0	20
-
-average trip duration: 9722.05 seconds = 02:42:02

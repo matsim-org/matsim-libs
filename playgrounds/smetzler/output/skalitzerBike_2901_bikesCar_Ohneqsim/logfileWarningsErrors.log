@@ -1,3 +1,0 @@
-2016-01-29 16:16:24,317 ERROR BasicPlanAgentImpl:153 last activity of person driver agent id car_home1_work1_17 has end time < infty; setting it to infty
-2016-01-29 16:16:24,318 ERROR BasicPlanAgentImpl:154  This message given only once.
-2016-01-29 16:16:26,376  WARN ExpBetaPlanChanger:86 Would make sense to revise this once more.  See comments in code.  kai, nov08
