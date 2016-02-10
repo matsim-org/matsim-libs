@@ -8,7 +8,7 @@
 	</module>
  
 	<module name="network">
-		<param name="inputNetworkFile" value="input/network/equilNetwork.xml" />
+		<param name="inputNetworkFile" value="input/network/equilNetworkReducedCapAndLength.xml" />
 	</module>
 
 	<module name="plans">
@@ -16,8 +16,8 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="./output/equil_bike_0602_wSand_futherTesting" />
-		<param name="lastIteration" value="10" />
+		<param name="outputDirectory" value="./output/equil_bike_0902_wSlopeAndSurfaceCapit100" />
+		<param name="lastIteration" value="100" />
 	</module>
 
 	<module name="qsim">
@@ -38,8 +38,8 @@
 	</module>
 	
 	<module name="bike" >
-		<param name="inputSurfaceInformationFile" value="input/network/equilNetwork_att.xml" />
-		<param name="referenceBikeSpeed" value="1" /> <!-- 6.01 is gut -->
+		<param name="inputNetworkObjectattributeFile" value="input/network/equilNetwork_attWithSlopeAndSurface.xml" />
+		<param name="referenceBikeSpeed" value="3.0" /> <!-- 6.01 is gut -->
 	</module>
 	
 	<!--

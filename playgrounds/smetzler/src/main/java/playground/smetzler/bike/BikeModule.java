@@ -16,13 +16,15 @@ public class BikeModule extends AbstractModule {
 		
 		
 		// die Disutility wird aus time und distance mithilfe des RandomizingTimeDistanceTravelDisutility berechnet 
+		// in den RandomizingTimeDistanceTravelDisutility/OnlyTimeDependentTravelDisutility sollte die brechntete aktuelle Fahrzeut aus der BikeTravelTime eingehen
         addTravelDisutilityFactoryBinding("bike").toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( "bike" ) );
+        			
        //addTravelDisutilityFactoryBinding("bike").to(BikeTravelDisutilityFactory.class);
 		
 		//von Multimodal Kopiert
        // addRoutingModuleBinding("bike").toProvider(new TripRouterFactoryModule.NetworkRoutingModuleProvider("bike"));
 
-        
+
 		//analog zu RunMobsimWithMultipleModeVehiclesExample, sorgt momentan lediglich dafür dass die maxV und PCU eingestellt ist.
 		bindMobsim().toProvider(BikeQSimFactory.class);
 		

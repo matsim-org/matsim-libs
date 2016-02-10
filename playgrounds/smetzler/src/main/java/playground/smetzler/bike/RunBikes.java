@@ -10,7 +10,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunBikes {
 	
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("input/config_bike_equil.xml", new BikeConfigGroup());
+		Config config = ConfigUtils.loadConfig("../../../berlin-bike/input/config_bike_equil.xml", new BikeConfigGroup());
+
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);

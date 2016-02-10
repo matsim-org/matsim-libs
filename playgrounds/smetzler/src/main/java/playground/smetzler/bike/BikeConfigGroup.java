@@ -31,14 +31,14 @@ import java.util.TreeMap;
 public class BikeConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "bike";
-	
-	private static final String INPUT_SURFACE_INFORMATION_FILE = "inputSurfaceInformationFile";
+
+	private static final String INPUT_NETWORK_ATTRIBUTE_FILE = "inputNetworkObjectattributeFile";
 	private static final String INPUT_REFERENCE_BIKE_SPEED = "referenceBikeSpeed";
 
-	
 
-	private String surfaceInformationFile = null;
-	private String referenceBikeSpeed = null;
+
+	private String networkAttFile = null;
+	private double referenceBikeSpeed = 6.01;
 
 
 	public BikeConfigGroup() {
@@ -49,63 +49,62 @@ public class BikeConfigGroup extends ConfigGroup {
 	public final void addParam(final String key, final String value) {
 		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
 		if ( "null".equalsIgnoreCase( value ) ) return;
-		
-		if (INPUT_SURFACE_INFORMATION_FILE.equals(key)) {
-			setSurfaceInformationFile(value);
+
+		if (INPUT_NETWORK_ATTRIBUTE_FILE.equals(key)) {
+			setNetworkAttFile(value);
 		} else if (INPUT_REFERENCE_BIKE_SPEED.equals(key)) {
-			setReferenceBikeSpeed(value);
+			setReferenceBikeSpeed(Double.parseDouble(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
 	}
-	
 
 
 	@Override
 	public final String getValue(final String key) {
-		if (INPUT_SURFACE_INFORMATION_FILE.equals(key)) {
-			return getSurfaceInformationFile();
+		if (INPUT_NETWORK_ATTRIBUTE_FILE.equals(key)) {
+			return getNetworkAttFile();
 		} else if (INPUT_REFERENCE_BIKE_SPEED.equals(key)) {
-			return getReferenceBikeSpeed();
+			return Double.toString(getReferenceBikeSpeed());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
 	}
-	
+
 
 
 	@Override
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<>();
-		map.put(INPUT_SURFACE_INFORMATION_FILE, getValue(INPUT_SURFACE_INFORMATION_FILE));
+		map.put(INPUT_NETWORK_ATTRIBUTE_FILE, getValue(INPUT_NETWORK_ATTRIBUTE_FILE));
 		map.put(INPUT_REFERENCE_BIKE_SPEED, getValue(INPUT_REFERENCE_BIKE_SPEED));
 		return map;
 	}
-	
+
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(INPUT_SURFACE_INFORMATION_FILE, "Path to a file containing surface information for the network's links (required file format: ObjectAttributes).");
+		map.put(INPUT_NETWORK_ATTRIBUTE_FILE, "Path to a file containing information for the network's links (required file format: ObjectAttributes).");
 		map.put(INPUT_REFERENCE_BIKE_SPEED, "ReferenceBikeSpeed // 6.01 according to Prakin and Rotheram");
 		return map;
 	}
-	void setSurfaceInformationFile(String file) {
-		this.surfaceInformationFile = file;
+	void setNetworkAttFile(String file) {
+		this.networkAttFile = file;
 	}
-	
-	public String getSurfaceInformationFile() {
-		return this.surfaceInformationFile;
+
+	public String getNetworkAttFile() {
+		return this.networkAttFile;
 	}
-	
-	public void setReferenceBikeSpeed(final String value) {
+
+	public void setReferenceBikeSpeed(final double value) {
 		this.referenceBikeSpeed = value;
 	}
 
-	public String getReferenceBikeSpeed() {
+	public double getReferenceBikeSpeed() {
 		// used in core at following places:
 		// (1) In the Controler where it may configure the router for "prepareForSim".
 		// (2) In within-day
 		return this.referenceBikeSpeed;
 	}
-	
+
 }
