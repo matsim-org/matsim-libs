@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE objectAttributes SYSTEM "http://matsim.org/files/dtd/objectattributes_v1.dtd">
+
+<objectAttributes>
+	<object id="1">
+		<attribute name="cyclewaytype" class="java.lang.String">track</attribute>
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+		<attribute name="slope" class="java.lang.Double">0.05</attribute>
+
+	</object>
+	<object id="2">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+		<attribute name="slope" class="java.lang.Double">0.05</attribute>
+	</object>
+	<object id="3">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+		<attribute name="slope" class="java.lang.Double">0.05</attribute>
+
+	</object>
+	<object id="4">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+		<attribute name="slope" class="java.lang.Double">0.02</attribute>
+	</object>
+	<object id="5">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+		<attribute name="slope" class="java.lang.Double">0.05</attribute>
+
+	</object>
+	<object id="6">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+		<attribute name="slope" class="java.lang.Double">0.05</attribute>
+
+	</object>
+	<object id="7">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+		<attribute name="slope" class="java.lang.Double">0.05</attribute>
+
+	</object>
+	<object id="8">
+		<attribute name="surface" class="java.lang.String">sand</attribute>
+		<attribute name="slope" class="java.lang.Double">0.05</attribute>
+
+	</object>
+	<object id="9">
+		<attribute name="surface" class="java.lang.String">asphalt</attribute>
+		<attribute name="slope" class="java.lang.Double">0.05</attribute>
+	</object>
+	<object id="10">
+		<attribute name="surface" class="java.lang.String">asphalt</attribute>
+		<attribute name="slope" class="java.lang.Double">0.05</attribute>
+	</object>
+	<object id="11">
+		<attribute name="surface" class="java.lang.String">asphalt</attribute>
+		<attribute name="slope" class="java.lang.Double">0.05</attribute>
+	</object>
+	
+	<object id="20">
+		<attribute name="surface" class="java.lang.String">bla</attribute>
+		<attribute name="slope" class="java.lang.Double">0.05</attribute>
+	</object>
+</objectAttributes>

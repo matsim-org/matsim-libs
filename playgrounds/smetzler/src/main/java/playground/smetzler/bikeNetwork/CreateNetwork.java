@@ -15,15 +15,19 @@ public class CreateNetwork {
 
 	public static void main(String[] args) {
 		
-		String DHDN_GK4 = "EPSG:31468"; //String DHDN = "EPSG:3068";
 		String WGS84 = "EPSG:4326";
+		String DHDN_GK4 = "EPSG:31468"; //String DHDN = "EPSG:3068";
 		
-		String inputOSM = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/tempelhof/tempelhof.osm";
-	//	String outputXML = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/skalitzer/skalitzer_MATsim.xml";
-	//  String outputBikeXML = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/skalitzer/skalitzer_bikeatt.xml";
 		
-		String outputXML =     "../smetzler/input/network/tempelhof_MATsim.xml";
-		String outputBikeXML = "../smetzler/input/network/tempelhof_bikeatt_Oneway.xml";
+		//String inputOSM = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/tempelhof/tempelhof.osm";
+		String inputOSM = "../../../berlin-bike/sonstiges/network_sonstiges/tempelhof/tempelhof.osm";
+		
+		
+//		String outputXML =     "../smetzler/input/network/tempelhof_MATsim.xml";
+//		String outputBikeXML = "../smetzler/input/network/tempelhof_bikeatt_Oneway.xml";
+		String outputXML =     "../../../berlin-bike/input/network/tempelhof_MATsim.xml";
+		String outputBikeXML = "../../../berlin-bike/input/network/tempelhof_bikeatt_Oneway.xml";
+		
 		
 		
 		Config config = ConfigUtils.createConfig();

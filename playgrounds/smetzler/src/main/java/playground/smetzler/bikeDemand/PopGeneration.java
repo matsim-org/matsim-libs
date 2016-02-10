@@ -23,7 +23,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 public class PopGeneration implements Runnable {
 	
 	//String outputPop = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/demand/skalitzer/skalitzer_pop.xml";
-	String outputPop = "../smetzler/input/demand/equil_bike.xml";
+	//String outputPop = "../smetzler/input/demand/equil_bike.xml";
+	String outputPop = "../../../berlin-bike/input/demand/equil_bike.xml";
 	//String DHDN = "EPSG:3068";
 	private Map<String, Coord> zoneGeometries = new HashMap<>();
 

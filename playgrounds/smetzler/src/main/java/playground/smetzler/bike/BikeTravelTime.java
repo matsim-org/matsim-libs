@@ -17,7 +17,15 @@ public class BikeTravelTime implements TravelTime {
 
 	/**
 	 * in this class traveltime is calculated depending on the following parameters:
-	 * surface, smoothness, slope/elevation, #crossings (info in nodes), cyclewaytype, size of street aside, weather/wind, parkende autos?
+	 * surface, slope/elevation
+	 * 
+	 * following parameters are supposed to be implemented
+	 * cyclewaytype, smoothness? (vs surface), weather/wind?, #crossings (info in nodes)
+	 * 
+	 * 
+	 * following parameters are supposed to be implemented to the disutility
+	 * traveltime, distance, surface, smoothness, slope/elevation, #crossings (info in nodes), cyclewaytype, 
+	 * size of street aside, weather/wind, parkende autos?
 	 * 
 	 */
 
