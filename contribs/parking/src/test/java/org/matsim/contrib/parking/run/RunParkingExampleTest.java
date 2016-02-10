@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.parking.run;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,6 +45,7 @@ public class RunParkingExampleTest {
 		RunParkingExample.run(config);
 		long expected = CRCChecksum.getCRCFromFile( utils.getInputDirectory() + "/output_events.xml.gz" ) ;
 		long actual = CRCChecksum.getCRCFromFile( utils.getOutputDirectory() + "/output_events.xml.gz" ) ;
+		Logger.getLogger( RunParkingExampleTest.class ).info( "expected=" + expected + "; actual=" + actual ); 
 		Assert.assertEquals(expected, actual);
 	}
 
