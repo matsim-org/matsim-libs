@@ -198,11 +198,11 @@ public class PatnaUrbanDemandGenerator {
 			travelMode = "walk";	break;
 		case "9999" : 
 //			travelMode = randomModeSlum();	break;				// 480 such trips are found
-			travelMode = getDistanceFactorFromBeelineDist(beelineDist, true);
+			travelMode = getDistanceFactorFromBeelineDist(beelineDist, true); break;
 		case "999999" : 
 //			travelMode = randomModeUrban(); break; 			// for zones 27 to 42
-			travelMode = getDistanceFactorFromBeelineDist(beelineDist, false);
-		default : throw new RuntimeException("Travel mode input code is not recognized. Aborting ...");
+			travelMode = getDistanceFactorFromBeelineDist(beelineDist, false); break;
+		default : throw new RuntimeException("Travel mode input code "+travelModeFromSurvey+" is not recognized. Aborting ...");
 		}
 		return travelMode;
 	}
@@ -364,8 +364,10 @@ public class PatnaUrbanDemandGenerator {
 		for(double d : in){
 			sum+=d;
 		}
+		double valueSoFar = 0;
 		for(int index = 0; index < in.length; index++){
-			if(rndDouble <= in[index]/sum) return modeSequence[index];
+			valueSoFar += in[index];
+			if(rndDouble <= valueSoFar/sum) return modeSequence[index];
 		}
 		return null;
 	}
