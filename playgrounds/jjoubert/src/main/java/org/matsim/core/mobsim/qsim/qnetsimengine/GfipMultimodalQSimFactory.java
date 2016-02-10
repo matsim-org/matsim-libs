@@ -164,7 +164,6 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 		}
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qSim.addAgentSource(agentSource);
-		qSim.getSimTimer().setSimTimestepSize(0.05);
 
 		return qSim;		
 	}

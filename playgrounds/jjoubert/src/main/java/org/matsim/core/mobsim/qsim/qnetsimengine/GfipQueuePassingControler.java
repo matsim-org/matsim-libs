@@ -238,7 +238,7 @@ public class GfipQueuePassingControler {
 		/* Set up vehicle use. */
 		config.vehicles().setVehiclesFile(inputDirectory + (inputDirectory.endsWith("/") ? "" : "/") + "input_vehicles.xml.gz");
 
-		config.qsim().setTimeStepSize(0.1);
+		config.qsim().setTimeStepSize(0.05);
 		return config;
 	}
 
