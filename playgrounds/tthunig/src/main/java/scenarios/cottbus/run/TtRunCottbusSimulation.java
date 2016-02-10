@@ -238,8 +238,6 @@ public class TtRunCottbusSimulation {
 
 	private static Scenario prepareScenario(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-//		createNetwork(scenario); TODO load?
-//		createPopulation(scenario); TODO load?
 		createRunNameAndOutputDir(scenario);
 	
 		// add missing scenario elements
@@ -248,7 +246,6 @@ public class TtRunCottbusSimulation {
 		if (signalsConfigGroup.isUseSignalSystems()) {
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
 					new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
-//			createSignals(scenario); TODO load?
 		}
 		
 		if (WRITE_INITIAL_FILES) 
