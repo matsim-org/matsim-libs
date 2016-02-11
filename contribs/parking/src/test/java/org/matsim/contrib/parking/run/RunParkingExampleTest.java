@@ -50,9 +50,9 @@ public class RunParkingExampleTest {
 		long actual = CRCChecksum.getCRCFromFile( filenameActual ) ;
 		Logger.getLogger( RunParkingExampleTest.class ).info( "expected=" + expected + "; actual=" + actual ); 
 		if ( actual != expected ) {
-			EventsFileComparator.compare(filenameExpected, filenameActual) ;
+			int result = EventsFileComparator.compare(filenameExpected, filenameActual) ;
+			Assert.assertEquals( 0, result );
 		}
-		Assert.assertEquals(expected, actual);
 	}
 
 }
