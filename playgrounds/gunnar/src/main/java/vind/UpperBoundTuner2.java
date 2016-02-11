@@ -22,7 +22,7 @@
  * contact: gunnar.floetteroed@abe.kth.se
  *
  */
-package floetteroed.opdyts.searchalgorithms;
+package vind;
 
 import static org.apache.commons.math3.optim.linear.Relationship.GEQ;
 

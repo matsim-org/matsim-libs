@@ -45,10 +45,10 @@ import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
 import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.SamplingStage;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
-import floetteroed.opdyts.trajectorysampling.WeightOptimizer2;
 import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
@@ -155,10 +155,9 @@ public class RandomSearch<U extends DecisionVariable> {
 			}
 		}
 
-		final WeightOptimizer2 weightOptimizer;
+		final WeightOptimizer weightOptimizer;
 		if (adjustWeights) {
-			weightOptimizer = new WeightOptimizer2(equilibriumGapWeight,
-					uniformityGapWeight);
+			weightOptimizer = new WeightOptimizer(1.0);
 		} else {
 			weightOptimizer = null;
 		}
@@ -253,23 +252,27 @@ public class RandomSearch<U extends DecisionVariable> {
 
 				newInitialState = this.simulator.run(sampler, newInitialState);
 				newBestDecisionVariable = sampler
-						.getDecisionVariable2finalObjectiveFunctionValueView()
-						.keySet().iterator().next();
+						.getDecisionVariable2convergenceResultView().keySet()
+						.iterator().next();
 				newBestObjectiveFunctionValue = sampler
-						.getDecisionVariable2finalObjectiveFunctionValueView()
-						.get(newBestDecisionVariable);
+						.getDecisionVariable2convergenceResultView().get(
+								newBestDecisionVariable).finalObjectiveFunctionValue;
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
 				if (weightOptimizer != null) {
-					final double[] newWeights = weightOptimizer.updateWeights(
-							equilibriumGapWeight, uniformityGapWeight,
-							sampler.lastSamplingStage,
-							sampler.finalObjFctValue, sampler.finalEquilGap,
-							sampler.finalUnifGap,
-							sampler.finalSurrogateObjectiveFunction,
-							sampler.finalAlphas);
-					equilibriumGapWeight = newWeights[0];
-					uniformityGapWeight = newWeights[1];
+					if ((bestObjectiveFunctionValue == null)
+							|| (newBestObjectiveFunctionValue < bestObjectiveFunctionValue)) {
+						final ConvergenceCriterionResult convergenceResult = sampler
+								.getDecisionVariable2convergenceResultView()
+								.get(newBestDecisionVariable);
+						final double[] newWeights = weightOptimizer
+								.updateWeights(
+										convergenceResult.finalEquilibiriumGap,
+										convergenceResult.finalUniformityGap,
+										convergenceResult.finalObjectiveFunctionValueStddev);
+						equilibriumGapWeight = newWeights[0];
+						uniformityGapWeight = newWeights[1];
+					}
 				}
 
 			} else {
@@ -281,11 +284,12 @@ public class RandomSearch<U extends DecisionVariable> {
 										this.logFileName, true)));
 						logWriter.print((new SimpleDateFormat(
 								"yyyy-MM-dd HH:mm:ss")).format(new Date(System
-								.currentTimeMillis())) + "\t");
+								.currentTimeMillis()))
+								+ "\t");
 						logWriter.print(it + "\t");
 						logWriter.print(this.transitions + "\t");
 						logWriter.print(bestObjectiveFunctionValue + "\t");
-						logWriter.println(bestDecisionVariable);						
+						logWriter.println(bestDecisionVariable);
 						logWriter.flush();
 						logWriter.close();
 					} catch (IOException e) {
@@ -299,7 +303,6 @@ public class RandomSearch<U extends DecisionVariable> {
 				newBestObjectiveFunctionValue = Double.POSITIVE_INFINITY;
 
 				for (U candidate : candidates) {
-					this.convergenceCriterion.reset();
 					final SingleTrajectorySampler<U> singleSampler;
 					singleSampler = new SingleTrajectorySampler<>(candidate,
 							this.objectBasedObjectiveFunction,
@@ -307,8 +310,8 @@ public class RandomSearch<U extends DecisionVariable> {
 					final SimulatorState candidateInitialState = this.simulator
 							.run(singleSampler, thisRoundsInitialState);
 					final double candidateObjectiveFunctionValue = singleSampler
-							.getDecisionVariable2finalObjectiveFunctionValueView()
-							.get(candidate);
+							.getDecisionVariable2convergenceResultView().get(
+									candidate).finalObjectiveFunctionValue;
 					if (candidateObjectiveFunctionValue < newBestObjectiveFunctionValue) {
 						newBestDecisionVariable = candidate;
 						newBestObjectiveFunctionValue = candidateObjectiveFunctionValue;

@@ -22,7 +22,7 @@
  * contact: gunnar.floetteroed@abe.kth.se
  *
  */
-package floetteroed.opdyts.trajectorysampling;
+package vind;
 
 import static org.apache.commons.math3.optim.linear.Relationship.EQ;
 import static org.apache.commons.math3.optim.linear.Relationship.GEQ;
@@ -44,6 +44,7 @@ import org.apache.commons.math3.optim.linear.NoFeasibleSolutionException;
 import org.apache.commons.math3.optim.linear.SimplexSolver;
 import org.apache.commons.math3.optim.linear.UnboundedSolutionException;
 
+import floetteroed.opdyts.trajectorysampling.SamplingStage;
 import floetteroed.utilities.math.Matrix;
 import floetteroed.utilities.math.Vector;
 
@@ -52,7 +53,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-class WeightOptimizer {
+class WeightOptimizer15 {
 
 	// -------------------- MEMBERS --------------------
 
@@ -68,22 +69,22 @@ class WeightOptimizer {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	WeightOptimizer(
-			final SurrogateObjectiveFunction<?> lastSurrogateObjectiveFunction,
-			final Vector trialAlphas) {
-		this(lastSurrogateObjectiveFunction
-				.dInterpolObjFctVal_dAlpha(trialAlphas),
-				lastSurrogateObjectiveFunction
-						.dEquilibriumGap_dAlpha(trialAlphas),
-				lastSurrogateObjectiveFunction
-						.d2EquilibriumGapdAlpha2(trialAlphas),
-				lastSurrogateObjectiveFunction
-						.dUniformityGap_dAlpha(trialAlphas),
-				lastSurrogateObjectiveFunction
-						.d2UniformityGapdAlpha2(trialAlphas));
-	}
+//	WeightOptimizer15(
+//			final SurrogateObjectiveFunction<?> lastSurrogateObjectiveFunction,
+//			final Vector trialAlphas) {
+//		this(lastSurrogateObjectiveFunction
+//				.dInterpolObjFctVal_dAlpha(trialAlphas),
+//				lastSurrogateObjectiveFunction
+//						.dEquilibriumGap_dAlpha(trialAlphas),
+//				lastSurrogateObjectiveFunction
+//						.d2EquilibriumGapdAlpha2(trialAlphas),
+//				lastSurrogateObjectiveFunction
+//						.dUniformityGap_dAlpha(trialAlphas),
+//				lastSurrogateObjectiveFunction
+//						.d2UniformityGapdAlpha2(trialAlphas));
+//	}
 
-	private WeightOptimizer(final Vector dInterpolatedObjectiveFunctiondAlpha,
+	private WeightOptimizer15(final Vector dInterpolatedObjectiveFunctiondAlpha,
 			final Vector dEquilibriumGapdAlpha,
 			final Matrix d2EquilibriumGapdAlpha2,
 			final Vector dUniformityGapdAlpha,

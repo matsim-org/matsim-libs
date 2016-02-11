@@ -11,10 +11,8 @@ import java.util.List;
 import java.util.Random;
 
 import vind.VectorToObjectBasedObjectiveFunctionWrapper;
-import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.utilities.latex.PSTricksDiagramWriter;
 import floetteroed.utilities.math.Discretizer;
@@ -171,8 +169,9 @@ class Talk_2015_09_03 {
 					final ObjectiveFunction objectiveFunction = new VectorToObjectBasedObjectiveFunctionWrapper(
 							new NTimesTwoRoutesObjectiveFunction(externalities));
 
-					final ConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
-							1e-4, 1e-4, simulate ? 10 : 10);
+					final ConvergenceCriterion convergenceCriterion = null;
+//					new ObjectiveFunctionChangeConvergenceCriterion(
+//							1e-4, 1e-4, simulate ? 10 : 10);
 
 					final int maxMemoryLength = Integer.MAX_VALUE; // TODO NEW
 					final RandomSearch<NTimesTwoRoutesDecisionVariableMixedDiscrCont> search = new RandomSearch<>(
