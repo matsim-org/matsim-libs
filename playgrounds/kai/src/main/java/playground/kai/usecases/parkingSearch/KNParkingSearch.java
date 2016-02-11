@@ -60,7 +60,7 @@ import com.google.inject.Provides;
  * @author nagel
  *
  */
-final class KnParkingSearch {
+final class KNParkingSearch {
 	private static class ParkingSearchQSimModule extends com.google.inject.AbstractModule {
 		@Override 
 		protected void configure() {
