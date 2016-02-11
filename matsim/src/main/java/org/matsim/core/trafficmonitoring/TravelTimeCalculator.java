@@ -145,15 +145,20 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		// yyyy the hard-coded 30 hours seems a bit dangerous ... assume someone wants to run matsim for a week?? kai, jan'16
 	}
 
+	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime, TravelTimeCalculatorConfigGroup ttconfigGroup) {
+		this(network, timeslice, maxTime, ttconfigGroup.isCalculateLinkTravelTimes(), ttconfigGroup.isCalculateLinkToLinkTravelTimes(), ttconfigGroup.isFilterModes(), CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModes()));
+	}
+
 	public TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
-			TravelTimeCalculatorConfigGroup ttconfigGroup) {
+								boolean calculateLinkTravelTimes, boolean calculateLinkToLinkTravelTimes, boolean filterModes, Set<String> strings) {
+		this.calculateLinkTravelTimes = calculateLinkTravelTimes;
+		this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
+		this.filterAnalyzedModes = filterModes;
+		this.analyzedModes = strings;
 		this.timeSlice = timeslice;
 		this.numSlots = (maxTime / this.timeSlice) + 1;
 		this.aggregator = new OptimisticTravelTimeAggregator(this.numSlots, this.timeSlice);
 		this.ttDataFactory = new TravelTimeDataArrayFactory(network, this.numSlots);
-		this.calculateLinkTravelTimes = ttconfigGroup.isCalculateLinkTravelTimes();
-		this.calculateLinkToLinkTravelTimes = ttconfigGroup.isCalculateLinkToLinkTravelTimes();
-		this.filterAnalyzedModes = ttconfigGroup.isFilterModes();
 		if (this.calculateLinkTravelTimes){
 			this.linkData = new ConcurrentHashMap<>((int) (network.getLinks().size() * 1.4));
 
@@ -167,7 +172,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 			 * increases the routing performance by 20-30%.
 			 * cdobler, oct'13
 			 */
-	//		this.dataContainerProvider = new MapBasedDataContainerProvider(linkData, ttDataFactory);
+			//		this.dataContainerProvider = new MapBasedDataContainerProvider(linkData, ttDataFactory);
 			this.dataContainerProvider = new ArrayBasedDataContainerProvider(linkData, ttDataFactory, network);
 		} else this.dataContainerProvider = null;
 		if (this.calculateLinkToLinkTravelTimes){
@@ -180,9 +185,9 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		// the vehicleEntersTraffic event.  So we need to memorize the ignored vehicles from there ...
 		this.vehiclesToIgnore = new HashSet<>();
 
-		this.analyzedModes = CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModes());
-	
+
 		this.reset(0);
+
 	}
 
 	@Override
