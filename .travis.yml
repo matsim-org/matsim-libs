@@ -1,10 +1,11 @@
 language: java
 script:
-  - cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn test -B -Dmaven.test.redirectTestOutputToFile
+  - cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn test -B
+#  - cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn test -B -Dmaven.test.redirectTestOutputToFile
 env:
   global:
     - MAVEN_OPTS="-XX:MaxPermSize=1g -Xmx2g"
   matrix:
-    - MODULE=matsim
+#    - MODULE=matsim
     - MODULE=contribs
-    - MODULE=playgrounds
+#    - MODULE=playgrounds
