@@ -49,7 +49,7 @@ import org.matsim.facilities.OpeningTimeImpl;
  * @author nagel
  *
  */
-final class RunWithFacilitiesExample {
+public final class RunWithFacilitiesExample {
 
 	// NOTE: facilities has been in the matsim main distribution for a long time.  But it never has been in the core, and thus was 
 	// never maintained by the core team.  The following is an attempt to piece together what seems to be used in other places.
