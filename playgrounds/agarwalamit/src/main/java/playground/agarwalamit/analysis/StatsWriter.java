@@ -53,7 +53,7 @@ public class StatsWriter {
 		events.addHandler( calcLegTimes );
 		
 		new MatsimEventsReader(events).readFile(eventsFile) ;
-		calcLegTimes.writeStats(filesDir+"/_stats_");
+		calcLegTimes.writeStats(filesDir+"/analysis/_stats_");
 	}
 }
 
