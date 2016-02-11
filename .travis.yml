@@ -7,5 +7,5 @@ env:
     - MAVEN_OPTS="-XX:MaxPermSize=1g -Xmx2g"
   matrix:
 #    - MODULE=matsim
-    - MODULE=contribs
+    - MODULE=contribs/parking
 #    - MODULE=playgrounds
