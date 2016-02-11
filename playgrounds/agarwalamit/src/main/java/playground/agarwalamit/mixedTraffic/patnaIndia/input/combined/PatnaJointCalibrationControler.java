@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
 
+import java.io.File;
 import java.util.Arrays;
 
 import org.matsim.core.config.Config;
@@ -36,6 +37,9 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 
+import playground.agarwalamit.analysis.StatsWriter;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
+import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
@@ -56,7 +60,7 @@ public class PatnaJointCalibrationControler {
 	private static final String JOINT_COUNTS_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_counts.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_vehicles_10pct.xml.gz";
 	
-	private static final String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/c1/";
+	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/c1_2/";
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -64,6 +68,8 @@ public class PatnaJointCalibrationControler {
 		
 		if(args.length>0){
 			ConfigUtils.loadConfig(config, args[0]);
+			OUTPUT_DIR = args [1];
+			config.controler().setOutputDirectory( OUTPUT_DIR );
 		} else {
 			config = pjc.createBasicConfigSettings();
 		}
@@ -89,10 +95,23 @@ public class PatnaJointCalibrationControler {
 					addTravelTimeBinding(mode).to(networkTravelTime());
 					addTravelDisutilityFactoryBinding(mode).to(carTravelDisutilityFactoryKey());					
 				}
-			
 			}
 		});
 		controler.run();
+		
+		new File(OUTPUT_DIR+"/analysis/").mkdir();
+		String outputEventsFile = OUTPUT_DIR+"/output_events.xml.gz";
+		// write some default analysis
+		StatsWriter.run(OUTPUT_DIR+"/analysis/");
+		
+		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile);
+		mtta.run();
+		mtta.writeResults(OUTPUT_DIR+"/analysis/modalTravelTime.txt");
+		
+		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile);
+		msc.run();
+		msc.writeResults(OUTPUT_DIR+"/analysis/modalShareFromEvents.txt");
+		
 	}
 
 	/**
@@ -112,7 +131,7 @@ public class PatnaJointCalibrationControler {
 		config.vehicles().setVehiclesFile(JOINT_VEHICLES_10PCT);
 		
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(100);
+		config.controler().setLastIteration(0);
 		config.controler().setWriteEventsInterval(50);
 		config.controler().setWritePlansInterval(50);
 		config.controler().setOutputDirectory(OUTPUT_DIR);
