@@ -89,5 +89,20 @@
   		<artifactId>roadpricing</artifactId>
   		<version>0.8.0-SNAPSHOT</version>
   	</dependency>
+  	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>johannes</artifactId>
+  		<version>0.8.0-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.matsim.contrib</groupId>
+  		<artifactId>transEnergySim</artifactId>
+  		<version>0.8.0-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>boescpa</artifactId>
+  		<version>0.8.0-SNAPSHOT</version>
+  	</dependency>
   </dependencies>
 </project>

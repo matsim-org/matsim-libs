@@ -27,21 +27,26 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -64,18 +69,17 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.GfipQueuePassingQSimFactory.QueueType;
+import org.matsim.core.mobsim.qsim.qnetsimengine.GfipMultimodalQSimFactory.QueueType;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -89,35 +93,43 @@ import org.matsim.vehicles.VehiclesFactory;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
-import com.google.inject.Provider;
-
 public class GfipQueuePassingControler {
-	
+
 	public static void main(String[] args){
 		Header.printHeader(GfipQueuePassingControler.class.toString(), args);
 
-		/* Clear and set the output directory. */
-		String outputDirectory = args[0];
-		FileUtils.delete(new File( outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "output/" ));
+		String inputDirectory = args[0];
+		inputDirectory += inputDirectory.endsWith("/") ? "" : "/";
+		String outputDirectory = args[2];
+		outputDirectory += outputDirectory.endsWith("/") ? "" : "/";
 
 		/* Build the scenario including network, plans and vehicles. */
-//		buildTriLegScenario(outputDirectory);
+		int numberOfAgents = Integer.parseInt(args[6]);
+		buildTriLegScenario(inputDirectory, numberOfAgents);
 
 		/* Set up the specific queue type. */
-		final QueueType queueType = QueueType.valueOf(args[1]);
-		
-		/* Link Ids to check. */
-		String linkIdIn = args[2];
-		String linkIdOut = args[3];
+		final QueueType queueType = QueueType.valueOf(args[3]);
 
-		Config config = getDefaultConfig(outputDirectory, queueType);
+		Config config = getDefaultConfig(inputDirectory, queueType);
 		config.parallelEventHandling().setNumberOfThreads(1);
 		config.global().setNumberOfThreads(1);
-		
+
+		/* Clear and set the output directory. */
+		FileUtils.delete(new File( outputDirectory ));
+		config.controler().setOutputDirectory(outputDirectory);
+
+		/* Get the correct network. */
+		String networkFile = args[1];
+		config.network().setInputFile(inputDirectory + networkFile);
+
+		/* Link Ids to check. */
+		String linkIdIn = args[4];
+		String linkIdOut = args[5];
+
 		// ---
-		
+
 		Scenario sc = ScenarioUtils.loadScenario(config);
-		
+
 		// ---
 
 		final Controler controler = new Controler(sc) ;
@@ -125,12 +137,7 @@ public class GfipQueuePassingControler {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new GfipQueuePassingQSimFactory(queueType).createMobsim(controler.getScenario(), controler.getEvents());
-					}
-				});
+				bindMobsim().toProvider(new GfipMultimodalQSimFactory(queueType));
 			}
 		});
 
@@ -138,25 +145,51 @@ public class GfipQueuePassingControler {
 		controler.getEvents().addHandler(linkCounter);
 		controler.addControlerListener(linkCounter);
 		controler.addControlerListener(new AssignVehiclesToAllRoutes());
+		/* Mobsim. */
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addMobsimListenerBinding().toInstance(linkCounter);
 			}
 		});
+		/* Routers. The default module I'm adding here will take all network
+		 * modes and give them the default network routing module. */
+		//		controler.addOverridingModule(new TripRouterFactoryModule());
+
+		/* Travel disutility bindings. */
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addTravelTimeBinding(GfipMode.GFIP_A1.toString()).to(networkTravelTime());
+				addTravelTimeBinding(GfipMode.GFIP_A2.toString()).to(networkTravelTime());
+				addTravelTimeBinding(GfipMode.GFIP_B.toString()).to(networkTravelTime());
+				addTravelTimeBinding(GfipMode.GFIP_C.toString()).to(networkTravelTime());
+
+				addTravelDisutilityFactoryBinding(GfipMode.GFIP_A1.toString()).to(carTravelDisutilityFactoryKey());
+				addTravelDisutilityFactoryBinding(GfipMode.GFIP_A2.toString()).to(carTravelDisutilityFactoryKey());
+				addTravelDisutilityFactoryBinding(GfipMode.GFIP_B.toString()).to(carTravelDisutilityFactoryKey());
+				addTravelDisutilityFactoryBinding(GfipMode.GFIP_C.toString()).to(carTravelDisutilityFactoryKey());
+			}
+		});
+
+
+
+
 		controler.run();
 
 		Header.printFooter();
 	}
 
 
-	private static Config getDefaultConfig(String outputDirectory, QueueType queueType){
+	private static Config getDefaultConfig(String inputDirectory, QueueType queueType){
 		Config config  = ConfigUtils.createConfig();
+
+		/* Fix the seed. */
+		config.global().setRandomSeed(201602021240l);
 
 		/* Set all the defaults we want. */
 		config.controler().setLastIteration(1);
-		config.controler().setWriteEventsInterval(10);
-		config.controler().setOutputDirectory(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "output");
+		config.controler().setWriteEventsInterval(1);
 
 		switch (queueType) {
 		case FIFO:
@@ -179,7 +212,7 @@ public class GfipQueuePassingControler {
 				GfipMode.GFIP_B.toString(),
 				GfipMode.GFIP_C.toString()};
 		config.qsim().setMainModes( Arrays.asList(modes) );
-		config.qsim().setEndTime(Time.parseTime("30:00:00"));
+		config.qsim().setEndTime(Time.UNDEFINED_TIME);
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		config.qsim().setStuckTime(Time.parseTime("02:00:00"));
 		config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
@@ -200,13 +233,12 @@ public class GfipQueuePassingControler {
 		config.strategy().addStrategySettings(best);
 
 		/* Set input files */
-		config.plans().setInputFile(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_plans.xml.gz");
-		config.network().setInputFile(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_network.xml.gz");
+		config.plans().setInputFile(inputDirectory + (inputDirectory.endsWith("/") ? "" : "/") + "input_plans.xml.gz");
 
 		/* Set up vehicle use. */
-//		config.scenario().setUseVehicles(true);
-		config.vehicles().setVehiclesFile(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_vehicles.xml.gz");
+		config.vehicles().setVehiclesFile(inputDirectory + (inputDirectory.endsWith("/") ? "" : "/") + "input_vehicles.xml.gz");
 
+		config.qsim().setTimeStepSize(0.05);
 		return config;
 	}
 
@@ -230,13 +262,20 @@ public class GfipQueuePassingControler {
 	 * capacity of each subsequent link. This ensures a bottleneck in the
 	 * network, and ultimately spill backs.  
 	 * 
-	 * @param outputDirectory where the scenario, i.e. network, plans and 
+	 * @param inputDirectory where the scenario, i.e. network, plans and 
 	 * 		  vehicles files are written to.
 	 */
-	private static void buildTriLegScenario(String outputDirectory){
+	private static void buildTriLegScenario(String inputDirectory, int numberOfAgents){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		/* Build the octagon network. */
+		Set<String> modes = new TreeSet<>();
+		modes.add(GfipMode.GFIP_A1.toString());
+		modes.add(GfipMode.GFIP_A2.toString());
+		modes.add(GfipMode.GFIP_B.toString());
+		modes.add(GfipMode.GFIP_C.toString());
+		modes.add(TransportMode.car);
+
+		/* Build the linear tri-link network. */
 		NetworkFactory nf = sc.getNetwork().getFactory();
 		Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		sc.getNetwork().addNode(n1);
@@ -249,36 +288,39 @@ public class GfipQueuePassingControler {
 
 		/* Links with fixed capacity. */
 		Link l12 = nf.createLink(Id.createLinkId("12"), n1, n2);
-		l12.setLength(10000);
+		l12.setLength(1000);
 		l12.setCapacity(2500); 
 		l12.setNumberOfLanes(1000);
 		l12.setFreespeed(120.0/3.6);
+		l12.setAllowedModes(modes);
 
 		Link l23 = nf.createLink(Id.createLinkId("23"), n2, n3);
-		l23.setLength(50000);
+		l23.setLength(5000);
 		l23.setCapacity(2500);
 		l23.setNumberOfLanes(2);
 		l23.setFreespeed(120.0/3.6);
+		l23.setAllowedModes(modes);
 
 		Link l34 = nf.createLink(Id.createLinkId("34"), n3, n4);
-		l34.setLength(100000);
+		l34.setLength(1000);
 		l34.setCapacity(2500);
 		l34.setNumberOfLanes(1000);
 		l34.setFreespeed(120.0/3.6);
+		l34.setAllowedModes(modes);
 
 		sc.getNetwork().addLink(l12);
 		sc.getNetwork().addLink(l23);
 		sc.getNetwork().addLink(l34);
 
-		new NetworkWriter(sc.getNetwork()).write(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_network.xml.gz");
+		new NetworkWriter(sc.getNetwork()).write(inputDirectory + (inputDirectory.endsWith("/") ? "" : "/") + "input_network.xml.gz");
 
 		/* Chop the network into smaller bits. */
-//		Network nw0500 = LongLinkSplitter.splitNetwork(sc.getNetwork(), 500.0);
-//		new NetworkWriter(nw0500).write(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_network_0500.xml.gz");
-//		Network nw1000 = LongLinkSplitter.splitNetwork(sc.getNetwork(), 1000.0);
-//		new NetworkWriter(nw1000).write(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_network_1000.xml.gz");
-//		Network nw2000 = LongLinkSplitter.splitNetwork(sc.getNetwork(), 2000.0);
-//		new NetworkWriter(nw2000).write(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_network_2000.xml.gz");
+		//		Network nw0500 = LongLinkSplitter.splitNetwork(sc.getNetwork(), 500.0);
+		//		new NetworkWriter(nw0500).write(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_network_0500.xml.gz");
+		//		Network nw1000 = LongLinkSplitter.splitNetwork(sc.getNetwork(), 1000.0);
+		//		new NetworkWriter(nw1000).write(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_network_1000.xml.gz");
+		//		Network nw2000 = LongLinkSplitter.splitNetwork(sc.getNetwork(), 2000.0);
+		//		new NetworkWriter(nw2000).write(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_network_2000.xml.gz");
 
 		/* Create the vehicle types. */
 		VehiclesFactory vf = VehicleUtils.getFactory();
@@ -312,7 +354,7 @@ public class GfipQueuePassingControler {
 
 		/* Create the population. */
 		PopulationFactory pf = sc.getPopulation().getFactory();
-		for(int i = 0; i < 30000; i++){ // 900v/h
+		for(int i = 0; i < numberOfAgents; i++){ // 900v/h
 			Person person = pf.createPerson(Id.createPersonId(i));
 			Plan plan = pf.createPlan();
 
@@ -363,25 +405,28 @@ public class GfipQueuePassingControler {
 			}
 			sc.getVehicles().addVehicle(vehicle);
 		}
-		new PopulationWriter(sc.getPopulation()).write(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_plans.xml.gz");
-		new VehicleWriterV1(sc.getVehicles()).writeFile(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "input_vehicles.xml.gz");
+		new PopulationWriter(sc.getPopulation()).write(inputDirectory + (inputDirectory.endsWith("/") ? "" : "/") + "input_plans.xml.gz");
+		new VehicleWriterV1(sc.getVehicles()).writeFile(inputDirectory + (inputDirectory.endsWith("/") ? "" : "/") + "input_vehicles.xml.gz");
 	}
-	
+
 
 	private static class LinkCounter implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-	VehicleEntersTrafficEventHandler, PersonArrivalEventHandler,
+	VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
 	IterationEndsListener, MobsimInitializedListener, MobsimBeforeCleanupListener{
 		private final Logger log = Logger.getLogger(LinkCounter.class);
 		private final QueueType queueType;
 		private List<String> spaceTimeList;
+		private List<String> allSpaceTimeList;
 		private List<String> rhoList;
 		private Map<Id<Link>, List<Tuple<Double,Integer>>> countMap;
 		private Map<Id<Vehicle>, List<Double>> spaceTimeMap;
+		private Map<Id<Vehicle>, Map<Id<Link>,List<Double>>> allSpaceTimeMap;
 		private final Scenario sc;
 		private Id<Link> checkedLinkIn;
 		private Id<Link> checkedLinkOut;
 		private QSim qsim;
 		private Map<Id<Vehicle>, Double[]> timeMap;
+		private Map<Id<Vehicle>, Map<Id<Link>, Double[]>> timeMapAll;
 		GfipLinkSpeedCalculator calculator;
 
 		public LinkCounter(final Scenario sc, QueueType queueType, 
@@ -389,10 +434,12 @@ public class GfipQueuePassingControler {
 			this.sc = sc;
 			this.queueType = queueType;
 			this.spaceTimeList = new ArrayList<String>();
+			this.spaceTimeMap = new TreeMap<Id<Vehicle>, List<Double>>();
+			this.allSpaceTimeList = new ArrayList<String>();
 			this.rhoList = new ArrayList<String>();
 			this.countMap = new TreeMap<Id<Link>, List<Tuple<Double, Integer>>>();
-			this.spaceTimeMap = new TreeMap<Id<Vehicle>, List<Double>>();
 			this.timeMap = new TreeMap<>();
+			this.timeMapAll = new TreeMap<>();
 
 			/* Initialise the link counts, knowing what the correct Ids are. */
 			for(Id<Link> id : this.sc.getNetwork().getLinks().keySet()){
@@ -403,18 +450,35 @@ public class GfipQueuePassingControler {
 			/* Setup link Id listeners */
 			this.checkedLinkIn = Id.createLinkId(linkIdIn);
 			this.checkedLinkOut = Id.createLinkId(linkIdOut);
+
+			/* Initialise the all space-time map. */
+			this.allSpaceTimeMap = new TreeMap<Id<Vehicle>, Map<Id<Link>, List<Double>>>();
+			for(Id<Vehicle> vId : this.sc.getVehicles().getVehicles().keySet()){
+				this.allSpaceTimeMap.put(vId, new TreeMap<Id<Link>, List<Double>>());
+				this.timeMapAll.put(vId, new TreeMap<Id<Link>, Double[]>());
+			}
 		}
 
 		@Override
 		public void reset(int iteration) {
 			this.spaceTimeList = new LinkedList<String>();
+			this.allSpaceTimeList = new ArrayList<String>();
 			this.countMap = new ConcurrentHashMap<Id<Link>, List<Tuple<Double, Integer>>>();
+			this.rhoList = new ArrayList<>();
 			this.spaceTimeMap = new ConcurrentHashMap<Id<Vehicle>, List<Double>>();
+			this.timeMap = new TreeMap<>();
+			this.timeMapAll = new TreeMap<>();
 
 			/* Initialise the link counts, knowing what the correct Ids are. */
 			for(Id<Link> id : this.sc.getNetwork().getLinks().keySet()){
 				this.countMap.put(id, new ArrayList<Tuple<Double, Integer>>());
 				this.countMap.get(id).add(new Tuple<Double, Integer>(0.0, 0));
+			}
+			/* Initialise the all space-time map. */
+			this.allSpaceTimeMap = new TreeMap<Id<Vehicle>, Map<Id<Link>, List<Double>>>();
+			for(Id<Vehicle> vId : this.sc.getVehicles().getVehicles().keySet()){
+				this.allSpaceTimeMap.put(vId, new TreeMap<Id<Link>, List<Double>>());
+				this.timeMapAll.put(vId, new TreeMap<Id<Link>, Double[]>());
 			}
 		}
 
@@ -435,36 +499,57 @@ public class GfipQueuePassingControler {
 			/* Update the rho value for each link. */
 			NetsimLink thisLink = this.qsim.getNetsimNetwork().getNetsimLink(linkId);
 			double pcuEquivalents = (double) thisLink.getCustomAttributes().get("pcu");
-			
+
 			/* When calculating rho NOW, one should NOT add the PCU equivalents, 
 			 * because this vehicle has already been put ON the link. */
 			double rho = pcuEquivalents 
-					/ ( (thisLink.getLink().getLength()/1000)*thisLink.getLink().getNumberOfLanes());
+					/ ( (thisLink.getLink().getLength()/1000)*thisLink.getLink().getNumberOfLanes() );
 			rhoList.add(String.format("%s,%.0f,%.2f", linkId.toString(), time, rho));
-			
+
+			/* Update the time discrepancy for ALL link 2 segments. */
+			if(linkId.toString().startsWith("23")){
+				Vehicle vehicle = this.sc.getVehicles().getVehicles().get( event.getVehicleId() ) ;
+				GfipMode mode = GfipMode.valueOf( vehicle.getType().getId().toString().toUpperCase() ) ;
+
+				Link link = this.sc.getNetwork().getLinks().get(event.getLinkId());
+
+				double velocity = this.calculator.estimateModalVelocityFromDensity(rho, mode);
+
+				double entryTime = event.getTime();
+				double t = link.getLength() / velocity;
+				Double[] da = {new Double(rho), new Double(entryTime), new Double(entryTime + t), 0.0, 0.0};
+				timeMapAll.get(vehicle.getId()).put(linkId, da);
+			}
+
+
+			/* Update the entry time for ALL links. */
+			Map<Id<Link>, List<Double>> linkMap = new TreeMap<>();
+			linkMap.put(event.getLinkId(), new ArrayList<Double>());
+			allSpaceTimeMap.put(event.getVehicleId(), linkMap);
+			allSpaceTimeMap.get(event.getVehicleId()).get(event.getLinkId()).add(event.getTime());
+
 			if(event.getLinkId().equals(checkedLinkIn)){ 
 				spaceTimeMap.put(event.getVehicleId(), new ArrayList<Double>());
 				spaceTimeMap.get(event.getVehicleId()).add(event.getTime());
-				
+
 				/* Get the entry time and estimated leave time. */
 				double entryTime = event.getTime();
 
-//				QVehicle vehicle = this.qsim.getQNetsimEngine().getVehicles().get(event.getVehicleId());
-//				GfipMode mode = GfipMode.valueOf(vehicle.getVehicle().getType().getId().toString().toUpperCase());
+				//				QVehicle vehicle = this.qsim.getQNetsimEngine().getVehicles().get(event.getVehicleId());
+				//				GfipMode mode = GfipMode.valueOf(vehicle.getVehicle().getType().getId().toString().toUpperCase());
 				// Johan, you don't need qnetsim engine for this (or am I overlooking something?): kai, mar'15
 				Vehicle vehicle = this.sc.getVehicles().getVehicles().get( event.getVehicleId() ) ;
 				GfipMode mode = GfipMode.valueOf( vehicle.getType().getId().toString().toUpperCase() ) ;
-				
+
 				Link link = this.sc.getNetwork().getLinks().get(event.getLinkId());
-				
 
 				double velocity = this.calculator.estimateModalVelocityFromDensity(rho, mode);
-				
+
 				double t = link.getLength() / velocity;
 				Double[] da = {new Double(rho), new Double(entryTime), new Double(entryTime + t), 0.0, 0.0};
 				timeMap.put(event.getVehicleId(), da);
 			} 
-			
+
 		}
 
 		@Override
@@ -473,8 +558,14 @@ public class GfipQueuePassingControler {
 			double pcuEquivalent = this.sc.getVehicles().getVehicles().get(event.getVehicleId()).getType().getPcuEquivalents();
 			double oldPcuTotal = (double) netsimLink.getCustomAttributes().get("pcu");
 			netsimLink.getCustomAttributes().put("pcu", oldPcuTotal+pcuEquivalent);
+
+			/* Adds the first entry onto link 1. */
+			Map<Id<Link>, List<Double>> linkMap = new TreeMap<>();
+			linkMap.put(event.getLinkId(), new ArrayList<Double>());
+			allSpaceTimeMap.put(event.getVehicleId(), linkMap);
+			allSpaceTimeMap.get(event.getVehicleId()).get(event.getLinkId()).add(event.getTime());
 		}
-		
+
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
@@ -491,6 +582,21 @@ public class GfipQueuePassingControler {
 			int oldCount = this.countMap.get(linkId).get( this.countMap.get(linkId).size()-1 ).getSecond();
 			this.countMap.get(linkId).add(new Tuple<Double, Integer>(time, oldCount-1));
 
+			/* Update the exit times for all links. */
+			{
+				List<Double> thisList = this.allSpaceTimeMap.get(event.getVehicleId()).get(linkId);
+				thisList.add(event.getTime());
+				String s = "";
+				s += event.getVehicleId();
+				s += "," + this.sc.getVehicles().getVehicles().get(event.getVehicleId()).getType().getId().toString();
+				s += "," + linkId.toString();
+				s += "," + rho;
+				s += "," + String.valueOf(thisList.get(0));
+				s += "," + String.valueOf(thisList.get(1));
+				this.allSpaceTimeList.add(s);
+				this.allSpaceTimeMap.get(event.getVehicleId()).remove(linkId);
+			}
+
 			/* Write the space-time chain to file, and then remove the person. */
 			if(event.getLinkId().equals(checkedLinkOut) && this.spaceTimeMap.containsKey(event.getVehicleId())){
 				List<Double> thisList = this.spaceTimeMap.get(event.getVehicleId());
@@ -503,8 +609,15 @@ public class GfipQueuePassingControler {
 				this.spaceTimeList.add(s);
 				this.spaceTimeMap.remove(event.getVehicleId());
 			}
-			
+
 			/* Put the actual link leave time in the travel time observations. */
+			/* First for all segments on link 2. */
+			if(event.getLinkId().toString().startsWith("23")){
+				Double[] da = timeMapAll.get(event.getVehicleId()).get(event.getLinkId());
+				da[3] = rho;
+				da[4] = event.getTime();
+			}
+			/* Then for only the observed links. */
 			if(event.getLinkId().equals(checkedLinkOut)){ 
 				Double[] da = timeMap.get(event.getVehicleId());
 				da[3] = rho;
@@ -512,14 +625,32 @@ public class GfipQueuePassingControler {
 			}
 		}
 
-
 		@Override
-		public void handleEvent(PersonArrivalEvent event) {
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
 			NetsimLink netsimLink = this.qsim.getNetsimNetwork().getNetsimLink(event.getLinkId());
 			double pcuEquivalent = this.sc.getVehicles().getVehicles().get(event.getPersonId()).getType().getPcuEquivalents();
 			double oldPcuTotal = (double) netsimLink.getCustomAttributes().get("pcu");
 			netsimLink.getCustomAttributes().put("pcu", oldPcuTotal-pcuEquivalent);
+
+			/* Update the exit times for all links. */
+			double rho = (pcuEquivalent + this.sc.getVehicles().getVehicles().get(event.getVehicleId()).getType().getPcuEquivalents()) 
+					/ ( (netsimLink.getLink().getLength()/1000)*netsimLink.getLink().getNumberOfLanes());
+			{
+				Id<Link> linkId = event.getLinkId();
+				List<Double> thisList = this.allSpaceTimeMap.get(event.getVehicleId()).get(linkId);
+				thisList.add(event.getTime());
+				String s = "";
+				s += event.getVehicleId();
+				s += "," + this.sc.getVehicles().getVehicles().get(event.getVehicleId()).getType().getId().toString();
+				s += "," + linkId.toString();
+				s += "," + rho;
+				s += "," + String.valueOf(thisList.get(0));
+				s += "," + String.valueOf(thisList.get(1));
+				this.allSpaceTimeList.add(s);
+				this.allSpaceTimeMap.get(event.getVehicleId()).remove(linkId);
+			}
 		}
+
 
 		@Override
 		public void notifyIterationEnds(IterationEndsEvent event) {
@@ -576,7 +707,7 @@ public class GfipQueuePassingControler {
 
 			BufferedWriter bw = IOUtils.getBufferedWriter(spaceTimeFilename);
 			try {
-				bw.write("id,type,link23,end");
+				bw.write("id,type,entry,exit");
 				bw.newLine();
 
 				for(String s : this.spaceTimeList){
@@ -592,6 +723,31 @@ public class GfipQueuePassingControler {
 				} catch (IOException e) {
 					e.printStackTrace();
 					throw new RuntimeException("Cannot close space-time observations.");
+				}
+			}
+
+			/* Write the space-time observations for ALL links. */
+			String allSpaceTimeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "allSpaceTime.csv");
+			log.info("Writing all space-time observations to " + allSpaceTimeFilename);
+
+			BufferedWriter bwAll = IOUtils.getBufferedWriter(allSpaceTimeFilename);
+			try {
+				bwAll.write("id,type,link,endRho,entry,exit");
+				bwAll.newLine();
+
+				for(String s : this.allSpaceTimeList){
+					bwAll.write(s);
+					bwAll.newLine();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot write all space-time observations.");
+			} finally{
+				try {
+					bwAll.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw new RuntimeException("Cannot close all space-time observations.");
 				}
 			}
 
@@ -619,16 +775,16 @@ public class GfipQueuePassingControler {
 					throw new RuntimeException("Cannot close rho observations.");
 				}
 			}
-			
+
 			/* Write the estimated versus actual times to file. */
 			String timeFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancy.csv");
 			log.info("Writing space-time observations to " + timeFilename);
-			
+
 			BufferedWriter bwTime = IOUtils.getBufferedWriter(timeFilename);
 			try {
 				bwTime.write("vehicleId,vehicleType,startRho,startTime,estimated,endRho,actual");
 				bwTime.newLine();
-				
+
 				for(Id<Vehicle> id : this.timeMap.keySet()){
 					String vehicleType = this.sc.getVehicles().getVehicles().get(id).getType().getId().toString();
 					Double[] da = timeMap.get(id);
@@ -641,6 +797,37 @@ public class GfipQueuePassingControler {
 			} finally{
 				try {
 					bwTime.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw new RuntimeException("Cannot close rho observations.");
+				}
+			}
+
+			/* Now write the estimated versus actual times for ALL link 2 
+			 * segments to file. */
+			String timeAllFilename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancyAll.csv");
+			log.info("Writing time discrepancy observations for ALL link 2 segments to " + timeAllFilename);
+
+			BufferedWriter bwTimeAll = IOUtils.getBufferedWriter(timeAllFilename);
+			try {
+				bwTimeAll.write("vehicleId,vehicleType,linkId,startRho,startTime,estimated,endRho,actual");
+				bwTimeAll.newLine();
+
+				for(Id<Vehicle> id : this.timeMapAll.keySet()){
+					for(Id<Link> linkId : this.timeMapAll.get(id).keySet()){
+						String vehicleType = this.sc.getVehicles().getVehicles().get(id).getType().getId().toString();
+						Double[] da = timeMapAll.get(id).get(linkId);
+						bwTimeAll.write(String.format("%s,%s,%s,%.2f,%.2f,%.2f,%.2f,%.2f", 
+								id.toString(),  vehicleType, linkId.toString(), da[0], da[1], da[2], da[3], da[4]));
+						bwTimeAll.newLine();
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot write rho observations.");
+			} finally{
+				try {
+					bwTimeAll.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 					throw new RuntimeException("Cannot close rho observations.");
@@ -695,7 +882,6 @@ public class GfipQueuePassingControler {
 		public void prepareReplanning(ReplanningContext replanningContext) {}
 		@Override
 		public void handlePlan(Plan plan) {
-			@SuppressWarnings("unchecked")
 			Id<Vehicle> vehId = Id.create(plan.getPerson().getId().toString(), Vehicle.class);
 			for ( Leg leg : PopulationUtils.getLegs(plan) ) {
 				if ( leg.getRoute()!=null && leg.getRoute() instanceof NetworkRoute ) {

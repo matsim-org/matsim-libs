@@ -18,27 +18,22 @@
  * *********************************************************************** */
 package org.matsim.contrib.matsim4urbansim.run;
 
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
-
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestUrbansimPopulation;
-import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import junit.framework.Assert;
 
 /**
  * @author nagel
@@ -77,50 +72,31 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 		final String PARCELS = "parcels.csv" ;
 		
 		log.info("comparing travel data ...");
-		compareFiles(TRAVEL_DATA) ;
+		compareFilesByLinesInMemory(TRAVEL_DATA) ;
 		log.info("... done.");
 		log.info("comparing persons data ...");
-		compareFiles(PERSONS) ;
+		compareFilesByLinesInMemory(PERSONS) ;
 		log.info("... done.");
 		log.info("comparing zones data ...");
-		compareFiles(ZONES) ;
+		compareFilesByLinesInMemory(ZONES) ;
 		log.info("... done.");
 		log.info("comparing parcels data ...");
-		compareFiles(PARCELS) ;
+		compareFilesByLinesInMemory(PARCELS) ;
 		log.info("... done.");
 		log.info("comparing accessibility indicators ...");
-		compareFiles(ACCESSIBILITY_INDICATORS) ;
+		compareFilesByLinesInMemory(ACCESSIBILITY_INDICATORS) ;
 		log.info("... done.");
 	}
 
 
-	private void compareFiles(String fileName) {
+	private void compareFilesByLinesInMemory(String fileName) {
 		String originalFileName = utils.getClassInputDirectory() + fileName ;
 		log.info( "old: " + originalFileName ) ;
-		final long originalCheckSum = CRCChecksum.getCRCFromFile(originalFileName);
-	
+		Set<String> expected = fileToLines(originalFileName);
 		String revisedFileName = utils.getOutputDirectory() + fileName ;
 		log.info( "new: " + revisedFileName ) ;
-		final long revisedCheckSum = CRCChecksum.getCRCFromFile(revisedFileName) ;
-
-		if ( revisedCheckSum != originalCheckSum ) {
-	
-			List<String> original = fileToLines(originalFileName);
-			List<String> revised  = fileToLines(revisedFileName);
-	
-			Patch patch = DiffUtils.diff(original, revised);
-	
-			for (Delta delta: patch.getDeltas()) {
-				System.out.flush() ;
-				System.err.println("===");
-				System.err.println(delta.getOriginal());
-				System.err.println(delta.getRevised());
-				System.err.println("===");
-				System.err.flush() ;
-			}
-		}
-		Assert.assertEquals( originalCheckSum,  revisedCheckSum );
-		log.info("done") ;
+		Set<String> actual = fileToLines(revisedFileName);
+		Assert.assertEquals(expected, actual);
 	}
 	
 	
@@ -128,9 +104,9 @@ public class MATSim4UrbanSimParcelIntegrationTest {
 	 * Helper method for get the file content
 	 * taken from ConfigReadWriteOverwriteTest.java
 	 */	
-	private static List<String> fileToLines(String filename) {
-		List<String> lines = new LinkedList<String>();
-		String line = "";
+	private static Set<String> fileToLines(String filename) {
+		Set<String> lines = new HashSet<>();
+		String line;
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(filename));
 			while ((line = in.readLine()) != null) {

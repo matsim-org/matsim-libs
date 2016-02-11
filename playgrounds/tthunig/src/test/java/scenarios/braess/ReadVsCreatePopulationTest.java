@@ -42,11 +42,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
 
-import scenarios.analysis.TtAbstractAnalysisTool;
-import scenarios.analysis.TtListenerToBindAndWriteAnalysis;
-import scenarios.braess.analysis.TtAnalyzeBraess;
-import scenarios.braess.createInput.TtCreateBraessPopulation;
-import scenarios.braess.createInput.TtCreateBraessPopulation.InitRoutes;
+import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
+import scenarios.illustrative.analysis.TtListenerToBindAndWriteAnalysis;
+import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
+import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
+import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 
 /**
  * This test compares the simulation results of two runs, that only differ by

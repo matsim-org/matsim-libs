@@ -23,24 +23,39 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class TransitIntegrationTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Test(expected = RuntimeException.class)
+	public void testPtInteractionParams() {
+		Config config = ConfigUtils.createConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		params.setScoringThisActivityAtAll(true);
+		params.setTypicalDuration(60.0);
+		config.planCalcScore().addActivityParams(params);
+		Controler controler = new Controler(config);
+		controler.run();
+	}
+
 	@Test
 	public void test_RunTutorial() {
 		Config config = this.utils.loadConfig("test/scenarios/pt-tutorial/config.xml");
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		config.controler().setLastIteration(0);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setCreateGraphs(false);
 		config.plans().setInputFile("test/scenarios/pt-tutorial/population2.xml");
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
 
 		MutableScenario s = (MutableScenario) controler.getScenario();

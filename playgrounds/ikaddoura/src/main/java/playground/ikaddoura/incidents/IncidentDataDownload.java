@@ -46,12 +46,10 @@ public class IncidentDataDownload extends TimerTask {
 	private static final Logger log = Logger.getLogger(IncidentDataDownload.class);
 
 	private static enum Area { germany, berlin } ;
-	
-	private final Area area = Area.berlin;
-	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/berlin-test/";
 
-//	private final Area area = Area.germany;
-//	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany-test/";
+	private static Area area;
+	private static String outputDirectory;
+	private static long timeIntervalSec;
 
 	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss"); 
 	private final boolean downloadZipFile = true;
@@ -59,10 +57,38 @@ public class IncidentDataDownload extends TimerTask {
 
 	public static void main(String[] args) throws XMLStreamException, IOException {
 		IncidentDataDownload incidentDownload = new IncidentDataDownload();
+		
+		if (args.length > 0) {
+			
+			outputDirectory = args[0];		
+			log.info("Output directory: "+ outputDirectory);
+			
+			String areaString = args[1];
+			if (areaString.equalsIgnoreCase(Area.germany.toString())) {
+				area = Area.germany;
+			} else if (areaString.equalsIgnoreCase(Area.berlin.toString())) {
+				area = Area.berlin;
+			} else {
+				throw new RuntimeException("Unknown area. Aborting...");
+			}
+			log.info("Area: " + area);
+			
+			timeIntervalSec = Long.valueOf(args[2]);
+			log.info("Time interval: " + timeIntervalSec);
+			
+		} else {
+			
+			outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany-test/";
+			area = Area.germany;
+			timeIntervalSec = 60;
+			
+//			outputDirectory = "../../../shared-svn/studies/ihab/incidents/berlin-test/";
+//			area = Area.berlin;
+		}
 				
 //		run in certain time intervals
 		Timer t = new Timer();
-		t.scheduleAtFixedRate(incidentDownload, 0, 60 * 1000);		
+		t.scheduleAtFixedRate(incidentDownload, 0, timeIntervalSec * 1000);		
 		incidentDownload.run();
 		
 		// run it once
@@ -98,7 +124,7 @@ public class IncidentDataDownload extends TimerTask {
 			e.printStackTrace();
 		}
 				
-		String outputFile = "incidentData_" + this.area.toString() + "_" + System.currentTimeMillis() + "_" + formatter.format(new Date()) + ".xml";
+		String outputFile = "incidentData_" + area.toString() + "_" + System.currentTimeMillis() + "_" + formatter.format(new Date()) + ".xml";
 		String outputPathAndFile = outputDirectory + outputFile;	
 		
 		if (downloadXMLFile) {

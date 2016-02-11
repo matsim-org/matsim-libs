@@ -9,14 +9,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.facilities.ActivityFacility;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -26,6 +30,8 @@ import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class GeometryUtils {
+	
+	private static final Logger log = Logger.getLogger(GeometryUtils.class);
 	
 	private static final String TAB = "\t";
 	private static final String END = "END";
@@ -130,9 +136,9 @@ public class GeometryUtils {
 		
 	}
 	
-	public static void writeNetwork2Shapefile(Network network, String shapefile, String crs){
+	public static void writeNetwork2Shapefile(Network network, String shapefilePath, String crs){
 		
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		Collection<SimpleFeature> linkFeatures = new ArrayList<SimpleFeature>();
 		PolylineFeatureFactory linkFactory = new PolylineFeatureFactory.Builder().
 				setCrs(MGC.getCRS(crs)).
 				setName("link").
@@ -154,7 +160,64 @@ public class GeometryUtils {
 					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),
 					link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(),
 					link.getCapacity(), link.getFreespeed(), CollectionUtils.setToString(link.getAllowedModes())}, null);
-			features.add(ft);
+			linkFeatures.add(ft);
+		}
+		
+		if(linkFeatures.size() > 0){
+			
+			ShapeFileWriter.writeGeometries(linkFeatures, shapefilePath + "/links.shp");
+			
+		} else {
+			
+			log.error("Link feature collection is empty and thus there is no file to write...");
+			
+		}
+		
+		Collection<SimpleFeature> nodeFeatures = new ArrayList<>();
+		PointFeatureFactory pointFactory = new PointFeatureFactory.Builder().
+				setCrs(MGC.getCRS(crs)).
+				addAttribute("id", String.class).
+				create();
+		
+		for(Node node : network.getNodes().values()){
+			
+			SimpleFeature feature = pointFactory.createPoint(MGC.coord2Coordinate(node.getCoord()),
+					new Object[]{node.getId().toString()}, null);
+			nodeFeatures.add(feature);
+			
+		}
+		
+		if(nodeFeatures.size() > 0){
+			
+			ShapeFileWriter.writeGeometries(nodeFeatures, shapefilePath + "/nodes.shp");
+			
+		} else {
+			
+			log.error("Point feature collection is empty and thus there is no file to write...");
+			
+		}
+		
+	}
+	
+	public static void writeFacilities2Shapefile(Collection<? extends ActivityFacility> facilities, String shapefile, String crs){
+		
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		PointFeatureFactory factory = new PointFeatureFactory.Builder().
+				setCrs(MGC.getCRS(crs)).
+				setName("facilities").
+				addAttribute("ID", String.class).
+				addAttribute("actType", String.class).
+				create();
+				
+		for(ActivityFacility facility : facilities){
+			
+			Set<String> options = new HashSet<>();
+			options.addAll(facility.getActivityOptions().keySet());
+			SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(facility.getCoord()),
+					new Object[]{facility.getId().toString(), CollectionUtils.setToString(options)},
+					null);
+			features.add(feature);
+			
 		}
 		
 		ShapeFileWriter.writeGeometries(features, shapefile);

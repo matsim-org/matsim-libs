@@ -144,7 +144,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 			 * activity.
 			 */
 			Activity nextNonParkingActivity = (Activity) executedPlan.getPlanElements().get(planElementIndex + 3);
-			ActivityFacility facility = ((MutableScenario) scenario).getActivityFacilities().getFacilities()
+			ActivityFacility facility = scenario.getActivityFacilities().getFacilities()
 					.get(nextNonParkingActivity.getFacilityId());
 			nextActivityFacilityMap.put(event.getPersonId(), facility);
 

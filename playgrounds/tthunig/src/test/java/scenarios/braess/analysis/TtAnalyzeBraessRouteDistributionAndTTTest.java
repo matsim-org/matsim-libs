@@ -21,7 +21,8 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import scenarios.braess.createInput.TtCreateBraessPopulation;
+import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
+import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
 
 /**
  * This class tests the functionality of the class
@@ -45,7 +46,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	private String outputdir;
 	
 	/**
-	 * Test method for {@link scenarios.braess.analysis.TtAnalyzeBraess#calculateAvgRouteTTsByDepartureTime()}
+	 * Test method for {@link scenarios.illustrative.braess.analysis.TtAnalyzeBraess#calculateAvgRouteTTsByDepartureTime()}
 	 * with 2 agents driving different routes and again with 5 agents driving the same route
 	 * 
 	 * @author Gabriel Thunig
@@ -159,7 +160,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	}
 	
 	/**
-	 * Test method for {@link scenarios.braess.analysis.TtAnalyzeBraess#getTotalTT()}.
+	 * Test method for {@link scenarios.illustrative.braess.analysis.TtAnalyzeBraess#getTotalTT()}.
 	 * 
 	 * @author Tilmann Schlenther
 	 */	

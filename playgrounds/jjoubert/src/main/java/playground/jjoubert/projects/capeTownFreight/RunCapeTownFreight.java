@@ -133,6 +133,9 @@ public class RunCapeTownFreight {
 		config.plans().setActivityDurationInterpretation(
 				PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 
+		/* Facilities */
+		config.facilities().setInputFile(folder + "facilities.xml.gz");
+		
 		/* QSim */
 		config.qsim().setNumberOfThreads(machine.getThreads());
 		String[] modes ={"car","commercial"};

@@ -8,6 +8,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
@@ -107,7 +108,7 @@ public class Matsim4Urbansim {
 			oldPop=null ;
 		}
 
-		Population newPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population newPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		// read urbansim persons.  Generates hwh acts as side effect
 		readFromUrbansim.readPersons( oldPop, newPop, facilities, network, samplingRate ) ;
 		oldPop=null ;
@@ -119,10 +120,7 @@ public class Matsim4Urbansim {
 
 		((MutableScenario) scenario).setPopulation(newPop);
 		Controler controler = new Controler(scenario) ;
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
 
 		// The following lines register what should be done _after_ the iterations were run:
 		MyControlerListener myControlerListener = new MyControlerListener( zones ) ;
