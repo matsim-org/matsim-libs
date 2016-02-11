@@ -59,7 +59,7 @@ public class CreatePopulation {
 
 			//define list of considered TAZ
 			Integer[] consideredTAZ={1955,1948,1949,1950,1951,1952,1953,1954,1956,1957,1958,1959,
-					1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,2127,2128,2129,2130};
+					1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,2127,2128,2129,2130,1919,1917,1921, 2185, 2186,2233,1992};
 			ArrayList<Integer> consideredTAZList=new ArrayList<Integer>(Arrays.asList(consideredTAZ));
 
 			// read data-file and create population

@@ -12,7 +12,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 public class MAControlerCase1b {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/configCase1b.xml");
+		Config config = ConfigUtils.loadConfig("C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/Case1/configCase1b_fcf3.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
 		Controler controler = new Controler(config);
