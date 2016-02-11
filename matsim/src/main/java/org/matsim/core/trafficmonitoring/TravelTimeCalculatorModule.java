@@ -47,13 +47,11 @@ import javax.inject.Provider;
  */
 public class TravelTimeCalculatorModule extends AbstractModule {
 
-    final boolean ONE_FOR_EACH_MODE = true;
-
     @Override
     public void install() {
-        if (ONE_FOR_EACH_MODE) {
+        if (getConfig().travelTimeCalculator().getSeparateModes()) {
             for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
-                bind(TravelTimeCalculator.class).annotatedWith(Names.named(mode)).toProvider(TravelTimeCalculatorProvider.class).in(Singleton.class);
+                bind(TravelTimeCalculator.class).annotatedWith(Names.named(mode)).toProvider(new SingleModeTravelTimeCalculatorProvider(mode)).in(Singleton.class);
                 addTravelTimeBinding(mode).toProvider(new Provider<TravelTime>() {
                     @Inject Injector injector;
                     @Override
@@ -63,12 +61,6 @@ public class TravelTimeCalculatorModule extends AbstractModule {
                 });
             }
         } else {
-            // I declare that there is something of type TravelTimeCalculator which
-            //  - will exist only once (live as long as the Controler).
-            //  - will be available to other bound classes via injection
-            //  - will come out of the Provider below.
-            // If I was in a script, I could also pass an instance directly which I created myself, but
-            // here, the Scenario is not available yet, so I defer construction.
             bind(TravelTimeCalculator.class).toProvider(TravelTimeCalculatorProvider.class).in(Singleton.class);
             if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
                 for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
@@ -107,60 +99,36 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
     private static class TravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
 
-        @Inject
-        TravelTimeCalculatorConfigGroup config;
-
-        @Inject
-        EventsManager eventsManager;
-
-        @Inject
-        Network network;
+        @Inject TravelTimeCalculatorConfigGroup config;
+        @Inject EventsManager eventsManager;
+        @Inject Network network;
 
         @Override
         public TravelTimeCalculator get() {
             TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), 30*3600, config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), config.isFilterModes(), CollectionUtils.stringToSet(config.getAnalyzedModes()));
-
-            switch ( config.getTravelTimeCalculatorType() ) {
-				case TravelTimeCalculatorArray:
-					calculator.setTravelTimeDataFactory(new TravelTimeDataArrayFactory(network, calculator.numSlots));
-					break;
-				case TravelTimeCalculatorHashMap:
-					calculator.setTravelTimeDataFactory(new TravelTimeDataHashMapFactory(network));
-					break;
-				default:
-					throw new RuntimeException(config.getTravelTimeCalculatorType() + " is unknown!");
-			}
-
-            AbstractTravelTimeAggregator travelTimeAggregator;
-            switch( config.getTravelTimeAggregatorType() ) {
-			case "optimistic":
-				travelTimeAggregator = new OptimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice);
-				break ;
-			case "experimental_LastMile":
-				travelTimeAggregator = new PessimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice);
-				break ;
-			default:
-				throw new RuntimeException(config.getTravelTimeAggregatorType() + " is unknown!");
-			}
-            calculator.setTravelTimeAggregator(travelTimeAggregator);
-
-            TravelTimeGetter travelTimeGetter;
-            switch( config.getTravelTimeGetterType() ) {
-			case "average":
-				travelTimeGetter = new AveragingTravelTimeGetter();
-				break ;
-			case "linearinterpolation":
-				travelTimeGetter = new LinearInterpolatingTravelTimeGetter(calculator.numSlots, calculator.timeSlice);
-				break ;
-			default:
-				throw new RuntimeException(config.getTravelTimeGetterType() + " is unknown!");
-			}
-            travelTimeAggregator.connectTravelTimeGetter(travelTimeGetter);
-
             eventsManager.addHandler(calculator);
-            return calculator;
+            return TravelTimeCalculator.configure(calculator, config, network);
+        }
+    }
+
+    private static class SingleModeTravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
+
+        @Inject TravelTimeCalculatorConfigGroup config;
+        @Inject EventsManager eventsManager;
+        @Inject Network network;
+
+        private String mode;
+
+        SingleModeTravelTimeCalculatorProvider(String mode) {
+            this.mode = mode;
         }
 
+        @Override
+        public TravelTimeCalculator get() {
+            TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), 30*3600, config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), true, CollectionUtils.stringToSet(mode));
+            eventsManager.addHandler(calculator);
+            return TravelTimeCalculator.configure(calculator, config, network);
+        }
     }
 
 }
