@@ -40,6 +40,8 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.StatsWriter;
+import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
+import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
@@ -62,7 +64,7 @@ public class PatnaJointCalibrationControler {
 	private static final String JOINT_COUNTS_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_counts.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_vehicles_10pct.xml.gz";
 
-	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/c0_congestionFree/";
+	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/cxx/";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -99,6 +101,15 @@ public class PatnaJointCalibrationControler {
 				}
 			}
 		});
+		
+		controler.addOverridingModule(new AbstractModule() { // ploting modal share over iterations
+			@Override
+			public void install() {
+				this.bind(ModalShareEventHandler.class);
+				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
+			}
+		});
+		
 		controler.run();
 
 		// delete unnecessary iterations folder here.
@@ -141,7 +152,7 @@ public class PatnaJointCalibrationControler {
 		config.vehicles().setVehiclesFile(JOINT_VEHICLES_10PCT);
 
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(100);
+		config.controler().setLastIteration(1);
 		config.controler().setWriteEventsInterval(100);
 		config.controler().setWritePlansInterval(100);
 		config.controler().setOutputDirectory(OUTPUT_DIR);
