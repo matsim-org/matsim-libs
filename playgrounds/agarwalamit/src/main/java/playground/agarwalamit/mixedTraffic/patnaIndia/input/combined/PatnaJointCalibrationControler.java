@@ -66,7 +66,7 @@ public class PatnaJointCalibrationControler {
 	private static final String JOINT_COUNTS_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_counts.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_vehicles_10pct.xml.gz";
 
-	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/cxx/";
+	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/c3/";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
@@ -80,6 +80,12 @@ public class PatnaJointCalibrationControler {
 			config = pjc.createBasicConfigSettings();
 		}
 
+		config.planCalcScore().getOrCreateModeParams("car").setConstant(0.);
+		config.planCalcScore().getOrCreateModeParams("bike").setConstant(12.);
+		config.planCalcScore().getOrCreateModeParams("motorbike").setConstant(9.);
+		config.planCalcScore().getOrCreateModeParams("pt").setConstant(-15.);
+		config.planCalcScore().getOrCreateModeParams("walk").setConstant(-11.);
+		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		final Controler controler = new Controler(config);
@@ -114,7 +120,6 @@ public class PatnaJointCalibrationControler {
 				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
 			}
 		});
-		
 		controler.run();
 
 		// delete unnecessary iterations folder here.
