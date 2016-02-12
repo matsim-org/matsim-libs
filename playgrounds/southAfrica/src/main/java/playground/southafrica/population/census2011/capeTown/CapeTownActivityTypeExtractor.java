@@ -31,13 +31,13 @@ import playground.southafrica.utilities.Header;
  * 
  * @author jwjoubert
  */
-public class CTActivityTypeExtractor {
+public class CapeTownActivityTypeExtractor {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Header.printHeader(CTActivityTypeExtractor.class.toString(), args);
+		Header.printHeader(CapeTownActivityTypeExtractor.class.toString(), args);
 		
 		/* For persons. */
 		String populationFile = args[0];
