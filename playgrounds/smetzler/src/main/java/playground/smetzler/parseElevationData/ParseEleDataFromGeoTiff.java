@@ -29,7 +29,7 @@ public class ParseEleDataFromGeoTiff {
 
 	private void initTif() throws Exception {
 		// download data from http://earthexplorer.usgs.gov/ (login in required)
-		File tiffFile = new File("../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/elevation_berlin/n52_e013_1arc_v3.tif");
+		File tiffFile = new File("../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/n52_e013_1arc_v3.tif");
 		GeoTiffReader reader = new GeoTiffReader(tiffFile);
 
 		grid = reader.read(null);

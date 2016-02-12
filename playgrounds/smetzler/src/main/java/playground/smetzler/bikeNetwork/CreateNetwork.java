@@ -20,13 +20,13 @@ public class CreateNetwork {
 		
 		
 		//String inputOSM = "../../../../13.Sem - Uni WS 15-16/Masterarbeit/netzwerk/tempelhof/tempelhof.osm";
-		String inputOSM = "../../../berlin-bike/sonstiges/network_sonstiges/tempelhof/tempelhof.osm";
+		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/tempelhof/tempelhof.osm";
 		
 		
 //		String outputXML =     "../smetzler/input/network/tempelhof_MATsim.xml";
 //		String outputBikeXML = "../smetzler/input/network/tempelhof_bikeatt_Oneway.xml";
-		String outputXML =     "../../../berlin-bike/input/network/tempelhof_MATsim.xml";
-		String outputBikeXML = "../../../berlin-bike/input/network/tempelhof_bikeatt_Oneway.xml";
+		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/tempelhof_MATsim.xml";
+		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/tempelhof_bikeatt_Oneway.xml";
 		
 		
 		
