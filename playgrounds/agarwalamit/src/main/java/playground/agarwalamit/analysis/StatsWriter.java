@@ -33,6 +33,10 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 */
 
 public class StatsWriter {
+	
+	public static void main(String[] args) {
+		StatsWriter.run("../../../../repos/runs-svn/patnaIndia/run108/calibration/c2/");
+	}
 
 	public static void run (final String filesDir) {
 		
@@ -56,6 +60,3 @@ public class StatsWriter {
 		calcLegTimes.writeStats(filesDir+"/analysis/_stats_");
 	}
 }
-
-
-	
