@@ -39,7 +39,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -109,12 +112,50 @@ public class CapeTownScenarioCleaner {
 		LOG.info("Ensuring network and config has all routed modes.");
 		new MatsimNetworkReader(sc.getNetwork()).parse(network);
 		
+		/* Update the network modes. */
 		String[] networkModes = {"car", "commercial"};
 		Set<String> modes = new HashSet<>(Arrays.asList(networkModes));
 		for(Link link : sc.getNetwork().getLinks().values()){
 			link.setAllowedModes(modes);
 		}
 		
+		/* Update the config file accordingly. */
+		Config config = ConfigUtils.createConfig();
+		ConfigUtils.loadConfig(config, folder + "config.xml");
+		config.qsim().setMainModes(modes);
+		config.plansCalcRoute().setNetworkModes(modes);
+		/* Add the teleported modes. */
+		ModeRoutingParams ride = new ModeRoutingParams("ride");
+		ride.setBeelineDistanceFactor(1.3);
+		ride.setTeleportedModeFreespeedFactor(0.8); /* Free speed-based. */
+		config.plansCalcRoute().addModeRoutingParams(ride);
+		ModeRoutingParams taxi = new ModeRoutingParams("taxi");
+		taxi.setBeelineDistanceFactor(1.3);
+		taxi.setTeleportedModeSpeed(50.0 / 3.6);
+		config.plansCalcRoute().addModeRoutingParams(taxi);
+		ModeRoutingParams brt = new ModeRoutingParams("brt");
+		brt.setBeelineDistanceFactor(1.3);
+		brt.setTeleportedModeSpeed(50.0 / 3.6);
+		config.plansCalcRoute().addModeRoutingParams(brt);
+		ModeRoutingParams rail = new ModeRoutingParams("rail");
+		rail.setBeelineDistanceFactor(1.3);
+		rail.setTeleportedModeSpeed(20.0 / 3.6);
+		config.plansCalcRoute().addModeRoutingParams(rail);
+		ModeRoutingParams walk = new ModeRoutingParams("walk");
+		walk.setBeelineDistanceFactor(1.3);
+		walk.setTeleportedModeSpeed(2.0 / 3.6);
+		config.plansCalcRoute().addModeRoutingParams(walk);
+		ModeRoutingParams cycle = new ModeRoutingParams("cycle");
+		cycle.setBeelineDistanceFactor(1.3);
+		cycle.setTeleportedModeSpeed(2.0 / 3.6);
+		config.plansCalcRoute().addModeRoutingParams(cycle);
+		ModeRoutingParams other = new ModeRoutingParams("other");
+		other.setBeelineDistanceFactor(1.3);
+		other.setTeleportedModeSpeed(30.0 / 3.6);
+		config.plansCalcRoute().addModeRoutingParams(other);
+		
+		new ConfigWriter(config).write(folder + "config.xml");
+
 		new NetworkWriter(sc.getNetwork()).write(network);
 		LOG.info("Done updating network modes.");
 	}
