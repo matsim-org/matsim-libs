@@ -94,6 +94,11 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		reset();
 
+		// Merge three streams of different type into one and react on it.
+		// Otherwise, I would have to synchronize on the three scoreXX methods,
+		// because the three upstream producers can run on different threads.
+		// And I want to start to stop using low-level concurrency constructs
+		// and explore more high-level ones.
 		Observable<Event> events = ObservableUtils.fromEventsManager(eventsManager);
 		Observable<PersonExperiencedActivity> activities = ObservableUtils.fromEventsToActivities(eventsToActivities);
 		Observable<PersonExperiencedLeg> legs = ObservableUtils.fromEventsToLegs(eventsToLegs);
