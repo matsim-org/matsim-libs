@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -55,7 +56,7 @@ public class BikeQSimFactory implements Provider<Mobsim> {
 		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
 
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
 		car.setMaximumVelocity(60.0/3.6);
 		car.setPcuEquivalents(1.0);
 		modeVehicleTypes.put("car", car);
