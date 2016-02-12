@@ -94,59 +94,66 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		reset();
 
-//		Observable<ControlerEvent> controlerEvents = ObservableUtils.fromControlerListenerManager(controlerListenerManager);
 		Observable<Event> events = ObservableUtils.fromEventsManager(eventsManager);
 		Observable<PersonExperiencedActivity> activities = ObservableUtils.fromEventsToActivities(eventsToActivities);
 		Observable<PersonExperiencedLeg> legs = ObservableUtils.fromEventsToLegs(eventsToLegs);
-
 		Observable<Object> allEvents = Observable.merge(events, activities, legs);
 		allEvents.subscribe(new Action1<Object>() {
 			@Override
 			public void call(Object o) {
 				if (o instanceof HasPersonId) {
-					// this is for the stuff that is directly based on events.
-					// note that this passes on _all_ person events, even those already passed above.
-					// for the time being, not all PersonEvents may "implement HasPersonId".
-					// link enter/leave events are NOT passed on, for performance reasons.
-					// kai/dominik, dec'12
-
-					ScoringFunction scoringFunction = getScoringFunctionForAgent( ((HasPersonId) o).getPersonId());
-					if (scoringFunction != null) {
-						if ( o instanceof PersonStuckEvent) {
-							scoringFunction.agentStuck(((Event) o).getTime()) ;
-						} else if ( o instanceof PersonMoneyEvent) {
-							scoringFunction.addMoney(((PersonMoneyEvent) o).getAmount()) ;
-						} else {
-							scoringFunction.handleEvent((Event) o) ;
-						}
-					}
+					scorePersonEvent((HasPersonId) o);
 				} else if (o instanceof PersonExperiencedActivity) {
-					Id<Person> agentId = ((PersonExperiencedActivity) o).getAgentId();
-					Activity activity = ((PersonExperiencedActivity) o).getActivity();
-					ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
-					if (scoringFunction != null) {
-						scoringFunction.handleActivity(activity);
-						ScoringFunctionsForPopulation.this.agentRecords.get(agentId).addActivity(activity);
-						TDoubleCollection partialScoresForAgent = ScoringFunctionsForPopulation.this.partialScores.get(agentId);
-						partialScoresForAgent.add(scoringFunction.getScore());
-					}
+					scoreExperiencedActivity((PersonExperiencedActivity) o);
 				} else if (o instanceof PersonExperiencedLeg) {
-					Id<Person> agentId = ((PersonExperiencedLeg) o).getAgentId();
-					Leg leg = ((PersonExperiencedLeg) o).getLeg();
-					ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
-					if (scoringFunction != null) {
-						scoringFunction.handleLeg(leg);
-						agentRecords.get(agentId).addLeg(leg);
-						TDoubleCollection partialScoresForAgent = ScoringFunctionsForPopulation.this.partialScores.get(agentId);
-						partialScoresForAgent.add(scoringFunction.getScore());
-					}
+					scoreExperiencedLeg((PersonExperiencedLeg) o);
 				}
-//				else if (o instanceof IterationEndsEvent) {
-//					reset();
-//				}
 			}
 		});
 		eventsManager.addHandler(this); // only so that I receive the reset() call!
+	}
+
+	private void scorePersonEvent(HasPersonId o) {
+		// this is for the stuff that is directly based on events.
+		// note that this passes on _all_ person events, even those which are aggregated into legs and activities.
+		// for the time being, not all PersonEvents may "implement HasPersonId".
+		// link enter/leave events are NOT passed on, for performance reasons.
+		// kai/dominik, dec'12
+
+		ScoringFunction scoringFunction = getScoringFunctionForAgent(o.getPersonId());
+		if (scoringFunction != null) {
+			if ( o instanceof PersonStuckEvent) {
+				scoringFunction.agentStuck(((Event) o).getTime()) ;
+			} else if ( o instanceof PersonMoneyEvent) {
+				scoringFunction.addMoney(((PersonMoneyEvent) o).getAmount()) ;
+			} else {
+				scoringFunction.handleEvent((Event) o) ;
+			}
+		}
+	}
+
+	private void scoreExperiencedLeg(PersonExperiencedLeg o) {
+		Id<Person> agentId = o.getAgentId();
+		Leg leg = o.getLeg();
+		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
+		if (scoringFunction != null) {
+			scoringFunction.handleLeg(leg);
+			agentRecords.get(agentId).addLeg(leg);
+			TDoubleCollection partialScoresForAgent = ScoringFunctionsForPopulation.this.partialScores.get(agentId);
+			partialScoresForAgent.add(scoringFunction.getScore());
+		}
+	}
+
+	private void scoreExperiencedActivity(PersonExperiencedActivity o) {
+		Id<Person> agentId = o.getAgentId();
+		Activity activity = o.getActivity();
+		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
+		if (scoringFunction != null) {
+			scoringFunction.handleActivity(activity);
+			ScoringFunctionsForPopulation.this.agentRecords.get(agentId).addActivity(activity);
+			TDoubleCollection partialScoresForAgent = ScoringFunctionsForPopulation.this.partialScores.get(agentId);
+			partialScoresForAgent.add(scoringFunction.getScore());
+		}
 	}
 
 	private void reset() {
