@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -34,10 +36,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -65,21 +69,24 @@ import playground.ikaddoura.incidents.data.TrafficItem;
 public class IncidentDataAnalysis {
 	private static final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
  
-//	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-//	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/berlin-test/";
-
-	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
-	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany-test/";
+	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
+	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/output-berlin/";
+//	private final String outputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-berlin/";
+	
+//	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
+//	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany-test/";
 	
 	private final boolean writeCSVFileForEachXMLFile = false;
-	
+	private final String coordinateSystem = TransformationFactory.DHDN_GK4;
+		
 // ##################################################################
-	
+
 	private Map<String, TrafficItem> trafficItems = new HashMap<>();
 	private Map<String, Path> trafficItemId2path = new HashMap<>();
 	private Scenario scenario = null;
 	private Network carNetwork = null;
 	private TMCAlerts tmc = new TMCAlerts();
+	private Set<String> trafficItemsToBeChecked = new HashSet<>();
 	
 	public static void main(String[] args) throws XMLStreamException, IOException {
 		IncidentDataAnalysis incidentAnalysis = new IncidentDataAnalysis();
@@ -95,13 +102,26 @@ public class IncidentDataAnalysis {
 			e1.printStackTrace();
 		}
 		
-		collectTrafficItems();
+		collectTrafficItems(); // traffic items that have the same traffic item IDs are updated by the more recent information
+		updateTrafficItems(); // update all traffic items that are updated or canceled by another traffic item
 		loadScenario();
 		computeCarNetwork();
-		computePath();
+		computeIncidentPaths();
 		writeIncidentLinksToShapeFile();
 		
 		OutputDirectoryLogging.closeOutputDirLogging();
+	}
+
+	private void updateTrafficItems() {
+		for (TrafficItem item : this.trafficItems.values()) {
+			if (tmc.trafficItemIsAnUpdate(item)) {
+				// TODO
+				
+			} else {
+				// no update / no cancellation / no clearance
+			}
+		}
+
 	}
 
 	private void computeCarNetwork() {
@@ -138,12 +158,13 @@ public class IncidentDataAnalysis {
 	private void writeIncidentLinksToShapeFile() {
 		
 		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
-		.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
+		.setCrs(MGC.getCRS(this.coordinateSystem))
 		.setName("Link")
 		.addAttribute("LinkId", String.class)
 		.addAttribute("IncidentId", String.class)
 		.addAttribute("Street", String.class)
 		.addAttribute("Alert", String.class)
+		.addAttribute("Message", String.class)
 		.addAttribute("Length", Double.class)
 		.addAttribute("Modes", String.class)
 		.addAttribute("Capacity", Double.class)
@@ -161,25 +182,64 @@ public class IncidentDataAnalysis {
 						
 		for (String id : this.trafficItemId2path.keySet()) {
 			
-			for (Link link : this.trafficItemId2path.get(id).links) {
-				if (tmc.getIncidentObject(link, this.trafficItems.get(id)) != null) {
-					SimpleFeature feature = factory.createPolyline(
-							new Coordinate[] {
-									new Coordinate(MGC.coord2Coordinate(link.getFromNode().getCoord())),
-									new Coordinate(MGC.coord2Coordinate(link.getToNode().getCoord())) }
-							, tmc.getIncidentObject(link, this.trafficItems.get(id))
-							, null);
-					features.add(feature);
+			if (this.trafficItemId2path.get(id) == null) {
+				// no path identified
+				log.warn("Skipping traffic item " + id + " because there is no path.");
+				
+			} else {
+				for (Link link : this.trafficItemId2path.get(id).links) {
+					if (tmc.getIncidentObject(link, this.trafficItems.get(id)) != null) {
+						SimpleFeature feature = factory.createPolyline(
+								new Coordinate[] {
+										new Coordinate(MGC.coord2Coordinate(link.getFromNode().getCoord())),
+										new Coordinate(MGC.coord2Coordinate(link.getToNode().getCoord())) }
+								, tmc.getIncidentObject(link, this.trafficItems.get(id))
+								, null);
+						features.add(feature);
+					}
 				}
 			}
 		}
 		
 		if (features.isEmpty()) {
-			log.warn("No traffic incidents. Nothing to write out.");
+			log.warn("No traffic incidents. Nothing to write into a shape file.");
 		} else {
 			log.info("Writing out incident shapefile... ");
 			ShapeFileWriter.writeGeometries(features, outputDirectory + "incidentLinks.shp");
 			log.info("Writing out incident shapefile... Done.");
+		}
+		
+		if (!this.trafficItemsToBeChecked.isEmpty()) {
+			Collection<SimpleFeature> criticalFeatures = new ArrayList<SimpleFeature>();
+			
+			for (String id : this.trafficItemsToBeChecked) {
+				
+				if (this.trafficItemId2path.get(id) == null) {
+					// no path identified
+					log.warn("Skipping traffic item " + id + " because there is no path.");
+					
+				} else {
+					for (Link link : this.trafficItemId2path.get(id).links) {
+						if (tmc.getIncidentObject(link, this.trafficItems.get(id)) != null) {
+							SimpleFeature feature = factory.createPolyline(
+									new Coordinate[] {
+											new Coordinate(MGC.coord2Coordinate(link.getFromNode().getCoord())),
+											new Coordinate(MGC.coord2Coordinate(link.getToNode().getCoord())) }
+									, tmc.getIncidentObject(link, this.trafficItems.get(id))
+									, null);
+							criticalFeatures.add(feature);
+						}
+					}
+				}
+			}
+			
+			if (criticalFeatures.isEmpty()) {
+				log.warn("No traffic incidents. Nothing to write into a shape file.");
+			} else {
+				log.info("Writing out incident shapefile... ");
+				ShapeFileWriter.writeGeometries(criticalFeatures, outputDirectory + "incidentLinksToBeChecked.shp");
+				log.info("Writing out incident shapefile... Done.");
+			}
 		}
 	}
 
@@ -259,35 +319,91 @@ public class IncidentDataAnalysis {
 		
 	}
 	
-	private void computePath() {
+	private void computeIncidentPaths() {
 		
 		log.info("Processing traffic items...");
 		
 		for (String id : this.trafficItems.keySet()) {
-			
-			DijkstraFactory f = new DijkstraFactory();
-			final TravelDisutility travelCosts = TravelDisutilityUtils.createFreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
-			
-			final Coord coordOriginWGS84 = new Coord(Double.valueOf(this.trafficItems.get(id).getOrigin().getLongitude()), Double.valueOf(this.trafficItems.get(id).getOrigin().getLatitude()));
+						
+			final Coord coordFromWGS84 = new Coord(Double.valueOf(this.trafficItems.get(id).getOrigin().getLongitude()), Double.valueOf(this.trafficItems.get(id).getOrigin().getLatitude()));
 			final Coord coordToWGS84 = new Coord(Double.valueOf(this.trafficItems.get(id).getTo().getLongitude()), Double.valueOf(this.trafficItems.get(id).getTo().getLatitude()));
 
-			CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
+			CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, this.coordinateSystem);
 			
-			final Coord coordOriginGK4 = ct.transform(coordOriginWGS84);
-			final Coord coordToGK4 = ct.transform(coordToWGS84);
+			final Coord coordFromGK4 = ct.transform(coordFromWGS84);
+			final Coord coordToGK4 = ct.transform(coordToWGS84);			
+			double beelineDistance = NetworkUtils.getEuclidianDistance(coordFromGK4, coordToGK4);
 			
-			Link linkOrigin = NetworkUtils.getNearestLink(carNetwork, coordOriginGK4);
-			Link linkTo = NetworkUtils.getNearestLink(carNetwork, coordToGK4);
+			Path incidentPath = null;
+			
+			// first just use the nearest link functionality
+			Link nearestLinkFrom = NetworkUtils.getNearestLink(carNetwork, coordFromGK4);
+			Link nearestLinkTo = NetworkUtils.getNearestLink(carNetwork, coordToGK4);
+			
+			incidentPath = computePath(nearestLinkFrom.getToNode(), nearestLinkTo.getFromNode());
+			double pathDistance = computePathDistance(incidentPath);
+			
+			// then see if the path is plausible
+			boolean tryToFindABetterPath = false;
+			if (pathDistance > 2. * beelineDistance) {
+				log.warn("No good path identified for incident " + id + ". The path distance is at least twice as long as the beeline distance. Trying to identify a more plausible path.");
+				tryToFindABetterPath = true;
+			}
+				
+			if (tryToFindABetterPath) {
+				double pathDistanceBeelineDifference = Double.MAX_VALUE;
 
-			Path path = f.createPathCalculator(scenario.getNetwork(), travelCosts, new FreeSpeedTravelTime()).calcLeastCostPath(linkOrigin.getFromNode(), linkTo.getToNode(), 0., null, null);
-			if (path == null || path.links.size() == 0) {
-				log.warn("No path identified for incident " + this.trafficItems.get(id).toString());
+				Collection<Node> nearestNodesAroundFromCoord = ((NetworkImpl) carNetwork).getNearestNodes(coordFromGK4, 100.);
+				Collection<Node> nearestNodesAroundToCoord = ((NetworkImpl) carNetwork).getNearestNodes(coordFromGK4, 100.);
+				
+				for (Node nodeArroundFromCoord : nearestNodesAroundFromCoord) {
+					for (Node nodeAroundToCoord : nearestNodesAroundToCoord) {
+						
+						Path path = computePath(nodeArroundFromCoord, nodeAroundToCoord);
+						double pathDifference = Math.abs(computePathDistance(path) - beelineDistance);
+						
+						if (pathDifference < pathDistanceBeelineDifference) {
+							pathDistanceBeelineDifference = pathDifference;
+							incidentPath = path;
+						}
+					}
+				}
 			}
 			
-			this.trafficItemId2path.put(id, path);
+			if (pathDistance > 2. * beelineDistance) {
+				log.warn("No good path identified for incident " + id + ". The path distance is at least twice as long as the beeline distance. Maybe try a better network resolution.");
+				this.trafficItemsToBeChecked.add(id);
+			}
+			
+			if (incidentPath == null || incidentPath.links.size() == 0) {
+				log.warn("No path identified for incident " + id + ".");
+			}
+			
+			this.trafficItemId2path.put(id, incidentPath);
 		}
 		
 		log.info("Processing traffic items... Done.");		
+	}
+
+	private double computePathDistance(Path path) {
+		
+		double pathDistance = 0.;
+		
+		for (Link link : path.links) {
+			pathDistance = pathDistance + link.getLength();
+		}	
+		
+		return pathDistance;
+	}
+
+	private Path computePath(Node fromNode, Node toNode) {
+		
+		DijkstraFactory f = new DijkstraFactory();
+		final TravelDisutility travelCosts = TravelDisutilityUtils.createFreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
+
+		Path path = f.createPathCalculator(scenario.getNetwork(), travelCosts, new FreeSpeedTravelTime()).calcLeastCostPath(scenario.getNetwork().getNodes().get(fromNode.getId()), scenario.getNetwork().getNodes().get(toNode.getId()), 0., null, null);
+		
+		return path;
 	}
 
 }

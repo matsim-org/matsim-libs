@@ -45,7 +45,7 @@ public class TMCAlerts {
 			double changedFreeSpeed) {
 
 		if (incidentObject == null) {
-			incidentObject = new Object[] {link.getId(), trafficItem.getId(), (trafficItem.getOrigin().getDescription() + " --> " + trafficItem.getTo().getDescription()), trafficItem.getTMCAlert().getPhraseCode(), link.getLength(),
+			incidentObject = new Object[] {link.getId(), trafficItem.getId(), (trafficItem.getOrigin().getDescription() + " --> " + trafficItem.getTo().getDescription()), trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription(), link.getLength(),
 					
 					// the parameters under normal conditions
 					link.getAllowedModes(), link.getCapacity(), link.getNumberOfLanes(), link.getFreespeed(),
@@ -63,6 +63,53 @@ public class TMCAlerts {
 		return incidentObject;
 	}
 	
+	protected boolean trafficItemIsAnUpdate(TrafficItem trafficItem) {
+		
+		if (trafficItem.getTMCAlert().getPhraseCode().endsWith("87") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("88") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("89") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("90") ||
+			
+				// Z91 is not a cancellation / clearance
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("C91") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("P91") ||
+				
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("92") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("93") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("94") ||
+				
+				// Z95 is not a cancellation / clearance 
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("Y95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("X95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("U95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("T95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("Q95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("P95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("L95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("H95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("G95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("F95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("E95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("D95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("C95") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("B95") ||
+							
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("96") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("97") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("98") ||
+				
+				// T99 is not a cancellation / clearance
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("F99") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("H99")
+				) {
+			
+			return true;
+						
+		} else {
+			return false;
+		}
+	}
+	
 	public Object[] getIncidentObject(Link link, TrafficItem trafficItem) {
 		Object[] incidentObject = null;
 		
@@ -70,51 +117,9 @@ public class TMCAlerts {
 		
 		if (trafficItem.getTMCAlert() != null && trafficItem.getTMCAlert().getPhraseCode() != null) {
 			
-			// ####### cleared / cancelled #######
-			
-			if (trafficItem.getTMCAlert().getPhraseCode().endsWith("87") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("88") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("89") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("90") ||
+			if (trafficItemIsAnUpdate(trafficItem)) {
+				// incident / warning cleared or no longer valid
 				
-					// Z91 is not a cancellation / clearance
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("C91") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("P91") ||
-					
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("92") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("93") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("94") ||
-					
-					// Z95 is not a cancellation / clearance 
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("Y95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("X95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("U95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("T95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("Q95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("P95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("L95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("H95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("G95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("F95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("E95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("D95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("C95") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("B95") ||
-								
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("96") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("97") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("98") ||
-					
-					// T99 is not a cancellation / clearance
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("F99") ||
-					trafficItem.getTMCAlert().getPhraseCode().endsWith("H99")
-					) {
-								
-				// incident / warning / ... cleared or no longer valid
-				
-				log.warn("Cleared: " + trafficItem.toString());
-				// TODO: Check if the previous message's end time was right or updated. If not, use these messages to set the end time. 
-			
 			} else {
 				
 				// ####### specific codes ########
@@ -190,7 +195,7 @@ public class TMCAlerts {
 					
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 					
-				} else if (containsOrEndsWith(trafficItem, "E14")) { // abwechselnd in beide Richtungen nur ein Fahrstreifen frei // TODO: what about the other direction?
+				} else if (containsOrEndsWith(trafficItem, "E14")) { // abwechselnd in beide Richtungen nur ein Fahrstreifen frei
 					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
 							link.getAllowedModes(),
 							1.5 * (link.getCapacity() / link.getNumberOfLanes()),
