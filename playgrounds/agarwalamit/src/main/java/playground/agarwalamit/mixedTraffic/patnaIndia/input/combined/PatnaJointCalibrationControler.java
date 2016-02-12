@@ -78,13 +78,13 @@ public class PatnaJointCalibrationControler {
 			config.controler().setOutputDirectory( OUTPUT_DIR );
 		} else {
 			config = pjc.createBasicConfigSettings();
+			
+			config.planCalcScore().getOrCreateModeParams("car").setConstant(0.);
+			config.planCalcScore().getOrCreateModeParams("bike").setConstant(12.);
+			config.planCalcScore().getOrCreateModeParams("motorbike").setConstant(9.);
+			config.planCalcScore().getOrCreateModeParams("pt").setConstant(-15.);
+			config.planCalcScore().getOrCreateModeParams("walk").setConstant(-11.);
 		}
-
-		config.planCalcScore().getOrCreateModeParams("car").setConstant(0.);
-		config.planCalcScore().getOrCreateModeParams("bike").setConstant(12.);
-		config.planCalcScore().getOrCreateModeParams("motorbike").setConstant(9.);
-		config.planCalcScore().getOrCreateModeParams("pt").setConstant(-15.);
-		config.planCalcScore().getOrCreateModeParams("walk").setConstant(-11.);
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
@@ -162,7 +162,7 @@ public class PatnaJointCalibrationControler {
 		config.vehicles().setVehiclesFile(JOINT_VEHICLES_10PCT);
 
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1);
+		config.controler().setLastIteration(100);
 		config.controler().setWriteEventsInterval(100);
 		config.controler().setWritePlansInterval(100);
 		config.controler().setOutputDirectory(OUTPUT_DIR);
