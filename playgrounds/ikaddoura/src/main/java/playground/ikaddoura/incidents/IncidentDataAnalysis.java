@@ -70,23 +70,24 @@ public class IncidentDataAnalysis {
 	private static final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
  
 	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/output-berlin/";
-//	private final String outputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-berlin/";
+//	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/output-berlin/";
+	private final String outputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-berlin/";
 	
 //	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
 //	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany-test/";
 	
 	private final boolean writeCSVFileForEachXMLFile = false;
-	private final String coordinateSystem = TransformationFactory.DHDN_GK4;
 		
 // ##################################################################
 
-	private Map<String, TrafficItem> trafficItems = new HashMap<>();
-	private Map<String, Path> trafficItemId2path = new HashMap<>();
+	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
+	private final Map<String, TrafficItem> trafficItems = new HashMap<>();
+	private final Map<String, Path> trafficItemId2path = new HashMap<>();
+	private final TMCAlerts tmc = new TMCAlerts();
+	private final Set<String> trafficItemsToBeChecked = new HashSet<>();
+
 	private Scenario scenario = null;
 	private Network carNetwork = null;
-	private TMCAlerts tmc = new TMCAlerts();
-	private Set<String> trafficItemsToBeChecked = new HashSet<>();
 	
 	public static void main(String[] args) throws XMLStreamException, IOException {
 		IncidentDataAnalysis incidentAnalysis = new IncidentDataAnalysis();
@@ -113,13 +114,35 @@ public class IncidentDataAnalysis {
 	}
 
 	private void updateTrafficItems() {
-		for (TrafficItem item : this.trafficItems.values()) {
-			if (tmc.trafficItemIsAnUpdate(item)) {
-				// TODO
+		Set<String> updateItemsToBeDeleted = new HashSet<>();
+
+		for (TrafficItem updateItem : this.trafficItems.values()) {
+			
+			if (tmc.trafficItemIsAnUpdate(updateItem)) {
+								
+				if (this.trafficItems.get(updateItem.getOriginalId()) == null) {
+					// original traffic item not in map
+					
+				} else {
+					TrafficItem originalItem = this.trafficItems.get(updateItem.getOriginalId());
+
+					if (updateItem.getOrigin().toString().equals(originalItem.getOrigin().toString()) && updateItem.getTo().toString().equals(originalItem.getTo().toString())) {
+						// everything seems ok, the updated traffic item's locations are the same
+						
+					} else {
+						throw new RuntimeException("An update message should only update the incident's endtime. The location should remain the same. Aborting...");
+					}
+					originalItem.setEndTime(updateItem.getStartTime());
+					updateItemsToBeDeleted.add(updateItem.getId());
+				}
 				
 			} else {
-				// no update / no cancellation / no clearance
+				// nothing to update
 			}
+		}
+		log.info("+++ " + updateItemsToBeDeleted.size() + " original traffic item(s) updated according to update message(s)");
+		for (String updateItemId : updateItemsToBeDeleted) {
+			this.trafficItems.remove(updateItemId);
 		}
 
 	}
@@ -158,7 +181,7 @@ public class IncidentDataAnalysis {
 	private void writeIncidentLinksToShapeFile() {
 		
 		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
-		.setCrs(MGC.getCRS(this.coordinateSystem))
+		.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
 		.setName("Link")
 		.addAttribute("LinkId", String.class)
 		.addAttribute("IncidentId", String.class)
@@ -267,49 +290,116 @@ public class IncidentDataAnalysis {
 				}
 				
 				int counterNew = 0;
-				int counterUpdated = 0;
-				int counterIgnored = 0;
+				int counterUpdatedEndTimes = 0;
+				int counterUpdatedEndTimesUpdateMessage = 0;
+				int counterIgnoredAlreadyInMap = 0;
+				int counterIgnoredNullInfoItem = 0;
 				for (TrafficItem item : trafficItemReader.getTrafficItems()) {
 					
-					if (trafficItems.containsKey(item.getId())) {
-						// Item with same ID is already in the map.
-						
-						if (item.toString().equals(trafficItems.get(item.getId()).toString())) {
-							// Everything is fine. No need for adding the item to the map.
-							counterIgnored++;
-							
-						} else {
-							// The traffic item information is different.
-							
-							if ( item.getOrigin().toString().equals(trafficItems.get(item.getId()).getOrigin().toString()) &&
-									item.getTo().toString().equals(trafficItems.get(item.getId()).getTo().toString()) &&
-									item.getTMCAlert().toString().equals(trafficItems.get(item.getId()).getTMCAlert().toString()) &&
-									item.getStartTime().equals(trafficItems.get(item.getId()).getStartTime()) ) {
-								
-								// Only the end time has changed. Everything is fine.
-								
-							} else {
-								log.warn("Two traffic items have the same ID but contain different information.");
-								log.warn("new traffic item: " + item.toString());
-								log.warn("old traffic item: " + trafficItems.get(item.getId()).toString());
-							}
-							
-							// Adding the more recent information.
-							if  (item.getDownloadTime() > trafficItems.get(item.getId()).getDownloadTime() ) {
-								counterUpdated++;
-								trafficItems.put(item.getId(), item);
-							}
-						}
+					if (item.getTMCAlert().getPhraseCode() == null ||
+							item.getTo().getLatitude() == null ||
+							item.getTo().getLongitude() == null ||
+							item.getOrigin().getLatitude() == null ||
+							item.getOrigin().getLongitude() == null) {
+
+						log.warn("Null info. Ignoring traffic item: " + item.toString());
+						counterIgnoredNullInfoItem++;
 						
 					} else {
-						counterNew++;
-						trafficItems.put(item.getId(), item);
+						if (trafficItems.containsKey(item.getId())) {
+							// Item with same ID is already in the map.
+							
+							if (item.toString().equals(trafficItems.get(item.getId()).toString())) {
+								// Everything is fine. No need for adding the item to the map.
+								counterIgnoredAlreadyInMap++;
+								
+							} else {
+								// The traffic item information is different.
+								
+								// same locations, same messages, same start times, different end times
+								if ( item.getOrigin().toString().equals(trafficItems.get(item.getId()).getOrigin().toString()) &&
+										item.getTo().toString().equals(trafficItems.get(item.getId()).getTo().toString()) &&
+										item.getTMCAlert().toString().equals(trafficItems.get(item.getId()).getTMCAlert().toString()) &&
+										item.getStartTime().equals(trafficItems.get(item.getId()).getStartTime()) &&
+										(!item.getEndTime().equals(trafficItems.get(item.getId()).getEndTime())) ) {
+									
+									log.info("Different end times...");
+									log.info("New item: " + item.toString());
+									log.info("Old item: " + trafficItems.get(item.getId()));
+									
+									if ( item.getDownloadTime() > trafficItems.get(item.getId()).getDownloadTime() ) {
+										trafficItems.put(item.getId(), item);
+										counterUpdatedEndTimes++;
+									}
+									
+									log.info("Upd item: " + trafficItems.get(item.getId()));
+
+									
+								// same locations, different messages
+								} else if (item.getOrigin().toString().equals(trafficItems.get(item.getId()).getOrigin().toString()) &&
+										item.getTo().toString().equals(trafficItems.get(item.getId()).getTo().toString()) &&
+										(!item.getTMCAlert().toString().equals(trafficItems.get(item.getId()).getTMCAlert().toString())) ) {
+									
+									if (tmc.trafficItemIsAnUpdate(item) && (!tmc.trafficItemIsAnUpdate(trafficItems.get(item.getId()))) ) {
+										
+										if (trafficItems.get(item.getId()).getEndTime().equals(item.getStartTime())) {
+											// already updated before
+										} else {
+											log.info("Different messages...");
+											log.info("New item: " + item.toString());
+											log.info("Old item: " + trafficItems.get(item.getId()));
+											
+											trafficItems.get(item.getId()).setEndTime(item.getStartTime());
+											counterUpdatedEndTimesUpdateMessage++;
+											
+											log.info("Upd item: " + trafficItems.get(item.getId()));	
+										}
+
+									} else if ( (!tmc.trafficItemIsAnUpdate(item)) && tmc.trafficItemIsAnUpdate(trafficItems.get(item.getId())) ) {
+										if (item.getEndTime().equals(trafficItems.get(item.getId()).getStartTime())) {
+											// already updated before
+										} else {
+											log.info("Different messages...");
+											log.info("New item: " + item.toString());
+											log.info("Old item: " + trafficItems.get(item.getId()));
+											
+											item.setEndTime(trafficItems.get(item.getId()).getStartTime());
+											trafficItems.put(item.getId(), item);
+											counterUpdatedEndTimesUpdateMessage++;
+											
+											log.info("Upd item: " + trafficItems.get(item.getId()));
+										}
+									
+									} else {
+										
+//										if (item.getDownloadTime() > trafficItems.get(item.getId()).getDownloadTime() ) {
+//											trafficItems.put(item.getId(), item);
+//										}	
+										throw new RuntimeException("Aborting...");
+									}
+								} else {
+									
+//									if (item.getDownloadTime() > trafficItems.get(item.getId()).getDownloadTime() ) {
+//										trafficItems.put(item.getId(), item);
+//									}
+									throw new RuntimeException("Aborting...");
+								}	
+							}
+							
+						} else {
+							counterNew++;
+							trafficItems.put(item.getId(), item);
+						}
 					}
+					
 				}
 				
-				log.info(" +++ " + counterNew + " new traffic items added to map.");
-				log.info(" +++ " + counterIgnored + " traffic items ignored (already in the map).");
-				log.info(" +++ " + counterUpdated + " traffic items updated (more recent information).");
+				if (counterNew > 0) log.info(" +++ " + counterNew + " new traffic items added to map.");
+				if (counterIgnoredAlreadyInMap > 0) log.info(" +++ " + counterIgnoredAlreadyInMap + " traffic items ignored (already in the map).");
+				
+				if (counterUpdatedEndTimes > 0) log.info(" +++ " + counterUpdatedEndTimes + " traffic items updated (more recent information).");
+				if (counterUpdatedEndTimesUpdateMessage > 0) log.info(" +++ " + counterUpdatedEndTimesUpdateMessage + " traffic items updated (canceled message).");
+				if (counterIgnoredNullInfoItem > 0) log.info(" +++ " + counterIgnoredNullInfoItem + " traffic items ignored (null info).");
 			}
 			log.info("Collecting traffic items from all xml files in directory " + this.outputDirectory + "... Done.");
 		}
@@ -327,8 +417,6 @@ public class IncidentDataAnalysis {
 						
 			final Coord coordFromWGS84 = new Coord(Double.valueOf(this.trafficItems.get(id).getOrigin().getLongitude()), Double.valueOf(this.trafficItems.get(id).getOrigin().getLatitude()));
 			final Coord coordToWGS84 = new Coord(Double.valueOf(this.trafficItems.get(id).getTo().getLongitude()), Double.valueOf(this.trafficItems.get(id).getTo().getLatitude()));
-
-			CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, this.coordinateSystem);
 			
 			final Coord coordFromGK4 = ct.transform(coordFromWGS84);
 			final Coord coordToGK4 = ct.transform(coordToWGS84);			
@@ -346,15 +434,15 @@ public class IncidentDataAnalysis {
 			// then see if the path is plausible
 			boolean tryToFindABetterPath = false;
 			if (pathDistance > 2. * beelineDistance) {
-				log.warn("No good path identified for incident " + id + ". The path distance is at least twice as long as the beeline distance. Trying to identify a more plausible path.");
+				log.warn("No good path identified for incident " + id + ". The path distance is at least twice as long as the beeline distance. Trying to identify a more plausible path...");
 				tryToFindABetterPath = true;
 			}
 				
 			if (tryToFindABetterPath) {
 				double pathDistanceBeelineDifference = Double.MAX_VALUE;
 
-				Collection<Node> nearestNodesAroundFromCoord = ((NetworkImpl) carNetwork).getNearestNodes(coordFromGK4, 100.);
-				Collection<Node> nearestNodesAroundToCoord = ((NetworkImpl) carNetwork).getNearestNodes(coordFromGK4, 100.);
+				Collection<Node> nearestNodesAroundFromCoord = ((NetworkImpl) carNetwork).getNearestNodes(coordFromGK4, 250.);
+				Collection<Node> nearestNodesAroundToCoord = ((NetworkImpl) carNetwork).getNearestNodes(coordFromGK4, 250.);
 				
 				for (Node nodeArroundFromCoord : nearestNodesAroundFromCoord) {
 					for (Node nodeAroundToCoord : nearestNodesAroundToCoord) {
@@ -371,7 +459,8 @@ public class IncidentDataAnalysis {
 			}
 			
 			if (pathDistance > 2. * beelineDistance) {
-				log.warn("No good path identified for incident " + id + ". The path distance is at least twice as long as the beeline distance. Maybe try a better network resolution.");
+				log.warn("No good path identified for incident " + id + ". The path distance is at least twice as long as the beeline distance."
+						+ "The inplausible paths will be written into 'incidentsLinksToBeChecked.shp'. Maybe try a better network resolution.");
 				this.trafficItemsToBeChecked.add(id);
 			}
 			
