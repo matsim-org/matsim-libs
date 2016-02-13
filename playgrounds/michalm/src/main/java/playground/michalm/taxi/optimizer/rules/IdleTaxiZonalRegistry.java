@@ -97,7 +97,7 @@ public class IdleTaxiZonalRegistry
         }
 
         Zone zone = zonalSystem.getZone(node);
-        Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone);
+        Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
         List<Vehicle> nearestVehs = new ArrayList<>();
 
         for (Zone z : zonesByDistance) {
