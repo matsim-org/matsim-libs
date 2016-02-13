@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,45 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone;
+package playground.michalm.zone.util;
 
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.*;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.matsim.api.core.v01.network.*;
+
+import playground.michalm.zone.*;
 
 
-public class ZoneShpWriter
+public class NetworkWithZonesUtils
 {
-    public static final String ID_HEADER = "ID";
-
-    private final Map<Id<Zone>, Zone> zones;
-    private final String coordinateSystem;
-
-
-    public ZoneShpWriter(Map<Id<Zone>, Zone> zones, String coordinateSystem)
+    //if SRSs of the network and zones are different, zoneFinder should convert between CRSs
+    public static Map<Id<Link>, Zone> createLinkToZoneMap(Network network, ZoneFinder zoneFinder)
     {
-        this.zones = zones;
-        this.coordinateSystem = coordinateSystem;
+        Map<Id<Link>, Zone> linkToZone = new HashMap<>();
+
+        for (Link l : network.getLinks().values()) {
+            linkToZone.put(l.getId(), zoneFinder.findZone(l.getToNode().getCoord()));
+        }
+
+        return linkToZone;
     }
 
 
-    public void write(String shpFile)
+    public static Map<Id<Node>, Zone> createNodeToZoneMap(Network network, ZoneFinder zoneFinder)
     {
-        CoordinateReferenceSystem crs = MGC.getCRS(coordinateSystem);
+        Map<Id<Node>, Zone> nodeToZone = new HashMap<>();
 
-        PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder()
-                .addAttribute(ID_HEADER, String.class).setCrs(crs).setName("zone").create();
-
-        List<SimpleFeature> features = new ArrayList<>();
-        for (Zone z : zones.values()) {
-            String id = z.getId() + "";
-            features.add(factory.createPolygon(z.getMultiPolygon(), new Object[] { id }, id));
+        for (Node n : network.getNodes().values()) {
+            nodeToZone.put(n.getId(), zoneFinder.findZone(n.getCoord()));
         }
 
-        ShapeFileWriter.writeGeometries(features, shpFile);
+        return nodeToZone;
     }
 }

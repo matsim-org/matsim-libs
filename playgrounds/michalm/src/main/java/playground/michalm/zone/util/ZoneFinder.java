@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone;
+package playground.michalm.zone.util;
 
-import java.util.*;
+import org.matsim.api.core.v01.Coord;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
+import playground.michalm.zone.Zone;
 
 
-public class NetworkWithZonesUtils
+public interface ZoneFinder
 {
-    //if SRSs of the network and zones are different, zoneFinder should convert between CRSs
-    public static Map<Id<Link>, Zone> createLinkToZoneMap(Network network, ZoneFinder zoneFinder)
-    {
-        Map<Id<Link>, Zone> linkToZone = new HashMap<>();
-
-        for (Link l : network.getLinks().values()) {
-            linkToZone.put(l.getId(), zoneFinder.findZone(l.getToNode().getCoord()));
-        }
-
-        return linkToZone;
-    }
+    Zone findZone(Coord coord);
 }

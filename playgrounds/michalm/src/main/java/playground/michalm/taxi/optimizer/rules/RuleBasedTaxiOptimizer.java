@@ -30,14 +30,14 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
+import playground.michalm.zone.*;
 import playground.michalm.zone.util.*;
-import playground.michalm.zone.util.SquareGridSystem.SquareZone;
 
 
 public class RuleBasedTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    private static ZonalSystem<SquareZone> zonalSystem;//TODO
+    private static ZonalSystem zonalSystem;//TODO
 
     protected final BestDispatchFinder dispatchFinder;
 
