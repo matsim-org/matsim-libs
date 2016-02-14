@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone.util;
+package playground.michalm.zone;
 
-import java.util.List;
-
-import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 
-import playground.michalm.zone.util.SquareGridSystem.SquareZone;
 
-
-public class SquareGridSystem
-    implements ZonalSystem<SquareZone>
+public class SquareGrid
 {
-    public static class SquareZone
-        implements ZonalSystem.Zone
-    {
-        private final int idx;
-        private final int row;
-        private final int col;
-
-
-        public SquareZone(int idx, int row, int col)
-        {
-            this.idx = idx;
-            this.row = row;
-            this.col = col;
-        }
-
-
-        @Override
-        public int getIdx()
-        {
-            return idx;
-        }
-    }
-
-
     private final Network network;
     private final double cellSize;
 
@@ -62,14 +33,13 @@ public class SquareGridSystem
     private double maxX;
     private double maxY;
 
-    private final int cols;
-    private final int rows;
+    private int cols;
+    private int rows;
 
-    private final SquareZone[] zones;
-    private final List<SquareZone>[] zonesByDistance;
+    private Zone[] zones;
 
 
-    public SquareGridSystem(Network network, double cellSize)
+    public SquareGrid(Network network, double cellSize)
     {
         this.network = network;
         this.cellSize = cellSize;
@@ -79,19 +49,11 @@ public class SquareGridSystem
         cols = (int)Math.ceil( (maxX - minX) / cellSize);
         rows = (int)Math.ceil( (maxY - minY) / cellSize);
 
-        zones = initZones();
-
-        zonesByDistance = ZonalSystems.initZonesByDistance(this, network, zones,
-                new ZonalSystems.DistanceCalculator<SquareZone>() {
-                    public double calcDistance(SquareZone z1, SquareZone z2)
-                    {
-                        return (z1.row - z2.row) * (z1.row - z2.row) + (z1.col - z2.col) * (z1.col - z2.col);
-                    }
-                });
+        initZones();
     }
 
 
-    //The content is copied from NetworkImpl
+    //This method's content has been copied from NetworkImpl
     private void initBounds()
     {
         minX = Double.POSITIVE_INFINITY;
@@ -120,40 +82,32 @@ public class SquareGridSystem
     }
 
 
-    private SquareZone[] initZones()
+    private void initZones()
     {
-        SquareZone[] zones = new SquareZone[rows * cols];
+        zones = new Zone[rows * cols];
+        double x0 = minX + cellSize / 2;
+        double y0 = minY + cellSize / 2;
+
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 int idx = r * cols + c;
-                zones[idx] = new SquareZone(idx, r, c);
+                Coord coord = new Coord(c * cellSize + x0, r * cellSize + y0);
+                zones[idx] = new Zone(Id.create(idx, Zone.class), "square", coord);
             }
         }
+    }
 
+
+    public Zone[] getZones()
+    {
         return zones;
     }
 
 
-    @Override
-    public SquareZone getZone(Node node)
+    public Zone getZone(Coord coord)
     {
-        Coord coord = node.getCoord();
         int r = (int)Math.round( ( (coord.getY() - minY) / cellSize));
         int c = (int)Math.round( ( (coord.getX() - minX) / cellSize));
         return zones[r * cols + c];
-    }
-
-
-    @Override
-    public int getZoneCount()
-    {
-        return zones.length;
-    }
-
-
-    @Override
-    public Iterable<SquareZone> getZonesByDistance(Node node)
-    {
-        return zonesByDistance[getZone(node).getIdx()];
     }
 }

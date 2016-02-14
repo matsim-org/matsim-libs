@@ -38,10 +38,10 @@ import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 class KNTaxiLauncher
 {
     /**
+     * @param config configuration (e.g. read from a param file)
      * @param removeNonPassengers if {@code true}, only taxi traffic is simulated
      * @param endActivitiesAtTimeZero if {@code true}, everybody calls taxi at time 0
      * @param useOTFVis TODO
-     * @param file path to the configuration file (e.g. param.in)
      */
     public static void run(Configuration config, boolean removeNonPassengers,
             boolean endActivitiesAtTimeZero, boolean useOTFVis)

@@ -26,27 +26,27 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.data.Request;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.zone.util.ZonalSystem;
-import playground.michalm.zone.util.ZonalSystem.Zone;
+import playground.michalm.zone.*;
+import playground.michalm.zone.util.*;
 
 
 public class UnplannedRequestZonalRegistry
 {
-    private final ZonalSystem<?> zonalSystem;
-
-    private final Map<Id<Request>, TaxiRequest>[] requestsInZones;
+    private final ZonalSystem zonalSystem;
+    private final Map<Id<Zone>, List<Zone>> zonesSortedByDistance;
+    private final Map<Id<Zone>, Map<Id<Request>, TaxiRequest>> requestsInZones;
 
     private int requestCount = 0;
 
 
-    @SuppressWarnings("unchecked")
-    public UnplannedRequestZonalRegistry(ZonalSystem<?> zonalSystem)
+    public UnplannedRequestZonalRegistry(ZonalSystem zonalSystem)
     {
         this.zonalSystem = zonalSystem;
+        zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
 
-        this.requestsInZones = (Map<Id<Request>, TaxiRequest>[])new Map[zonalSystem.getZoneCount()];
-        for (int i = 0; i < requestsInZones.length; i++) {
-            requestsInZones[i] = new HashMap<>();
+        requestsInZones = new HashMap<>(zonalSystem.getZones().size());
+        for (Id<Zone> id : zonalSystem.getZones().keySet()) {
+            requestsInZones.put(id, new HashMap<Id<Request>, TaxiRequest>());
         }
     }
 
@@ -54,9 +54,9 @@ public class UnplannedRequestZonalRegistry
     //after submitted
     public void addRequest(TaxiRequest request)
     {
-        int zoneIdx = getZoneIdx(request);
+        Id<Zone> zoneId = getZoneId(request);
 
-        if (requestsInZones[zoneIdx].put(request.getId(), request) != null) {
+        if (requestsInZones.get(zoneId).put(request.getId(), request) != null) {
             throw new IllegalStateException(request + " is already in the registry");
         }
 
@@ -67,9 +67,9 @@ public class UnplannedRequestZonalRegistry
     //after scheduled
     public void removeRequest(TaxiRequest request)
     {
-        int zoneIdx = getZoneIdx(request);
+        Id<Zone> zoneId = getZoneId(request);
 
-        if (requestsInZones[zoneIdx].remove(request.getId()) == null) {
+        if (requestsInZones.get(zoneId).remove(request.getId()) == null) {
             throw new IllegalStateException(request + " is not in the registry");
         }
 
@@ -79,11 +79,12 @@ public class UnplannedRequestZonalRegistry
 
     public Iterable<TaxiRequest> findNearestRequests(Node node, int minCount)
     {
-        Iterable<? extends Zone> zonesByDistance = zonalSystem.getZonesByDistance(node);
+        Zone zone = zonalSystem.getZone(node);
+        Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
         List<TaxiRequest> nearestReqs = new ArrayList<>();
 
         for (Zone z : zonesByDistance) {
-            nearestReqs.addAll(requestsInZones[z.getIdx()].values());
+            nearestReqs.addAll(requestsInZones.get(z.getId()).values());
 
             if (nearestReqs.size() >= minCount) {
                 return nearestReqs;
@@ -94,9 +95,9 @@ public class UnplannedRequestZonalRegistry
     }
 
 
-    private int getZoneIdx(TaxiRequest request)
+    private Id<Zone> getZoneId(TaxiRequest request)
     {
-        return zonalSystem.getZone(request.getFromLink().getFromNode()).getIdx();
+        return zonalSystem.getZone(request.getFromLink().getFromNode()).getId();
     }
 
 

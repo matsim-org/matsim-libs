@@ -30,6 +30,7 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import playground.michalm.zone.*;
+import playground.michalm.zone.util.*;
 
 
 public class ZonalTaxiOptimizer

@@ -106,7 +106,7 @@ public class CreatePoznanPT
     {
         //String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/network_ver.4.net";
         //String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/network_ver.5_(33N).net";
-        String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/A ZTM.net";
+        String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/A {ZTM.net";
         String outDir = "d:/PP-rad/poznan/test/";
         String transitScheduleWithNetworkFile = outDir + "transitSchedule.xml";
         String transitNetworkFile = outDir + "pt_network.xml";

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone;
+package playground.michalm.zone.util;
 
 import java.util.*;
 
@@ -27,6 +27,8 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
+
+import playground.michalm.zone.Zone;
 
 
 public class ZoneFinderImpl

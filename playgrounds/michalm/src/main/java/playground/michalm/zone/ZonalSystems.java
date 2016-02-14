@@ -17,61 +17,57 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone.util;
+package playground.michalm.zone;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.Id;
 
-import com.google.common.primitives.Booleans;
+import com.google.common.collect.Maps;
 
-import playground.michalm.zone.util.ZonalSystem.Zone;
+import playground.michalm.util.distance.DistanceCalculators;
 
 
 public class ZonalSystems
 {
-    public interface DistanceCalculator<Z extends Zone>
+    public interface ZonalDistanceCalculator
     {
-        double calcDistance(Z z1, Z z2);
+        double calcDistance(Zone z1, Zone z2);
     }
 
 
-    public static <Z extends Zone> List<Z>[] initZonesByDistance(ZonalSystem<Z> zonalSystem,
-            Network network, Z[] zones, final DistanceCalculator<? super Z> distCalc)
+    public static final ZonalDistanceCalculator BEELINE_DISTANCE_CALCULATOR = new ZonalDistanceCalculator() {
+        @Override
+        public double calcDistance(Zone z1, Zone z2)
+        {
+            return DistanceCalculators.BEELINE_DISTANCE_CALCULATOR.calcDistance(z1.getCoord(),
+                    z2.getCoord());
+        }
+    };
+
+
+    public static Map<Id<Zone>, List<Zone>> initZonesByDistance(Map<Id<Zone>, Zone> zones)
     {
-        int count = zones.length;
-        @SuppressWarnings("unchecked")
-        List<Z>[] zonesByDistance = new List[count];
+        return initZonesByDistance(zones, BEELINE_DISTANCE_CALCULATOR);
+    }
 
-        //find zones with/without nodes
-        boolean[] containsNodes = new boolean[count];
-        for (Node n : network.getNodes().values()) {
-            containsNodes[zonalSystem.getZone(n).getIdx()] = true;
-        }
 
-        int zonesWithNodesCount = Booleans.countTrue(containsNodes);
-        List<Z> zonesWithNodes = new ArrayList<>(zonesWithNodesCount);
-        for (int i = 0; i < count; i++) {
-            if (containsNodes[i]) {
-                zonesWithNodes.add(zones[i]);
-            }
-        }
+    public static Map<Id<Zone>, List<Zone>> initZonesByDistance(Map<Id<Zone>, Zone> zones,
+            final ZonalDistanceCalculator distCalc)
+    {
+        Map<Id<Zone>, List<Zone>> zonesByDistance = Maps.newHashMapWithExpectedSize(zones.size());
+        List<Zone> sortedList = new ArrayList<>(zones.values());
 
-        for (int i = 0; i < count; i++) {
-            if (!containsNodes[i]) {
-                continue;
-            }
-
-            final Z currentZone = zones[i];
-            Collections.sort(zonesWithNodes, new Comparator<Z>() {
-                public int compare(Z z1, Z z2)
+        for (final Zone currentZone : zones.values()) {
+            Collections.sort(sortedList, new Comparator<Zone>() {
+                public int compare(Zone z1, Zone z2)
                 {
                     return Double.compare(distCalc.calcDistance(currentZone, z1),
                             distCalc.calcDistance(currentZone, z2));
                 }
             });
 
-            zonesByDistance[i] = new ArrayList<>(zonesWithNodes);
+            zonesByDistance.put(currentZone.getId(), new ArrayList<>(sortedList));
         }
 
         return zonesByDistance;

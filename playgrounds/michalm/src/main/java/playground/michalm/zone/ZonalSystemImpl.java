@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone.util;
+package playground.michalm.zone;
 
-import org.matsim.api.core.v01.network.Node;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.*;
+
+import playground.michalm.zone.*;
+import playground.michalm.zone.util.*;
 
 
-public interface ZonalSystem<Z extends ZonalSystem.Zone>
+public class ZonalSystemImpl
+    implements ZonalSystem
 {
-    public interface Zone
+    private final Map<Id<Zone>, Zone> zones;
+    private final Map<Id<Node>, Zone> nodeToZoneMap;
+    
+    public ZonalSystemImpl(Map<Id<Zone>, Zone> zones, ZoneFinder zoneFinder, Network network)
     {
-        int getIdx();
+        this.zones = zones;
+        
+        nodeToZoneMap = NetworkWithZonesUtils.createNodeToZoneMap(network, zoneFinder);
     }
-
-
-    Z getZone(Node node);
-
-
-    int getZoneCount();
-
-
-    Iterable<Z> getZonesByDistance(Node node);
+    
+    
+    @Override
+    public Map<Id<Zone>, Zone> getZones()
+    {
+        return zones;
+    }
+    
+    
+    @Override
+    public Zone getZone(Node node)
+    {
+        return nodeToZoneMap.get(node);
+    }
 }

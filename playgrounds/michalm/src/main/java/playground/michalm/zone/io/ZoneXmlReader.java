@@ -17,13 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone;
+package playground.michalm.zone.io;
 
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
+
+import playground.michalm.zone.Zone;
 
 
 public class ZoneXmlReader
