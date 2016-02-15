@@ -37,6 +37,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
+import java.lang.annotation.Annotation;
 import java.util.*;
 
 public abstract class Injector {
