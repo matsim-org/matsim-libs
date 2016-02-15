@@ -50,7 +50,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
-import playground.jbischoff.taxibus.scenario.analysis.quick.TTEventHandler;
+import playground.jbischoff.taxibus.scenario.analysis.quick.TraveltimeAndDistanceEventHandler;
 import playground.jbischoff.taxibus.scenario.analysis.quick.TaxiBusTravelTimesAnalyzer;
 
 /**

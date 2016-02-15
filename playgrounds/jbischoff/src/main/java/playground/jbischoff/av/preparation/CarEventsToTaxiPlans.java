@@ -73,14 +73,14 @@ public class CarEventsToTaxiPlans {
 				.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/bvg.run132.25pct.output_network.xml.gz");
 
 		
-		ConverterEventHandler ch = new ConverterEventHandler(scenario, geometry,scenario2.getNetwork(), true);
+		ConverterEventHandler ch = new ConverterEventHandler(scenario, geometry,scenario2.getNetwork(), false);
 //		ConverterEventHandler ch = new ConverterEventHandler(scenario, geometry,scenario2.getNetwork(), false);
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(ch);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 //		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.events.xml.gz");
-		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.filtered.xml.gz");
-		new PopulationWriter(ch.population).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/subscenarios/tenpercentpt/plansWithCars10.10.xml.gz");
+		reader.readFile("C:/Users/Joschka/Documents/runs-svn/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.filtered.convertedTo2016.xml.gz");
+		new PopulationWriter(ch.population).write("C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/pop/plans0.10.xml.gz");
 		ch.printCars();
 	}
 	
@@ -99,6 +99,8 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 	private boolean leaveCarTrips;
 	private Set<Id<Person>> carOwnersInZone = new HashSet<>();
 	private Set<Id<Person>> carOwners= new HashSet<>();
+	int ptd = 0;
+	private int wgv = 0;
 	
 	public ConverterEventHandler(Scenario scenario, Geometry shape, Network oldNetwork) {
 		this(scenario, shape, oldNetwork, false);
@@ -120,6 +122,8 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		if (event.getPersonId().toString().startsWith("pt")) return;
+		if (event.getPersonId().toString().startsWith("wv")) return;
+		
 
 		if (event.getLegMode().equals("car")) {
 			Tuple<Id<Link>, Double> t = departures.remove(event.getPersonId());
@@ -202,7 +206,12 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getPersonId().toString().startsWith("pt")) return;
+		if (event.getPersonId().toString().startsWith("pt")){ 
+			ptd++;
+			return;}
+		if (event.getPersonId().toString().startsWith("wv")){ 
+			wgv ++;
+			return;}
 		if (event.getLegMode().equals("car")) {
 			departures.put(event.getPersonId(), new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime()));
 
@@ -221,5 +230,7 @@ class ConverterEventHandler implements PersonDepartureEventHandler, PersonArriva
 	public void printCars(){
 		System.out.println(this.carOwnersInZone.size() + " in zone. ");
 		System.out.println(this.carOwners.size() + " total. ");
+		System.out.println(ptd + " pt driver events.");
+		System.out.println(wgv + " wgv departure events.");
 	}
 }

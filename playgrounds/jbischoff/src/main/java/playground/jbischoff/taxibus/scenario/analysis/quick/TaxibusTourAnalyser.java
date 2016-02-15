@@ -36,31 +36,49 @@ import org.apache.commons.math3.stat.descriptive.summary.Sum;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.postgresql.jdbc2.TimestampUtils;
+
+import playground.jbischoff.utils.JbUtils;
 
 /**
  * @author  jbischoff
- *
+ *	Analysis tool for taxibus trips. 
+ *	Should be working for shared trips, as long as all pick-ups are handled before drop offs, i.e. in most cases where hubing in spoking is involved.
+ *	The tool will produce less meaningful results if pickups and drop offs are mixed.
  */
-public class TaxibusRideTimeAnalyser implements ActivityEndEventHandler, ActivityStartEventHandler {
+public class TaxibusTourAnalyser implements ActivityEndEventHandler, ActivityStartEventHandler, LinkEnterEventHandler {
 	
 	private HashSet<Id<Vehicle>> vehicles = new HashSet<>();
 	private Set<TaxibusTour> tours = new TreeSet<>();
 	
 	private Map<Id<Vehicle>,Integer> currentRidePax = new HashMap<>();
+	private Map<Id<Vehicle>,Integer> paxDroppedOff = new HashMap<>();
+
 	private Map<Id<Vehicle>,Double> lastPickupOnTour = new HashMap<>();
 	private Map<Id<Vehicle>,Double> firstPickupOnTour = new HashMap<>();
+	
+	private Map<Id<Vehicle>,Double> firstDropoffOnTour = new HashMap<>();
+	
+	
+	private Map<Id<Vehicle>,Double> overallDistanceOnTour = new HashMap<>();
+	private Map<Id<Vehicle>,Double> pickUpDistanceOnTour = new HashMap<>();
+
+	private final Network network;
 	
 	private double[] hourlyDepartures = new double[24];
 	private double[] hourlyTourDepartures = new double[24];
 	
-
+	public TaxibusTourAnalyser(Network network) {
+		this.network = network;
+	}
 	
 	
 	@Override
@@ -83,27 +101,60 @@ public class TaxibusRideTimeAnalyser implements ActivityEndEventHandler, Activit
 		} else if (event.getActType().startsWith("PassengerDropoff")){
 			handleDropoff(event);
 		}
+		else if (event.getActType().startsWith("Stay")){
+			handleStay(event);
+		}
 		
 		
 
+	}
+
+	private void handleStay(ActivityEndEvent event) {
+		//Stay Task ends - begin of dispatch == begin of tour
+		Id<Vehicle> vid = p2vid(event.getPersonId());
+		this.overallDistanceOnTour.put(vid, 0.0);
+		
+		
 	}
 
 	private void handleDropoff(ActivityEndEvent event) {
 		Id<Vehicle> vid = p2vid(event.getPersonId());
 		if (lastPickupOnTour.containsKey(vid)){
-		double lastPickup = lastPickupOnTour.remove(vid);
-		double firstPickup = firstPickupOnTour.remove(vid);
-		int occupancy = currentRidePax.remove(vid);
-		double pickUpDuration = lastPickup-firstPickup;
+		int dropoffNo= paxDroppedOff.get(vid);	
+		if (dropoffNo ==0){
+			firstDropoffOnTour.put(vid, event.getTime());
+			dropoffNo++;
+			paxDroppedOff.put(vid, dropoffNo);
+		}	
+		else if (dropoffNo < (currentRidePax.get(vid)-1)){
+			dropoffNo++;
+			paxDroppedOff.put(vid, dropoffNo);
+		}
+		else if (dropoffNo == (currentRidePax.get(vid)-1)){
 		
-		TaxibusTour tour = new TaxibusTour(firstPickup, lastPickup, occupancy, pickUpDuration, event.getTime(), vid) ;
+			
+			double lastPickup = lastPickupOnTour.remove(vid);
+			double firstPickup = firstPickupOnTour.remove(vid);
+			int occupancy = currentRidePax.remove(vid);
+			double pickUpDuration = lastPickup-firstPickup;
+			double firstDropoff = firstDropoffOnTour.get(vid);
+			double lastDropoff = event.getTime();
+			double dropOffDuration = lastDropoff-firstDropoff;
+			double overallDistance = overallDistanceOnTour.remove(vid);
+			double pickupDistance = pickUpDistanceOnTour.remove(vid);
+			
+			TaxibusTour tour = new TaxibusTour(occupancy, firstPickup, lastPickup, pickUpDuration, firstDropoff, lastDropoff, dropOffDuration, pickupDistance, overallDistance, vid);
+			this.tours.add(tour);
+			
+		}
+			
 		
-		this.tours.add(tour);
+		
 		}
 	}
 
 	private void handlePickup(ActivityEndEvent event) {
-		int hour = getHour(event.getTime());
+		int hour = JbUtils.getHour(event.getTime());
 		
 		Id<Vehicle> vid = p2vid(event.getPersonId());
 		int pax = 1;
@@ -116,6 +167,8 @@ public class TaxibusRideTimeAnalyser implements ActivityEndEventHandler, Activit
 		if (!firstPickupOnTour.containsKey(vid)){
 			firstPickupOnTour.put(vid, event.getTime());
 			hourlyTourDepartures[hour]++;
+			pickUpDistanceOnTour.put(vid, overallDistanceOnTour.get(vid));
+			this.paxDroppedOff.put(vid, 0);
 		}
 	}
 
@@ -161,7 +214,7 @@ public class TaxibusRideTimeAnalyser implements ActivityEndEventHandler, Activit
 	private void writeTours(String toursFile) {
 		BufferedWriter writer = IOUtils.getBufferedWriter(toursFile);
 		try {
-			writer.append("Vehicle\tFirstPickUp\tlastPickup\tOccupancy\tPickUpDuration\tDropOffTime");
+			writer.append("Vehicle\tFirstPickUp\tlastPickup\tPickUpDuration\tfirstDropOff\tlastDropoff\tDropoffDuration\tTourDistance\tPickupDistance\tOccupancy");
 			for (TaxibusTour tour : this.tours){
 				writer.newLine();
 				writer.append(tour.toString());
@@ -180,43 +233,68 @@ public class TaxibusRideTimeAnalyser implements ActivityEndEventHandler, Activit
 		return vid;
 	}
 	
-	private int getHour(double time){
-		int hour = (int) Math.floor(time/(3600));
-		if (hour>23){
-			hour = hour%24;
+	private Id<Vehicle> v2vid (Id<org.matsim.vehicles.Vehicle> vehicleId){
+		Id<Vehicle> vid = Id.create(vehicleId.toString(), Vehicle.class);
+		return vid;
+	}
+	
+
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		Id<Vehicle> vid = v2vid(event.getVehicleId());
+		if (overallDistanceOnTour.containsKey(vid)){
+			double distance = overallDistanceOnTour.get(vid);
+			distance += network.getLinks().get(event.getLinkId()).getLength();
+			overallDistanceOnTour.put(vid, distance);
 		}
-		return hour;
+		
 	}
 }
 class TaxibusTour implements Comparable<TaxibusTour>{
-		
+	int occupancy;
+	DecimalFormat df = new DecimalFormat( "##,##0.00" );
+
 	Double firstPickup;
 	double lastPickup;
-	int occupancy;
 	double pickUpDuration;
-	double dropoffTime;
+	
+	double firstDropoff;
+	double lastDropoff;
+	double dropOffDuration;
+	
+	double pickupDistance;
+	double overallDistance;
+	
+	
 	Id<Vehicle> vid;
 	
 	
-	
-	TaxibusTour(Double firstPickup, double lastPickup, int occupancy, double pickUpDuration, double dropoffTime,
+	TaxibusTour(int occupancy, Double firstPickup, double lastPickup, double pickUpDuration, double firstDropoff,
+			double lastDropoff, double dropOffDuration, double pickupDistance, double overallDistance,
 			Id<Vehicle> vid) {
-		super();
+		this.occupancy = occupancy;
 		this.firstPickup = firstPickup;
 		this.lastPickup = lastPickup;
-		this.occupancy = occupancy;
 		this.pickUpDuration = pickUpDuration;
-		this.dropoffTime = dropoffTime;
+		this.firstDropoff = firstDropoff;
+		this.lastDropoff = lastDropoff;
+		this.dropOffDuration = dropOffDuration;
+		this.pickupDistance = pickupDistance;
+		this.overallDistance = overallDistance;
 		this.vid = vid;
 	}
 
-	
+
+
 
 	@Override
 	public String toString() {
 
-		return vid + "\t"+ Time.writeTime(firstPickup) + "\t" + Time.writeTime(lastPickup) + "\t" + Time.writeTime(occupancy)
-				+ "\t" + Time.writeTime(pickUpDuration) + "\t" + Time.writeTime(dropoffTime);
+		return vid + "\t"+ Time.writeTime(firstPickup) + "\t" + Time.writeTime(lastPickup) + "\t" + Time.writeTime(pickUpDuration) +"\t"+
+				Time.writeTime(firstDropoff) + "\t" + Time.writeTime(lastDropoff) + "\t" + Time.writeTime(dropOffDuration) 
+				+ "\t" + df.format(overallDistance/1000)+ "\t" + df.format(pickupDistance/1000) + "\t" + occupancy;
+				
 	}
 
 

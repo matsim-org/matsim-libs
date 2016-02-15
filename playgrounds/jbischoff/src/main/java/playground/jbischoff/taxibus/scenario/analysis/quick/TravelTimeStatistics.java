@@ -24,10 +24,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author  jbischoff
@@ -60,10 +64,17 @@ public class TravelTimeStatistics   {
 		inputFile=args[0];	
 		File f = new File (inputFile);
 		folder = f.getParent()+"/";
+		
 		}
+		String networkfile = guessNetworkFile(inputFile);
+		
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
 		System.out.println("Processing Events File: " + inputFile);
+		System.out.println("Network Events File: " + networkfile);
 		System.out.println("Output will be written to: " + folder);
 		
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfile);
 
 		EventsManager events = EventsUtils.createEventsManager();
 
@@ -71,11 +82,11 @@ public class TravelTimeStatistics   {
 		links.add(Id.createLinkId(57196)); // a39
 		links.add(Id.createLinkId(42571)); // L295
 
-		TTEventHandler carTT = new TTEventHandler();
-		TTEventHandler allTT = new TTEventHandler();
-		TTEventHandler tbTT = new TTEventHandler();
-		TTEventHandler ptTT = new TTEventHandler();
-		TaxibusRideTimeAnalyser analyser = new TaxibusRideTimeAnalyser();
+		TraveltimeAndDistanceEventHandler carTT = new TraveltimeAndDistanceEventHandler(scenario.getNetwork());
+		TraveltimeAndDistanceEventHandler allTT = new TraveltimeAndDistanceEventHandler(scenario.getNetwork());
+		TraveltimeAndDistanceEventHandler tbTT = new TraveltimeAndDistanceEventHandler(scenario.getNetwork());
+		TraveltimeAndDistanceEventHandler ptTT = new TraveltimeAndDistanceEventHandler(scenario.getNetwork()	);
+		TaxibusTourAnalyser analyser = new TaxibusTourAnalyser(scenario.getNetwork());
 
 		carTT.addMode("car");
 
@@ -106,6 +117,13 @@ public class TravelTimeStatistics   {
 		analyser.writeOutput(folder);
 
 		a.printOutput();
+	}
+	
+	static String guessNetworkFile(String eventsFile){
+		String path = eventsFile.replace("output_events.xml.gz", "output_network.xml.gz");
+		
+		return path;
+		
 	}
 	
 
