@@ -115,14 +115,14 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
         // td, 15 feb 16: removed the "Leg" versions of strategies. Notify the users that they should switch to the
         // "Trip" versions. Should be left in 0.8.XXX releases, and then deleted, along with their name in the enum.
-        if ( usedStrategyNames.contains( DefaultStrategy.ChangeLegMode ) ) {
-            log.error( DefaultStrategy.ChangeLegMode+" does not exist anymore. Please use "+DefaultStrategy.ChangeTripMode+" instead." );
+        if ( usedStrategyNames.contains( DefaultStrategy.ChangeLegMode.toString() ) ) {
+            log.error( DefaultStrategy.ChangeLegMode+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.ChangeTripMode+" instead." );
         }
-        if ( usedStrategyNames.contains( DefaultStrategy.ChangeSingleLegMode ) ) {
-            log.error( DefaultStrategy.ChangeSingleLegMode+" does not exist anymore. Please use "+DefaultStrategy.ChangeSingleTripMode+" instead." );
+        if ( usedStrategyNames.contains( DefaultStrategy.ChangeSingleLegMode.toString() ) ) {
+            log.error( DefaultStrategy.ChangeSingleLegMode+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.ChangeSingleTripMode+" instead." );
         }
-        if ( usedStrategyNames.contains( DefaultStrategy.TripSubtourModeChoice ) ) {
-            log.error( DefaultStrategy.TripSubtourModeChoice+" does not exist anymore. Please use "+DefaultStrategy.TripSubtourModeChoice+" instead." );
+        if ( usedStrategyNames.contains( DefaultStrategy.TripSubtourModeChoice.toString() ) ) {
+            log.error( DefaultStrategy.TripSubtourModeChoice+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.TripSubtourModeChoice+" instead." );
         }
     }
 

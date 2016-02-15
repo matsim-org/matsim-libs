@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -44,16 +45,24 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.households.Household;
+import org.matsim.households.HouseholdsReaderV10;
+import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import playground.southafrica.population.census2011.attributeConverters.CoordConverter;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -95,17 +104,63 @@ public class CapeTownScenarioCleaner {
 		folder = folder + (folder.endsWith("/") ? "" : "/");
 		checkFiles(folder);
 		
-		Scenario sc = joinPopulations(folder);
+		String personsCRS = args[1];
+		String freightCRS = args[2];
+		String wantedCRS = args[3];
+		Scenario sc = joinPopulations(folder, personsCRS, freightCRS, wantedCRS);
 		
-		String network = args[1];
+		String network = args[4];
 		updateNetworkModes(sc, folder, network);
 		
+		sc = cleanupHouseholds(sc, folder, personsCRS, wantedCRS);
 		
 		/* Write the final population to file. */
 		new PopulationWriter(sc.getPopulation()).write(folder + "population.xml.gz");
 		new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(folder + "populationAttributes.xml.gz");
+		new FacilitiesWriter(sc.getActivityFacilities()).write(folder + "facilities.xml.gz");
+		new HouseholdsWriterV10(sc.getHouseholds()).writeFile(folder + "households.xml.gz");
+		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(sc.getHouseholds().getHouseholdAttributes());
+		oaw.putAttributeConverter(Coord.class, new CoordConverter());
+		oaw.writeFile(folder + "householdAttributes.xml.gz");
 		
 		Header.printFooter();
+	}
+	
+		
+	/**
+	 * The households contain the member IDs. But in this class we've adapted
+	 * the person IDs to distinguish between the persons and the commercial 
+	 * vehicles. This class now just adapts the member IDs for all households.
+	 * 
+	 * @param folder
+	 */
+	private static Scenario cleanupHouseholds(Scenario sc, String folder, 
+			String personCRS, String wantedCRS){
+		LOG.info("Adjusting household member IDs and home coordinates...");
+		
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(personCRS, wantedCRS);
+		
+		new HouseholdsReaderV10(sc.getHouseholds()).parse(folder + "wip/households.xml.gz");
+		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(sc.getHouseholds().getHouseholdAttributes());
+		oar.putAttributeConverter(Coord.class, new CoordConverter());
+		oar.parse(folder + "wip/householdAttributes.xml.gz");
+		
+		for(Household hh : sc.getHouseholds().getHouseholds().values()){
+			int householdSize = hh.getMemberIds().size();
+			for(int i = 0; i < householdSize; i++){
+				String oldId = hh.getMemberIds().get(0).toString();
+				Id<Person> newId = Id.createPersonId("coct_p_" + oldId);
+				hh.getMemberIds().remove(0);
+				hh.getMemberIds().add(newId);
+			}
+			
+			/* Update the household's home coordinate. */
+			Coord oldCoord = (Coord) sc.getHouseholds().getHouseholdAttributes().getAttribute(hh.getId().toString(), "homeCoord");
+			sc.getHouseholds().getHouseholdAttributes().putAttribute(hh.getId().toString(), "homeCoord", ct.transform(oldCoord));
+		}
+		
+		LOG.info("Done adjusting household member IDs and home coordinates.");
+		return sc;
 	}
 	
 	private static void updateNetworkModes(Scenario sc, String folder, String network){
@@ -125,9 +180,15 @@ public class CapeTownScenarioCleaner {
 		config.qsim().setMainModes(modes);
 		config.plansCalcRoute().setNetworkModes(modes);
 		/* Add the teleported modes. */
+		
+		/* First check if mode parameters does not yet exist. */
+		
+		
 		ModeRoutingParams ride = new ModeRoutingParams("ride");
 		ride.setBeelineDistanceFactor(1.3);
 		ride.setTeleportedModeFreespeedFactor(0.8); /* Free speed-based. */
+//		ride.setTeleportedModeSpeed(50.0 / 3.6);
+		
 		config.plansCalcRoute().addModeRoutingParams(ride);
 		ModeRoutingParams taxi = new ModeRoutingParams("taxi");
 		taxi.setBeelineDistanceFactor(1.3);
@@ -160,8 +221,13 @@ public class CapeTownScenarioCleaner {
 		LOG.info("Done updating network modes.");
 	}
 	
-	private static Scenario joinPopulations(String folder){
-		LOG.info("joining the person and commercial vehicle populations...");
+	private static Scenario joinPopulations(String folder,
+			String personCRS, String freightCRS, String wantedCRS){
+		LOG.info("Joining the person and commercial vehicle populations...");
+
+		CoordinateTransformation ctPersons = TransformationFactory.getCoordinateTransformation(personCRS, wantedCRS);
+		CoordinateTransformation ctFreight = TransformationFactory.getCoordinateTransformation(freightCRS, wantedCRS);
+		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationFactory pf = sc.getPopulation().getFactory();
 		ActivityFacilitiesFactory aff = sc.getActivityFacilities().getFactory();
@@ -174,13 +240,18 @@ public class CapeTownScenarioCleaner {
 			Person person = pf.createPerson(Id.createPersonId("coct_p_" + id.toString()));
 			PlanImpl plan = new PlanImpl();
 			plan.copyFrom(scPersons.getPopulation().getPersons().get(id).getSelectedPlan());
-			/* Check and add modes. */
 			for(PlanElement pe : plan.getPlanElements()){
+				/* Check and add modes. */
 				if(pe instanceof Leg){
 					Leg leg = (Leg)pe;
 					if(!modes.contains(leg.getMode())){
 						modes.add(leg.getMode());
 					}
+				} else if (pe instanceof Activity){
+					/* Transform the activity locations. */
+					ActivityImpl act = (ActivityImpl)pe;
+					Coord oldCoord = act.getCoord();
+					act.setCoord(ctPersons.transform(oldCoord));
 				}
 			}
 			person.addPlan(plan);
@@ -217,16 +288,26 @@ public class CapeTownScenarioCleaner {
 					/* Check the facilities. */
 					Activity act = (Activity)pe;
 					Id<ActivityFacility> fid = act.getFacilityId();
-					ActivityFacility facility;
-					if(!sc.getActivityFacilities().getFacilities().containsKey(fid)){
-						facility = aff.createActivityFacility(fid, act.getCoord());
-						sc.getActivityFacilities().addActivityFacility(facility);
-					} else{
-						facility = sc.getActivityFacilities().getFacilities().get(fid);
-					}
-					if(!facility.getActivityOptions().containsKey(act.getType())){
-						ActivityOption option = aff.createActivityOption(act.getType());
-						facility.addActivityOption(option);
+					
+					/* Update the coordinate. */
+					Coord oldCoord = act.getCoord();
+					((ActivityImpl)act).setCoord(ctFreight.transform(oldCoord));
+					
+					/* Since chopStart and chopEnd activities will not have 
+					 * facility IDs, they need to be ignored in the next 
+					 * portion of the code. */
+					if(fid != null){
+						ActivityFacility facility;
+						if(!sc.getActivityFacilities().getFacilities().containsKey(fid)){
+							facility = aff.createActivityFacility(fid, act.getCoord());
+							sc.getActivityFacilities().addActivityFacility(facility);
+						} else{
+							facility = sc.getActivityFacilities().getFacilities().get(fid);
+						}
+						if(!facility.getActivityOptions().containsKey(act.getType())){
+							ActivityOption option = aff.createActivityOption(act.getType());
+							facility.addActivityOption(option);
+						}
 					}
 				}
 			}
@@ -271,6 +352,7 @@ public class CapeTownScenarioCleaner {
 			}
 		}
 	}
+	
 	
 	private static boolean checkFile(File f){
 		boolean error = false;

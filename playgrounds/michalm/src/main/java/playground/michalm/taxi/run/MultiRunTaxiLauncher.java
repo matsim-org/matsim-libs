@@ -24,13 +24,12 @@ import java.util.List;
 
 import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
+import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams;
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
-import playground.michalm.taxi.util.stats.*;
 
 
 class MultiRunTaxiLauncher

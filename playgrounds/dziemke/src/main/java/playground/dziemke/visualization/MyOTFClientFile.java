@@ -24,6 +24,7 @@ import java.awt.BorderLayout;
 
 import javax.swing.SwingUtilities;
 
+import com.jogamp.opengl.GLAutoDrawable;
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
@@ -67,7 +68,8 @@ public class MyOTFClientFile implements Runnable {
 	}
 
 	private void createDrawer() {
-		OTFClient otfClient = new OTFClient();
+		GLAutoDrawable canvas = OTFOGLDrawer.createGLCanvas(new OTFVisConfigGroup());
+		OTFClient otfClient = new OTFClient(canvas);
 		OTFFileReader otfServer = new OTFFileReader(url);
 		otfClient.setServer(otfServer);
 		// #########################################################################################
@@ -90,12 +92,11 @@ public class MyOTFClientFile implements Runnable {
 		OTFServerQuadTree servQ = otfServer.getQuad(connect);
 		OTFClientQuadTree clientQ = servQ.convertToClient(otfServer, connect);
 		clientQ.getConstData();
-		OTFClientQuadTree clientQuadTree = clientQ;
-		clientQuadTree.setMinEasting(110000);
-		clientQuadTree.setMaxEasting(0);
-		clientQuadTree.setMinNorthing(116000);
-		clientQuadTree.setMaxNorthing(140000);
-		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, otfVisConfig);
+		clientQ.setMinEasting(110000);
+		clientQ.setMaxEasting(0);
+		clientQ.setMinNorthing(116000);
+		clientQ.setMaxNorthing(140000);
+		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, hostControlBar, otfVisConfig, canvas);
 		mainDrawer.setIncludeLogo(false);
 		mainDrawer.setScreenshotInterval(3600);
 		mainDrawer.setTimeOfLastScreenshot(86400);

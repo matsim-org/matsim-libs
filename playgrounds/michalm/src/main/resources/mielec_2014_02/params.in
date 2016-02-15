@@ -4,7 +4,7 @@ plansFile                ${inputDir}/plans_taxi_4.0.xml.gz
 taxisFile                ${inputDir}/taxis-25.xml
 onlineVehicleTracker     false
 
-optimizer.paramsClass               playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams
+optimizer.paramsClass               org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams
 optimizer.id                        RULE_DSE_FF
 optimizer.travelTimeSource          FREE_FLOW_SPEED
 optimizer.goal                      DEMAND_SUPPLY_EQUIL

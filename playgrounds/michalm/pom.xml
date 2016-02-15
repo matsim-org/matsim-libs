@@ -62,7 +62,7 @@
 
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>locationchoice</artifactId>
+			<artifactId>taxi</artifactId>
 			<version>0.8.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>

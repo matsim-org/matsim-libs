@@ -22,6 +22,7 @@ package playground.michalm.barcelona.supply;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.zone.util.RandomPointUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -29,7 +30,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.prep.PreparedPolygon;
 
 import playground.michalm.barcelona.BarcelonaZones;
-import playground.michalm.zone.util.RandomPointUtils;
 
 
 public class BarcelonaTaxiCreator

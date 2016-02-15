@@ -25,9 +25,9 @@ import java.util.*;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.util.random.*;
+import org.matsim.contrib.zone.Zone;
 
 import playground.michalm.demand.DefaultPersonCreator;
-import playground.michalm.zone.Zone;
 
 
 public class PersonCreatorWithRandomTaxiMode

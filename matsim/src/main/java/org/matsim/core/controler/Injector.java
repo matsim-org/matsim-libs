@@ -37,6 +37,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
+import java.lang.annotation.Annotation;
 import java.util.*;
 
 public abstract class Injector {
@@ -63,8 +64,9 @@ public abstract class Injector {
         for (Map.Entry<Key<?>, Binding<?>> entry : realInjector.getBindings().entrySet()) {
       	  Level level = Level.INFO ;
       	  if ( entry.getKey().toString().contains("type=org.matsim") ) {
-      		  logger.log( level, entry.getKey().getTypeLiteral() );
-      		  logger.log(level, "   -> " + entry.getValue().getProvider());
+              Annotation annotation = entry.getKey().getAnnotation();
+              logger.log( level, entry.getKey().getTypeLiteral() + " " + (annotation != null ? annotation.toString() : ""));
+              logger.log(level, "   -> " + entry.getValue().getProvider());
       	  }
         }
         return realInjector;
