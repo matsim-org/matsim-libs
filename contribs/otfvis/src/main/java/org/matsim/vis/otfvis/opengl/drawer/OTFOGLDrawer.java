@@ -351,14 +351,10 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	public static GLAutoDrawable createGLCanvas(OTFVisConfigGroup otfVisConfig) {
 		GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
-        boolean isMac = System.getProperty("os.name").equals("Mac OS X");
-        boolean isJava7 = System.getProperty("java.version").startsWith("1.7");
-		if (otfVisConfig.isMapOverlayMode() || (isMac && isJava7)) {
+		if (otfVisConfig.isMapOverlayMode()) {
             // A GLJPanel is an OpenGL component which is "more Swing compatible" than a GLCanvas.
             // The JOGL doc says the tradeoff is that it is slower than a GLCanvas.
             // We use it if we want to put map tiles behind the agent drawer, because it can be made translucent!
-            // On Java 7 on Mac, I get strange behavior (wrong layout on startup with no obvious fix), so I
-            // also use the "more compatible" version, which works.
             GLJPanel glJPanel = new GLJPanel(caps);
             if (otfVisConfig.isMapOverlayMode()) {
                 glJPanel.setOpaque(false); // So that the map shines through
@@ -648,6 +644,8 @@ public class OTFOGLDrawer implements GLEventListener {
 		gl.glClear( GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
 		if (!glInited) {
+			// This method can (and will) be called several times.
+			// (Gl contexts can change without notice.)
 			float minEasting = (float)clientQ.getMinEasting();
 			float minNorthing = (float)clientQ.getMinNorthing();
 			float maxNorthing = (float)clientQ.getMaxNorthing();
@@ -656,17 +654,17 @@ public class OTFOGLDrawer implements GLEventListener {
 			this.scale = 1.0f / (float) pixelRatio;
 			this.viewBounds =  new QuadTree.Rect(minEasting, minNorthing, minEasting + (maxNorthing - minNorthing) * aspectRatio, maxNorthing);
 			setZoomToNearestInteger();
+			this.hostControlBar.getOTFHostControl().fetchTimeAndStatus();
+			int time = this.hostControlBar.getOTFHostControl().getSimTime();
+			QuadTree.Rect rect = new QuadTree.Rect((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
+			this.currentSceneGraph = this.clientQ.getSceneGraph(time, rect);
 		}
 		marker = OTFOGLDrawer.createTexture(gl, MatsimResource.getAsInputStream("otfvis/marker.png"));
 		setFrustrum(gl);
-
-
 		for (OTFGLAbstractDrawable item : this.overlayItems) {
 			item.glInit();
 		}
-		if (currentSceneGraph != null) {
-			currentSceneGraph.glInit();
-		}
+		currentSceneGraph.glInit();
 		glInited = true;
 	}
 
@@ -734,7 +732,6 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	public void setAlpha(float a){
 		this.alpha = a;
-		// This only redraws GUI Elements, no need to invalidate(), just redraw()
 		this.canvas.display();
 	}
 
