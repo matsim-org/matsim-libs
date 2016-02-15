@@ -39,6 +39,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -53,6 +54,7 @@ import playground.agarwalamit.utils.GeometryUtils;
 public class PatnaUrbanDemandGenerator {
 
 	private static final Logger LOG = Logger.getLogger(PatnaUrbanDemandGenerator.class);
+	private static final Random RAND = MatsimRandom.getLocalInstance();
 
 	private Scenario scenario;
 	private Collection<SimpleFeature> features ;
@@ -86,12 +88,12 @@ public class PatnaUrbanDemandGenerator {
 		filesReader(planFile2, "nonSlum_");
 		filesReader(planFile3, "slum_");
 	}
-	
+
 	public void writePlans(final String outputDir){
 		new PopulationWriter(scenario.getPopulation()).write(outputDir+"/initial_urban_plans_"+cloningFactor+"pct.xml.gz");
 		LOG.info("Writing Plan file is finished.");
 	}
-	
+
 	public Population getPopulation(){
 		return scenario.getPopulation();
 	}
@@ -162,7 +164,8 @@ public class PatnaUrbanDemandGenerator {
 					Person person = factory.createPerson(Id.createPersonId(idPrefix+population.getPersons().size()));
 					population.addPerson(person);
 
-					String travelMode = getTravelMode(parts [8]);
+					double beelineDist = CoordUtils.calcDistance(homeZoneCoordTransform, workZoneCoordTransform);
+					String travelMode = getTravelMode(parts [8], beelineDist);
 
 					Plan plan = createPlan( workZoneCoordTransform, homeZoneCoordTransform, travelMode, tripPurpose);
 					person.addPlan(plan);
@@ -176,7 +179,7 @@ public class PatnaUrbanDemandGenerator {
 		}
 	}
 
-	private String getTravelMode( final String travelModeFromSurvey) {
+	private String getTravelMode( final String travelModeFromSurvey, final double beelineDist) {
 		String travelMode ;
 		switch (travelModeFromSurvey) {
 		case "1":	// Bus
@@ -194,10 +197,12 @@ public class PatnaUrbanDemandGenerator {
 		case "8" : 
 			travelMode = "walk";	break;
 		case "9999" : 
-			travelMode = randomModeSlum();	break;				// 480 such trips are found 
+//			travelMode = randomModeSlum();	break;				// 480 such trips are found
+			travelMode = getDistanceFactorFromBeelineDist(beelineDist, true); break;
 		case "999999" : 
-			travelMode = randomModeUrban(); break; 			// for zones 27 to 42
-		default : throw new RuntimeException("Travel mode input code is not recognized. Aborting ...");
+//			travelMode = randomModeUrban(); break; 			// for zones 27 to 42
+			travelMode = getDistanceFactorFromBeelineDist(beelineDist, false); break;
+		default : throw new RuntimeException("Travel mode input code "+travelModeFromSurvey+" is not recognized. Aborting ...");
 		}
 		return travelMode;
 	}
@@ -219,7 +224,6 @@ public class PatnaUrbanDemandGenerator {
 	}
 
 	private Plan createPlan (final Coord toZoneFeatureCoord, final Coord fromZoneFeatureCoord, final String mode, final String tripPurpose) {
-		Random random = MatsimRandom.getRandom();
 		Population population = scenario.getPopulation();
 		PopulationFactory populationFactory = population.getFactory();
 		Plan plan = populationFactory.createPlan();
@@ -231,33 +235,33 @@ public class PatnaUrbanDemandGenerator {
 		switch (tripPurpose) {
 
 		case "1" : {//work act starts between 8 to 9:30 and duration is 8 hours
-			homeActEndTime = 8.0*3600. + random.nextInt(91)*60.; 
+			homeActEndTime = 8.0*3600. + RAND.nextInt(91)*60.; 
 			secondActEndTimeLeaveTime = homeActEndTime + 8*3600.; 
-			secondActType = PatnaUrbanActivityTypes.valueOf("work").toString();
+			secondActType = PatnaUrbanActivityTypes.work.toString();
 			break; 
 		}  
 		case "2" : { // educational act starts between between 6:30 to 8:30 hours and duration is assumed about 7 hours
-			homeActEndTime = 6.5*3600. + random.nextInt(121)*60.; 
+			homeActEndTime = 6.5*3600. + RAND.nextInt(121)*60.; 
 			secondActEndTimeLeaveTime = homeActEndTime + 7*3600.;
-			secondActType = PatnaUrbanActivityTypes.valueOf("educational").toString();
+			secondActType = PatnaUrbanActivityTypes.educational.toString();
 			break;
 		}  
 		case "3" : {// social duration between 5 to 7 hours
 			homeActEndTime= 10.*3600. ; 
-			secondActEndTimeLeaveTime = homeActEndTime+ 5.*3600. + random.nextInt(121)*60.; 
-			secondActType = PatnaUrbanActivityTypes.valueOf("social").toString();
+			secondActEndTimeLeaveTime = homeActEndTime+ 5.*3600. + RAND.nextInt(121)*60.; 
+			secondActType = PatnaUrbanActivityTypes.social.toString();
 			break;
 		}  
 		case "4" : { // other act duration between 5 to 7 hours
 			homeActEndTime = 8.*3600 ; 
-			secondActEndTimeLeaveTime= homeActEndTime + 5.*3600. + random.nextInt(121)*60.; 
-			secondActType = PatnaUrbanActivityTypes.valueOf("other").toString();
+			secondActEndTimeLeaveTime= homeActEndTime + 5.*3600. + RAND.nextInt(121)*60.; 
+			secondActType = PatnaUrbanActivityTypes.other.toString();
 			break;
 		} 
 		case "9999" : { // no data
-			homeActEndTime = 8.*3600. + random.nextInt(121)*60.; 
+			homeActEndTime = 8.*3600. + RAND.nextInt(121)*60.; 
 			secondActEndTimeLeaveTime= homeActEndTime + 7*3600.; 
-			secondActType = PatnaUrbanActivityTypes.valueOf("unknown").toString();
+			secondActType = PatnaUrbanActivityTypes.unknown.toString();
 			break;
 		} 
 		default : throw new RuntimeException("Trip purpose input code is not recognized. Aborting ...");
@@ -283,8 +287,7 @@ public class PatnaUrbanDemandGenerator {
 		// this method is for slum population as 480 plans don't have information about travel mode so one random mode is assigned out of these four modes.
 		//		share of each vehicle is given in table 5-13 page 91 in CMP Patna
 		//		pt - 15, car -0, 2W - 7, Bicycle -39 and walk 39
-		Random rnd = MatsimRandom.getRandom();
-		int rndNr = rnd.nextInt(100);
+		int rndNr = RAND.nextInt(100);
 		String travelMode = null;
 		if (rndNr <= 15)  travelMode = "pt";				
 		else if ( rndNr <= 22) travelMode = "motorbike";					
@@ -296,8 +299,7 @@ public class PatnaUrbanDemandGenerator {
 	private  String randomModeUrban () {
 		//		share of each vehicle is given in table 5-13 page 91 in CMP Patna
 		//		pt - 23, car -5, 2W - 25, Bicycle -33 and walk 14
-		Random rnd = MatsimRandom.getRandom();
-		int rndNr = rnd.nextInt(100);
+		int rndNr = RAND.nextInt(100);
 		String travelMode = null;
 		if (rndNr <=23 )  travelMode = "pt";										
 		else if ( rndNr <= 48) travelMode = "motorbike";					
@@ -305,5 +307,68 @@ public class PatnaUrbanDemandGenerator {
 		else if ( rndNr <= 86) travelMode = "bike";					
 		else  travelMode = "walk";			
 		return travelMode;
+	}
+
+	private String getDistanceFactorFromBeelineDist(final double beelineDist, final boolean isSlum){
+		// following is the weighted average trip length distribution data for slum and non slum
+		// trip length distribution is assumed same for slum and non-slum in absence of other data.
+		// numbers are in the same sequence as that of modes in the method "getModeFromArray".
+		if(isSlum){
+			if(beelineDist <= 2000) {
+				double [] modeClasses = {0.0, 10.72, 7.0, 3.25, 70.0};
+				return getModeFromArray(modeClasses);
+			} else if (beelineDist  <= 4000) {
+				double [] modeClasses = {0.0, 49.56, 35.0, 19.5, 28.0};
+				return getModeFromArray(modeClasses);
+			} else if (beelineDist <= 6000) {
+				double [] modeClasses = {0.0, 17.23, 19.0, 39.5, 1.0};
+				return getModeFromArray(modeClasses);
+			} else if(beelineDist <= 8000) {
+				double [] modeClasses = {0.0, 14.28, 23.0, 9.25, 1.0};
+				return getModeFromArray(modeClasses);
+			} else if(beelineDist <= 10000) {
+				double [] modeClasses = {0.0, 1.15, 8.0, 14.5, 0.0};
+				return getModeFromArray(modeClasses);
+			} else {
+				double [] modeClasses = {0.0, 7.05, 8.0, 14.0, 0.0};
+				return getModeFromArray(modeClasses);
+			}
+		} else {
+			if(beelineDist <= 2000) {
+				double [] modeClasses = {6.0, 10.85, 7.0, 4.91, 70.0};
+				return getModeFromArray(modeClasses);
+			} else if (beelineDist  <= 4000) {
+				double [] modeClasses = {17.0, 49.3, 35.0, 22.83, 28.0};
+				return getModeFromArray(modeClasses);
+			} else if (beelineDist <= 6000) {
+				double [] modeClasses = {20.0, 17.46, 19.0, 31.74, 1.0};
+				return getModeFromArray(modeClasses);
+			} else if(beelineDist <= 8000) {
+				double [] modeClasses = {19.0, 14.15, 23.0, 13.13, 1.0};
+				return getModeFromArray(modeClasses);
+			} else if(beelineDist <= 10000) {
+				double [] modeClasses = {26.0, 1.18, 8.0, 15.61, 0.0 };
+				return getModeFromArray(modeClasses);
+			} else {
+				double [] modeClasses = {12.0, 7.06, 8.0, 11.78, 0.0};
+				return getModeFromArray(modeClasses);
+			}
+		}
+	}
+
+	private String [] modeSequence = {"car","bike","motorbike","pt","walk"};
+
+	private String getModeFromArray(double [] in){
+		double rndDouble = RAND.nextDouble();
+		double sum = 0;
+		for(double d : in){
+			sum+=d;
+		}
+		double valueSoFar = 0;
+		for(int index = 0; index < in.length; index++){
+			valueSoFar += in[index];
+			if(rndDouble <= valueSoFar/sum) return modeSequence[index];
+		}
+		return null;
 	}
 }

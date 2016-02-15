@@ -118,7 +118,7 @@ public class SurveyParser {
 		LOG.info(" Number of households: " + surveySc.getHouseholds().getHouseholds().size());
 		LOG.info("    Number of persons: " + surveySc.getPopulation().getPersons().size());
 		LOG.info("---------------------------------------");
-		PopulationUtils.printActivityStatistics(args[7] + (args[7].endsWith("/") ? "" : "/") + "population.xml");
+		PopulationUtils.printActivityStatistics(args[7] + (args[7].endsWith("/") ? "" : "/") + "population.xml.gz");
 		
 		/* Some arbitrary checks. Remove once done. */
 		LOG.info("              Number of observed zones: " + sp.zoneMap.size());
@@ -699,11 +699,11 @@ public class SurveyParser {
 		folder = folder + (folder.endsWith("/") ? "" : "/");
 		LOG.info("Writing population to " + folder);
 		
-		new PopulationWriter(scenario.getPopulation()).write(folder + "population.xml");
-		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(folder + "populationAttributes.xml");
+		new PopulationWriter(scenario.getPopulation()).write(folder + "population.xml.gz");
+		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(folder + "populationAttributes.xml.gz");
 		
-		new HouseholdsWriterV10(scenario.getHouseholds()).writeFile(folder + "households.xml");
-		new ObjectAttributesXmlWriter(scenario.getHouseholds().getHouseholdAttributes()).writeFile(folder + "householdAttributes.xml");
+		new HouseholdsWriterV10(scenario.getHouseholds()).writeFile(folder + "households.xml.gz");
+		new ObjectAttributesXmlWriter(scenario.getHouseholds().getHouseholdAttributes()).writeFile(folder + "householdAttributes.xml.gz");
 		
 		LOG.info("Done writing population.");
 	}

@@ -24,10 +24,10 @@
  */
 package floetteroed.opdyts.convergencecriteria;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import floetteroed.opdyts.trajectorysampling.TransitionSequence;
+import floetteroed.utilities.math.BasicStatistics;
 import floetteroed.utilities.math.Vector;
 
 /**
@@ -44,16 +44,6 @@ public class FixedIterationNumberConvergenceCriterion implements
 
 	private final int averagingIterations;
 
-	private List<Double> finalWeights = null;
-
-	private Double finalEquilbiriumGap = null;
-
-	private Double finalUniformityGap = null;
-
-	// -------------------- MEMBERS --------------------
-
-	private Double finalObjectiveFunctionValue = null;
-
 	// -------------------- CONSTRUCTION --------------------
 
 	public FixedIterationNumberConvergenceCriterion(
@@ -65,33 +55,25 @@ public class FixedIterationNumberConvergenceCriterion implements
 	// --------------- IMPLEMENTATION OF ConvergenceCriterion ---------------
 
 	@Override
-	public void evaluate(final TransitionSequence<?> transitionSequence) {
+	public ConvergenceCriterionResult evaluate(
+			final TransitionSequence<?> transitionSequence) {
+
 		if ((transitionSequence.iterations() < this.iterationsToConvergence)) {
-			this.finalObjectiveFunctionValue = null;
+
+			return null;
+
 		} else {
+
+			// objective function statistics
 			final List<Double> objectiveFunctionValues = transitionSequence
 					.getObjectiveFunctionValues();
-			this.finalObjectiveFunctionValue = 0.0;
+			final BasicStatistics objectiveFunctionValueStats = new BasicStatistics();
 			for (int i = transitionSequence.size() - this.averagingIterations; i < transitionSequence
 					.size(); i++) {
-				this.finalObjectiveFunctionValue += objectiveFunctionValues
-						.get(i);
-			}
-			this.finalObjectiveFunctionValue /= this.averagingIterations;
-
-			// TODO >>> NEW >>>
-			this.finalWeights = new ArrayList<>(transitionSequence.size());
-			for (int i = 0; i < transitionSequence.size()
-					- this.averagingIterations; i++) {
-				this.finalWeights.add(0.0);
-			}
-			for (int i = transitionSequence.size() - this.averagingIterations; i < transitionSequence
-					.size(); i++) {
-				this.finalWeights.add(1.0 / this.averagingIterations);
+				objectiveFunctionValueStats.add(objectiveFunctionValues.get(i));
 			}
 
-			// TODO >>> EVEN NEWER >>>
-			
+			// gap statistics
 			final Vector totalDelta = transitionSequence.getTransitions()
 					.get(transitionSequence.size() - this.averagingIterations)
 					.getDelta().copy();
@@ -100,42 +82,15 @@ public class FixedIterationNumberConvergenceCriterion implements
 				totalDelta.add(transitionSequence.getTransitions().get(i)
 						.getDelta());
 			}
-			final double finalWeight = 1.0 / this.averagingIterations;
-			totalDelta.mult(finalWeight);
-			this.finalEquilbiriumGap = totalDelta.euclNorm();
-			this.finalUniformityGap = finalWeight;
-			
-			// TODO <<< NEW <<<
+
+			// package the results
+			return new ConvergenceCriterionResult(
+					objectiveFunctionValueStats.getAvg(),
+					objectiveFunctionValueStats.getStddev(),
+					totalDelta.euclNorm() / this.averagingIterations,
+					1.0 / this.averagingIterations,
+					transitionSequence.getDecisionVariable(),
+					transitionSequence.size());
 		}
-	}
-
-	@Override
-	public boolean isConverged() {
-		return (this.finalObjectiveFunctionValue != null);
-	}
-
-	@Override
-	public Double getFinalObjectiveFunctionValue() {
-		return this.finalObjectiveFunctionValue;
-	}
-
-	@Override
-	public void reset() {
-		this.finalObjectiveFunctionValue = null;
-	}
-
-	@Override
-	public List<Double> getFinalWeights() {
-		return this.finalWeights;
-	}
-
-	@Override
-	public Double getFinalEquilbriumGap() {
-		return this.finalEquilbiriumGap;
-	}
-
-	@Override
-	public Double getFinalUniformityGap() {
-		return this.finalUniformityGap;
 	}
 }

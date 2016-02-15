@@ -45,7 +45,6 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 
 import floetteroed.opdyts.DecisionVariable;
-import floetteroed.opdyts.searchalgorithms.UpperBoundTuner;
 import floetteroed.opdyts.trajectorysampling.SamplingStage;
 import floetteroed.utilities.math.Vector;
 

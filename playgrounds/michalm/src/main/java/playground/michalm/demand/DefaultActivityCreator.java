@@ -28,7 +28,7 @@ import org.matsim.core.population.ActivityImpl;
 
 import com.vividsolutions.jts.geom.*;
 
-import playground.michalm.zone.Zone;
+import playground.michalm.zone.*;
 import playground.michalm.zone.util.RandomPointUtils;
 
 

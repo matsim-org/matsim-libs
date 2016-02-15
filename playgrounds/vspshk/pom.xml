@@ -14,11 +14,11 @@
   		<artifactId>mzilske</artifactId>
   		<version>0.8.0-SNAPSHOT</version>
   	</dependency>
-  	<dependency>
+  	<!-- <dependency>
   		<groupId>playground</groupId>
   		<artifactId>dziemke</artifactId>
   		<version>0.8.0-SNAPSHOT</version>
-  	</dependency>
+  	</dependency> -->
   	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>dgrether</artifactId>

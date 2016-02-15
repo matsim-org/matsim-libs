@@ -102,7 +102,8 @@ public class TransitionSequence<U extends DecisionVariable> {
 
 	// -------------------- GETTERS --------------------
 
-	DecisionVariable getDecisionVariable() {
+	// TODO is now public
+	public DecisionVariable getDecisionVariable() {
 		return this.transitions.getFirst().getDecisionVariable();
 	}
 

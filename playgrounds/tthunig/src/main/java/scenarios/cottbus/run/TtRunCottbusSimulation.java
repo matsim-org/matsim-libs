@@ -47,7 +47,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
@@ -62,6 +61,8 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
+import scenarios.analysis.TtGeneralAnalysis;
+import scenarios.analysis.TtListenerToBindGeneralAnalysis;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
 /**
@@ -156,15 +157,15 @@ public class TtRunCottbusSimulation {
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultStrategy.TimeAllocationMutator.toString());
-			strat.setWeight(0.0);
+			strat.setWeight(0.1);
 			strat.setDisableAfter(config.controler().getLastIteration() - 100);
 			config.strategy().addStrategySettings(strat);
-			// TODO set mutation rate
+			config.timeAllocationMutator().setMutationRange(1800); // 1800 is default
 		}
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
-			strat.setWeight(0.9);
+			strat.setWeight(0.8);
 			strat.setDisableAfter(config.controler().getLastIteration());
 			config.strategy().addStrategySettings(strat);
 		}
@@ -341,7 +342,13 @@ public class TtRunCottbusSimulation {
 			});
 		}
 		
-		// TODO ?! add a controler listener to analyze results
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				this.addControlerListenerBinding().to(TtListenerToBindGeneralAnalysis.class);
+				this.bind(TtGeneralAnalysis.class);
+			}
+		});
 		
 		return controler;
 	}

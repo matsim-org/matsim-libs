@@ -14,7 +14,7 @@ public class Case1CreatePopulationAndDemand {
 	private final static Logger Log = Logger.getLogger(Case1CreatePopulationAndDemand.class);
 	private Scenario scenario;
 
-	private String networkFile = "C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/Case1/merged-network_UTM31N_IKEA.xml";
+	private String networkFile = "C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/network/merged-network_UTM31N_IKEA.xml";
 	private String dataFile ="C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/mergedPrdToAscii.csv";
 
 	public static void main(String[] args) {

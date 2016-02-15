@@ -45,7 +45,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	// ---
 
 	private static final String WRITING_OUTPUT_EVENTS = "writingOutputEvents" ;
-	private boolean writingOutputEvents = false ;
+	private boolean writingOutputEvents = true ;
 
 	// ---
 

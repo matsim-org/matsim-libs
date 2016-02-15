@@ -39,14 +39,13 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 	public static void main(String[] args) {
 		Header.printHeader(NmbmActivityTypeManipulator.class.toString(), args);
 		String population = args[0];
-		String network = args[1];
-		String decileFile = args[2];
-		String outputPopulation = args[3];
-		String outputConfig = args[4];
+		String decileFile = args[1];
+		String outputPopulation = args[2];
+		String outputConfig = args[3];
 		
 		NmbmActivityTypeManipulator atm = new NmbmActivityTypeManipulator();
 		atm.parseDecileFile(decileFile);
-		atm.parsePopulation(population, network);
+		atm.parsePopulation(population);
 		atm.run();
 		
 		/* Write the population to file. */

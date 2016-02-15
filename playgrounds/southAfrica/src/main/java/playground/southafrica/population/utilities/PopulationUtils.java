@@ -73,55 +73,62 @@ public class PopulationUtils {
 		for(Person person : sc.getPopulation().getPersons().values()){
 			Plan selectedPlan = person.getSelectedPlan();
 			
-			/* Iterate over index, and not the PlanElement, as we need the index */
-			for(int i = 0; i < selectedPlan.getPlanElements().size(); i++){
-				PlanElement pe = selectedPlan.getPlanElements().get(i);
-				if(pe instanceof Activity){
-					double duration = 0.0;
-					ActivityImpl act = (ActivityImpl) pe;
-					if(i == 0){
-						/* It is the first (home) activity. */
-						duration = act.getEndTime();
-						if(!act.getType().equalsIgnoreCase("h")){
-							LOG.warn("Chain starting with activity other than `home': " 
-									+ act.getType() + " (" + person.getId() + ")");
-							durations.add(new Tuple<String, Double>(act.getType(), duration));
-						} else{
-							durations.add(new Tuple<String, Double>("h1", duration));
-						}
-						if(duration < 0){
-							LOG.warn("First!! Negative duration: " + duration);
-						}
-					} else if(i < selectedPlan.getPlanElements().size() - 1){
-						/* It can be any activity. */
-						if(act.getType().equalsIgnoreCase("h")){
-							durations.add(new Tuple<String, Double>("h3", act.getEndTime() - act.getStartTime()));
-						} else {
-							if(act.getStartTime() == Double.NEGATIVE_INFINITY ||
-									act.getEndTime() == Double.NEGATIVE_INFINITY){
-								/* Rather use activity's maximum duration. */
-								duration = act.getMaximumDuration();
-							} else{
-								duration = act.getEndTime() - act.getStartTime();
-							}
-							durations.add(new Tuple<String, Double>(act.getType(), duration));
-						}
-						if(duration < 0){
-							LOG.warn("Mid!! Negative duration: " + duration);
-						}
-					} else {
-						/* It is the final (home) activity. */
-						duration = Math.max(24*60*60, act.getStartTime()) - act.getStartTime();
-						if(duration != Double.POSITIVE_INFINITY){
+			/* Ignore plans that have a s ingle home-based activity. */
+			if(selectedPlan.getPlanElements().size() == 1){
+				/* Ignore it, the person stays home. */
+				/* TODO Toe determine the activity duration, i.e. scoring, we
+				 * may have to consider giving these a duration of 24:00:00. */
+			} else {
+				/* Iterate over index, and not the PlanElement, as we need the index */
+				for(int i = 0; i < selectedPlan.getPlanElements().size(); i++){
+					PlanElement pe = selectedPlan.getPlanElements().get(i);
+					if(pe instanceof Activity){
+						double duration = 0.0;
+						ActivityImpl act = (ActivityImpl) pe;
+						if(i == 0){
+							/* It is the first (home) activity. */
+							duration = act.getEndTime();
 							if(!act.getType().equalsIgnoreCase("h")){
-								LOG.warn("Chain ending with activity other than `home': " 
+								LOG.warn("Chain starting with activity other than `home': " 
 										+ act.getType() + " (" + person.getId() + ")");
 								durations.add(new Tuple<String, Double>(act.getType(), duration));
 							} else{
-								durations.add(new Tuple<String, Double>("h2", duration));
+								durations.add(new Tuple<String, Double>("h1", duration));
 							}
 							if(duration < 0){
-								LOG.warn("LAST!! Negative duration: " + duration);
+								LOG.warn("First for " + person.getId().toString() + "!! Negative duration: " + duration);
+							}
+						} else if(i < selectedPlan.getPlanElements().size() - 1){
+							/* It can be any activity. */
+							if(act.getType().equalsIgnoreCase("h")){
+								durations.add(new Tuple<String, Double>("h3", act.getEndTime() - act.getStartTime()));
+							} else {
+								if(act.getStartTime() == Double.NEGATIVE_INFINITY ||
+										act.getEndTime() == Double.NEGATIVE_INFINITY){
+									/* Rather use activity's maximum duration. */
+									duration = act.getMaximumDuration();
+								} else{
+									duration = act.getEndTime() - act.getStartTime();
+								}
+								durations.add(new Tuple<String, Double>(act.getType(), duration));
+							}
+							if(duration < 0){
+								LOG.warn("Mid for " + person.getId().toString() + "!! Negative duration: " + duration);
+							}
+						} else {
+							/* It is the final (home) activity. */
+							duration = Math.max(24*60*60, act.getStartTime()) - act.getStartTime();
+							if(duration != Double.POSITIVE_INFINITY){
+								if(!act.getType().equalsIgnoreCase("h")){
+									LOG.warn("Chain ending with activity other than `home': " 
+											+ act.getType() + " (" + person.getId() + ")");
+									durations.add(new Tuple<String, Double>(act.getType(), duration));
+								} else{
+									durations.add(new Tuple<String, Double>("h2", duration));
+								}
+								if(duration < 0){
+									LOG.warn("LAST!! Negative duration: " + duration);
+								}
 							}
 						}
 					}

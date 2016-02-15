@@ -33,10 +33,14 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 */
 
 public class StatsWriter {
-
+	
 	public static void main(String[] args) {
+		StatsWriter.run("../../../../repos/runs-svn/patnaIndia/run108/calibration/c2/");
+	}
+
+	public static void run (final String filesDir) {
 		
-		String filesDir = "../../../../repos/runs-svn/patnaIndia/run108/calibration/c1/";
+//		String filesDir = "../../../../repos/runs-svn/patnaIndia/run108/calibration/congestionFree/";
 		String eventsFile = filesDir+"/output_events.xml.gz";
 		String plansFile = filesDir+"/output_plans.xml.gz";
 		String networkFile = filesDir+"/output_network.xml.gz";
@@ -53,9 +57,6 @@ public class StatsWriter {
 		events.addHandler( calcLegTimes );
 		
 		new MatsimEventsReader(events).readFile(eventsFile) ;
-		calcLegTimes.writeStats(filesDir+"/_stats_");
+		calcLegTimes.writeStats(filesDir+"/analysis/_stats_");
 	}
 }
-
-
-	

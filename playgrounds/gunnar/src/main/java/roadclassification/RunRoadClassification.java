@@ -26,10 +26,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import floetteroed.opdyts.DecisionVariable;
 import opdytsintegration.MATSimSimulator;
 import opdytsintegration.TimeDiscretization;
 
@@ -46,9 +44,11 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
-import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 
 public class RunRoadClassification {
@@ -129,8 +129,9 @@ public class RunRoadClassification {
 //				0.0, 0.0, 0.0, 0.95, 1.0);
 		final int minimumAverageIterations = 5;
 
-		final ObjectiveFunctionChangeConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
-				1e-1, 1e-1, minimumAverageIterations);
+		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(100, 10);
+//		final ObjectiveFunctionChangeConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
+//				1e-1, 1e-1, minimumAverageIterations);
 
 		// Discretizize the day into 24 one-hour time bins, starting at midnight.
 		final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 3600, 24);

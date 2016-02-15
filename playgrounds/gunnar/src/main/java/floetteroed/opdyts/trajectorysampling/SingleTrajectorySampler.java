@@ -24,6 +24,7 @@
  */
 package floetteroed.opdyts.trajectorysampling;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
 import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
@@ -48,6 +50,8 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 	private final ObjectiveFunction objectiveFunction;
 
 	private final ConvergenceCriterion convergenceCriterion;
+
+	private ConvergenceCriterionResult convergenceResult = null;
 
 	private SimulatorState fromState = null;
 
@@ -72,17 +76,14 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	@Override
 	public boolean foundSolution() {
-		return this.convergenceCriterion.isConverged();
+		return this.convergenceResult != null;
 	}
 
 	@Override
-	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValueView() {
-		final Map<U, Double> result = new LinkedHashMap<>();
-		if (this.convergenceCriterion.isConverged()) {
-			result.put(this.decisionVariable,
-					this.convergenceCriterion.getFinalObjectiveFunctionValue());
-		}
-		return result;
+	public Map<U, ConvergenceCriterionResult> getDecisionVariable2convergenceResultView() {
+		final Map<U, ConvergenceCriterionResult> result = new LinkedHashMap<>();
+			result.put(this.decisionVariable, this.convergenceResult);
+		return Collections.unmodifiableMap(result);
 	}
 
 	@Override
@@ -131,15 +132,4 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 	public void setStandardLogFileName(final String logFileName) {
 		throw new UnsupportedOperationException();
 	}
-
-	@Override
-	public Map<U, Double> getDecisionVariable2selfTunedEquilbriumGapWeightView() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Map<U, Double> getDecisionVariable2selfTunedUniformityGapWeightView() {
-		throw new UnsupportedOperationException();
-	}
-
 }

@@ -18,8 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
 
+import java.io.File;
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -35,7 +37,15 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.StatsWriter;
+import playground.agarwalamit.analysis.controlerListner.ModalShareControlerListner;
+import playground.agarwalamit.analysis.controlerListner.ModalTravelTimeControlerListner;
+import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
+import playground.agarwalamit.analysis.travelTime.ModalTravelTimeAnalyzer;
+import playground.agarwalamit.analysis.travelTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.FreeSpeedTravelTimeForBike;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.OuterCordonUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter.PatnaUserGroup;
@@ -49,39 +59,47 @@ public class PatnaJointCalibrationControler {
 
 	private final static double SAMPLE_SIZE = 0.10;
 	private final static String subPopAttributeName = "userGroup";
-	
+
 	private static final String NET_FILE = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/network_diff_linkSpeed.xml.gz"; //
 	private static final String JOINT_PLANS_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_plans_10pct.xml.gz"; //
 	private static final String JOINT_PERSONS_ATTRIBUTE_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_personAttributes_10pct.xml.gz"; //
 	private static final String JOINT_COUNTS_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_counts.xml.gz"; //
 	private static final String JOINT_VEHICLES_10PCT = "../../../../repos/shared-svn/projects/patnaIndia/inputs/simulationInputs/joint_vehicles_10pct.xml.gz";
-	
-	private static final String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/c1/";
-	
+
+	private static String OUTPUT_DIR = "../../../../repos/runs-svn/patnaIndia/run108/calibration/c3/";
+
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		PatnaJointCalibrationControler pjc = new PatnaJointCalibrationControler();
-		
+
 		if(args.length>0){
 			ConfigUtils.loadConfig(config, args[0]);
+			OUTPUT_DIR = args [1];
+			config.controler().setOutputDirectory( OUTPUT_DIR );
 		} else {
 			config = pjc.createBasicConfigSettings();
+			
+			config.planCalcScore().getOrCreateModeParams("car").setConstant(0.);
+			config.planCalcScore().getOrCreateModeParams("bike").setConstant(12.);
+			config.planCalcScore().getOrCreateModeParams("motorbike").setConstant(9.);
+			config.planCalcScore().getOrCreateModeParams("pt").setConstant(-15.);
+			config.planCalcScore().getOrCreateModeParams("walk").setConstant(-11.);
 		}
-
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
 		final RandomizingTimeDistanceTravelDisutility.Builder builder_bike =  new RandomizingTimeDistanceTravelDisutility.Builder("bike");
-		
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				
+
 				addTravelTimeBinding("bike").to(FreeSpeedTravelTimeForBike.class);
 				addTravelDisutilityFactoryBinding("bike").toInstance(builder_bike);
-				
+
 				addTravelTimeBinding("bike_ext").to(FreeSpeedTravelTimeForBike.class);
 				addTravelDisutilityFactoryBinding("bike_ext").toInstance(builder_bike);
 
@@ -89,32 +107,64 @@ public class PatnaJointCalibrationControler {
 					addTravelTimeBinding(mode).to(networkTravelTime());
 					addTravelDisutilityFactoryBinding(mode).to(carTravelDisutilityFactoryKey());					
 				}
-			
+			}
+		});
+		
+		controler.addOverridingModule(new AbstractModule() { // ploting modal share over iterations
+			@Override
+			public void install() {
+				this.bind(ModalShareEventHandler.class);
+				this.addControlerListenerBinding().to(ModalShareControlerListner.class);
+				
+				this.bind(ModalTripTravelTimeHandler.class);
+				this.addControlerListenerBinding().to(ModalTravelTimeControlerListner.class);
 			}
 		});
 		controler.run();
+
+		// delete unnecessary iterations folder here.
+		int firstIt = controler.getConfig().controler().getFirstIteration();
+		int lastIt = controler.getConfig().controler().getLastIteration();
+		for (int index =firstIt+1; index <lastIt; index ++){
+			String dirToDel = OUTPUT_DIR+"/ITERS/it."+index;
+			Logger.getLogger(PatnaJointCalibrationControler.class).info("Deleting the directory "+dirToDel);
+			IOUtils.deleteDirectory(new File(dirToDel),false);
+		}
+
+		new File(OUTPUT_DIR+"/analysis/").mkdir();
+		String outputEventsFile = OUTPUT_DIR+"/output_events.xml.gz";
+		// write some default analysis
+		StatsWriter.run(OUTPUT_DIR);
+
+		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(outputEventsFile);
+		mtta.run();
+		mtta.writeResults(OUTPUT_DIR+"/analysis/modalTravelTime.txt");
+
+		ModalShareFromEvents msc = new ModalShareFromEvents(outputEventsFile);
+		msc.run();
+		msc.writeResults(OUTPUT_DIR+"/analysis/modalShareFromEvents.txt");
 	}
 
 	/**
 	 * This config do not have locations of inputs files (network, plans, counts etc).
 	 */
 	public Config createBasicConfigSettings () {
-		
+
 		Config config = ConfigUtils.createConfig();
-		
+
 		config.network().setInputFile(NET_FILE);
-		
+
 		config.plans().setInputFile(JOINT_PLANS_10PCT);
 		config.plans().setSubpopulationAttributeName(subPopAttributeName);
 		config.plans().setInputPersonAttributeFile(JOINT_PERSONS_ATTRIBUTE_10PCT);
-		
+
 		config.qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 		config.vehicles().setVehiclesFile(JOINT_VEHICLES_10PCT);
-		
+
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
-		config.controler().setWriteEventsInterval(50);
-		config.controler().setWritePlansInterval(50);
+		config.controler().setWriteEventsInterval(100);
+		config.controler().setWritePlansInterval(100);
 		config.controler().setOutputDirectory(OUTPUT_DIR);
 
 		config.counts().setCountsFileName(JOINT_COUNTS_10PCT);
@@ -201,19 +251,19 @@ public class PatnaJointCalibrationControler {
 			ActivityParams homeAct = new ActivityParams("home");
 			homeAct.setTypicalDuration(12*3600);
 			config.planCalcScore().addActivityParams(homeAct);
-			
+
 			ActivityParams edu = new ActivityParams("educational");
 			edu.setTypicalDuration(7*3600);
 			config.planCalcScore().addActivityParams(edu);
-			
+
 			ActivityParams soc = new ActivityParams("social");
 			soc.setTypicalDuration(5*3600);
 			config.planCalcScore().addActivityParams(soc);
-			
+
 			ActivityParams oth = new ActivityParams("other");
 			oth.setTypicalDuration(5*3600);
 			config.planCalcScore().addActivityParams(oth);
-			
+
 			ActivityParams unk = new ActivityParams("unknown");
 			unk.setTypicalDuration(7*3600);
 			config.planCalcScore().addActivityParams(unk);
@@ -253,7 +303,7 @@ public class PatnaJointCalibrationControler {
 		{
 			ModeRoutingParams mrp = new ModeRoutingParams("walk");
 			mrp.setTeleportedModeSpeed(5./3.6);
-			mrp.setBeelineDistanceFactor(1.1);
+			mrp.setBeelineDistanceFactor(1.5);
 			config.plansCalcRoute().addModeRoutingParams(mrp);
 		}
 		{

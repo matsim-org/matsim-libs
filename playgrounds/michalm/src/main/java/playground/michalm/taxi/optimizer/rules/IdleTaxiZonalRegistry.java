@@ -27,34 +27,35 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.*;
 
 import playground.michalm.taxi.schedule.TaxiStayTask;
 import playground.michalm.taxi.scheduler.*;
-import playground.michalm.zone.util.ZonalSystem;
-import playground.michalm.zone.util.ZonalSystem.Zone;
+import playground.michalm.zone.*;
+import playground.michalm.zone.util.*;
 
 
 public class IdleTaxiZonalRegistry
 {
-    private final ZonalSystem<?> zonalSystem;
+    private final ZonalSystem zonalSystem;
+    private final Map<Id<Zone>, List<Zone>> zonesSortedByDistance;
 
-    private final Map<Id<Vehicle>, Vehicle>[] vehiclesInZones;
+    private final Map<Id<Zone>, Map<Id<Vehicle>, Vehicle>> vehiclesInZones;
     private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
 
     private final Predicate<Vehicle> isIdle;
 
 
-    @SuppressWarnings("unchecked")
-    public IdleTaxiZonalRegistry(ZonalSystem<?> zonalSystem, TaxiScheduler scheduler)
+    public IdleTaxiZonalRegistry(ZonalSystem zonalSystem, TaxiScheduler scheduler)
     {
         this.zonalSystem = zonalSystem;
+        zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
 
         isIdle = TaxiSchedulerUtils.createIsIdle(scheduler);
 
-        vehiclesInZones = (Map<Id<Vehicle>, Vehicle>[])new Map[zonalSystem.getZoneCount()];
-        for (int i = 0; i < vehiclesInZones.length; i++) {
-            vehiclesInZones[i] = new HashMap<>();
+        vehiclesInZones = Maps.newHashMapWithExpectedSize(zonalSystem.getZones().size());
+        for (Id<Zone> id : zonalSystem.getZones().keySet()) {
+            vehiclesInZones.put(id, new HashMap<Id<Vehicle>, Vehicle>());
         }
     }
 
@@ -62,9 +63,9 @@ public class IdleTaxiZonalRegistry
     public void addVehicle(Vehicle vehicle)
     {
         TaxiStayTask stayTask = (TaxiStayTask)vehicle.getSchedule().getCurrentTask();
-        int zoneIdx = getZoneIdx(stayTask);
+        Id<Zone> zoneId = getZoneId(stayTask);
 
-        if (vehiclesInZones[zoneIdx].put(vehicle.getId(), vehicle) != null) {
+        if (vehiclesInZones.get(zoneId).put(vehicle.getId(), vehicle) != null) {
             throw new IllegalStateException(vehicle + " is already in the registry");
         }
 
@@ -77,9 +78,9 @@ public class IdleTaxiZonalRegistry
     public void removeVehicle(Vehicle vehicle)
     {
         TaxiStayTask stayTask = (TaxiStayTask)Schedules.getPreviousTask(vehicle.getSchedule());
-        int zoneIdx = getZoneIdx(stayTask);
+        Id<Zone> zoneId = getZoneId(stayTask);
 
-        if (vehiclesInZones[zoneIdx].remove(vehicle.getId()) == null) {
+        if (vehiclesInZones.get(zoneId).remove(vehicle.getId()) == null) {
             throw new IllegalStateException(vehicle + " is not in the registry");
         }
 
@@ -95,12 +96,13 @@ public class IdleTaxiZonalRegistry
             return getVehicles();
         }
 
-        Iterable<? extends Zone> zonesByDistance = zonalSystem.getZonesByDistance(node);
+        Zone zone = zonalSystem.getZone(node);
+        Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
         List<Vehicle> nearestVehs = new ArrayList<>();
 
         for (Zone z : zonesByDistance) {
             Iterables.addAll(nearestVehs,
-                    Iterables.filter(vehiclesInZones[z.getIdx()].values(), isIdle));
+                    Iterables.filter(vehiclesInZones.get(z.getId()).values(), isIdle));
 
             if (nearestVehs.size() >= minCount) {
                 return nearestVehs;
@@ -111,9 +113,9 @@ public class IdleTaxiZonalRegistry
     }
 
 
-    private int getZoneIdx(TaxiStayTask stayTask)
+    private Id<Zone> getZoneId(TaxiStayTask stayTask)
     {
-        return zonalSystem.getZone(stayTask.getLink().getToNode()).getIdx();
+        return zonalSystem.getZone(stayTask.getLink().getToNode()).getId();
     }
 
 

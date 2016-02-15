@@ -77,11 +77,6 @@ class SurrogateObjectiveFunction<U extends DecisionVariable> {
 		return this.uniformityGapWeight;
 	}
 
-	// TODO NEW
-	int transitionCnt() {
-		return this.transitions.size();
-	}
-	
 	// -------------------- VALUES --------------------
 
 	double interpolatedObjectiveFunctionValue(final Vector alphas) {
@@ -150,15 +145,15 @@ class SurrogateObjectiveFunction<U extends DecisionVariable> {
 
 	// -------------------- HESSIANS --------------------
 
-	Matrix d2EquilibriumGapdAlpha2(final Vector alphas) {
-		final Matrix result = this.deltaCovariances.copy();
-		final Vector gradient = this.dEquilibriumGap_dAlpha(alphas);
-		result.addOuterProduct(gradient, gradient, -1.0);
-		result.mult(1.0 / this.equilibriumGap(alphas));
-		return result;
-	}
-
-	Matrix d2UniformityGapdAlpha2(final Vector alphas) {
-		return Matrix.newDiagonal(alphas.size(), 2.0);
-	}
+	// Matrix d2EquilibriumGapdAlpha2(final Vector alphas) {
+	// final Matrix result = this.deltaCovariances.copy();
+	// final Vector gradient = this.dEquilibriumGap_dAlpha(alphas);
+	// result.addOuterProduct(gradient, gradient, -1.0);
+	// result.mult(1.0 / this.equilibriumGap(alphas));
+	// return result;
+	// }
+	//
+	// Matrix d2UniformityGapdAlpha2(final Vector alphas) {
+	// return Matrix.newDiagonal(alphas.size(), 2.0);
+	// }
 }

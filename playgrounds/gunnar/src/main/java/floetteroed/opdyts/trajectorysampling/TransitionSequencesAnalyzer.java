@@ -103,11 +103,6 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		return this.surrogateObjectiveFunction.getUniformityWeight();
 	}
 
-	// TODO NEW
-	SurrogateObjectiveFunction<U> getSurrogateObjectiveFunction() {
-		return this.surrogateObjectiveFunction;
-	}
-	
 	// -------------------- GENERAL STATISTICS --------------------
 
 	public double originalObjectiveFunctionValue(final Vector alphas) {
@@ -120,7 +115,8 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 	}
 
 	public double surrogateObjectiveFunctionValue(final Vector alphas) {
-		return this.surrogateObjectiveFunction.surrogateObjectiveFunctionValue(alphas);
+		return this.surrogateObjectiveFunction
+				.surrogateObjectiveFunctionValue(alphas);
 	}
 
 	public Map<U, Double> decisionVariable2alphaSum(final Vector alphas) {
@@ -135,28 +131,12 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		return result;
 	}
 
-	// TODO not sure about the transition ordering
-	//
-	// public double lastObjectiveFunctionValue() {
-	// return this.transitions.get(this.transitions.size() - 1)
-	// .getToStateObjectiveFunctionValue();
-	// }
-	//
-	// public double lastEquilibriuGap() {
-	// return this.transitions.get(this.transitions.size() - 1).getDelta()
-	// .euclNorm();
-	// }
-
 	// -------------------- OPTIMIZATION --------------------
 
-	// TODO NEW
-	Vector lastAlphas = null;
-	
 	public SamplingStage<U> newOptimalSamplingStage(
 			final Transition<U> lastTransition,
 			final Double convergedObjectiveFunctionValue) {
 		final Vector alphas = this.optimalAlphas();
-		this.lastAlphas = alphas.copy();
 		return new SamplingStage<>(alphas, this, lastTransition,
 				convergedObjectiveFunctionValue);
 	}

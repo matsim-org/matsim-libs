@@ -31,7 +31,7 @@ public class Case0CreateDemand {
 	private Random random = new Random();
 	private ObjectAttributes homeLocations = new ObjectAttributes();
 
-	private String[] activityTypeStrings = {"home","work","n.a.","brinGet","dailyShopping","nonDailyShopping","services","socialVisit","leisure","touring","other"} ;
+	private String[] activityTypeStrings = {"home","work","n.a.","bringGet","dailyShopping","nonDailyShopping","services","socialVisit","leisure","touring","other"} ;
 	private String[] modeStrings = {"n.a.","car","n.a.","slow","pt","n.a.","ride"};
 
 

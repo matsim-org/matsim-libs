@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -22,41 +22,51 @@ package playground.michalm.zone;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.MultiPolygon;
+import org.matsim.api.core.v01.network.*;
 
 
-public class ZoneShpReader
+public class SquareGridSystem
+    implements ZonalSystem
 {
-    private final Map<Id<Zone>, Zone> zones;
+    private final SquareGrid grid;
+    private final Map<Id<Zone>, Zone> zones = new HashMap<>();
+    private final Map<Id<Zone>, Zone> safeZones = Collections.unmodifiableMap(zones);
 
 
-    public ZoneShpReader(Map<Id<Zone>, Zone> zones)
+    public SquareGridSystem(Network network, double cellSize)
     {
-        this.zones = zones;
+        this.grid = new SquareGrid(network, cellSize);
+
+        for (Node n : network.getNodes().values()) {
+            Zone zone = grid.getZone(n.getCoord());
+            zones.put(zone.getId(), zone);
+        }
     }
 
 
-    public void readZones(String file)
+    public static Map<Id<Zone>, Zone> filterZonesWithNodes(Map<Id<Zone>, Zone> zones,
+            Network network, ZonalSystem zonalSystem)
     {
-        readZones(file, ZoneShpWriter.ID_HEADER);
+        Map<Id<Zone>, Zone> zonesWithNodes = new HashMap<>();
+        for (Node n : network.getNodes().values()) {
+            Zone zone = zonalSystem.getZone(n);
+            zonesWithNodes.put(zone.getId(), zone);
+        }
+
+        return zonesWithNodes;
     }
 
 
-    public void readZones(String file, String idHeader)
+    @Override
+    public Map<Id<Zone>, Zone> getZones()
     {
-        Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(file);
-        if (features.size() != zones.size()) {
-            throw new RuntimeException(
-                    "Features#: " + features.size() + "; zones#: " + zones.size());
-        }
+        return safeZones;
+    }
 
-        for (SimpleFeature ft : features) {
-            String id = ft.getAttribute(idHeader).toString();
-            Zone z = zones.get(Id.create(id, Zone.class));
-            z.setMultiPolygon((MultiPolygon)ft.getDefaultGeometry());
-        }
+
+    @Override
+    public Zone getZone(Node node)
+    {
+        return grid.getZone(node.getCoord());
     }
 }

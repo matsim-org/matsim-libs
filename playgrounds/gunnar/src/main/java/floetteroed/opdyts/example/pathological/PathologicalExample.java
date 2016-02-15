@@ -52,12 +52,12 @@ public class PathologicalExample {
 	public void run() {
 
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				100, 10);
+				150, 50);
 		final ObjectiveFunction objFct = new LinearSystemObjectiveFunction();
 
 		final int maxMemorizedTrajectoryLength = Integer.MAX_VALUE;
 		final boolean interpolate = true;
-		final int maxRandomSearchIterations = 50;
+		final int maxRandomSearchIterations = 10;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
 		final boolean includeCurrentBest = true;
 		

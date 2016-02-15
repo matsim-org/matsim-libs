@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * SurveyActivityDurationChecker.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,12 +18,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone;
+/**
+ * 
+ */
+package playground.southafrica.population.capeTownTravelSurvey;
 
-import org.matsim.api.core.v01.Coord;
+import playground.southafrica.population.utilities.PopulationUtils;
+import playground.southafrica.utilities.Header;
 
+/**
+ * Checks the activity durations of the parsed survey plans. This should be
+ * done before allocating the survey plans to a full population. The objective
+ * of this class is mainly fault finding.
+ * 
+ * @author jwjoubert
+ */
+public class SurveyActivityDurationChecker {
 
-public interface ZoneFinder
-{
-    Zone findZone(Coord coord);
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Header.printHeader(SurveyActivityDurationChecker.class.toString(), args);
+		
+		String populationFile = args[0];
+		String outputFile = args[1];
+		
+		PopulationUtils.extractActivityDurations(populationFile, outputFile);
+
+		Header.printFooter();
+	}
+
 }

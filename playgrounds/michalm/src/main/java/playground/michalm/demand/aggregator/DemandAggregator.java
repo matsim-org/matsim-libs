@@ -27,6 +27,7 @@ import org.matsim.matrices.*;
 
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.zone.*;
+import playground.michalm.zone.util.ZoneFinder;
 
 
 public class DemandAggregator

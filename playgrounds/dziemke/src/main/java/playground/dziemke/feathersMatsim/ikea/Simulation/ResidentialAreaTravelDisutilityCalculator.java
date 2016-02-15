@@ -78,10 +78,9 @@ public class ResidentialAreaTravelDisutilityCalculator implements TravelDisutili
 		Activity homeActivity=(Activity)pe;
 		Coord homeCoord=homeActivity.getCoord();
 
+		if(link.toString().contains("id=Link4Residents2")||link.toString().contains("id=Link4Residents1")){
 		if(!nodeList.contains(homeCoord)){
-			if(link.toString().contains("id=Link4Residents2")||link.toString().contains("id=Link4Residents1")){
-
-				linkTravelDisutility=linkTravelDisutility*10000;}
+						linkTravelDisutility=linkTravelDisutility*10000;}
 		}
 
 

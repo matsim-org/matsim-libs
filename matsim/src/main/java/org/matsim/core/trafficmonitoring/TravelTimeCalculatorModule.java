@@ -22,7 +22,10 @@
 
 package org.matsim.core.trafficmonitoring;
 
+import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -46,20 +49,27 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
     @Override
     public void install() {
-        // I declare that there is something of type TravelTimeCalculator which
-        //  - will exist only once (live as long as the Controler).
-        //  - will be available to other bound classes via injection
-        //  - will come out of the Provider below.
-        // If I was in a script, I could also pass an instance directly which I created myself, but
-        // here, the Scenario is not available yet, so I defer construction.
-        bind(TravelTimeCalculator.class).toProvider(TravelTimeCalculatorProvider.class).in(Singleton.class);
-        if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
-            for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
-                addTravelTimeBinding(mode).toProvider(ObservedLinkTravelTimes.class);
+        if (getConfig().travelTimeCalculator().getSeparateModes()) {
+            for (final String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
+                bind(TravelTimeCalculator.class).annotatedWith(Names.named(mode)).toProvider(new SingleModeTravelTimeCalculatorProvider(mode)).in(Singleton.class);
+                addTravelTimeBinding(mode).toProvider(new Provider<TravelTime>() {
+                    @Inject Injector injector;
+                    @Override
+                    public TravelTime get() {
+                        return injector.getInstance(Key.get(TravelTimeCalculator.class, Names.named(mode))).getLinkTravelTimes();
+                    }
+                });
             }
-        }
-        if (getConfig().travelTimeCalculator().isCalculateLinkToLinkTravelTimes()) {
-            bind(LinkToLinkTravelTime.class).toProvider(ObservedLinkToLinkTravelTimes.class);
+        } else {
+            bind(TravelTimeCalculator.class).toProvider(TravelTimeCalculatorProvider.class).in(Singleton.class);
+            if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
+                for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
+                    addTravelTimeBinding(mode).toProvider(ObservedLinkTravelTimes.class);
+                }
+            }
+            if (getConfig().travelTimeCalculator().isCalculateLinkToLinkTravelTimes()) {
+                bind(LinkToLinkTravelTime.class).toProvider(ObservedLinkToLinkTravelTimes.class);
+            }
         }
     }
 
@@ -89,22 +99,36 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
     private static class TravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
 
-        @Inject
-        TravelTimeCalculatorConfigGroup config;
-
-        @Inject
-        EventsManager eventsManager;
-
-        @Inject
-        Network network;
+        @Inject TravelTimeCalculatorConfigGroup config;
+        @Inject EventsManager eventsManager;
+        @Inject Network network;
 
         @Override
         public TravelTimeCalculator get() {
-            TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(network, config);
-            eventsManager.addHandler(travelTimeCalculator);
-            return travelTimeCalculator;
+            TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), 30*3600, config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), config.isFilterModes(), CollectionUtils.stringToSet(config.getAnalyzedModes()));
+            eventsManager.addHandler(calculator);
+            return TravelTimeCalculator.configure(calculator, config, network);
+        }
+    }
+
+    private static class SingleModeTravelTimeCalculatorProvider implements Provider<TravelTimeCalculator> {
+
+        @Inject TravelTimeCalculatorConfigGroup config;
+        @Inject EventsManager eventsManager;
+        @Inject Network network;
+
+        private String mode;
+
+        SingleModeTravelTimeCalculatorProvider(String mode) {
+            this.mode = mode;
         }
 
+        @Override
+        public TravelTimeCalculator get() {
+            TravelTimeCalculator calculator = new TravelTimeCalculator(network, config.getTraveltimeBinSize(), 30*3600, config.isCalculateLinkTravelTimes(), config.isCalculateLinkToLinkTravelTimes(), true, CollectionUtils.stringToSet(mode));
+            eventsManager.addHandler(calculator);
+            return TravelTimeCalculator.configure(calculator, config, network);
+        }
     }
 
 }

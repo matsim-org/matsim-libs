@@ -40,6 +40,7 @@ import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
 import floetteroed.opdyts.logging.ConvergedObjectiveFunctionValue;
 import floetteroed.opdyts.logging.EquilibriumGap;
 import floetteroed.opdyts.logging.EquilibriumGapWeight;
@@ -53,7 +54,6 @@ import floetteroed.opdyts.logging.TotalMemory;
 import floetteroed.opdyts.logging.UniformityGap;
 import floetteroed.opdyts.logging.UniformityGapWeight;
 import floetteroed.utilities.math.MathHelpers;
-import floetteroed.utilities.math.Vector;
 import floetteroed.utilities.statisticslogging.Statistic;
 import floetteroed.utilities.statisticslogging.StatisticsMultiWriter;
 
@@ -97,18 +97,9 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 
 	private U currentDecisionVariable = null;
 
-	private Map<U, Double> decisionVariable2finalObjectiveFunctionValue = new LinkedHashMap<>();
-
-	private Map<U, Double> decisionVariable2selfTunedEquilibriumGapWeight = new LinkedHashMap<>();
-
-	private Map<U, Double> decisionVariable2selfTunedUniformityGapWeight = new LinkedHashMap<>();
+	private Map<U, ConvergenceCriterionResult> decisionVariable2convergenceResult = new LinkedHashMap<>();
 
 	private final List<SamplingStage<U>> samplingStages = new ArrayList<>();
-
-	// private SurrogateObjectiveFunction<U> lastSurrogateObjectiveFunction =
-	// null;
-
-	// private Vector lastAlphas = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -174,26 +165,16 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 	}
 
 	@Override
-	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValueView() {
+	public Map<U, ConvergenceCriterionResult> getDecisionVariable2convergenceResultView() {
 		return Collections
-				.unmodifiableMap(this.decisionVariable2finalObjectiveFunctionValue);
-	}
-
-	@Override
-	public Map<U, Double> getDecisionVariable2selfTunedEquilbriumGapWeightView() {
-		return Collections
-				.unmodifiableMap(this.decisionVariable2selfTunedEquilibriumGapWeight);
-	}
-
-	@Override
-	public Map<U, Double> getDecisionVariable2selfTunedUniformityGapWeightView() {
-		return Collections
-				.unmodifiableMap(this.decisionVariable2selfTunedUniformityGapWeight);
+				.unmodifiableMap(this.decisionVariable2convergenceResult);
 	}
 
 	@Override
 	public boolean foundSolution() {
-		return (this.decisionVariable2finalObjectiveFunctionValue.size() > 0);
+		return (this.decisionVariable2convergenceResult.size() > 0);
+		// return (this.decisionVariable2finalObjectiveFunctionValue.size() >
+		// 0);
 	}
 
 	public List<SamplingStage<U>> getSamplingStages() {
@@ -262,57 +243,21 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 			/*
 			 * Check for convergence.
 			 */
-			this.convergenceCriterion.evaluate(currentTransitionSequence);
-			if (this.convergenceCriterion.isConverged()) {
-
-				// convergedObjectiveFunctionValue = this.convergenceCriterion
-				// .getFinalObjectiveFunctionValue();
-
-				// >>> TODO NEW >>>
+			final ConvergenceCriterionResult convergenceResult = this.convergenceCriterion
+					.evaluate(currentTransitionSequence);
+			if (convergenceResult != null) {
 				samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
 						decisionVariable2transitionSequence,
 						this.equilibriumWeight, this.uniformityWeight);
 				samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
 						this.decisionVariable2transitionSequence.get(
 								this.currentDecisionVariable)
-								.getLastTransition(), this.convergenceCriterion
-								.getFinalObjectiveFunctionValue());
+								.getLastTransition(),
+						convergenceResult.finalObjectiveFunctionValue);
 				this.samplingStages.add(samplingStage);
-				// <<< TODO NEW <<<
-
-				this.decisionVariable2finalObjectiveFunctionValue.put(
-						this.currentDecisionVariable, this.convergenceCriterion
-								.getFinalObjectiveFunctionValue());
-
-				// final WeightOptimizer weightOptimizer = new WeightOptimizer(
-				// this.lastSurrogateObjectiveFunction, this.lastAlphas);
-				final WeightOptimizer weightOptimizer = new WeightOptimizer(
-						samplingStageEvaluator.getSurrogateObjectiveFunction(),
-						// this.lastSurrogateObjectiveFunction,
-						samplingStageEvaluator.lastAlphas.copy());
-				final double[] result = weightOptimizer
-						.updateWeights(this.equilibriumWeight,
-								this.uniformityWeight, this.samplingStages
-										.get(this.samplingStages.size() - 1),
-								this.convergenceCriterion
-										.getFinalObjectiveFunctionValue(),
-								this.convergenceCriterion
-										.getFinalEquilbriumGap(),
-								this.convergenceCriterion
-										.getFinalUniformityGap());
-				this.decisionVariable2selfTunedEquilibriumGapWeight.put(
-						this.currentDecisionVariable, result[0]);
-				this.decisionVariable2selfTunedUniformityGapWeight.put(
-						this.currentDecisionVariable, result[1]);
-				
-				this.lastSamplingStage = samplingStage;
-				this.finalObjFctValue = this.convergenceCriterion.getFinalObjectiveFunctionValue();
-				this.finalEquilGap = samplingStage.getEquilibriumGap();
-				this.finalUnifGap = samplingStage.getUniformityGap();
-				this.finalSurrogateObjectiveFunction = samplingStageEvaluator.getSurrogateObjectiveFunction();
-				this.finalAlphas = samplingStageEvaluator.lastAlphas.copy();
-
-			}			
+				this.decisionVariable2convergenceResult.put(
+						this.currentDecisionVariable, convergenceResult);
+			}
 		}
 
 		/*
@@ -345,7 +290,6 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 			 * Create the next sampling stage.
 			 */
 
-			// >>> TODO NEW >>>
 			if (samplingStageEvaluator == null) {
 				samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
 						decisionVariable2transitionSequence,
@@ -356,11 +300,6 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 								.getLastTransition(), null);
 				this.samplingStages.add(samplingStage);
 			}
-			// <<< TODO NEW <<<
-
-			// this.lastAlphas = samplingStageEvaluator.lastAlphas.copy();
-			// this.lastSurrogateObjectiveFunction = samplingStageEvaluator
-			// .getSurrogateObjectiveFunction();
 
 			this.statisticsWriter.writeToFile(samplingStage);
 
@@ -378,18 +317,4 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 
 		}
 	}
-	
-	// TODO EXPERIMENTAL
-	
-	public SamplingStage<U> lastSamplingStage;
-	
-	public double finalObjFctValue;
-	
-	public double finalEquilGap;
-	
-	public double finalUnifGap;
-	
-	public SurrogateObjectiveFunction<U> finalSurrogateObjectiveFunction;
-	
-	public Vector finalAlphas;
 }
