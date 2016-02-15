@@ -66,7 +66,11 @@ import playground.southafrica.utilities.RandomPermutation;
 /**
  * Class to assign the travel demand, i.e. activity chains, observed in the 
  * Travel Survey of 2013 for City of Cape Town, to a synthetic population of
- * agents for the same area.
+ * agents for the same area. 
+ * 
+ * <h5>Note:</h5> The output coordinate reference system of the population is
+ * changed to that of the travel diary. If that is a problem, you need to 
+ * manually transform the coordinates outside of this class.
  *
  * @author jwjoubert
  */
@@ -110,8 +114,11 @@ public class SurveyPlanPicker {
 	/**
 	 * Class to build a {@link QuadTree} of plans for different population
 	 * profiles.
-	 * @param surveyPopulationFolder containing the four population files (See {@link 
-	 * ComprehensivePopulationReader}).
+	 * 
+	 * @param areaShapefile the path to the shapefile that will be used as 
+	 * extent for the {@link QuadTree}s of different demographic signatures. 
+	 * It is important that this shapefile must be in the same Coordinate 
+	 * Reference System (CRS) as the plans that represent the travel diary.
 	 */
 	public SurveyPlanPicker(String areaShapefile) {
 		/* Get the QuadTree extent. */
