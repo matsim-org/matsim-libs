@@ -121,7 +121,7 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		scheduler = new TaxibusScheduler(context, params);
 
 		optimConfig = new TaxibusOptimizerConfiguration(context, travelTime, travelDisutility, scheduler,
-				tbcg.getOutputDir());
+				tbcg.getOutputDir(),tbcg);
 
 		if (tbcg.getAlgorithmConfig().equals("line")) {
 
