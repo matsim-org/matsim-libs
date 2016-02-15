@@ -37,7 +37,10 @@ public class PlanCalcScoreConfigGroupTest {
 		ActivityParams ap = new ActivityParams("type1");
 		c.addActivityParams(ap);
 		Assert.assertEquals(ap, c.getActivityParams("type1"));
-		Assert.assertEquals(1, c.getActivityParams().size());
+
+		//		Assert.assertEquals(1, c.getActivityParams().size());
+		Assert.assertEquals(2, c.getActivityParams().size());
+		// yyyyyy see PlanCalcScoreConfigGroup, where I am currently adding car interaction activity hard-wired.  kai, feb'16
 	}
 
 	@Test

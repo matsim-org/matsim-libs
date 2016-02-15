@@ -396,11 +396,14 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private void arrangeAgentDeparture(final MobsimAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay();
 		Id<Link> linkId = agent.getCurrentLinkId();
-		Gbl.assertIf( linkId!=null );
+		Gbl.assertNonNull( linkId );
 		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, agent.getMode()));
+		Gbl.assertNonNull( this.departureHandlers );
 
 		for (DepartureHandler departureHandler : this.departureHandlers) {
-			if (departureHandler.handleDeparture(now, agent, linkId)) {
+			Gbl.assertNonNull(departureHandler);
+			final boolean result = departureHandler.handleDeparture(now, agent, linkId);
+			if (result) {
 				return;
 			}
 		}

@@ -73,7 +73,7 @@ VisData  {
 		Double speed = scenario.getConfig().plansCalcRoute().getOrCreateModeRoutingParams( agent.getMode() ).getTeleportedModeSpeed() ;
 		Facility<?> dpfac = agent.getCurrentFacility() ;
 		Facility<?> arfac = agent.getDestinationFacility() ;
-		travelTime = travelTimeCheckTmp(travelTime, speed, dpfac, arfac);
+		travelTime = travelTimeCheck(travelTime, speed, dpfac, arfac);
 		
 		double arrivalTime = now + travelTime ;
 		this.teleportationList.add(new Tuple<>(arrivalTime, agent));
@@ -89,37 +89,37 @@ VisData  {
 		return true;
 	}
 
-	private static Double travelTimeCheckTmp(Double travelTime, Double speed, Facility<?> dpfac, Facility<?> arfac) {
+	private static Double travelTimeCheck(Double travelTime, Double speed, Facility<?> dpfac, Facility<?> arfac) {
 		if ( speed==null ) {
 			// if we don't have a bushwhacking speed, the only thing we can do is trust the router
 			return travelTime ;
-		} else {
-			// yy maybe the activity has the coord?  this should rather be getCoordFromAct(...). kai, feb'16
-			// But we cannot do this since DriverAgent not necessarily has an activity.
-			
-
-			if ( dpfac.getCoord()==null || arfac.getCoord()==null ) {
-				// yy this is for example the case if activities are initialized at links, without coordinates.  Could use the link coordinate
-				// instead, but somehow this does not feel any better. kai, feb'16
-				
-				return travelTime ;
-			}
-
-			if ( speed != null && dpfac != null && arfac != null ) {
-				final Coord dpCoord = dpfac.getCoord();
-				final Coord arCoord = arfac.getCoord();
-				
-				double dist = NetworkUtils.getEuclidianDistance( dpCoord, arCoord ) ;
-				travelTime = dist / speed ; 
-			}
-			if ( travelTime == null ) {
-				log.warn( "speed = " + speed ) ;
-				log.warn( "dpfac = " + dpfac ) ;
-				log.warn( "arfac = " + arfac ) ;
-				throw new RuntimeException("bushwacking ttime cannot be determined; don't know what to do ...") ;
-			}
+		} 
+		
+		if ( dpfac == null || arfac == null ) {
+			log.warn( "dpfac = " + dpfac ) ;
+			log.warn( "arfac = " + arfac ) ;
+			throw new RuntimeException("have bushwhacking mode but nothing that leads to coordinates; don't know what to do ...") ;
+			// (means that the agent is not correctly implemented)
 		}
-		return travelTime;
+		
+		if ( dpfac.getCoord()==null || arfac.getCoord()==null ) {
+			// yy this is for example the case if activities are initialized at links, without coordinates.  Could use the link coordinate
+			// instead, but somehow this does not feel any better. kai, feb'16
+			
+			return travelTime ;
+		}
+			
+		final Coord dpCoord = dpfac.getCoord();
+		final Coord arCoord = arfac.getCoord();
+				
+		double dist = NetworkUtils.getEuclidianDistance( dpCoord, arCoord ) ;
+		double travelTimeTmp = dist / speed ;
+		
+		if ( travelTimeTmp < travelTime ) {
+			return travelTime ;
+		}
+			
+		return travelTimeTmp ;
 	}
 
 	@Override
