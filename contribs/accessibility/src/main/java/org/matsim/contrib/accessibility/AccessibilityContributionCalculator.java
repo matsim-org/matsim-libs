@@ -5,7 +5,7 @@ import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.facilities.ActivityFacility;
 
 /**
- * Interface to provide a mean to compute the utility of a given
+ * Interface to provide a means to compute the utility of a given
  * origin destination, for a given mode.
  * This includes travel time estimation and utility formulation.
  *

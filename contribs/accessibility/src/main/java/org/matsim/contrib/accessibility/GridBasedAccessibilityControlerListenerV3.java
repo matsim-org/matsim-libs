@@ -189,14 +189,14 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 		}
 		
 		UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter = null;
-		log.warn("here-1") ;
+//		log.warn("here-1") ;
 		if (urbanSimMode) {
 			if ( outputSubdirectory != null ) {
 				throw new RuntimeException("output subdirectory not null stems from separate accessibility computation per activity type.  "
 						+ "This is, however, not supported on the urbansim side, so using it in the urbansim mode does not make sense.  "
 						+ "Thus aborting ..." ) ;
 			}
-			log.warn("here0");
+//			log.warn("here0");
 			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
 			delegate.addFacilityDataExchangeListener(urbansimAccessibilityWriter);
 		}
@@ -358,7 +358,7 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 			log.warn("accessibilitySum = " + accessibilitySums);
 			accessibilityGiniCoefficients.put(mode, giniCoefficient);
 		}
-		log.info("Done with caluclating aggregate values!");
+		log.info("Done with calculating aggregate values!");
 	}
 	//
 

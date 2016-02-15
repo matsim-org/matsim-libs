@@ -249,7 +249,7 @@ import java.util.concurrent.ConcurrentHashMap;
 	}
 
 	
-	final void computeAccessibilities( Scenario scenario, Double departureTime ) {
+	final void computeAccessibilities(Scenario scenario, Double departureTime) {
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
 		// not using a simple double array for type safety in long argument lists. kai, feb'14
@@ -257,43 +257,20 @@ import java.util.concurrent.ConcurrentHashMap;
 			gcs[ii] = new SumOfExpUtils() ;
 		}
 
-
-		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
-		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
-		// ========================================================================
-		for ( ActivityFacility aFac : measuringPoints.getFacilities().values() ) {
-
-			// determine nearest network node (from- or toNode) based on the link
-			Node fromNode = NetworkUtils.getCloserNodeOnLink(aFac.getCoord(), ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(aFac.getCoord()));
-
-			// this is used as a key for hash map lookups
-			Id<Node> nodeId = fromNode.getId();
-
-			// create new entry if key does not exist!
-			if(!aggregatedOrigins.containsKey(nodeId)) {
-				aggregatedOrigins.put(nodeId, new ArrayList<ActivityFacility>());
-			}
-			// assign measure point (origin) to it's nearest node
-			aggregatedOrigins.get(nodeId).add(aFac);
-		}
-		// ========================================================================
-
-		log.info("");
-		log.info("Number of measurement points (origins): " + measuringPoints.getFacilities().values().size());
-		log.info("Number of aggregated measurement points (origins): " + aggregatedOrigins.size());
+		// Condense measuring points (origins) that have the same nearest node on the network
+		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode(
+				scenario);
 		log.info("Now going through all origins:");
-
-		ProgressBar bar = new ProgressBar( aggregatedOrigins.size() );
-		// ========================================================================
+		ProgressBar bar = new ProgressBar(aggregatedOrigins.size());
+		
 		// go through all nodes (keys) that have a measuring point (origin) assigned
-		for ( Id<Node> nodeId : aggregatedOrigins.keySet() ) {
-			
+		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
 			bar.update();
 
-			Node fromNode = scenario.getNetwork().getNodes().get( nodeId );
+			Node fromNode = scenario.getNetwork().getNodes().get(nodeId);
 
-			for ( AccessibilityContributionCalculator calculator : calculators.values() ) {
-				calculator.notifyNewOriginNode( fromNode, departureTime );
+			for (AccessibilityContributionCalculator calculator : calculators.values()) {
+				calculator.notifyNewOriginNode(fromNode, departureTime);
 			}
 
 			// get list with origins that are assigned to "fromNode"
@@ -339,6 +316,36 @@ import java.util.concurrent.ConcurrentHashMap;
 		for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 			zoneDataExchangeInterface.finish();
 		}
+	}
+
+	
+	/**
+	 * This method condenses measuring points (origins) that have the same nearest node on the network
+	 * @param scenario
+	 * @return
+	 */
+	private Map<Id<Node>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode(Scenario scenario) {
+		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
+		
+		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
+
+			// determine nearest network node (from- or toNode) based on the link
+			Node fromNode = NetworkUtils.getCloserNodeOnLink(measuringPoint.getCoord(),
+					((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(measuringPoint.getCoord()));
+
+			// this is used as a key for hash map lookups
+			Id<Node> nodeId = fromNode.getId();
+
+			// create new entry if key does not exist!
+			if(!aggregatedOrigins.containsKey(nodeId)) {
+				aggregatedOrigins.put(nodeId, new ArrayList<ActivityFacility>());
+			}
+			// assign measure point (origin) to it's nearest node
+			aggregatedOrigins.get(nodeId).add(measuringPoint);
+		}
+		log.info("Number of measurement points (origins): " + measuringPoints.getFacilities().values().size());
+		log.info("Number of aggregated measurement points (origins): " + aggregatedOrigins.size());
+		return aggregatedOrigins;
 	}
 
 	

@@ -41,19 +41,19 @@ public class AccessibilityComputationNairobiTest {
 		String folderStructure = "../../";
 		String networkFile = "matsimExamples/countries/ke/nairobi/2015-10-15_network.xml";
 
-		// adapt folder structure that may be different on different machines, esp. on server
+		// Adapt folder structure that may be different on different machines, esp. on server
 		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 
 		networkFile = folderStructure + networkFile ;
 		String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
 
 		
-		// minibus-pt
+		// Minibus-pt
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelDistanceMatrix.csv.gz";
 //		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/measuringPointsAsStops/stops.csv.gz";
 
-		// regular pt
+		// Regular pt
 //		String travelTimeMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
 //		String travelDistanceMatrixFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
 //		String ptStopsFile = folderStructure + "matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
@@ -72,7 +72,7 @@ public class AccessibilityComputationNairobiTest {
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 
 		
-		// config and scenario
+		// Config and scenario
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
@@ -82,14 +82,14 @@ public class AccessibilityComputationNairobiTest {
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.abort);
 
-		// some (otherwise irrelevant) settings to make the vsp check happy:
+		// Some (otherwise irrelevant) settings to make the vsp check happy:
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 
 		{
-			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings stratSets = new StrategySettings();
 			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			stratSets.setWeight(1.);
 			config.strategy().addStrategySettings(stratSets);
@@ -107,35 +107,37 @@ public class AccessibilityComputationNairobiTest {
 		double[] mapViewExtent = {xMin, yMin, xMax, yMax};
 		
 		
-		// no pt block
+		// No pt block
 
 		
 		assertNotNull(config);
 
 		
-		// collect activity types
+		// Collect activity types
 		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
-		log.warn( "found activity types: " + activityTypes );
-		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
-		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
+		log.info( "found activity types: " + activityTypes );
 		
-		// no collection of homes for Nairobi; was necessary for density layer, instead based on network. see below
-//		String activityFacilityType = "h";
-//		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
+		// No collection of homes for Nairobi, which necessary for the density layer. Here, the
+		// density layer is based on the network. see below
 
 		
-		// network density points
+		// Network density points
 		ActivityFacilities measuringPoints = 
 				AccessibilityRunUtils.createMeasuringPointsFromNetwork(scenario.getNetwork(), cellSize);
 		
 		double maximumAllowedDistance = 0.5 * cellSize;
 		final ActivityFacilities networkDensityFacilities = AccessibilityRunUtils.createNetworkDensityFacilities(
-				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);		
+				scenario.getNetwork(), measuringPoints, maximumAllowedDistance);
+		
 
+		// Start controller
 		final Controler controler = new Controler(scenario) ;
-		controler.addOverridingModule(new AccessibilityComputationTestModule(activityTypes, networkDensityFacilities, crs, name, cellSize));
+		controler.addOverridingModule(new AccessibilityComputationTestModule(
+				activityTypes, networkDensityFacilities, crs, name, cellSize));
 		controler.run();
+		
 
+		// QGis output
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();
@@ -144,7 +146,6 @@ public class AccessibilityComputationNairobiTest {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-//					if (!actType.equals("w")) {
 					if (!actType.equals(FacilityTypes.WORK)) {
 						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 						continue ;
@@ -156,5 +157,4 @@ public class AccessibilityComputationNairobiTest {
 			}  
 		}
 	}
-
 }

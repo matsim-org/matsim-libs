@@ -105,7 +105,7 @@ public class AccessibilityComputationNMBTest {
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 
 		{
-			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+			StrategySettings stratSets = new StrategySettings();
 			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 			stratSets.setWeight(1.);
 			config.strategy().addStrategySettings(stratSets);

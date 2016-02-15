@@ -153,7 +153,7 @@ public final class NetworkUtil {
 		 * and another link with no special slope to also test possible special cases.
 		 */
 		
-		NetworkImpl network = NetworkImpl.createNetwork();
+		NetworkImpl network = (NetworkImpl) NetworkUtils.createNetwork();
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
