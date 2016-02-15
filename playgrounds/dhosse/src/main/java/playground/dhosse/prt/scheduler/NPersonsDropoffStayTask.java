@@ -2,8 +2,8 @@ package playground.dhosse.prt.scheduler;
 
 import java.util.List;
 
-import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.schedule.TaxiDropoffTask;
+import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 
 public class NPersonsDropoffStayTask extends TaxiDropoffTask {
 

@@ -4,13 +4,13 @@ import java.io.PrintWriter;
 
 import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams;
-import playground.michalm.taxi.util.stats.*;
 import playground.michalm.util.MovingAgentsRegister;
 
 

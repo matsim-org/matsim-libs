@@ -4,11 +4,9 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.matsim.contrib.dvrp.data.Requests;
+import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-
-import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizer;
-import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
 
 public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
 	

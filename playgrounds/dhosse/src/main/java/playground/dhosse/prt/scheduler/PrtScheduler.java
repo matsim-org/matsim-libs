@@ -9,13 +9,12 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
+import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
+import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.core.router.util.*;
-
-import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
-import playground.michalm.taxi.optimizer.BestDispatchFinder;
-import playground.michalm.taxi.schedule.*;
-import playground.michalm.taxi.scheduler.*;
 
 public class PrtScheduler extends TaxiScheduler {
 

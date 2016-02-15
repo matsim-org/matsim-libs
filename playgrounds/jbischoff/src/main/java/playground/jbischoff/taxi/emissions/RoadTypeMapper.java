@@ -21,16 +21,10 @@ package playground.jbischoff.taxi.emissions;
 
 import java.util.Map.Entry;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkUtils;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.core.config.*;
+import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 

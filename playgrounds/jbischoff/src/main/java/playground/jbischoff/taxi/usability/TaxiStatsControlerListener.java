@@ -22,10 +22,9 @@ package playground.jbischoff.taxi.usability;
 import java.io.PrintWriter;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-
-import playground.michalm.taxi.util.stats.*;
 
 /**
  * @author  jbischoff

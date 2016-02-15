@@ -1,11 +1,11 @@
 package playground.dhosse.prt.optimizer;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.router.util.*;
 
 import playground.dhosse.prt.PrtConfigGroup;
-import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 
 public class PrtOptimizerConfiguration

@@ -1,29 +1,18 @@
 package playground.jbischoff.taxi.berlin.demand;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.io.*;
+import java.text.*;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.matrices.*;
 import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.Matrix;
 
 import playground.jbischoff.taxi.berlin.data.BeelineDistanceExractor;
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.Zone;
 
 
 public class BerlinTaxiDemandEvaluator

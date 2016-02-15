@@ -113,6 +113,7 @@
 		<module>cadytsIntegration</module>
 		<module>carsharing</module>
 		<module>dvrp</module>
+		<module>taxi</module>
 		<module>emissions</module>
 		<module>freight</module>
 		<module>gtfs2matsimtransitschedule</module>

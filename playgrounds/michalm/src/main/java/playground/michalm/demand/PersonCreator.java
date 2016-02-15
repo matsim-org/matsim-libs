@@ -20,8 +20,7 @@
 package playground.michalm.demand;
 
 import org.matsim.api.core.v01.population.*;
-
-import playground.michalm.zone.Zone;
+import org.matsim.contrib.zone.Zone;
 
 
 public interface PersonCreator
