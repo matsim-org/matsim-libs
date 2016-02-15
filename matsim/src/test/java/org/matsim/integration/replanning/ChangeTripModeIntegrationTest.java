@@ -51,14 +51,14 @@ import org.matsim.testcases.MatsimTestCase;
 /**
  * @author mrieser
  */
-public class ChangeLegModeIntegrationTest extends MatsimTestCase {
+public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 
 	public void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
 		final Config config = loadConfig(null);
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
-		strategySettings.setStrategyName("ChangeLegMode");
+		strategySettings.setStrategyName("ChangeTripMode");
 		strategySettings.setWeight(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 		config.setParam("changeLegMode", "modes", "car,walk");
