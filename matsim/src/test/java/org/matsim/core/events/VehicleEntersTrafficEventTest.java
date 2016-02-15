@@ -31,7 +31,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author mrieser
  */
-public class Wait2LinkEventTest extends MatsimTestCase {
+public class VehicleEntersTrafficEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final VehicleEntersTrafficEvent event1 = new VehicleEntersTrafficEvent(8463.7301, Id.create("483", Person.class), 
