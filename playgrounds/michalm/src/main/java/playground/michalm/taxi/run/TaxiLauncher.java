@@ -27,22 +27,22 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
-import org.matsim.contrib.taxi.TaxiUtils;
+import org.matsim.contrib.taxi.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
+import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
+import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.contrib.taxi.util.stats.StatsCollector.StatsCalculator;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.*;
 
-import playground.michalm.taxi.*;
-import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
+import playground.michalm.taxi.data.ETaxiData;
 import playground.michalm.taxi.data.file.*;
 import playground.michalm.taxi.ev.*;
-import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
-import playground.michalm.taxi.util.stats.*;
-import playground.michalm.taxi.util.stats.StatsCollector.StatsCalculator;
 
 
 class TaxiLauncher

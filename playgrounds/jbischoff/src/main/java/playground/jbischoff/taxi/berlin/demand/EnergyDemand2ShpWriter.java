@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.geotools.feature.simple.*;
 import org.matsim.api.core.v01.*;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -34,7 +35,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.vividsolutions.jts.geom.*;
 
 import playground.jbischoff.taxi.berlin.data.BeelineDistanceExractor;
-import playground.michalm.zone.Zone;
 
 
 public class EnergyDemand2ShpWriter

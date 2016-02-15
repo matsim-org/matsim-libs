@@ -5,12 +5,12 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
 import playground.dhosse.prt.scheduler.PrtScheduler;
-import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.*;
 
 public class NPersonsProblem {
 	

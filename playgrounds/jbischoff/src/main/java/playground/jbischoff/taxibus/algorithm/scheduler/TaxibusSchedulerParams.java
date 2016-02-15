@@ -19,7 +19,7 @@
 
 package playground.jbischoff.taxibus.algorithm.scheduler;
 
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
+import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
 
 /**
  * @author  jbischoff

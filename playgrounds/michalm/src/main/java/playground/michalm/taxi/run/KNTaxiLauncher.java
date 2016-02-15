@@ -26,13 +26,12 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.run.VrpPopulationUtils;
 import org.matsim.contrib.taxi.TaxiUtils;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
+import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams;
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
-import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
-import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 
 
 class KNTaxiLauncher

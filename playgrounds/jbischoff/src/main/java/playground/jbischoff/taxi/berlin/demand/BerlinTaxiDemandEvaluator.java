@@ -5,6 +5,7 @@ import java.text.*;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.matrices.*;
@@ -12,7 +13,6 @@ import org.matsim.matrices.Entry;
 
 import playground.jbischoff.taxi.berlin.data.BeelineDistanceExractor;
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.Zone;
 
 
 public class BerlinTaxiDemandEvaluator

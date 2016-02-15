@@ -25,13 +25,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.contrib.zone.*;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
-import playground.michalm.zone.Zone;
-import playground.michalm.zone.Zones;
 
 /**
  * @author  jbischoff

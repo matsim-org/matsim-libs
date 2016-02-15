@@ -30,18 +30,16 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
-import org.matsim.contrib.taxi.TaxiUtils;
+import org.matsim.contrib.taxi.*;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
+import org.matsim.contrib.taxi.optimizer.rules.*;
+import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.util.*;
 
 import com.google.inject.*;
-
-import playground.michalm.taxi.*;
-import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
-import playground.michalm.taxi.optimizer.rules.*;
-import playground.michalm.taxi.scheduler.*;
 
 
 /**

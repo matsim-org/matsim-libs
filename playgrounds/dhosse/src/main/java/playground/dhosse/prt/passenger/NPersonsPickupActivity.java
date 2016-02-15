@@ -6,9 +6,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-
-import playground.michalm.taxi.data.TaxiRequest;
 
 public class NPersonsPickupActivity implements PassengerPickupActivity {
 

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.taxi.TaxiUtils;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -38,7 +39,6 @@ import org.matsim.core.utils.io.tabularFileParser.*;
 import com.vividsolutions.jts.geom.*;
 
 import playground.michalm.berlin.BerlinZoneUtils;
-import playground.michalm.zone.Zone;
 
 
 /**
