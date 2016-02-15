@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -69,6 +70,12 @@ class ScenarioLoaderImpl {
 	private final MutableScenario scenario;
 
 	private Map<Class<?>, AttributeConverter<?>> attributeConverters = Collections.emptyMap();
+
+	@Inject
+	public void setAttributeConverters(Map<Class<?>, AttributeConverter<?>> attributeConverters) {
+		log.debug( "setting "+attributeConverters );
+		this.attributeConverters = attributeConverters;
+	}
 
 	ScenarioLoaderImpl(Config config) {
 		this.config = config;
