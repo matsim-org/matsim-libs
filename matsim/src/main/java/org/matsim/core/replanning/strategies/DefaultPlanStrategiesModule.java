@@ -101,9 +101,6 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
         if (usedStrategyNames.contains(DefaultStrategy.TimeAllocationMutator_ReRoute.toString())) {
             addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator_ReRoute.toString()).toProvider(TimeAllocationMutatorReRoutePlanStrategyProvider.class);
         }
-        if (usedStrategyNames.contains(DefaultStrategy.ChangeLegMode.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.ChangeLegMode.toString()).toProvider(ChangeLegModePlanStrategyProvider.class);
-        }
         if (usedStrategyNames.contains(DefaultStrategy.SubtourModeChoice.toString())) {
             addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice.toString()).toProvider(SubtourModeChoicePlanStrategyProvider.class);
         }
