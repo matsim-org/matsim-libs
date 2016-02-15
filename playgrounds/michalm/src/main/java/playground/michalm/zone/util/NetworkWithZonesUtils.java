@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 
-import playground.michalm.zone.*;
+import playground.michalm.zone.Zone;
 
 
 public class NetworkWithZonesUtils

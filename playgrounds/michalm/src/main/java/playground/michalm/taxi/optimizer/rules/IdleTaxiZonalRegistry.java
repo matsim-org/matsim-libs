@@ -32,7 +32,6 @@ import com.google.common.collect.*;
 import playground.michalm.taxi.schedule.TaxiStayTask;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.zone.*;
-import playground.michalm.zone.util.*;
 
 
 public class IdleTaxiZonalRegistry

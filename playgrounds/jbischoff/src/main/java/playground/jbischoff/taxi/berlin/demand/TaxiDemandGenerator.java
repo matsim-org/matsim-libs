@@ -22,7 +22,7 @@ package playground.jbischoff.taxi.berlin.demand;
 import java.util.Map;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
+import org.matsim.contrib.taxi.TaxiUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationWriter;

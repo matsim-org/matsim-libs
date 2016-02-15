@@ -17,35 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dynagent.run.DynConfigUtils;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.contrib.taxi.TaxiUtils;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 
 
-public class VrpConfigUtils
+public class TaxiConfigUtils
 {
     public static Config createConfig()
     {
-        Config config = DynConfigUtils.createConfig();
-        updateTravelTimeCalculatorConfigGroup(config);
+        Config config = VrpConfigUtils.createConfig();
+        updatePlansCalcRouteConfigGroup(config);
         return config;
     }
 
 
     public static Config loadConfig(final String file)
     {
-        Config config = DynConfigUtils.loadConfig(file);
-        updateTravelTimeCalculatorConfigGroup(config);
+        Config config = VrpConfigUtils.loadConfig(file);
+        updatePlansCalcRouteConfigGroup(config);
         return config;
     }
 
 
-    private static void updateTravelTimeCalculatorConfigGroup(Config config)
+    private static void updatePlansCalcRouteConfigGroup(Config config)
     {
-        TravelTimeCalculatorConfigGroup configGroup = config.travelTimeCalculator();
-        configGroup.setTravelTimeGetterType("average");
-        // configGroup.setTravelTimeGetterType("linearinterpolation");
+        ModeRoutingParams taxiParams = new ModeRoutingParams();
+        taxiParams.setMode(TaxiUtils.TAXI_MODE);
+        taxiParams.setTeleportedModeFreespeedFactor(1.1);//TODO probably should be larger than 1.0
+        config.plansCalcRoute().addModeRoutingParams(taxiParams);
     }
 }

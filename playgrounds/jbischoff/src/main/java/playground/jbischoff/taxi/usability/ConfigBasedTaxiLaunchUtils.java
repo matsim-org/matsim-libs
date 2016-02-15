@@ -19,15 +19,11 @@
  * *********************************************************************** */
 package playground.jbischoff.taxi.usability;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.contrib.dvrp.*;
+import org.matsim.core.controler.*;
 
 import playground.michalm.taxi.data.ETaxiData;
 import playground.michalm.taxi.data.file.*;
-import playground.michalm.taxi.ev.ETaxiUtils;
 
 /**
  * @author jbischoff

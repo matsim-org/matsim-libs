@@ -31,7 +31,6 @@ import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.zone.*;
-import playground.michalm.zone.util.*;
 
 
 public class RuleBasedTaxiOptimizer

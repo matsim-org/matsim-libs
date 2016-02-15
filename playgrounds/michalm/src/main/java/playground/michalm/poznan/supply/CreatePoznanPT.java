@@ -4,9 +4,8 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.*;
-import org.matsim.core.network.*;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;

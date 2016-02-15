@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
+import org.matsim.contrib.taxi.TaxiUtils;
 
 public class TaxiCustomerWaitHandler implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
 

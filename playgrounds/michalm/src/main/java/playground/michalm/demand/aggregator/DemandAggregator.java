@@ -26,7 +26,7 @@ import org.matsim.contrib.util.EnumCounter;
 import org.matsim.matrices.*;
 
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.*;
+import playground.michalm.zone.Zone;
 import playground.michalm.zone.util.ZoneFinder;
 
 

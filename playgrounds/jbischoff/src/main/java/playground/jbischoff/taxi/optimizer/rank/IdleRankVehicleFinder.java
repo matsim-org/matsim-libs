@@ -28,7 +28,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.util.DistanceUtils;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Iterables;
 
 import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.jbischoff.taxi.vehicles.ElectricTaxi;

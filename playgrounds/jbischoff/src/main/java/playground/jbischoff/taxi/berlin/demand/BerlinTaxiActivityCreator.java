@@ -26,11 +26,11 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
+import com.vividsolutions.jts.geom.*;
+
 import playground.michalm.berlin.BerlinZoneUtils;
 import playground.michalm.demand.DefaultActivityCreator;
 import playground.michalm.zone.Zone;
-
-import com.vividsolutions.jts.geom.*;
 
 
 public class BerlinTaxiActivityCreator

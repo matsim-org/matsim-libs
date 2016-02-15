@@ -32,7 +32,7 @@ import playground.michalm.demand.aggregator.*;
 import playground.michalm.demand.taxi.ServedRequests;
 import playground.michalm.poznan.zone.PoznanZones;
 import playground.michalm.util.matrices.*;
-import playground.michalm.zone.*;
+import playground.michalm.zone.Zone;
 import playground.michalm.zone.util.*;
 
 

@@ -19,12 +19,6 @@
 
 package playground.michalm.taxi.optimizer.mip;
 
-import org.apache.commons.configuration.Configuration;
-
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams;
-import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
-
-
 public class MIPTaxiOptimizerParams
 //    extends TaxiOptimizerParams
 {

@@ -20,19 +20,13 @@
 
 package playground.jbischoff.taxi.usability;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.*;
 import org.matsim.facilities.Facility;
 
 /**

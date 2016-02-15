@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.extensions.taxi;
+package org.matsim.contrib.taxi;
 
 public class TaxiUtils
 {

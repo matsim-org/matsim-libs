@@ -24,8 +24,8 @@ import java.util.*;
 import org.apache.commons.configuration.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.run.VrpPopulationUtils;
+import org.matsim.contrib.taxi.TaxiUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams;

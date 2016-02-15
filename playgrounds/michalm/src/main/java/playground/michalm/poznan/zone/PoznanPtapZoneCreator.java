@@ -5,7 +5,7 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 
 import playground.michalm.util.visum.VisumMatrixReader;
-import playground.michalm.zone.*;
+import playground.michalm.zone.Zone;
 import playground.michalm.zone.io.ZoneXmlWriter;
 
 
