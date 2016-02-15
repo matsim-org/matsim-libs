@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
-import java.io.File;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -38,6 +36,8 @@ import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
+
+import java.io.File;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -60,7 +60,6 @@ import org.matsim.vehicles.VehicleReaderV1;
 class ScenarioLoaderImpl {
 
 	private static final Logger log = Logger.getLogger(ScenarioLoaderImpl.class);
-
 
 	private final Config config;
 
