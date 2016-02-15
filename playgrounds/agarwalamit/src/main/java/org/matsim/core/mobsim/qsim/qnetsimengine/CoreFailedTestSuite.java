@@ -18,45 +18,34 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.matsim.core.controler.ControlerTest;
-import org.matsim.core.mobsim.qsim.FlowStorageSpillbackTest;
-import org.matsim.core.mobsim.qsim.QSimTest;
-import org.matsim.core.mobsim.qsim.TransitQueueNetworkTest;
-import org.matsim.examples.EquilTest;
-import org.matsim.modules.ScoreStatsModuleTest;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorTest;
-
-
 /**
  * @author amit
  */
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-	
-	FlowStorageSpillbackTest.class, //testFlowCongestion
-	EquilTest.class, //testEquil
-	TravelTimeCollectorTest.class, //testGetLinkTravelTime
-	ControlerTest.class, //testTravelTimeCalculation
-//	ReRoutingTest.class,  //testReRoutingFastAStarLandmarks --probably moved to contrib-- amit feb 2016
-	ScoreStatsModuleTest.class,//testScoreStats
-	
-	/*
-	 * flowacc must be updated before doSimStep(now) step. That's why both tests are failing.
-	 */
-	QLinkTest.class, //	testBuffer, testStorageSpaceDifferentVehicleSizes 
-
-	/*
-	 * rounding errors for e.g. remaining flowcap is 0.00000000001 and therefore can allow next vehicle.
-	 */
-	QSimTest.class, //testFlowCapacityDriving, testFlowCapacityStarting, testFlowCapacityMixed --
-	
-//	StorageCapOnSimultaneousSpillBackTest.class,//storageCapTest4BottleneckLink , moved to my playground.
-	TransitQueueNetworkTest.class //testNonBlockingStop_FirstLink, testBlockingStop_FirstLink
-})
-
-public class CoreFailedTestSuite {
-
-}
+//@RunWith(Suite.class)
+//@Suite.SuiteClasses({
+//	
+//	FlowStorageSpillbackTest.class, //testFlowCongestion
+//	EquilTest.class, //testEquil
+//	TravelTimeCollectorTest.class, //testGetLinkTravelTime
+//	ControlerTest.class, //testTravelTimeCalculation
+////	ReRoutingTest.class,  //testReRoutingFastAStarLandmarks --probably moved to contrib-- amit feb 2016
+//	ScoreStatsModuleTest.class,//testScoreStats
+//	
+//	/*
+//	 * flowacc must be updated before doSimStep(now) step. That's why both tests are failing.
+//	 */
+//	QLinkTest.class, //	testBuffer, testStorageSpaceDifferentVehicleSizes 
+//
+//	/*
+//	 * rounding errors for e.g. remaining flowcap is 0.00000000001 and therefore can allow next vehicle.
+//	 */
+//	QSimTest.class, //testFlowCapacityDriving, testFlowCapacityStarting, testFlowCapacityMixed --
+//	
+////	StorageCapOnSimultaneousSpillBackTest.class,//storageCapTest4BottleneckLink , moved to my playground.
+//	TransitQueueNetworkTest.class //testNonBlockingStop_FirstLink, testBlockingStop_FirstLink
+//})
+//
+//public class CoreFailedTestSuite {
+//
+//}
