@@ -229,14 +229,14 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	        NetworkRoute networkRoute = RouteUtils.createNetworkRoute(experiencedRoute, null);
 	        networkRoute.setTravelTime(travelTime);
         
-	        /* use the relative position of vehicle enter/leave traffic events on first/last links 
+	        /* use the relative position of vehicle enter/leave traffic events on first/last links
 	         * to calculate the correct route distance including the first/last link. 
 	         * (see MATSIM-227) tt feb'16
 	         */
 	        double relativePositionOnDepartureLink = relPosOnDepartureLinkPerPerson.get(event.getPersonId());
-	        double relativePositionOnArrivalLink = relPosOnArrivalLinkPerPerson.get(event.getPersonId());
-	        networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, relativePositionOnDepartureLink, 
-	        		relativePositionOnArrivalLink, network));
+		    double relativePositionOnArrivalLink = relPosOnArrivalLinkPerPerson.get(event.getPersonId());
+		    networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, relativePositionOnDepartureLink, 
+		    		relativePositionOnArrivalLink, network));
 	        
 	        leg.setRoute(networkRoute);
 	    } else if ((pendingTransitTravel = transitTravels.remove(event.getPersonId())) != null) {
