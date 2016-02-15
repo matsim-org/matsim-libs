@@ -209,7 +209,7 @@ public class ExtractTripModeSharesAroundBellevue {
 		for ( Leg l : trip.getLegsOnly() ) {
 			final Route r = l.getRoute();
 			if ( USE_NET_DIST && r instanceof NetworkRoute )  {
-				dist += RouteUtils.calcDistance( (NetworkRoute) r , network );
+				dist += RouteUtils.calcDistanceExcludingStartEndLink( (NetworkRoute) r , network );
 			}
 			else {
 				// TODO: make configurable?

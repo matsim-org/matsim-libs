@@ -79,7 +79,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistance(route, this.network));
+			route.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route, this.network));
 			leg.setRoute(route);
 			travTime = (int) path.travelTime;
 		} else {

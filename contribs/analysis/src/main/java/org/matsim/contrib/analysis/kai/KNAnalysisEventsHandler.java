@@ -277,7 +277,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 					break;
 				case legDistances:
 					if ( leg.getRoute() instanceof NetworkRoute ) {
-						item = RouteUtils.calcDistance( ((NetworkRoute)leg.getRoute()), this.scenario.getNetwork() ) ;
+						item = RouteUtils.calcDistanceExcludingStartEndLink( ((NetworkRoute)leg.getRoute()), this.scenario.getNetwork() ) ;
 					} else if ( leg.getRoute()!=null && !Double.isNaN( leg.getRoute().getDistance() ) )  {
 						item = leg.getRoute().getDistance() ;
 					} else {

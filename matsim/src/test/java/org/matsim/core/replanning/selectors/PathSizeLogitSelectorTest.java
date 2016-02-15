@@ -102,7 +102,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l1.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
-		r.setDistance(RouteUtils.calcDistance(r, network));
+		r.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(r, network));
 		leg.setRoute(r);
 		p1.addActivity(a);
 		p1.addLeg(leg);
@@ -125,7 +125,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(l2.getId());
 		srcRoute.add(l3.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
-		r.setDistance(RouteUtils.calcDistance(r, network));
+		r.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(r, network));
 		leg.setRoute(r);
 		p2.addActivity(a);
 		p2.addLeg(leg);
@@ -146,7 +146,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(l4.getId());
 		srcRoute.add(l5.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
-		r.setDistance(RouteUtils.calcDistance(r, network));
+		r.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(r, network));
 		leg.setRoute(r);
 		p3.addActivity(a);
 		p3.addLeg(leg);
@@ -172,7 +172,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l1.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
-		r.setDistance(RouteUtils.calcDistance(r, network));
+		r.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(r, network));
 		leg.setRoute(r);
 		p1.addActivity(a);
 		p1.addLeg(leg);
@@ -204,7 +204,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l1.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
-		r.setDistance(RouteUtils.calcDistance(r, network));
+		r.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(r, network));
 		leg.setRoute(r);
 		p1.addActivity(a);
 		p1.addLeg(leg);
@@ -238,7 +238,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l1.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
-		r.setDistance(RouteUtils.calcDistance(r, network));
+		r.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(r, network));
 		leg.setRoute(r);
 		p1.addActivity(a);
 		p1.addLeg(leg);
@@ -258,7 +258,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(l2.getId());
 		srcRoute.add(l3.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
-		r.setDistance(RouteUtils.calcDistance(r, network));
+		r.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(r, network));
 		leg.setRoute(r);
 		p2.addActivity(a);
 		p2.addLeg(leg);
@@ -279,7 +279,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		srcRoute.add(l4.getId());
 		srcRoute.add(l5.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
-		r.setDistance(RouteUtils.calcDistance(r, network));
+		r.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(r, network));
 		leg.setRoute(r);
 		p3.addActivity(a);
 		p3.addLeg(leg);

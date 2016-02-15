@@ -45,7 +45,7 @@ public class PathCostsNetwork extends PathCosts {
 			networkRoute.setLinkIds(fromLinkId, NetworkUtils.getLinkIds(path.links), toLinkId);
 			networkRoute.setTravelTime(path.travelTime);
 			networkRoute.setTravelCost(path.travelCost);
-			networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, this.network));
+			networkRoute.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(networkRoute, this.network));
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			route.setTravelTime(0);

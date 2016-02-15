@@ -775,7 +775,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link3.getId());
 			route1.setLinkIds(link1.getId(), Arrays.asList(link2.getId()), link3.getId());
 			route1.setTravelTime(firstLegTravelTime);
-			route1.setDistance(RouteUtils.calcDistance(route1, this.network));
+			route1.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route1, this.network));
 			route1.setVehicleId(Id.createVehicleId("dummyVehicle1"));
 			leg.setRoute(route1);
 
