@@ -28,42 +28,39 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.analysis.PersonArrivalAnalyzer;
 
-
 /**
  * @author amit
  */
 
 public class EvacProgress {
 
-	private int shortestPathRunIteration = 0;
-	private int NERunIteration = 100;
+	private final int shortestPathRunIteration = 0;
+	private final int NERunIteration = 100;
 
-	private String dir = "../../../repos/runs-svn/patnaIndia/run105/1pct/evac_passing/";
-
+	private final String dir = "../../../repos/runs-svn/patnaIndia/run105/1pct/evac_passing/";
 
 	public static void main(String[] args) {
 		new EvacProgress().runAndWrite();
 	}
 
-
 	public void runAndWrite (){
 
-		String eventsFile_sp = dir+"/ITERS/it."+shortestPathRunIteration+"/"+shortestPathRunIteration+".events.xml.gz";
-		String eventsFile_ne = dir+"/ITERS/it."+NERunIteration+"/"+NERunIteration+".events.xml.gz";
+		String eventsFileSP = dir+"/ITERS/it."+shortestPathRunIteration+"/"+shortestPathRunIteration+".events.xml.gz";
+		String eventsFileNE = dir+"/ITERS/it."+NERunIteration+"/"+NERunIteration+".events.xml.gz";
 
-		PersonArrivalAnalyzer arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFile_sp, dir+"output_config.xml.gz"); 
+		PersonArrivalAnalyzer arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileSP, dir+"output_config.xml.gz"); 
 		arrivalAnalyzer.run();
-		SortedMap<String,SortedMap<Integer, Integer>> evacProgress_sp = arrivalAnalyzer.getTimeBinToNumberOfArrivals();
+		SortedMap<String,SortedMap<Integer, Integer>> evacProgressSP = arrivalAnalyzer.getTimeBinToNumberOfArrivals();
 
-		arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFile_ne, dir+"output_config.xml.gz"); 
+		arrivalAnalyzer = new PersonArrivalAnalyzer(eventsFileNE, dir+"output_config.xml.gz"); 
 		arrivalAnalyzer.run();
-		SortedMap<String,SortedMap<Integer, Integer>>  evacProgress_ne = arrivalAnalyzer.getTimeBinToNumberOfArrivals();
+		SortedMap<String,SortedMap<Integer, Integer>>  evacProgressNE = arrivalAnalyzer.getTimeBinToNumberOfArrivals();
 
 		String outFile = dir+"/analysis/evacuationProgress.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
 		
 		SortedSet<Integer> timeBins = new TreeSet<>();
-		timeBins.addAll(evacProgress_sp.get(TransportMode.car).keySet());
+		timeBins.addAll(evacProgressSP.get(TransportMode.car).keySet());
 
 		try {
 			writer.write("hourOfTheDay \t");//\t  \t  \n
@@ -72,19 +69,19 @@ public class EvacProgress {
 			}
 			writer.newLine();
 			
-			for(String mode : evacProgress_sp.keySet()){
+			for(String mode : evacProgressSP.keySet()){
 				writer.write("numberOfEvacueeShortestPath_"+mode+"\t");
-				for (Integer ii : evacProgress_sp.get(mode).keySet()){
-					writer.write(evacProgress_sp.get(mode).get(ii)+"\t");
+				for (Integer ii : evacProgressSP.get(mode).keySet()){
+					writer.write(evacProgressSP.get(mode).get(ii)+"\t");
 				}
 				writer.newLine();
 			}
 			writer.newLine();
 			
-			for(String mode : evacProgress_ne.keySet()){
+			for(String mode : evacProgressNE.keySet()){
 				writer.write("numberOfEvacueeNashEq_"+mode+"\t");
-				for (Integer ii : evacProgress_ne.get(mode).keySet()){
-					writer.write(evacProgress_ne.get(mode).get(ii)+"\t");
+				for (Integer ii : evacProgressNE.get(mode).keySet()){
+					writer.write(evacProgressNE.get(mode).get(ii)+"\t");
 				}
 				writer.newLine();
 			}
@@ -94,6 +91,5 @@ public class EvacProgress {
 			throw new RuntimeException("Data is not written in file. Reason: "
 					+ e);
 		}
-
 	}
 }

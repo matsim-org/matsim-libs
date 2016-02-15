@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.eunoia.scoring;
 
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule;
+import eu.eunoiaproject.bikesharing.scoring.StepBasedFare;
+import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -28,15 +32,9 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.pt.PtConstants;
-
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 import playground.thibautd.router.multimodal.DenivelationAlongRouteScoring;
 import playground.thibautd.router.multimodal.LinkSlopeScorer;
-
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule;
-import eu.eunoiaproject.bikesharing.scoring.StepBasedFare;
-import eu.eunoiaproject.bikesharing.scoring.StepBasedFareConfigGroup;
 
 /**
  * @author thibautd

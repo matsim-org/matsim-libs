@@ -1,9 +1,5 @@
 package playground.johannes.gsv.analysis;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -12,8 +8,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -21,18 +17,17 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.*;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.gsv.sim.RailCountsCollector;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Analyzer {
 	
@@ -49,7 +44,7 @@ public class Analyzer {
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
 		
 		TransitScheduleReader schedReader = new TransitScheduleReader(scenario);
@@ -100,7 +95,7 @@ public class Analyzer {
 					Activity act = (Activity) plan.getPlanElements().get(i);
 					Id<ActivityFacility> id = Id.create("autofacility_"+ i +"_" + person.getId().toString(), ActivityFacility.class);
 					ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, act.getCoord());
-					fac.createActivityOption(act.getType());
+					fac.createAndAddActivityOption(act.getType());
 					
 					((ActivityImpl)act).setFacilityId(id);
 				}

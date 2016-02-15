@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacility;
 
@@ -131,9 +131,9 @@ public class ParkingOccupancyMaintainer {
 		this.parkingArrivalDepartureLog = parkingArrivalLog;
 	}
 
-	private Controler controler;
+	private MatsimServices controler;
 
-	public ParkingOccupancyMaintainer(Controler controler) {
+	public ParkingOccupancyMaintainer(MatsimServices controler) {
 		this.controler = controler;
 
 		// initialize currentParkingOccupancy based on plans

@@ -1,0 +1,151 @@
+% This file was created with JabRef 2.9.2.
+% Encoding: ISO8859_1
+
+@MASTERSTHESIS{Bischoff2010BaSylvia,
+  author = {Bischoff, J.},
+  title = {{Verkehrsabh{\"a}ngige Lichtsignalanlagensteuerung -- Vergleich und
+	simulationsbasierte Evaluation}},
+  year = {2010},
+  month = {December},
+  abstract = {Verkehrsabh{\"a}ngige Lichtsignalanlagensteuerungen sind ein geeignetes
+	Mittel, flexibel auf schwankende Verkehrsnachfragen zu reagieren.
+	Sie k{\"o}nnen sich zeitnah an die tats{\"a}chliche Nachfrage anpassen.
+	Weltweit gibt es dabei unterschiedliche Steuerungsverfahren. Im Rahmen
+	dieser Arbeit wird zun{\"a}chst ein Vergleich verschiedener Verfahren
+	erstellt. Dabei werden sowohl etablierte Industrieverfahren wie etwa
+	SCOOT und MOTION betrachtet als auch solche, die bisher nur Gegenstand
+	universit{\"a}rer Forschung sind. Im zweiten Teil der Arbeit wird
+	ein Teil der in Deutschland genutzten SYLVIA-Steuerung in der Verkehrssimulation
+	{MATSim} umgesetzt. Hierzu erfolgt eine Anpassung der in SYLVIA enthaltenden
+	Phasenl{\"a}ngensteuerung auf Zeitl{\"u}ckenbasis. Um einen fl{\"a}chendeckenden
+	Einsatz in bestehenden {MATSim}-Szenarien zu erm{\"o}glichen, wurde
+	zudem ein Algorithmus zur automatischen Grundplangenerierung erstellt.
+	Durch eine flexible Zwangsdehnung kann dabei eine konstante Umlaufzeit
+	gehalten werden. Die Evaluation erfolgt dabei an Hand eines Szenarios,
+	dass eine Nachfrage des Pendlerverkehrs in und um Cottbus darstellt.
+	Diese wurde um eine variable Menge zum Stadion fahrender Fu\ss{}ballfans
+	erg{\"a}nzt. Die umgesetzte Steuerung erzielt in der Simulation gute
+	Ergebnisse und f{\"u}hrt mit steigender Fananzahl zu deutlichen Reisezeitverk{\"u}rzungen
+	gegen{\"u}ber der existierenden Festzeitsteuerung. Adaptive and actuated
+	traffic control systems are an appropriate method to react flexibly
+	to fluctuating traffic demand. They allow a real time adaption to
+	the actual traffic flow. This thesis gives a comparison of existing
+	control systems. It includes well-established systems such as SCOOT
+	and MOTION and systems still under research in university studies.
+	In the second part of the thesis an element of the SYLVIA controller
+	used in Germany is implemented in {MATSim}. SYLVIA's gap-based traffic
+	actuated phase length controller is adapted in order to achieve this.
+	Furthermore, an algorithm for an automatic generation of a minimum
+	plan has been developed which allows the integration into any existing
+	{MATSim} scenario. By using a flexible forced stretch mechanism the
+	cycle length is held at a constant value. To evaluate the controller,
+	a scenario describing the flow of commuter traffic in Cottbus, Germany
+	is used. A variable number of football fans travelling to the stadium
+	are added to the commuter flow. The implemented controller scores
+	good results: In comparison with a plan-based controller a considerable
+	travel time reduction is achieved (despite the growing number of
+	fans).},
+  crossref = {BachelorsThesisVsp},
+  file = {Bischoff2010BaSylvia:2010/Bischoff2010BaSylvia.pdf:PDF},
+  howpublished = {Bachelor Thesis, Berlin Institute of Technology},
+  owner = {dgrether},
+  projectname = {dgrether},
+  timestamp = {2011.01.12},
+  vspwp = {./.}
+}
+
+@MASTERSTHESIS{Neumann2008DA,
+  author = {Neumann, A.},
+  title = {{Modellierung und Evaluation von Lichtsignalanlagen in Queue-Simulationen}},
+  year = {2008},
+  crossref = {DiplomArbeitVsp},
+  file = {Neumann2008DA:2008/Neumann2008DA.pdf:PDF},
+  owner = {lsoltani},
+  projectname = {dgrether},
+  timestamp = {2010.09.02},
+  vspwp = {08-24}
+}
+
+@MASTERSTHESIS{Roeder2010BachelorGershenson,
+  author = {R{\"o}der, D.},
+  title = {{Modellierung und Simulation einer adaptiven Steuerung f{\"u}r Lichtsignalanlagen
+	in Queue-Simulationen}},
+  year = {2010},
+  abstract = {Planbasierte Lichtsignalanlagensteuerungen sind nicht in der Lage
+	auf eine stark schwankende Verkehrsnachfrage zu reagieren. Ein m{\"o}glicher
+	Ansatz dieses Problem zu l{\"o}sen ist eine verkehrsadaptive Steuerung,
+	die sich zeitnah der aktuellen Nachfrage anpasst. Um die Funktionsf{\"a}higkeit
+	solcher Steuerungen zu testen, wird im Rahmen dieser Arbeit ein bestehender
+	Algorithmus an {MATSim} angepasst und implementiert. Die Leistungs-
+	und Funktionsf{\"a}higkeit wird anhand von zwei Szenarien {\"u}berpr{\"u}ft.
+	Der implementierte Algorithmus liefert gute Ergebnisse, die sich
+	in den Dimensionen einer mathematisch optimierten Festzeitsteuerung
+	bewegen. Eine reale Umsetzung erscheint jedoch fraglich, oder sogar
+	ausgeschlossen. Zun{\"a}chst ist eine variable Umlaufzeit bei der
+	Planung von Lichtsignalanlagen un{\"u}blich, beziehungsweise durch
+	die entsprechenden Richtlinien sogar ausgeschlossen. Des Weiteren
+	ber{\"u}cksichtigt der Algorithmus nur den motorisierten Verkehr.
+	Fu\ss{}g{\"a}nger, Radfahrer, sowie der {\"O}PNV finden jedoch bei
+	der Planung von Lichtsignalanlagen im Allgemeinen besondere Ber{\"u}cksichtigung.
+	Sie haben dementsprechend einen gro\ss{}en Einfluss auf die Freigabezeiten
+	f{\"u}r den motorisierten Verkehr, so dass eine Simulation ohne Ber{\"u}cksichtigung
+	dieser Verkehrsteilnehmer nur bedingt sinnvoll erscheint. Dar{\"u}ber
+	hinaus bedarf es einer Vielzahl an Daten {\"u}ber das aktuelle Verkehrsgeschehen.
+	Um diese zu erhalten werden gro\ss{}e Mengen an Sensorik ben{\"o}tigt,
+	deren Anschaffung sehr teuer ist. Plan-based traffic light controllers
+	are not able to react if the traffic flow changes rapidly. A possible
+	solution is an adaptive controller, having the ability to react on
+	a changing traffic flow. To check the functional capability of such
+	controllers an existing algorithm is aligned and implemented in {MATSim}.
+	The efficiency is checked with two scenarios. The implemented algorithm
+	shows a high efficiency. It is able to compete against mathematical
+	optimized plan-based controllers. However the usability in a real
+	world scenario seems to be problematic. First of all a variable time
+	of circulation is unusual, respectively it is forbidden accordingly
+	to actual guidelines for traffic light systems. Furthermore the algorithm
+	considered only motorized private transport, even though pedestrian,
+	biker and the public transport have a high influence to release times
+	for the motorized private transport. Beyond that very much sensor
+	technology is necessary to get the data used by the algorithm.},
+  comment = {ok},
+  crossref = {BachelorsThesisVsp},
+  file = {Roeder2010BachelorGershenson.pdf:2010/Roeder2010BachelorGershenson.pdf:PDF},
+  howpublished = {Bachelorarbeit der TU Berlin},
+  owner = {dgrether},
+  projectname = {dgrether},
+  timestamp = {2010.05.31},
+  vspwp = {./.}
+}
+
+@ARTICLE{GretherNeumannNagel2012SignalsQueueModelABMTrans,
+  author = {Grether, D. and Neumann, A. and Nagel, K.},
+  title = {Simulation of Urban Traffic Control: A Queue Model Approach},
+  journal = {Procedia Computer Science},
+  year = {2012},
+  volume = {10},
+  pages = {808--814},
+  annote = {article, not proceedings},
+  booktitle = {The 2nd International Workshop on Agent-based Mobility, Traffic and
+	Transportation Models, Methodologies and Applications},
+  doi = {10.1016/j.procs.2012.06.104},
+  file = {GretherNeumannNagel2012SignalsQueueModel.pdf:2012/GretherNeumannNagel2012SignalsQueueModel.pdf:PDF},
+  howpublished = {1st International Workshop on Agent-based Mobility, Traffic and Transportation
+	Models, Methodologies and Applications},
+  keywords = {urban traffic control, queue model, microsimulation},
+  owner = {dgrether},
+  projectname = {bmbf-advest},
+  timestamp = {2012.05.15},
+  vspwp = {12-03}
+}
+
+@PHDTHESIS{Grether2014PhD,
+  author = {Grether, D. S.},
+  title = {Extension of a Multi-Agent Transport Simulation for Traffic Signal
+	Control and Air Transport Systems},
+  school = {Technische Universit{\"a}t Berlin},
+  year = {2014},
+  file = {Grether2014PhD.pdf:2014/Grether2014PhD.pdf:PDF},
+  owner = {dgrether},
+  timestamp = {2014.05.30}
+}
+

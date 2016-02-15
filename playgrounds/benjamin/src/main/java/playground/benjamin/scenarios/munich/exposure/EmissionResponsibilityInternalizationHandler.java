@@ -27,8 +27,7 @@ import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
-
+import org.matsim.core.controler.MatsimServices;
 
 
 /**
@@ -40,7 +39,7 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 	EventsManager eventsManager;
 	EmissionResponsibilityCostModule emissionResponsibilityCostModule;
 
-	public EmissionResponsibilityInternalizationHandler(Controler controler, EmissionResponsibilityCostModule emissionCostModule) {
+	public EmissionResponsibilityInternalizationHandler(MatsimServices controler, EmissionResponsibilityCostModule emissionCostModule) {
 		this.eventsManager = controler.getEvents();
 		this.emissionResponsibilityCostModule = emissionCostModule;
 	}
@@ -74,7 +73,6 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 	private void calculateWarmEmissionCostsAndThrowEvent(WarmEmissionEvent event) {
 		Id personId = event.getVehicleId();
 		double time = event.getTime();
-		System.out.println("person id" + personId.toString());
 		double warmEmissionCosts = emissionResponsibilityCostModule.calculateWarmEmissionCosts(event.getWarmEmissions(), event.getLinkId(), time);
 		double amount2Pay = - warmEmissionCosts;
 		

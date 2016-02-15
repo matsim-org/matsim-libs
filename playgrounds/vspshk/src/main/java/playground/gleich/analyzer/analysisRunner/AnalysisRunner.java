@@ -21,7 +21,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -433,7 +433,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 
 	private void rBvgAna(){
 		VehDelayAtStopHistogramAnalyzer cda = new VehDelayAtStopHistogramAnalyzer(100);
-		cda.init((ScenarioImpl) scenario);
+		cda.init((MutableScenario) scenario);
 		cda.preProcessData();
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = cda.getEventHandler();
@@ -447,7 +447,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 		cda.writeResults(outputDirectory + "/BvgAna/");
 		
 		PtTripTravelTimeTransfersAnalyzer transfer = new PtTripTravelTimeTransfersAnalyzer();
-		transfer.init((ScenarioImpl) scenario);
+		transfer.init((MutableScenario) scenario);
 		transfer.preProcessData();
 		EventsManager events2 = EventsUtils.createEventsManager();
 		List<EventHandler> handler2 = transfer.getEventHandler();
@@ -478,7 +478,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	
 	private void rCarDistanceAnalyzer() {
 		CarDistanceAnalyzer cda = new CarDistanceAnalyzer();
-		cda.init((ScenarioImpl) scenario);
+		cda.init((MutableScenario) scenario);
 		cda.preProcessData();
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = cda.getEventHandler();
@@ -495,7 +495,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	private void rEmissionsAnalyzer() {
 		 //insert emissions event file
 		EmissionsAnalyzer ema = new EmissionsAnalyzer("Z:/WinHome/ArbeitWorkspace/Analyzer/output/test1/ITERS/it.10/10.events.xml.gz");
-		ema.init((ScenarioImpl) scenario);
+		ema.init((MutableScenario) scenario);
 		ema.preProcessData();
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = ema.getEventHandler();
@@ -519,7 +519,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	
 	private void rMonetaryPaymentsAnalyzer(){
 		MonetaryPaymentsAnalyzer mpa = new MonetaryPaymentsAnalyzer();
-		mpa.init((ScenarioImpl) scenario);
+		mpa.init((MutableScenario) scenario);
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = mpa.getEventHandler();
 		for(EventHandler eh : handler){
@@ -575,7 +575,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	}
 	
 	private void rPtCircuityAnalysis(){
-		ScenarioImpl sc = (ScenarioImpl) scenario;
+		MutableScenario sc = (MutableScenario) scenario;
 		Vehicles vehicles = sc.getTransitVehicles();
 		PtCircuityAnalyzer analysis = new PtCircuityAnalyzer(scenario, vehicles);
 		analysis.preProcessData();
@@ -593,7 +593,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	
 	private void rPtDriverPrefix(){
 		PtDriverIdAnalyzer pda = new PtDriverIdAnalyzer();
-		pda.init((ScenarioImpl)scenario);
+		pda.init((MutableScenario)scenario);
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = pda.getEventHandler();
 		for(EventHandler eh : handler){
@@ -609,7 +609,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 		
 		Map<Id<TransitLine>, TransitLine> lines = scenario.getTransitSchedule().getTransitLines();
 		//scenario.getScenarioElement(vehicles)
-		ScenarioImpl sc = (ScenarioImpl) scenario;
+		MutableScenario sc = (MutableScenario) scenario;
 
 		Vehicles vehicles = sc.getTransitVehicles();
 		//(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices)
@@ -651,7 +651,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	
 	private void rPtOperator(){
 		PtOperatorAnalyzer poa = new PtOperatorAnalyzer();
-		poa.init((ScenarioImpl)scenario);
+		poa.init((MutableScenario)scenario);
 		poa.preProcessData();
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = poa.getEventHandler();
@@ -683,7 +683,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 		
 		Map<Id<TransitLine>, TransitLine> lines = scenario.getTransitSchedule().getTransitLines();
 		//scenario.getScenarioElement(vehicles)
-		ScenarioImpl sc = (ScenarioImpl) scenario;
+		MutableScenario sc = (MutableScenario) scenario;
 
 		Vehicles vehicles = sc.getTransitVehicles();
 		//(Map<Id, TransitLine> lines, Vehicles vehicles, double interval in seconds, int maxSlices)
@@ -797,7 +797,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 		
 	private void rTravelTimeAnalyzer() {
 		TravelTimeAnalyzer tt = new TravelTimeAnalyzer();
-		tt.init((ScenarioImpl) scenario);
+		tt.init((MutableScenario) scenario);
 		tt.preProcessData();
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = tt.getEventHandler();
@@ -813,7 +813,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 
 	private void rUserBenefits() {
 		UserBenefitsAnalyzer uba = new UserBenefitsAnalyzer();
-		uba.init((ScenarioImpl) scenario);
+		uba.init((MutableScenario) scenario);
 		uba.preProcessData();
 		(new File(outputDirectory + "/UserBenefits")).mkdir(); 
 		uba.writeResults(outputDirectory + "/UserBenefits/");
@@ -822,7 +822,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	
 	private void rWaitingTimes(){
 		WaitingTimesAnalyzer tt = new WaitingTimesAnalyzer();
-		tt.init((ScenarioImpl) scenario);
+		tt.init((MutableScenario) scenario);
 		tt.preProcessData();
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = tt.getEventHandler();
@@ -838,7 +838,7 @@ Information: Building backing store for org.geotools.referencing.factory.epsg.Th
 	
 	private void rWelfareAnalyzer(){
 		WelfareAnalyzer tt = new WelfareAnalyzer();
-		tt.init((ScenarioImpl) scenario);
+		tt.init((MutableScenario) scenario);
 		tt.preProcessData();
 		EventsManager events = EventsUtils.createEventsManager();
 		List<EventHandler> handler = tt.getEventHandler();

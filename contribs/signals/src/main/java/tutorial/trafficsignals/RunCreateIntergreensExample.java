@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package tutorial.trafficsignals;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
@@ -60,7 +62,7 @@ public class RunCreateIntergreensExample {
 	}
 	
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		String configFile = new RunCreateTrafficSignalScenarioExample().run();
 		Config config = ConfigUtils.loadConfig(configFile);
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseIntergreenTimes(true);

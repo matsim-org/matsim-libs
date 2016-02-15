@@ -19,20 +19,18 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.qsim;
 
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.collections.MapUtils;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
-
-import org.matsim.core.utils.collections.MapUtils;
 
 /**
  * A {@link BikeSharingManager} meant to simulate the "best case" relocation strategy,

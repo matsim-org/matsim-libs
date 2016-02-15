@@ -37,12 +37,12 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.DgPaths;
@@ -165,7 +165,7 @@ public class CMCFScenarioGeneratorNoReroute {
 			configOut = config1Out;
 		}
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = scenario.getConfig();
 
 		this.network = scenario.getNetwork();
@@ -173,14 +173,14 @@ public class CMCFScenarioGeneratorNoReroute {
 	}
 
 	private void createPlans() throws Exception {
-		this.plans = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		this.plans = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		int firstHomeEndTime = 0;// 6 * 3600;
 		int homeEndTime = firstHomeEndTime;
 		Link l1 = this.network.getLinks().get(Id.create(1, Link.class));
 		Link l6 = this.network.getLinks().get(Id.create(6, Link.class));
 
 		for (int i = 1; i <= 7200; i++) {
-			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
+			Person p = PopulationUtils.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
 			// home % 2

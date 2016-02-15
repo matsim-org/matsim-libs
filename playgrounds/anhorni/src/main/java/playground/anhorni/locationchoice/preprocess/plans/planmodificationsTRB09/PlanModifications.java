@@ -103,7 +103,7 @@ public class PlanModifications {
 
 
 		this.network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkfilePath);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfilePath);
 		log.info("network reading done");
 
 		//this.facilities=new Facilities();

@@ -19,12 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.framework.cliques.population.CliquesSchemaNames;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
@@ -34,7 +31,9 @@ import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
-import org.matsim.contrib.socnetsim.framework.cliques.population.CliquesSchemaNames;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 /**
  * @author thibautd

@@ -26,7 +26,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.XY2Links;
@@ -45,7 +45,7 @@ public class DgOTFVisUtils {
 		c.logEntries();
 	}
 	
-	public static void locateAndRoutePopulation(ScenarioImpl scenario){
+	public static void locateAndRoutePopulation(MutableScenario scenario){
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new XY2Links(scenario));
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(
@@ -63,7 +63,7 @@ public class DgOTFVisUtils {
 						new TripRouterFactoryBuilderWithDefaults().build(
 								scenario ).get(
 						) );
-		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (ScenarioImpl) scenario);
+		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (MutableScenario) scenario);
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			pp4s.run(p);
 		}

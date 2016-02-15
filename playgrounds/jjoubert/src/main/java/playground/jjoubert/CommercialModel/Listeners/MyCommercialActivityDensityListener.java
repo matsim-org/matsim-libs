@@ -43,8 +43,8 @@ public class MyCommercialActivityDensityListener implements IterationStartsListe
 
 	public void notifyIterationStarts(IterationStartsEvent event) {
 
-		event.getControler();
-		String outputCommercialActivityDensityFilename = event.getControler().getControlerIO().getIterationPath(event.getIteration()) + "/" + event.getIteration() + ".eventsTruckMinor.txt";
+		event.getServices();
+		String outputCommercialActivityDensityFilename = event.getServices().getControlerIO().getIterationPath(event.getIteration()) + "/" + event.getIteration() + ".eventsTruckMinor.txt";
 		try {
 			this.outputCommercialActivityDensity = new BufferedWriter(new FileWriter(new File( outputCommercialActivityDensityFilename )));
 			this.outputCommercialActivityDensity.write("Long");
@@ -57,13 +57,13 @@ public class MyCommercialActivityDensityListener implements IterationStartsListe
 			e.printStackTrace();
 		}
 
-        Network nw = event.getControler().getScenario().getNetwork();
+        Network nw = event.getServices().getScenario().getNetwork();
 		this.cs = new MyCommercialActivityDensityWriter(this.outputCommercialActivityDensity, nw);
-		event.getControler().getEvents().addHandler(this.cs);
+		event.getServices().getEvents().addHandler(this.cs);
 	}	
 	
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		event.getControler().getEvents().removeHandler(this.cs);
+		event.getServices().getEvents().removeHandler(this.cs);
 		try {
 			this.outputCommercialActivityDensity.close();
 		} catch (IOException e) {

@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
-
-import org.matsim.core.utils.collections.MapUtils;
 
 /**
  * merges object attributes files to stdout

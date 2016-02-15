@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.router;
 
+import org.matsim.core.router.StageActivityTypes;
+
 import java.util.ArrayList;
 import java.util.Collection;
-
-import org.matsim.core.router.StageActivityTypes;
 
 
 /**

@@ -24,6 +24,7 @@
  */ 
 package floetteroed.opdyts.searchalgorithms;
 
+import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 
@@ -32,14 +33,14 @@ import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
  * @author Gunnar Flötteröd
  *
  */
-public interface Simulator {
+public interface Simulator<U extends DecisionVariable> {
 
 	/**
 	 * Implements the same functionality as run(TrajectorySampler, null).
 	 */
-	public SimulatorState run(TrajectorySampler evaluator);
+	public SimulatorState run(TrajectorySampler<U> evaluator);
 
-	public SimulatorState run(TrajectorySampler evaluator,
+	public SimulatorState run(TrajectorySampler<U> evaluator,
 			SimulatorState initialState);
 
 }

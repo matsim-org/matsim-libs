@@ -24,7 +24,7 @@ import java.util.Collection;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -36,7 +36,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class CottbusUtils {
 
-	public static ScenarioImpl loadCottbusScenrio(boolean fixedTimeSignals){
+	public static MutableScenario loadCottbusScenrio(boolean fixedTimeSignals){
 		Config c2 = ConfigUtils.createConfig();
 		c2.qsim().setUseLanes(true);
 		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
@@ -50,7 +50,7 @@ public class CottbusUtils {
 		else {
 			ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(DgCottbusScenarioPaths.SIGNAL_CONTROL_SYLVIA_FILENAME);
 		}
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.loadScenario(c2);
+		MutableScenario sc = (MutableScenario) ScenarioUtils.loadScenario(c2);
 		return sc;
 	}
 	

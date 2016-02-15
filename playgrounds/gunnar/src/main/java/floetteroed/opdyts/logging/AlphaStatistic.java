@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.opdyts.logging;
 
 import java.util.ArrayList;
@@ -37,7 +37,8 @@ import floetteroed.utilities.statisticslogging.Statistic;
  * @author Gunnar Flötteröd
  *
  */
-public class AlphaStatistic implements Statistic<SamplingStage<?>> {
+public class AlphaStatistic<U extends DecisionVariable> implements
+		Statistic<SamplingStage<U>> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -65,7 +66,7 @@ public class AlphaStatistic implements Statistic<SamplingStage<?>> {
 	}
 
 	@Override
-	public String value(final SamplingStage<?> data) {
+	public String value(final SamplingStage<U> data) {
 		final StringBuffer result = new StringBuffer(Double.toString(data
 				.getAlphaSum(this.decisionVariables.get(0))));
 		for (int i = 1; i < this.decisionVariables.size(); i++) {

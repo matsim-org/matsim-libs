@@ -59,7 +59,7 @@ public class TaxiOfflineEmissionTool {
 		
 		Config config = ConfigUtils.createConfig(ecg);
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.createLookupTables();

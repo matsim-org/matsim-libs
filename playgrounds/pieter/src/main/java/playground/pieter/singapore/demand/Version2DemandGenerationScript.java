@@ -21,7 +21,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.*;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
@@ -38,7 +38,7 @@ public class Version2DemandGenerationScript {
 	private static final double DEFAULT_LEISURE_HOME_DEPARTTIME = Time
 			.parseTime("09:00:00");
 	private InputDataCollection inputData;
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private DataBaseAdmin dba;
 	private Properties diverseScriptProperties;
 	private Logger scriptLog;
@@ -52,7 +52,7 @@ public class Version2DemandGenerationScript {
 		this.diverseScriptProperties = new Properties();
 		this.diverseScriptProperties.load(new FileInputStream(new File(
 				otherProperties)));
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
 		scriptLog = Logger.getLogger("DemandGenScript");
 		scriptLog.info("Starting.");

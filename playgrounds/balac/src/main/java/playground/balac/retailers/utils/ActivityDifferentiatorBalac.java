@@ -14,7 +14,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
@@ -32,7 +32,7 @@ public class ActivityDifferentiatorBalac {
 		private final double groceryShare = 0.3;
 		private final int groceryShopsNumber = 200;
 		private int numberOfShopActs;
-		private final ScenarioImpl scenario;
+		private final MutableScenario scenario;
 		private ArrayList<Id> groceryFacilities = new ArrayList<Id>();
 		private TreeMap<Id<ActivityFacility>,ActivityFacility> shopFacilities = new TreeMap<Id<ActivityFacility>,ActivityFacility>();
 		//private final String retailersFacilitiesPath = "../../matsim/input/triangle/Retailers.txt";
@@ -43,7 +43,7 @@ public class ActivityDifferentiatorBalac {
 
 		
 				
-		public ActivityDifferentiatorBalac(ScenarioImpl scenario) {
+		public ActivityDifferentiatorBalac(MutableScenario scenario) {
 			this.scenario = scenario;
 			this.shopFacilities= this.scenario.getActivityFacilities().getFacilitiesForActivityType("shop");
 		}
@@ -113,7 +113,7 @@ public class ActivityDifferentiatorBalac {
 			//	SortedSet<OpeningTime> openingTimesFri = ao.getOpeningTimes(DayType.fri);
 				if (this.groceryFacilities.contains(af.getId())) {
 					
-					afi.createActivityOption("shopgrocery");
+					afi.createAndAddActivityOption("shopgrocery");
 					afi.getActivityOptions().get("shopgrocery").setCapacity(capacity);
 					
 					if  (!(openingTimesWkday==null)) {
@@ -155,7 +155,7 @@ public class ActivityDifferentiatorBalac {
 					
 				}
 				else { 
-					afi.createActivityOption("nongrocery");
+					afi.createAndAddActivityOption("nongrocery");
 				afi.getActivityOptions().get("nongrocery").setCapacity(capacity);
 				if  (!(openingTimesWkday==null)) {
 					for (OpeningTime openingTime: openingTimesWkday){

@@ -124,7 +124,7 @@ public class AutonomousVehicle {
         }
     }
 
-    public void incServiceDistance(long serviceDistance) {
+    public void incServiceDistance(double serviceDistance) {
         if (serviceDistance >= 0) {
             totalServiceDistance += serviceDistance;
         } else {

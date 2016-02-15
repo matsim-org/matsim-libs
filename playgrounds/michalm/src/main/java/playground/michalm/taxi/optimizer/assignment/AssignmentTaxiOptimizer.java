@@ -22,6 +22,9 @@ package playground.michalm.taxi.optimizer.assignment;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Requests;
+import org.matsim.contrib.locationchoice.router.*;
+import org.matsim.core.router.*;
+import org.matsim.core.router.util.RoutingNetwork;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -30,15 +33,29 @@ import playground.michalm.taxi.optimizer.*;
 public class AssignmentTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    public AssignmentTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
+    private final MultiNodeDijkstra router;
+    private final BackwardFastMultiNodeDijkstra backwardRouter;
+
+
+    public AssignmentTaxiOptimizer(TaxiOptimizerContext optimContext)
     {
-        super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
+        super(optimContext, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
+
+        router = new MultiNodeDijkstra(optimContext.context.getScenario().getNetwork(),
+                optimContext.travelDisutility, optimContext.travelTime, true);
+
+        FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
+        RoutingNetwork routingNetwork = new InverseArrayRoutingNetworkFactory(null)
+                .createRoutingNetwork(optimContext.context.getScenario().getNetwork());
+        backwardRouter = new BackwardFastMultiNodeDijkstra(routingNetwork,
+                optimContext.travelDisutility, optimContext.travelTime, null, fastRouterFactory,
+                true);
     }
 
 
     protected void scheduleUnplannedRequests()
     {
-        new AssignmentProblem(optimConfig)
+        new AssignmentProblem(optimContext, router, backwardRouter)
                 .scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
     }
 }

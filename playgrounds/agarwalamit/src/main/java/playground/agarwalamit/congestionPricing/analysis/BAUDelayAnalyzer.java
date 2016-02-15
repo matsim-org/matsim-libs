@@ -32,11 +32,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
-import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.analysis.congestion.CrossMarginalCongestionEventsWriter;
+import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
  * (1) Read events file and write congestion events for desired implementation.
@@ -65,7 +64,7 @@ public class BAUDelayAnalyzer {
 	private String congestionImpl;
 	
 
-	private final PersonFilter pf = new PersonFilter();
+	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	
 	public static void main(String[] args) {
 		BAUDelayAnalyzer analyzer = new BAUDelayAnalyzer("implV3");
@@ -89,7 +88,7 @@ public class BAUDelayAnalyzer {
 			writer.write("timeBin \t personId \t userGroup \t delayInHr \n");
 			for (double d : timeBin2CausingPerson2Delay.keySet()){
 				for (Id<Person> personId : timeBin2CausingPerson2Delay.get(d).keySet()){
-					writer.write(d+"\t"+personId+"\t"+getUserGroupFromPersonId(personId)+"\t"+timeBin2CausingPerson2Delay.get(d).get(personId) / 3600+"\n");
+					writer.write(d+"\t"+personId+"\t"+pf.getUserGroupFromPersonId(personId)+"\t"+timeBin2CausingPerson2Delay.get(d).get(personId) / 3600+"\n");
 				}
 			}
 			writer.close();
@@ -116,7 +115,7 @@ public class BAUDelayAnalyzer {
 		try {
 			writer.write("personId\tuserGroup\taffectedDelayInHr\tcausedDelayInHr\n");
 			for (Id<Person> id :causedPerson2Delay.keySet()){
-				writer.write(id+"\t"+getUserGroupFromPersonId(id)+"\t"+affectedperson2Delay.get(id) / 3600+"\t"+causedPerson2Delay.get(id) / 3600+"\n");
+				writer.write(id+"\t"+pf.getUserGroupFromPersonId(id)+"\t"+affectedperson2Delay.get(id) / 3600+"\t"+causedPerson2Delay.get(id) / 3600+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
@@ -134,7 +133,7 @@ public class BAUDelayAnalyzer {
 		
 		Config config = scenario.getConfig();
 
-		double vtts_car = ((config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600) +
+		double vttsCar = ((config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600) +
 				(config.planCalcScore().getPerforming_utils_hr()/3600)) 
 				/ (config.planCalcScore().getMarginalUtilityOfMoney());
 
@@ -161,7 +160,7 @@ public class BAUDelayAnalyzer {
 					 */
 					if(delay!=0 && count==0) throw new RuntimeException("Delay is not zero whereas person count is zero. Can not happen. Aborting...");
 					else if(delay !=0 && count !=0 )  {
-						avgToll = vtts_car * ( delay / count);
+						avgToll = vttsCar * ( delay / count);
 					}
 					writer.write(d+"\t"+linkId+"\t"+avgToll+"\n");	
 				}
@@ -174,9 +173,8 @@ public class BAUDelayAnalyzer {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin);
-		personAnalyzer.preProcessData();
-		personAnalyzer.postProcessData();
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, scenario.getConfig().qsim().getEndTime());
+		personAnalyzer.run();
 		return personAnalyzer.getTimeBin2AffectedPersonId2Delay();
 	}
 	
@@ -184,14 +182,5 @@ public class BAUDelayAnalyzer {
 		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(congestionEventsFile, scenario, noOfTimeBin);
 		delayAnalyzer.run();
 		return delayAnalyzer.getTimeBin2CausingPersonId2Delay();
-	}
-	
-	private UserGroup getUserGroupFromPersonId(Id<Person> presonId){
-		for(UserGroup ug :UserGroup.values()){
-			if(pf.isPersonIdFromUserGroup(presonId, ug)){
-				return ug;
-			}
-		}
-		return null;
 	}
 }

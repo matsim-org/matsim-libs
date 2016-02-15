@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.network.NetworkImpl;
@@ -39,21 +39,21 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 
 	private final static Logger log = Logger.getLogger(ExtractChoiceSetsRoutingTest.class);
 
-//	private Controler controler = null;
-	public ExtractChoiceSetsRoutingTest(Controler controler) {
+//	private Controler services = null;
+	public ExtractChoiceSetsRoutingTest(MatsimServices controler) {
 
-//		this.controler = controler;
+//		this.services = services;
 
 	}
 	@Override
 	public void notifyAfterMobsim(final AfterMobsimEvent event) {
-		if (event.getIteration() < event.getControler().getConfig().controler().getLastIteration()) {
+		if (event.getIteration() < event.getServices().getConfig().controler().getLastIteration()) {
 			return;
 		}
-		computeChoiceSet(event.getControler());
+		computeChoiceSet(event.getServices());
 	}
 
-	protected void computeChoiceSet(Controler controler) {
+	protected void computeChoiceSet(MatsimServices controler) {
 
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 
@@ -69,7 +69,7 @@ public class ExtractChoiceSetsRoutingTest implements AfterMobsimListener {
 	}
 
 
-	private LegImpl computeLeg(ActivityImpl fromAct, ActivityImpl toAct, Controler controler) {
+	private LegImpl computeLeg(ActivityImpl fromAct, ActivityImpl toAct, MatsimServices controler) {
 		Person person = PersonImpl.createPerson(Id.create("1", Person.class));
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		PlanRouterAdapter router = new PlanRouterAdapter( controler );

@@ -19,7 +19,9 @@
 
 package playground.jbischoff.av.run;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -37,22 +39,28 @@ import playground.jbischoff.taxi.evaluation.TravelDistanceTimeEvaluator;
 public class EventsAnalyser {
 
 	public static void main(String[] args) {
-		String pre = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/";
-		String inputFile = pre+"events.out.xml";
+		String pre = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/";
+		String inputFile = pre+"runs/xx_with_events/21_jb/nullevents21.out.xml.gz";
 		EventsManager events = EventsUtils.createEventsManager();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(pre+"networkc.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(pre+"scenario/networkc.xml.gz");
+		
 		TravelDistanceTimeEvaluator tdtc = new TravelDistanceTimeEvaluator(scenario.getNetwork(), 24*3600);
 		TaxiCustomerWaitTimeAnalyser twc = new TaxiCustomerWaitTimeAnalyser(scenario, Double.MAX_VALUE);
 		events.addHandler(twc);
+		for (int i = 0; i<10000;i++){
+			String v = "rt"+i;
+			Id<Vehicle> m = Id.create(v,Vehicle.class);
+			tdtc.addAgent(m);
+		}
 		events.addHandler(tdtc);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(inputFile);
 		
 		twc.printTaxiCustomerWaitStatistics();
-		twc.writeCustomerWaitStats(pre+"waitstats.txt");
+		twc.writeCustomerWaitStats(pre+"runs/xx_with_events/waitstats.txt");
 		tdtc.printTravelDistanceStatistics();
-		tdtc.writeTravelDistanceStatsToFiles(pre+"distanceStats");
+		tdtc.writeTravelDistanceStatsToFiles(pre+"runs/xx_with_events/distanceStats");
 				
 		
 	}

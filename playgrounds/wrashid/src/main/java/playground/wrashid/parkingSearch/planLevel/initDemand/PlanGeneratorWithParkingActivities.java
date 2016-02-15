@@ -29,7 +29,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -42,19 +42,19 @@ public class PlanGeneratorWithParkingActivities {
 
 	ClosestParkingMatrix closestParkingMatrix;
 	NetworkImpl network;
-	ScenarioImpl scenario;
+	MutableScenario scenario;
 
-	public ScenarioImpl getScenario() {
+	public MutableScenario getScenario() {
 		return scenario;
 	}
 
 	public PlanGeneratorWithParkingActivities(String inputPlansFilePath, String networkFilePath, String facilitiesFilePath) {
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFilePath);
 
 		this.network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFilePath);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilePath);
 
 		this.closestParkingMatrix = new ClosestParkingMatrix(scenario.getActivityFacilities(), network);
 

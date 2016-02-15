@@ -19,15 +19,14 @@
 
 package eu.eunoiaproject.bikesharing.framework.router;
 
-import java.util.List;
-
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.MainModeIdentifier;
 
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import java.util.List;
 
 public class BikeSharingModeIdentifier implements MainModeIdentifier {
 	private final MainModeIdentifier delegate;

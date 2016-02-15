@@ -52,7 +52,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -115,7 +115,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestInVehicleDelay01(scenario);
 		fillScheduleTestInVehicleDelay01(scenario);
@@ -219,7 +219,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	wParams.setTypicalDuration(3600.);
 	config.planCalcScore().addActivityParams(wParams);
 	
-	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 	
 	setPopulationTestInVehicleDelay02(scenario);
 	fillScheduleTestInVehicleDelay02(scenario);
@@ -339,7 +339,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		setPopulationTestInVehicleDelay03(scenario);
 		fillScheduleTestInVehicleDelay03(scenario);
@@ -498,7 +498,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		setPopulationTestWaitingDelay01(scenario);
 		fillScheduleTestWaitingDelay01(scenario);
@@ -597,7 +597,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay02(scenario);
 		fillScheduleTestWaitingDelay02(scenario);
@@ -698,7 +698,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay03(scenario);
 		fillScheduleTestWaitingDelay03(scenario);
@@ -806,7 +806,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 			
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay03b(scenario);
 		fillScheduleTestWaitingDelay03b(scenario);
@@ -907,7 +907,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay04(scenario);
 		fillScheduleTestWaitingDelay04(scenario);
@@ -1028,7 +1028,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay05(scenario);
 		fillScheduleTestWaitingDelay05(scenario);
@@ -1149,7 +1149,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay06(scenario);
 		fillScheduleTestWaitingDelay06(scenario);
@@ -1268,7 +1268,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestCapacityDelay01(scenario);
 		fillScheduleTestCapacityDelay01(scenario);
@@ -1339,7 +1339,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestCapacityDelay02(scenario);
 		fillScheduleTestCapacityDelay02(scenario);
@@ -1407,7 +1407,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestCapacityDelay03(scenario);
 		fillScheduleTestCapacityDelay03(scenario);
@@ -1487,7 +1487,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestCapacityDelay04(scenario);
 		fillScheduleTestCapacityDelay04(scenario);
@@ -1564,7 +1564,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		setPopulationTestCapacityDelay05(scenario);
 		fillScheduleTestCapacityDelay05(scenario);
@@ -2009,7 +2009,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillScheduleTestInVehicleDelay01(ScenarioImpl scenario) {
+	private void fillScheduleTestInVehicleDelay01(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -2101,7 +2101,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestInVehicleDelay01(ScenarioImpl scenario) {
+	private void fillVehicleTestInVehicleDelay01(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -2208,7 +2208,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 		
-	private void fillScheduleTestInVehicleDelay02(ScenarioImpl scenario) {
+	private void fillScheduleTestInVehicleDelay02(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -2300,7 +2300,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestInVehicleDelay02(ScenarioImpl scenario) {
+	private void fillVehicleTestInVehicleDelay02(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 	
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -2523,7 +2523,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 
-	private void fillScheduleTestInVehicleDelay03(ScenarioImpl scenario) {
+	private void fillScheduleTestInVehicleDelay03(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -2615,7 +2615,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestInVehicleDelay03(ScenarioImpl scenario) {
+	private void fillVehicleTestInVehicleDelay03(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -2798,7 +2798,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	
 	}
 	
-	private void fillScheduleTestWaitingDelay01(ScenarioImpl scenario) {
+	private void fillScheduleTestWaitingDelay01(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -2890,7 +2890,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestWaitingDelay01(ScenarioImpl scenario) {
+	private void fillVehicleTestWaitingDelay01(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -3073,7 +3073,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillScheduleTestWaitingDelay02(ScenarioImpl scenario) {
+	private void fillScheduleTestWaitingDelay02(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -3165,7 +3165,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestWaitingDelay02(ScenarioImpl scenario) {
+	private void fillVehicleTestWaitingDelay02(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -3348,7 +3348,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillScheduleTestWaitingDelay03(ScenarioImpl scenario) {
+	private void fillScheduleTestWaitingDelay03(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -3447,7 +3447,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestWaitingDelay03(ScenarioImpl scenario) {
+	private void fillVehicleTestWaitingDelay03(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -3634,7 +3634,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillScheduleTestWaitingDelay03b(ScenarioImpl scenario) {
+	private void fillScheduleTestWaitingDelay03b(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -3733,7 +3733,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestWaitingDelay03b(ScenarioImpl scenario) {
+	private void fillVehicleTestWaitingDelay03b(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -3933,7 +3933,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillScheduleTestWaitingDelay04(ScenarioImpl scenario) {
+	private void fillScheduleTestWaitingDelay04(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -4025,7 +4025,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestWaitingDelay04(ScenarioImpl scenario) {
+	private void fillVehicleTestWaitingDelay04(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -4221,7 +4221,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillScheduleTestWaitingDelay05(ScenarioImpl scenario) {
+	private void fillScheduleTestWaitingDelay05(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -4313,7 +4313,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestWaitingDelay05(ScenarioImpl scenario) {
+	private void fillVehicleTestWaitingDelay05(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -4532,7 +4532,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillScheduleTestWaitingDelay06(ScenarioImpl scenario) {
+	private void fillScheduleTestWaitingDelay06(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -4713,7 +4713,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestWaitingDelay06(ScenarioImpl scenario) {
+	private void fillVehicleTestWaitingDelay06(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -4917,7 +4917,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 
-	private void fillScheduleTestCapacityDelay01(ScenarioImpl scenario) {
+	private void fillScheduleTestCapacityDelay01(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -5023,7 +5023,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestCapacityDelay01(ScenarioImpl scenario) {
+	private void fillVehicleTestCapacityDelay01(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -5227,7 +5227,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillScheduleTestCapacityDelay02(ScenarioImpl scenario) {
+	private void fillScheduleTestCapacityDelay02(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -5333,7 +5333,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestCapacityDelay02(ScenarioImpl scenario) {
+	private void fillVehicleTestCapacityDelay02(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -5563,7 +5563,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 
-	private void fillScheduleTestCapacityDelay03(ScenarioImpl scenario) {
+	private void fillScheduleTestCapacityDelay03(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -5669,7 +5669,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestCapacityDelay03(ScenarioImpl scenario) {
+	private void fillVehicleTestCapacityDelay03(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -5886,7 +5886,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 
-	private void fillScheduleTestCapacityDelay04(ScenarioImpl scenario) {
+	private void fillScheduleTestCapacityDelay04(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -5992,7 +5992,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestCapacityDelay04(ScenarioImpl scenario) {
+	private void fillVehicleTestCapacityDelay04(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
@@ -6222,7 +6222,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 
-	private void fillScheduleTestCapacityDelay05(ScenarioImpl scenario) {
+	private void fillScheduleTestCapacityDelay05(MutableScenario scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -6328,7 +6328,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void fillVehicleTestCapacityDelay05(ScenarioImpl scenario) {
+	private void fillVehicleTestCapacityDelay05(MutableScenario scenario) {
 		Vehicles veh = scenario.getTransitVehicles();
 
 		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);

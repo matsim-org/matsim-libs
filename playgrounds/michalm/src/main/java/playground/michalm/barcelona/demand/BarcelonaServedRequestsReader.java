@@ -24,7 +24,7 @@ import java.text.*;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.core.utils.geometry.*;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.michalm.demand.taxi.ServedRequest;

@@ -30,10 +30,10 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
@@ -44,7 +44,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -81,7 +81,7 @@ public class MixedLaneTest {
 	 */
 	@Test
 	public void testFixture(){
-		LaneDefinitions20 lanes = this.fixture.sc.getLanes();
+		Lanes lanes = this.fixture.sc.getLanes();
 		Assert.assertNotNull(lanes);
 		Assert.assertNotNull(lanes.getLanesToLinkAssignments());
 		LanesToLinkAssignment20 lanesLink1 = lanes.getLanesToLinkAssignments().get(fixture.id1);
@@ -132,7 +132,7 @@ public class MixedLaneTest {
 		if (reduceCap){
 			fixture.sc.getConfig().qsim().setStartTime(3500.0);
 			fixture.sc.getConfig().qsim().setEndTime(7200.0);
-			LaneDefinitions20 lanes = fixture.sc.getLanes();
+			Lanes lanes = fixture.sc.getLanes();
 			Lane lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.laneId1);
 			lane1.setCapacityVehiclesPerHour(1800.0);
 			Lane lane1ol = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.link1FirstLaneId);
@@ -197,7 +197,7 @@ public class MixedLaneTest {
 		
 		if (reduceCap){
 			// reduce capacity on lane 1
-			LaneDefinitions20 lanes = fixture.sc.getLanes();
+			Lanes lanes = fixture.sc.getLanes();
 			Lane lane1 = lanes.getLanesToLinkAssignments().
 					get(fixture.id1).getLanes().get(fixture.laneId1);
 			lane1.setCapacityVehiclesPerHour(1800.0);
@@ -287,7 +287,7 @@ public class MixedLaneTest {
 
 
 	private static class MixedLanesEventsHandler implements LaneEnterEventHandler, LinkEnterEventHandler, 
-		LaneLeaveEventHandler, PersonDepartureEventHandler, Wait2LinkEventHandler {
+		LaneLeaveEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler {
 
 		LaneEnterEvent lastLane1olEnterEvent = null;
 		LaneLeaveEvent lastLane1olLeaveEvent = null;
@@ -352,7 +352,7 @@ public class MixedLaneTest {
 		}
 
 		@Override
-		public void handleEvent(Wait2LinkEvent event) {
+		public void handleEvent(VehicleEntersTrafficEvent event) {
 			vehId2DriverId.put(event.getVehicleId(), event.getPersonId());
 		}
 

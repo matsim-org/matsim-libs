@@ -32,7 +32,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -42,7 +42,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class StopId2LineId2PulkAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(StopId2LineId2PulkAnalyzer.class);
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	
 	private StopId2LineId2PulkHandler handler;
 	private TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> stopId2LineId2Pulk;
@@ -51,7 +51,7 @@ public class StopId2LineId2PulkAnalyzer extends AbstractAnalysisModule{
 		super(StopId2LineId2PulkAnalyzer.class.getSimpleName());
 	}
 	
-	public void init(ScenarioImpl scenario) {
+	public void init(MutableScenario scenario) {
 		this.scenario = scenario;
 		this.handler = new StopId2LineId2PulkHandler();
 	}

@@ -32,15 +32,6 @@ public class TransitRouterModule extends AbstractModule {
     public void install() {
         if (getConfig().transit().isUseTransit()) {
             bind(TransitRouter.class).toProvider(TransitRouterImplFactory.class);
-        } else {
-            bind(TransitRouter.class).toProvider(DummyTransitRouterFactory.class);
-        }
-    }
-
-    static class DummyTransitRouterFactory implements Provider<TransitRouter> {
-        @Override
-        public TransitRouter get() {
-            throw new RuntimeException("Transit not enabled.");
         }
     }
 

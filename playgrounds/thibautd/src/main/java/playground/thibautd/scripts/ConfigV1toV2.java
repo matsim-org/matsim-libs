@@ -20,9 +20,9 @@
 package playground.thibautd.scripts;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.ConfigReader;
 
 /**
  * @author thibautd

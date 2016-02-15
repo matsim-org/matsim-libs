@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PlanImpl;
@@ -94,7 +94,7 @@ public abstract class Utils
     return facilityQuadTree;
   }
 
-  public static final QuadTree<ActivityFacility> createFacilityQuadTree(Controler controler) {
+  public static final QuadTree<ActivityFacility> createFacilityQuadTree(MatsimServices controler) {
     double minx = (1.0D / 0.0D);
     double miny = (1.0D / 0.0D);
     double maxx = (-1.0D / 0.0D);
@@ -117,7 +117,7 @@ public abstract class Utils
     return facilityQuadTree;
   }
 
-  public static final QuadTree<Person> createPersonQuadTree(Controler controler) {
+  public static final QuadTree<Person> createPersonQuadTree(MatsimServices controler) {
     double minx = (1.0D / 0.0D);
     double miny = (1.0D / 0.0D);
     double maxx = (-1.0D / 0.0D);
@@ -138,7 +138,7 @@ public abstract class Utils
     log.info("PersonQuadTree has been created");
     return personQuadTree; }
 
-  public static final QuadTree<ActivityFacility> createShopsQuadTree(Controler controler) {
+  public static final QuadTree<ActivityFacility> createShopsQuadTree(MatsimServices controler) {
     double minx = (1.0D / 0.0D);
     double miny = (1.0D / 0.0D);
     double maxx = (-1.0D / 0.0D);
@@ -163,7 +163,7 @@ public abstract class Utils
     return shopsQuadTree;
   }
 
-  public static final QuadTree<PersonPrimaryActivity> createPersonPrimaryActivityQuadTree(Controler controler)
+  public static final QuadTree<PersonPrimaryActivity> createPersonPrimaryActivityQuadTree(MatsimServices controler)
   {
     int i;
     double minx = (1.0D / 0.0D);

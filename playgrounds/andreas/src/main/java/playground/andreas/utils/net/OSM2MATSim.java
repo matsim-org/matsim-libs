@@ -8,7 +8,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkSegmentDoubleLinks;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
@@ -116,9 +116,9 @@ public class OSM2MATSim {
 		System.out.println("NetworkCleaner...done");
 
 		// Simplifier
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(outputFile + "_cl.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(outputFile + "_cl.xml.gz");
 
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();

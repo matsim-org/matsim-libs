@@ -43,14 +43,22 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * @author amit
  */
 public class ActDurationDiffDistribution {
-	
+	private final String outputDir;
+	private final String bau;
+	private Map<Id<Person>, Map<String, List<Double>>> personId2ActDurationDiff;
+	private List<Double> allDurDiffs;
+	private List<Integer> timeClasses;
+	private Set<String> actTypes ;
+	private SortedMap<String, SortedMap<Integer, Integer>> actType2ActDurationDiff2LegCount;
+	private final boolean sortPersons;
+	private final String userGroup;
 
 	/**
 	 * @param outputDir
 	 * @param bau business as usual scenario or baseCaseCtd or initial scenario
 	 * Use this to get distribution for whole population
 	 */
-	public ActDurationDiffDistribution(String outputDir, String bau) {
+	public ActDurationDiffDistribution(final String outputDir, final String bau) {
 		this.outputDir = outputDir;
 		this.bau = bau;
 		this.sortPersons = false;
@@ -62,24 +70,13 @@ public class ActDurationDiffDistribution {
 	 * @param bau business as usual scenario name or run number for baseCaseCtd
 	 * @param userGroup for which distribution is required
 	 */
-	public ActDurationDiffDistribution(String outputDir, String bau, UserGroup userGroup) {
+	public ActDurationDiffDistribution(final String outputDir, final String bau, final UserGroup userGroup) {
 		this.outputDir = outputDir;
 		this.bau = bau;
 		this.sortPersons = true;
 		this.userGroup = userGroup.toString();
-		ActivityType2DurationHandler.log.warn("Result will consider persons from "+this.userGroup+" sub population group.");
+		ActivityType2DurationHandler.LOG.warn("Result will consider persons from "+this.userGroup+" sub population group.");
 	}
-
-	private String outputDir;
-	private String bau;
-	private ActivityType2ActDurationsAnalyzer actDurAnalyzer;
-	private Map<Id<Person>, Map<String, List<Double>>> personId2ActDurationDiff;
-	private List<Double> allDurDiffs;
-	private List<Integer> timeClasses;
-	private Set<String> actTypes ;
-	private SortedMap<String, SortedMap<Integer, Integer>> actType2ActDurationDiff2LegCount;
-	private boolean sortPersons;
-	private String userGroup;
 
 	public static void main(String[] args) {
 		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
@@ -90,7 +87,7 @@ public class ActDurationDiffDistribution {
 		}
 	}
 
-	public void run (String runCase){
+	public void run (final String runCase){
 		personId2ActDurationDiff = new HashMap<>();
 		allDurDiffs = new ArrayList<Double>();
 		timeClasses = new ArrayList<Integer>();
@@ -111,7 +108,7 @@ public class ActDurationDiffDistribution {
 	 * @param bau initial scenario
 	 * @param runCase policy scenario
 	 */
-	private void getPersonId2ActDurationDiff(String bau, String runCase){
+	private void getPersonId2ActDurationDiff(final String bau, final String runCase){
 		Map<Id<Person>, Map<String, List<Double>>> bauPerson2ActDurations = getPersonId2ActType2ActDurations(bau);
 		Map<Id<Person>, Map<String, List<Double>>> runCasePerson2ActDurations = getPersonId2ActType2ActDurations(runCase);
 
@@ -134,14 +131,14 @@ public class ActDurationDiffDistribution {
 		}
 	}
 
-	private Map<Id<Person>, Map<String, List<Double>>> getPersonId2ActType2ActDurations(String run){
-		actDurAnalyzer = new ActivityType2ActDurationsAnalyzer(outputDir+run);
+	private Map<Id<Person>, Map<String, List<Double>>> getPersonId2ActType2ActDurations(final String run){
+		ActivityType2ActDurationsAnalyzer actDurAnalyzer = new ActivityType2ActDurationsAnalyzer(outputDir+run);
 		actDurAnalyzer.preProcessData();
 		actDurAnalyzer.postProcessData();
 		return actDurAnalyzer.getPersonId2ActivityType2ActivityDurations();
 	}
 
-	private void writeResults(String runCase) {
+	private void writeResults(final String runCase) {
 		String fileName = outputDir+"/analysis/"+runCase+userGroup+"_actTyp2ActDur_Diff_DistributionDuration.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 		try {
@@ -162,13 +159,13 @@ public class ActDurationDiffDistribution {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason - " + e);
 		}
-		ActivityType2DurationHandler.log.info("Data is written to file "+fileName);
+		ActivityType2DurationHandler.LOG.info("Data is written to file "+fileName);
 	}
 	
 	/**
 	 * writes activity type to typical activity duration to file. 
 	 */
-	private void writeTypicalAndMinimumActivityDurations(String configFile){
+	private void writeTypicalAndMinimumActivityDurations(final String configFile){
 
 		Config config = new Config();
 		config.addCoreModules();
@@ -195,7 +192,7 @@ public class ActDurationDiffDistribution {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason - " + e);
 		}
-		ActivityType2DurationHandler.log.info("Data is written to file "+fileName);
+		ActivityType2DurationHandler.LOG.info("Data is written to file "+fileName);
 	}
 	
 	private void getActType2ActDurationDiffDistributionData(){
@@ -222,7 +219,7 @@ public class ActDurationDiffDistribution {
 		}
 	}
 
-	private void storeData(Id<Person> id) {
+	private void storeData(final Id<Person> id) {
 		Map<String, List<Double>> actTyp2Dur = personId2ActDurationDiff.get(id);
 		for(String actTyp : actTyp2Dur.keySet()){
 			List<Double> durs = actTyp2Dur.get(actTyp);
@@ -238,7 +235,6 @@ public class ActDurationDiffDistribution {
 			}
 		}
 	}
-
 
 	private void initializeTimeClasses(){
 		int endOfTimeClass =0;
@@ -262,7 +258,6 @@ public class ActDurationDiffDistribution {
 			timeClasses.add(-endOfTimeClass);
 		}
 		Collections.sort(timeClasses);
-		ActivityType2DurationHandler.log.info("Following activity duration classes are defined: "+timeClasses.toString());
+		ActivityType2DurationHandler.LOG.info("Following activity duration classes are defined: "+timeClasses.toString());
 	}
-
 }

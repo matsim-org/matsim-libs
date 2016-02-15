@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -15,6 +15,8 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
+import saleem.stockholmscenario.teleportation.ptoptimisation.PTControlListener;
+
 public class StockholmScenarioSimulation {
 public static void main(String[] args) {
 	
@@ -22,13 +24,14 @@ public static void main(String[] args) {
  * standing capacity and passenger car equivalents of the vehicle types based on the sample size. This is done to balance out the effect of setting storage capacity 
  * factor and flow capacity factor (in the Config file) on the PT links.
 */
-        String path = "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\config.xml";
+//        String path = "/home/saleem/input/config.xml";
+		String path = "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\config.xml";
         Config config = ConfigUtils.loadConfig(path);
 		double samplesize = config.qsim().getStorageCapFactor();
 //        double samplesize = 0.1;
         Controler controler = new Controler(config);
-        controler.addControlerListener(new StockholmControlListener());
 		Scenario scenario = controler.getScenario();
+		controler.addControlerListener(new PTControlListener(scenario));
 		Network network = scenario.getNetwork();
 		Vehicles vehicles = scenario.getTransitVehicles();
 		ArrayList<VehicleType> vehcilestypes = toArrayList(vehicles.getVehicleTypes().values().iterator());
@@ -40,20 +43,21 @@ public static void main(String[] args) {
 			cap.setStandingRoom((int)Math.ceil(cap.getStandingRoom()*samplesize));
 			vt.setCapacity(cap);
 			vt.setPcuEquivalents(vt.getPcuEquivalents()*samplesize);
+			System.out.println("Sample Size is: " + samplesize);
 		}
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		//network.getLinks().clear();
 		//network.getNodes().clear();
 		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
-		Iterator iter = network.getLinks().values().iterator();
-		while(iter.hasNext()){
-			Link link = (Link)iter.next();
-			if(link.getId().toString().startsWith("tr")){
-//				link.setCapacity(link.getCapacity()/config.qsim().getFlowCapFactor());
-			}
-		}
-//		NetworkWriter networkWriter =  new NetworkWriter(network);
-//		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
+//		Iterator iter = network.getLinks().values().iterator();
+//		while(iter.hasNext()){
+//			Link link = (Link)iter.next();
+//			if(link.getId().toString().startsWith("tr")){
+////				link.setCapacity(link.getCapacity()/config.qsim().getFlowCapFactor());
+//			}
+//		}
+		NetworkWriter networkWriter =  new NetworkWriter(network);
+		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
 //		TransitScheduleWriter tw = new TransitScheduleWriter(schedule);
 //		tw.writeFile("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoSchedule.xml");
 
@@ -73,12 +77,12 @@ public static void main(String[] args) {
         // setting up PT Matrix
         PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, mbpcg);
 
-        //and finally setting up the controler
-        Controler controler = new Controler(config);
+        //and finally setting up the services
+        Controler services = new Controler(config);
         // setting up routing 
-        controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler.getScenario(), ptMatrix) ); // the car and pt router
+        services.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(services.getScenario(), ptMatrix) ); // the car and pt router
 
-        controler.run();*/
+        services.run();*/
 	}
 public static ArrayList<VehicleType> toArrayList(Iterator<VehicleType> iter){
 	ArrayList<VehicleType> arraylist = new ArrayList<VehicleType>();

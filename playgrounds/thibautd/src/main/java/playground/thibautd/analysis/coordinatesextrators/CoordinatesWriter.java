@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.coordinatesextrators;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @author thibautd

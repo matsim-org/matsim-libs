@@ -12,18 +12,16 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.jsprit;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import jsprit.core.problem.Location;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import jsprit.core.problem.driver.Driver;
 import jsprit.core.problem.vehicle.Vehicle;
 
+import jsprit.core.problem.vehicle.VehicleImpl;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -362,6 +360,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		private Map<String,VehicleTypeVarCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeVarCosts>();
 
 		private boolean isFIFO = false;
+
+		private String defaultTypeId = UUID.randomUUID().toString();
 		
 		/**
 		 * Creates the builder requiring {@link Network} and a collection of {@link CarrierVehicleType}.
@@ -378,6 +378,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			for(CarrierVehicleType type : vehicleTypes){
 				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeVarCosts(type.getVehicleCostInformation().perDistanceUnit, type.getVehicleCostInformation().perTimeUnit));
 			}
+			typeSpecificCosts.put(defaultTypeId,new VehicleTypeVarCosts(1.,0.));
 		}
 
 		/**
@@ -512,6 +513,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	
 	private Collection<InternalLeastCostPathCalculatorListener> listeners = new ArrayList<InternalLeastCostPathCalculatorListener>();
+
+	private String defaultTypeId;
 	
 	private NetworkBasedTransportCosts(Builder builder) {
 		super();
@@ -521,6 +524,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		this.leastCostPathCalculatorFactory = builder.leastCostPathCalculatorFactory;
 		this.roadPricingCalc = builder.roadPricingCalculator;
 		this.timeSliceWidth = builder.timeSliceWidth;
+		this.defaultTypeId = builder.defaultTypeId;
 		this.ttMemorizedCounter = new Counter("#TransportCostValues cached ");
 		this.ttRequestedCounter = new Counter("numTravelCosts requested ");
 	}
@@ -535,14 +539,16 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	 * @Throws {@link IllegalStateException} if vehicle is null
 	 */
 	@Override
-	public double getTransportTime(String fromId, String toId, double departureTime, Driver driver, Vehicle vehicle) {
+	public double getTransportTime(Location fromId, Location toId, double departureTime, Driver driver, Vehicle vehicle) {
 		if(fromId.equals(toId)){
 			return 0.0;
 		}
-		if(vehicle == null) throw new IllegalStateException("cannot calculate transport-time since vehicle missing.");
+		if(vehicle == null) {
+			vehicle = getDefaultVehicle(fromId);
+		}
 		String typeId = vehicle.getType().getTypeId();
 		int timeSlice = getTimeSlice(departureTime);
-		TransportDataKey transportDataKey = makeKey(fromId,toId,timeSlice,typeId);
+		TransportDataKey transportDataKey = makeKey(fromId.getId(),toId.getId(),timeSlice,typeId);
 		TransportData data = costCache.get(transportDataKey);
 		double transportTime;
 		if(data != null){
@@ -550,8 +556,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		}
 		else{
 			informStartCalc();
-			Id<Link> fromLinkId = Id.create(fromId, Link.class);
-			Id<Link> toLinkId = Id.create(toId, Link.class);
+			Id<Link> fromLinkId = Id.create(fromId.getId(), Link.class);
+			Id<Link> toLinkId = Id.create(toId.getId(), Link.class);
 			Link fromLink = network.getLinks().get(fromLinkId);
 			Link toLink = network.getLinks().get(toLinkId);
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
@@ -572,7 +578,13 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		}
 		return transportTime;
 	}
-	
+
+	private VehicleImpl getDefaultVehicle(Location fromId) {
+		return VehicleImpl.Builder.newInstance("default")
+				.setType(jsprit.core.problem.vehicle.VehicleTypeImpl.Builder.newInstance(defaultTypeId).build())
+				.setStartLocation(fromId).build();
+	}
+
 	private void informEndCalc(){
 		for(InternalLeastCostPathCalculatorListener l : listeners) l.endCalculation(Thread.currentThread().getId());
 	}
@@ -590,22 +602,24 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	 * @Throws {@link IllegalStateException} if vehicle is null
 	 */
 	@Override
-	public double getTransportCost(String fromId, String toId, double departureTime, Driver driver, Vehicle vehicle) {
+	public double getTransportCost(Location fromId, Location toId, double departureTime, Driver driver, Vehicle vehicle) {
 		if(fromId ==  null || toId == null) throw new IllegalStateException(
                 "either fromId ("+fromId+") or toId ("+toId+") is null [departureTime="+departureTime+"][vehicle="+vehicle+"]");
         if(fromId.equals(toId)){
 			return 0.0;
 		}
-		if(vehicle == null) throw new IllegalStateException("cannot calculate transport-costs since vehicle is missing");
-		Id<Link> fromLinkId = Id.create(fromId, Link.class);
-		Id<Link> toLinkId = Id.create(toId, Link.class);
+		if(vehicle == null) {
+			vehicle = getDefaultVehicle(fromId);
+		}
+		Id<Link> fromLinkId = Id.create(fromId.getId(), Link.class);
+		Id<Link> toLinkId = Id.create(toId.getId(), Link.class);
 		Link fromLink = network.getLinks().get(fromLinkId);
 		Link toLink = network.getLinks().get(toLinkId);
 		LeastCostPathCalculator router = createLeastCostPathCalculator();
 	
 		int timeSlice = getTimeSlice(departureTime);
 		String typeId = vehicle.getType().getTypeId();
-		TransportDataKey transportDataKey = makeKey(fromId,toId,timeSlice, typeId);
+		TransportDataKey transportDataKey = makeKey(fromId.getId(),toId.getId(),timeSlice, typeId);
 		TransportData data = costCache.get(transportDataKey);
 		double transportCost;
 		if(data != null){
@@ -647,7 +661,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	 * @Throws {@link IllegalStateException} if vehicle is null
 	 */
 	@Override
-	public double getBackwardTransportCost(String fromId, String toId, double arrivalTime, Driver driver, Vehicle vehicle) {
+	public double getBackwardTransportCost(Location fromId, Location toId, double arrivalTime, Driver driver, Vehicle vehicle) {
 		return getTransportCost(fromId, toId, arrivalTime, driver, vehicle);
 	}
 
@@ -659,7 +673,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	 * @Throws {@link IllegalStateException} if vehicle is null
 	 */
 	@Override
-	public double getBackwardTransportTime(String fromId, String toId, double arrivalTime, Driver driver, Vehicle vehicle) { 
+	public double getBackwardTransportTime(Location fromId, Location toId, double arrivalTime, Driver driver, Vehicle vehicle) {
 		return getTransportTime(fromId, toId, arrivalTime, driver, vehicle);
 	}
 

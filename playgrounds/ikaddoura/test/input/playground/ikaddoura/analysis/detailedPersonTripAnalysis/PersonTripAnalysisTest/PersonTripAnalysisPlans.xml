@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v5.dtd">
+
+<population>
+
+<!-- ====================================================================== -->
+
+	<person id="0">
+		<plan score="987.654321" selected="yes">
+			<act type="home" link="Link1" end_time="08:00:00" />
+			<leg mode="car">
+				<route type="links" start_link="Link1" end_link="Link7" trav_time="450.0" distance="4000.0">Link1 Link2 Link3 Link4 Link7</route>
+			</leg>
+			<act type="work" link="Link7" end_time="8:20:00"/>
+			<leg mode="car">
+				<route type="links" start_link="Link7" end_link="Link1" trav_time="450.0" distance="4000.0">Link7 Link6 Link5 Link2 Link1</route>
+			</leg>
+			<act type="home" link="Link1" />
+		</plan>
+
+		<plan score="108.24947269715014" selected="no">
+			<act type="dummy" link="0_1" end_time="08:00:00" />
+			<leg mode="car">
+				<route type="links" start_link="0_1" end_link="5_6" trav_time="undefined" distance="30007.5">0_1 1_2 2_23 23_3 3_5 5_6</route>
+			</leg>
+			<act type="dummy" link="5_6" />
+		</plan>
+
+		<plan score="108.24947269715014" selected="no">
+			<act type="dummy" link="0_1" end_time="08:00:00" />
+			<leg mode="car">
+				<route type="links" start_link="0_1" end_link="5_6" trav_time="undefined" distance="30015.0">0_1 1_2 2_24 24_4 4_45 45_5 5_6</route>
+			</leg>
+			<act type="dummy" link="5_6" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="1">
+		<plan score="123.456789" selected="yes">
+			<act type="work" link="Link7" end_time="8:20:00"/>
+			<leg mode="car">
+				<route type="links" start_link="Link7" end_link="Link1" trav_time="950.0" distance="4000.0">Link7 Link6 Link5 Link2 Link1</route>
+			</leg>
+			<act type="home" link="Link1" />
+		</plan>
+
+		<plan score="103.72179804633701" selected="no">
+			<act type="dummy" link="0_1" end_time="08:30:00" />
+			<leg mode="car">
+				<route type="links" start_link="0_1" end_link="5_6" trav_time="undefined" distance="30007.5">0_1 1_2 2_23 23_3 3_5 5_6</route>
+			</leg>
+			<act type="dummy" link="5_6" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+</population>

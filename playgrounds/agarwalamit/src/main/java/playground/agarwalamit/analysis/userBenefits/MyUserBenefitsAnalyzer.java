@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsAnalyzer;
@@ -47,8 +47,8 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
  */
 public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 	
-	private final Logger log = Logger.getLogger(UserBenefitsAnalyzer.class);
-	private ScenarioImpl scenario;
+	private static final Logger LOG = Logger.getLogger(UserBenefitsAnalyzer.class);
+	private MutableScenario scenario;
 	private UserBenefitsCalculator userWelfareCalculator;
 	
 	private double allUsersLogSum;
@@ -61,13 +61,12 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 		super(MyUserBenefitsAnalyzer.class.getSimpleName());
 	}
 	
-	
 	/**
 	 * @param scenario
 	 * @param welfareMeasure user welfare or logsum
 	 * @param considerAllPlans include plans with negative or null score or not
 	 */
-	public void init(ScenarioImpl scenario, WelfareMeasure welfareMeasure, boolean considerAllPlans) {
+	public void init(final MutableScenario scenario, final WelfareMeasure welfareMeasure, final boolean considerAllPlans) {
 		this.scenario = scenario;
 		this.welfareMeasure = welfareMeasure;
 		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig(), this.welfareMeasure, considerAllPlans);
@@ -84,7 +83,7 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 		this.allUsersLogSum = this.userWelfareCalculator.calculateUtility_money(this.scenario.getPopulation());
 		this.personWithNoValidPlanCnt = this.userWelfareCalculator.getPersonsWithoutValidPlanCnt();
 		
-		this.log.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + this.personWithNoValidPlanCnt);
+		LOG.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + this.personWithNoValidPlanCnt);
 		
 		this.personId2MonetarizedUserWelfare = this.userWelfareCalculator.getPersonId2MonetizedUtility();
 		this.personId2UserWelfare = this.userWelfareCalculator.getPersonId2Utility();
@@ -95,7 +94,7 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 	}
 
 	@Override
-	public void writeResults(String outputFolder) {
+	public void writeResults(final String outputFolder) {
 		String fileName = outputFolder + "userBenefits"+this.welfareMeasure+".txt";
 		File file = new File(fileName);
 				
@@ -117,18 +116,18 @@ public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 			}
 			
 			bw.close();
-			this.log.info("Output written to " + fileName);
+			LOG.info("Output written to " + fileName);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public double getTotalUserWelfare_money() {
+	public double getTotalUserWelfareMoney() {
 		return this.allUsersLogSum;
 	}
 
-	public Map<Id<Person>, Double> getPersonId2UserWelfare_utils() {
+	public Map<Id<Person>, Double> getPersonId2UserWelfareUtils() {
 		return personId2UserWelfare;
 	}
 	

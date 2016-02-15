@@ -2,6 +2,8 @@ package saleem.p0;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -9,22 +11,16 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.handler.GenericEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkImpl;
+
+import saleem.stockholmscenario.utils.CollectionUtil;
 
 public class P0ControlHandler implements BasicEventHandler{
 	Link link2, link4, link5;
@@ -43,24 +39,44 @@ public class P0ControlHandler implements BasicEventHandler{
 	public Map<Double, Double> delaysLink2 = new HashMap<Double, Double>();
 	public Map<Double, Double> delaysLink4 = new HashMap<Double, Double>();
 	public static List<NetworkChangeEvent> events = new ArrayList<NetworkChangeEvent>() ;
+	public static List<Double>delayOverIterLink2 = new ArrayList<Double>() ;//Average delay on link2 over each iteration
+	public static List<Double> delayOverIterLink4 = new ArrayList<Double>() ;
 	ArrayList<Double> absolutepressuredifference = new ArrayList<Double>();//To check the convergence quality
 	ArrayList<Double> absolutepressurelink2 = new ArrayList<Double>();//To check the convergence quality
 	ArrayList<Double> absolutepressurelink4 = new ArrayList<Double>();//To check the convergence quality
 	double totaldelaylink2=0, totaldelaylink4=0, averagedelaylink2=0, averagedelaylink4=0;
 	int countvehlink2=0, countvehlink4=0;
-	public P0ControlHandler(NetworkImpl network, int iter) {
-		this.iter=iter;
+	int totalcountvehlink2=0, totalcountvehlink4=0;
+	public P0ControlHandler(NetworkImpl network) {
 		this.network=network;
-		 link2 = network.getLinks().get(Id.create("2", Link.class));
-		 link4 = network.getLinks().get(Id.create("4", Link.class));
-		 link5 = network.getLinks().get(Id.create("5", Link.class));
-		 satcapacity2 = link2.getCapacity();
-		 satcapacity4 = link4.getCapacity();
-		 satcapacity5 = link5.getCapacity();
-		 capacity2=satcapacity2*satcapacity5/(satcapacity2+satcapacity4);//In Veh Per Hour
-		 capacity4=satcapacity4*satcapacity5/(satcapacity2+satcapacity4);
-		 initialcapacitiesLink2.add(capacity2);
-		 initialcapacitiesLink4.add(capacity4);
+	}
+	public void initialise(int iter){
+		this.capacitiesLink2 = new HashMap<Double, Double>();
+		this.capacitiesLink4 = new HashMap<Double, Double>();
+		this.initialcapacitiesLink2 = new ArrayList<Double>();
+		this.initialcapacitiesLink4 = new ArrayList<Double>();
+		this.arrtimes = new HashMap<String, Double>();
+		this.deptimes = new HashMap<String, Double>();
+		this.vehiclesandlinks = new HashMap<String, String>();
+		this.delaysLink2 = new HashMap<Double, Double>();
+		this.delaysLink4 = new HashMap<Double, Double>();
+		this.iter=iter;
+		this.bintime=0;
+		this.absolutepressuredifference = new ArrayList<Double>();//To check the convergence quality
+		this.absolutepressurelink2 = new ArrayList<Double>();//To check the convergence quality
+		this.absolutepressurelink4 = new ArrayList<Double>();//To check the convergence quality
+		this.totaldelaylink2=0; this.totaldelaylink4=0; this.averagedelaylink2=0; this.averagedelaylink4=0;
+		this.countvehlink2=0; this.countvehlink4=0;totalcountvehlink2=0; totalcountvehlink4=0;
+		this.link2 = network.getLinks().get(Id.create("2", Link.class));
+		this.link4 = network.getLinks().get(Id.create("4", Link.class));
+		this.link5 = network.getLinks().get(Id.create("5", Link.class));
+		this.satcapacity2 = link2.getCapacity();
+		this.satcapacity4 = link4.getCapacity();
+		this.satcapacity5 = link5.getCapacity();
+		this.capacity2=0.5*this.satcapacity2;//The value of green time is 0.5 initially. In Veh Per Hour
+		this.capacity4=0.5*this.satcapacity4;
+		this.initialcapacitiesLink2.add(this.capacity2);
+		this.initialcapacitiesLink4.add(this.capacity4);
 		 if(iter==0){
 			 NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(21600 + Math.random()/10000);//Assuming the simulations start at 06:00
 			 change.addLink(link2);
@@ -115,6 +131,7 @@ public class P0ControlHandler implements BasicEventHandler{
 				}else{
 					averagedelaylink4 = 0;
 				}
+				totalcountvehlink2+=countvehlink2; totalcountvehlink4+=countvehlink4;
 				totaldelaylink2=0;totaldelaylink4=0;countvehlink2=0;countvehlink4=0;
 	}
 	public Link getLink(String id){
@@ -151,7 +168,7 @@ public class P0ControlHandler implements BasicEventHandler{
 				if(abspres1ink4!=0)absolutepressurelink4.add(abspres1ink4);
 				capacitiesLink2.put(bintime-500, capacity2);
 				capacitiesLink4.put(bintime-500, capacity4);
-				
+				//Capacities on day one
 				initialcapacitiesLink2.add(initialcapacitiesLink2.get(0));
 				initialcapacitiesLink4.add(initialcapacitiesLink4.get(0));
 			}
@@ -184,13 +201,12 @@ public class P0ControlHandler implements BasicEventHandler{
 		}
 	}
 	public void adjustCapacityP0(double time) {
-		
 		   double p2 = averagedelaylink2 * satcapacity2;//where satcapacity2 and satcapacity4 refer to saturation capacity, and capacity2 and capacity4 refer to flow capacities
 		   double p4 = averagedelaylink4 * satcapacity4;
-		   if(iter==0 || p2==p4){
+		   if(iter==0){
 			   return;
 		   }
-		   double factor = 200/iter;//To make the capacity change dependent on number of day/iteration
+		   double m = 0.1/iter;//To make the capacity change dependent on number of day/iteration
 		   if(lastcapacitiesLink2.get(time)!=null){
 			  capacity2=lastcapacitiesLink2.get(time);
 			  capacity4=lastcapacitiesLink4.get(time);
@@ -198,12 +214,15 @@ public class P0ControlHandler implements BasicEventHandler{
 		   else{
 			   return;
 		   }
+		   double factor2 = m*satcapacity2;
+		   double factor4 = m*satcapacity4;//To make the capacity change dependent on number of day/iteration
+
 		   //p2=p2/capacity2;
 		   //p4=p4/capacity4;
 		   if (p2>=p4){
-			   		if(capacity2+factor<satcapacity5 && capacity2+factor<satcapacity2  && capacity4-factor>0){
-			   			capacity2=capacity2+factor;
-				   		capacity4=capacity4-factor;
+			   		if(capacity2+factor2<satcapacity2  && capacity4-factor4>50){
+			   			capacity2=capacity2+factor2;
+				   		capacity4=capacity4-factor4;
 			   			NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(time+Math.random()/10000);//To ensure the change takes effect at the start of the time bin
 						change.addLink(link2);
 						change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity2/3600));
@@ -216,9 +235,9 @@ public class P0ControlHandler implements BasicEventHandler{
 			   		}
 		   }
 		   else if (p4>p2){
-		   	   	if(capacity4+factor<satcapacity5 && capacity4+factor<satcapacity4 && capacity2-factor>0){
-		   	   		capacity2=capacity2-factor;
-		   	   		capacity4=capacity4+factor;
+		   	   	if(capacity4+factor4<satcapacity4 && capacity2-factor2>50){
+		   	   		capacity2=capacity2-factor2;
+		   	   		capacity4=capacity4+factor4;
 		   			NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(time+Math.random()/10000);//To ensure the change takes effect at the start of the time bin
 					change.addLink(link2);
 					change.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, capacity2/3600));
@@ -242,8 +261,29 @@ public class P0ControlHandler implements BasicEventHandler{
 		while (iter1.hasNext()){ 
 			delaylink4+=iter1.next();
 		}
+		this.delayOverIterLink2.add(this.iter,delaylink2/delaysLink2.values().size());
+		this.delayOverIterLink4.add(this.iter,delaylink4/delaysLink4.values().size());
 		System.out.println("Average Delay Link 2: " + delaylink2/delaysLink2.values().size());
 		System.out.println("Average Delay Link 4: " + delaylink4/delaysLink4.values().size());
+		System.out.println("Total Vehicles on Link 2: " + totalcountvehlink2);
+		System.out.println("Total Vehicles on Link 4: " + totalcountvehlink4);
+		
+	}
+	public void AverageDelayOverLast20Iters(){
+		double delaylink2=0;
+		double delaylink4=0;
+		if(iter<481){
+			return;//return if too early
+		}
+		for (int i=481;i<=500;i++){ 
+			delaylink2+=this.delayOverIterLink2.get(i);
+		}
+		for (int i=481;i<=500;i++){ 
+			delaylink4+=this.delayOverIterLink4.get(i);
+		}
+		System.out.println("Average Delay Link 2 for Last 20 Iterations: " + delaylink2/20);
+		System.out.println("Average Delay Link 4  for Last 20 Iterations: " + delaylink4/20);
+		
 	}
 	public void printCapacityStats(){
 		
@@ -254,6 +294,7 @@ public class P0ControlHandler implements BasicEventHandler{
 		}
 		System.out.println();
 	}
+	//For plotting without P0
 	public void writeInitiaDelaystoFile(){
 		TextReaderWriter rw = new TextReaderWriter();
 		rw.writeToTextFile(toArrayList(delaysLink2.values().iterator()), "H:\\Mike Work\\delayslink2.txt");
@@ -261,8 +302,32 @@ public class P0ControlHandler implements BasicEventHandler{
 		rw.writeToTextFile(toArrayList(delaysLink4.values().iterator()), "H:\\Mike Work\\delayslink4.txt");
 		rw.writeToTextFile(toArrayList(delaysLink4.keySet().iterator()), "H:\\Mike Work\\timelink4.txt");
 	}
-	public void readInitiaDelaysFromFile(String path){
-		
+	//Sort delays according to time
+	public ArrayList<Double> sortDelaysPerTime(Map<Double, Double> delays){
+		ArrayList<Double> sorteddelays = new ArrayList<Double>();
+		CollectionUtil cutil = new CollectionUtil();
+		List<Double> times = cutil.toArrayList(delays.keySet().iterator());
+		Collections.sort(times, new Comparator<Double>() {
+
+	        public int compare(Double a, Double b) {
+	            return (int)(a - b);
+	        }
+	    });
+		for(Double d:times){
+			sorteddelays.add(delays.get(d));
+		}
+		return sorteddelays;
+	}
+	//Sort times in increasing order
+	public ArrayList<Double> sortTimes(ArrayList<Double> times){
+		CollectionUtil cutil = new CollectionUtil();
+		Collections.sort(times, new Comparator<Double>() {
+
+	        public int compare(Double a, Double b) {
+	            return (int)(a - b);
+	        }
+	    });
+		return times;
 	}
 	public void plotStats(){
 		TextReaderWriter rw = new TextReaderWriter();
@@ -270,15 +335,15 @@ public class P0ControlHandler implements BasicEventHandler{
 		ArrayList<Double> initialdelaysLink4 = rw.readFromTextFile("H:\\Mike Work\\delayslink4.txt");
 		ArrayList<Double> initialtimeslink2 = rw.readFromTextFile("H:\\Mike Work\\timelink2.txt");
 		ArrayList<Double> initialtimeslink4 = rw.readFromTextFile("H:\\Mike Work\\timelink4.txt");
-		//if(iter==20)writeInitiaDelaystoFile();//For dashed line, writing to text file
+//		if(iter==500)writeInitiaDelaystoFile();//For dashed line without P0, writing to text file
 		ArrayList<Double> capacitieslink2 = toArrayList(capacitiesLink2.values().iterator());
 		ArrayList<Double> capacitieslink4 = toArrayList(capacitiesLink4.values().iterator());
 		ArrayList<Double> times = toArrayList(capacitiesLink2.keySet().iterator());
-		ArrayList<Double> delayslink2 = toArrayList(delaysLink2.values().iterator());
-		ArrayList<Double> delayslink4 = toArrayList(delaysLink4.values().iterator());
+		ArrayList<Double> delayslink2 = sortDelaysPerTime(delaysLink2);
+		ArrayList<Double> delayslink4 = sortDelaysPerTime(delaysLink4);
 		PlotStatistics plot = new PlotStatistics();
 		plot.PlotCapacities(iter, times, capacitieslink2, capacitieslink4, initialcapacitiesLink2, initialcapacitiesLink4);
-		plot.PlotDelays(iter, toArrayList(delaysLink2.keySet().iterator()), toArrayList(delaysLink4.keySet().iterator()), delayslink2, delayslink4, initialtimeslink2, initialtimeslink4, initialdelaysLink2, initialdelaysLink4);
+		plot.PlotDelays(iter, sortTimes(toArrayList(delaysLink2.keySet().iterator())), sortTimes(toArrayList(delaysLink4.keySet().iterator())), delayslink2, delayslink4, initialtimeslink2, initialtimeslink4, initialdelaysLink2, initialdelaysLink4);
 		plot.PlotDelaysandCapacities(iter, times, capacitieslink2, capacitieslink4, delayslink2, delayslink4);
 	}
 	public ArrayList<Double> toArrayList(Iterator<Double> iter){
@@ -305,8 +370,8 @@ public class P0ControlHandler implements BasicEventHandler{
 		PlotStatistics plot = new PlotStatistics();
 		plot.plotAbsolutePressures(iter, times, abspreslink2, abspreslink4);
 	}
-	public void plotAbsoultePressureDifference(ArrayList<Double> iters,ArrayList<Double> itersscaled, ArrayList<Double> initialabsolutepressuredifference, ArrayList<Double> avgabsolutepressuredifference){
+	public void plotAbsoultePressureDifference(ArrayList<Double> iters, ArrayList<Double> initialabsolutepressuredifference, ArrayList<Double> avgabsolutepressuredifference){
 		PlotStatistics plot = new PlotStatistics();
-		plot.PlotAbsolutePressureDiff(iter, iters, itersscaled, initialabsolutepressuredifference, avgabsolutepressuredifference);
+		plot.PlotAbsolutePressureDiff(iter, iters, initialabsolutepressuredifference, avgabsolutepressuredifference);
 	}
 }

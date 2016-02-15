@@ -32,7 +32,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
-
 import playground.thibautd.parknride.ParkAndRideConstants;
 
 /**

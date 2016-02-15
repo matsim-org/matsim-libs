@@ -20,14 +20,14 @@
 
 package playground.meisterk.org.matsim.enterprisecensus;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.regex.Pattern;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.regex.Pattern;
 
 public class EnterpriseCensusParser {
 

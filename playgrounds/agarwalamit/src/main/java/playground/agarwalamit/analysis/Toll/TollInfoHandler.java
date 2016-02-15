@@ -29,8 +29,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.population.Person;
 
-import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+import playground.agarwalamit.utils.MapUtils;
 
 /**
  * @author amit
@@ -38,53 +37,26 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 public class TollInfoHandler implements PersonMoneyEventHandler {
 
-	private SortedMap<UserGroup, SortedMap<Double,Double> > userGrp2TimeBin2Toll = new TreeMap<>();
-	private SortedMap<UserGroup, SortedMap<Double, Map<Id<Person>,Double> > > userGrp2TimeBin2Person2Toll = new TreeMap<>();
-
-	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
-	private final int noOfTimeBins;
+	private final SortedMap<Double, Map<Id<Person>,Double> >  timeBin2Person2Toll = new TreeMap<>();
 	private final double timeBinSize;
 
-	public TollInfoHandler (double simulationEndTime, int numberOfTimeBins) {
-		this.noOfTimeBins = numberOfTimeBins;
-		this.timeBinSize = simulationEndTime/this.noOfTimeBins;
-
-		initializeMaps();
+	public TollInfoHandler (final double simulationEndTime, final int numberOfTimeBins) {
+		this.timeBinSize = simulationEndTime/numberOfTimeBins;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		userGrp2TimeBin2Toll.clear();
-		userGrp2TimeBin2Person2Toll.clear();
-
-		initializeMaps();
-	}
-
-	private void initializeMaps(){
-		for (UserGroup ug : UserGroup.values()){
-			this.userGrp2TimeBin2Toll.put(ug, new TreeMap<Double, Double>() );
-			this.userGrp2TimeBin2Person2Toll.put(ug, new TreeMap<Double, Map<Id<Person>,Double>>() );
-		}
+		timeBin2Person2Toll.clear();
 	}
 
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
-		UserGroup ug = pf.getUserGroupFromPersonId(event.getPersonId());
 
-		Double time = event.getTime(); 
-		if(time ==0.0) time = this.timeBinSize;
-		double endOfTimeInterval =  Math.ceil(time/timeBinSize)*timeBinSize;
+		double endOfTimeInterval = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) ) * this.timeBinSize;
 
-		if( endOfTimeInterval <= 0.0 ) endOfTimeInterval = timeBinSize;
+		if( timeBin2Person2Toll.containsKey(endOfTimeInterval) ) {
 
-		Map<Double,Double> timeBin2Toll = this.userGrp2TimeBin2Toll.get(ug);
-		Map<Double,Map<Id<Person>,Double>> timeBin2PersonId2Toll = this.userGrp2TimeBin2Person2Toll.get(ug);
-
-		if( timeBin2Toll.containsKey(endOfTimeInterval) ) {
-
-			timeBin2Toll.put(endOfTimeInterval, event.getAmount() + timeBin2Toll.get(endOfTimeInterval));
-
-			Map<Id<Person>,Double> person2Toll = timeBin2PersonId2Toll.get(endOfTimeInterval);
+			Map<Id<Person>,Double> person2Toll = timeBin2Person2Toll.get(endOfTimeInterval);
 
 			if( person2Toll.containsKey(event.getPersonId()) ) {
 				person2Toll.put(event.getPersonId(), event.getAmount() + person2Toll.get(event.getPersonId()) );
@@ -93,47 +65,27 @@ public class TollInfoHandler implements PersonMoneyEventHandler {
 			}
 
 		} else {
-			timeBin2Toll.put(endOfTimeInterval, event.getAmount());
-
 			Map<Id<Person>,Double> person2Toll = new HashMap<Id<Person>, Double>();
 			person2Toll.put(event.getPersonId(), event.getAmount());
-			timeBin2PersonId2Toll.put(endOfTimeInterval, person2Toll);
+			timeBin2Person2Toll.put(endOfTimeInterval, person2Toll);
 		}
 	}
 
 	/**
-	 * @return user group to time bin to to toll value
+	 * @return time bin to person id to toll value
 	 */
-	public SortedMap<UserGroup,SortedMap<Double,Double>> getUserGroup2TimeBin2Toll() {
-		return userGrp2TimeBin2Toll;
-	}
-
-	/**
-	 * @return user group to time bin to person id to toll value
-	 */
-	public SortedMap<UserGroup,SortedMap<Double,Map<Id<Person>,Double>>> getUserGrp2TimeBin2Person2Toll() {
-		return userGrp2TimeBin2Person2Toll;
+	public SortedMap<Double,Map<Id<Person>,Double>> getTimeBin2Person2Toll() {
+		return timeBin2Person2Toll;
 	}
 
 	/**
 	 * @return timeBin to toll values for whole population
 	 */
 	public SortedMap<Double,Double> getTimeBin2Toll(){
-		SortedMap<Double, Double> person2Toll = new TreeMap<Double, Double>();
-
-		for (UserGroup ug : UserGroup.values()){
-
-			for (double d :this.userGrp2TimeBin2Toll.get(ug).keySet()){
-
-				if(person2Toll.containsKey(d)) {
-					person2Toll.put(d, this.userGrp2TimeBin2Toll.get(ug).get(d) + person2Toll.get(d) );
-				} else {
-					person2Toll.put(d, this.userGrp2TimeBin2Toll.get(ug).get(d));
-				}
-			}
+		SortedMap<Double, Double> timebin2Toll = new TreeMap<Double, Double>();
+		for (double d :this.timeBin2Person2Toll.keySet()){
+			timebin2Toll.put(d, MapUtils.doubleValueSum(timeBin2Person2Toll.get(d)));
 		}
-		return person2Toll;
+		return timebin2Toll;
 	}
 }
-
-

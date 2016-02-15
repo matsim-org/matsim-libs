@@ -22,11 +22,11 @@
  */
 package playground.johannes.gsv.sim;
 
-import java.util.LinkedList;
-
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+
+import java.util.LinkedList;
 
 /**
  * @author johannes

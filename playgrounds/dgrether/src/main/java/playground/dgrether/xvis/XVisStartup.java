@@ -28,7 +28,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.dgrether.xvis.control.XVisControl;
 import playground.dgrether.xvis.gui.MainFrame;
@@ -99,7 +99,7 @@ public class XVisStartup {
 	}
 	
 	
-	public void runVisualizer(ScenarioImpl sc) {
+	public void runVisualizer(MutableScenario sc) {
 		DataManager dataManager = new DataManager(sc);
 		dataManager.createVisScenario();
 		this.initializeGui(dataManager);

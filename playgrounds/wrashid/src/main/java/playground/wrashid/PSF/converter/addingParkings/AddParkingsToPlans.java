@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 
 /**
@@ -27,7 +27,7 @@ public class AddParkingsToPlans {
 	 * As input this method receives a population, without parking acts (and
 	 * related lets) and adds these.
 	 */
-	public static void generatePlanWithParkingActs(ScenarioImpl scenario) {
+	public static void generatePlanWithParkingActs(MutableScenario scenario) {
 		// modify population and write it out again
 		addParkings(scenario);
 //		GeneralLib.writePopulation(scenario.getPopulation(), outputPlansFile);
@@ -37,7 +37,7 @@ public class AddParkingsToPlans {
 	 * Returns the same population object, but added with parking act/legs.
 	 * The facility is also added to the existing acts.
 	 */
-	private static void addParkings(ScenarioImpl scenario) {
+	private static void addParkings(MutableScenario scenario) {
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			List<PlanElement> planElements = person.getSelectedPlan()

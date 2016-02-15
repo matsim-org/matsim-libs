@@ -26,7 +26,7 @@ import java.util.List;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.ModelLane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
@@ -45,13 +45,13 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 
 	private final transient VisNetwork network;
 
-	private final transient LaneDefinitions20 lanes;
+	private final transient Lanes lanes;
 	
 	private transient VisLaneModelBuilder laneModelBuilder = new VisLaneModelBuilder();
 
 	private Config config;
 	
-	public OTFLaneWriter(VisNetwork visNetwork, LaneDefinitions20 laneDefinitions, Config config){
+	public OTFLaneWriter(VisNetwork visNetwork, Lanes laneDefinitions, Config config){
 		this.network = visNetwork;
 		this.lanes = laneDefinitions;
 		this.config = config;

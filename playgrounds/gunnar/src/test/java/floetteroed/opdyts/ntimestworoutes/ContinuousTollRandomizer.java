@@ -1,5 +1,6 @@
 package floetteroed.opdyts.ntimestworoutes;
 
+import java.util.List;
 import java.util.Random;
 
 import floetteroed.opdyts.DecisionVariable;
@@ -39,7 +40,6 @@ public class ContinuousTollRandomizer implements DecisionVariableRandomizer {
 
 	// ---------- IMPLEMENTATION OF DecisionVariableRandomizer ----------
 
-	@Override
 	public DecisionVariable newRandomDecisionVariable() {
 		final Vector tollVector = new Vector(this.roadCnt);
 		for (int i = 0; i < this.roadCnt; i++) {
@@ -49,19 +49,20 @@ public class ContinuousTollRandomizer implements DecisionVariableRandomizer {
 	}
 
 	@Override
-	public DecisionVariable newRandomVariation(final DecisionVariable parent) {
-		final Vector childTolls = ((NTimesTwoRoutesDecisionVariable) parent)
-				.getTolls().copy();
-		for (int i = 0; i < this.roadCnt; i++) {
-			double newVal = childTolls.get(i) + this.sigmaToll
-					* this.rnd.nextGaussian();
-			if (newVal > this.maxToll) {
-				newVal = this.maxToll;
-			} else if (newVal < 0.0) {
-				newVal = 0.0;
-			}
-			childTolls.set(i, newVal);
-		}
-		return new NTimesTwoRoutesDecisionVariable(this.simulator, childTolls);
+	public List<DecisionVariable> newRandomVariations(final DecisionVariable parent) {
+		return null;
+//		final Vector childTolls = ((NTimesTwoRoutesDecisionVariable) parent)
+//				.getTolls().copy();
+//		for (int i = 0; i < this.roadCnt; i++) {
+//			double newVal = childTolls.get(i) + this.sigmaToll
+//					* this.rnd.nextGaussian();
+//			if (newVal > this.maxToll) {
+//				newVal = this.maxToll;
+//			} else if (newVal < 0.0) {
+//				newVal = 0.0;
+//			}
+//			childTolls.set(i, newVal);
+//		}
+//		return new NTimesTwoRoutesDecisionVariable(this.simulator, childTolls);
 	}
 }

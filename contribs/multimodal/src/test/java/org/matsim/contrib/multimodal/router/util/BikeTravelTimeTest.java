@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -179,11 +179,11 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		Person p1 = PersonImpl.createPerson(Id.create("1", Person.class));
+		Person p1 = PopulationUtils.createPerson(Id.create("1", Person.class));
 		PersonUtils.setAge(p1, 90);
 		PersonUtils.setSex(p1, "f");
 
-		Person p2 = PersonImpl.createPerson(Id.create("2", Person.class));
+		Person p2 = PopulationUtils.createPerson(Id.create("2", Person.class));
 		PersonUtils.setAge(p2, 20);
 		PersonUtils.setSex(p2, "m");
 		

@@ -30,7 +30,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -41,7 +41,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class PtDriverIdAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(PtDriverIdAnalyzer.class);
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	
 	private PtDriverIdHandler ptDriverPrefixHandler;
 	
@@ -49,7 +49,7 @@ public class PtDriverIdAnalyzer extends AbstractAnalysisModule{
 		super(PtDriverIdAnalyzer.class.getSimpleName());
 	}
 	
-	public void init(ScenarioImpl scenario) {
+	public void init(MutableScenario scenario) {
 		this.scenario = scenario;
 		this.ptDriverPrefixHandler = new PtDriverIdHandler();
 	}

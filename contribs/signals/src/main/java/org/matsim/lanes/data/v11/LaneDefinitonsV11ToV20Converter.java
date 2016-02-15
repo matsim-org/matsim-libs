@@ -28,7 +28,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.lanes.data.v20.LaneDefinitionsReader;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 
@@ -59,13 +59,13 @@ public class LaneDefinitonsV11ToV20Converter {
 		Config config = ConfigUtils.createConfig();
 		config.qsim().setUseLanes(true);
 		Scenario sc = ScenarioUtils.createScenario(config);
-		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(sc.getNetwork());
 		netReader.readFile(networkFilename);
 		Network net = sc.getNetwork();
 		LaneDefinitions11 lanedefs11 = new LaneDefinitions11Impl();
 		LaneDefinitionsReader11 reader11 = new LaneDefinitionsReader11(lanedefs11, LaneDefinitionsReader.SCHEMALOCATIONV11);
 		reader11.readFile(laneDefs11Filename);
-		LaneDefinitions20 lanedefs20 = LaneDefinitionsV11ToV20Conversion.convertTo20(lanedefs11, net);
+		Lanes lanedefs20 = LaneDefinitionsV11ToV20Conversion.convertTo20(lanedefs11, net);
 		LaneDefinitionsWriter20 writer20 = new LaneDefinitionsWriter20(lanedefs20);
 		writer20.write(laneDefs20Filename);
 	}

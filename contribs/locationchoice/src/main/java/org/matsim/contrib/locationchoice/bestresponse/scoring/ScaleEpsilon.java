@@ -19,17 +19,18 @@
 
 package org.matsim.contrib.locationchoice.bestresponse.scoring;
 
-import java.util.HashMap;
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
 import java.util.Set;
 
 public class ScaleEpsilon {
 	
-	private HashMap<String, Double> epsilonFactors = new HashMap<String, Double>();
+	private TObjectDoubleMap<String> epsilonFactors = new TObjectDoubleHashMap<>();
 	private boolean useSimpleTypes = false; // demand v1: e.g., s0.5, ... s24.0 = s
 	
-	
 	public double getEpsilonFactor(String actType) {
-		if (this.useSimpleTypes) actType = actType.substring(0,1);
+		if (this.useSimpleTypes) actType = actType.substring(0, 1);
 		return this.epsilonFactors.get(actType);
 	}
 	
@@ -42,7 +43,7 @@ public class ScaleEpsilon {
 	}
 	
 	public boolean isFlexibleType(String actType) {
-		if (this.useSimpleTypes) actType = actType.substring(0,1);
+		if (this.useSimpleTypes) actType = actType.substring(0, 1);
 		return this.epsilonFactors.containsKey(actType);
 	}
 	
@@ -50,7 +51,7 @@ public class ScaleEpsilon {
 		return this.epsilonFactors.size();
 	}
 	
-	public Set<String>  getFlexibleTypes() {
+	public Set<String> getFlexibleTypes() {
 		return this.epsilonFactors.keySet();
 	}
 }

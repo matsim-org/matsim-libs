@@ -36,13 +36,14 @@ class MyPlanSelector implements PlanSelector, ActivityEndEventHandler
 
 	@Override
 	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
-		log.error("calling selectPlan") ;
-		return null ;
+		log.error("calling selectPlan: PesonId: " + person.getId() + " Returning first Plan") ;
+		//returning first plan available. In real live the selection will be more sophisticated
+		return person.getPlans().get(0);
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		log.error("calling handleEvent for an ActivityEndEvent") ;
+		//log.error("calling handleEvent for an ActivityEndEvent") ;
 	}
 
 	@Override

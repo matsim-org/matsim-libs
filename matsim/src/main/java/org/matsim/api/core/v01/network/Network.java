@@ -36,45 +36,45 @@ public interface Network extends MatsimToplevelContainer {
 	@Override
 	public NetworkFactory getFactory();
 
-  /**
-   * Returns a set of this network's nodes. This set might be empty, but it
-   * should not be <code>null</code>.
-   *
-   * @return a set of this network's nodes
-   */
-  public Map<Id<Node>, ? extends Node> getNodes();
+	/**
+	 * Returns a set of this network's nodes. This set might be empty, but it
+	 * should not be <code>null</code>.
+	 *
+	 * @return a set of this network's nodes
+	 */
+	public Map<Id<Node>, ? extends Node> getNodes();
 
-  /**
-   * Returns a set of this network's links. This set might be empty, but it
-   * should not be <code>null</code>.
-   *
-   * @return a set of this network's links
-   */
-  public Map<Id<Link>, ? extends Link> getLinks();
+	/**
+	 * Returns a set of this network's links. This set might be empty, but it
+	 * should not be <code>null</code>.
+	 *
+	 * @return a set of this network's links
+	 */
+	public Map<Id<Link>, ? extends Link> getLinks();
 
-  /**
-   * Returns the time period over which
-   * the capacity of the given links has been measured.
-   * The default is given in the dtd.  Currently (may'11) it is 1h = 3600.0 sec.
-   * <p/>
-   * Notes:<ul>
-   * <li> There is no setter for this value since API-based network generation code should not use anything else but the default.
-   * The default is in the network dtd, but it is an attribute under "links", not under "network".
-   * </ul>
-   * @return the time period in seconds
-   */
-  public double getCapacityPeriod();
+	/**
+	 * Returns the time period over which
+	 * the capacity of the given links has been measured.
+	 * The default is given in the dtd.  Currently (may'11) it is 1h = 3600.0 sec.
+	 * <p/>
+	 * Notes:<ul>
+	 * <li> There is no setter for this value since API-based network generation code should not use anything else but the default.
+	 * The default is in the network dtd, but it is an attribute under "links", not under "network".
+	 * </ul>
+	 * @return the time period in seconds
+	 */
+	public double getCapacityPeriod();
 
 
-  /**
-   * Returns the lane width of the network's links. The default is given in the dtd; current (may'11) it is 3.75m.
-   * <p/>
-   * Notes:<ul>
-   * <li> There is no setter for this value since API-based network generation code should not use anything else but the default.
-   * </ul>
-   * @return the lane width in meters
-   */
-  public double getEffectiveLaneWidth();
+	/**
+	 * Returns the lane width of the network's links. The default is given in the dtd; current (may'11) it is 3.75m.
+	 * <p/>
+	 * Notes:<ul>
+	 * <li> There is no setter for this value since API-based network generation code should not use anything else but the default.
+	 * </ul>
+	 * @return the lane width in meters
+	 */
+	public double getEffectiveLaneWidth();
 
 
 	public void addNode(Node nn);

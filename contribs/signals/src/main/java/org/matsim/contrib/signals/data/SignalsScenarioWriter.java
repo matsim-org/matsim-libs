@@ -26,6 +26,7 @@ import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesWriter10;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesData;
 import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
@@ -36,7 +37,8 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 /**
  * Flexible writer for all kind of signals data output. Easiest way to write all existing data is
  * new SignalsScenarioWriter("myOutputDirectory").writeSignalsData(mySignalsDataInstance);
- * @author dgrether
+ * 
+ * @author dgrether, tthunig
  */
 public class SignalsScenarioWriter {
 	
@@ -47,6 +49,7 @@ public class SignalsScenarioWriter {
 	public static final String FILENAME_SIGNAL_CONTROL = "output_signal_control_v2.0.xml.gz";
 	public static final String FILENAME_AMBER_TIMES = "output_amber_times_v1.0.xml.gz";
 	private static final String FILENAME_INTERGREEN_TIMES = "output_intergreen_times_v1.0.xml.gz";
+	private static final String FILENAME_SIGNAL_CSV = "via_signals.csv.gz";
 
 	private String pathToSignalSystemsOutputFilename = null;
 
@@ -57,6 +60,8 @@ public class SignalsScenarioWriter {
 	private String pathToAmberTimesOutputFilename = null;
 
 	private String pathToIntergreenTimesOutputFilename = null;
+	
+	private String pathToSignalCSVOutputFilename = null;
 
 	public SignalsScenarioWriter(){
 	}
@@ -67,6 +72,7 @@ public class SignalsScenarioWriter {
 		this.pathToSignalControlOutputFilename = outputDirectoryPath + FILENAME_SIGNAL_CONTROL;
 		this.pathToAmberTimesOutputFilename = outputDirectoryPath + FILENAME_AMBER_TIMES;
 		this.pathToIntergreenTimesOutputFilename =  outputDirectoryPath + FILENAME_INTERGREEN_TIMES;
+		this.pathToSignalCSVOutputFilename = outputDirectoryPath + FILENAME_SIGNAL_CSV;
 	}
 	
 	
@@ -76,9 +82,12 @@ public class SignalsScenarioWriter {
 		this.pathToSignalControlOutputFilename = controlerIo.getOutputFilename(FILENAME_SIGNAL_CONTROL);
 		this.pathToAmberTimesOutputFilename = controlerIo.getOutputFilename(FILENAME_AMBER_TIMES);
 		this.pathToIntergreenTimesOutputFilename = controlerIo.getOutputFilename(FILENAME_INTERGREEN_TIMES);
+		this.pathToSignalCSVOutputFilename = controlerIo.getOutputFilename(FILENAME_SIGNAL_CSV);
 	}
 	
-	public void writeSignalsData(SignalsData signalsData){
+	public void writeSignalsData(Scenario scenario){
+		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+		
 		if (signalsData.getSignalSystemsData() != null){
 			this.writeSignalSystemsData(signalsData.getSignalSystemsData());
 		}
@@ -109,8 +118,21 @@ public class SignalsScenarioWriter {
 		else{
 			log.info("No IntergreenTimesData object set to write!");
 		}
+		if (signalsData.getSignalSystemsData() != null && signalsData.getSignalGroupsData() != null && signalsData.getSignalControlData() != null){
+			writeSignalCSVData(scenario);
+		}
 	}
 	
+	public void writeSignalCSVData(Scenario scenario) {
+		if (this.pathToSignalCSVOutputFilename != null) {
+			SignalsViaCSVWriter writer = new SignalsViaCSVWriter(scenario);
+			writer.writeSignalsCSV(this.pathToSignalCSVOutputFilename);
+		}
+		else {
+			log.warn("No path to signal csv output file set!");
+		}
+	}
+
 	public void writeSignalSystemsData(SignalSystemsData signalSystemsData){
 		if (this.pathToSignalSystemsOutputFilename != null) {
 			SignalSystemsWriter20 writer = new SignalSystemsWriter20(signalSystemsData);

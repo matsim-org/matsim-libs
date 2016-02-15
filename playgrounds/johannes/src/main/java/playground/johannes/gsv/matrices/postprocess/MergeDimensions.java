@@ -23,10 +23,10 @@ import org.apache.log4j.Logger;
 import playground.johannes.gsv.matrices.episodes2matrix.DirectionPredicate;
 import playground.johannes.gsv.matrices.episodes2matrix.Episodes2Matrix;
 import playground.johannes.gsv.matrices.episodes2matrix.InfereWeCommuter;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixTxtIO;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -94,8 +94,8 @@ public class MergeDimensions {
                             String filename = String.format("%s/%s.txt.gz", rootDir, matrixName);
                             if(new File(filename).exists()) {
                                 logger.info(String.format("Loading matrix %s...", matrixName));
-                                KeyMatrix m = new KeyMatrix();
-                                KeyMatrixTxtIO.read(m, filename);
+                                NumericMatrix m = new NumericMatrix();
+                                NumericMatrixTxtIO.read(m, filename);
 
                                 Set<String> keys = m.keys();
                                 for (String i : keys) {

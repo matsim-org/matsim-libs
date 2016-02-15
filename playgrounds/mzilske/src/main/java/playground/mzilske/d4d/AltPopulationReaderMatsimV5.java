@@ -44,10 +44,10 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
@@ -137,7 +137,7 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 
 	private Person parsePerson(XMLStreamReader xmlr) throws XMLStreamException {
 		String id = xmlr.getAttributeValue(""	, "id");
-		Person person = PersonImpl.createPerson(Id.create(id, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(id, Person.class));
 		String sex = xmlr.getAttributeValue(""	, "sex");
 		if (sex!=null) PersonUtils.setSex(person, sex);
 		String age = xmlr.getAttributeValue(""	, "age");

@@ -1,16 +1,15 @@
 package playground.wrashid.ABMT.vehicleShare;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.LegImpl;
-import org.matsim.api.core.v01.Id;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,7 +66,7 @@ public class VehicleInitializer implements IterationStartsListener {
 		int existingKeyUsed = 0;
 		int numberOfPlansRemovedFromHM = 0;
 		HashSet<Plan> allCurrentPlans = new HashSet<Plan>();
-        for (Person person : event.getControler().getScenario().getPopulation().getPersons()
+        for (Person person : event.getServices().getScenario().getPopulation().getPersons()
 				.values()) {
 			
 			if (person.getId().toString().equalsIgnoreCase("111106347")){

@@ -102,7 +102,7 @@ public class EvacuationRunner {
                     withinDayControlerListener.setModesAnalyzedByTravelTimeCollector(CollectionUtils.stringToSet(TransportMode.car));
 					addControlerListenerBinding().toInstance(withinDayControlerListener);
 
-					// pre-configure within-day controler listener with outcomes from the multi-modal controler listener
+					// pre-configure within-day services listener with outcomes from the multi-modal services listener
 					addControlerListenerBinding().toInstance(preconfigureWithinDayControlerListener);
 				}
             });

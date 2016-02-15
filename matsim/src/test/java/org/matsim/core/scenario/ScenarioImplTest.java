@@ -32,7 +32,7 @@ import org.matsim.vehicles.Vehicles;
 public class ScenarioImplTest {
 	@Test
 	public void testAddAndGetScenarioElement() {
-		final ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		final Object element1 = new Object();
 		final String name1 = "peter_parker";
@@ -60,7 +60,7 @@ public class ScenarioImplTest {
 
 	@Test
 	public void testCannotAddAnElementToAnExistingName() {
-		final ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		final String name = "bruce_wayne";
 
@@ -79,7 +79,7 @@ public class ScenarioImplTest {
 
 	@Test
 	public void testRemoveElement() {
-		final ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final MutableScenario s = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		final Object element = new Object();
 		final String name = "clark_kent";

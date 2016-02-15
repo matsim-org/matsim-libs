@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.services;
 
-import java.util.Collection;
-
 import playground.johannes.coopsim.eval.Evaluator;
 import playground.johannes.coopsim.pysical.Trajectory;
+
+import java.util.Collection;
 
 /**
  * @author illenberger

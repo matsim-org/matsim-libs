@@ -44,7 +44,7 @@ public class PlanToShapefile {
 			throw new IllegalArgumentException("Need four arguments.");
 		}
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader nr = new MatsimNetworkReader(s);
+		MatsimNetworkReader nr = new MatsimNetworkReader(s.getNetwork());
 		MatsimPopulationReader pr = new MatsimPopulationReader(s);
 		nr.parse(networkFilename);
 		pr.parse(plansFilename);

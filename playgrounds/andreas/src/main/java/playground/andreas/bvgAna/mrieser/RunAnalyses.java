@@ -56,7 +56,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -91,7 +91,7 @@ public class RunAnalyses {
 	private final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 	public void readNetwork() {
-		new MatsimNetworkReader(this.scenario).readFile(networkFilename);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFilename);
 	}
 
 	public void readPopulation() {
@@ -100,7 +100,7 @@ public class RunAnalyses {
 
 	public void extractSelectedPlansOnly() {
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(s).readFile(networkFilename);
+		new MatsimNetworkReader(s.getNetwork()).readFile(networkFilename);
 		PopulationImpl pop = (PopulationImpl) s.getPopulation();
 		pop.setIsStreaming(true);
 
@@ -201,7 +201,7 @@ public class RunAnalyses {
 
 	public void createRemainSeatedStats() {
 		StopId2RemainSeatedDataMap remainSeated = new StopId2RemainSeatedDataMap();
-		TransitSchedule ts = ((ScenarioImpl) this.scenario).getTransitSchedule();
+		TransitSchedule ts = ((MutableScenario) this.scenario).getTransitSchedule();
 
 		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(remainSeated);
@@ -375,7 +375,7 @@ public class RunAnalyses {
 				}
 			}
 		}
-		TransitSchedule ts = ((ScenarioImpl) this.scenario).getTransitSchedule();
+		TransitSchedule ts = ((MutableScenario) this.scenario).getTransitSchedule();
 		System.out.println("stopId\tstopX\tstopY\tstopName\t#affectPrs");
 		Set<Id> handledStops = new HashSet<Id>();
 		for (TransitStopFacility stop : ts.getFacilities().values()) {
@@ -394,7 +394,7 @@ public class RunAnalyses {
 	}
 
 	public void createCatchmentAreaStats(Set<Id<Person>> agentIds, Id<TransitLine> lineId, Id<TransitRoute>[] routeIds) {
-		TransitSchedule ts = ((ScenarioImpl) this.scenario).getTransitSchedule();
+		TransitSchedule ts = ((MutableScenario) this.scenario).getTransitSchedule();
 		Set<Id<TransitStopFacility>> stopIds = new HashSet<>();
 		Set<Id<Vehicle>> vehicleIds = new HashSet<>();
 		TransitLine line = ts.getTransitLines().get(lineId);

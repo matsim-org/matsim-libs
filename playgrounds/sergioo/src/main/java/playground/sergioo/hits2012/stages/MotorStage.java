@@ -11,5 +11,9 @@ public class MotorStage extends Stage {
 		super(id, mode, walkTime, inVehicleTime, lastWalkTime);
 		this.numPassegers = numPassengers;
 	}
+
+	public int getNumPassegers() {
+		return numPassegers;
+	}
 	
 }

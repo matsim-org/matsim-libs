@@ -21,8 +21,6 @@ package playground.thibautd.socnetsimusages.traveltimeequity;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import java.util.Set;
-
 /**
  * @author thibautd
  */

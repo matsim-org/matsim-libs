@@ -41,7 +41,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -70,7 +69,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  * @author dstrippgen
  *
  */
-public class OnTheFlyServer extends PlayPauseSimulation implements OTFLiveServer {
+public class OnTheFlyServer extends PlayPauseSimulationControl implements OTFLiveServer {
 
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
 
@@ -175,14 +174,6 @@ public class OnTheFlyServer extends PlayPauseSimulation implements OTFLiveServer
 	public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events) {
 		OnTheFlyServer instance = new OnTheFlyServer(scenario, events);
 		return instance;
-	}
-
-	@Override
-	public int getLocalTime() {
-		return (int) ((QSim)this.visMobsim).getSimTimer().getTimeOfDay() ;
-		// I changed something here with the extraction of the play/pause functionality, and since the result did not work, I put the above line
-		// in as a fix.  It could not work for playback ... but then
-		// I think that this class is only used for live simulation, and cannnot be used for playback. kai, mar'15
 	}
 
 	@Override
@@ -368,18 +359,23 @@ public class OnTheFlyServer extends PlayPauseSimulation implements OTFLiveServer
 
 	@Override
 	public boolean requestNewTime(final int time, final TimePreference searchDirection) {
-		if (getStatus() == Status.FINISHED) {
+		if ( isFinished() ) {
 			return true;
-		} else if( ((searchDirection == TimePreference.RESTART) && (time < getLocalTime()))) { 
-			doStep(time);
-			return true;
+//		} else if( ((searchDirection == TimePreference.RESTART) && (time < getLocalTime()))) { 
+//			doStep(time);
+//			return true;
+			// not doing anything meaningful anywhere (I think).  kai, jan'16
 		} else if (time < getLocalTime()) {
 			// if requested time lies in the past, sorry we cannot do that right now
+
 			setStepToTime(0);
+			// yyyy I think we could as well call "pause" (and should do that for clarity and encapsulation).  However, I am unsure
+			// if the current pause method releases enough of the monitors. kai, jan'16
+			
 			// if forward search is OK, then the actual timestep is the BEST fit
 			return (searchDirection != TimePreference.EARLIER);
 		} else if (time == getLocalTime()) {
-			setStepToTime(0);
+			setStepToTime(0); // see above
 			return true;
 		} else {
 			doStep(time);

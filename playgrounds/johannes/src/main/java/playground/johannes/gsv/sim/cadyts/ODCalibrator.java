@@ -35,6 +35,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.common.collections.CollectionUtils;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.counts.Count;
@@ -42,14 +45,15 @@ import org.matsim.counts.Counts;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import org.matsim.vehicles.Vehicle;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.ODMatrixOperations;
+import playground.johannes.synpop.util.Executor;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -63,7 +67,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 	
 	public static final String VIRTUAL_ID_PREFIX = "virtual";
 
-	public static final String ZONE_ID_KEY = "gsvId";
+	public static final String ZONE_ID_KEY = "NO";
 	
 	private static final Logger logger = Logger.getLogger(ODCalibrator.class);
 
@@ -89,7 +93,9 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 	
 	private final Population population;
 
-	public ODCalibrator(Scenario scenario, CadytsContext cadytsContext, KeyMatrix odMatrix, ZoneCollection zones, double distThreshold, double countThreshold, String aggKey) {
+	private final Map<Id<Person>, Id<Vehicle>> person2VehicleIds = new HashMap<>();
+
+	public ODCalibrator(Scenario scenario, CadytsContext cadytsContext, NumericMatrix odMatrix, ZoneCollection zones, double distThreshold, double countThreshold, String aggKey) {
 		this.network = scenario.getNetwork();
 		this.p2p = (PlanToPlanStepBasedOnEvents) cadytsContext.getPlansTranslator();
 		this.adaptor = cadytsContext.getSimResultsAdaptor();
@@ -106,7 +112,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 		determineCandidates(zones, scenario.getPopulation(), distThreshold);
 	}
 
-	private void buildVirtualNetwork(KeyMatrix odMartix, Counts counts, ActivityFacilities facilities) {
+	private void buildVirtualNetwork(NumericMatrix odMartix, Counts counts, ActivityFacilities facilities) {
 		logger.info("Building virutal network...");
 		
 		Set<String> keys = odMartix.keys();
@@ -163,7 +169,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		if(cnt > 0) {
 			logger.warn(String.format("%s facilities cannot be assigned to a virtual node.", cnt));
@@ -201,12 +207,6 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 				Plan plan = person.getSelectedPlan();
 				Activity from = (Activity) plan.getPlanElements().get(idx - 1);
 				Activity to = (Activity) plan.getPlanElements().get(idx + 1);
-				
-//				Node startNode = person2Node.remove(event.getDriverId());
-//				Node endNode = network.getLinks().get(event.getLinkId()).getToNode();
-
-//				Node vStart = real2virtual.get(startNode);
-//				Node vEnd = real2virtual.get(endNode);
 
 				Node vStart = facility2Node.get(from.getFacilityId());
 				Node vEnd = facility2Node.get(to.getFacilityId());
@@ -214,8 +214,15 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 				if (vStart != null && vEnd != null) {
 					Link vLink = NetworkUtils.getConnectingLink(vStart, vEnd);
 					if (vLink != null) {
+
+						Id<Vehicle> vehicleId = person2VehicleIds.get(event.getPersonId());
+						if(vehicleId == null) {
+							vehicleId = Id.createVehicleId(event.getPersonId());
+							person2VehicleIds.put(event.getPersonId(), vehicleId);
+						}
+
 						p2p.handleEvent(new PersonDepartureEvent(event.getTime(), event.getPersonId(), vLink.getId(), event.getLegMode()));
-						p2p.handleEvent(new LinkLeaveEvent(event.getTime(), event.getPersonId(), vLink.getId(), null));
+						p2p.handleEvent(new LinkLeaveEvent(event.getTime(), vehicleId, vLink.getId()));
 						p2p.handleEvent(new PersonArrivalEvent(event.getTime(), event.getPersonId(), vLink.getId(), event.getLegMode()));
 
 						adaptor.addVirtualCount(vLink);
@@ -245,7 +252,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 //		}
 	}
 	
-	private KeyMatrix buildCalibrationMatrix(KeyMatrix refMatrix, Scenario scenario, double distThreshold, double countThreshold, String aggKey) {
+	private NumericMatrix buildCalibrationMatrix(NumericMatrix refMatrix, Scenario scenario, double distThreshold, double countThreshold, String aggKey) {
 		/*
 		 * remove reference relations below distance threshold
 		 */
@@ -255,14 +262,14 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 		 * aggregated if specified
 		 */
 		if(aggKey != null) {
-			refMatrix = MatrixOperations.aggregate(refMatrix, zones, aggKey);
+			refMatrix = ODMatrixOperations.aggregate(refMatrix, zones, aggKey);
 			zones = aggregateZones(zones, aggKey);
 		}
 		/*
 		 * build matrix from simulated plans
 		 */
 		logger.info("Building matrix from simulated plans...");
-		KeyMatrix simMatrix = plans2Matrix(scenario.getPopulation(), zones, scenario.getActivityFacilities(), distThreshold);
+		NumericMatrix simMatrix = plans2Matrix(scenario.getPopulation(), zones, scenario.getActivityFacilities(), distThreshold);
 		/*
 		 * calculate normalization
 		 */
@@ -309,7 +316,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 		return refMatrix;
 	}
 	
-	private void removeEntries(KeyMatrix m, ZoneCollection zones, double distThreshold) {
+	private void removeEntries(NumericMatrix m, ZoneCollection zones, double distThreshold) {
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		Set<String> keys = m.keys();
 		int cnt = 0;
@@ -338,8 +345,8 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 		logger.info(String.format("Removed %s trips with less than %s KM.", cnt, distThreshold/1000.0));
 	}
 	
-	private KeyMatrix plans2Matrix(Population pop, ZoneCollection zones, ActivityFacilities facilities, double distThreshold) {
-		KeyMatrix m = new KeyMatrix();
+	private NumericMatrix plans2Matrix(Population pop, ZoneCollection zones, ActivityFacilities facilities, double distThreshold) {
+		NumericMatrix m = new NumericMatrix();
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 //		candidates = new LinkedHashSet<>();
 		
@@ -389,7 +396,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			ProgressLogger.step();
 		}
 		
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		return m;
 	}
@@ -438,26 +445,28 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 	}
 	
 	private void determineCandidates(ZoneCollection zones, Population pop, double distThreshold) {
-		List<Zone> zoneList = new ArrayList<>(zones.getZones());
+		final List<Zone> zoneList = new ArrayList<>(zones.getZones());
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		double minZoneDist = Double.MAX_VALUE;
-		
+
 		logger.info("Calculating minimal zone distance...");
-		ProgressLogger.init(zoneList.size(), 2, 10);
-		for(int i = 0; i < zoneList.size(); i++) {
-			for(int j = i+1; j < zoneList.size(); j++) {
-				Zone zi = zoneList.get(i);
-				Zone zj = zoneList.get(j);
-				
-				double controidDist = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
-				if(controidDist >= distThreshold) {
-					double d = DistanceOp.distance(zi.getGeometry(), zj.getGeometry());
-					minZoneDist = Math.min(minZoneDist, d);
-				}
-			}
-			ProgressLogger.step();
+
+		List<Zone>[] segments = CollectionUtils.split(zoneList, Executor.getFreePoolSize());
+		List<MinDistThread> threads = new ArrayList<>();
+
+		ProgressLogger.init(zoneList.size() * segments.length, 2, 10);
+		for(List<Zone> segment : segments) {
+			threads.add(new MinDistThread(zoneList, segment, dCalc, distThreshold));
 		}
-		ProgressLogger.termiante();
+		Executor.submitAndWait(threads);
+
+		for(MinDistThread thread : threads) {
+			minZoneDist = Math.min(minZoneDist, thread.getMinZoneDist());
+		}
+		Executor.shutdown();
+		ProgressLogger.terminate();
+
+		logger.info(String.format("Minimum zone distance: %s", minZoneDist));
 		
 		logger.info("Determining simulation candidates...");
 		candidates = new LinkedHashSet<>();
@@ -482,8 +491,50 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		logger.info(String.format("Determined %s simulation candidates.", candidates.size()));
+	}
+
+	private static class MinDistThread implements Runnable {
+
+		private final List<Zone> startZones;
+
+		private final List<Zone> targetZones;
+
+		private final DistanceCalculator dCalc;
+
+		private final double distThreshold;
+
+		private double minZoneDist = Double.MAX_VALUE;
+
+		public MinDistThread(List<Zone> startZones, List<Zone> targetZones, DistanceCalculator dCalc, double
+				distThreshold) {
+			this.startZones = startZones;
+			this.targetZones = targetZones;
+			this.dCalc = dCalc;
+			this.distThreshold = distThreshold;
+		}
+
+		public double getMinZoneDist() {
+			return minZoneDist;
+		}
+
+		@Override
+		public void run() {
+			for(int i = 0; i < startZones.size(); i++) {
+				for (int j = 0; j < targetZones.size(); j++) {
+					Zone zi = startZones.get(i);
+					Zone zj = targetZones.get(j);
+
+					double controidDist = dCalc.distance(zi.getGeometry().getCentroid(), zj.getGeometry().getCentroid());
+					if (controidDist >= distThreshold) {
+						double d = DistanceOp.distance(zi.getGeometry(), zj.getGeometry());
+						minZoneDist = Math.min(minZoneDist, d);
+					}
+				}
+				ProgressLogger.step();
+			}
+		}
 	}
 }

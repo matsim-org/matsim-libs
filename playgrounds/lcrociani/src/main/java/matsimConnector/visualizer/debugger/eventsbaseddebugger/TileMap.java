@@ -125,7 +125,7 @@ public class TileMap implements ZoomPanListener {
 //				System.out.println(this.currentZoom);
 				double range = this.currentZoom*this.tileSize/2;
 				Collection<Tile> tmp = new ArrayList<Tile>();
-				 this.currentQuad.getRectangle(x - range, y - range, x + range, y + range, tmp);
+				 this.currentQuad.getRectangle(x-range, y-range,x+range,y+range,tmp);
 //				 System.out.println("one new at:" + x + "  " + y);
 				Tile tile = null;
 				if (tmp.size() == 0) {

@@ -12,7 +12,7 @@ import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -22,7 +22,7 @@ public class AccessibilityCalc {
 	
 private SpatialGrid freeSpeedGrid;
 	
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	
 	private ZoneLayer<Id<Zone>> measuringPoints;
 	
@@ -32,7 +32,7 @@ private SpatialGrid freeSpeedGrid;
 	
 	private Geometry boundary;
 	
-	public AccessibilityCalc(ZoneLayer<Id<Zone>> measuringPoints, SpatialGrid freeSpeedGrid, ScenarioImpl scenario, Geometry boundary) {
+	public AccessibilityCalc(ZoneLayer<Id<Zone>> measuringPoints, SpatialGrid freeSpeedGrid, MutableScenario scenario, Geometry boundary) {
 		
 		this.freeSpeedGrid = freeSpeedGrid;
 		this.scenario = scenario;

@@ -21,15 +21,10 @@ package org.matsim.contrib.signals.controler;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 
 /**
@@ -38,30 +33,15 @@ import org.matsim.contrib.signals.model.SignalSystemsManager;
  * @author dgrether
  *
  */
-public final class DefaultSignalsControllerListener implements SignalsControllerListener, ShutdownListener, IterationStartsListener {
+final class DefaultSignalsControllerListener implements SignalsControllerListener, ShutdownListener {
 
-	private QSimSignalEngine signalEngine;
-
-	@Override
-	public final void notifyIterationStarts(IterationStartsEvent event) {
-		event.getControler().getMobsimListeners().remove(this.signalEngine);
-		//build model
-		FromDataBuilder modelBuilder = new FromDataBuilder(event.getControler().getScenario(), event.getControler().getEvents());
-		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		//init mobility simulation
-		this.signalEngine = new QSimSignalEngine(signalManager);
-		event.getControler().getMobsimListeners().add(signalEngine);
-		signalManager.resetModel(event.getIteration());
-	}
-	
 	@Override
 	public final void notifyShutdown(ShutdownEvent event) {
-		writeData(event.getControler().getScenario(), event.getControler().getControlerIO());
+		writeData(event.getServices().getScenario(), event.getServices().getControlerIO());
 	}
 	
 	private static void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
-		SignalsData data = (SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME);
-		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
+		new SignalsScenarioWriter(controlerIO).writeSignalsData(sc);
 	}
 
 }

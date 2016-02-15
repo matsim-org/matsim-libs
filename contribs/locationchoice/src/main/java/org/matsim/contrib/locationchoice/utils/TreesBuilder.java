@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -44,7 +45,7 @@ public class TreesBuilder {
 	private Set<String> flexibleTypes = new HashSet<String>();
 	private final DestinationChoiceConfigGroup config;
 	
-	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
+	protected TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacility>>();
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	
 	private ActTypeConverter converter = new ActTypeConverter(true);
@@ -142,7 +143,7 @@ public class TreesBuilder {
 		}
 	}
 
-	private QuadTreeRing<ActivityFacility> buildFacQuadTree(String type, TreeMap<Id<ActivityFacility>,ActivityFacility> facilities_of_type) {
+	private QuadTree<ActivityFacility> buildFacQuadTree(String type, TreeMap<Id<ActivityFacility>,ActivityFacility> facilities_of_type) {
 		Gbl.startMeasurement();
 		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;
@@ -161,7 +162,7 @@ public class TreesBuilder {
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTreeRing<ActivityFacility> quadtree = new QuadTreeRing<ActivityFacility>(minx, miny, maxx, maxy);
+		QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
 		for (final ActivityFacility f : facilities_of_type.values()) {
 			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 		}
@@ -171,7 +172,7 @@ public class TreesBuilder {
 		return quadtree;
 	}
 
-	public TreeMap<String, QuadTreeRing<ActivityFacility>> getQuadTreesOfType() {
+	public TreeMap<String, QuadTree<ActivityFacility>> getQuadTreesOfType() {
 		return quadTreesOfType;
 	}
 	public TreeMap<String, ActivityFacilityImpl[]> getFacilitiesOfType() {

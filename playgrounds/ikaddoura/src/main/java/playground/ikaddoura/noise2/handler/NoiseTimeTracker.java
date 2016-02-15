@@ -76,6 +76,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 	private double totalCausedNoiseCost = 0.;
 	private double totalAffectedNoiseCost = 0.;
 	
+	private boolean useCompression = false ;
+	
 	public NoiseTimeTracker(NoiseContext noiseContext, EventsManager events, String outputDirectory) {
 		this.noiseContext = noiseContext;
 		this.outputDirectoryBasic = outputDirectory;
@@ -205,7 +207,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 		
 		log.info("Calculating noise emissions...");
 		calculateNoiseEmission();
-		if (writeOutput()) NoiseWriter.writeNoiseEmissionStatsPerHour(this.noiseContext, outputDirectory);
+		if (writeOutput()) NoiseWriter.writeNoiseEmissionStatsPerHour(this.noiseContext, outputDirectory, useCompression);
 		log.info("Calculating noise emissions... Done.");
 		
 		log.info("Calculating noise immissions...");
@@ -889,6 +891,14 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 
 	public double getTotalAffectedNoiseCost() {
 		return totalAffectedNoiseCost;
+	}
+
+	public final boolean isUseCompression() {
+		return this.useCompression;
+	}
+
+	public final void setUseCompression(boolean useCompression) {
+		this.useCompression = useCompression;
 	}
 	
 }

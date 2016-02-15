@@ -20,7 +20,7 @@
 package playground.thibautd.hitchiking.routing;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.TripRouter;
@@ -34,12 +34,12 @@ import playground.thibautd.hitchiking.spotweights.SpotWeighter;
  */
 public class HitchHikingTripRouterFactory /* extends DefaultTripRouterFactoryImpl */ {
 	private final HitchHikingSpots spots;
-	private final Controler controler;
+	private final MatsimServices controler;
 	private final SpotWeighter spotWeighter;
 	private final HitchHikingConfigGroup config;
 
 	public HitchHikingTripRouterFactory(
-			final Controler controler,
+			final MatsimServices controler,
 			final HitchHikingSpots spots,
 			final SpotWeighter spotWeighter,
 			final HitchHikingConfigGroup config) {

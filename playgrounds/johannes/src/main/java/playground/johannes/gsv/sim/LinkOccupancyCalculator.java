@@ -19,14 +19,9 @@
 
 package playground.johannes.gsv.sim;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
-import gnu.trove.TObjectIntHashMap;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -37,6 +32,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.vehicles.Vehicle;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * @author johannes
@@ -91,8 +91,8 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 	 */
 	@Override
 	public void reset(int iteration) {
-		values = new TObjectDoubleHashMap<Id<Link>>(5000);
-		counter = new TObjectIntHashMap<Id<Person>>(population.getPersons().size());
+		values = new TObjectDoubleHashMap<>(5000);
+		counter = new TObjectIntHashMap<>(population.getPersons().size());
 
 	}
 
@@ -106,12 +106,16 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 
-		Id<Person> personId = event.getDriverId();
+		Id<Vehicle> vehicleId = event.getVehicleId();
+		Id<Person> personId = Id.createPersonId(vehicleId);
 		Person person = population.getPersons().get(personId);
+
 		Plan plan = person.getSelectedPlan();
+
 		int idx = counter.get(personId);
 		Activity nextAct = (Activity) plan.getPlanElements().get(idx + 1);
 		String type = nextAct.getType();
+
 		if (type.equalsIgnoreCase(HOME)) {
 			Activity prevAct = (Activity) plan.getPlanElements().get(idx - 1);
 			type = prevAct.getType();

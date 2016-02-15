@@ -24,7 +24,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
-
 /**
  * All inputs parameters required for spatial analysis are listed and set here.
  * @author amit
@@ -34,42 +33,13 @@ public class SpatialDataInputs {
 
 	public enum LinkWeightMethod {line, point};
 	
-	/**
-	 * If analyzing only one scenario. By default, events file from last iteration and other output files (network, plans, config) are taken.
-	 */
-	public SpatialDataInputs(LinkWeightMethod linkWeightMethod, String initialCaseLocation) {
-		this.linkWeigthMethod = linkWeightMethod;
-		this.initialCase = initialCaseLocation;
-		setInitialFiles();
-	}
-	
-	/**
-	 * If comparing two scenarios. By default, events file from last iteration and other output files (network, plans, config) are taken.
-	 */
-	public SpatialDataInputs(LinkWeightMethod linkWeightMethod, String initialCaseLocation, String compareToCaseLocation) {
-		this.isComparing = true;
-		this.linkWeigthMethod = linkWeightMethod;
-		this.initialCase = initialCaseLocation;
-		this.compareToCase = compareToCaseLocation;
-		
-		setInitialFiles();
-		
-		this.compareToCaseConfig = this.compareToCase+"/output_config.xml";
-		this.compareToCaseNetwork = this.compareToCase+"/output_network.xml.gz";
-		this.compareToCaseLastIteration = LoadMyScenarios.getLastIteration(this.compareToCaseConfig);
-		this.compareToCaseEmissionEventsFile = this.compareToCase+"/ITERS/it."+this.compareToCaseLastIteration+"/"+this.compareToCaseLastIteration+".emission.events.xml.gz";
-		this.compareToCaseEventsFile = this.compareToCase+"/ITERS/it."+this.compareToCaseLastIteration+"/"+compareToCaseLastIteration+".events.xml.gz";
-		this.compareToCasePlans = this.compareToCase+"/output_plans.xml.gz";
-	}
-
 	public final static Logger LOG = Logger.getLogger(SpatialDataInputs.class);
 	
-	private LinkWeightMethod linkWeigthMethod;
+	private final LinkWeightMethod linkWeigthMethod;
 	
-	GridType gridType;
-	double cellWidth;
-	
-	String initialCase;
+	private GridType gridType;
+	private double cellWidth;
+	private final String initialCase;
 	
 	/**
 	 * Config extension is taken .xml (not .xml.gz) because .xml have possible changes due to core changes.
@@ -77,7 +47,6 @@ public class SpatialDataInputs {
 	 */
 	public String initialCaseConfig;
 	public String initialCaseNetworkFile;
-	int initialCaseLastIteration; 
 	public String initialCaseEmissionEventsFile;
 	public String initialCaseEventsFile;
 	public String initialCasePlansFile;
@@ -91,7 +60,6 @@ public class SpatialDataInputs {
 	
 	public String compareToCaseConfig;
 	public String compareToCaseNetwork;
-	int compareToCaseLastIteration ; 
 	public String compareToCaseEmissionEventsFile;
 	public String compareToCaseEventsFile;
 	public String compareToCasePlans; 
@@ -99,28 +67,56 @@ public class SpatialDataInputs {
 	public String shapeFile ;
 	public CoordinateReferenceSystem targetCRS ;
 	
-	double xMin;
-	double xMax;
-	double yMin;
-	double yMax;
+	private double xMin;
+	private double xMax;
+	private double yMin;
+	private double yMax;
 	
-	final  double boundingBoxArea = (yMax-yMin)*(xMax-xMin);
+	private final  double boundingBoxArea = (yMax-yMin)*(xMax-xMin);
 	private double smoothingRadius = 500.;
+	
+	/**
+	 * If analyzing only one scenario. By default, events file from last iteration and other output files (network, plans, config) are taken.
+	 */
+	public SpatialDataInputs(final LinkWeightMethod linkWeightMethod, final String initialCaseLocation) {
+		this.linkWeigthMethod = linkWeightMethod;
+		this.initialCase = initialCaseLocation;
+		setInitialFiles();
+	}
+	
+	/**
+	 * If comparing two scenarios. By default, events file from last iteration and other output files (network, plans, config) are taken.
+	 */
+	public SpatialDataInputs(final LinkWeightMethod linkWeightMethod, final String initialCaseLocation, final String compareToCaseLocation) {
+		this.isComparing = true;
+		this.linkWeigthMethod = linkWeightMethod;
+		this.initialCase = initialCaseLocation;
+		this.compareToCase = compareToCaseLocation;
+		
+		setInitialFiles();
+		
+		this.compareToCaseConfig = this.compareToCase+"/output_config.xml";
+		this.compareToCaseNetwork = this.compareToCase+"/output_network.xml.gz";
+		int compareToCaseLastIteration = LoadMyScenarios.getLastIteration(this.compareToCaseConfig);
+		this.compareToCaseEmissionEventsFile = this.compareToCase+"/ITERS/it."+compareToCaseLastIteration+"/"+compareToCaseLastIteration+".emission.events.xml.gz";
+		this.compareToCaseEventsFile = this.compareToCase+"/ITERS/it."+compareToCaseLastIteration+"/"+compareToCaseLastIteration+".events.xml.gz";
+		this.compareToCasePlans = this.compareToCase+"/output_plans.xml.gz";
+	}
 	
 	/**
 	 * Hexagonal or square grids.
 	 */
-	public void setGridInfo(GridType gridType, double cellWidth) {
+	public void setGridInfo(final GridType gridType, final double cellWidth) {
 		this.gridType = gridType;
 		this.cellWidth = cellWidth;
 	}
 
-	public void setShapeData(CoordinateReferenceSystem targetCRS, String shapeFile) {
+	public void setShapeData(final CoordinateReferenceSystem targetCRS, final String shapeFile) {
 		this.setShapeFile(shapeFile);
 		this.setTargetCRS(targetCRS);
 	}
 
-	public void setBoundingBox(double xMin, double xMax, double yMin, double yMax){
+	public void setBoundingBox(final double xMin, final double xMax,final double yMin, final double yMax){
 		this.xMin = xMin;
 		this.xMax = xMax;
 		this.yMin = yMin;
@@ -131,28 +127,60 @@ public class SpatialDataInputs {
 		return smoothingRadius;
 	}
 
-	public void setSmoothingRadius(double smoothingRadius) {
+	public void setSmoothingRadius(final double smoothingRadius) {
 		this.smoothingRadius = smoothingRadius;
 	}
 
-	public void setTargetCRS(CoordinateReferenceSystem targetCRS) {
+	public void setTargetCRS(final CoordinateReferenceSystem targetCRS) {
 		this.targetCRS = targetCRS;
 	}
 
-	public void setShapeFile(String shapeFile) {
+	public void setShapeFile(final String shapeFile) {
 		this.shapeFile = shapeFile;
 	}
 	
 	private void setInitialFiles(){
 		initialCaseConfig = initialCase+"/output_config.xml";
 		initialCaseNetworkFile = initialCase+"/output_network.xml.gz";
-		initialCaseLastIteration = LoadMyScenarios.getLastIteration(initialCaseConfig);
+		int initialCaseLastIteration = LoadMyScenarios.getLastIteration(initialCaseConfig);
 		initialCaseEmissionEventsFile = initialCase+"/ITERS/it."+initialCaseLastIteration+"/"+initialCaseLastIteration+".emission.events.xml.gz";
 		initialCaseEventsFile = initialCase+"/ITERS/it."+initialCaseLastIteration+"/"+initialCaseLastIteration+".events.xml.gz";
 		initialCasePlansFile = initialCase+"/output_plans.xml.gz";
 	}
 
-	LinkWeightMethod getLinkWeigthMethod() {
+	public LinkWeightMethod getLinkWeigthMethod() {
 		return linkWeigthMethod;
+	}
+
+	public GridType getGridType() {
+		return gridType;
+	}
+
+	public double getCellWidth() {
+		return cellWidth;
+	}
+
+	public String getInitialCase() {
+		return initialCase;
+	}
+
+	public double getxMin() {
+		return xMin;
+	}
+
+	public double getxMax() {
+		return xMax;
+	}
+
+	public double getyMin() {
+		return yMin;
+	}
+
+	public double getyMax() {
+		return yMax;
+	}
+
+	public double getBoundingBoxArea() {
+		return boundingBoxArea;
 	}
 }

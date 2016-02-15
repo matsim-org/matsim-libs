@@ -7,26 +7,21 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
 /**
  * @author aneumann
  */
-public class TransitControler extends Controler {
+public class TransitControler {
 
 	private final static Logger log = Logger.getLogger(TransitControler.class);
 
 	private boolean useOTFVis = false;
 	
-	public TransitControler(Config config) {
-		super(config);
-		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
-	}
-	
-	public TransitControler(ScenarioImpl scenario) {
-		super(scenario);
+	public TransitControler(MutableScenario scenario) {
+//		super(scenario);
 		// TODO Auto-generated constructor stub
 		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	}
@@ -97,18 +92,18 @@ public class TransitControler extends Controler {
 		config.planCalcScore().addActivityParams(transitActivityParams);
 		
 		// reading the scenario (based on the config):
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		MutableScenario sc = (MutableScenario) ScenarioUtils.loadScenario(config);
 		
-		TransitControler tc = new TransitControler(sc);
+		Controler tc = new Controler(sc);
         tc.setScoringFunctionFactory(new BvgScoringFunctionFactory(sc,  new BvgScoringFunctionConfigGroup(config)));
 		
 
 
 		// Not needed to use own scoring function
 
-		if(args.length > 1 && args[1].equalsIgnoreCase("true")){
-			tc.setUseOTFVis(true);
-		}
+//		if(args.length > 1 && args[1].equalsIgnoreCase("true")){
+//			tc.setUseOTFVis(true);
+//		}
 		tc.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :

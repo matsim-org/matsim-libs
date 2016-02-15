@@ -35,6 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -72,10 +73,10 @@ public class CopyOfCreatePlans {
 			
 			Scenario scenario = ScenarioUtils.createScenario(config);
 			
-			new MatsimNetworkReader(scenario).readFile("input/oslo/trondheim.xml");
+			new MatsimNetworkReader(scenario.getNetwork()).readFile("input/oslo/trondheim.xml");
 			Population pop = fillScenario(scenario);
 			
-			Controler controler = new Controler(scenario);
+			MatsimServices controler = new Controler(scenario);
 			controler.getConfig().controler().setOverwriteFileSetting(
 					true ?
 							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :

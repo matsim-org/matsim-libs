@@ -32,9 +32,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestCase;
@@ -48,14 +48,14 @@ public class EventsToScoreTest extends MatsimTestCase {
 	 * Tests that an AgentUtilityEvent is handled by calling the method addUtility() of a scoring function.
 	 */
 	public void testAddMoney() {
-        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population population = scenario.getPopulation();
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
-		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(e2s);
+
+		EventsToScore e2s = EventsToScore.createWithScoreUpdating(scenario, sfFactory, events);
 
 		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4));
 
@@ -82,16 +82,15 @@ public class EventsToScoreTest extends MatsimTestCase {
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
         Population population = scenario.getPopulation();
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		PlanImpl plan = new PlanImpl() ;
 		person.addPlan(plan);
 		
 		ScoringFunctionFactory sfFactory = new CharyparNagelScoringFunctionFactory( scenario );
-		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(e2s);
-		
+		EventsToScore e2s = EventsToScore.createWithScoreUpdating(scenario, sfFactory, events);
+
 		for ( int mockIteration = config.controler().getFirstIteration() ; mockIteration <= config.controler().getLastIteration() ; mockIteration++ ) {
 
 			events.resetHandlers(mockIteration) ;

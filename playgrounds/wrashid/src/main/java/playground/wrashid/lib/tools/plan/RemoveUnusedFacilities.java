@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
@@ -44,7 +44,7 @@ public class RemoveUnusedFacilities {
 		
 		String outputFacilitiesFile="H:/data/experiments/TRBAug2012/input/facilties_8kmCut_10pct.xml.gz";	
 	
-		ScenarioImpl scenario= (ScenarioImpl) GeneralLib.readScenario(inputPlansFile, inputNetworkFile,inputFacilities);
+		MutableScenario scenario= (MutableScenario) GeneralLib.readScenario(inputPlansFile, inputNetworkFile,inputFacilities);
 		
 		HashSet<Id> usedFacilities=new HashSet<Id>();
 		

@@ -19,8 +19,8 @@
 
 package playground.johannes.synpop.source.mid2008.generator;
 
-import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.util.HashMap;
 import java.util.Map;

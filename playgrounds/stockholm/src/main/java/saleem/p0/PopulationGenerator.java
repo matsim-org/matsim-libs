@@ -30,7 +30,7 @@ public class PopulationGenerator {
 		
 		/*
 		 * We enter coordinates in the WGS84 reference system, but we want them to appear in the population file
-		 * projected to UTM33N, because we also generated the network that way.
+		 * projected to UTM33N, because we also generated the network in UTM33N.
 		 */
 		CoordinateTransformation ct = 
 			 TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
@@ -58,7 +58,7 @@ public class PopulationGenerator {
 		 */
 		
 		long key =1;
-		for(long i=1; i<3000;i++){
+		for(long i=1; i<=5000;i++){
 			key=i;
 			Person person = populationFactory.createPerson(Id.createPersonId(key));
 			population.addPerson(person);
@@ -73,9 +73,10 @@ public class PopulationGenerator {
 			 * we keep the home coordinates for later use (see below).
 			 * Note that we use the CoordinateTransformation created above.
 			 */
+//			Coord homeCoordinates = new Coord(683474.55573, 4826700.65288);
 			Coord homeCoordinates = new Coord(686661.13571, 4827510.51845);
 			Activity activity1 = populationFactory.createActivityFromCoord("home", homeCoordinates);
-			activity1.setEndTime(21600 + i*2); // leave at 6 o'clock, one vehicle entering after other in a short while so that there is no peak at one second
+			activity1.setEndTime(21600 + i*0.72); // leave at 6 o'clock, one vehicle entering after other in a short while so that there is no peak at one second
 			//activity1.setEndTime(21600);
 			plan.addActivity(activity1); // add the Activity to the Plan
 			
@@ -99,14 +100,16 @@ public class PopulationGenerator {
 
 		}
 		
-		 for(long i=1; i<1500;i++){
-			key=i+3000;
+		 for(long i=1; i<=3000;i++){
+			key=i+5000;
 			Person person = populationFactory.createPerson(Id.createPersonId(key));
 			population.addPerson(person);
 			Plan plan = populationFactory.createPlan();
+//			Coord homeCoordinates = new Coord(683474.55573, 4826700.65288);
 			Coord homeCoordinates = new Coord(686661.13571, 4826063.88649);
+
 			Activity activity1 = populationFactory.createActivityFromCoord("home", homeCoordinates);
-			activity1.setEndTime(21600+ i*2); // leave at 6 o'clock
+			activity1.setEndTime(21600 + i*1.2); // leave at 6 o'clock
 			//activity1.setEndTime(21600);
 			plan.addActivity(activity1); // add the Activity to the Plan
 			plan.addLeg(populationFactory.createLeg("car"));
@@ -124,7 +127,7 @@ public class PopulationGenerator {
 		 * Write the population (of 1 Person) to a file.
 		 */
 		MatsimWriter popWriter = new org.matsim.api.core.v01.population.PopulationWriter(population, network);
-		popWriter.write("H:\\Mike Work\\population.xml");
+		popWriter.write("H:\\Mike Work\\input\\population.xml");
 	}
 	public static String claculateTime(double timeInSeconds){
 		int hours = (int) timeInSeconds / 3600;

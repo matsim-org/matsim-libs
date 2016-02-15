@@ -26,7 +26,7 @@ import org.matsim.contrib.minibus.PConstants;
 import org.matsim.contrib.minibus.replanning.PStrategy;
 import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.*;
@@ -173,7 +173,7 @@ public final class CreateOperatorFromTransitSchedule implements PStrategy {
 
 
 	private TransitSchedule readTransitSchedule(String transitScheduleToStartWith) {
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().transit().setUseTransit(true);
 		log.info("Reading " + transitScheduleToStartWith);
 		new TransitScheduleReaderV1(sc).readFile(transitScheduleToStartWith);

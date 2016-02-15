@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.services;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
+
+import java.util.Collection;
 
 /**
  * @author illenberger

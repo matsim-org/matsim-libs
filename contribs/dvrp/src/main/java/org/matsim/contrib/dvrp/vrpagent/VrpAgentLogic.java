@@ -98,7 +98,7 @@ public class VrpAgentLogic
 
     private DynActivity createBeforeScheduleActivity()
     {
-        return new AbstractDynActivity("Before schedule: " + vehicle.getId()) {
+        return new AbstractDynActivity("Before schedule") {
             public double getEndTime()
             {
                 Schedule<?> s = vehicle.getSchedule();
@@ -118,7 +118,6 @@ public class VrpAgentLogic
 
     private DynActivity createAfterScheduleActivity()
     {
-        return new StaticDynActivity("After schedule: " + vehicle.getId(),
-                Double.POSITIVE_INFINITY);
+        return new StaticDynActivity("After schedule", Double.POSITIVE_INFINITY);
     }
 }

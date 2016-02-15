@@ -19,16 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.spacetimeprismjoinabletrips;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
-
 import playground.thibautd.analysis.spacetimeprismjoinabletrips.TripsPrism.PassengerRecord;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * writes the records information in a simple flat format

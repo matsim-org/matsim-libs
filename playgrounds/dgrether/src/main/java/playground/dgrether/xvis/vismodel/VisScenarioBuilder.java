@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.lanes.ModelLane;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.vis.VisLane;
@@ -110,7 +110,7 @@ public class VisScenarioBuilder {
 	private void createVisLinks(Scenario scenario, VisScenario visScenario,
 			CoordinateTransformation transform) {
 		VisLaneModelBuilder visLaneModelBuilder = new VisLaneModelBuilder();
-		LaneDefinitions20 lanes = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		Lanes lanes = (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME);
 		for (Link l : scenario.getNetwork().getLinks().values()){
 			LanesToLinkAssignment20 l2l = null;
 			if (lanes != null) {

@@ -104,14 +104,15 @@ public class ResponsibilityGridTools {
 				}
 			}
 		}
-		if(!linkId.toString().contains("_p")){
-			if(relevantDuration>1.){
-			System.out.println("average of time bin is " + averageOfCurrentTimeBin);
-			System.out.println("calculating relative factor for link " + linkId.toString() + " in cell " + cellOfLink.toString());
-			System.out.println("relevant duration for this link " + relevantDuration 
-					+ " resulting factor " + (relevantDuration/averageOfCurrentTimeBin));
-			}
-		}
+		//following print statments are commented. amit, Oct'15
+//		if(!linkId.toString().contains("_p")){
+//			if(relevantDuration>1.){
+//			System.out.println("average of time bin is " + averageOfCurrentTimeBin);
+//			System.out.println("calculating relative factor for link " + linkId.toString() + " in cell " + cellOfLink.toString());
+//			System.out.println("relevant duration for this link " + relevantDuration 
+//					+ " resulting factor " + (relevantDuration/averageOfCurrentTimeBin));
+//			}
+//		}
 		return relevantDuration / averageOfCurrentTimeBin;	
 		}
 		return 0.0;

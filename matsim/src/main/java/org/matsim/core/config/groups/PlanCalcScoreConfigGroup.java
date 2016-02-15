@@ -743,6 +743,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public static class ModeParams extends ReflectiveConfigGroup implements MatsimParameters {
+		private static final String MONETARY_DISTANCE_RATE = "monetaryDistanceRate";
+
 		final static String SET_TYPE = "modeParams";
 
 		private String mode = null;
@@ -817,12 +819,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.constant = constant;
 		}
 
-		@StringGetter( "monetaryDistanceRate" )
+		@StringGetter( MONETARY_DISTANCE_RATE )
 		public double getMonetaryDistanceRate() {
 			return this.monetaryDistanceRate;
 		}
 
-		@StringSetter( "monetaryDistanceRate" )
+		@StringSetter( MONETARY_DISTANCE_RATE )
 		public void setMonetaryDistanceRate(double monetaryDistanceRate) {
 			testForLocked() ;
 			this.monetaryDistanceRate = monetaryDistanceRate;

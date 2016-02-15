@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -33,12 +32,12 @@ public class PathCostsGeneric extends PathCosts {
 
 	public void createRoute(final Link startLink, final Link endLink, double beelineDistanceFactor, double speed) {
 			this.route = new GenericRouteImpl(startLink.getId(), endLink.getId());
-			this.calculateDirectDistance(startLink.getId(), endLink.getId(), beelineDistanceFactor);
+			this.calculateDirectDistance(startLink, endLink, beelineDistanceFactor);
 			this.route.setTravelTime(this.route.getDistance() / speed);
 	}
 	
-	private void calculateDirectDistance(Id startLinkId, Id endLinkId, double beelineDistanceFactor) {
-		double distance = CoordUtils.calcDistance(network.getLinks().get(startLinkId).getCoord(), network.getLinks().get(endLinkId).getCoord());
+	private void calculateDirectDistance(Link startLink, Link endLink, double beelineDistanceFactor) {
+		double distance = CoordUtils.calcDistance(startLink.getCoord(), endLink.getCoord());
 		this.route.setDistance(beelineDistanceFactor * distance);
 	}
 }

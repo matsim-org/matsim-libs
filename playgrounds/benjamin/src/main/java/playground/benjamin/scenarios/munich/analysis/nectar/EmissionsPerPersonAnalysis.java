@@ -30,7 +30,7 @@ import org.matsim.contrib.emissions.utils.EmissionWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
@@ -63,7 +63,7 @@ public class EmissionsPerPersonAnalysis {
 		Scenario scenario = loadScenario(netFile, plansFile);
 
 		EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionFile);
-		ema.init((ScenarioImpl) scenario);
+		ema.init((MutableScenario) scenario);
 		ema.preProcessData();
 		ema.postProcessData();
 		

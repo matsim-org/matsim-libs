@@ -5,9 +5,13 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Network;
@@ -15,6 +19,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import playground.wrashid.bodenbender.StudyArea;
 
@@ -77,7 +82,8 @@ public class TravelDemand {
 	}
 
 	private static class CollectPositionOfVehicles implements PersonArrivalEventHandler, LinkEnterEventHandler,
-			LinkLeaveEventHandler {
+			LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+		private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 		// key: agentId, value:linkId
 		private HashMap<Id, Id> startPositions = new HashMap<Id, Id>();
@@ -105,14 +111,13 @@ public class TravelDemand {
 
 		@Override
 		public void reset(int iteration) {
-			// TODO Auto-generated method stub
-
+			delegate.reset(iteration);
 		}
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			double time = event.getTime();
-			Id personId = event.getDriverId();
+			Id personId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
 			Id linkId = event.getLinkId();
 			boolean isArrival = false;
 			updatePosition(time, personId, linkId, isArrival);
@@ -132,7 +137,7 @@ public class TravelDemand {
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			double time = event.getTime();
-			Id personId = event.getDriverId();
+			Id personId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
 			Id linkId = event.getLinkId();
 			boolean isArrival = false;
 			updatePosition(time, personId, linkId, isArrival);
@@ -145,6 +150,14 @@ public class TravelDemand {
 			Id linkId = event.getLinkId();
 			boolean isArrival = true;
 			updatePosition(time, personId, linkId, isArrival);
+		}
+
+		public void handleEvent(VehicleEntersTrafficEvent event) {
+			this.delegate.handleEvent(event);
+		}
+
+		public void handleEvent(VehicleLeavesTrafficEvent event) {
+			this.delegate.handleEvent(event);
 		}
 
 	}

@@ -95,7 +95,8 @@ public class ParallelPopulationReaderMatsimV4Runner extends PopulationReaderMats
 	
 	private void startPerson(final Attributes atts) {
 		String ageString = atts.getValue("age");
-		int age = Integer.MIN_VALUE;
+//		int age = Integer.MIN_VALUE;
+		Integer age = null ;
 		if (ageString != null) age = Integer.parseInt(ageString);
 		PersonUtils.setAge(this.currperson, age);
 		PersonUtils.setSex(this.currperson, atts.getValue("sex"));

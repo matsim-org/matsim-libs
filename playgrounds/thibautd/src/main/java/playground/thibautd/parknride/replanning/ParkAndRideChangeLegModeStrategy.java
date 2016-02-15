@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
@@ -32,8 +32,10 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
-
+import org.matsim.core.router.TripRouter;
 import playground.thibautd.parknride.ParkAndRideConstants;
+
+import javax.inject.Provider;
 
 
 /**
@@ -44,12 +46,12 @@ import playground.thibautd.parknride.ParkAndRideConstants;
 public class ParkAndRideChangeLegModeStrategy implements PlanStrategy {
 	private final PlanStrategyImpl strategy = new PlanStrategyImpl( new RandomPlanSelector() );
 
-	public ParkAndRideChangeLegModeStrategy(final Controler controler) {
+	public ParkAndRideChangeLegModeStrategy(final MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
 		StageActivityTypes pnrList = ParkAndRideConstants.PARKING_ACT_TYPE;
 
-		addStrategyModule( new TripsToLegsModule( controler.getConfig() , pnrList ) );
-		addStrategyModule( new ChangeLegMode( controler.getConfig() ) );
-		addStrategyModule( new ReRoute(controler.getScenario() ) );
+		addStrategyModule( new TripsToLegsModule(pnrList, tripRouterProvider, controler.getConfig().global()) );
+		addStrategyModule( new ChangeLegMode( controler.getConfig().global(), controler.getConfig().changeLegMode() ) );
+		addStrategyModule( new ReRoute(controler.getScenario(), tripRouterProvider) );
 		addStrategyModule( new ParkAndRideInvalidateStartTimes( controler ) );
 	}
 

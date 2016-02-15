@@ -25,14 +25,17 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import org.matsim.core.router.TripRouter;
 import playground.telaviv.locationchoice.LocationChoicePlanModule;
+
+import javax.inject.Provider;
 
 /*
  * PlanStrategy can be selected by using the full path to this Class in
@@ -44,13 +47,13 @@ public class LocationChoiceReRoutePlanStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl planStrategyDelegate = null;
 	
-	public LocationChoiceReRoutePlanStrategy(Controler controler) {
+	public LocationChoiceReRoutePlanStrategy(MatsimServices controler, Provider<TripRouter> tripRouterProvider) {
 		
 		Scenario scenario = controler.getScenario();
 		
 		planStrategyDelegate = new PlanStrategyImpl(new RandomPlanSelector());
 		planStrategyDelegate.addStrategyModule(new LocationChoicePlanModule(scenario));
-		planStrategyDelegate.addStrategyModule(new ReRoute(scenario));
+		planStrategyDelegate.addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 	}
 	
 	public void addStrategyModule(PlanStrategyModule module) {

@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.synPop.data;
 
-import java.util.Map;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
 
-import playground.johannes.sna.gis.ZoneLayer;
+import java.util.Map;
 
 /**
  * @author johannes

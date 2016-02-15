@@ -2,6 +2,8 @@ package matsimConnector.scenarioGenerator;
 
 import java.util.ArrayList;
 
+import matsimConnector.utility.Constants;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -33,10 +35,19 @@ public class PopulationGenerator {
 		population.getPersons().clear();
 		PopulationFactory factory = population.getFactory();
 		double t = 0;
-		double flowProportion = initLinks.size();
+		double flowProportion = 1./initLinks.size();
 		int generated = 0;
-		for (Link link : initLinks){			
+		for (Link link : initLinks){
 			int linkLimit = (int)(populationSize*flowProportion);
+			/*HOOGENDOORN EXP CONFIGURATION
+			linkLimit = 2000;
+			populationSize=4000;
+			String originNodeId = link.getFromNode().getId().toString();
+			if (originNodeId.endsWith("s")){
+				linkLimit = populationSize-linkLimit;
+				double cap = 5.*Constants.FLOPW_CAP_PER_METER_WIDTH;
+				link.setCapacity(cap);
+			}*/
 			for (int i = 0; i < linkLimit & generated<populationSize; i++) {
 				Person pers = factory.createPerson(Id.create("p"+population.getPersons().size(),Person.class));
 				Plan plan = factory.createPlan();

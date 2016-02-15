@@ -2,10 +2,6 @@
 package herbie.creation.ptAnalysis;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -19,7 +15,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -30,6 +26,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 
 public class QuickLegAnalysisPtPlanbased {
 	
@@ -50,7 +50,7 @@ public class QuickLegAnalysisPtPlanbased {
 	
 	private final static Logger log = Logger.getLogger(PtScenarioAdaption.class);
 	private final static String SEPARATOR = "===";
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private Population pop;
 	private TransitScheduleFactory transitFactory = null;
 	private ArrayList<Double> headways = new ArrayList<Double>();
@@ -106,9 +106,9 @@ public class QuickLegAnalysisPtPlanbased {
 		log.info("inizialize ... ");
 		
 		
-    	this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    	this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(scenario).readFile(NETWORKFILE);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
 		
 		pop = scenario.getPopulation();
 		

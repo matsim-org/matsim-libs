@@ -20,7 +20,7 @@
 package playground.johannes.gsv.fpd;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -28,7 +28,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.ColorUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -49,15 +51,13 @@ import org.wololo.geojson.Feature;
 import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.LineString;
 import org.wololo.jts2geojson.GeoJSONWriter;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.gsv.sim.cadyts.ODCalibrator;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.graph.spatial.io.ColorUtils;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.awt.*;
 import java.io.BufferedWriter;
@@ -86,10 +86,10 @@ public class NetLoad {
 		/*
 		 * load matrix
 		 */
-		KeyMatrixXMLReader mReader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader mReader = new NumericMatrixXMLReader();
 		mReader.setValidating(false);
 		mReader.parse(matrixFile);
-		KeyMatrix m = mReader.getMatrix();
+		NumericMatrix m = mReader.getMatrix();
 
 		MatrixOperations.applyFactor(m, 1.952898582487276);
 		/*
@@ -100,7 +100,7 @@ public class NetLoad {
 		/*
 		 * lead network
 		 */
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(netFile);
 		Network network = scenario.getNetwork();
 		/*
@@ -148,7 +148,7 @@ public class NetLoad {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		/*
 		 * compare counts
 		 */

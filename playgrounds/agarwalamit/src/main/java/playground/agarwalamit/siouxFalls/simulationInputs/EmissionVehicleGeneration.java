@@ -38,6 +38,7 @@ import org.matsim.vehicles.Vehicles;
  * @author amit after benjamin
  *
  */
+//ZZ_TODO : probably mode this to some templates.
 public class EmissionVehicleGeneration {
 
 
@@ -49,7 +50,7 @@ public class EmissionVehicleGeneration {
 		this.scenario = scenario;
 	}
 
-	private static final Logger log = Logger.getLogger(EmissionVehicleGeneration.class);
+	private static final Logger LOG = Logger.getLogger(EmissionVehicleGeneration.class);
 
 	public static void main(String[] args) {
 		//		NetworkSimplifier networkSimplifier = new NetworkSimplifier();
@@ -101,6 +102,6 @@ public class EmissionVehicleGeneration {
 
 		VehicleWriterV1 vehicleWriter = new VehicleWriterV1(outputVehicles);
 		vehicleWriter.writeFile(outputVehicleFile);
-		log.info("Writing emission Vehicles files is finished.");
+		LOG.info("Writing emission Vehicles files is finished.");
 	}
 }

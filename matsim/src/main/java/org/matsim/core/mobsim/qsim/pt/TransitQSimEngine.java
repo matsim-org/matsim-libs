@@ -117,7 +117,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		}
 	}
 
-	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe(TransitStopAgentTracker thisAgentTracker) {
+	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe() {
 		Scenario scenario = this.qSim.getScenario();
 		Vehicles vehicles = scenario.getTransitVehicles();
 		Collection<MobsimAgent> drivers = new ArrayList<>();
@@ -133,7 +133,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		return drivers;
 	}
 
-	private UmlaufCache getOrCreateUmlaufCache(final Scenario scenario) {
+	private static UmlaufCache getOrCreateUmlaufCache(final Scenario scenario) {
 		UmlaufCache umlaufCache;
 
 		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder =
@@ -213,7 +213,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		ptDrivers = createVehiclesAndDriversWithUmlaeufe(this.agentTracker);
+		ptDrivers = createVehiclesAndDriversWithUmlaeufe();
 	}
 
 	public Collection<MobsimAgent> getPtDrivers() {

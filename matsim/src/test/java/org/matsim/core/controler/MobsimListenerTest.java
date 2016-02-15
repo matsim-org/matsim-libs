@@ -49,7 +49,7 @@ public class MobsimListenerTest {
             }
         });
         c.getConfig().controler().setCreateGraphs(false);
-        c.setDumpDataAtEnd(false);
+        c.getConfig().controler().setDumpDataAtEnd(false);
         c.getConfig().controler().setWriteEventsInterval(0);
         c.run();
     }
@@ -67,7 +67,7 @@ public class MobsimListenerTest {
             }
         });
         c.getConfig().controler().setCreateGraphs(false);
-        c.setDumpDataAtEnd(false);
+        c.getConfig().controler().setDumpDataAtEnd(false);
         c.getConfig().controler().setWriteEventsInterval(0);
         c.run();
     }

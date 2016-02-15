@@ -35,7 +35,7 @@ import org.matsim.contrib.minibus.routeProvider.ComplexCircleScheduleProvider;
 import org.matsim.contrib.minibus.routeProvider.RandomStopProvider;
 import org.matsim.contrib.minibus.routeProvider.SimpleCircleScheduleProvider;
 import org.matsim.contrib.minibus.schedule.CreateStopsForAllCarLinks;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -177,7 +177,7 @@ public class ComplexCircleScheduleProviderTest {
 	@Test
     public final void testGetRandomTransitStop() {
 		
-		ScenarioImpl scenario = (ScenarioImpl) PScenarioHelper.createTestNetwork();
+		MutableScenario scenario = (MutableScenario) PScenarioHelper.createTestNetwork();
 		PConfigGroup pC = new PConfigGroup();
 		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, scenario.getPopulation(), scenario.getTransitSchedule(), null);
 		
@@ -193,7 +193,7 @@ public class ComplexCircleScheduleProviderTest {
 	@Test
     public final void testCreateEmptyLine() {
 		
-		ScenarioImpl scenario = (ScenarioImpl) PScenarioHelper.createTestNetwork();
+		MutableScenario scenario = (MutableScenario) PScenarioHelper.createTestNetwork();
 		PConfigGroup pC = new PConfigGroup();
 		
 		Id<Operator> lineId = Id.create("1", Operator.class);

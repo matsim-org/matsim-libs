@@ -15,27 +15,19 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
@@ -109,7 +101,7 @@ public class GeneticAlgorithmMode {
 		private void calculateScore(final Scenario scenario) {
 			TransitActsRemover transitActsRemover = new TransitActsRemover();
 			for(Person person:scenario.getPopulation().getPersons().values()) {
-				Person copyPerson = PersonImpl.createPerson(person.getId());
+				Person copyPerson = PopulationUtils.createPerson(person.getId());
 				PersonUtils.setCarAvail(copyPerson, PersonUtils.getCarAvail(person));
 				PlanImpl copyPlan = new PlanImpl(copyPerson);
 				copyPlan.copyFrom(person.getSelectedPlan());
@@ -210,7 +202,7 @@ public class GeneticAlgorithmMode {
 		scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate((double) 10);
 		new MatsimPopulationReader(scenario).readFile(args[1]);
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
-		new MatsimNetworkReader(scenario).readFile(args[3]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[3]);
 		new TransitScheduleReader(scenario).readFile(args[4]);
 		for(Link link:scenario.getNetwork().getLinks().values()) {
 			Set<String> modes = new HashSet<String>(link.getAllowedModes());
@@ -237,32 +229,9 @@ public class GeneticAlgorithmMode {
 		if(!args[5].equals("NO"))
 			new MatsimEventsReader(events).readFile(args[5]);
 		routerManager = new RouterManager(scenario.getConfig().global().getNumberOfThreads(), scenario, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
-		final TravelDisutilityFactory factory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+		final TravelDisutilityFactory factory = new Builder( TransportMode.car );
 		final TravelDisutility disutility = factory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		final Provider<TransitRouter> transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
-		ReplanningContext context = new ReplanningContext() {
-			@Override
-			public TravelDisutility getTravelDisutility() {
-				return disutility;
-			}
-			@Override
-			public TravelTime getTravelTime() {
-				return travelTimeCalculator.getLinkTravelTimes();
-			}
-			@Override
-			public ScoringFunctionFactory getScoringFunctionFactory() {
-				return new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario);
-			}
-			@Override
-			public int getIteration() {
-				return 1;
-			}
-			@Override
-			public TripRouter getTripRouter() {
-				return TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory).get();
-			}
-		};
-		ReRoute module = new ReRoute(scenario);
 		int numIterations = new Integer(args[6]);
 		int maxElements = new Integer(args[7]);
 		NavigableSet<ParametersArray> memory = new TreeSet<ParametersArray>(new Comparator<ParametersArray>() {

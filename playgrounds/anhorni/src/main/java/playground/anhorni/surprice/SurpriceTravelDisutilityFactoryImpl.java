@@ -21,7 +21,7 @@ package playground.anhorni.surprice;
 
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -39,9 +39,9 @@ public class SurpriceTravelDisutilityFactoryImpl implements TravelDisutilityFact
 	private String day;
 	private AgentMemories memories;
 	private  ObjectAttributes preferences;
-	private Controler controler;
+	private MatsimServices controler;
 	
-	public SurpriceTravelDisutilityFactoryImpl(String day, AgentMemories memories,  ObjectAttributes preferences, Controler controler) {
+	public SurpriceTravelDisutilityFactoryImpl(String day, AgentMemories memories,  ObjectAttributes preferences, MatsimServices controler) {
 		this.day = day;
 		this.memories = memories;
 		this.preferences = preferences;

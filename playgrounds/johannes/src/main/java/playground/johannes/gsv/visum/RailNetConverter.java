@@ -22,18 +22,17 @@
  */
 package playground.johannes.gsv.visum;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.johannes.gsv.visum.NetFileReader.TableHandler;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author johannes

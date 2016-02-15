@@ -52,13 +52,13 @@ class LaneDefinitionsReader20 extends MatsimJaxbXmlParser implements MatsimSomeR
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsReader20.class);
 
-	private LaneDefinitions20 laneDefinitions;
+	private Lanes laneDefinitions;
 
 	private LaneDefinitionsFactory20 builder;
 	/**
 	 * @param schemaLocation
 	 */
-	public LaneDefinitionsReader20(LaneDefinitions20 laneDefs, String schemaLocation) {
+	public LaneDefinitionsReader20(Lanes laneDefs, String schemaLocation) {
 		super(schemaLocation);
 		this.laneDefinitions = laneDefs;
 		builder = this.laneDefinitions.getFactory();

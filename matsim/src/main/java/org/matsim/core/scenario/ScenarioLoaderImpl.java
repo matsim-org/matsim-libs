@@ -27,7 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.TimeVariantLinkFactory;
+import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
@@ -52,7 +52,7 @@ import org.matsim.vehicles.VehicleReaderV1;
  * <li> Given what we have now, does it make sense to leave this class public?  yy kai, mar'11
  * </ul>
  *
- * @see org.matsim.core.scenario.ScenarioImpl
+ * @see org.matsim.core.scenario.MutableScenario
  *
  * @author dgrether
  */
@@ -76,15 +76,15 @@ public class ScenarioLoaderImpl {
 
 	private final Config config;
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 
 	private ScenarioLoaderImpl(Config config) {
 		this.config = config;
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(this.config);
 	}
 
 	private ScenarioLoaderImpl(Scenario scenario) {
-		this.scenario = (ScenarioImpl) scenario;
+		this.scenario = (MutableScenario) scenario;
 		this.config = this.scenario.getConfig();
 	}
 
@@ -124,9 +124,9 @@ public class ScenarioLoaderImpl {
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 			if (this.config.network().isTimeVariantNetwork()) {
 				log.info("use TimeVariantLinks in NetworkFactory.");
-				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
+				network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 			}
-			new MatsimNetworkReader(this.scenario).parse(networkFileName);
+			new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
 			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);

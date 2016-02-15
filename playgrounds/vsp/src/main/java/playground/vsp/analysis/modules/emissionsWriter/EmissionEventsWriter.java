@@ -34,7 +34,7 @@ import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.WarmEmissionHandler;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -47,7 +47,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class EmissionEventsWriter extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(EmissionEventsWriter.class);
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private EmissionModule emissionModule;
 	private WarmEmissionHandler wEmiHandler;
 	private ColdEmissionHandler cEmiHandler;
@@ -60,7 +60,7 @@ public class EmissionEventsWriter extends AbstractAnalysisModule{
 		this.outputPath = outputFolder + this.getName() + "/";
 	}
 	
-	public void init(ScenarioImpl scenario) {
+	public void init(MutableScenario scenario) {
 		this.scenario = scenario;
 		this.emissionModule = new EmissionModule(scenario);
 		this.emissionModule.createLookupTables();

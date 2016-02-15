@@ -39,8 +39,8 @@ public class CreateMultiModalNetwork {
 		Scenario streetScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario transitScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(streetScenario).readFile("/data/matsim/cdobler/2030/network.xml.gz");
-		new MatsimNetworkReader(transitScenario).readFile("/data/matsim/cdobler/2030/network.edited.xml.gz");
+		new MatsimNetworkReader(streetScenario.getNetwork()).readFile("/data/matsim/cdobler/2030/network.xml.gz");
+		new MatsimNetworkReader(transitScenario.getNetwork()).readFile("/data/matsim/cdobler/2030/network.edited.xml.gz");
 		
 		Network streetNetwork = streetScenario.getNetwork();
 		Network transitNetwork = transitScenario.getNetwork();

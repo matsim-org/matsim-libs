@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.jfree.util.Log;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.balac.carsharing.preprocess.membership.FacilitiesPortfolio;
 import playground.balac.carsharing.preprocess.membership.MembershipAssigner;
@@ -15,9 +15,9 @@ import playground.balac.carsharing.preprocess.membership.algos.RunMembershipGA;
 public class CSmembershipMaximizationStrategy extends CSstationsLocationStrategy
 {
   private MembershipAssigner membershipAssigner;
-  private ScenarioImpl scenario;
+  private MutableScenario scenario;
 
-  public CSmembershipMaximizationStrategy(ScenarioImpl scenario)
+  public CSmembershipMaximizationStrategy(MutableScenario scenario)
   {
     this.scenario = scenario;
   }

@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.jointpseudosim.qsim;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
@@ -36,10 +33,12 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-
 import playground.thibautd.pseudoqsim.ParkedVehicleProvider;
 import playground.thibautd.pseudoqsim.PopulationAgentSourceForTeleportedVehicles;
 import playground.thibautd.pseudoqsim.VehicularTeleportationEngine;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author thibautd

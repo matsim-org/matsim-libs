@@ -23,6 +23,15 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<repositories>
@@ -33,7 +42,7 @@
 		</repository>
 		<!-- repeating repositories below although they are in socnetgen in attempt 
 			to repair intermittent build failures. kai, sep'15 -->
-		<repository>
+		<!--<repository>
 			<id>basex</id>
 			<name>BaseX Maven Repository</name>
 			<url>http://files.basex.org/maven</url>
@@ -42,15 +51,16 @@
 			<id>xqj</id>
 			<name>XQJ Maven Repository</name>
 			<url>http://xqj.net/maven</url>
-		</repository>
+		</repository>-->
 	</repositories>
 	<dependencies>
 
 		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1-beta1</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>cadytsIntegration</artifactId>

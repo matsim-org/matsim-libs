@@ -20,24 +20,24 @@
 package playground.johannes.gsv.synPop.osm;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,10 +61,10 @@ public class AdjustFacilitiesFromMatrix {
 		 * load matrix
 		 */
 		logger.info("Loading matrix...");
-		KeyMatrixXMLReader mReader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader mReader = new NumericMatrixXMLReader();
 		mReader.setValidating(false);
 		mReader.parse(matrixFile);
-		KeyMatrix m = mReader.getMatrix();
+		NumericMatrix m = mReader.getMatrix();
 		/*
 		 * load zones
 		 */
@@ -93,7 +93,7 @@ public class AdjustFacilitiesFromMatrix {
 		
 		Random random = new XORShiftRandom();
 		double c = MatrixOperations.sum(m) / scenario.getActivityFacilities().getFacilities().size();
-		TObjectDoubleHashMap<String> marginals = MatrixOperations.marginalsCol(m);
+		TObjectDoubleHashMap<String> marginals = MatrixOperations.columnMarginals(m);
 
 		for (Zone zone : zones.getZones()) {
 			String name = zone.getAttribute("nuts3_name");
@@ -141,7 +141,7 @@ public class AdjustFacilitiesFromMatrix {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 		if (notfound > 0) {
 			logger.warn(String.format("Cannot assign %s facilities to a zone.", notfound));

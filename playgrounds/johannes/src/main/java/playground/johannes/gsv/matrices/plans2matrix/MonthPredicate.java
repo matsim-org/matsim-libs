@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 /**
  * @author johannes

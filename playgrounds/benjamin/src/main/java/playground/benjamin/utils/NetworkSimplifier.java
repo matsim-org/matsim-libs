@@ -59,7 +59,7 @@ public class NetworkSimplifier {
 	
 			Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			final Network network = scenario.getNetwork();
-			new MatsimNetworkReader(scenario).readFile("../../detailedEval/Net/network-86-85-87-84_withLanes.xml");
+			new MatsimNetworkReader(scenario.getNetwork()).readFile("../../detailedEval/Net/network-86-85-87-84_withLanes.xml");
 	
 			NetworkSimplifier nsimply = new NetworkSimplifier();
 			nsimply.setNodesToMerge(nodeTypesToMerge);

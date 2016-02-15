@@ -12,6 +12,7 @@ public class DensityGrid extends Grid<Double> {
 
 	private final PedestrianFootprint pedestrianFootprint;
 	private final EnvironmentGrid environmentGrid;
+	private static double cellArea = Math.pow(Constants.CELL_SIZE, 2);
 	
 	public DensityGrid(int rows, int cols, EnvironmentGrid environmentGrid) {
 		super(rows, cols);
@@ -44,7 +45,6 @@ public class DensityGrid extends Grid<Double> {
 	
 	public double getDensityAt(GridPoint position){
 		double deltaArea = 0;
-		double cellArea = Math.pow(Constants.CELL_SIZE, 2);
 		for (GridPoint shift : pedestrianFootprint.getValuesMap().keySet()){
 			GridPoint positionToWrite = Distances.gridPointDifference(position, shift);
 			if (!neighbourCondition(positionToWrite.getY(), positionToWrite.getX())){

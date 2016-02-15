@@ -126,7 +126,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 					if (af == null) {
 						af = ((ActivityFacilitiesImpl) activityFacilities).createAndAddFacility(Id.create(id, ActivityFacility.class),c);
 						id++;
-						ActivityOptionImpl ao = af.createActivityOption(a.getType());
+						ActivityOptionImpl ao = af.createAndAddActivityOption(a.getType());
 						ao.setCapacity(1.0);
 						if (a.getType().equals("tta")){ ao.addOpeningTime(ot); }
 						facs.put(af.getCoord().getX(),af.getCoord().getY(),af);
@@ -134,7 +134,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 					else if (af.getCoord().equals(c)) {
 						ActivityOptionImpl ao = (ActivityOptionImpl) af.getActivityOptions().get(a.getType());
 						if (ao == null) {
-							ao = af.createActivityOption(a.getType());
+							ao = af.createAndAddActivityOption(a.getType());
 							ao.setCapacity(1.0);
 							if (a.getType().equals("tta")){ ao.addOpeningTime(ot); }
 						}
@@ -142,7 +142,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 					else {
 						af = ((ActivityFacilitiesImpl) activityFacilities).createAndAddFacility(Id.create(id, ActivityFacility.class),c);
 						id++;
-						ActivityOptionImpl ao = af.createActivityOption(a.getType());
+						ActivityOptionImpl ao = af.createAndAddActivityOption(a.getType());
 						ao.setCapacity(1.0);
 						if (a.getType().equals("tta")){ ao.addOpeningTime(ot); }
 						facs.put(af.getCoord().getX(),af.getCoord().getY(),af);

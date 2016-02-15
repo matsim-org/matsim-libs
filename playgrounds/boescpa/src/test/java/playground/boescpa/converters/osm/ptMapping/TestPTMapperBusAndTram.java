@@ -32,7 +32,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.boescpa.lib.tools.networkModification.NetworkUtils;
+import playground.boescpa.lib.tools.NetworkUtils;
 
 import static org.junit.Assert.assertEquals;
 

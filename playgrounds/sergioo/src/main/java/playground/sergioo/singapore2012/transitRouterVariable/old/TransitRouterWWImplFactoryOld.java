@@ -21,7 +21,7 @@ package playground.sergioo.singapore2012.transitRouterVariable.old;
 
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.pt.router.PreparedTransitSchedule;
@@ -39,10 +39,10 @@ public class TransitRouterWWImplFactoryOld implements Provider<TransitRouter>, A
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Network network;
 	private TransitRouterNetworkTravelTimeAndDisutilityWWOld transitRouterNetworkTravelTimeAndDisutilityWW;
-	private Controler controler;
+	private MatsimServices controler;
 	private final WaitTimeOld waitTime;
 	
-	public TransitRouterWWImplFactoryOld(final TransitRouterConfig config, final Controler controler, final WaitTimeOld waitTime) {
+	public TransitRouterWWImplFactoryOld(final TransitRouterConfig config, final MatsimServices controler, final WaitTimeOld waitTime) {
 		this.config = config;
         this.network = controler.getScenario().getNetwork();
 		this.controler = controler;

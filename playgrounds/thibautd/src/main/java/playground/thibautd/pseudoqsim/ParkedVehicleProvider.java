@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.pseudoqsim;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
 
 /**
  * @author thibautd

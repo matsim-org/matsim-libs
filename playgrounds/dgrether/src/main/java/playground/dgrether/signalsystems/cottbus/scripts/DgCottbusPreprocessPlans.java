@@ -53,7 +53,7 @@ public class DgCottbusPreprocessPlans {
 		ScenarioUtils.loadScenario(scenario);
 		
 		
-		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new XY2Links(scenario.getNetwork()));
+		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new XY2Links(scenario.getNetwork(), null));
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
 		((PopulationImpl) scenario.getPopulation()).addAlgorithm(
 				new PlanRouter(

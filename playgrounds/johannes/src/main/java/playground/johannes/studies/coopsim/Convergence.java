@@ -19,16 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import gnu.trove.TDoubleArrayList;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-
+import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.commons.math.stat.regression.SimpleRegression;
+
+import java.io.*;
 
 /**
  * @author illenberger

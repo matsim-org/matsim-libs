@@ -87,6 +87,10 @@ public class FacilityData {
         return quadTrees.get(type);
     }
 
+    public String getAttribute(ActivityFacility facility, String key) {
+        return null;
+    }
+
     private synchronized void initMap() {
         if (facilitiesMap == null) {
             facilitiesMap = new HashMap<>();

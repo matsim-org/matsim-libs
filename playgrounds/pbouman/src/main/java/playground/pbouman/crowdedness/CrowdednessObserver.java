@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -78,7 +78,7 @@ public class CrowdednessObserver implements
 	public CrowdednessObserver( Scenario sc, EventsManager ev , SeatAssignmentRule rule) {
 		this.sc = sc ;
 		this.ev = ev ;
-		this.vehs = ((ScenarioImpl)this.sc).getTransitVehicles() ;
+		this.vehs = ((MutableScenario)this.sc).getTransitVehicles() ;
 		this.rule = rule;
 		this.personsInVehicles = new HashMap<Vehicle,SeatAdministration>();
 		this.pendingObservation = new HashSet<Vehicle>();

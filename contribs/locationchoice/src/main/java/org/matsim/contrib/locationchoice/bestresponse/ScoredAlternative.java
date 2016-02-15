@@ -60,13 +60,20 @@ public class ScoredAlternative implements Comparable<ScoredAlternative> {
 		// o  == this ->   0
 		// this <  o  -> - 1
 		
-		// here: reverse order:
-		if (Math.abs(this.score - o.getScore()) > epsilon) {
+//		// here: reverse order:
+//		if (Math.abs(this.score - o.getScore()) > epsilon) {
+//			if (this.score > o.getScore()) return -1;
+//			else return +1;
+//		}		
+//		else {
+//			return this.alternativeId.compareTo(o.getAlternativeId());
+//		}
+		
+		// Not sure why this epsilon was used :? However, I ran into an Exception: "java.lang.IllegalArgumentException: Comparison method violates its general contract!"
+		// Therefore, I adapted it and compared it to 0.0 - hope that's fine. cdobler, oct'15
+		if (Math.abs(this.score - o.getScore()) > 0.0) {
 			if (this.score > o.getScore()) return -1;
 			else return +1;
-		}		
-		else {
-			return this.alternativeId.compareTo(o.getAlternativeId());
-		}
+		} else return this.alternativeId.compareTo(o.getAlternativeId());
 	}
 }

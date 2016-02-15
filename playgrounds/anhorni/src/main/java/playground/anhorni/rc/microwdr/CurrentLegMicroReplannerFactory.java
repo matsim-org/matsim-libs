@@ -21,7 +21,7 @@
 package playground.anhorni.rc.microwdr;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -34,10 +34,10 @@ public class CurrentLegMicroReplannerFactory extends WithinDayDuringLegReplanner
 	private final Scenario scenario;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final RoutingContext routingContext;
-	private final Controler controler;
+	private final MatsimServices controler;
 	
 	public CurrentLegMicroReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-										   Provider<TripRouter> tripRouterFactory, RoutingContext routingContext, Controler controler) {
+										   Provider<TripRouter> tripRouterFactory, RoutingContext routingContext, MatsimServices controler) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.tripRouterFactory = tripRouterFactory;

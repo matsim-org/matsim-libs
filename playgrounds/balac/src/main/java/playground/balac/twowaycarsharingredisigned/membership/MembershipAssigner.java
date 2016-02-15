@@ -19,7 +19,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -234,9 +234,9 @@ public class MembershipAssigner {
 		// TODO Auto-generated method stub
 		Logger.getLogger( "org.matsim.core.population.PopulationReaderMatsimV4" ).setLevel(Level.OFF);
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		FacilitiesReaderMatsimV1 facilitiesReader  = new FacilitiesReaderMatsimV1(scenario);
 		networkReader.readFile(args[1]);
 		facilitiesReader.readFile(args[3]);

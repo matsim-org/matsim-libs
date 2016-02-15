@@ -29,9 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import floetteroed.opdyts.DecisionVariable;
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
-import floetteroed.opdyts.VectorBasedObjectiveFunction;
 import floetteroed.utilities.math.Vector;
 
 /**
@@ -48,22 +46,22 @@ public class TransitionSequence<U extends DecisionVariable> {
 
 	private SimulatorState lastState = null;
 
+	private int iterations = 0;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	TransitionSequence(final SimulatorState fromState,
 			final U decisionVariable, final SimulatorState toState,
-			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
-			final VectorBasedObjectiveFunction vectorBasedObjectiveFunction) {
+			final double objectiveFunctionValue) {
 		this.addTransition(fromState, decisionVariable, toState,
-				objectBasedObjectiveFunction, vectorBasedObjectiveFunction);
+				objectiveFunctionValue);
 	}
 
 	// -------------------- SETTERS --------------------
 
 	void addTransition(final SimulatorState fromState,
 			final U decisionVariable, final SimulatorState toState,
-			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
-			final VectorBasedObjectiveFunction vectorBasedObjectiveFunction) {
+			final double objectiveFunctionValue) {
 
 		if (fromState == null) {
 			throw new IllegalArgumentException("fromState is null");
@@ -87,22 +85,12 @@ public class TransitionSequence<U extends DecisionVariable> {
 				.copy();
 		delta.add(fromState.getReferenceToVectorRepresentation(), -1.0);
 
-		final Vector toStateVectorRepresentation = toState
-				.getReferenceToVectorRepresentation();
-
-		final double toStateObjectiveFunctionValue;
-		if (objectBasedObjectiveFunction != null) {
-			toStateObjectiveFunctionValue = objectBasedObjectiveFunction
-					.value(toState);
-		} else {
-			toStateObjectiveFunctionValue = vectorBasedObjectiveFunction
-					.value(toStateVectorRepresentation);
-		}
-
 		// new transitions are added at the end
-		this.transitions.add(new Transition<>(decisionVariable, delta,
-				toStateVectorRepresentation, toStateObjectiveFunctionValue));
+		this.transitions.add(new Transition<>(decisionVariable, delta, toState
+				.getReferenceToVectorRepresentation(), objectiveFunctionValue));
 		this.lastState = toState;
+
+		this.iterations++;
 	}
 
 	void shrinkToMaximumLength(final int maximumLength) {
@@ -114,7 +102,8 @@ public class TransitionSequence<U extends DecisionVariable> {
 
 	// -------------------- GETTERS --------------------
 
-	DecisionVariable getDecisionVariable() {
+	// TODO is now public
+	public DecisionVariable getDecisionVariable() {
 		return this.transitions.getFirst().getDecisionVariable();
 	}
 
@@ -122,8 +111,19 @@ public class TransitionSequence<U extends DecisionVariable> {
 		return this.lastState;
 	}
 
-	List<Transition<U>> getTransitions() {
+	// TODO is now public
+	public List<Transition<U>> getTransitions() {
 		return this.transitions;
+	}
+
+	// TODO NEW
+	// remember: transitions are added at the end (and removed from the front)
+	Transition<U> getLastTransition() {
+		return this.transitions.getLast();
+	}
+
+	public int iterations() {
+		return this.iterations;
 	}
 
 	public int size() {
@@ -133,7 +133,6 @@ public class TransitionSequence<U extends DecisionVariable> {
 	public List<Double> getObjectiveFunctionValues() {
 		final List<Double> result = new ArrayList<Double>(this.size());
 		for (Transition<U> transition : this.transitions) {
-			// result.add(objectiveFunction.value(transition.getToState()));
 			result.add(transition.getToStateObjectiveFunctionValue());
 		}
 		return result;

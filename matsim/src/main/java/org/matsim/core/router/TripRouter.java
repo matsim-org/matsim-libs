@@ -154,11 +154,18 @@ public final class TripRouter implements MatsimExtensionPoint {
 		RoutingModule module = routingModules.get( mainMode );
 
 		if (module != null) {
-			return module.calcRoute(
-					fromFacility,
-					toFacility,
-					departureTime,
-					person);
+			final List<? extends PlanElement> trip =
+					module.calcRoute(
+						fromFacility,
+						toFacility,
+						departureTime,
+						person);
+
+			if ( trip == null ) {
+				throw new NullPointerException( "Routing module "+module+" returned a null Trip for main mode "+mainMode );
+			}
+
+			return trip;
 		}
 
 		throw new UnknownModeException( "unregistered main mode "+mainMode+": does not pertain to "+routingModules.keySet() );
@@ -216,7 +223,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 			return now + (travelTime != Time.UNDEFINED_TIME ? travelTime : 0);
 		}
-	}	
+	}
 
 	/**
 	 * Inserts a trip between two activities in the sequence of plan elements
@@ -288,6 +295,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 		List<PlanElement> seq = plan.subList( indexOfOrigin + 1 , indexOfDestination );
 		List<PlanElement> oldTrip = new ArrayList<>( seq );
 		seq.clear();
+		assert trip != null;
 		seq.addAll( trip );
 
 		return oldTrip;

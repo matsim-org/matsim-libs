@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -35,7 +35,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionInternalizationHandler;
@@ -49,7 +49,7 @@ import playground.vsp.congestion.handlers.TollHandler;
 public class InternalizeEmissionsCongestionControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 	private final Logger logger = Logger.getLogger(InternalizeEmissionsCongestionControlerListener.class);
 
-	private Controler controler;
+	private MatsimServices controler;
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 	private String emissionEventOutputFile;
@@ -61,12 +61,12 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 	int firstIt;
 	int lastIt;
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private TollHandler tollHandler;
 	private CongestionHandlerImplV3 congestionHandler;
 
 
-	public InternalizeEmissionsCongestionControlerListener(EmissionModule emissionModule, EmissionCostModule emissionCostModule,ScenarioImpl scenario, TollHandler tollHandler) {
+	public InternalizeEmissionsCongestionControlerListener(EmissionModule emissionModule, EmissionCostModule emissionCostModule,MutableScenario scenario, TollHandler tollHandler) {
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
 		this.scenario = scenario;
@@ -75,7 +75,7 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.controler = event.getControler();
+		this.controler = event.getServices();
 
 		EventsManager eventsManager = this.controler.getEvents();
 		this.congestionHandler = new CongestionHandlerImplV3(eventsManager, this.scenario);
@@ -140,5 +140,4 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {
 		this.hotspotLinks = hotspotLinks;
 	}
-
 }

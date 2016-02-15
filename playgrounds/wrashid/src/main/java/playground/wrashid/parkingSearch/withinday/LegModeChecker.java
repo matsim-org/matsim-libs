@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -141,7 +141,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 				 * Get position of the car. We assume that the car is located at
 				 * the coordinate of the home location of an agent.
 				 */
-				Coord carCoord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(firstActivity.getFacilityId()).getCoord();
+				Coord carCoord = ((MutableScenario) scenario).getActivityFacilities().getFacilities().get(firstActivity.getFacilityId()).getCoord();
 				
 				/*
 				 * Where does the first car trip start?
@@ -192,8 +192,8 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 				Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
 				Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);
 				
-				Coord previousCoord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(previousActivity.getFacilityId()).getCoord();
-				Coord nextCoord = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(nextActivity.getFacilityId()).getCoord();
+				Coord previousCoord = ((MutableScenario) scenario).getActivityFacilities().getFacilities().get(previousActivity.getFacilityId()).getCoord();
+				Coord nextCoord = ((MutableScenario) scenario).getActivityFacilities().getFacilities().get(nextActivity.getFacilityId()).getCoord();
 				
 				/*
 				 * Check the distance to the car. 

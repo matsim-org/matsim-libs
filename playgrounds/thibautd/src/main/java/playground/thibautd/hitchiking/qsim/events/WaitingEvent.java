@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.qsim.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+
+import java.util.Map;
 
 /**
  * @author thibautd

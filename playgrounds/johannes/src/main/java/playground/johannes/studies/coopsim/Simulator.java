@@ -28,7 +28,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.common.collections.ChoiceSet;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
 import org.matsim.contrib.common.util.LoggerUtils;
+import org.matsim.contrib.common.util.XORShiftRandom;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialGraph;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
+import org.matsim.contrib.socnetgen.sna.math.GaussDistribution;
+import org.matsim.contrib.socnetgen.sna.math.LinearDistribution;
+import org.matsim.contrib.socnetgen.sna.math.LogNormalDistribution;
+import org.matsim.contrib.socnetgen.sna.math.PowerLawDistribution;
+import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -40,7 +50,7 @@ import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.facilities.ActivityFacilities;
@@ -56,17 +66,8 @@ import playground.johannes.coopsim.mental.choice.*;
 import playground.johannes.coopsim.mental.planmod.*;
 import playground.johannes.coopsim.mental.planmod.concurrent.ConcurrentPlanModEngine;
 import playground.johannes.coopsim.pysical.PhysicalEngine;
-import playground.johannes.sna.util.MultiThreading;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.graph.social.SocialGraph;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
-import playground.johannes.socialnetworks.statistics.GaussDistribution;
-import playground.johannes.socialnetworks.statistics.LinearDistribution;
-import playground.johannes.socialnetworks.statistics.LogNormalDistribution;
-import playground.johannes.socialnetworks.statistics.PowerLawDistribution;
-import playground.johannes.socialnetworks.survey.ivt2009.graph.io.SocialSparseGraphMLReader;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.utils.NetworkLegRouter;
+import playground.johannes.coopsim.utils.NetworkLegRouter;
+import playground.johannes.studies.sbsurvey.io.SocialSparseGraphMLReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -225,11 +226,11 @@ public class Simulator {
 	}
 
 	private static void loadData(Config config) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		logger.info("Loading network data...");
 		LoggerUtils.setVerbose(false);
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile(config.getParam("network", "inputNetworkFile"));
 		network = (NetworkImpl) scenario.getNetwork();
 		LoggerUtils.setVerbose(true);
@@ -319,9 +320,9 @@ public class Simulator {
 		}
 		FixedActivityTypeSelector actTypeSelector = new FixedActivityTypeSelector(types);
 //		ChoiceSet<String> choiceSet = new ChoiceSet<String>(random);
-//		choiceSet.addChoice(ActivityType.visit.name());
-//		choiceSet.addChoice(ActivityType.gastro.name());
-//		choiceSet.addChoice(ActivityType.culture.name());
+//		choiceSet.addOption(ActivityType.visit.name());
+//		choiceSet.addOption(ActivityType.gastro.name());
+//		choiceSet.addOption(ActivityType.culture.name());
 //		ActivityTypeSelector actTypeSelector = new ActivityTypeSelector(choiceSet);
 		choiceSelector.addComponent(actTypeSelector);
 		
@@ -454,9 +455,9 @@ public class Simulator {
 			 * activity types
 			 */
 			ChoiceSet<String> actTypeChoiceSet = new ChoiceSet<String>(random);
-			actTypeChoiceSet.addChoice(ActivityType.visit.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_visit")));
-			actTypeChoiceSet.addChoice(ActivityType.gastro.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_gastro")));
-			actTypeChoiceSet.addChoice(ActivityType.culture.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_culture")));
+			actTypeChoiceSet.addOption(ActivityType.visit.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_visit")));
+			actTypeChoiceSet.addOption(ActivityType.gastro.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_gastro")));
+			actTypeChoiceSet.addOption(ActivityType.culture.name(), Double.parseDouble(config.getParam(SOCNET_MODULE_NAME, "actshare_culture")));
 
 			for(SocialVertex v : graph.getVertices()) {
 				ActivityDesires desire = personDesires.get(v.getPerson().getPerson());

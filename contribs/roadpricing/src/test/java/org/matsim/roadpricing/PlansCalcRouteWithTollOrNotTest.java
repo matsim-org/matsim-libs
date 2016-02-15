@@ -22,7 +22,6 @@
 
 package org.matsim.roadpricing;
 
-import com.google.inject.Singleton;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,16 +36,16 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioElementsModule;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Singleton;
 
 /**
  * Tests {@link PlansCalcRouteWithTollOrNot} as isolated as possible.
@@ -66,7 +65,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	public void testBestAlternatives() {
 		Config config = matsimTestUtils.loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
@@ -131,11 +130,11 @@ public class PlansCalcRouteWithTollOrNotTest {
 					@Override
 					public void install() {
 						bind(RoadPricingScheme.class).toInstance(toll);
-						bind(Scenario.class).toInstance(scenario);
 						addTravelTimeBinding(TransportMode.car).to(FreeSpeedTravelTime.class);
 						bind(PlansCalcRouteWithTollOrNot.class);
-						install(new ScenarioElementsModule());
-						addTravelDisutilityFactoryBinding(TransportMode.car).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class);
+						install(new ScenarioByInstanceModule(scenario));
+						addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(
+								new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ) );
 						install(new TripRouterModule());
 						addControlerListenerBinding().to(RoadPricingControlerListener.class);
 
@@ -157,7 +156,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	public void testTolledActLink() {
 		Config config = matsimTestUtils.loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
@@ -183,7 +182,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	public void testAllAlternativesTolled() {
 		Config config = matsimTestUtils.loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
@@ -211,7 +210,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	public void testOutsideTollTime() {
 		Config config = matsimTestUtils.loadConfig(null);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled

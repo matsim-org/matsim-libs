@@ -20,12 +20,11 @@
 
 package playground.gregor.grpc.dummyjupedsim;
 
-import io.grpc.ServerImpl;
-import io.grpc.transport.netty.NettyServerBuilder;
 
+import io.grpc.internal.ServerImpl;
+import io.grpc.netty.NettyServerBuilder;
 import org.apache.log4j.Logger;
 import org.matsim.hybrid.ExternInterfaceServiceGrpc;
-
 import playground.gregor.hybridsim.grpc.GRPCInternalServer;
 
 public class JuPedSimServer implements Runnable{
@@ -34,12 +33,20 @@ public class JuPedSimServer implements Runnable{
 
 	/* The port on which the server should run */
 	private final int port = 9998;
-	private ServerImpl server;
-
 	private final ExternalInterfaceServiceImpl mi;
+	private ServerImpl server;
 
 	public JuPedSimServer(ExternalInterfaceServiceImpl mi) {
 		this.mi = mi;
+	}
+
+	@Override
+	public void run() {
+		try {
+			start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void start() throws Exception {
@@ -61,15 +68,6 @@ public class JuPedSimServer implements Runnable{
 	public void stop() {
 		if (this.server != null) {
 			this.server.shutdown();
-		}
-	}
-
-	@Override
-	public void run() {
-		try {
-			start();
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 

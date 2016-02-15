@@ -38,8 +38,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -81,7 +81,7 @@ import javax.inject.Provider;
  */
 public class PrepareEvacuationScenario {
 	
-	private final TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+	private final TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car );
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
 	
 	public void prepareScenario(Scenario scenario) {

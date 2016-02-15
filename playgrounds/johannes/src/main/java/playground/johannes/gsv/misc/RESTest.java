@@ -22,12 +22,6 @@
  */
 package playground.johannes.gsv.misc;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -39,13 +33,18 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
 import playground.johannes.gsv.analysis.RailCounts;
 import playground.johannes.gsv.analysis.TransitLineAttributes;
 import playground.johannes.gsv.visum.LineRouteCountsHandler;
 import playground.johannes.gsv.visum.LineRouteCountsHandler.CountsContainer;
 import playground.johannes.gsv.visum.NetFileReader;
 import playground.johannes.gsv.visum.NetFileReader.TableHandler;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -71,7 +70,7 @@ public class RESTest {
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
 		reader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.gk3.xml");
 		
 		Map<String, TableHandler> tableHandlers = new HashMap<String, NetFileReader.TableHandler>();

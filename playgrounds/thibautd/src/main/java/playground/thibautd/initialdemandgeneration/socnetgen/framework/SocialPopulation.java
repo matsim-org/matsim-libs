@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
+import org.matsim.api.core.v01.Id;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 
 /**
  * @author thibautd

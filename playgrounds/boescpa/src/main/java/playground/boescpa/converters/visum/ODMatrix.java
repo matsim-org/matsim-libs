@@ -41,7 +41,7 @@ public class ODMatrix {
 
 	// TODO-boescpa Write tests...
 
-	private final HashMap<Long, VisumTrip> trips;
+	private final List<VisumTrip> trips;
 	private final int hour;
 	private final String mode;
 
@@ -50,7 +50,7 @@ public class ODMatrix {
 	private HashMap<Long,Zone> borders;
 	private HashMap<Long,Zone> farOut;
 
-	public ODMatrix(HashMap<Long, VisumTrip> tripCollection, int hour, String mode) {
+	public ODMatrix(List<VisumTrip> tripCollection, int hour, String mode) {
 		this.trips = tripCollection;
 		this.hour = hour;
 		this.mode = mode;
@@ -104,7 +104,7 @@ public class ODMatrix {
 	// ************** Create the OD-Matrix
 
 	public void createODMatrix() {
-		for (VisumTrip visumTrip : trips.values()) {
+		for (VisumTrip visumTrip : trips) {
 			if (mode.equals("") || visumTrip.isModeType(mode)) {
 				this.addTrip(visumTrip);
 			}

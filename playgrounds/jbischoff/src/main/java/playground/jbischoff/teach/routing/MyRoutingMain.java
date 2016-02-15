@@ -29,6 +29,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author jbischoff
+ *	Example input data can be found in the MATSim tutorial 2015, 
+ *	https://isis.tu-berlin.de/course/view.php?id=5682
  *
  */
 public class MyRoutingMain {

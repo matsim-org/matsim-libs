@@ -89,7 +89,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if (Constants.STOP_FACILITY.equals(name)) {
 			boolean isBlocking = Boolean.parseBoolean(atts.getValue(Constants.IS_BLOCKING));
-			TransitStopFacility stop = new TransitStopFacilityImpl(
+			TransitStopFacility stop = schedule.getFactory().createTransitStopFacility(
 					Id.create(atts.getValue(Constants.ID), TransitStopFacility.class), new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))), isBlocking);
 			if (atts.getValue(Constants.LINK_REF_ID) != null) {
 				Id<Link> linkId = Id.create(atts.getValue(Constants.LINK_REF_ID), Link.class);

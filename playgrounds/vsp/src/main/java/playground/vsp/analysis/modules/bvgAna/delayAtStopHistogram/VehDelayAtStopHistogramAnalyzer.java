@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
@@ -53,7 +53,7 @@ import playground.vsp.analysis.modules.AbstractAnalysisModule;
  */
 public class VehDelayAtStopHistogramAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(VehDelayAtStopHistogramAnalyzer.class);
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private VehDelayAtStopHistogramEventHandler delayHandler;
 	private int numberOfDetailedSlots;
 	
@@ -70,7 +70,7 @@ public class VehDelayAtStopHistogramAnalyzer extends AbstractAnalysisModule{
 		this.numberOfDetailedSlots = numberOfDetailedSlots;
 	}
 	
-	public void init(ScenarioImpl scenario) {
+	public void init(MutableScenario scenario) {
 		this.scenario = scenario;
 		this.delayHandler = new VehDelayAtStopHistogramEventHandler(this.numberOfDetailedSlots);
 	}

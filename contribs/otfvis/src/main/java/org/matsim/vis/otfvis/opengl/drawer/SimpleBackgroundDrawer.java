@@ -20,12 +20,14 @@
 
 package org.matsim.vis.otfvis.opengl.drawer;
 
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureCoords;
+import java.awt.geom.Rectangle2D;
+
+import javax.media.opengl.GL2;
+
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
-import java.awt.geom.Rectangle2D;
+import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.texture.TextureCoords;
 
 /**
  * SimpleBackgroundDrawer can draw a picture behind the network at a given coord.

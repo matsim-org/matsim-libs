@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 /**
  * @author ikaddoura
@@ -37,14 +37,14 @@ public class MarginalCostPricingPtHandler implements TransferDelayInVehicleEvent
 	private final static Logger log = Logger.getLogger(MarginalCostPricingPtHandler.class);
 
 	private final EventsManager events;
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final double vtts_inVehicle;
 	private final double vtts_waiting;
 	
 	// TODO: make configurable
 //	private final double operatorCostPerVehHour = 39.93; // = 33 * 1.21 (overhead)
 
-	public MarginalCostPricingPtHandler(EventsManager eventsManager, ScenarioImpl scenario) {
+	public MarginalCostPricingPtHandler(EventsManager eventsManager, MutableScenario scenario) {
 		this.events = eventsManager;
 		this.scenario = scenario;
 		this.vtts_inVehicle = (this.scenario.getConfig().planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();

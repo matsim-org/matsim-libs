@@ -1,5 +1,6 @@
 package playground.dhosse.gap.scenario.network;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,9 +12,15 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 import playground.dhosse.gap.Global;
+import playground.dhosse.gap.scenario.GAPScenarioBuilder;
 
 public class NetworkCreator {
 
@@ -52,6 +59,25 @@ public class NetworkCreator {
 		onr.parse(osmFile);
 		
 		new NetworkCleaner().run(network);
+		
+	}
+	
+	public static void createMultimodalNetwork(Network network, String outputNetworkFile){
+		
+		Set<String> allowedModes = new HashSet<>();
+		allowedModes.add(TransportMode.car);
+		allowedModes.add(TransportMode.bike);
+		allowedModes.add(TransportMode.walk);
+		
+		for(Link link : network.getLinks().values()){
+			
+			if(link.getFreespeed() <= 50 / 3.6){
+				link.setAllowedModes(allowedModes);
+			}
+			
+		}
+		
+		new NetworkWriter(network).write(outputNetworkFile);
 		
 	}
 	
@@ -113,6 +139,52 @@ public class NetworkCreator {
 		tunnelGP06.setLength(6880);
 		tunnelGP06.setNumberOfLanes(1);
 		network.addLink(tunnelGP06);
+		
+		new NetworkWriter(network).write(outputNetworkFile);
+		
+	}
+	
+	public static void createZone30InAllOfGarmisch(Network network, String outputNetworkFile){
+		
+		double minSpeedToIgnore = 60 / 3.6 * 0.5;
+		double maxSpeed = 30/3.6 * 0.8;
+		
+		//read in built area shapefile
+		Collection<SimpleFeature> builtAreas = new ShapeFileReader().readFileAndInitialize(Global.adminBordersDir + "Gebietsstand_2007/gemeinden_2007_bebaut.shp");
+		
+		Geometry geometry = null;
+		for(SimpleFeature feature : builtAreas){
+			
+			//search for the Garmisch-Partenkirchen geometry and make it selected
+			Long identifier = (Long) feature.getAttribute("GEM_KENNZ");
+			if(identifier == Long.parseLong(Global.idGarmischPartenkirchen)){
+				geometry = (Geometry) feature.getDefaultGeometry();
+			}
+			
+		}
+		
+		//parse all links and lower their max speed
+		for(Link link : network.getLinks().values()){
+			
+			com.vividsolutions.jts.geom.Point point = MGC.coord2Point(Global.UTM32NtoGK4.transform(link.getCoord()));
+			
+			if(geometry.contains(point)){
+				
+				//make sure, the max speed of links is not accidentially increased!!!
+				if(link.getFreespeed() <= minSpeedToIgnore){
+					
+					double speed = Math.min(link.getFreespeed(), maxSpeed);
+
+					if(link.getFreespeed() != speed){
+						link.setCapacity(600 * link.getNumberOfLanes());
+					}
+					link.setFreespeed(speed);
+					
+				}
+				
+			}
+			
+		}
 		
 		new NetworkWriter(network).write(outputNetworkFile);
 		

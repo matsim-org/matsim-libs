@@ -19,15 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
+import playground.ivt.utils.MoreIOUtils;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Random;
-
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
-
-import playground.thibautd.utils.MoreIOUtils;
 
 /**
  * @author thibautd

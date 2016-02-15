@@ -57,7 +57,7 @@ public class DgCreateCottbusCityNetwork {
 		
 		String fullNetworkFilename = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(sc.getNetwork());
 		netReader.readFile(fullNetworkFilename);
 		Network network = sc.getNetwork();
 		

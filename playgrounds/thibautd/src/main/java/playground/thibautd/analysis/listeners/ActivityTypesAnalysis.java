@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.listeners;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.core.controler.events.ControlerEvent;
@@ -34,6 +29,11 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -65,7 +65,7 @@ public class ActivityTypesAnalysis implements
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		event.getControler().getEvents().addHandler(this);
+		event.getServices().getEvents().addHandler(this);
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public class ActivityTypesAnalysis implements
 		List<String> modes = getExistingTypes();
 		double[] xAxis = getXAxis();
 		Map<String, double[]> yAxes = getYAxes(modes);
-		String fileName = event.getControler().getControlerIO().getOutputFilename(FILE_NAME);
+		String fileName = event.getServices().getControlerIO().getOutputFilename(FILE_NAME);
 		XYLineChart globalChart = new XYLineChart(title+", all types", X_TITLE, Y_TITLE);
 		XYLineChart particularChart;
 

@@ -44,7 +44,7 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
@@ -95,7 +95,7 @@ public class EmissionsAnalyzerRelativeDurations extends AbstractAnalysisModule{
 	
 	}
 	
-	public void init(ScenarioImpl scenario) {
+	public void init(MutableScenario scenario) {
 //		// calc relative factor
 //		this.relativeDurationFactor = calcRelativeDurations();
 //		

@@ -55,6 +55,10 @@ public class MiDPersonGroupTemplates {
 		
 	}
 	
+	public Map<String,Map<String,List<MiDTravelChain>>> getPersonGroupId2TravelPatterns(){
+		return this.personGroupId2TravelPattern2TravelChains;
+	}
+	
 	public Map<String,List<MiDTravelChain>> getTravelPatterns(String pHash){
 		
 		return this.personGroupId2TravelPattern2TravelChains.get(pHash);

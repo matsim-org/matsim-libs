@@ -19,16 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-
 import playground.thibautd.parknride.ParkAndRideFacilities;
 import playground.thibautd.parknride.ParkAndRideFacilitiesXmlReader;
 import playground.thibautd.parknride.ParkAndRideFacility;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 /**
  * a simple utility to extract coordinates of park and ride facilities.

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
@@ -41,13 +41,13 @@ public class TransitFareRouterNetworkTimeAndDisutilityCalc implements TravelTime
 
 	private double currentFactor = 1;
 	
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private TransitRouterNetworkTravelTimeAndDisutility calc;
 	
 	private Map<String,AgentProperties> agentProps;
 	private double minimumMoneyUtility;
 	
-	public TransitFareRouterNetworkTimeAndDisutilityCalc(final TransitRouterConfig config, final ScenarioImpl scenario, Map<String,AgentProperties> props)
+	public TransitFareRouterNetworkTimeAndDisutilityCalc(final TransitRouterConfig config, final MutableScenario scenario, Map<String,AgentProperties> props)
 	{
 		this(config,scenario);
 		if (props != null)
@@ -61,7 +61,7 @@ public class TransitFareRouterNetworkTimeAndDisutilityCalc implements TravelTime
 		}
 	}
 	
-	public TransitFareRouterNetworkTimeAndDisutilityCalc(final TransitRouterConfig config, final ScenarioImpl scenario)
+	public TransitFareRouterNetworkTimeAndDisutilityCalc(final TransitRouterConfig config, final MutableScenario scenario)
 	{
 		calc = new TransitRouterNetworkTravelTimeAndDisutility(config);
 		this.scenario = scenario;

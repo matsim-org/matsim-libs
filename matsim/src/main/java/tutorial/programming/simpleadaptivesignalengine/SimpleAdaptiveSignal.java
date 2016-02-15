@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -34,13 +36,13 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalizeableItem;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalizeableItem;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author nagel
@@ -51,7 +53,7 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, LinkEnterEven
 	private Queue<Double> vehicleExitTimesOnLink5 = new LinkedList<Double>() ;
 	private long cnt4 = 0 ;
 	private long cnt5 = 0 ;
-	private Controler controler;
+	private OutputDirectoryHierarchy controlerIO;
 	private Writer out ;
 	
 	class Result {
@@ -62,8 +64,9 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, LinkEnterEven
 	
 	private List<Result> results = new ArrayList<Result>() ;
 	
-	public SimpleAdaptiveSignal(Controler controler) {
-		this.controler = controler ;
+	@Inject
+	public SimpleAdaptiveSignal(OutputDirectoryHierarchy controlerIO) {
+		this.controlerIO = controlerIO ;
 	}
 
 	@Override
@@ -124,7 +127,7 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, LinkEnterEven
 		cnt5 = 0 ;
 
 		if ( out==null ) {
-			out = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("split.txt")) ;
+			out = IOUtils.getBufferedWriter(controlerIO.getOutputFilename("split.txt")) ;
 		}
 
 		

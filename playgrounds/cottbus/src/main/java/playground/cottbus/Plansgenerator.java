@@ -33,8 +33,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -64,7 +64,7 @@ public class Plansgenerator {
 	private void init() {
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.network = this.scenario.getNetwork();
-		new MatsimNetworkReader(this.scenario).readFile(networkFilename);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFilename);
 	}
 
 	private void createPlans() throws Exception {
@@ -336,7 +336,7 @@ public class Plansgenerator {
 		for (int i = CURRENT_ID+1; i <= MAX_ID; i++) {
 			homeEndtime = START_TIME;
 
-			Person p = PersonImpl.createPerson(Id.create(i, Person.class));
+			Person p = PopulationUtils.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
 			//home

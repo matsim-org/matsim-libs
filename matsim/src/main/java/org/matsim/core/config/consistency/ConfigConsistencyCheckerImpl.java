@@ -51,6 +51,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		this.checkLaneDefinitionRoutingConfiguration(config);
 		this.checkPlanCalcScore(config);
 		this.checkMobsimSelection(config);
+		this.checkTransit(config);
 	}
 
 	/**
@@ -164,8 +165,13 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		if ((config.qsim().isUseLanes()) &&
 		    !config.controler().isLinkToLinkRoutingEnabled()){
 		  	log.warn("Using lanes without enabling linktolinkrouting might not lead to expected simulation results");
-		   }
+		}
 	}
 
+	private void checkTransit(final Config config) {
+		if ( config.transit().isUseTransit() && config.transit().getVehiclesFile()==null ) {
+			log.warn("Your are using Transit but have not provided a transit vehicles file. This most likely won't work.");
+		}
+	}
 
 }

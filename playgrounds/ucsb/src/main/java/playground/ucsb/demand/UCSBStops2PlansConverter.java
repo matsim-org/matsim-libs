@@ -38,7 +38,7 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -109,7 +109,7 @@ public class UCSBStops2PlansConverter {
 		ObjectAttributes personObjectAttributes = new ObjectAttributes();
 
 		log.info("parsing network data...");
-		new NetworkReaderMatsimV1(scenario).parse(networkFile);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(networkFile);
 		ObjectAttributes linkObjectAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(linkObjectAttributes).parse(linkObjectAttributeFile);
 		log.info("done. (parsing)");
@@ -149,7 +149,7 @@ public class UCSBStops2PlansConverter {
 		log.info("done. (reading)");
 		
 		log.info("assigning activities to links...");
-		new XY2Links((ScenarioImpl)scenario).run(scenario.getPopulation());
+		new XY2Links((MutableScenario)scenario).run(scenario.getPopulation());
 		log.info("done. (assigning)");
 
 		log.info("writing data to "+outputBase+"...");

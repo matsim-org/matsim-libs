@@ -25,10 +25,10 @@ package playground.artemc.crowding.internalization;
 
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import java.io.IOException;
 
@@ -61,8 +61,8 @@ public class InternalizationPtControler {
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-	//	controler.addControlerListener(new InternalizationPtControlerListener( (ScenarioImpl) controler.getScenario()));
-		controler.addOverridingModule(new OTFVisModule());
+	//	services.addControlerListener(new InternalizationPtControlerListener( (ScenarioImpl) services.getScenario()));
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.run();
 		
 	}

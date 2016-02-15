@@ -67,7 +67,7 @@ public class MergeBurgdorfPopulation {
 		int popSize = 0;
 		
 		log.info("Read network...");
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		log.info("done.");
 		
 		if (useVisitorPopulation) {

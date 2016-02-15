@@ -43,6 +43,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -56,7 +57,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
@@ -68,6 +69,8 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.*;
 
 /**
@@ -128,7 +131,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -172,7 +175,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}
 		});
 
-		events.addHandler(new CongestionHandlerImplV9(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV9(events, (MutableScenario) sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -216,7 +219,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}
 		});
 
-		events.addHandler(new CongestionHandlerImplV8(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV8(events, (MutableScenario) sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -266,7 +269,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -302,11 +305,17 @@ public class MarginalCongestionHandlerV3QsimTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+					@Inject Scenario scenario;
+					@Inject EventsManager eventsManager;
+					@Override
+					public ControlerListener get() {
+						return new MarginalCongestionPricingContolerListener(scenario, tollHandler, new CongestionHandlerImplV3(eventsManager, scenario));
+					}
+				});
 				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
-		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())) );
-	
 		final String timeBin1 = "08:00-08:15";
 		final String timeBin2 = "08:15-08:30";
 			
@@ -367,14 +376,14 @@ public class MarginalCongestionHandlerV3QsimTest {
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
 				// last but one iteration
-				if(((event.getControler().getConfig().controler().getLastIteration())-(event.getIteration()))==1){
+				if(((event.getServices().getConfig().controler().getLastIteration())-(event.getIteration()))==1){
 					avgValue1 = tollHandler.getAvgToll(linkId2_, 28800);
 					avgValue2 = tollHandler.getAvgToll(linkId2_, 29700);
 					avgOldValue1 = tollHandler.getAvgTollOldValue(linkId2_, 28800);
 					avgOldValue2 = tollHandler.getAvgTollOldValue(linkId2_, 28800);
 				}
 				// last iteration
-				else if(((event.getControler().getConfig().controler().getLastIteration())-(event.getIteration()))==0){
+				else if(((event.getServices().getConfig().controler().getLastIteration())-(event.getIteration()))==0){
 					avgValue3 = tollHandler.getAvgToll(linkId2_, 28800);
 					avgValue4 = tollHandler.getAvgToll(linkId2_, 29700);
 					avgOldValue3 = tollHandler.getAvgTollOldValue(linkId2_, 28800);
@@ -446,7 +455,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -504,7 +513,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -564,7 +573,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -633,7 +642,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
 		
 		QSim sim = createQSim(sc, events);
 		sim.run();

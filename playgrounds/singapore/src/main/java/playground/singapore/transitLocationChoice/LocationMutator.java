@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -80,7 +80,7 @@ public abstract class LocationMutator implements PlanAlgorithm {
 		if (this.defineFlexibleActivities.getFlexibleTypes().size() > 0) {
 			locationChoiceBasedOnKnowledge = false;
 		}
-		this.initTrees(((ScenarioImpl) scenario).getActivityFacilities());
+		this.initTrees(((MutableScenario) scenario).getActivityFacilities());
 	}
 
 	/**

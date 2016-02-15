@@ -27,7 +27,7 @@ package playground.ikaddoura.optimization;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.ikaddoura.internalizationPt.CapacityDelayHandler;
 import playground.ikaddoura.internalizationPt.MarginalCostPricingPtHandler;
@@ -45,7 +45,7 @@ import playground.vsp.congestion.handlers.MarginalCongestionPricingHandler;
 public class OptControlerListener implements StartupListener {
 
 	private final double fare;
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final boolean calculate_inVehicleTimeDelayEffects;
 	private final boolean calculate_waitingTimeDelayEffects;
 	private final boolean marginalCostPricingPt;
@@ -54,7 +54,7 @@ public class OptControlerListener implements StartupListener {
 	private final boolean calculate_capacityDelayEffects;
 
 	public OptControlerListener(double fare,
-			ScenarioImpl scenario,
+			MutableScenario scenario,
 			boolean calculate_inVehicleTimeDelayEffects,
 			boolean calculate_waitingTimeDelayEffects, 
 			boolean calculate_capacityDelayEffects,
@@ -76,31 +76,31 @@ public class OptControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		EventsManager eventsManager = event.getControler().getEvents();
+		EventsManager eventsManager = event.getServices().getEvents();
 
 		// pt mode
 		if (this.calculate_inVehicleTimeDelayEffects) {
-			event.getControler().getEvents().addHandler(new TransferDelayInVehicleHandler(eventsManager, scenario));
+			event.getServices().getEvents().addHandler(new TransferDelayInVehicleHandler(eventsManager, scenario));
 		}
 		if (this.calculate_waitingTimeDelayEffects) {
-			event.getControler().getEvents().addHandler(new TransferDelayWaitingHandler(eventsManager, scenario));
+			event.getServices().getEvents().addHandler(new TransferDelayWaitingHandler(eventsManager, scenario));
 		}
 		if (this.calculate_capacityDelayEffects) {
-			event.getControler().getEvents().addHandler(new CapacityDelayHandler(eventsManager, scenario));
+			event.getServices().getEvents().addHandler(new CapacityDelayHandler(eventsManager, scenario));
 		}
 		if (this.marginalCostPricingPt) {
-			event.getControler().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario));
+			event.getServices().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario));
 		}
 		
 		// car mode
 		if (this.calculate_carCongestionEffects) {
-			event.getControler().getEvents().addHandler(new CongestionHandlerImplV3(eventsManager, scenario));
+			event.getServices().getEvents().addHandler(new CongestionHandlerImplV3(eventsManager, scenario));
 		}
 		if (this.marginalCostPricingCar) {
-			event.getControler().getEvents().addHandler(new MarginalCongestionPricingHandler(eventsManager, scenario));
+			event.getServices().getEvents().addHandler(new MarginalCongestionPricingHandler(eventsManager, scenario));
 		}
 				
-		event.getControler().getEvents().addHandler(new ConstantFareHandler(eventsManager, this.fare));
+		event.getServices().getEvents().addHandler(new ConstantFareHandler(eventsManager, this.fare));
 	}
 
 }

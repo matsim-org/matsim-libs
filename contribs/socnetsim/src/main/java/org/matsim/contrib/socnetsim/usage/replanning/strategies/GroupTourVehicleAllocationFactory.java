@@ -66,7 +66,7 @@ public class GroupTourVehicleAllocationFactory extends AbstractConfigurableSelec
 						sc.getConfig().global().getNumberOfThreads(),
 						TransportMode.car,
 						(VehicleRessources) sc.getScenarioElement(
-							VehicleRessources.ELEMENT_NAME ) ) ) );
+							VehicleRessources.ELEMENT_NAME ), tripRouterFactory) ) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(

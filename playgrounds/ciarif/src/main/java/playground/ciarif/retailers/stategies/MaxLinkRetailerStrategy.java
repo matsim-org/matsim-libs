@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -21,11 +21,11 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 	
 	private final static Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
 	public static final String NAME = "maxLinkRetailerStrategy";
-	private Controler controler;
+	private MatsimServices controler;
 	private Map<Id,ActivityFacility> movedFacilities;
 	// TODO balmermi: do the same speed optimization here
 
-	public MaxLinkRetailerStrategy(Controler controler) {
+	public MaxLinkRetailerStrategy(MatsimServices controler) {
 		this.controler = controler;
 	}
 	

@@ -20,14 +20,19 @@
 package playground.johannes.gsv.synPop.gis;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.common.gis.CRSUtils;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.sna.gis.io.ZoneLayerSHP;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -36,12 +41,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
-import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -96,7 +96,7 @@ public class Plz8OsmCompare {
 		
 		System.err.println(String.format("%s zones not found.", zoneNotFound));
 		
-		TDoubleDoubleHashMap stats = Correlations.mean(values1.toNativeArray(), values2.toNativeArray());
+		TDoubleDoubleHashMap stats = Correlations.mean(values1.toArray(), values2.toArray());
 		StatsWriter.writeHistogram(stats, "employees", "facilities", "/home/johannes/gsv/osm/shop-compare.txt");
 //		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/osm/shop-compare.txt"));
 //		writer.write("employees\tfacilities");

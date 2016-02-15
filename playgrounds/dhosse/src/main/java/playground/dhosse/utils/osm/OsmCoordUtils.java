@@ -21,7 +21,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 /**
  * @author dziemke
  */
-class OsmCoordUtils {
+public class OsmCoordUtils {
 	private final static Logger log = Logger.getLogger(OsmCoordUtils.class);
 
 

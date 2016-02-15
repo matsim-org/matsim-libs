@@ -27,7 +27,6 @@ package floetteroed.opdyts.trajectorysampling;
 import java.util.List;
 
 import floetteroed.opdyts.DecisionVariable;
-import floetteroed.opdyts.VectorBasedObjectiveFunction;
 import floetteroed.utilities.math.Matrix;
 import floetteroed.utilities.math.Vector;
 
@@ -36,14 +35,9 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-class SurrogateObjectiveFunction<U extends DecisionVariable> implements VectorBasedObjectiveFunction {
+class SurrogateObjectiveFunction<U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
-
-	// private final ObjectBasedObjectiveFunction
-	// originalObjectBasedObjectiveFunction;
-
-	private final VectorBasedObjectiveFunction originalVectorBasedObjectiveFunction;
 
 	private final List<Transition<U>> transitions;
 
@@ -51,27 +45,15 @@ class SurrogateObjectiveFunction<U extends DecisionVariable> implements VectorBa
 
 	private final double equilibriumGapWeight;
 
-	private final double uniformityWeight;
-
-	private final double initialGradientNorm;
+	private final double uniformityGapWeight;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	SurrogateObjectiveFunction(
-			// final ObjectBasedObjectiveFunction
-			// originalObjectBasedObjectiveFunction,
-			final VectorBasedObjectiveFunction originalVectorBasedObjectiveFunction,
-			final List<Transition<U>> transitions,
-			final double equilibriumGapWeight, final double uniformityWeight,
-			final double initialGradientNorm) {
-
-		// this.originalObjectBasedObjectiveFunction =
-		// originalObjectBasedObjectiveFunction;
-		this.originalVectorBasedObjectiveFunction = originalVectorBasedObjectiveFunction;
+	SurrogateObjectiveFunction(final List<Transition<U>> transitions,
+			final double equilibriumGapWeight, final double uniformityWeight) {
 		this.transitions = transitions;
 		this.equilibriumGapWeight = equilibriumGapWeight;
-		this.uniformityWeight = uniformityWeight;
-		this.initialGradientNorm = initialGradientNorm;
+		this.uniformityGapWeight = uniformityWeight;
 
 		this.deltaCovariances = new Matrix(transitions.size(),
 				transitions.size());
@@ -85,30 +67,26 @@ class SurrogateObjectiveFunction<U extends DecisionVariable> implements VectorBa
 		}
 	}
 
-	// -------------------- INTERNALS --------------------
+	// -------------------- PARAMETERS --------------------
 
-	private Vector interpolatedSimulatorState(final Vector alphas) {
-		Vector result = this.transitions.get(0).getToState().copy();
-		result.mult(alphas.get(0));
-		for (int i = 1; i < alphas.size(); i++) {
-			result.add(this.transitions.get(i).getToState(), alphas.get(i));
-		}
-		return result;
+	double getEquilibriumGapWeight() {
+		return this.equilibriumGapWeight;
 	}
 
-	double originalObjectiveFunctionValue(final Vector alphas) {
-		if (this.originalVectorBasedObjectiveFunction != null) {
-			return this.originalVectorBasedObjectiveFunction.value(this
-					.interpolatedSimulatorState(alphas));
-		} else {
-			double result = 0;
-			for (int i = 0; i < alphas.size(); i++) {
-				result += alphas.get(i)
-						* this.transitions.get(i)
-								.getToStateObjectiveFunctionValue();
-			}
-			return result;
+	double getUniformityWeight() {
+		return this.uniformityGapWeight;
+	}
+
+	// -------------------- VALUES --------------------
+
+	double interpolatedObjectiveFunctionValue(final Vector alphas) {
+		double result = 0;
+		for (int i = 0; i < alphas.size(); i++) {
+			result += alphas.get(i)
+					* this.transitions.get(i)
+							.getToStateObjectiveFunctionValue();
 		}
+		return result;
 	}
 
 	double equilibriumGap(final Vector alphas) {
@@ -124,75 +102,58 @@ class SurrogateObjectiveFunction<U extends DecisionVariable> implements VectorBa
 		return Math.sqrt(Math.max(result, 0.0));
 	}
 
-	// ObjectBasedObjectiveFunction originalObjectBasedObjectiveFunction() {
-	// return this.originalObjectBasedObjectiveFunction;
-	// }
-
-	// VectorBasedObjectiveFunction originalVectorBasedObjectiveFunction() {
-	// return this.originalVectorBasedObjectiveFunction;
-	// }
-
-	double getEquilibriumGapWeight() {
-		return this.equilibriumGapWeight;
+	double surrogateObjectiveFunctionValue(final Vector alphas) {
+		return this.interpolatedObjectiveFunctionValue(alphas)
+				+ this.equilibriumGapWeight * this.equilibriumGap(alphas)
+				+ this.uniformityGapWeight * alphas.innerProd(alphas);
 	}
 
-	double getUniformityWeight() {
-		return this.uniformityWeight;
-	}
+	// -------------------- GRADIENTS --------------------
 
-	// double getInitialGradientNorm() {
-	// return this.initialGradientNorm;
-	// }
-
-	// --------------------IMPLEMENTATION OF ObjectiveFunction ----------
-
-	@Override
-	public double value(final Vector alphas) {
-		return this.originalObjectiveFunctionValue(alphas)
-				+ this.equilibriumGapWeight * this.initialGradientNorm
-				* this.equilibriumGap(alphas) + this.uniformityWeight
-				* this.initialGradientNorm * alphas.euclNorm();
-	}
-
-	@Override
-	public Vector gradient(final Vector alphas) {
+	Vector dInterpolObjFctVal_dAlpha(final Vector alphas) {
 		final Vector result = new Vector(alphas.size());
-		/*
-		 * objective function value contribution
-		 */
-		if (this.originalVectorBasedObjectiveFunction != null) {
-			final Vector interpolatedState = this
-					.interpolatedSimulatorState(alphas);
-			final Vector originalGradient = this.originalVectorBasedObjectiveFunction
-					.gradient(interpolatedState);
-			for (int i = 0; i < alphas.size(); i++) {
-				result.set(i, originalGradient.innerProd(this.transitions
-						.get(i).getToState()));
-			}
-		} else {
-			for (int i = 0; i < alphas.size(); i++) {
-				// result.set(i, this.originalObjectiveFunction
-				// .value(this.transitions.get(i).getToState()));
-				result.set(i, this.transitions.get(i)
-						.getToStateObjectiveFunctionValue());
-			}
-		}
-		/*
-		 * equilibrium gap contribution
-		 */
-		final double equilibriumGap = this.equilibriumGap(alphas);
-		for (int l = 0; l < alphas.size(); l++) {
-			result.add(l, this.equilibriumGapWeight * this.initialGradientNorm
-					* alphas.innerProd(this.deltaCovariances.getRow(l))
-					/ (equilibriumGap + 1e-8));
-		}
-		/*
-		 * uniformity contribution, assuming alpha vector to have norm 1
-		 */
-		for (int l = 0; l < alphas.size(); l++) {
-			result.add(l, this.uniformityWeight * this.initialGradientNorm
-					* alphas.get(l));
+		for (int i = 0; i < alphas.size(); i++) {
+			result.set(i, this.transitions.get(i)
+					.getToStateObjectiveFunctionValue());
 		}
 		return result;
 	}
+
+	Vector dEquilibriumGap_dAlpha(final Vector alphas) {
+		final Vector result = new Vector(alphas.size());
+		final double equilibriumGap = this.equilibriumGap(alphas);
+		for (int i = 0; i < alphas.size(); i++) {
+			result.set(i, alphas.innerProd(this.deltaCovariances.getRow(i))
+					/ (equilibriumGap + 1e-8));
+		}
+		return result;
+	}
+
+	Vector dUniformityGap_dAlpha(final Vector alphas) {
+		final Vector result = alphas.copy();
+		result.mult(2.0);
+		return result;
+	}
+
+	Vector dSurrObjFctVal_dAlpha(final Vector alphas) {
+		final Vector result = this.dInterpolObjFctVal_dAlpha(alphas);
+		result.add(this.dEquilibriumGap_dAlpha(alphas),
+				this.equilibriumGapWeight);
+		result.add(this.dUniformityGap_dAlpha(alphas), this.uniformityGapWeight);
+		return result;
+	}
+
+	// -------------------- HESSIANS --------------------
+
+	// Matrix d2EquilibriumGapdAlpha2(final Vector alphas) {
+	// final Matrix result = this.deltaCovariances.copy();
+	// final Vector gradient = this.dEquilibriumGap_dAlpha(alphas);
+	// result.addOuterProduct(gradient, gradient, -1.0);
+	// result.mult(1.0 / this.equilibriumGap(alphas));
+	// return result;
+	// }
+	//
+	// Matrix d2UniformityGapdAlpha2(final Vector alphas) {
+	// return Matrix.newDiagonal(alphas.size(), 2.0);
+	// }
 }

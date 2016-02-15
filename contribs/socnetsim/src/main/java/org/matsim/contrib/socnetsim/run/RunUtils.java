@@ -35,7 +35,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 /**
@@ -184,7 +184,7 @@ public class RunUtils {
 			scenario.addScenarioElement(
 							VehicleRessources.ELEMENT_NAME,
 							new HouseholdBasedVehicleRessources(
-								((ScenarioImpl) scenario).getHouseholds() ) );
+								((MutableScenario) scenario).getHouseholds() ) );
 		}
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {

@@ -29,7 +29,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.DgPaths;
@@ -57,7 +57,7 @@ public class FourWaysVisMviTest {
 		String signalGroupsFile = TESTINPUTDIR + "testSignalGroups_v2.0.xml";
 		String signalControlFile = TESTINPUTDIR + "testSignalControl_v2.0.xml";
     
-    ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+    MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     Config conf = scenario.getConfig();
     conf.network().setInputFile(netFile);
     conf.plans().setInputFile(popFile);

@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.rules.TestWatchman;
 import org.junit.runners.model.FrameworkMethod;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
@@ -76,13 +77,12 @@ public class MatsimTestUtils extends TestWatchman {
 	 * @param configfile The path/filename of a configuration file, or null to load the default configuration.
 	 * @return The loaded configuration.
 	 */
-	public Config loadConfig(final String configfile) {
+	public Config loadConfig(final String configfile, final ConfigGroup... customGroups) {
 		Config config;
 		if (configfile != null) {
-			config = ConfigUtils.loadConfig(configfile);
+			config = ConfigUtils.loadConfig(configfile, customGroups);
 		} else {
-			config = new Config();
-			config.addCoreModules();
+			config = ConfigUtils.createConfig( customGroups );
 		}
 		this.outputDirectory = getOutputDirectory();
 		config.controler().setOutputDirectory(this.outputDirectory);

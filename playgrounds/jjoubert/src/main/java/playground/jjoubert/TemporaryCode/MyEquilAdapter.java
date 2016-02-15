@@ -97,7 +97,7 @@ public class MyEquilAdapter {
 	}
 	
 	public void readNetwork(String networkFilename) {
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc.getNetwork());
 		nr.parse(networkFilename);
 	}
 

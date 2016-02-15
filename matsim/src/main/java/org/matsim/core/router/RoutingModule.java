@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 
@@ -43,7 +44,7 @@ public interface RoutingModule {
 	 * {@link #getStageActivityTypes()} method.
 	 * <br>
 	 * <b>important:</b> if route computation relies on a shortest path algorithm
-	 * using {@link TravelTime} and/or {@link PersonalizableTravelDisutility}
+	 * using {@link TravelTime} and/or {@link TravelDisutility}
 	 * estimators, this method is responsible for setting the person to the argument
 	 * person in those estimators before running the shortest path algorithm.
 	 *
@@ -54,8 +55,8 @@ public interface RoutingModule {
 	 * @return a list of {@link PlanElement}, in proper order, representing the trip.
 	 */
 	public List<? extends PlanElement> calcRoute(
-			Facility fromFacility,
-			Facility toFacility,
+			Facility<?> fromFacility,
+			Facility<?> toFacility,
 			double departureTime,
 			Person person);
 

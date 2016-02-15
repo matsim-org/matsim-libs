@@ -8,13 +8,13 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="./input/usecases/chessboard/passenger/passengerPlans.xml" />
+		<param name="inputPlansFile" value="./input/usecases/chessboard/passenger/noPlans.xml" />
 	</module>
 
 	<module name="controler">
 		<param name="outputDirectory" value="./output" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="100" />
+		<param name="lastIteration" value="5" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="queueSimulation" />
 	</module>

@@ -51,7 +51,6 @@ public class UserGroupToTollData {
 		UserGroupToTollData taug = new UserGroupToTollData();
 		taug.readFileAndStoreData(inFile);
 		taug.filterAndWriteUserGroupData(outFile);
-
 	}
 
 	private void readFileAndStoreData (String file){
@@ -107,9 +106,5 @@ public class UserGroupToTollData {
 			throw new RuntimeException("Data is not written in file. Reason: "
 					+ e);
 		}
-
-
 	}
-
-
 }

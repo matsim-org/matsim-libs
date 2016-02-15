@@ -22,7 +22,7 @@ package playground.thibautd.parknride.replanning;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
@@ -37,16 +37,22 @@ import playground.thibautd.parknride.ParkAndRideUtils;
 import playground.thibautd.parknride.scoring.ParkAndRideScoringFunctionFactory;
 
 import javax.inject.Provider;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author thibautd
  */
 public class ParkAndRideChooseModeForSubtourModule extends AbstractMultithreadedModule {
-	private final Controler controler;
+	private final MatsimServices controler;
 	private static final boolean CHECK_CAR_AVAIL = false;
 
-	public ParkAndRideChooseModeForSubtourModule(final Controler controler) {
+	public ParkAndRideChooseModeForSubtourModule(final MatsimServices controler) {
 		super( controler.getConfig().global() );
 		this.controler = controler;
 	}

@@ -90,26 +90,29 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 		// yy could probably move all of this method into the constructor, and then get rid of this method.  But should
 		// be debugged and a test case written before. kai, oct'15
 
-		Scenario scenario = event.getControler().getScenario();
+		Scenario scenario = event.getServices().getScenario();
 		Config config = scenario.getConfig();
 
+		// 1st major Cadyts method is "calibrator.addMesurement"
+		// in this implementation it is called by the "CadytsBuilder", dz 09/15
 		this.calibrator = CadytsBuilder.buildCalibratorAndAddMeasurements(config, this.counts, measurements, Measurement.class) ;
 
 		this.measurementListener = new MeasurementListener(scenario, measurements );
-		event.getControler().getEvents().addHandler(measurementListener);
+		event.getServices().getEvents().addHandler(measurementListener);
 	}
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 
-		// ---------- 2nd important Cadyts method is "analyzer.addToDemand"
+		// 2nd major Cadyts method is "analyzer.addToDemand", dz 09/15
+		
 		// Register demand for this iteration with Cadyts.
 		// Note that planToPlanStep will return null for plans which have never been executed.
 		// This is fine, since the number of these plans will go to zero in normal simulations,
 		// and Cadyts can handle this "noise". Checked this with Gunnar.
 		// mz 2015
-		for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
-			Plan<Measurement> planSteps = this.measurementListener.getPlanSteps(person.getSelectedPlan());
+		for (Person person : event.getServices().getScenario().getPopulation().getPersons().values()) {
+			Plan<Measurement> planSteps = this.measurementListener.getCadytsPlan(person.getSelectedPlan());
 			this.calibrator.addToDemand(planSteps);
 		}
 	}
@@ -117,16 +120,15 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (this.writeAnalysisFile) {
-			String analysisFilepath = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), ANALYSIS_FILENAME);
+			String analysisFilepath = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), ANALYSIS_FILENAME);
 			this.calibrator.setFlowAnalysisFile(analysisFilepath);
 		}
 
-		// ---------- 3rd important method "calibrator.afterNetworkLoading"
+		// 3rd major Cadyts method "calibrator.afterNetworkLoading", dz 09/15
 		this.calibrator.afterNetworkLoading(this.measurementListener);
 
 		// write some output
-		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), COSTOFFSET_FILENAME);
-		// TODO writing does not work currently; reactivate this when other stuff has been sorted out
+		String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), COSTOFFSET_FILENAME);
 		try {
 			new CadytsCostOffsetsXMLFileIO<Measurement>( this.measurements, Measurement.class)
 			.write(filename, this.calibrator.getLinkCostOffsets());

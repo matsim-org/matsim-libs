@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.charts.XYLineChart;
 import playground.artemc.analysis.TripAnalysisHandler;
 
@@ -24,7 +24,7 @@ import java.util.TreeMap;
 public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 	private static final Logger log = Logger.getLogger(DisaggregatedScoreAnalyzer.class);
 
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private Map<Id, DisaggregatedScore> disaggregatedScores = new HashMap<Id, DisaggregatedScore>();
 	private Map<Integer, Double> activityUtility2it = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> legUtilityTotal2it = new TreeMap<Integer, Double>();
@@ -34,7 +34,7 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 	private Map<Integer, Double> sumUtility2it = new TreeMap<Integer, Double>();
 	private TripAnalysisHandler tripAnalysisHandler;
 
-	public DisaggregatedScoreAnalyzer(ScenarioImpl scenario, TripAnalysisHandler tripAnalysisHandler) {
+	public DisaggregatedScoreAnalyzer(MutableScenario scenario, TripAnalysisHandler tripAnalysisHandler) {
 		super();
 		this.scenario = scenario;
 		this.tripAnalysisHandler = tripAnalysisHandler;
@@ -63,9 +63,9 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 		this.stuckUtility2it.put(event.getIteration(),0.0);
 		this.sumUtility2it.put(event.getIteration(),0.0);
 
-        for(Person person: event.getControler().getScenario().getPopulation().getPersons().values()) {
-			//DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) event.getControler().getPlansScoring().getScoringFunctionForAgent(person.getId());
-			CharyparNagelScoringFunctionForAnalysisFactory disScoringFactory = (CharyparNagelScoringFunctionForAnalysisFactory) event.getControler().getScoringFunctionFactory();
+        for(Person person: event.getServices().getScenario().getPopulation().getPersons().values()) {
+			//DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) event.getServices().getPlansScoring().getScoringFunctionForAgent(person.getId());
+			CharyparNagelScoringFunctionForAnalysisFactory disScoringFactory = (CharyparNagelScoringFunctionForAnalysisFactory) event.getServices().getScoringFunctionFactory();
 			DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) disScoringFactory.getPersonScoringFunctions().get(person.getId());
 
 			disaggregatedScores.put(person.getId(), new DisaggregatedScore(sf.getActivityTotalScore(), sf.getLegScores(), sf.getMoneyTotalScore(), sf.getStuckScore()));
@@ -87,7 +87,7 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 
 		String fileName = this.scenario.getConfig().controler().getOutputDirectory() + "/disaggregatedScore.csv";
 		File file = new File(fileName);
-        Integer persons = event.getControler().getScenario().getPopulation().getPersons().size();
+        Integer persons = event.getServices().getScenario().getPopulation().getPersons().size();
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));

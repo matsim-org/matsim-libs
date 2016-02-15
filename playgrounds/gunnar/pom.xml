@@ -18,6 +18,12 @@
   		<systemPath>${basedir}/libs/utilities.jar</systemPath>	
   	</dependency>
   	-->
+  	  	<dependency>
+  		<groupId>org.matsim.contrib</groupId>
+  		<artifactId>roadpricing</artifactId>
+  		<version>0.8.0-SNAPSHOT</version>
+  	</dependency>
+  	
     <dependency>
      	<groupId>org.apache.commons</groupId>
      	<artifactId>commons-math3</artifactId>

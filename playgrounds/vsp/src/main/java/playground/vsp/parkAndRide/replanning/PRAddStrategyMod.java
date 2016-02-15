@@ -35,11 +35,11 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.parkAndRide.PRConstants;
 import playground.vsp.parkAndRide.PRFacility;
@@ -55,7 +55,7 @@ import playground.vsp.parkAndRide.PRFacility;
 public class PRAddStrategyMod implements PlanStrategyModule {
 	private static final Logger log = Logger.getLogger(PRAddStrategyMod.class);
 
-	private ScenarioImpl sc;
+	private MutableScenario sc;
 	private Network net;
 	private Population pop;
 	private Map<Id<PRFacility>, PRFacility> id2prFacility = new HashMap<>();
@@ -70,8 +70,8 @@ public class PRAddStrategyMod implements PlanStrategyModule {
 	 * @param gravity
 	 * @param typicalDuration 
 	 */
-	public PRAddStrategyMod(Controler controler, Map<Id<PRFacility>, PRFacility> id2prFacility, double gravity, double typicalDuration) {
-		this.sc = (ScenarioImpl) controler.getScenario();
+	public PRAddStrategyMod(MatsimServices controler, Map<Id<PRFacility>, PRFacility> id2prFacility, double gravity, double typicalDuration) {
+		this.sc = (MutableScenario) controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();
 		this.id2prFacility = id2prFacility;

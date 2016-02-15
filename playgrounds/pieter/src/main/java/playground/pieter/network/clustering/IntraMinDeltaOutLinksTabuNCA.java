@@ -123,7 +123,7 @@ public class IntraMinDeltaOutLinksTabuNCA extends NodeClusteringAlgorithm {
 		String fileName = "f:/TEMP/singmindeltaoutlinkstabu.txt";
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
-		MatsimNetworkReader nwr = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader nwr = new MatsimNetworkReader(scenario.getNetwork());
 		// nwr.readFile(args[0]);
 //		 nwr.readFile("f:/matsimWorkspace/playgrounds/pieter/data/zurich/horni/network.xml.gz");
 //		nwr.readFile("f:/matsimWorkspace/matsim/examples/siouxfalls/network-wo-dummy-node.xml");

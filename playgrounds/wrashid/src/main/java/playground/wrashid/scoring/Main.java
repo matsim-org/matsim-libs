@@ -27,9 +27,9 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 public class Main {
 	public static void main(String[] args) {
 		//Controler controler = new Controler(args);
-        //CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getConfig().scenario(), controler.getScenario().getNetwork());
+        //CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(services.getConfig().planCalcScore(), services.getConfig().scenario(), services.getScenario().getNetwork());
 		//controler.setScoringFunctionFactory(factory);
-		//controler.getConfig().controler().setOverwriteFileSetting(
+		//services.getConfig().services().setOverwriteFileSetting(
 		//		true ?
 		//				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 		//				OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );

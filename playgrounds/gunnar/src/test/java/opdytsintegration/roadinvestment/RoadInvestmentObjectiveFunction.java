@@ -1,6 +1,6 @@
 package opdytsintegration.roadinvestment;
 
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 
 /**
@@ -9,7 +9,7 @@ import floetteroed.opdyts.SimulatorState;
  * 
  */
 public class RoadInvestmentObjectiveFunction implements
-		ObjectBasedObjectiveFunction {
+		ObjectiveFunction {
 
 	private final double betaPayScale = 0.04;
 

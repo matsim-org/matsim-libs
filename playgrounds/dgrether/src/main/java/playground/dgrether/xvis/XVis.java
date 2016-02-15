@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 
@@ -106,21 +106,21 @@ public class XVis {
 
 	private void startXVis(String filename) throws IOException {
 		MatsimFileTypeGuesser guesser = new MatsimFileTypeGuesser(filename);
-		ScenarioImpl scenario =  null;
+		MutableScenario scenario =  null;
 		if (MatsimFileTypeGuesser.FileType.Config.equals(guesser.getGuessedFileType())) {
 			Config config = ConfigUtils.loadConfig(filename);
-			scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+			scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		}
 		else 	if (MatsimFileTypeGuesser.FileType.Network.equals(guesser.getGuessedFileType())){
 			Config config = ConfigUtils.createConfig();
 			config.network().setInputFile(filename);
-			scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+			scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		}
 		else if (MatsimFileTypeGuesser.FileType.SignalControl.equals(guesser.getGuessedFileType())){
 			Config config = ConfigUtils.createConfig();
 			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(filename);
-			scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+			scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		}
 		
 		if (scenario != null){

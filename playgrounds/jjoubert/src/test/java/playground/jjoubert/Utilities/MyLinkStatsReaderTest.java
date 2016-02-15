@@ -101,7 +101,7 @@ public class MyLinkStatsReaderTest extends MatsimTestCase{
 	private void setupTest() {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		String f = (new File(getInputDirectory())).getParent() + "/network.xml";
-		MatsimNetworkReader mnr = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader mnr = new MatsimNetworkReader(scenario.getNetwork());
 		mnr.readFile(f);
 	}
 

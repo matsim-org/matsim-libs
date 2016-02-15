@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 
 /**
  * @author johannes
@@ -104,6 +104,18 @@ public class ProxyActAdaptor implements Activity {
 	@Override
 	public Id<ActivityFacility> getFacilityId() {
 		return Id.create(delegate.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
+	}
+
+	@Override
+	public void setLinkId(Id<Link> id) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setFacilityId(Id<ActivityFacility> id) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 }

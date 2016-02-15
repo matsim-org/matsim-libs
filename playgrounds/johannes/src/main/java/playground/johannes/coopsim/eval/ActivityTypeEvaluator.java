@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.eval;
 
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-
 import playground.johannes.coopsim.mental.ActivityDesires;
 import playground.johannes.coopsim.pysical.Trajectory;
+
+import java.util.Map;
 
 /**
  * @author illenberger

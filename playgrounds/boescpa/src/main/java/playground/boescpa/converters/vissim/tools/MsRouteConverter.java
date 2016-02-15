@@ -44,7 +44,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -52,7 +52,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import playground.boescpa.lib.tools.coordUtils.CoordAnalyzer;
-import playground.boescpa.lib.tools.shpUtils.SHPFileUtil;
+import playground.boescpa.lib.tools.SHPFileUtils;
 
 /**
  * Provides a matsim-events specific implementation of RouteConverter.
@@ -85,11 +85,11 @@ public class MsRouteConverter extends AbstractRouteConverter {
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {
 				if (geographicEventAnalyzer.eventInArea(event)) {
-					Trip currentTrip = currentTrips.get(event.getDriverId());
+					Trip currentTrip = currentTrips.get(Id.createPersonId(event.getVehicleId().toString()));
 					if (currentTrip == null) {
-						Id<Trip> tripId = Id.create(event.getDriverId().toString() + "_" + String.valueOf(event.getTime()), Trip.class);
+						Id<Trip> tripId = Id.create(event.getVehicleId().toString() + "_" + String.valueOf(event.getTime()), Trip.class);
 						currentTrip = new Trip(tripId, event.getTime());
-						currentTrips.put(event.getDriverId(),currentTrip);
+						currentTrips.put(Id.createPersonId(event.getVehicleId().toString()),currentTrip);
 					}
 					currentTrip.links.add(event.getLinkId());
 					currentTrip.endTime = event.getTime();
@@ -142,14 +142,14 @@ public class MsRouteConverter extends AbstractRouteConverter {
 		private final Network network;
 		private GeographicEventAnalyzer(String path2MATSimNetwork, String path2VissimZoneShp) {
 			// read network
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario.getNetwork());
 			NetworkReader.readFile(path2MATSimNetwork);
 			this.network = scenario.getNetwork();
 			// read zones
 			Set<SimpleFeature> features = new HashSet<SimpleFeature>();
 			features.addAll(ShapeFileReader.getAllFeatures(path2VissimZoneShp));
-			SHPFileUtil util = new SHPFileUtil();
+			SHPFileUtils util = new SHPFileUtils();
 			Geometry cuttingArea = util.mergeGeometries(features);
 			this.coordAnalyzer = new CoordAnalyzer(cuttingArea);
 		}

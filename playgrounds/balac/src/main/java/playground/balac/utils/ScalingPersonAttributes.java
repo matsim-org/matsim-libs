@@ -10,7 +10,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -19,9 +19,9 @@ public class ScalingPersonAttributes {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(sc);
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(sc);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(sc.getNetwork());
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
 				

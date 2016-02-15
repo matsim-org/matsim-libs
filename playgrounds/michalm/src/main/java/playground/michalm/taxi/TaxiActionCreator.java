@@ -51,7 +51,7 @@ public class TaxiActionCreator
 
         switch (tt.getTaxiTaskType()) {
             case DRIVE_EMPTY:
-            case DRIVE_WITH_PASSENGER:
+            case DRIVE_OCCUPIED:
                 return legCreator.createLeg((DriveTask)task);
 
             case PICKUP:

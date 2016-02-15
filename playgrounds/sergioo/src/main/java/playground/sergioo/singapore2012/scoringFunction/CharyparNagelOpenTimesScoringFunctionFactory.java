@@ -23,7 +23,7 @@ package playground.sergioo.singapore2012.scoringFunction;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -55,7 +55,7 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 			this.params = new CharyparNagelScoringParameters(this.config);
 		}
 		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(person.getSelectedPlan(), params, ((ScenarioImpl) scenario).getActivityFacilities()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(person.getSelectedPlan(), params, ((MutableScenario) scenario).getActivityFacilities()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));

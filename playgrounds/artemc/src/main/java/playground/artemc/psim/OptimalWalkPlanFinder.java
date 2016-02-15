@@ -7,7 +7,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -24,7 +24,7 @@ public class OptimalWalkPlanFinder {
 	}
 
 	public static void main(String[] args){
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		OptimalWalkPlanFinder optimalWalkPlanFinder = new OptimalWalkPlanFinder(scenario.getConfig());
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
 		optimalWalkPlanFinder.findOptimalWalkPlan(plan);

@@ -35,8 +35,11 @@ public class CachedEpisode extends CachedElement implements Episode {
 
     private final List<Segment> legs;
 
-    public CachedEpisode(Episode delegate) {
+    private final CachedPerson person;
+
+    public CachedEpisode(Episode delegate, CachedPerson person) {
         super(delegate);
+        this.person = person;
 
         activities = new ArrayList<>(delegate.getActivities().size());
         for(Segment activity : delegate.getActivities()) {
@@ -99,7 +102,8 @@ public class CachedEpisode extends CachedElement implements Episode {
 
     @Override
     public Person getPerson() {
-        throw new UnsupportedOperationException("Navigation not supported.");
+        return person;
+//        throw new UnsupportedOperationException("Navigation not supported.");
 //        return ((Episode)getDelegate()).getPerson();
     }
 }

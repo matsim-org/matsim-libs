@@ -25,6 +25,7 @@ import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
@@ -48,10 +49,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -219,8 +221,8 @@ public class RunPSim {
             });
         } else {
             //randomized routing for car and transit
-            final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
-                    new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+            final Builder disutilityFactory =
+                    new Builder( TransportMode.car );
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
@@ -238,7 +240,9 @@ public class RunPSim {
         matsimControler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                addPlanSelectorForRemovalBinding("DiversityGeneratingPlansRemover").toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                if (getConfig().strategy().getPlanSelectorForRemoval().equals("DiversityGeneratingPlansRemover")) {
+                    bindPlanSelectorForRemoval().toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                }
             }
         });
         if (Diversity)
@@ -269,7 +273,7 @@ public class RunPSim {
         formatter.printHelp("PSimControler", header, options, footer, true);
     }
 
-    public Controler getMatsimControler() {
+    public MatsimServices getMatsimControler() {
         return matsimControler;
     }
 
@@ -546,10 +550,10 @@ public class RunPSim {
         final private static int INDEX_BEST = 1;
         final private static int INDEX_AVERAGE = 2;
         final private static int INDEX_EXECUTED = 3;
-        private final Controler controler;
+        private final MatsimServices controler;
         private BufferedWriter out;
 
-        public QSimScoreWriter(Controler controler) {
+        public QSimScoreWriter(MatsimServices controler) {
             super();
             this.controler = controler;
 

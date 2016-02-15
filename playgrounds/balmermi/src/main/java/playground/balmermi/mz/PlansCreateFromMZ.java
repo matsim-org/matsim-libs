@@ -195,7 +195,7 @@ public class PlansCreateFromMZ {
 				// creating/getting the matsim person
 				Person person = plans.getPersons().get(pid);
 				if (person == null) {
-					person = PersonImpl.createPerson(pid);
+					person = PopulationUtils.createPerson(pid);
 					plans.addPerson(person);
 					PersonUtils.setAge(person, age);
 					PersonUtils.setLicence(person, licence);

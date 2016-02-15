@@ -58,7 +58,7 @@ public class MyOsmNetworkCleaner {
 			monc = new MyOsmNetworkCleaner();
 		}
 		Scenario runSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader mnr = new MatsimNetworkReader(runSc);
+		MatsimNetworkReader mnr = new MatsimNetworkReader(runSc.getNetwork());
 		mnr.parse(args[0]);
 		
 		// For now, use the envelope of the multipolygon.

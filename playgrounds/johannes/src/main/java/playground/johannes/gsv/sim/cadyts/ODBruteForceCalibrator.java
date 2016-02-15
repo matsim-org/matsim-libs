@@ -27,9 +27,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.common.collections.ChoiceSet;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -43,19 +47,15 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.*;
-import playground.johannes.coopsim.mental.choice.ChoiceSet;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.ObjectKeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.HashMatrix;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import javax.inject.Provider;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class ODBruteForceCalibrator {
 
 	private static final Logger logger = Logger.getLogger(ODBruteForceCalibrator.class);
 
-	private final KeyMatrix refMatrix;
+	private final NumericMatrix refMatrix;
 
 	private final ZoneCollection zones;
 
@@ -88,7 +88,7 @@ public class ODBruteForceCalibrator {
 
 	private final double distThreshold;
 
-	public ODBruteForceCalibrator(KeyMatrix refMatrix, Scenario scenario, ZoneCollection zones, TripRouter router, double distThreshold) {
+	public ODBruteForceCalibrator(NumericMatrix refMatrix, Scenario scenario, ZoneCollection zones, TripRouter router, double distThreshold) {
 		this.refMatrix = refMatrix;
 		this.zones = zones;
 		this.router = router;
@@ -127,11 +127,11 @@ public class ODBruteForceCalibrator {
 			}
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 	}
 
 	public void run(Population population) {
-		ObjectKeyMatrix<ODRelation> simMatrix = plans2Matrix(population, zones, facilities, distThreshold, zoneKey);
+		HashMatrix<String, ODRelation> simMatrix = plans2Matrix(population, zones, facilities, distThreshold, zoneKey);
 
 		DistanceCalculator distCalc = CartesianDistanceCalculator.getInstance();
 		Discretizer disc = new LinearDiscretizer(50000);
@@ -142,7 +142,7 @@ public class ODBruteForceCalibrator {
 		}
 	}
 
-	private void processZone(Set<Zone> zoneSet, Zone origin, DistanceCalculator distCalc, Discretizer disc, ObjectKeyMatrix<ODRelation> simMatrix) {
+	private void processZone(Set<Zone> zoneSet, Zone origin, DistanceCalculator distCalc, Discretizer disc, HashMatrix<String, ODRelation> simMatrix) {
 		/*
 		 * get od-pairs above distance threshold
 		 */
@@ -193,7 +193,7 @@ public class ODBruteForceCalibrator {
 
 			ChoiceSet<Tuple<String, String>> lowODKeys = new ChoiceSet<>(random);
 			for (Entry<Tuple<String, String>, Double> e : lowODs.entrySet()) {
-				lowODKeys.addChoice(e.getKey(), Math.abs(e.getValue()));// check
+				lowODKeys.addOption(e.getKey(), Math.abs(e.getValue()));// check
 																		// negative
 																		// weights
 			}
@@ -223,7 +223,7 @@ public class ODBruteForceCalibrator {
 							} else {
 								fails++;
 								if (fails > 100) {
-									lowODKeys.removeChoice(od);
+									lowODKeys.removeOption(od);
 									logger.info("Failed shifting for 100 times. Removing OD from choice set.");
 								}
 							}
@@ -310,9 +310,9 @@ public class ODBruteForceCalibrator {
 		}
 	}
 
-	private ObjectKeyMatrix<ODRelation> plans2Matrix(Population pop, ZoneCollection zones, ActivityFacilities facilities, double distThreshold,
-			String zoneIdKey) {
-		ObjectKeyMatrix<ODRelation> m = new ObjectKeyMatrix<>();
+	private HashMatrix<String, ODRelation> plans2Matrix(Population pop, ZoneCollection zones, ActivityFacilities facilities, double distThreshold,
+												String zoneIdKey) {
+		HashMatrix<String, ODRelation> m = new HashMatrix<>();
 
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		// Map<Tuple<String, String>, ODRelation> odPairs = new HashMap<>();
@@ -369,7 +369,7 @@ public class ODBruteForceCalibrator {
 			ProgressLogger.step();
 		}
 
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 
 		return m;
 	}
@@ -425,7 +425,7 @@ public class ODBruteForceCalibrator {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
+		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario.getNetwork());
 		netReader.readFile("/home/johannes/gsv/ger/data/network.xml.gz");
 
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
@@ -450,10 +450,10 @@ public class ODBruteForceCalibrator {
 		Provider<TripRouter> factory = builder.build(scenario);
 		TripRouter router = factory.get();
 
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
-		KeyMatrix refMatrix = reader.getMatrix();
+		NumericMatrix refMatrix = reader.getMatrix();
 		MatrixOperations.applyFactor(refMatrix, 1 / 16.0);
 		MatrixOperations.applyFactor(refMatrix, 1 / (4 * 11.8));
 
@@ -469,7 +469,7 @@ public class ODBruteForceCalibrator {
 		calibrator.run(scenario.getPopulation());
 	}
 
-	private static void removeEntries(KeyMatrix m, ZoneCollection zones, double distThreshold) {
+	private static void removeEntries(NumericMatrix m, ZoneCollection zones, double distThreshold) {
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		Set<String> keys = m.keys();
 		int cnt = 0;

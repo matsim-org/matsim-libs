@@ -20,43 +20,37 @@
 
 package playground.gregor.grpc.dummyjupedsim;
 
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CyclicBarrier;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.hybrid.MATSimInterface;
-import org.matsim.hybrid.MATSimInterface.Extern2MATSim;
+import org.matsim.hybrid.MATSimInterface.*;
 import org.matsim.hybrid.MATSimInterface.Extern2MATSim.Agent.Builder;
-import org.matsim.hybrid.MATSimInterface.Extern2MATSimConfirmed;
-import org.matsim.hybrid.MATSimInterface.ExternAfterSim;
-import org.matsim.hybrid.MATSimInterface.ExternDoSimStep;
-import org.matsim.hybrid.MATSimInterface.ExternOnPrepareSim;
-import org.matsim.hybrid.MATSimInterface.ExternSimStepFinished;
-import org.matsim.hybrid.MATSimInterface.ExternalConnect;
-import org.matsim.hybrid.MATSimInterface.ExternalConnectConfirmed;
-import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent;
 import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent.Agent;
 import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceServiceBlockingStub;
-
 import playground.gregor.hybridsim.grpc.ExternalSim;
+
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CyclicBarrier;
 
 public final class DummyJuPedSim implements ExternalSim{
 
 
+	private final ConcurrentLinkedQueue<Agent> agentQ = new ConcurrentLinkedQueue<>();
+	private final CyclicBarrier simStepBarrier = new CyclicBarrier(2);
 	private JuPedSimClient c;
 	private boolean run = true;
-	private final ConcurrentLinkedQueue<Agent> agentQ = new ConcurrentLinkedQueue<>();
-
-	private final CyclicBarrier simStepBarrier = new CyclicBarrier(2);
 	private ExternDoSimStep currentStep;
 	private JuPedSimServer server;
 
 	public DummyJuPedSim() {
 		Logger.getLogger("io.netty").setLevel(Level.OFF);
 
+	}
+
+	public static void main(String[] args) {
+		new Thread(new DummyJuPedSim()).start();
 	}
 
 	@Override
@@ -92,7 +86,7 @@ public final class DummyJuPedSim implements ExternalSim{
 					Extern2MATSim req = MATSimInterface.Extern2MATSim.newBuilder().setAgent(ab).build();
 					MATSimInterfaceServiceBlockingStub stub = this.c.getBlockingStub();
 					Extern2MATSimConfirmed resp = stub.reqExtern2MATSim(req);
-					if (resp.hasAccepted()) {
+					if (resp.getAccepted()) {
 						this.agentQ.poll();
 					}
 				}
@@ -104,10 +98,6 @@ public final class DummyJuPedSim implements ExternalSim{
 		}
 		System.err.println("done!");
 
-	}
-
-	public static void main(String [] args) {
-		new Thread(new DummyJuPedSim()).start();
 	}
 
 	public void putAgent(MATSim2ExternPutAgent request) {

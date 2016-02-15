@@ -46,6 +46,8 @@ public class TripsValidator {
         Factory factory = new PlainFactory();
         Set<? extends Person> persons = PopulationIO.loadFromXML(args[0], factory);
 
+
+
         TaskRunner.run(new SortLegsTask(MiDKeys.LEG_INDEX, new SortLegsTask.IntComparator()), persons);
         TaskRunner.validateEpisodes(new ValidateMissingLegTimes(), persons);
         TaskRunner.validateEpisodes(new ValidateNegativeLegDuration(), persons);

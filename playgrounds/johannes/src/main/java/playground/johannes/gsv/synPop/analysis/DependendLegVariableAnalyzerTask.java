@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.contrib.common.stats.Correlations;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import playground.johannes.socialnetworks.statistics.Correlations;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Person;
@@ -71,8 +71,8 @@ public class DependendLegVariableAnalyzerTask extends AnalyzerTask {
             if (outputDirectoryNotNull()) {
                 try {
                     String filename = String.format("%s/%s.%s.mean.txt", getOutputDirectory(), xKey, yKey);
-                    double[] x = xVals.toNativeArray();
-                    double[] y = yVals.toNativeArray();
+                    double[] x = xVals.toArray();
+                    double[] y = yVals.toArray();
                     Discretizer disc = FixedSampleSizeDiscretizer.create(x, 50, 100);
                     TDoubleDoubleHashMap corr = Correlations.mean(x, y, disc);
                     StatsWriter.writeHistogram(corr, xKey, yKey, filename);

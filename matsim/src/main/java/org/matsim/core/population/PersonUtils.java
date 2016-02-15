@@ -11,8 +11,8 @@ public class PersonUtils {
 	private final static String SEX_ATTRIBUTE="sex";
 	private final static String HAS_LICENSE= "hasLicense";
 	private static final String CAR_AVAIL = "carAvail";
-	private static final String EMPLOYED = "employed";
-	private static final String AGE = "age";
+	public static final String EMPLOYED = "employed";
+	public static final String AGE = "age";
 	private static final String TRAVELCARDS = "travelcards";
 	private final static Logger log = Logger.getLogger(PersonImpl.class);
 
@@ -29,7 +29,7 @@ public class PersonUtils {
 	public static void removeUnselectedPlans(Person person) {
 		for (Iterator<? extends Plan> iter = person.getPlans().iterator(); iter.hasNext(); ) {
 			Plan plan = iter.next();
-			if (!plan.isSelected()) {
+			if (!PersonUtils.isSelected(plan)) {
 				iter.remove();
 			}
 		}
@@ -105,5 +105,9 @@ public class PersonUtils {
 	@Deprecated // use PersonAttributes
 	public static TreeSet<String> getTravelcards(Person person) {
 		return (TreeSet<String>) person.getCustomAttributes().get(TRAVELCARDS);
+	}
+
+	public static boolean isSelected(Plan plan) {
+		return plan.getPerson().getSelectedPlan()==plan ;
 	}
 }

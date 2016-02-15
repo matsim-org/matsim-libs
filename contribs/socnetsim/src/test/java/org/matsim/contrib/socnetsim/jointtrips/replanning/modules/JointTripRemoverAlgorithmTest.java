@@ -43,8 +43,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
@@ -86,8 +86,8 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createSimplisticFixture() {
-		Person driver = PersonImpl.createPerson(Id.createPersonId("Schumacher"));
-		Person passenger = PersonImpl.createPerson(Id.createPersonId("Asterix"));
+		Person driver = PopulationUtils.createPerson(Id.createPersonId("Schumacher"));
+		Person passenger = PopulationUtils.createPerson(Id.createPersonId("Asterix"));
 
 		Id<Link> link1 = Id.createLinkId( 1 );
 		Id<Link> link2 = Id.createLinkId( 2 );
@@ -151,9 +151,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersFixture() {
-		Person driver = PersonImpl.createPerson(Id.createPersonId("Alonso"));
-		Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Boule"));
-		Person passenger2 = PersonImpl.createPerson(Id.createPersonId("Bill"));
+		Person driver = PopulationUtils.createPerson(Id.createPersonId("Alonso"));
+		Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Boule"));
+		Person passenger2 = PopulationUtils.createPerson(Id.createPersonId("Bill"));
 
 		Id<Link> link1 = Id.create( 1 , Link.class );
 		Id<Link> link2 = Id.create( 2 , Link.class );
@@ -236,9 +236,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersFixtureWithInternOverlap() {
-		Person driver = PersonImpl.createPerson(Id.createPersonId("Prost"));
-		Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Joe"));
-		Person passenger2 = PersonImpl.createPerson(Id.createPersonId("Avrell"));
+		Person driver = PopulationUtils.createPerson(Id.createPersonId("Prost"));
+		Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Joe"));
+		Person passenger2 = PopulationUtils.createPerson(Id.createPersonId("Avrell"));
 
 		Id<Link> link1 = Id.create( 1 , Link.class );
 		Id<Link> link2 = Id.create( 2 , Link.class );
@@ -336,9 +336,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersFixtureWithExternOverlap() {
-		Person driver = PersonImpl.createPerson(Id.createPersonId("Kowalski"));
-		Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Pif"));
-		Person passenger2 = PersonImpl.createPerson(Id.createPersonId("Paf"));
+		Person driver = PopulationUtils.createPerson(Id.createPersonId("Kowalski"));
+		Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Pif"));
+		Person passenger2 = PopulationUtils.createPerson(Id.createPersonId("Paf"));
 
 		Id<Link> link1 = Id.create( 1 , Link.class );
 		Id<Link> link2 = Id.create( 2 , Link.class );
@@ -436,8 +436,8 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createMultiDriverStageFixture() {
-		final Person driver = PersonImpl.createPerson(Id.createPersonId("Schumacher"));
-		final Person passenger = PersonImpl.createPerson(Id.createPersonId("Asterix"));
+		final Person driver = PopulationUtils.createPerson(Id.createPersonId("Schumacher"));
+		final Person passenger = PopulationUtils.createPerson(Id.createPersonId("Asterix"));
 		final String stageType = "drinkACoffee";
 
 		final Id<Link> link1 = Id.create( 1 , Link.class );
@@ -507,8 +507,8 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createMultiPassengerStageFixture() {
-		final Person driver = PersonImpl.createPerson(Id.createPersonId("Schumacher"));
-		final Person passenger = PersonImpl.createPerson(Id.createPersonId("Asterix"));
+		final Person driver = PopulationUtils.createPerson(Id.createPersonId("Schumacher"));
+		final Person passenger = PopulationUtils.createPerson(Id.createPersonId("Asterix"));
 		final String stageType = "drinkACoffee";
 
 		final Id<Link> link1 = Id.create( 1 , Link.class );
@@ -578,9 +578,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersInDifferentTripsRemoveFirstFixture() {
-		final Person driver = PersonImpl.createPerson(Id.createPersonId("Alonso"));
-		final Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Boule"));
-		final Person passenger2 = PersonImpl.createPerson(Id.createPersonId("Bill"));
+		final Person driver = PopulationUtils.createPerson(Id.createPersonId("Alonso"));
+		final Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Boule"));
+		final Person passenger2 = PopulationUtils.createPerson(Id.createPersonId("Bill"));
 
 		final Id<Link> link1 = Id.create( 1 , Link.class );
 		final Id<Link> link2 = Id.create( 2 , Link.class );
@@ -667,9 +667,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersInDifferentTripsRemoveSecondFixture() {
-		final Person driver = PersonImpl.createPerson(Id.createPersonId("Alonso"));
-		final Person passenger1 = PersonImpl.createPerson(Id.createPersonId("Boule"));
-		final Person passenger2 = PersonImpl.createPerson(Id.createPersonId("Bill"));
+		final Person driver = PopulationUtils.createPerson(Id.createPersonId("Alonso"));
+		final Person passenger1 = PopulationUtils.createPerson(Id.createPersonId("Boule"));
+		final Person passenger2 = PopulationUtils.createPerson(Id.createPersonId("Bill"));
 
 		final Id link1 = Id.createLinkId( 1 );
 		final Id link2 = Id.createLinkId( 2 );
@@ -757,9 +757,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoDriversFixture(final boolean removeFirst) {
-		final Person driver1 = PersonImpl.createPerson(Id.createPersonId("Alonso"));
-		final Person driver2 = PersonImpl.createPerson(Id.createPersonId("Schumacher"));
-		final Person passenger = PersonImpl.createPerson(Id.createPersonId("Rantanplan"));
+		final Person driver1 = PopulationUtils.createPerson(Id.createPersonId("Alonso"));
+		final Person driver2 = PopulationUtils.createPerson(Id.createPersonId("Schumacher"));
+		final Person passenger = PopulationUtils.createPerson(Id.createPersonId("Rantanplan"));
 
 		final Id link1 = Id.createLinkId( 1 );
 		final Id link2 = Id.createLinkId( 2 );

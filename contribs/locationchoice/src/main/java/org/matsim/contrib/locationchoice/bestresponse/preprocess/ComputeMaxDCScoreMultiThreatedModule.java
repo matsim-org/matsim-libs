@@ -20,7 +20,6 @@
 package org.matsim.contrib.locationchoice.bestresponse.preprocess;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,12 +31,14 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedModule {	
-	private String type;
-	private TreeMap<Id<ActivityFacility>, ActivityFacilityWithIndex> typedFacilities;
-	private DestinationChoiceBestResponseContext lcContext;
+public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedModule {
+	
 	private static final Logger log = Logger.getLogger(ComputeMaxDCScoreMultiThreatedModule.class);
-	private DestinationSampler sampler;
+	
+	private final String type;
+	private final ActivityFacilityWithIndex[] typedFacilities;
+	private final DestinationChoiceBestResponseContext lcContext;
+	private final DestinationSampler sampler;
 		
 	public ComputeMaxDCScoreMultiThreatedModule(String type, DestinationChoiceBestResponseContext lcContext, DestinationSampler sampler) {
 		super(lcContext.getScenario().getConfig().global().getNumberOfThreads());
@@ -49,13 +50,15 @@ public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedM
 		 * objects due to performance reasons.
 		 */
 		Map<Id<ActivityFacility>, ActivityFacility> map = lcContext.getScenario().getActivityFacilities().getFacilitiesForActivityType(lcContext.getConverter().convertType(type));
-		this.typedFacilities = new TreeMap<Id<ActivityFacility>, ActivityFacilityWithIndex>();
+		this.typedFacilities = new ActivityFacilityWithIndex[map.size()];
+		int i = 0;
 		for (ActivityFacility activityFacility : map.values()) {
 			int index = this.lcContext.getFacilityIndex(activityFacility.getId());
-			this.typedFacilities.put(activityFacility.getId(),new ActivityFacilityWithIndex(activityFacility, index));
+			this.typedFacilities[i] = new ActivityFacilityWithIndex(activityFacility, index);
+			i++;
 		}
 		
-		if (this.typedFacilities.size() == 0) {
+		if (this.typedFacilities.length == 0) {
 			log.warn("There are no facilities for type : " + type);
 		} 
 		this.sampler = sampler;
@@ -64,6 +67,6 @@ public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedM
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		DestinationScoring scorer = new DestinationScoring(this.lcContext);		
-		return new ComputeMaxDCScorePlanAlgo(this.type, typedFacilities, scorer, this.sampler, lcContext);
+		return new ComputeMaxDCScorePlanAlgo(this.type, this.typedFacilities, scorer, this.sampler, this.lcContext);
 	}
 }

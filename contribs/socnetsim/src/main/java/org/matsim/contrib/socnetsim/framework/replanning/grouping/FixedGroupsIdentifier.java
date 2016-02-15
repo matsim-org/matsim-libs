@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 
@@ -65,7 +65,7 @@ public class FixedGroupsIdentifier implements GroupIdentifier {
 
 			return config.households().getInputFile()!=null ?
 					new FixedGroupsIdentifier(
-							((ScenarioImpl) scenario).getHouseholds() ) :
+							((MutableScenario) scenario).getHouseholds() ) :
 					FixedGroupsIdentifierFileParser.readCliquesFile(
 							cliquesConf.getInputFile() );
 		}

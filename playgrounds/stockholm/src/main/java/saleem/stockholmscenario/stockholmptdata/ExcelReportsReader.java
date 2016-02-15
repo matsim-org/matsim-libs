@@ -303,8 +303,10 @@ public class ExcelReportsReader {
 						//		}
 							}
 						}
-					transit.addLine(line);
-					transit.addLine(line_r);
+					if(line.getTransitRoutes().size()!=0)
+						transit.addLine(line);
+					if(line_r.getTransitRoutes().size()!=0)
+						transit.addLine(line_r);
 					}
 				}
 			}catch(Exception ioe) {

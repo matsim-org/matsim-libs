@@ -28,6 +28,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
@@ -45,6 +46,8 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
+import javax.inject.Inject;
 
 public class CemdapMatsimCadytsController {
 	//private final static Logger log = Logger.getLogger(CemdapMatsimCadytsController.class);
@@ -144,9 +147,8 @@ public class CemdapMatsimCadytsController {
 		final Controler controler = new Controler(config);
 		
 		// cadytsContext (and cadytsCarConfigGroup)
-		final CadytsContext cContext = new CadytsContext(controler.getConfig());
 		// CadytsContext generates new CadytsCarConfigGroup with name "cadytsCar"
-		controler.addControlerListener(cContext);
+		controler.addOverridingModule(new CadytsCarModule());
 		
 		controler.getConfig().getModule("cadytsCar").addParam("startTime", "00:00:00");
 		controler.getConfig().getModule("cadytsCar").addParam("endTime", "24:00:00");
@@ -163,7 +165,7 @@ public class CemdapMatsimCadytsController {
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-
+			@Inject private CadytsContext cContext;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );

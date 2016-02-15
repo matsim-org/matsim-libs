@@ -24,7 +24,7 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -45,7 +45,7 @@ class WorldReaderMatsimV2 extends MatsimXmlParser {
     private World world;
 	private ZoneLayer currLayer = null;
 
-	public WorldReaderMatsimV2(final ScenarioImpl scenario, World world) {
+	public WorldReaderMatsimV2(final MutableScenario scenario, World world) {
         Scenario scenario1 = scenario;
 		this.world = world;
 	}

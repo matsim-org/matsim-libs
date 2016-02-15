@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package eu.eunoiaproject.elevation;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -32,9 +29,11 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 /**
  * @author thibautd

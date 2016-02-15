@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -20,7 +20,7 @@ public class ShopingFacilitiesLocations {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		//MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		//networkReader.readFile(args[0]);
 		new FacilitiesReaderMatsimV1(scenario).readFile(args[0]);

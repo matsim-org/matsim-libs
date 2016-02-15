@@ -19,13 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Arrays;
-
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -34,6 +30,10 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesWriter;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author thibautd
@@ -46,7 +46,7 @@ public class GenerateFacilitiesOnAllLinks {
 		final String[] acttypes = Arrays.copyOfRange( args , 3 , args.length );
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( scenario ).readFile( netfile );
+		new MatsimNetworkReader(scenario.getNetwork()).readFile( netfile );
 		final BufferedWriter f2l = IOUtils.getBufferedWriter( outf2l );
 		f2l.write( "fid\tlid" );
 

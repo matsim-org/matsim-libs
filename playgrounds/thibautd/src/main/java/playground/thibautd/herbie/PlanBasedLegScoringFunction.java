@@ -19,16 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import java.util.Iterator;
-
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-
 import playground.thibautd.hitchiking.HitchHikingConstants;
+
+import java.util.Iterator;
 
 /**
  * Uses the plan elements from the plan rather than the ones constructed from the

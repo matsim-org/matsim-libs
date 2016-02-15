@@ -5,6 +5,7 @@ import org.matsim.analysis.ScoreStats;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.PersonUtils;
 
 /**
  * Created by fouriep on 11/28/14.
@@ -64,7 +65,7 @@ public class SlaveScoreStatsCalculator{
                 cntScores++;
 
                 // executed plan?
-                if (plan.isSelected()) {
+                if (PersonUtils.isSelected(plan)) {
                     sumExecutedScores += score;
                     nofExecutedScores++;
                 }

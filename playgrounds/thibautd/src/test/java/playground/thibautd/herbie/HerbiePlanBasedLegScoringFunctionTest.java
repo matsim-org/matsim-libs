@@ -19,12 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.scoring.HerbieScoringFunctionFactory;
+import herbie.running.scoring.LegScoringFunction;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -51,6 +48,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -67,11 +65,13 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
-
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.scoring.HerbieScoringFunctionFactory;
-import herbie.running.scoring.LegScoringFunction;
 import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointLegScoringFunction;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
 
 /**
  * @author thibautd
@@ -98,7 +98,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getCarPlan() {
-		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
@@ -135,7 +135,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getPtPlanNoTransfer() {
-		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
@@ -170,7 +170,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getPtPlanTransfer() {
-		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 //		desires.putActivityDuration( "h" , 12 * 3600 );
 //		desires.putActivityDuration( "w" , 12 * 3600 );
@@ -220,7 +220,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	}
 
 	private static Plan getWalkPlan() {
-		PersonImpl person = (PersonImpl) PersonImpl.createPerson(Id.create("jojo", Person.class));
+		PersonImpl person = (PersonImpl) PopulationUtils.createPerson(Id.create("jojo", Person.class));
 		//Desires desires = person.createDesires( "bwarf" );
 		//desires.putActivityDuration( "h" , 12 * 3600 );
 		//desires.putActivityDuration( "w" , 12 * 3600 );
@@ -264,9 +264,9 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	private void initFacilities() {
 		facilities = new ActivityFacilitiesImpl();
 		ActivityFacilityImpl fac = facilities.createAndAddFacility( Id.create( "h" , ActivityFacility.class ) , new Coord(0, 0));
-		fac.createActivityOption( "h" ).addOpeningTime( new OpeningTimeImpl( 0 , 24 * 3600 ) );
+		fac.createAndAddActivityOption( "h" ).addOpeningTime( new OpeningTimeImpl( 0 , 24 * 3600 ) );
 		fac = facilities.createAndAddFacility( Id.create( "w" , ActivityFacility.class) , new Coord(0, 0));
-		fac.createActivityOption( "w" ).addOpeningTime( new OpeningTimeImpl( 7 , 20 * 3600 ) );
+		fac.createAndAddActivityOption( "w" ).addOpeningTime( new OpeningTimeImpl( 7 , 20 * 3600 ) );
 	}
 
 	private void initConfig() {

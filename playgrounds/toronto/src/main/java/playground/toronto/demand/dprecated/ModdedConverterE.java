@@ -17,10 +17,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -198,7 +198,7 @@ public class ModdedConverterE {
 
 						}
 
-						Person p = PersonImpl.createPerson(Id.create(personId, Person.class));
+						Person p = PopulationUtils.createPerson(Id.create(personId, Person.class));
 						PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 						// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 						endTime = convertTime(tabs[3]);
@@ -292,7 +292,7 @@ public class ModdedConverterE {
 		String oldPlansFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\fout_modechoices_recleaned.txt";
 		String newPlansFilename = "C:\\Thesis_HJY\\matsim\\output\\ConvertPlan\\plansE.xml.gz";
 		String zoneFilename = "C:\\Thesis_HJY\\matsim\\input\\ConvertPlan\\centroids.txt";
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		ModdedConverterE c = new ModdedConverterE();
 

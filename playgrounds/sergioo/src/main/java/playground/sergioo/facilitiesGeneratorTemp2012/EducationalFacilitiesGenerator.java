@@ -67,7 +67,7 @@ public class EducationalFacilitiesGenerator {
 					ActivityOption option = facility.getActivityOptions().get("edu");
 					double capacity = 0;
 					if(option==null)
-						option = ((ActivityFacilityImpl) facility).createActivityOption("edu");
+						option = ((ActivityFacilityImpl) facility).createAndAddActivityOption("edu");
 					else
 						capacity = option.getCapacity();
 					option.setCapacity((double)((int)(capacity+educationalFacilitiesResult.getDouble(2))));
@@ -78,7 +78,7 @@ public class EducationalFacilitiesGenerator {
 					option = facility.getActivityOptions().get("profess");
 					capacity = 0;
 					if(option==null)
-						option = ((ActivityFacilityImpl) facility).createActivityOption("profess");
+						option = ((ActivityFacilityImpl) facility).createAndAddActivityOption("profess");
 					else
 						capacity = option.getCapacity();
 					option.setCapacity((double)((int)(capacity+educationalFacilitiesResult.getDouble(3))));

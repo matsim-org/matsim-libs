@@ -42,7 +42,7 @@ public class LaneDefinitionsReader implements MatsimSomeReader {
 
 	public static final String SCHEMALOCATIONV20 = "http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd";
 	
-	private LaneDefinitions20 laneDefinitions;
+	private Lanes laneDefinitions;
 
 	public LaneDefinitionsReader(Scenario scenario) {
 		this.laneDefinitions = scenario.getLanes();

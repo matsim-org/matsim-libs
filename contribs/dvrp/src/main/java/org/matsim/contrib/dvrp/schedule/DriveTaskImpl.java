@@ -20,7 +20,6 @@
 package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.router.*;
 
 
 public class DriveTaskImpl

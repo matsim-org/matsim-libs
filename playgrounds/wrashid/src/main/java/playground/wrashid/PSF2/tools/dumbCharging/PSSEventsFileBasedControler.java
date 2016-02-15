@@ -21,10 +21,8 @@
 package playground.wrashid.PSF2.tools.dumbCharging;
 
 import java.util.LinkedList;
-import java.util.Random;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
@@ -73,18 +71,18 @@ public class PSSEventsFileBasedControler {
 		PSSControlerDumbCharging pssControlerDumbCharging = new PSSControlerDumbCharging(configFile, null);
 
 		pssControlerDumbCharging.prepareMATSimIterations();
-		Controler controler = pssControlerDumbCharging.getControler();
+		MatsimServices controler = pssControlerDumbCharging.getControler();
 
 		addControlerHandlerForReadingAllowedChargingLocationsParameter(controler);
 		
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		
-		//addPHEVSampleFilter_Deprecated_use_EventsFilterSamplingInstead(controler);
+		//addPHEVSampleFilter_Deprecated_use_EventsFilterSamplingInstead(services);
 
 		pssControlerDumbCharging.runControler();
 	}
 
-	private static void addControlerHandlerForReadingAllowedChargingLocationsParameter(Controler controler) {
+	private static void addControlerHandlerForReadingAllowedChargingLocationsParameter(MatsimServices controler) {
 		controler.addControlerListener(new StartupListener() {
 
 			@Override
@@ -94,7 +92,7 @@ public class PSSEventsFileBasedControler {
 				
 				String paramName="ParametersPSF2.allowedChargingLocations";
 				try{
-					String str=	event.getControler().getConfig().getParam("PSF", paramName);
+					String str=	event.getServices().getConfig().getParam("PSF", paramName);
 					
 					String[] activityLocations=str.split(",");
 					
@@ -123,15 +121,15 @@ public class PSSEventsFileBasedControler {
 	}
 
 	/*
-	private static void addPHEVSampleFilter_Deprecated_use_EventsFilterSamplingInstead(Controler controler) {
-		controler.addControlerListener(new StartupListener() {
+	private static void addPHEVSampleFilter_Deprecated_use_EventsFilterSamplingInstead(Controler services) {
+		services.addControlerListener(new StartupListener() {
 
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				double percentageOfPHEVs=100;
 				String paramName="PHEVsAsPercentageOfWholePopulation";
 				try{
-					String str=	event.getControler().getConfig().getParam("PSF", paramName);
+					String str=	event.getServices().getConfig().getParam("PSF", paramName);
 					percentageOfPHEVs=Integer.parseInt(str);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -141,7 +139,7 @@ public class PSSEventsFileBasedControler {
 				
 				ParametersPSF2.phevAgents = new LinkedList<Id>();
 
-				Controler ctrl = event.getControler();
+				Controler ctrl = event.getServices();
 
 				Random rand = new Random();
 

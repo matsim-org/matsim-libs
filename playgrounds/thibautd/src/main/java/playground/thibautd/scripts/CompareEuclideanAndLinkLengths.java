@@ -19,19 +19,18 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 /**
  * @author thibautd
@@ -51,7 +50,7 @@ public class CompareEuclideanAndLinkLengths {
 		final String outFile = args.getValue( "-o" );
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).readFile( networkFile );
+		new MatsimNetworkReader(sc.getNetwork()).readFile( networkFile );
 		
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
 		writer.write( "linkId\tlinkLength\teuclLength" );

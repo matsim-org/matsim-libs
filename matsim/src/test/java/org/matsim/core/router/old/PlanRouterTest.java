@@ -38,6 +38,7 @@ import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.Facility;
@@ -53,11 +54,11 @@ public class PlanRouterTest {
         final Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
         config.plans().setInputFile("test/scenarios/equil/plans1.xml");
         final Scenario scenario = ScenarioUtils.loadScenario(config);
-        Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+        com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
             @Override
             public void install() {
                 install(new TripRouterModule());
-                bind(Scenario.class).toInstance(scenario);
+                install(new ScenarioByInstanceModule(scenario));
                 addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
                 addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
             }
@@ -86,14 +87,14 @@ public class PlanRouterTest {
 
         // A trip router which provides vehicle ids by itself.
         final Id<Vehicle> newVehicleId = Id.create(2, Vehicle.class);
-        Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+        com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
             @Override
             public void install() {
+                install(new ScenarioByInstanceModule(scenario));
                 install(AbstractModule.override(Arrays.asList(new TripRouterModule()), new AbstractModule() {
                     @Override
                     public void install() {
-                        bind(Scenario.class).toInstance(scenario);
-                        addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility( config.planCalcScore() ));
+                        addTravelTimeBinding("car").toInstance(new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
                         addTravelDisutilityFactoryBinding("car").toInstance(new OnlyTimeDependentTravelDisutilityFactory());
                     }
                 }));

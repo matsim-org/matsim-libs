@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.router;
 
-import java.util.List;
-
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
+
+import java.util.List;
 
 /**
  * @author thibautd

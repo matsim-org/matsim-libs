@@ -19,17 +19,25 @@
  * *********************************************************************** */
 package playground.thibautd.mobsim;
 
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -45,6 +53,11 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * @author thibautd
@@ -162,7 +175,7 @@ public class CompareEventsUtils {
 	}
 
 	private static class EventStreamComparator implements
-			LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler,
+			LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler,
 			VehicleLeavesTrafficEventHandler,
 			PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 			TransitDriverStartsEventHandler, AgentWaitingForPtEventHandler,
@@ -239,11 +252,11 @@ public class CompareEventsUtils {
 						((LinkLeaveEvent) storedEvent).getLinkId(),
 						((LinkLeaveEvent) event).getLinkId() );
 			}
-			if ( event instanceof Wait2LinkEvent ) {
+			if ( event instanceof VehicleEntersTrafficEvent ) {
 				Assert.assertEquals(
 						"unexpected wait link id person "+queueId,
-						((Wait2LinkEvent) storedEvent).getLinkId(),
-						((Wait2LinkEvent) event).getLinkId() );
+						((VehicleEntersTrafficEvent) storedEvent).getLinkId(),
+						((VehicleEntersTrafficEvent) event).getLinkId() );
 			}
 
 			// difficult to know what precision to ask...
@@ -282,7 +295,7 @@ public class CompareEventsUtils {
 		}
 
 		@Override
-		public void handleEvent(final Wait2LinkEvent event) {
+		public void handleEvent(final VehicleEntersTrafficEvent event) {
 			if ( ignoreLinkEvents ) return;
 			handleEvent(
 				eventsPerPerson,
@@ -295,7 +308,7 @@ public class CompareEventsUtils {
 			if ( ignoreLinkEvents ) return;
 			handleEvent(
 				eventsPerPerson,
-				event.getDriverId(),
+				event.getVehicleId(),
 				event );
 		}
 
@@ -304,7 +317,7 @@ public class CompareEventsUtils {
 			if ( ignoreLinkEvents ) return;
 			handleEvent(
 				eventsPerPerson,
-				event.getDriverId(),
+				event.getVehicleId(),
 				event );
 		}
 

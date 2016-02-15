@@ -23,14 +23,13 @@ package playground.meisterk.kti.router;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.matrices.Entry;
-
 import playground.balmermi.world.Zone;
 
-public class KtiPtRoute extends GenericRouteImpl {
+public class KtiPtRoute extends AbstractRoute {
 
 	public static final char SEPARATOR = '=';
 	public static final String IDENTIFIER = "kti";
@@ -43,6 +42,7 @@ public class KtiPtRoute extends GenericRouteImpl {
 	private BasicLocation toMunicipality = null;
 	private SwissHaltestelle toStop = null;
 	private Double inVehicleTime = null;
+	private String routeDescription;
 
 	public KtiPtRoute(Id startLinkId, Id endLinkId, PlansCalcRouteKtiInfo plansCalcRouteKtiInfo) {
 		super(startLinkId, endLinkId);
@@ -69,7 +69,8 @@ public class KtiPtRoute extends GenericRouteImpl {
 	public String getRouteDescription() {
 
 		if (this.fromStop == null) {
-			return super.getRouteDescription();
+//			return super.getRouteDescription();
+			return this.routeDescription ;
 		}
 		String routeDescription =
 			IDENTIFIER + SEPARATOR +
@@ -92,7 +93,9 @@ public class KtiPtRoute extends GenericRouteImpl {
 	public void setRouteDescription(
 			String routeDescription) {
 
-		super.setRouteDescription(routeDescription);
+//		super.setRouteDescription(routeDescription);
+		this.routeDescription = routeDescription ;
+		
 		if (routeDescription.startsWith(IDENTIFIER)) {
 			String[] routeDescriptionArray = StringUtils.explode(routeDescription, SEPARATOR);
 			this.fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(routeDescriptionArray[1]);

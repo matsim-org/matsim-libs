@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -45,7 +45,7 @@ abstract class AbstractPersonReRouteStuck extends AbstractPersonAlgorithm  {
 	
 	final Set<Id<Person>> agentsStuck;
 
-	AbstractPersonReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id<Person>> agentsStuck) {
+	AbstractPersonReRouteStuck(final PlanAlgorithm router, final MutableScenario scenario, Set<Id<Person>> agentsStuck) {
 		super();
 		this.router = router;
         Network network = scenario.getNetwork();

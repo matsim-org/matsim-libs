@@ -4,23 +4,27 @@ import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
-import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
-import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
+import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
-import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
+import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
+import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -33,19 +37,15 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.vehicles.Vehicle;
-
-import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
-import org.matsim.contrib.eventsBasedPTRouter.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -226,13 +226,12 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 install(new DefaultMobsimModule());
                 install(new TripRouterModule());
                 install(new CharyparNagelScoringFunctionModule());
-                install(new ScenarioElementsModule());
                 install(new StrategyManagerModule());
                 if (IntelligentRouters)
                     install(new TravelDisutilityModule());
                 else{
-                    final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
-                            new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+                    final Builder disutilityFactory =
+                            new Builder( TransportMode.car );
                     matsimControler.addOverridingModule(new AbstractModule() {
                         @Override
                         public void install() {
@@ -243,7 +242,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
                 }
                 bind(TravelTime.class).toInstance(travelTime);
-                addPlanSelectorForRemovalBinding("DiversityGeneratingPlansRemover").toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                if (getConfig().strategy().getPlanSelectorForRemoval().equals("DiversityGeneratingPlansRemover")) {
+                    bindPlanSelectorForRemoval().toProvider(DiversityGeneratingPlansRemover.Builder.class);
+                }
             }
         });
 //        new Thread(new TimesReceiver()).start();
@@ -271,8 +272,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 }
             });
         } else {
-                    final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
-                            new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+            final Builder disutilityFactory =
+                    new Builder( TransportMode.car );
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
@@ -289,7 +290,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             matsimControler.getConfig().strategy().setPlanSelectorForRemoval("DiversityGeneratingPlansRemover");
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
-        matsimControler.setDumpDataAtEnd(false);
+        matsimControler.getConfig().controler().setDumpDataAtEnd(false);
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException, InterruptedException {
@@ -356,10 +357,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             pSimFactory.setStopStopTime(stopStopTimes);
             pSimFactory.setWaitTime(waitTimes);
             pSimFactory.setTransitPerformance(transitPerformance);
-            if (matsimControler.getTransitRouterFactory() instanceof TransitRouterEventsWSFactory) {
-                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
-                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
-            }
+//            if (matsimControler.getTransitRouterFactory() instanceof TransitRouterEventsWSFactory) {
+//                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
+//                ((TransitRouterEventsWSFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
+//            }
+            throw new RuntimeException();
         }
         plancatcher.init();
         numberOfIterations++;
@@ -564,7 +566,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         communications();
     }
 
-    public Controler getMATSimControler() {
+    public MatsimServices getMATSimControler() {
         return matsimControler;
     }
 

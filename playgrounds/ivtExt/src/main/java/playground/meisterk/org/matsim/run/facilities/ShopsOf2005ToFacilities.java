@@ -20,6 +20,49 @@
 
 package playground.meisterk.org.matsim.run.facilities;
 
+import net.opengis.kml._2.AbstractFeatureType;
+import net.opengis.kml._2.AbstractGeometryType;
+import net.opengis.kml._2.BasicLinkType;
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.IconStyleType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PointType;
+import net.opengis.kml._2.StyleType;
+import net.opengis.kml._2.TimeSpanType;
+import org.apache.commons.io.FileUtils;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimResource;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOptionImpl;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTime.DayType;
+import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.vis.kml.KMZWriter;
+import playground.meisterk.org.matsim.facilities.ShopId;
+import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesOpentimesKTIYear2;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
+import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,52 +77,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.regex.Pattern;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.Unmarshaller;
-
-import net.opengis.kml._2.AbstractFeatureType;
-import net.opengis.kml._2.AbstractGeometryType;
-import net.opengis.kml._2.BasicLinkType;
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.IconStyleType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.PointType;
-import net.opengis.kml._2.StyleType;
-import net.opengis.kml._2.TimeSpanType;
-
-import org.apache.commons.io.FileUtils;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.MatsimResource;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.facilities.OpeningTime.DayType;
-import org.matsim.vis.kml.KMZWriter;
-
-import playground.meisterk.org.matsim.facilities.ShopId;
-import playground.meisterk.org.matsim.facilities.algorithms.FacilitiesOpentimesKTIYear2;
 
 
 /**
@@ -776,7 +773,7 @@ public class ShopsOf2005ToFacilities {
 
 				// yeah, we can use the open times
 
-				ActivityOptionImpl shopping = theCurrentPickpay.createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = theCurrentPickpay.createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 				openNumbers.clear();
 				closeNumbers.clear();
 
@@ -880,7 +877,7 @@ public class ShopsOf2005ToFacilities {
 
 			ActivityFacility theCurrentMigrosZH = facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentMigrosZH != null) {
-				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentMigrosZH).createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentMigrosZH).createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 				String openTimeString = tokens[6];
 				openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);
 				openDayTokens = openTimeString.split(ANYTHING_BUT_LETTERS);
@@ -1054,7 +1051,7 @@ public class ShopsOf2005ToFacilities {
 			ActivityFacilityImpl theCurrentMigrosOstschweiz = (ActivityFacilityImpl) facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentMigrosOstschweiz != null) {
 
-				ActivityOptionImpl shopping = theCurrentMigrosOstschweiz.createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = theCurrentMigrosOstschweiz.createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 
 				// extract numbers
 				for (int tokenPos = 2; tokenPos < openTimeTokens.length; tokenPos++) {
@@ -1148,7 +1145,7 @@ public class ShopsOf2005ToFacilities {
 			ActivityFacility theCurrentCoopZH = facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentCoopZH != null) {
 
-				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentCoopZH).createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentCoopZH).createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 
 				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
 
@@ -1229,7 +1226,7 @@ public class ShopsOf2005ToFacilities {
 			System.out.println(facilityId);
 			ActivityFacilityImpl theCurrentCoopTG = (ActivityFacilityImpl) facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentCoopTG != null) {
-				ActivityOptionImpl shopping = theCurrentCoopTG.createActivityOption(ACTIVITY_TYPE_SHOP);
+				ActivityOptionImpl shopping = theCurrentCoopTG.createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 
 				for (int tokenPos = START_OPEN_TOKEN_INDEX; tokenPos <= END_OPEN_TOKEN_INDEX; tokenPos++) {
 
@@ -1389,7 +1386,7 @@ public class ShopsOf2005ToFacilities {
 
 				ActivityFacility theCurrentDenner = facilities.getFacilities().get(Id.create(shopId.getShopId(), ActivityFacility.class));
 				if (theCurrentDenner != null) {
-					ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentDenner).createActivityOption(ACTIVITY_TYPE_SHOP);
+					ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentDenner).createAndAddActivityOption(ACTIVITY_TYPE_SHOP);
 					for (String openTimeString : new String[]{weekDayToken, saturdayToken}) {
 
 						openHourTokens = openTimeString.split(ANYTHING_BUT_DIGITS);
@@ -1449,7 +1446,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void shopsToTXT(Config config) {
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		ActivityFacilities shopsOf2005 = scenario.getActivityFacilities();
 		shopsOf2005.setName("shopsOf2005");
 		ArrayList<String> txtLines = new ArrayList<String>();
@@ -1606,7 +1603,7 @@ public class ShopsOf2005ToFacilities {
 
 		ActivityFacilities facilities = null;
 		for (int dataSetIndex : new int[]{SHOPS_OF_2005/*, SHOPS_FROM_ENTERPRISE_CENSUS*/}) {
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			facilities = scenario.getActivityFacilities();
 			facilities.setName(shopsNames.get(Integer.valueOf(dataSetIndex)));
 
@@ -1709,7 +1706,7 @@ public class ShopsOf2005ToFacilities {
 
 	private static void applyOpentimesToEnterpriseCensus(Config config) {
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		ActivityFacilities facilities_input = scenario.getActivityFacilities();
 		facilities_input.setName("Switzerland based on Enterprise census 2000.");
 

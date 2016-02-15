@@ -44,7 +44,6 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class CongestionPricingComperator {
 
-
 	public CongestionPricingComperator(String runScenario) {
 		this.pricingScenario = runScenario;
 		scenario = LoadMyScenarios.loadScenarioFromOutputDir(runDir+pricingScenario+"/");
@@ -55,7 +54,7 @@ public class CongestionPricingComperator {
 		//		
 
 		Config config = scenario.getConfig();
-		vtts_car = ((config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600) +
+		vttsCar = ((config.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() /3600) +
 				(config.planCalcScore().getPerforming_utils_hr()/3600)) 
 				/ (config.planCalcScore().getMarginalUtilityOfMoney());
 	}
@@ -68,7 +67,7 @@ public class CongestionPricingComperator {
 	private String pricingScenario;
 	private final boolean isSortingForInsideMunich = true;
 	private final String suffixForSoring = "_sorted";
-	private double vtts_car;
+	private double vttsCar;
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter(isSortingForInsideMunich);
 
 	public static void main(String[] args) {
@@ -154,7 +153,7 @@ public class CongestionPricingComperator {
 					 */
 					if((delay != 0 && count == 0) || (delay == 0 && count != 0))throw new RuntimeException("Zero delay with non zero person count or converese can not happen. Aborting...");
 					else if(delay !=0 && count !=0 )  {
-						avgToll = vtts_car * ( delay / count) ;
+						avgToll = vttsCar * ( delay / count) ;
 					}
 					writer.write(d+"\t"+linkId+"\t"+avgToll+"\n");	
 				}
@@ -166,9 +165,8 @@ public class CongestionPricingComperator {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, isSortingForInsideMunich);
-		personAnalyzer.preProcessData();
-		personAnalyzer.postProcessData();
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, scenario.getConfig().qsim().getEndTime(), isSortingForInsideMunich);
+		personAnalyzer.run();
 		return personAnalyzer.getTimeBin2AffectedPersonId2Delay();
 	}
 

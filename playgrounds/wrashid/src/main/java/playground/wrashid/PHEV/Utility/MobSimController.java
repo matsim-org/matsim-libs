@@ -3,6 +3,7 @@ package playground.wrashid.PHEV.Utility;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumption;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
@@ -15,28 +16,30 @@ import org.matsim.core.mobsim.jdeqsim.util.Timer;
  *
  * @author mrieser
  */
-public class MobSimController extends Controler {
+public class MobSimController {
+
+	private final Controler controler;
 
 	public MobSimController(final String[] args) {
-	    super(args);
+	    controler = new Controler(args);
 	  }
 
 	public static void main(final String[] args) {
 		Timer t=new Timer();
 		t.startTimer();
 		final MobSimController controler = new MobSimController(args);
-		controler.getConfig().controler().setOverwriteFileSetting(
+		controler.controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		EventsManager events=controler.getEvents();
+		EventsManager events= controler.controler.getEvents();
 		
 		
 		ElectricCostHandler ecHandler=new ElectricCostHandler(controler,getEnergyConsumptionSamples(),events,"1");
 		events.addHandler(ecHandler);
 		
 		
-		controler.run();
+		controler.controler.run();
 		t.endTimer();
 		t.printMeasuredTime("Time needed for MobSimController run: ");
 		ecHandler.printRecordedSOC();
@@ -63,5 +66,9 @@ public class MobSimController extends Controler {
 		
 		return ecs;
 	}
-	
+
+	public MatsimServices getControler() {
+		return controler;
+	}
+
 }

@@ -21,7 +21,7 @@ package org.matsim.contrib.locationchoice.router;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.ActivityWrapperFacility;
@@ -81,7 +81,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 
     @Deprecated // use TripRouter instead. kai, dec'13
 	public PlanRouterAdapter(
-			final Controler controler) {
+			final MatsimServices controler) {
 		this.planRouter = new PlanRouter(
 							controler.getTripRouterProvider().get(),
 							controler.getScenario().getActivityFacilities() );

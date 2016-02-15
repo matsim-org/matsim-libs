@@ -23,9 +23,11 @@ package matsimConnector.visualizer.debugger.eventsbaseddebugger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import matsimConnector.agents.Pedestrian;
 import matsimConnector.environment.TransitionArea;
@@ -36,6 +38,7 @@ import matsimConnector.events.CAAgentExitEvent;
 import matsimConnector.events.CAAgentLeaveEnvironmentEvent;
 import matsimConnector.events.CAAgentMoveEvent;
 import matsimConnector.events.CAAgentMoveToOrigin;
+import matsimConnector.events.CAEngineStepPerformedEvent;
 import matsimConnector.events.CAEventHandler;
 import matsimConnector.events.debug.ForceReDrawEvent;
 import matsimConnector.events.debug.ForceReDrawEventHandler;
@@ -50,6 +53,8 @@ import matsimConnector.utility.MathUtility;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 import pedCA.environment.grid.EnvironmentGrid;
 import pedCA.environment.grid.GridPoint;
@@ -100,10 +105,10 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	
 	public void startIteration(int iteration){
 		fs = null;
-		if((iteration==0 || iteration ==9) && Constants.SAVE_FRAMES){
+		if((iteration%2==0) && Constants.SAVE_FRAMES){
 			String pathName = Constants.PATH+"/videos/frames/it"+iteration;
 			FileUtility.deleteDirectory(new File(pathName));
-			fs = new FrameSaver(pathName, "png", 1);
+			fs = new FrameSaver(pathName, "png", 300);
 		}
 		this.vis.fs = fs;
 		this.keyControl.fs = fs;
@@ -113,6 +118,32 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 		this.vis.addAdditionalDrawer(drawer);
 		if (drawer instanceof ClockedVisDebuggerAdditionalDrawer) {
 			this.drawers.add((ClockedVisDebuggerAdditionalDrawer) drawer);
+		}
+	}
+	
+	private void drawNodesAndLinks() {
+		Map<String, Node> nodes = new HashMap<>();
+		for (Node n : sc.getNetwork().getNodes().values()) {
+			this.vis.addCircleStatic(n.getCoord().getX(),n.getCoord().getY(),.2f,0,0,0,255,0);
+		}
+		for (Link l : sc.getNetwork().getLinks().values()) {
+			
+			Node from = l.getFromNode();
+			Node to = l.getToNode();
+			
+			if (from!= null && to != null){
+				boolean isStairs = false;
+				for (String stairId : Constants.stairsLinks){
+					if (stairId.equals(l.getId().toString()))
+						isStairs = true;
+				}
+				if (isStairs)
+					this.vis.addLineStatic(from.getCoord().getX(), from.getCoord().getY(), to.getCoord().getX(),
+							to.getCoord().getY(), 255, 255, 0, 255, 0);
+				else
+					this.vis.addLineStatic(from.getCoord().getX(), from.getCoord().getY(), to.getCoord().getX(),
+						to.getCoord().getY(), 0, 0, 0, 255, 0);
+			}
 		}
 	}
 
@@ -136,19 +167,19 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 			for(int x=0; x<environmentGrid.getColumns();x++)
 				if (environmentGrid.getCellValue(y, x)==pedCA.utility.Constants.ENV_OBSTACLE)
 					drawObstacle(new GridPoint(x,y));		
-				else if(environmentGrid.getCellValue(y, x)==pedCA.utility.Constants.ENV_TACTICAL_DESTINATION)
+				else if(environmentGrid.belongsToTacticalDestination(new GridPoint(x, y)))
 					drawTacticalDestinationCell(new GridPoint(x,y));
 	}
 
 	private void drawTacticalDestinationCell(GridPoint gridPoint) {
 		Coordinates bottomLeft = new Coordinates(gridPoint);
-		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 0, 0, 255, 150, 0, true);
+		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 150, 150, 255, 150, 0, true);
 		
 	}
 
 	private void drawObstacle(GridPoint gridPoint) {
 		Coordinates bottomLeft = new Coordinates(gridPoint);
-		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 255, 0, 0, 192, 0, true);
+		this.vis.addRectStatic(bottomLeft.getX(), bottomLeft.getY()+Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, Constants.CA_CELL_SIDE, 80, 80, 80, 192, 0, true);
 	}
 
 	private void drawPedestrianGridBorders(PedestrianGrid pedestrianGrid) {
@@ -172,7 +203,7 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 			c0 = c1;
 			c1 = it.next();
 			if (pedestrianGrid instanceof TransitionArea)
-				this.vis.addDashedLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), 255,lp.g,lp.b,lp.a, 0, .3, 0.15);
+				this.vis.addDashedLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), 0,lp.g,lp.b,lp.a, 0, .3, 0.15);
 			else
 				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, 0);
 		}
@@ -286,13 +317,14 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 	
 	public void handleEvent(CAAgentConstructEvent event) {		
 		if (!environmentInit){
+			drawNodesAndLinks();
 			drawCAEnvironments();
 			environmentInit = true;
 		}
 		
 		Pedestrian pedestrian = event.getPedestrian();
 		CircleProperty cp = new CircleProperty();
-		cp.rr = (float) (0.4/5.091);
+		cp.rr = (float) (0.8/5.091);
 		this.circleProperties.put(pedestrian.getId(), cp);
 		updateColor(pedestrian);
 		/*
@@ -377,18 +409,35 @@ public class EventBasedVisDebuggerEngine implements CAEventHandler, LineEventHan
 
 	@Override
 	public void handleEvent(CAAgentChangeLinkEvent event) {
-		Pedestrian pedestrian = event.getPedestrian();
-		updateColor(pedestrian);
+		//Pedestrian pedestrian = event.getPedestrian();
+		//updateColor(pedestrian);
 	}
 
 	private void updateColor(Pedestrian pedestrian) {
 		CircleProperty cp = this.circleProperties.get(pedestrian.getId());
-		int destLevel = pedestrian.getDestination().getLevel();
-		int origLevel = pedestrian.getOriginMarker().getLevel();
-		int color = (((destLevel+1)*origLevel)*40)%256;
-		cp.r = color;
-		cp.g = 255-color;
-		cp.b = color;
-		cp.a = 255;
+		//int destLevel = 0;//pedestrian.getDestination().getLevel();
+		double xDest = pedestrian.getOriginMarker().getCoordinates().getX();
+		//int color;
+		//int origLevel = pedestrian.getOriginMarker().getLevel();
+		//int color = (((destLevel+1)*origLevel)*100)%256;
+		int brightness = 80;
+		if (xDest<0.4){
+			cp.r = 255;
+			cp.g = brightness;
+			cp.b = brightness;//255-color;
+			cp.a = 255;
+		}
+		else{
+			cp.r = brightness;
+			cp.g = brightness;
+			cp.b = 255;//255-color;
+			cp.a = 255;
+		}
+	}
+
+	@Override
+	public void handleEvent(CAEngineStepPerformedEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 }

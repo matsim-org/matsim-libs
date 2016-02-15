@@ -13,7 +13,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -73,7 +73,7 @@ public class DgOTFVis {
 	public void playAndRouteConfig(String config){
 		Config cc = ConfigUtils.loadConfig(config);
 		ConfigUtils.addOrGetModule(cc, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setMapOverlayMode(true);
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.loadScenario(cc);
+		MutableScenario sc = (MutableScenario) ScenarioUtils.loadScenario(cc);
 		DgOTFVisUtils.preparePopulation4Simulation(sc);
 		this.playScenario(sc);
 	}

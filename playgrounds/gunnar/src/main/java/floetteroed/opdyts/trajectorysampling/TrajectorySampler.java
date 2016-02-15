@@ -27,7 +27,10 @@ package floetteroed.opdyts.trajectorysampling;
 import java.util.Map;
 
 import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
+import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
  * 
@@ -46,8 +49,13 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 	public U getCurrentDecisionVariable();
 
 	public int getTotalTransitionCnt();
-	
-	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValue();
+
+	public Map<U, ConvergenceCriterionResult> getDecisionVariable2convergenceResultView();
+
+	public void addStatistic(final String logFileName,
+			final Statistic<SamplingStage<U>> statistic);
+
+	public void setStandardLogFileName(String logFileName);
 
 	/**
 	 * Call once before the simulation is started. This implements a randomly
@@ -66,5 +74,8 @@ public interface TrajectorySampler<U extends DecisionVariable> {
 	 *            the newly reached simulator state
 	 */
 	public void afterIteration(SimulatorState newState);
+
+	// TODO NEW
+	public ObjectiveFunction getObjectiveFunction();
 
 }

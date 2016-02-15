@@ -40,8 +40,8 @@ public class KtiPopulationPreparation implements StartupListener {
 
 	public void notifyStartup(StartupEvent event) {
 
-        Population pop = event.getControler().getScenario().getPopulation();
-		Config config = event.getControler().getConfig();		
+        Population pop = event.getServices().getScenario().getPopulation();
+		Config config = event.getServices().getConfig();
 		/*
 		 * for an explanation, see the element comment of the kti config parameter
 		 */

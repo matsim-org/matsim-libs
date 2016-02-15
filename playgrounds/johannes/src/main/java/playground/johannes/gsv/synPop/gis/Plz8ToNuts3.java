@@ -19,16 +19,15 @@
 
 package playground.johannes.gsv.synPop.gis;
 
+import com.vividsolutions.jts.geom.Point;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.sna.gis.io.ZoneLayerSHP;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes

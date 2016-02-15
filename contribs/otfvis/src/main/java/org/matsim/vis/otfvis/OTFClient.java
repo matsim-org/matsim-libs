@@ -87,7 +87,7 @@ public final class OTFClient extends JFrame {
 	
 	public OTFClient() {
 		super("MATSim OTFVis");
-		this.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+		this.setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
 		JFrame.setDefaultLookAndFeelDecorated(true);
 		boolean isMac = System.getProperty("os.name").equals("Mac OS X");
 		if (isMac){
@@ -154,8 +154,7 @@ public final class OTFClient extends JFrame {
 		Action exitAction = new AbstractAction("Quit") {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				endProgram(0);
-			}
+				dispatchEvent(new WindowEvent(OTFClient.this, WindowEvent.WINDOW_CLOSING));			}
 		};
 		fileMenu.add(exitAction);
 		setJMenuBar(menuBar);
@@ -209,17 +208,4 @@ public final class OTFClient extends JFrame {
 		return hostControlBar;
 	}
 
-	@Override
-	protected void processWindowEvent(WindowEvent e) {
-		if (e.getID() == WindowEvent.WINDOW_CLOSING) {
-			this.endProgram(0);
-		} else {
-			super.processWindowEvent(e);
-		}
-	}
-
-	public void endProgram(int code) {
-		System.exit(code);
-	}
-	
 }

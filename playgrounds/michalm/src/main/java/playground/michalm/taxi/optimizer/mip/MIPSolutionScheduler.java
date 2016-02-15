@@ -1,35 +1,41 @@
 package playground.michalm.taxi.optimizer.mip;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.router.DijkstraWithThinPath;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.mip.MIPProblem.MIPSolution;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 
 class MIPSolutionScheduler
 {
-    private final TaxiOptimizerConfiguration optimConfig;
+    private final TaxiOptimizerContext optimContext;
     private final MIPRequestData rData;
     private final VehicleData vData;
     private final int m;
     private final int n;
 
+    private LeastCostPathCalculator router;
+
     private MIPSolution solution;
     private Vehicle currentVeh;
 
 
-    MIPSolutionScheduler(TaxiOptimizerConfiguration optimConfig, MIPRequestData rData,
+    MIPSolutionScheduler(TaxiOptimizerContext optimContext, MIPRequestData rData,
             VehicleData vData)
     {
-        this.optimConfig = optimConfig;
+        this.optimContext = optimContext;
         this.rData = rData;
         this.vData = vData;
         this.m = vData.dimension;
         this.n = rData.dimension;
+        
+        router = new DijkstraWithThinPath(optimContext.context.getScenario().getNetwork(),
+                optimContext.travelDisutility, optimContext.travelTime);
     }
 
 
@@ -59,7 +65,7 @@ class MIPSolutionScheduler
 
     private void appendRequestToCurrentVehicle(int i)
     {
-        LinkTimePair earliestDeparture = optimConfig.scheduler.getEarliestIdleness(currentVeh);
+        LinkTimePair earliestDeparture = optimContext.scheduler.getEarliestIdleness(currentVeh);
         TaxiRequest req = rData.requests[i];
 
         //use earliestDeparture.time instead of w[i]-tt (latest departure time) due to:
@@ -68,10 +74,9 @@ class MIPSolutionScheduler
         // - we want to dispatch vehicles as soon as possible
         //   (because tt in MIP are based on the free flow speed estimates, while the actual
         //   times are usually longer hence the vehicle is likely to arrive after w[i])
-        VrpPathWithTravelData path = optimConfig.calculator.calcPath(earliestDeparture.link,
-                req.getFromLink(), earliestDeparture.time);
+        VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(earliestDeparture.link,
+                req.getFromLink(), earliestDeparture.time, router, optimContext.travelTime);
 
-        VehicleRequestPath vrPath = new VehicleRequestPath(currentVeh, req, path);
-        optimConfig.scheduler.scheduleRequest(vrPath);
+        optimContext.scheduler.scheduleRequest(currentVeh, req, path);
     }
 }

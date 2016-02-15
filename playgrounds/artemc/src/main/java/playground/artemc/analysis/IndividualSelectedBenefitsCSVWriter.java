@@ -3,7 +3,7 @@ package playground.artemc.analysis;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationReaderMatsimV5;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.artemc.utils.Writer;
 
@@ -28,7 +28,7 @@ public class IndividualSelectedBenefitsCSVWriter {
 		for (File file : fList) {
 			if (file.isDirectory()) {
 				HashMap<String, String> scoreMap = new HashMap<String, String>();
-				ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+				MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 				System.out.println(file.getAbsolutePath());
 				populationFile = file.getAbsolutePath() + "/output_plans.xml.gz";

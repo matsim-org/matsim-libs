@@ -19,14 +19,17 @@
  * *********************************************************************** */
 package playground.ivt.replanning;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-
+import com.google.inject.Inject;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import javax.inject.Provider;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * Randomly mutates mode of non-chain based trips.
@@ -35,15 +38,18 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class SwitchNonChainBasedModeModule extends AbstractMultithreadedModule {
 	private final Config config;
 
-	public SwitchNonChainBasedModeModule(final Config config) {
+	private final Provider<TripRouter> tripRouterProvider;
+
+	public SwitchNonChainBasedModeModule(final Config config, Provider<TripRouter> tripRouterProvider) {
 		super( config.global() );
 		this.config = config;
+		this.tripRouterProvider = tripRouterProvider;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		return new SwitchNonChainBasedModeAlgorithm(
-				getReplanningContext().getTripRouter(),
+				tripRouterProvider.get(),
 				getNonChainBasedModes(),
 				0.7,
 				MatsimRandom.getLocalInstance() );

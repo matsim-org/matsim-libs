@@ -18,11 +18,13 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich.analysis;
 
+import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -34,9 +36,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.io.IOUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.vividsolutions.jts.geom.Point;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
@@ -45,11 +50,10 @@ import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs.LinkWeightMethod;
 import playground.agarwalamit.analysis.spatial.SpatialInterpolation;
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
+import playground.agarwalamit.utils.GeometryUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author amit
@@ -57,31 +61,55 @@ import com.vividsolutions.jts.geom.Point;
 
 public class MunichSpatialPlots {
 
-	String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/policies/";
-	String bau = runDir+"/bau";
-	String policyName = "implV6";
-	String policyCase = runDir+"/"+policyName;
+	private String runDir = "../../../../repos/runs-svn/detEval/emissionCongestionInternalization/hEART/output/";
+	private String bau = runDir+"/bau";
+	private String policyName = "ei";
+	private String policyCase = runDir+"/"+policyName;
 	private final double countScaleFactor = 100;
-	private final double gridSize = 500;
+	private static double gridSize ;
+	private static double smoothingRadius ;
 	private boolean isWritingGGPLOTData = true;
 	private int noOfBins = 1;
-	
-	private final double xMin=4452550.25;
-	private final double xMax=4479483.33;
-	private final double yMin=5324955.00;
-	private final double yMax=5345696.81;
-	
+
+	private static double xMin=4452550.25;
+	private static double xMax=4479483.33;
+	private static double yMin=5324955.00;
+	private static double yMax=5345696.81;
+
 	private final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 
-	private final String shapeFile = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-	
+	private static final String SHAPE_FILE_CITY = "../../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	private static final String SHAPE_FILE_MMA = "../../../../repos/shared-svn/projects/detailedEval/Net/boundaryArea/munichMetroArea_correctedCRS_simplified.shp";
+	private static boolean isCityArea = false;
+	private static String shapeFile;
+
 	public static void main(String[] args) {
+		//city area only
+		if(isCityArea) {
+			ReferencedEnvelope re = GeometryUtils.getBoundingBox(SHAPE_FILE_CITY);
+			xMin = re.getMinX();
+			xMax = re.getMaxX();
+			yMin = re.getMinY();
+			yMax = re.getMaxY();
+			gridSize = 500;
+			smoothingRadius = 500;
+			shapeFile = SHAPE_FILE_CITY;
+		} else {//metropolitan area
+			ReferencedEnvelope re = GeometryUtils.getBoundingBox(SHAPE_FILE_MMA);
+			xMin = re.getMinX();
+			xMax = re.getMaxX();
+			yMin = re.getMinY();
+			yMax = re.getMaxY();
+			gridSize = 1500;
+			smoothingRadius = 2000;
+			shapeFile = SHAPE_FILE_MMA;
+		}
 		MunichSpatialPlots plots = new MunichSpatialPlots();
-//		plots.writeCongestionToCells();
+		//		plots.writeCongestionToCells();
 		plots.writeEmissionToCells();
 		//		plots.writeUserWelfareToCells();
-		plots.writePopulationDensityCountToCells();
-		plots.writePersonTollToCells();
+		//		plots.writePopulationDensityCountToCells();
+//		plots.writePersonTollToCells();
 		//		plots.writeLinkTollToCells();
 	}
 
@@ -108,7 +136,7 @@ public class MunichSpatialPlots {
 				}
 			}
 			plot.processLocationForDensityCount(act,countScaleFactor);
-//			plot.processHomeLocation(act, 1*countScaleFactor); // if want to interpolate
+			//			plot.processHomeLocation(act, 1*countScaleFactor); // if want to interpolate
 		}
 
 		plot.writeRData("popDensity_interpolate",isWritingGGPLOTData);
@@ -117,8 +145,8 @@ public class MunichSpatialPlots {
 
 	public void writeUserWelfareToCells(){
 
-		Map<Id<Person>, Double> person_userWElfare_money_Bau = new HashMap<>();
-		Map<Id<Person>, Double> person_userWElfare_money_policy = new HashMap<>();
+		Map<Id<Person>, Double> personUserWelfareMoneyBau = new HashMap<>();
+		Map<Id<Person>, Double> personUserWelfareMoneyPolicy = new HashMap<>();
 
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,bau,policyCase);
@@ -132,24 +160,23 @@ public class MunichSpatialPlots {
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.initialCasePlansFile,inputs.initialCaseNetworkFile);
 
 		MyUserBenefitsAnalyzer userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
-		userBenefitsAnalyzer.init((ScenarioImpl)sc, WelfareMeasure.SELECTED, false);
+		userBenefitsAnalyzer.init((MutableScenario)sc, WelfareMeasure.SELECTED, false);
 		userBenefitsAnalyzer.preProcessData();
 		userBenefitsAnalyzer.postProcessData();
 
-		person_userWElfare_money_Bau = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
+		personUserWelfareMoneyBau = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
 
 		if(inputs.isComparing){
 			userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
-			Scenario sc_policy = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.compareToCasePlans,inputs.compareToCaseNetwork);
-			userBenefitsAnalyzer.init((ScenarioImpl)sc_policy, WelfareMeasure.SELECTED, false);
+			Scenario scPolicy = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.compareToCasePlans,inputs.compareToCaseNetwork);
+			userBenefitsAnalyzer.init((MutableScenario)scPolicy, WelfareMeasure.SELECTED, false);
 			userBenefitsAnalyzer.preProcessData();
 			userBenefitsAnalyzer.postProcessData();
-			person_userWElfare_money_policy = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
+			personUserWelfareMoneyPolicy = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
 		}
 
 		for(Person p : sc.getPopulation().getPersons().values()){
 			Id<Person> id = p.getId();
-
 
 			Activity act  = sc.getPopulation().getFactory().createActivityFromLinkId("NA", Id.createLinkId("NA"));
 			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
@@ -160,12 +187,12 @@ public class MunichSpatialPlots {
 			}
 
 			if(inputs.isComparing){
-				double userWelfare_diff ;
-				userWelfare_diff = person_userWElfare_money_policy.get(id) - person_userWElfare_money_Bau.get(id);
-				plot.processHomeLocation(act, userWelfare_diff*countScaleFactor);
+				double userWelfareDiff ;
+				userWelfareDiff = personUserWelfareMoneyPolicy.get(id) - personUserWelfareMoneyBau.get(id);
+				plot.processHomeLocation(act, userWelfareDiff*countScaleFactor);
 
 			} else {
-				plot.processHomeLocation(act, countScaleFactor * person_userWElfare_money_Bau.get(id));
+				plot.processHomeLocation(act, countScaleFactor * personUserWelfareMoneyBau.get(id));
 			}
 		}
 
@@ -267,19 +294,16 @@ public class MunichSpatialPlots {
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(inputs.initialCaseNetworkFile,inputs.initialCaseConfig);
 
-		ExperiencedDelayAnalyzer delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.initialCaseEventsFile, sc, noOfBins); 
-		delayAnalyzer.preProcessData();
-		delayAnalyzer.postProcessData();
+		ExperiencedDelayAnalyzer delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.initialCaseEventsFile, sc, noOfBins, sc.getConfig().qsim().getEndTime()); 
+		delayAnalyzer.run();
 		linkDelaysBau = delayAnalyzer.getTimeBin2LinkId2Delay();
 
 		if(inputs.isComparing){
 			Scenario scCompareTo =LoadMyScenarios.loadScenarioFromNetworkAndConfig(inputs.compareToCaseNetwork,inputs.compareToCaseConfig); 
-			delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.compareToCaseEventsFile, scCompareTo, noOfBins);
-			delayAnalyzer.preProcessData();
-			delayAnalyzer.postProcessData();
+			delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.compareToCaseEventsFile, scCompareTo, noOfBins, sc.getConfig().qsim().getEndTime());
+			delayAnalyzer.run();
 			linkDelaysPolicy = delayAnalyzer.getTimeBin2LinkId2Delay();
 		}
-		double sumDelays =0;
 
 		for(double time :linkDelaysBau.keySet()){
 			for(Link l : sc.getNetwork().getLinks().values()){
@@ -311,19 +335,10 @@ public class MunichSpatialPlots {
 					}
 
 					plot.processLink(l,  delays);
-					sumDelays += (delays);
 				}
 			}
 			plot.writeRData("delays_"+(int)time/3600+"h", isWritingGGPLOTData);
-			SpatialDataInputs.LOG.info("Total delays from link emission map is "+sumDelays);
-
-			double cellWeights =0;
-			for(Point p: plot.getCellWeights().keySet()){
-				cellWeights += plot.getCellWeights().get(p);
-			}
-			SpatialDataInputs.LOG.info("Total delays from cell weights  is "+cellWeights);
-			plot.clear();
-			sumDelays=0;
+			plot.reset();
 		}
 	}
 
@@ -337,43 +352,36 @@ public class MunichSpatialPlots {
 		inputs.setBoundingBox(xMin, xMax, yMin, yMax);
 		inputs.setTargetCRS(targetCRS);
 		inputs.setGridInfo(GridType.HEX, gridSize);
-		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
+		inputs.setSmoothingRadius(smoothingRadius);
+		inputs.setShapeFile(shapeFile);
 
-		// set bounding box, smoothing radius and targetCRS if different.
-		//		inputs.setTargetCRS(MGC.getCRS("EPSG:20004"));
-				inputs.setBoundingBox(4452550.25, 4479483.33, 5324955.00, 5345696.81);
-		//		inputs.setSmoothingRadius(500.);
-
-		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
+//		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/", true);
 
 		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEmissionEventsFile, noOfBins);
-		emsLnkAna.init();
 		emsLnkAna.preProcessData();
 		emsLnkAna.postProcessData();
 		linkEmissionsBau = emsLnkAna.getLink2TotalEmissions();
 
 		if(inputs.isComparing){
 			emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig), inputs.compareToCaseEmissionEventsFile, noOfBins);
-			emsLnkAna.init();
 			emsLnkAna.preProcessData();
 			emsLnkAna.postProcessData();
 			linkEmissionsPolicy = emsLnkAna.getLink2TotalEmissions();
 		}
 
-
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
-		double sumEmission =0;
+
+		EmissionTimebinDataWriter writer = new EmissionTimebinDataWriter();
+		writer.openWriter(runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/"+"viaData_NO2_"+GridType.HEX+"_"+gridSize+"_"+smoothingRadius+"_line_"+policyName+"_diff.txt");
 
 		for(double time :linkEmissionsBau.keySet()){
 			for(Link l : sc.getNetwork().getLinks().values()){
 				Id<Link> id = l.getId();
 
 				if(plot.isInResearchArea(l)){
-
 					double emiss = 0;
-
 					if(inputs.isComparing){
-
 						double linkEmissionBau =0;
 						double linkEmissionPolicy =0;
 
@@ -388,32 +396,25 @@ public class MunichSpatialPlots {
 						emiss = linkEmissionPolicy - linkEmissionBau;
 
 					} else {
-
 						if(linkEmissionsBau.get(time).containsKey(id)) emiss = countScaleFactor * linkEmissionsBau.get(time).get(id).get(WarmPollutant.NO2.toString());
 						else emiss =0;
 					}
 
 					plot.processLink(l,  emiss);
-					sumEmission += (emiss);
+					
 				}
 			}
-			plot.writeRData("NO2_"+(int)time/3600+"h",isWritingGGPLOTData);
-			SpatialDataInputs.LOG.info("Total NO2 emissions from link emission map is "+sumEmission);
-
-			double cellWeights =0;
-			for(Point p: plot.getCellWeights().keySet()){
-				cellWeights += plot.getCellWeights().get(p);
-			}
-			SpatialDataInputs.LOG.info("Total NO2 emissions from cell weights  is "+cellWeights);
-			plot.clear();
-			sumEmission=0;
+			writer.writeData(time, plot.getCellWeights());
+			//			plot.writeRData("NO2_"+(int)time/3600+"h",isWritingGGPLOTData);
+			plot.reset();
 		}
+		writer.closeWriter();
 	}
 
-	private Map<Id<Person>, Double> getPersonIdToTollPayments (Scenario sc){
+	private Map<Id<Person>, Double> getPersonIdToTollPayments (final Scenario sc){
 
 		MonetaryPaymentsAnalyzer paymentsAnalzer = new MonetaryPaymentsAnalyzer();
-		paymentsAnalzer.init((ScenarioImpl)sc);
+		paymentsAnalzer.init((MutableScenario)sc);
 		paymentsAnalzer.preProcessData();
 
 		EventsManager events = EventsUtils.createEventsManager();
@@ -432,4 +433,34 @@ public class MunichSpatialPlots {
 		return paymentsAnalzer.getPersonId2amount();
 	}
 
+	private class EmissionTimebinDataWriter{
+
+		BufferedWriter writer;
+		public void openWriter (final String outputFile){
+			writer = IOUtils.getBufferedWriter(outputFile);
+			try {
+				writer.write("timebin\t centroidX \t centroidY \t weight \n");
+			} catch (Exception e) {
+				throw new RuntimeException("Data is not written to file. Reason "+e);
+			}
+		}
+
+		public void writeData(final double timebin, final Map<Point,Double> cellWeights){
+			try {
+				for(Point p : cellWeights.keySet()){
+					writer.write(timebin+"\t"+p.getCentroid().getX()+"\t"+p.getCentroid().getY()+"\t"+cellWeights.get(p)+"\n");
+				}
+			} catch (Exception e) {
+				throw new RuntimeException("Data is not written to file. Reason "+e);
+			}
+		}
+
+		public void closeWriter (){
+			try {
+				writer.close();	
+			} catch (Exception e) {
+				throw new RuntimeException("Data is not written to file. Reason "+e);
+			}
+		}
+	}
 }

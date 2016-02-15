@@ -20,17 +20,17 @@
 
 package playground.gregor.grpc.dummyjupedsim;
 
-import io.grpc.ChannelImpl;
-import io.grpc.transport.netty.NegotiationType;
-import io.grpc.transport.netty.NettyChannelBuilder;
 
-import java.util.concurrent.TimeUnit;
-
+import io.grpc.internal.ManagedChannelImpl;
+import io.grpc.netty.NegotiationType;
+import io.grpc.netty.NettyChannelBuilder;
 import org.matsim.hybrid.MATSimInterfaceServiceGrpc;
 import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceServiceBlockingStub;
 
+import java.util.concurrent.TimeUnit;
+
 public class JuPedSimClient {
-	private final ChannelImpl channel;
+	private final ManagedChannelImpl channel;
 
 	private final MATSimInterfaceServiceBlockingStub blockingStub;
 
@@ -40,7 +40,7 @@ public class JuPedSimClient {
 	}
 
 	public void shutdown() throws InterruptedException {
-		this.channel.shutdown().awaitTerminated(5, TimeUnit.SECONDS);
+		this.channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
 	}
 
 	public MATSimInterfaceServiceBlockingStub getBlockingStub(){

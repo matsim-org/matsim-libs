@@ -40,7 +40,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -67,14 +67,14 @@ public class PseudoNetworkDemo {
 //			transitScheduleFile = "../thesis-data/application/transitSchedule.oevModellZH.xml";
 		}
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 
 		Network network = scenario.getNetwork();
 //		network.setCapacityPeriod(3600.0);
 		if (networkFile != null) {
-			new MatsimNetworkReader(scenario).parse(networkFile);
+			new MatsimNetworkReader(scenario.getNetwork()).parse(networkFile);
 		}
 
 		TransitSchedule schedule = scenario.getTransitSchedule();

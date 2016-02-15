@@ -23,9 +23,11 @@ package org.matsim.core.events;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 
+import javax.inject.Inject;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An EventsHandler that handles all occurring Events in separate Threads.
@@ -60,7 +63,12 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 	private int handlerCount = 0;
 	
 	private AtomicLong counter;
-	private AtomicBoolean hadException;
+	private AtomicReference<Throwable> hadException = new AtomicReference<>();
+
+	@Inject
+	SimStepParallelEventsManagerImpl(ParallelEventHandlingConfigGroup config) {
+		this(config.getNumberOfThreads() != null ? config.getNumberOfThreads() : 1);
+	}
 
     public SimStepParallelEventsManagerImpl() {
 		this(1);
@@ -142,7 +150,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		 */
         CyclicBarrier waitForEmptyQueuesBarrier = new CyclicBarrier(this.numOfThreads, processedEventsChecker);
 		
-		hadException = new AtomicBoolean(false);
+		hadException = new AtomicReference<>();
         ExceptionHandler uncaughtExceptionHandler = new ExceptionHandler(hadException, waitForEmptyQueuesBarrier,
                 simStepEndBarrier, iterationEndBarrier);
 		
@@ -180,12 +188,13 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		 * been stopped.
 		 * If not, it is waited until all threads have ended processing events.
 		 */
-		if (!hadException.get()) {
+		Throwable throwable = this.hadException.get();
+		if (throwable == null) {
 			try {
 				this.processEvent(new LastEventOfIteration(Double.POSITIVE_INFINITY));
 				iterationEndBarrier.await();
 			} catch (InterruptedException | BrokenBarrierException e) {
-				this.hadException.set(true);
+				this.hadException.set(e);
 			}
         }
 		
@@ -197,9 +206,9 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		 * the Main Thread.
 		 */
 		this.parallelMode = false;
-		
-		if (this.hadException.get()) {
-			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.");
+
+		if (throwable != null) {
+			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.", throwable);
 		}
 	}
 
@@ -211,7 +220,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		 * has crashed. Therefore the remaining threads would get stuck at the
 		 * CyclicBarrier.
 		 */
-		if (hadException.get()) {
+		if (hadException.get() != null) {
 			return;
 		}
 		
@@ -390,12 +399,12 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 	 */
 	private static class ExceptionHandler implements UncaughtExceptionHandler {
 
-		private final AtomicBoolean hadException;
+		private final AtomicReference<Throwable> hadException;
 		private final CyclicBarrier simStepEndBarrier;
 		private final CyclicBarrier iterationEndBarrier;
 		private final CyclicBarrier waitForEmptyQueuesBarrier;
 
-		public ExceptionHandler(final AtomicBoolean hadException, CyclicBarrier waitForEmptyQueuesBarrier,
+		public ExceptionHandler(final AtomicReference<Throwable> hadException, CyclicBarrier waitForEmptyQueuesBarrier,
 				CyclicBarrier simStepEndBarrier, CyclicBarrier iterationEndBarrier) {
 			this.hadException = hadException;
 			this.waitForEmptyQueuesBarrier = waitForEmptyQueuesBarrier;
@@ -405,7 +414,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 
 		@Override
 		public void uncaughtException(Thread t, Throwable e) {
-			this.hadException.set(true);
+			this.hadException.set(e);
 			log.error("Thread " + t.getName() + " died with exception while handling events.", e);
 
 			/*

@@ -13,7 +13,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
@@ -23,7 +23,7 @@ import playground.balac.carsharing.router.CarSharingStations;
 
 public class StationsLocationMain
 {
-  private final ScenarioImpl scenario = (ScenarioImpl)ScenarioUtils.createScenario(ConfigUtils.createConfig());
+  private final MutableScenario scenario = (MutableScenario)ScenarioUtils.createScenario(ConfigUtils.createConfig());
   private final Population plans = this.scenario.getPopulation();
   private final Network network = this.scenario.getNetwork();
   private String plansfilePath;
@@ -78,7 +78,7 @@ public class StationsLocationMain
     new FacilitiesReaderMatsimV1(this.scenario).readFile(this.facilitiesfilePath);
 
     log.info("reading the network ...");
-    new MatsimNetworkReader(this.scenario).readFile(this.networkfilePath);
+    new MatsimNetworkReader(this.scenario.getNetwork()).readFile(this.networkfilePath);
 
     log.info("  reading file " + this.plansfilePath);
     PopulationReader plansReader = new MatsimPopulationReader(this.scenario);

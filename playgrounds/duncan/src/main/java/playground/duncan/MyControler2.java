@@ -41,9 +41,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -96,7 +96,7 @@ public class MyControler2 {
 			for ( int ii=0 ; ii<nPersons ; ii++ ) {
 				Id<Person> id = Id.create( popCnt , Person.class) ;
 				popCnt++ ;
-				Person newPerson = PersonImpl.createPerson(id);
+				Person newPerson = PopulationUtils.createPerson(id);
 				population.addPerson( newPerson ) ;
 				PlanImpl plan = PersonUtils.createAndAddPlan(newPerson, true);
 				playground.kai.urbansim.Utils.makeHomePlan(plan, coord) ;

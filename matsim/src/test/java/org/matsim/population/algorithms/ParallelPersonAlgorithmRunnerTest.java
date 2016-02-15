@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -65,10 +65,10 @@ public class ParallelPersonAlgorithmRunnerTest {
 	 */
 	@Test
 	public void testNofPersons() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 		for (int i = 0; i < 100; i++) {
-			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
 			population.addPerson(person);
 		}
 		final PersonAlgorithmTester tester = new PersonAlgorithmTester();
@@ -90,10 +90,10 @@ public class ParallelPersonAlgorithmRunnerTest {
 	@Test
 	public void testCrashingAlgorithm() {
 		try {
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			Population population = scenario.getPopulation();
 			for (int i = 0; i < 10; i++) {
-				Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+				Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
 				population.addPerson(person);
 			}
 			ParallelPersonAlgorithmRunner.run(population, 2, new AbstractPersonAlgorithm() {

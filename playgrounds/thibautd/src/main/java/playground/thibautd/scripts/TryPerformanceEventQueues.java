@@ -19,14 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
+import org.matsim.core.mobsim.jdeqsim.util.Timer;
+import playground.ivt.utils.ArgParser;
+import playground.thibautd.utils.ConcurrentListSPSC;
+
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import org.matsim.core.mobsim.jdeqsim.util.Timer;
-
-import playground.ivt.utils.ArgParser;
-import playground.thibautd.utils.ConcurrentListSPSC;
 
 /**
  * Similar to what Rashid did for his ConcurrentListSPSC, but including 

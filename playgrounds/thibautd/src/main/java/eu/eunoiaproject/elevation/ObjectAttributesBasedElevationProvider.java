@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package eu.eunoiaproject.elevation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author thibautd

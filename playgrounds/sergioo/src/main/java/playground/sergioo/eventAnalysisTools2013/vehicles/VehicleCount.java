@@ -14,9 +14,9 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -25,7 +25,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class VehicleCount implements Wait2LinkEventHandler, PersonArrivalEventHandler  {
+public class VehicleCount implements VehicleEntersTrafficEventHandler, PersonArrivalEventHandler  {
 
 	private static Integer[] numCars;
 	private static Integer[] numCarsCh;
@@ -153,7 +153,7 @@ public class VehicleCount implements Wait2LinkEventHandler, PersonArrivalEventHa
 	}
 	
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		int slot = (int)event.getTime()/timeInterval;
 		if(slot==numCars.length)
 			slot--;
@@ -199,7 +199,7 @@ public class VehicleCount implements Wait2LinkEventHandler, PersonArrivalEventHa
 	
 	public static void main(String[] args) throws FileNotFoundException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[0]);
 		EventsManager events = EventsUtils.createEventsManager();
 		int totalTime = new Integer(args[3]), timeInterval = new Integer(args[4]);
 		events.addHandler(new VehicleCount(totalTime, timeInterval));

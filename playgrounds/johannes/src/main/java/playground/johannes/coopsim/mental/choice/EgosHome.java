@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.choice;
 
-import java.util.Collection;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.common.collections.ChoiceSet;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.facilities.ActivityFacility;
 
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import java.util.Collection;
+import java.util.Random;
 
 /**
  * @author illenberger
@@ -46,7 +46,7 @@ public class EgosHome implements FacilityChoiceSetGenerator {
 		
 		for(SocialVertex ego : egos) {
 			Activity home = (Activity) ego.getPerson().getPerson().getSelectedPlan().getPlanElements().get(0);
-			choiceSet.addChoice(home.getFacilityId());
+			choiceSet.addOption(home.getFacilityId());
 		}
 		
 		return choiceSet;

@@ -23,10 +23,11 @@ package playground.telaviv.zones;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
@@ -59,7 +60,7 @@ public class CreateODTravelTimeMatrices {
 	
 	public static void main(String[] args) throws Exception {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		ZoneMapping zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
 		TravelTime travelTime = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		new CreateODTravelTimeMatrices(scenario, zoneMapping, travelTime).calculateODMatrices();
@@ -69,8 +70,8 @@ public class CreateODTravelTimeMatrices {
 		this.scenario = scenario;
 		this.zoneMapping = zoneMapping;
 		this.travelTime = travelTime2;
-		
-		travelCost = new TravelTimeAndDistanceBasedTravelDisutilityFactory().createTravelDisutility(travelTime2, scenario.getConfig().planCalcScore());	
+
+		travelCost = new Builder( TransportMode.car ).createTravelDisutility(travelTime2, scenario.getConfig().planCalcScore());
 		getConnectorNodes();
 	}
 	

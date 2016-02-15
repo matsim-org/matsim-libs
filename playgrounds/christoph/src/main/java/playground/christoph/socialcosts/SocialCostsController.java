@@ -130,7 +130,7 @@ public class SocialCostsController {
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
-			Controler controler = event.getControler();
+			Controler controler = event.getServices();
 			
 			// initialize the social costs calculator
             SocialCostCalculator scc = new SocialCostCalculator(controler.getScenario().getNetwork(), controler.getEvents(), controler.getLinkTravelTimes());

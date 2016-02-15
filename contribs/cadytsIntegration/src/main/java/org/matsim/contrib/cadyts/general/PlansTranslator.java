@@ -11,6 +11,6 @@ import org.matsim.api.core.v01.population.Plan;
  */
 public interface PlansTranslator<T> {
 	
-	cadyts.demand.Plan<T> getPlanSteps(final Plan plan) ; 
+	cadyts.demand.Plan<T> getCadytsPlan(final Plan plan) ; 
 	
 }

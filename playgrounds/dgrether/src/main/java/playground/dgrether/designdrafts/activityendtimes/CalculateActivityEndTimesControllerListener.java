@@ -40,7 +40,7 @@ public class CalculateActivityEndTimesControllerListener implements StartupListe
 
 	public void notifyStartup(StartupEvent event) {
 		log.info("calculating missing end times of Activities...");
-        Population pop = event.getControler().getScenario().getPopulation();
+        Population pop = event.getServices().getScenario().getPopulation();
 		for (Person person : pop.getPersons().values()){
 			for (Plan plan : person.getPlans()) {
 				Iterator<PlanElement> it  = plan.getPlanElements().iterator();

@@ -22,7 +22,6 @@ package playground.thibautd.hitchiking.qsim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-
 import playground.thibautd.hitchiking.HitchHikingConstants;
 
 /**

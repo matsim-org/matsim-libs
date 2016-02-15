@@ -31,31 +31,33 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.vehicles.Vehicle;
 
 import playground.jjoubert.CommercialTraffic.SAZone;
 
 public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler, 
 													  LinkLeaveEventHandler, 
 													  PersonArrivalEventHandler{
-	private Map<Id, SAZone> map;
-	private Map<Id, ArrayList<ArrayList<Double>>> linkSpeeds;
-	private Map<Id, Double> eventMap;
+	private Map<Id<Link>, SAZone> map;
+	private Map<Id<Link>, ArrayList<ArrayList<Double>>> linkSpeeds;
+	private Map<Id<Vehicle>, Double> eventMap;
 	private Network networkLayer;
 	private Integer lowerAgentId;
 	private Integer upperAgentId;
 	private boolean weighLinksByUse = false;
 	
-	public MyPrivateVehicleSpeedAnalyser(Map<Id, SAZone> map, Network nl, int lowerAgentId, int upperAgentId, int hours){
+	public MyPrivateVehicleSpeedAnalyser(Map<Id<Link>, SAZone> map, Network nl, int lowerAgentId, int upperAgentId, int hours){
 		this.map = map;
 		this.networkLayer = nl;
 		this.lowerAgentId = lowerAgentId;
 		this.upperAgentId = upperAgentId;
-		this.eventMap = new TreeMap<Id, Double>();
+		this.eventMap = new TreeMap<Id<Vehicle>, Double>();
 		
-		linkSpeeds = new TreeMap<Id, ArrayList<ArrayList<Double>>>();
+		linkSpeeds = new TreeMap<Id<Link>, ArrayList<ArrayList<Double>>>();
 		ArrayList<ArrayList<Double>> linkSpeedArray;
-		for (Id key : this.map.keySet()) {
+		for (Id<Link> key : this.map.keySet()) {
 			linkSpeedArray = new ArrayList<ArrayList<Double>>(hours);
 			ArrayList<Double> hourArray;
 			for(int i = 0; i < hours; i++){
@@ -69,12 +71,12 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		if(map.containsKey(linkId)){
-			int thisPersonNumber = Integer.parseInt(event.getDriverId().toString());
-			if( thisPersonNumber >= lowerAgentId && thisPersonNumber <= upperAgentId ){
-				Id personId = event.getDriverId();
-				eventMap.put(personId, event.getTime());				
+			int thisVehicleNumber = Integer.parseInt(event.getVehicleId().toString());
+			if( thisVehicleNumber >= lowerAgentId && thisVehicleNumber <= upperAgentId ){
+				Id<Vehicle> vehicleId = event.getVehicleId();
+				eventMap.put(vehicleId, event.getTime());				
 			}
 		}
 		
@@ -120,31 +122,31 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 
 	
 	private void addSpeedToZone(LinkLeaveEvent event){
-		if(eventMap.containsKey(event.getDriverId())){
+		if(eventMap.containsKey(event.getVehicleId())){
 			int hour = (int) Math.floor((event.getTime()) / 3600);
 			Double speed = (this.networkLayer.getLinks().get(event.getLinkId()).getLength() / 	// in meters 
-					(event.getTime() - eventMap.get(event.getDriverId()))) *			// in seconds
+					(event.getTime() - eventMap.get(event.getVehicleId()))) *			// in seconds
 					(3600/1000);														// convert m/s -> km/h 
 			
 			SAZone theZone = map.get(event.getLinkId());
 			theZone.addToSpeedDetail(hour, speed);
 			theZone.incrementSpeedCount(hour);
 			
-			eventMap.remove(event.getDriverId());
+			eventMap.remove(event.getVehicleId());
 		}		
 	}
 
 	
 	public void addSpeedToLink(LinkLeaveEvent event) {
-		if(eventMap.containsKey(event.getDriverId())){
+		if(eventMap.containsKey(event.getVehicleId())){
 			int hour = (int) Math.floor((event.getTime()) / 3600);
 			Double speed = (this.networkLayer.getLinks().get(event.getLinkId()).getLength() / 	// in meters 
-					(event.getTime() - eventMap.get(event.getDriverId()))) *			// in seconds
+					(event.getTime() - eventMap.get(event.getVehicleId()))) *			// in seconds
 					(3600/1000);														// convert m/s -> km/h 
 			
 			linkSpeeds.get(event.getLinkId()).get(hour).add(speed);
 			
-			eventMap.remove(event.getDriverId());
+			eventMap.remove(event.getVehicleId());
 		}
 		
 	}

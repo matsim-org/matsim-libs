@@ -19,7 +19,10 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
 
-import com.google.inject.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -29,7 +32,6 @@ import org.matsim.core.config.ConfigWriter;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;

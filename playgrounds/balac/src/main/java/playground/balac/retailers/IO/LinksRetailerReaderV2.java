@@ -10,7 +10,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -29,7 +29,7 @@ public class LinksRetailerReaderV2
   public static final String CONFIG_LINKS_CRITERIA = "freeLinksCriteria";
   public static final String CONFIG_GROUP = "Retailers";
   private String linkIdFile;
-  private Controler controler;
+  private MatsimServices controler;
   protected TreeMap<Id<Link>, LinkRetailersImpl> allLinks = new TreeMap<>();
   protected TreeMap<Id<Link>, LinkRetailersImpl> freeLinks = new TreeMap<>();
   private TreeMap<Id<Link>, LinkRetailersImpl> currentLinks = new TreeMap<>();
@@ -38,7 +38,7 @@ public class LinksRetailerReaderV2
   private double ratioSum = 0.0D;
   private static final Logger log = Logger.getLogger(LinksRetailerReaderV2.class);
 
-  public LinksRetailerReaderV2(Controler controler, Retailers retailers)
+  public LinksRetailerReaderV2(MatsimServices controler, Retailers retailers)
   {
     this.controler = controler;
     this.retailers = retailers;

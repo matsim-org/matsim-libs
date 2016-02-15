@@ -27,7 +27,7 @@ package playground.artemc.crowding.internalization;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import playground.artemc.crowding.newScoringFunctions.ScoreTracker;
 
 /**
@@ -37,10 +37,10 @@ import playground.artemc.crowding.newScoringFunctions.ScoreTracker;
 
 public class InternalizationPtControlerListener implements StartupListener {
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private ScoreTracker scoreTracker;
 
-	public InternalizationPtControlerListener(ScenarioImpl scenario, ScoreTracker scoreTracker){
+	public InternalizationPtControlerListener(MutableScenario scenario, ScoreTracker scoreTracker){
 		this.scenario = scenario;
 		this.scoreTracker = scoreTracker;
 	}
@@ -48,12 +48,12 @@ public class InternalizationPtControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		EventsManager eventsManager = event.getControler().getEvents();
+		EventsManager eventsManager = event.getServices().getEvents();
 		
-		event.getControler().getEvents().addHandler(new TransferDelayInVehicleHandler(eventsManager, scenario));
-		//event.getControler().getEvents().addHandler(new TransferDelayWaitingHandler(eventsManager, scenario));
-		event.getControler().getEvents().addHandler(new CapacityDelayHandler(eventsManager, scenario));
-		event.getControler().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario, scoreTracker));
+		event.getServices().getEvents().addHandler(new TransferDelayInVehicleHandler(eventsManager, scenario));
+		//event.getServices().getEvents().addHandler(new TransferDelayWaitingHandler(eventsManager, scenario));
+		event.getServices().getEvents().addHandler(new CapacityDelayHandler(eventsManager, scenario));
+		event.getServices().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario, scoreTracker));
 	}
 
 }

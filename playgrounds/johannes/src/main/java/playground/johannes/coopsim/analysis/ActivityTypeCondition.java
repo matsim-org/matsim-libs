@@ -2,7 +2,6 @@ package playground.johannes.coopsim.analysis;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
-
 import playground.johannes.coopsim.pysical.Trajectory;
 
 public class ActivityTypeCondition implements PlanElementCondition {

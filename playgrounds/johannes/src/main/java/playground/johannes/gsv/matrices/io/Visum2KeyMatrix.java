@@ -19,14 +19,13 @@
 
 package playground.johannes.gsv.matrices.io;
 
-import java.util.List;
-
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLWriter;
 
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import java.util.List;
 
 /**
  * @author johannes
@@ -34,8 +33,8 @@ import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
  */
 public class Visum2KeyMatrix {
 
-	public static KeyMatrix convert(Matrix visumMatrix) {
-		KeyMatrix keyMatrix = new KeyMatrix();
+	public static NumericMatrix convert(Matrix visumMatrix) {
+		NumericMatrix keyMatrix = new NumericMatrix();
 		
 		for(List<Entry> entries : visumMatrix.getFromLocations().values()) {
 			for(Entry entry : entries) {
@@ -51,9 +50,9 @@ public class Visum2KeyMatrix {
 		VisumMatrixReader reader = new VisumMatrixReader(visumMatrix);
 		reader.readFile("/home/johannes/gsv/prognose-update/iv-2030.txt");
 		
-		KeyMatrix keyMatrix = convert(visumMatrix);
+		NumericMatrix keyMatrix = convert(visumMatrix);
 		
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
 		writer.write(keyMatrix, "/home/johannes/gsv/prognose-update/iv-2030.xml");
 	}
 

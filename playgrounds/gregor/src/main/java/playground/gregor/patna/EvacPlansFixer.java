@@ -50,7 +50,7 @@ public class EvacPlansFixer {
 		MatsimPopulationReader r = new MatsimPopulationReader(sc);
 		r.readFile(inFile);
 		
-		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
+		MatsimNetworkReader nr = new MatsimNetworkReader(sc.getNetwork());
 		nr.readFile(netFile);
 		
 		

@@ -29,13 +29,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
@@ -238,7 +238,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + consideration in scoring
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
 		
 		} else if (noisePricing && congestionPricing == false) {
 			// only noise pricing
@@ -264,7 +264,7 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + NO consideration in scoring
-			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
 			
 		} else if (noisePricing == false && congestionPricing) {
 			// only congestion pricing
@@ -290,11 +290,11 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + consideration in scoring
-			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
 			
 		} else if (noisePricing == false && congestionPricing == false) {
 			// base case
-			
+						
 			// a router which accounts for the person- and trip-specific VTTS
 			final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
 			factory.setSigma(sigma);
@@ -313,13 +313,13 @@ public class CNControler {
 			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 			
 			// computation of congestion events + NO consideration in scoring
-			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())));
 
 		} else {
 			throw new RuntimeException("This setup is not considered. Aborting...");
 		}
 		
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		

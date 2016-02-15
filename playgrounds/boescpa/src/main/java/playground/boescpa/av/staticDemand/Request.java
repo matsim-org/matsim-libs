@@ -21,7 +21,7 @@
 
 package playground.boescpa.av.staticDemand;
 
-import playground.boescpa.lib.tools.tripReader.Trip;
+import playground.boescpa.analysis.trips.Trip;
 
 /**
  * WHAT IS IT FOR?

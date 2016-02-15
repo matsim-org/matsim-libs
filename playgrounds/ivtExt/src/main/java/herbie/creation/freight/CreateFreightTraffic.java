@@ -20,6 +20,38 @@
 package herbie.creation.freight;
 
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTime.DayType;
+import org.matsim.facilities.OpeningTimeImpl;
+import utils.BuildTrees;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,33 +64,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.Vector;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.facilities.OpeningTime.DayType;
-
-import utils.BuildTrees;
 
 public class CreateFreightTraffic {
 	
@@ -81,7 +86,7 @@ public class CreateFreightTraffic {
 	
 	private QuadTree<ActivityFacility> facilityTree;
 	private Statistics stats = new Statistics();
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	
 	private String crossBorderPlansFilePath;
 	
@@ -114,8 +119,8 @@ public class CreateFreightTraffic {
 		this.roundingLimit = Double.parseDouble(config.findParam("freight", "roundingLimit"));
 		this.crossBorderPlansFilePath = config.findParam("freight", "crossBorderPlansFile");
 		
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(this.scenario).readFile(this.networkfilePath);
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(this.networkfilePath);
 		new FacilitiesReaderMatsimV1(this.scenario).readFile(this.facilitiesfilePath);
 		
 		BuildTrees util = new BuildTrees();
@@ -244,7 +249,7 @@ public class CreateFreightTraffic {
 	}
 		
 	private Person createPerson(int originIndex, int destinationIndex, int index) {
-		Person p = PersonImpl.createPerson(Id.create(this.freightOffset + index, Person.class));
+		Person p = PopulationUtils.createPerson(Id.create(this.freightOffset + index, Person.class));
 		PersonUtils.setEmployed(p, true);
 		PersonUtils.setCarAvail(p, "always");
 //		((PersonImpl)p).createDesires("freight");
@@ -361,7 +366,7 @@ public class CreateFreightTraffic {
 	
 	private void addFreightActivity2Facility(ActivityFacility facility) {
 		if (facility.getActivityOptions().get("freight") == null) {
-			((ActivityFacilityImpl)facility).createActivityOption("freight");
+			((ActivityFacilityImpl)facility).createAndAddActivityOption("freight");
 			OpeningTime ot = new OpeningTimeImpl(DayType.wk, 5.0 * 3600.0, 20.0 * 3600.0);
 			((ActivityFacilityImpl)facility).getActivityOptions().get("freight").addOpeningTime(ot);
 		}	
@@ -369,7 +374,7 @@ public class CreateFreightTraffic {
 	
 	private void addActivity2FacilityWithoutOpeningHours(ActivityFacility facility, String type) {
 		if (facility.getActivityOptions().get(type) == null) {
-			((ActivityFacilityImpl)facility).createActivityOption(type);
+			((ActivityFacilityImpl)facility).createAndAddActivityOption(type);
 			OpeningTime ot = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600.0);
 			((ActivityFacilityImpl)facility).getActivityOptions().get(type).addOpeningTime(ot);
 		}	
@@ -378,9 +383,9 @@ public class CreateFreightTraffic {
 	private void extendCrossBorderFacilitiesWithWorkActivity() {
 		log.info("Update Cross Boarder Facilites with the correct activities ...");
 		
-		ScenarioImpl sTmp = (ScenarioImpl) ScenarioUtils.createScenario(
+		MutableScenario sTmp = (MutableScenario) ScenarioUtils.createScenario(
 				ConfigUtils.createConfig());
-		new MatsimNetworkReader(sTmp).readFile(networkfilePath);
+		new MatsimNetworkReader(sTmp.getNetwork()).readFile(networkfilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
 		populationReader.readFile(crossBorderPlansFilePath);
 		

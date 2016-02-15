@@ -21,8 +21,8 @@ package playground.johannes.gsv.synPop.analysis;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.CommonKeys;
 
 /**
  * @author johannes

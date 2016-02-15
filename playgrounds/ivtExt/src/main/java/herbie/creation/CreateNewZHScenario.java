@@ -23,22 +23,29 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.population.algorithms.XY2Links;
-
 import utils.BuildTrees;
 
 import java.io.File;
@@ -49,7 +56,7 @@ import java.util.Vector;
 
 public class CreateNewZHScenario {
 	private final static Logger log = Logger.getLogger(CreateNewZHScenario.class);
-	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private String outputFolder;
 	private String networkfilePath;
 	private String facilitiesfilePath;
@@ -93,7 +100,7 @@ public class CreateNewZHScenario {
 		this.readConfig(configFile);
 		
 		log.info("\tReading network, facilities and plans .............................");
-		new MatsimNetworkReader(scenario).readFile(networkfilePath);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfilePath);
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesfilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenario);
 		populationReader.readFile(plansV2filePath);
@@ -123,10 +130,10 @@ public class CreateNewZHScenario {
 	// read cross-border plans and add them to the scenario
 	// the cross border facilities are already integrated in the facilities
 	private void addSpecialPlans2Population(String plansFilePath, String type) {
-		ScenarioImpl sTmp = (ScenarioImpl) ScenarioUtils.createScenario(
+		MutableScenario sTmp = (MutableScenario) ScenarioUtils.createScenario(
 				ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(sTmp).readFile(networkfilePath);
+		new MatsimNetworkReader(sTmp.getNetwork()).readFile(networkfilePath);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(sTmp);
 		populationReader.readFile(plansFilePath);
 		
@@ -197,7 +204,7 @@ public class CreateNewZHScenario {
 	// mapping the activities to this.network
 	// the normal plans v2 are already mapped
 	private void map2Network(Population population) {
-		XY2Links mapper = new XY2Links(this.scenario.getNetwork());
+		XY2Links mapper = new XY2Links(this.scenario.getNetwork(), null);
 		for (Person p : population.getPersons().values()){
 			mapper.run(p);
 		}

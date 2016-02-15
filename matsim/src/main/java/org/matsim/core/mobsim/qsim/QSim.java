@@ -227,8 +227,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			while (doContinue) {
 				doContinue = doSimStep();
 			}
-		}
-		finally {
+		} finally {
 			// We really want to perform that. For instance, with QNetsimEngine, threads are cleaned up in this method.
 			// Without this finally, in case of a crash, threads are not closed, which lead to process hanging forever
 			// at least on the eth euler cluster (but not on our local machines at ivt!?) td oct 15
@@ -397,6 +396,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private void arrangeAgentDeparture(final MobsimAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay();
 		Id<Link> linkId = agent.getCurrentLinkId();
+		Gbl.assertIf( linkId!=null );
 		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, agent.getMode()));
 
 		for (DepartureHandler departureHandler : this.departureHandlers) {

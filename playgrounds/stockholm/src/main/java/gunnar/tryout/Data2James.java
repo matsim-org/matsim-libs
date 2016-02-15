@@ -34,7 +34,7 @@ public class Data2James {
 		System.out.println("STARTED ...");
 
 		System.out.println("	READING PERSON ATTRIBUTES");
-		final String regentOutputFileName = "./data/synthetic_population/150615_trips.xml";
+		final String regentOutputFileName = "./test/regentmatsim/exchange/trips.xml";
 		final ObjectAttributes personAttributes = new ObjectAttributes();
 		(new ObjectAttributesXmlReader(personAttributes))
 				.parse(regentOutputFileName);
@@ -42,12 +42,12 @@ public class Data2James {
 		System.out.println("	READING NETWORK AND PLANS");
 		final Config config = ConfigUtils.createConfig();
 		config.setParam("network", "inputNetworkFile",
-				"./data/transmodeler/network.xml");
+				"./test/regentmatsim/input/network-plain.xml");
 		config.setParam("plans", "inputPlansFile",
-				"./data/saleem/10.plans.xml.gz");
+				"./test/qi/200.plans.xml.gz");
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		 final String outputFile = "./data/2015-09-15_toJames.csv";
+		 final String outputFile = "./test/qi/2015-10-31_toQi.csv";
 		 final PrintWriter writer = new PrintWriter(outputFile);
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {

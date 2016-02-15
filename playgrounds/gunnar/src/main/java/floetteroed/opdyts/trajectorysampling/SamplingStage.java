@@ -56,10 +56,20 @@ public class SamplingStage<U extends DecisionVariable> {
 
 	private final Map<U, Double> decisionVariable2alphaSum;
 
+	private final U lastDecisionVariable;
+
+	private final double lastObjectiveFunctionValue;
+
+	private final double lastEquilibriumGap;
+
+	private final Double convergedObjectiveFunctionValue;
+
 	// -------------------- CONSTRUCTION --------------------
 
-	public SamplingStage(final Vector alphas,
-			final TransitionSequencesAnalyzer<U> evaluator) {
+	SamplingStage(final Vector alphas,
+			final TransitionSequencesAnalyzer<U> evaluator,
+			final Transition<U> lastTransition,
+			final Double convergedObjectiveFunctionValue) {
 
 		this.alphas = alphas.copy();
 		this.equilibriumGapWeight = evaluator.getEquilibriumGapWeight();
@@ -72,24 +82,37 @@ public class SamplingStage<U extends DecisionVariable> {
 				.surrogateObjectiveFunctionValue(alphas);
 		this.decisionVariable2alphaSum = evaluator
 				.decisionVariable2alphaSum(alphas);
+
+		this.lastDecisionVariable = lastTransition.getDecisionVariable();
+		this.lastObjectiveFunctionValue = lastTransition
+				.getToStateObjectiveFunctionValue();
+		this.lastEquilibriumGap = lastTransition.getDelta().euclNorm();
+
+		this.convergedObjectiveFunctionValue = convergedObjectiveFunctionValue;
 	}
 
-	// -------------------- CONTENT ACCESS --------------------
+	// -------------------- PACKAGE PRIVATE FUNCTIONALITY --------------------
 
-	public double getAlphaNorm() {
-		return this.alphas.euclNorm();
+	U drawDecisionVariable(final Random rnd) {
+		return MathHelpers.draw(this.decisionVariable2alphaSum, rnd);
 	}
 
-	public double getEquilbriumGapWeight() {
+	// -------------------- PUBLIC CONTENT ACCESS --------------------
+
+	public double getEquilibriumGapWeight() {
 		return this.equilibriumGapWeight;
 	}
 
-	public double getUniformityWeight() {
+	public double getUniformityGapWeight() {
 		return this.uniformityWeight;
 	}
 
 	public double getEquilibriumGap() {
 		return this.equilibriumGap;
+	}
+
+	public double getUniformityGap() {
+		return this.alphas.innerProd(this.alphas);
 	}
 
 	public double getSurrogateObjectiveFunctionValue() {
@@ -104,13 +127,24 @@ public class SamplingStage<U extends DecisionVariable> {
 		return this.decisionVariable2alphaSum.get(decisionVariable);
 	}
 
-	// TODO NEW; replace by view on the entire map
 	public Set<U> getDecisionVariables() {
 		return Collections.unmodifiableSet(this.decisionVariable2alphaSum
 				.keySet());
 	}
 
-	U drawDecisionVariable(final Random rnd) {
-		return MathHelpers.draw(this.decisionVariable2alphaSum, rnd);
+	public U getLastDecisionVariable() {
+		return this.lastDecisionVariable;
+	}
+
+	public double getLastObjectiveFunctionValue() {
+		return this.lastObjectiveFunctionValue;
+	}
+
+	public double getLastEquilibriumGap() {
+		return this.lastEquilibriumGap;
+	}
+
+	public Double getConvergedObjectiveFunctionValue() {
+		return this.convergedObjectiveFunctionValue;
 	}
 }

@@ -42,8 +42,12 @@ import org.matsim.core.utils.collections.Tuple;
  * @author amit
  */
 public class ActivityType2DurationHandler implements ActivityEndEventHandler, ActivityStartEventHandler {
-
-	public ActivityType2DurationHandler(double midNightTime) {
+	public static final Logger LOG = Logger.getLogger(ActivityType2DurationHandler.class);
+	private Map<Id<Person>, PersonActivityInfo> personId2ActInfo;
+	private double midNightTime;
+	private Set<String> actTyps;
+	
+	public ActivityType2DurationHandler(final double midNightTime) {
 		this.personId2ActInfo = new HashMap<>();
 		this.actTyps = new HashSet<>();
 		this.midNightTime = midNightTime;
@@ -52,11 +56,6 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 	public ActivityType2DurationHandler(){
 		this(24*3600);		
 	}
-
-	public static Logger log = Logger.getLogger(ActivityType2DurationHandler.class);
-	private Map<Id<Person>, PersonActivityInfo> personId2ActInfo;
-	double midNightTime;
-	private Set<String> actTyps;
 
 	@Override
 	public void reset(int iteration) {
@@ -139,7 +138,7 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 				actEndTimes.add(new Tuple<String, Double>(lastActType, midNightTime));
 			} else {
 				if(warnCount==0){
-					log.warn("Person "+personId+" do not have any open ended activity and simulation ends."
+					LOG.warn("Person "+personId+" do not have any open ended activity and simulation ends."
 							+ "Possible explanation must be stuckAndAbort.");
 					Gbl.ONLYONCE.toString();
 				}

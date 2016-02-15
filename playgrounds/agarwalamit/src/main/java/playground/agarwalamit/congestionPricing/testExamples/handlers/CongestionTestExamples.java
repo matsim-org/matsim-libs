@@ -19,9 +19,7 @@
 package playground.agarwalamit.congestionPricing.testExamples.handlers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -35,24 +33,12 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
@@ -100,14 +86,14 @@ public class CongestionTestExamples {
 	}
 	
 	public void getDelayDataForPricingImpls(Scenario sc, String networkExampleName){
-		List<CongestionEvent> congestionEvents_v3 = getCongestionEvents("v3",sc);
-		List<CongestionEvent> congestionEvents_v4 = getCongestionEvents("v4",sc); 
+		List<CongestionEvent> congestionEventsV3 = getCongestionEvents("v3",sc);
+		List<CongestionEvent> congestionEventsV4 = getCongestionEvents("v4",sc); 
 //		List<CongestionEvent> congestionEvents_v6 = getCongestionEvents("v6",sc);
 		
 		System.out.println("v3");
-		 SortedMap<String,Tuple<Double, Double>> tab_v3 = getId2CausedAndAffectedDelays(congestionEvents_v3,sc);
+		 SortedMap<String,Tuple<Double, Double>> tabV3 = getId2CausedAndAffectedDelays(congestionEventsV3,sc);
 		 System.out.println("v4");
-		 SortedMap<String,Tuple<Double, Double>> tab_v4 = getId2CausedAndAffectedDelays(congestionEvents_v4,sc);
+		 SortedMap<String,Tuple<Double, Double>> tabV4 = getId2CausedAndAffectedDelays(congestionEventsV4,sc);
 //		 System.out.println("v6");
 //		 SortedMap<String,Tuple<Double, Double>> tab_v6 = getId2CausedAndAffectedDelays(congestionEvents_v6, sc);
 //		 
@@ -134,13 +120,13 @@ public class CongestionTestExamples {
 		
 		for(CongestionEvent e : events){
 			System.out.println(e.toString());
-			Tuple<Double, Double> causingPerson_tup = id2CausingAffectedDelays.get(e.getCausingAgentId().toString());
-			causingPerson_tup = new Tuple<Double, Double>(causingPerson_tup.getFirst()+e.getDelay(), causingPerson_tup.getSecond());
-			id2CausingAffectedDelays.put(e.getCausingAgentId().toString(), causingPerson_tup);
+			Tuple<Double, Double> causingPersonTup = id2CausingAffectedDelays.get(e.getCausingAgentId().toString());
+			causingPersonTup = new Tuple<Double, Double>(causingPersonTup.getFirst()+e.getDelay(), causingPersonTup.getSecond());
+			id2CausingAffectedDelays.put(e.getCausingAgentId().toString(), causingPersonTup);
 			
-			Tuple<Double, Double> affectedPerson_tup = id2CausingAffectedDelays.get(e.getAffectedAgentId().toString());
-			affectedPerson_tup = new Tuple<Double, Double>(affectedPerson_tup.getFirst(), affectedPerson_tup.getSecond()+e.getDelay());
-			id2CausingAffectedDelays.put(e.getAffectedAgentId().toString(), affectedPerson_tup);
+			Tuple<Double, Double> affectedPersonTup = id2CausingAffectedDelays.get(e.getAffectedAgentId().toString());
+			affectedPersonTup = new Tuple<Double, Double>(affectedPersonTup.getFirst(), affectedPersonTup.getSecond()+e.getDelay());
+			id2CausingAffectedDelays.put(e.getAffectedAgentId().toString(), affectedPersonTup);
 		}
 		return id2CausingAffectedDelays;
 	}
@@ -166,13 +152,13 @@ public class CongestionTestExamples {
 		});
 		
 		if(congestionPricingImpl.equalsIgnoreCase("v3")) {
-			events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl)sc));
+			events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario)sc));
 			Logger.getLogger(CongestionTestExamples.class).warn("The analysis table is generated using events and thus there are some delays unaccounted in implV3.");
 		}
 		else if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
 //		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
 
-		QSim sim = createQSim(sc, events);
+		QSim sim = QSimUtils.createDefaultQSim(sc, events);
 		sim.run();
 		
 		return congestionEvents;
@@ -200,43 +186,5 @@ public class CongestionTestExamples {
 			System.out.println(event.toString());			
 		}
 		
-	}
-	
-
-	private QSim createQSim (Scenario sc, EventsManager manager){
-		QSim qSim1 = new QSim(sc, manager);
-		ActivityEngine activityEngine = new ActivityEngine(manager, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, manager);
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-		car.setMaximumVelocity(Double.POSITIVE_INFINITY);
-		car.setPcuEquivalents(1.0);
-		modeVehicleTypes.put("car", car);
-		agentSource.setModeVehicleTypes(modeVehicleTypes);
-		qSim.addAgentSource(agentSource);
-		
-		if ( useOTFVis ) {
-			// otfvis configuration.  There is more you can do here than via file!
-			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
-			//				otfVisConfig.setShowParking(true) ; // this does not really work
-
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, manager, qSim);
-			OTFClientLive.run(sc.getConfig(), server);
-		}
-
-		return qSim;
 	}
 }

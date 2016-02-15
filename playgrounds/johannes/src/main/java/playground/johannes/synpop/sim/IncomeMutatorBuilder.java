@@ -31,7 +31,7 @@ import java.util.Random;
  */
 public class IncomeMutatorBuilder implements MutatorBuilder<CachedPerson> {
 
-    public static final Object INCOME_DATA_KEY = new Object();
+    public  final Object incomeDataKey;
 
     private final Random random;
 
@@ -44,12 +44,13 @@ public class IncomeMutatorBuilder implements MutatorBuilder<CachedPerson> {
         this.listener = listener;
         generator = new RandomIntGenerator(random, 500, 8000);
 
-        Converters.registerWithObjectKey(CommonKeys.HH_INCOME, INCOME_DATA_KEY, DoubleConverter.getInstance());
+        incomeDataKey = Converters.register(CommonKeys.HH_INCOME, DoubleConverter.getInstance());
+
     }
 
     @Override
     public Mutator<CachedPerson> build() {
-        RandomElementMutator em = new AttributeMutator(INCOME_DATA_KEY, generator, listener);
+        RandomElementMutator em = new AttributeMutator(incomeDataKey, generator, listener);
         Mutator<CachedPerson> m = new RandomPersonMutator(em, random);
         return m;
 

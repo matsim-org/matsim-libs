@@ -19,10 +19,7 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -32,7 +29,9 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * @author johannes
@@ -53,14 +52,14 @@ public class ODCountsAnalyzer implements AfterMobsimListener {
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		Network network = event.getControler().getScenario().getNetwork();
+		Network network = event.getServices().getScenario().getNetwork();
 		DescriptiveStatistics diff = new DescriptiveStatistics();
 		DescriptiveStatistics absDiff = new DescriptiveStatistics();
 		DescriptiveStatistics error = new DescriptiveStatistics();
 		DescriptiveStatistics absError = new DescriptiveStatistics();
 
 		try {
-			String file = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "odCounts.txt");
+			String file = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "odCounts.txt");
 			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 
 			writer.write("id\tobs\tsim");
@@ -103,16 +102,16 @@ public class ODCountsAnalyzer implements AfterMobsimListener {
 					absError.getMean(), absError.getPercentile(50), absError.getVariance(), absError.getMin(), absError.getMax()));
 			
 			
-			file = event.getControler().getControlerIO().getOutputFilename("odCountsDiff.txt");
+			file = event.getServices().getControlerIO().getOutputFilename("odCountsDiff.txt");
 			writeStats(file, diff, event.getIteration());
 			
-			file = event.getControler().getControlerIO().getOutputFilename("odCountsAbsDiff.txt");
+			file = event.getServices().getControlerIO().getOutputFilename("odCountsAbsDiff.txt");
 			writeStats(file, absDiff, event.getIteration());
 			
-			file = event.getControler().getControlerIO().getOutputFilename("odCountsError.txt");
+			file = event.getServices().getControlerIO().getOutputFilename("odCountsError.txt");
 			writeStats(file, error, event.getIteration());
 			
-			file = event.getControler().getControlerIO().getOutputFilename("odCountsAbsError.txt");
+			file = event.getServices().getControlerIO().getOutputFilename("odCountsAbsError.txt");
 			writeStats(file, absError, event.getIteration());
 		} catch (IOException e) {
 			e.printStackTrace();

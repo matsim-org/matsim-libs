@@ -37,9 +37,12 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
+
+import javax.inject.Inject;
 
 /**
  * @author mrieser
@@ -63,6 +66,15 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 	private final Map<Id<Person>, String> previousActivityTypes = new HashMap<>();
 	private double sumTripDurations = 0;
 	private int sumTrips = 0;
+
+	@Inject
+	CalcLegTimes(EventsManager eventsManager) {
+		eventsManager.addHandler(this);
+	}
+
+	public CalcLegTimes() {
+
+	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {

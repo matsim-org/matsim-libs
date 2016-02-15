@@ -30,7 +30,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -51,7 +51,7 @@ public class PopulationSample {
 
 		log.info("samplePopulation...");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 //		World world = scenario.getWorld();
 
 		//////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ public class PopulationSample {
 		log.info("  done.");
 
 		System.out.println("  reading the network xml file...");
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 //		world.complete(config);
 		Gbl.printMemoryUsage();
 		System.out.println("  done.");

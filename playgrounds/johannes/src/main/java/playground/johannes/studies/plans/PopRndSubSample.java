@@ -28,7 +28,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class PopRndSubSample {
 //		int numSamples = 10000;
 		
 		Config config = ConfigUtils.createConfig();
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile(input);
 
@@ -74,7 +74,7 @@ public class PopRndSubSample {
 				newPop.addPerson(persons.get(i));
 				ProgressLogger.step();
 			}
-			ProgressLogger.termiante();
+			ProgressLogger.terminate();
 			logger.info(String.format("New population size: %1$s.", pop.getPersons().size()));
 			
 			new PopulationWriter(newPop, scenario.getNetwork()).write(output);

@@ -3,6 +3,8 @@ package playground.southafrica.population.demographics;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
+import playground.southafrica.population.capeTownTravelSurvey.PersonEnums;
+
 /**
  * Class to convert a numeric age into a predefined class.
  * 
@@ -40,6 +42,34 @@ public enum SaDemographicsAge {
 		} else{
 			return Retired;
 		}
+	}
+	
+	/**
+	 * To be compatible with this Census 2011, the Class {@link PersonEnums.AgeGroup}
+	 * converts the year of birth to an age class, but retains the 'unknown' 
+	 * option. Here we just report those as 'retired'. Otherwise, the age 
+	 * classification is the same as the method {@link #getAgeClass(double)}.
+	 * @param ageClass
+	 * @return
+	 */
+	public static SaDemographicsAge getCapeTown2013AgeClass(String ageClass){
+		PersonEnums.AgeGroup ageGroup = PersonEnums.AgeGroup.parseFromDescription(ageClass);
+		switch (ageGroup) {
+		case INFANT:
+			return Infant;
+		case YOUNG:
+			return Young;
+		case CHILD:
+			return Child;
+		case EARLYCAREER:
+			return EarlyCareer;
+		case LATECAREER:
+			return LateCareer;
+		case RETIRED:
+		case UNKNOWN:
+			return Retired;
+		}
+		return Retired;
 	}
 	
 	/**

@@ -20,8 +20,8 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import org.apache.log4j.Logger;
-import playground.johannes.socialnetworks.utils.CollectionUtils;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import org.matsim.contrib.common.collections.CollectionUtils;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import playground.johannes.synpop.data.Person;
 
 import java.util.Collection;

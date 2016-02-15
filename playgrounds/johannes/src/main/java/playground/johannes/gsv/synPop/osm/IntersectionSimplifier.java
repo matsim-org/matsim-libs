@@ -19,14 +19,6 @@
 
 package playground.johannes.gsv.synPop.osm;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,6 +33,8 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
+
+import java.util.*;
 
 /**
  * @author johannes
@@ -182,7 +176,7 @@ public class IntersectionSimplifier implements NetworkRunnable {
 	public static void main(String args[]) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("/home/johannes/gsv/osm/germany-network-cat5.simplified3.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("/home/johannes/gsv/osm/germany-network-cat5.simplified3.xml");
 
 		IntersectionSimplifier simplifier = new IntersectionSimplifier();
 		simplifier.run(network);

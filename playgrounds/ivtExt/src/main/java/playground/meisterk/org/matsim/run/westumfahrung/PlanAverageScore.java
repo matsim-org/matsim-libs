@@ -22,6 +22,7 @@ package playground.meisterk.org.matsim.run.westumfahrung;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -37,7 +38,7 @@ public class PlanAverageScore extends AbstractPersonAlgorithm implements PlanAlg
 	@Override
 	public void run(Person person) {
 		for (Plan plan : person.getPlans()) {
-			if (plan.isSelected()) {
+			if (PersonUtils.isSelected(plan)) {
 				run(plan);
 			}
 		}

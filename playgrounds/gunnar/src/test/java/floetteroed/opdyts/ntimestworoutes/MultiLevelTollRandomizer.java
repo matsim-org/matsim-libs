@@ -1,5 +1,6 @@
 package floetteroed.opdyts.ntimestworoutes;
 
+import java.util.List;
 import java.util.Random;
 
 import floetteroed.opdyts.DecisionVariable;
@@ -49,7 +50,6 @@ public class MultiLevelTollRandomizer implements DecisionVariableRandomizer {
 		return new NTimesTwoRoutesDecisionVariable(this.simulator, tollVector);
 	}
 
-	@Override
 	public DecisionVariable newRandomDecisionVariable() {
 		final Vector tollVector = new Vector(this.roadCnt);
 		for (int i = 0; i < this.roadCnt; i++) {
@@ -61,27 +61,28 @@ public class MultiLevelTollRandomizer implements DecisionVariableRandomizer {
 	}
 
 	@Override
-	public DecisionVariable newRandomVariation(final DecisionVariable parent) {
-		final Vector childTolls = ((NTimesTwoRoutesDecisionVariable) parent)
-				.getTolls().copy();
-		for (int i = 0; i < this.roadCnt; i++) {
-			if (this.rnd.nextDouble() < this.mutationProbability) {
-				double val = childTolls.get(i);
-				if (this.rnd.nextBoolean()) {
-					// val += this.deltaToll;
-					val += (1 + this.rnd.nextInt(this.maxDeltaBin))
-							+ this.deltaToll;
-				} else {
-					// val -= this.deltaToll;
-					val -= (1 + this.rnd.nextInt(this.maxDeltaBin))
-							+ this.deltaToll;
-				}
-				val = Math.max(0,
-						Math.min((this.tollBinCnt - 1) * this.deltaToll, val));
-				childTolls.set(i, val);
-			}
-		}
-		return new NTimesTwoRoutesDecisionVariable(this.simulator, childTolls);
-		// return extremeToll();
+	public List<DecisionVariable> newRandomVariations(final DecisionVariable parent) {
+		return null;
+//		final Vector childTolls = ((NTimesTwoRoutesDecisionVariable) parent)
+//				.getTolls().copy();
+//		for (int i = 0; i < this.roadCnt; i++) {
+//			if (this.rnd.nextDouble() < this.mutationProbability) {
+//				double val = childTolls.get(i);
+//				if (this.rnd.nextBoolean()) {
+//					// val += this.deltaToll;
+//					val += (1 + this.rnd.nextInt(this.maxDeltaBin))
+//							+ this.deltaToll;
+//				} else {
+//					// val -= this.deltaToll;
+//					val -= (1 + this.rnd.nextInt(this.maxDeltaBin))
+//							+ this.deltaToll;
+//				}
+//				val = Math.max(0,
+//						Math.min((this.tollBinCnt - 1) * this.deltaToll, val));
+//				childTolls.set(i, val);
+//			}
+//		}
+//		return new NTimesTwoRoutesDecisionVariable(this.simulator, childTolls);
+//		// return extremeToll();
 	}
 }

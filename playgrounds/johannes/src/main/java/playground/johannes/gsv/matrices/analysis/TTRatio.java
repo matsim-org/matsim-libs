@@ -19,17 +19,13 @@
 
 package playground.johannes.gsv.matrices.analysis;
 
-import gnu.trove.TDoubleArrayList;
-import gnu.trove.TDoubleDoubleHashMap;
-import org.matsim.contrib.common.stats.Discretizer;
-import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
-import org.matsim.contrib.common.stats.LinearDiscretizer;
-import org.matsim.contrib.common.stats.StatsWriter;
+import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
+import org.matsim.contrib.common.stats.*;
 import org.matsim.core.utils.collections.Tuple;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.MatrixOperations;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
-import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -54,22 +50,22 @@ public class TTRatio {
 		String carTTFile = "/home/johannes/gsv/matrices/analysis/marketShares/ttMatrix.xml";
 		String railTTFile = "/home/johannes/gsv/matrices/analysis/marketShares/railTT.xml";
 
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 
 		reader.parse(carVolFile);
-		KeyMatrix carVol = reader.getMatrix();
+		NumericMatrix carVol = reader.getMatrix();
 
 		reader.parse(railVolFile);
-		KeyMatrix railVol = reader.getMatrix();
+		NumericMatrix railVol = reader.getMatrix();
 		MatrixOperations.applyFactor(railVol, 1/365.0);
 
 		reader.parse(carTTFile);
-		KeyMatrix carTT = reader.getMatrix();
+		NumericMatrix carTT = reader.getMatrix();
 		MatrixOperations.applyFactor(carTT, 2);
 		
 		reader.parse(railTTFile);
-		KeyMatrix railTT = reader.getMatrix();
+		NumericMatrix railTT = reader.getMatrix();
 
 		List<Tuple<String, String>> relations = getRelations(railVol, 100000);
 //		List<Tuple<String, String>> relations = getRelations(carVol, 10000);
@@ -111,13 +107,13 @@ public class TTRatio {
 		
 		ratioWriter.close();
 		
-		Discretizer disc = FixedSampleSizeDiscretizer.create(ratios.toNativeArray(), 50, 200);
-//		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toNativeArray(), shares.toNativeArray(), disc);
-		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toNativeArray(), shares.toNativeArray(), new LinearDiscretizer(0.02));
+		Discretizer disc = FixedSampleSizeDiscretizer.create(ratios.toArray(), 50, 200);
+//		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toArray(), shares.toArray(), disc);
+		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toArray(), shares.toArray(), new LinearDiscretizer(0.02));
 		StatsWriter.writeHistogram(hist, "Ratio", "Share", "/home/johannes/gsv/matrices/analysis/marketShares/ratio.hist.txt");
 	}
 
-	private static List<Tuple<String, String>> getRelations(KeyMatrix m, int num) {
+	private static List<Tuple<String, String>> getRelations(NumericMatrix m, int num) {
 		Map<Double, Tuple<String, String>> map = new TreeMap<>(new Comparator<Double>() {
 
 			@Override

@@ -107,7 +107,7 @@ public class MATSimUtils {
 		
 		MatsimRandom.reset(123);
 		
-		new MatsimNetworkReader(scenario).readFile(this.networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.networkFile);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
 		new MatsimPopulationReader(scenario).readFile(this.plansFile);
@@ -144,7 +144,7 @@ public class MATSimUtils {
 
 		MatsimRandom.reset(123);
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(this.scenario).readFile(this.networkFile);
+		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(this.networkFile);
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		
 		new MatsimPopulationReader(this.scenario).readFile(this.plansFile);		
@@ -170,7 +170,7 @@ public class MATSimUtils {
 		
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(scenario).readFile(this.networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.networkFile);
 		this.network = (NetworkImpl) scenario.getNetwork();
 	}
 	

@@ -54,7 +54,7 @@ public class AddDuration {
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 	    log.info("Reading network xml file...");
-	    MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
+	    MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario.getNetwork());
 		NetworkReader.readFile("./input/miniScenarioNetwork.xml");
 		Network network = scenario.getNetwork();
 	    log.info("Reading network xml file...done.");

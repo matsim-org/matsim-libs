@@ -19,21 +19,21 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.joinabletripsidentifier;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.ivt.utils.MoreIOUtils;
+import playground.ivt.utils.PassengerTracker;
 
-import playground.thibautd.utils.MoreIOUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -47,12 +47,12 @@ public class RunExtractData {
 
 	public static void main(final String[] args) {
 		String configFile = args[0];
-		Config config = ConfigUtils.loadConfig(configFile);
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		Config config = ConfigUtils.loadConfig( configFile );
+		Scenario scenario = ScenarioUtils.createScenario( config );
 		ScenarioUtils.loadScenario(scenario);
 		Network network = scenario.getNetwork();
 
-		ConfigGroup module = config.getModule(MODULE);
+		ConfigGroup module = config.getModule( MODULE );
 		String eventFile = module.getValue(EVENTS);
 		String outputDir = module.getValue(DIR);
 
@@ -72,7 +72,9 @@ public class RunExtractData {
 		}
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		TripReconstructor trips = new TripReconstructor(network);
+		PassengerTracker tracker = new PassengerTracker();
+		TripReconstructor trips = new TripReconstructor( tracker, network);
+		eventsManager.addHandler(tracker);
 		eventsManager.addHandler(trips);
 
 		(new MatsimEventsReader(eventsManager)).readFile(eventFile);

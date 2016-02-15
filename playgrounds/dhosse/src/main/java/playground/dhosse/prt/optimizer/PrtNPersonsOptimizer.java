@@ -8,11 +8,11 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.AbstractTaxiOptimizer;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
 
 public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
 	
-	public PrtNPersonsOptimizer(TaxiOptimizerConfiguration optimConfig) {
+	public PrtNPersonsOptimizer(TaxiOptimizerContext optimConfig) {
 		
 		super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), false);
 		
@@ -31,7 +31,7 @@ public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
 
 	protected void scheduleUnplannedRequests() {
 		
-		new NPersonsProblem(optimConfig).scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
+		new NPersonsProblem(optimContext).scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
 		
 	}
 

@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scoring.ScoringFunction;
 
 import playground.juliakern.distribution.ResponsibilityEvent;
@@ -70,7 +71,7 @@ public class ResponsibilityScoringFunction implements ScoringFunction {
 		
 		Id personId = plan.getPerson().getId();
 
-		if(!plan.isSelected())System.out.println("++++++++++++++++shouldnt happen");
+		if(!PersonUtils.isSelected(plan))System.out.println("++++++++++++++++shouldnt happen");
 		Double amount = new Double(.0);
 		if(ecl!=null){
 			if(ecl.getResp()!=null){

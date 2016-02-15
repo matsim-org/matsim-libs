@@ -3,7 +3,7 @@ package org.matsim.core.mobsim.jdeqsim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class TestMessageFactory extends MatsimTestCase{
@@ -77,7 +77,7 @@ public class TestMessageFactory extends MatsimTestCase{
 		MessageFactory.GC_ALL_MESSAGES();
 		SimulationParameters.setGC_MESSAGES(true);
 		Scheduler scheduler=new Scheduler(new MessageQueue());
-		Person person= PersonImpl.createPerson(Id.create("abc", Person.class));
+		Person person= PopulationUtils.createPerson(Id.create("abc", Person.class));
 		Vehicle vehicle=new Vehicle(scheduler, person, PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );
 		
 		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).scheduler==scheduler);
@@ -100,7 +100,7 @@ public class TestMessageFactory extends MatsimTestCase{
 		MessageFactory.GC_ALL_MESSAGES();
 		SimulationParameters.setGC_MESSAGES(false);
 		Scheduler scheduler=new Scheduler(new MessageQueue());
-		Person person= PersonImpl.createPerson(Id.create("abc", Person.class));
+		Person person= PopulationUtils.createPerson(Id.create("abc", Person.class));
 		Vehicle vehicle=new Vehicle(scheduler, person, PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );
 		
 		assertEquals(true,MessageFactory.getEndLegMessage(scheduler, vehicle).scheduler==scheduler);

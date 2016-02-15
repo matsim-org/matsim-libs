@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.agarwalamit.analysis.congestion.AbsoluteDelays;
 import playground.agarwalamit.analysis.userBenefits.UserBenefitsAndTotalWelfare;
@@ -47,7 +47,6 @@ public class DelaysAndWelfare {
 		for(String runCase :runCases){
 			writeCongestionStatsExternally(runCase);
 		}
-		
 	}
 
 	private static void writeCongestionStatsExternally(String runCase){
@@ -65,7 +64,7 @@ public class DelaysAndWelfare {
 //		CongestionHandlerImplV6 implV6 = null ;
 		switch(runCase){
 		case "implV3" :
-			impl3 = new CongestionHandlerImplV3(manager, (ScenarioImpl) sc);
+			impl3 = new CongestionHandlerImplV3(manager, (MutableScenario) sc);
 			manager.addHandler(impl3);
 			break;
 		case "implV4" : 
@@ -92,6 +91,4 @@ public class DelaysAndWelfare {
 			break;
 		}
 	}
-
-
 }

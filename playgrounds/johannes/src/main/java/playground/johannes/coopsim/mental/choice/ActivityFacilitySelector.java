@@ -20,19 +20,20 @@
 package playground.johannes.coopsim.mental.choice;
 
 import com.vividsolutions.jts.geom.Point;
-import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.map.hash.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.collections.ChoiceSet;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import org.matsim.contrib.common.gis.DistanceCalculator;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.Histogram;
 import org.matsim.contrib.common.stats.StatsWriter;
+import org.matsim.contrib.socnetgen.sna.graph.social.SocialVertex;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.graph.social.SocialVertex;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -87,7 +88,7 @@ public class ActivityFacilitySelector implements ChoiceSelector {
 		
 		for(SocialVertex ego : egos) {
 			Point p1 = ego.getPoint();
-			for(Id id : choiceSet.getChoices()) {
+			for(Id id : choiceSet.getOptions()) {
 				ActivityFacility fac = facilities.getFacilities().get(id);
 				Point p2 = MatsimCoordUtils.coordToPoint(fac.getCoord());
 				

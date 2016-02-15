@@ -20,18 +20,16 @@
 package eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.run;
 
 import com.google.inject.Provider;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-
 import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.config.RandomRelocatorConfigGroup;
 import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim.BikeSharingWithSimplisticRelocationQSimFactory;
 import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim.SimplisticRelocatorManagerEngine;
 import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterModule;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 
 /**

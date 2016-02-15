@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.parkAndRide.PRFacility;
 
@@ -44,7 +44,7 @@ import playground.vsp.parkAndRide.PRFacility;
 
 public class PRFacilityCreator {
 	
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	
 	private double linkCapacity;
 	private double freeSpeed;
@@ -53,7 +53,7 @@ public class PRFacilityCreator {
 	
 	private List<PRFacility> parkAndRideFacilities = new ArrayList<PRFacility>();
 	
-	public PRFacilityCreator(ScenarioImpl scenario) {
+	public PRFacilityCreator(MutableScenario scenario) {
 		this.scenario = scenario;
 	}
 	

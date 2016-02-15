@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import playground.artemc.crowding.newScoringFunctions.ScoreTracker;
 
 /**
@@ -38,7 +38,7 @@ public class MarginalCostPricingPtHandler implements TransferDelayInVehicleEvent
 	private final static Logger log = Logger.getLogger(MarginalCostPricingPtHandler.class);
 
 	private final EventsManager events;
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final double vtts_inVehicle;
 	private final double vtts_waiting;
 	private ScoreTracker scoreTracker;
@@ -46,7 +46,7 @@ public class MarginalCostPricingPtHandler implements TransferDelayInVehicleEvent
 	// TODO: make configurable
 //	private final double operatorCostPerVehHour = 39.93; // = 33 * 1.21 (overhead)
 
-	public MarginalCostPricingPtHandler(EventsManager eventsManager, ScenarioImpl scenario, ScoreTracker scoreTracker) {
+	public MarginalCostPricingPtHandler(EventsManager eventsManager, MutableScenario scenario, ScoreTracker scoreTracker) {
 		this.events = eventsManager;
 		this.scenario = scenario;
 		this.scoreTracker = scoreTracker;

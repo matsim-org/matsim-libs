@@ -19,11 +19,6 @@
 
 package playground.johannes.gsv.visum;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -39,7 +34,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -47,6 +42,11 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class DataPrepare {
 
@@ -68,11 +68,11 @@ public class DataPrepare {
 	private final static String ROUTED_PLANS_FILE = "/home/johannes/gsv/matsim/studies/netz2030/data/raw/population.xml";
 
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final Config config;
 
 	public DataPrepare() {
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = this.scenario.getConfig();
 	}
 
@@ -195,12 +195,12 @@ X;Dritte GV;OV;1.000
 	}
 
 	protected void mergeNetworks() {
-		ScenarioImpl transitScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario transitScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network transitNetwork = transitScenario.getNetwork();
-		ScenarioImpl streetScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario streetScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network streetNetwork = streetScenario.getNetwork();
-		new MatsimNetworkReader(transitScenario).parse("/home/johannes/gsv/matsim/studies/netz2030/data/network.rail.wgs84.xml");
-		new MatsimNetworkReader(streetScenario).parse("/home/johannes/gsv/matsim/studies/netz2030/data/network.road.wgs84.xml");
+		new MatsimNetworkReader(transitScenario.getNetwork()).parse("/home/johannes/gsv/matsim/studies/netz2030/data/network.rail.wgs84.xml");
+		new MatsimNetworkReader(streetScenario.getNetwork()).parse("/home/johannes/gsv/matsim/studies/netz2030/data/network.road.wgs84.xml");
 		MergeNetworks.merge(streetNetwork, "", transitNetwork, "", (NetworkImpl) this.scenario.getNetwork());
 		new NetworkWriter(this.scenario.getNetwork()).write("/home/johannes/gsv/matsim/studies/netz2030/data/network.wgs84.xml");
 	}
@@ -275,7 +275,7 @@ X;Dritte GV;OV;1.000
 //		NetworkConfigGroup netConfig = (NetworkConfigGroup) app.config.getModule(NetworkConfigGroup.GROUP_NAME);
 //		netConfig.setInputFile("/home/johannes/gsv/netz2030/data/network.multimodal.xml");
 		
-		MatsimNetworkReader netreader = new MatsimNetworkReader(app.scenario);
+		MatsimNetworkReader netreader = new MatsimNetworkReader(app.scenario.getNetwork());
 		netreader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.gk3.xml");
 		
 //		VehicleReaderV1 vehReader = new VehicleReaderV1(app.scenario.getVehicles());

@@ -36,6 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -59,6 +60,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import javax.inject.Inject;
 import java.util.*;
 
 
@@ -132,7 +134,7 @@ public class PassingTest {
 
 		SimpleNetwork net = new SimpleNetwork();
 
-		net.scenario.getConfig().qsim().setUseDefaultVehicles(false);
+		net.scenario.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		Map<String, VehicleType> mode2VehType = getVehicleTypeInfo();
 
@@ -180,12 +182,10 @@ public class PassingTest {
 		
 		Controler cntrlr = new Controler(net.scenario);
 		cntrlr.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		cntrlr.getConfig().controler().setCreateGraphs(false);
-        cntrlr.setDumpDataAtEnd(false);
-		
+		cntrlr.getConfig().controler().setDumpDataAtEnd(false);
+
 		TravelTimeControlerListner travelTimeCntrlrListner = new TravelTimeControlerListner();
 
 		cntrlr.addControlerListener(travelTimeCntrlrListner); 
@@ -210,11 +210,11 @@ public class PassingTest {
 
 		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>,Double>>();
 		PersonLinkTravelTimeEventHandler hand;
+		@Inject EventsManager eventsManager;
 
 		@Override
 		public void notifyStartup(StartupEvent event) {
 
-			EventsManager eventsManager = event.getControler().getEvents();
 			hand = new PersonLinkTravelTimeEventHandler();
 			eventsManager.addHandler(hand);
 		}

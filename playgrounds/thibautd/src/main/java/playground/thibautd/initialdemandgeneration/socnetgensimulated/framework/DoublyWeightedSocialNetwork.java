@@ -25,10 +25,9 @@ import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.TShortStack;
 import gnu.trove.stack.array.TIntArrayStack;
 import gnu.trove.stack.array.TShortArrayStack;
+import org.apache.log4j.Logger;
 
 import java.util.Arrays;
-
-import org.apache.log4j.Logger;
 
 /**
  * @author thibautd

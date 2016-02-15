@@ -9,7 +9,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -34,7 +34,7 @@ public class ptCountGenerator extends MatsimXmlWriter{
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dbKrakatau = new DataBaseAdmin(new File("./data/dataBases/artemcKrakatau.properties"));
 		Config config = ConfigUtils.createConfig();
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		config.transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("H:/FCL/Operations/Data/MATSimXMLCurrentData/transitScheduleWV.xml");
 		TransitSchedule transitSchedule = scenario.getTransitSchedule();

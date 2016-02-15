@@ -102,14 +102,6 @@ class VehicularDepartureHandler implements DepartureHandler {
 		}
 	}
 
-	/**
-	 * Design thoughts:<ul>
-	 * <li> yyyyyy It is not completely clear what happens when the vehicle is used by someone else. kai, nov'11
-	 * <li> Seems to me that a parked vehicle is teleported. kai, nov'11
-	 * <li> yyyyyy Seems to me that a non-parked vehicle will end up with two references to it, with race conditions???? kai, nov11
-	 * <li> yyyyyy Note that the "linkId" parameter is not used for any physical action!!
-	 * </ul> 
-	 */
 	private void teleportVehicleTo(QVehicle vehicle, Id<Link> linkId) {
 		if (vehicle.getCurrentLink() != null) {
 			if (cntTeleportVehicle < 9) {
@@ -122,7 +114,8 @@ class VehicularDepartureHandler implements DepartureHandler {
 			QLinkInternalI qlinkOld = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
 			QVehicle result = qlinkOld.removeParkedVehicle(vehicle.getId());
 			if ( result==null ) {
-				throw new RuntimeException( "could not remove parked vehicle.  Maybe it is currently used by someone else?"
+				throw new RuntimeException( "Could not remove parked vehicle with id " + vehicle.getId() +" on the link id " 
+						+ linkId + ".  Maybe it is currently used by someone else?"
 						+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
 						+ "Maybe was never placed onto a link?" );
 			}

@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -67,15 +67,6 @@ public interface Scenario {
 	void addScenarioElement(String name, Object o);
 
 	/**
-	 * Removes the object from the scenario, such it can no
-	 * longer be retrieved using {@link #getScenarioElement(String)}.
-	 *
-	 * @param name the name of the element
-	 * @return the object which was associated with this name, or null if there was none
-	 */
-	Object removeScenarioElement(String name);
-
-	/**
 	 *
 	 * @param name the name of the element to get
 	 * @return the object associated with that name, or null if none is associated
@@ -90,6 +81,6 @@ public interface Scenario {
 
 	Households getHouseholds();
 
-	LaneDefinitions20 getLanes();
+	Lanes getLanes();
 
 }

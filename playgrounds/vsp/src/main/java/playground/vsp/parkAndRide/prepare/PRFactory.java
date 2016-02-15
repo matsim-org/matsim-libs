@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.vsp.parkAndRide.PRFacility;
@@ -52,7 +52,7 @@ public class PRFactory {
 	private Map<Id, Node> id2nextCarLinkToNode = new HashMap<Id, Node>();
 	private List<Id> insertedIDs = new ArrayList<Id>();
 	
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private double extensionRadius;
 	private int maxSearchSteps;
 	private String outputPath;
@@ -64,7 +64,7 @@ public class PRFactory {
 	private boolean useScheduleFile;
 	private int constantPRcapacity;
 
-	public PRFactory(ScenarioImpl scenario, double extensionRadius, int maxSearchSteps, String outputPath) {
+	public PRFactory(MutableScenario scenario, double extensionRadius, int maxSearchSteps, String outputPath) {
 		this.scenario = scenario;
 		this.extensionRadius = extensionRadius;
 		this.maxSearchSteps = maxSearchSteps;

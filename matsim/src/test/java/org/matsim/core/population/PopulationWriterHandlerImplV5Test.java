@@ -40,7 +40,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.testcases.MatsimTestUtils;
@@ -73,11 +73,11 @@ public class PopulationWriterHandlerImplV5Test {
 	}
 
 	private NetworkRoute doTestWriteNetworkRoute(final String startLinkId, final String linkIds, final String endLinkId, final String expectedRouteSerialization) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.util.loadConfig(null));
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(this.util.loadConfig(null));
 		Id<Link> idFrom = Id.create(startLinkId, Link.class);
 		Id<Link> idTo = Id.create(endLinkId, Link.class);
 
-		ScenarioImpl tmpScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario tmpScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		Person person = pb.createPerson(Id.create(1, Person.class));
@@ -117,12 +117,12 @@ public class PopulationWriterHandlerImplV5Test {
 	
 	@Test
 	public void testWriteGenericRouteRoute() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.util.loadConfig(null));
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(this.util.loadConfig(null));
 		String startLinkId = "1";
 		String endLinkId = "4";
 		Id<Link> idFrom = Id.create(startLinkId, Link.class);
 		Id<Link> idTo = Id.create(endLinkId, Link.class);
-		ScenarioImpl tmpScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario tmpScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = tmpScenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		Person person = pb.createPerson(Id.create(1, Person.class));

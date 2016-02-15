@@ -13,13 +13,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import playground.artemc.analysis.AnalysisControlerListener;
@@ -57,7 +58,7 @@ public class ChoiceGenerationControler implements BeforeMobsimListener {
 		this.controler = controler;
 	}
 
-	public Controler getControler() {
+	public MatsimServices getControler() {
 		return controler;
 	}
 
@@ -118,7 +119,7 @@ public class ChoiceGenerationControler implements BeforeMobsimListener {
 		controler.setScoringFunctionFactory(customScoringFunctionFactory);
 
 		// Additional analysis
-		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
+		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((MutableScenario) controler.getScenario());
 		controler.addControlerListener(analysisControlerListener);
 
 		//Money payment analysis
@@ -127,7 +128,7 @@ public class ChoiceGenerationControler implements BeforeMobsimListener {
 
 		controler.getScenario().getConfig().controler().setLastIteration(0);
 
-//		controler.setTransitRouterFactory(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+//		services.setTransitRouterFactory(new TransitRouterEventsWSFactory(services.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 //      controler.setScoringFunctionFactory(
 //            new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(),
 //                    controler.getScenario()));

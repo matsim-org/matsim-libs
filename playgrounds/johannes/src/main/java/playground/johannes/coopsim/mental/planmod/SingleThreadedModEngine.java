@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.planmod;
 
+import org.matsim.api.core.v01.population.Plan;
+
 import java.util.List;
 import java.util.Map;
-
-import org.matsim.api.core.v01.population.Plan;
 
 /**
  * @author illenberger

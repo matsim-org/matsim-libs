@@ -1,6 +1,5 @@
 package playground.singapore.travelsummary;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -8,21 +7,17 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
 import javax.swing.JTextField;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.JCheckBox;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
@@ -37,7 +32,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.sql.SQLException;
 import java.util.Properties;
 
 public class EventsToTravelSummaryTablesGUI extends JFrame {
@@ -359,7 +353,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 
 	public void runEventsProcessing() {
 		boolean isTransit = false;
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+		MutableScenario scenario = (MutableScenario) ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(configFileComponent
 						.getText()));
 		scenario.getConfig().transit().setUseTransit(true);
@@ -369,7 +363,7 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 					.readFile(transitScheduleFileComponent.getText());
 			isTransit = true;
 		}
-		new MatsimNetworkReader(scenario).readFile(networkFileComponent
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFileComponent
 				.getText());
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();

@@ -20,6 +20,7 @@
 package playground.thibautd.pseudoqsim.pseudoqsimengine;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.qsim.NetsimWrappingQVehicleProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -36,7 +37,6 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.contrib.socnetsim.qsim.NetsimWrappingQVehicleProvider;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 
 /**

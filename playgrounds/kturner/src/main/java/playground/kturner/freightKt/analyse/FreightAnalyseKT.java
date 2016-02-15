@@ -11,7 +11,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class FreightAnalyseKT {
@@ -50,7 +50,7 @@ public class FreightAnalyseKT {
 			config.plans().setInputFile(populationFile);
 			config.network().setInputFile(networkFile);
 			
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 			EventsManager events = EventsUtils.createEventsManager();
 			
 			CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;

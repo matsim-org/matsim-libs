@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
@@ -51,7 +51,7 @@ public class MergePopulation {
 	private static final Logger log = Logger.getLogger(MergePopulation.class);
 	
 	public static void main(String[] args) {
-		new MergePopulation(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+		new MergePopulation(((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 	}
 	
 	public MergePopulation(Scenario scenario) {

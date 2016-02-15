@@ -49,41 +49,33 @@ import org.matsim.core.gbl.Gbl;
 public class LegModeActivityEndTimeAndActDurationHandler implements PersonDepartureEventHandler, 
 ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 
-	private final Logger logger = Logger.getLogger(LegModeActivityEndTimeAndActDurationHandler.class);
-	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2ActEndTimes;
-	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2ActDurations;
-	private Map<Id<Person>, SortedMap<String, Double>> personId2ActEndTimes;
-	private Map<Id<Person>, SortedMap<String, Double>> personId2ActStartTimes;
-	private Set<Id<Person>> stuckPersons;
-	private Map<Id<Person>, String> personId2LegModes;
-	private Scenario sc;
+	private final static Logger LOG = Logger.getLogger(LegModeActivityEndTimeAndActDurationHandler.class);
+	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2ActEndTimes = new TreeMap<>();
+	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2ActDurations = new TreeMap<>();
+	private final Map<Id<Person>, SortedMap<String, Double>> personId2ActEndTimes = new HashMap<>();
+	private final Map<Id<Person>, SortedMap<String, Double>> personId2ActStartTimes = new HashMap<>();
+	private final Set<Id<Person>> stuckPersons = new HashSet<>();
+	private final Map<Id<Person>, String> personId2LegModes = new HashMap<>();
 	private final int maxStuckAndAbortWarnCount;
 	private int warnCount;
-	private double simEndTime;
+	private final double simEndTime;
 
 	/**
 	 * @param scenario should contain config details and population file.
 	 */
-	public LegModeActivityEndTimeAndActDurationHandler(Scenario scenario) {
+	public LegModeActivityEndTimeAndActDurationHandler(final Scenario scenario) {
 		
-		this.logger.warn("Although legs are not assigned to activities still for comparison purpose"
+		LOG.warn("Although legs are not assigned to activities still for comparison purpose"
 				+ "leg mode distribution for activities could be plotted using arrival legs.");
 		
-		this.logger.warn("This class to get leg mode 2 person id 2 activity endTime/StartTime/duration will work fine "
+		LOG.warn("This class to get leg mode 2 person id 2 activity endTime/StartTime/duration will work fine "
 				+ "if all trips of a person are made by same travel mode. "
 				+ "Because, travel mode is linked with departure events not with activity end or start events.");
 		
-		this.sc = scenario;
-		this.simEndTime = sc.getConfig().qsim().getEndTime();
-		this.mode2PersonId2ActEndTimes = new TreeMap<String, Map<Id<Person>,List<Double>>>();
-		this.mode2PersonId2ActDurations = new TreeMap<String, Map<Id<Person>,List<Double>>>();
-		this.personId2ActEndTimes = new HashMap<Id<Person>, SortedMap<String,Double>>();
-		this.personId2LegModes = new HashMap<Id<Person>, String>();
-		this.personId2ActStartTimes = new HashMap<Id<Person>, SortedMap<String,Double>>();
-		this.stuckPersons = new HashSet<Id<Person>>();
+		this.simEndTime = scenario.getConfig().qsim().getEndTime();
 		this.maxStuckAndAbortWarnCount=5;
 
-		for(Person p:this.sc.getPopulation().getPersons().values()){
+		for(Person p: scenario.getPopulation().getPersons().values()){
 			Id<Person> id = p.getId();
 			this.personId2ActEndTimes.put(id, new TreeMap<String, Double>());
 			this.personId2ActStartTimes.put(id, new TreeMap<String, Double>());
@@ -129,9 +121,9 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 		this.stuckPersons.add(event.getPersonId());
 		this.warnCount++;
 		if(this.warnCount<=this.maxStuckAndAbortWarnCount){
-			this.logger.warn("'StuckAndAbort' event is thrown for person "+event.getPersonId().toString()+" Details are "+event.toString()+
+			LOG.warn("'StuckAndAbort' event is thrown for person "+event.getPersonId().toString()+" Details are "+event.toString()+
 					". \n Correctness of travel durations for such persons can not be guaranteed.");
-			if(this.warnCount==this.maxStuckAndAbortWarnCount) this.logger.warn(Gbl.FUTURE_SUPPRESSED);
+			if(this.warnCount==this.maxStuckAndAbortWarnCount) LOG.warn(Gbl.FUTURE_SUPPRESSED);
 		}
 	}
 
@@ -146,7 +138,7 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 		return this.mode2PersonId2ActDurations;
 	}
 
-	private SortedMap<String, Map<Id<Person>, List<Double>>> sortingPersonWRTMode(Map<Id<Person>, SortedMap<String,Double>> pId2Times){
+	private SortedMap<String, Map<Id<Person>, List<Double>>> sortingPersonWRTMode(final Map<Id<Person>, SortedMap<String,Double>> pId2Times){
 		SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2Times = new TreeMap<String, Map<Id<Person>,List<Double>>>();
 
 		for(String travelMode :this.personId2LegModes.values()){
@@ -162,17 +154,17 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 		return mode2PersonId2Times;
 	}
 
-	private void checkForActivityDuration(SortedMap<String,Double> actDurations){
+	private void checkForActivityDuration(final SortedMap<String,Double> actDurations){
 		for(double d :actDurations.values()){
 			if(d<0) throw new RuntimeException("Activity duration is negative. Aborting...");
 			else if(d==0) {
-				this.logger.warn("Activity duration is zero, it means activity start and end times are same. Do check for consistency.");
+				LOG.warn("Activity duration is zero, it means activity start and end times are same. Do check for consistency.");
 			}
-			else if(d>=this.simEndTime) this.logger.warn("Activity duration is more than simulation end time. Do check for consistency.");
+			else if(d>=this.simEndTime) LOG.warn("Activity duration is more than simulation end time. Do check for consistency.");
 		}
 	}
 	public Map<Id<Person>, SortedMap<String,Double>> getPersonId2ActType2ActDurations(){
-		if(this.warnCount>0) this.logger.warn(this.warnCount+" 'StuckAndAbort' events are thrown. "
+		if(this.warnCount>0) LOG.warn(this.warnCount+" 'StuckAndAbort' events are thrown. "
 				+ "Correctness of travel durations for stuck persons can not be guaranteed. Therefore, excluding such agents in the calculations.");
 		Map<Id<Person>, SortedMap<String,Double>> personId2Durations = new HashMap<Id<Person>, SortedMap<String,Double>>();
 		for(Id<Person> id:this.personId2ActEndTimes.keySet()){

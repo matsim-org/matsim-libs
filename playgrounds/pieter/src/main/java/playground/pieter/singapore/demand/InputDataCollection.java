@@ -19,7 +19,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
@@ -60,13 +60,13 @@ class InputDataCollection implements Serializable {
 	private final HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>> bizActFrequencies = new HashMap<>();
 	private final HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>> leisureActFrequencies = new HashMap<>();
 
-	private transient ScenarioImpl scenario;
+	private transient MutableScenario scenario;
 	private transient Logger inputLog;
 	HashMap<Integer, HashMap<String, LocationSampler>> subDGPActivityLocationSamplers;
 	HashMap<String, Integer> facilityToSubDGP;
 
 	public InputDataCollection(DataBaseAdmin dba,
-			Properties diverseScriptProperties, ScenarioImpl scenario,
+			Properties diverseScriptProperties, MutableScenario scenario,
 			boolean facilitiesAllInOneXML) throws SQLException,
 			NoConnectionException {
 		inputLog = Logger.getLogger("InputData");
@@ -332,7 +332,7 @@ class InputDataCollection implements Serializable {
 						double startCap = facility.getActivityOptions()
 								.get("home").getCapacity();
 						ActivityOptionImpl option = facility
-								.createActivityOption(activityType);
+								.createAndAddActivityOption(activityType);
 						option.addOpeningTime(new OpeningTimeImpl(
 								DayType.wkday, Time.parseTime("10:00:00"), Time
 										.parseTime("22:00:00")));
@@ -344,7 +344,7 @@ class InputDataCollection implements Serializable {
 
 					for (String activityType : secondaryCapacities.keySet()) {
 						ActivityOptionImpl option = facility
-								.createActivityOption(activityType);
+								.createAndAddActivityOption(activityType);
 						option.addOpeningTime(new OpeningTimeImpl(
 								DayType.wkday, Time.parseTime("10:00:00"), Time
 										.parseTime("22:00:00")));
@@ -487,7 +487,7 @@ class InputDataCollection implements Serializable {
 								.getDouble("y_utm48n")));
 				facility.setDesc(rs.getString("property_type"));
 				ActivityOptionImpl actOption = facility
-						.createActivityOption("home");
+						.createAndAddActivityOption("home");
 				actOption.setCapacity((double) rs.getInt("units"));
 
 			}
@@ -761,7 +761,7 @@ class InputDataCollection implements Serializable {
 //		inputLog.info("DONE: Loading occupation vs masterplan landuse type frequencies");
 //	}
 
-	public void restoreIfDeserialized(ScenarioImpl scenario, DataBaseAdmin dba,
+	public void restoreIfDeserialized(MutableScenario scenario, DataBaseAdmin dba,
 			Properties p) {
 		this.setScenario(scenario);
 		this.setDiverseScriptProperties(p);
@@ -777,7 +777,7 @@ class InputDataCollection implements Serializable {
 		this.diverseScriptProperties = diverseScriptProperties;
 	}
 
-	void setScenario(ScenarioImpl scenario) {
+	void setScenario(MutableScenario scenario) {
 		this.scenario = scenario;
 	}
 

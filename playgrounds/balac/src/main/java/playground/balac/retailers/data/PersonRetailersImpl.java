@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 
 import playground.balac.retailers.RetailersLocationListener;
 
@@ -26,7 +27,7 @@ public class PersonRetailersImpl implements Person
 
   public PersonRetailersImpl(PersonImpl p)
   {
-	  delegate = PersonImpl.createPerson(p.getId());
+	  delegate = PopulationUtils.createPerson(p.getId());
     this.plans = p.getPlans();
     addPlan(p.getSelectedPlan());
     setSelectedPlan(p.getSelectedPlan());

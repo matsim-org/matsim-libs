@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import java.util.Arrays;
-import java.util.Random;
-
 import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
+
+import java.util.Arrays;
+import java.util.Random;
 
 /**
  * @author illenberger

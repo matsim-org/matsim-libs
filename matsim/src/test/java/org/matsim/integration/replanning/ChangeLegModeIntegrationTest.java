@@ -20,22 +20,20 @@
 
 package org.matsim.integration.replanning;
 
-import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerI;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.*;
 import org.matsim.core.replanning.ReplanningContext;
@@ -43,7 +41,8 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
@@ -57,7 +56,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 	public void testStrategyManagerConfigLoaderIntegration() {
 		// setup config
 		final Config config = loadConfig(null);
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setStrategyName("ChangeLegMode");
 		strategySettings.setWeight(1.0);
@@ -72,7 +71,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 		// setup population with one person
 		Population population = scenario.getPopulation();
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", new Coord(0, 0));
@@ -82,12 +81,11 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
         act = plan.createAndAddActivity("work", new Coord((double) 0, (double) 500));
 		act.setLinkId(link.getId());
 
-        Injector injector = Injector.createInjector(config, new AbstractModule() {
+        com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
             @Override
             public void install() {
-				bind(Integer.class).annotatedWith(Names.named("iteration")).toInstance(0);
-                bind(Scenario.class).toInstance(scenario);
-                bind(EventsManager.class).toInstance(EventsUtils.createEventsManager());
+                install(new ScenarioByInstanceModule(scenario));
+                install(new EventsManagerModule());
                 install(new StrategyManagerModule());
 				install(new CharyparNagelScoringFunctionModule());
                 install(new TripRouterModule());

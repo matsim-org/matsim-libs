@@ -22,14 +22,13 @@
  */
 package playground.johannes.gsv.sim.cadyts;
 
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
-
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
 
 /**
  * @author nagel
@@ -55,7 +54,7 @@ public class CadytsScoring<T> implements ArbitraryEventScoring , org.matsim.core
 	
 	@Override
 	public void finish() {
-		cadyts.demand.Plan<T> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps(plan);
+		cadyts.demand.Plan<T> currentPlanSteps = this.ptPlanToPlanStep.getCadytsPlan(plan);
 //		if(currentPlanSteps != null) {
 //			System.err.println();
 //		}

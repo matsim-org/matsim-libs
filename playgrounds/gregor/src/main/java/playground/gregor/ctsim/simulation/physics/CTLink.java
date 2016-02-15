@@ -6,7 +6,7 @@ import com.vividsolutions.jts.geom.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -153,7 +153,7 @@ public class CTLink implements CTNetworkEntity {
 				this.cells.add(cell);
 				qt.put(cell.getX(), cell.getY(), cell);
 				for (GraphEdge ge : pt.edges) {
-					debugGe(ge);
+//					debugGe(ge);
 					ProtoCell protoNeighbor = pt.nb.get(ge);
 					Geometry nCh = geoMap.get(protoNeighbor);
 					CTCell neighbor = null;
@@ -322,7 +322,7 @@ public class CTLink implements CTNetworkEntity {
 		maxY = maxY > y3 ? maxY : y3;
 		List<GraphEdge> edges = v.generateVoronoi(xa, ya, minX - WIDTH, maxX + WIDTH, minY - WIDTH, maxY + WIDTH);
 		for (GraphEdge ge : edges) {
-			debugGe(ge);
+//			debugGe(ge);
 //			double aa = ge.x1-ge.x2;
 //			double bb = ge.y1-ge.y2;
 //			double cc = Math.sqrt(aa*aa+bb*bb);
@@ -337,19 +337,6 @@ public class CTLink implements CTNetworkEntity {
 
 		}
 		return cells;
-	}
-
-	private void debugGe(GraphEdge ge) {
-		if (!CTRunner.DEBUG) {
-			return;
-		}
-		LineSegment s = new LineSegment();
-		s.x0 = ge.x1;
-		s.x1 = ge.x2;
-		s.y0 = ge.y1;
-		s.y1 = ge.y2;
-		LineEvent le = new LineEvent(0, s, true, 128, 128, 128, 255, 10, 0.1, 0.2);
-		em.processEvent(le);
 	}
 
 	private void debugBound(Coordinate[] bounds) {
@@ -397,6 +384,19 @@ public class CTLink implements CTNetworkEntity {
 			em.processEvent(le);
 		}
 
+	}
+
+	private void debugGe(GraphEdge ge) {
+		if (!CTRunner.DEBUG) {
+			return;
+		}
+		LineSegment s = new LineSegment();
+		s.x0 = ge.x1;
+		s.x1 = ge.x2;
+		s.y0 = ge.y1;
+		s.y1 = ge.y2;
+		LineEvent le = new LineEvent(0, s, true, 128, 128, 128, 255, 10, 0.1, 0.2);
+		em.processEvent(le);
 	}
 
 	private void debugEntrances(double dsX, double usX, double dsY, double usY) {
@@ -498,11 +498,11 @@ public class CTLink implements CTNetworkEntity {
 			}
 		}
 		CTPed p = new CTPed(cell, agent);
-		Wait2LinkEvent e = new Wait2LinkEvent(Math.ceil(now), p.getDriver().getId(), p.getDriver().getCurrentLinkId(), Id.create(p.getDriver().getId(), Vehicle.class), "walkct", 0);
+		VehicleEntersTrafficEvent e = new VehicleEntersTrafficEvent(Math.ceil(now), p.getDriver().getId(), p.getDriver().getCurrentLinkId(), Id.create(p.getDriver().getId(), Vehicle.class), "walkct", 0);
 		this.em.processEvent(e);
 		cell.jumpOnPed(p, now);
 		//TODO move following to jumpoff method in cell; create pseudo cell class for that purpose
-		LinkEnterEvent le = new LinkEnterEvent(Math.ceil(now), p.getDriver().getId(), p.getDriver().getCurrentLinkId(), Id.create(p.getDriver().getId(), Vehicle.class));
+		LinkEnterEvent le = new LinkEnterEvent(Math.ceil(now), Id.create(p.getDriver().getId(), Vehicle.class), p.getDriver().getCurrentLinkId());
 		this.em.processEvent(le);
 		cell.updateIntendedCellJumpTimeAndChooseNextJumper(now);
 	}

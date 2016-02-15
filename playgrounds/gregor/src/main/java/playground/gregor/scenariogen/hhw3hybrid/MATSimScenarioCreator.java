@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import jj2000.j2k.entropy.encoder.EntropyCoder;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -64,7 +62,7 @@ public class MATSimScenarioCreator {
 		c.network().setInputFile("/Users/laemmel/devel/hhw_hybrid/input/network.xml.gz");
 		c.network().setChangeEventInputFile("/Users/laemmel/devel/hhw_hybrid/input/networkChangeEvents.xml.gz");
 		Scenario sc = ScenarioUtils.createScenario(c);
-		new MatsimNetworkReader(sc).parse(c.network().getInputFile());
+		new MatsimNetworkReader(sc.getNetwork()).parse(c.network().getInputFile());
 		this.sc = sc;
 	}
 	

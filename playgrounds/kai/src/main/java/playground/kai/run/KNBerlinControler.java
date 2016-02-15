@@ -13,8 +13,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
@@ -25,8 +28,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
-import org.matsim.core.replanning.modules.ChangeLegMode;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.noise2.NoiseParameters;
@@ -36,52 +38,62 @@ import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 import playground.ikaddoura.noise2.handler.PersonActivityTracker;
 import playground.ikaddoura.noise2.utils.MergeNoiseCSVFile;
+import playground.ikaddoura.noise2.utils.MergeNoiseCSVFile.OutputFormat;
 
 class KNBerlinControler {
 	private static final Logger log = Logger.getLogger("blabla");
-	
+
 	public static void main ( String[] args ) {
 		log.warn("here") ;
-		
+
 		// ### prepare the config:
 		Config config = ConfigUtils.loadConfig( "/Users/nagel/kairuns/a100/config.xml" ) ;
-		
+
 		// paths:
-//		config.network().setInputFile("/Users/nagel/");
+		//		config.network().setInputFile("/Users/nagel/");
 		config.controler().setOutputDirectory("/Users/nagel/kairuns/a100/output/");
-		
-		config.controler().setLastIteration(0); 
-		config.controler().setWriteSnapshotsInterval(0);
-		config.controler().setWritePlansInterval(100);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+
+		config.controler().setFirstIteration(100); // with something like "9" we don't get output events! 
+		config.controler().setLastIteration(100); // with something like "9" we don't get output events! 
+		config.controler().setWriteSnapshotsInterval(100);
+		config.controler().setWritePlansInterval(200);
 		config.controler().setWriteEventsInterval(100);
 		config.vspExperimental().setWritingOutputEvents(true);
-		
+
 		config.global().setNumberOfThreads(6);
 		config.qsim().setNumberOfThreads(5);
 		config.parallelEventHandling().setNumberOfThreads(1);
-		
-		double sampleFactor = 0.02 ;
+
+		final double sampleFactor = 0.02 ;
 		config.controler().setMobsim( MobsimType.qsim.toString() );
 		config.qsim().setFlowCapFactor( sampleFactor );
-//		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) );
+		//		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) ); // this version certainly is completely wrong.
 		config.qsim().setStorageCapFactor(0.03);
 		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
 		config.qsim().setUsingFastCapacityUpdate(false);
-//		config.controler().setMobsim(MobsimType.JDEQSim.toString());
-//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.END_TIME, "36:00:00") ;
-//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.FLOW_CAPACITY_FACTOR, Double.toString(sampleFactor) ) ;
-//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.SQUEEZE_TIME, "5" ) ;
-//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.STORAGE_CAPACITY_FACTOR, Double.toString( Math.pow(sampleFactor, -0.25)) ) ;
-		
+		config.qsim().setNumberOfThreads(6);
+		config.qsim().setUsingFastCapacityUpdate(true);
+
+		//		config.controler().setMobsim(MobsimType.JDEQSim.toString());
+		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.END_TIME, "36:00:00") ;
+		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.FLOW_CAPACITY_FACTOR, Double.toString(sampleFactor) ) ;
+		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.SQUEEZE_TIME, "5" ) ;
+		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.STORAGE_CAPACITY_FACTOR, Double.toString( Math.pow(sampleFactor, -0.25)) ) ;
+
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
 
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+
 		config.planCalcScore().setFractionOfIterationsToStartScoreMSA(0.8);
+		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
+			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
+		}
 
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
 		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration );
-		
+
 		{
 			ModeRoutingParams pars = config.plansCalcRoute().getOrCreateModeRoutingParams("pt") ;
 			pars.setBeelineDistanceFactor(1.5);
@@ -104,59 +116,55 @@ class KNBerlinControler {
 			params.setMarginalUtilityOfTraveling(0.);
 			config.planCalcScore().addModeParams(params);
 		}
-		
+
 		{
 			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
 			stratSets.setStrategyName( DefaultStrategy.ChangeSingleTripMode.toString() );
 			stratSets.setWeight(0.1);
 			config.strategy().addStrategySettings(stratSets);
 		}
-		config.setParam( ChangeLegMode.CONFIG_MODULE, ChangeLegMode.CONFIG_PARAM_MODES, "walk,bike,car,pt,pt2" );
-		
-//		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
-//			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
-//		}
-		
+		config.setParam( ChangeLegModeConfigGroup.CONFIG_MODULE, ChangeLegModeConfigGroup.CONFIG_PARAM_MODES, "walk,bike,car,pt,pt2" );
+
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		config.checkConsistency();
-		
+
 		// ===
-		
+
 		// prepare the scenario
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		
+
 		// ===
-		
+
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
+
 		controler.addControlerListener(new KaiAnalysisListener()) ;
-//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-//		controler.setMobsimFactory(new OldMobsimFactory()) ;
-		
+		//		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		//		controler.setMobsimFactory(new OldMobsimFactory()) ;
+
 		// run everything:
 		controler.run();
-		
+
 		// ===
 		// post-processing:
 
 		// grid parameters
 		GridParameters gridParameters = new GridParameters();
-		
+
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
-				
-		gridParameters.setReceiverPointGap(1000.);
+
+		gridParameters.setReceiverPointGap(200.);
 
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
-		
+
 		// noise parameters
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(1./sampleFactor); // yyyyyy sample size!!!!
 
-		
+
 		// yyyyyy Same link ids?  Otherwise ask student
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 		tunnelLinkIDs.add(Id.create("108041", Link.class));
@@ -209,38 +217,57 @@ class KNBerlinControler {
 		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		File file = new File(outputFilePath);
 		file.mkdirs();
-		
+
 		EventsManager events = EventsUtils.createEventsManager();
-		
+
 		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
-			
+
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
-				
+		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", true);
+
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
+		timeTracker.setUseCompression(true);
 		events.addHandler(timeTracker);
-		
+
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
 		events.addHandler(actTracker);
-		
+
 		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(outputDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
 		log.info("Reading events file... Done.");
-		
+
 		timeTracker.computeFinalTimeIntervals();
 
 		eventWriter.closeFile();
 		log.info("Noise calculation completed.");
-		
-		// ---
-		
-//		MergeNoiseCSVFile.main(null);
-		// yy needs settable paths
 
-	
+		// ---
+
+		mergeNoiseFiles(outputFilePath);
+
+
+
 	}
-	
+
+	static void mergeNoiseFiles(String outputFilePath) {
+		final String receiverPointsFile = outputFilePath + "/receiverPoints/receiverPoints.csv" ;
+
+		final String[] labels = { "immission", "consideredAgentUnits", "damages_receiverPoint" };
+		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/", outputFilePath + "/damages_receiverPoint/" };
+
+
+		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+		merger.setWorkingDirectory(workingDirectories);
+		merger.setReceiverPointsFile(receiverPointsFile);
+		merger.setLabel(labels);
+		merger.setOutputFormat(OutputFormat.xyt);
+		merger.setThreshold(1.);
+		merger.setOutputDirectory(outputFilePath);
+		merger.run();
+
+	}
+
 }

@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -47,12 +47,12 @@ public class MainPerLinkParkingFacilityGenerator {
 
 	public static void main(String[] args) {
 
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		String networkFile = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\network.xml.gz";
 		String facilitiesPath = "C:\\data\\workspace\\playgrounds\\wrashid\\test\\scenarios\\berlin\\parkingFacilities.xml.gz";
 
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		Network net = sc.getNetwork();
 
 		ActivityFacilitiesImpl activityFacilities = new ActivityFacilitiesImpl();
@@ -65,7 +65,7 @@ public class MainPerLinkParkingFacilityGenerator {
 			int parkingCapacity = (int) Math.round(Math.ceil(link.getLength() / 2.0 / 5.0/100.0/2));
 			totalNumberOfParkingsAdded+=parkingCapacity;
 			ActivityFacilityImpl activityFacility = activityFacilities.createAndAddFacility(Id.create(parkPlatzId, ActivityFacility.class), link.getCoord());
-			activityFacility.createActivityOption("parking").setCapacity(parkingCapacity);
+			activityFacility.createAndAddActivityOption("parking").setCapacity(parkingCapacity);
 			parkPlatzId++;
 		}
 		

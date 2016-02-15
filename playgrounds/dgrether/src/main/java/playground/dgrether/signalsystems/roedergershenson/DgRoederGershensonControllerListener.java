@@ -25,8 +25,8 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -54,18 +54,18 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
+		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
 		
-		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , event.getControler().getEvents());
+		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, new DgGershensonRoederSignalModelFactory(new DefaultSignalModelFactory()) , event.getServices().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 
 		
 		//TODO init gershenson controller and sensor manager here
 		DgSensorManager sensorManager = new DgSensorManager(scenario.getNetwork());
-		event.getControler().getEvents().addHandler(sensorManager);
+		event.getServices().getEvents().addHandler(sensorManager);
 		for (SignalSystem ss : this.signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){
-				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
+				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
 				((DgRoederGershensonController)ss.getSignalController()).registerAndInitializeSensorManager(sensorManager);
 			
 			}
@@ -74,7 +74,8 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 		
 		
 		this.signalEngie = new QSimSignalEngine(this.signalManager);
-		event.getControler().getMobsimListeners().add(this.signalEngie);
+//		event.getServices().getMobsimListeners().add(this.signalEngie);
+		throw new RuntimeException();
 	}
 
 	
@@ -85,8 +86,7 @@ public class DgRoederGershensonControllerListener implements SignalsControllerLi
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		SignalsData data = (SignalsData) event.getControler().getScenario().getScenarioElement(SignalsData.ELEMENT_NAME);
-		new SignalsScenarioWriter(event.getControler().getControlerIO()).writeSignalsData(data);
+		new SignalsScenarioWriter(event.getServices().getControlerIO()).writeSignalsData(event.getServices().getScenario());
 	}
 
 

@@ -20,7 +20,7 @@
 
 package org.matsim.core.controler.events;
 
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 /**
  * Event class to notify observers that the mobility simulation will start next.
@@ -32,7 +32,7 @@ public final class BeforeMobsimEvent extends ControlerEvent {
 	/** The iteration number */
 	private final int iteration;
 
-	public BeforeMobsimEvent(final Controler controler, final int iteration) {
+	public BeforeMobsimEvent(final MatsimServices controler, final int iteration) {
 		super(controler);
 		this.iteration = iteration;
 	}

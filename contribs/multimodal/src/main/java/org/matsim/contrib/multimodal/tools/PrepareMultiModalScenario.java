@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 
 public class PrepareMultiModalScenario {
 
@@ -33,7 +34,7 @@ public class PrepareMultiModalScenario {
 		Config config = scenario.getConfig();
 		log.info("setting up multi modal simulation");
 		
-		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
+		MultiModalConfigGroup multiModalConfigGroup = ConfigUtils.addOrGetModule(config, MultiModalConfigGroup.GROUP_NAME, MultiModalConfigGroup.class);
 		
 		// set Route Factories
 //		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();

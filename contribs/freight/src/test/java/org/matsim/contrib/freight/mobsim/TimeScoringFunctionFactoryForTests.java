@@ -21,6 +21,8 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
 import org.matsim.core.utils.misc.Time;
 
+import javax.inject.Inject;
+
 @Ignore
 public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
 
@@ -213,13 +215,8 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 		
 	}
 	 
-	 private Network network;
+	@Inject private Network network;
 	
-	public TimeScoringFunctionFactoryForTests(Network network) {
-		super();
-		this.network = network;
-	}
-
 	@Override
 	public ScoringFunction createScoringFunction(Carrier carrier) {
 		ScoringFunctionAccumulator sf = new ScoringFunctionAccumulator();

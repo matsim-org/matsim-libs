@@ -25,16 +25,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.util.*;
+import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.util.DistanceUtils;
+
+import com.google.common.collect.*;
 
 import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.jbischoff.taxi.vehicles.ElectricTaxi;
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.filter.VehicleFilter;
 import playground.michalm.taxi.scheduler.*;
-
-import com.google.common.collect.*;
 
 
 /**
@@ -42,7 +41,6 @@ import com.google.common.collect.*;
  */
 
 public class IdleRankVehicleFinder
-    implements VehicleFilter
 {
     private final MatsimVrpContext context;
     private final TaxiScheduler scheduler;
@@ -51,7 +49,7 @@ public class IdleRankVehicleFinder
     private boolean useChargeOverTime;
     private boolean includeDriversWill = false;
     Random rnd;
-    private static double MINIMUMSOCFORDISPATCH = 0.25;
+    private static double MINIMUM_SOC_FOR_DISPATCH = 0.25;
 
 
     public IdleRankVehicleFinder(MatsimVrpContext context, TaxiScheduler scheduler)
@@ -80,7 +78,7 @@ public class IdleRankVehicleFinder
 
     private boolean hasEnoughCapacityForTask(Vehicle veh)
     {
-        return (getVehicleSoc(veh) > MINIMUMSOCFORDISPATCH);
+        return (getVehicleSoc(veh) > MINIMUM_SOC_FOR_DISPATCH);
     }
 
 
@@ -104,12 +102,11 @@ public class IdleRankVehicleFinder
     }
 
 
-    @Override
-    public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
-            TaxiRequest request)
-    {
-        return Lists.newArrayList(findVehicleForRequest(vehicles, request));
-    }
+//    public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
+//            TaxiRequest request)
+//    {
+//        return Lists.newArrayList(findVehicleForRequest(vehicles, request));
+//    }
 
 
     private Vehicle findBestChargedVehicle(TaxiRequest req)

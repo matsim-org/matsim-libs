@@ -44,7 +44,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -76,15 +76,15 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
@@ -99,7 +99,7 @@ public class QSimTest {
 
 	private final static Logger log = Logger.getLogger(QSimTest.class);
 
-	private QSim createQSim(ScenarioImpl scenario, EventsManager events) {
+	private QSim createQSim(MutableScenario scenario, EventsManager events) {
 		QSim qSim1 = new QSim(scenario, events);
 		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);
@@ -141,7 +141,7 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
-		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
@@ -179,7 +179,7 @@ public class QSimTest {
 
 		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
 		for (int i = 0; i < 2; i++) {
-			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 			a1.setEndTime((6+i)*3600);
@@ -218,7 +218,7 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
-		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
@@ -264,7 +264,7 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
-		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(0);
@@ -308,7 +308,7 @@ public class QSimTest {
 		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link1
-		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
@@ -339,7 +339,7 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of 1st event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of 2nd event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of 3rd event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of 4th event.", Wait2LinkEvent.class, allEvents.get(3).getClass());
+		Assert.assertEquals("wrong type of 4th event.", VehicleEntersTrafficEvent.class, allEvents.get(3).getClass());
 		Assert.assertEquals("wrong type of 5th event.", VehicleLeavesTrafficEvent.class, allEvents.get(4).getClass());
 		Assert.assertEquals("wrong type of 6th event.", PersonLeavesVehicleEvent.class, allEvents.get(5).getClass());
 		Assert.assertEquals("wrong type of 7th event.", PersonArrivalEvent.class, allEvents.get(6).getClass());
@@ -359,7 +359,7 @@ public class QSimTest {
 
 		Assert.assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId() );
 		Assert.assertEquals("wrong link in 2nd event.", f.link1.getId(), ((PersonDepartureEvent) allEvents.get(1)).getLinkId() );
-		Assert.assertEquals("wrong link in 4th event.", f.link1.getId(), ((Wait2LinkEvent) allEvents.get(3)).getLinkId() );
+		Assert.assertEquals("wrong link in 4th event.", f.link1.getId(), ((VehicleEntersTrafficEvent) allEvents.get(3)).getLinkId() );
 		Assert.assertEquals("wrong link in 5th event.", f.link1.getId(), ((VehicleLeavesTrafficEvent) allEvents.get(4)).getLinkId() );
 		Assert.assertEquals("wrong link in 7th event.", f.link1.getId(), ((PersonArrivalEvent) allEvents.get(6)).getLinkId() );
 		Assert.assertEquals("wrong link in 8th event.", f.link1.getId(), ((ActivityStartEvent) allEvents.get(7)).getLinkId() );
@@ -377,7 +377,7 @@ public class QSimTest {
 		Link loopLink = f.network.createAndAddLink(Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1);
 
 		// add a single person with leg from link1 to loop-link
-		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(6*3600);
@@ -410,7 +410,7 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of 1st event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of 2nd event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(3).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(3).getClass());
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(4).getClass()); // link 1
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(5).getClass()); // link 2
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(6).getClass());
@@ -444,7 +444,7 @@ public class QSimTest {
 	public void testAgentWithoutLeg() {
 		Fixture f = new Fixture();
 
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		plan.createAndAddActivity("home", f.link1.getId());
 		f.plans.addPerson(person);
@@ -471,7 +471,7 @@ public class QSimTest {
 	public void testAgentWithoutLegWithEndtime() {
 		Fixture f = new Fixture();
 
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
@@ -499,7 +499,7 @@ public class QSimTest {
 	public void testAgentWithLastActWithEndtime() {
 		Fixture f = new Fixture();
 
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl act = plan.createAndAddActivity("home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
@@ -535,7 +535,7 @@ public class QSimTest {
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
-			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			/* exact dep. time: 6:29:48. The agents needs:
 			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
@@ -591,7 +591,7 @@ public class QSimTest {
 		
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 3; i++) {
-			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			/* exact dep. time: 6:29:48. The agents needs:
 			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
@@ -644,7 +644,7 @@ public class QSimTest {
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 10000; i++) {
-			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
@@ -689,7 +689,7 @@ public class QSimTest {
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 5000; i++) {
-			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
@@ -702,7 +702,7 @@ public class QSimTest {
 		}
 		// add a lot of persons with legs from link1 to link3
 		for (int i = 5001; i <= 10000; i++) {
-			Person person = PersonImpl.createPerson(Id.create(i, Person.class));
+			Person person = PopulationUtils.createPerson(Id.create(i, Person.class));
 			PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link1.getId());
 			a2.setEndTime(7*3600 - 1812);
@@ -742,7 +742,7 @@ public class QSimTest {
 	@Test
 	public void testVehicleTeleportationTrue() {
 		Fixture f = new Fixture();
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
@@ -777,7 +777,7 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(5).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(6).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(7).getClass());
-		Assert.assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(8).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(8).getClass());
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(9).getClass());
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(10).getClass());
 		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(11).getClass());
@@ -797,7 +797,7 @@ public class QSimTest {
 		Fixture f = new Fixture();
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
 		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
@@ -813,7 +813,7 @@ public class QSimTest {
 		plan.createAndAddActivity("l", f.link3.getId());
 		f.plans.addPerson(person);
 
-		Person personWhoBringsTheCar = PersonImpl.createPerson(Id.create(2, Person.class));
+		Person personWhoBringsTheCar = PopulationUtils.createPerson(Id.create(2, Person.class));
 		PlanImpl planWhichBringsTheCar = PersonUtils.createAndAddPlan(personWhoBringsTheCar, true);
 		ActivityImpl aa1 = planWhichBringsTheCar.createAndAddActivity("h", f.link1.getId());
 		aa1.setEndTime(7.0*3600 + 30);
@@ -856,7 +856,7 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(7).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(8).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(9).getClass());
-		Assert.assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(10).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(10).getClass());
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(11).getClass());
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(12).getClass());
 		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(13).getClass());
@@ -864,7 +864,7 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(15).getClass());
 		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(16).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(17).getClass());
-		Assert.assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(18).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(18).getClass());
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(19).getClass());
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(20).getClass());
 		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(21).getClass());
@@ -887,7 +887,7 @@ public class QSimTest {
 	public void testVehicleTeleportationFalse() {
 		Fixture f = new Fixture();
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
@@ -937,7 +937,7 @@ public class QSimTest {
 	@Test
 	public void testAssignedVehicles() {
 		Fixture f = new Fixture();
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link2.getId());
 		a1.setEndTime(7.0*3600);
@@ -993,7 +993,7 @@ public class QSimTest {
 		Fixture f = new Fixture();
 		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
@@ -1023,7 +1023,7 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(3).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(3).getClass());
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(4).getClass()); // link1
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(5).getClass()); // link2
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(6).getClass());
@@ -1050,7 +1050,7 @@ public class QSimTest {
 		Fixture f = new Fixture();
 		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
@@ -1080,7 +1080,7 @@ public class QSimTest {
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(3).getClass());
+		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(3).getClass());
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(4).getClass()); // link1
 		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(5).getClass()); // link2
 		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(6).getClass());
@@ -1206,7 +1206,7 @@ public class QSimTest {
 		((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).setRouteFactory(NetworkRoute.class, new LinkNetworkRouteFactory());
 
 		// create a person with a car-leg from link1 to link5, but an incomplete route
-		Person person = PersonImpl.createPerson(Id.create(0, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
 		a1.setEndTime(8*3600);
@@ -1234,7 +1234,7 @@ public class QSimTest {
 
 	@Test
 	public void testStartAndEndTime() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
 		// build simple network with 1 link
@@ -1294,7 +1294,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testCleanupSim_EarlyEnd() {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
 		double simEndTime = 8.0*3600;

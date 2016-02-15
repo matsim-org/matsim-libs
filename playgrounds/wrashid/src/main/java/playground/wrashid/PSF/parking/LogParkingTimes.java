@@ -8,14 +8,14 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	Controler controler;
+	MatsimServices controler;
 	HashMap<Id<Person>, ParkingTimes> parkingTimes = new HashMap<>();
 
-	public LogParkingTimes(Controler controler) {
+	public LogParkingTimes(MatsimServices controler) {
 		super();
 		this.controler = controler;
 	}

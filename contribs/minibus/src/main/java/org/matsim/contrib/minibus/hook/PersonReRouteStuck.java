@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitActsRemover;
 
@@ -41,7 +41,7 @@ final class PersonReRouteStuck extends AbstractPersonReRouteStuck {
 	
 	private final TransitActsRemover transitActsRemover;
 
-	public PersonReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id<Person>> agentsStuck) {
+	public PersonReRouteStuck(final PlanAlgorithm router, final MutableScenario scenario, Set<Id<Person>> agentsStuck) {
 		super(router, scenario, agentsStuck);
 		this.transitActsRemover = new TransitActsRemover(); 
 	}

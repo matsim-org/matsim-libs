@@ -19,15 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,8 +33,16 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
-
 import playground.thibautd.parknride.herbiespecific.RelevantCoordinates;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * Identifies hitch hiking spots in the following way:
@@ -70,7 +69,7 @@ public class IdentifySpotsRough {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		
-		(new MatsimNetworkReader( scenario )).readFile( networkFile );
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile( networkFile );
 
 		Network network = scenario.getNetwork();
 

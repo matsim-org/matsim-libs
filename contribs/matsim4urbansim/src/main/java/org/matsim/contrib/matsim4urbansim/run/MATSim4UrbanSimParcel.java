@@ -43,7 +43,6 @@ import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtModule;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
@@ -60,17 +59,22 @@ import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWriterListener;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.controler.*;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.Map;
 
 
 /**
@@ -152,8 +156,7 @@ class MATSim4UrbanSimParcel{
 			throw new RuntimeException("An error occured while initializing MATSim scenario ...") ;
 		}
 
-		scenario = ScenarioUtils.createScenario( connector.getConfig() );
-		ScenarioUtils.loadScenario(scenario);
+		scenario = ScenarioUtils.loadScenario( connector.getConfig() );
 		setControlerSettings();
 		// init Benchmark as default
 		benchmark = new Benchmark();
@@ -177,17 +180,19 @@ class MATSim4UrbanSimParcel{
 		cleanNetwork(network);
 
 		// get the data from UrbanSim (parcels and persons)
-		readFromUrbanSim();
+		prepareReadFromUrbanSim();
 
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
-		ActivityFacilitiesImpl parcels = null;
+//		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim parcels") ;
+		ActivityFacilitiesImpl parcels = (ActivityFacilitiesImpl) scenario.getActivityFacilities() ;
+
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunity locations (e.g. workplaces) for zones or parcels");
+		// yyyy parcels and opportunities should be come one ...
+		// yyyy ... and then become the matsim activity facilities.
 
 		// initializing parcels and zones from UrbanSim input
-		//readUrbansimParcelModel(parcels, zones);
 		if(isParcelMode){
-			parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 			// initializing parcels and zones from UrbanSim input
 			readFromUrbansim.readFacilitiesParcel(parcels, zones);
 			// initializing opportunity facilities (like work places) on parcel level
@@ -210,16 +215,13 @@ class MATSim4UrbanSimParcel{
 		log.info("### DONE with demand generation from urbansim ###");
 
 		// set population in scenario
-		((ScenarioImpl) scenario).setPopulation(newPopulation);
+		((MutableScenario) scenario).setPopulation(newPopulation);
 
 		// running mobsim and assigned controller listener
 		runControler(zones, parcels, opportunities);
 	}
 
-	/**
-	 * 
-	 */
-	void readFromUrbanSim() {
+	private void prepareReadFromUrbanSim() {
 		// get the data from UrbanSim (parcels and persons)
 		if(getMATSim4UrbanSimControlerConfig().usingShapefileLocationDistribution()){
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
@@ -238,8 +240,6 @@ class MATSim4UrbanSimParcel{
 	/**
 	 * read person table from urbansim and build MATSim population
 	 * 
-	 * @param readFromUrbansim
-	 * @param parcelsOrZones
 	 * @param network
 	 * @return
 	 */
@@ -302,7 +302,7 @@ class MATSim4UrbanSimParcel{
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
 			BoundingBox nbb = BoundingBox.createBoundingBox(controler.getScenario().getNetwork());
 			ptMatrix = PtMatrix.createPtMatrix(controler.getScenario().getConfig().plansCalcRoute(), nbb, ConfigUtils.addOrGetModule(controler.getScenario().getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));	
-			controler.addOverridingModule(new MatrixBasedPtModule(ptMatrix)); // the car and pt router
+			controler.addOverridingModule(new MatrixBasedPtModule()); // the car and pt router
 
 			log.error("reconstructing pt route distances; not tested ...") ;
 			for ( Person person : scenario.getPopulation().getPersons().values() ) {
@@ -339,93 +339,112 @@ class MATSim4UrbanSimParcel{
 	 * @param parcels
 	 * @param controler
 	 */
-	final void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, ActivityFacilitiesImpl opportunities, Controler controler, PtMatrix ptMatrix) {
+	final void addControlerListener(final ActivityFacilitiesImpl zones, final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl opportunities, final Controler controler, final PtMatrix ptMatrix) {
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				// The following lines register what should be done _after_ the iterations are done:
+				if(computeZone2ZoneImpedance || MATSim4UrbanSimZone.BRUSSELS_SCENARIO_CALCULATE_ZONE2ZONE_MATRIX) {
+					// (for the time being, this is computed for the Brussels scenario no matter what, since it is needed for the travel time
+					// comparisons. kai, apr'13)
 
-		// The following lines register what should be done _after_ the iterations are done:
-		if(computeZone2ZoneImpedance || MATSim4UrbanSimZone.BRUSSELS_SCENARIO_CALCULATE_ZONE2ZONE_MATRIX) {
-			// (for the time being, this is computed for the Brussels scenario no matter what, since it is needed for the travel time 
-			// comparisons. kai, apr'13)
+					// creates zone2zone impedance matrix
+					addControlerListenerBinding().toInstance( new Zone2ZoneImpedancesControlerListener( zones,
+							parcels,
+							ptMatrix,
+							benchmark) );
+				}
 
-			// creates zone2zone impedance matrix
-			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, 
-					parcels,
-					ptMatrix,
-					this.benchmark) );
-		}
+				if(computeAgentPerformance) {
+					// creates a persons.csv output for UrbanSim
+					UrbanSimParameterConfigModuleV3 module = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(getConfig());
+					addControlerListenerBinding().toInstance(new AgentPerformanceControlerListener(benchmark, ptMatrix, module));
+				}
 
-		if(computeAgentPerformance) {
-			// creates a persons.csv output for UrbanSim
-			UrbanSimParameterConfigModuleV3 module = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(controler.getConfig());
-			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark, ptMatrix, module));
-		}
+				if(computeZoneBasedAccessibilities){
+					// creates zone based table of log sums
+					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+						@Inject Map<String, TravelTime> travelTimes;
+						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+						@Override
+						public ControlerListener get() {
+							ZoneBasedAccessibilityControlerListenerV3 zbacl = new ZoneBasedAccessibilityControlerListenerV3( zones,
+									opportunities,
+									ptMatrix,
+									((UrbanSimParameterConfigModuleV3) getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME)).getMATSim4OpusTemp(),
+									scenario, travelTimes, travelDisutilityFactories);
+							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+								zbacl.setComputingAccessibilityForMode(mode, true);
+							}
+							if ( ptMatrix==null ) {
+								zbacl.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+								// somewhat stupid fix. kai, jan'2015
+							}
+							return zbacl;
+						}
+					});
 
-		if(computeZoneBasedAccessibilities){
-			// creates zone based table of log sums
-			UrbanSimParameterConfigModuleV3 module = (UrbanSimParameterConfigModuleV3) controler.
-					getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
-			ZoneBasedAccessibilityControlerListenerV3 zbacl = new ZoneBasedAccessibilityControlerListenerV3( zones,
-					opportunities,
-					ptMatrix,
-					module.getMATSim4OpusTemp(),
-					this.scenario);
-			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-				zbacl.setComputingAccessibilityForMode(mode, true);
+					log.error("yyyy I think that ZoneBasedAccessibilityControlerListener and GridBasedAccessibilityControlerListener are writing " +
+							"to the same file!!!!  Check, and fix if true.  kai, jul'13") ;
+
+				}
+
+				if(computeGridBasedAccessibility){
+					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+						@Inject Map<String, TravelTime> travelTimes;
+						@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+						@Inject Scenario scenario;
+						@Override
+						public ControlerListener get() {
+							// initializing grid based accessibility controler listener
+							GridBasedAccessibilityControlerListenerV3 gbacl =
+									new GridBasedAccessibilityControlerListenerV3( opportunities, ptMatrix, scenario.getConfig(), scenario, travelTimes, travelDisutilityFactories);
+							gbacl.setUrbansimMode(true);
+
+							for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
+								gbacl.setComputingAccessibilityForMode(mode, true);
+							}
+							if ( ptMatrix==null ) {
+								gbacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
+								// somewhat stupid fix. kai, jan'2015
+							}
+
+							if(computeGridBasedAccessibilitiesUsingShapeFile) {
+								gbacl.generateGridsAndMeasuringPointsByShapeFile(shapeFile, cellSizeInMeter);
+							} else if(computeGridBasedAccessibilityUsingBoundingBox) {
+								gbacl.generateGridsAndMeasuringPointsByCustomBoundary(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
+							} else {
+								gbacl.generateGridsAndMeasuringPointsByNetwork(cellSizeInMeter);
+							}
+
+							if(isParcelMode){
+								// creating a writer listener that writes out accessibility results in UrbanSim format for parcels
+								UrbanSimParcelCSVWriterListener csvParcelWiterListener = new UrbanSimParcelCSVWriterListener(parcels,scenario.getConfig());
+								// the writer listener is added to grid based accessibility controler listener and will be triggered when accessibility calculations are done.
+								// (adding such a listener is optional, here its done to be compatible with UrbanSim)
+								gbacl.addSpatialGridDataExchangeListener(csvParcelWiterListener);
+							}
+
+							// accessibility calculations will be triggered when mobsim finished
+							return gbacl;
+						}
+					});
+
+
+				}
+
+				// From here outputs are for analysis/debugging purposes only
+				{ // dump population in csv format
+					if(isParcelMode)
+						readFromUrbansim.readAndDumpPersons2CSV(parcels, scenario.getNetwork());
+					//		else
+					//			readFromUrbansim.readAndDumpPersons2CSV(zones, controler.getNetwork());
+					// I don't think that this has a chance to work: uses the parcel model keys to extract info from a zone
+					// model person file.  kai, jul'13
+				}
+
 			}
-			if ( ptMatrix==null ) {
-				zbacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
-				// somewhat stupid fix. kai, jan'2015
-			}
-
-			controler.addControlerListener( zbacl );
-
-			log.error("yyyy I think that ZoneBasedAccessibilityControlerListener and GridBasedAccessibilityControlerListener are writing " +
-					"to the same file!!!!  Check, and fix if true.  kai, jul'13") ;
-
-		}
-
-		if(computeGridBasedAccessibility){
-			// initializing grid based accessibility controler listener
-			GridBasedAccessibilityControlerListenerV3 gbacl = 
-					new GridBasedAccessibilityControlerListenerV3( opportunities, ptMatrix, scenario.getConfig(), scenario.getNetwork() );
-			gbacl.setUrbansimMode(true);
-
-			for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-				gbacl.setComputingAccessibilityForMode(mode, true);
-			}
-			if ( ptMatrix==null ) {
-				gbacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
-				// somewhat stupid fix. kai, jan'2015
-			}
-
-			if(computeGridBasedAccessibilitiesUsingShapeFile)
-				gbacl.generateGridsAndMeasuringPointsByShapeFile(shapeFile, cellSizeInMeter);
-			else if(computeGridBasedAccessibilityUsingBoundingBox)
-				gbacl.generateGridsAndMeasuringPointsByCustomBoundary(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
-			else
-				gbacl.generateGridsAndMeasuringPointsByNetwork(cellSizeInMeter);
-
-			// accessibility calculations will be triggered when mobsim finished
-			controler.addControlerListener( gbacl );
-
-			if(isParcelMode){
-				// creating a writer listener that writes out accessibility results in UrbanSim format for parcels
-				UrbanSimParcelCSVWriterListener csvParcelWiterListener = new UrbanSimParcelCSVWriterListener(parcels,controler.getConfig());
-				// the writer listener is added to grid based accessibility controler listener and will be triggered when accessibility calculations are done.
-				// (adding such a listener is optional, here its done to be compatible with UrbanSim)
-				gbacl.addSpatialGridDataExchangeListener(csvParcelWiterListener);
-			}
-
-		}
-
-		// From here outputs are for analysis/debugging purposes only
-		{ // dump population in csv format
-			if(isParcelMode)
-				readFromUrbansim.readAndDumpPersons2CSV(parcels, controler.getScenario().getNetwork());
-			//		else
-			//			readFromUrbansim.readAndDumpPersons2CSV(zones, controler.getNetwork());
-			// I don't think that this has a chance to work: uses the parcel model keys to extract info from a zone 
-			// model person file.  kai, jul'13
-		}
+		});
 	}
 
 	/**
@@ -435,7 +454,7 @@ class MATSim4UrbanSimParcel{
 	 * @param parcels 
 	 * @param controler 
 	 */
-	void addFurtherControlerListener(ActivityFacilities zones, ActivityFacilities parcels, Controler controler){
+	void addFurtherControlerListener(ActivityFacilities zones, ActivityFacilities parcels, MatsimServices controler){
 		// this is just a stub and does nothing. 
 		// This needs to be implemented/overwritten by an inherited class
 	}

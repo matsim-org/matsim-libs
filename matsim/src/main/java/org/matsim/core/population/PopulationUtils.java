@@ -32,8 +32,11 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -46,6 +49,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -57,6 +61,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
 /**
@@ -91,20 +96,24 @@ public final class PopulationUtils {
      * @return the new Population instance
      */
 	public static Population createPopulation(Config config, Network network) {
-        ModeRouteFactory routeFactory = new ModeRouteFactory();
-        String networkRouteType = config.plans().getNetworkRouteType();
-        RouteFactory factory;
-        if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
-            factory = new LinkNetworkRouteFactory();
-        } else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
-            factory = new CompressedNetworkRouteFactory(network);
-        } else {
-            throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
-        }
-        routeFactory.setRouteFactory(NetworkRoute.class, factory);
-        return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
+		return createPopulation(config.plans(), network);
 	}
-	
+
+	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network) {
+		ModeRouteFactory routeFactory = new ModeRouteFactory();
+		String networkRouteType = plansConfigGroup.getNetworkRouteType();
+		RouteFactory factory;
+		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
+			factory = new LinkNetworkRouteFactory();
+		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
+			factory = new CompressedNetworkRouteFactory(network);
+		} else {
+			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
+		}
+		routeFactory.setRouteFactory(NetworkRoute.class, factory);
+		return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
+	}
+
 	public static Leg unmodifiableLeg( Leg leg ) {
 		return new UnmodifiableLeg( leg ) ;
 	}
@@ -229,6 +238,16 @@ public final class PopulationUtils {
 			return this.delegate.toString() ;
 		}
 
+		@Override
+		public void setLinkId(Id<Link> id) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public void setFacilityId(Id<ActivityFacility> id) {
+			throw new UnsupportedOperationException() ;
+		}
+
 	}
 
 	/**
@@ -297,11 +316,6 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public boolean isSelected() {
-			return delegate.isSelected();
-		}
-
-		@Override
 		public void setPerson(Person person) {
 			throw new UnsupportedOperationException() ;
 		}
@@ -355,6 +369,38 @@ public final class PopulationUtils {
 		return Time.UNDEFINED_TIME ;
 	}
 
+	public static Id<Link> computeLinkIdFromActivity( Activity act, ActivityFacilities facs, Config config ) {
+		// the following might eventually become configurable by config. kai, feb'16
+		if ( act.getFacilityId()==null ) {
+			final Id<Link> linkIdFromActivity = act.getLinkId();
+			Gbl.assertNonNull( linkIdFromActivity );
+			return linkIdFromActivity ;
+		} else {
+			ActivityFacility facility = facs.getFacilities().get( act.getFacilityId() ) ;
+			if ( facility==null || facility.getLinkId()==null ) {
+				Logger.getLogger( PopulationUtils.class ).warn("we have a facility id, but can't find the facility; this should not really happen") ;
+				final Id<Link> linkIdFromActivity = act.getLinkId();
+				Gbl.assertIf( linkIdFromActivity!=null );
+				return linkIdFromActivity ;
+			} else {
+				return facility.getLinkId() ;
+			} 
+			// yy sorry about this mess, I am just trying to make explicit which seems to have been the logic so far implicitly.  kai, feb'16
+		}
+	}
+
+	public static Coord computeCoordFromActivity( Activity act, ActivityFacilities facs, Config config ) {
+		// the following might eventually become configurable by config. kai, feb'16
+		if ( act.getFacilityId()==null ) {
+			return act.getCoord() ; // if not available, fall back on coord of link?
+		} else {
+			Gbl.assertIf( facs!=null ) ;
+			ActivityFacility facility = facs.getFacilities().get( act.getFacilityId() ) ;
+			Gbl.assertIf( facility!=null );
+			return facility.getCoord() ;
+		}
+	}
+	
 	/**
 	 * A pointer to material in TripStructureUtils
 	 *
@@ -585,6 +631,11 @@ public final class PopulationUtils {
 			}
 		}
 		return false;
+	}
+
+	
+	public static Person createPerson(final Id<Person> id) {
+		return new PersonImpl(id);
 	}
 	
 }

@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.media.opengl.GL2;
 
-import com.jogamp.opengl.GL2;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
@@ -168,7 +168,7 @@ public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	private void recalculatePositions() {
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLaneWidth(OTFClientControl.getInstance().getOTFVisConfig().getEffectiveLaneWidth());
-		linkWidthCalculator.setLinkWidth(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
+		linkWidthCalculator.setLinkWidthForVis(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth());
 		for (VisLinkWLanes linkData : this.lanesLinkData.values()){
 			this.laneModelBuilder.recalculatePositions(linkData, linkWidthCalculator);
 		}

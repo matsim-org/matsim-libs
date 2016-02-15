@@ -20,12 +20,6 @@
 
 package playground.meisterk;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -50,7 +44,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
@@ -58,7 +52,6 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonRemoveLinkAndRoute;
 import org.matsim.run.XY2Links;
-
 import playground.meisterk.PersonAnalyseTimesByActivityType.Activities;
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.KtiPtRoute;
@@ -67,6 +60,12 @@ import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 import playground.meisterk.org.matsim.config.groups.MeisterkConfigGroup;
 import playground.meisterk.org.matsim.population.algorithms.PersonSetFirstActEndTime;
 import playground.meisterk.org.matsim.population.algorithms.PlanAnalyzeTourModeChoiceSet;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class MyRuns {
 
@@ -141,7 +140,7 @@ public class MyRuns {
 
 	void ktiPtRoutesPerformanceTest(final String[] args) {
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
 		config.addModule(ktiConfigGroup);
@@ -198,7 +197,7 @@ public class MyRuns {
 	void moveInitDemandToDifferentNetwork(final String[] args) {
 
 		// read ivtch demand
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 		MeisterkConfigGroup meisterkConfigGroup = new MeisterkConfigGroup();
 		config.addModule(meisterkConfigGroup);
@@ -224,7 +223,7 @@ public class MyRuns {
 
 		// ... but I think we can just give the existing scenario to the reader, so I am changing this.  There is so much commented out in this
 		// code that it is probably no longer used anyways. kai, sep'15
-		new MatsimNetworkReader(scenario).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
+		new MatsimNetworkReader(scenario.getNetwork()).parse(config.getParam(MeisterkConfigGroup.GROUP_NAME, "inputSecondNetworkFile"));
 
 		// run XY2Links
 		XY2Links xY2Links = new XY2Links();
@@ -355,13 +354,13 @@ public class MyRuns {
 
 	public void analyzeModeChainFeasibility(Config config) {
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		// initialize scenario with events from a given events file
 		// - network
 		logger.info("Reading network xml file...");
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 		logger.info("Reading network xml file...done.");
 
 		// - facilities
@@ -462,7 +461,7 @@ public class MyRuns {
 		logger.info("Writing plans file...DONE.");
 	}
 
-	public static Population initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, ScenarioImpl scenario) {
+	public static Population initMatsimAgentPopulation(final String inputFilename, final boolean isStreaming, final ArrayList<PersonAlgorithm> algos, MutableScenario scenario) {
 
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 
@@ -507,11 +506,11 @@ public class MyRuns {
 	 */
 	public static void analyseInitialTimes(Config config) {
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		// initialize scenario with events from a given events file
 		// - network
 		logger.info("Reading network xml file...");
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 		logger.info("Reading network xml file...done.");
 		// - population
 		PersonAlgorithm pa = new PersonAnalyseTimesByActivityType(TIME_BIN_SIZE);

@@ -8,7 +8,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 public class Global {
 	
-	public static final String runID = "run10";
+	public static final String runID = "run12";
 	
 	public static final Random random = MatsimRandom.getRandom();
 	
@@ -18,15 +18,16 @@ public class Global {
 	public static final int N = 86336;
 	
 	//directories
-	static final String smbDir = "/run/user/1007/gvfs/smb-share:server=innoz-dc01,share=innoz/";
+	static final String smbDir = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/";
 	public static final String adminBordersDir = smbDir + "3_Allgemein/Geoinformation/Administrative_Grenzen/"; //gemeinden_2009.shp
 	public static final String projectDir = smbDir + "2_MediengestützteMobilität/10_Projekte/eGAP/";
 	public static final String dataDir = projectDir + "20_Datengrundlage/";
 	public static final String networkDataDir = dataDir + "Netzwerk/";
 	public static final String matsimDir = projectDir + "30_Modellierung/";
 	public static final String matsimInputDir = matsimDir + "INPUT/";
-	public static final String runInputDir = matsimDir + "OUTPUT/" + Global.runID + "/input/";
-	public static final String matsimOutputDir = matsimDir + "OUTPUT/" + Global.runID + "/output";
+//	public static final String runInputDir = matsimDir + "OUTPUT/" + Global.runID + "/input/";
+	public static final String runInputDir = "/home/dhosse/" + Global.runID + "/input/";
+	public static final String matsimOutputDir = matsimDir + "OUTPUT/" + Global.runID + "/output/";
 	
 	//coordinate systems and transformations
 	static final String fromCrs = "EPSG:4326";
@@ -71,6 +72,10 @@ public class Global {
 	public static final String idWallgau = "09180136";
 	
 	//subpopulation classes
+//	public static final String USER_GROUP = "usrGroup";
+//	public static final String GP_CAR = "GP_CAR";
+//	public static final String COMMUTER = "COMMUTER";
+//	public static final String LICENSE_OWNER = "CAR_OPTION";
 	public static final String USER_GROUP = "userGroup";
 	public static final String GP_CAR = "CAR_OWNER";
 	public static final String COMMUTER = "COMMUTER";
@@ -78,9 +83,6 @@ public class Global {
 	
 	//age classes
 	public static final String AGE = "AGE";
-	public static final String CHILD = "CHILD";
-	public static final String ADULT = "ADULT";
-	public static final String PENSIONER = "PENSIONER";
 	
 	//sex classes
 	public static final String SEX = "SEX";
@@ -97,13 +99,7 @@ public class Global {
 	
 	//driving license
 	public static final String LICENSE = "LICENSE";
-	public static final String HAS_LICENSE = "HAS_LICENSE";
-	public static final String NO_LICENSE = "NO_LICENSE";
 	
-	//status of residence
-	public static final String RESIDENCE = "RESIDENCE";
-	public static final String INHABITANT = "INHABITANT";
-
 	public static double getN() {
 		return n;
 	}

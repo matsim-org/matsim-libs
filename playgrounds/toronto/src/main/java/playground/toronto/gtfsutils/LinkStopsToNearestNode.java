@@ -19,7 +19,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -32,13 +32,13 @@ public class LinkStopsToNearestNode {
 		String outputFolder = args[2];
 
 		//Create base network
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkInFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkInFile);
 		
-		ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario2 = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl noHighways = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario2).readFile(networkInFile);
+		new MatsimNetworkReader(scenario2.getNetwork()).readFile(networkInFile);
 		
 		//Remove highways and on/off ramps. Should not affect routes which travel on highways since transit lines don't stop ON highways.	
 		ArrayList<Id<Link>> linksToRemove = new ArrayList<>();

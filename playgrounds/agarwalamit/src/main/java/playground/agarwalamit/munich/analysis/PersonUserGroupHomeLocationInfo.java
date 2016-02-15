@@ -65,7 +65,7 @@ public class PersonUserGroupHomeLocationInfo {
 						if (pe instanceof Activity){
 							homeCoord = ((Activity)pe).getCoord();
 							break;
-						}
+						} else homeCoord = new Coord(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 					}
 					writer.write(p.getId()+"\t"+ug+"\t"+homeCoord.getX()+"\t"+homeCoord.getY()+"\n");
 				}
@@ -76,5 +76,4 @@ public class PersonUserGroupHomeLocationInfo {
 					+ e);
 		}
 	}
-
 }

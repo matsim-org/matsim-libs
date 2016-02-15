@@ -35,16 +35,31 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+
 import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.Map;
 
 public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl delegate;
 	private Scenario scenario;
-	
+	private final Provider<TripRouter> tripRouterProvider;
+	private ScoringFunctionFactory scoringFunctionFactory;
+	private Map<String, TravelTime> travelTimes;
+	private Map<String, TravelDisutilityFactory> travelDisutilities;
+
 	@Inject
-	public BestReplyLocationChoicePlanStrategy(Scenario scenario) {
+	BestReplyLocationChoicePlanStrategy(Scenario scenario, Provider<TripRouter> tripRouterProvider, ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities) {
 		this.scenario = scenario;
+		this.tripRouterProvider = tripRouterProvider;
+		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.travelTimes = travelTimes;
+		this.travelDisutilities = travelDisutilities;
 	}
 		
 	@Override
@@ -59,12 +74,13 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		 * such that they are already available at the time of constructing this object. ah feb'13
 		 */
 		DestinationChoiceBestResponseContext lcContext = (DestinationChoiceBestResponseContext) scenario.getScenarioElement(DestinationChoiceBestResponseContext.ELEMENT_NAME);
+		Config config = lcContext.getScenario().getConfig();
+		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		MaxDCScoreWrapper maxDcScoreWrapper = (MaxDCScoreWrapper)scenario.getScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME);
-		if ( !DestinationChoiceConfigGroup.Algotype.bestResponse.equals(((DestinationChoiceConfigGroup)lcContext.getScenario().getConfig().getModule("locationchoice")).getAlgorithm())) {
+		if ( !DestinationChoiceConfigGroup.Algotype.bestResponse.equals(dccg.getAlgorithm())) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}		
-		Config config = lcContext.getScenario().getConfig() ;
-		String planSelector = config.findParam("locationchoice", "planSelector");
+		String planSelector = dccg.getPlanSelector();
 		if (planSelector.equals("BestScore")) {
 			delegate = new PlanStrategyImpl(new BestPlanSelector<Plan, Person>());
 		} else if (planSelector.equals("ChangeExpBeta")) {
@@ -74,9 +90,9 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		} else {
 			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		}
-		delegate.addStrategyModule(new TripsToLegsModule(scenario.getConfig()));
-		delegate.addStrategyModule(new BestReplyDestinationChoice(lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled()));
-		delegate.addStrategyModule(new ReRoute(lcContext.getScenario()));
+		delegate.addStrategyModule(new TripsToLegsModule(tripRouterProvider, config.global()));
+		delegate.addStrategyModule(new BestReplyDestinationChoice(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities));
+		delegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider));
 		
 		delegate.init(replanningContext);
 	}

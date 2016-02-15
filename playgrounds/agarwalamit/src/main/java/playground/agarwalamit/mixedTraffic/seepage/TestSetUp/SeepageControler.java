@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -44,21 +45,21 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  * @author amit
  */
 public class SeepageControler {
-	 public static final String outputDir = "../../../repos/shared-svn/projects/mixedTraffic/seepage/xt_1Link/seepage/";
-	 static final List<String> mainModes = Arrays.asList(TransportMode.car,TransportMode.bike);
-	 static final String seepMode = "bike";
-	 static final String isSeepModeStorageFree = "false";
+	 public static final String OUTPUT_DIR = "../../../repos/shared-svn/projects/mixedTraffic/seepage/xt_1Link/seepage/";
+	 static final List<String> MAIN_MODES = Arrays.asList(TransportMode.car,TransportMode.bike);
+	 static final String SEEP_MODE = "bike";
+	 static final String IS_SEEP_MODE_STORAGE_FREEE="false";
 	 
 	private void run (){
 		CreateInputs inputs = new CreateInputs();
 		inputs.run();
 		Scenario sc = inputs.getScenario();
 		
-		sc.getConfig().qsim().setUseDefaultVehicles(false);
+		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 
-		for(String travelMode:mainModes){
+		for(String travelMode:MAIN_MODES){
 			VehicleType mode = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode,VehicleType.class));
 			mode.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(travelMode));
 			mode.setPcuEquivalents(MixedTrafficVehiclesUtils.getPCU(travelMode));
@@ -80,7 +81,7 @@ public class SeepageControler {
 		}
 		
 		EventsManager manager = EventsUtils.createEventsManager();
-		EventWriterXML eventWriterXML = new EventWriterXML(outputDir+"/events.xml");
+		EventWriterXML eventWriterXML = new EventWriterXML(OUTPUT_DIR+"/events.xml");
 		manager.addHandler(eventWriterXML);
 		
 		QSim qSim = QSimUtils.createDefaultQSim(sc, manager);
@@ -93,17 +94,5 @@ public class SeepageControler {
 	
 	public static void main(String[] args) {
 		new SeepageControler().run();
-//		CreateInputs inputs = new CreateInputs();
-//		inputs.run();
-//		Scenario sc = inputs.getScenario();
-//		
-//		Controler myController = new Controler(sc.getConfig());	
-//		myController.setOverwriteFiles(true) ;
-//		myController.setCreateGraphs(true);
-//		myController.setMobsimFactory(new PatnaQSimFactory()); 
-////		myController.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-//		myController.setDumpDataAtEnd(true);
-//		myController.run();
-//		myController.setMobsimFactory(new SeepageMobsimfactory());
 	}
 }

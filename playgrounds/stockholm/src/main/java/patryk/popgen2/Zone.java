@@ -38,11 +38,11 @@ public class Zone {
 	public void addBuilding(Building building) {
 		buildings.add(building);
 		
-		if(building.isSingleFamilyBuilding()) {
+		if(building.isVilla()) {
 			singleFamilyBuildings.add(building);
 			homeBuildings.add(building);
 		}
-		else if (building.isMultiFamilyBuilding()) {
+		else if (building.isApartmentBuilding()) {
 			multiFamilyBuildings.add(building);
 			multiFamilyBuildingSizes.add(building.getBuildingSize());
 			homeBuildings.add(building);

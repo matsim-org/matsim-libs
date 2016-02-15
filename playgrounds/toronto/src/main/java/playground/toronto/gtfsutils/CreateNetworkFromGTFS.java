@@ -16,7 +16,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -35,9 +35,9 @@ public class CreateNetworkFromGTFS{
         HashMap<Id<Node>,Coord> StopAndCoordinates = new HashMap<>();
         HashMap<Id<Link>,Link> RemoveLinks = new HashMap<>();
         
-        ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(NetworkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(NetworkFile);
 		
 		/*read the stops file
 		 * create nodes for each stop

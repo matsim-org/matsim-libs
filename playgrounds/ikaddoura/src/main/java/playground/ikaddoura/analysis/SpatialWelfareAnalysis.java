@@ -31,7 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.shapes.IKGISAnalyzer;
@@ -105,7 +105,7 @@ public class SpatialWelfareAnalysis {
 		Config config1 = ConfigUtils.loadConfig(runDirectory1 + "output_config.xml.gz");
 		config1.network().setInputFile(runDirectory1 + "output_network.xml.gz");
 		config1.plans().setInputFile(runDirectory1 + "output_plans.xml.gz");
-		ScenarioImpl scenario1 = (ScenarioImpl) ScenarioUtils.loadScenario(config1);
+		MutableScenario scenario1 = (MutableScenario) ScenarioUtils.loadScenario(config1);
 		
 		Map<Id<Person>, Double> personId2userBenefit_baseCase = getPersonId2UserBenefit(scenario1, runDirectory1);
 		Map<Id<Person>, Double> personId2tollPayments_baseCase = getPersonId2TollPayments(scenario1, runDirectory1);
@@ -118,7 +118,7 @@ public class SpatialWelfareAnalysis {
 		Config config2 = ConfigUtils.loadConfig(runDirectory2 + "output_config.xml.gz");
 		config2.network().setInputFile(runDirectory2 + "output_network.xml.gz");
 		config2.plans().setInputFile(runDirectory2 + "output_plans.xml.gz");
-		ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.loadScenario(config2);
+		MutableScenario scenario2 = (MutableScenario) ScenarioUtils.loadScenario(config2);
 		
 		Map<Id<Person>, Double> personId2userBenefit_policyCase = getPersonId2UserBenefit(scenario2, runDirectory2);
 		Map<Id<Person>, Double> personId2tollPayments_policyCase = getPersonId2TollPayments(scenario2, runDirectory2);
@@ -149,7 +149,7 @@ public class SpatialWelfareAnalysis {
 		return personId2Sum;
 	}
 
-	private Map<Id<Person>, Double> calculateDifference(ScenarioImpl scenario, Map<Id<Person>, Double> personId2value1, Map<Id<Person>, Double> personId2value2) {
+	private Map<Id<Person>, Double> calculateDifference(MutableScenario scenario, Map<Id<Person>, Double> personId2value1, Map<Id<Person>, Double> personId2value2) {
 		Map<Id<Person>, Double> personId2difference = new HashMap<Id<Person>, Double>();
 		
 		for (Id<Person> id : scenario.getPopulation().getPersons().keySet()) {
@@ -166,7 +166,7 @@ public class SpatialWelfareAnalysis {
 		return personId2difference;
 	}
 
-	private Map<Id<Person>, Double> getPersonId2TollPayments(ScenarioImpl scenario, String runDirectory) {
+	private Map<Id<Person>, Double> getPersonId2TollPayments(MutableScenario scenario, String runDirectory) {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		

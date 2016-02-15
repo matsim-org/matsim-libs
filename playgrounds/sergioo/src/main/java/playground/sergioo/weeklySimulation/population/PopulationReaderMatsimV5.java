@@ -33,10 +33,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
@@ -161,7 +161,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		int age = Integer.MIN_VALUE;
 		if (ageString != null)
 			age = Integer.parseInt(ageString);
-		this.currperson = PersonImpl.createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
+		this.currperson = PopulationUtils.createPerson(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
 		PersonUtils.setSex(this.currperson, atts.getValue(ATTR_PERSON_SEX));
 		PersonUtils.setAge(this.currperson, age);
 		PersonUtils.setLicence(this.currperson, atts.getValue(ATTR_PERSON_LICENSE));

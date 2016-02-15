@@ -19,6 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.framework.cliques.Clique;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Counter;
+import org.xml.sax.Attributes;
+import playground.thibautd.householdsfromcensus.CliquesWriter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,15 +34,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.misc.Counter;
-import org.xml.sax.Attributes;
-
-import playground.thibautd.householdsfromcensus.CliquesWriter;
-import org.matsim.contrib.socnetsim.framework.cliques.Clique;
 
 /**
  * @author thibautd

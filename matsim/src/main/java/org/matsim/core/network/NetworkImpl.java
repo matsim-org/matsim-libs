@@ -260,13 +260,13 @@ public final class NetworkImpl implements Network {
 	 */
 	public void addNetworkChangeEvent(final NetworkChangeEvent event) {
 		this.networkChangeEvents.add(event);
-        for (Link link : event.getLinks()) {
-            if (link instanceof TimeVariantLinkImpl) {
-                ((TimeVariantLinkImpl)link).applyEvent(event);
-            } else {
-                throw new IllegalArgumentException("Link " + link.getId().toString() + " is not TimeVariant.");
-            }
-        }
+		for (Link link : event.getLinks()) {
+			if (link instanceof TimeVariantLinkImpl) {
+				((TimeVariantLinkImpl)link).applyEvent(event);
+			} else {
+				throw new IllegalArgumentException("Link " + link.getId().toString() + " is not TimeVariant.");
+			}
+		}
 	}
 
 	@Override
@@ -414,7 +414,7 @@ public final class NetworkImpl implements Network {
 		return Collections.unmodifiableMap(links);
 	}
 
-	public void setFactory(final NetworkFactoryImpl networkFactory) {
+	 void setFactory(final NetworkFactoryImpl networkFactory) {
 		this.factory = networkFactory;
 	}
 

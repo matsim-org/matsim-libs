@@ -19,6 +19,9 @@
 
 package playground.johannes.gsv.matrices.analysis;
 
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -26,9 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 
 /**
  * @author johannes
@@ -41,11 +41,11 @@ public class OriginVolume {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse("/home/johannes/sge/prj/matsim/run/874/output/matrices-averaged/miv.sym.xml");
 		
-		KeyMatrix m = reader.getMatrix();
+		NumericMatrix m = reader.getMatrix();
 
 		Set<String> keys = m.keys();
 		Map<String, Double> vols = new HashMap<>();

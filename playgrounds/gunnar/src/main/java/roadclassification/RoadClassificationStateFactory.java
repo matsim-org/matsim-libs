@@ -4,8 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.inject.Provider;
-import floetteroed.opdyts.DecisionVariable;
+import javax.inject.Inject;
+
 import opdytsintegration.MATSimState;
 import opdytsintegration.MATSimStateFactory;
 
@@ -14,11 +14,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
-
-import floetteroed.utilities.math.Vector;
 import org.matsim.counts.Counts;
 
-import javax.inject.Inject;
+import floetteroed.opdyts.DecisionVariable;
+import floetteroed.utilities.math.Vector;
 
 /**
  * 

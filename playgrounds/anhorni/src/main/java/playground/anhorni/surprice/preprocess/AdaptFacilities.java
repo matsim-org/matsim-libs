@@ -53,7 +53,7 @@ public class AdaptFacilities {
 	
 	public void run(String facilitiesFileIn, String facilitiesFileOut, String networkFile) {
 		log.info("start facility adaption ========================================");
-		new MatsimNetworkReader(scenario).readFile(networkFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		new FacilitiesReaderConvertOTs(scenario).readFile(facilitiesFileIn);
 				
 		// -------------------------------------------------------

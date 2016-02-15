@@ -19,27 +19,25 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.router;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.*;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.RoutingModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.facilities.Facility;
-
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
 import playground.thibautd.router.multimodal.LinkSlopeScorer;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Builds a standard trip router factory for bike sharing simulations.
@@ -49,7 +47,6 @@ public class BikeSharingTripRouterModule extends AbstractModule {
 	
 	private boolean routePtUsingSchedule = false;
 
-	private final Provider<TripRouter> delegate;
 	private final Scenario scenario;
 	private final LinkSlopeScorer slopeScorer;
 
@@ -57,43 +54,21 @@ public class BikeSharingTripRouterModule extends AbstractModule {
 
 	public BikeSharingTripRouterModule(
 			final TransitMultiModalAccessRoutingModule.RoutingData routingData,
-			final Provider<TripRouter> delegate,
 			final Scenario scenario,
 			final LinkSlopeScorer slopeScorer) {
-		this.delegate = delegate;
 		this.scenario = scenario;
 		this.data = routingData;
 		this.slopeScorer = slopeScorer;
 	}
 
 	public BikeSharingTripRouterModule(
-			final Provider<TripRouter> delegate,
 			final Scenario scenario,
 			final LinkSlopeScorer slopeScorer) {
 		this( scenario.getConfig().transit().isUseTransit() ?
 					new TransitMultiModalAccessRoutingModule.RoutingData( scenario ) :
 					null,
-			delegate,
 			scenario,
 			slopeScorer );
-	}
-
-	public BikeSharingTripRouterModule(
-			final TransitMultiModalAccessRoutingModule.RoutingData routingData,
-			final Scenario scenario,
-			final LinkSlopeScorer slopeScorer) {
-		this( routingData,
-				TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario),
-				scenario,
-				slopeScorer );
-	}
-
-	public BikeSharingTripRouterModule(
-			final Scenario scenario,
-			final LinkSlopeScorer slopeScorer) {
-		this(TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(scenario),
-				scenario,
-				slopeScorer );
 	}
 
 	@Override

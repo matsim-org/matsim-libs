@@ -112,7 +112,7 @@ final class TransitQLink {
 		}
 	}
 	
-	protected HandleTransitStopResult handleTransitStop(final double now, final QVehicle veh, 
+	 HandleTransitStopResult handleTransitStop(final double now, final QVehicle veh, 
 			final TransitDriverAgent transitDriver, Id<Link> linkId) {
 		TransitStopFacility stop = transitDriver.getNextTransitStop();
 		if ((stop != null) && (stop.getLinkId().equals(linkId))) {

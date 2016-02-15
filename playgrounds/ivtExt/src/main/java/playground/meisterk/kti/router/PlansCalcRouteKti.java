@@ -20,8 +20,6 @@
 
 package playground.meisterk.kti.router;
 
-import java.util.HashSet;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -29,6 +27,8 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+
+import java.util.HashSet;
 
 
 /**

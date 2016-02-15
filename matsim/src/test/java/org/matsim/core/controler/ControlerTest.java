@@ -36,7 +36,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -47,18 +46,17 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -74,7 +72,7 @@ public class ControlerTest {
 
 	@Test
 	public void testConstructor() {
-		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		MatsimServices controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
         assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
         assertNotNull(controler.getScenario().getPopulation());
         assertEquals(23, controler.getScenario().getNetwork().getLinks().size());
@@ -84,8 +82,22 @@ public class ControlerTest {
 	}
 
 	@Test
+	public void testTerminationCriterion() {
+		Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		Controler controler = new Controler(config);
+		controler.setTerminationCriterion(new TerminationCriterion() {
+			@Override
+			public boolean continueIterations(int iteration) {
+				return false;
+			}
+		});
+		controler.run();
+	}
+
+	@Test
 	public void testConstructor_EventsManagerTypeImmutable() {
-		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		MatsimServices controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
 		try {
 			controler.getConfig().setParam("parallelEventHandling", "numberOfThreads", "2");
 			Assert.fail("Expected exception");
@@ -161,7 +173,7 @@ public class ControlerTest {
 		Controler controler = new Controler(f.scenario);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		// test if we got the right result
@@ -198,7 +210,7 @@ public class ControlerTest {
 		final Config config = this.utils.loadConfig(null);
 		config.controler().setLastIteration(0);
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		// create a very simple network with one link only and an empty population
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new Coord(0, 0));
@@ -227,7 +239,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue("Custom ScoringFunctionFactory was not set.",
@@ -301,7 +313,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
 		 * otherwise, everything is fine. */
@@ -342,7 +354,7 @@ public class ControlerTest {
 		Leg leg1 = null;
 		Leg leg2 = null;
 
-		person1 = PersonImpl.createPerson(Id.create(1, Person.class));
+		person1 = PopulationUtils.createPerson(Id.create(1, Person.class));
 		// --- plan 1 ---
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);
@@ -397,7 +409,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
 		 * otherwise, everything is fine. */
@@ -449,7 +461,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
@@ -489,7 +501,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 		assertEquals(4, controler.getConfig().controler().getWriteEventsInterval());
 
@@ -532,7 +544,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
@@ -563,7 +575,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
@@ -595,7 +607,7 @@ public class ControlerTest {
 				});
 			}
 		});
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
@@ -625,7 +637,7 @@ public class ControlerTest {
 			}
 		});
 
-		controler.setDumpDataAtEnd(true);
+		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
@@ -655,54 +667,28 @@ public class ControlerTest {
 			}
 		});
 
-		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 
 		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
 	}
 
-	/**
-	 * @author mrieser
-	 * @throws InterruptedException
-	 */
-	@Test
+	@Test(expected = RuntimeException.class)
 	public void testShutdown_UncaughtException() throws InterruptedException {
-		ControlerRunnable r = new ControlerRunnable();
+		final Config config = ControlerTest.this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
+		config.controler().setLastIteration(1);
 
-		// we have to start the Controler in it's own thread, as JUnit interferes with the UncaughtExceptionHandler
-		Thread t = new Thread(r);
-		t.start();
-		t.join();
-
-		assertNotNull(r.controler);
-		assertNotNull(r.controler.uncaughtException);
-	}
-
-	private class ControlerRunnable implements Runnable {
-		/*package*/ Controler controler = null;
-		@Override
-		public void run() {
-			final Config config = ControlerTest.this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-			config.controler().setLastIteration(1);
-
-			controler = new Controler(config);
-			final CrashingMobsimFactory testFactory = new CrashingMobsimFactory();
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bindMobsim().toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return testFactory.createMobsim(controler.getScenario(), controler.getEvents());
-						}
-					});
-				}
-			});
-			controler.getConfig().controler().setCreateGraphs(false);
-            controler.setDumpDataAtEnd(false);
-			controler.run();
-		}
+		Controler controler = new Controler(config);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().to(CrashingMobsim.class);
+			}
+		});
+		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.run();
 	}
 
 	@Test
@@ -727,7 +713,7 @@ public class ControlerTest {
 				}
 			});
 			controler.getConfig().controler().setCreateGraphs(false);
-			controler.setDumpDataAtEnd(false);
+			controler.getConfig().controler().setDumpDataAtEnd(false);
 			controler.run();
 			Assert.fail("expected exception, got none.");
 			
@@ -762,7 +748,7 @@ public class ControlerTest {
 				}
 			});
 			controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+			controler.getConfig().controler().setDumpDataAtEnd(false);
 			controler.run();
 			Assert.fail("expected exception, got none.");
 			
@@ -797,7 +783,7 @@ public class ControlerTest {
 				}
 			});
 			controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+			controler.getConfig().controler().setDumpDataAtEnd(false);
 			controler.run();
 			Assert.fail("expected exception, got none.");
 			
@@ -823,7 +809,7 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "googleearth.kmz")).exists());
@@ -842,7 +828,7 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());
@@ -861,7 +847,7 @@ public class ControlerTest {
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "T.veh.gz")).exists());
@@ -894,24 +880,36 @@ public class ControlerTest {
 		controler.run();
 	}
 
-	/*package*/ static class FakeMobsim implements Mobsim {
+	static class FakeMobsim implements Mobsim {
 		@Override
 		public void run() {
 			// nothing to do
 		}
 	}
 
-	/*package*/ static class CrashingMobsimFactory implements MobsimFactory {
-		/*package*/ int counter = 0;
+	static class CrashingMobsim implements Mobsim {
 		@Override
-		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-			this.counter++;
-			throw new NullPointerException("Just for testing...");
+		public void run() {
+			// Evil: Create and join an unmanaged thread on which there is an Exception.
+			// Normally, this silently exits, but we want it to test our infrastructure where
+			// Exceptions on wild threads are collected and dispatched to the Controler.
+			Thread thread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					throw new NullPointerException("Just for testing...");
+				}
+			});
+			thread.start();
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	/** A helper class for testSetScoringFunctionFactory() */
-	/*package*/ static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
+	static class DummyScoringFunctionFactory implements ScoringFunctionFactory {
 		@Override
 		public ScoringFunction createNewScoringFunction(final Person person) {
 			return new SumScoringFunction();
@@ -922,7 +920,7 @@ public class ControlerTest {
 	 * @author mrieser
 	 */
 	private static class Fixture {
-		final ScenarioImpl scenario;
+		final MutableScenario scenario;
 		final Network network;
 		Node node1 = null;
 		Node node2 = null;
@@ -933,7 +931,7 @@ public class ControlerTest {
 		Link link3 = null;
 
 		protected Fixture(final Config config) {
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+			this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 			this.network = this.scenario.getNetwork();
 
 			/* Create a simple network with 4 nodes and 3 links:

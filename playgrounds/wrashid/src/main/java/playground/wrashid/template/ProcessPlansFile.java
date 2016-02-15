@@ -26,7 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.wrashid.tryouts.plan.NewPopulation;
@@ -38,7 +38,7 @@ import playground.wrashid.tryouts.plan.NewPopulation;
 public class ProcessPlansFile extends NewPopulation {
 	public static void main(String[] args) {
 
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		String inputPlansFile = "./test/scenarios/berlin/plans_hwh_1pct.xml.gz";
 		String outputPlansFile = "./test.xml.gz";
@@ -47,7 +47,7 @@ public class ProcessPlansFile extends NewPopulation {
 		Population inPop = sc.getPopulation();
 
 		Network net = sc.getNetwork();
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 
 		PopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(inputPlansFile);

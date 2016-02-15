@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -59,7 +59,7 @@ public class JointPlanIOTest {
 		JointPlansXmlWriter.write(population, jointPlans, file);
 
 		final Scenario rereadScenario = ScenarioUtils.createScenario( scenario.getConfig() );
-		((ScenarioImpl) rereadScenario).setPopulation( scenario.getPopulation() );
+		((MutableScenario) rereadScenario).setPopulation( scenario.getPopulation() );
 		new JointPlansXmlReader( rereadScenario ).parse( file );
 		final JointPlans reReadJointPlans = (JointPlans)
 				rereadScenario.getScenarioElement( JointPlans.ELEMENT_NAME );

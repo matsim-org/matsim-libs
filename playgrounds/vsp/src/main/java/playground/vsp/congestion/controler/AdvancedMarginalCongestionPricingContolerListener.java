@@ -34,7 +34,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.vsp.congestion.handlers.AdvancedMarginalCongestionPricingHandler;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -47,7 +47,7 @@ import playground.vsp.congestion.handlers.TollHandler;
 public class AdvancedMarginalCongestionPricingContolerListener implements StartupListener, AfterMobsimListener, IterationEndsListener {
 	private final static Logger log = Logger.getLogger(AdvancedMarginalCongestionPricingContolerListener.class);
 
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private TollHandler tollHandler;
 	private EventHandler congestionHandler;
 	private AdvancedMarginalCongestionPricingHandler pricingHandler;
@@ -59,7 +59,7 @@ public class AdvancedMarginalCongestionPricingContolerListener implements Startu
 	 * @param handler must be one of the implementation for congestion pricing 
 	 */
 	public AdvancedMarginalCongestionPricingContolerListener(Scenario scenario, TollHandler tollHandler, EventHandler congestionHandler){
-		this.scenario = (ScenarioImpl) scenario;
+		this.scenario = (MutableScenario) scenario;
 		this.tollHandler = tollHandler;
 		this.congestionHandler = congestionHandler;
 	}
@@ -67,7 +67,7 @@ public class AdvancedMarginalCongestionPricingContolerListener implements Startu
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		EventsManager eventsManager = event.getControler().getEvents();
+		EventsManager eventsManager = event.getServices().getEvents();
 		
 		this.pricingHandler = new AdvancedMarginalCongestionPricingHandler(eventsManager, this.scenario);
 //		this.extCostHandler = new CongestionAnalysisEventHandler(this.scenario, false);
@@ -100,7 +100,7 @@ public class AdvancedMarginalCongestionPricingContolerListener implements Startu
 		
 		// write out analysis every iteration
 		this.tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
-//		CongestionAnalysisWriter writerCar = new CongestionAnalysisWriter(this.extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
+//		CongestionAnalysisWriter writerCar = new CongestionAnalysisWriter(this.extCostHandler, event.getServices().getControlerIO().getIterationPath(event.getIteration()));
 //		writerCar.writeDetailedResults(TransportMode.car);
 //		writerCar.writeAvgTollPerDistance(TransportMode.car);
 //		writerCar.writeAvgTollPerTimeBin(TransportMode.car);

@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.qsim;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -30,11 +27,13 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
-
 import playground.thibautd.hitchiking.HitchHikingConstants;
 import playground.thibautd.hitchiking.qsim.PassengerQueuesPerLink.Queue;
 import playground.thibautd.hitchiking.qsim.events.PassengerEndsWaitingEvent;
 import playground.thibautd.hitchiking.qsim.events.PassengerStartsWaitingEvent;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * A departure handler for the "hitch hiking passenger" mode.

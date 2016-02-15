@@ -21,7 +21,9 @@
 package org.matsim.vis.snapshotwriters;
 
 import com.google.inject.Inject;
+import org.matsim.core.controler.ControlerI;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.replanning.ReplanningContext;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -32,8 +34,8 @@ class TransimsSnapshotWriterFactory implements Provider<SnapshotWriter> {
 	private final int iteration;
 
 	@Inject
-	TransimsSnapshotWriterFactory(OutputDirectoryHierarchy controlerIO, @Named("iteration") int iteration) {
-		this.iteration = iteration;
+	TransimsSnapshotWriterFactory(OutputDirectoryHierarchy controlerIO, ReplanningContext replanningContext) {
+		this.iteration = replanningContext.getIteration();
 		this.controlerIO = controlerIO;
 	}
 

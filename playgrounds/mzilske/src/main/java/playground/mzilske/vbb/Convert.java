@@ -7,7 +7,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -45,7 +45,7 @@ public class Convert {
 //		}
 		new NetworkWriter(scenario.getNetwork()).write("/Users/zilske/gtfs-bvg/network.xml");
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("/Users/zilske/gtfs-bvg/transit-schedule.xml");
-		new VehicleWriterV1(((ScenarioImpl) scenario).getTransitVehicles()).writeFile("/Users/zilske/gtfs-bvg/transit-vehicles.xml");		
+		new VehicleWriterV1(((MutableScenario) scenario).getTransitVehicles()).writeFile("/Users/zilske/gtfs-bvg/transit-vehicles.xml");		
 	}
 	
 	private static Scenario readScenario() {

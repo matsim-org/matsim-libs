@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 public class PlanGeneratorWithParkingActivitiesTest extends TestCase{
 
@@ -24,7 +24,7 @@ public class PlanGeneratorWithParkingActivitiesTest extends TestCase{
 		
 		pghc.processPlans();
 		
-		ScenarioImpl scenario = pghc.getScenario();
+		MutableScenario scenario = pghc.getScenario();
 		
 		Plan planOfPersonOne=scenario.getPopulation().getPersons().get(Id.create(1, Person.class)).getSelectedPlan();	
 		

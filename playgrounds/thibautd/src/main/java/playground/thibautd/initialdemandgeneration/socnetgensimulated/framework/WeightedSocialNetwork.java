@@ -20,15 +20,14 @@
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
 import gnu.trove.set.TIntSet;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 
 /**
  * Stores ties and their utilities, if they are over a pre-defined threshold.

@@ -14,10 +14,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.controler.*;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,8 +35,6 @@ import playground.balac.onewaycarsharingredisgned.router.OneWayCarsharingRDRouti
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-
-import javax.inject.Provider;
 
 public class CarsharingMATSimLControler {
 
@@ -118,63 +113,44 @@ public class CarsharingMATSimLControler {
 		            }
 		        });
 
-			controler.setTripRouterFactory(
-                    new javax.inject.Provider<org.matsim.core.router.TripRouter>() {
-                        @Override
-                        public TripRouter get() {
-                            // this factory initializes a TripRouter with default modules,
-                            // taking into account what is asked for in the config
+			    controler.addOverridingModule(new AbstractModule() {
 
-                            // This allows us to just add our module and go.
-							final Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
+					@Override
+					public void install() {
 
-                            final TripRouter router = delegate.get();
+						addRoutingModuleBinding("twowaycarsharing").toInstance(new TwoWayCSRoutingModule());
+						addRoutingModuleBinding("freefloating").toInstance(new FreeFloatingRoutingModule());
+						addRoutingModuleBinding("onewaycarsharing").toInstance(new OneWayCarsharingRDRoutingModule());
 
-                            // add our module to the instance
-                            router.setRoutingModule(
-                                "twowaycarsharing",
-                                new TwoWayCSRoutingModule());
+						bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
 
-                            router.setRoutingModule(
-                                    "freefloating",
-                                    new FreeFloatingRoutingModule());
+		                    final MainModeIdentifier defaultModeIdentifier = new MainModeIdentifierImpl();
+							
+							@Override
+							public String identifyMainMode(List<? extends PlanElement> tripElements) {
 
-                            router.setRoutingModule(
-                                    "onewaycarsharing",
-                                    new OneWayCarsharingRDRoutingModule());
-
-                            // we still need to provide a way to identify our trips
-                            // as being twowaycarsharing trips.
-                            // This is for instance used at re-routing.
-                            final MainModeIdentifier defaultModeIdentifier =
-                                router.getMainModeIdentifier();
-                            router.setMainModeIdentifier(
-                                    new MainModeIdentifier() {
-                                        @Override
-                                        public String identifyMainMode(
-                                                final List<? extends PlanElement> tripElements) {
-                                            for ( PlanElement pe : tripElements ) {
-                                                if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
-                                                    return "twowaycarsharing";
-                                                }
-                                                else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "onewaycarsharing" ) ) {
-                                                    return "onewaycarsharing";
-                                                }
-                                                else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
-                                                    return "freefloating";
-                                                }
-                                            }
-                                            // if the trip doesn't contain a carsharing leg,
-                                            // fall back to the default identification method.
-                                            return defaultModeIdentifier.identifyMainMode( tripElements );
-                                        }
-                                    });
-
-                            return router;
-                        }
-
-
-                });
+								for ( PlanElement pe : tripElements ) {
+		                            if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
+		                                return "twowaycarsharing";
+		                            }
+		                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "onewaycarsharing" ) ) {
+		                                return "onewaycarsharing";
+		                            }
+		                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
+		                                return "freefloating";
+		                            }
+		                        }
+		                        // if the trip doesn't contain a carsharing leg,
+		                        // fall back to the default identification method.
+		                        return defaultModeIdentifier.identifyMainMode( tripElements );
+							
+							}				
+							
+						});		
+						
+					}
+					
+				});
 
 			connectFacilitiesWithNetwork( controler );
 
@@ -192,7 +168,7 @@ public class CarsharingMATSimLControler {
 
 		}
 
-		private static void connectFacilitiesWithNetwork(Controler controler) {
+		private static void connectFacilitiesWithNetwork(MatsimServices controler) {
 	        ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 			//log.warn("number of facilities: " +facilities.getFacilities().size());
 	        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
@@ -202,7 +178,7 @@ public class CarsharingMATSimLControler {
 			wcl.connectFacilitiesWithLinks(facilities, network);
 		}
 
-		private static void initializeLocationChoice( final Controler controler ) {
+		private static void initializeLocationChoice( final MatsimServices controler ) {
 			final Scenario scenario = controler.getScenario();
 			final DestinationChoiceBestResponseContext lcContext =
 				new DestinationChoiceBestResponseContext( scenario );

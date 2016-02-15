@@ -205,14 +205,14 @@ public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEvent
 		/*
 		 * write text files
 		 */
-		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "activitiyAgentsInEvacuationArea.txt");
+		fileName = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "activitiyAgentsInEvacuationArea.txt");
 		writer.write(fileName, activityBins, activityBinsParticipatingAtHome, activityBinsParticipatingNotAtHome, 
 				activityBinsNotParticipatingAtHome, activityBinsNotParticipatingNotAtHome);
 		
 		/*
 		 * write activity performing graphs
 		 */
-		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "activityAgentsInEvacuationArea.png");
+		fileName = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "activityAgentsInEvacuationArea.png");
 		writer.writeGraphic(fileName, activityBins, activityBinsParticipatingAtHome, activityBinsParticipatingNotAtHome, 
 				activityBinsNotParticipatingAtHome, activityBinsNotParticipatingNotAtHome);
 	}

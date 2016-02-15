@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 public class NetworkReadExample {
@@ -37,9 +37,9 @@ public class NetworkReadExample {
 		//getFilteredEquilNetLinks();
 	}
 	public static Map<Id<Link>, ? extends Link> getNetworkLinks(String networkFile, Coord center, double radius){ //read network
-		ScenarioImpl scenanrioImpl = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()); // create a new scenario object
+		MutableScenario scenanrioImpl = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig()); // create a new scenario object
 
-		new MatsimNetworkReader(scenanrioImpl).readFile(networkFile);//matsim function, need scenario object for reading
+		new MatsimNetworkReader(scenanrioImpl.getNetwork()).readFile(networkFile);//matsim function, need scenario object for reading
 		// read the network file
 		Network network=scenanrioImpl.getNetwork();
 
@@ -65,7 +65,7 @@ public class NetworkReadExample {
 	}
 	public static double getDistance(Coord coordA, Coord coordB){
 //		return Math.sqrt(((coordA.getX()-coordB.getX())*(coordA.getX()-coordB.getX()) + (coordA.getY()-coordB.getY())*(coordA.getY()-coordB.getY())));
-		return CoordUtils.calcDistance(coordA, coordA);
+		return CoordUtils.calcDistance(coordA, coordB);
 	} //filter algorithm
 
 }

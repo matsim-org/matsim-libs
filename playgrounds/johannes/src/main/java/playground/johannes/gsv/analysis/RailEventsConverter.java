@@ -10,7 +10,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import playground.johannes.gsv.sim.TransitAlightEvent;
 import playground.johannes.gsv.sim.TransitBoardEvent;
 import playground.johannes.gsv.sim.TransitLineEvent;

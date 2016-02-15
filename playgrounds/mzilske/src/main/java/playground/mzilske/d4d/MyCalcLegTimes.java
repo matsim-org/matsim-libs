@@ -35,7 +35,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -65,7 +64,7 @@ public class MyCalcLegTimes implements PersonDepartureEventHandler, PersonArriva
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		Scenario scenario = ScenarioUtils.createScenario(RunSimulation.createConfig("", 1.0));
 		scenario.getConfig().planCalcScore().setWriteExperiencedPlans(true);
-		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("/Users/zilske/d4d/output/network.xml");
 		MyCalcLegTimes events2ScoreCar = new MyCalcLegTimes(scenario, "car");
 		eventsManager.addHandler(events2ScoreCar);
 		MyCalcLegTimes events2ScoreOther = new MyCalcLegTimes(scenario, "other");

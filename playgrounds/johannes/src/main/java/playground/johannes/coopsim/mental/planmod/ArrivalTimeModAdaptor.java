@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.planmod;
 
-import java.util.Map;
-
 import playground.johannes.coopsim.mental.choice.ArrivalTimeSelector;
 import playground.johannes.coopsim.mental.choice.PlanIndexSelector;
+
+import java.util.Map;
 
 /**
  * @author illenberger

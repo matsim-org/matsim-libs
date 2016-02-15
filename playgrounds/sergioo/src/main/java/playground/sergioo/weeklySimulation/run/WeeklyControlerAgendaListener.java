@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -38,7 +39,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.*;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningAgendaFactory;
@@ -75,13 +76,13 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 	//Methods
 	//@Override
 	public void notifyStartup(StartupEvent event) {
-		final Controler controler = event.getControler();
+		final MatsimServices controler = event.getServices();
         TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getScenario().getNetwork());
         Network net = NetworkUtils.createNetwork();
 		HashSet<String> carMode = new HashSet<String>();
 		carMode.add(TransportMode.car);
 		filter.filter(net, carMode);
-		for(ActivityFacility facility:((ScenarioImpl)controler.getScenario()).getActivityFacilities().getFacilities().values())
+		for(ActivityFacility facility:((MutableScenario)controler.getScenario()).getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(((NetworkImpl)net).getNearestLinkExactly(facility.getCoord()).getId());
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		Set<String> modes = new HashSet<String>();
@@ -123,27 +124,30 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("ReRouteBase").toProvider(new ReRoutePlanStrategyFactory(scenario));
+				Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
+				addPlanStrategyBinding("ReRouteBase").toProvider(new ReRoutePlanStrategyFactory(scenario, tripRouterProvider));
 			}
 		});
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("TimeAllocationBase").toProvider(new TimeAllocationMutatorPlanStrategyFactory(scenario));
+				Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
+				addPlanStrategyBinding("TimeAllocationBase").toProvider(new TimeAllocationMutatorPlanStrategyFactory(scenario, tripRouterProvider));
 			}
 		});
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("TripSubtourModeChoiceBase").toProvider(new TripSubtourModeChoiceStrategyFactory(scenario));
+				Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
+				addPlanStrategyBinding("TripSubtourModeChoiceBase").toProvider(new TripSubtourModeChoiceStrategyFactory(scenario, tripRouterProvider));
 			}
 		});
-	/*WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
-		controler.getEvents().addHandler(waitTimeCalculator);
-		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
-		controler.getEvents().addHandler(stopStopTimeCalculator);
-		TransitRouterFactory transitRouterFactory = new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
-		controler.setTransitRouterFactory(transitRouterFactory);*/
+	/*WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(services.getScenario().getTransitSchedule(), services.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (services.getConfig().qsim().getEndTime()-services.getConfig().qsim().getStartTime()));
+		services.getEvents().addHandler(waitTimeCalculator);
+		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(services.getScenario().getTransitSchedule(), services.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (services.getConfig().qsim().getEndTime()-services.getConfig().qsim().getStartTime()));
+		services.getEvents().addHandler(stopStopTimeCalculator);
+		TransitRouterFactory transitRouterFactory = new TransitRouterWSImplFactory(services.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
+		services.setTransitRouterFactory(transitRouterFactory);*/
 		controler.addOverridingModule(new PRTripRouterModule());
 		final PassivePlannerManager passivePlannerManager = new PassivePlannerManager(controler.getConfig().global().getNumberOfThreads()-controler.getConfig().qsim().getNumberOfThreads());
 		controler.addControlerListener(passivePlannerManager);

@@ -20,10 +20,10 @@
 package playground.johannes.gsv.synPop.data;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.socnetgen.sna.gis.Zone;
+import org.matsim.contrib.socnetgen.sna.gis.ZoneLayer;
+import org.matsim.contrib.socnetgen.sna.gis.io.ZoneLayerSHP;
 import org.matsim.core.config.ConfigGroup;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.synpop.gis.DataLoader;
 
 import java.io.IOException;

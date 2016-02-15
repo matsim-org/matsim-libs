@@ -19,19 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import playground.johannes.coopsim.pysical.Trajectory;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.coopsim.pysical.Trajectory;
 
 /**
  * @author illenberger

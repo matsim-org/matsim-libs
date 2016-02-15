@@ -49,7 +49,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		super(args);
 		
 		// register this as a Controller Listener
-		super.addControlerListener(this);
+		controler.addControlerListener(this);
 		
 		throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL) ;
 	}
@@ -140,7 +140,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		 * might have been changed. Therefore, we have to ensure that the 
 		 * chains are still valid.
 		 */
-		for (Person person : this.getScenario().getPopulation().getPersons().values()) {
+		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
 			legModeChecker.run(person.getSelectedPlan());			
 		}
 	}
@@ -159,13 +159,13 @@ public class WithinDayParkingController extends WithinDayController implements R
 //			args=new String[]{"test/input/playground/wrashid/parkingSearch/withinday/chessboard/config.xml"};
 		}
 		final WithinDayParkingController controller = new WithinDayParkingController(args);
-		controller.getConfig().controler().setOverwriteFileSetting(
+		controller.controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 
-		controller.run();
+		controller.controler.run();
 		
 		System.exit(0);
 	}

@@ -28,7 +28,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.facilities.ActivityFacilities;
-
 import playground.thibautd.analysis.listeners.ModeAnalysis;
 
 /**

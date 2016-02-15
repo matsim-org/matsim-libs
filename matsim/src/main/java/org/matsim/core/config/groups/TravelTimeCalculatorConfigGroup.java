@@ -33,8 +33,8 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUPNAME = "travelTimeCalculator";
-	
-	public static enum TravelTimeCalculatorType {TravelTimeCalculatorArray,TravelTimeCalculatorHashMap} ;
+
+	public enum TravelTimeCalculatorType {TravelTimeCalculatorArray,TravelTimeCalculatorHashMap}
 	
 	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";
 	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
@@ -46,6 +46,7 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 
 	private static final String ANALYZEDMODES = "analyzedModes";
 	private static final String FILTERMODES = "filterModes";
+	private static final String SEPARATEMODES = "separateModes";
 
 	private TravelTimeCalculatorType travelTimeCalculator = TravelTimeCalculatorType.TravelTimeCalculatorArray;
 	private String travelTimeAggregator = "optimistic";
@@ -57,7 +58,8 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 
 	private String analyzedModes = TransportMode.car;
 	private boolean filterModes = false;
-	
+	private boolean separateModes = false;
+
 	public TravelTimeCalculatorConfigGroup() {
 		super(GROUPNAME);
 	}
@@ -72,8 +74,9 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 		map.put(TRAVEL_TIME_AGGREGATOR, "How to deal with congested time bins that have no link entry events. `optimistic' " +
 				"assumes free speed (too optimistic); 'experimental_LastMile' is experimental and probably too pessimistic.") ;
 		map.put(ANALYZEDMODES, "Transport modes that will be respected by the travel time collector. 'car' is default, which " +
-				"includes also bussed from the pt simulation module. Use this parameter in combination with 'filterModes' = true!");
+				"includes also busses from the pt simulation module. Use this parameter in combination with 'filterModes' = true!");
 		map.put(FILTERMODES, "If true, link travel times from legs performed on modes not included in the 'analyzedModes' parameter are ignored.");
+		map.put(SEPARATEMODES, "If true, link travel times are measured and calculated separately for each mode in analyzedModes. Other modes are ignored. If true, filterModes has no effect.");
 		// === 
 		String str = null ;
 		for ( TravelTimeCalculatorType type : TravelTimeCalculatorType.values() ) {
@@ -173,6 +176,16 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	@StringSetter( ANALYZEDMODES )
 	public void setAnalyzedModes(final String analyzedModes) {
 		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
+	}
+
+	@StringGetter(SEPARATEMODES)
+	public boolean getSeparateModes() {
+		return this.separateModes;
+	}
+
+	@StringSetter(SEPARATEMODES)
+	public void setSeparateModes(boolean separateModes) {
+		this.separateModes = separateModes;
 	}
 	
 }

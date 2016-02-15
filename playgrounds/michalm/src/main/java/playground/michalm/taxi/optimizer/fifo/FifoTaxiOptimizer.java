@@ -30,16 +30,19 @@ import playground.michalm.taxi.optimizer.*;
 public class FifoTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    public FifoTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
+    private final BestDispatchFinder dispatchFinder;
+
+    public FifoTaxiOptimizer(TaxiOptimizerContext optimContext)
     {
-        super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), true);
+        super(optimContext, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), true);
+        dispatchFinder = new BestDispatchFinder(optimContext);
     }
 
 
     @Override
     protected void scheduleUnplannedRequests()
     {
-        new FifoSchedulingProblem(optimConfig)
+        new FifoSchedulingProblem(optimContext, dispatchFinder)
                 .scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
     }
 }

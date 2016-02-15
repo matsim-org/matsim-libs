@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import java.util.Map;
-
 import org.matsim.core.config.ConfigGroup;
+
+import java.util.Map;
 
 /**
  * @author thibautd

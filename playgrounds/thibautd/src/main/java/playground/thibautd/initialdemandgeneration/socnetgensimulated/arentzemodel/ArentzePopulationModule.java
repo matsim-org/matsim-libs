@@ -21,7 +21,6 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.arentzemo
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import com.google.inject.Singleton;
 import gnu.trove.list.TCharList;
 import gnu.trove.list.array.TCharArrayList;
 import org.apache.log4j.Logger;
@@ -33,8 +32,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
-import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocialNetworkGenerationConfigGroup;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.IndexedPopulation;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocialNetworkGenerationConfigGroup;
 
 import java.util.ArrayList;
 import java.util.List;

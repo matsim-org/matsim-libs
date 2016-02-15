@@ -19,12 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
+import org.matsim.core.utils.io.MatsimXmlWriter;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.WeightedSocialNetwork.WeightedAlter;
+
 import java.util.Arrays;
 import java.util.Collections;
-
-import org.matsim.core.utils.io.MatsimXmlWriter;
-
-import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.WeightedSocialNetwork.WeightedAlter;
 
 /**
  * @author thibautd

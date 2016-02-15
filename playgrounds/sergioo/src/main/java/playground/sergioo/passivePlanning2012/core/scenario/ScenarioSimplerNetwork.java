@@ -16,7 +16,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -76,10 +76,6 @@ public class ScenarioSimplerNetwork implements Scenario {
 		delegate.addScenarioElement(name, o);
 	}
 	@Override
-	public Object removeScenarioElement(String name) {
-		return delegate.removeScenarioElement(name);
-	}
-	@Override
 	public Object getScenarioElement(String name) {
 		return delegate.getScenarioElement(name);
 	}
@@ -101,7 +97,7 @@ public class ScenarioSimplerNetwork implements Scenario {
 	}
 
 	@Override
-	public LaneDefinitions20 getLanes() {
+	public Lanes getLanes() {
 		return delegate.getLanes();
 	}
 

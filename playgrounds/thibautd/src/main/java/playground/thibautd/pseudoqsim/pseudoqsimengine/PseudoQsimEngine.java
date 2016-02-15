@@ -19,20 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.pseudoqsim.pseudoqsimengine;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.Collection;
-import java.util.Queue;
-import java.util.Random;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.PriorityBlockingQueue;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.DriverAgent;
@@ -48,7 +47,13 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.Collection;
+import java.util.Queue;
+import java.util.Random;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * An engine aimed at replacing the QnetsimEngine for a "PSim" like behavior.
@@ -207,7 +212,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 			//vehicle.setCurrentLink( linkId );
 
 			eventsManager.processEvent(
-					new Wait2LinkEvent(
+					new VehicleEntersTrafficEvent(
 						now,
 						agent.getId(),
 						linkId,
@@ -424,18 +429,16 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 				eventsManager.processEvent(
 					new LinkLeaveEvent(
 						time,
-						agent.getId(),
-						event.linkId,
-						event.vehicle.getId() ) );
+						event.vehicle.getId(),
+						event.linkId ) );
 
 				agent.notifyMoveOverNode( nextLinkId );
 
 				eventsManager.processEvent(
 					new LinkEnterEvent(
 						time,
-						agent.getId(),
-						nextLinkId,
-						event.vehicle.getId() ) );
+						event.vehicle.getId(),
+						nextLinkId ) );
 
 				arrivalQueue.add(
 						calcArrival(

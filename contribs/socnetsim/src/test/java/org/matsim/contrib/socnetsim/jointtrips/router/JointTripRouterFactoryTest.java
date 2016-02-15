@@ -32,6 +32,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -39,20 +42,16 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -102,7 +101,7 @@ public class JointTripRouterFactoryTest {
 		Id<Person> passengerId = Id.create( "passenger" , Person.class );
 
 		// driver
-		Person pers = PersonImpl.createPerson(driverId);
+		Person pers = PopulationUtils.createPerson(driverId);
 		PlanImpl plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
@@ -121,7 +120,7 @@ public class JointTripRouterFactoryTest {
 		dLeg.setRoute( dRoute );
 
 		// passenger
-		pers = PersonImpl.createPerson(passengerId);
+		pers = PopulationUtils.createPerson(passengerId);
 		plan = new PlanImpl( pers );
 		pers.addPlan( plan );
 		pers.setSelectedPlan( plan );
@@ -150,13 +149,13 @@ public class JointTripRouterFactoryTest {
 	}
 
 	private static Provider<TripRouter> createFactory(final Scenario scenario) {
-		Injector injector = Injector.createInjector(
+		com.google.inject.Injector injector = Injector.createInjector(
 				scenario.getConfig(),
 				AbstractModule.override(Collections.singleton(new AbstractModule() {
 					@Override
 					public void install() {
-						bind(Scenario.class).toInstance(scenario);
 						bind(EventsManager.class).toInstance(EventsUtils.createEventsManager(scenario.getConfig()));
+						install(new ScenarioByInstanceModule(scenario));
 						install(new TripRouterModule());
 						install(new TravelTimeCalculatorModule());
 						install(new TravelDisutilityModule());

@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
@@ -61,7 +61,7 @@ public class HUPCIdentifier extends DuringLegAgentSelector implements MobsimInit
 	private final WithinDayAgentUtils withinDayAgentUtils;
 	private Scenario scenario;
 
-	public HUPCIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructureZH parkingInfrastructure, Controler controler) {
+	public HUPCIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructureZH parkingInfrastructure, MatsimServices controler) {
 		this.parkingAgentsTracker = parkingAgentsTracker;
 		this.parkingInfrastructure = parkingInfrastructure;
 		

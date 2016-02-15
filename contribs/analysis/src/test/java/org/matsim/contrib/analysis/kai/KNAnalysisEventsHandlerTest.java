@@ -43,9 +43,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.misc.Time;
@@ -73,7 +73,7 @@ public class KNAnalysisEventsHandlerTest {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		this.population = scenario.getPopulation();
-		Person person = PersonImpl.createPerson(DEFAULT_PERSON_ID);
+		Person person = PopulationUtils.createPerson(DEFAULT_PERSON_ID);
 		this.population.addPerson(person);
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		plan.createAndAddActivity("act1", new Coord(100.0, 100.0));

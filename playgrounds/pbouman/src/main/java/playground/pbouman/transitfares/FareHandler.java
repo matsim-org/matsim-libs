@@ -22,7 +22,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.pbouman.transitfares.FarePolicies.DiscountInterval;
 
@@ -44,7 +44,7 @@ public class FareHandler implements
 	
 //	private LinkedList<DiscountInterval> discountIntervals;
 //	private LinkedList<PricingPolicy> pricingPolicies;
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 //	private double transferGracePeriod;
 
 	private HashMap<Id, Id> driverToVehicle;
@@ -69,7 +69,7 @@ public class FareHandler implements
 	
 	public FareHandler(Scenario s, String oFile)
 	{
-		scenario = (ScenarioImpl) s;
+		scenario = (MutableScenario) s;
 		reset(0);
 		output = oFile;
 	}
@@ -209,8 +209,8 @@ public class FareHandler implements
 	@Override
 	public void notifyStartup(StartupEvent event)
 	{
-		event.getControler().getEvents().addHandler(this);
-		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
+		event.getServices().getEvents().addHandler(this);
+		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
 		policies = new FarePolicies(scenario);
 		scenario.addScenarioElement(FarePolicies.ELEMENT_NAME, policies);
 	}
@@ -232,7 +232,7 @@ public class FareHandler implements
 			
 			PersonMoneyEvent ame =  new PersonMoneyEvent(24*3600, p, -(fare*factor));
 			rev += fare;
-			event.getControler().getEvents().processEvent(ame);
+			event.getServices().getEvents().processEvent(ame);
 		}
 		if (output != null)
 		{

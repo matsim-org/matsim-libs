@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.facilities.ActivityFacility;
+
+import java.util.Map;
 
 /**
  * @author thibautd

@@ -1,9 +1,11 @@
 package playground.sergioo.hits2012;
 
-public abstract class Stage {
+import java.io.Serializable;
+
+public abstract class Stage implements Serializable {
 
 	//Enumerations
-	public static enum Column {
+	public static enum Column implements Serializable {
 	
 		MODE(82, "CE"),
 		MODE_OTHERS(83, "CF"),
@@ -38,7 +40,7 @@ public abstract class Stage {
 	
 	}
 	
-	public static enum Mode {
+	public static enum Mode implements Serializable {
 	
 		CAR_DRIVER("Car driver"),
 		CAR_PASSENGER("Car passenger"),

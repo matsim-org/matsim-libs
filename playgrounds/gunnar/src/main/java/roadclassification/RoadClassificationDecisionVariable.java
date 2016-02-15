@@ -1,22 +1,23 @@
 package roadclassification;
 
 
-import floetteroed.opdyts.DecisionVariable;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.OsmNetworkReader;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import floetteroed.opdyts.DecisionVariable;
+
 class RoadClassificationDecisionVariable implements DecisionVariable {
+
+	static Logger log = Logger.getLogger(RoadClassificationDecisionVariable.class);
+
+
+	public List<LinkSettings> getLinkSettingses() {
+		return linkSettingses;
+	}
 
 	private final List<LinkSettings> linkSettingses;
 	private final ObjectAttributes linkAttributes;
@@ -30,6 +31,10 @@ class RoadClassificationDecisionVariable implements DecisionVariable {
 
 	@Override
 	public final void implementInSimulation() {
+		log.info("--DecisionVariable follows--");
+		for (LinkSettings linkSettings : getLinkSettingses()) {
+			log.info(String.format("%d %d %d\n", (int) linkSettings.getCapacity(), (int) linkSettings.getFreespeed(), (int) linkSettings.getNofLanes()));
+		}
 		for (Link link : network.getLinks().values()) {
 			LinkSettings roadCategory = linkSettingses.get((int) linkAttributes.getAttribute(link.getId().toString(), "roadCategory"));
 			link.setFreespeed(roadCategory.getFreespeed());

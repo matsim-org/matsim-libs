@@ -22,6 +22,8 @@ package org.matsim.core.events.algorithms;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -32,7 +34,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -41,14 +43,15 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
 
 public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, ActivityStartEventHandler, PersonArrivalEventHandler, 
 		PersonDepartureEventHandler, PersonStuckEventHandler, PersonMoneyEventHandler, 
-		Wait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+		VehicleEntersTrafficEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 	
 	/* Implement all the different event handlers by its own. Future event types will no longer be
 	 * suitable to be written to a TXT-format file, but will have additional attributes that need to be
@@ -60,6 +63,8 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 	private BufferedWriter out = null;
 	private double lastTime = Double.NaN;
 	private String timeString = null;
+	
+	private Map<Id<Vehicle>, Id<Person>> vehicleToDriverMap = new HashMap<>();
 
 	public EventWriterTXT(final String filename) {
 		init(filename);
@@ -179,17 +184,19 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 	}
 
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, Wait2LinkEvent.EVENT_TYPE);
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, VehicleEntersTrafficEvent.EVENT_TYPE);
+		
+		vehicleToDriverMap.put(event.getVehicleId(), event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		writeLine(event.getTime(), event.getDriverId(), event.getLinkId(), 5, LinkEnterEvent.EVENT_TYPE);
+		writeLine(event.getTime(), vehicleToDriverMap.get(event.getVehicleId()), event.getLinkId(), 5, LinkEnterEvent.EVENT_TYPE);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		writeLine(event.getTime(), event.getDriverId(), event.getLinkId(), 2, LinkLeaveEvent.EVENT_TYPE);
+		writeLine(event.getTime(), vehicleToDriverMap.get(event.getVehicleId()), event.getLinkId(), 2, LinkLeaveEvent.EVENT_TYPE);
 	}
 }

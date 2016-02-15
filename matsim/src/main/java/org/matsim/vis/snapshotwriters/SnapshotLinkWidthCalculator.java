@@ -43,7 +43,7 @@ public class SnapshotLinkWidthCalculator {
 		return laneWidth;
 	}
 	
-	public void setLinkWidth(double linkWidthCorrectionFactor){
+	public void setLinkWidthForVis(double linkWidthCorrectionFactor){
 		this.widthOfMedian = linkWidthCorrectionFactor;
 	}
 	

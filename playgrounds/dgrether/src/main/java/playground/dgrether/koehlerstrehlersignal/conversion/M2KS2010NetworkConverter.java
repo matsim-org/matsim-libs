@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
@@ -95,7 +95,7 @@ public class M2KS2010NetworkConverter {
 	}
 
 	public DgKSNetwork convertNetworkLanesAndSignals(Network network,
-			LaneDefinitions20 lanes, SignalsData signals, double startTime,
+			Lanes lanes, SignalsData signals, double startTime,
 			double endTime) {
 		return this.convertNetworkLanesAndSignals(network, lanes, signals,
 				null, startTime, endTime);
@@ -118,7 +118,7 @@ public class M2KS2010NetworkConverter {
 	 * @return the corresponding ks-model network
 	 */
 	public DgKSNetwork convertNetworkLanesAndSignals(Network network,
-			LaneDefinitions20 lanes, SignalsData signals,
+			Lanes lanes, SignalsData signals,
 			Envelope signalsBoundingBox, double startTime, double endTime) {
 		log.info("Checking cycle time...");
 		this.cycle = readCycle(signals);
@@ -154,7 +154,7 @@ public class M2KS2010NetworkConverter {
 	 * conversion of extended nodes: fromLink -> toLink : 2 crossing nodes + 1
 	 * light
 	 */
-	private DgKSNetwork convertNetwork(Network net, LaneDefinitions20 lanes,
+	private DgKSNetwork convertNetwork(Network net, Lanes lanes,
 			SignalsData signalsData) {
 		DgKSNetwork ksnet = new DgKSNetwork();
 		/*

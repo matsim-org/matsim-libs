@@ -54,7 +54,7 @@ public class AffectedAreaPenaltyCalculator {
 	public static void main(String[] args) {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario).readFile("../../matsim/mysimulations/census2000V2/input_10pct/network_ivtch.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("../../matsim/mysimulations/census2000V2/input_10pct/network_ivtch.xml.gz");
 		Network network = scenario.getNetwork();
 		
 		new EvacuationConfigReader().readFile("../../matsim/mysimulations/census2000V2/config_evacuation.xml");

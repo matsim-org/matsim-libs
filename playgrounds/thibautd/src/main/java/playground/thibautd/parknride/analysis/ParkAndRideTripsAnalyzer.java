@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.parknride.analysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
@@ -37,9 +34,11 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.pt.PtConstants;
-
 import playground.ivt.utils.WrapperChartUtil;
 import playground.thibautd.parknride.ParkAndRideConstants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides methods to create plots relative to various caracteristics of

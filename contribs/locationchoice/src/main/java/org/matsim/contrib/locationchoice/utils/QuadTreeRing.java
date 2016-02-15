@@ -23,6 +23,11 @@ import java.util.Collection;
 
 import org.matsim.core.utils.collections.QuadTree;
 
+/*
+ * The super-class now also supports the method getRing(...) and its internal realization should be faster.
+ * cdobler, oct'15 
+ */
+@Deprecated
 public class QuadTreeRing<T> extends QuadTree<T> {
 
 	private static final long serialVersionUID = 1L;

@@ -19,15 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.listeners;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ControlerEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -36,6 +31,11 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Event handler that computes statistics about the evolution of chosen
@@ -80,7 +80,7 @@ public class ModeAnalysis implements
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		Controler c = event.getControler();
+		MatsimServices c = event.getServices();
 		
 		if (c != null) {
 			c.getEvents().addHandler(this);
@@ -118,7 +118,7 @@ public class ModeAnalysis implements
 		List<String> modes = getUsedModes();
 		double[] xAxis = getXAxis();
 		Map<String, double[]> yAxes = getYAxes(modes);
-		String fileName = event.getControler().getControlerIO().getOutputFilename(FILE_NAME);
+		String fileName = event.getServices().getControlerIO().getOutputFilename(FILE_NAME);
 		XYLineChart globalChart = new XYLineChart(title+", all modes", X_TITLE, Y_TITLE);
 		XYLineChart particularChart;
 

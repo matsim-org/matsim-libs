@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.analysis.populationstats;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.LogarithmicAxis;
@@ -31,8 +26,12 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.AbstractIntervalXYDataset;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.ivt.utils.WrapperChartUtil;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Counts the number of cliques of each size, and outputs a graph

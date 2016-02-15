@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.boescpa.lib.tools.coordUtils.CoordAnalyzer;
-import playground.boescpa.lib.tools.shpUtils.SHPFileUtil;
+import playground.boescpa.lib.tools.SHPFileUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -175,7 +175,7 @@ public abstract class OsmFilter {
 		public OsmFilterShp(final String pathToShpFile) {
 			this.pathToShpFile = pathToShpFile;
 			Set<SimpleFeature> features = new HashSet<>();
-			SHPFileUtil util = new SHPFileUtil();
+			SHPFileUtils util = new SHPFileUtils();
 			features.addAll(ShapeFileReader.getAllFeatures(this.pathToShpFile));
 			Geometry area = util.mergeGeometries(features);
 			this.coordAnalyzer = new CoordAnalyzer(area);

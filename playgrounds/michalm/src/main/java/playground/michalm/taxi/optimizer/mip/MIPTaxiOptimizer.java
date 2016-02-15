@@ -36,7 +36,7 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 public class MIPTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
+    private final PathTreeBasedTravelTimeCalculator pathTreeTravelTimeCalc;
 
     private boolean wasLastPlanningHorizonFull = false;//in order to run optimization for the first request
     private boolean hasPickedUpReqsRecently = false;
@@ -44,19 +44,19 @@ public class MIPTaxiOptimizer
     private int optimCounter = 0;
 
 
-    public MIPTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
+    public MIPTaxiOptimizer(TaxiOptimizerContext optimContext)
     {
-        super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
+        super(optimContext, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
 
-        if (!optimConfig.scheduler.getParams().destinationKnown) {
+        if (!optimContext.scheduler.getParams().destinationKnown) {
             throw new IllegalArgumentException("Destinations must be known ahead");
         }
 
         TravelTime travelTime = new FreeSpeedTravelTime();
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 
-        pathTravelTimeCalc = new PathTreeBasedTravelTimeCalculator(
-                new DijkstraWithDijkstraTreeCache(optimConfig.context.getScenario().getNetwork(),
+        pathTreeTravelTimeCalc = new PathTreeBasedTravelTimeCalculator(
+                new DijkstraWithDijkstraTreeCache(optimContext.context.getScenario().getNetwork(),
                         travelDisutility, travelTime, TimeDiscretizer.CYCLIC_24_HOURS));
     }
 
@@ -75,12 +75,12 @@ public class MIPTaxiOptimizer
             return;
         }
 
-        MIPProblem mipProblem = new MIPProblem(optimConfig, pathTravelTimeCalc);
+        MIPProblem mipProblem = new MIPProblem(optimContext, pathTreeTravelTimeCalc);
         mipProblem.scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
 
         optimCounter++;
         if (optimCounter % 10 == 0) {
-            System.err.println(optimCounter + "; time=" + optimConfig.context.getTime());
+            System.err.println(optimCounter + "; time=" + optimContext.context.getTime());
         }
 
         wasLastPlanningHorizonFull = mipProblem.isPlanningHorizonFull();

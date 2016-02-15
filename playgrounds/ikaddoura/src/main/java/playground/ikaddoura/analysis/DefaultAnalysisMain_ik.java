@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.analysis.DefaultAnalysis_ik;
@@ -41,7 +41,7 @@ public class DefaultAnalysisMain_ik {
 	private final String iterationOutputDir;
 	private final String eventsFile;
 
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	
 	/**
 	 * 
@@ -108,7 +108,7 @@ public class DefaultAnalysisMain_ik {
 	private void readFiles(String shapeFile) {
 		
 		log.info("Reading scenario...");
-		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(this.config);
+		this.scenario = (MutableScenario) ScenarioUtils.loadScenario(this.config);
 		log.info("Reading scenario... done.");
 		
 		Gbl.printElapsedTime();

@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -27,7 +27,7 @@ import java.util.LinkedList;
 public class IterEndStats {
 	HashMap<Id, LinkedList<ParkingSpot>> parkings=new HashMap<Id, LinkedList<ParkingSpot>>();
 	public void run(ParkControl parkControl){
-		Controler controler = parkControl.controller;
+		MatsimServices controler = parkControl.controller;
 		if(!parkControl.evUsage){
 			System.out.println("Iteration end stats does not work without EV usage");
 			return;

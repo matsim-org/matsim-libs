@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
@@ -57,7 +57,7 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 	
 	private static final Logger log = Logger.getLogger(TravelStatsHandler.class);
 	
-	private final ScenarioImpl scenario;
+	private final MutableScenario scenario;
 	private final Double interval;
 	
 	private final Map<Id<Vehicle>, String> transitVehicleId2transportModeMap;
@@ -73,7 +73,7 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 	private Integer maxSlice = 0;
 	
 	public TravelStatsHandler(Scenario scenario, Double interval) {
-		this.scenario = (ScenarioImpl) scenario;
+		this.scenario = (MutableScenario) scenario;
 		this.interval = interval;
 
 		this.transitVehicleId2transportModeMap = new HashMap<>();

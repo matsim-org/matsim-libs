@@ -82,7 +82,7 @@ public abstract class PtCountsFixture {
 		new MatsimCountsReader(this.counts).readFile(config.findParam(MODULE_NAME, countFileParamName));
 
 		this.network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(config.network().getInputFile());
 	}
 
 	public abstract CountsComparisonAlgorithm getCCA();

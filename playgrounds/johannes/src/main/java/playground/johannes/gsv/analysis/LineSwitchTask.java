@@ -1,12 +1,11 @@
 package playground.johannes.gsv.analysis;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.pysical.Trajectory;
+
+import java.util.Map;
+import java.util.Set;
 
 public class LineSwitchTask extends TrajectoryAnalyzerTask {
 

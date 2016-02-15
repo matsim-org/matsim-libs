@@ -31,6 +31,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 
+import javax.inject.Inject;
+
 /**
  * @author dgrether, mrieser
  */
@@ -38,13 +40,14 @@ public class PopulationFactoryImpl implements PopulationFactory {
 
 	private final ModeRouteFactory routeFactory;
 
-    PopulationFactoryImpl(ModeRouteFactory routeFactory) {
+    @Inject
+	PopulationFactoryImpl(ModeRouteFactory routeFactory) {
         this.routeFactory = routeFactory;
     }
 
     @Override
 	public Person createPerson(final Id<Person> id) {
-        return PersonImpl.createPerson(id);
+        return PopulationUtils.createPerson(id);
 	}
 
 	@Override

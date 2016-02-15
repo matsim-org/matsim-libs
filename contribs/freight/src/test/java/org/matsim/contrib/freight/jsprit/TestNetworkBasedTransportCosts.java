@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
+import jsprit.core.problem.Location;
 import jsprit.core.problem.driver.Driver;
 import jsprit.core.problem.vehicle.Vehicle;
 import jsprit.core.problem.vehicle.VehicleType;
@@ -31,7 +32,7 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = getClassInputDirectory() + "network.xml";
-		new NetworkReaderMatsimV1(scenario).parse(NETWORK_FILENAME);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(NETWORK_FILENAME);
 		
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(network);
@@ -53,8 +54,8 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		when(vehicle2.getType()).thenReturn(type2);
 		when(vehicle2.getId()).thenReturn("vehicle2");
 		
-		assertEquals(20000.0, c.getTransportCost("20", "21", 0.0, mock(Driver.class), vehicle1), 0.01);
-		assertEquals(40000.0, c.getTransportCost("20", "21", 0.0, mock(Driver.class), vehicle2), 0.01);
+		assertEquals(20000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
+		assertEquals(40000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
 
 	}
 	
@@ -64,7 +65,7 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = getClassInputDirectory() + "network.xml";
-		new NetworkReaderMatsimV1(scenario).parse(NETWORK_FILENAME);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(NETWORK_FILENAME);
 		
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder = NetworkBasedTransportCosts.Builder.newInstance(network);
@@ -80,7 +81,7 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		when(vehicle2.getId()).thenReturn("vehicle2");
 		
 		try{
-			c.getTransportCost("20", "21", 0.0, mock(Driver.class), vehicle2);
+			c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2);
 		}
 		catch(IllegalStateException e){ assertTrue(true); }
 		
@@ -92,7 +93,7 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		String NETWORK_FILENAME = getClassInputDirectory() + "network.xml";
-		new NetworkReaderMatsimV1(scenario).parse(NETWORK_FILENAME);
+		new NetworkReaderMatsimV1(scenario.getNetwork()).parse(NETWORK_FILENAME);
 		
 		CarrierVehicleType vtype1 = mock(CarrierVehicleType.class);
 		VehicleCostInformation param1 = new VehicleCostInformation(0.0, 2.0, 0.0);
@@ -123,8 +124,8 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		when(vehicle2.getType()).thenReturn(type2);
 		when(vehicle2.getId()).thenReturn("vehicle2");
 		
-		assertEquals(20000.0, c.getTransportCost("20", "21", 0.0, mock(Driver.class), vehicle1), 0.01);
-		assertEquals(40000.0, c.getTransportCost("20", "21", 0.0, mock(Driver.class), vehicle2), 0.01);
+		assertEquals(20000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
+		assertEquals(40000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
 
 	}
 

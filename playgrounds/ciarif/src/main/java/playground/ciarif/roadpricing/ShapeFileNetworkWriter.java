@@ -45,7 +45,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 		public void writeNetwork(String network, String outfile) {
 			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			Network net = scenario.getNetwork();
-			MatsimNetworkReader reader = new MatsimNetworkReader(scenario);
+			MatsimNetworkReader reader = new MatsimNetworkReader(scenario.getNetwork());
 			reader.readFile(network);
 			writeNetwork(net, outfile);
 		}

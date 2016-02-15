@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 public interface Vehicle
     extends Identifiable<Vehicle>
 {
-    Link getStartLink();// TODO or just BasicLocation getStartLocation()?? and getEndLocation()??
+    Link getStartLink();
 
 
     double getCapacity();

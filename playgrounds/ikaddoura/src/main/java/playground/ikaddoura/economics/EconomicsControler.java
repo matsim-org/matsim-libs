@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -39,7 +39,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
@@ -105,9 +105,9 @@ public class EconomicsControler {
 		config.controler().setOutputDirectory(path + "output_StandardRunUserSpecificPricing/");
 		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 
 		Controler controler = new Controler(scenario);
@@ -125,12 +125,12 @@ public class EconomicsControler {
 				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 			}
 		});
-		controler.addControlerListener(new MarginalCongestionPricingContolerListener( controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())  ));
+		controler.addControlerListener(new MarginalCongestionPricingContolerListener( controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (MutableScenario) controler.getScenario())  ));
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.getConfig().controler().setCreateGraphs(true);
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.run();
 		
 	}
@@ -151,9 +151,9 @@ public class EconomicsControler {
 		config.controler().setOutputDirectory(path + "output_StandardRunFlatPricing_" + flatToll + "/");
 		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 
 		Controler controler = new Controler(scenario);
@@ -169,7 +169,7 @@ public class EconomicsControler {
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.getConfig().controler().setCreateGraphs(true);
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.run();
 		
 	}
@@ -187,9 +187,9 @@ public class EconomicsControler {
 		config.controler().setOutputDirectory(path + "output_StandardRunNoPricing/");
 		config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
-		new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 
 		Controler controler = new Controler(scenario);
@@ -200,7 +200,7 @@ public class EconomicsControler {
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(true);
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.run();
 	}
 
@@ -221,9 +221,9 @@ public class EconomicsControler {
 			config.controler().setOutputDirectory(path + "output_DemandAsFunctionOfCost_" + cost + "/");
 			config.plans().setInputFile(path + "input/population_" + maxDemand + ".xml");
 			
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 			
-			new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+			new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 			new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 			
 			Controler controler = new Controler(scenario);
@@ -234,7 +234,7 @@ public class EconomicsControler {
 					OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 			controler.getConfig().controler().setCreateGraphs(false);
             controler.addControlerListener(demandFunctionControlerListener);
-			controler.addOverridingModule(new OTFVisModule());
+			controler.addOverridingModule(new OTFVisFileWriterModule());
 			controler.run();
 			
 			// analysis
@@ -280,8 +280,8 @@ public class EconomicsControler {
 			Population population = PopulationUtils.createPopulation(config);
 			population = generatePopulation(population, demand);
 			
-			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-			new MatsimNetworkReader(scenario).readFile(scenario.getConfig().network().getInputFile());
+			MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
+			new MatsimNetworkReader(scenario.getNetwork()).readFile(scenario.getConfig().network().getInputFile());
 			scenario.setPopulation(population);
 			
 			if (demand == maxDemand) {
@@ -291,13 +291,13 @@ public class EconomicsControler {
 			
 			Controler controler = new Controler(scenario);
 
-			CostFunctionsControlerListener economicsControlerListener = new CostFunctionsControlerListener((ScenarioImpl) controler.getScenario());
+			CostFunctionsControlerListener economicsControlerListener = new CostFunctionsControlerListener((MutableScenario) controler.getScenario());
 
 			controler.getConfig().controler().setOverwriteFileSetting(
 					OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 			controler.getConfig().controler().setCreateGraphs(false);
             controler.addControlerListener(economicsControlerListener);
-			controler.addOverridingModule(new OTFVisModule());
+			controler.addOverridingModule(new OTFVisFileWriterModule());
 			controler.run();
 			
 			// analysis

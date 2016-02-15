@@ -33,6 +33,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.legMode.distributions.LegModeRouteDistanceDistributionHandler;
+import playground.agarwalamit.utils.ListUtils;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -49,8 +50,6 @@ public class ModalTravelDistance {
 		for(String runCase : runCases){
 			new ModalTravelDistance().run(dir+runCase+"/ITERS/it.1500/1500.events.xml.gz", dir+runCase);
 		}
-		
-
 	}
 
 	private  void run(String eventsFile, String outputDir){
@@ -73,10 +72,8 @@ public class ModalTravelDistance {
 			double modeSum = 0.;
 			int modeLegs = 0;
 			for(Id<Person> p : mode2Person2TripDistances.get(mode).keySet()){
-				for(Double d :mode2Person2TripDistances.get(mode).get(p)){
-					modeSum += d;
-					modeLegs ++;
-				}
+				modeLegs += mode2Person2TripDistances.get(mode).get(p).size();
+				modeSum = ListUtils.doubleSum(mode2Person2TripDistances.get(mode).get(p));
 			}
 			mode2TotalTripDists.put(mode, modeSum);
 			mode2NoOfLegs.put(mode, modeLegs);

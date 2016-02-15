@@ -19,33 +19,46 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 public class PathCostsNetwork extends PathCosts {
 	
 	public PathCostsNetwork(Network network) {
 		super(network);
 	}
-
-	public void createRoute(List<Link> linksAllIncluded, double traveltime) {
-		List<Id<Link>> linkIds = new ArrayList<Id<Link>>(); 
-		for (int i = 1; i < linksAllIncluded.size() - 2; i++) {
-			linkIds.add(linksAllIncluded.get(i).getId());
-		}
-		this.route = new LinkNetworkRouteImpl(linksAllIncluded.get(0).getId(), linkIds, linksAllIncluded.get(linksAllIncluded.size()-1).getId());
-		this.calculateNetworkRouteLength();
-		this.route.setTravelTime(traveltime);
-	}
+	
+	public void createRoute(Id<Link> fromLinkId, Path path, Id<Link> toLinkId) {
 		
-	private void calculateNetworkRouteLength() {		
-		this.route.setDistance(RouteUtils.calcDistance((NetworkRoute) route, network));
+		NetworkRoute networkRoute = new LinkNetworkRouteImpl(fromLinkId, toLinkId);
+		if (!fromLinkId.equals(toLinkId)) {
+			// do not drive/walk around, if we stay on the same link
+//			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
+//			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+//			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			networkRoute.setLinkIds(fromLinkId, NetworkUtils.getLinkIds(path.links), toLinkId);
+			networkRoute.setTravelTime(path.travelTime);
+			networkRoute.setTravelCost(path.travelCost);
+			networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, this.network));
+		} else {
+			// create an empty route == staying on place if toLink == endLink
+			route.setTravelTime(0);
+			route.setDistance(0.0);
+		}
+		this.route = networkRoute;
+		
+//		List<Id<Link>> linkIds = new ArrayList<Id<Link>>(); 
+//		for (int i = 1; i < linksAllIncluded.size() - 2; i++) {
+//			linkIds.add(linksAllIncluded.get(i).getId());
+//		}
+//		this.route = new LinkNetworkRouteImpl(linksAllIncluded.get(0).getId(), linkIds, linksAllIncluded.get(linksAllIncluded.size()-1).getId());
+//		this.calculateNetworkRouteLength();
+//		this.route.setTravelTime(traveltime);
 	}
 }

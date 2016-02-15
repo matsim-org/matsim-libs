@@ -102,7 +102,7 @@ public class MyDemandGenerator {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population p = scenario.getPopulation();
 		
-		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(scenario);
+		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(scenario.getNetwork());
 		nr.parse(networkFile.getAbsolutePath());
 		NetworkImpl ni = (NetworkImpl) scenario.getNetwork(); 
 		
@@ -115,7 +115,7 @@ public class MyDemandGenerator {
 				while((line = br.readLine()) != null){
 					String[] entry = line.split(",");
 					String agentId = entry[0];
-					Person agent = PersonImpl.createPerson(Id.create(agentId, Person.class));
+					Person agent = PopulationUtils.createPerson(Id.create(agentId, Person.class));
 					PersonUtils.setEmployed(agent, true);
 
 					Plan plan = new PlanImpl(agent);

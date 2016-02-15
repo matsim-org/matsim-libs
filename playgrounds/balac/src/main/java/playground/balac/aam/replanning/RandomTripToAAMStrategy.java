@@ -10,18 +10,21 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
 
 
 public class RandomTripToAAMStrategy implements PlanStrategy{
 	private final PlanStrategyImpl strategy;
 	
-	public RandomTripToAAMStrategy(final Scenario controler) {
+	public RandomTripToAAMStrategy(final Scenario controler, Provider<TripRouter> tripRouterProvider) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 		 	
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   //lets try without this, not sure if it is needed
-		AAMTripModeChoice smc = new AAMTripModeChoice(controler.getConfig());
+		AAMTripModeChoice smc = new AAMTripModeChoice(controler.getConfig(), tripRouterProvider);
 		addStrategyModule(smc );
-		addStrategyModule( new ReRoute(controler) );
+		addStrategyModule( new ReRoute(controler, tripRouterProvider) );
 	}
 	public void addStrategyModule(final PlanStrategyModule module) {
 		strategy.addStrategyModule(module);

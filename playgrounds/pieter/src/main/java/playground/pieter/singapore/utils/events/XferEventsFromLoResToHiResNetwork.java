@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -48,7 +48,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.TransitRouteImpl;
@@ -87,7 +87,7 @@ public class XferEventsFromLoResToHiResNetwork{
 		private final EventsManager linkEvents = EventsUtils.createEventsManager();
 		{
 			filteredEvents = new HashSet<>();
-			filteredEvents.add(Wait2LinkEvent.EVENT_TYPE);
+			filteredEvents.add(VehicleEntersTrafficEvent.EVENT_TYPE);
 			filteredEvents.add(LinkEnterEvent.EVENT_TYPE);
 			filteredEvents.add(LinkLeaveEvent.EVENT_TYPE);
 			filteredEvents.add(VehicleArrivesAtFacilityEvent.EVENT_TYPE);
@@ -172,8 +172,8 @@ public class XferEventsFromLoResToHiResNetwork{
 		}
 	}
 
-	private final ScenarioImpl loRes;
-	private final ScenarioImpl hiRes;
+	private final MutableScenario loRes;
+	private final MutableScenario hiRes;
 	
 	private final File outpath;
 	private final Map<String, LinkedList<Event>> vehicleLinkEvents;
@@ -184,12 +184,12 @@ public class XferEventsFromLoResToHiResNetwork{
 
 	private XferEventsFromLoResToHiResNetwork(String loResNetwork, String hiResNetwork, String loResSchedule,
                                               String hiResSchedule, String loResEvents) {
-		loRes = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		hiRes = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		loRes = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		hiRes = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		loRes.getConfig().transit().setUseTransit(true);
 		hiRes.getConfig().transit().setUseTransit(true);
-		new MatsimNetworkReader(loRes).readFile(loResNetwork);
-		new MatsimNetworkReader(hiRes).readFile(hiResNetwork);
+		new MatsimNetworkReader(loRes.getNetwork()).readFile(loResNetwork);
+		new MatsimNetworkReader(hiRes.getNetwork()).readFile(hiResNetwork);
 		new TransitScheduleReader(loRes).readFile(loResSchedule);
 		new TransitScheduleReader(hiRes).readFile(hiResSchedule);
 		outpath = new File(new File(loResEvents).getParent() + "/temp");
@@ -284,7 +284,7 @@ public class XferEventsFromLoResToHiResNetwork{
 			Iterator<TransitRouteStop> stopIterator = stops.iterator();
 			TransitRouteStop firstStop = stopIterator.next();
 			Id departureLinkId = firstStop.getStopFacility().getLinkId();
-			Event wait2Link = new Wait2LinkEvent(tDSE.getTime() + 0.004, driverId, departureLinkId, vehId, PtConstants.NETWORK_MODE, 1.0);
+			Event wait2Link = new VehicleEntersTrafficEvent(tDSE.getTime() + 0.004, driverId, departureLinkId, vehId, PtConstants.NETWORK_MODE, 1.0);
 			hiResEvents.addLast(wait2Link);
 			Id fromLinkId = departureLinkId;
 			Iterator<Event> eventIterator = loResEvents.iterator();
@@ -309,20 +309,20 @@ public class XferEventsFromLoResToHiResNetwork{
 
 				double availableTime = arrival.getTime() - departure.getTime();
 				double lastTime = departure.getTime() + 1;
-				Event linkLeave = new LinkLeaveEvent(lastTime += 0.001, driverId, fromLinkId, vehId);
+				Event linkLeave = new LinkLeaveEvent(lastTime += 0.001, vehId, fromLinkId);
 				Event linkEnter = null;
 
 				hiResEvents.addLast(linkLeave);
 				List<Id<Link>> linkIds = subRoute.getLinkIds();
 				for (int i = 0; i < linkIds.size(); i++) {
-					linkEnter = new LinkEnterEvent(lastTime += 0.001, driverId, linkIds.get(i), vehId);
+					linkEnter = new LinkEnterEvent(lastTime += 0.001, vehId, linkIds.get(i));
 					linkLeave = new LinkLeaveEvent(
-							lastTime += (availableTime * linkTravelTimes.get(i) / totalExpectedtravelTime), driverId,
-							linkIds.get(i), vehId);
+							lastTime += (availableTime * linkTravelTimes.get(i) / totalExpectedtravelTime), vehId,
+							linkIds.get(i));
 					hiResEvents.addLast(linkEnter);
 					hiResEvents.addLast(linkLeave);
 				}
-				linkEnter = new LinkEnterEvent(lastTime += 0.001, driverId, toLinkId, vehId);
+				linkEnter = new LinkEnterEvent(lastTime += 0.001, vehId, toLinkId);
 				hiResEvents.addLast(linkEnter);
 				if(eventIterator.hasNext()){
 					departure = (VehicleDepartsAtFacilityEvent) eventIterator.next();					

@@ -10,7 +10,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingIntervalInfo;
 import playground.wrashid.PSF2.pluggable.parkingTimes.ParkingTimesPlugin;
@@ -41,7 +41,7 @@ public class EnergyConsumptionMain {
 
 		String fleetCompositionFileName = config.getParameterValue("fleetCompositionFileName");
 
-		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
+		MutableScenario scenario = (MutableScenario) GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
 		HashMap<Id, VehicleTypeLAV> agentVehicleMapping = VehiclePopulationAssignment.getAgentVehicleMapping(eventsFileName,
 				scenario, fleetCompositionFileName);
 

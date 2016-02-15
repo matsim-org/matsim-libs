@@ -41,7 +41,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -134,9 +134,9 @@ public class PTCountsNetworkSimplifier {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.network = scenario.getNetwork();
 		log.info("Reading " + this.netInFile);
-		new MatsimNetworkReader(scenario).readFile(this.netInFile);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.netInFile);
 
-		ScenarioImpl osmScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario osmScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config osmConfig = osmScenario.getConfig();
 		if(this.usePT){
 			osmConfig.transit().setUseTransit(true);

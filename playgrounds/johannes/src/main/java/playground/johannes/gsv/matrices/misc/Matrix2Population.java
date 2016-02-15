@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.common.util.ProgressLogger;
+import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -37,12 +38,12 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
 import playground.johannes.gsv.matrices.io.Visum2KeyMatrix;
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneGeoJsonIO;
+import playground.johannes.synpop.matrix.MatrixOperations;
+import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +66,7 @@ public class Matrix2Population {
 		zone2Fac = initFacilities(facilities, type, zones, zoneIdKey);
 	}
 
-	public void generatePersons(KeyMatrix matrix, Population population, double proba) {
+	public void generatePersons(NumericMatrix matrix, Population population, double proba) {
 		Random random = new XORShiftRandom();
 		List<String> keys = new ArrayList<>(matrix.keys());
 
@@ -172,7 +173,7 @@ public class Matrix2Population {
 			
 			ProgressLogger.step();
 		}
-		ProgressLogger.termiante();
+		ProgressLogger.terminate();
 		
 		return zone2facs;
 	}
@@ -197,14 +198,14 @@ public class Matrix2Population {
 			Matrix vMatrix = new Matrix("1", null);
 			VisumMatrixReader vReader = new VisumMatrixReader(vMatrix);
 			vReader.readFile(matrixDir + file);
-			KeyMatrix m = Visum2KeyMatrix.convert(vMatrix);
+			NumericMatrix m = Visum2KeyMatrix.convert(vMatrix);
 			
 			String type = file.split("\\.")[1];
 			
 			logger.info("Initializing facilities...");
 			Matrix2Population m2p = new Matrix2Population(scenario.getActivityFacilities(), zones, type, "NO");
 			
-			logger.info(String.format("Generating persons out of %s %s trips...", playground.johannes.gsv.zones.MatrixOperations.sum(m), type));
+			logger.info(String.format("Generating persons out of %s %s trips...", MatrixOperations.sum(m), type));
 			m2p.generatePersons(m, scenario.getPopulation(), 1/11.8);
 			logger.info(String.format("Generated %s persons.", scenario.getPopulation().getPersons().size()));
 		}

@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.qsim;
 
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -45,12 +50,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
 
 /**
  * Tests that the expected simulation events are thrown.

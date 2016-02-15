@@ -64,31 +64,31 @@ public class BivariatMeanTest extends TestCase {
         simPersons.add(cachedPerson1);
         simPersons.add(cachedPerson2);
 
-        Object dataKey1 = new Object();
-        Object dataKey2 = new Object();
-        Converters.registerWithObjectKey("attribute1", dataKey1, DoubleConverter.getInstance());
-        Converters.registerWithObjectKey("attribute2", dataKey2, DoubleConverter.getInstance());
+        Object dataKey1 = Converters.register("attribute1", DoubleConverter.getInstance());
+        Object dataKey2 = Converters.register("attribute2", DoubleConverter.getInstance());
 
         BivariatMean mm = new BivariatMean(refPersons, simPersons, "attribute1", "attribute2", new
                 LinearDiscretizer(1));
 
-        Assert.assertEquals(5.0, mm.evaluate(null));
+        double binCount = 4.0;
+
+        Assert.assertEquals(5.0/binCount, mm.evaluate(null));
 
         cachedPerson1.setData(dataKey2, 1.0);
         mm.onChange(dataKey2, 0.0, 1.0, cachedPerson1);
-        Assert.assertEquals(4.0, mm.evaluate(null));
+        Assert.assertEquals(4.0/binCount, mm.evaluate(null));
 
         cachedPerson1.setData(dataKey1, 0.0);
         mm.onChange(dataKey1, 1.0, 0.0, cachedPerson1);
-        Assert.assertEquals(4.0, mm.evaluate(null));
+        Assert.assertEquals(4.0/binCount, mm.evaluate(null));
 
         cachedPerson1.setData(dataKey2, 0.0);
         mm.onChange(dataKey2, 1.0, 0.0, cachedPerson1);
-        Assert.assertEquals(4.0, mm.evaluate(null));
+        Assert.assertEquals(4.0/binCount, mm.evaluate(null));
 
         cachedPerson1.setData(dataKey1, 3.0);
         mm.onChange(dataKey1, 0.0, 3.0, cachedPerson1);
-        Assert.assertEquals(1.5, mm.evaluate(null));
+        Assert.assertEquals(1.5/binCount, mm.evaluate(null));
     }
 
 

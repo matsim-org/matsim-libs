@@ -38,7 +38,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -431,7 +431,7 @@ public class TransitRouterImplTest {
 	 */
 	private static class WalkFixture {
 
-		/*package*/ final ScenarioImpl scenario;
+		/*package*/ final MutableScenario scenario;
 		/*package*/ final TransitSchedule schedule;
 		/*package*/ final TransitRouterConfig routerConfig;
 
@@ -452,7 +452,7 @@ public class TransitRouterImplTest {
 		final TransitStopFacility stop7;
 
 		/*package*/ WalkFixture() {
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.scenario.getConfig().transit().setUseTransit(true);
 			this.routerConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore(),
 					this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),

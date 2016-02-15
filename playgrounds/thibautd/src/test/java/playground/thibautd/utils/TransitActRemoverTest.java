@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +29,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.List;
 
 /**
  * Tests the behaviour of TransitActRemoverCorrectTravelTime on a simple PlanImpl

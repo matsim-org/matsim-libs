@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -70,7 +70,7 @@ import cadyts.demand.PlanBuilder;
 
 	PtPlanToPlanStepBasedOnEvents(final Scenario sc, final Set<Id<TransitLine>> calibratedLines) {
 		this.sc = sc;
-		this.schedule = ((ScenarioImpl) sc).getTransitSchedule();
+		this.schedule = ((MutableScenario) sc).getTransitSchedule();
 		this.calibratedLines = calibratedLines;
 	}
 
@@ -78,7 +78,7 @@ import cadyts.demand.PlanBuilder;
 	private long plansNotFound = 0;
 
 	@Override
-	public final cadyts.demand.Plan<T> getPlanSteps(final Plan plan) {
+	public final cadyts.demand.Plan<T> getCadytsPlan(final Plan plan) {
 		@SuppressWarnings("unchecked") // getting stuff from custom attributes has to be untyped.  (Although I am not sure why it is necessary to put this
 		// there in the first place. kai, jul'13)
 		PlanBuilder<T> planStepFactory = (PlanBuilder<T>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);

@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -32,6 +30,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.List;
 
 /**
  * @author thibautd

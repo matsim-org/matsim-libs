@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
@@ -31,7 +31,7 @@ public class ConnectHomesAndWorkplacesSimple {
 
 	public void run(final String[] args) {
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 //		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities() ;
 		MatsimFacilitiesReader fr = new MatsimFacilitiesReader(scenario) ;

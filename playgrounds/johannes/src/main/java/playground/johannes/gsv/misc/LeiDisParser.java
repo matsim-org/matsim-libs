@@ -19,22 +19,16 @@
 
 package playground.johannes.gsv.misc;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import com.vividsolutions.jts.geom.Point;
+import org.matsim.api.core.v01.Coord;
+import playground.johannes.gsv.visum.NetFileReader;
+import playground.johannes.gsv.visum.NetFileReader.TableHandler;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-
-import org.matsim.api.core.v01.Coord;
-
-import playground.johannes.gsv.visum.NetFileReader;
-import playground.johannes.gsv.visum.NetFileReader.TableHandler;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes

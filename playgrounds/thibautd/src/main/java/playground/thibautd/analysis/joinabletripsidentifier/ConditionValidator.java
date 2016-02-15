@@ -1,7 +1,6 @@
 package playground.thibautd.analysis.joinabletripsidentifier;
 
 import org.matsim.api.core.v01.network.Network;
-
 import playground.thibautd.analysis.joinabletripsidentifier.DataPloter.TwofoldTripValidator;
 import playground.thibautd.analysis.joinabletripsidentifier.JoinableTrips.JoinableTrip;
 

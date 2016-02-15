@@ -24,18 +24,18 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.random.RandomLocationMutator;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.testcases.MatsimTestCase;
 
 
 public class RandomLocationMutatorTest  extends MatsimTestCase {
 
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 
 	private RandomLocationMutator initialize() {
 		Initializer initializer = new Initializer();
 		initializer.init(this);
-		scenario = (ScenarioImpl) initializer.getControler().getScenario();
+		scenario = (MutableScenario) initializer.getControler().getScenario();
 		return new RandomLocationMutator(scenario, new Random(1111));
 	}
 

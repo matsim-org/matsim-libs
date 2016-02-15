@@ -19,10 +19,10 @@
 
 package playground.johannes.synpop.source.mid2008.generator;
 
-import java.util.Map;
-
-import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.data.Segment;
+import playground.johannes.synpop.source.mid2008.MiDKeys;
+
+import java.util.Map;
 
 /**
  * @author johannes

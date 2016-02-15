@@ -21,6 +21,12 @@ package playground.thibautd.socnetsimusages.jointpseudosim.qsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.qsim.JointModesDepartureHandler;
+import org.matsim.contrib.socnetsim.jointtrips.qsim.PassengerUnboardingAgentFactory;
+import org.matsim.contrib.socnetsim.qsim.NetsimWrappingQVehicleProvider;
+import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
+import org.matsim.contrib.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -34,14 +40,8 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.contrib.socnetsim.qsim.NetsimWrappingQVehicleProvider;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
 import playground.thibautd.pseudoqsim.pseudoqsimengine.PseudoQsimEngine;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.jointtrips.qsim.JointModesDepartureHandler;
-import org.matsim.contrib.socnetsim.jointtrips.qsim.PassengerUnboardingAgentFactory;
-import org.matsim.contrib.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles;
 
 import java.util.ArrayList;
 import java.util.List;

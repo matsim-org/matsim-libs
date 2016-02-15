@@ -19,7 +19,6 @@
 
 package playground.johannes.synpop.source.mid2008.processing;
 
-import org.matsim.counts.algorithms.graphs.helper.Comp;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.processing.EpisodeTask;

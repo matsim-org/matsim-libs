@@ -28,9 +28,9 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultPlansRemover;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultPlansRemover;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 
 /**
  * Configuration group for specifying the plans-replanning to be used.
@@ -65,7 +65,7 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		public static final String SET_NAME = "strategysettings";
 		private Id<StrategySettings> id;
 		private double probability = -1.0;
-		private String name = null;
+		private String strategyName = null;
 		private int disableAfter = -1;
 		private String exePath = null;
 		private String subpopulation = null;
@@ -74,11 +74,14 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			this( Id.create( MatsimRandom.getRandom().nextLong(), StrategySettings.class) );
 		}
 
+		@Deprecated // use empty constructor. kai/mz, nov'15
 		public StrategySettings(final Id<StrategySettings> id) {
 			super( SET_NAME );
 			this.id = id;
+//			this.strategyName = id.toString() ; // safety net, can be overridden by (also deprecated) setStrategyName(...).  kai/mz, nov'15
+			// putting the above into the code fails at least one test.  We would vote for removing that test ...
 		}
-
+		
 		@Override
 		public final Map<String, String> getComments() {
 			Map<String,String> map = super.getComments();
@@ -97,7 +100,7 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			}
 			
 			map.put( "strategyName",
-					"name of strategy.  Possible default names: " + sels + " (selectors), " + strats + " (innovative strategies)." );
+					"strategyName of strategy.  Possible default names: " + sels + " (selectors), " + strats + " (innovative strategies)." );
 			map.put( "weight",
 					"weight of a strategy: for each agent, a strategy will be selected with a probability proportional to its weight");
 			map.put( "disableAfterIteration",
@@ -116,7 +119,7 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			super.checkConsistency();
 
 			if ( getStrategyName() == null || getStrategyName().length() == 0 ) {
-				throw new RuntimeException("Strategy name is not set");
+				throw new RuntimeException("Strategy strategyName is not set");
 			}
 			if ( getWeight() < 0.0 ) {
 				throw new RuntimeException("Weight for strategy " + getStrategyName() + " must be >= 0.0" ); 
@@ -135,12 +138,12 @@ public final class StrategyConfigGroup extends ConfigGroup {
 
 		@StringSetter( "strategyName" )
 		public void setStrategyName(final String name) {
-			this.name = name;
+			this.strategyName = name;
 		}
 
 		@StringGetter( "strategyName" )
 		public String getStrategyName() {
-			return this.name;
+			return this.strategyName;
 		}
 
 		@StringSetter( "disableAfterIteration" )
@@ -163,6 +166,7 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			return this.exePath;
 		}
 
+		@Deprecated // not clear if this is only for backwards compatibility (config v1) or should actually be used. kai/mz, nov'15
 		public Id<StrategySettings> getId() {
 			return this.id;
 		}
@@ -256,7 +260,7 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		for ( DefaultPlansRemover name : DefaultPlansRemover.values() ) {
 			strb.append( name.toString() + " " ) ;
 		}
-		map.put(ReflectiveDelegate.PLAN_SELECTOR_FOR_REMOVAL,"name of PlanSelector for plans removal.  "
+		map.put(ReflectiveDelegate.PLAN_SELECTOR_FOR_REMOVAL,"strategyName of PlanSelector for plans removal.  "
 				+ "Possible defaults: " + strb.toString() + ". The current default, WorstPlanSelector is not a good " +
 				"choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically " +
 				"tested. kai, feb'12") ;

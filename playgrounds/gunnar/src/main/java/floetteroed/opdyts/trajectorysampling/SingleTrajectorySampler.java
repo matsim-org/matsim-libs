@@ -24,14 +24,16 @@
  */
 package floetteroed.opdyts.trajectorysampling;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import floetteroed.opdyts.DecisionVariable;
-import floetteroed.opdyts.ObjectBasedObjectiveFunction;
+import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
-import floetteroed.opdyts.VectorBasedObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
+import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
  * 
@@ -45,11 +47,11 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	private final U decisionVariable;
 
-	private final ObjectBasedObjectiveFunction objectBasedObjectiveFunction;
-
-	private final VectorBasedObjectiveFunction vectorBasedObjectiveFunction;
+	private final ObjectiveFunction objectiveFunction;
 
 	private final ConvergenceCriterion convergenceCriterion;
+
+	private ConvergenceCriterionResult convergenceResult = null;
 
 	private SimulatorState fromState = null;
 
@@ -58,38 +60,30 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 	// -------------------- CONSTRUCTION --------------------
 
 	public SingleTrajectorySampler(final U decisionVariable,
-			final ObjectBasedObjectiveFunction objectBasedObjectiveFunction,
+			final ObjectiveFunction objectiveFunction,
 			final ConvergenceCriterion convergenceCriterion) {
 		this.decisionVariable = decisionVariable;
-		this.objectBasedObjectiveFunction = objectBasedObjectiveFunction;
-		this.vectorBasedObjectiveFunction = null;
-		this.convergenceCriterion = convergenceCriterion;
-	}
-
-	public SingleTrajectorySampler(final U decisionVariable,
-			final VectorBasedObjectiveFunction vectorBasedObjectiveFunction,
-			final ConvergenceCriterion convergenceCriterion) {
-		this.decisionVariable = decisionVariable;
-		this.objectBasedObjectiveFunction = null;
-		this.vectorBasedObjectiveFunction = vectorBasedObjectiveFunction;
+		this.objectiveFunction = objectiveFunction;
 		this.convergenceCriterion = convergenceCriterion;
 	}
 
 	// --------------- IMPLEMENTATION OF TrajectorySampler ---------------
 
 	@Override
-	public boolean foundSolution() {
-		return this.convergenceCriterion.isConverged();
+	public ObjectiveFunction getObjectiveFunction() {
+		return this.objectiveFunction;
 	}
 
 	@Override
-	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValue() {
-		final Map<U, Double> result = new LinkedHashMap<>();
-		if (this.convergenceCriterion.isConverged()) {
-			result.put(this.decisionVariable,
-					this.convergenceCriterion.getFinalObjectiveFunctionValue());
-		}
-		return result;
+	public boolean foundSolution() {
+		return this.convergenceResult != null;
+	}
+
+	@Override
+	public Map<U, ConvergenceCriterionResult> getDecisionVariable2convergenceResultView() {
+		final Map<U, ConvergenceCriterionResult> result = new LinkedHashMap<>();
+			result.put(this.decisionVariable, this.convergenceResult);
+		return Collections.unmodifiableMap(result);
 	}
 
 	@Override
@@ -106,15 +100,13 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 	public void afterIteration(SimulatorState newState) {
 		if (this.fromState != null) {
 			if (this.transitionSequence == null) {
-				this.transitionSequence = new TransitionSequence(
+				this.transitionSequence = new TransitionSequence<U>(
 						this.fromState, this.decisionVariable, newState,
-						this.objectBasedObjectiveFunction,
-						this.vectorBasedObjectiveFunction);
+						this.objectiveFunction.value(newState));
 			} else {
 				this.transitionSequence.addTransition(this.fromState,
 						this.decisionVariable, newState,
-						this.objectBasedObjectiveFunction,
-						this.vectorBasedObjectiveFunction);
+						this.objectiveFunction.value(newState));
 			}
 			this.convergenceCriterion.evaluate(this.transitionSequence);
 		}
@@ -128,5 +120,16 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 		} else {
 			return 0;
 		}
+	}
+
+	@Override
+	public void addStatistic(final String logFileName,
+			final Statistic<SamplingStage<U>> statistic) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void setStandardLogFileName(final String logFileName) {
+		throw new UnsupportedOperationException();
 	}
 }

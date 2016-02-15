@@ -1,17 +1,16 @@
 package playground.artemc.psim;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.artemc.analysis.IndividualScoreFromPopulationSQLWriter;
@@ -43,7 +42,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 
 	private final ChoiceGenerationControler choiceGenerationControler;
 
-	private Controler controler;
+	private MatsimServices controler;
 	private Population population;
 	private HashMap<Id<Person>, Plan> initialPlans = new HashMap<Id<Person>, Plan>();
 	static Integer departureTimeChoices = 3;
@@ -133,7 +132,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 
 			planMap.put(initialMode, population.getPersons().get(personId).getSelectedPlan());
 
-			//String[] modes = controler.getScenario().getConfig().getModule("subtourModeChoice").getValue("modes").split(",");
+			//String[] modes = services.getScenario().getConfig().getModule("subtourModeChoice").getValue("modes").split(",");
 			//String[] modes = {"car","walk"};
 
 			ArrayList<String> relevantModes = new ArrayList<String>();
@@ -186,7 +185,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 				/* Departure time modification */
 				for (Plan planToModify : population.getPersons().get(personId).getPlans()) {
 
-					if (((Leg) planToModify.getPlanElements().get(1)).getMode().equals(mode) && !planToModify.isSelected()) {
+					if (((Leg) planToModify.getPlanElements().get(1)).getMode().equals(mode) && !PersonUtils.isSelected(planToModify)) {
 
 						//Home departure time + 1h
 						if (planModCounter == 0) {
@@ -262,7 +261,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 			for (Plan newPlan : population.getPersons().get(personId).getPlans()) {
 				if(personId.toString().equals("1000"))
 					System.out.println();
-				if (!newPlan.isSelected()) {
+				if (!PersonUtils.isSelected(newPlan)) {
 					count++;
 					Person newPerson = populationFactory.createPerson(Id.createPersonId(personId.toString() + "_" + count));
 					newPerson.addPlan(newPlan);
@@ -328,17 +327,17 @@ public class ChoiceSetGenerator implements ShutdownListener {
 		}
 
 		/*Write score table to SQL*/
-		Integer relativeOutputDirectory = event.getControler().getConfig().controler().getOutputDirectory().split("/").length;
+		Integer relativeOutputDirectory = event.getServices().getConfig().controler().getOutputDirectory().split("/").length;
 
 		String tableName = schema + ".scores_";
-		String tableSuffix = event.getControler().getConfig().controler().getOutputDirectory().split("/")[relativeOutputDirectory - 1];
+		String tableSuffix = event.getServices().getConfig().controler().getOutputDirectory().split("/")[relativeOutputDirectory - 1];
 		tableSuffix = tableSuffix.replaceAll("\\.0x", "x");
 		tableSuffix = tableSuffix.replaceAll("-", "_");
 		tableSuffix = tableSuffix.replaceAll("\\.5", "5");
 		tableSuffix = tableSuffix.replaceAll("\\.1", "1");
 		tableName = tableName + tableSuffix;
 
-		IndividualScoreFromPopulationSQLWriter sqlWriter = new IndividualScoreFromPopulationSQLWriter(event.getControler().getConfig(), newPopulation);
+		IndividualScoreFromPopulationSQLWriter sqlWriter = new IndividualScoreFromPopulationSQLWriter(event.getServices().getConfig(), newPopulation);
 		sqlWriter.writeToDatabase(connectionPropertiesPath, schema, tableName);
 
 		new PopulationWriter(newScenario.getPopulation()).write(choiceGenerationControler.getControler().getConfig().controler().getOutputDirectory() + "/output_plansJoin.xml");

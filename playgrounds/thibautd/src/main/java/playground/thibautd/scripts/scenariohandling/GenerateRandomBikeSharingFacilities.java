@@ -19,20 +19,19 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
-import java.util.Random;
-
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesWriter;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilitiesWriter;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacility;
+
+import java.util.Random;
 
 /**
  * @author thibautd
@@ -59,7 +58,7 @@ public class GenerateRandomBikeSharingFacilities {
 		final int maxCapacity = args.getIntegerValue( "-m" );
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		new MatsimNetworkReader( sc ).parse( networkFile );
+		new MatsimNetworkReader(sc.getNetwork()).parse( networkFile );
 
 		final BikeSharingFacilities facilities = new BikeSharingFacilities();
 

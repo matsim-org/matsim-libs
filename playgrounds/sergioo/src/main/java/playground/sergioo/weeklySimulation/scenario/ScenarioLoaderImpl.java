@@ -29,13 +29,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.TimeVariantLinkFactory;
+import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -57,7 +57,7 @@ import playground.sergioo.weeklySimulation.population.PopulationReaderMatsimV5;
  * <li> Given what we have now, does it make sense to leave this class public?  yy kai, mar'11
  * </ul>
  *
- * @see org.matsim.core.scenario.ScenarioImpl
+ * @see org.matsim.core.scenario.MutableScenario
  *
  * @author dgrether
  */
@@ -171,9 +171,9 @@ public class ScenarioLoaderImpl {
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 			if (this.config.network().isTimeVariantNetwork()) {
 				log.info("use TimeVariantLinks in NetworkFactory.");
-				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
+				network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 			}
-			new MatsimNetworkReader(this.scenario).parse(networkFileName);
+			new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
 			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
@@ -280,8 +280,8 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadLanes() {
-		LaneDefinitions20 laneDefinitions = new LaneDefinitions20Impl();
-		this.scenario.addScenarioElement(LaneDefinitions20.ELEMENT_NAME, laneDefinitions);
+		Lanes laneDefinitions = new LaneDefinitions20Impl();
+		this.scenario.addScenarioElement(Lanes.ELEMENT_NAME, laneDefinitions);
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);

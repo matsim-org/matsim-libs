@@ -27,12 +27,18 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.utils.misc.ArgumentParser;
 
 /**
- * @author mrieser / Senozon AG
- *
  * A very simple class which just dumps a clean config
  * with all settings and their default values to a file.
  * Useful to get a list of available settings for many users.
+ * <p/>
+ * Run as {@code java -cp .../matsim.jar org.matsim.run.CreateFullConfig config.xml} .
+ * <p/>
+ * An example from the development head can be found <a href="http://ci.matsim.org:8080/job/MATSim_M2/ws/matsim/test/output/org/matsim/run/CreateFullConfigTest/testMain/newConfig.xml">here</a>.
+ * <p/>
  * This class is mentioned in the User Guide.
+ * 
+ * @author mrieser / Senozon AG
+ *
  */
 public class CreateFullConfig {
 

@@ -21,7 +21,6 @@ package playground.ivt.matsim2030;
 
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -39,6 +38,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializ
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
@@ -46,8 +46,13 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.*;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
@@ -58,18 +63,21 @@ import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
-
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import playground.ivt.matsim2030.router.TransitRouterWithThinnedNetworkFactory;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
-import org.matsim.core.utils.collections.MapUtils;
 import playground.ivt.utils.TripModeShares;
 
 import javax.inject.Provider;
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -181,7 +189,7 @@ public class Matsim2030Utils {
 
 			if ( mergingGroup.getPtSubnetworkFile() != null ) {
 				log.info( "reading pt network from "+mergingGroup.getPtSubnetworkFile() );
-				new MatsimNetworkReader( scenario ).readFile( mergingGroup.getPtSubnetworkFile() );
+				new MatsimNetworkReader(scenario.getNetwork()).readFile( mergingGroup.getPtSubnetworkFile() );
 			}
 		}
 		else {
@@ -385,7 +393,7 @@ public class Matsim2030Utils {
 		return subNetwork;
 	}
 
-	public static void initializeLocationChoice( final Controler controler ) {
+	public static void initializeLocationChoice( final MatsimServices controler ) {
 		final Scenario scenario = controler.getScenario();
 		final DestinationChoiceBestResponseContext lcContext =
 			new DestinationChoiceBestResponseContext( scenario );
@@ -440,7 +448,7 @@ public class Matsim2030Utils {
 		return builder.build( scenario );
 	}
 
-	public static void loadControlerListeners( final Controler controler ) {
+	public static void loadControlerListeners( final MatsimServices controler ) {
 		controler.addControlerListener(
 				new CalcLegTimesHerbieListener(
 					CALC_LEG_TIMES_FILE_NAME,

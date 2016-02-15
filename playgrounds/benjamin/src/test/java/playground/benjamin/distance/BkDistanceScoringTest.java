@@ -59,7 +59,7 @@
 ////				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
 ////				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
 ////				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
-//				planScorer = new EventsToScore(controler.getScenario(), controler.getScoringFunctionFactory(), controler.getConfig().planCalcScore().getLearningRate());
+//				planScorer = new EventsToScore(services.getScenario(), services.getScoringFunctionFactory(), services.getConfig().planCalcScore().getLearningRate());
 //				controler.getEvents().addHandler(planScorer);
 //			}
 //		});
@@ -89,7 +89,7 @@
 ////				double agent1LeaveHomeTime = controler.getPopulation().getPerson(id1).getPlans().get(0).getFirstActivity().getEndTime();
 ////				double agent2LeaveHomeTime = controler.getPopulation().getPerson(id2).getPlans().get(0).getFirstActivity().getEndTime();
 ////				controler.getEvents().addHandler(new TestSingleIterationEventHandler(agent1LeaveHomeTime, agent2LeaveHomeTime));
-//				planScorer = new EventsToScore(controler.getScenario(), controler.getScoringFunctionFactory(), controler.getConfig().planCalcScore().getLearningRate());
+//				planScorer = new EventsToScore(services.getScenario(), services.getScoringFunctionFactory(), services.getConfig().planCalcScore().getLearningRate());
 //				controler.getEvents().addHandler(planScorer);
 //			}
 //		});

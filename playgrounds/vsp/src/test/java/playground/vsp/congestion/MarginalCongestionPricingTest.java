@@ -53,7 +53,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
@@ -200,7 +200,7 @@ public class MarginalCongestionPricingTest {
 
 		});
 
-		events.addHandler(new CongestionHandlerImplV4(events, (ScenarioImpl) sc));
+		events.addHandler(new CongestionHandlerImplV4(events, (MutableScenario) sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();

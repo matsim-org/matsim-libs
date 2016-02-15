@@ -112,7 +112,7 @@ public class CTNodeCell extends CTCell {
 		l.poll();
 		ctPed.notifyMoveOverNode();
 		DriverAgent driver = ctPed.getDriver();
-		LinkEnterEvent e = new LinkEnterEvent(Math.floor(time), driver.getId(), driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
+		LinkEnterEvent e = new LinkEnterEvent(Math.floor(time), Id.create(driver.getId(), Vehicle.class), driver.getCurrentLinkId());
 
 		this.net.getEventsManager().processEvent(e);
 
@@ -131,7 +131,7 @@ public class CTNodeCell extends CTCell {
 			return false;
 		}
 
-		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time), driver.getId(), driver.getCurrentLinkId(), Id.create(driver.getId(), Vehicle.class));
+		LinkLeaveEvent e = new LinkLeaveEvent(Math.floor(time), Id.create(driver.getId(), Vehicle.class), driver.getCurrentLinkId());
 		this.net.getEventsManager().processEvent(e);
 		if (ctPed.getNextLinkId() == null) {
 			CTNetsimEngine en = this.net.getEngine();
@@ -198,7 +198,10 @@ public class CTNodeCell extends CTCell {
 			width = CTLink.WIDTH;
 		}
 		double area = width * width;
-		if (((CTNode) this.getParent()).getNode().getOutLinks().size() == 1) {
+		if (((CTNode) this.getParent()).getNode().getOutLinks().size() == 1
+				&& ((CTNode) this.getParent()).getNode().getInLinks().size() == 1
+				&& ((CTNode) this.getParent()).getNode().getOutLinks().values().iterator().next().getToNode()
+				== ((CTNode) this.getParent()).getNode().getInLinks().values().iterator().next().getFromNode()) {
 			area = width * mxLength;
 		}
 

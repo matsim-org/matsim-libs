@@ -395,12 +395,9 @@ public class DemandGeneratorOnePersonV3 {
 	
 	
 	private static void initLogging(String outputBase) {
-		try
-		{
+		try	{
 			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputBase);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException e)	{
 			log.error("Cannot create logfiles: " + e.getMessage());
 			e.printStackTrace();
 		}

@@ -24,8 +24,13 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.arentzemodel.ArentzePopulationModule;
-import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.*;
-import playground.thibautd.utils.MoreIOUtils;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ConfigModule;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.FileWriterEvolutionListener;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.ModelIterator;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.PreprocessedModelRunnerConfigGroup;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocNetGenFrameworkModule;
+import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.SocialNetworkGenerationConfigGroup;
+import playground.ivt.utils.MoreIOUtils;
 
 /**
  * @author thibautd

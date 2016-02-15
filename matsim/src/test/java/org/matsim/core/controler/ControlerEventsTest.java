@@ -25,10 +25,8 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestCase;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +44,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.calledStartupListener = new ArrayList<Integer>(3);
+		this.calledStartupListener = new ArrayList<>(3);
 	}
 
 	@Override
@@ -58,9 +56,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 	public void testCoreListenerExecutionOrder() {
 		Config config = loadConfig(getClassInputDirectory() + "config.xml");
 
-		Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
+		TestController controler = new TestController(config);
 		ControlerEventsTestListener firstListener = new ControlerEventsTestListener(1, this);
 		ControlerEventsTestListener secondListener = new ControlerEventsTestListener(2, this);
 		ControlerEventsTestListener thirdListener = new ControlerEventsTestListener(3, this);
@@ -68,7 +64,7 @@ public class ControlerEventsTest extends MatsimTestCase {
 		controler.addCoreControlerListener(firstListener);
 		controler.addCoreControlerListener(secondListener);
 		controler.addCoreControlerListener(thirdListener);
-		controler.run();
+		controler.run(config);
 		assertEquals(3, this.calledStartupListener.get(0).intValue());
 		assertEquals(2, this.calledStartupListener.get(1).intValue());
 		assertEquals(1, this.calledStartupListener.get(2).intValue());
@@ -77,20 +73,16 @@ public class ControlerEventsTest extends MatsimTestCase {
 	public void testEvents() {
 		Config config = loadConfig(getClassInputDirectory() + "config.xml");
 
-		Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
+		TestController controler = new TestController(config);
 		ControlerEventsTestListener listener = new ControlerEventsTestListener(1, this);
 		controler.addControlerListener(listener);
-		controler.run();
+		controler.run(config);
 		//test for startup events
 		StartupEvent startup = listener.getStartupEvent();
 		assertNotNull("No ControlerStartupEvent fired!", startup);
-		assertEquals(controler, startup.getControler());
 		//test for shutdown
 		ShutdownEvent shutdown = listener.getShutdownEvent();
 		assertNotNull("No ControlerShutdownEvent fired!", shutdown);
-		assertEquals(controler, shutdown.getControler());
 		//test for iterations
 		//setup
 		List<IterationStartsEvent> setupIt = listener.getIterationStartsEvents();
@@ -100,38 +92,36 @@ public class ControlerEventsTest extends MatsimTestCase {
 		List<IterationEndsEvent> finishIt = listener.getIterationEndsEvents();
 		assertEquals(1, finishIt.size());
 		assertEquals(0, finishIt.get(0).getIteration());
+	}
 
-		// prepare remove test
-		controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
-		listener = new ControlerEventsTestListener(1, this);
-		// we know from the code above, that "add" works
-		controler.addControlerListener(listener);
-		// now remove the listener
-		controler.removeControlerListener(listener);
+	private static class TestController extends AbstractController {
 
-		// clear directory to run with same config again...
-		String outPath = config.controler().getOutputDirectory();
-		File outDir = new File(outPath);
-		IOUtils.deleteDirectory(outDir);
+		private final Config config;
 
-		// now run
-		controler.run();
+		public TestController(Config config) {
+			this.config = config;
+			super.setupOutputDirectory(new OutputDirectoryHierarchy(config.controler()));
+		}
 
-		//test for startup events
-		startup = listener.getStartupEvent();
-		assertNull("ControlerStartupEvent fired!", startup);
-		//test for shutdown
-		shutdown = listener.getShutdownEvent();
-		assertNull("ControlerShutdownEvent fired!", shutdown);
-		//test for iterations
-		//setup
-		setupIt = listener.getIterationStartsEvents();
-		assertEquals(0, setupIt.size());
-		//shutdown
-		finishIt = listener.getIterationEndsEvents();
-		assertEquals(0, finishIt.size());
+		@Override
+		protected void loadCoreListeners() {
+
+		}
+
+		@Override
+		protected void runMobSim() {
+
+		}
+
+		@Override
+		protected void prepareForSim() {
+
+		}
+
+		@Override
+		protected boolean continueIterations(int iteration) {
+			return iteration <= config.controler().getLastIteration();
+		}
 	}
 
 }

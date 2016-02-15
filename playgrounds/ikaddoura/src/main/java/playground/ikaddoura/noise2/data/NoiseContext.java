@@ -130,8 +130,9 @@ public class NoiseContext {
 					|| this.grid.getGridParams().getReceiverPointsGridMinX() != 0.
 					|| this.grid.getGridParams().getReceiverPointsGridMaxY() != 0.
 					|| this.grid.getGridParams().getReceiverPointsGridMinY() != 0.) {
-				throw new RuntimeException("In order to keep track of the agent activities, the grid of receiver points should not be limited to a set of predefined coordinates."
-						+ "For a grid covering all activity locations, set the minimum and maximum x/y parameters to 0.0. Aborting... ");
+				log.warn("In order to keep track of the agent activities, the grid of receiver points should not be limited to a set of predefined coordinates."
+						+ "For a grid covering all activity locations, set the minimum and maximum x/y parameters to 0.0. "
+						+ "There will be more agents mapped to the receiver points at the edges. Only the inner receiver points should be used for analysis.");
 			}
 						
 			if (this.grid.getGridParams().getReceiverPointsGridMinX() == 0. && this.grid.getGridParams().getReceiverPointsGridMinY() == 0. && this.grid.getGridParams().getReceiverPointsGridMaxX() == 0. && this.grid.getGridParams().getReceiverPointsGridMaxY() == 0.) {

@@ -19,6 +19,17 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetsim.framework.population.JointPlans;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
+import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
+import org.matsim.contrib.socnetsim.utils.CollectionUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,18 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Counter;
-
-import org.matsim.contrib.socnetsim.framework.population.JointPlans;
-import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
-import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
-import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 
 /**
  * @author thibautd
@@ -103,7 +102,7 @@ public class AnalysePerformanceOfCoalitionSelection {
 		final ReplanningGroup group = new ReplanningGroup();
 
 		for ( int i = 0; i < groupSize; i++ ) {
-			group.addPerson(PersonImpl.createPerson(Id.create(i, Person.class)));
+			group.addPerson(PopulationUtils.createPerson(Id.create(i, Person.class)));
 		}
 
 		for ( Person person : group.getPersons() ) {

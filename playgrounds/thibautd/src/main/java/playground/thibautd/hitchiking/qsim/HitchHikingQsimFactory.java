@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -46,9 +46,9 @@ import java.util.List;
  */
 public class HitchHikingQsimFactory implements MobsimFactory {
 
-    private final Controler controler;
+    private final MatsimServices controler;
 
-	public HitchHikingQsimFactory(final Controler controler) {
+	public HitchHikingQsimFactory(final MatsimServices controler) {
 		this.controler = controler;
 	}
 

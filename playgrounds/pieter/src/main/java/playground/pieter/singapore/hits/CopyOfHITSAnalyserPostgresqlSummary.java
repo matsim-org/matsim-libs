@@ -21,7 +21,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -108,7 +108,7 @@ public class CopyOfHITSAnalyserPostgresqlSummary {
     private static void createRouters(String[] args, boolean fSR) {
 		freeSpeedRouting = fSR;
 		scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
-		(new MatsimNetworkReader(scenario)).readFile(args[1]);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
 		double startTime = new Double(args[5]), endTime = new Double(args[6]), binSize = new Double(args[7]);
 		WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(scenario.getTransitSchedule(), (int) binSize,
@@ -186,7 +186,7 @@ public class CopyOfHITSAnalyserPostgresqlSummary {
 			eventsManager.addHandler(travelTimeCalculator);
 			(new MatsimEventsReader(eventsManager)).readFile(carEventsFileName);
 		}
-		TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutilityFactory()
+		TravelDisutility travelDisutility = new Builder( TransportMode.car )
 				.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		carCongestedDijkstra = new Dijkstra(scenario.getNetwork(), travelDisutility,
 				travelTimeCalculator.getLinkTravelTimes());

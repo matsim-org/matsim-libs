@@ -28,14 +28,13 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
-
 import org.matsim.core.utils.geometry.CoordUtils;
 import utils.Bins;
 
@@ -60,8 +59,8 @@ public class AnalyzeMicrocensus {
 	
 	String type ="";
 		
-	private ScenarioImpl scenarioCH;
-	private ScenarioImpl scenarioZH;
+	private MutableScenario scenarioCH;
+	private MutableScenario scenarioZH;
 	private String mode = null;
 		
 	public static void main(final String[] args) {
@@ -99,7 +98,7 @@ public class AnalyzeMicrocensus {
 	}
 	
 	private void init(String mode, String plansFilePath, String networkfilePath) {
-		scenarioCH = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenarioCH = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.mode = mode;
 		this.ch_distanceDistribution = new Bins(500.0, 40000.0, type + "_trips_mc_" + this.mode);
 		this.ch_distanceDistributionHomeBased = new Bins(500.0, 40000.0, type +  "_trips_mc_home-based_" + this.mode);
@@ -113,8 +112,8 @@ public class AnalyzeMicrocensus {
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.scenarioCH);
 		populationReader.readFile(plansFilePath);
 		
-		scenarioZH = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenarioZH).readFile(networkfilePath);
+		scenarioZH = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenarioZH.getNetwork()).readFile(networkfilePath);
 	}
 	
 	private void dilutedZH() {

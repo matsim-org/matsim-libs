@@ -47,6 +47,7 @@ public class RunPersonAttributesExample {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
 		LOG.info("Adding a single person to the population with the following attributes:");
 		LOG.info("   |_ gender: male");
 		LOG.info("   |_ age: 35");

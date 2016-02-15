@@ -22,8 +22,8 @@
  */
 package playground.johannes.gsv.analysis;
 
-import gnu.trove.TDoubleObjectHashMap;
-import gnu.trove.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TDoubleObjectHashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import net.opengis.kml._2.*;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -31,7 +31,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.Colorizable;
+import org.matsim.contrib.socnetgen.sna.graph.spatial.io.NumericAttributeColorizer;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -40,9 +43,6 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.graph.spatial.io.Colorizable;
-import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -290,7 +290,7 @@ public class KMLRailCountsWriter {
 		/*
 		 * (non-Javadoc)
 		 * 
-		 * @see playground.johannes.socialnetworks.graph.spatial.io.
+		 * @see org.matsim.contrib.socnetgen.socialnetworks.graph.spatial.io.
 		 * NumericAttributeColorizer#getValue(java.lang.Object)
 		 */
 		@Override

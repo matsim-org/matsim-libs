@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 /**
  * @author balacm
@@ -12,8 +12,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class ModifyNetworkHomogenized {
 
 
-	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 	double freeSpeedFactor = 0.7;
 	String outputFilePath = null;
 	String networkFilePath = null;

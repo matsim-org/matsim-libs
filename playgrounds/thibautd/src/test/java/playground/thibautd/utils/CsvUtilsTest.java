@@ -19,22 +19,33 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 /**
  * @author thibautd
  */
 public class CsvUtilsTest {
 	@Test
+	public void testConvertBackAndForth() {
+		final String line = "stuff1,some spaced stuff,\"some quoted, with commas!\",,\"with a \\\" in the middle\",";
+		final String[] fields = CsvUtils.parseCsvLine( ',' , '"' , line );
+		final String newLine = CsvUtils.buildCsvLine( ',' , '"' , fields );
+
+		Assert.assertEquals(
+				"escaping not stable",
+				line,
+				newLine );
+	}
+	@Test
 	public void testSplit() {
-		final String[] fields = CsvUtils.parseCsvLine( ',' , '"' , "stuff1,\"some spaced stuff\",\"some quoted, with commas!\",," );
+		final String[] fields = CsvUtils.parseCsvLine( ',' , '"' , "stuff1,\"some spaced stuff\",\"some quoted, with commas!\",,\"with a \\\" in the middle\"," );
 
 		Assert.assertEquals(
 				"wrong number of fields in "+Arrays.toString( fields ),
-				5,
+				6,
 				fields.length );
 		Assert.assertEquals(
 				"wrong value in field",
@@ -55,6 +66,10 @@ public class CsvUtilsTest {
 		Assert.assertEquals(
 				"wrong value in field",
 				fields[ 4 ],
+				"with a \" in the middle" );
+		Assert.assertEquals(
+				"wrong value in field",
+				fields[ 5 ],
 				"" );
 	}
 
@@ -66,11 +81,51 @@ public class CsvUtilsTest {
 				"some spaced stuff",
 				"some quoted, with commas!",
 				"",
-				"" );
+				"\"" );
 		Assert.assertEquals(
 				"unexpected line",
-				"\"stuff1\",\"some spaced stuff\",\"some quoted, with commas!\",\"\",\"\"",
+				"stuff1,some spaced stuff,\"some quoted, with commas!\",,\"\\\"\"",
 				line );
+	}
+
+	@Test
+	public void testOnlyEscapeIfNecessary() {
+		final String string = "some normal string";
+
+		Assert.assertEquals(
+				"string was escaped without reason",
+				string,
+				CsvUtils.escapeField( '\t' , '"' , string ) );
+	}
+
+	@Test
+	public void testEscapeQuotes() {
+		final String string = "some \"quoted\" string";
+
+		Assert.assertEquals(
+				"string was not escaped",
+				"\"some \\\"quoted\\\" string\"",
+				CsvUtils.escapeField( '\t' , '"' , string ) );
+	}
+
+	@Test
+	public void testEscapeSeparator() {
+		final String string = "some\tseparated\tstring";
+
+		Assert.assertEquals(
+				"string was not escaped",
+				"\"some\tseparated\tstring\"",
+				CsvUtils.escapeField( '\t' , '"' , string ) );
+	}
+
+	@Test
+	public void testEscapeBackslash() {
+		final String string = "some \\";
+
+		Assert.assertEquals(
+				"string was not escaped",
+				"\"some \\\\\"",
+				CsvUtils.escapeField( '\t' , '"' , string ) );
 	}
 }
 

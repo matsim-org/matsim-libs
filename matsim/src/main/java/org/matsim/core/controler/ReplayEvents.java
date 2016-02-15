@@ -22,17 +22,13 @@
 
 package org.matsim.core.controler;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.EventHandler;
 
+import javax.inject.Inject;
 import java.util.Set;
 
 /**
@@ -44,38 +40,31 @@ import java.util.Set;
  */
 public class ReplayEvents {
 
-    public static interface Results {
+    public interface Results {
         <T> T get(Class<? extends T> type);
     }
 
-    public static Results run(final Scenario scenario, final String eventsFilename, final AbstractModule... modules) {
-        final Injector injector = Injector.createInjector(
-                scenario.getConfig(),
+    @Inject
+    Set<ControlerListener> controlerListenersDeclaredByModules;
+
+    @Inject
+    EventsManager eventsManager;
+
+    public static Results run(final Config config, final String eventsFilename, final AbstractModule... modules) {
+        final com.google.inject.Injector injector = Injector.createInjector(
+                config,
+                new Module(),
                 new AbstractModule() {
                     @Override
                     public void install() {
                         for (AbstractModule module : modules) {
                             install(module);
                         }
-                        bind(Scenario.class).toInstance(scenario);
                     }
                 });
-        final EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
-        for (EventHandler eventHandler : injector.getEventHandlersDeclaredByModules()) {
-            eventsManager.addHandler(eventHandler);
-        }
-        Set<ControlerListener> controlerListenersDeclaredByModules = injector.getControlerListenersDeclaredByModules();
-        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
-            if (controlerListener instanceof StartupListener) {
-                ((StartupListener) controlerListener).notifyStartup(new StartupEvent(null));
-            }
-        }
-        new MatsimEventsReader(eventsManager).readFile(eventsFilename);
-        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
-            if (controlerListener instanceof ShutdownListener) {
-                ((ShutdownListener) controlerListener).notifyShutdown(new ShutdownEvent(null, false));
-            }
-        }
+        ReplayEvents instance = injector.getInstance(ReplayEvents.class);
+        instance.playEventsFile(eventsFilename, 1);
+
         return new Results() {
             @Override
             public <T> T get(Class<? extends T> type) {
@@ -84,4 +73,44 @@ public class ReplayEvents {
         };
     }
 
+    public void playEventsFile(String eventsFilename, int iterationNumber) {
+        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+            if (controlerListener instanceof StartupListener) {
+                ((StartupListener) controlerListener).notifyStartup(new StartupEvent(null));
+            }
+        }
+        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+            if (controlerListener instanceof IterationStartsListener) {
+                ((IterationStartsListener) controlerListener).notifyIterationStarts(new IterationStartsEvent(null, iterationNumber));
+            }
+        }
+        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+            if (controlerListener instanceof BeforeMobsimListener) {
+                ((BeforeMobsimListener) controlerListener).notifyBeforeMobsim(new BeforeMobsimEvent(null, iterationNumber));
+            }
+        }
+        new MatsimEventsReader(eventsManager).readFile(eventsFilename);
+        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+            if (controlerListener instanceof AfterMobsimListener) {
+                ((AfterMobsimListener) controlerListener).notifyAfterMobsim(new AfterMobsimEvent(null, iterationNumber));
+            }
+        }
+        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+            if (controlerListener instanceof IterationEndsListener) {
+                ((IterationEndsListener) controlerListener).notifyIterationEnds(new IterationEndsEvent(null, iterationNumber));
+            }
+        }
+        for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
+            if (controlerListener instanceof ShutdownListener) {
+                ((ShutdownListener) controlerListener).notifyShutdown(new ShutdownEvent(null, false));
+            }
+        }
+    }
+
+    public static class Module extends AbstractModule {
+        @Override
+		public void install() {
+			bind(ReplayEvents.class).asEagerSingleton();
+		}
+    }
 }

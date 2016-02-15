@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
@@ -38,7 +38,7 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 
 	private final static Logger log = Logger.getLogger(SpatialAveragingForLinkDemand.class);
 
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private Collection<SimpleFeature> shapeFile;
 	private int noOfTimeBins = 1;
 	
@@ -77,7 +77,7 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 		this.targetCRS = MGC.getCRS("EPSG:20004");
 	}
 	
-	public void init(ScenarioImpl scenario, Collection<SimpleFeature> shapeFile, int noOfTimeBins){
+	public void init(MutableScenario scenario, Collection<SimpleFeature> shapeFile, int noOfTimeBins){
 		this.scenario = scenario;
 		this.shapeFile = shapeFile;
 		this.noOfTimeBins = noOfTimeBins;

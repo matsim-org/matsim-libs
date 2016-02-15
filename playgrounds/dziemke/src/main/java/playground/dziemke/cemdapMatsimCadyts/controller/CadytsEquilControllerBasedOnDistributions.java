@@ -18,8 +18,8 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -44,11 +44,11 @@ public class CadytsEquilControllerBasedOnDistributions {
 		config.global().setCoordinateSystem("Atlantis");
 
 		// network
-		String inputNetworkFile = "/Users/dominik/Workspace/data/examples/equil/input/network_diff_lengths2.xml";
+		String inputNetworkFile = "/Users/dominik/SVN/shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/network_diff_lengths2.xml";
 		config.network().setInputFile(inputNetworkFile);
 
 		// plans
-		String inputPlansFile = "/Users/dominik/Workspace/data/examples/equil/input/plans1000.xml";
+		String inputPlansFile = "/Users/dominik/SVN/shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/input/plans1000.xml";
 		config.plans().setInputFile(inputPlansFile);
 
 		//simulation
@@ -66,8 +66,8 @@ public class CadytsEquilControllerBasedOnDistributions {
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
 
 		// controller
-		String runId = "74";
-		String outputDirectory = "/Users/dominik/Workspace/data/examples/equil/output/" + runId + "/";
+		String runId = "80";
+		String outputDirectory = "/Users/dominik/SVN/shared-svn/projects/cemdapMatsimCadyts/cadyts/equil/output/" + runId + "/";
 		config.controler().setRunId(runId);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setFirstIteration(0);

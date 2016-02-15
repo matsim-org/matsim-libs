@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -54,7 +55,7 @@ public class KNAnalysisEventsHandler implements
 PersonDepartureEventHandler, PersonArrivalEventHandler, 
 PersonMoneyEventHandler, 
 LinkLeaveEventHandler, LinkEnterEventHandler, 
-PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
+PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	private final static Logger log = Logger.getLogger(KNAnalysisEventsHandler.class);
 
@@ -65,11 +66,11 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	private Scenario scenario = null ;
 	private Population population = null;
-	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
-	private final TreeMap<Id, Integer> agentLegs = new TreeMap<Id, Integer>();
+	private final TreeMap<Id<Person>, Double> agentDepartures = new TreeMap<>();
+	private final TreeMap<Id<Person>, Integer> agentLegs = new TreeMap<>();
 
 	// statistics types:
-	enum StatType { durations, durationsOtherBins, beelineDistances, legDistances, scores, payments } ;
+	enum StatType { durations, durationsOtherBins, beelineDistances, beelineDistancesOtherBins, legDistances, scores, payments } ;
 
 	// container that contains the statistics containers:
 	private final Map<StatType,Databins<String>> statsContainer = new TreeMap<>() ;
@@ -85,6 +86,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 	// (initializing with empty set, meaning output will say no vehicles at gantries).
 	
 	private Set<Id<Link>> otherTolledLinkIds = new HashSet<Id<Link>>() ;
+
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
 	// to avoid under- or over-counting with respect to loops.
@@ -141,6 +144,11 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 			switch ( type ) {
 			case beelineDistances: {
 				double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
+				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+				this.statsContainer.put( type, databins) ;
+				break; }
+			case beelineDistancesOtherBins: {
+				double[] dataBoundariesTmp = {0., 2000., 4000., 6000., 8000., 10000.} ;
 				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
 				this.statsContainer.put( type, databins) ;
 				break; }
@@ -254,6 +262,19 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 						item = CoordUtils.calcDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
 					}
 					break;
+				case beelineDistancesOtherBins:
+					if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
+						item = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()) ;
+					} else {
+						if ( noCoordCnt < 1 ) {
+							noCoordCnt ++ ;
+							log.warn("either fromAct or to Act has no Coord; using link coordinates as substitutes.\n" + Gbl.ONLYONCE ) ;
+						}
+						Link fromLink = scenario.getNetwork().getLinks().get( fromAct.getLinkId() ) ;
+						Link   toLink = scenario.getNetwork().getLinks().get(   toAct.getLinkId() ) ;
+						item = CoordUtils.calcDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
+					}
+					break;
 				case legDistances:
 					if ( leg.getRoute() instanceof NetworkRoute ) {
 						item = RouteUtils.calcDistance( ((NetworkRoute)leg.getRoute()), this.scenario.getNetwork() ) ;
@@ -287,7 +308,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 	private String getSubpopName(Person person) {
 		return "yy_" + getSubpopName( person.getId(), this.population.getPersonAttributes(), this.scenario.getConfig().plans().getSubpopulationAttributeName() ) ;
 	}
-	public static final String getSubpopName( Id personId, ObjectAttributes personAttributes, String subpopAttrName ) {
+	public static final String getSubpopName( Id<Person> personId, ObjectAttributes personAttributes, String subpopAttrName ) {
 		String subpop = (String) personAttributes.getAttribute( personId.toString(), subpopAttrName ) ;
 		return "subpop_" + subpop;
 	}
@@ -308,6 +329,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	@Override
 	public void reset(final int iteration) {
+		delegate.reset(iteration);
+		
 		this.agentDepartures.clear();
 		this.agentLegs.clear();
 
@@ -448,8 +471,8 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 
 		// write link statistics:
-		for ( Entry<Id, Double> entry : this.linkCnts.entrySet() ) {
-			final Id linkId = entry.getKey();
+		for ( Entry<Id<Link>, Double> entry : this.linkCnts.entrySet() ) {
+			final Id<Link> linkId = entry.getKey();
 			linkAttribs.putAttribute(linkId.toString(), CNT, entry.getValue().toString() ) ;
 			linkAttribs.putAttribute(linkId.toString(), TTIME_SUM, this.linkTtimesSums.get(linkId).toString() ) ;
 		}
@@ -537,7 +560,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		}
 	}
 
-	private Map<Id,Double> vehicleEnterTimes = new HashMap<Id,Double>() ;
+	private Map<Id<Vehicle>,Double> vehicleEnterTimes = new HashMap<>() ;
 
 	private Map<Id<Vehicle>,Double> vehicleGantryCounts = new HashMap<Id<Vehicle>,Double>() ;
 
@@ -555,19 +578,19 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		}
 		
 		if ( this.otherTolledLinkIds.contains( event.getLinkId() ) ) {
-			add( event.getDriverId(), 1., CERTAIN_LINKS_CNT );
+			add( delegate.getDriverOfVehicle(event.getVehicleId()), 1., CERTAIN_LINKS_CNT );
 		}
 		
 	}
 
-	private Map<Id,Double> linkTtimesSums = new HashMap<Id,Double>() ;
-	private Map<Id,Double> linkCnts = new HashMap<Id,Double>() ;
+	private Map<Id<Link>,Double> linkTtimesSums = new HashMap<>() ;
+	private Map<Id<Link>,Double> linkCnts = new HashMap<>() ;
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		Double enterTime = vehicleEnterTimes.get( event.getVehicleId() ) ;
 		if ( enterTime != null && enterTime < 9.*3600. ) {
-			final Id linkId = event.getLinkId();
+			final Id<Link> linkId = event.getLinkId();
 			final Double sumSoFar = linkTtimesSums.get( linkId );
 			if ( sumSoFar == null ) {
 				linkTtimesSums.put( linkId, event.getTime() - enterTime ) ;
@@ -597,6 +620,16 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 				Logger.getLogger(this.getClass()).warn( Gbl.ONLYONCE ) ;
 			}
 		}
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		delegate.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		delegate.handleEvent(event);
 	}
 
 }

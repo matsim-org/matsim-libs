@@ -127,11 +127,10 @@ public class Padang2CT {
 		CTRunner.main(new String[]{inputDir + "/config.xml", "false"});
 
 
-
 	}
 
 	private static void loadAndModifyNetwork(Scenario sc) {
-		new MatsimNetworkReader(sc).readFile(PDG_INPUT + "/output_network.xml.gz");
+		new MatsimNetworkReader(sc.getNetwork()).readFile(PDG_INPUT + "/output_network.xml.gz");
 		Set<String> mode = new HashSet<>();
 		mode.add("walkct");
 		for (Link l : sc.getNetwork().getLinks().values()) {
@@ -140,6 +139,7 @@ public class Padang2CT {
 				l.setLength(1000);
 			}
 			l.setAllowedModes(mode);
+
 		}
 	}
 

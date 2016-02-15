@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.utils.charts;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jfree.data.statistics.BoxAndWhiskerCalculator;
 import org.jfree.data.statistics.BoxAndWhiskerItem;
 import org.jfree.data.statistics.BoxAndWhiskerXYDataset;
 import org.jfree.data.xy.AbstractXYDataset;
 import org.matsim.core.utils.collections.Tuple;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implementation of a {@link BoxAndWhiskerXYDataset} which allows for any

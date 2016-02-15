@@ -75,7 +75,7 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 	public void notifyStartup(StartupEvent event) {
 
 		try {
-			this.iterationSummaryOut = new PrintStream(event.getControler().getControlerIO().getOutputFilename(this.averagesSummaryFilename));
+			this.iterationSummaryOut = new PrintStream(event.getServices().getControlerIO().getOutputFilename(this.averagesSummaryFilename));
 			this.iterationSummaryOut.print("#iteration\tall");
 			for (String mode : modes) {
 				this.iterationSummaryOut.print("\t" + mode);
@@ -85,8 +85,8 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 			e.printStackTrace();
 		}
 
-        this.calcLegTimesKTI = new CalcLegTimesKTI(event.getControler().getScenario().getPopulation(), iterationSummaryOut);
-		event.getControler().getEvents().addHandler(this.calcLegTimesKTI);
+        this.calcLegTimesKTI = new CalcLegTimesKTI(event.getServices().getScenario().getPopulation(), iterationSummaryOut);
+		event.getServices().getEvents().addHandler(this.calcLegTimesKTI);
 
 	}
 
@@ -117,7 +117,7 @@ public class CalcLegTimesKTIListener implements StartupListener, AfterMobsimList
 
 			PrintStream out = null;
 			try {
-				out = new PrintStream(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), travelTimeDistributionFilename));
+				out = new PrintStream(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), travelTimeDistributionFilename));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}

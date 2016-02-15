@@ -22,12 +22,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -39,7 +36,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 
 /**
@@ -70,18 +66,28 @@ public class NetworkRoutingModule implements RoutingModule {
 
 	@Override
 	public List<? extends PlanElement> calcRoute(
-			final Facility fromFacility,
-			final Facility toFacility,
+			final Facility<?> fromFacility,
+			final Facility<?> toFacility,
 			final double departureTime,
 			final Person person) {
 		Leg newLeg = populationFactory.createLeg( mode );
 		newLeg.setDepartureTime( departureTime );
 
+		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
+		Link toLink = this.network.getLinks().get(toFacility.getLinkId());
+
+		/* Remove this and next three lines once debugged. */
+		if(fromLink == null || toLink == null){
+			Logger.getLogger(NetworkRoutingModule.class).error("  ==>  null from/to link for person " + person.getId().toString());
+		}
+		if (fromLink == null) throw new RuntimeException("fromLink "+fromFacility.getLinkId()+" missing.");
+		if (toLink == null) throw new RuntimeException("toLink "+toFacility.getLinkId()+" missing.");
+
 		double travTime = routeLeg(
 				person,
 				newLeg,
-				new FacilityWrapper( fromFacility ),
-				new FacilityWrapper( toFacility ),
+				fromLink,
+				toLink,
 				departureTime);
 
 		// otherwise, information may be lost
@@ -100,86 +106,8 @@ public class NetworkRoutingModule implements RoutingModule {
 		return "[NetworkRoutingModule: mode="+mode+"]";
 	}
 
-	private static class FacilityWrapper implements Activity {
-		private final Facility wrapped;
-
-		public FacilityWrapper(final Facility toWrap) {
-			this.wrapped = toWrap;
-		}
-
-		@Override
-		public double getEndTime() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setEndTime(double seconds) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public String getType() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setType(String type) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public Coord getCoord() {
-			return wrapped.getCoord();
-		}
-
-		@Override
-		public double getStartTime() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setStartTime(double seconds) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public double getMaximumDuration() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setMaximumDuration(double seconds) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public Id<Link> getLinkId() {
-			return wrapped.getLinkId();
-		}
-
-		@Override
-		public Id<ActivityFacility> getFacilityId() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public String toString() {
-			return "[FacilityWrapper: wrapped="+wrapped+"]";
-		}
-	}
-
-
-	/*package (Tests)*/ double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
+	private double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
 		double travTime = 0;
-		Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
-		Link toLink = this.network.getLinks().get(toAct.getLinkId());
-
-		/* Remove this and next three lines once debugged. */
-		if(fromLink == null || toLink == null){
-			Logger.getLogger(NetworkRoutingModule.class).error("  ==>  null from/to link for person " + person.getId().toString());
-		}
-		if (fromLink == null) throw new RuntimeException("fromLink "+fromAct.getLinkId()+" missing.");
-		if (toLink == null) throw new RuntimeException("toLink "+toAct.getLinkId()+" missing.");
 
 		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
@@ -187,7 +115,7 @@ public class NetworkRoutingModule implements RoutingModule {
 //		CarRoute route = null;
 		Path path = null;
 		if (toLink != fromLink) {
-			// do not drive/walk around, if we stay on the same link
+			// (a "true" route)
 			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
@@ -199,6 +127,7 @@ public class NetworkRoutingModule implements RoutingModule {
 			travTime = (int) path.travelTime;
 		} else {
 			// create an empty route == staying on place if toLink == endLink
+			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
 			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setTravelTime(0);
 			route.setDistance(0.0);
@@ -208,7 +137,10 @@ public class NetworkRoutingModule implements RoutingModule {
 
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		((LegImpl) leg).setArrivalTime(depTime + travTime); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
+		if ( leg instanceof LegImpl ) {
+			((LegImpl) leg).setArrivalTime(depTime + travTime); 
+			// (not in interface!)
+		}
 		return travTime;
 	}
 

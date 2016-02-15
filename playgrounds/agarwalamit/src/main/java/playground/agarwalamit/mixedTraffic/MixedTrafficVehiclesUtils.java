@@ -25,27 +25,28 @@ import org.matsim.api.core.v01.TransportMode;
  */
 public class MixedTrafficVehiclesUtils {
 	
-	public final static String car = TransportMode.car;
-	public final static String bike = TransportMode.bike;
-	public final static String walk = TransportMode.walk;
-	public final static String motorbike = "motorbike";
-	public final static String truck = "truck";
+	public final static String CAR = TransportMode.car;
+	public final static String BIKE = TransportMode.bike;
+	public final static String WALK = TransportMode.walk;
+	// ZZ_TODO : check PT speed and PCU.
+	public final static String PT = TransportMode.pt;
+	public final static String MOTORBIKE = "motorbike";
+	public final static String TRUCK = "truck";
 	
 	/**
 	 * @param travelMode
 	 * for which PCU value is required
-	 * @return 
-	 * default is PCU for car (1.0)
 	 */
-	public static double getPCU(String travelMode){
+	public static double getPCU(final String travelMode){
 		double pcu;
 		switch (travelMode) {
-		case car: pcu = 1.0; break;
-		case bike: pcu = 0.25; break;
-		case motorbike: pcu = 0.25;break;
-		case walk: pcu = 0.10;break;
-		case truck: pcu = 3.0; break;
-		default: pcu = 1.0; break;
+		case CAR: pcu = 1.0; break;
+		case BIKE: pcu = 0.25; break;
+		case MOTORBIKE: pcu = 0.25;break;
+		case WALK: pcu = 0.10;break;
+		case PT :
+		case TRUCK: pcu = 3.0; break;
+		default: throw new RuntimeException("No PCU is set for travel mode "+travelMode+ ".");
 		}
 		return pcu;
 	}
@@ -53,18 +54,17 @@ public class MixedTrafficVehiclesUtils {
 	/**
 	 * @param travelMode
 	 * for which speed is required
-	 * @return 
-	 * speed in mps; default is speed for car (16.67 mps)
 	 */
-	public static double getSpeed(String travelMode){
+	public static double getSpeed(final String travelMode){
 		double speed;
 		switch (travelMode) {
-		case car: speed = 16.67; break;
-		case bike: speed = 4.17; break;
-		case motorbike: speed = 16.67;break;
-		case walk: speed = 1.2;break;
-		case truck : speed = 8.33; break;
-		default: speed = 16.67; break;
+		case CAR: speed = 16.67; break;
+		case BIKE: speed = 4.17; break;
+		case MOTORBIKE: speed = 16.67;break;
+		case WALK: speed = 1.2;break;
+		case PT :
+		case TRUCK : speed = 8.33; break;
+		default: throw new RuntimeException("No speed is set for travel mode "+travelMode+ ".");
 		}
 		return speed;
 	}
@@ -76,8 +76,8 @@ public class MixedTrafficVehiclesUtils {
 	 * physical road space occupied based on PCU unit 
 	 * default is cell size for car (7.5 m)
 	 */
-	public static double getCellSize(String travelMode){
-		double MATSimCellSize = 7.5;
-		return MATSimCellSize*getPCU(travelMode);
+	public static double getCellSize(final String travelMode){
+		double matsimCellSize = 7.5;
+		return matsimCellSize*getPCU(travelMode);
 	}
 }

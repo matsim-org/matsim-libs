@@ -27,13 +27,20 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.internal.MatsimDataClassImplMarkerInterface;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * maintainer: mrieser / Senozon AG
  */
-public class ActivityFacilityImpl implements ActivityFacility {
+public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassImplMarkerInterface {
+	// After some thinking, we think that this design is ok:
+	// * all methods are final (reduce maintenance for upstream maintainers)
+	// * the class itself is not final
+	// * the constructor is protected
+	// * derived classes can thus extend to the attributes
+	// 
 	
 	private Customizable customizableDelegate;
 
@@ -47,16 +54,22 @@ public class ActivityFacilityImpl implements ActivityFacility {
 
 	private Id<Link> linkId;
 
+	/**
+	 * Deliberately protected, see {@link MatsimDataClassImplMarkerInterface}
+	 * 
+	 * @param id
+	 * @param center
+	 */
 	protected ActivityFacilityImpl(final Id<ActivityFacility> id, final Coord center) {
 		this.id = id;
 		this.coord = center;
 	}
 
-	public double calcDistance(Coord otherCoord) {
+	public final double calcDistance(Coord otherCoord) {
 		return CoordUtils.calcDistance(this.coord, otherCoord);
 	}
 
-	public final ActivityOptionImpl createActivityOption(final String type) {
+	public final ActivityOptionImpl createAndAddActivityOption(final String type) {
 		String type2 = type.intern();
 		ActivityOptionImpl a = new ActivityOptionImpl(type2);
 		addActivityOption(a);
@@ -64,7 +77,7 @@ public class ActivityFacilityImpl implements ActivityFacility {
 	}
 
 	@Override
-	public void addActivityOption(ActivityOption option) {
+	public final void addActivityOption(ActivityOption option) {
 		String type = option.getType() ;
 		if (this.activities.containsKey(type)) {
 			throw new RuntimeException(this + "[type=" + type + " already exists]");
@@ -80,7 +93,7 @@ public class ActivityFacilityImpl implements ActivityFacility {
 		this.coord = newCoord;
 	}
 
-	public void setDesc(String desc) {
+	public final void setDesc(String desc) {
 		if (desc == null) { this.desc = null; }
 		else { this.desc = desc.intern(); }
 	}
@@ -95,32 +108,33 @@ public class ActivityFacilityImpl implements ActivityFacility {
 	}
 
 	@Override
-	public Id<Link> getLinkId() {
+	public final Id<Link> getLinkId() {
 		return this.linkId;
 	}
 
-	public void setLinkId(Id<Link> linkId) {
+	public final void setLinkId(Id<Link> linkId) {
 		this.linkId = linkId;
 	}
 
 	@Override
 	public final String toString() {
-		return super.toString() +
-		       "[nof_activities=" + this.activities.size() + "]";
+		return "[" + super.toString() +
+				" ID=" + this.id +
+		       " nof_activities=" + this.activities.size() + "]";
 	}
 
 	@Override
-	public Coord getCoord() {
+	public final Coord getCoord() {
 		return this.coord;
 	}
 
 	@Override
-	public Id<ActivityFacility> getId() {
+	public final Id<ActivityFacility> getId() {
 		return this.id;
 	}
 
 	@Override
-	public Map<String, Object> getCustomAttributes() {
+	public final Map<String, Object> getCustomAttributes() {
 		if (this.customizableDelegate == null) {
 			this.customizableDelegate = CustomizableUtils.createCustomizable();
 		}

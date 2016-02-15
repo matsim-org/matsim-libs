@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 
@@ -48,7 +48,7 @@ public class TransitFares
 
 		if (useAgentSensitivities)
 		{
-			ScenarioImpl si = (ScenarioImpl) controler.getScenario();
+			MutableScenario si = (MutableScenario) controler.getScenario();
 			si.addScenarioElement(AgentSensitivities.ELEMENT_NAME, new AgentSensitivities(si));
 		}
 		

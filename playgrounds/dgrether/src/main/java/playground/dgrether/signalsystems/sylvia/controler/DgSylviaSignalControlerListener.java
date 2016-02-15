@@ -30,8 +30,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -69,20 +69,20 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		ScenarioImpl scenario = (ScenarioImpl) event.getControler().getScenario();
+		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
 		
-		this.sensorManager = new DgSensorManager(event.getControler().getScenario().getNetwork());
+		this.sensorManager = new DgSensorManager(event.getServices().getScenario().getNetwork());
 		if ( scenario.getConfig().network().getLaneDefinitionsFile()!=null || scenario.getConfig().qsim().isUseLanes()){
-			this.sensorManager.setLaneDefinitions((LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
+			this.sensorManager.setLaneDefinitions((Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
 		}
-		event.getControler().getEvents().addHandler(sensorManager);
+		event.getServices().getEvents().addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
-				new DgSylviaSignalModelFactory(new DefaultSignalModelFactory(), sensorManager, this.sylviaConfig) , event.getControler().getEvents());
+				new DgSylviaSignalModelFactory(new DefaultSignalModelFactory(), sensorManager, this.sylviaConfig) , event.getServices().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		
 		SignalEngine engine = new QSimSignalEngine(this.signalManager);
-		event.getControler().getMobsimListeners().add(engine);
+//		event.getServices().getMobsimListeners().add(engine);
 		
 		if ( this.alwaysSameMobsimSeed ) {
 			MobsimInitializedListener randomSeedResetter = new MobsimInitializedListener(){
@@ -91,8 +91,9 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 					MatsimRandom.reset(0); // make sure it is same random seed every time
 				}
 			};
-			event.getControler().getMobsimListeners().add(randomSeedResetter) ;
+//			event.getServices().getMobsimListeners().add(randomSeedResetter) ;
 		}
+		throw new RuntimeException();
 	}
 
 
@@ -104,12 +105,11 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		this.writeData(event.getControler().getScenario(), event.getControler().getControlerIO());
+		this.writeData(event.getServices().getScenario(), event.getServices().getControlerIO());
 	}
 	
 	public void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
-		SignalsData data = (SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME);
-		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
+		new SignalsScenarioWriter(controlerIO).writeSignalsData(sc);
 	}
 	
 	

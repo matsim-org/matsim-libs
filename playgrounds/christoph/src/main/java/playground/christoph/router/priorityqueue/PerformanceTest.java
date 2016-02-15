@@ -21,6 +21,7 @@
 package playground.christoph.router.priorityqueue;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -54,7 +55,7 @@ public class PerformanceTest {
 //		int numRoutes = 16384;
 		
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(travelTime, config.planCalcScore());
 //		LeastCostPathCalculatorFactory factory = new DijkstraFactory(); 
 //		LeastCostPathCalculatorFactory factory = new AStarEuclideanFactory(scenario.getNetwork(), travelDisutility);
 //		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(scenario.getNetwork(), travelDisutility);

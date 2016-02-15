@@ -23,7 +23,7 @@ import java.io.*;
 import java.util.Map;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -92,7 +92,7 @@ public class ChargerReader
         double power = 50_000;//50kW 
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario).readFile(networkFile);
+        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
         Map<Id<Zone>, Zone> zones = BerlinZoneUtils.readZones(zonesXmlFile, zonesShpFile);
 

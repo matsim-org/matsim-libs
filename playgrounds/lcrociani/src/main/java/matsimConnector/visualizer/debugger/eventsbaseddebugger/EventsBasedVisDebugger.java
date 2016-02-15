@@ -27,9 +27,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.OverlayLayout;
+import javax.swing.*;
+import java.awt.*;
+
 
 import matsimConnector.utility.Constants;
 
@@ -107,7 +107,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		computeOffsets(sc);
 		this.fr = new JFrame();
 		//				this.fr.setSize(1024,788);
-		this.fr.setSize(1024,788);
+		this.fr.setSize(3840,2160);
 		//		this.fr.setSize(1280,740);
 		//		this.fr.setSize(720,740);
 		JPanel compositePanel = new JPanel();

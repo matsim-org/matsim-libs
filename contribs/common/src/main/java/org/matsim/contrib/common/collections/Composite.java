@@ -30,7 +30,7 @@ import java.util.List;
  */
 public abstract class Composite<T> {
 
-	protected List<T> components = new ArrayList<T>();
+	protected final List<T> components = new ArrayList<T>();
 
 	/**
 	 * Adds a component to the composite.

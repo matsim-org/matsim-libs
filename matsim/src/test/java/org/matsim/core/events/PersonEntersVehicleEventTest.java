@@ -23,7 +23,7 @@ package org.matsim.core.events;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
@@ -36,7 +36,7 @@ import org.matsim.vehicles.VehicleTypeImpl;
 public class PersonEntersVehicleEventTest extends MatsimTestCase {
 
 	public void testReadWriteXml() {
-		Person person = PersonImpl.createPerson(Id.create(1, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		VehicleType vehicleType = new VehicleTypeImpl(Id.create("testVehType", VehicleType.class));
 		Vehicle vehicle = new VehicleImpl(Id.create(80, Vehicle.class), vehicleType);
 		PersonEntersVehicleEvent event = new PersonEntersVehicleEvent(5.0 * 3600 + 11.0 * 60, person.getId(), vehicle.getId());

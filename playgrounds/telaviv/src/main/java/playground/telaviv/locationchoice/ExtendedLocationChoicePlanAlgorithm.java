@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -180,7 +180,7 @@ public class ExtendedLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		/*
 		 * We have only one Facility per Link which has the same Id as the Link itself.
 		 */
-		ActivityFacility facility = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(newLinkId);
+		ActivityFacility facility = ((MutableScenario)scenario).getActivityFacilities().getFacilities().get(newLinkId);
 
 		/*
 		 * Replace LinkId, FacilityId and the Coordinate

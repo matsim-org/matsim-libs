@@ -31,7 +31,7 @@ import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.Pair;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
@@ -54,13 +54,13 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
 	private double countsScalingFactor;
 
-	public ParkingAnalysisHandlerZH(Controler controler, ParkingInfrastructure parkingInfrastructure) {
+	public ParkingAnalysisHandlerZH(MatsimServices controler, ParkingInfrastructure parkingInfrastructure) {
 		this.controler = controler;
 		this.parkingInfrastructure = parkingInfrastructure;
 		initializeParkingCounts(controler);
 	}
 
-	public void initializeParkingCounts(Controler controler) {
+	public void initializeParkingCounts(MatsimServices controler) {
 		String baseFolder = null;
 		countsScalingFactor = Double.parseDouble(controler.getConfig().findParam("parking", "countsScalingFactor"));
 

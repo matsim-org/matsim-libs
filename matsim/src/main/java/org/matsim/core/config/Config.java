@@ -27,6 +27,7 @@ import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.*;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
+import org.matsim.run.CreateFullConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,8 @@ import java.util.TreeMap;
 /**
  * Stores all configuration settings specified in a configuration file and
  * provides access to the settings at runtime.
+ * 
+ * @see CreateFullConfig
  *
  * @author mrieser
  */
@@ -76,7 +79,7 @@ public class Config implements MatsimExtensionPoint {
 	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null;
 	private PtCountsConfigGroup ptCounts = null;
 	private VehiclesConfigGroup vehicles = null ;
-
+	private ChangeLegModeConfigGroup changeLegMode = null;
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
 
@@ -166,7 +169,10 @@ public class Config implements MatsimExtensionPoint {
 		
 		this.vehicles = new VehiclesConfigGroup() ;
 		this.modules.put( VehiclesConfigGroup.GROUP_NAME , this.vehicles ) ;
-		
+
+		this.changeLegMode = new ChangeLegModeConfigGroup();
+		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, this.changeLegMode);
+
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 	}
 
@@ -462,6 +468,10 @@ public class Config implements MatsimExtensionPoint {
 
 	public SubtourModeChoiceConfigGroup subtourModeChoice() {
 		return this.subtourModeChoice;
+	}
+
+	public ChangeLegModeConfigGroup changeLegMode() {
+		return this.changeLegMode;
 	}
 
 	// other:

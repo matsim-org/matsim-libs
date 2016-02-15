@@ -27,11 +27,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
@@ -40,7 +40,7 @@ import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 
 
 /**
@@ -48,7 +48,7 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
  *
  */
 public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-	VehicleLeavesTrafficEventHandler, Wait2LinkEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
+	VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
 
 	private static final Logger log = Logger.getLogger(DgSensorManager.class);
 	
@@ -62,7 +62,7 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 
 	private Network network;
 
-	private LaneDefinitions20 laneDefinitions = null;
+	private Lanes laneDefinitions = null;
 	
 	public DgSensorManager(Network network){
 		this.network = network;
@@ -190,7 +190,7 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 	}
 	
 	@Override
-	public void handleEvent(Wait2LinkEvent event) {
+	public void handleEvent(VehicleEntersTrafficEvent event) {
 		if (this.linkIdSensorMap.containsKey(event.getLinkId())){
 			this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);		
 		}
@@ -202,7 +202,7 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 		this.linkFirstSecondDistanceMeterMap.clear();
 	}
 
-	public void setLaneDefinitions(LaneDefinitions20 laneDefinitions) {
+	public void setLaneDefinitions(Lanes laneDefinitions) {
 		this.laneDefinitions  = laneDefinitions;
 	}
 

@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
@@ -103,7 +103,7 @@ public class RunHotspotPricingMunich {
 
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.addOverridingModule(new OTFVisModule());
+		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.run();
 	}
 
@@ -112,7 +112,7 @@ public class RunHotspotPricingMunich {
 		Set<Id<Link>> hotspotLinksMerged = new HashSet<>();
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.loadConfig(fileName));
-		new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
+		new MatsimNetworkReader(sc.getNetwork()).readFile(sc.getConfig().network().getInputFile());
 		Network network = sc.getNetwork();
 		
 		for(Link link : network.getLinks().values()){

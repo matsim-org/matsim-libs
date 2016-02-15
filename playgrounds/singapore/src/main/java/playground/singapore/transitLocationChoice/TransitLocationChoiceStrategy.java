@@ -23,13 +23,16 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import com.google.inject.Inject;
+import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
 
 public class TransitLocationChoiceStrategy implements PlanStrategy {
 	
 	private PlanStrategyImpl delegate;
 	
 	@Inject
-	public TransitLocationChoiceStrategy(final Scenario scenario) {
+	public TransitLocationChoiceStrategy(final Scenario scenario, Provider<TripRouter> tripRouterProvider) {
 		String planSelector = ((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).getPlanSelector();
 		if (planSelector.equals("BestScore")) {
 			delegate = new PlanStrategyImpl(new BestPlanSelector());
@@ -47,9 +50,9 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);
 		((DestinationChoiceConfigGroup)scenario.getConfig().getModule("locationchoice")).setAlgorithm(DestinationChoiceConfigGroup.Algotype.localSearchRecursive);
-		addStrategyModule(new DestinationChoice(scenario));
-		addStrategyModule(new TimeAllocationMutator(scenario.getConfig()));
-		addStrategyModule(new ReRoute(scenario));
+		addStrategyModule(new DestinationChoice(tripRouterProvider, scenario));
+		addStrategyModule(new TimeAllocationMutator(tripRouterProvider, scenario.getConfig().plans(), scenario.getConfig().timeAllocationMutator(), scenario.getConfig().global()));
+		addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 	}
 	
 	public void addStrategyModule(PlanStrategyModule module) {

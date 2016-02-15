@@ -154,7 +154,7 @@ public class MielecDemandExtender
     private void readPlans()
     {
         Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(sc).readFile(inputNetFile);
+        new MatsimNetworkReader(sc.getNetwork()).readFile(inputNetFile);
         new MatsimPopulationReader(sc).readFile(inputPlansFile);
         agentIds = new HashSet<>();
         for (Entry<Id<Person>, ? extends Person> e : sc.getPopulation().getPersons().entrySet()) {

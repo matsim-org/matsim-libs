@@ -53,15 +53,10 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 
 public class Person2ActivityPerformingWriter {
-
-	private Logger log = Logger.getLogger(Person2ActivityPerformingWriter.class);
-
-	private String outputFilesDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run0/baseCaseCtd/";
-
-	private Map<Id<Person>,Map<String, Double>> personId2Act2UtilPerf = new HashMap<>();
-
-	private Set<String> actTypes = new HashSet<String>();
-
+	private static final Logger LOG = Logger.getLogger(Person2ActivityPerformingWriter.class);
+	private final String outputFilesDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run0/baseCaseCtd/";
+	private final Map<Id<Person>,Map<String, Double>> personId2Act2UtilPerf = new HashMap<>();
+	private final Set<String> actTypes = new HashSet<String>();
 	private final UserGroup userGroup = UserGroup.URBAN;
 
 	public static void main(String[] args) {
@@ -69,7 +64,6 @@ public class Person2ActivityPerformingWriter {
 	}
 
 	private void run(){
-
 		ActivityType2ActDurationsAnalyzer actAnalyzer = new ActivityType2ActDurationsAnalyzer(outputFilesDir);
 		actAnalyzer.preProcessData();
 		actAnalyzer.postProcessData();
@@ -94,7 +88,7 @@ public class Person2ActivityPerformingWriter {
 				String lastActType = actStartTimes.get(noOfActivities-1).getFirst();
 				actEndTimes.add(new Tuple<String, Double>(lastActType, 24.*3600.));
 			} else {
-				log.warn("Person "+p.getId()+" do not have any open ended activity and simulation ends."
+				LOG.warn("Person "+p.getId()+" do not have any open ended activity and simulation ends."
 						+ "Possible explanation must be stuckAndAbort.");
 			}
 
@@ -162,7 +156,7 @@ public class Person2ActivityPerformingWriter {
 		}
 	}
 
-	public void writeActType2UtilPerforming(String outputFolder) {
+	public void writeActType2UtilPerforming(final String outputFolder) {
 		String fileName = outputFolder+"/"+userGroup+"_actTyp2TotalUtilityOfPerforming.txt";
 		SortedMap<String, Double> act2UtilPerform = getActType2TotalUtilOfPerforming();
 
@@ -180,7 +174,7 @@ public class Person2ActivityPerformingWriter {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written. Reason - " + e);
 		}
-		log.info("Data is written to file "+fileName);
+		LOG.info("Data is written to file "+fileName);
 	}
 
 	/**
@@ -206,13 +200,10 @@ public class Person2ActivityPerformingWriter {
 	}
 
 	public class Person2ActivityScoringFunction implements ScoringFunction{
-
-		public Person2ActivityScoringFunction(CharyparNagelActivityScoring delegate) {
+		private CharyparNagelActivityScoring delegate;
+		public Person2ActivityScoringFunction(final CharyparNagelActivityScoring delegate) {
 			this.delegate = delegate;
 		}
-
-		private CharyparNagelActivityScoring delegate;
-
 		@Override
 		public final void handleActivity(Activity activity) {
 

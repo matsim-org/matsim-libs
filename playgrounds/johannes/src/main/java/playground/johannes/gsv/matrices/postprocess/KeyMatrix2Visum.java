@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.matrices.postprocess;
 
+import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.NumericMatrixXMLReader;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 
 /**
  * @author johannes
@@ -41,11 +41,11 @@ public class KeyMatrix2Visum {
 		String in = args[0];
 		String out = args[1];
 
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		NumericMatrixXMLReader reader = new NumericMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse(in);
 
-		KeyMatrix inMatrix = reader.getMatrix();
+		NumericMatrix inMatrix = reader.getMatrix();
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(out));
 		writer.write("$O;D3");

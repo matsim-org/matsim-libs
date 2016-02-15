@@ -27,7 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.congestion.analysis.CongestionAnalysisEventHandler;
@@ -59,7 +59,7 @@ public class ExtCostMain {
 		config.network().setInputFile(netFile);
 		config.plans().setInputFile(null);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 
 		CongestionAnalysisEventHandler extCostTripHandler = new CongestionAnalysisEventHandler(scenario, true);

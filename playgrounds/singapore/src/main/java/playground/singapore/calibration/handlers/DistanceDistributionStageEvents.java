@@ -303,7 +303,7 @@ public class DistanceDistributionStageEvents implements TransitDriverStartsEvent
 	public static void main(String[] args) throws IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
-		new MatsimNetworkReader(scenario).parse(args[0]);
+		new MatsimNetworkReader(scenario.getNetwork()).parse(args[0]);
 		new TransitScheduleReader(scenario).readFile(args[1]);
 		int lastIteration = new Integer(args[2]);
 		int iterationsInterval = new Integer(args[3]);

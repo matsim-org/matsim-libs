@@ -31,7 +31,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
@@ -74,16 +74,16 @@ final class ActivityLocationsParatransitUser implements IterationEndsListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
-        parsePopulation(event.getControler().getScenario().getPopulation());
+        parsePopulation(event.getServices().getScenario().getPopulation());
 
         String outNameIdentifier = "actsFromParatransitUsers.txt";
         if (this.firstIteration) {
 			// write it to main output
-			writeResults(event.getControler().getControlerIO().getOutputFilename("0." + outNameIdentifier));
+			writeResults(event.getServices().getControlerIO().getOutputFilename("0." + outNameIdentifier));
 			this.firstIteration = false;
 		} else {
 			// write it somewhere
-			writeResults(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), outNameIdentifier));
+			writeResults(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), outNameIdentifier));
 		}
 	}
 
@@ -184,13 +184,13 @@ final class ActivityLocationsParatransitUser implements IterationEndsListener {
 		
 		Gbl.startMeasurement();
 		
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		String networkFile = "f:/p_runs/txl/network.final.xml.gz";
 		String inPlansFile = "f:/p_runs/txl/run71/it.380/run71.380.plans.xml.gz";
 		String outFilename = "f:/p_runs/txl/run71/it.380/actsFromParatransitUsers.txt";
 		
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		
 		Population inPop = sc.getPopulation();
 		PopulationReader popReader = new MatsimPopulationReader(sc);

@@ -40,7 +40,7 @@ public class EmissionCongestionTravelDisutilityCalculatorFactory implements Trav
 
 	private final EmissionModule emissionModule;
 	private final EmissionCostModule emissionCostModule;
-	private Set<Id> hotspotLinks;
+	private Set<Id<Link>> hotspotLinks;
 	private TollHandler tollHandler;
 	
 	public EmissionCongestionTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule, TollHandler tollHandler) {
@@ -68,7 +68,7 @@ public class EmissionCongestionTravelDisutilityCalculatorFactory implements Trav
 		};
 	}
 
-	public void setHotspotLinks(Set<Id> hotspotLinks) {
+	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {
 		this.hotspotLinks = hotspotLinks;
 	}
 

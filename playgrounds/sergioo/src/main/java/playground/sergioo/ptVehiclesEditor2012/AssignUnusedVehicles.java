@@ -6,7 +6,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -25,7 +25,7 @@ public class AssignUnusedVehicles {
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(args[1]);
 		Set<Id<Vehicle>> vehicleIds = new HashSet<Id<Vehicle>>();
-		for(Vehicle vehicle:((ScenarioImpl)scenario).getTransitVehicles().getVehicles().values())
+		for(Vehicle vehicle:((MutableScenario)scenario).getTransitVehicles().getVehicles().values())
 			vehicleIds.add(vehicle.getId());
 		for(TransitLine line:scenario.getTransitSchedule().getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values())

@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.otfvis.OTFVisModule;
+import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -30,7 +30,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.vsp.energy.trafficstate.TrafficStateControlerListener;
 
@@ -65,7 +64,7 @@ public class ERunner {
 		if(!(additionalPlansFile == null)){
 			PopulationFactory f = this.sc.getPopulation().getFactory();
 			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			new MatsimNetworkReader(sc).readFile(this.sc.getConfig().getParam(NetworkConfigGroup.GROUP_NAME, "inputNetworkFile"));
+			new MatsimNetworkReader(sc.getNetwork()).readFile(this.sc.getConfig().getParam(NetworkConfigGroup.GROUP_NAME, "inputNetworkFile"));
 			new MatsimPopulationReader(sc).readFile(additionalPlansFile);
 			Person newPerson;
 			for(Person p: sc.getPopulation().getPersons().values()){
@@ -79,11 +78,11 @@ public class ERunner {
 	
 	public void run(){
 		Controler c = new Controler(this.sc);
-		c.addOverridingModule(new OTFVisModule());
+		c.addOverridingModule(new OTFVisFileWriterModule());
 		TrafficStateControlerListener trafficState = new TrafficStateControlerListener();
 		c.addControlerListener(trafficState);
-		
-		c.setDumpDataAtEnd(true);
+
+		c.getConfig().controler().setDumpDataAtEnd(true);
 		c.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :

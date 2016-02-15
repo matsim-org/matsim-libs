@@ -25,7 +25,6 @@ import org.matsim.core.mobsim.qsim.FlowStorageSpillbackTest;
 import org.matsim.core.mobsim.qsim.QSimTest;
 import org.matsim.core.mobsim.qsim.TransitQueueNetworkTest;
 import org.matsim.examples.EquilTest;
-import org.matsim.integration.always.ReRoutingTest;
 import org.matsim.modules.ScoreStatsModuleTest;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorTest;
 
@@ -42,7 +41,7 @@ import playground.agarwalamit.flowDynamics.StorageCapOnSimultaneousSpillBackTest
 	EquilTest.class, //testEquil
 	TravelTimeCollectorTest.class, //testGetLinkTravelTime
 	ControlerTest.class, //testTravelTimeCalculation
-	ReRoutingTest.class,  //testReRoutingFastAStarLandmarks
+//	ReRoutingTest.class,  //testReRoutingFastAStarLandmarks --probably moved to contrib-- amit feb 2016
 	ScoreStatsModuleTest.class,//testScoreStats
 	
 	/*

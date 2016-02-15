@@ -37,6 +37,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
@@ -229,7 +230,7 @@ public class TestEmissionPricing {
 		// check not selected plans - score should be worse if link 39 is used
 		boolean plan9ex=false;
 		for(Plan p: activeAgent.getPlans()){			
-			if(p.isSelected()==false){
+			if(PersonUtils.isSelected(p)==false){
 				logger.info("This plan is not selected. It's score is " + p.getScore());
 				for(PlanElement pe: p.getPlanElements()){
 					if(pe instanceof Leg){

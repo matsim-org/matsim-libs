@@ -37,9 +37,6 @@ import org.matsim.testcases.MatsimTestCase;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.Point;
-
 public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 	public void testSelectedPlansActsShape() throws IOException {
@@ -51,7 +48,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 		Scenario scenario = ScenarioUtils.createScenario(super.loadConfig(null));
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(populationFilename);
@@ -77,7 +74,7 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 		Scenario scenario = ScenarioUtils.createScenario(super.loadConfig(null));
 		Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile(networkFilename);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 
 		Population population = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(populationFilename);

@@ -10,8 +10,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
-import com.google.inject.Inject;
-
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
@@ -49,14 +47,14 @@ public class AfterSimulationListener implements AfterMobsimListener {
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 
-		optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes.getParkingTimes(), Double.parseDouble(event.getControler().getConfig().findParam("PSF", "default.maxBatteryCapacity")));
+		optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes.getParkingTimes(), Double.parseDouble(event.getServices().getConfig().findParam("PSF", "default.maxBatteryCapacity")));
 		optimizedCharger.outputOptimizationData(event);
 
 		chargingTimes = optimizedCharger.getChargingTimes();
 
 		ChargingTimes.printEnergyUsageStatistics(chargingTimes, ParametersPSF.getHubLinkMapping());
 		
-		EventsManager events = event.getControler().getEvents() ;
+		EventsManager events = event.getServices().getEvents() ;
 		addCostOfElectricalChargingToTheScore(events);
 	}
 

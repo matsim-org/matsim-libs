@@ -31,42 +31,8 @@ import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
 
 import javax.inject.Provider;
 
-public class CarsharingWithTaxiControler extends Controler{
+public class CarsharingWithTaxiControler {
 
-	public CarsharingWithTaxiControler(Scenario scenario) {
-		super(scenario);
-	}
-
-
-	public void init(Config config, Network network, Scenario sc) {
-		AllCSModesScoringFunctionFactory allCSModesScoringFunctionFactory = new AllCSModesScoringFunctionFactory(
-				      config, 
-				      network, sc);
-	    this.setScoringFunctionFactory(allCSModesScoringFunctionFactory); 	
-				
-	    this.loadMyControlerListeners();
-		}
-	
-	  private void loadMyControlerListeners() {  
-		  
-//	    super.loadControlerListeners();   
-	    Set<String> modes = new TreeSet<String>();
-	    modes.add("freefloating");
-	    modes.add("twowaycarsharing");
-	    modes.add("car");
-	    modes.add("walk");
-	    modes.add("pt");
-	    modes.add("bike");
-	    modes.add("taxi");
-        TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(this.getConfig().getParam("controler", "outputDirectory")+ "/tripsFile",
-	    		this.getConfig().getParam("controler", "outputDirectory") + "/durationsFile",
-	    		this.getConfig().getParam("controler", "outputDirectory") + "/distancesFile",
-	    		modes, true, getScenario().getNetwork());
-	    this.addControlerListener(tripsAnalyzer);
-	    
-	    this.addControlerListener(new AllCSModesTestListener(this,
-	    		Integer.parseInt(this.getConfig().getModule("AllCSModes").getValue("statsWriterFrequency"))));
-	  }
 	public static void main(final String[] args) {
 		
     	final Config config = ConfigUtils.loadConfig(args[0]);
@@ -88,7 +54,7 @@ public class CarsharingWithTaxiControler extends Controler{
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		
-		final CarsharingWithTaxiControler controler = new CarsharingWithTaxiControler( sc );
+		final Controler controler = new Controler( sc );
 
 		controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -96,77 +62,74 @@ public class CarsharingWithTaxiControler extends Controler{
                 bindMobsim().toProvider( AllCSModesQsimFactory.class );
             }
         });
+		controler.addOverridingModule(new AbstractModule() {
 
-		controler.setTripRouterFactory(
-            new javax.inject.Provider<org.matsim.core.router.TripRouter>() {
-                @Override
-                public TripRouter get() {
-                    // this factory initializes a TripRouter with default modules,
-                    // taking into account what is asked for in the config
+			@Override
+			public void install() {
 
-                    // This allows us to just add our module and go.
-                    final Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
+				addRoutingModuleBinding("twowaycarsharing").toInstance(new TwoWayCSRoutingModule());
+				addRoutingModuleBinding("freefloating").toInstance(new FreeFloatingRoutingModule());
+				addRoutingModuleBinding("onewaycarsharing").toInstance(new OneWayCarsharingRDRoutingModule());
+				addRoutingModuleBinding("taxiservice").toInstance(new TaxiserviceRoutingModule(controler));
 
-                    final TripRouter router = delegate.get();
+				bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
 
-                    // add our module to the instance
-                    router.setRoutingModule(
-                        "twowaycarsharing",
-                        new TwoWayCSRoutingModule());
+                    final MainModeIdentifier defaultModeIdentifier = new MainModeIdentifierImpl();
+					
+					@Override
+					public String identifyMainMode(List<? extends PlanElement> tripElements) {
 
-                    router.setRoutingModule(
-                            "freefloating",
-                            new FreeFloatingRoutingModule());
+						for ( PlanElement pe : tripElements ) {
+                            if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
+                                return "twowaycarsharing";
+                            }
+                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "onewaycarsharing" ) ) {
+                                return "onewaycarsharing";
+                            }
+                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
+                                return "freefloating";
+                            }
+                            else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "taxi" ) ) {
+                                return "taxi";
+                            }
+                        }
+                        // if the trip doesn't contain a carsharing leg,
+                        // fall back to the default identification method.
+                        return defaultModeIdentifier.identifyMainMode( tripElements );
+					
+					}				
+					
+				});		
+				
+			}
+			
+		});
 
-                    router.setRoutingModule(
-                            "onewaycarsharing",
-                            new OneWayCarsharingRDRoutingModule());
-
-                    router.setRoutingModule(
-                            "taxiservice",
-                            new TaxiserviceRoutingModule(controler));
-
-                    // we still need to provide a way to identify our trips
-                    // as being twowaycarsharing trips.
-                    // This is for instance used at re-routing.
-                    final MainModeIdentifier defaultModeIdentifier =
-                        router.getMainModeIdentifier();
-                    router.setMainModeIdentifier(
-                            new MainModeIdentifier() {
-                                @Override
-                                public String identifyMainMode(
-                                        final List<? extends PlanElement> tripElements) {
-                                    for ( PlanElement pe : tripElements ) {
-                                        if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
-                                            return "twowaycarsharing";
-                                        }
-                                        else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "onewaycarsharing" ) ) {
-                                            return "onewaycarsharing";
-                                        }
-                                        else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
-                                            return "freefloating";
-                                        }
-                                        else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "taxi" ) ) {
-                                            return "taxi";
-                                        }
-                                    }
-                                    // if the trip doesn't contain a onewaycarsharing leg,
-                                    // fall back to the default identification method.
-                                    return defaultModeIdentifier.identifyMainMode( tripElements );
-                                }
-                            });
-
-                    return router;
-                }
+		AllCSModesScoringFunctionFactory allCSModesScoringFunctionFactory = new AllCSModesScoringFunctionFactory(
+				config,
+				sc.getNetwork(), sc);
+		controler.setScoringFunctionFactory(allCSModesScoringFunctionFactory);
 
 
-            });
+//	    super.loadControlerListeners();
+		Set<String> modes = new TreeSet<String>();
+		modes.add("freefloating");
+		modes.add("twowaycarsharing");
+		modes.add("car");
+		modes.add("walk");
+		modes.add("pt");
+		modes.add("bike");
+		modes.add("taxi");
+		TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(controler.getConfig().getParam("controler", "outputDirectory")+ "/tripsFile",
+				controler.getConfig().getParam("controler", "outputDirectory") + "/durationsFile",
+				controler.getConfig().getParam("controler", "outputDirectory") + "/distancesFile",
+				modes, true, controler.getScenario().getNetwork());
+		controler.addControlerListener(tripsAnalyzer);
 
-
-		controler.init(config, sc.getNetwork(), sc);
+		controler.addControlerListener(new AllCSModesTestListener(controler,
+				Integer.parseInt(controler.getConfig().getModule("AllCSModes").getValue("statsWriterFrequency"))));
 
 		controler.run();
-
 
 	}
 

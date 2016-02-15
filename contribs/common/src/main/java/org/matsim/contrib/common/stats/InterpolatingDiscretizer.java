@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.common.stats;
 
-import gnu.trove.TDoubleArrayList;
+import gnu.trove.list.array.TDoubleArrayList;
 
 import java.util.Arrays;
 
@@ -59,8 +59,8 @@ public class InterpolatingDiscretizer implements Discretizer {
         }
         tmpValues.add(values[values.length - 1]);
 
-        borders = new FixedBordersDiscretizer(tmpBorders.toNativeArray());
-        binValues = tmpValues.toNativeArray();
+        borders = new FixedBordersDiscretizer(tmpBorders.toArray());
+        binValues = tmpValues.toArray();
     }
 
     /**

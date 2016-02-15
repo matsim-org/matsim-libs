@@ -141,15 +141,15 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-            this.addNetworkAsLayer(event.getControler().getScenario().getNetwork(), 0);
+            this.addNetworkAsLayer(event.getServices().getScenario().getNetwork(), 0);
 			this.createAttValues();
 			this.globalPaxHandler = new CountPPaxHandler(this.pIdentifier);
-			event.getControler().getEvents().addHandler(this.globalPaxHandler);
+			event.getServices().getEvents().addHandler(this.globalPaxHandler);
 			this.linkId2TotalCountsFromLastIteration = new HashMap<>();			
 			this.operatorHandler = new CountPOperatorHandler(this.pIdentifier);
-			event.getControler().getEvents().addHandler(this.operatorHandler);
+			event.getServices().getEvents().addHandler(this.operatorHandler);
 			this.vehHandler = new CountPVehHandler(this.pIdentifier);
-			event.getControler().getEvents().addHandler(this.vehHandler);
+			event.getServices().getEvents().addHandler(this.vehHandler);
 			this.linkId2OperatorIdsFromLastIteration = new HashMap<>();
 			this.linkId2LineId2CountsFromLastIteration = new HashMap<>();
 			this.linkId2VehCountsFromLastIteration = new HashMap<>();
@@ -162,9 +162,9 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 			this.addValuesToGexf(event.getIteration(), this.globalPaxHandler, this.operatorHandler);
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
 				if (writeOperatorInDetail) {
-					this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "pStat_detail.gexf.gz"));
+					this.write(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "pStat_detail.gexf.gz"));
 				} else {
-					this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPStat.FILENAME));
+					this.write(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), GexfPStat.FILENAME));
 				}
 			}			
 		}		
@@ -174,9 +174,9 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 	public void notifyShutdown(ShutdownEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
 			if (writeOperatorInDetail) {
-				this.write(event.getControler().getControlerIO().getOutputFilename("pStat_detail.gexf.gz"));
+				this.write(event.getServices().getControlerIO().getOutputFilename("pStat_detail.gexf.gz"));
 			} else {
-				this.write(event.getControler().getControlerIO().getOutputFilename(GexfPStat.FILENAME));
+				this.write(event.getServices().getControlerIO().getOutputFilename(GexfPStat.FILENAME));
 			}
 		}		
 	}

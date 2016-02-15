@@ -23,7 +23,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -99,7 +99,7 @@ public class HITSAnalyser {
     private static void createRouters(String[] args, boolean freeSpeedRouting) {
 		scenario = ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(args[0]));
-		(new MatsimNetworkReader(scenario)).readFile(args[1]);
+		(new MatsimNetworkReader(scenario.getNetwork())).readFile(args[1]);
 		if (!freeSpeedRouting)
 			(new MatsimPopulationReader(scenario)).readFile(args[2]);
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
@@ -179,7 +179,7 @@ public class HITSAnalyser {
 		}
 
 		// now for car
-		TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutilityFactory()
+		TravelDisutility travelDisutility = new Builder( TransportMode.car )
 				.createTravelDisutility(travelTimeCalculator
 						.getLinkTravelTimes(), scenario.getConfig()
 						.planCalcScore());

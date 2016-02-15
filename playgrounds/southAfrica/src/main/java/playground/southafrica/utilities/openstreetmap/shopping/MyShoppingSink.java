@@ -101,20 +101,20 @@ public class MyShoppingSink implements Sink {
 						ActivityFacilityImpl mall = facilities.createAndAddFacility(Id.create(relation.getId(), ActivityFacility.class), coord);
 						mall.setDesc(name);
 						/* Shopping */
-						ActivityOptionImpl shopping = mall.createActivityOption("s");
+						ActivityOptionImpl shopping = mall.createAndAddActivityOption("s");
 						shopping.addOpeningTime(new OpeningTimeImpl(32400, 61200)); // 09:00 - 17:00
 						shopping.setCapacity(Double.parseDouble(gla) / 10);
 
 						/* Work */
-						ActivityOptionImpl work = mall.createActivityOption("w");
+						ActivityOptionImpl work = mall.createAndAddActivityOption("w");
 						work.addOpeningTime(new OpeningTimeImpl(28800, 72000)); // 08:00 - 20:00
 						work.setCapacity(Double.parseDouble(gla) / 20);
 						
-						ActivityOptionImpl leisure = mall.createActivityOption("l");
+						ActivityOptionImpl leisure = mall.createAndAddActivityOption("l");
 						leisure.addOpeningTime(new OpeningTimeImpl(28800, 72000)); // 08:00 - 20:00
 						leisure.setCapacity(Double.parseDouble(gla) / 10);
 
-						ActivityOptionImpl minor = mall.createActivityOption("minor");
+						ActivityOptionImpl minor = mall.createAndAddActivityOption("minor");
 						
 						facilityAttributes.putAttribute(mall.getId().toString(), "gla", gla);
 					}					

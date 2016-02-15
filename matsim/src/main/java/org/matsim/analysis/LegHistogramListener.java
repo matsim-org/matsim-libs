@@ -22,6 +22,7 @@ package org.matsim.analysis;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -39,18 +40,11 @@ import javax.inject.Inject;
  */
 final class LegHistogramListener implements IterationEndsListener, IterationStartsListener {
 
-	private final LegHistogram histogram;
-	private final boolean outputGraph;
+	@Inject private LegHistogram histogram;
+	@Inject private ControlerConfigGroup controlerConfigGroup;
+	@Inject private OutputDirectoryHierarchy controlerIO;
 
 	static private final Logger log = Logger.getLogger(LegHistogramListener.class);
-    private final OutputDirectoryHierarchy controlerIO;
-
-    @Inject
-    LegHistogramListener(Config config, LegHistogram legHistogram, OutputDirectoryHierarchy controlerIO) {
-        this.controlerIO = controlerIO;
-		this.histogram = legHistogram;
-		this.outputGraph = config.controler().isCreateGraphs();
-	}
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
@@ -61,7 +55,7 @@ final class LegHistogramListener implements IterationEndsListener, IterationStar
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.histogram.write(controlerIO.getIterationFilename(event.getIteration(), "legHistogram.txt"));
 		this.printStats();
-		if (this.outputGraph) {
+		if (controlerConfigGroup.isCreateGraphs()) {
 			LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
 			for (String legMode : this.histogram.getLegModes()) {
 				LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);

@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * @author thibautd
@@ -66,7 +66,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithNothing() {
 		String name = "no information";
-		Person person = PersonImpl.createPerson(Id.create(name, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
 		fixtures.add( new Fixture( name , plan , true ) );
 	}
@@ -74,7 +74,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithNoLicense() {
 		String name = "no License";
-		Person person = PersonImpl.createPerson(Id.create(name, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
 		PersonUtils.setLicence(person, "no");
 		fixtures.add( new Fixture( name , plan , false ) );
@@ -83,7 +83,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithNoCar() {
 		String name = "no car" ;
-		Person person = PersonImpl.createPerson(Id.create(name, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
 		PersonUtils.setCarAvail(person, "never");
 		fixtures.add( new Fixture( name , plan , false ) );
@@ -92,7 +92,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithCarSometimes() {
 		String name = "car sometimes";
-		Person person = PersonImpl.createPerson(Id.create(name, Person.class));
+		Person person = PopulationUtils.createPerson(Id.create(name, Person.class));
 		Plan plan = new PlanImpl( person );
 		PersonUtils.setCarAvail(person, "sometimes");
 		fixtures.add( new Fixture( name , plan , true ) );

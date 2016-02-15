@@ -7,7 +7,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -46,7 +46,7 @@ public class Convert {
 		new NetworkWriter(scenario.getNetwork()).write("Z:/WinHome/otp-matsim/Ulm/gtfs2matsim/network.xml");
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("Z:/WinHome/otp-matsim/Ulm/gtfs2matsim/transit-schedule.xml");
 		// getTransitVehicles() instead of getVehicles()
-		new VehicleWriterV1(((ScenarioImpl) scenario).getTransitVehicles()).writeFile("Z:/WinHome/otp-matsim/Ulm/gtfs2matsim/transit-vehicles.xml");		
+		new VehicleWriterV1(((MutableScenario) scenario).getTransitVehicles()).writeFile("Z:/WinHome/otp-matsim/Ulm/gtfs2matsim/transit-vehicles.xml");		
 	}
 	
 	private static Scenario readScenario() {

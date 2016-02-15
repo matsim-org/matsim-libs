@@ -54,10 +54,10 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 	@Override
 	public void notifyStartup(StartupEvent e) {
 		this.timeCalcHandler = new DgTimeCalcEventHandler();
-		e.getControler().getEvents().addHandler(this.timeCalcHandler);
+		e.getServices().getEvents().addHandler(this.timeCalcHandler);
 		if (collectGreenSplitInformation){
 			this.initGreenSplitHandler();
-			e.getControler().getEvents().addHandler(this.signalGreenSplitHandler);
+			e.getServices().getEvents().addHandler(this.signalGreenSplitHandler);
 		}
 	}
 
@@ -69,7 +69,7 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent e) {
 		if (e.getIteration() == 0 || e.getIteration() % 10 == 0){
-			log.info("Analysis of run id: " + e.getControler().getConfig().controler().getRunId());
+			log.info("Analysis of run id: " + e.getServices().getConfig().controler().getRunId());
 			log.info("Agents that passed an adaptive signal system (1,17 or 18) at least once: "
 					+ this.timeCalcHandler.getPassedAgents());
 			
@@ -97,7 +97,7 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 	
 	
 	private void writeSignalStats(IterationEndsEvent event){
-			String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "signal_statistic.csv");
+			String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "signal_statistic.csv");
 			new DgGreenSplitWriter(signalGreenSplitHandler).writeFile(filename);
 			
 			log.info("Wrote signalsystemstats.");

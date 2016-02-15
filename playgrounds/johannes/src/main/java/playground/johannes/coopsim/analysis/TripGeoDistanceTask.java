@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.contrib.common.gis.DistanceCalculator;
+import org.matsim.contrib.common.gis.OrthodromicDistanceCalculator;
+import org.matsim.facilities.ActivityFacilities;
+import playground.johannes.coopsim.pysical.Trajectory;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.facilities.ActivityFacilities;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 
 /**
  * @author illenberger

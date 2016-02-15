@@ -43,7 +43,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -68,12 +68,12 @@ import org.matsim.vehicles.VehiclesFactory;
 public class ElFarolTrainScenario
 {
 
-	public static ScenarioImpl generateScenario()
+	public static MutableScenario generateScenario()
 	{
 		return generateScenario(400,10,3, 12 * 60, 20, 20);
 	}
 	
-	public static ScenarioImpl generateScenario(int numAgents, int timeSlots, int intervalLength, double headWay, double popFrac)
+	public static MutableScenario generateScenario(int numAgents, int timeSlots, int intervalLength, double headWay, double popFrac)
 	{
 		
 		int importantSlots = timeSlots - intervalLength + 1;
@@ -85,7 +85,7 @@ public class ElFarolTrainScenario
 		
 	}
 	
-	public static ScenarioImpl generateScenario(int numAgents, int timeSlots, int intervalLength, double headWay, int seatCap, int standCap)
+	public static MutableScenario generateScenario(int numAgents, int timeSlots, int intervalLength, double headWay, int seatCap, int standCap)
 	{
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
@@ -98,7 +98,7 @@ public class ElFarolTrainScenario
 		HashSet<String> transitModes = new HashSet<String>();
 		transitModes.add("pt");
 		config.transit().setTransitModes(transitModes);
-		ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		MutableScenario scen = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		
 		/* ******** *

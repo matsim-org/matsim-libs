@@ -88,7 +88,7 @@ public class FacilitiesAddDataPulsBuildings {
 //				Id id = new IdImpl(entries[39].trim());
 
 				ActivityFacilityImpl af = facilities.createAndAddFacility(id,coord);
-				ActivityOptionImpl ao = af.createActivityOption("home");
+				ActivityOptionImpl ao = af.createAndAddActivityOption("home");
 				ao.setCapacity(cap);
 				
 				// progress report

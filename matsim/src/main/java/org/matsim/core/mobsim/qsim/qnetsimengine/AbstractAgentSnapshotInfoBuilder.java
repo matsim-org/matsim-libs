@@ -21,9 +21,15 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.Queue;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -37,6 +43,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QueueWithBuffer.Hole;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -49,14 +56,14 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
  */
 abstract class AbstractAgentSnapshotInfoBuilder {
 
-    private final AgentSnapshotInfoFactory snapshotInfoFactory;
+	private final AgentSnapshotInfoFactory snapshotInfoFactory;
 	private Scenario scenario;
-	
+
 	AbstractAgentSnapshotInfoBuilder( Scenario sc, final AgentSnapshotInfoFactory agentSnapshotInfoFactory ){
-        this.snapshotInfoFactory = agentSnapshotInfoFactory;
-        this.scenario = sc ;
+		this.snapshotInfoFactory = agentSnapshotInfoFactory;
+		this.scenario = sc ;
 	}
-	
+
 	/**
 	 * Put the vehicles from the waiting list in positions. Their actual position doesn't matter, PositionInfo provides a
 	 * constructor for handling this situation.
@@ -154,29 +161,50 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		positions.add(pos);
 	}
-	
+
 	public final void positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
-			double now, Collection<MobsimVehicle> vehs, double curvedLength, double storageCapacity, 
-			double euklideanDistance, Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, 
-			double freeSpeed, int numberOfLanesAsInt)
+			double now, Collection<MobsimVehicle> vehs, TreeMap<Double,Hole> holePositions, double curvedLength, 
+			double storageCapacity, double euklideanDistance, Coord upstreamCoord, Coord downstreamCoord, 
+			double inverseFlowCapPerTS, double freeSpeed, int numberOfLanesAsInt)
 	{
 		double spacing = this.calculateVehicleSpacing( curvedLength, vehs.size(), storageCapacity );
 		double freespeedTraveltime = curvedLength / freeSpeed ;
 
 		double lastDistanceFromFromNode = Double.NaN;
 
+//		Iterator<Entry<Double, Hole>> iterator = holePositions.descendingMap().entrySet().iterator() ;
+		Iterator<Entry<Double, Hole>> iterator = holePositions.entrySet().iterator() ;
+
+
 		for ( MobsimVehicle mveh : vehs ) {
 			QVehicle veh = (QVehicle) mveh ;
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
+
 			double distanceFromFromNode = this.calculateDistanceOnVectorFromFromNode2(curvedLength, spacing,
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
-			Integer lane = this.guessLane(veh, numberOfLanesAsInt );
-			double speedValue = this.calcSpeedValueBetweenZeroAndOne(veh,
+
+			Integer lane = AbstractAgentSnapshotInfoBuilder.guessLane(veh, numberOfLanesAsInt );
+			double speedValue = AbstractAgentSnapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh,
 					inverseFlowCapPerTS, now, freeSpeed);
 			this.positionAgentOnLink(positions, upstreamCoord, downstreamCoord,
-						curvedLength, euklideanDistance, veh,
-						distanceFromFromNode, lane, speedValue);
+					curvedLength, euklideanDistance, veh,
+					distanceFromFromNode, lane, speedValue);
 			lastDistanceFromFromNode = distanceFromFromNode;
+
+			if ( QueueWithBuffer.HOLES ) {
+				while ( iterator.hasNext() ) {
+					Entry<Double, Hole> entry = iterator.next();
+					double size = entry.getValue().getSizeInEquivalents() ;
+					double holePositionFromFromNode = entry.getKey() ;
+					// since hole position here is from fromNode, subtracting it from (curved) length to get the position from toNode. amit Nov'15
+					if ( curvedLength -  holePositionFromFromNode > lastDistanceFromFromNode ) {  // +7.5?  -7.5?  +7.5*size?  -7.5*size?
+//						lastDistanceFromFromNode +=  7.5 * size ; // why dependent on size when a vehicle take 7.5 m? amit Nov 15
+						lastDistanceFromFromNode +=  7.5  ; // where is the magic number coming from?  cellSize??
+					} else {
+						break ;
+					}
+				}
+			}
 		}
 	}
 
@@ -191,16 +219,16 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		pos.setAgentState(AgentState.PERSON_OTHER_MODE );
 		positions.add(pos);
 	}
-	
+
 	public final static double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed){
 		int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 		// "inverseSimulatedFlowCapacity" is there to keep vehicles green that only wait for capacity (i.e. have no vehicle
 		// ahead). Especially important with small samples sizes.  This is debatable :-).  kai, jan'11
-		
+
 		double speed = (now > cmp ? 0.0 : 1.0);
 		return speed;
 	}
-	
+
 	public final static Integer guessLane(QVehicle veh, int numberOfLanes){
 		Integer tmpLane;
 		try {
@@ -214,10 +242,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		int lane = 1 + (tmpLane % numberOfLanes);
 		return lane;
 	}
-	
+
 	final void positionPassengers(Collection<AgentSnapshotInfo> positions,
-                            Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
-                            double lengthOfCurve, double euclideanLength, Integer lane, double speedValueBetweenZeroAndOne) {
+			Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
+			double lengthOfCurve, double euclideanLength, Integer lane, double speedValueBetweenZeroAndOne) {
 		int cnt = passengers.size();
 		int laneInt = 2*(cnt+1);
 		if (lane != null){
@@ -234,38 +262,38 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		}
 	}
 
-	
+
 	/**
 	 * Returns all the people sitting in this vehicle.
 	 *
 	 * @param vehicle
 	 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
 	 */
-    final List<Identifiable> getPeopleInVehicle(QVehicle vehicle) {
+	final List<Identifiable> getPeopleInVehicle(QVehicle vehicle) {
 		ArrayList<Identifiable> people = new ArrayList<>();
 		people.add(vehicle.getDriver());
-//		if (vehicle instanceof TransitVehicle) {
-//			for (PassengerAgent passenger : ((TransitVehicle) vehicle).getPassengers()) {
-//				people.add((MobsimAgent) passenger);
-//			}
-//		}
+		//		if (vehicle instanceof TransitVehicle) {
+		//			for (PassengerAgent passenger : ((TransitVehicle) vehicle).getPassengers()) {
+		//				people.add((MobsimAgent) passenger);
+		//			}
+		//		}
 		for ( PassengerAgent passenger : vehicle.getPassengers() ) {
 			people.add(passenger) ;
 		}
 		return people;
 	}
 
-    public abstract double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double overallStorageCapacity);
+	public abstract double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double overallStorageCapacity);
 
-    /**
-     * @param length
-     * @param spacing
-     * @param lastDistanceFromFromNode
-     * @param now
-     * @param freespeedTraveltime
-     * @param remainingTravelTime
-     * @return
-     */
-    public abstract double calculateDistanceOnVectorFromFromNode2(double length, double spacing, double lastDistanceFromFromNode, double now,
-                                                                  double freespeedTraveltime, double remainingTravelTime);
+	/**
+	 * @param length
+	 * @param spacing
+	 * @param lastDistanceFromFromNode
+	 * @param now
+	 * @param freespeedTraveltime
+	 * @param remainingTravelTime
+	 * @return
+	 */
+	public abstract double calculateDistanceOnVectorFromFromNode2(double length, double spacing, double lastDistanceFromFromNode, double now,
+			double freespeedTraveltime, double remainingTravelTime);
 }

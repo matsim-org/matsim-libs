@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
@@ -87,13 +87,13 @@ public class Nce2Gexf extends MatsimJaxbXmlWriter{
 		
 		Gbl.startMeasurement();
 	
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
 		String networkFile = "f:/stab/network.xml";
 		String nceDiffFile = "f:/stab/diff.txt";
 		String outFilename = "f:/stab/diff.gexf.gz";
 		
-		new MatsimNetworkReader(sc).readFile(networkFile);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
 		
 		Nce2Gexf p2g = new Nce2Gexf();
 		p2g.init(nceDiffFile, sc.getNetwork().getNodes());

@@ -20,9 +20,7 @@
 
 package playground.johannes.gsv.sim.cadyts;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import cadyts.demand.PlanBuilder;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,7 +36,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 
-import cadyts.demand.PlanBuilder;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
 		PersonDepartureEventHandler, PersonArrivalEventHandler {
@@ -47,7 +46,7 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 
 	private final Scenario scenario;
 
-	private final Set<Id> driverAgents;
+	private final Set<Id<Person>> driverAgents;
 	
 	private int iteration = -1;
 
@@ -64,7 +63,7 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 		for ( String str : calibratedLinks ) {
 			this.calibratedLinks.add( Id.createLinkId( str ) ) ;
 		}
-		this.driverAgents = new HashSet<Id>();
+		this.driverAgents = new HashSet<>();
 	}
 
 	void addCalibratedItem(Id<Link> link) {
@@ -75,7 +74,7 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 	private long plansNotFound = 0;
 
 	@Override
-	public final cadyts.demand.Plan<Link> getPlanSteps(final Plan plan) {
+	public final cadyts.demand.Plan<Link> getCadytsPlan(final Plan plan) {
 		PlanBuilder<Link> planStepFactory = (PlanBuilder<Link>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 		if (planStepFactory == null) {
 			this.plansNotFound++;
@@ -111,13 +110,14 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 	public void handleEvent(LinkLeaveEvent event) {
 		
 		// if it is not a driver, ignore the event
-		if (!driverAgents.contains(event.getDriverId())) return;
+		Id<Person> personId = Id.createPersonId(event.getVehicleId());
+		if (!driverAgents.contains(personId)) return;
 		
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
 		if (calibratedLinks != null && !calibratedLinks.contains(event.getLinkId())) return;
 		
 		// get the "Person" behind the id:
-		Person person = this.scenario.getPopulation().getPersons().get(event.getDriverId());
+		Person person = this.scenario.getPopulation().getPersons().get(personId);
 		
 		// get the selected plan:
 		Plan selectedPlan = person.getSelectedPlan();

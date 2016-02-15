@@ -18,19 +18,11 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.NetworkRoutingModule;
-import org.matsim.core.router.PseudoTransitRoutingModule;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TeleportationRoutingModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.LinkToLinkTravelTime;
 
 /**
  * @author nagel

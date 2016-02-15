@@ -214,6 +214,9 @@ public class StrategyConfigGroupTest {
 	}
 
 	private ConfigGroup toUnderscoredModule(final StrategyConfigGroup initialGroup) {
+		// yyyy is this method/this execution path still necessary?  Maybe we need to be able to read config v1, but certainly
+		// we don't need to WRITE it, do we?  kai/mz, nov'15
+		
 		final ConfigGroup module = new ConfigGroup( initialGroup.getName() );
 
 		for ( Map.Entry<String, String> e : initialGroup.getParams().entrySet() ) {

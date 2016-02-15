@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.emission.EmissionCostFactors;
@@ -47,7 +47,7 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
  */
 public class EmissionsPerPersonPerUserGroup {
 
-	public static final Logger logger = Logger.getLogger(EmissionsPerPersonPerUserGroup.class);
+	public static final Logger LOG = Logger.getLogger(EmissionsPerPersonPerUserGroup.class);
 	private int lastIteration;
 	private String outputDir;
 	private SortedMap<UserGroup, SortedMap<String, Double>> userGroupToEmissions;
@@ -68,7 +68,7 @@ public class EmissionsPerPersonPerUserGroup {
 		eppa.run(runCases);
 	}
 	
-	private void init(String runCase){
+	private void init(final String runCase){
 		
 		this.scenario = LoadMyScenarios.loadScenarioFromOutputDir(this.outputDir+runCase);
 		this.lastIteration = this.scenario.getConfig().controler().getLastIteration();
@@ -85,13 +85,13 @@ public class EmissionsPerPersonPerUserGroup {
 		}
 	}
 
-	public void run(String [] runCases) {
+	public void run(final String [] runCases) {
 		for(String runCase:runCases){
 			init(runCase);
 			
 			String emissionEventFile = this.outputDir+runCase+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".emission.events.xml.gz";//"/events.xml";//
 			EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionEventFile);
-			ema.init((ScenarioImpl) this.scenario);
+			ema.init((MutableScenario) this.scenario);
 			ema.preProcessData();
 			ema.postProcessData();
 
@@ -105,7 +105,7 @@ public class EmissionsPerPersonPerUserGroup {
 		}
 	}
 
-	private void writeTotalEmissionsCostsPerUserGroup(String outputFile){
+	private void writeTotalEmissionsCostsPerUserGroup(final String outputFile){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
 			writer.write("userGroup \t");
@@ -127,10 +127,10 @@ public class EmissionsPerPersonPerUserGroup {
 		} catch (Exception e){
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 		}
-		logger.info("Finished Writing data to file "+outputFile);		
+		LOG.info("Finished Writing data to file "+outputFile);		
 	}
 
-	private void writeTotalEmissionsPerUserGroup(String outputFile) {
+	private void writeTotalEmissionsPerUserGroup(final String outputFile) {
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
@@ -150,7 +150,7 @@ public class EmissionsPerPersonPerUserGroup {
 		} catch (Exception e){
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 		}
-		logger.info("Finished Writing files to file "+outputFile);		
+		LOG.info("Finished Writing files to file "+outputFile);		
 	}
 
 	private void getTotalEmissionsPerUserGroup(

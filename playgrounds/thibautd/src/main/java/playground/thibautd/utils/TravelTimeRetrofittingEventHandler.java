@@ -19,10 +19,8 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -33,11 +31,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.router.TripStructureUtils;
-
 import org.matsim.core.utils.collections.MapUtils;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * "Retrofits" travel time from events in the plans.

@@ -19,18 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.jointpseudosim.qsim;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Scopes;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider.PSimIterationsCriterion;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Scopes;
 
 /**
  * @author thibautd

@@ -15,7 +15,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -114,7 +114,7 @@ public class VehiclesDataProcessor {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("./data/currentSimulation/transitScheduleWVWAM.xml");
-		for(TransitLine transitLine:((ScenarioImpl)scenario).getTransitSchedule().getTransitLines().values())
+		for(TransitLine transitLine:((MutableScenario)scenario).getTransitSchedule().getTransitLines().values())
 			if(transitLine.getRoutes().values().iterator().hasNext() && transitLine.getRoutes().values().iterator().next().getTransportMode().trim().equals("bus")) {
 				String company = "1";
 				if(sBSLinesNames.contains(transitLine.getId().toString()))
@@ -174,8 +174,8 @@ public class VehiclesDataProcessor {
 		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(transitFile);
-		Vehicles vehicles = ((ScenarioImpl)scenario).getTransitVehicles();
-		for(TransitLine transitLine:((ScenarioImpl)scenario).getTransitSchedule().getTransitLines().values()) {
+		Vehicles vehicles = ((MutableScenario)scenario).getTransitVehicles();
+		for(TransitLine transitLine:((MutableScenario)scenario).getTransitSchedule().getTransitLines().values()) {
 			if(transitLine.getRoutes().values().iterator().hasNext()) {
 				ResultSet result = dataBaseVehicles.executeQuery("SELECT * FROM pt_systems.Lines WHERE name='"+transitLine.getId().toString()+"'");
 				if(result.next()) {

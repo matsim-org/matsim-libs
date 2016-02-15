@@ -24,10 +24,9 @@
 package playground.vsptelematics.ub6;
 
 
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
 import playground.vsptelematics.common.IncidentGenerator;
 
 /**
@@ -35,23 +34,35 @@ import playground.vsptelematics.common.IncidentGenerator;
  * @author dgrether
  *
  */
-public class Controller extends Controler {
-	
-	public Controller(String[] args) {
-		super(args);
-	}
+public class Controller {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Controller c = new Controller(args);
+		Controler c = new Controler(args);
 		c.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		c.getConfig().controler().setCreateGraphs(false);
-        addListener(c);
+		c.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				boolean useHomogeneousTravelTimes = false;
+				bind(RouteTTObserver.class).asEagerSingleton();
+				addControlerListenerBinding().to(RouteTTObserver.class);
+				String param = getConfig().getParam("telematics", "useHomogeneousTravelTimes");
+				if (param != null) {
+					useHomogeneousTravelTimes = Boolean.parseBoolean(param);
+				}
+				if (useHomogeneousTravelTimes) {
+					addControlerListenerBinding().to(Scorer.class);
+				}
+				if (getConfig().network().isTimeVariantNetwork()) {
+					addControlerListenerBinding().to(IncidentGenerator.class);
+				}
+
+			}
+		});
 		c.setScoringFunctionFactory(new NoScoringFunctionFactory());
 //		throw new RuntimeException("I removed the overriding of loadCoreListeners() below since that method should become " +
 //				"final in Controler.  I am not sure why this was needed; it looks like it was supposed to be a less heavyweight version of the" +
@@ -71,33 +82,6 @@ public class Controller extends Controler {
 //
 //		this.addCoreControlerListener(new EventsHandling(this.events)); // must be last being added (=first being executed)
 //	}
-	
 
-	private static void addListener(Controler c){
-		c.addControlerListener(new StartupListener(){
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				Controler con = event.getControler();
-				double alpha = con.getConfig().planCalcScore().getLearningRate();
-				final RouteTTObserver observer = new RouteTTObserver(con.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
-				con.addControlerListener(observer);
-				con.getEvents().addHandler(observer);
-				
-				boolean useHomogeneousTravelTimes = false;
-				
-				String param = con.getScenario().getConfig().getParam("telematics", "useHomogeneousTravelTimes");
-				if (param != null) {
-					useHomogeneousTravelTimes = Boolean.parseBoolean(param);
-				}
-				
-				if (useHomogeneousTravelTimes) {
-					con.addControlerListener(new Scorer(observer));
-				}
-				
-				if (con.getScenario().getConfig().network().isTimeVariantNetwork()){
-					IncidentGenerator generator = new IncidentGenerator(con.getScenario().getConfig().getParam("telematics", "incidentsFile"), con.getScenario().getNetwork());
-					con.addControlerListener(generator);
-				}
-			}});
-	}
+
 }

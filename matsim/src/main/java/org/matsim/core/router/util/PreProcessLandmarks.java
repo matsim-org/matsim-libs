@@ -45,9 +45,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class PreProcessLandmarks extends PreProcessEuclidean {
 
-	private final Rectangle2D.Double travelZone;
-
 	private final int landmarkCount;
+
+	private final Landmarker landmarker;
 
 	private Node[] landmarks;
 	
@@ -90,10 +90,19 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	 * @param landmarkCount
 	 */
 	public PreProcessLandmarks(final TravelDisutility costFunction, final Rectangle2D.Double travelZone, final int landmarkCount) {
+		this( costFunction ,
+				new PieSlicesLandmarker( travelZone ),
+				landmarkCount );
+	}
+
+	public PreProcessLandmarks(
+			final TravelDisutility costFunction,
+			final Landmarker landmarker,
+			final int landmarkCount) {
 		super(costFunction);
 
-		this.travelZone = travelZone;
 		this.landmarkCount = landmarkCount;
+		this.landmarker = landmarker;
 	}
 
 	@Override
@@ -102,8 +111,7 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		
 		log.info("Putting landmarks on network...");
 		long now = System.currentTimeMillis();
-		LandmarkerPieSlices landmarker = new LandmarkerPieSlices(this.landmarkCount, this.travelZone);
-		landmarker.run(network);
+		landmarks = landmarker.identifyLandmarks( landmarkCount , network );
 		log.info("done in " + (System.currentTimeMillis() - now) + " ms");
 
 		log.info("Initializing landmarks data");
@@ -111,7 +119,6 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 			this.nodeData.put(node, new LandmarksData(this.landmarkCount));
 		}
 		
-		this.landmarks = landmarker.getLandmarks();
 		int nOfThreads = this.numberOfThreads;
 		if (nOfThreads > this.landmarks.length) {
 			nOfThreads = this.landmarks.length;
@@ -138,12 +145,12 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 		}
 
 		for (Node node : network.getNodes().values()) {
-			LandmarksData r = (LandmarksData) getNodeData(node);
+			LandmarksData r = getNodeData(node);
 			r.updateMinMaxTravelTimes();
 		}
 
 		for (Node node : network.getNodes().values()) {
-			LandmarksData r = (LandmarksData) getNodeData(node);
+			LandmarksData r = getNodeData(node);
 			for (int i = 0; i < this.landmarks.length; i++) {
 				if (r.getMinLandmarkTravelTime(i) > r.getMaxLandmarkTravelTime(i)) {
 					log.info("Min > max for node " + node.getId() + " and landmark " + i);
@@ -230,16 +237,21 @@ public class PreProcessLandmarks extends PreProcessEuclidean {
 	}
 
 	@Override
-	public DeadEndData getNodeData(final Node n) {
+	public LandmarksData getNodeData(final Node n) {
 		DeadEndData r = this.nodeData.get(n);
 		if (r == null) {
 			r = new LandmarksData(this.landmarkCount);
 			this.nodeData.put(n, r);
 		}
-		return r;
+		// would be better to work with a Map<Node,LandmarksData>, but for some reason the implementor of this class
+		// decided to inherit from PreProcessEuclidean, which inherits from PreprocessDijkstra, which is wehre the field
+		// is..
+		// Before I casted here, the cast was done from whithin AStarLandmarks algorithm, which is even worse.
+		// td dec 15
+		return (LandmarksData) r;
 	}
 
-	public class LandmarksData extends DeadEndData {
+	public static class LandmarksData extends DeadEndData {
 
 		private final double[] landmarkTravelTime1;
 		private final double[] landmarkTravelTime2;

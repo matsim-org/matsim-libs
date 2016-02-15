@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -23,6 +24,8 @@ import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.controler.listener.FFListener;
 import playground.balac.freefloating.routerparkingmodule.FreeFloatingRoutingModule;
 import playground.balac.freefloating.scoring.FreeFloatingScoringFunctionFactory;
+import playground.balac.onewaycarsharingredisgned.router.OneWayCarsharingRDRoutingModule;
+import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
 
 import javax.inject.Provider;
 
@@ -70,65 +73,52 @@ public class FreeFloatingWithParkingControler {
 		    	
 		    }
 		    
-		/*      final ParkingModuleWithFFCarSharingZH parkingModule = new ParkingModuleWithFFCarSharingZH(controler, freefloatingCars);
+		/*      final ParkingModuleWithFFCarSharingZH parkingModule = new ParkingModuleWithFFCarSharingZH(services, freefloatingCars);
 
-			controler.addOverridingModule(new AbstractModule() {
+			services.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bindMobsim().toProvider(new Provider<Mobsim>() {
 						@Override
 						public Mobsim get() {
-							return new FreeFloatingQsimFactory(sc, controler,
-									parkingModule, freefloatingCars).createMobsim(controler.getScenario(), controler.getEvents());
+							return new FreeFloatingQsimFactory(sc, services,
+									parkingModule, freefloatingCars).createMobsim(services.getScenario(), services.getEvents());
 						}
 					});
 				}
 			});*/
 		}
-		
-		controler.setTripRouterFactory(
-				new javax.inject.Provider<org.matsim.core.router.TripRouter>() {
-					@Override
-					public TripRouter get() {
-						// this factory initializes a TripRouter with default modules,
-						// taking into account what is asked for in the config
-					
-						// This allows us to just add our module and go.
-						final Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
+		  controler.addOverridingModule(new AbstractModule() {
 
-						final TripRouter router = delegate.get();
+				@Override
+				public void install() {
+
+					addRoutingModuleBinding("freefloating").toInstance(new FreeFloatingRoutingModule());
+
+					bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
+
+	                    final MainModeIdentifier defaultModeIdentifier = new MainModeIdentifierImpl();
 						
-						// add our module to the instance
-						router.setRoutingModule(
-							"freefloating",
-							new FreeFloatingRoutingModule());
-
-						// we still need to provide a way to identify our trips
-						// as being freefloating trips.
-						// This is for instance used at re-routing.
-						final MainModeIdentifier defaultModeIdentifier =
-							router.getMainModeIdentifier();
-						router.setMainModeIdentifier(
-								new MainModeIdentifier() {
-									@Override
-									public String identifyMainMode(
-											final List<? extends PlanElement> tripElements) {
-										for ( PlanElement pe : tripElements ) {
-											if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
-												return "freefloating";
-											}
-										}
-										// if the trip doesn't contain a freefloating leg,
-										// fall back to the default identification method.
-										return defaultModeIdentifier.identifyMainMode( tripElements );
-									}
-								});
+						@Override
+						public String identifyMainMode(List<? extends PlanElement> tripElements) {
+							for ( PlanElement pe : tripElements ) {
+							 if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
+	                                return "freefloating";
+	                            }
+							}
+	                        
+	                        // if the trip doesn't contain a carsharing leg,
+	                        // fall back to the default identification method.
+	                        return defaultModeIdentifier.identifyMainMode( tripElements );
 						
-						return router;
-					}
-
+						}				
+						
+					});		
 					
-				});
+				}
+				
+			});
+	
 		FreeFloatingScoringFunctionFactory ffScoringFunctionFactory = new FreeFloatingScoringFunctionFactory(
 			      config, 
 			      sc.getNetwork(), sc);

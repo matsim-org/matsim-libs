@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.synPop.mid.analysis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import playground.johannes.synpop.data.ActivityTypes;
 import playground.johannes.synpop.source.mid2008.generator.RowHandler;
 import playground.johannes.synpop.source.mid2008.generator.VariableNames;

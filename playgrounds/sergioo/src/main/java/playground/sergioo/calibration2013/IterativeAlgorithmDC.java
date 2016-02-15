@@ -1,6 +1,7 @@
 package playground.sergioo.calibration2013;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -20,18 +21,15 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -136,7 +134,7 @@ public class IterativeAlgorithmDC {
 						persons.add(person);
 				}
 		new MatsimFacilitiesReader(scenario).readFile(args[2]);
-		new MatsimNetworkReader(scenario).readFile(args[3]);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(args[3]);
 		for(Link link:scenario.getNetwork().getLinks().values()) {
 			Set<String> modes = new HashSet<String>(link.getAllowedModes());
 			modes.add("pt");
@@ -171,29 +169,15 @@ public class IterativeAlgorithmDC {
 		final StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(scenario.getTransitSchedule(), scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (scenario.getConfig().qsim().getEndTime()-scenario.getConfig().qsim().getStartTime()));
 		events.addHandler(stopStopTimeCalculator);
 		new MatsimEventsReader(events).readFile(args[10]);
-		final TravelDisutilityFactory factory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
-		final TravelDisutility disutility = factory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
+		final TravelDisutilityFactory factory = new Builder( TransportMode.car );
+		Map<String, TravelDisutilityFactory> factories = new HashMap<>();
+		factories.put(TransportMode.car, factory);
+
 		final Provider<TransitRouter> transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		context = new ReplanningContext() {
 			@Override
-			public TravelDisutility getTravelDisutility() {
-				return disutility;
-			}
-			@Override
-			public TravelTime getTravelTime() {
-				return travelTimeCalculator.getLinkTravelTimes();
-			}
-			@Override
-			public ScoringFunctionFactory getScoringFunctionFactory() {
-				return new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario);
-			}
-			@Override
 			public int getIteration() {
 				return 1;
-			}
-			@Override
-			public TripRouter getTripRouter() {
-				return TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory).get();
 			}
 		};
 		double minValue = new Double(args[5]), maxValue = new Double(args[6]);
@@ -213,11 +197,13 @@ public class IterativeAlgorithmDC {
 					ReadOrComputeMaxDCScore rcms = new ReadOrComputeMaxDCScore(dcContext);
                     rcms.readOrCreateMaxDCScore(new Controler(scenario).getConfig(), dcContext.kValsAreRead());
                     rcms.getPersonsMaxEpsUnscaled();
-					BestReplyDestinationChoice module = new BestReplyDestinationChoice(dcContext, rcms.getPersonsMaxEpsUnscaled());
+					Map<String, TravelTime> travelTimes = new HashMap<>();
+					travelTimes.put(TransportMode.car, travelTimeCalculator.getLinkTravelTimes());
+					BestReplyDestinationChoice module = new BestReplyDestinationChoice(TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory), dcContext, rcms.getPersonsMaxEpsUnscaled(), new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario), travelTimes, factories);
 					module.prepareReplanning(context);
 					Collection<PlanImpl> copiedPlans = new ArrayList<PlanImpl>();
 					for(Person person:typePopulations.get(type)) {
-						Person copyPerson = PersonImpl.createPerson(person.getId());
+						Person copyPerson = PopulationUtils.createPerson(person.getId());
 						PlanImpl copyPlan = new PlanImpl(copyPerson);
 						copyPlan.copyFrom(person.getSelectedPlan());
 						copyPerson.addPlan(copyPlan);

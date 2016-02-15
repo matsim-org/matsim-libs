@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -158,7 +158,7 @@ public class DemandMatrixReader {
 
 	private void readShape() {
 		Collection<SimpleFeature> landkreise = ShapeFileReader.getAllFeatures(this.shapeFile);
-		final ActivityFacilitiesFactory factory = ((ScenarioImpl)this.sc).getActivityFacilities().getFactory();
+		final ActivityFacilitiesFactory factory = ((MutableScenario)this.sc).getActivityFacilities().getFactory();
 		for (SimpleFeature landkreis : landkreise) {
 			Integer gemeindeschluessel = Integer.parseInt((String) landkreis.getAttribute("gemeindesc"));
 			Geometry geo = (Geometry) landkreis.getDefaultGeometry();

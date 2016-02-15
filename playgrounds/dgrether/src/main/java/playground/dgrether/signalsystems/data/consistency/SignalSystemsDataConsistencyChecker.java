@@ -22,7 +22,7 @@ package playground.dgrether.signalsystems.data.consistency;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.Lanes;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
@@ -41,11 +41,11 @@ public class SignalSystemsDataConsistencyChecker {
 	
 	private SignalsData signalsData;
 
-	private LaneDefinitions20 lanes;
+	private Lanes lanes;
 
 	private Network network;
 
-	public SignalSystemsDataConsistencyChecker(Network network, LaneDefinitions20 lanes, SignalsData signalsData) {
+	public SignalSystemsDataConsistencyChecker(Network network, Lanes lanes, SignalsData signalsData) {
 		this.network = network;
 		this.signalsData = signalsData;
 		this.lanes = lanes;

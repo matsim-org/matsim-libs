@@ -22,16 +22,12 @@
 
 package org.matsim.core.controler;
 
-import org.matsim.analysis.LegTimesModule;
-import org.matsim.analysis.ScoreStatsModule;
-import org.matsim.analysis.VolumesAnalyzerModule;
-import org.matsim.analysis.LegHistogramModule;
-import org.matsim.analysis.LinkStatsModule;
+import org.matsim.analysis.*;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.scenario.ScenarioElementsModule;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.counts.CountsModule;
@@ -42,8 +38,8 @@ import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
 public class ControlerDefaultsModule extends AbstractModule {
     @Override
     public void install() {
+        install(new EventsManagerModule());
         install(new DefaultMobsimModule());
-        install(new ScenarioElementsModule());
         install(new TravelTimeCalculatorModule());
         install(new TravelDisutilityModule());
         install(new CharyparNagelScoringFunctionModule());
@@ -53,6 +49,7 @@ public class ControlerDefaultsModule extends AbstractModule {
         install(new VolumesAnalyzerModule());
         install(new LegHistogramModule());
         install(new LegTimesModule());
+        install(new TravelDistanceStatsModule());
         install(new ScoreStatsModule());
         install(new CountsModule());
         install(new PtCountsModule());

@@ -34,7 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
@@ -249,16 +249,14 @@ public class KrasnojarskSpatialPlots {
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(inputs.initialCaseNetworkFile,inputs.initialCaseConfig);
 
-		ExperiencedDelayAnalyzer delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.initialCaseEventsFile, sc, noOfBins); 
-		delayAnalyzer.preProcessData();
-		delayAnalyzer.postProcessData();
+		ExperiencedDelayAnalyzer delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.initialCaseEventsFile, sc, noOfBins, sc.getConfig().qsim().getEndTime()); 
+		delayAnalyzer.run();
 		linkDelaysBau = delayAnalyzer.getTimeBin2LinkId2Delay();
 
 		if(inputs.isComparing){
 			Scenario scCompareTo = LoadMyScenarios.loadScenarioFromNetworkAndConfig(inputs.compareToCaseNetwork,inputs.compareToCaseConfig);
-			delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.compareToCaseEventsFile, scCompareTo, noOfBins);
-			delayAnalyzer.preProcessData();
-			delayAnalyzer.postProcessData();
+			delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.compareToCaseEventsFile, scCompareTo, noOfBins, sc.getConfig().qsim().getEndTime());
+			delayAnalyzer.run();
 			linkDelaysPolicy = delayAnalyzer.getTimeBin2LinkId2Delay();
 		}
 		double sumDelays =0;
@@ -304,7 +302,7 @@ public class KrasnojarskSpatialPlots {
 				cellWeights += plot.getCellWeights().get(p);
 			}
 			SpatialDataInputs.LOG.info("Total delays from cell weights  is "+cellWeights);
-			plot.clear();
+			plot.reset();
 			sumDelays=0;
 		}
 	}
@@ -335,14 +333,12 @@ public class KrasnojarskSpatialPlots {
 		String networkFile = bau+"/network.xml";
 		
 		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), emissionEventsFile, noOfBins);
-		emsLnkAna.init();
 		emsLnkAna.preProcessData();
 		emsLnkAna.postProcessData();
 		linkEmissionsBau = emsLnkAna.getLink2TotalEmissions();
 
 		if(inputs.isComparing){
 			emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig), inputs.compareToCaseEmissionEventsFile, noOfBins);
-			emsLnkAna.init();
 			emsLnkAna.preProcessData();
 			emsLnkAna.postProcessData();
 			linkEmissionsPolicy = emsLnkAna.getLink2TotalEmissions();
@@ -392,7 +388,7 @@ public class KrasnojarskSpatialPlots {
 				cellWeights += plot.getCellWeights().get(p);
 			}
 			SpatialDataInputs.LOG.info("Total NO2 emissions from cell weights  is "+cellWeights);
-			plot.clear();
+			plot.reset();
 			sumEmission=0;
 		}
 	}

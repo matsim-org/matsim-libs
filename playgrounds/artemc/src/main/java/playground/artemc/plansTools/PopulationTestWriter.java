@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class PopulationTestWriter {
@@ -20,7 +20,7 @@ public class PopulationTestWriter {
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population population = ((ScenarioImpl)scenario).getPopulation();
+		Population population = ((MutableScenario)scenario).getPopulation();
 		PopulationFactory populationFactory = population.getFactory();
 		Person newPerson = populationFactory.createPerson(Id.create("newPerson1", Person.class));
 		Plan plan = populationFactory.createPlan();

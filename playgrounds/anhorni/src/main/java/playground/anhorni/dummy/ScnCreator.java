@@ -98,7 +98,7 @@ public class ScnCreator {
 		this.origScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		new MatsimNetworkReader(this.origScenario).readFile(networkFile);
+		new MatsimNetworkReader(this.origScenario.getNetwork()).readFile(networkFile);
 		new FacilitiesReaderMatsimV1(this.origScenario).readFile(this.facilitiesFile);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.origScenario);
 		populationReader.readFile(this.plansFile);

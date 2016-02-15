@@ -26,7 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -48,7 +48,7 @@ public class MyNetworkGenerator {
 		new NetworkCleaner().run(net);
 		new NetworkWriter(net).write("/Users/johanwjoubert/Desktop/Temp/network.xml");
 
-		Config c = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getConfig();
+		Config c = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getConfig();
 		c.global().setCoordinateSystem(UTM35S);
 
 		// TODO Sort out these errors: Cannot instatiate FeatureGeneratorBuilder.

@@ -3,7 +3,7 @@ cd ../../matsim
 mvn clean
 mvn install -DskipTests=true
 
-cd ../contrib
+cd ../contribs
 mvn clean
 mvn install -fae -DskipTests=true
 

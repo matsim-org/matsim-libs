@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class PlanSelectorByModeV2 {
@@ -32,8 +32,8 @@ public class PlanSelectorByModeV2 {
 		log.info("Reading population...");
 		new MatsimPopulationReader(scenario).readFile(inputPopulationFile);
 		new MatsimPopulationReader(scenario2).readFile(inputPopulationFile);
-		Population populationPT = ((ScenarioImpl)scenario).getPopulation();
-		Population populationCar = ((ScenarioImpl)scenario2).getPopulation();
+		Population populationPT = ((MutableScenario)scenario).getPopulation();
+		Population populationCar = ((MutableScenario)scenario2).getPopulation();
 		
 		
 		ArrayList<Id> carUsersForRemoval = new ArrayList<Id>();

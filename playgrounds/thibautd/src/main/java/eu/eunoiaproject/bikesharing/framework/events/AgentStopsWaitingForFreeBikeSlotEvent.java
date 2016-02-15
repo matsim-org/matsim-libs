@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.events;
 
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 
 /**
  * @author thibautd

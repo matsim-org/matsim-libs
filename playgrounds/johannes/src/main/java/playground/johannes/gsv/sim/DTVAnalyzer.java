@@ -19,33 +19,24 @@
 
 package playground.johannes.gsv.sim;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.vividsolutions.jts.geom.Point;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
-import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.common.gis.CRSUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -56,12 +47,11 @@ import org.matsim.counts.CountsReaderMatsimV1;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import playground.johannes.coopsim.utils.MatsimCoordUtils;
 
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.gis.LinkSHPWriter;
-import playground.johannes.sna.gis.CRSUtils;
-
-import com.vividsolutions.jts.geom.Point;
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author johannes
@@ -75,7 +65,7 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 	
 	private final double factor;
 	
-	public DTVAnalyzer(Network network, Controler controler, EventsManager events, String countsfile, LinkOccupancyCalculator calculator, double factor) {
+	public DTVAnalyzer(String countsfile, LinkOccupancyCalculator calculator, double factor) {
 		obsCounts = new Counts();
 		CountsReaderMatsimV1 reader = new CountsReaderMatsimV1(obsCounts);
 		reader.parse(countsfile);
@@ -84,20 +74,20 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 		this.factor = factor;
 	}
 	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.listener.IterationStartsListener#notifyIterationStarts(org.matsim.core.controler.events.IterationStartsEvent)
+	 * @see org.matsim.core.services.listener.IterationStartsListener#notifyIterationStarts(org.matsim.core.services.events.IterationStartsEvent)
 	 */
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-//		simCounts = new VolumesAnalyzer(30*60*60, 30*60*60, event.getControler().getNetwork());
-//		event.getControler().getEvents().addHandler(simCounts);
+//		simCounts = new VolumesAnalyzer(30*60*60, 30*60*60, event.getServices().getNetwork());
+//		event.getServices().getEvents().addHandler(simCounts);
 	}
 	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.controler.events.IterationEndsEvent)
+	 * @see org.matsim.core.services.listener.IterationEndsListener#notifyIterationEnds(org.matsim.core.services.events.IterationEndsEvent)
 	 */
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String outdir = event.getControler().getControlerIO().getIterationPath(event.getIteration());
-//		simCounts = event.getControler().getVolumes();
+		String outdir = event.getServices().getControlerIO().getIterationPath(event.getIteration());
+//		simCounts = event.getServices().getVolumes();
 		
 		TObjectDoubleHashMap<Count> countsMap = new TObjectDoubleHashMap<Count>();
 		try {
@@ -133,7 +123,7 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 //			writeShape(countsMap, outdir + "/counts.relerror.shp");
 			
 //			LinkSHPWriter shpWriter = new LinkSHPWriter();
-//			shpWriter.write(event.getControler().getNetwork().getLinks().values(), simCounts, outdir + "/linkflow.shp", factor);
+//			shpWriter.write(event.getServices().getNetwork().getLinks().values(), simCounts, outdir + "/linkflow.shp", factor);
 			
 			simCounts.writeValues(outdir + "/linkoccup.txt");
 		} catch (IOException e) {

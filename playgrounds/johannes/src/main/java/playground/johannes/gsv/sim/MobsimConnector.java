@@ -22,9 +22,6 @@
  */
 package playground.johannes.gsv.sim;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -33,8 +30,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.util.TravelTime;
-
 import playground.johannes.gsv.sim.cadyts.CadytsContext;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * @author johannes

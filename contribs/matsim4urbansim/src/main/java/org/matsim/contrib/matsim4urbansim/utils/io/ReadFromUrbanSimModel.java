@@ -31,10 +31,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -285,8 +285,8 @@ public class ReadFromUrbanSimModel {
 	 */
 	public Population readPersonsZone(Population oldPop, final ActivityFacilitiesImpl zones, final Network network, final double samplingRate) {
 		
-		Population mergePop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain all persons from UrbanSim Persons table
-		Population backupPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain only new persons (id) that don't exist in warm start pop file
+		Population mergePop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain all persons from UrbanSim Persons table
+		Population backupPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain only new persons (id) that don't exist in warm start pop file
 		cnt = new PopulationCounter();
 		RandomLocationDistributor rld = new RandomLocationDistributor(this.shapefile, this.radius);
 		
@@ -326,7 +326,7 @@ public class ReadFromUrbanSimModel {
 				compensationFlag = false;
 				currentZoneLocations	 = new ZoneLocations();
 				
-				Person newPerson = PersonImpl.createPerson(personId);
+				Person newPerson = PopulationUtils.createPerson(personId);
 
 				// get home location id
 				Id<ActivityFacility> homeZoneId = Id.create( parts[ indexZoneID_HOME ], ActivityFacility.class );
@@ -406,8 +406,8 @@ public class ReadFromUrbanSimModel {
 	 */
 	public Population readPersonsParcel(Population oldPop, final ActivityFacilitiesImpl parcels, final Network network, final double samplingRate) {
 		
-		Population mergePop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain all persons from UrbanSim Persons table
-		Population backupPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain only new persons (id) that don't exist in warm start pop file
+		Population mergePop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain all persons from UrbanSim Persons table
+		Population backupPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation(); // will contain only new persons (id) that don't exist in warm start pop file
 		cnt = new PopulationCounter();
 		
 		boolean compensationFlag = false;
@@ -444,7 +444,7 @@ public class ReadFromUrbanSimModel {
 				// see reason of this flag below
 				compensationFlag = false;
 				
-				Person newPerson = PersonImpl.createPerson(personId);
+				Person newPerson = PopulationUtils.createPerson(personId);
 
 				// get home location id
 				Id<ActivityFacility> homeParcelId = Id.create( parts[ indexParcelID_HOME ], ActivityFacility.class );
@@ -547,7 +547,7 @@ public class ReadFromUrbanSimModel {
 			printDetailedPopulationInfo(cnt);
 			log.info("Size of new population (" +  mergePop.getPersons().size() + ") is larger than samplingRate*NumberUrbansimPersons (" + targetPopSize + "). Removing persons from newPop ...");
 			// Since no person can be removed from newPop a new, down sampled population is created ...
-			Population downSampledPop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+			Population downSampledPop = ((MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 			
 			List<Person> newPopList = new ArrayList<Person>( mergePop.getPersons().values() ); // Population data structure not needed!
 			Collections.shuffle( newPopList );	// pick random person

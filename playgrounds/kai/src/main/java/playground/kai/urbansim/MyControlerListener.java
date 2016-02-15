@@ -21,8 +21,9 @@ package playground.kai.urbansim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkImpl;
@@ -56,11 +57,11 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." ) ;
 
-		// get the calling controler:
-		Controler controler = event.getControler() ;
+		// get the calling services:
+		MatsimServices controler = event.getServices() ;
 
 		TravelTime ttc = controler.getLinkTravelTimes();
-		LeastCostPathTree st = new LeastCostPathTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(ttc, controler.getConfig().planCalcScore()));
+		LeastCostPathTree st = new LeastCostPathTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(ttc, controler.getConfig().planCalcScore()));
 
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		double dpTime = 8.*3600 ;
@@ -113,8 +114,8 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 //	public void notifyIterationEnds(IterationEndsEvent event) {
 //		log.info("Entering notifyIterationEnds ..." ) ;
 //
-//		// get the calling controler:
-//		Controler controler = event.getControler() ;
+//		// get the calling services:
+//		Controler services = event.getServices() ;
 //
 //		// load first plans file
 //		log.info("Reading 0.it plans file ...");
@@ -134,8 +135,8 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 //		}
 //		log.info("... done feeding 0.it plans into planComparison.") ;
 //
-//		log.info("Getting second plans set from controler and feeding it into planComparison ...") ;
-//		population = controler.getPopulation();
+//		log.info("Getting second plans set from services and feeding it into planComparison ...") ;
+//		population = services.getPopulation();
 //		for (Id id : population.getPersons().keySet()) {
 //			Plan plan = population.getPerson(id).getSelectedPlan();
 //			result.addSecondPlansData(id, plan.getScore());

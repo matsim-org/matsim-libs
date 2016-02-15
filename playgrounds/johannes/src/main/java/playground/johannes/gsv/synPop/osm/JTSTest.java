@@ -19,18 +19,12 @@
 
 package playground.johannes.gsv.synPop.osm;
 
-import java.util.Random;
-
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
+import org.matsim.contrib.common.util.XORShiftRandom;
+
+import java.util.Random;
 
 /**
  * @author johannes

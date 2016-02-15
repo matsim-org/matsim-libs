@@ -34,11 +34,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -91,7 +91,7 @@ public class MultiModalControlerListenerTest {
 
 		MultiModalConfigGroup multiModalConfigGroup = new MultiModalConfigGroup();
 		multiModalConfigGroup.setMultiModalSimulationEnabled(true);
-		multiModalConfigGroup.setSimulatedModes("walk,bike,unknown");
+		multiModalConfigGroup.setSimulatedModes("walk,bike,other");
 		multiModalConfigGroup.setNumberOfThreads(numberOfThreads);
 		config.addModule(multiModalConfigGroup);
 
@@ -109,7 +109,7 @@ public class MultiModalControlerListenerTest {
 
 		// set unkown mode speed
 		double unknownModeSpeed = 2.0;
-		config.plansCalcRoute().setTeleportedModeSpeed("unknown", unknownModeSpeed);
+		config.plansCalcRoute().setTeleportedModeSpeed("other", unknownModeSpeed);
 
         config.travelTimeCalculator().setFilterModes(true);
 
@@ -134,12 +134,12 @@ public class MultiModalControlerListenerTest {
 		link4.setLength(1000.0);
 		link5.setLength(1.0);
 
-		link0.setAllowedModes(CollectionUtils.stringToSet("car,bike,walk,unknown"));
+		link0.setAllowedModes(CollectionUtils.stringToSet("car,bike,walk,other"));
 		link1.setAllowedModes(CollectionUtils.stringToSet("car"));
 		link2.setAllowedModes(CollectionUtils.stringToSet("bike"));
 		link3.setAllowedModes(CollectionUtils.stringToSet("walk"));
-		link4.setAllowedModes(CollectionUtils.stringToSet("unknown"));
-		link5.setAllowedModes(CollectionUtils.stringToSet("car,bike,walk,unknown"));
+		link4.setAllowedModes(CollectionUtils.stringToSet("other"));
+		link5.setAllowedModes(CollectionUtils.stringToSet("car,bike,walk,other"));
 
 		scenario.getNetwork().addNode(node0);
 		scenario.getNetwork().addNode(node1);
@@ -155,11 +155,11 @@ public class MultiModalControlerListenerTest {
 		scenario.getPopulation().addPerson(createPerson(scenario, "p0", "car"));
 		scenario.getPopulation().addPerson(createPerson(scenario, "p1", "bike"));
 		scenario.getPopulation().addPerson(createPerson(scenario, "p2", "walk"));
-		scenario.getPopulation().addPerson(createPerson(scenario, "p3", "unknown"));
+		scenario.getPopulation().addPerson(createPerson(scenario, "p3", "other"));
 
 		Controler controler = new Controler(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
@@ -241,7 +241,7 @@ public class MultiModalControlerListenerTest {
 
 		Controler controler = new Controler(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
@@ -315,7 +315,7 @@ public class MultiModalControlerListenerTest {
 	}
 
 	private static class LinkModeChecker implements LinkLeaveEventHandler, PersonDepartureEventHandler,
-	PersonArrivalEventHandler, Wait2LinkEventHandler {
+	PersonArrivalEventHandler, VehicleEntersTrafficEventHandler {
 
 		int arrivalCount = 0;
 		int linkLeftCount = 0;
@@ -337,14 +337,14 @@ public class MultiModalControlerListenerTest {
 			leftCountPerMode.put(TransportMode.walk, 0);
 			leftCountPerMode.put(TransportMode.ride, 0);
 			leftCountPerMode.put(TransportMode.pt, 0);
-			leftCountPerMode.put("unknown", 0);
+			leftCountPerMode.put("other", 0);
 
 			travelTimesPerMode.put(TransportMode.car, 0.0);
 			travelTimesPerMode.put(TransportMode.bike, 0.0);
 			travelTimesPerMode.put(TransportMode.walk, 0.0);
 			travelTimesPerMode.put(TransportMode.ride, 0.0);
 			travelTimesPerMode.put(TransportMode.pt, 0.0);
-			travelTimesPerMode.put("unknown", 0.0);
+			travelTimesPerMode.put("other", 0.0);
 		}
 
 		@Override
@@ -359,7 +359,7 @@ public class MultiModalControlerListenerTest {
 		}
 
 		@Override
-		public void handleEvent(Wait2LinkEvent event) {
+		public void handleEvent(VehicleEntersTrafficEvent event) {
 			this.vehModes.put(event.getVehicleId(), event.getNetworkMode());
 		}
 

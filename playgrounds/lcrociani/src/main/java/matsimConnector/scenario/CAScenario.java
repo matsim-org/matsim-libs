@@ -143,7 +143,7 @@ public class CAScenario {
 		
 		Id <Link> toCAId = IdUtility.createLinkId(fromId, toId);
 		Link toCA = scNet.getFactory().createLink(toCAId, pivot, n);
-		LinkUtility.initLink(toCA, Constants.TRANSITION_LINK_LENGTH, 3, modesToCA);
+		LinkUtility.initLink(toCA, Constants.TRANSITION_LINK_LENGTH, 10, modesToCA);
 		scNet.addLink(toCA);
 		mapLinkToEnvironment(toCA, environmentCA);
 	}

@@ -17,14 +17,15 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import scenarios.braess.createInput.TtCreateBraessPopulation;
+import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
+import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
 
 /**
- * This class tests the functionality of the getTotalTT method in the class
+ * This class tests the functionality of the class
  * TtAnalyzeBraessRouteDistributionAndTT. The network used is the basic Braess
  * scenario with unlimited capacity, the number of persons traveling through the
  * scenario and the travel time per link can be varied.
@@ -45,7 +46,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	private String outputdir;
 	
 	/**
-	 * Test method for {@link scenarios.braess.analysis.TtAnalyzeBraess#calculateAvgRouteTTsByDepartureTime()}
+	 * Test method for {@link scenarios.illustrative.braess.analysis.TtAnalyzeBraess#calculateAvgRouteTTsByDepartureTime()}
 	 * with 2 agents driving different routes and again with 5 agents driving the same route
 	 * 
 	 * @author Gabriel Thunig
@@ -159,7 +160,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	}
 	
 	/**
-	 * Test method for {@link scenarios.braess.analysis.TtAnalyzeBraess#getTotalTT()}.
+	 * Test method for {@link scenarios.illustrative.braess.analysis.TtAnalyzeBraess#getTotalTT()}.
 	 * 
 	 * @author Tilmann Schlenther
 	 */	

@@ -22,7 +22,6 @@ package playground.johannes.gsv.synPop.analysis;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
 

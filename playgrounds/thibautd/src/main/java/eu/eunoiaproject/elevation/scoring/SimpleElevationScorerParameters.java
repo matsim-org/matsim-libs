@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package eu.eunoiaproject.elevation.scoring;
 
+import org.matsim.core.api.internal.MatsimParameters;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.matsim.core.api.internal.MatsimParameters;
 
 /**
  * @author thibautd

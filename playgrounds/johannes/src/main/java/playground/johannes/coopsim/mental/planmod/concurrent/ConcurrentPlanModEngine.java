@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.mental.planmod.concurrent;
 
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetgen.sna.util.MultiThreading;
+import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorFactory;
+import playground.johannes.coopsim.mental.planmod.PlanModEngine;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import org.matsim.api.core.v01.population.Plan;
-
-import playground.johannes.coopsim.mental.planmod.Choice2ModAdaptorFactory;
-import playground.johannes.coopsim.mental.planmod.PlanModEngine;
-import playground.johannes.sna.util.MultiThreading;
 
 /**
  * @author illenberger

@@ -1,7 +1,6 @@
 package playground.johannes.coopsim.analysis;
 
 import org.matsim.api.core.v01.population.Leg;
-
 import playground.johannes.coopsim.pysical.Trajectory;
 
 public class LegModeCondition implements PlanElementCondition<Leg> {

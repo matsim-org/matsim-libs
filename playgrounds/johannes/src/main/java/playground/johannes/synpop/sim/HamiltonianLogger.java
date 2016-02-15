@@ -26,7 +26,10 @@ import playground.johannes.synpop.sim.data.CachedPerson;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -40,6 +43,8 @@ public class HamiltonianLogger implements MarkovEngineListener {
 
     private final long logInterval;
 
+    private final long startIteration;
+
     private AtomicLong iter = new AtomicLong();
 
     private BufferedWriter writer;
@@ -48,18 +53,35 @@ public class HamiltonianLogger implements MarkovEngineListener {
 
     private final String outdir;
 
-    public HamiltonianLogger(Hamiltonian h, int logInterval) {
-        this(h, logInterval, null);
+    private final DecimalFormat format;
+
+    private final String name;
+
+    public HamiltonianLogger(Hamiltonian h, int logInterval, String name) {
+        this(h, logInterval, name, null);
     }
 
-    public HamiltonianLogger(Hamiltonian h, long logInterval, String outdir) {
+    public HamiltonianLogger(Hamiltonian h, long logInterval, String name, String outdir) {
+        this(h, logInterval, name, outdir, 0);
+    }
+
+    public HamiltonianLogger(Hamiltonian h, long logInterval, String name, String outdir, long startIteration) {
         this.h = h;
         this.logInterval = logInterval;
+        this.startIteration = startIteration;
         this.outdir = outdir;
+
+        if(name == null)
+            this.name = h.getClass().getSimpleName();
+        else
+            this.name = name;
+
+        format = new DecimalFormat("0E0", new DecimalFormatSymbols(Locale.US));
+        format.setMaximumFractionDigits(340);
 
         if (outdir != null) {
             try {
-                writer = new BufferedWriter(new FileWriter(outdir + "/" + h.getClass().getSimpleName() + ".txt"));
+                writer = new BufferedWriter(new FileWriter(outdir + "/" + name + ".txt"));
                 writer.write("iter\th");
                 writer.newLine();
             } catch (IOException e) {
@@ -70,21 +92,25 @@ public class HamiltonianLogger implements MarkovEngineListener {
 
     @Override
     public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
-        if (iter.get() % logInterval == 0) {
+        if(iter.get() % logInterval == 0) {
             long iterNow = iter.get();
-            double hVal = h.evaluate(population);
-            logger.info(String.format("%s [%s]: %s", h.getClass().getSimpleName(), iterNow, hVal));
+            if (iterNow >= startIteration) {
+                double hVal = h.evaluate(population);
+                logger.info(String.format("%s [%s]: %s", name, format.format(iterNow), hVal));
 
-            if (writer != null) {
-                try {
-                    writer.write(String.valueOf(iterNow));
-                    writer.write(TAB);
-                    writer.write(String.valueOf(hVal));
-                    writer.newLine();
-                    writer.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (writer != null) {
+                    try {
+                        writer.write(String.valueOf(iterNow));
+                        writer.write(TAB);
+                        writer.write(String.valueOf(hVal));
+                        writer.newLine();
+                        writer.flush();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
+            } else {
+                logger.info(String.format("%s [%s]: <<inactive>>", name, format.format(iterNow)));
             }
         }
 

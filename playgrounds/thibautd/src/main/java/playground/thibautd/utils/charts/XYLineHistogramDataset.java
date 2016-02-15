@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.utils.charts;
 
+import org.jfree.data.xy.AbstractIntervalXYDataset;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.jfree.data.xy.AbstractIntervalXYDataset;
 
 /**
  * A dataset meant to easily create either "line" or "plain" histograms.

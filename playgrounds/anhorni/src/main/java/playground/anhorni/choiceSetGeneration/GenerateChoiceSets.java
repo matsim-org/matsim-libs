@@ -304,7 +304,7 @@ public class GenerateChoiceSets {
 	}
 
 	private void createChoiceSetFacilities() {
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(this.scenario);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(this.scenario.getNetwork());
 		networkReader.readFile(this.config.network().getInputFile());
 
 		ZHFacilitiesReader zhFacilitiesReader = new ZHFacilitiesReader(this.network);

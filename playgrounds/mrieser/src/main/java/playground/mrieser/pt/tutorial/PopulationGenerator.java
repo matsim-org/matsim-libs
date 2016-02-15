@@ -98,10 +98,10 @@ public class PopulationGenerator {
 			pop.addPerson(person);
 		}
 
-		new MatsimNetworkReader(sc).readFile(networkFilename);
+		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFilename);
 		NetworkImpl carNetwork = NetworkImpl.createNetwork();
 		new TransportModeNetworkFilter(sc.getNetwork()).filter(carNetwork, CollectionUtils.stringToSet(TransportMode.car));
-		new XY2Links(carNetwork).run(pop);
+		new XY2Links(carNetwork, null).run(pop);
 
 		new PopulationWriter(pop, null).write(filename);
 	}

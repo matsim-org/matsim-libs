@@ -24,6 +24,8 @@
  */
 package floetteroed.opdyts;
 
+import java.util.Collection;
+
 /**
  * Creates random decision variables that are used as "innovations" in an
  * iterative, stochastic optimization process.
@@ -36,15 +38,16 @@ package floetteroed.opdyts;
  */
 public interface DecisionVariableRandomizer<U extends DecisionVariable> {
 
-	/**
-	 * @return a completely random decision variable (uniform to the extent
-	 *         possible)
-	 */
-	public U newRandomDecisionVariable();
+	// /**
+	// * @return a completely random decision variable (uniform to the extent
+	// * possible)
+	// */
+	// public U newRandomDecisionVariable();
 
 	/**
-	 * @return a random variation of <code>decisionVariable</code>
+	 * @return two random variations of decisionVariable; these are symmetric
+	 *         ("positive and negative") to the extent possible
 	 */
-	public U newRandomVariation(final U decisionVariable);
+	public Collection<U> newRandomVariations(final U decisionVariable);
 
 }

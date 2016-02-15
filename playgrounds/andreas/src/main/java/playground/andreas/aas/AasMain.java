@@ -24,7 +24,7 @@ import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -45,7 +45,7 @@ public class AasMain {
 	private final String iterationOutputDir;
 	private final String eventsFile;
 
-	private ScenarioImpl scenario;
+	private MutableScenario scenario;
 	private Collection<SimpleFeature> shapeFile;
 	
 	/**
@@ -112,7 +112,7 @@ public class AasMain {
 
 	private void readFiles(String shapeFile) {
 		log.info("Reading scenario...");
-		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(this.config);
+		this.scenario = (MutableScenario) ScenarioUtils.loadScenario(this.config);
 		log.info("Reading scenario... done");
 
 		log.info("Reading shapeFile " + shapeFile);
@@ -143,7 +143,7 @@ public class AasMain {
 	}
 
 
-	private ScenarioImpl getScenario() {
+	private MutableScenario getScenario() {
 		return this.scenario;
 	}
 	

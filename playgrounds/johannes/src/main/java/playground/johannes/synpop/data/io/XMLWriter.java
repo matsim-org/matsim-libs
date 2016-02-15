@@ -21,13 +21,13 @@ package playground.johannes.synpop.data.io;
 
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * @author johannes
@@ -50,9 +50,9 @@ public class XMLWriter extends MatsimXmlWriter {
 	}
 
 	private void writePerson(Person person) {
-		List<Tuple<String, String>> atts = getAttributes(((PlainPerson)person).getAttributes());
+		List<Tuple<String, String>> atts = getAttributes(person);
 		
-		atts.add(new Tuple<String, String>(Constants.ID_KEY, person.getId()));
+		atts.add(new Tuple<>(Constants.ID_KEY, person.getId()));
 		
 		writeStartTag(Constants.PERSON_TAG, atts);
 		for(Episode plan : person.getEpisodes())
@@ -62,7 +62,7 @@ public class XMLWriter extends MatsimXmlWriter {
 	}
 
 	private void writePlan(Episode plan) {
-		writeStartTag(Constants.PLAN_TAG, getAttributes(((PlainEpisode)plan).getAttributes()));
+		writeStartTag(Constants.PLAN_TAG, getAttributes(plan));
 		for (int i = 0; i < plan.getActivities().size(); i++) {
 			if (i > 0)
 				writeLeg(plan.getLegs().get(i - 1));
@@ -73,32 +73,21 @@ public class XMLWriter extends MatsimXmlWriter {
 	}
 
 	private void writeActivity(Attributable activity) {
-		writeStartTag(Constants.ACTIVITY_TAG, getAttributes(((PlainElement)activity).getAttributes()), true);
+		writeStartTag(Constants.ACTIVITY_TAG, getAttributes(activity), true);
 	}
 
 	private void writeLeg(Attributable leg) {
-		writeStartTag(Constants.LEG_TAG, getAttributes(((PlainElement)leg).getAttributes()), true);
+		writeStartTag(Constants.LEG_TAG, getAttributes(leg), true);
 	}
 
-	private List<Tuple<String, String>> getAttributes(Map<String, String> attributes) {
-		List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>(attributes.size() + 1);
+	private List<Tuple<String, String>> getAttributes(Attributable attributable) {
+		Collection<String> keys = attributable.keys();
+		List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>(keys.size() + 1);
 
-		for (Entry<String, String> entry : attributes.entrySet()) {
-			String value = null;
-			
-//			AttributeSerializer serializer = serializers.get(entry.getKey());
-//			if (serializer == null) {
-				
-				if (entry.getValue() != null) {
-					value = entry.getValue().toString();
-				}
-				
-//			} else {
-//				value = serializer.encode(entry.getValue());
-//			}
-
+		for (String key : keys) {
+			String value = attributable.getAttribute(key);
 			if(value != null) {
-				atts.add(new Tuple<String, String>(entry.getKey(), value));
+				atts.add(new Tuple<>(key, value));
 			}
 		}
 

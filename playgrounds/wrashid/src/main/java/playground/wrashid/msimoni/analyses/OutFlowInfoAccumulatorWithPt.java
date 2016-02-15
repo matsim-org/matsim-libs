@@ -31,14 +31,22 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 public class OutFlowInfoAccumulatorWithPt implements LinkLeaveEventHandler,
-		PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
+		PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler,
+		VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	private final int binSizeInSeconds; // set the length of interval
 	private final int numBins;
@@ -58,6 +66,7 @@ public class OutFlowInfoAccumulatorWithPt implements LinkLeaveEventHandler,
 
 	@Override
 	public void reset(int iteration) {
+		delegate.reset(iteration);
 		linkOutFlow = new HashMap<Id, int[]>();
 		leavesPerLink = new HashMap<Id, Integer>();
 		carAgents = new HashSet<Id>();
@@ -65,9 +74,10 @@ public class OutFlowInfoAccumulatorWithPt implements LinkLeaveEventHandler,
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		Id<Person> driverId = delegate.getDriverOfVehicle( event.getVehicleId() ) ;
 		
 		// ignore non-car travelers
-		if (!this.carAgents.contains(event.getDriverId())) return;
+		if (!this.carAgents.contains(driverId)) return;
 		
 		// call from NetworkReadExample
 		linkLeave(event.getLinkId(), event.getTime());
@@ -150,6 +160,14 @@ public class OutFlowInfoAccumulatorWithPt implements LinkLeaveEventHandler,
 
 	public HashMap<Id, int[]> getLinkOutFlow() {
 		return linkOutFlow;
+	}
+
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.delegate.handleEvent(event);
+	}
+
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.delegate.handleEvent(event);
 	}
 
 }

@@ -50,7 +50,7 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsWriter20.class);
 
-	private LaneDefinitions20 laneDefinitions;
+	private Lanes laneDefinitions;
 
 	/**
 	 * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
@@ -58,7 +58,7 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 	 * @param lanedefs
 	 *
 	 */
-	public LaneDefinitionsWriter20(LaneDefinitions20 lanedefs) {
+	public LaneDefinitionsWriter20(Lanes lanedefs) {
 		log.info("Using LaneDefinitionWriter20...");
 		this.laneDefinitions = lanedefs;
 	}

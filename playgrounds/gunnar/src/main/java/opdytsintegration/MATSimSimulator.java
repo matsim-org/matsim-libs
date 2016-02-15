@@ -1,73 +1,154 @@
 package opdytsintegration;
 
-import floetteroed.opdyts.DecisionVariable;
+import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.controler.TerminationCriterion;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
+import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 
 /**
  * Created by michaelzilske on 08/10/15.
+ * 
+ * Modified by Gunnar, starting in December 2015.
  */
-public class MATSimSimulator implements Simulator {
+public class MATSimSimulator<U extends DecisionVariable> implements
+		Simulator<U> {
 
-	// private final Set<? extends DecisionVariable> decisionVariables;
-    private final MATSimStateFactory stateFactory;
-    private final Scenario scenario;
+	// -------------------- MEMBERS --------------------
 
-    public MATSimSimulator(// Set<? extends DecisionVariable> decisionVariables, 
-    		MATSimStateFactory stateFactory, Scenario scenario) {
-        // this.decisionVariables = decisionVariables;
-        this.stateFactory = stateFactory;
-        this.scenario = scenario;
-    }
+	private final MATSimStateFactory<U> stateFactory;
 
-    @Override
-	public SimulatorState run(TrajectorySampler evaluator) {
-//				evaluator.addStatistic("./mylog.txt", new InterpolatedObjectiveFunctionValue());
-//				evaluator.addStatistic("./mylog.txt", new AlphaStatistic(decisionVariables));
+	private final Scenario scenario;
 
-		final MATSimDecisionVariableSetEvaluator predictor
-				= new MATSimDecisionVariableSetEvaluator(evaluator, 
-						// decisionVariables, 
-						stateFactory);
-		predictor.setMemory(1);
-		predictor.setBinSize_s(10 * 60);
-		predictor.setStartBin(6 * 5);
-		predictor.setBinCnt(6 * 20);
+	private final TimeDiscretization timeDiscretization;
 
-		final Controler controler = new Controler(scenario);
-		controler.addControlerListener(predictor);
+	private final Set<Id<Link>> relevantLinkIds;
+
+	private AbstractModule[] modules = null;
+
+	private int nextControlerRun = 0;
+
+	private ScoringFunctionFactory scoringFunctionFactory = null;
+
+	// -------------------- CONSTRUCTOR --------------------
+
+	public MATSimSimulator(final MATSimStateFactory<U> stateFactory,
+			final Scenario scenario,
+			final TimeDiscretization timeDiscretization,
+			final Set<Id<Link>> relevantLinkIds,
+			final AbstractModule... modules) {
+		this.stateFactory = stateFactory;
+		this.scenario = scenario;
+		this.timeDiscretization = timeDiscretization;
+		this.relevantLinkIds = relevantLinkIds;
+		this.modules = modules;
+
+		final String outputDirectory = this.scenario.getConfig().controler()
+				.getOutputDirectory();
+		this.scenario.getConfig().controler()
+				.setOutputDirectory(outputDirectory + "_0");
+	}
+
+	// TODO NEW
+	public void setScoringFunctionFactory(final ScoringFunctionFactory factory) {
+		this.scoringFunctionFactory = factory;
+	}
+
+	// --------------- IMPLEMENTATION OF Simulator INTERFACE ---------------
+
+	@Override
+	public SimulatorState run(final TrajectorySampler<U> trajectorySampler) {
+
+		/*
+		 * (1) This function is called in many iterations. Each time, it
+		 * executes a complete MATSim run. To avoid that the MATSim output files
+		 * are overwritten each time, set iteration-specific output directory
+		 * names.
+		 */
+		String outputDirectory = this.scenario.getConfig().controler()
+				.getOutputDirectory();
+		outputDirectory = outputDirectory.substring(0,
+				outputDirectory.lastIndexOf("_"))
+				+ "_" + this.nextControlerRun;
+		this.scenario.getConfig().controler()
+				.setOutputDirectory(outputDirectory);
+
+		/*
+		 * (2) Create the MATSimDecisionVariableSetEvaluator that is supposed to
+		 * "optimize along" the MATSim run of this iteration.
+		 */
+		final MATSimDecisionVariableSetEvaluator<U> matsimDecisionVariableEvaluator = new MATSimDecisionVariableSetEvaluator<>(
+				trajectorySampler, this.stateFactory, this.timeDiscretization,
+				this.relevantLinkIds);
+		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
+		// matsimDecisionVariableEvaluator.setStandardLogFileName("./opdyts.log");
+
+		/*
+		 * (3) Create, configure, and run a new MATSim Controler.
+		 * 
+		 * TODO Is this done correctly?
+		 */
+		final Controler controler = new Controler(this.scenario);
+		if (this.modules != null) {
+			// controler.setModules(new
+			// ControlerDefaultsWithRoadPricingModule());
+			controler.setModules(this.modules);
+			// this.modules = null; // ???
+		}
+		controler.addControlerListener(matsimDecisionVariableEvaluator);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				binder().requestInjection(stateFactory);
 			}
 		});
-		controler.setTerminationCriterion(new Controler.TerminationCriterion() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public boolean continueIterations(int iteration) {
-				return !predictor.foundSolution();
+			public void install() {
+				binder().requestInjection(matsimDecisionVariableEvaluator);
 			}
 		});
-		controler.run();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				binder().requestInjection(
+						trajectorySampler.getObjectiveFunction());
+			}
+		});
+		controler.setTerminationCriterion(new TerminationCriterion() {
+			@Override
+			public boolean continueIterations(int iteration) {
+				return (!matsimDecisionVariableEvaluator.foundSolution());
+			}
+		});
 
-		return predictor.getFinalState();
+		// >>>>>>>>>> TODO NEW >>>>>>>>>>
+		if (this.scoringFunctionFactory != null) {
+			controler.setScoringFunctionFactory(this.scoringFunctionFactory);
+		}
+		// <<<<<<<<<< TODO NEW <<<<<<<<<<
+
+		controler.run();
+		this.nextControlerRun++;
+		return matsimDecisionVariableEvaluator.getFinalState();
 	}
 
-    @Override
-	public SimulatorState run(TrajectorySampler evaluator, SimulatorState initialState) {
+	@Override
+	public SimulatorState run(final TrajectorySampler<U> evaluator,
+			final SimulatorState initialState) {
 		if (initialState != null) {
-			((MATSimState) initialState).setPopulation(scenario.getPopulation());
 			initialState.implementInSimulation();
 		}
-		return run(evaluator);
+		return this.run(evaluator);
 	}
+
 }
