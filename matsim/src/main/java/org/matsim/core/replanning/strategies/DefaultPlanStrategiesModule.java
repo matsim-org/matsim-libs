@@ -23,6 +23,7 @@
 package org.matsim.core.replanning.strategies;
 
 import com.google.inject.TypeLiteral;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,8 +38,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class DefaultPlanStrategiesModule extends AbstractModule {
-	
-	public enum DefaultPlansRemover { WorstPlanSelector, SelectRandom, SelectExpBetaForRemoval, ChangeExpBetaForRemoval,
+    private static final Logger log = Logger.getLogger( DefaultPlanStrategiesModule.class );
+
+    public enum DefaultPlansRemover { WorstPlanSelector, SelectRandom, SelectExpBetaForRemoval, ChangeExpBetaForRemoval,
 		PathSizeLogitSelectorForRemoval }
 
     @Override
@@ -109,6 +111,18 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
         }
         if (usedStrategyNames.contains(DefaultStrategy.ChangeSingleTripMode.toString())) {
             addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(ChangeSingleTripModePlanStrategyProvider.class);
+        }
+
+        // td, 15 feb 16: removed the "Leg" versions of strategies. Notify the users that they should switch to the
+        // "Trip" versions. Should be left in 0.8.XXX releases, and then deleted, along with their name in the enum.
+        if ( usedStrategyNames.contains( DefaultStrategy.ChangeLegMode ) ) {
+            log.error( DefaultStrategy.ChangeLegMode+" does not exist anymore. Please use "+DefaultStrategy.ChangeTripMode+" instead." );
+        }
+        if ( usedStrategyNames.contains( DefaultStrategy.ChangeSingleLegMode ) ) {
+            log.error( DefaultStrategy.ChangeSingleLegMode+" does not exist anymore. Please use "+DefaultStrategy.ChangeSingleTripMode+" instead." );
+        }
+        if ( usedStrategyNames.contains( DefaultStrategy.TripSubtourModeChoice ) ) {
+            log.error( DefaultStrategy.TripSubtourModeChoice+" does not exist anymore. Please use "+DefaultStrategy.TripSubtourModeChoice+" instead." );
         }
     }
 
