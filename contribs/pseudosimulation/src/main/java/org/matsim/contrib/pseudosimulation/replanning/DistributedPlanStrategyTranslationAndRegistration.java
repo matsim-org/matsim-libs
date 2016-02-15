@@ -65,7 +65,6 @@ public class DistributedPlanStrategyTranslationAndRegistration {
         SupportedMutators.put("ChangeSingleTripMode", ChangeSingleTripModePlanStrategyProvider.class);
         SupportedMutators.put("SubtourModeChoice", SubtourModeChoicePlanStrategyProvider.class);
         SupportedMutators.put("ChangeTripMode", ChangeTripModePlanStrategyProvider.class);
-        SupportedMutators.put("TripSubtourModeChoice", TripSubtourModeChoicePlanStrategyProvider.class);
 
         SupportedMutatorGenes.put("ReRoute", new Character('A'));
         SupportedMutatorGenes.put("TimeAllocationMutator", new Character('B'));

@@ -116,9 +116,6 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
         if (usedStrategyNames.contains(DefaultStrategy.ChangeSingleTripMode.toString())) {
             addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(ChangeSingleTripModePlanStrategyProvider.class);
         }
-        if (usedStrategyNames.contains(DefaultStrategy.TripSubtourModeChoice.toString())) {
-            addPlanStrategyBinding(DefaultStrategy.TripSubtourModeChoice.toString()).toProvider(TripSubtourModeChoicePlanStrategyProvider.class);
-        }
     }
 
     public static enum DefaultSelector { KeepLastSelected, BestScore, ChangeExpBeta, SelectExpBeta, SelectRandom, SelectPathSizeLogit }
