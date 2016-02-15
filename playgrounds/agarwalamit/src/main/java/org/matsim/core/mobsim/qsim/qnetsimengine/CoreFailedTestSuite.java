@@ -28,7 +28,6 @@ import org.matsim.examples.EquilTest;
 import org.matsim.modules.ScoreStatsModuleTest;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorTest;
 
-import playground.agarwalamit.flowDynamics.StorageCapOnSimultaneousSpillBackTest;
 
 /**
  * @author amit
@@ -54,7 +53,7 @@ import playground.agarwalamit.flowDynamics.StorageCapOnSimultaneousSpillBackTest
 	 */
 	QSimTest.class, //testFlowCapacityDriving, testFlowCapacityStarting, testFlowCapacityMixed --
 	
-	StorageCapOnSimultaneousSpillBackTest.class,//storageCapTest4BottleneckLink
+//	StorageCapOnSimultaneousSpillBackTest.class,//storageCapTest4BottleneckLink , moved to my playground.
 	TransitQueueNetworkTest.class //testNonBlockingStop_FirstLink, testBlockingStop_FirstLink
 })
 
