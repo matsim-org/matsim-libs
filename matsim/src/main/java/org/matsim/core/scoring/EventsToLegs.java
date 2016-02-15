@@ -233,10 +233,10 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	         * to calculate the correct route distance including the first/last link. 
 	         * (see MATSIM-227) tt feb'16
 	         */
-	        double relativePositionOnDepartureLink = relPosOnDepartureLinkPerPerson.get(event.getPersonId());
-		    double relativePositionOnArrivalLink = relPosOnArrivalLinkPerPerson.get(event.getPersonId());
-		    networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, relativePositionOnDepartureLink, 
-		    		relativePositionOnArrivalLink, network));
+	        double relPosOnDepartureLink = relPosOnDepartureLinkPerPerson.get(event.getPersonId());
+		    double relPosOnArrivalLink = relPosOnArrivalLinkPerPerson.get(event.getPersonId());
+		    networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, relPosOnDepartureLink, 
+		    		relPosOnArrivalLink, network));
 	        
 	        leg.setRoute(networkRoute);
 	    } else if ((pendingTransitTravel = transitTravels.remove(event.getPersonId())) != null) {
