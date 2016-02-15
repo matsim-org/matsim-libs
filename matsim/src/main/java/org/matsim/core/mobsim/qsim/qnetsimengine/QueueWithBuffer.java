@@ -573,7 +573,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		calculateFlowCapacity();
 		calculateStorageCapacity();
 		
-		if(this.fastCapacityUpdate){
+		if(fastCapacityUpdate){
 			flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 		}
 	}
@@ -618,7 +618,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		QVehicle veh = buffer.poll();
 		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		flowcap_accumulate.timeStep = now;
+		flowcap_accumulate.timeStep = now; // for fastCapacityUpdate variant, this should be updated 1 time step before, amit Feb 2016
 		return veh;
 	}
 
