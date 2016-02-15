@@ -135,8 +135,8 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	}
 	private Map<Id<Person>, LegImpl> legs = new HashMap<>();
 	private Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new HashMap<>();
-	private Map<Id<Person>, Double> relPosOnDepartureLinkPerPerson;
-	private Map<Id<Person>, Double> relPosOnArrivalLinkPerPerson;
+	private Map<Id<Person>, Double> relPosOnDepartureLinkPerPerson = new HashMap<>();
+	private Map<Id<Person>, Double> relPosOnArrivalLinkPerPerson = new HashMap<>();
 	private Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
 	private Map<Id<Person>, PendingTransitTravel> transitTravels = new HashMap<>();
 	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
