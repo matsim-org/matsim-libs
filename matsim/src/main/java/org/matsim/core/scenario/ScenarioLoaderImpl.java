@@ -56,34 +56,22 @@ import org.matsim.vehicles.VehicleReaderV1;
  *
  * @author dgrether
  */
-public class ScenarioLoaderImpl {
+// deliberately non-public.  Use method in ScenarioUtils.
+class ScenarioLoaderImpl {
 
 	private static final Logger log = Logger.getLogger(ScenarioLoaderImpl.class);
 
-
-	static Scenario loadScenario(Config config) {
-		// deliberately non-public.  Use method in ScenarioUtils.
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(config);
-		Scenario scenario = scenarioLoader.loadScenario();
-		return scenario;
-	}
-
-	static void loadScenario(Scenario scenario) {
-		// deliberately non-public.  Use method in ScenarioUtils.
-		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
-		scenarioLoader.loadScenario();
-	}
 
 	private final Config config;
 
 	private final MutableScenario scenario;
 
-	private ScenarioLoaderImpl(Config config) {
+	ScenarioLoaderImpl(Config config) {
 		this.config = config;
 		this.scenario = (MutableScenario) ScenarioUtils.createScenario(this.config);
 	}
 
-	private ScenarioLoaderImpl(Scenario scenario) {
+	ScenarioLoaderImpl(Scenario scenario) {
 		this.scenario = (MutableScenario) scenario;
 		this.config = this.scenario.getConfig();
 	}
@@ -94,7 +82,7 @@ public class ScenarioLoaderImpl {
 	 * optional elements.
 	 * @return the Scenario
 	 */
-	private Scenario loadScenario() {
+	Scenario loadScenario() {
 		String currentDir = new File("tmp").getAbsolutePath();
 		currentDir = currentDir.substring(0, currentDir.length() - 3);
 		log.info("loading scenario from base directory: " + currentDir);
