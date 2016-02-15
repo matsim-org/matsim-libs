@@ -182,6 +182,10 @@ public class NetworkUtils {
 		return links;
 	}
 
+	/**
+	 * @param list of links
+	 * @return list of link IDs
+	 */
 	public static List<Id<Link>> getLinkIds(final List<Link> links) {
 		List<Id<Link>> linkIds = new ArrayList<>();
 		if (links != null) {

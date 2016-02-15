@@ -20,6 +20,7 @@ public class TeleportationPlugin extends AbstractQSimPlugin {
 		result.add(new AbstractModule() {
 			@Override
 			protected void configure() {
+//				bind(TeleportationEngineWDistanceCheck.class).asEagerSingleton();
 				bind(TeleportationEngine.class).asEagerSingleton();
 			}
 		});
@@ -29,6 +30,7 @@ public class TeleportationPlugin extends AbstractQSimPlugin {
 	@Override
 	public Collection<Class<? extends MobsimEngine>> engines() {
 		Collection<Class<? extends MobsimEngine>> result = new ArrayList<>();
+//		result.add(TeleportationEngineWDistanceCheck.class);
 		result.add(TeleportationEngine.class);
 		return result;
 	}

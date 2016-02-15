@@ -181,6 +181,19 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
 			addParameterSet( walk );
 		}
+		
+		// the following two are deliberately different from "walk" since "walk" may become a network routing mode, but these two
+		// will not. kai, dec'15
+		{
+			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.access_walk );
+			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
+			addParameterSet( walk );
+		}
+		{
+			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.egress_walk );
+			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
+			addParameterSet( walk );
+		}
 
 		// I'm not sure if anyone needs the "undefined" mode. In particular, it doesn't do anything for modes which are
 		// really unknown, it is just a mode called "undefined". michaz 02-2012

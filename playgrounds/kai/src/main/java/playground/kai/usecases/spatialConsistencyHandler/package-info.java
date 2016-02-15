@@ -20,4 +20,4 @@
  * @author nagel
  *
  */
-package playground.kai.usecases.invertednetwork;
+package playground.kai.usecases.spatialConsistencyHandler;

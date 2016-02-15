@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.facilities.Facility;
 
 /**
  * Minimal interface for an agent that can do activities and legs.  For the legs, there is the minimal information to
@@ -110,4 +111,7 @@ public interface MobsimAgent extends NetworkAgent, Identifiable<Person> {
      */
     public void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId);
 
+    public Facility<? extends Facility<?>> getCurrentFacility() ;
+    
+    public Facility<? extends Facility<?>> getDestinationFacility() ;
 }

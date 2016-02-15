@@ -36,6 +36,10 @@ public final class TransportMode {
 	public static final String pt = "pt";
 	public static final String walk = "walk";
 	public static final String transit_walk = "transit_walk";
+	
+	public static final String access_walk = "access_walk" ; // "bushwhacking" from facility to network
+	public static final String egress_walk = "egress_walk" ; // "bushwhacking" from network to facility
+	
 	public static final String other = "other";
 
 	private TransportMode() {
