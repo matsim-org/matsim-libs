@@ -7,8 +7,10 @@ import org.matsim.core.controler.AbstractModule;
 public class ScenarioByConfigModule extends AbstractModule {
 	@Override
 	public void install() {
-		Scenario scenario  = ScenarioUtils.createScenario(getConfig());
-		ScenarioUtils.loadScenario(scenario) ;
+		final ScenarioLoaderImpl loader = new ScenarioLoaderImpl( getConfig() );
+		binder().requestInjection( loader );
+		Scenario scenario = loader.loadScenario();
+
 		install(new ScenarioByInstanceModule(scenario));
 	}
 }
