@@ -55,7 +55,7 @@ public class NetworkCreationTest extends MatsimTestCase {
 		network.addNode(n2);
 		Link l1 = nb.createLink(Id.create(1, Link.class), n1, n2);
 		//test defaults
-		assertEquals(1.0, l1.getLength());
+		assertEquals(0.0, l1.getLength()); // euclidean link length (both coordinates are the same)
 		assertEquals(1.0, l1.getCapacity());
 		assertEquals(1.0, l1.getFreespeed());
 		assertEquals(1.0, l1.getNumberOfLanes());

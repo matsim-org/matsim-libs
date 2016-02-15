@@ -57,7 +57,8 @@ public class NetworkFactoryImpl implements NetworkFactory {
 
 	@Override
 	public Link createLink(Id<Link> id, Node fromNode, Node toNode) {
-		return this.linkFactory.createLink(id, fromNode, toNode, this.network, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 1.0, 1.0, 1.0);
+		return this.linkFactory.createLink(id, fromNode, toNode, 
+				this.network, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 1.0, 1.0, 1.0);
 	}
 
 	public Link createLink(final Id<Link> id, final Node from, final Node to,
