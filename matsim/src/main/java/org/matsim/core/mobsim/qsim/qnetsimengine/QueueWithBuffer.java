@@ -621,7 +621,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		QVehicle veh = buffer.poll();
 		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		flowcap_accumulate.setTimeStep( now  );
+//		flowcap_accumulate.setTimeStep( now  );// why do I need this, amit, feb 2016 
 		return veh;
 	}
 
