@@ -161,7 +161,7 @@ public class RouteUtils {
 		if (!networkRoute.getStartLinkId().equals(networkRoute.getEndLinkId())){
 			// add relative distance of arrival link
 			routeDistance += network.getLinks().get(networkRoute.getEndLinkId()).getLength() * relPosOnArrivalLink;
-		} else {
+		} else { // i.e. departure = arrival link
 			// subtract relative distance of arrival link that is not traveled
 			routeDistance -= network.getLinks().get(networkRoute.getEndLinkId()).getLength() * (1.0 - relPosOnArrivalLink);
 		}
