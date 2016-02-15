@@ -25,6 +25,7 @@ package org.matsim.core.controler;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.multibindings.MapBinder;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -42,6 +43,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 import com.google.inject.Binder;
@@ -77,6 +79,7 @@ public abstract class AbstractModule implements Module {
 	private Multibinder<ControlerListener> controlerListenerMultibinder;
 	private Multibinder<MobsimListener> mobsimListenerMultibinder;
 	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
+	private MapBinder<Class<?>, AttributeConverter<?>> attributeConverterMapBinder;
 
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
@@ -102,6 +105,11 @@ public abstract class AbstractModule implements Module {
 		this.snapshotWriterMultibinder = Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
 		this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
 		this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
+		this.attributeConverterMapBinder =
+				MapBinder.newMapBinder(
+						this.binder,
+						new TypeLiteral<Class<?>>(){},
+						new TypeLiteral<AttributeConverter<?>>() {} );
 		this.install();
 	}
 
@@ -156,6 +164,10 @@ public abstract class AbstractModule implements Module {
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<SnapshotWriter> addSnapshotWriterBinding() {
 		return snapshotWriterMultibinder.addBinding();
+	}
+
+	protected final LinkedBindingBuilder<AttributeConverter<?>> addAttributeConverterBinding(final Class<?> clazz ) {
+		return attributeConverterMapBinder.addBinding( clazz );
 	}
 
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindCarTravelDisutilityFactory() {
