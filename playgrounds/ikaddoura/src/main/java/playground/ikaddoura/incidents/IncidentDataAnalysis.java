@@ -71,6 +71,7 @@ public class IncidentDataAnalysis {
  
 	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
 //	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/output-berlin/";
+//	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/berlinXXX/";
 	private final String outputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-berlin/";
 	
 //	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
@@ -130,6 +131,8 @@ public class IncidentDataAnalysis {
 						// everything seems ok, the updated traffic item's locations are the same
 						
 					} else {
+						log.warn("Old item: " + this.trafficItems.get(updateItem.getId()));
+						log.warn("New item: " + updateItem);
 						throw new RuntimeException("An update message should only update the incident's endtime. The location should remain the same. Aborting...");
 					}
 					originalItem.setEndTime(updateItem.getStartTime());
@@ -271,11 +274,18 @@ public class IncidentDataAnalysis {
 		log.info("Collecting traffic items from all xml files in directory " + this.outputDirectory + "...");
 	
 		File[] fileList = new File(outputDirectory).listFiles();
-
-		for(File f : fileList) {
-			
+		
+		if (fileList.length == 0) {
+			throw new RuntimeException("No file in " + this.outputDirectory + ". Aborting...");
+		}
+		
+		boolean foundXMLFile = false;
+		
+		for (File f : fileList) {
+ 
 			if (f.getName().endsWith(".xml") || f.getName().endsWith(".xml.gz")) {
 				
+				foundXMLFile = true;
 				String inputXmlFile = f.toString();
 								
 				HereMapsTrafficItemXMLReader trafficItemReader = new HereMapsTrafficItemXMLReader();
@@ -401,7 +411,12 @@ public class IncidentDataAnalysis {
 				if (counterUpdatedEndTimesUpdateMessage > 0) log.info(" +++ " + counterUpdatedEndTimesUpdateMessage + " traffic items updated (canceled message).");
 				if (counterIgnoredNullInfoItem > 0) log.info(" +++ " + counterIgnoredNullInfoItem + " traffic items ignored (null info).");
 			}
-			log.info("Collecting traffic items from all xml files in directory " + this.outputDirectory + "... Done.");
+		}
+		
+		log.info("Collecting traffic items from all xml files in directory " + this.outputDirectory + "... Done.");
+		
+		if (!foundXMLFile) {
+			throw new RuntimeException("No *.xml or *.xml.gz file found in directory " + this.outputDirectory + ". Aborting...");
 		}
 		
 		TrafficItemWriter writer = new TrafficItemWriter();
