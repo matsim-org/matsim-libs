@@ -20,20 +20,25 @@
 /**
  * 
  */
-package org.matsim.contrib.noise;
+package playground.ikaddoura.noise;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.noise.NoiseCalculationOnline;
+import org.matsim.contrib.noise.NoiseParameters;
 import org.matsim.contrib.noise.data.GridParameters;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * 
@@ -55,7 +60,7 @@ public class NoiseOnlineControler {
 			
 		} else {
 			
-			configFile = "/pathToConfigFile/config.xml";
+			configFile = "/Users/ihab/Desktop/test/config.xml";
 		}
 				
 		NoiseOnlineControler noiseImmissionControler = new NoiseOnlineControler();
@@ -66,20 +71,75 @@ public class NoiseOnlineControler {
 		
 		// grid parameters
 		
-		GridParameters gridParameters = new GridParameters();		
+		GridParameters gridParameters = new GridParameters();
+		
+		// modify the default grid parameters
+		
 		gridParameters.setReceiverPointGap(100.);
 		
-		String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
+		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);			
 			
-		String[] consideredActivitiesForDamages = {"home", "work"};
+		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
-				
+		
+		// ...
+		
 		// noise parameters
 
-		NoiseParameters noiseParameters = new NoiseParameters();		
+		NoiseParameters noiseParameters = new NoiseParameters();
+		
+		// modify the default noise parameters
+		
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);		
 		noiseParameters.setScaleFactor(10.);
+		
+		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
+		tunnelLinkIDs.add(Id.create("108041", Link.class));
+		tunnelLinkIDs.add(Id.create("108142", Link.class));
+		tunnelLinkIDs.add(Id.create("108970", Link.class));
+		tunnelLinkIDs.add(Id.create("109085", Link.class));
+		tunnelLinkIDs.add(Id.create("109757", Link.class));
+		tunnelLinkIDs.add(Id.create("109919", Link.class));
+		tunnelLinkIDs.add(Id.create("110060", Link.class));
+		tunnelLinkIDs.add(Id.create("110226", Link.class));
+		tunnelLinkIDs.add(Id.create("110164", Link.class));
+		tunnelLinkIDs.add(Id.create("110399", Link.class));
+		tunnelLinkIDs.add(Id.create("96503", Link.class));
+		tunnelLinkIDs.add(Id.create("110389", Link.class));
+		tunnelLinkIDs.add(Id.create("110116", Link.class));
+		tunnelLinkIDs.add(Id.create("110355", Link.class));
+		tunnelLinkIDs.add(Id.create("92604", Link.class));
+		tunnelLinkIDs.add(Id.create("92603", Link.class));
+		tunnelLinkIDs.add(Id.create("25651", Link.class));
+		tunnelLinkIDs.add(Id.create("25654", Link.class));
+		tunnelLinkIDs.add(Id.create("112540", Link.class));
+		tunnelLinkIDs.add(Id.create("112556", Link.class));
+		tunnelLinkIDs.add(Id.create("5052", Link.class));
+		tunnelLinkIDs.add(Id.create("5053", Link.class));
+		tunnelLinkIDs.add(Id.create("5380", Link.class));
+		tunnelLinkIDs.add(Id.create("5381", Link.class));
+		tunnelLinkIDs.add(Id.create("106309", Link.class));
+		tunnelLinkIDs.add(Id.create("106308", Link.class));
+		tunnelLinkIDs.add(Id.create("26103", Link.class));
+		tunnelLinkIDs.add(Id.create("26102", Link.class));
+		tunnelLinkIDs.add(Id.create("4376", Link.class));
+		tunnelLinkIDs.add(Id.create("4377", Link.class));
+		tunnelLinkIDs.add(Id.create("106353", Link.class));
+		tunnelLinkIDs.add(Id.create("106352", Link.class));
+		tunnelLinkIDs.add(Id.create("103793", Link.class));
+		tunnelLinkIDs.add(Id.create("103792", Link.class));
+		tunnelLinkIDs.add(Id.create("26106", Link.class));
+		tunnelLinkIDs.add(Id.create("26107", Link.class));
+		tunnelLinkIDs.add(Id.create("4580", Link.class));
+		tunnelLinkIDs.add(Id.create("4581", Link.class));
+		tunnelLinkIDs.add(Id.create("4988", Link.class));
+		tunnelLinkIDs.add(Id.create("4989", Link.class));
+		tunnelLinkIDs.add(Id.create("73496", Link.class));
+		tunnelLinkIDs.add(Id.create("73497", Link.class));
+		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
+				
+		// ...
 		
 		// controler
 		

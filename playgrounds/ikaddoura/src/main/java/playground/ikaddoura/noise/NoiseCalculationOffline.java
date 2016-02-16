@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.noise;
+package playground.ikaddoura.noise;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,17 +25,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.noise.NoiseParameters;
+import org.matsim.contrib.noise.NoiseWriter;
 import org.matsim.contrib.noise.data.GridParameters;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.scenario.ScenarioUtils;
-
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
@@ -44,6 +39,14 @@ import org.matsim.contrib.noise.handler.PersonActivityTracker;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile.OutputFormat;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
@@ -85,8 +88,8 @@ public class NoiseCalculationOffline {
 			
 		} else {
 			
-			runDirectory = "pathTo/RunDirectory/";
-			outputDirectory = "pathTo/analysis-output-directory/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/";
 			receiverPointGap = 25.;
 			lastIteration = 100;
 			timeBinSize = 900.;
@@ -110,24 +113,66 @@ public class NoiseCalculationOffline {
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(lastIteration);
-				
+		
+		// ################################
+		
 		GridParameters gridParameters = new GridParameters();
 		gridParameters.setReceiverPointGap(receiverPointGap);
-						
-		// Define min and max x-y-coordinates (e.g. Greater Berlin area)
-		double xMin = 4573258.;
-		double yMin = 5801225.;
-		double xMax = 4620323.;
-		double yMax = 5839639.;
+		
+		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
+		double xMin = 4590855.;
+		double yMin = 5819679.;
+		double xMax = 4594202.;
+		double yMax = 5821736.;
+		
+//		// Berlin Coordinates: Area around the Tempelhofer Feld 4591900,5813265 : 4600279,5818768
+//		double xMin = 4591900.;
+//		double yMin = 5813265.;
+//		double xMax = 4600279.;
+//		double yMax = 5818768.;
+				
+//      // Berlin Coordinates: Greater Berlin area
+//		double xMin = 4573258.;
+//		double yMin = 5801225.;
+//		double xMax = 4620323.;
+//		double yMax = 5839639.;
+
+//      // Berlin Coordinates: Berlin area
+//		double xMin = 4575415.;
+//		double yMin = 5809450.;
+//		double xMax = 4615918.;
+//		double yMax = 5832532.;
+		
+//      // Berlin Coordinates: Hundekopf
+//		double xMin = 4583187.;
+//		double yMin = 5813643.;
+//		double xMax = 4605520.;
+//		double yMax = 5827098.;
+
+//		// Berlin Coordinates: Manteuffelstrasse
+//		double xMin = 4595288.82;
+//		double yMin = 5817859.97;
+//		double xMax = 4598267.52;
+//		double yMax = 5820953.98;	
+		
 		gridParameters.setReceiverPointsGridMinX(xMin);
 		gridParameters.setReceiverPointsGridMinY(yMin);
 		gridParameters.setReceiverPointsGridMaxX(xMax);
 		gridParameters.setReceiverPointsGridMaxY(yMax);
 		
-		// Define activity types to be considered for noise damage calculation
-		String[] consideredActivitiesForDamages = {"home", "work"};
+//		 Berlin Activity Types
+		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		String[] consideredActivitiesForDamages = {"home"};
+//		String[] consideredActivitiesForDamages = {"work"};
+//		String[] consideredActivitiesForDamages = {"educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		String[] consideredActivitiesForDamages = {"leisure"};
+//		String[] consideredActivitiesForDamages = {"home", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
-				
+		
+//		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga", "leisure"};
+//		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+		
 		// ################################
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
@@ -145,7 +190,58 @@ public class NoiseCalculationOffline {
 		hgvIdPrefixes.add("lkw");
 		noiseParameters.setHgvIdPrefixes(hgvIdPrefixes);
 		
+//		Set<String> busIdPrefixes = new HashSet<String>();
+//		busIdPrefixes.add("-B-");
+//		noiseParameters.setBusIdPrefixes(busIdPrefixes);
+		
+//		 Berlin Tunnel Link IDs
+		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
+		tunnelLinkIDs.add(Id.create("108041", Link.class));
+		tunnelLinkIDs.add(Id.create("108142", Link.class));
+		tunnelLinkIDs.add(Id.create("108970", Link.class));
+		tunnelLinkIDs.add(Id.create("109085", Link.class));
+		tunnelLinkIDs.add(Id.create("109757", Link.class));
+		tunnelLinkIDs.add(Id.create("109919", Link.class));
+		tunnelLinkIDs.add(Id.create("110060", Link.class));
+		tunnelLinkIDs.add(Id.create("110226", Link.class));
+		tunnelLinkIDs.add(Id.create("110164", Link.class));
+		tunnelLinkIDs.add(Id.create("110399", Link.class));
+		tunnelLinkIDs.add(Id.create("96503", Link.class));
+		tunnelLinkIDs.add(Id.create("110389", Link.class));
+		tunnelLinkIDs.add(Id.create("110116", Link.class));
+		tunnelLinkIDs.add(Id.create("110355", Link.class));
+		tunnelLinkIDs.add(Id.create("92604", Link.class));
+		tunnelLinkIDs.add(Id.create("92603", Link.class));
+		tunnelLinkIDs.add(Id.create("25651", Link.class));
+		tunnelLinkIDs.add(Id.create("25654", Link.class));
+		tunnelLinkIDs.add(Id.create("112540", Link.class));
+		tunnelLinkIDs.add(Id.create("112556", Link.class));
+		tunnelLinkIDs.add(Id.create("5052", Link.class));
+		tunnelLinkIDs.add(Id.create("5053", Link.class));
+		tunnelLinkIDs.add(Id.create("5380", Link.class));
+		tunnelLinkIDs.add(Id.create("5381", Link.class));
+		tunnelLinkIDs.add(Id.create("106309", Link.class));
+		tunnelLinkIDs.add(Id.create("106308", Link.class));
+		tunnelLinkIDs.add(Id.create("26103", Link.class));
+		tunnelLinkIDs.add(Id.create("26102", Link.class));
+		tunnelLinkIDs.add(Id.create("4376", Link.class));
+		tunnelLinkIDs.add(Id.create("4377", Link.class));
+		tunnelLinkIDs.add(Id.create("106353", Link.class));
+		tunnelLinkIDs.add(Id.create("106352", Link.class));
+		tunnelLinkIDs.add(Id.create("103793", Link.class));
+		tunnelLinkIDs.add(Id.create("103792", Link.class));
+		tunnelLinkIDs.add(Id.create("26106", Link.class));
+		tunnelLinkIDs.add(Id.create("26107", Link.class));
+		tunnelLinkIDs.add(Id.create("4580", Link.class));
+		tunnelLinkIDs.add(Id.create("4581", Link.class));
+		tunnelLinkIDs.add(Id.create("4988", Link.class));
+		tunnelLinkIDs.add(Id.create("4989", Link.class));
+		tunnelLinkIDs.add(Id.create("73496", Link.class));
+		tunnelLinkIDs.add(Id.create("73497", Link.class));
+		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
+		
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
+		
 		noiseParameters.setTimeBinSizeNoiseComputation(timeBinSize);
 				
 		log.info("Loading scenario...");

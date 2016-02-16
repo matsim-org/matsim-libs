@@ -31,47 +31,44 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+
+import org.matsim.contrib.noise.data.ReceiverPoint;
 
 /**
  * @author ikaddoura
  *
  */
 public final class MergeNoiseCSVFile {
-	// lv final. kai
+
 	private static final Logger log = Logger.getLogger(MergeNoiseCSVFile.class);
 
+	// default values
 	private double startTime = 4. * 3600.;
 	private double timeBinSize = 3600.;
 	private double endTime = 24. * 3600.;
-
-	private String outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/";
-
-	private String[] workingDirectories = { "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/immissions/"
-			, "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/consideredAgentUnits/"
-			, "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/damages_receiverPoint/"};
-	private String[] labels = { "immission" , "consideredAgentUnits" , "damages_receiverPoint" };
-
-	private String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn1/noiseAnalysisVia/analysis_it.100/receiverPoints/receiverPoints.csv";
 	private String separator = ";";
-
-	public static enum OutputFormat { ihab, xyt } ;
-	private OutputFormat outputFormat = OutputFormat.xyt ;
-
 	private double threshold = -1. ;
+	private OutputFormat outputFormat = OutputFormat.xyt ;
+	
+	private String outputDirectory = null;
+	private String[] workingDirectories = null;
+	private String[] labels = null;
+	private String receiverPointsFile = null;
+
+	public static enum OutputFormat { xyt1t2t3etc, xyt } ;
 
 	private Map<String, Map<Double, Map<Id<ReceiverPoint>, Double>>> label2time2rp2value = new HashMap<>();
 	private Map<Id<ReceiverPoint>, Coord> rp2Coord = new HashMap<Id<ReceiverPoint>, Coord>();
 
-	public final void setThreshold(double threshold) {
-		this.threshold = threshold;
-	}
-
 	public static void main(String[] args) {
 		MergeNoiseCSVFile readNoiseFile = new MergeNoiseCSVFile();
 		readNoiseFile.run();
+	}
+	
+	public final void setThreshold(double threshold) {
+		this.threshold = threshold;
 	}
 
 	public final void setLabel(String label) {
@@ -82,8 +79,6 @@ public final class MergeNoiseCSVFile {
 	public void setWorkingDirectory(String workingDirectory) {
 		this.workingDirectories = null;
 		this.workingDirectories[0] = workingDirectory;
-
-		// setting the output directory to the same as the working directory
 		this.outputDirectory = workingDirectory;
 	}
 
@@ -109,6 +104,18 @@ public final class MergeNoiseCSVFile {
 
 	public void setTimeBinSize(double timeBinSize) {
 		this.timeBinSize = timeBinSize;
+	}
+
+	public void setStartTime(double startTime) {
+		this.startTime = startTime;
+	}
+
+	public void setEndTime(double endTime) {
+		this.endTime = endTime;
+	}
+
+	public void setSeparator(String separator) {
+		this.separator = separator;
 	}
 
 	public final void run() {
@@ -137,7 +144,7 @@ public final class MergeNoiseCSVFile {
 			// write headers
 			switch( this.outputFormat ) {
 			// yy should probably become different classes. kai
-			case ihab:
+			case xyt1t2t3etc:
 				bw.write("Receiver Point Id;x;y");
 				for (String label : this.label2time2rp2value.keySet()) {
 					for (double time = startTime; time <= endTime; time = time + timeBinSize) {
@@ -159,7 +166,7 @@ public final class MergeNoiseCSVFile {
 
 			// fill table
 			switch( this.outputFormat ) {
-			case ihab:	
+			case xyt1t2t3etc:	
 
 				for (Id<ReceiverPoint> rp : this.rp2Coord.keySet()) {
 					bw.write(rp.toString() + ";" + rp2Coord.get(rp).getX() + ";" + rp2Coord.get(rp).getY());
