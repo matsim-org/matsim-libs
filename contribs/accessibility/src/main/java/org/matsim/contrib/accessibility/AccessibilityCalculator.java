@@ -192,7 +192,7 @@ import java.util.concurrent.ConcurrentHashMap;
 			Node nearestNode = ((NetworkImpl)network).getNearestNode( opportunity.getCoord() );
 
 			// get Euclidian distance to nearest node
-			double distance_meter 	= NetworkUtils.getEuclidianDistance(opportunity.getCoord(), nearestNode.getCoord());
+			double distance_meter 	= NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
 
 			double VjkWalkTravelTime	= this.betaWalkTT * walkTravelTime_h;

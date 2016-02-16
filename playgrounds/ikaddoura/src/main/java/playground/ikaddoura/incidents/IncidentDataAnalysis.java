@@ -420,7 +420,7 @@ public class IncidentDataAnalysis {
 			
 			final Coord coordFromGK4 = ct.transform(coordFromWGS84);
 			final Coord coordToGK4 = ct.transform(coordToWGS84);			
-			double beelineDistance = NetworkUtils.getEuclidianDistance(coordFromGK4, coordToGK4);
+			double beelineDistance = NetworkUtils.getEuclideanDistance(coordFromGK4, coordToGK4);
 			
 			Path incidentPath = null;
 			
