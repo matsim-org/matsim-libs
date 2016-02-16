@@ -82,13 +82,12 @@ public class EditRoutes {
 	}
 
 	/**
-	 * Re-locates a future route. The route is given by its leg.
+	 * Re-locates a future route. The route is given by its leg. It just replaces the route for the given leg, without looking after
+	 * overall plan consistency.
 	 * 
 	 * @return true when replacing the route worked, false when something went wrong
 	 * 
-	 * @deprecated switch this to relocateFutureTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
 	 */
-	@Deprecated // switch this to relocateFutureTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
 	public boolean relocateFutureLegRoute(Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person ) {
 
 		Link fromLink = network.getLinks().get(fromLinkId);
@@ -211,13 +210,11 @@ public class EditRoutes {
 	}
 
 	/**
-	 * Re-locates a current route. The route is given by its leg.
+	 * Re-locates a current route. The route is given by its leg.  Does not look after plans consistency!
 	 * 
 	 * @return true when replacing the route worked, false when something went wrong
 	 * 
-	 * @deprecated switch this to (a new) relocateCurrentTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
 	 */
-	@Deprecated // switch this to (a new) relocateCurrentTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
 	public boolean relocateCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, Id<Link> toLinkId, double time ) {
 
 		Route route = leg.getRoute();

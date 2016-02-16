@@ -427,11 +427,15 @@ public class ControlerTest {
 		for (Plan plan : new Plan[]{plan1, plan2}) {
 			assertEquals(
 					"unexpected plan length in "+plan.getPlanElements(),
-					3,
+					7,
+					// now 7 instead of earlier 3: h-wlk-iact-car-iact-walk-h
 					plan.getPlanElements().size());
 			assertNotNull(
 					"null route in plan "+plan.getPlanElements(),
 					((Leg) plan.getPlanElements().get( 1 )).getRoute());
+			assertNotNull(
+					"null route in plan "+plan.getPlanElements(),
+					((Leg) plan.getPlanElements().get( 3 )).getRoute());
 		}
 	}
 

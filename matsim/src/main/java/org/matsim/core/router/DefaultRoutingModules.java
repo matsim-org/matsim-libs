@@ -57,18 +57,18 @@ public final class DefaultRoutingModules {
 	}
 
 	public static RoutingModule createNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
-		return new NetworkRoutingModule(
-				mode,
-				popFact,
-				net,
-				routeAlgo,
-				((PopulationFactoryImpl) popFact).getModeRouteFactory() );
-//		return new NetworkRoutingInclEgressAccessModule(
+//		return new NetworkRoutingModule(	
 //				mode,
 //				popFact,
 //				net,
 //				routeAlgo,
 //				((PopulationFactoryImpl) popFact).getModeRouteFactory() );
+		return new NetworkRoutingInclEgressAccessModule(
+				mode,
+				popFact,
+				net,
+				routeAlgo,
+				((PopulationFactoryImpl) popFact).getModeRouteFactory() );
 	}
 
 }
