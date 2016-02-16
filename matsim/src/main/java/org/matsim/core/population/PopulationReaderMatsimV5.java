@@ -247,7 +247,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		if (Double.isNaN(this.currRoute.getDistance())) {
 			if (this.currRoute instanceof NetworkRoute) {
 				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
-					this.currRoute.setDistance(RouteUtils.calcDistance((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
+					this.currRoute.setDistance(RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
 				}
 			} else {
 				Coord fromCoord = getCoord(this.prevAct);
@@ -352,7 +352,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		if (Double.isNaN(this.currRoute.getDistance())) {
 			if (this.currRoute instanceof NetworkRoute) {
 				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
-					this.currRoute.setDistance(RouteUtils.calcDistance((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
+					this.currRoute.setDistance(RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
 				}
 			} else {
 				Coord fromCoord = getCoord(this.prevAct);

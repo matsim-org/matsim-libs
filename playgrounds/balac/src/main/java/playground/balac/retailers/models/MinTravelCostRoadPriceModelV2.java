@@ -294,7 +294,7 @@ public class MinTravelCostRoadPriceModelV2 extends RetailerModelImpl
       route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
       route.setTravelTime((int)path.travelTime);
       route.setTravelCost(path.travelCost);
-      route.setDistance(RouteUtils.calcDistance(route, network));
+      route.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route, network));
       leg.setRoute(route);
       travTime = (int)path.travelTime;
     }

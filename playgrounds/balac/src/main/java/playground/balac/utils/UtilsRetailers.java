@@ -71,7 +71,7 @@ public class UtilsRetailers {
 				if (pe instanceof Leg) {
 					if (((Leg) pe).getMode().equals( "car" )) {
 						car = true;
-						previousDistance = RouteUtils.calcDistance((NetworkRoute) ((Leg) pe).getRoute(), scenario.getNetwork());
+						previousDistance = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) ((Leg) pe).getRoute(), scenario.getNetwork());
 						if (shop == true) {
 							distanceFromcar += previousDistance;
 							numberFrom++;

@@ -80,10 +80,7 @@ public class EventsToLegsTest {
 		Assert.assertEquals(10.0,lh.handledLeg.getLeg().getDepartureTime(), 1e-9);
 		Assert.assertEquals(20.0,lh.handledLeg.getLeg().getTravelTime(), 1e-9);
 		Assert.assertEquals(20.0,lh.handledLeg.getLeg().getRoute().getTravelTime(), 1e-9);
-		
-		// Don't know if it makes sense, but according to specification,
-		// the length of a route still does not include first and last link.
-		Assert.assertEquals(500.0,lh.handledLeg.getLeg().getRoute().getDistance(), 1e-9);
+		Assert.assertEquals(550.0,lh.handledLeg.getLeg().getRoute().getDistance(), 1e-9);
 	}
 	
 	private static Scenario createTriangularNetwork() {

@@ -49,7 +49,7 @@ public class TravelDistanceGrocery {
 					if (((Activity) pe).getType().startsWith( "work")) {
 						if (previousLeg != null) {
 						if (previousLeg.getMode().equals( "car" )) {
-							distanceCar += RouteUtils.calcDistance((NetworkRoute)previousLeg.getRoute(), scenario.getNetwork());
+							distanceCar += RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute)previousLeg.getRoute(), scenario.getNetwork());
 					//		countC++;
 						}
 						else if (previousLeg.getMode().equals( "bike" )) {

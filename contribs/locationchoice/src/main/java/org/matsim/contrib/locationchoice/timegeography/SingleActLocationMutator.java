@@ -84,13 +84,13 @@ public class SingleActLocationMutator extends LocationMutator {
 		double travelDistancePost = 0.0;
 
 		if (legPre.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePre = RouteUtils.calcDistance((NetworkRoute) legPre.getRoute(), this.scenario.getNetwork());
+			travelDistancePre = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) legPre.getRoute(), this.scenario.getNetwork());
 		}
 		else {
 			travelDistancePre = CoordUtils.calcDistance(actPre.getCoord(), actToMove.getCoord());
 		}
 		if (legPost.getMode().compareTo(TransportMode.car) == 0) {
-			travelDistancePost = RouteUtils.calcDistance((NetworkRoute) legPost.getRoute(), this.scenario.getNetwork());
+			travelDistancePost = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) legPost.getRoute(), this.scenario.getNetwork());
 		}
 		else {
 			travelDistancePost = CoordUtils.calcDistance(actToMove.getCoord(), actPost.getCoord());

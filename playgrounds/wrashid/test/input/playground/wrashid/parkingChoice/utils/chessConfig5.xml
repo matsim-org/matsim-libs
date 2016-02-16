@@ -81,7 +81,7 @@
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
 		<param name="ModuleProbability_1" value="1" />
-		<param name="Module_1" value="ChangeLegMode" />
+		<param name="Module_1" value="ChangeTripMode" />
 	</module>
 	
 	<module name="parkingChoice">

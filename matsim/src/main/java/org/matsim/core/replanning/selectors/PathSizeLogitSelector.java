@@ -97,7 +97,7 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 					NetworkRoute r = (NetworkRoute) leg.getRoute();
 					// (yyyy this will fail when the route is not a network route.  kai, oct'12)
 
-					pathSize += RouteUtils.calcDistance(r, network);
+					pathSize += RouteUtils.calcDistanceExcludingStartEndLink(r, network);
 					// (i.e. pathSize will be the sum over all routes of the plan)
 					
 					for (Id<Link> linkId : r.getLinkIds()){
