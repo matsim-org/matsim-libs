@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 
@@ -37,8 +38,14 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  * @author ikaddoura
  *
  */
-public class GridParameters {
+public class GridParameters extends ReflectiveConfigGroup {
 	
+	public static final String GROUP_NAME = "grid";
+	
+	public GridParameters() {
+		super(GROUP_NAME);
+	}
+
 	private static final Logger log = Logger.getLogger(GridParameters.class);
 
 	private double receiverPointGap = 250.;
@@ -52,6 +59,9 @@ public class GridParameters {
 	private double receiverPointsGridMinY = 0.;
 	private double receiverPointsGridMaxX = 0.;
 	private double receiverPointsGridMaxY = 0.;
+	
+	private String consideredActivitiesForReceiverPointGridString = null;
+	private String consideredActivitiesForSpatialFunctionalityString = null;
 
 	// ########################################################################################################
 			
@@ -80,55 +90,67 @@ public class GridParameters {
 	
 	// ########################################################################################################
 
+	@StringGetter( "receiverPointGap" )
+	public double getReceiverPointGap() {
+		return receiverPointGap;
+	}
+	
+	@StringSetter( "receiverPointGap" )
 	public void setReceiverPointGap(double receiverPointGap) {
 		log.info("Setting the horizontal/vertical distance between each receiver point to " + receiverPointGap);
 		this.receiverPointGap = receiverPointGap;
 	}
 
+	@StringGetter( "receiverPointsGridMinX" )
 	public double getReceiverPointsGridMinX() {
 		return receiverPointsGridMinX;
 	}
 
+	@StringSetter( "receiverPointsGridMinX" )
 	public void setReceiverPointsGridMinX(double receiverPointsGridMinX) {
 		log.info("Setting receiverPoints grid MinX Coordinate to " + receiverPointsGridMinX);
 		this.receiverPointsGridMinX = receiverPointsGridMinX;
 	}
 
+	@StringGetter( "receiverPointsGridMinY" )
 	public double getReceiverPointsGridMinY() {
 		return receiverPointsGridMinY;
 	}
 
+	@StringSetter( "receiverPointsGridMinY" )
 	public void setReceiverPointsGridMinY(double receiverPointsGridMinY) {
 		log.info("Setting receiverPoints grid MinY Coordinate to " + receiverPointsGridMinY);
 		this.receiverPointsGridMinY = receiverPointsGridMinY;
 	}
 
+	@StringGetter( "receiverPointsGridMaxX" )
 	public double getReceiverPointsGridMaxX() {
 		return receiverPointsGridMaxX;
 	}
 
+	@StringSetter( "receiverPointsGridMaxX" )
 	public void setReceiverPointsGridMaxX(double receiverPointsGridMaxX) {
 		log.info("Setting receiverPoints grid MaxX Coordinate to " + receiverPointsGridMaxX);
 		this.receiverPointsGridMaxX = receiverPointsGridMaxX;
 	}
 
+	@StringGetter( "receiverPointsGridMaxY" )
 	public double getReceiverPointsGridMaxY() {
 		return receiverPointsGridMaxY;
 	}
 
+	@StringSetter( "receiverPointsGridMaxY" )
 	public void setReceiverPointsGridMaxY(double receiverPointsGridMaxY) {
 		log.info("Setting receiverPoints grid MaxY Coordinate to " + receiverPointsGridMaxY);
 		this.receiverPointsGridMaxY = receiverPointsGridMaxY;
 	}
-	
-	public double getReceiverPointGap() {
-		return receiverPointGap;
-	}
 
+	@StringGetter( "transformationFactory" )
 	public String getTransformationFactory() {
 		return transformationFactory;
 	}
 
+	@StringSetter( "transformationFactory" )
 	public void setTransformationFactory(String transformationFactory) {
 		this.transformationFactory = transformationFactory;
 	}
@@ -146,12 +168,36 @@ public class GridParameters {
 		return consideredActivitiesForSpatialFunctionality;
 	}
 
-	public void setConsideredActivitiesForSpatialFunctionality(String[] consideredActivities) {
+	public void setConsideredActivitiesForSpatialFunctionality(
+			String[] consideredActivities) {
 		log.info("Setting considered activities to: ");
 		for (int i = 0; i < consideredActivities.length; i++) {
 			log.info(consideredActivities[i]);
 		}
 		this.consideredActivitiesForSpatialFunctionality = consideredActivities;
+	}
+
+	@StringGetter( "consideredActivitiesForReceiverPointGridString" )
+	public String getConsideredActivitiesForReceiverPointGridString() {
+		return consideredActivitiesForReceiverPointGridString;
+	}
+
+	@StringSetter( "consideredActivitiesForReceiverPointGridString" )
+	public void setConsideredActivitiesForReceiverPointGridString(String consideredActivitiesForReceiverPointGridString) {
+		// TODO: set the array
+		this.consideredActivitiesForReceiverPointGridString = consideredActivitiesForReceiverPointGridString;
+	}
+
+	@StringGetter( "consideredActivitiesForSpatialFunctionalityString" )
+	public String getConsideredActivitiesForSpatialFunctionalityString() {
+		return consideredActivitiesForSpatialFunctionalityString;
+	}
+
+	@StringSetter( "consideredActivitiesForSpatialFunctionalityString" )
+	public void setConsideredActivitiesForSpatialFunctionalityString(
+			String consideredActivitiesForSpatialFunctionalityString) {
+		// TODO: set the array
+		this.consideredActivitiesForSpatialFunctionalityString = consideredActivitiesForSpatialFunctionalityString;
 	}
 	
 }
