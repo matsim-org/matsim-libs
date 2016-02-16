@@ -33,7 +33,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 //	ScoreStatsModuleTest.class,//testScoreStats
 //	
 //	/*
-//	 * flowacc must be updated before doSimStep(now) step. That's why both tests are failing.
+//	 * flowacc must be updated at the argument time and not the simEngine time; doSimStep(now) step. That's why both tests are failing.
 //	 */
 //	QLinkTest.class, //	testBuffer, testStorageSpaceDifferentVehicleSizes 
 //
