@@ -139,7 +139,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> mode : modes.entrySet()) {
 				String modeName = mode.getKey();
 				ModeParams params = mode.getValue();
-				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, params.getMarginalUtilityOfTraveling() );
+				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, params.getMarginalUtilityOfTraveling() / 3600. );
 				modeParams.put(modeName, new ModeUtilityParameters.Builder( params ) );
 			}
 
