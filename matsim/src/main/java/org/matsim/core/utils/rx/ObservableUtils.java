@@ -34,7 +34,9 @@ import org.matsim.core.scoring.PersonExperiencedActivity;
 import org.matsim.core.scoring.PersonExperiencedLeg;
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action0;
 import rx.observers.SafeSubscriber;
+import rx.subscriptions.Subscriptions;
 
 public class ObservableUtils {
 
@@ -115,10 +117,6 @@ public class ObservableUtils {
                 final BasicEventHandler handler = new BasicEventHandler() {
                     @Override
                     public void handleEvent(Event event) {
-                        if (subscriber.isUnsubscribed()) {
-                            eventsManager.removeHandler(this);
-                            return;
-                        }
                         subscriber.onNext(event);
                     }
 
@@ -128,6 +126,12 @@ public class ObservableUtils {
                     }
                 };
                 eventsManager.addHandler(handler);
+                subscriber.add(Subscriptions.create(new Action0() {
+                    @Override
+                    public void call() {
+                        eventsManager.removeHandler(handler);
+                    }
+                }));
             }
         });
     }
