@@ -181,36 +181,32 @@ public class CapeTownScenarioCleaner {
 		config.plansCalcRoute().setNetworkModes(modes);
 		/* Add the teleported modes. */
 		
-		/* First check if mode parameters does not yet exist. */
-		
-		
-		ModeRoutingParams ride = new ModeRoutingParams("ride");
+		ModeRoutingParams ride = config.plansCalcRoute().getOrCreateModeRoutingParams("ride");
 		ride.setBeelineDistanceFactor(1.3);
 		ride.setTeleportedModeFreespeedFactor(0.8); /* Free speed-based. */
-//		ride.setTeleportedModeSpeed(50.0 / 3.6);
-		
 		config.plansCalcRoute().addModeRoutingParams(ride);
-		ModeRoutingParams taxi = new ModeRoutingParams("taxi");
+		
+		ModeRoutingParams taxi = config.plansCalcRoute().getOrCreateModeRoutingParams("taxi");
 		taxi.setBeelineDistanceFactor(1.3);
 		taxi.setTeleportedModeSpeed(50.0 / 3.6);
 		config.plansCalcRoute().addModeRoutingParams(taxi);
-		ModeRoutingParams brt = new ModeRoutingParams("brt");
+		ModeRoutingParams brt = config.plansCalcRoute().getOrCreateModeRoutingParams("brt");
 		brt.setBeelineDistanceFactor(1.3);
 		brt.setTeleportedModeSpeed(50.0 / 3.6);
 		config.plansCalcRoute().addModeRoutingParams(brt);
-		ModeRoutingParams rail = new ModeRoutingParams("rail");
+		ModeRoutingParams rail = config.plansCalcRoute().getOrCreateModeRoutingParams("rail");
 		rail.setBeelineDistanceFactor(1.3);
 		rail.setTeleportedModeSpeed(20.0 / 3.6);
 		config.plansCalcRoute().addModeRoutingParams(rail);
-		ModeRoutingParams walk = new ModeRoutingParams("walk");
+		ModeRoutingParams walk = config.plansCalcRoute().getOrCreateModeRoutingParams("walk");
 		walk.setBeelineDistanceFactor(1.3);
 		walk.setTeleportedModeSpeed(2.0 / 3.6);
 		config.plansCalcRoute().addModeRoutingParams(walk);
-		ModeRoutingParams cycle = new ModeRoutingParams("cycle");
+		ModeRoutingParams cycle = config.plansCalcRoute().getOrCreateModeRoutingParams("cycle");
 		cycle.setBeelineDistanceFactor(1.3);
 		cycle.setTeleportedModeSpeed(2.0 / 3.6);
 		config.plansCalcRoute().addModeRoutingParams(cycle);
-		ModeRoutingParams other = new ModeRoutingParams("other");
+		ModeRoutingParams other = config.plansCalcRoute().getOrCreateModeRoutingParams("other");
 		other.setBeelineDistanceFactor(1.3);
 		other.setTeleportedModeSpeed(30.0 / 3.6);
 		config.plansCalcRoute().addModeRoutingParams(other);
