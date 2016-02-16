@@ -43,7 +43,6 @@ import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Builder;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.kticompatibility.KtiActivityScoring;
@@ -175,8 +174,8 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 			return individualParameters.get( person.getId() );
 		}
 
-		final Builder builder =
-				new Builder(config, config.getScoringParameters(null), scenarioConfig);
+		final CharyparNagelScoringParameters.Builder builder =
+				new CharyparNagelScoringParameters.Builder(config, config.getScoringParameters(null), scenarioConfig);
 		final Set<String> handledTypes = new HashSet<String>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			
@@ -193,8 +192,10 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 					(Double) personAttributes
 					.getAttribute(person.getId().toString(), "traveling_car" );
 			
-			builder.setModeParameters("car", new ModeUtilityParameters(travelingCarUtility, 0.0, 0.0,
-					config.getScoringParameters( null ).getOrCreateModeParams("car").getConstant()));
+			builder.setModeParameters("car",
+					new ModeUtilityParameters.Builder()
+						.setMarginalUtilityOfTraveling_s( travelingCarUtility )
+						.setConstant( config.getScoringParameters( null ).getOrCreateModeParams("car").getConstant() ) );
 			
 			
 			// XXX works only if no variation of type of activities between plans
@@ -250,7 +251,7 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 
 			builder.setActivityParameters(
 					act.getType(),
-					typeBuilder.build());
+					typeBuilder );
 		}
 
 		final CharyparNagelScoringParameters params =

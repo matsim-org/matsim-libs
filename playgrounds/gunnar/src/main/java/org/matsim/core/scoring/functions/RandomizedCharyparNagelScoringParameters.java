@@ -104,7 +104,7 @@ public class RandomizedCharyparNagelScoringParameters implements
 		return Units.S_PER_D - this.getTypicalWorkDuration_s(person);
 	}
 
-	protected ActivityUtilityParameters actParams(final Person person,
+	protected ActivityUtilityParameters.Builder actParams(final Person person,
 			final String type) {
 		final ActivityUtilityParameters defaultActParams = this.defaultParameters.utilParams
 				.get(type);
@@ -126,7 +126,7 @@ public class RandomizedCharyparNagelScoringParameters implements
 		builder.setScoreAtAll(true); // TODO no getter
 		builder.setZeroUtilityComputation(new ActivityUtilityParameters.SameAbsoluteScore());
 		// TODO no getter
-		return builder.build();
+		return builder;
 	}
 
 	protected double marginalUtilityOfPerforming_s(final Person person) {

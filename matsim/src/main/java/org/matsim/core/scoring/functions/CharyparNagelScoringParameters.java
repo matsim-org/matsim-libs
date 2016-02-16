@@ -81,8 +81,8 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	}
 
 	public static final class Builder {
-		private final Map<String, ActivityUtilityParameters> utilParams;
-		private final Map<String, ModeUtilityParameters> modeParams;
+		private final Map<String, ActivityUtilityParameters.Builder> utilParams;
+		private final Map<String, ModeUtilityParameters.Builder> modeParams;
 
 		private double marginalUtilityOfWaiting_s;
 		private double marginalUtilityOfLateArrival_s;
@@ -130,7 +130,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			utilParams = new TreeMap<>() ;
 			for (ActivityParams params : scoringParameterSet.getActivityParams()) {
 				ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
-				utilParams.put(params.getActivityType(), factory.build() ) ;
+				utilParams.put(params.getActivityType(), factory ) ;
 			}
 
 			modeParams = new TreeMap<>() ;
@@ -140,7 +140,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 				String modeName = mode.getKey();
 				ModeParams params = mode.getValue();
 				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, params.getMarginalUtilityOfTraveling() );
-				modeParams.put(modeName, new ModeUtilityParameters.Builder( params ).build() );
+				modeParams.put(modeName, new ModeUtilityParameters.Builder( params ) );
 			}
 
 			abortedPlanScore = Math.min(
@@ -153,12 +153,12 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			// kai, feb'12
 		}
 
-		public Builder setActivityParameters(String activityType, ActivityUtilityParameters params) {
+		public Builder setActivityParameters(String activityType, ActivityUtilityParameters.Builder params) {
 			this.utilParams.put( activityType , params );
 			return this;
 		}
 
-		public Builder setModeParameters(String mode, ModeUtilityParameters params) {
+		public Builder setModeParameters(String mode, ModeUtilityParameters.Builder params) {
 			this.modeParams.put( mode , params );
 			return this;
 		}
@@ -214,9 +214,19 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		}
 
 		public CharyparNagelScoringParameters build() {
+			final Map<String, ModeUtilityParameters> modes = new TreeMap<>();
+			for ( Map.Entry<String, ModeUtilityParameters.Builder> e : modeParams.entrySet() ) {
+				modes.put( e.getKey() , e.getValue().build() );
+			}
+
+			final Map<String, ActivityUtilityParameters> acts = new TreeMap<>();
+			for ( Map.Entry<String, ActivityUtilityParameters.Builder> e : utilParams.entrySet() ) {
+				acts.put( e.getKey() , e.getValue().build() );
+			}
+
 			return new CharyparNagelScoringParameters(
-					Collections.unmodifiableMap( utilParams ),
-					Collections.unmodifiableMap( modeParams ),
+					acts,
+					modes,
 					marginalUtilityOfWaiting_s,
 					marginalUtilityOfLateArrival_s,
 					marginalUtilityOfEarlyDeparture_s,

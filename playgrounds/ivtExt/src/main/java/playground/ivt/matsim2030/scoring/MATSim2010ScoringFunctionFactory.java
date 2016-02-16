@@ -226,7 +226,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 
 			builder.setActivityParameters(
 					act.getType(),
-					typeBuilder.build());
+					typeBuilder );
 		}
 
 		final CharyparNagelScoringParameters params =

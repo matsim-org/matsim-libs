@@ -220,7 +220,7 @@ public class SharedMobilityScoringFunctionFactory implements ScoringFunctionFact
 
 			builder.setActivityParameters(
 					act.getType(),
-					typeBuilder.build());
+					typeBuilder );
 		}
 
 		final CharyparNagelScoringParameters params =
