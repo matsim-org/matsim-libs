@@ -345,15 +345,14 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() <= 0 && isNotOfferingVehicle() ){
 		
 			double flowCapSoFar = flowcap_accumulate.getValue();
-			double newStoredFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
-			double totalFlowCap = flowCapSoFar + newStoredFlowCap;
-
-			if(totalFlowCap > flowCapacityPerTimeStep) {
-				flowcap_accumulate.setValue(flowCapacityPerTimeStep);
-				flowcap_accumulate.setTimeStep( now );
-			}else {
-				flowcap_accumulate.addValue(newStoredFlowCap,now);
-			}
+			double accumulateFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
+			double newFlowCap = flowCapSoFar + accumulateFlowCap;
+			
+			// dont update the flow cap and time if it is less than 0. this could be useful to reduce some rounding errors.
+			newFlowCap = Math.min(newFlowCap, flowCapacityPerTimeStep);
+			
+			flowcap_accumulate.setValue(newFlowCap);
+			flowcap_accumulate.setTimeStep( now );
 		}
 	}
 
