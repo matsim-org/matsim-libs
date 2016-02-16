@@ -243,7 +243,12 @@ public final class Controler implements ControlerI, MatsimServices {
 		if (this.injectorCreated) {
 			return this.injector.getInstance(Scenario.class);
 		} else {
-			// IllegalStateException?
+			if ( scenario == null ) {
+				log.error( "Trying to get Scenario before it was instanciated.");
+				log.error( "When passing a config file or a config file path to the Controler constructor," );
+				log.error( "Scenario will be loaded first when the run() method is invoked." );
+				throw new IllegalStateException( "Trying to get Scenario before is was instanciated." );
+			}
 			return this.scenario;
 		}
     }
