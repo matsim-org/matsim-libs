@@ -30,11 +30,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-
-import playground.ikaddoura.noise2.events.NoiseEventAffected;
-import playground.ikaddoura.noise2.events.NoiseEventCaused;
-import playground.ikaddoura.noise2.handler.NoiseEventAffectedHandler;
-import playground.ikaddoura.noise2.handler.NoiseEventCausedHandler;
+import org.matsim.contrib.noise.events.NoiseEventAffected;
+import org.matsim.contrib.noise.events.NoiseEventCaused;
+import org.matsim.contrib.noise.handler.NoiseEventAffectedHandler;
+import org.matsim.contrib.noise.handler.NoiseEventCausedHandler;
 
 /**
  * Analyzes an event file with noise events.

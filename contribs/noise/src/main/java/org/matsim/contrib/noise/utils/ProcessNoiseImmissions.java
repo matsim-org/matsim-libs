@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.dziemke.feathersMatsim.ikea.noise;
+package org.matsim.contrib.noise.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -238,7 +238,7 @@ public class ProcessNoiseImmissions {
 
 		String qGisProjectFile = "immission.qgs";
 		
-		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_UTM31N, workingDirectory);
+		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
 			
 // ################################################################################################################################################
 		double[] extent = {4568808,5803042,4622772,5844280};

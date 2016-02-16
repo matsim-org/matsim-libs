@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DefaultTravelCostCalculatorFactoryImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,50 +16,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ikaddoura.integrationCN;
 
+/**
+ * 
+ */
+package org.matsim.contrib.noise.routing;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import playground.vsp.congestion.handlers.TollHandler;
-
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author ikaddoura
  *
  */
-public final class TollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
+public class NoiseTollDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
-	private double sigma = 0. ;
-	private Builder randomizedTimeDistanceTravelDisutilityFactory;
-	private final NoiseContext noiseContext;
-	private final TollHandler tollHandler;
+	private NoiseContext noiseContext;
 
-	public TollTimeDistanceTravelDisutilityFactory(Builder randomizedTimeDistanceTravelDisutilityFactory, NoiseContext noiseContext, TollHandler tollHandler) {
+	@Deprecated
+	public NoiseTollDisutilityCalculatorFactory(NoiseContext noiseContext) {
 		this.noiseContext = noiseContext;
-		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
-		this.tollHandler = tollHandler;
 	}
 
 	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		
-		randomizedTimeDistanceTravelDisutilityFactory.setSigma(sigma);
-		
-		return new TollTimeDistanceTravelDisutility(
-				randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
-				this.noiseContext,
-				this.tollHandler,
-				cnScoringGroup.getMarginalUtilityOfMoney(),
-				this.sigma
-			);
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		final TollTravelDisutilityCalculator ttdc = new TollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, noiseContext);
+
+		return new TravelDisutility(){
+
+			@Override
+			public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+				double linkTravelDisutility = ttdc.getLinkTravelDisutility(link, time, person, vehicle);
+				return linkTravelDisutility;
+			}
+			
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
+				return ttdc.getLinkMinimumTravelDisutility(link);
+			}
+		};
 	}
-	
-	public void setSigma ( double val ) {
-		this.sigma = val;
-	}
+
 }

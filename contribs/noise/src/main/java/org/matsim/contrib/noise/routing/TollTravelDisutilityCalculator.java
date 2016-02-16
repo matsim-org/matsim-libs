@@ -17,89 +17,70 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.integrationCN;
+/**
+ * 
+ */
+package org.matsim.contrib.noise.routing;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import playground.vsp.congestion.handlers.TollHandler;
-
 /**
-* @author ikaddoura
-*/
+ * @author ikaddoura
+ *
+ */
+public class TollTravelDisutilityCalculator implements TravelDisutility{
 
-public class TollTimeDistanceTravelDisutility implements TravelDisutility {
-	
-	private final TravelDisutility randomizedTimeDistanceTravelDisutility;
-	private final NoiseContext noiseContext;
-	private TollHandler tollHandler;
-	private final double marginalUtilityOfMoney;
-	private final double sigma ;
-	
-	/*
-	 * Blur the Social Cost to speed up the relaxation process. Values between
-	 * 0.0 and 1.0 are valid. 0.0 means the old value will be kept, 1.0 means
-	 * the old value will be totally overwritten.
-	 */
-	private final double blendFactor = 1.0;
-	
-	public TollTimeDistanceTravelDisutility(TravelDisutility randomizedTimeDistanceTravelDisutility,
-			NoiseContext noiseContext,
-			TollHandler tollHandler,
-			double marginalUtilityOfMoney,
-			double sigma) {
+	private static final Logger log = Logger.getLogger(TollTravelDisutilityCalculator.class);
 
-		this.randomizedTimeDistanceTravelDisutility = randomizedTimeDistanceTravelDisutility;
-		this.noiseContext = noiseContext;
-		this.tollHandler = tollHandler;
-		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
-		this.sigma = sigma;
+	private TravelTime timeCalculator;
+	private double marginalUtlOfMoney;
+	private double distanceCostRateCar;
+	private double marginalUtlOfTravelTime;
+	private NoiseContext noiseContext;
+	
+	@Deprecated
+	public TollTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, NoiseContext noiseContext) {
+		this.timeCalculator = timeCalculator;
+		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
+		this.distanceCostRateCar = cnScoringGroup.getModes().get(TransportMode.car).getMonetaryDistanceRate();
+		this.marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0); // TODO: make this dependent on the agent-specific time pressure...
+		this.noiseContext = noiseContext;		
+		log.info("The link travel disutility is calculated based on the travel time, the distance and the expected toll (monetized noise damage costs) of each link.");
 	}
 
 	@Override
-	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-				
-		double randomizedTimeDistanceDisutilityForLink = this.randomizedTimeDistanceTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle v) {
 		
-		double logNormalRnd = 1. ;
-		if ( sigma != 0. ) {
-			logNormalRnd = (double) person.getCustomAttributes().get("logNormalRnd") ;
-		}
-				
+		double linkTravelTime = this.timeCalculator.getLinkTravelTime(link, time, person, v);
+		double linkTravelTimeDisutility = this.marginalUtlOfTravelTime * linkTravelTime ;
+
+		double distance = link.getLength();
+		double distanceCost = - this.distanceCostRateCar * distance;
+		double linkDistanceDisutility = this.marginalUtlOfMoney * distanceCost;
+
 		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link.getId(), time, person.getId());
-		double randomizedTollDisutility = linkExpectedTollDisutility * logNormalRnd;
 		
-		return randomizedTimeDistanceDisutilityForLink + randomizedTollDisutility;
-	}
+		double linkTravelDisutility = linkTravelTimeDisutility + linkDistanceDisutility + linkExpectedTollDisutility;
 
-	@Override
-	public double getLinkMinimumTravelDisutility(Link link) {
-		throw new UnsupportedOperationException();
+		return linkTravelDisutility;
 	}
 
 	private double calculateExpectedTollDisutility(Id<Link> linkId, double time, Id<Person> personId) {
-		
+	
 		/* The following is an estimate of the tolls that an agent would have to pay if choosing that link in the next
 		iteration i based on the tolls in iteration i-1 */
 		
-		// congestion toll distulity
-		
-		double linkExpectedTollNewValue = this.tollHandler.getAvgToll(linkId, time);
-		double linkExpectedTollOldValue = this.tollHandler.getAvgTollOldValue(linkId, time);
-
-		double blendedOldValue = (1 - blendFactor) * linkExpectedTollOldValue;
-		double blendedNewValue = blendFactor * linkExpectedTollNewValue;	
-
-		double expectedLinkCongestionTollDisutility = -1 * this.marginalUtilityOfMoney * (blendedOldValue + blendedNewValue);			
-
-		// noise toll disutility
-		
-		double linkExpectedNoiseToll = 0.;
+		double linkExpectedToll = 0.;
 		double timeIntervalEndTime = ((int) (time / this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) + 1) * this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
 		
 		if (this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime) == null ||
@@ -117,12 +98,12 @@ public class TollTimeDistanceTravelDisutility implements TravelDisutility {
 			}
 			
 			if (isHGV) {
-						
+			
 				if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.AverageCost) {	
-					linkExpectedNoiseToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId).getAverageDamageCostPerHgv();
+					linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId).getAverageDamageCostPerHgv();
 					
 				} else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.MarginalCost) {
-					linkExpectedNoiseToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId).getMarginalDamageCostPerHgv();
+					linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId).getMarginalDamageCostPerHgv();
 					
 				} else {
 					throw new RuntimeException("Unknown noise allocation approach. Aborting...");
@@ -131,10 +112,10 @@ public class TollTimeDistanceTravelDisutility implements TravelDisutility {
 			} else {
 				
 				if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.AverageCost) {	
-					linkExpectedNoiseToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId).getAverageDamageCostPerCar();
+					linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId).getAverageDamageCostPerCar();
 					
 				} else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.MarginalCost) {
-					linkExpectedNoiseToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId).getMarginalDamageCostPerCar();
+					linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId).getMarginalDamageCostPerCar();
 					
 				} else {
 					throw new RuntimeException("Unknown noise allocation approach. Aborting...");
@@ -142,12 +123,16 @@ public class TollTimeDistanceTravelDisutility implements TravelDisutility {
 			}
 
 		}
-						
-		double expectedLinkNoiseTollDistuility = this.marginalUtilityOfMoney * linkExpectedNoiseToll;			
 		
-		double linkExpectedTollDisutility = expectedLinkCongestionTollDisutility + expectedLinkNoiseTollDistuility;
+//		log.warn("Expected toll on link " + linkId + " at time " + time + " in time interval " + timeIntervalEndTime + ": " + linkExpectedToll);
+				
+		double linkExpectedTollDisutility = this.marginalUtlOfMoney * linkExpectedToll;			
 		return linkExpectedTollDisutility;
 	}
-	
-}
 
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		throw new UnsupportedOperationException();
+	}
+
+}

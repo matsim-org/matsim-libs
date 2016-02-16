@@ -35,11 +35,10 @@ import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
 import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
+import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-
-import playground.ikaddoura.noise2.data.ReceiverPoint;
 
 /**
  * @author ikaddoura
