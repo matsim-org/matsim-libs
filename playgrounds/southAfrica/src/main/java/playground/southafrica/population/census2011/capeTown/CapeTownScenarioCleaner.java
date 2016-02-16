@@ -23,6 +23,7 @@ package playground.southafrica.population.census2011.capeTown;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -63,6 +64,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.southafrica.population.census2011.attributeConverters.CoordConverter;
+import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -99,9 +101,24 @@ public class CapeTownScenarioCleaner {
 	public static void main(String[] args) {
 		Header.printHeader(CapeTownScenarioCleaner.class.toString(), args);
 		
-		/* Check the necessary population input files. */
 		String folder = args[0];
 		folder = folder + (folder.endsWith("/") ? "" : "/");
+
+		/* Copy the person and commercial vehicle attribute files from the 
+		 * work-in-progress folder. */
+		try {
+			FileUtils.copyFile(
+					new File(folder + "wip/freightAttributes.xml.gz"), 
+					new File(folder + "commercialAttributes.xml.gz"));
+			FileUtils.copyFile(
+					new File(folder + "wip/populationAttributes.xml.gz"), 
+					new File(folder + "personAttributes.xml.gz"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Could not copy attribute files.");
+		}
+		
+		/* Check the necessary population input files. */
 		checkFiles(folder);
 		
 		String personsCRS = args[1];
@@ -181,42 +198,30 @@ public class CapeTownScenarioCleaner {
 		config.plansCalcRoute().setNetworkModes(modes);
 		/* Add the teleported modes. */
 		
-		/* First check if mode parameters does not yet exist. */
-		
-		
-		ModeRoutingParams ride = new ModeRoutingParams("ride");
+		ModeRoutingParams ride = config.plansCalcRoute().getOrCreateModeRoutingParams("ride");
+		ride = config.plansCalcRoute().getModeRoutingParams().get("ride");
 		ride.setBeelineDistanceFactor(1.3);
 		ride.setTeleportedModeFreespeedFactor(0.8); /* Free speed-based. */
-//		ride.setTeleportedModeSpeed(50.0 / 3.6);
-		
-		config.plansCalcRoute().addModeRoutingParams(ride);
-		ModeRoutingParams taxi = new ModeRoutingParams("taxi");
+		ModeRoutingParams taxi = config.plansCalcRoute().getOrCreateModeRoutingParams("taxi");
 		taxi.setBeelineDistanceFactor(1.3);
 		taxi.setTeleportedModeSpeed(50.0 / 3.6);
-		config.plansCalcRoute().addModeRoutingParams(taxi);
-		ModeRoutingParams brt = new ModeRoutingParams("brt");
+		ModeRoutingParams brt = config.plansCalcRoute().getOrCreateModeRoutingParams("brt");
 		brt.setBeelineDistanceFactor(1.3);
 		brt.setTeleportedModeSpeed(50.0 / 3.6);
-		config.plansCalcRoute().addModeRoutingParams(brt);
-		ModeRoutingParams rail = new ModeRoutingParams("rail");
+		ModeRoutingParams rail = config.plansCalcRoute().getOrCreateModeRoutingParams("rail");
 		rail.setBeelineDistanceFactor(1.3);
 		rail.setTeleportedModeSpeed(20.0 / 3.6);
-		config.plansCalcRoute().addModeRoutingParams(rail);
-		ModeRoutingParams walk = new ModeRoutingParams("walk");
+		ModeRoutingParams walk = config.plansCalcRoute().getOrCreateModeRoutingParams("walk");
 		walk.setBeelineDistanceFactor(1.3);
 		walk.setTeleportedModeSpeed(2.0 / 3.6);
-		config.plansCalcRoute().addModeRoutingParams(walk);
-		ModeRoutingParams cycle = new ModeRoutingParams("cycle");
+		ModeRoutingParams cycle = config.plansCalcRoute().getOrCreateModeRoutingParams("cycle");
 		cycle.setBeelineDistanceFactor(1.3);
 		cycle.setTeleportedModeSpeed(2.0 / 3.6);
-		config.plansCalcRoute().addModeRoutingParams(cycle);
-		ModeRoutingParams other = new ModeRoutingParams("other");
+		ModeRoutingParams other = config.plansCalcRoute().getOrCreateModeRoutingParams("other");
 		other.setBeelineDistanceFactor(1.3);
 		other.setTeleportedModeSpeed(30.0 / 3.6);
-		config.plansCalcRoute().addModeRoutingParams(other);
 		
 		new ConfigWriter(config).write(folder + "config.xml");
-
 		new NetworkWriter(sc.getNetwork()).write(network);
 		LOG.info("Done updating network modes.");
 	}
