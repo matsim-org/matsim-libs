@@ -125,6 +125,9 @@ import org.matsim.core.utils.misc.Time;
 		out.write(" id=\"" + facility.getId() + "\"");
 		out.write(" x=\"" + facility.getCoord().getX() + "\"");
 		out.write(" y=\"" + facility.getCoord().getY() + "\"");
+		if (facility.getLinkId() != null) {
+			out.write(" linkId=\"" + facility.getLinkId().toString() + "\"");
+		}
 		if (facility.getDesc() != null) { out.write(" desc=\"" + facility.getDesc() + "\""); }
 		out.write(">\n");
 	}
