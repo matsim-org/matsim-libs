@@ -31,7 +31,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTime.DayType;
 import org.matsim.facilities.OpeningTimeImpl;
 
 import java.util.Collections;
@@ -76,10 +75,9 @@ org.matsim.core.scoring.functions.CharyparNagelActivityScoring {
 	private CharyparNagelScoringParameters params;
 	private Plan plan;
 
-	private static final DayType DEFAULT_DAY = DayType.wed;
 	private static final SortedSet<OpeningTime> DEFAULT_OPENING_TIME = new TreeSet<OpeningTime>();
 	static {
-		OpeningTime defaultOpeningTime = new OpeningTimeImpl(ActivityScoringFunction.DEFAULT_DAY, Double.MIN_VALUE, Double.MAX_VALUE);
+		OpeningTime defaultOpeningTime = new OpeningTimeImpl(Double.MIN_VALUE, Double.MAX_VALUE);
 		ActivityScoringFunction.DEFAULT_OPENING_TIME.add(defaultOpeningTime);
 	}
 

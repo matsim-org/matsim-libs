@@ -42,13 +42,6 @@ public class OpeningTimeImpl implements OpeningTime {
 		this.validateTimes();
 	}
 
-	@Deprecated
-	public OpeningTimeImpl(final DayType day, final double startTime, final double endTime) {
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.validateTimes();
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	//
 	// interface implementation
