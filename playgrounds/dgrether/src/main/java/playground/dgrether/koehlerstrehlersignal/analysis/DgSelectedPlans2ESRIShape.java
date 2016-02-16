@@ -113,7 +113,7 @@ public class DgSelectedPlans2ESRIShape {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
 					if (leg.getRoute() instanceof NetworkRoute) {
-						if (RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network) > 0) {
+						if (RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) leg.getRoute(), this.network) > 0) {
 							fts.add(getLegFeature(leg, id));
 						}
 					} else if (leg.getRoute().getDistance() > 0) {
@@ -146,7 +146,7 @@ public class DgSelectedPlans2ESRIShape {
 		String mode = leg.getMode();
 		Double depTime = leg.getDepartureTime();
 		Double travTime = leg.getTravelTime();
-		Double dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+		Double dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) leg.getRoute(), this.network);
 
 		List<Id<Link>> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 		Coordinate [] coords = new Coordinate[linkIds.size() + 1];

@@ -964,14 +964,14 @@ public class CepasToEvents {
                         .getRoutes().get(likeliestRoute).getRoute();
                 try {
                     NetworkRoute subRoute = route.getSubRoute(fromLink.getId(), toLink.getId());
-                    return RouteUtils.calcDistance(subRoute, scenario.getNetwork()) + toLink.getLength();
+                    return RouteUtils.calcDistanceExcludingStartEndLink(subRoute, scenario.getNetwork()) + toLink.getLength();
 
                 } catch (IllegalArgumentException e) {
-                    double distance = RouteUtils.calcDistance(
+                    double distance = RouteUtils.calcDistanceExcludingStartEndLink(
                             route.getSubRoute(fromLink.getId(), route.getEndLinkId()), scenario.getNetwork())
                             + scenario.getNetwork().getLinks().get(route.getEndLinkId()).getLength();
                     return distance
-                            + RouteUtils.calcDistance(route.getSubRoute(route.getStartLinkId(), toLink.getId()),
+                            + RouteUtils.calcDistanceExcludingStartEndLink(route.getSubRoute(route.getStartLinkId(), toLink.getId()),
                             scenario.getNetwork()) + toLink.getLength();
 
                 }

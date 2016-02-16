@@ -455,7 +455,7 @@ public class TransitQueryEngineForR implements Serializable {
                     .getRoutes().get(routeId).getRoute();
             try {
                 NetworkRoute subRoute = networkRoute.getSubRoute(fromLink.getId(), toLink.getId());
-                return RouteUtils.calcDistance(subRoute, scenario.getNetwork()) + toLink.getLength();
+                return RouteUtils.calcDistanceExcludingStartEndLink(subRoute, scenario.getNetwork()) + toLink.getLength();
 
             } catch (IllegalArgumentException e) {
                 //instead of going th elong way round, throw an err

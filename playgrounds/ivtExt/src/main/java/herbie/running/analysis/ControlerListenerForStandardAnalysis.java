@@ -225,7 +225,7 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 				Leg leg = (Leg) pe;
 				Route route = leg.getRoute();
 				if (route != null) {
-					double dist = RouteUtils.calcDistance((NetworkRoute) route, this.network);
+					double dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, this.network);
 					if (route.getEndLinkId() != null && route.getStartLinkId() != route.getEndLinkId()) {
 						dist += this.network.getLinks().get(route.getEndLinkId()).getLength();
 					}

@@ -99,7 +99,7 @@ public class ScoringFromLeg extends CharyparNagelLegScoring {
 		double dist = route.getDistance();
 		if (TransportMode.car.equals(leg.getMode())) {
 			if (route instanceof NetworkRoute) {	
-				dist =  RouteUtils.calcDistance((NetworkRoute) route, network);
+				dist =  RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, network);
 			}
 			// (I just put in the last three lines.  This is not optimal, but better than nothing.  kai, mar'12)
 			
