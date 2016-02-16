@@ -44,7 +44,7 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Builder;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Mode;
+import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.kticompatibility.KtiActivityScoring;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
@@ -193,7 +193,7 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 					(Double) personAttributes
 					.getAttribute(person.getId().toString(), "traveling_car" );
 			
-			builder.setModeParameters("car", new Mode(travelingCarUtility, 0.0, 0.0,
+			builder.setModeParameters("car", new ModeUtilityParameters(travelingCarUtility, 0.0, 0.0,
 					config.getScoringParameters( null ).getOrCreateModeParams("car").getConstant()));
 			
 			

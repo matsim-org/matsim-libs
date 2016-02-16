@@ -35,25 +35,8 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 
 public class CharyparNagelScoringParameters implements MatsimParameters {
 
-	public static class Mode {
-		public Mode(
-				double marginalUtilityOfTraveling_s,
-				double marginalUtilityOfDistance_m,
-				double monetaryDistanceCostRate,
-				double constant) {
-			this.marginalUtilityOfTraveling_s = marginalUtilityOfTraveling_s;
-			this.marginalUtilityOfDistance_m = marginalUtilityOfDistance_m;
-			this.monetaryDistanceCostRate = monetaryDistanceCostRate;
-			this.constant = constant;
-		}
-		public final double marginalUtilityOfTraveling_s;
-		public final double marginalUtilityOfDistance_m;
-		public final double monetaryDistanceCostRate;
-		public final double constant;
-	}
-	
 	public final Map<String, ActivityUtilityParameters> utilParams;
-	public final Map<String, Mode> modeParams;
+	public final Map<String, ModeUtilityParameters> modeParams;
 	public final double marginalUtilityOfWaiting_s;
 	public final double marginalUtilityOfLateArrival_s;
 	public final double marginalUtilityOfEarlyDeparture_s;
@@ -70,7 +53,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 
 	private CharyparNagelScoringParameters(
 			final Map<String, ActivityUtilityParameters> utilParams,
-			final Map<String, Mode> modeParams,
+			final Map<String, ModeUtilityParameters> modeParams,
 			final double marginalUtilityOfWaiting_s,
 			final double marginalUtilityOfLateArrival_s,
 			final double marginalUtilityOfEarlyDeparture_s,
@@ -99,7 +82,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 
 	public static final class Builder {
 		private final Map<String, ActivityUtilityParameters> utilParams;
-		private final Map<String, Mode> modeParams;
+		private final Map<String, ModeUtilityParameters> modeParams;
 
 		private double marginalUtilityOfWaiting_s;
 		private double marginalUtilityOfLateArrival_s;
@@ -150,23 +133,14 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 				utilParams.put(params.getActivityType(), factory.build() ) ;
 			}
 
-			modeParams = new TreeMap<String, Mode>() ;
+			modeParams = new TreeMap<>() ;
 			Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
 			double worstMarginalUtilityOfTraveling_s = 0.0;
 			for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> mode : modes.entrySet()) {
 				String modeName = mode.getKey();
 				ModeParams params = mode.getValue();
-				double marginalUtilityOfTraveling_s = params.getMarginalUtilityOfTraveling() / 3600.0;
-				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, marginalUtilityOfTraveling_s);
-				double marginalUtilityOfDistance_m = params.getMarginalUtilityOfDistance();
-				double monetaryDistanceRate = params.getMonetaryDistanceRate();
-				double constant = params.getConstant();
-				Mode newModeParams = new Mode(
-						marginalUtilityOfTraveling_s,
-						marginalUtilityOfDistance_m,
-						monetaryDistanceRate,
-						constant);
-				modeParams.put(modeName, newModeParams);
+				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, params.getMarginalUtilityOfTraveling() );
+				modeParams.put(modeName, new ModeUtilityParameters.Builder( params ).build() );
 			}
 
 			abortedPlanScore = Math.min(
@@ -184,7 +158,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			return this;
 		}
 
-		public Builder setModeParameters(String mode, Mode params) {
+		public Builder setModeParameters(String mode, ModeUtilityParameters params) {
 			this.modeParams.put( mode , params );
 			return this;
 		}
