@@ -35,7 +35,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityOptionImpl;
 
 public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
 
@@ -143,46 +142,6 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 	@Override
 	public void endActivity(final BufferedWriter out) throws IOException {
 		out.write("\t\t\t</activity>\n\n");
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <location ... > ... </location>
-	//////////////////////////////////////////////////////////////////////
-
-//	public void startLocation(final Facility facility, final BufferedWriter out) throws IOException {
-//		out.write("\t\t\t\t<location");
-//		out.write(" type=\"" + facility.getLayer().getType() + "\"");
-//		out.write(" id=\"" + facility.getId() + "\"");
-//		out.write(">\n");
-//	}
-//
-//	public void endLocation(final BufferedWriter out) throws IOException {
-//		out.write("\t\t\t\t</location>\n");
-//	}
-
-	@Override
-	public void startPrimaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t\t<location");
-		out.write(" id=\"" + activity.getFacility().getId() + "\"");
-		out.write(" isPrimary=\"" + "yes" + "\"");
-		out.write(">\n");
-	}
-
-	@Override
-	public void endPrimaryLocation(final BufferedWriter out) throws IOException {
-		out.write("\t\t\t\t</location>\n");
-	}
-
-	@Override
-	public void startSecondaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t\t<location");
-		out.write(" id=\"" + activity.getFacility().getId() + "\"");
-		out.write(">\n");
-	}
-
-	@Override
-	public void endSecondaryLocation(final BufferedWriter out) throws IOException {
-		out.write("\t\t\t\t</location>\n");
 	}
 
 	//////////////////////////////////////////////////////////////////////

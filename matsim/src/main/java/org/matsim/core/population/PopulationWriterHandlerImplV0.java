@@ -35,7 +35,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityOptionImpl;
 
 	/*package*/ class PopulationWriterHandlerImplV0 extends AbstractPopulationWriterHandler {
 
@@ -109,26 +108,6 @@ import org.matsim.facilities.ActivityOptionImpl;
 
 	@Override
 	public void endActivity(final BufferedWriter out) throws IOException {
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <location ... > ... </location>
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public void startPrimaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
-	}
-
-	@Override
-	public void endPrimaryLocation(final BufferedWriter out) throws IOException {
-	}
-
-	@Override
-	public void startSecondaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
-	}
-
-	@Override
-	public void endSecondaryLocation(final BufferedWriter out) throws IOException {
 	}
 
 	//////////////////////////////////////////////////////////////////////
