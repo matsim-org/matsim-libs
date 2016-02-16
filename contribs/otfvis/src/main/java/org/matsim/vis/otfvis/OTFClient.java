@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.vis.otfvis;
 
+import com.jogamp.opengl.GLAutoDrawable;
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
@@ -85,7 +86,7 @@ public final class OTFClient extends JFrame {
 		return Math.log(scale) / Math.log(2);
 	}
 	
-	public OTFClient() {
+	public OTFClient(GLAutoDrawable canvas) {
 		super("MATSim OTFVis");
 		this.setDefaultCloseOperation( WindowConstants.EXIT_ON_CLOSE );
 		JFrame.setDefaultLookAndFeelDecorated(true);
@@ -96,6 +97,13 @@ public final class OTFClient extends JFrame {
 		}
 		//Make sure menus appear above JOGL Layer
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+		compositePanel = new JPanel();
+		compositePanel.setBackground(Color.white);
+		compositePanel.setOpaque(true);
+		compositePanel.setLayout(new OverlayLayout(compositePanel));
+		compositePanel.add((Component) canvas);
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		compositePanel.setPreferredSize(new Dimension(screenSize.width/2,screenSize.height/2));
 		log.info("created MainFrame");
 	}
 
@@ -146,7 +154,6 @@ public final class OTFClient extends JFrame {
 			public void actionPerformed(final ActionEvent e) {
 				OTFVisConfigGroup visConfig = save.chooseAndReadSettingsFile();
 				OTFClientControl.getInstance().setOTFVisConfig(visConfig);
-				OTFClientControl.getInstance().getMainOTFDrawer().redraw();
 			}
 		};
 		fileMenu.add(openAction);
@@ -169,13 +176,6 @@ public final class OTFClient extends JFrame {
 		log.info("created HostControlBar");
 		OTFClientControl.getInstance().setMainOTFDrawer(mainDrawer);
 		log.info("created drawer");
-		compositePanel = new JPanel();
-        compositePanel.setBackground(Color.white);
-        compositePanel.setOpaque(true);
-		compositePanel.setLayout(new OverlayLayout(compositePanel));
-        compositePanel.add(mainDrawer.getComponent());
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        compositePanel.setPreferredSize(new Dimension(screenSize.width/2,screenSize.height/2));
 		getContentPane().add(compositePanel, BorderLayout.CENTER);
 		hostControlBar.setDrawer(mainDrawer);
 	}

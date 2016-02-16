@@ -16,9 +16,6 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-/**
- * 
- */
 package playground.southafrica.population.census2011.capeTown;
 
 import java.io.File;
@@ -68,17 +65,6 @@ public class CapeTownPopulationSampler {
 		String outputFolder = args[1];
 		outputFolder += outputFolder.endsWith("/") ? "" : "/";
 		double fraction = Double.parseDouble(args[2]);
-		
-		/* The household attributes have not been used, so there should not be
-		 * a householdAttributes.xml.gz file in the population folder containing
-		 * the other files. 
-		 */
-		try {
-			FileUtils.copyFile(new File(inputFolder + "wip/householdAttributes.xml.gz"), new File(inputFolder + "householdAttributes.xml.gz"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Could not copy the household attributes file.");
-		}
 		
 		Scenario scIn = parseInputScenario(inputFolder);
 		Scenario scOut = sample(scIn, fraction);
