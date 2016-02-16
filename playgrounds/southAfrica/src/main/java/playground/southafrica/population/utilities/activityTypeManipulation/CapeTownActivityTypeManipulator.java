@@ -47,11 +47,11 @@ public class CapeTownActivityTypeManipulator extends ActivityTypeManipulator {
 
 		/* Chopped chain starts. */
 		ActivityParams cs = new ActivityParams("chopStart");
-		cs.setTypicalDuration(Time.parseTime("00:00:01"));
+		cs.setTypicalDuration(Time.parseTime("00:01:00"));
 		this.config.planCalcScore().addActivityParams(cs);
 		/* Chopped chain ends. */
 		ActivityParams ce = new ActivityParams("chopEnd");
-		ce.setTypicalDuration(Time.parseTime("00:00:01"));
+		ce.setTypicalDuration(Time.parseTime("00:01:00"));
 		this.config.planCalcScore().addActivityParams(ce);
 	}
 

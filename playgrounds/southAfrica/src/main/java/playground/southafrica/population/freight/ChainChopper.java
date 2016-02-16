@@ -159,7 +159,7 @@ public class ChainChopper {
 					 * plan. */
 					currentPlan = new PlanImpl();
 					Activity cutActivityStart = new ActivityImpl("chopStart", cCut);
-					cutActivityStart.setEndTime(0.0);
+					cutActivityStart.setEndTime(Time.parseTime("00:01:00"));
 					currentPlan.addActivity(cutActivityStart);
 					lastLocation = cCut;
 					cumTime = 0.0;

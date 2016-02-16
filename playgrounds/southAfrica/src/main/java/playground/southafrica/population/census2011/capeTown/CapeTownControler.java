@@ -27,6 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
 import playground.southafrica.utilities.Header;
@@ -55,16 +56,20 @@ public class CapeTownControler {
 		Machine machine = Machine.valueOf(args[1]);
 		
 		Config config = setupConfig(folder, machine);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		Controler controler = new Controler(config);
 		
 		/* Bind the travel time and disutility functions to all modes that will
-		 * assume teleportation via free-speed routing.*/
+		 * assume network routes. */
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addTravelTimeBinding("ride").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("ride").to(carTravelDisutilityFactoryKey());
+
+				addTravelTimeBinding("commercial").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("commercial").to(carTravelDisutilityFactoryKey());
 			}
 		});
 		
