@@ -138,6 +138,7 @@
 		<module>map2mapmatching</module>
 		<module>travelsummary</module>
 		<module>deprecated</module>
+		<module>protobuf</module>
 	</modules>
 	<repositories>
 		<repository>
