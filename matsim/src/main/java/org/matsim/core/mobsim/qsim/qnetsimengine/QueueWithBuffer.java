@@ -286,7 +286,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		if(fastCapacityUpdate){
 			updateFlowAccumulation(now);
 			if (flowcap_accumulate.getValue() > 0.0  ) {
-				flowcap_accumulate.addValue(-veh.getSizeInEquivalents(), now); 
+				flowcap_accumulate.addValue(-veh.getSizeInEquivalents(), now);
 			} else {
 				throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
 			}
@@ -342,7 +342,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	private void updateFlowAccumulation(final double now){
 		
-		if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() <= 0 && isNotOfferingVehicle() ){
+		if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() <= 0. && isNotOfferingVehicle() ){
 		
 			double flowCapSoFar = flowcap_accumulate.getValue();
 			double accumulateFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
@@ -619,7 +619,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		QVehicle veh = buffer.poll();
 		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		flowcap_accumulate.setTimeStep( now  );// though flowcap is updated during addToBuffer, but the actual time of leaving is this. amit Feb 2016 
+		updateFlowAccumulation( now );
 		return veh;
 	}
 
