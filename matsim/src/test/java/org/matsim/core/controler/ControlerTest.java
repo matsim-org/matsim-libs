@@ -71,9 +71,13 @@ public class ControlerTest {
 	private final static Logger log = Logger.getLogger(ControlerTest.class);
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test @Ignore( "With Guice, it is OK to have the scenario loaded lazily. Should be tested?" )
-	public void testConstructor() {
-		MatsimServices controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+	@Test
+	public void testScenarioLoading() {
+		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		// need to run the controler to get Scenario initilized
+		controler.getConfig().controler().setLastIteration( 0 );
+		controler.run();
+
         assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
         assertNotNull(controler.getScenario().getPopulation());
         assertEquals(23, controler.getScenario().getNetwork().getLinks().size());
