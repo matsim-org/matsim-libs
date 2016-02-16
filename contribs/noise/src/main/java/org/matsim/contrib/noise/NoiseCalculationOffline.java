@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.noise2;
+package org.matsim.contrib.noise;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +37,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.ikaddoura.noise2.NoiseParameters;
+import playground.ikaddoura.noise2.NoiseWriter;
 import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 import playground.ikaddoura.noise2.data.NoiseContext;
