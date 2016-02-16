@@ -100,7 +100,7 @@ public abstract class AbstractController {
                 controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected);
             }
         };
-        MatsimRuntimeModifications.run(runnable, dirtyShutdown);
+        MatsimRuntimeModifications.run(runnable);
         OutputDirectoryLogging.closeOutputDirLogging();
     }
 
