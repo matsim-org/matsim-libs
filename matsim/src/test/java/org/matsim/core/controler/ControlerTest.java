@@ -72,7 +72,13 @@ public class ControlerTest {
 
 	@Test
 	public void testScenarioLoading() {
-		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		// used to use the String[] constructor, but this makes it use the output/equil/ output directory,
+		// which is problematic as we need a "false" run to check if the scenario is initialized after recent changes
+		// td feb 16
+		// Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		final Config config = utils.loadConfig( "test/scenarios/equil/config.xml" );
+		Controler controler = new Controler( config );
+
 		// need to run the controler to get Scenario initilized
 		controler.getConfig().controler().setLastIteration( 0 );
 		controler.run();
