@@ -101,7 +101,6 @@ public class NoiseTest {
 		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivities);
 		
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
-		noiseContext.initialize();
 		
 		// test the grid of receiver points
 		Assert.assertEquals("wrong number of receiver points", 16, noiseContext.getReceiverPoints().size(), MatsimTestUtils.EPSILON);
@@ -189,7 +188,6 @@ public class NoiseTest {
 		events.addHandler(eventWriter);
 			
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
-		noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
@@ -947,7 +945,6 @@ public class NoiseTest {
 		events.addHandler(eventWriter);
 			
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
-		noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
@@ -1058,7 +1055,6 @@ public class NoiseTest {
 		events.addHandler(eventWriter);
 			
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
-		noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);

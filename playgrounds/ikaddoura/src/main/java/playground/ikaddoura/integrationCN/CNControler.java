@@ -34,7 +34,6 @@ import org.matsim.contrib.noise.NoiseParameters;
 import org.matsim.contrib.noise.data.GridParameters;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.routing.VTTSNoiseTollTimeDistanceTravelDisutilityFactory;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

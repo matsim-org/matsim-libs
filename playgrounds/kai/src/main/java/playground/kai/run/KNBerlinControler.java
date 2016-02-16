@@ -223,7 +223,6 @@ class KNBerlinControler {
 		events.addHandler(eventWriter);
 
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
-		noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", true);
 
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);

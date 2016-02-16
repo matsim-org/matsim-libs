@@ -162,7 +162,6 @@ public class NoiseCalculationOffline {
 		file.mkdirs();
 
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
-		noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 
 		EventsManager events = EventsUtils.createEventsManager();

@@ -56,14 +56,9 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		
-		log.info("Initialization...");
-		
-		this.noiseContext.initialize();
+				
 		NoiseWriter.writeReceiverPoints(noiseContext, event.getServices().getConfig().controler().getOutputDirectory() + "/receiverPoints/", false);
-		
-		log.info("Initialization... Done.");
-	
+			
 		this.timeTracker = new NoiseTimeTracker(noiseContext, event.getServices().getEvents(), event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/");
 		event.getServices().getEvents().addHandler(this.timeTracker);
 	

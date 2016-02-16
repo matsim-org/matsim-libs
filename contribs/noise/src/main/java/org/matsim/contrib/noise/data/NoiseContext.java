@@ -87,6 +87,9 @@ public class NoiseContext {
 		
 		this.noiseReceiverPoints = new HashMap<Id<ReceiverPoint>, NoiseReceiverPoint>();
 		this.noiseLinks = new HashMap<Id<Link>, NoiseLink>();
+		
+		checkConsistency();
+		setRelevantLinkInfo();
 	}
 
 	// for routing purposes
@@ -98,12 +101,6 @@ public class NoiseContext {
 		double currentTimeIntervalCopy = this.currentTimeBinEndTime;
 		
 		this.timeInterval2linkId2noiseLinks.put(currentTimeIntervalCopy, noiseLinksThisTimeBinCopy);
-	}
-	
-	public final void initialize() {
-		// yy why not move this material into the constructor? kai, jul'15
-		checkConsistency();
-		setRelevantLinkInfo();
 	}
 	
 	private void checkConsistency() {
