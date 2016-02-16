@@ -322,10 +322,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	private boolean hasFlowCapacityLeftAndBufferSpace() {
-		final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 		
 		if(fastCapacityUpdate){
-			updateFlowAccumulation(now);
+//			updateFlowAccumulation(now); // cant use simEngine time here, because, time passed in doSimStep(now) can be different (as in QLinkTest). amit feb 2016.
 			return (
 					usedBufferStorageCapacity < bufferStorageCapacity
 					&&
@@ -466,7 +465,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				letVehicleArrive(now, veh);
 				continue;
 			}
-
+			
+			if(fastCapacityUpdate) updateFlowAccumulation(now); // required here, in order to use the time from method argument instead of simEngine time. amit feb 2016.
 			/* is there still room left in the buffer? */
 			if (!hasFlowCapacityLeftAndBufferSpace() ) {
 				return;
