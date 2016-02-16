@@ -66,8 +66,7 @@ public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 		if (!this.usingIndividualScoringParameters) {
 			Config config = this.scenario.getConfig();
 			String subPopulationAttributeName = null;
-			this.nonPersonalizedScoringParameters = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), 
-					config.planCalcScore().getScoringParameters(subPopulationAttributeName), config.scenario()).create();
+			this.nonPersonalizedScoringParameters = new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(subPopulationAttributeName), config.scenario()).build();
 		}
 	}
 	
@@ -87,7 +86,7 @@ public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		
 		if (this.usingIndividualScoringParameters) {
-			CharyparNagelScoringParameters scoringParameters = CharyparNagelScoringParameters.getBuilder(this.scenario, person.getId()).create();
+			CharyparNagelScoringParameters scoringParameters = new CharyparNagelScoringParameters.Builder(this.scenario, person.getId()).build();
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(scoringParameters, this.scenario.getNetwork()));
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(scoringParameters));
 		} else {

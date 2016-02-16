@@ -85,8 +85,8 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
+
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -148,8 +148,8 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
+
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -202,7 +202,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		

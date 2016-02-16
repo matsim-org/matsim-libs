@@ -42,7 +42,7 @@ import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Builder;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.kticompatibility.KtiActivityScoring;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
@@ -169,8 +169,8 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			return individualParameters.get( person.getId() );
 		}
 
-		final CharyparNagelScoringParametersBuilder builder =
-				CharyparNagelScoringParameters.getBuilder( config, config.getScoringParameters( null ), scenarioConfig );
+		final Builder builder =
+				new Builder(config, config.getScoringParameters(null), scenarioConfig);
 		final Set<String> handledTypes = new HashSet<String>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			// XXX works only if no variation of type of activities between plans
@@ -224,13 +224,13 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 				typeBuilder.setTypicalDuration_s(typicalDuration);
 			}
 
-			builder.withActivityParameters(
+			builder.setActivityParameters(
 					act.getType(),
 					typeBuilder.create());
 		}
 
 		final CharyparNagelScoringParameters params =
-				builder.create();
+				builder.build();
 		individualParameters.put( person.getId() , params );
 		return params;
 	}

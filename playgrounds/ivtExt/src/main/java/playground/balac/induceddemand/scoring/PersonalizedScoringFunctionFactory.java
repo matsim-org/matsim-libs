@@ -43,7 +43,7 @@ import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Builder;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Mode;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.kticompatibility.KtiActivityScoring;
@@ -175,8 +175,8 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 			return individualParameters.get( person.getId() );
 		}
 
-		final CharyparNagelScoringParametersBuilder builder =
-				CharyparNagelScoringParameters.getBuilder( config, config.getScoringParameters( null ), scenarioConfig );
+		final Builder builder =
+				new Builder(config, config.getScoringParameters(null), scenarioConfig);
 		final Set<String> handledTypes = new HashSet<String>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			
@@ -187,13 +187,13 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 					.getAttribute(person.getId().toString(), "performing_" + act.getType());
 			
 			if (performingUtility != null) 
-				builder.withMarginalUtilityOfPerforming_s(performingUtility);
+				builder.setMarginalUtilityOfPerforming_s(performingUtility);
 			
 			final Double travelingCarUtility =
 					(Double) personAttributes
 					.getAttribute(person.getId().toString(), "traveling_car" );
 			
-			builder.withModeParameters("car", new Mode(travelingCarUtility, 0.0, 0.0, 
+			builder.setModeParameters("car", new Mode(travelingCarUtility, 0.0, 0.0,
 					config.getScoringParameters( null ).getOrCreateModeParams("car").getConstant()));
 			
 			
@@ -248,13 +248,13 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 				typeBuilder.setTypicalDuration_s(typicalDuration);
 			}
 
-			builder.withActivityParameters(
+			builder.setActivityParameters(
 					act.getType(),
 					typeBuilder.create());
 		}
 
 		final CharyparNagelScoringParameters params =
-				builder.create();
+				builder.build();
 		individualParameters.put( person.getId() , params );
 		return params;
 	}
