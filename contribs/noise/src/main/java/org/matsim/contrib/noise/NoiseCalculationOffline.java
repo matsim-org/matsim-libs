@@ -28,6 +28,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.noise.data.GridParameters;
+import org.matsim.contrib.noise.data.NoiseAllocationApproach;
+import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
+import org.matsim.contrib.noise.handler.NoiseTimeTracker;
+import org.matsim.contrib.noise.handler.PersonActivityTracker;
+import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
+import org.matsim.contrib.noise.utils.MergeNoiseCSVFile.OutputFormat;
+import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -36,18 +45,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.ikaddoura.noise2.NoiseParameters;
-import playground.ikaddoura.noise2.NoiseWriter;
-import playground.ikaddoura.noise2.data.GridParameters;
-import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
-import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.noise2.handler.LinkSpeedCalculation;
-import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
-import playground.ikaddoura.noise2.handler.PersonActivityTracker;
-import playground.ikaddoura.noise2.utils.MergeNoiseCSVFile;
-import playground.ikaddoura.noise2.utils.ProcessNoiseImmissions;
-import playground.ikaddoura.noise2.utils.MergeNoiseCSVFile.OutputFormat;
 
 /**
  * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.

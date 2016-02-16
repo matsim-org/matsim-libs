@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.utils;
+package playground.ikaddoura.noise;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

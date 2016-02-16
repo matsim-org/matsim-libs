@@ -31,9 +31,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.core.utils.io.IOUtils;
-
-import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 
 
 /**

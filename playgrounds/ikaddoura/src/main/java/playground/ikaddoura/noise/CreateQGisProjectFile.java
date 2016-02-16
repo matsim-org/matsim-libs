@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.utils;
+package playground.ikaddoura.noise;
 
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
 import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;

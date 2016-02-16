@@ -35,10 +35,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.NoiseParameters;
+import org.matsim.contrib.noise.handler.NoiseEquations;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-
-import playground.ikaddoura.noise2.handler.NoiseEquations;
 
 /**
  * Contains the grid and further noise-specific information.

@@ -17,9 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.noise.routing;
+package playground.ikaddoura.integrationCN;
 
 import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.contrib.noise.routing.NoiseTollTimeDistanceTravelDisutility;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;

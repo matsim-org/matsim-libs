@@ -29,16 +29,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
+import org.matsim.contrib.noise.data.GridParameters;
+import org.matsim.contrib.noise.data.NoiseAllocationApproach;
+import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
+import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-
-import playground.ikaddoura.noise2.data.GridParameters;
-import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
-import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.noise2.routing.NoiseTollDisutilityCalculatorFactory;
-import playground.ikaddoura.noise2.utils.ProcessNoiseImmissions;
 
 /**
  * 
@@ -155,7 +153,6 @@ public class NoiseOnlineControler {
 		});
 		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 
-		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		

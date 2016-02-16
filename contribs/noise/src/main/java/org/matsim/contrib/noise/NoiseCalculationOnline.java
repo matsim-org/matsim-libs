@@ -23,19 +23,18 @@
 package org.matsim.contrib.noise;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.contrib.noise.data.NoiseReceiverPoint;
+import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
+import org.matsim.contrib.noise.handler.NoisePricingHandler;
+import org.matsim.contrib.noise.handler.NoiseTimeTracker;
+import org.matsim.contrib.noise.handler.PersonActivityTracker;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-
-import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.noise2.data.NoiseReceiverPoint;
-import playground.ikaddoura.noise2.handler.LinkSpeedCalculation;
-import playground.ikaddoura.noise2.handler.NoisePricingHandler;
-import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
-import playground.ikaddoura.noise2.handler.PersonActivityTracker;
 
 
 /**
