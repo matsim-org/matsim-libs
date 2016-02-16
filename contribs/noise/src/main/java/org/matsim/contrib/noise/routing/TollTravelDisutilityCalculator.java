@@ -48,7 +48,6 @@ public class TollTravelDisutilityCalculator implements TravelDisutility{
 	private double marginalUtlOfTravelTime;
 	private NoiseContext noiseContext;
 	
-	@Deprecated
 	public TollTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, NoiseContext noiseContext) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
