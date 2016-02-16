@@ -170,7 +170,6 @@ public class WorkFacilitiesGeneration {
 						pTCapacityFO += matrix.getElement(f, o, s);
 					if(pTCapacityFO>0) {
 						ActivityOptionImpl activityOption = new ActivityOptionImpl(optionText);
-						activityOption.setFacility(mPArea);
 						activityOption.setCapacity(pTCapacityFO/mPAreaData.getModeShare());
 						activityOption.addOpeningTime(openingTime);
 						mPArea.getActivityOptions().put(activityOption.getType(), activityOption);
@@ -198,7 +197,6 @@ public class WorkFacilitiesGeneration {
 					double capacity = activityOptionArea.getCapacity()*proportion;
 					if(capacity>0) {
 						ActivityOptionImpl activityOption = new ActivityOptionImpl(activityOptionArea.getType());
-						activityOption.setFacility(building);
 						activityOption.setCapacity(capacity);
 						activityOption.addOpeningTime(activityOptionArea.getOpeningTimes().first());
 						building.getActivityOptions().put(activityOption.getType(), activityOption);

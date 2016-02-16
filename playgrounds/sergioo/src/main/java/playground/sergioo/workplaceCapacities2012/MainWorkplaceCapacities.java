@@ -995,7 +995,7 @@ public class MainWorkplaceCapacities {
 			System.out.println("Matrix written!");
 		}
 		Matrix3DImpl matrix = (Matrix3DImpl)capacities;
-		ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)FacilitiesUtils.createActivityFacilities()).createAndAddFacility(Id.create("dummy", ActivityFacility.class), new Coord((double) 0, (double) 0));
+		ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)FacilitiesUtils.createActivityFacilities()).createAndAddFacility(Id.create("dummy", ActivityFacility.class), new Coord(0, 0));
 		for(int o=0; o<matrix.getDimension(1); o++) {
 			double[] center = new double[]{0, 0};
 			for(PointPerson pointPerson:clusters.get(o).getPoints())
@@ -1016,7 +1016,6 @@ public class MainWorkplaceCapacities {
 					pTCapacityFO += matrix.getElement(f, o, s);
 				if(pTCapacityFO>0) {
 					ActivityOptionImpl activityOption = new ActivityOptionImpl(optionText);
-					activityOption.setFacility(fac);
 					activityOption.setCapacity(pTCapacityFO/mPArea.getModeShare());
 					activityOption.addOpeningTime(openingTime);
 					mPArea.putActivityOption(activityOption);
@@ -1074,7 +1073,7 @@ public class MainWorkplaceCapacities {
 			modeShareZone.difference += getMaxCapacity(mPArea)-capacity;
 		}
 		System.out.println("Zones done!");
-		ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)FacilitiesUtils.createActivityFacilities()).createAndAddFacility(Id.create("dummy", ActivityFacility.class), new Coord((double) 0, (double) 0));
+		ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)FacilitiesUtils.createActivityFacilities()).createAndAddFacility(Id.create("dummy", ActivityFacility.class), new Coord(0, 0));
 		for(int c=0; c<matrixCapacities[0].length; c++) {
 			double[] center = new double[]{0, 0};
 			for(PointPerson pointPerson:clusters.get(c).getPoints())
@@ -1102,7 +1101,6 @@ public class MainWorkplaceCapacities {
 				MPAreaData mPArea = mPAreaI.next();
 				double pTCapacityFO = matrixCapacities[w][c];
 				ActivityOptionImpl activityOption = new ActivityOptionImpl(optionText);
-				activityOption.setFacility(fac);
 				double capacity = 0;
 				for(int sc=0; sc<matrixCapacities[0].length; sc++)
 					capacity += matrixCapacities[w][sc];
@@ -1144,7 +1142,6 @@ public class MainWorkplaceCapacities {
 						scheduleCapacity = 0.0;
 					scheduleCapacities.put(activityOptionArea.getType(), scheduleCapacity+capacity);
 					ActivityOptionImpl activityOption = new ActivityOptionImpl(activityOptionArea.getType());
-					activityOption.setFacility(building);
 					activityOption.setCapacity(capacity);
 					activityOption.addOpeningTime(activityOptionArea.getOpeningTimes().first());
 					building.getActivityOptions().put(activityOption.getType(), activityOption);

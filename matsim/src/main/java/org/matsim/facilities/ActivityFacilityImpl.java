@@ -82,10 +82,6 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 		if (this.activities.containsKey(type)) {
 			throw new RuntimeException(this + "[type=" + type + " already exists]");
 		}
-		if (option.getFacility() != null && option.getFacility() != this) {
-			throw new RuntimeException("This activity option already belongs to a different ActivityFacility!");
-		}
-		option.setFacility(this);
 		this.activities.put(type, option);
 	}
 	
