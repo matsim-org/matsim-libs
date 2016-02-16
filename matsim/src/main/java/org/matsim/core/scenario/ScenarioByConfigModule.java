@@ -2,6 +2,7 @@ package org.matsim.core.scenario;
 
 
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 
@@ -13,6 +14,7 @@ public class ScenarioByConfigModule extends AbstractModule {
 	}
 
 	@Provides
+	@Singleton
 	private Scenario createScenario( final ScenarioLoaderImpl loader ) {
 		return loader.loadScenario();
 	}

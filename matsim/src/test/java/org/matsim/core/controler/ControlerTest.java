@@ -32,6 +32,7 @@ import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -70,7 +71,7 @@ public class ControlerTest {
 	private final static Logger log = Logger.getLogger(ControlerTest.class);
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test
+	@Test @Ignore( "With Guice, it is OK to have the scenario loaded lazily. Should be tested?" )
 	public void testConstructor() {
 		MatsimServices controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
         assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
