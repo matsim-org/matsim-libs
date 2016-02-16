@@ -31,6 +31,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.router.TripRouter;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -273,5 +274,13 @@ public class HitchHikerAgent implements MobsimDriverPassengerAgent , HasPerson {
 	@Override
 	public double getWeight() {
 		return delegate.getWeight();
+	}
+
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		return this.delegate.getCurrentFacility();
+	}
+
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		return this.delegate.getDestinationFacility();
 	}
 }

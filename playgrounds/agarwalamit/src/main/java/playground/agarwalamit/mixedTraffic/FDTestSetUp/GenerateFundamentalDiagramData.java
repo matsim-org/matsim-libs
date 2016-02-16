@@ -55,6 +55,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -742,6 +743,18 @@ public class GenerateFundamentalDiagramData {
 		@Override
 		public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public Facility<? extends Facility<?>> getCurrentFacility() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Facility<? extends Facility<?>> getDestinationFacility() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
 		}
 
 	}

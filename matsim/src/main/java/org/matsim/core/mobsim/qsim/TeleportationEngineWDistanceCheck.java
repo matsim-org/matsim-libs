@@ -13,6 +13,7 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -58,10 +59,15 @@ VisData  {
 	public TeleportationEngineWDistanceCheck(Scenario scenario, EventsManager eventsManager) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
-	}
+}
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+		log.warn("here10") ;
+		if ( !agent.getMode().contains("walk") ) {
+			return false ;
+		}
+		log.warn("here20") ;
 		if ( agent.getExpectedTravelTime()==null || agent.getExpectedTravelTime()==Time.UNDEFINED_TIME ) {
 			Logger.getLogger( this.getClass() ).info( "mode: " + agent.getMode() );
 			throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
@@ -89,7 +95,7 @@ VisData  {
 		return true;
 	}
 
-	private static Double travelTimeCheck(Double travelTime, Double speed, Facility<?> dpfac, Facility<?> arfac) {
+	 static Double travelTimeCheck(Double travelTime, Double speed, Facility<?> dpfac, Facility<?> arfac) {
 		if ( speed==null ) {
 			// if we don't have a bushwhacking speed, the only thing we can do is trust the router
 			return travelTime ;
@@ -158,7 +164,6 @@ VisData  {
 
 	@Override
 	public void onPrepareSim() {
-
 	}
 
 	@Override

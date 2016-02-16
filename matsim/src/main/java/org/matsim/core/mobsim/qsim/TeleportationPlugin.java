@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class TeleportationPlugin extends AbstractQSimPlugin {
-	private boolean withDistanceCheck = true ;
+//	private boolean withDistanceCheck = true ;
 
 	public TeleportationPlugin(Config config) {
 		super(config);
@@ -21,12 +21,12 @@ public class TeleportationPlugin extends AbstractQSimPlugin {
 		result.add(new AbstractModule() {
 			@Override
 			protected void configure() {
-				if ( withDistanceCheck ) {
-					bind(TeleportationEngineWDistanceCheck.class).asEagerSingleton();
-				} else {
+//				if ( withDistanceCheck ) {
+//					bind(TeleportationEngineWDistanceCheck.class).asEagerSingleton();
+//				} else {
 					bind(TeleportationEngine.class).asEagerSingleton();
 				}
-			}
+//			}
 		});
 		return result;
 	}
@@ -34,11 +34,11 @@ public class TeleportationPlugin extends AbstractQSimPlugin {
 	@Override
 	public Collection<Class<? extends MobsimEngine>> engines() {
 		Collection<Class<? extends MobsimEngine>> result = new ArrayList<>();
-		if ( withDistanceCheck ) {
-			result.add(TeleportationEngineWDistanceCheck.class);
-		} else {
+//		if ( withDistanceCheck ) {
+//			result.add(TeleportationEngineWDistanceCheck.class);
+//		} else {
 			result.add(TeleportationEngine.class);
-		}
+//		}
 		return result;
 	}
 }

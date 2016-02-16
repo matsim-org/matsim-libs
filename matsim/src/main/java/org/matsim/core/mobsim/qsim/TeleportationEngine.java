@@ -14,6 +14,7 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -21,12 +22,12 @@ import org.matsim.vis.snapshotwriters.VisData;
 import javax.inject.Inject;
 import java.util.*;
 
+/**
+ * Includes all agents that have transportation modes unknown to the
+ * NetsimEngine (often all != "car") or have two activities on the same link
+ */
 public final class TeleportationEngine implements DepartureHandler, MobsimEngine,
 VisData {
-	/**
-	 * Includes all agents that have transportation modes unknown to the
-	 * QueueSimulation (i.e. != "car") or have two activities on the same link
-	 */
 	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<>(
 			30, new Comparator<Tuple<Double, MobsimAgent>>() {
 
@@ -43,6 +44,8 @@ VisData {
 	private InternalInterface internalInterface;
 	private Scenario scenario;
 	private EventsManager eventsManager;
+	
+	private boolean withTravelTimeCheck = true ;
 
 	@Inject
 	public TeleportationEngine(Scenario scenario, EventsManager eventsManager) {
@@ -55,22 +58,29 @@ VisData {
     	if ( agent.getExpectedTravelTime()==null || agent.getExpectedTravelTime()==Time.UNDEFINED_TIME ) {
     		Logger.getLogger( this.getClass() ).info( "mode: " + agent.getMode() );
     		throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
-    				+ " since otherwise mode choice optimization will eventually lead to all legs teleported.  kai/mz, apr'15") ;
+    				+ " since we cannot guess travel times for arbitrary modes and arbitrary landscapes.  kai/mz, apr'15 & feb'16") ;
     	}
-		double arrivalTime = now + agent.getExpectedTravelTime();
-		this.teleportationList.add(new Tuple<>(arrivalTime,
-				agent));
+
+    	Double travelTime = agent.getExpectedTravelTime() ;
+    	if ( withTravelTimeCheck ) {
+    		Double speed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( agent.getMode() ) ;
+    		Facility<?> dpfac = agent.getCurrentFacility() ;
+    		Facility<?> arfac = agent.getDestinationFacility() ;
+    		travelTime = TeleportationEngineWDistanceCheck.travelTimeCheck(travelTime, speed, dpfac, arfac);
+    	}
+    	
+		double arrivalTime = now + travelTime ;
+		this.teleportationList.add(new Tuple<>(arrivalTime, agent));
+		
+		// === below here is only visualization, no dynamics ===
 		Id<Person> agentId = agent.getId();
-		Link currLink = this.scenario
-				.getNetwork().getLinks().get(linkId);
-		Link destLink = this.scenario
-				.getNetwork().getLinks().get(agent.getDestinationLinkId());
-		double travTime = agent.getExpectedTravelTime();
+		Link currLink = this.scenario .getNetwork().getLinks().get(linkId);
+		Link destLink = this.scenario .getNetwork().getLinks().get(agent.getDestinationLinkId());
 		Coord fromCoord = currLink.getToNode().getCoord();
 		Coord toCoord = destLink.getToNode().getCoord();
-		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId,
-				fromCoord, toCoord, travTime);
+		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travelTime);
 		this.teleportationData.put(agentId, agentInfo);
+		
 		return true;
 	}
 

@@ -43,6 +43,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -919,6 +920,18 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	@Override
 	public Id<Link> chooseNextLinkId() {
 		return this.driverAgentDelegate.chooseNextLinkId() ;
+	}
+
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		return this.basicAgentDelegate.getCurrentFacility();
+	}
+
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		return this.basicAgentDelegate.getDestinationFacility();
+	}
+
+	public final PlanElement getPreviousPlanElement() {
+		return this.basicAgentDelegate.getPreviousPlanElement();
 	}
 
 
