@@ -101,7 +101,7 @@ public class BikeSharingRoutingModule implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		final double directDistance = CoordUtils.calcDistance( fromFacility.getCoord() , toFacility.getCoord() );
+		final double directDistance = CoordUtils.calcEuclideanDistance( fromFacility.getCoord() , toFacility.getCoord() );
 
 		final double maxSearchRadius = directDistance / 3d;
 		final BikeSharingFacility startStation = chooseCloseStation( fromFacility , maxSearchRadius );

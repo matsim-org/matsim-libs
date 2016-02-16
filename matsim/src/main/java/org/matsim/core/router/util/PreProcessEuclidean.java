@@ -74,7 +74,7 @@ public class PreProcessEuclidean extends PreProcessDijkstra {
 	private boolean checkLinkLengths(final Network network) {
 		for (Link link : network.getLinks().values()) {
 			double linkLength = link.getLength();
-			double eucDist = CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
+			double eucDist = CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 			if (linkLength < eucDist) {
 				if (log.isDebugEnabled()) {
 					log.debug("link " + link.getId() + " has length " + linkLength + " which is smaller than the euclidean distance " + eucDist);

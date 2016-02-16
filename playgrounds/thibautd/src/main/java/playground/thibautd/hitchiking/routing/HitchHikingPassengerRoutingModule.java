@@ -83,7 +83,7 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 				fromFacility,
 				toFacility,
 				doSpot);
-		double distance = CoordUtils.calcDistance( puSpot.getCoord() , doSpot.getCoord() );
+		double distance = CoordUtils.calcEuclideanDistance( puSpot.getCoord() , doSpot.getCoord() );
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 
@@ -107,7 +107,7 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 		double egressDeparture = lastPtLeg.getDepartureTime() + lastPtLeg.getTravelTime();
 
 		egressDeparture = egressDeparture == Time.UNDEFINED_TIME ?
-			CoordUtils.calcDistance( fromFacility.getCoord() , doSpot.getCoord() ) * BEEFLY_ESTIMATED_SPEED :
+			CoordUtils.calcEuclideanDistance( fromFacility.getCoord() , doSpot.getCoord() ) * BEEFLY_ESTIMATED_SPEED :
 			egressDeparture + distance * BEEFLY_ESTIMATED_SPEED;
 
 		trip.addAll( ptRoutingModule.calcRoute(
@@ -128,16 +128,16 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 
 		double centerX = (o.getX() + d.getX()) / 2d;
 		double centerY = (o.getY() + d.getY()) / 2d;
-		double maxBeeFlyDist = CoordUtils.calcDistance( o , d ) * (1 + config.getMaximumDetourFraction());
+		double maxBeeFlyDist = CoordUtils.calcEuclideanDistance( o , d ) * (1 + config.getMaximumDetourFraction());
 
 		List<Link> disk = new ArrayList<Link>( spots.getSpots( centerX , centerY , maxBeeFlyDist / 2d ) );
 
 		Iterator<Link> it = disk.iterator();
 		while (it.hasNext()) {
 			Link l = it.next();
-			double dist = CoordUtils.calcDistance( o, l.getCoord() )
-				+ CoordUtils.calcDistance( l.getCoord() , doPoint )
-				+ CoordUtils.calcDistance( doPoint , d );
+			double dist = CoordUtils.calcEuclideanDistance( o, l.getCoord() )
+				+ CoordUtils.calcEuclideanDistance( l.getCoord() , doPoint )
+				+ CoordUtils.calcEuclideanDistance( doPoint , d );
 			if (dist > maxBeeFlyDist) it.remove();
 		}
 

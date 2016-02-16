@@ -55,7 +55,7 @@ public class NetworkFalsifier implements NetworkRunnable {
 		for (Link link : network.getLinks().values()) {
 			Coord fromCoord = link.getFromNode().getCoord();
 			Coord toCoord = link.getToNode().getCoord();
-			link.setLength(CoordUtils.calcDistance(fromCoord, toCoord));
+			link.setLength(CoordUtils.calcEuclideanDistance(fromCoord, toCoord));
 		}
 	}
 

@@ -49,7 +49,7 @@ public class VisumRuns {
 		final Collection<VisumNetwork.Stop> stops = vNetwork.findStops(location, 0.4);
 		System.out.println("found the following stops:");
 		for (VisumNetwork.Stop stop : stops) {
-			System.out.println("id=" + stop.id + " x=" + stop.coord.getX() + " y=" + stop.coord.getY() + " name=" + stop.name + " dist=" + CoordUtils.calcDistance(stop.coord, location));
+			System.out.println("id=" + stop.id + " x=" + stop.coord.getX() + " y=" + stop.coord.getY() + " name=" + stop.name + " dist=" + CoordUtils.calcEuclideanDistance(stop.coord, location));
 		}
 	}
 

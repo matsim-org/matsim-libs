@@ -113,7 +113,7 @@ public class KtiPtRoute extends AbstractRoute {
 	}
 
 	public double calcInVehicleDistance() {
-		return CoordUtils.calcDistance(this.getFromStop().getCoord(), this.getToStop().getCoord()) * CROW_FLY_FACTOR;
+		return CoordUtils.calcEuclideanDistance(this.getFromStop().getCoord(), this.getToStop().getCoord()) * CROW_FLY_FACTOR;
 	}
 
 	protected double calcInVehicleTime() {
@@ -139,8 +139,8 @@ public class KtiPtRoute extends AbstractRoute {
 	public double calcAccessEgressDistance(final Activity fromAct, final Activity toAct) {
 
 		return
-		(CoordUtils.calcDistance(fromAct.getCoord(), this.getFromStop().getCoord()) +
-		CoordUtils.calcDistance(toAct.getCoord(), this.getToStop().getCoord()))
+		(CoordUtils.calcEuclideanDistance(fromAct.getCoord(), this.getFromStop().getCoord()) +
+		CoordUtils.calcEuclideanDistance(toAct.getCoord(), this.getToStop().getCoord()))
 		* CROW_FLY_FACTOR;
 
 	}

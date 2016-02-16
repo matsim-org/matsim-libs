@@ -251,7 +251,7 @@ public abstract class Utils
 	      if (f.getActivityOptions().containsKey("shopgrocery")) {
 	        Coord c = f.getCoord();
 	        if (!retailerFacilities.containsKey(f.getId())) {
-	        	if (CoordUtils.calcDistance(c, center) < 5000)
+	        	if (CoordUtils.calcEuclideanDistance(c, center) < 5000)
 	        		shopsInsideQuadTree.put(c.getX(), c.getY(), f);
 	        }
 	      }
@@ -294,7 +294,7 @@ public static final QuadTree<ActivityFacility> createOutsideShopsQuadTreeWIthout
       if (f.getActivityOptions().containsKey("shopgrocery")) {
         Coord c = f.getCoord();
         if (!retailerFacilities.containsKey(f.getId())) {
-        	if (CoordUtils.calcDistance(c, center) >= 5000)
+        	if (CoordUtils.calcEuclideanDistance(c, center) >= 5000)
         		shopsOutsideQuadTree.put(c.getX(), c.getY(), f);
         	
         }

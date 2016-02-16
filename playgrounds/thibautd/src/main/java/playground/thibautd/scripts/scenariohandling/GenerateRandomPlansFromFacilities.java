@@ -148,7 +148,7 @@ public class GenerateRandomPlansFromFacilities {
 		for ( int i=0; i < weights.length; i++ ) {
 			weights[ i ] = Math.exp(
 					betaDist *
-					CoordUtils.calcDistance(
+					CoordUtils.calcEuclideanDistance(
 						home,
 						nonHomeLocations.get( i ).getCoord() ) );
 			if ( weights[ i ] == Double.POSITIVE_INFINITY ) throw new RuntimeException();

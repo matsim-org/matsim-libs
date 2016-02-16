@@ -163,7 +163,7 @@ public class MembershipGenerationFreeFloating {
 		boolean insideBorders = false;
 		
 		Activity a = (Activity) p.getSelectedPlan().getPlanElements().get(0);
-		if (CoordUtils.calcDistance(a.getCoord(), coord) < 10000)
+		if (CoordUtils.calcEuclideanDistance(a.getCoord(), coord) < 10000)
 			insideBorders = true;
 		return insideBorders;
 	}

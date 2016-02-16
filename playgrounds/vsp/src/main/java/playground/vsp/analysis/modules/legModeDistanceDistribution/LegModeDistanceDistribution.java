@@ -254,7 +254,7 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 							String legMode = leg.getMode();
 							Coord from = plan.getPreviousActivity(leg).getCoord();
 							Coord to = plan.getNextActivity(leg).getCoord();
-							Double legBeelineDist = CoordUtils.calcDistance(from, to);
+							Double legBeelineDist = CoordUtils.calcEuclideanDistance(from, to);
 
 							if(legMode.equals(mode)){
 								if(legBeelineDist > this.distanceClasses.get(i) && legBeelineDist <= this.distanceClasses.get(i + 1)){
@@ -298,7 +298,7 @@ public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 					Leg leg = (Leg) pe;
 					Coord from = plan.getPreviousActivity(leg).getCoord();
 					Coord to = plan.getNextActivity(leg).getCoord();
-					Double legBeelineDist = CoordUtils.calcDistance(from, to);
+					Double legBeelineDist = CoordUtils.calcEuclideanDistance(from, to);
 					
 					if(legBeelineDist > longestBeelineDistance){
 						longestBeelineDistance = legBeelineDist;

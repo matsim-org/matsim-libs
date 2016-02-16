@@ -277,7 +277,7 @@ public class SocialNetworkedPopulationDilutionUtils {
 		for ( Activity activity : TripStructureUtils.getActivities( p.getSelectedPlan() , EmptyStageActivityTypes.INSTANCE ) ) {
 			if ( activity.getCoord() == null ) throw new NullPointerException( "no coord for activity "+activity+" for person "+p );
 
-			if ( CoordUtils.calcDistance( center , activity.getCoord() ) < radius ) return true;
+			if ( CoordUtils.calcEuclideanDistance( center , activity.getCoord() ) < radius ) return true;
 
 			if ( lastCoord != null &&
 					CoordUtils.distancePointLinesegment(

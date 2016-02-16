@@ -798,7 +798,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			leg.setTravelTime(thirdLegTravelTime);
 			Route route3 = new GenericRouteImpl(link5.getId(), link7.getId());
 			route3.setTravelTime(thirdLegTravelTime);
-			route3.setDistance(CoordUtils.calcDistance(link5.getCoord(), link7.getCoord()));
+			route3.setDistance(CoordUtils.calcEuclideanDistance(link5.getCoord(), link7.getCoord()));
 			leg.setRoute(route3);
 
 			ActivityImpl fourthActivity = this.plan.createAndAddActivity("w", link7.getId());
@@ -809,7 +809,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			leg.setTravelTime(fourthLegTravelTime);
 			Route route4 = new GenericRouteImpl(link7.getId(), link9.getId());
 			route4.setTravelTime(fourthLegTravelTime);
-			route4.setDistance(CoordUtils.calcDistance(link7.getCoord(), link9.getCoord()));
+			route4.setDistance(CoordUtils.calcEuclideanDistance(link7.getCoord(), link9.getCoord()));
 			leg.setRoute(route4);
 
 			ActivityImpl fifthActivity = this.plan.createAndAddActivity("h", link9.getId());

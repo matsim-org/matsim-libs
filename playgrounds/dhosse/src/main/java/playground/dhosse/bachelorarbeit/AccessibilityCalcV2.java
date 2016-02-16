@@ -58,7 +58,7 @@ public class AccessibilityCalcV2 {
 			
 			Link nearestLink = network.getNearestLinkExactly(coord);
 			
-			double distance_meter = CoordUtils.calcDistance(coord, nearestLink.getCoord());
+			double distance_meter = CoordUtils.calcEuclideanDistance(coord, nearestLink.getCoord());
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
 			
 			this.freeSpeedGrid.setValue(walkTravelTime_h, p);

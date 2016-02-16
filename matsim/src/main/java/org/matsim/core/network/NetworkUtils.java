@@ -285,7 +285,7 @@ public class NetworkUtils {
 	 *
 	 */
 	public static double getEuclideanDistance(Coord origin, Coord destination){
-		return CoordUtils.calcDistance(origin, destination);
+		return CoordUtils.calcEuclideanDistance(origin, destination);
 	}
 
 	/** 

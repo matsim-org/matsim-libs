@@ -197,7 +197,7 @@ public class CreateDemand {
 		Coord closest = null;
 		double closestDistance = Double.MAX_VALUE;
 		for (Coord coord : coordMap.values()){
-			double distance = CoordUtils.calcDistance(coord, location);
+			double distance = CoordUtils.calcEuclideanDistance(coord, location);
 			if (distance<closestDistance) {
 				closestDistance = distance;
 				closest = coord;

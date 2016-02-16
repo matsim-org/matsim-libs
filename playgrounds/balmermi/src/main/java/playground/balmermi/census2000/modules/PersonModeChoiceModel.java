@@ -85,7 +85,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 				} else {
 					Activity act = (Activity) pe;
 					if (prevAct != null) {
-						plan_dist += CoordUtils.calcDistance(act.getCoord(), prevAct.getCoord());
+						plan_dist += CoordUtils.calcEuclideanDistance(act.getCoord(), prevAct.getCoord());
 						String type = act.getType();
 						if (mainpurpose == 1){
 							if (type == W) { mainpurpose = 0; break; }

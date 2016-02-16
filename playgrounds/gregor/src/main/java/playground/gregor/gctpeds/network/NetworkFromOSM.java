@@ -210,7 +210,7 @@ public class NetworkFromOSM {
 		double cap = Double.parseDouble(w.getTags().get("width"))*0.3048; //width in feet
 		Node n0 = net.getNodes().get(id0);
 		Node n1 = net.getNodes().get(id1);
-		double length = CoordUtils.calcDistance(n0.getCoord(), n1.getCoord());
+		double length = CoordUtils.calcEuclideanDistance(n0.getCoord(), n1.getCoord());
 		
 		Link l = fac.createLink(Id.createLinkId(this.lId++), n0, n1);
 		l.setLength(length);

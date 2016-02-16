@@ -175,7 +175,7 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 	private double getCriteriaFromPath(VrpPathWithTravelData path) {
 		switch (cost) {
 		case BEELINE:
-			return CoordUtils.calcDistance(path.getFromLink().getCoord(), path.getToLink().getCoord());
+			return CoordUtils.calcEuclideanDistance(path.getFromLink().getCoord(), path.getToLink().getCoord());
 			
 		case ARRIVALTIME:
 			return path.getArrivalTime();

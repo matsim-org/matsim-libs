@@ -291,7 +291,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			l0.setCapacity(capacity);
 			l0.setFreespeed(fs);
 			l0.setNumberOfLanes(nofLanes);
-			double l = CoordUtils.calcDistance(n1.getCoord(), n2.getCoord());
+			double l = CoordUtils.calcEuclideanDistance(n1.getCoord(), n2.getCoord());
 			l0.setLength(l);
 			l0.setAllowedModes(modes);
 			net.addLink(l0);

@@ -86,7 +86,7 @@ public class DistanceDistributionStage {
 						chain.modes.add("car");
 					}
 					else if(leg.getMode().equals("transit_walk")) {
-						chain.distances.add(CoordUtils.calcDistance(network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord()));
+						chain.distances.add(CoordUtils.calcEuclideanDistance(network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord()));
 						if(((Activity)elements.get(i-1)).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)||((Activity)elements.get(i+1)).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
 							chain.modes.add("transit_walk");
 						else

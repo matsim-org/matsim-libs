@@ -98,9 +98,9 @@ public class RouterManager {
 								if(((TransitRouterNetworkLink)link).getRoute()!=null)
 									distances[PT_POSITION] += RouteUtils.calcDistance(((TransitRouterNetworkLink)link).getRoute().getRoute().getSubRoute(((TransitRouterNetworkLink)link).getFromNode().stop.getStopFacility().getLinkId(), ((TransitRouterNetworkLink)link).getToNode().stop.getStopFacility().getLinkId()), scenario.getNetwork());
 								else if(((TransitRouterNetworkLink)link).getFromNode().getRoute()==null && ((TransitRouterNetworkLink)link).getToNode().getRoute()==null)
-									distances[PT_POSITION] += CoordUtils.calcDistance(((TransitRouterNetworkLink)link).getFromNode().getCoord(), ((TransitRouterNetworkLink)link).getToNode().getCoord());
-							double startDistance = CoordUtils.calcDistance(prev.getCoord(), path.nodes.get(0).getCoord());
-							double endDistance = CoordUtils.calcDistance(path.nodes.get(path.nodes.size()-1).getCoord(), next.getCoord());
+									distances[PT_POSITION] += CoordUtils.calcEuclideanDistance(((TransitRouterNetworkLink)link).getFromNode().getCoord(), ((TransitRouterNetworkLink)link).getToNode().getCoord());
+							double startDistance = CoordUtils.calcEuclideanDistance(prev.getCoord(), path.nodes.get(0).getCoord());
+							double endDistance = CoordUtils.calcEuclideanDistance(path.nodes.get(path.nodes.size()-1).getCoord(), next.getCoord());
 							distances[PT_POSITION] += startDistance;
 							distances[PT_POSITION] += endDistance;
 							costs[PT_POSITION] += startDistance/walkSpeed * (0 - scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0);
@@ -108,7 +108,7 @@ public class RouterManager {
 						}
 						else
 							distances[PT_POSITION] = Double.POSITIVE_INFINITY;
-						distances[WALK_POSITION] = CoordUtils.calcDistance(prev.getCoord(), next.getCoord());
+						distances[WALK_POSITION] = CoordUtils.calcEuclideanDistance(prev.getCoord(), next.getCoord());
 						costs[WALK_POSITION] = distances[WALK_POSITION]/walkSpeed * (0 - scenario.getConfig().planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0);
 						int bestPosition = getBestPosition(costs);
 						for(int p = 0; p<NUM_MODES; p++)

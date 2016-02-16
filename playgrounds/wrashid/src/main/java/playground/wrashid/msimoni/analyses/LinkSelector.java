@@ -33,7 +33,7 @@ public class LinkSelector {
 		for (Link link : network.getLinks().values()) {
 			if (link.getLength() < length) continue;
 			
-			double d = CoordUtils.calcDistance(center, link.getCoord());
+			double d = CoordUtils.calcEuclideanDistance(center, link.getCoord());
 			if (d < distance) {
 				System.out.println(link.getId().toString());
 				selectedLinks.put(link.getId(), link);

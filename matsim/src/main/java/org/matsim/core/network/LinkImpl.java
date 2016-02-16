@@ -105,7 +105,7 @@ public class LinkImpl implements Link {
 		this.checkCapacitiySemantics();
 		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
-		this.euklideanDist = CoordUtils.calcDistance(this.from.getCoord(), this.to.getCoord());
+		this.euklideanDist = CoordUtils.calcEuclideanDistance(this.from.getCoord(), this.to.getCoord());
 		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
 			loopWarnCnt++ ;
 			log.warn("[from=to=" + this.to + " link is a loop]");

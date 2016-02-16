@@ -120,9 +120,9 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 			route.setTravelTime(travTime);
 			double dist = 0;
 			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
-				dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
+				dist = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord());
 			} else {
-				dist = CoordUtils.calcDistance(fromLink.getCoord(), toLink.getCoord());
+				dist = CoordUtils.calcEuclideanDistance(fromLink.getCoord(), toLink.getCoord());
 			}
 			route.setDistance(dist * beelineDistanceFactor);
 			leg.setRoute(route);

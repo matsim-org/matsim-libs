@@ -66,7 +66,7 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 	}
 
 	public final double calcDistance(Coord otherCoord) {
-		return CoordUtils.calcDistance(this.coord, otherCoord);
+		return CoordUtils.calcEuclideanDistance(this.coord, otherCoord);
 	}
 
 	public final ActivityOptionImpl createAndAddActivityOption(final String type) {

@@ -215,7 +215,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 				/*
 				 * Check the distance to the car. 
 				 */
-				double distance = CoordUtils.calcDistance(carCoord, previousCoord);
+				double distance = CoordUtils.calcEuclideanDistance(carCoord, previousCoord);
 				if (distance > maxDistance) {
 					/* 
 					 * Idea:

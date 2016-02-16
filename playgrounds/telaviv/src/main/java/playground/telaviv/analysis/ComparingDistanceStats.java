@@ -102,7 +102,7 @@ public class ComparingDistanceStats implements IterationEndsListener {
 							else distance = RouteUtils.calcDistance((NetworkRoute) route, event.getServices().getScenario().getNetwork());
 						} else {
 							if (route.getDistance() != Double.NaN) distance = route.getDistance();
-							else distance = CoordUtils.calcDistance(((Activity) pe).getCoord(), plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord());
+							else distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), plan.getPreviousActivity(plan.getPreviousLeg((Activity)pe)).getCoord());
 						}
 						this.bins.addVal(distance, 1.0);
 					}	

@@ -114,7 +114,7 @@ public class AnalyzeAsArentze {
 					writer.write( "\t"+alter.getAgeCategory() );
 					writer.write( "\t"+(ego.isMale() ? "m" : "f" ) );
 					writer.write( "\t"+(alter.isMale() ? "m" : "f" ) );
-					writer.write( "\t"+CoordUtils.calcDistance( ego.getCoord() , alter.getCoord() ) );
+					writer.write( "\t"+CoordUtils.calcEuclideanDistance( ego.getCoord() , alter.getCoord() ) );
 				}
 			}
 			counter.printCounter();

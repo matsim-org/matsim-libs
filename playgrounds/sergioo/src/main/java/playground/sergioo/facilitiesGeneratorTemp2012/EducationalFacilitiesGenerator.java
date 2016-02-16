@@ -124,7 +124,7 @@ public class EducationalFacilitiesGenerator {
 		int zip=-1;
 		double nearest = Double.MAX_VALUE;
 		for(Entry<Integer, Coord> postalCode: allPostalCodes.entrySet()) {
-			double distance = CoordUtils.calcDistance(postalCode.getValue(), coord);
+			double distance = CoordUtils.calcEuclideanDistance(postalCode.getValue(), coord);
 			if(distance<nearest) {
 				zip = postalCode.getKey();
 				nearest = distance;
