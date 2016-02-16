@@ -69,8 +69,13 @@ public class PlanRouterTest {
         Id<Vehicle> vehicleId = Id.create(1, Vehicle.class);
         ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).setVehicleId(vehicleId);
         testee.run(plan);
-        Assert.assertEquals("Vehicle Id transferred to new Plan", vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
-        // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
+
+        if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+      	  Assert.assertEquals("Vehicle Id transferred to new Plan", vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
+        } else {
+      	  Assert.assertEquals("Vehicle Id transferred to new Plan", vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
+      	  // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
+        }
     }
 
     @Test
@@ -91,12 +96,16 @@ public class PlanRouterTest {
         final RoutingModule routingModule = new RoutingModule() {
               @Override
               public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
-                  List<? extends PlanElement> trip = DefaultRoutingModules.createNetworkRouter("car", scenario.getPopulation().getFactory(), 
+                  List<? extends PlanElement> trip = DefaultRoutingModules.createPureNetworkRouter("car", scenario.getPopulation().getFactory(), 
                   		scenario.getNetwork(), 
                   		leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime, config.planCalcScore()), travelTime)
                   		).calcRoute(fromFacility, toFacility, departureTime, person);
-                  ((NetworkRoute) TripStructureUtils.getLegs(trip).get(1).getRoute()).setVehicleId(newVehicleId);
-                  // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
+                  if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+                        ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute()).setVehicleId(newVehicleId);
+                  } else {
+                        ((NetworkRoute) TripStructureUtils.getLegs(trip).get(1).getRoute()).setVehicleId(newVehicleId);
+                        // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
+                  }
                   return trip;
               }
 
@@ -123,8 +132,12 @@ public class PlanRouterTest {
 
         PlanRouter testee = new PlanRouter(tripRouter);
         testee.run(plan);
-        Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
-        // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
+        if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+              Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
+        } else {
+              Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
+              // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
+        }
 
     }
 

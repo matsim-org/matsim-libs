@@ -43,7 +43,7 @@ public class BushwhackingRoutingModule implements RoutingModule {
 		params.setTeleportedModeSpeed(2.0);
 		teleportationLegRouter = DefaultRoutingModules.createTeleportationRouter("unknown", pf, params ) ; 
 		TravelTime ttc = new FreeSpeedTravelTime();
-		networkLegRouter = DefaultRoutingModules.createNetworkRouter("unknown", pf, 
+		networkLegRouter = DefaultRoutingModules.createPureNetworkRouter("unknown", pf, 
 				network, new Dijkstra(network, new OnlyTimeDependentTravelDisutility(ttc), ttc) );
 	}
 

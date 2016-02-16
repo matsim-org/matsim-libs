@@ -51,7 +51,7 @@ public class CARoutingModule implements Provider<RoutingModule> {
 
 	@Override
 	public RoutingModule get() {
-		return DefaultRoutingModules.createNetworkRouter(TransportMode.walkca, scenario.getPopulation()
+		return DefaultRoutingModules.createPureNetworkRouter(TransportMode.walkca, scenario.getPopulation()
 				.getFactory(), scenario.getNetwork(), createRoutingAlgo());
 	}
 

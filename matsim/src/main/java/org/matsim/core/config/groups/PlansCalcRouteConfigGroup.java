@@ -432,11 +432,6 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		addParameterSet( pars );
 	}
 	
-//	@SuppressWarnings("static-method")
-//	public double getBeelineDistanceFactor() {
-//		return beelineDistanceFactor;
-//	}
-
 	@Deprecated // use mode-specific beeline distance factors!
 	public void setBeelineDistanceFactor(double val) {
 		testForLocked() ;
@@ -452,6 +447,11 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 	}
 
+	@SuppressWarnings("static-method")
+	public boolean isInsertingAccessEgressWalk() {
+		// not outside-configurable for the time being. kai, feb'16
+		return false ;
+	}
 
 
 }

@@ -82,11 +82,17 @@ public class EditRoutesTest extends MatsimTestCase {
 	public void testReplanFutureLegRoute() {
 		// this is ok (we can still replan a single leg with the computer science router). kai, dec'15
 		
-		int firstCarLeg = 3 ; // 1-->3	
-		int scndCarLeg = 9 ; // 3-->9
-
-		
 		createScenario();
+		
+		
+		int firstCarLeg = 1 ; // 1-->3	
+		int scndCarLeg = 3 ; // 3-->9
+		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+			firstCarLeg = 3 ; // 1-->3	
+			scndCarLeg = 9 ; // 3-->9
+		}
+
+
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, routeFactory);
 		
 		Leg legHW = (Leg) plan.getPlanElements().get(firstCarLeg);
@@ -134,18 +140,27 @@ public class EditRoutesTest extends MatsimTestCase {
 		// yyyy this test is misleading.  "relocateFutureLegRoute"  is ok, but it does not look after the overall plan consistency, 
 		// as this test implies.  kai, feb'16
 		
-		int firstCarLeg = 3 ; // 1-->3	
-		int scndCarLeg = 9 ; // 3-->9
-
 
 		createScenario();
+
+		int firstCarLeg = 1 ; // 1-->3	
+		int scndAct = 2 ;
+		int scndCarLeg = 3 ; // 3-->9
+		int thrdAct = 4 ;
+		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+			firstCarLeg = 3 ; // 1-->3
+			scndAct = 6 ;
+			scndCarLeg = 9 ; // 3-->9
+			thrdAct = 12 ;
+		}
+
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, routeFactory);
 		
 		Activity activityH1 = (Activity) plan.getPlanElements().get(0);
 		Leg legHW = (Leg) plan.getPlanElements().get(firstCarLeg);
-		Activity activityW1 = (Activity) plan.getPlanElements().get(6);
+		Activity activityW1 = (Activity) plan.getPlanElements().get(scndAct);
 		Leg legWH = (Leg) plan.getPlanElements().get(scndCarLeg);
-		Activity activityH2 = (Activity) plan.getPlanElements().get(12);
+		Activity activityH2 = (Activity) plan.getPlanElements().get(thrdAct);
 		
 		// create new, empty routes and set them in the Legs
 		NetworkRoute networkRouteHW = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(
@@ -205,11 +220,18 @@ public class EditRoutesTest extends MatsimTestCase {
 	 */
 	public void testReplanCurrentLegRoute() {
 		// this is ok (we can still replan a single leg with the computer science router). kai, dec'15
-		int firstCarLeg = 3 ; // 1-->3	
-		int scndCarLeg = 9 ; // 3-->9
-		
 		
 		createScenario();
+		
+		int firstCarLeg = 1 ; // 1-->3	
+		int scndCarLeg = 3 ; // 3-->9
+		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) { 
+			firstCarLeg = 3 ; // 1-->3	
+			scndCarLeg = 9 ; // 3-->9
+		}
+
+
+		
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, routeFactory);
 		
 		ActivityImpl activityW1 = null;

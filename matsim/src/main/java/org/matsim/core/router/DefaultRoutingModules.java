@@ -56,13 +56,16 @@ public final class DefaultRoutingModules {
                 params.getBeelineDistanceFactor() );
 	}
 
-	public static RoutingModule createNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
-//		return new NetworkRoutingModule(	
-//				mode,
-//				popFact,
-//				net,
-//				routeAlgo,
-//				((PopulationFactoryImpl) popFact).getModeRouteFactory() );
+	public static RoutingModule createPureNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
+		return new NetworkRoutingModule(	
+				mode,
+				popFact,
+				net,
+				routeAlgo,
+				((PopulationFactoryImpl) popFact).getModeRouteFactory() );
+	}
+	
+	public static RoutingModule createAccessEgressNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
 		return new NetworkRoutingInclEgressAccessModule(
 				mode,
 				popFact,
