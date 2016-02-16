@@ -23,6 +23,7 @@ package org.matsim.core.config;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
+import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.*;
 import org.matsim.pt.config.TransitConfigGroup;
@@ -174,6 +175,7 @@ public class Config implements MatsimExtensionPoint {
 		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, this.changeLegMode);
 
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
+		this.addConfigConsistencyChecker(new UnmaterializedConfigGroupChecker());
 	}
 
 	/**

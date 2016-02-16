@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
@@ -58,7 +59,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 		this.eventsByPerson = null;
 		this.vehicleToDriver = null;
 		this.allEvents = null;
-		SimulationParameters.reset(); // SimulationParameter contains a Map containing Links which refer to the Network, give that free for GC
+		Road.getAllRoads().clear(); // SimulationParameter contains a Map containing Links which refer to the Network, give that free for GC
 		super.tearDown();
 	}
 
@@ -66,7 +67,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(new PersonEventCollector());
 		events.initProcessing();
-		new JDEQSimulation(scenario, events).run();
+		new JDEQSimulation(ConfigUtils.addOrGetModule(scenario.getConfig(), JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class), scenario, events).run();
 		events.finishProcessing();
 	}
 
