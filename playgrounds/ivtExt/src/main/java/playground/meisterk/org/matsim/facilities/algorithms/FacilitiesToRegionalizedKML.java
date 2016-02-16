@@ -37,7 +37,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
-import playground.meisterk.org.matsim.run.facilities.ShopsOf2005ToFacilities.Day;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -81,7 +80,6 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 	final int MONDAY_DAY = 21;
 
 	private static final Logger log = Logger.getLogger(FacilitiesToRegionalizedKML.class);
-	private static final Day[] days = Day.values();
 
 	// documentName should become the facilities::name
 	private String documentName = null;
@@ -136,6 +134,7 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 
 	}
 
+	@Override
 	public void run(final ActivityFacility facility) {
 
 		PlacemarkType aShopOpeningPeriod = null;
@@ -156,7 +155,6 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 
 		// have to iterate this over opening times
 		int dayCounter = 0;
-		for (Day day : days) {
 			if (facility.getActivityOptions().get(ACTIVITY_TYPE_SHOP) != null) {
 				Set<OpeningTime> dailyOpentimes = facility.getActivityOptions().get(ACTIVITY_TYPE_SHOP).getOpeningTimes();
 				if (dailyOpentimes != null) {
@@ -180,7 +178,6 @@ public class FacilitiesToRegionalizedKML extends AbstractFacilityAlgorithm {
 						aTimeSpanType.setEnd("2008-04-" + Integer.toString(this.MONDAY_DAY + dayCounter) + "T" + Time.writeTime(opentime.getEndTime()) + "+01:00");
 					}
 				}
-			}
 			dayCounter++;
 		}
 	}

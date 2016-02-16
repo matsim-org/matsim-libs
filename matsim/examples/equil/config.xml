@@ -71,8 +71,4 @@
 		<param name="Module_2" value="ReRoute" />
 	</module>
 
-	<module name="otfvis">
-	  <param name="coloringScheme" value="byId" />
-	</module>
-
 </config>

@@ -96,7 +96,7 @@ public class RouterManager {
 						if(path!=null) {
 							for(Link link:path.links)
 								if(((TransitRouterNetworkLink)link).getRoute()!=null)
-									distances[PT_POSITION] += RouteUtils.calcDistance(((TransitRouterNetworkLink)link).getRoute().getRoute().getSubRoute(((TransitRouterNetworkLink)link).getFromNode().stop.getStopFacility().getLinkId(), ((TransitRouterNetworkLink)link).getToNode().stop.getStopFacility().getLinkId()), scenario.getNetwork());
+									distances[PT_POSITION] += RouteUtils.calcDistanceExcludingStartEndLink(((TransitRouterNetworkLink)link).getRoute().getRoute().getSubRoute(((TransitRouterNetworkLink)link).getFromNode().stop.getStopFacility().getLinkId(), ((TransitRouterNetworkLink)link).getToNode().stop.getStopFacility().getLinkId()), scenario.getNetwork());
 								else if(((TransitRouterNetworkLink)link).getFromNode().getRoute()==null && ((TransitRouterNetworkLink)link).getToNode().getRoute()==null)
 									distances[PT_POSITION] += CoordUtils.calcDistance(((TransitRouterNetworkLink)link).getFromNode().getCoord(), ((TransitRouterNetworkLink)link).getToNode().getCoord());
 							double startDistance = CoordUtils.calcDistance(prev.getCoord(), path.nodes.get(0).getCoord());

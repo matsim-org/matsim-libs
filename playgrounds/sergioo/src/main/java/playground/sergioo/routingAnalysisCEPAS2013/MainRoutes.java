@@ -182,7 +182,7 @@ public class MainRoutes {
 	protected static float getDistance(Network network, TransitSchedule transitSchedule, String[] parts) {
 		Id<Link> fromLinkId = transitSchedule.getFacilities().get(Id.create(parts[1], ActivityFacility.class)).getLinkId();
 		Id<Link> toLinkId = transitSchedule.getFacilities().get(Id.create(parts[4], ActivityFacility.class)).getLinkId();
-		return (float)RouteUtils.calcDistance(transitSchedule.getTransitLines().get(Id.create(parts[2], TransitLine.class)).getRoutes().get(Id.create(parts[3], TransitRoute.class)).getRoute().getSubRoute(fromLinkId, toLinkId), network);
+		return (float)RouteUtils.calcDistanceExcludingStartEndLink(transitSchedule.getTransitLines().get(Id.create(parts[2], TransitLine.class)).getRoutes().get(Id.create(parts[3], TransitRoute.class)).getRoute().getSubRoute(fromLinkId, toLinkId), network);
 	}
 	
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {

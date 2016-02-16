@@ -19,7 +19,6 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.facilities.OpeningTime.DayType;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
@@ -87,8 +86,8 @@ public class EducationalFacilitiesGenerator {
 						option = ((ActivityFacilityImpl) facility).createAndAddActivityOption(EDUCATION_ACTIVITY_TYPES[eduType]);
 					else
 						capacity = option.getCapacity();
-					option.setCapacity((double)((int)(capacity+educationalFacilitiesResult.getDouble(2))));
-					option.addOpeningTime(new OpeningTimeImpl(DayType.wkday, EDUCATION_START_TIMES[eduType], EDUCATION_START_TIMES[eduType]+EDUCATION_DURATIONS[eduType]));
+					option.setCapacity(((int)(capacity+educationalFacilitiesResult.getDouble(2))));
+					option.addOpeningTime(new OpeningTimeImpl(EDUCATION_START_TIMES[eduType], EDUCATION_START_TIMES[eduType]+EDUCATION_DURATIONS[eduType]));
 				}	
 			}
 		}

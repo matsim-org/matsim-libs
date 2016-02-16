@@ -111,7 +111,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 
 			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 				Route route = leg.getRoute();
-				dist = RouteUtils.calcDistance((NetworkRoute) route, network);
+				dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, network);
 				tmpScore += this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m * ktiConfigGroup.getDistanceCostCar()/1000d * dist;
 			}
 			tmpScore += travelTime * this.params.modeParams.get(TransportMode.car).marginalUtilityOfTraveling_s;

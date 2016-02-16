@@ -39,6 +39,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -225,7 +226,7 @@ public class MiniScenarioMultiRun {
 		// "100.0"); // instead of 1800.0
 		// scenario.getConfig().setParam("JDEQSim", "storageCapacityFactor",
 		// "5.0"); // instead of 1.0
-		Mobsim sim = new JDEQSimulation(scenario, eventsManager);
+		Mobsim sim = new JDEQSimulation(ConfigUtils.addOrGetModule(scenario.getConfig(), JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class), scenario, eventsManager);
 		sim.run();
 
 		// QSimConfigGroup conf = new QSimConfigGroup();

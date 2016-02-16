@@ -111,7 +111,7 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 					if (mode.equalsIgnoreCase(TransportMode.car)) {
 						// if pe is a leg
 						Route route = leg.getRoute();
-						distance = RouteUtils.calcDistance(
+						distance = RouteUtils.calcDistanceExcludingStartEndLink(
 								(NetworkRoute) route, network);
 					}
 					else if(mode.equalsIgnoreCase(TransportMode.pt)){

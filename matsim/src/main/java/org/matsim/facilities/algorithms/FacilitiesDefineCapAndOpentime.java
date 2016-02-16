@@ -28,7 +28,6 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.facilities.OpeningTime.DayType;
 
 public class FacilitiesDefineCapAndOpentime {
 
@@ -87,27 +86,27 @@ public class FacilitiesDefineCapAndOpentime {
 				ActivityOptionImpl a = (ActivityOptionImpl) a_it.next();
 				if (a.getType().equals("home")) {
 					a.setCapacity(this.nof_persons/home_cnt);
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wk, TIME_0000, TIME_2400));
+					a.addOpeningTime(new OpeningTimeImpl(TIME_0000, TIME_2400));
 				}
 				else if (a.getType().equals("work")) {
 					a.setCapacity(this.nof_persons/work_cnt);
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0800, TIME_1800));
+					a.addOpeningTime(new OpeningTimeImpl(TIME_0800, TIME_1800));
 				}
 				else if (a.getType().equals("education")) {
 					a.setCapacity(this.nof_persons/educ_cnt);
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0800, TIME_1200));
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1300, TIME_1700));
+					a.addOpeningTime(new OpeningTimeImpl(TIME_0800, TIME_1200));
+					a.addOpeningTime(new OpeningTimeImpl(TIME_1300, TIME_1700));
 				}
 				else if (a.getType().equals("shop")) {
 					a.setCapacity(this.nof_persons/shop_cnt);
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0830, TIME_1200));
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1330, TIME_2000));
-					a.addOpeningTime(new OpeningTimeImpl(DayType.sat, TIME_0900, TIME_1700));
+					a.addOpeningTime(new OpeningTimeImpl(TIME_0830, TIME_1200));
+					a.addOpeningTime(new OpeningTimeImpl(TIME_1330, TIME_2000));
+					a.addOpeningTime(new OpeningTimeImpl(TIME_0900, TIME_1700));
 				}
 				else if (a.getType().equals("leisure")) {
 					a.setCapacity(this.nof_persons/leis_cnt);
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1700, TIME_2400));
-					a.addOpeningTime(new OpeningTimeImpl(DayType.wkend, TIME_2000, TIME_2400));
+					a.addOpeningTime(new OpeningTimeImpl(TIME_1700, TIME_2400));
+					a.addOpeningTime(new OpeningTimeImpl(TIME_2000, TIME_2400));
 				}
 				else { throw new RuntimeException("[something is wrong!]"); }
 			}

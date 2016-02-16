@@ -7,7 +7,7 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.core.mobsim.jdeqsim.DeadlockPreventionMessage;
 import org.matsim.core.mobsim.jdeqsim.EventMessage;
 import org.matsim.core.mobsim.jdeqsim.Message;
-import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
 /*
@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.jdeqsim.util.Timer;
 public class MessageExecutor extends Thread {
 
 	PScheduler scheduler = null;
+	double simulationEndTime = Double.MAX_VALUE;
 	int numberOfMessagesProcessed = 0;
 	int missedNumberOfLocks = 0;
 	int id;
@@ -80,8 +81,7 @@ public class MessageExecutor extends Thread {
 		LinkedList<Message> list = new LinkedList<Message>();
 		while (!(scheduler.getQueue().isEmpty() && scheduler.getQueue()
 				.isListEmptyWitnessedByAll())
-				&& scheduler.getSimTime() < SimulationParameters
-						.getSimulationEndTime()) {
+				&& scheduler.getSimTime() < simulationEndTime) {
 			list = scheduler.getQueue().getNextMessages(list);
 			// m=scheduler.queue.getNextMessage();
 

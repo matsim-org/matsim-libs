@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.OpeningTime.DayType;
 import org.xml.sax.Attributes;
 
 /**
@@ -107,17 +106,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 	
 	private void startOpentime(final Attributes atts) {
-		DayType day = getDayType(atts.getValue("day"));
-		this.curractivity.addOpeningTime(new OpeningTimeImpl(day, Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time"))));
-	}
-
-	
-	private DayType getDayType(String dt){
-		for (DayType d : DayType.values()) {
-			if (d.toString().equalsIgnoreCase(dt))
-				return d;
-		}
-		throw new IllegalArgumentException("Cannot detect daytype for String: " + dt);
+		this.curractivity.addOpeningTime(new OpeningTimeImpl(Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time"))));
 	}
 
 	/**

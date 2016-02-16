@@ -26,9 +26,6 @@ import org.matsim.core.api.internal.MatsimFacilitiesObject;
  */
 public interface OpeningTime extends Comparable<OpeningTime>, MatsimFacilitiesObject {
 	
-	@Deprecated
-	public enum DayType {mon, tue, wed, thu, fri, sat, sun, wkday, wkend, wk}
-	
 	public double getStartTime();
 	
 	public void setStartTime(double starttime);
