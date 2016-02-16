@@ -198,7 +198,7 @@ public abstract class Gbl {
 			throw new RuntimeException("assertion error; follow stack trace") ;
 		}
 	}
-	public static void assertNonNull( Object obj ) {
+	public static void assertNotNull( Object obj ) {
 		if ( obj==null ) {
 			throw new RuntimeException( "object is null; follow stack trace" ) ;
 		}

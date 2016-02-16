@@ -103,7 +103,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 
 	@Override
 	public final void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
-		Gbl.assertNonNull(linkId);
+		Gbl.assertNotNull(linkId);
 		this.setCurrentLinkId( linkId ) ;
 	}
 

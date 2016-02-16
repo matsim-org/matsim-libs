@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -44,7 +44,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.PtConstants;
 
 
 /**
@@ -97,7 +96,7 @@ public final class NetworkRoutingInclEgressAccessModule implements RoutingModule
 
 				Coord accessActCoord = network.getLinks().get( fromFacility.getLinkId() ).getToNode().getCoord() ;
 				// yy maybe use orthogonal distance instead?
-				Assert.assertNotNull( accessActCoord );
+				Gbl.assertNotNull( accessActCoord );
 
 				Leg accessLeg = this.populationFactory.createLeg( TransportMode.access_walk ) ;
 				accessLeg.setDepartureTime( now );
@@ -126,7 +125,7 @@ public final class NetworkRoutingInclEgressAccessModule implements RoutingModule
 
 				Coord egressActCoord = network.getLinks().get( egressActLinkId ).getToNode().getCoord() ;
 				// yy maybe use orthogonal distance instead?
-				Assert.assertNotNull( egressActCoord );
+				Gbl.assertNotNull( egressActCoord );
 
 				result.add( createInteractionActivity( egressActCoord, egressActLinkId ) ) ;
 

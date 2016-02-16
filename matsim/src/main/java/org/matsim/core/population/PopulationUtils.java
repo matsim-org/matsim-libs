@@ -373,7 +373,7 @@ public final class PopulationUtils {
 		// the following might eventually become configurable by config. kai, feb'16
 		if ( act.getFacilityId()==null ) {
 			final Id<Link> linkIdFromActivity = act.getLinkId();
-			Gbl.assertNonNull( linkIdFromActivity );
+			Gbl.assertNotNull( linkIdFromActivity );
 			return linkIdFromActivity ;
 		} else {
 			ActivityFacility facility = facs.getFacilities().get( act.getFacilityId() ) ;

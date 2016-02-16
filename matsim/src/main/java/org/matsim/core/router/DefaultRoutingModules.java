@@ -63,6 +63,12 @@ public final class DefaultRoutingModules {
 				net,
 				routeAlgo,
 				((PopulationFactoryImpl) popFact).getModeRouteFactory() );
+//		return new NetworkRoutingInclEgressAccessModule(
+//				mode,
+//				popFact,
+//				net,
+//				routeAlgo,
+//				((PopulationFactoryImpl) popFact).getModeRouteFactory() );
 	}
 
 }
