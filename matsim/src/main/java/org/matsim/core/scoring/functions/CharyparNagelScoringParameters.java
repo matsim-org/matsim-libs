@@ -158,9 +158,17 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			return this;
 		}
 
+		public ActivityUtilityParameters.Builder getActivityParameters(String activityType) {
+			return this.utilParams.get( activityType );
+		}
+
 		public Builder setModeParameters(String mode, ModeUtilityParameters.Builder params) {
 			this.modeParams.put( mode , params );
 			return this;
+		}
+
+		public ModeUtilityParameters.Builder getModeParameters(String mode) {
+			return this.modeParams.get( mode  );
 		}
 
 		public Builder setMarginalUtilityOfWaiting_s(double marginalUtilityOfWaiting_s) {
