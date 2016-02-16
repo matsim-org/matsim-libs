@@ -60,9 +60,10 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 	 * @param id
 	 * @param center
 	 */
-	protected ActivityFacilityImpl(final Id<ActivityFacility> id, final Coord center) {
+	protected ActivityFacilityImpl(final Id<ActivityFacility> id, final Coord center, final Id<Link> linkId) {
 		this.id = id;
 		this.coord = center;
+		this.linkId = linkId;
 	}
 
 	public final double calcDistance(Coord otherCoord) {

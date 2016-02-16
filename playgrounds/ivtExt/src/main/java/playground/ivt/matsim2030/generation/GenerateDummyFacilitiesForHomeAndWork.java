@@ -40,7 +40,6 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.OpeningTimeImpl;
@@ -143,8 +142,7 @@ public class GenerateDummyFacilitiesForHomeAndWork {
 		ActivityFacility facility = facilities.getFacilities().get( id );
 
 		if ( facility == null ) {
-			facility = facilities.getFactory().createActivityFacility( id , coord );
-			((ActivityFacilityImpl) facility).setLinkId( linkId );
+			facility = facilities.getFactory().createActivityFacility( id , coord, linkId );
 			facilities.addActivityFacility( facility );
 
 			final ActivityOption option = facilities.getFactory().createActivityOption( type );
