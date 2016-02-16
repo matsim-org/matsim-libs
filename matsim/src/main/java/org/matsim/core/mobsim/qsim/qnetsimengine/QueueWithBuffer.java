@@ -343,16 +343,17 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private void updateFlowAccumulation(final double now){
 		
 		if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() <= 0. && isNotOfferingVehicle() ){
+			
+				double flowCapSoFar = flowcap_accumulate.getValue();
+				double accumulateFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
+				double newFlowCap = flowCapSoFar + accumulateFlowCap;
+				
+				newFlowCap = Math.min(newFlowCap, flowCapacityPerTimeStep);
+				
+				flowcap_accumulate.setValue(newFlowCap);
+				flowcap_accumulate.setTimeStep( now );
 		
-			double flowCapSoFar = flowcap_accumulate.getValue();
-			double accumulateFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
-			double newFlowCap = flowCapSoFar + accumulateFlowCap;
 			
-			// dont update the flow cap and time if it is less than 0. this could be useful to reduce some rounding errors.
-			newFlowCap = Math.min(newFlowCap, flowCapacityPerTimeStep);
-			
-			flowcap_accumulate.setValue(newFlowCap);
-			flowcap_accumulate.setTimeStep( now );
 		}
 	}
 
@@ -619,7 +620,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		QVehicle veh = buffer.poll();
 		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		if(fastCapacityUpdate) updateFlowAccumulation( now );
+		if(fastCapacityUpdate) flowcap_accumulate.setTimeStep(now - 1);
 		return veh;
 	}
 
