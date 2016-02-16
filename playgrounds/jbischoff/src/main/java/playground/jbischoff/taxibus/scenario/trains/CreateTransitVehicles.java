@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.taxibus.scenario;
+
+package playground.jbischoff.taxibus.scenario.trains;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.utils.CreateVehiclesForSchedule;
+import org.matsim.vehicles.VehicleWriterV1;
 
-import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
-import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
-public class RunTaxibusExample {
+public class CreateTransitVehicles {
 
 	public static void main(String[] args) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/braunschweig/bs-network.xml");
+		TransitScheduleReader reader = new TransitScheduleReader(scenario);
+		reader.readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/braunschweig/bs-scheduleNetwork.xml");
 		
-		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/test/one_taxi/taxibusconfig.xml", new TaxibusConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-	
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
-		controler.run();
+		new CreateVehiclesForSchedule(scenario.getTransitSchedule(),scenario.getTransitVehicles()).run();;
+		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/transitvehicles.xml");
+		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/bs-scheduleNetwork.xml");
 	}
+	
+
 }

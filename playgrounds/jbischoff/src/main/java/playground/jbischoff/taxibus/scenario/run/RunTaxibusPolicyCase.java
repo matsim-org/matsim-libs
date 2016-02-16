@@ -72,7 +72,7 @@ public class RunTaxibusPolicyCase {
 
 		Controler controler = new Controler(scenario);
 
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses(false);
+		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
 			@Override
