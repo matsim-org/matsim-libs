@@ -126,7 +126,7 @@ public class RandomizedCharyparNagelScoringParameters implements
 		builder.setScoreAtAll(true); // TODO no getter
 		builder.setZeroUtilityComputation(new ActivityUtilityParameters.SameAbsoluteScore());
 		// TODO no getter
-		return builder.create();
+		return builder.build();
 	}
 
 	protected double marginalUtilityOfPerforming_s(final Person person) {

@@ -78,7 +78,7 @@ public class PtScoringTest {
 		
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
 		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
-		ActivityUtilityParameters params = builder.create() ;
+		ActivityUtilityParameters params = builder.build() ;
 		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
 
 
@@ -216,7 +216,7 @@ public class PtScoringTest {
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
 		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
-		ActivityUtilityParameters params = builder.create() ;
+		ActivityUtilityParameters params = builder.build() ;
 		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
 
 		double homeAct1End = 18060. ;
@@ -358,7 +358,7 @@ public class PtScoringTest {
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
 		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
-		ActivityUtilityParameters params = builder.create() ;
+		ActivityUtilityParameters params = builder.build() ;
 		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
 
 
@@ -431,7 +431,7 @@ public class PtScoringTest {
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
 		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
-		ActivityUtilityParameters params = builder.create() ;
+		ActivityUtilityParameters params = builder.build() ;
 		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
 
 

@@ -250,7 +250,7 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 
 			builder.setActivityParameters(
 					act.getType(),
-					typeBuilder.create());
+					typeBuilder.build());
 		}
 
 		final CharyparNagelScoringParameters params =

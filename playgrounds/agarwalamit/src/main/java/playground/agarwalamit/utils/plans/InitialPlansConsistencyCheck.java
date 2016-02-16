@@ -221,7 +221,7 @@ public class InitialPlansConsistencyCheck {
 		SortedMap<String, Double> actType2ZeroUtilDuration = new TreeMap<>();
 		for(String actType : params.getActivityTypes()){
 			ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( params.getActivityParams( actType ) ) ;
-			ActivityUtilityParameters ppp = builder.create() ;
+			ActivityUtilityParameters ppp = builder.build() ;
 			double zeroUtilDurSec = ppp.getZeroUtilityDuration_h() * 3600. ;
 
 			actType2ZeroUtilDuration.put(actType, zeroUtilDurSec);

@@ -80,7 +80,7 @@ public class SubpopulationCharyparNagelScoringParameters implements CharyparNage
 				transitActivityParams.setClosingTime(0.) ;
 				ActivityUtilityParameters.Builder modeParamsBuilder = new ActivityUtilityParameters.Builder(transitActivityParams);
 				modeParamsBuilder.setScoreAtAll(false);
-				builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder.create());
+				builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder.build());
 			}
 
 			this.params.put(

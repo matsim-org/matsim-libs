@@ -147,7 +147,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			utilParams = new TreeMap<>() ;
 			for (ActivityParams params : scoringParameterSet.getActivityParams()) {
 				ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
-				utilParams.put(params.getActivityType(), factory.create() ) ;
+				utilParams.put(params.getActivityType(), factory.build() ) ;
 			}
 
 			modeParams = new TreeMap<String, Mode>() ;

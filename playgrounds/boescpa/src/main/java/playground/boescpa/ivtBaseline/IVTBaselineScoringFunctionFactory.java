@@ -172,7 +172,7 @@ public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory
 
 			builder.setActivityParameters(
 					act.getType(),
-					typeBuilder.create());
+					typeBuilder.build());
 		}
 
 		final CharyparNagelScoringParameters params =

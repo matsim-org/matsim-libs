@@ -163,7 +163,7 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 			return this;
 		}
 
-		public ActivityUtilityParameters create() {
+		public ActivityUtilityParameters build() {
 			ActivityUtilityParameters params = new ActivityUtilityParameters(this.type) ;
 			params.setScoreAtAll(this.scoreAtAll) ;
 			params.setTypicalDuration( this.typicalDuration_s) ;
