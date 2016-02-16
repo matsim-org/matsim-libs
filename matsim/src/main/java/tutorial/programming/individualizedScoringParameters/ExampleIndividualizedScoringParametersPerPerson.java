@@ -1,5 +1,6 @@
 package tutorial.programming.individualizedScoringParameters;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -18,6 +19,7 @@ public class ExampleIndividualizedScoringParametersPerPerson implements Charypar
 	// For avoiding re-generating the parameters at each call, we store them in a map once created.
 	private Map<Id<Person>,CharyparNagelScoringParameters> cache = new HashMap<>();
 
+	@Inject
 	public ExampleIndividualizedScoringParametersPerPerson( final Scenario scenario ) {
 		this.scenario = scenario;
 	}
@@ -29,7 +31,7 @@ public class ExampleIndividualizedScoringParametersPerPerson implements Charypar
 		final CharyparNagelScoringParameters.Builder builder = new CharyparNagelScoringParameters.Builder(scenario, person.getId());
 
 		// tune. Here hard-coded for lisibility, but should be computed/read from person attributes.
-		builder.getActivityParameters( "home" ).setTypicalDuration_s( 8 * 3600 );
+		builder.getActivityParameters( "h" ).setTypicalDuration_s( 8 * 3600 );
 		builder.getModeParameters( "car" ).setMarginalUtilityOfTraveling_s( -6 );
 
 		final CharyparNagelScoringParameters parameters = builder.build();
