@@ -67,6 +67,8 @@ public class RunCarsharingTest {
 		config.plans().setInputPersonAttributeFile( utils.getClassInputDirectory()+"/1000desiresAttributes.xml");
 
 		config.facilities().setInputFile( utils.getClassInputDirectory()+"/facilities.xml" );
+		
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false); // otherwise does not work. kai,feb'16
 
 		FreeFloatingConfigGroup ffConfig = (FreeFloatingConfigGroup) config.getModule( FreeFloatingConfigGroup.GROUP_NAME ) ;
 		ffConfig.setvehiclelocations( utils.getClassInputDirectory()+"/Stations.txt");

@@ -60,9 +60,16 @@ import org.matsim.vehicles.Vehicle;
  * -- end of the free-floating rental is always on the link of the next activity, therefore no egress walk leg
  * @author balac
  */
-
-
 public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent {
+	/**
+	 * It seems that this whole class could be simplified a lot by observing the following:
+	 * - avoid copy and paste.  There is a lot of code repetition
+	 * - define more meaningful local variables.  This can be done by "extract local variable" refactorings in eclipse.
+	 * - consider using the EditRoutes infrastructure.  It does similar splicing.
+	 *
+	 */
+	
+	
 
 	private static final Logger log = Logger.getLogger(CarsharingPersonDriverAgentImpl.class);
 
@@ -111,6 +118,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		walkSpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get("walk");
 		//carsharingVehicleLocations = new ArrayList<ActivityFacility>();
 		
+		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			throw new RuntimeException( "does not work with a TripRouter that inserts access/egress walk") ;
+		}
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -129,7 +139,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		else if (this.basicAgentDelegate.getNextPlanElement() instanceof Leg && 
 				((Leg)this.basicAgentDelegate.getNextPlanElement()).getMode().equals("onewaycarsharing")) {
 			
-			insertOneWayCarsharingTrip(now);
+			insertOneWayCarsharingTripWhenEndingActivity(now);
 		}
 		
 		else if (this.basicAgentDelegate.getNextPlanElement() instanceof Leg && 
@@ -220,15 +230,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 	}
 
-	private void insertOneWayCarsharingTrip(double now) {
+	private void insertOneWayCarsharingTripWhenEndingActivity(double now) {
 		
 		List<PlanElement> planElements = this.basicAgentDelegate.getCurrentPlan().getPlanElements();
 		int indexOfInsertion = planElements.indexOf(this.basicAgentDelegate.getCurrentPlanElement()) + 1;
-		
-		final List<PlanElement> trip = new ArrayList<PlanElement>();
-		
-		final Leg legWalkStart = new LegImpl( "walk_ow_sb" );
-		
 		
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((Leg)this.basicAgentDelegate.getNextPlanElement()).getRoute();
 		OneWayCarsharingStation station = findClosestAvailableOWCar(route.getStartLinkId());
@@ -251,7 +256,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		routeStart.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startStationOW.getLink().getCoord()) * beelineFactor);	
 
+		final Leg legWalkStart = new LegImpl( "walk_ow_sb" );
 		legWalkStart.setRoute(routeStart);
+
+		final List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( legWalkStart );
 		
 		//adding vehicle part of the onewaycarsharing trip

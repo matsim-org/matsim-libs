@@ -5,16 +5,14 @@ import java.util.ArrayList;
 import org.matsim.api.core.v01.network.Link;
 
 
-public class TwoWayCarsharingStation {
+public class TwoWayCarsharingStation extends AbstractCarSharingStation {
 
 	
-	private Link link;
 	private int numberOfVehicles;
 	private ArrayList<String> vehicleIDs = new ArrayList<String>();
 
 	public TwoWayCarsharingStation(Link link, int numberOfVehicles, ArrayList<String> vehicleIDs) {
-		
-		this.link = link;
+		super(link) ;
 		this.numberOfVehicles = numberOfVehicles;
 		this.vehicleIDs = vehicleIDs;
 	}

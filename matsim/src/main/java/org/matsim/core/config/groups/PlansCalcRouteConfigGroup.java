@@ -66,6 +66,8 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private Double beelineDistanceFactor = 1.3 ;
 
+	private boolean insertingAccessEgressWalk = true ;
+
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_TYPE = "teleportedModeParameters";
 
@@ -447,10 +449,11 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 	}
 
-	@SuppressWarnings("static-method")
 	public boolean isInsertingAccessEgressWalk() {
-		// not outside-configurable for the time being. kai, feb'16
-		return true ;
+		return this.insertingAccessEgressWalk ;
+	}
+	public void setInsertingAccessEgressWalk( boolean val ) {
+		this.insertingAccessEgressWalk = val ;
 	}
 
 

@@ -4,16 +4,14 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.network.Link;
 
-public class FreeFloatingStation {
+public class FreeFloatingStation extends AbstractCarSharingStation {
 
 	
-	private Link link;
 	private int numberOfVehicles;
 	private ArrayList<String> vehicleIDs = new ArrayList<String>();
 	
 	public FreeFloatingStation(Link link, int numberOfVehicles, ArrayList<String> vehicleIDs) {
-		
-		this.link = link;
+		super(link) ;
 		this.numberOfVehicles = numberOfVehicles;
 		this.vehicleIDs = vehicleIDs;
 	}
