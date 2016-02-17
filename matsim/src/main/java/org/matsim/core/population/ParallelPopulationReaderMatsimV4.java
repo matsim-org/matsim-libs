@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.data.v20.Lanes;
@@ -68,7 +69,12 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 
 	private Thread[] threads;
 	private List<Tag> currentPersonXmlData;
-		
+
+	public ParallelPopulationReaderMatsimV4(
+			final Scenario scenario ) {
+		this( new IdentityTransformation() , scenario );
+	}
+
 	public ParallelPopulationReaderMatsimV4(
 			final CoordinateTransformation coordinateTransformation,
 			final Scenario scenario) {
