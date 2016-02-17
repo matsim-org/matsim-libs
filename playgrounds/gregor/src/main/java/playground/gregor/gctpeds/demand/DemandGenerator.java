@@ -127,7 +127,7 @@ public class DemandGenerator {
 		double weightSum = 0;
 		List<Location> cands = new ArrayList<>();
 		for (Location d : this.destinations) {
-			double dist = CoordUtils.calcDistance(o.l.getCoord(), d.l.getCoord());
+			double dist = CoordUtils.calcEuclideanDistance(o.l.getCoord(), d.l.getCoord());
 			if (dist > 50) {
 				double w = o.dep*d.arr*(dist*dist);
 				d.w = w;

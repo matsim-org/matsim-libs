@@ -384,7 +384,7 @@ public class MainEventAnalyzer {
 					else {
 						timePT += leg.getTravelTime();
 						if(leg.getRoute()!=null && leg.getRoute().getStartLinkId()!=null && leg.getRoute().getEndLinkId()!=null)
-							distancePT+=CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), (scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getCoord()));
+							distancePT+=CoordUtils.calcEuclideanDistance(scenario.getNetwork().getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), (scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getCoord()));
 						else if(leg.getMode().equals("transit_walk"))
 							distancePT+=4*leg.getTravelTime()/3.6;
 						else

@@ -105,13 +105,13 @@ class PtSubModeRouter implements TransitRouter {
 				// there is no nearest node...
 				distance = this.config.getSearchRadius() + this.config.getExtensionRadius();
 			}else{
-				distance = CoordUtils.calcDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
+				distance = CoordUtils.calcEuclideanDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
 			}
 			fromNodes = this.transitNetwork.getNearestNodes(fromCoord, distance + this.config.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : fromNodes) {
-			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
+			double distance = CoordUtils.calcEuclideanDistance(fromCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
@@ -127,13 +127,13 @@ class PtSubModeRouter implements TransitRouter {
 				// there is no nearest node...
 				distance = this.config.getSearchRadius() + this.config.getExtensionRadius();
 			}else{
-				distance = CoordUtils.calcDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
+				distance = CoordUtils.calcEuclideanDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
 			}
 			toNodes = this.transitNetwork.getNearestNodes(toCoord, distance + this.config.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : toNodes) {
-			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
+			double distance = CoordUtils.calcEuclideanDistance(toCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost = - (initialTime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
@@ -146,12 +146,12 @@ class PtSubModeRouter implements TransitRouter {
 			return null;
 		}
 
-		double directWalkCost = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		double directWalkCost = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 		if (directWalkCost < pathCost) {
 			List<Leg> legs = new ArrayList<Leg>();
 			Leg leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+			double walkTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
 			Route walkRoute = new GenericRouteImpl(null, null);
 			leg.setRoute(walkRoute);
 			leg.setTravelTime(walkTime);
@@ -206,7 +206,7 @@ class PtSubModeRouter implements TransitRouter {
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
+								double walkTime = CoordUtils.calcEuclideanDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
 								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 								leg.setRoute(walkRoute);
 								leg.setTravelTime(walkTime);
@@ -214,7 +214,7 @@ class PtSubModeRouter implements TransitRouter {
 								legs.add(leg);
 							} else { // accessStop == null, so it must be the first walk-leg
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(fromCoord, egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
+								double walkTime = CoordUtils.calcEuclideanDistance(fromCoord, egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
 								leg.setTravelTime(walkTime);
 								time += walkTime;
 								legs.add(leg);
@@ -248,9 +248,9 @@ class PtSubModeRouter implements TransitRouter {
 			leg = new LegImpl(TransportMode.transit_walk);
 			double walkTime;
 			if (accessStop == null) {
-				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+				walkTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
 			} else {
-				walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) / this.config.getBeelineWalkSpeed();
+				walkTime = CoordUtils.calcEuclideanDistance(accessStop.getCoord(), toCoord) / this.config.getBeelineWalkSpeed();
 			}
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
@@ -259,7 +259,7 @@ class PtSubModeRouter implements TransitRouter {
 			// it seems, the agent only walked
 			legs.clear();
 			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+			double walkTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
 		}

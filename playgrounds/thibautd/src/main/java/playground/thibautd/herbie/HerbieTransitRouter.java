@@ -89,12 +89,12 @@ public class HerbieTransitRouter implements TransitRouter {
 		if (fromNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(fromCoord);
-			double distance = CoordUtils.calcDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
+			double distance = CoordUtils.calcEuclideanDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
 			fromNodes = this.transitNetwork.getNearestNodes(fromCoord, distance + this.config.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : fromNodes) {
-			double distance = CoordUtils.calcDistance(fromCoord, node.stop.getStopFacility().getCoord());
+			double distance = CoordUtils.calcEuclideanDistance(fromCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost = HerbieRoutingWalkCostEstimator.getTransitRouterInitialWalkCost( config , initialTime );
 			wrappedFromNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
@@ -105,12 +105,12 @@ public class HerbieTransitRouter implements TransitRouter {
 		if (toNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(toCoord);
-			double distance = CoordUtils.calcDistance(toCoord, nearestNode.stop.getStopFacility().getCoord());
+			double distance = CoordUtils.calcEuclideanDistance(toCoord, nearestNode.stop.getStopFacility().getCoord());
 			toNodes = this.transitNetwork.getNearestNodes(toCoord, distance + this.config.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : toNodes) {
-			double distance = CoordUtils.calcDistance(toCoord, node.stop.getStopFacility().getCoord());
+			double distance = CoordUtils.calcEuclideanDistance(toCoord, node.stop.getStopFacility().getCoord());
 			double initialTime = distance / this.config.getBeelineWalkSpeed();
 			double initialCost = HerbieRoutingWalkCostEstimator.getTransitRouterInitialWalkCost( config , initialTime );
 			wrappedToNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
@@ -123,7 +123,7 @@ public class HerbieTransitRouter implements TransitRouter {
 			return null;
 		}
 
-		double directDist = CoordUtils.calcDistance(fromCoord, toCoord);
+		double directDist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
 		double directWalkTime = directDist / this.config.getBeelineWalkSpeed();
 		double directWalkCost = HerbieRoutingWalkCostEstimator.getFormerWalkCostNoDistance( config , directWalkTime );
 
@@ -185,7 +185,7 @@ public class HerbieTransitRouter implements TransitRouter {
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
+								double walkTime = CoordUtils.calcEuclideanDistance(accessStop.getCoord(), egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
 								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
 								leg.setRoute(walkRoute);
 								leg.setTravelTime(walkTime);
@@ -193,7 +193,7 @@ public class HerbieTransitRouter implements TransitRouter {
 								legs.add(leg);
 							} else { // accessStop == null, so it must be the first walk-leg
 								leg = new LegImpl(TransportMode.transit_walk);
-								double walkTime = CoordUtils.calcDistance(fromCoord, egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
+								double walkTime = CoordUtils.calcEuclideanDistance(fromCoord, egressStop.getCoord()) / this.config.getBeelineWalkSpeed();
 								leg.setTravelTime(walkTime);
 								time += walkTime;
 								legs.add(leg);
@@ -227,9 +227,9 @@ public class HerbieTransitRouter implements TransitRouter {
 			leg = new LegImpl(TransportMode.transit_walk);
 			double walkTime;
 			if (accessStop == null) {
-				walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+				walkTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
 			} else {
-				walkTime = CoordUtils.calcDistance(accessStop.getCoord(), toCoord) / this.config.getBeelineWalkSpeed();
+				walkTime = CoordUtils.calcEuclideanDistance(accessStop.getCoord(), toCoord) / this.config.getBeelineWalkSpeed();
 			}
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
@@ -238,7 +238,7 @@ public class HerbieTransitRouter implements TransitRouter {
 			// it seems, the agent only walked
 			legs.clear();
 			leg = new LegImpl(TransportMode.transit_walk);
-			double walkTime = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+			double walkTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
 			leg.setTravelTime(walkTime);
 			legs.add(leg);
 		}

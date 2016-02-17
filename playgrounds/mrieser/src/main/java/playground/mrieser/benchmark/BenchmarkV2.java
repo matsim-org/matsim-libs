@@ -110,7 +110,7 @@ public class BenchmarkV2 {
 				counter++;
 				workRegionLink = links[r.nextInt(links.length)];
 				workCoord = new Coord((workRegionLink.getToNode().getCoord().getX() + workRegionLink.getFromNode().getCoord().getX()) / 2 + r.nextInt(1000) - 500, (workRegionLink.getToNode().getCoord().getY() + workRegionLink.getFromNode().getCoord().getY()) / 2 + r.nextInt(1000) - 500);
-				double dist = CoordUtils.calcDistance(homeCoord, workCoord);
+				double dist = CoordUtils.calcEuclideanDistance(homeCoord, workCoord);
 				if (dist >= lowerRange && dist <= upperRange) {
 					linkIsInRange = true;
 				}

@@ -361,7 +361,7 @@ public class GenerateScenarioForDetours {
 		for ( Link l : network.getLinks().values() ) {
 			l.setCapacity( LINK_CAPACITY );
 			l.setLength(
-					CoordUtils.calcDistance( 
+					CoordUtils.calcEuclideanDistance( 
 						l.getFromNode().getCoord(),
 						l.getToNode().getCoord() ) );
 			l.setFreespeed( FREESPEED );

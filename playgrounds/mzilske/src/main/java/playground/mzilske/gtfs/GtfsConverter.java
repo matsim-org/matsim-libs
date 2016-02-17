@@ -473,14 +473,14 @@ public class GtfsConverter {
 				double totalLength = 0;
 				TransitRouteStop lastProperStop = stops.get(lastProperDepartureIndex);
 				for(TransitRouteStop sr: toBeInterpolated){
-					totalLength = CoordUtils.calcDistance(sr.getStopFacility().getCoord(), lastProperStop.getStopFacility().getCoord()) + totalLength;
+					totalLength = CoordUtils.calcEuclideanDistance(sr.getStopFacility().getCoord(), lastProperStop.getStopFacility().getCoord()) + totalLength;
 				}
-				totalLength = totalLength + CoordUtils.calcDistance(toBeInterpolated.get(toBeInterpolated.size()-1).getStopFacility().getCoord(), s.getStopFacility().getCoord());
+				totalLength = totalLength + CoordUtils.calcEuclideanDistance(toBeInterpolated.get(toBeInterpolated.size()-1).getStopFacility().getCoord(), s.getStopFacility().getCoord());
 				double timeAvaible = s.getArrivalOffset() - lastProperStop.getDepartureOffset();
 				double oldDepartureOffset = lastProperStop.getDepartureOffset();
 				for(Iterator<TransitRouteStop> it2 = toBeInterpolated.iterator(); it2.hasNext();){
 					TransitRouteStop sr = it2.next();
-					double newDepartureOffset = (CoordUtils.calcDistance(sr.getStopFacility().getCoord(), lastProperStop.getStopFacility().getCoord()))/(totalLength) * timeAvaible + oldDepartureOffset;
+					double newDepartureOffset = (CoordUtils.calcEuclideanDistance(sr.getStopFacility().getCoord(), lastProperStop.getStopFacility().getCoord()))/(totalLength) * timeAvaible + oldDepartureOffset;
 					oldDepartureOffset = newDepartureOffset;
 					TransitRouteStop newStop = ts.getFactory().createTransitRouteStop(sr.getStopFacility(), newDepartureOffset, newDepartureOffset);
 					toBeReplaced.put(stops.indexOf(sr), newStop);
@@ -673,7 +673,7 @@ public class GtfsConverter {
 
 				Link link = null;
 				if(addLink){
-					double length = CoordUtils.calcDistance(nodes.get(fromNodeId).getCoord(), nodes.get(toNodeId).getCoord());
+					double length = CoordUtils.calcEuclideanDistance(nodes.get(fromNodeId).getCoord(), nodes.get(toNodeId).getCoord());
 					Double freespeed = freespeedKmPerHour/3.6;
 					if((length > 0.0) && (!Double.isInfinite(departureTime)) && (!Double.isInfinite(arrivalTime))){
 						freespeed = length/(arrivalTime - departureTime);
@@ -884,9 +884,9 @@ public class GtfsConverter {
 				boolean add = false;
 				for(String[] shapeCoord: shapes){
 					Coord c = transform.transform(new Coord(Double.parseDouble(shapeCoord[1]), Double.parseDouble(shapeCoord[2])));
-					if(CoordUtils.calcDistance(c, fromCoord) <= this.toleranceInM){
+					if(CoordUtils.calcEuclideanDistance(c, fromCoord) <= this.toleranceInM){
 						add = true;						 
-					}else if(CoordUtils.calcDistance(c, toCoord) <= this.toleranceInM){
+					}else if(CoordUtils.calcEuclideanDistance(c, toCoord) <= this.toleranceInM){
 						add = false;
 						coord.add(c);
 						break;

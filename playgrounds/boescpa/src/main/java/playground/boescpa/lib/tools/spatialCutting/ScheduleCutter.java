@@ -102,7 +102,7 @@ public class ScheduleCutter {
         // Identify all stops inside specified area:
         Set<Id<TransitStopFacility>> stopsInArea = new HashSet<>();
         for (TransitStopFacility stop : schedule.getFacilities().values()) {
-            if (CoordUtils.calcDistance(stop.getCoord(), center) <= radius) {
+            if (CoordUtils.calcEuclideanDistance(stop.getCoord(), center) <= radius) {
                 stopsInArea.add(stop.getId());
             }
         }

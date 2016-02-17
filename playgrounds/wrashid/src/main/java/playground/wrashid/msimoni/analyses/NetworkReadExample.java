@@ -65,7 +65,7 @@ public class NetworkReadExample {
 	}
 	public static double getDistance(Coord coordA, Coord coordB){
 //		return Math.sqrt(((coordA.getX()-coordB.getX())*(coordA.getX()-coordB.getX()) + (coordA.getY()-coordB.getY())*(coordA.getY()-coordB.getY())));
-		return CoordUtils.calcDistance(coordA, coordB);
+		return CoordUtils.calcEuclideanDistance(coordA, coordB);
 	} //filter algorithm
 
 }

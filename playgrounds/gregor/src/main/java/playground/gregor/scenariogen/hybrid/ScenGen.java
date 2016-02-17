@@ -216,7 +216,7 @@ public class ScenGen {
 
 		double flow = 2 * .71 * 1.33;
 		for (Link l : net.getLinks().values()) {
-			double length = CoordUtils.calcDistance(l.getFromNode().getCoord(),
+			double length = CoordUtils.calcEuclideanDistance(l.getFromNode().getCoord(),
 					l.getToNode().getCoord());
 			l.setLength(length);
 			l.setAllowedModes(modes);

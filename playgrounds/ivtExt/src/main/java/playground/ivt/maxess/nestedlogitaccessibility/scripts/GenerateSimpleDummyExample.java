@@ -325,7 +325,7 @@ public class GenerateSimpleDummyExample {
 			for ( Link l : net.getLinks().values() ) {
 				l.setFreespeed( FREESPEED );
 				l.setLength(
-						CoordUtils.calcDistance(
+						CoordUtils.calcEuclideanDistance(
 								l.getFromNode().getCoord(),
 								l.getToNode().getCoord() ) );
 			}

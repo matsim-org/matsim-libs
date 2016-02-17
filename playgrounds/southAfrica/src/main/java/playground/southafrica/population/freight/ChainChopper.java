@@ -120,7 +120,7 @@ public class ChainChopper {
 				startTime = 0.0;
 				endTime = act.getEndTime();
 			} else{
-				distance = CoordUtils.calcDistance(lastLocation, act.getCoord()) * CROWFLY_FACTOR;
+				distance = CoordUtils.calcEuclideanDistance(lastLocation, act.getCoord()) * CROWFLY_FACTOR;
 				travelTime = distance / AVERAGE_SPEED;
 				startTime = cumTime + travelTime;
 				if(i == plan.getPlanElements().size()-1){

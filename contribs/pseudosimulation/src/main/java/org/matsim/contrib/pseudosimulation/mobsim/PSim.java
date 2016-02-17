@@ -402,7 +402,7 @@ public class PSim implements Mobsim {
         final double distance;
 
         public TransitWalkTimeAndDistance(Coord startCoord, Coord endCoord) {
-            distance = beelineDistanceFactor * CoordUtils.calcDistance(startCoord, endCoord);
+            distance = beelineDistanceFactor * CoordUtils.calcEuclideanDistance(startCoord, endCoord);
             time = distance / walkSpeed;
         }
 

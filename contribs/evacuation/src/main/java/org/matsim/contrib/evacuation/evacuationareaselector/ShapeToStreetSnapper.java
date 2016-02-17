@@ -103,7 +103,7 @@ public class ShapeToStreetSnapper {
 			Node n0 = nodes.get(i-1);
 			Node n1 = nodes.get(i);
 			Path path = dijkstra.calcLeastCostPath(n0, n1, 0, null, null);
-			if (path != null && (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * CoordUtils.calcDistance(n0.getCoord(), n1.getCoord()))) {
+			if (path != null && (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * CoordUtils.calcEuclideanDistance(n0.getCoord(), n1.getCoord()))) {
 				finalNodes.addAll(path.nodes.subList(0, path.nodes.size()-1));
 			}else {
 				finalNodes.add(n0);
@@ -113,7 +113,7 @@ public class ShapeToStreetSnapper {
 		Node nn0 = nodes.get(nodes.size()-1);
 		Node nn1 = nodes.get(0);
 		Path path = dijkstra.calcLeastCostPath(nn0, nn1, 0, null, null);
-		if (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * CoordUtils.calcDistance(nn0.getCoord(), nn1.getCoord()) ) {
+		if (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * CoordUtils.calcEuclideanDistance(nn0.getCoord(), nn1.getCoord()) ) {
 			finalNodes.addAll(path.nodes.subList(0, path.nodes.size()-1));
 		}
 

@@ -61,7 +61,7 @@ public class ExtractTravelTimesForModes {
 				final TripInfo info = new TripInfo();
 				info.tt = l.getTravelTime();
 				info.dist =
-						CoordUtils.calcDistance(
+						CoordUtils.calcEuclideanDistance(
 								t.getOriginActivity().getCoord(),
 								t.getDestinationActivity().getCoord() );
 

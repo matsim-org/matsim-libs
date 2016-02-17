@@ -79,7 +79,7 @@ public class DistanceCalculations {
 				System.out.println("could not find node with id " + nodeIDs[i+1]);
 			}
 			
-			distance += (CoordUtils.calcDistance(node1.getCoord(), node2.getCoord()));
+			distance += (CoordUtils.calcEuclideanDistance(node1.getCoord(), node2.getCoord()));
 		}
 		
 		Link startLink = network.getLinks().get(route.getStartLinkId());
@@ -116,7 +116,7 @@ public class DistanceCalculations {
 	public static double getWalkDistance(Route route, Network network) {
 		Coord fromCoord = network.getLinks().get(route.getStartLinkId()).getCoord();
 		Coord toCoord = network.getLinks().get(route.getEndLinkId()).getCoord();
-		return CoordUtils.calcDistance(fromCoord, toCoord);
+		return CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
 	}
 
 	public static double getLegDistance(ExperimentalTransitRoute route, Network network) {
@@ -124,7 +124,7 @@ public class DistanceCalculations {
 		Coord startLinkCoord = network.getLinks().get(route.getStartLinkId()).getCoord();
 		Coord endLinkCoord = network.getLinks().get(route.getEndLinkId()).getCoord();
 		
-		return CoordUtils.calcDistance(startLinkCoord, endLinkCoord);
+		return CoordUtils.calcEuclideanDistance(startLinkCoord, endLinkCoord);
 		
 //		Double routeDist = route.getDistance();
 //		if(!routeDist.isNaN()){

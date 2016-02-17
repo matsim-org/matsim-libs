@@ -251,7 +251,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 					break;
 				case beelineDistances:
 					if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
-						item = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()) ;
+						item = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord()) ;
 					} else {
 						if ( noCoordCnt < 1 ) {
 							noCoordCnt ++ ;
@@ -259,12 +259,12 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 						}
 						Link fromLink = scenario.getNetwork().getLinks().get( fromAct.getLinkId() ) ;
 						Link   toLink = scenario.getNetwork().getLinks().get(   toAct.getLinkId() ) ;
-						item = CoordUtils.calcDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
+						item = CoordUtils.calcEuclideanDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
 					}
 					break;
 				case beelineDistancesOtherBins:
 					if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
-						item = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()) ;
+						item = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord()) ;
 					} else {
 						if ( noCoordCnt < 1 ) {
 							noCoordCnt ++ ;
@@ -272,7 +272,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 						}
 						Link fromLink = scenario.getNetwork().getLinks().get( fromAct.getLinkId() ) ;
 						Link   toLink = scenario.getNetwork().getLinks().get(   toAct.getLinkId() ) ;
-						item = CoordUtils.calcDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
+						item = CoordUtils.calcEuclideanDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
 					}
 					break;
 				case legDistances:

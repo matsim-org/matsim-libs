@@ -79,7 +79,7 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 
 		double centerX = (o.getX() + d.getX()) / 2d;
 		double centerY = (o.getY() + d.getY()) / 2d;
-		double maxBeeFlyDist = CoordUtils.calcDistance( o , d ) * (1 + config.getMaximumDetourFraction());
+		double maxBeeFlyDist = CoordUtils.calcEuclideanDistance( o , d ) * (1 + config.getMaximumDetourFraction());
 
 		Collection<Link> closeSpots = spots.getSpots( centerX , centerY , maxBeeFlyDist / 2d );
 
@@ -93,7 +93,7 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 				puSpot,
 				d,
 				closeSpots,
-				maxBeeFlyDist - CoordUtils.calcDistance( puSpot.getCoord() , d ));
+				maxBeeFlyDist - CoordUtils.calcEuclideanDistance( puSpot.getCoord() , d ));
 
 		if (doSpots.size() == 0) {
 			return carRoutingModule.calcRoute( fromFacility , toFacility , departureTime , person );
@@ -123,8 +123,8 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 		Coord origin = puSpot.getCoord();
 		for (Link l : closeSpots) {
 			if (l != puSpot) {
-				double dist = CoordUtils.calcDistance( origin, l.getCoord() )
-				+ CoordUtils.calcDistance( l.getCoord() , destination );
+				double dist = CoordUtils.calcEuclideanDistance( origin, l.getCoord() )
+				+ CoordUtils.calcEuclideanDistance( l.getCoord() , destination );
 
 				if (dist < distanceBudget) {
 					doSpots.add( new IdWithDistance( l.getId() , dist ) );
@@ -157,12 +157,12 @@ public class HitchHikingDriverRoutingModule implements RoutingModule {
 			final Coord destination,
 			final Id destinationId,
 			final Collection<Link> spots1) {
-		double maxDetour = CoordUtils.calcDistance( origin , destination ) * ( 1  + config.getMaximumDetourFraction());
+		double maxDetour = CoordUtils.calcEuclideanDistance( origin , destination ) * ( 1  + config.getMaximumDetourFraction());
 		List<Link> possibleSpots = new ArrayList<Link>();
 
 		for (Link l : spots1) {
-			double detour = CoordUtils.calcDistance( origin, l.getCoord() )
-				+ CoordUtils.calcDistance( l.getCoord() , destination );
+			double detour = CoordUtils.calcEuclideanDistance( origin, l.getCoord() )
+				+ CoordUtils.calcEuclideanDistance( l.getCoord() , destination );
 			if (detour <= maxDetour) {
 				possibleSpots.add( l );
 			}

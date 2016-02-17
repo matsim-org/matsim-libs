@@ -98,7 +98,7 @@ public class DistanceDistributionTrip {
 						distancePT += RouteUtils.calcDistanceExcludingStartEndLink(route.getRoute().getSubRoute(eRoute.getStartLinkId(), eRoute.getEndLinkId()), network)+lastLinkLenght;
 					}
 					else if(leg.getMode().equals("transit_walk"))
-						distancePT += CoordUtils.calcDistance(network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord()); 
+						distancePT += CoordUtils.calcEuclideanDistance(network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord()); 
 				}
 				else if(planElement instanceof Activity)
 					if(!((Activity)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) && inPTLeg) {

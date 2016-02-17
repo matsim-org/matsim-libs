@@ -163,7 +163,7 @@ public class NetworkDistance {
 
 				Path path = router.calcLeastCostPath(fromNode, toNode, 0, null, null);
 
-				double crowflyDistance = CoordUtils.calcDistance(ct.transform(fromCoord), ct.transform(toCoord));
+				double crowflyDistance = CoordUtils.calcEuclideanDistance(ct.transform(fromCoord), ct.transform(toCoord));
 
 				writer.write(parts[0] + "\t" + parts[1] + "\t" + crowflyDistance + "\t" + getPathDistance(path));
 

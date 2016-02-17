@@ -356,7 +356,7 @@ public class ActivityChainChecker {
 			Coord c1 = chain.get(0).getCoord();
 			for(int i = 1; i < chain.size(); i++){
 				Coord c2 =chain.get(i).getCoord();
-				distance += CoordUtils.calcDistance(c1, c2)*distanceMultiplier;
+				distance += CoordUtils.calcEuclideanDistance(c1, c2)*distanceMultiplier;
 				c1 = c2;
 			}
 			

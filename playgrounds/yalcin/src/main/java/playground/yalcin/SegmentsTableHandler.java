@@ -167,7 +167,7 @@ public class SegmentsTableHandler implements TabularFileHandler {
 
 			//NearestStartStopDistance
 			this.writer.write(TAB);
-			this.writer.write(Double.toString(CoordUtils.calcDistance(this.startCoord, nearestStartStop.coord)));
+			this.writer.write(Double.toString(CoordUtils.calcEuclideanDistance(this.startCoord, nearestStartStop.coord)));
 
 			//NearestEndStop
 			Stop nearestEndStop = this.vNetwork.findNearestStop(this.endCoord);
@@ -176,21 +176,21 @@ public class SegmentsTableHandler implements TabularFileHandler {
 
 			//NearestEndStopDistance
 			this.writer.write(TAB);
-			this.writer.write(Double.toString(CoordUtils.calcDistance(this.endCoord, nearestEndStop.coord)));
+			this.writer.write(Double.toString(CoordUtils.calcEuclideanDistance(this.endCoord, nearestEndStop.coord)));
 
 			this.writer.write('\n');
 			// write possible starting stops
 			for (VisumNetwork.Stop stop : startStops) {
 				this.writer.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
 				this.writer.write(stop.id.toString() + "\t");
-				this.writer.write(Double.toString(CoordUtils.calcDistance(this.startCoord, stop.coord)));
+				this.writer.write(Double.toString(CoordUtils.calcEuclideanDistance(this.startCoord, stop.coord)));
 				this.writer.write("\n");
 			}
 			// write possible ending stops
 			for (VisumNetwork.Stop stop : endStops) {
 				this.writer.write("\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
 				this.writer.write(stop.id.toString() + "\t");
-				this.writer.write(Double.toString(CoordUtils.calcDistance(this.endCoord, stop.coord)));
+				this.writer.write(Double.toString(CoordUtils.calcEuclideanDistance(this.endCoord, stop.coord)));
 				this.writer.write("\n");
 			}
 		}

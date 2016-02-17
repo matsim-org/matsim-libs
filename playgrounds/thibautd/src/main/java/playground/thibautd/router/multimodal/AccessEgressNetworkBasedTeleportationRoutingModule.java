@@ -138,7 +138,7 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 			final Facility facility,
 			final Link link) {
 		if ( facility.getLinkId().equals( link.getId() ) ) return 0;
-		return crowFlyDistanceFactor * CoordUtils.calcDistance( facility.getCoord() , link.getCoord() );
+		return crowFlyDistanceFactor * CoordUtils.calcEuclideanDistance( facility.getCoord() , link.getCoord() );
 	}
 
 	private Path calcPath( final Link startLink , final Link endLink , final double depTime , final Person person ) {

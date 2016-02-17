@@ -176,7 +176,7 @@ public class CreateLegHistogramForSubpopulation {
 			final Coord linkCoord = link.getCoord();
 
 			final double dist =
-				CoordUtils.calcDistance(
+				CoordUtils.calcEuclideanDistance(
 						center,
 						linkCoord );
 			return dist <= radius;

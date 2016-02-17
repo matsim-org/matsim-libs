@@ -281,7 +281,7 @@ public class MATSimScenarioCreator {
 			if (!t.room2Id.equals("-1")){
 				Coord c = new Coord((t.v1.px + t.v2.px) / 2, (t.v1.py + t.v2.py) / 2);
 				Node n = impl.getNearestNode(c);
-				double dist = CoordUtils.calcDistance(c, n.getCoord());
+				double dist = CoordUtils.calcEuclideanDistance(c, n.getCoord());
 				if (dist > EPSILON) {
 					log.warn("Node and transition center are rather far away from each other ("+dist +"m) possibly wrong!");
 				}

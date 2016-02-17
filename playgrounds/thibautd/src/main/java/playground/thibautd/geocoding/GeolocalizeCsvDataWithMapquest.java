@@ -290,7 +290,7 @@ public class GeolocalizeCsvDataWithMapquest {
 
 		for ( Result r : inStreet ) {
 			final Coord c = r.getCH03Coord();
-			final double dist = CoordUtils.calcDistance( c , center );
+			final double dist = CoordUtils.calcEuclideanDistance( c , center );
 			if ( dist < min ) {
 				min = dist;
 				closest = r;

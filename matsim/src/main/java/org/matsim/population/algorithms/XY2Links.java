@@ -88,8 +88,6 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 						if (facility != null) act.setLinkId(facility.getLinkId());
 						// yy facility.getLinkId may be null, in particular since linkId is not even part of the facilities DTD. kai, feb'16
-						
-						if (act.getLinkId() != null) continue; // (*)
 					}
 				}
 				
@@ -97,8 +95,6 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 					// there may be activities in a plan that have a link and others that have a coordinate.  
 					// Those that have a link do not need a new link.  In addition, they may not even have a 
 					// coordinate.  kai/dominik, nov'11
-					
-					// this could presumably be combined with (*).  kai/dominik, nov'11
 					continue ;
 				}
 
@@ -111,14 +107,15 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 				// * the left link with getNearestLink
 				// * the right link with getNearestLinkExactly
 				// kai/dominik, jan'13
-				
+				/* ownPrepareForSimExample in matsim tutorials gives an example how to use
+				 * getNearestLinkExactly anyway. tt feb'2016
+				 */
 				
 				if (null == link) {
 					throw new RuntimeException("For person id="+plan.getPerson().getId()+": getNearestLink returned Null! act="+act);
 				}
 				act.setLinkId(link.getId());				
 			}
-//			else continue; // I think that this confuses more than it helps. kai, feb'16
 		}
 	}
 }

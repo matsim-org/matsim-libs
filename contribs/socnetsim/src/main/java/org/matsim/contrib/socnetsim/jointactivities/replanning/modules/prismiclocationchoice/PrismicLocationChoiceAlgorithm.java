@@ -160,7 +160,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 				final ActivityFacility end = facilities.getFacilities().get( subchain.getEnd().getFacilityId() );
 				if ( end == null ) throw new RuntimeException( "no facility "+ subchain.getEnd().getFacilityId()+" for activity "+ subchain.getEnd());
 
-				final double minDistance = CoordUtils.calcDistance( start.getCoord() , end.getCoord() ) + 1E-9;
+				final double minDistance = CoordUtils.calcEuclideanDistance( start.getCoord() , end.getCoord() ) + 1E-9;
 				final Collection<ActivityFacility> prism =
 					approximatePrism(
 							Math.max(
@@ -318,10 +318,10 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 				final ActivityFacility fac = choiceSet.get( i );
 				maxDists[ i ] = Double.NEGATIVE_INFINITY;
 				for ( Subchain subchain : subchains ) {
-					final double dist = CoordUtils.calcDistance(
+					final double dist = CoordUtils.calcEuclideanDistance(
 							subchain.getStart().getCoord(),
 							fac.getCoord() ) +
-						CoordUtils.calcDistance(
+						CoordUtils.calcEuclideanDistance(
 							subchain.getEnd().getCoord(),
 							fac.getCoord() );
 					if ( dist > maxDists[ i ] ) maxDists[ i ] = dist;
@@ -351,10 +351,10 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			for ( ActivityFacility fac : choiceSet ) {
 				double max = Double.NEGATIVE_INFINITY;
 				for ( Subchain subchain : subchains ) {
-					final double dist = CoordUtils.calcDistance(
+					final double dist = CoordUtils.calcEuclideanDistance(
 							subchain.getStart().getCoord(),
 							fac.getCoord() ) +
-						CoordUtils.calcDistance(
+						CoordUtils.calcEuclideanDistance(
 							subchain.getEnd().getCoord(),
 							fac.getCoord() );
 					if ( dist > max ) max = dist;
@@ -391,10 +391,10 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 				vals[ i ] = Double.NEGATIVE_INFINITY;
 
 				for ( Subchain subchain : subchains ) {
-					final double dist = CoordUtils.calcDistance(
+					final double dist = CoordUtils.calcEuclideanDistance(
 							subchain.getStart().getCoord(),
 							fac.getCoord() ) +
-						CoordUtils.calcDistance(
+						CoordUtils.calcEuclideanDistance(
 							subchain.getEnd().getCoord(),
 							fac.getCoord() );
 					if ( dist > vals[ i ] ) vals[ i ] = dist;

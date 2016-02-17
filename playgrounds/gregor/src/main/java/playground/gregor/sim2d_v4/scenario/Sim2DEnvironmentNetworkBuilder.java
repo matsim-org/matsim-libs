@@ -77,7 +77,7 @@ public abstract class Sim2DEnvironmentNetworkBuilder {
 					Node to = net.getNodes().get(toId);
 					Id<Link> lId = Id.create(fromId.toString() + "-->"+toId.toString(), Link.class);
 					Link l = fac.createLink(lId, from, to);
-					double dist = CoordUtils.calcDistance(from.getCoord(), to.getCoord());
+					double dist = CoordUtils.calcEuclideanDistance(from.getCoord(), to.getCoord());
 					l.setLength(dist);
 					l.setFreespeed(1.34);
 					LineSegment seg = s.getOpeningSegments().get(j);

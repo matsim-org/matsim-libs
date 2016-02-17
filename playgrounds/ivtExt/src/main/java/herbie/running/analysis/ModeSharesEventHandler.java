@@ -164,7 +164,7 @@ public class ModeSharesEventHandler
 		departureLink = this.network.getLinks().get(departureEvent.getLinkId());
 		arrivalLink = this.network.getLinks().get(arrivalEvent.getLinkId());
 
-		distance = CoordUtils.calcDistance(
+		distance = CoordUtils.calcEuclideanDistance(
 				departureLink.getCoord(),
 				arrivalLink.getCoord());
 

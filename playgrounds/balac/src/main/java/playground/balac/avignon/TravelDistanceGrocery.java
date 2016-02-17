@@ -53,15 +53,15 @@ public class TravelDistanceGrocery {
 					//		countC++;
 						}
 						else if (previousLeg.getMode().equals( "bike" )) {
-							distanceBike += CoordUtils.calcDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
+							distanceBike += CoordUtils.calcEuclideanDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
 					//		countB++;
 						}
 						else if (previousLeg.getMode().equals( "walk" )) {
-							distanceWalk += CoordUtils.calcDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
+							distanceWalk += CoordUtils.calcEuclideanDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
 						//	countW++;
 						}
 						else if (previousLeg.getMode().equals( "pt" )) {
-							distancePt += CoordUtils.calcDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
+							distancePt += CoordUtils.calcEuclideanDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
 						//	countPt++;
 						}
 						}

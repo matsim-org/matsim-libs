@@ -1969,7 +1969,7 @@ public class TransitQueryEngineForR implements Serializable {
             }
             if (fromLink == null || toLink == null)
                 return false;
-            euclideanDistance = NetworkUtils.getEuclidianDistance(fromLink.getToNode().getCoord(), toLink.getToNode().getCoord());
+            euclideanDistance = NetworkUtils.getEuclideanDistance(fromLink.getToNode().getCoord(), toLink.getToNode().getCoord());
 
             NetworkRoute networkRoute = scenario.getTransitSchedule().getTransitLines().get(lineId)
                     .getRoutes().get(routeId).getRoute();

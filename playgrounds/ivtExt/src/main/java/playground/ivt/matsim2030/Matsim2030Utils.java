@@ -227,7 +227,7 @@ public class Matsim2030Utils {
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
-			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
+			if ((CoordUtils.calcEuclideanDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcEuclideanDistance(to.getCoord(), center) <= radius)) {
 				areaOfInterest.put(link.getId(),link);
 			}
 		}

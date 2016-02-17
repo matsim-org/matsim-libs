@@ -346,7 +346,7 @@ public class ChooseRandomLegModeForSubtourCS implements PlanAlgorithm {
 	private double scorePTLeg(Activity originActivity, Activity destinationActivity) {
 		double score = 0.0D;
 
-		double travelTime = CoordUtils.calcDistance(originActivity.getCoord(), destinationActivity.getCoord()) * this.beeLineFactor/ this.ptSpeed;
+		double travelTime = CoordUtils.calcEuclideanDistance(originActivity.getCoord(), destinationActivity.getCoord()) * this.beeLineFactor/ this.ptSpeed;
 				
 		score += travelTime * this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s;
 		score += this.params.modeParams.get(TransportMode.pt).constant;
@@ -359,7 +359,7 @@ public class ChooseRandomLegModeForSubtourCS implements PlanAlgorithm {
 	private double scoreWalkLeg(Activity originActivity, Activity destinationActivity) {
 		double score = 0.0D;
 
-		double travelTime = CoordUtils.calcDistance(originActivity.getCoord(), destinationActivity.getCoord()) * this.beeLineFactor / this.walkSpeed;
+		double travelTime = CoordUtils.calcEuclideanDistance(originActivity.getCoord(), destinationActivity.getCoord()) * this.beeLineFactor / this.walkSpeed;
 				
 		score += travelTime * this.params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s;
 		score += this.params.modeParams.get(TransportMode.walk).constant;
