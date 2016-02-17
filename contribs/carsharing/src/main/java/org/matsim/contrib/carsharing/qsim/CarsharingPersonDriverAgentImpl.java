@@ -16,6 +16,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.events.NoParkingSpaceEvent;
 import org.matsim.contrib.carsharing.events.NoVehicleCarSharingEvent;
@@ -40,8 +42,12 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -68,16 +74,14 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	 * - consider using the EditRoutes infrastructure.  It does similar splicing.
 	 *
 	 */
-	
-	
+
+
 
 	private static final Logger log = Logger.getLogger(CarsharingPersonDriverAgentImpl.class);
 
-	private Link startLinkFF;
-
 	private OneWayCarsharingStation startStationOW;
 	private OneWayCarsharingStation endStationOW;
-	
+
 	private ArrayList<TwoWayCarsharingStation> pickupStations = new ArrayList<TwoWayCarsharingStation>();
 	private ArrayList<String> twcsVehicleIDs = new ArrayList<String>();
 	private Map<Id<Link>, Id<Vehicle>> vehicleIdLocation = new HashMap<Id<Link>, Id<Vehicle>>();
@@ -99,9 +103,12 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	private final TransitAgentImpl transitAgentDelegate ;
 	private final PlanBasedDriverAgentImpl driverAgentDelegate ;
 
+	private LeastCostPathCalculator pathCalculator;
+
 
 	public CarsharingPersonDriverAgentImpl(final Plan plan, final Netsim simulation, 
-			CarSharingVehicles carSharingVehicles, TripRouter tripRouter) {
+			CarSharingVehicles carSharingVehicles, TripRouter tripRouter, LeastCostPathCalculator pathCalculator) {
+		this.pathCalculator = pathCalculator;
 		Scenario scenario = simulation.getScenario() ;
 
 		this.basicAgentDelegate = new BasicPlanAgentImpl( plan, scenario, simulation.getEventsManager(), simulation.getSimTimer() ) ;
@@ -117,7 +124,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		beelineFactor = scenario.getConfig().plansCalcRoute().getBeelineDistanceFactors().get("walk");
 		walkSpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get("walk");
 		//carsharingVehicleLocations = new ArrayList<ActivityFacility>();
-		
+
 		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			throw new RuntimeException( "does not work with a TripRouter that inserts access/egress walk") ;
 		}
@@ -125,116 +132,113 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 	// -----------------------------------------------------------------------------------------------------------------------------
 
-	
+
 
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
-		
-		
+
+
 		if (this.basicAgentDelegate.getNextPlanElement() instanceof Leg && 
 				((Leg)this.basicAgentDelegate.getNextPlanElement()).getMode().equals("freefloating")) {
-			
-			insertFreeFloatingTrip(now);			
+
+			insertFreeFloatingTripWhenEndingActivity(now);			
 		}
 		else if (this.basicAgentDelegate.getNextPlanElement() instanceof Leg && 
 				((Leg)this.basicAgentDelegate.getNextPlanElement()).getMode().equals("onewaycarsharing")) {
-			
+
 			insertOneWayCarsharingTripWhenEndingActivity(now);
 		}
-		
+
 		else if (this.basicAgentDelegate.getNextPlanElement() instanceof Leg && 
 				((Leg)this.basicAgentDelegate.getNextPlanElement()).getMode().equals("twowaycarsharing")) {
-			
-			insertRoundTripCarsharingTrip(now);
+
+			insertRoundTripCarsharingTripWhenEndingActivity(now);
 		}
-		
+
 		if (!this.getState().equals(State.ABORT))
 			this.basicAgentDelegate.endActivityAndComputeNextState(now);
 
 	}
 
-	private void insertFreeFloatingTrip(double now) {
+	private void insertFreeFloatingTripWhenEndingActivity(double now) {
+		// (_next_ plan element is (presumably) a leg)
+		
 		List<PlanElement> planElements = this.basicAgentDelegate.getCurrentPlan().getPlanElements();
-		
 		int indexOfInsertion = planElements.indexOf(this.basicAgentDelegate.getCurrentPlanElement()) + 1;
-		
+
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 		
-		final Leg leg = new LegImpl( "walk_ff" );
-		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((Leg)this.basicAgentDelegate.getNextPlanElement()).getRoute();
+		Scenario scenario = this.basicAgentDelegate.getScenario() ;
+		PopulationFactory pf = scenario.getPopulation().getFactory() ;
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl)pf).getModeRouteFactory() ;
 
-		
-		FreeFloatingStation location = findClosestAvailableCar(route.getStartLinkId());
+		// === walk leg: ===
 
-		if (location == null) {
+		NetworkRoute route = (NetworkRoute) ((Leg)this.basicAgentDelegate.getNextPlanElement()).getRoute();
+		final Link currentLink = scenario.getNetwork().getLinks().get(route.getStartLinkId());
+		final Link destinationLink = scenario.getNetwork().getLinks().get(route.getEndLinkId());
+
+		FreeFloatingStation station = findClosestAvailableCar(currentLink);
+		if (station == null) {
 			this.setStateToAbort(now);
-			this.basicAgentDelegate.getEvents().processEvent(new NoVehicleCarSharingEvent(now, route.getStartLinkId(), "ff"));
+			this.basicAgentDelegate.getEvents().processEvent(new NoVehicleCarSharingEvent(now, currentLink.getId(), "ff"));
 			return;
 		}
-		ffVehId = location.getIDs().get(0);
-		this.carSharingVehicles.getFreeFLoatingVehicles().removeVehicle(location.getLink(), ffVehId);
-		startLinkFF = location.getLink();
-
-		GenericRouteImpl routeStart = new GenericRouteImpl(((Activity)this.basicAgentDelegate.getCurrentPlanElement()).getLinkId(),
-				startLinkFF.getId());
-		routeStart.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLinkFF.getCoord()) * beelineFactor) / walkSpeed));
+		ffVehId = station.getIDs().get(0);
+		this.carSharingVehicles.getFreeFLoatingVehicles().removeVehicle(station.getLink(), ffVehId);
 		
-		routeStart.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLinkFF.getCoord()) * beelineFactor);	
+		Route routeToCar = routeFactory.createRoute( Route.class, currentLink.getId(), station.getLink().getId() ) ; 
+		final double dist = CoordUtils.calcDistance(currentLink.getCoord(), station.getLink().getCoord()) * beelineFactor;
+		routeToCar.setTravelTime( (dist / walkSpeed));
+		routeToCar.setDistance(dist);	
 
-		
-		leg.setRoute(routeStart);
+		final Leg leg = pf.createLeg( "walk_ff" );
+		leg.setRoute(routeToCar);
+
 		trip.add( leg );
-		
+
+		// === car leg: ===
+
 		double travelTime = 0.0;
 		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 
-		DummyFacility dummyStartFacility = new DummyFacility(new Coord(startLinkFF.getCoord().getX(), 
-				startLinkFF.getCoord().getY()), startLinkFF.getId());
-
-		DummyFacility dummyEndFacility = new DummyFacility(new Coord(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord().getX(), 
-				this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord().getY()),
-				this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
-
-		for(PlanElement pe1: this.tripRouter.calcRoute("car", dummyStartFacility, dummyEndFacility, now, this.basicAgentDelegate.getPerson() )) {
+		for(PlanElement pe1: this.tripRouter.calcRoute("car", station, new LinkWrapperFacility(destinationLink), now, this.basicAgentDelegate.getPerson() )) {
 			// yyyy the following is memorizing only the last PlanElement that the router generates.  Not sure why this is necessary.
 			// In practice, the router seems to generate exactly one plan element and so there is no problem, but the code remains obscure.
 			// kai, may'15
-			
+
 			if (pe1 instanceof Leg) {
 				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
 				travelTime += ((Leg) pe1).getTravelTime();
 			}
 		}
 
-		Leg carLeg = new LegImpl("freefloating");
+		Vehicle vehicle = null ;
+		Path path = this.pathCalculator.calcLeastCostPath(station.getLink().getToNode(), destinationLink.getFromNode(), now, this.basicAgentDelegate.getPerson(), vehicle ) ;
+		
+		NetworkRoute carRoute = routeFactory.createRoute(NetworkRoute.class, station.getLink().getId(), destinationLink.getId() );
+		carRoute.setLinkIds(station.getLink().getId(), ids, destinationLink.getId());
+		carRoute.setTravelTime( travelTime);
+		carRoute.setVehicleId( Id.create("FF_" + (ffVehId), Vehicle.class) ) ;
 
+		Leg carLeg = pf.createLeg("freefloating");
 		carLeg.setTravelTime( travelTime );
+		carLeg.setRoute(carRoute);
 
-		Scenario scenario = this.basicAgentDelegate.getScenario() ;
-		LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, startLinkFF.getId(),
-				 this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
-
-		routeCar.setLinkIds(startLinkFF.getId(), ids, this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
-		routeCar.setTravelTime( travelTime);
-
-		Id<Vehicle> vehId = null ;
-		
-		vehId = Id.create("FF_" + (ffVehId), Vehicle.class);
-		
-		routeCar.setVehicleId( vehId ) ;
-		carLeg.setRoute(routeCar);
 		trip.add(carLeg);
-			
+		
+		// === insert trip: ===
+
 		planElements.remove(this.basicAgentDelegate.getNextPlanElement());
 		planElements.addAll(indexOfInsertion, trip);
-		
+
 	}
 
 	private void insertOneWayCarsharingTripWhenEndingActivity(double now) {
-		
+
 		List<PlanElement> planElements = this.basicAgentDelegate.getCurrentPlan().getPlanElements();
 		int indexOfInsertion = planElements.indexOf(this.basicAgentDelegate.getCurrentPlanElement()) + 1;
-		
+
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((Leg)this.basicAgentDelegate.getNextPlanElement()).getRoute();
 		OneWayCarsharingStation station = findClosestAvailableOWCar(route.getStartLinkId());
 
@@ -245,15 +249,15 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			return;
 
 		}
-		
+
 		GenericRouteImpl routeStart = new GenericRouteImpl(((Activity)this.basicAgentDelegate.getCurrentPlanElement()).getLinkId(),
 				station.getLink().getId());
-		
+
 		startStationOW = station;
 		owVehId = station.getIDs().get(0);
 		this.carSharingVehicles.getOneWayVehicles().removeVehicle(station, owVehId);
 		routeStart.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startStationOW.getLink().getCoord()) * beelineFactor) / walkSpeed));
-		
+
 		routeStart.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startStationOW.getLink().getCoord()) * beelineFactor);	
 
 		final Leg legWalkStart = new LegImpl( "walk_ow_sb" );
@@ -261,9 +265,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( legWalkStart );
-		
+
 		//adding vehicle part of the onewaycarsharing trip
-		
+
 		endStationOW = findClosestAvailableParkingSpace(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()));
 
 		if (endStationOW == null) {
@@ -273,8 +277,8 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 			return;
 		}
-		
-		
+
+
 		double travelTime = 0.0;
 		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 
@@ -288,7 +292,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			// yyyy the following is memorizing only the last PlanElement that the router generates.  Not sure why this is necessary.
 			// In practice, the router seems to generate exactly one plan element and so there is no problem, but the code remains obscure.
 			// kai, may'15
-			
+
 			if (pe1 instanceof Leg) {
 				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
 				travelTime += ((Leg) pe1).getTravelTime();
@@ -306,49 +310,49 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		routeCar.setTravelTime( travelTime);
 
 		Id<Vehicle> vehId = null ;
-		
+
 		vehId = Id.create("OW_" + (owVehId), Vehicle.class);
-		
+
 		routeCar.setVehicleId( vehId ) ;
 		carLeg.setRoute(routeCar);
 		trip.add(carLeg);
-	
+
 		//adding eggress walk leg
-		
+
 		final Leg legWalkEnd = new LegImpl( "walk_ow_sb" );
 		GenericRouteImpl routeEnd = new GenericRouteImpl(endStationOW.getLink().getId(),
 				route.getEndLinkId());
 
-	    routeEnd.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(endStationOW.getLink().getId()).getCoord(), 
-	    		this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor) / walkSpeed));
-		
-	    routeEnd.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(endStationOW.getLink().getId()).getCoord(),
+		routeEnd.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(endStationOW.getLink().getId()).getCoord(), 
+				this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor) / walkSpeed));
+
+		routeEnd.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(endStationOW.getLink().getId()).getCoord(),
 				this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor);	
 
 		legWalkEnd.setRoute(routeEnd);
 		trip.add( legWalkEnd );
-		
+
 		planElements.remove(this.basicAgentDelegate.getNextPlanElement());
 		planElements.addAll(indexOfInsertion, trip);
-		
-		
+
+
 	}
-	
-	private void insertRoundTripCarsharingTrip(double now) {
-		
+
+	private void insertRoundTripCarsharingTripWhenEndingActivity(double now) {
+
 		//TODO: throw exception if the next planElement is not a leg		
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((Leg)this.basicAgentDelegate.getNextPlanElement()).getRoute();
 
 		List<PlanElement> planElements = this.basicAgentDelegate.getCurrentPlan().getPlanElements();
-		
+
 		int indexOfInsertion = planElements.indexOf(this.basicAgentDelegate.getCurrentPlanElement()) + 1;
-		
+
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 		if (hasCSVehicleAtLink(route.getStartLinkId())) {
 			//log.info("person has available tw car :" + basicAgentDelegate.getPerson().getId());
-			
+
 			if (willUseTheVehicleLater(route.getEndLinkId())) {
-				
+
 				//log.info("person will use the car later:" + basicAgentDelegate.getPerson().getId());
 
 				double travelTime = 0.0;
@@ -364,7 +368,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 					// yyyy the following is memorizing only the last PlanElement that the router generates.  Not sure why this is necessary.
 					// In practice, the router seems to generate exactly one plan element and so there is no problem, but the code remains obscure.
 					// kai, may'15
-					
+
 					if (pe1 instanceof Leg) {
 						ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
 						travelTime += ((Leg) pe1).getTravelTime();
@@ -384,13 +388,13 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				routeCar.setTravelTime( travelTime);
 
 				Id<Vehicle> vehId = this.vehicleIdLocation.get(route.getStartLinkId());
-				
+
 				routeCar.setVehicleId( vehId ) ;
 				carLeg.setRoute(routeCar);
 				trip.add(carLeg);
-				
+
 			}
-			
+
 			else {
 				//log.info("person will not use the car later:" + basicAgentDelegate.getPerson().getId());
 
@@ -406,7 +410,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 					// yyyy the following is memorizing only the last PlanElement that the router generates.  Not sure why this is necessary.
 					// In practice, the router seems to generate exactly one plan element and so there is no problem, but the code remains obscure.
 					// kai, may'15
-					
+
 					if (pe1 instanceof Leg) {
 						ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
 						travelTime += ((Leg) pe1).getTravelTime();
@@ -426,245 +430,245 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				routeCar.setTravelTime( travelTime);
 
 				Id<Vehicle> vehId = this.vehicleIdLocation.get(route.getStartLinkId());
-				
+
 				routeCar.setVehicleId( vehId ) ;
 				carLeg.setRoute(routeCar);
 				trip.add(carLeg);
-				
+
 				final Leg legWalkEnd = new LegImpl( "walk_rb" );
 				//TODO: get start link from the station
 				GenericRouteImpl routeEnd = new GenericRouteImpl(null,
 						route.getEndLinkId());
 
-			    routeEnd.setTravelTime( ((CoordUtils.calcDistance(this.pickupStations.get(this.pickupStations.size() - 1).getLink().getCoord(), 
-			    		this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor) / walkSpeed));
-				
-			    routeEnd.setDistance(CoordUtils.calcDistance(this.pickupStations.get(this.pickupStations.size() - 1).getLink().getCoord(),
+				routeEnd.setTravelTime( ((CoordUtils.calcDistance(this.pickupStations.get(this.pickupStations.size() - 1).getLink().getCoord(), 
+						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor) / walkSpeed));
+
+				routeEnd.setDistance(CoordUtils.calcDistance(this.pickupStations.get(this.pickupStations.size() - 1).getLink().getCoord(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor);	
 
 				legWalkEnd.setRoute(routeEnd);
 				trip.add( legWalkEnd );
-				
+
 			}
-			
+
 		}
-		
+
 		else {
-			
+
 			if (willUseTheVehicleLater(route.getEndLinkId())) {
-			
+
 				//log.info("Person with an id: "   + basicAgentDelegate.getPerson().getId()
 				//		+ " does not have a tw car.");
-	
+
 				final Leg legWalkEnd = new LegImpl( "walk_rb" );
-				
+
 				TwoWayCarsharingStation pickUpStation = this.findClosestAvailableTWCar(route.getStartLinkId());
-				
+
 				if (pickUpStation == null) {
 					this.setStateToAbort(now);
 					this.basicAgentDelegate.getEvents().processEvent(new NoVehicleCarSharingEvent(now, route.getStartLinkId(), "tw"));
 					return;
-					
+
 				}
 				this.pickupStations.add(pickUpStation);
 				this.twcsVehicleIDs.add(pickUpStation.getIDs().get(0));
 				GenericRouteImpl routeEnd = new GenericRouteImpl(route.getStartLinkId(),
 						pickUpStation.getLink().getId());
-	
-			    routeEnd.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), 
-			    		this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor) / walkSpeed));
-				
-			    routeEnd.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
+
+				routeEnd.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), 
+						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor) / walkSpeed));
+
+				routeEnd.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor);	
-	
+
 				legWalkEnd.setRoute(routeEnd);
 				trip.add( legWalkEnd );
-				
+
 				//vehicle leg of the round-trip carsharing trip
-				
+
 				double travelTime = 0.0;
 				List<Id<Link>> ids = new ArrayList<Id<Link>>();
-	
+
 				DummyFacility dummyStartFacility =new DummyFacility(new Coord(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord().getX(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord().getY()), this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getId());
 				//TODO: get the station where the car was picked up and create the new route
 				DummyFacility dummyEndFacility = new DummyFacility(new Coord(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord().getX(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord().getY()), this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
-	
+
 				for(PlanElement pe1: this.tripRouter.calcRoute("car", dummyStartFacility, dummyEndFacility, now, this.basicAgentDelegate.getPerson() )) {
 					// yyyy the following is memorizing only the last PlanElement that the router generates.  Not sure why this is necessary.
 					// In practice, the router seems to generate exactly one plan element and so there is no problem, but the code remains obscure.
 					// kai, may'15
-					
+
 					if (pe1 instanceof Leg) {
 						ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
 						travelTime += ((Leg) pe1).getTravelTime();
 					}
 				}
-	
+
 				Leg carLeg = new LegImpl("twowaycarsharing");
-	
+
 				carLeg.setTravelTime( travelTime );
-	
+
 				Scenario scenario = this.basicAgentDelegate.getScenario() ;
 				LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, pickUpStation.getLink().getId(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
-	
+
 				routeCar.setLinkIds( pickUpStation.getLink().getId(), ids, 
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
 				routeCar.setTravelTime( travelTime);
-	
+
 				//log.info("Rented twowaycarsharing car has an id: " + pickUpStation.getIDs().get(0));
 				Id<Vehicle> vehId = Id.create("TW_" + (pickUpStation.getIDs().get(0)), Vehicle.class);
 				this.carSharingVehicles.getTwoWayVehicles().removeVehicle(pickUpStation, pickUpStation.getIDs().get(0));
-	
+
 				routeCar.setVehicleId( vehId ) ;
 				carLeg.setRoute(routeCar);
 				trip.add(carLeg);
 			}
-			
+
 			else {
-				
+
 				//log.info("Two way carsharing trip is assigned to a leg between the same locations!");
-				
+
 				final Leg legWalkStart = new LegImpl( "walk_rb" );
-				
+
 				TwoWayCarsharingStation pickUpStation = this.findClosestAvailableTWCar(route.getStartLinkId());
-				
+
 				if (pickUpStation == null) {
 					this.setStateToAbort(now);
 					this.basicAgentDelegate.getEvents().processEvent(new NoVehicleCarSharingEvent(now, route.getStartLinkId(), "tw"));
 					return;
-					
+
 				}
 				this.pickupStations.add(pickUpStation);
 				this.twcsVehicleIDs.add(pickUpStation.getIDs().get(0));
 				GenericRouteImpl routeWalkStart = new GenericRouteImpl(route.getStartLinkId(),
 						pickUpStation.getLink().getId());
-	
+
 				routeWalkStart.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), 
-			    		this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor) / walkSpeed));
-				
+						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor) / walkSpeed));
+
 				routeWalkStart.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor);	
-	
-			    legWalkStart.setRoute(routeWalkStart);
+
+				legWalkStart.setRoute(routeWalkStart);
 				trip.add( legWalkStart );
-				
+
 				//vehicle leg of the round-trip carsharing trip
-				
+
 				double travelTime = 0.0;
 				List<Id<Link>> ids = new ArrayList<Id<Link>>();
-	
+
 				DummyFacility dummyStartFacility =new DummyFacility(new Coord(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord().getX(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord().getY()), this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getId());
 				//TODO: get the station where the car was picked up and create the new route
 				DummyFacility dummyEndFacility = new DummyFacility(new Coord(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord().getX(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord().getY()), this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
-	
+
 				for(PlanElement pe1: this.tripRouter.calcRoute("car", dummyStartFacility, dummyEndFacility, now, this.basicAgentDelegate.getPerson() )) {
 					// yyyy the following is memorizing only the last PlanElement that the router generates.  Not sure why this is necessary.
 					// In practice, the router seems to generate exactly one plan element and so there is no problem, but the code remains obscure.
 					// kai, may'15
-					
+
 					if (pe1 instanceof Leg) {
 						ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
 						travelTime += ((Leg) pe1).getTravelTime();
 					}
 				}
-	
+
 				Leg carLeg = new LegImpl("twowaycarsharing");
-	
+
 				carLeg.setTravelTime( travelTime );
-	
+
 				Scenario scenario = this.basicAgentDelegate.getScenario() ;
 				LinkNetworkRouteImpl routeCar = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, pickUpStation.getLink().getId(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
-	
+
 				routeCar.setLinkIds( pickUpStation.getLink().getId(), ids, 
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getId());
 				routeCar.setTravelTime( travelTime);
-	
+
 				//log.info("Rented twowaycarsharing car has an id: " + pickUpStation.getIDs().get(0));
 				Id<Vehicle> vehId = Id.create("TW_" + (pickUpStation.getIDs().get(0)), Vehicle.class);
 				this.carSharingVehicles.getTwoWayVehicles().removeVehicle(pickUpStation, pickUpStation.getIDs().get(0));
-	
+
 				routeCar.setVehicleId( vehId ) ;
 				carLeg.setRoute(routeCar);
 				trip.add(carLeg);
-				
+
 				final Leg legWalkEnd = new LegImpl( "walk_rb" );
-				
+
 				GenericRouteImpl routeWalkEnd = new GenericRouteImpl(pickUpStation.getLink().getId(),
 						route.getEndLinkId());
-	
+
 				routeWalkEnd.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord(), 
-			    		this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor) / walkSpeed));
-				
+						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor) / walkSpeed));
+
 				routeWalkEnd.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor);	
-	
+
 				legWalkEnd.setRoute(routeWalkEnd);
 				trip.add( legWalkEnd );
-				
-				
-				
+
+
+
 			}
-			
-			
+
+
 		}
-		
+
 		planElements.remove(this.basicAgentDelegate.getNextPlanElement());
 		planElements.addAll(indexOfInsertion, trip);
-		
+
 	}
-	
+
 	private boolean willUseTheVehicleLater(Id<Link> linkId) {
 		// TODO Auto-generated method stub
-		
+
 		boolean willUseVehicle = false;
-		
+
 		List<PlanElement> planElements = this.basicAgentDelegate.getCurrentPlan().getPlanElements();
-		
+
 		int index = planElements.indexOf(this.basicAgentDelegate.getCurrentPlanElement()) + 1;
-		
+
 		for (int i = index; i < planElements.size(); i++) {
-			
+
 			if (planElements.get(i) instanceof Leg) {
-				
+
 				if (((Leg)planElements.get(i)).getMode().equals("twowaycarsharing")) {
-					
+
 					if (((Leg)planElements.get(i)).getRoute().getStartLinkId().toString().equals(linkId.toString())) {
-						
+
 						willUseVehicle = true;
 					}
 				}
-				
+
 			}
 		}
-		
+
 		return willUseVehicle;
 	}
 
 	private boolean hasCSVehicleAtLink(Id<Link> linkId) {
 		boolean hasVehicle = false;
-		
+
 		if (this.vehicleIdLocation.containsKey(linkId))
 			hasVehicle = true;
-		
+
 		return hasVehicle;
 	}
 
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
-		
+
 		parkCSVehicle( );			
 
 		this.basicAgentDelegate.endLegAndComputeNextState(now);
-		
+
 	}	
 
-	
+
 	private void parkCSVehicle() {
 		Leg currentLeg = (Leg) this.basicAgentDelegate.getCurrentPlanElement() ;
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
@@ -675,7 +679,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			owVehId = null;
 		}
 		else if (currentLeg.getMode().equals("twowaycarsharing") 
-				
+
 				&& this.basicAgentDelegate.getNextPlanElement() instanceof Leg
 				) {
 
@@ -702,7 +706,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 	}
 
-	
+
 	//added methods
 
 
@@ -729,12 +733,16 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 	}	
 
+	@Deprecated // use method below directly (do lookup in calling method)
 	private FreeFloatingStation findClosestAvailableCar(Id<Link> linkId) {		
 		//find the closest available car in the quad tree(?) reserve it (make it unavailable)
 		Link link = this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(linkId);
 
-		FreeFloatingStation location = this.carSharingVehicles.getFreeFLoatingVehicles().getQuadTree().getClosest(link.getCoord().getX(), link.getCoord().getY());
+		return findClosestAvailableCar(link);
+	}
 
+	private FreeFloatingStation findClosestAvailableCar(Link link) {
+		FreeFloatingStation location = this.carSharingVehicles.getFreeFLoatingVehicles().getQuadTree().getClosest(link.getCoord().getX(), link.getCoord().getY());
 		return location;
 	}
 
@@ -798,7 +806,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) ((Leg) currentPlanElement).getRoute(); // if casts fail: illegal state.
 
-		
+
 		if (route.getVehicleId() != null) 
 			return route.getVehicleId();
 
