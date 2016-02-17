@@ -26,11 +26,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -85,18 +82,7 @@ public class NoiseConfigGroupTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		
-		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
-
-		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-			}
-		});
-		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-
+		controler.addControlerListener(new NoiseCalculationOnline(controler));
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		

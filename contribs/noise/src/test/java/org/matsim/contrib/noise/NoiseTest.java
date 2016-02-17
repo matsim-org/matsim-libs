@@ -99,7 +99,7 @@ public class NoiseTest {
 		String[] consideredActivities = {"home", "work"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
 		
-		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario);
 		
 		// test the grid of receiver points
 		Assert.assertEquals("wrong number of receiver points", 16, noiseContext.getReceiverPoints().size(), MatsimTestUtils.EPSILON);
@@ -186,7 +186,7 @@ public class NoiseTest {
 		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 			
-		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
@@ -940,7 +940,7 @@ public class NoiseTest {
 		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 			
-		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
@@ -1049,7 +1049,7 @@ public class NoiseTest {
 		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 			
-		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
