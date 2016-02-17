@@ -50,6 +50,9 @@ public class NoiseOfflineCalculation {
 	private String outputDirectory;
 	private Scenario scenario;
 	private NoiseConfigGroup noiseParameters;
+	
+	private NoiseContext noiseContext = null;
+	private NoiseTimeTracker timeTracker = null;
 
 	public NoiseOfflineCalculation(Scenario scenario, String analysisOutputDirectory) {
 		this.scenario = scenario;
@@ -76,12 +79,12 @@ public class NoiseOfflineCalculation {
 		File file = new File(outputFilePath);
 		file.mkdirs();
 					
-		NoiseContext noiseContext = new NoiseContext(scenario);
+		noiseContext = new NoiseContext(scenario);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 				
 		EventsManager events = EventsUtils.createEventsManager();
 
-		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
+		timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
 		events.addHandler(timeTracker);
 		
 		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
@@ -131,5 +134,14 @@ public class NoiseOfflineCalculation {
 		merger.setThreshold(-1.);
 		merger.run();
 	}
+
+	public NoiseTimeTracker getTimeTracker() {
+		return timeTracker;
+	}
+
+	public NoiseContext getNoiseContext() {
+		return noiseContext;
+	}
+	
 }
 

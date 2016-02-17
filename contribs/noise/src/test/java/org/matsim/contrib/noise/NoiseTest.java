@@ -23,7 +23,6 @@
 package org.matsim.contrib.noise;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,8 +44,6 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.NoiseConfigGroup;
-import org.matsim.contrib.noise.NoiseWriter;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.data.NoiseReceiverPoint;
@@ -54,10 +51,7 @@ import org.matsim.contrib.noise.data.PersonActivityInfo;
 import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.contrib.noise.events.NoiseEventAffected;
 import org.matsim.contrib.noise.events.NoiseEventCaused;
-import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
 import org.matsim.contrib.noise.handler.NoiseEquations;
-import org.matsim.contrib.noise.handler.NoiseTimeTracker;
-import org.matsim.contrib.noise.handler.PersonActivityTracker;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -65,8 +59,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -177,23 +169,10 @@ public class NoiseTest {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		String outputFilePath = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
-		File file = new File(outputFilePath);
-		file.mkdirs();
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
+		noiseCalculation.run();	
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		
-		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		events.addHandler(eventWriter);
-			
-		NoiseContext noiseContext = new NoiseContext(scenario);
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
-		
-		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
-		events.addHandler(actTracker);
-		
-		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
-		events.addHandler(timeTracker);
 				
 		final Map<Id<Person>, List<Event>> eventsPerPersonId = new HashMap<Id<Person>, List<Event>>();
 		
@@ -235,10 +214,6 @@ public class NoiseTest {
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
-		
-		timeTracker.computeFinalTimeIntervals();
-
-		eventWriter.closeFile();
 		
 		// ############################
 		// test considered agent units
@@ -302,7 +277,7 @@ public class NoiseTest {
 			
 			double affectedPersons = 0.;
 			
-			for(Id<Person> personId : noiseContext.getScenario().getPopulation().getPersons().keySet()){
+			for(Id<Person> personId : scenario.getPopulation().getPersons().keySet()){
 				
 				double start = 0.;
 				
@@ -366,13 +341,13 @@ public class NoiseTest {
 						// test code of getDurationInWithinInterval from actInfo
 						
 						double durationInThisInterval = 0.;
-						double timeIntervalStart = currentTimeSlot - noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
+						double timeIntervalStart = currentTimeSlot - noiseParameters.getTimeBinSizeNoiseComputation();
 						
 						if (( actInfo.getStartTime() < currentTimeSlot) && ( actInfo.getEndTime() >=  timeIntervalStart )) {
 							
 							if ((actInfo.getStartTime() <= timeIntervalStart) && actInfo.getEndTime() >= currentTimeSlot) {
 								
-								durationInThisInterval = noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
+								durationInThisInterval = noiseParameters.getTimeBinSizeNoiseComputation();
 							
 							} else if (actInfo.getStartTime() <= timeIntervalStart && actInfo.getEndTime() <= currentTimeSlot) {
 								
@@ -394,18 +369,18 @@ public class NoiseTest {
 								
 						}
 						
-						double durationInThisIntervalMethod = actInfo.getDurationWithinInterval(currentTimeSlot, noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()); 
+						double durationInThisIntervalMethod = actInfo.getDurationWithinInterval(currentTimeSlot, noiseParameters.getTimeBinSizeNoiseComputation()); 
 							
 						Assert.assertEquals("Durations of activities do not match!", durationInThisIntervalMethod, durationInThisInterval, MatsimTestUtils.EPSILON);
 							
-						double unitsThisPersonActivityInfo = durationInThisInterval / noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation(); 
-						affectedPersons = ( unitsThisPersonActivityInfo * noiseContext.getNoiseParams().getScaleFactor() );
+						double unitsThisPersonActivityInfo = durationInThisInterval / noiseParameters.getTimeBinSizeNoiseComputation(); 
+						affectedPersons = ( unitsThisPersonActivityInfo * noiseParameters.getScaleFactor() );
 						
 						Coord coord = actInfo.getActivityType().equals("home") ?
-								((Activity)noiseContext.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(0)).getCoord() :
-								((Activity)noiseContext.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(2)).getCoord();
+								((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(0)).getCoord() :
+								((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(2)).getCoord();
 							
-						Id<ReceiverPoint> rpId = noiseContext.getGrid().getActivityCoord2receiverPointId().get(coord);
+						Id<ReceiverPoint> rpId = noiseCalculation.getNoiseContext().getGrid().getActivityCoord2receiverPointId().get(coord);
 						
 						if(!affectedPersonsPerReceiverPointTest.containsKey(rpId)){
 							
@@ -481,7 +456,7 @@ public class NoiseTest {
 		
 		Map<Id<Link>, Integer> amountOfVehiclesPerLink = new HashMap<Id<Link>, Integer>();
 		
-		for(NoiseEventCaused event: timeTracker.getNoiseEventsCaused()){
+		for(NoiseEventCaused event: noiseCalculation.getTimeTracker().getNoiseEventsCaused()){
 			
 			if(event.getEmergenceTime() >= endTime - 3600 && event.getEmergenceTime() <= endTime){
 				
@@ -505,13 +480,13 @@ public class NoiseTest {
 		
 		Map<Id<Link>,Double> noiseEmissionsPerLink = new HashMap<Id<Link>,Double>();
 		
-		for(Id<Link> linkId : noiseContext.getScenario().getNetwork().getLinks().keySet()){
+		for(Id<Link> linkId : scenario.getNetwork().getLinks().keySet()){
 			noiseEmissionsPerLink.put(linkId, 0.);
 		}
 		
 		for(Id<Link> linkId : amountOfVehiclesPerLink.keySet()){
 
-			double vCar = (noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
+			double vCar = (scenario.getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
 			double vHdv = vCar;
 			double p = 0;
 			int n = amountOfVehiclesPerLink.size();
@@ -567,7 +542,7 @@ public class NoiseTest {
 			e.printStackTrace();
 		}
 		
-		for(NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()){
+		for(NoiseReceiverPoint rp : noiseCalculation.getNoiseContext().getReceiverPoints().values()){
 			
 			Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
 			
@@ -632,7 +607,7 @@ public class NoiseTest {
 			e.printStackTrace();
 		}
 		
-		for(ReceiverPoint rp : noiseContext.getReceiverPoints().values()){
+		for(ReceiverPoint rp : noiseCalculation.getNoiseContext().getReceiverPoints().values()){
 			
 			double noiseImmission = immissionPerReceiverPointId.get(rp.getId());
 			double affectedAgentUnits = consideredAgentsPerReceiverPoint.get(rp.getId()).get(1);
@@ -732,84 +707,6 @@ public class NoiseTest {
 		Assert.assertEquals("Wrong damage per car per link!", 0.00079854651258 / 2.0, damagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong damage per car per link!", 0.06561786301587 / 2.0, damagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong damage per car per link!", 0., damagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
-		
-		// ############################################
-		// test marginal damages per link, car and time
-		// ############################################
-		
-		// link 2: emission: 56.44189483793875
-		// link 2: emission_plusOneCar: 58.20280742849556
-		// link 2: emission_plusOneHGV: 58.80174566113962
-		
-//		int n_car = 0;
-//		int n_hgv = 1;
-//		double v = 35.0;
-//		double scaleFactor = 10.;
-//		
-//		int n = n_car + n_hgv;
-//		int nPlusOneCarOrHgv = n + 1;
-//		double p = n_hgv / (double) n;
-//		
-//		double pPlusOneHgv = (n_hgv + 1.) / ((double) nPlusOneCarOrHgv);
-//		double pPlusOneCar = n_hgv / ((double) nPlusOneCarOrHgv);
-//		
-//		System.out.println("p: " + p + " - pPlusOneCar: " + pPlusOneCar + " - pPlusOneHGV: " + pPlusOneHgv);
-//		
-//		n = (int) (n * scaleFactor);
-//		nPlusOneCarOrHgv = (int) (n * scaleFactor);
-//				
-//		double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
-//		System.out.println("m: " + mittelungspegel);
-//		double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(v, v, p);
-//		System.out.println("D: " + Dv);
-//		double noiseEmission = mittelungspegel + Dv;
-//		System.out.println("emission: " + noiseEmission);
-//		
-//		double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm(nPlusOneCarOrHgv, pPlusOneCar);
-//		System.out.println("m plus one car: " + mittelungspegelPlusOneCar);
-//		double DvPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(v, v, pPlusOneCar);
-//		System.out.println("D plus one car: " + DvPlusOneCar);
-//		double noiseEmissionPlusOneCar = mittelungspegelPlusOneCar + DvPlusOneCar;
-//		System.out.println("emission (plus one car): " + noiseEmissionPlusOneCar);
-//		
-//		double mittelungspegelPlusOneHgv = NoiseEquations.calculateMittelungspegelLm(nPlusOneCarOrHgv, pPlusOneHgv);
-//		System.out.println("m plus one HGV: " + mittelungspegelPlusOneHgv);
-//		double DvPlusOneHgv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(v, v, pPlusOneHgv);
-//		System.out.println("D plus one HGV: " + DvPlusOneHgv);
-//		double noiseEmissionPlusOneHgv = mittelungspegelPlusOneHgv + DvPlusOneHgv;
-//		System.out.println("emission (plus one hgv): " + noiseEmissionPlusOneHgv);
-
-		// link A5: emission: 86.43028648510975
-		// link A5: emission_plusOneCar: 88.19119907566656
-		// link A5: emission_plusOneHGV: 86.47455942823328 // this is due to the Geschwindigkeitskorrektur
-		
-		// link B5: emission: 0
-		// link B5: emission_plusOneCar: 30.710821120439775
-		// link B5: emission_plusOneHGV: 44.32342059450772
-		
-		// receiver point 16:
-		
-		// isolated immissions: {link2=50.45464287410944, linkA5=69.60186152606298, linkB5=0.0} --> final immission: 69.6543946397625 --> final damage cost: 0.0664164095284536
-		// isolated immission plus one car: {link2=52.21555546466625, linkA5=71.36277411661979, linkB5=12.012377641729797}
-		// isolated immission plus one hgv: {link2=52.81449369731031, linkA5=69.6461344691865, linkB5=25.624977115797748}
-		
-		// only on link2: plus one car {link2=52.21555546466625, linkA5=69.60186152606298, linkB5=0.0} --> final immission (plus one car on link2): 69.68042480833185 --> noise damage cost (plus one car on link2): 0.06653635108691325
-		// only on link2: plus one hgv {link2=52.81449369731031, linkA5=69.60186152606298, linkB5=0.0} --> final immission (plus one hgv on link2): 69.69192251206803 --> noise damage cost (plus one hgv on link2): 0.06658939903919044
-		
-		// only on linkA5: plus one car {link2=50.45464287410944, linkA5=71.36277411661979, linkB5=0.0} --> final immission (plus one car on linkA5): 71.39786670288962 --> noise damage cost (plus one car on linkA5): 0.07494784202184525
-		// only on linkA5: plus one hgv {link2=50.45464287410944, linkA5=69.6461344691865, linkB5=0.0} --> final immission (plus one hgv on linkA5): 69.69813794635571 --> noise damage cost (plus one car on linkA5): 0.06661809333629465
-		
-		// only on linkB5: plus one car {link2=50.45464287410944, linkA5=69.60186152606298, linkB5=12.012377641729797} --> final immission (plus one car on linkB5): 69.65440211426409 --> noise damage cost (plus one car on linkB5): 0.0664164439383374
-		// only on linkB5: plus one hgv {link2=50.45464287410944, linkA5=69.60186152606298, linkB5=25.624977115797748} --> final immission (plus one hgv on linkB5): 69.65456636493948 --> noise damage cost (plus one car on linkB5): 0.06641720009314242
-
-		// marginal damage cost car link2: 0.00011994
-		// marginal damage cost hgv link2: 0.00017299
-		
-		// marginal damage cost car linkA5: 0.00853143
-		// marginal damage cost hgv linkA5: 0.00020168
-		
-		// marginal damage cost car linkA5: 3.440988380343235E-8
-		// marginal damage cost hgv linkA5: 7.905646888239914E-7
 				
 		line = null;
 		
@@ -854,7 +751,7 @@ public class NoiseTest {
 
 		boolean tested = false;
 		int counter = 0;
-		for (NoiseEventCaused event : timeTracker.getNoiseEventsCaused()) {
+		for (NoiseEventCaused event : noiseCalculation.getTimeTracker().getNoiseEventsCaused()) {
 			tested = true;
 
 			if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
@@ -878,7 +775,7 @@ public class NoiseTest {
 		
 		boolean tested2 = false;
 		int counter2 = 0;
-		for (NoiseEventAffected event : timeTracker.getNoiseEventsAffected()) {
+		for (NoiseEventAffected event : noiseCalculation.getTimeTracker().getNoiseEventsAffected()) {
 			tested2 = true;
 
 			if (event.getEmergenceTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
@@ -913,56 +810,36 @@ public class NoiseTest {
 		// run the noise analysis for the final iteration (offline)
 		
 		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
-		
+
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
-		
+						
+		// adjust the default noise parameters
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setReceiverPointGap(250.);	
+		
 		String[] consideredActivities = {"home", "work"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
+		
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 		noiseParameters.setUseActualSpeedLevel(false);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
-		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		String outputFilePath = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
-		File file = new File(outputFilePath);
-		file.mkdirs();
-		
-		EventsManager events = EventsUtils.createEventsManager();
-		
-		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		events.addHandler(eventWriter);
-			
-		NoiseContext noiseContext = new NoiseContext(scenario);
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
-		
-		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
-		events.addHandler(actTracker);
-		
-		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
-		events.addHandler(timeTracker);
-						
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
-		
-		timeTracker.computeFinalTimeIntervals();
-
-		eventWriter.closeFile();
-			
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
+		noiseCalculation.run();	
+							
 		// ############################################
 		// test the noise-specific events
 		// ############################################
 
 		boolean tested = false;
 		int counter = 0;
-		for (NoiseEventCaused event : timeTracker.getNoiseEventsCaused()) {
+		for (NoiseEventCaused event : noiseCalculation.getTimeTracker().getNoiseEventsCaused()) {
 			tested = true;
 
 			if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
@@ -986,7 +863,7 @@ public class NoiseTest {
 		
 		boolean tested2 = false;
 		int counter2 = 0;
-		for (NoiseEventAffected event : timeTracker.getNoiseEventsAffected()) {
+		for (NoiseEventAffected event : noiseCalculation.getTimeTracker().getNoiseEventsAffected()) {
 			tested2 = true;
 
 			if (event.getEmergenceTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
@@ -1021,13 +898,14 @@ public class NoiseTest {
 		// run the noise analysis for the final iteration (offline)
 		
 		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
-		
+
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
-				
+						
+		// adjust the default noise parameters
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setReceiverPointGap(250.);	
 		
@@ -1037,29 +915,12 @@ public class NoiseTest {
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
-		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		String outputFilePath = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
-		File file = new File(outputFilePath);
-		file.mkdirs();
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
+		noiseCalculation.run();		
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		
-		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		events.addHandler(eventWriter);
-			
-		NoiseContext noiseContext = new NoiseContext(scenario);
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
-		
-		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
-		events.addHandler(actTracker);
-		
-		LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation(noiseContext);
-		events.addHandler(linkSpeedCalculator);	
-		
-		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
-		events.addHandler(timeTracker);
 				
 		final Map<Id<Person>, List<Event>> eventsPerPersonId = new HashMap<Id<Person>, List<Event>>();
 		
@@ -1101,11 +962,7 @@ public class NoiseTest {
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
-		
-		timeTracker.computeFinalTimeIntervals();
-
-		eventWriter.closeFile();
-		
+				
 		double endTime = 39600;
 		
 		String separator = ";";
@@ -1379,24 +1236,7 @@ public class NoiseTest {
 		double mittelungspegelPlusOneHGV = NoiseEquations.calculateMittelungspegelLm(nPlusOneHGV, pPlusOneHGV);			
 		double dVPlusOneHGV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneHGV);
 		double emissionPlusOneHGV = mittelungspegelPlusOneHGV + dVPlusOneHGV;
-		Assert.assertEquals("Wrong emission!", 58.4529399949061, emissionPlusOneHGV, MatsimTestUtils.EPSILON);	
-		
-//		System.out.println("emission: " + emission);
-//		System.out.print("emissionPlusOneCar: " + emissionPlusOneCar);
-//		
-//		if (emission >= emissionPlusOneCar) {
-//			System.out.println(" :-(");
-//		} else {
-//			System.out.println(" :-)");
-//		}
-//		
-//		System.out.print("emissionPlusOneHGV: " + emissionPlusOneHGV);
-//		
-//		if (emission >= emissionPlusOneHGV) {
-//			System.out.println(" :-(");
-//		} else {
-//			System.out.println(" :-)");
-//		}
+		Assert.assertEquals("Wrong emission!", 58.4529399949061, emissionPlusOneHGV, MatsimTestUtils.EPSILON);
 
 	}
 	
@@ -1445,75 +1285,5 @@ public class NoiseTest {
 		double dVPlusOneHGV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneHGV);
 		double emissionPlusOneHGV = mittelungspegelPlusOneHGV + dVPlusOneHGV;
 		Assert.assertEquals("Wrong emission!", 61.9518310976080, emissionPlusOneHGV, MatsimTestUtils.EPSILON);	
-		
-//		System.out.println("emission: " + emission);
-//		System.out.print("emissionPlusOneCar: " + emissionPlusOneCar);
-//		
-//		if (emission >= emissionPlusOneCar) {
-//			System.out.println(" :-(");
-//		} else {
-//			System.out.println(" :-)");
-//		}
-//		
-//		System.out.print("emissionPlusOneHGV: " + emissionPlusOneHGV);
-//		
-//		if (emission >= emissionPlusOneHGV) {
-//			System.out.println(" :-(");
-//		} else {
-//			System.out.println(" :-)");
-//		}
-		
 	}
-	
-//	// tests the static methods within class "noiseEquations" - other speed levels
-//	@Test
-//	public final void test6(){
-//		
-//		double vCar = 30.000001;
-//		double vHGV = 50.00001;
-//		int nCar = 119;
-//		int nHGV = 4;
-//		
-//		int n = (nCar + nHGV) * 10;
-//		
-//		double p = ( (double) nHGV / (double) (nCar + nHGV));			
-//		double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
-//		double dV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, p);
-//		double emission = mittelungspegel + dV;
-//	
-//		// plus one car
-//		
-//		int nPlusOneCar = (nCar+1 + nHGV) * 10;
-//		double pPlusOneCar = ( (double) nHGV / (double) ((nCar + 1) + nHGV));	
-//		double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm(nPlusOneCar, pPlusOneCar);			
-//		double dVPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneCar);
-//		double emissionPlusOneCar = mittelungspegelPlusOneCar + dVPlusOneCar;
-//		
-//		// plus one HGV
-//		
-//		int nPlusOneHGV = (nCar + nHGV + 1) * 10;
-//		double pPlusOneHGV = ( (double) (nHGV + 1) / (double) (nCar + (nHGV + 1)));	
-//		double mittelungspegelPlusOneHGV = NoiseEquations.calculateMittelungspegelLm(nPlusOneHGV, pPlusOneHGV);			
-//		double dVPlusOneHGV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneHGV);
-//		double emissionPlusOneHGV = mittelungspegelPlusOneHGV + dVPlusOneHGV;
-//		
-//		System.out.println("emission: " + emission);
-//		System.out.print("emissionPlusOneCar: " + emissionPlusOneCar);
-//		
-//		if (emission >= emissionPlusOneCar) {
-//			System.out.println(" :-(");
-//		} else {
-//			System.out.println(" :-)");
-//		}
-//		
-//		System.out.print("emissionPlusOneHGV: " + emissionPlusOneHGV);
-//		
-//		if (emission >= emissionPlusOneHGV) {
-//			System.out.println(" :-(");
-//		} else {
-//			System.out.println(" :-)");
-//		}
-//		
-//	}
-		
 }

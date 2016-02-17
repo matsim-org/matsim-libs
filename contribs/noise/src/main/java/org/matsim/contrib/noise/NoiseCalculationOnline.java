@@ -52,11 +52,6 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	private NoiseTimeTracker timeTracker;
 	private PersonActivityTracker actTracker;
 	private NoisePricingHandler pricing;
-			
-	@Deprecated
-	public NoiseCalculationOnline(NoiseContext noiseContext) {
-		this.noiseContext = noiseContext;
-	}
 
 	public NoiseCalculationOnline(Controler controler) {
 		
@@ -66,6 +61,9 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getConfig().getModule("noise");
 		
 		if (noiseParameters.isInternalizeNoiseDamages()) {
+			
+			log.info("Internalizing noise damages. The default travel disutility will be replaced by a travel distuility which accounts for noise tolls...");
+			
 			final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(this.noiseContext);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
