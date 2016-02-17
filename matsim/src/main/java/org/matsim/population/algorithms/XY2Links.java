@@ -88,8 +88,6 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 						if (facility != null) act.setLinkId(facility.getLinkId());
 						// yy facility.getLinkId may be null, in particular since linkId is not even part of the facilities DTD. kai, feb'16
-						
-						if (act.getLinkId() != null) continue; // (*)
 					}
 				}
 				
@@ -97,8 +95,6 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 					// there may be activities in a plan that have a link and others that have a coordinate.  
 					// Those that have a link do not need a new link.  In addition, they may not even have a 
 					// coordinate.  kai/dominik, nov'11
-					
-					// this could presumably be combined with (*).  kai/dominik, nov'11
 					continue ;
 				}
 
@@ -118,7 +114,6 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 				}
 				act.setLinkId(link.getId());				
 			}
-//			else continue; // I think that this confuses more than it helps. kai, feb'16
 		}
 	}
 }
