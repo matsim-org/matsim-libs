@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -52,8 +53,11 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.rx.ObservableUtils;
+import rx.Notification;
 import rx.Observable;
+import rx.Observer;
 import rx.functions.Action1;
+import rx.subjects.PublishSubject;
 
 /**
  * This class helps EventsToScore by keeping ScoringFunctions for the entire Population - one per Person -, and dispatching Activities
@@ -84,6 +88,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 	private final Map<Id<Person>, ScoringFunction> agentScorers = new HashMap<>();
 	private final Map<Id<Person>, Plan> agentRecords = new HashMap<>();
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
+	private final AtomicReference<Throwable> exception = new AtomicReference<>();
 
 	@Inject
 	ScoringFunctionsForPopulation(EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
@@ -103,9 +108,9 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		Observable<PersonExperiencedActivity> activities = ObservableUtils.fromEventsToActivities(eventsToActivities);
 		Observable<PersonExperiencedLeg> legs = ObservableUtils.fromEventsToLegs(eventsToLegs);
 		Observable<Object> allEvents = Observable.merge(events, activities, legs);
-		allEvents.subscribe(new Action1<Object>() {
+		allEvents.subscribe(new Observer<Object>() {
 			@Override
-			public void call(Object o) {
+			public void onNext(Object o) {
 				if (o instanceof HasPersonId) {
 					scorePersonEvent((HasPersonId) o);
 				} else if (o instanceof PersonExperiencedActivity) {
@@ -113,6 +118,16 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 				} else if (o instanceof PersonExperiencedLeg) {
 					scoreExperiencedLeg((PersonExperiencedLeg) o);
 				}
+			}
+
+			@Override
+			public void onCompleted() {
+
+			}
+
+			@Override
+			public void onError(Throwable e) {
+				exception.set(e);
 			}
 		});
 		eventsManager.addHandler(this); // only so that I receive the reset() call!
@@ -190,6 +205,15 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 	}
 
 	public void finishScoringFunctions() {
+		// Rethrow an exception in a scoring function (user code) if there was one.
+		if (exception.get() != null) {
+			Throwable throwable = exception.get();
+			if (throwable instanceof RuntimeException) {
+				throw ((RuntimeException) throwable);
+			} else {
+				throw new RuntimeException(throwable);
+			}
+		}
 		for (ScoringFunction sf : this.agentScorers.values()) {
 			sf.finish();
 		}
