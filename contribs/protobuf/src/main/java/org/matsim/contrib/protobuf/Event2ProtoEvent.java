@@ -19,80 +19,52 @@ package org.matsim.contrib.protobuf;
  *                                                                         *
  * *********************************************************************** */
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.contrib.hybrid.events.ProtobufEvents;
-import org.matsim.facilities.ActivityFacility;
 
 /**
  * Created by laemmel on 16/02/16.
  */
 public abstract class Event2ProtoEvent {
 
-	static Event getEvent(ProtobufEvents.Event pe) {
-		if (pe.getType() == ProtobufEvents.Event.Type.ActivityEnd) {
-			return  new ActivityEndEvent(pe.getActEnd().getTime(), Id.createPersonId(pe.getActEnd().getPersId().getId()),
-					Id.createLinkId(pe.getActEnd().getLinkId().getId()),Id.create(pe.getActEnd().getFacilityId().getId(),
-					ActivityFacility.class),pe.getActEnd().getActType());
-		} else if (pe.getType() == ProtobufEvents.Event.Type.ActivityStart){
-			return  new ActivityStartEvent(pe.getActStart().getTime(), Id.createPersonId(pe.getActStart().getPersId().getId()),
-					Id.createLinkId(pe.getActStart().getLinkId().getId()),Id.create(pe.getActStart().getFacilityId().getId(),
-					ActivityFacility.class),pe.getActStart().getActType());
-		} else if (pe.getType() == ProtobufEvents.Event.Type.LinkEnter){
-			return new LinkEnterEvent(pe.getLinkEnter().getTime(),Id.createVehicleId(pe.getLinkEnter().getVehId().getId()),
-					Id.createLinkId(pe.getLinkEnter().getLinkId().getId()));
-		} else if (pe.getType() == ProtobufEvents.Event.Type.LinkLeave){
-			return new LinkLeaveEvent(pe.getLinkLeave().getTime(),Id.createVehicleId(pe.getLinkLeave().getVehId().getId()),
-					Id.createLinkId(pe.getLinkLeave().getLinkId().getId()));
-		} else if (pe.getType() == ProtobufEvents.Event.Type.PersonArrival){
-			return new PersonArrivalEvent(pe.getPersonArrival().getTime(),Id.createPersonId(pe.getPersonArrival().getPersId().getId()),
-					Id.createLinkId(pe.getPersonArrival().getLinkId().getId()),pe.getPersonArrival().getLegMode());
-		} else if (pe.getType() == ProtobufEvents.Event.Type.PersonDeparture){
-			return new PersonDepartureEvent(pe.getPersonDeparture().getTime(),Id.createPersonId(pe.getPersonDeparture().getPersId().getId()),
-					Id.createLinkId(pe.getPersonDeparture().getLinkId().getId()),pe.getPersonDeparture().getLegMode());
-		} else {
-			throw new RuntimeException("Unsupported event type:" + pe.getType().toString());
-		}
-	}
-
-
 	static ProtobufEvents.Event getProtoEvent(Event event) {
 		ProtobufEvents.Event.Builder eb = ProtobufEvents.Event.newBuilder();
-		if (event instanceof ActivityEndEvent) {
-			ProtobufEvents.ActivityEndEvent.Builder ae = ProtobufEvents.ActivityEndEvent.newBuilder()
-					.setTime(event.getTime())
-					.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((ActivityEndEvent) event).getLinkId().toString()))
-					.setFacilityId(ProtobufEvents.ActivityFacilityId.newBuilder().setId(((ActivityEndEvent) event).getFacilityId().toString()))
-					.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((ActivityEndEvent) event).getPersonId().toString()))
-					.setActType(((ActivityEndEvent) event).getActType());
-			eb.setType(ProtobufEvents.Event.Type.ActivityEnd).setActEnd(ae);
 
+		if (event instanceof LinkLeaveEvent) {
+			ProtobufEvents.LinkLeaveEvent.Builder ll = ProtobufEvents.LinkLeaveEvent.newBuilder()
+					.setTime(event.getTime())
+					.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((LinkLeaveEvent) event).getLinkId().toString()))
+					.setVehId(ProtobufEvents.VehicleId.newBuilder().setId(((LinkLeaveEvent) event).getVehicleId().toString()));
+			eb.setType(ProtobufEvents.Event.Type.LinkLeave).setLinkLeave(ll);
 		}
 		else {
-			if (event instanceof ActivityStartEvent) {
-				ProtobufEvents.ActivityStartEvent.Builder as = ProtobufEvents.ActivityStartEvent.newBuilder()
+			if (event instanceof LinkEnterEvent) {
+				ProtobufEvents.LinkEnterEvent.Builder ll = ProtobufEvents.LinkEnterEvent.newBuilder()
 						.setTime(event.getTime())
-						.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((ActivityStartEvent) event).getLinkId().toString()))
-						.setFacilityId(ProtobufEvents.ActivityFacilityId.newBuilder().setId(((ActivityStartEvent) event).getFacilityId().toString()))
-						.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((ActivityStartEvent) event).getPersonId().toString()))
-						.setActType(((ActivityStartEvent) event).getActType());
-				eb.setType(ProtobufEvents.Event.Type.ActivityStart).setActStart(as);
+						.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((LinkEnterEvent) event).getLinkId().toString()))
+						.setVehId(ProtobufEvents.VehicleId.newBuilder().setId(((LinkEnterEvent) event).getVehicleId().toString()));
+				eb.setType(ProtobufEvents.Event.Type.LinkEnter).setLinkEnter(ll);
 			}
 			else {
-				if (event instanceof LinkLeaveEvent) {
-					ProtobufEvents.LinkLeaveEvent.Builder ll = ProtobufEvents.LinkLeaveEvent.newBuilder()
+				if (event instanceof ActivityEndEvent) {
+					ProtobufEvents.ActivityEndEvent.Builder ae = ProtobufEvents.ActivityEndEvent.newBuilder()
 							.setTime(event.getTime())
-							.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((LinkLeaveEvent) event).getLinkId().toString()))
-							.setVehId(ProtobufEvents.VehicleId.newBuilder().setId(((LinkLeaveEvent) event).getVehicleId().toString()));
-					eb.setType(ProtobufEvents.Event.Type.LinkLeave).setLinkLeave(ll);
+							.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((ActivityEndEvent) event).getLinkId().toString()))
+							.setFacilityId(ProtobufEvents.ActivityFacilityId.newBuilder().setId(((ActivityEndEvent) event).getFacilityId().toString()))
+							.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((ActivityEndEvent) event).getPersonId().toString()))
+							.setActType(((ActivityEndEvent) event).getActType());
+					eb.setType(ProtobufEvents.Event.Type.ActivityEnd).setActEnd(ae);
+
 				}
 				else {
-					if (event instanceof LinkEnterEvent) {
-						ProtobufEvents.LinkEnterEvent.Builder ll = ProtobufEvents.LinkEnterEvent.newBuilder()
+					if (event instanceof ActivityStartEvent) {
+						ProtobufEvents.ActivityStartEvent.Builder as = ProtobufEvents.ActivityStartEvent.newBuilder()
 								.setTime(event.getTime())
-								.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((LinkEnterEvent) event).getLinkId().toString()))
-								.setVehId(ProtobufEvents.VehicleId.newBuilder().setId(((LinkEnterEvent) event).getVehicleId().toString()));
-						eb.setType(ProtobufEvents.Event.Type.LinkEnter).setLinkEnter(ll);
+								.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((ActivityStartEvent) event).getLinkId().toString()))
+								.setFacilityId(ProtobufEvents.ActivityFacilityId.newBuilder().setId(((ActivityStartEvent) event).getFacilityId().toString()))
+								.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((ActivityStartEvent) event).getPersonId().toString()))
+								.setActType(((ActivityStartEvent) event).getActType());
+						eb.setType(ProtobufEvents.Event.Type.ActivityStart).setActStart(as);
 					}
 					else {
 						if (event instanceof PersonArrivalEvent) {
@@ -202,7 +174,6 @@ public abstract class Event2ProtoEvent {
 				}
 			}
 		}
-
 
 		return eb.build();
 	}
