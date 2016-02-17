@@ -143,7 +143,7 @@ public class NoiseCalculationOffline {
 		
 		Set<String> hgvIdPrefixes = new HashSet<String>();
 		hgvIdPrefixes.add("lkw");
-		noiseParameters.setHgvIdPrefixes(hgvIdPrefixes);
+		noiseParameters.setHgvIdPrefixesSet(hgvIdPrefixes);
 		
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 		noiseParameters.setTimeBinSizeNoiseComputation(timeBinSize);

@@ -208,7 +208,7 @@ class KNBerlinControler {
 		tunnelLinkIDs.add(Id.create("4989", Link.class));
 		tunnelLinkIDs.add(Id.create("73496", Link.class));
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
-		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
+		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 
 		// ---
 

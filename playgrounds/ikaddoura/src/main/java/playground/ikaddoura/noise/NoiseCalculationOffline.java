@@ -188,7 +188,7 @@ public class NoiseCalculationOffline {
 		
 		Set<String> hgvIdPrefixes = new HashSet<String>();
 		hgvIdPrefixes.add("lkw");
-		noiseParameters.setHgvIdPrefixes(hgvIdPrefixes);
+		noiseParameters.setHgvIdPrefixesSet(hgvIdPrefixes);
 		
 //		Set<String> busIdPrefixes = new HashSet<String>();
 //		busIdPrefixes.add("-B-");
@@ -238,7 +238,7 @@ public class NoiseCalculationOffline {
 		tunnelLinkIDs.add(Id.create("4989", Link.class));
 		tunnelLinkIDs.add(Id.create("73496", Link.class));
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
-		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
+		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 		
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 		

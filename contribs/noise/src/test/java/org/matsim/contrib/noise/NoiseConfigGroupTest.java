@@ -52,7 +52,7 @@ public class NoiseConfigGroupTest {
 	public final void test0(){
 		
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config0.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new GridParameters());
+		Config config = ConfigUtils.loadConfig(configFile, new GridParameters(), new NoiseParameters());
 				
 		GridParameters gridParameters = (GridParameters) config.getModule("noiseGrid");
 
@@ -63,15 +63,26 @@ public class NoiseConfigGroupTest {
 		Assert.assertEquals("wrong config parameter", "home,sleep,eat", actForRecPtGrid);		
 		
 		String actForSpatFct = gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[0] + "," + gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[1] + "," + gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[2];
-		Assert.assertEquals("wrong config parameter", "work,leisure,other", actForSpatFct);		
-			
+		Assert.assertEquals("wrong config parameter", "work,leisure,other", actForSpatFct);	
+		
+		NoiseParameters noiseParameters = (NoiseParameters) config.getModule("noise");
+
+		// test the config parameters
+		Assert.assertEquals("wrong config parameter", 12345789., noiseParameters.getRelevantRadius(), MatsimTestUtils.EPSILON);
+		Assert.assertFalse("wrong config parameter", noiseParameters.isComputeNoiseDamages());
+
+		String hgvIdPrefixes = noiseParameters.getHgvIdPrefixesSet().toArray()[0] + "," + noiseParameters.getHgvIdPrefixesSet().toArray()[1] + "," + noiseParameters.getHgvIdPrefixesSet().toArray()[2] + "," + noiseParameters.getHgvIdPrefixesSet().toArray()[3];
+		Assert.assertEquals("wrong config parameter", "lkw,LKW,HGV,hgv", hgvIdPrefixes);		
+		
+		String tunnelLinkIds = noiseParameters.getTunnelLinkIDsSet().toArray()[0] + "," + noiseParameters.getTunnelLinkIDsSet().toArray()[1];
+		Assert.assertEquals("wrong config parameter", "link1,link2", tunnelLinkIds);
 	}
 	
 	@Test
 	public final void test1(){
 		
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config1.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new GridParameters());
+		Config config = ConfigUtils.loadConfig(configFile, new GridParameters(), new NoiseParameters());
 				
 		GridParameters gridParameters = (GridParameters) config.getModule("noiseGrid");
 

@@ -90,7 +90,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		
-		if (this.noiseContext.getNoiseParams().getBusIdPrefixes().isEmpty()) {
+		if (this.noiseContext.getNoiseParams().getBusIdPrefixesSet().isEmpty()) {
 			if (cWarn1 == 0) {
 				log.warn("Simulated public transit detected. "
 						+ "To calculate noise caused by road vehicles, e.g. buses, "
@@ -101,7 +101,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 			
 		} else {
 			boolean isBus = false;
-			for (String busIdPrefix : this.noiseContext.getNoiseParams().getBusIdPrefixes()) {
+			for (String busIdPrefix : this.noiseContext.getNoiseParams().getBusIdPrefixesSet()) {
 				if (event.getTransitLineId().toString().contains(busIdPrefix)) {
 					isBus = true;
 					break;
@@ -285,7 +285,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 			}
 		
 			boolean isHGV = false;
-			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixes()) {
+			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixesSet()) {
 				if (event.getVehicleId().toString().startsWith(hgvPrefix)) {
 					isHGV = true;
 					break;
@@ -586,7 +586,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 					double amount = 0.;
 					
 					boolean isHGV = false;
-					for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixes()) {
+					for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixesSet()) {
 						if (vehicleId.toString().startsWith(hgvPrefix)) {
 							isHGV = true;
 							break;
@@ -657,7 +657,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 			Map<Id<Link>, Double> linkId2isolatedImmissionPlusOneHGV = new HashMap<Id<Link>, Double>();
 			
 			for(Id<Link> linkId : rp.getLinkId2distanceCorrection().keySet()) {
-				if (this.noiseContext.getNoiseParams().getTunnelLinkIDs().contains(linkId)) {
+				if (this.noiseContext.getNoiseParams().getTunnelLinkIDsSet().contains(linkId)) {
 					linkId2isolatedImmission.put(linkId, 0.);
 					linkId2isolatedImmissionPlusOneCar.put(linkId, 0.);
 					linkId2isolatedImmissionPlusOneHGV.put(linkId, 0.);

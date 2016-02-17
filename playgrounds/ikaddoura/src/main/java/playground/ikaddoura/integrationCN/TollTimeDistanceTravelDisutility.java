@@ -109,7 +109,7 @@ public class TollTimeDistanceTravelDisutility implements TravelDisutility {
 		} else {
 			
 			boolean isHGV = false;
-			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixes()) {
+			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixesSet()) {
 				if (personId.toString().startsWith(hgvPrefix)) {
 					isHGV = true;
 					break;

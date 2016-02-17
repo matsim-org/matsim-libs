@@ -7,6 +7,13 @@
 		<param name="consideredActivitiesForReceiverPointGrid" value="home,sleep,eat" />
 		<param name="consideredActivitiesForSpatialFunctionality" value="work,leisure,other" />
 	</module>
+	
+	<module name="noise" >
+		<param name="relevantRadius" value="12345789" />
+		<param name="computeNoiseDamages" value="false" />
+		<param name="hgvIdPrefixes" value="lkw,LKW,HGV,hgv" />
+		<param name="tunnelLinkIDs" value="link1,link2" />
+	</module>
 
 	<module name="network" >
 		<param name="inputNetworkFile" value="test/input/org/matsim/contrib/noise/NoiseConfigGroupTest/network1.xml" />
