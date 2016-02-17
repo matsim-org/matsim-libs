@@ -98,10 +98,13 @@ public class CapeTownControler {
 		if(fraction == 1.0){
 			/* Full model. */
 			config.qsim().setFlowCapFactor(1.0);
+			config.qsim().setStorageCapFactor(1.0);
 		} else if(fraction == 0.1){
-			config.qsim().setFlowCapFactor(0.3);
+			config.qsim().setFlowCapFactor(0.1);
+			config.qsim().setStorageCapFactor(0.3);
 		} else if(fraction == 0.01){
-			config.qsim().setFlowCapFactor(0.03);
+			config.qsim().setFlowCapFactor(0.01);
+			config.qsim().setStorageCapFactor(0.05);
 		} else{
 			throw new RuntimeException("Don't know how to adjust config for sample size " + fraction);
 		}
