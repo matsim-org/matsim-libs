@@ -107,7 +107,9 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 				// * the left link with getNearestLink
 				// * the right link with getNearestLinkExactly
 				// kai/dominik, jan'13
-				
+				/* ownPrepareForSimExample in matsim tutorials gives an example how to use
+				 * getNearestLinkExactly anyway. tt feb'2016
+				 */
 				
 				if (null == link) {
 					throw new RuntimeException("For person id="+plan.getPerson().getId()+": getNearestLink returned Null! act="+act);
