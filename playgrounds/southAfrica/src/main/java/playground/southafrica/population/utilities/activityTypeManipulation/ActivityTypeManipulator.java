@@ -20,6 +20,7 @@
 
 package playground.southafrica.population.utilities.activityTypeManipulation;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -30,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -103,6 +105,6 @@ public abstract class ActivityTypeManipulator {
 	
 	abstract protected void adaptActivityTypes(Plan plan);
 	
-	abstract protected void parseDecileFile(String filename);
+	abstract protected List<ActivityParams> parseDecileFile(String filename);
 
 }

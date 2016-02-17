@@ -31,11 +31,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Feasible mode chain analysis according to section 3.2 of

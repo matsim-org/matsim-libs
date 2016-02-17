@@ -208,6 +208,9 @@ public class CapeTownScenarioCleaner {
 		ModeRoutingParams brt = config.plansCalcRoute().getOrCreateModeRoutingParams("brt");
 		brt.setBeelineDistanceFactor(1.3);
 		brt.setTeleportedModeSpeed(50.0 / 3.6);
+		ModeRoutingParams bus = config.plansCalcRoute().getOrCreateModeRoutingParams("bus");
+		bus.setBeelineDistanceFactor(1.3);
+		bus.setTeleportedModeSpeed(50.0 / 3.6);
 		ModeRoutingParams rail = config.plansCalcRoute().getOrCreateModeRoutingParams("rail");
 		rail.setBeelineDistanceFactor(1.3);
 		rail.setTeleportedModeSpeed(20.0 / 3.6);
