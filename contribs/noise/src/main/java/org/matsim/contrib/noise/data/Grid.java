@@ -50,7 +50,7 @@ public class Grid {
 	private static final Logger log = Logger.getLogger(Grid.class);
 			
 	private final Scenario scenario;
-	private final NoiseConfigGroup gridParams;
+	private final NoiseConfigGroup noiseParams;
 		
 	private final Map<Id<Person>, List<Coord>> personId2consideredActivityCoords = new HashMap<Id<Person>, List<Coord>>();
 	
@@ -70,10 +70,11 @@ public class Grid {
 	
 	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
 					
+	@Deprecated
 	public Grid(Scenario scenario, NoiseConfigGroup gridParams) {
 		
 		this.scenario = scenario;	
-		this.gridParams = gridParams;
+		this.noiseParams = gridParams;
 		this.receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
 		
 		String[] consideredActTypesForDamagesArray = gridParams.getConsideredActivitiesForDamageCalculationArray();
@@ -86,10 +87,37 @@ public class Grid {
 			this.consideredActivitiesForReceiverPointGrid.add(consideredActTypesForReceiverPointGridArray[i]);
 		}
 
-		this.gridParams.checkGridParametersForConsistency();
+		this.noiseParams.checkGridParametersForConsistency();
 		initialize();
 	}
 	
+	public Grid(Scenario scenario) {
+		this.scenario = scenario;	
+
+		if ((NoiseConfigGroup) this.scenario.getConfig().getModule("noise") == null) {
+			throw new RuntimeException("Could not find a noise config group. "
+					+ "Check if the custom module is loaded, e.g. 'ConfigUtils.loadConfig(configFile, new NoiseConfigGroup())'"
+					+ " Aborting...");
+		}
+		
+		this.noiseParams = (NoiseConfigGroup) this.scenario.getConfig().getModule("noise");
+		
+		this.receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
+		
+		String[] consideredActTypesForDamagesArray = noiseParams.getConsideredActivitiesForDamageCalculationArray();
+		for (int i = 0; i < consideredActTypesForDamagesArray.length; i++) {
+			this.consideredActivitiesForSpatialFunctionality.add(consideredActTypesForDamagesArray[i]);
+		}
+		
+		String[] consideredActTypesForReceiverPointGridArray = noiseParams.getConsideredActivitiesForReceiverPointGridArray();
+		for (int i = 0; i < consideredActTypesForReceiverPointGridArray.length; i++) {
+			this.consideredActivitiesForReceiverPointGrid.add(consideredActTypesForReceiverPointGridArray[i]);
+		}
+
+		this.noiseParams.checkGridParametersForConsistency();
+		initialize();
+	}
+
 	private void initialize() {
 		setActivityCoords();
 		createGrid();
@@ -135,7 +163,7 @@ public class Grid {
 	
 	private void createGrid() {
 		
-		if (this.gridParams.getReceiverPointsGridMinX() == 0. && this.gridParams.getReceiverPointsGridMinY() == 0. && this.gridParams.getReceiverPointsGridMaxX() == 0. && this.gridParams.getReceiverPointsGridMaxY() == 0.) {
+		if (this.noiseParams.getReceiverPointsGridMinX() == 0. && this.noiseParams.getReceiverPointsGridMinY() == 0. && this.noiseParams.getReceiverPointsGridMaxX() == 0. && this.noiseParams.getReceiverPointsGridMaxY() == 0.) {
 			
 			log.info("Creating receiver points for the entire area between the minimum and maximium x and y activity coordinates of all activity locations.");
 						
@@ -156,10 +184,10 @@ public class Grid {
 			
 		} else {
 			
-			xCoordMin = this.gridParams.getReceiverPointsGridMinX();
-			xCoordMax = this.gridParams.getReceiverPointsGridMaxX();
-			yCoordMin = this.gridParams.getReceiverPointsGridMinY();
-			yCoordMax = this.gridParams.getReceiverPointsGridMaxY();
+			xCoordMin = this.noiseParams.getReceiverPointsGridMinX();
+			xCoordMax = this.noiseParams.getReceiverPointsGridMaxX();
+			yCoordMin = this.noiseParams.getReceiverPointsGridMinY();
+			yCoordMax = this.noiseParams.getReceiverPointsGridMaxY();
 			
 			log.info("Creating receiver points for the area between the coordinates (" + xCoordMin + "/" + yCoordMin + ") and (" + xCoordMax + "/" + yCoordMax + ").");
 			
@@ -173,9 +201,9 @@ public class Grid {
 
 		int counter = 0;
 		
-		for (double y = yCoordMax + 100. ; y > yCoordMin - 100. - gridParams.getReceiverPointGap() ; y = y - gridParams.getReceiverPointGap()) {
+		for (double y = yCoordMax + 100. ; y > yCoordMin - 100. - noiseParams.getReceiverPointGap() ; y = y - noiseParams.getReceiverPointGap()) {
 		
-			for (double x = xCoordMin - 100. ; x < xCoordMax + 100. + gridParams.getReceiverPointGap() ; x = x + gridParams.getReceiverPointGap()) {
+			for (double x = xCoordMin - 100. ; x < xCoordMax + 100. + noiseParams.getReceiverPointGap() ; x = x + noiseParams.getReceiverPointGap()) {
 				
 				Id<ReceiverPoint> id = Id.create(counter, ReceiverPoint.class);
 				Coord coord = new Coord(x, y);
@@ -221,8 +249,8 @@ public class Grid {
 		double xCoord = coord.getX();
 		double yCoord = coord.getY();
 		
-		int xDirection = (int) ((xCoord - xCoordMin) / (gridParams.getReceiverPointGap() / 1.));	
-		int yDirection = (int) ((yCoordMax - yCoord) / gridParams.getReceiverPointGap() / 1.);
+		int xDirection = (int) ((xCoord - xCoordMin) / (noiseParams.getReceiverPointGap() / 1.));	
+		int yDirection = (int) ((yCoordMax - yCoord) / noiseParams.getReceiverPointGap() / 1.);
 		
 		Tuple<Integer, Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
 		return zoneDefinition;
@@ -295,7 +323,7 @@ public class Grid {
 	}
 	
 	public NoiseConfigGroup getGridParams() {
-		return gridParams;
+		return noiseParams;
 	}
 
 }

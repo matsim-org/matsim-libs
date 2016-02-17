@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.handler.NoiseEquations;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
@@ -75,6 +76,7 @@ public class NoiseContext {
 	
 	// ############################################
 	
+	@Deprecated
 	public NoiseContext(Scenario scenario, NoiseConfigGroup noiseParameters) {
 		this.scenario = scenario;
 		
@@ -83,6 +85,28 @@ public class NoiseContext {
 		this.noiseParams = noiseParameters;
 		this.noiseParams.checkNoiseParametersForConsistency();
 		
+		this.currentTimeBinEndTime = noiseParams.getTimeBinSizeNoiseComputation();
+		
+		this.noiseReceiverPoints = new HashMap<Id<ReceiverPoint>, NoiseReceiverPoint>();
+		this.noiseLinks = new HashMap<Id<Link>, NoiseLink>();
+		
+		checkConsistency();
+		setRelevantLinkInfo();
+	}
+	
+	public NoiseContext(Scenario scenario) {
+		this.scenario = scenario;
+		this.grid = new Grid(scenario);
+		
+		if ((NoiseConfigGroup) this.scenario.getConfig().getModule("noise") == null) {
+			throw new RuntimeException("Could not find a noise config group. "
+					+ "Check if the custom module is loaded, e.g. 'ConfigUtils.loadConfig(configFile, new NoiseConfigGroup())'"
+					+ " Aborting...");
+		}
+		
+		this.noiseParams = (NoiseConfigGroup) this.scenario.getConfig().getModule("noise");
+		this.noiseParams.checkNoiseParametersForConsistency();
+				
 		this.currentTimeBinEndTime = noiseParams.getTimeBinSizeNoiseComputation();
 		
 		this.noiseReceiverPoints = new HashMap<Id<ReceiverPoint>, NoiseReceiverPoint>();

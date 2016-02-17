@@ -75,8 +75,6 @@ public class NoiseCalculationOffline {
 			
 			timeBinSize = Double.valueOf(args[4]);		
 			log.info("Time bin size: " + timeBinSize);
-
-			throw new RuntimeException("Not yet implemented. Aborting...");
 			
 		} else {
 			
