@@ -40,6 +40,7 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
+import playground.ivt.matsim2030.scoring.MATSim2010ScoringModule;
 
 import java.io.File;
 
@@ -86,11 +87,7 @@ public class RunZurichScenario {
 
 		// We use a specific scoring function, that uses individual preferences
 		// for activity durations.
-		controler.setScoringFunctionFactory(
-			new MATSim2010ScoringFunctionFactory(
-					controler.getScenario(),
-					new StageActivityTypesImpl(
-						PtConstants.TRANSIT_ACTIVITY_TYPE ) ) ); 	
+		controler.addOverridingModule( new MATSim2010ScoringModule() );
 
 		controler.run();
 	}

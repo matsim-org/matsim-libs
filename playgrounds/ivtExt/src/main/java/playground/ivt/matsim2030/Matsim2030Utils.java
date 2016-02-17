@@ -68,6 +68,7 @@ import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import playground.ivt.matsim2030.router.TransitRouterWithThinnedNetworkFactory;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
+import playground.ivt.matsim2030.scoring.MATSim2010ScoringModule;
 import playground.ivt.utils.TripModeShares;
 
 import javax.inject.Provider;
@@ -408,11 +409,7 @@ public class Matsim2030Utils {
 	}
 
 	public static void initializeScoring( final Controler controler ) {
- 		final MATSim2010ScoringFunctionFactory scoringFunctionFactory =
-			new MATSim2010ScoringFunctionFactory(
-					controler.getScenario(),
-					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ) ); 	
-		controler.setScoringFunctionFactory( scoringFunctionFactory );
+		controler.addOverridingModule( new MATSim2010ScoringModule() );
 	}
 
 	public static Provider<TripRouter> createTripRouterFactory(final Scenario scenario) {

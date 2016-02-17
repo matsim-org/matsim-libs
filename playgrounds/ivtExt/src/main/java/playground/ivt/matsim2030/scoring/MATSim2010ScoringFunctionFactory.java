@@ -56,7 +56,9 @@ import java.util.Set;
 
 /**
  * @author thibautd
+ * @deprecated use {@link MATSim2010ScoringModule} instead
  */
+@Deprecated
 public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final Scenario scenario;
