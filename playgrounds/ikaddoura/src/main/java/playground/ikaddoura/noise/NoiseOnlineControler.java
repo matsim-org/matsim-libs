@@ -32,10 +32,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
-import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
@@ -68,10 +67,9 @@ public class NoiseOnlineControler {
 
 	public void run(String configFile) {
 		
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 
-		// modify the default grid parameters
-		
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");		
 		noiseParameters.setReceiverPointGap(100.);
 		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
@@ -79,11 +77,7 @@ public class NoiseOnlineControler {
 			
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
-		
-		// ...
-				
-		// modify the default noise parameters
-		
+								
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);		
 		noiseParameters.setScaleFactor(10.);
 		
@@ -132,21 +126,8 @@ public class NoiseOnlineControler {
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 				
-		// ...
-		
-		// controler
-		
-		Controler controler = new Controler(configFile);
-
-		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), noiseParameters);
-		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-			}
-		});
-		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+		Controler controler = new Controler(config);
+		controler.addControlerListener(new NoiseCalculationOnline(controler));
 
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();

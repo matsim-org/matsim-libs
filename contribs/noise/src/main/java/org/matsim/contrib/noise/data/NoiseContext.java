@@ -75,24 +75,6 @@ public class NoiseContext {
 	
 	// ############################################
 	
-	@Deprecated
-	public NoiseContext(Scenario scenario, NoiseConfigGroup noiseParameters) {
-		this.scenario = scenario;
-		
-		this.grid = new Grid(scenario, noiseParameters);
-		
-		this.noiseParams = noiseParameters;
-		this.noiseParams.checkNoiseParametersForConsistency();
-		
-		this.currentTimeBinEndTime = noiseParams.getTimeBinSizeNoiseComputation();
-		
-		this.noiseReceiverPoints = new HashMap<Id<ReceiverPoint>, NoiseReceiverPoint>();
-		this.noiseLinks = new HashMap<Id<Link>, NoiseLink>();
-		
-		checkConsistency();
-		setRelevantLinkInfo();
-	}
-	
 	public NoiseContext(Scenario scenario) {
 		this.scenario = scenario;
 				

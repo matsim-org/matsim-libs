@@ -193,7 +193,7 @@ public class CNControler {
 		
 		noiseParameters.setWriteOutputIteration(10);
 		
-		noiseContext = new NoiseContext(controler.getScenario(), noiseParameters);
+		noiseContext = new NoiseContext(controler.getScenario());
 
 		// congestion
 		
