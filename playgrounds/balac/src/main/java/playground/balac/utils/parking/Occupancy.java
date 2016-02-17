@@ -90,7 +90,7 @@ public class Occupancy implements BasicEventHandler {
 		}
 		for (int i = 0; i < count.length; i++) {
 			
-			outLink.write(Integer.toString(count[i]));
+			outLink.write(Integer.toString(10 * count[i]));
 			outLink.newLine();
 		}
 		outLink.flush();
