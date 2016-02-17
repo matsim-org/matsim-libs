@@ -114,7 +114,7 @@ public class MyPersonPrepareForSim extends AbstractPersonAlgorithm {
 					else if (Double.isNaN(leg.getRoute().getDistance())){
 						Double dist = null;
 						if (leg.getRoute() instanceof NetworkRoute){
-							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+							dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) leg.getRoute(), this.network);
 						}
 						if (dist != null){
 							leg.getRoute().setDistance(dist);

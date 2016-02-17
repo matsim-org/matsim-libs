@@ -317,17 +317,17 @@ public class FFParkingWithPTPersonDriverAgentImpl implements MobsimDriverAgent, 
 					((Activity)planElements.get(indexOfInsertion + 4)).getLinkId());
 			
 			
-			routeStart.setTravelTime( ((CoordUtils.calcDistance(this.scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
+			routeStart.setTravelTime( ((CoordUtils.calcEuclideanDistance(this.scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
 					((Activity)planElements.get(indexOfInsertion + 4)).getCoord()) * beelineFactor) / ptSpeed));
 			
-			routeStart.setDistance(CoordUtils.calcDistance(this.scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
+			routeStart.setDistance(CoordUtils.calcEuclideanDistance(this.scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
 					((Activity)planElements.get(indexOfInsertion + 4)).getCoord()) * beelineFactor);	
 
 			
 			ptLeg.setRoute(routeStart);
 			this.cachedDestinationLinkId = ((Activity)planElements.get(indexOfInsertion + 4)).getLinkId();
 			ptLeg.setDepartureTime(now);
-			ptLeg.setTravelTime(((CoordUtils.calcDistance(this.scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
+			ptLeg.setTravelTime(((CoordUtils.calcEuclideanDistance(this.scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
 					((Activity)planElements.get(indexOfInsertion + 4)).getCoord()) * beelineFactor) / ptSpeed));
 			trip.add( ptLeg );
 			planElements.remove(indexOfInsertion);
@@ -347,7 +347,7 @@ public class FFParkingWithPTPersonDriverAgentImpl implements MobsimDriverAgent, 
 		LegImpl walkLeg = new LegImpl("walk_ff");
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLink.getId());
-		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
+		final double dist = CoordUtils.calcEuclideanDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
 		final double estimatedNetworkDistance = dist * this.beelineFactor;
 
 		final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );
