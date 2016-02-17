@@ -120,4 +120,185 @@ public class ProtoEvent2EventTest {
 		}
 	}
 
+	@Test
+	public final void testProtoEvent2EventPersonDeparture() {
+		ProtobufEvents.PersonDepartureEvent.Builder le = ProtobufEvents.PersonDepartureEvent.newBuilder().setTime(42.0).
+				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123")).setPersId(ProtobufEvents.PersonId.newBuilder().
+				setId("Alice")).setLegMode("crawling");
+
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonDeparture).
+				setPersonDeparture(le).build();
+
+		Event e = ProtoEvent2Event.getEvent(pe);
+		Assert.assertTrue(e instanceof PersonDepartureEvent);
+		if (e instanceof PersonDepartureEvent ) {
+			Assert.assertEquals(42.0, e.getTime(), 0.);
+			Assert.assertEquals("link123", ((PersonDepartureEvent) e).getLinkId().toString());
+			Assert.assertEquals("Alice",((PersonDepartureEvent) e).getPersonId().toString());
+			Assert.assertEquals("crawling", ((PersonDepartureEvent) e).getLegMode());
+		}
+	}
+
+	@Test
+	public final void testProtoEvent2EventPersonEntersVehicle() {
+		ProtobufEvents.PersonEntersVehicleEvent.Builder le = ProtobufEvents.PersonEntersVehicleEvent.newBuilder().setTime(42.0).
+				setPersId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).setVehId(ProtobufEvents.VehicleId.newBuilder().setId("K.I.T.T."));
+
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonEntersVehicle).
+				setPersonEntersVehicle(le).build();
+
+		Event e = ProtoEvent2Event.getEvent(pe);
+		Assert.assertTrue(e instanceof PersonEntersVehicleEvent);
+		if (e instanceof PersonEntersVehicleEvent ) {
+			Assert.assertEquals(42.0, e.getTime(), 0.);
+			Assert.assertEquals("Alice",((PersonEntersVehicleEvent) e).getPersonId().toString());
+			Assert.assertEquals("K.I.T.T.",((PersonEntersVehicleEvent) e).getVehicleId().toString());
+		}
+	}
+
+	@Test
+	public final void testProtoEvent2EventPersonLeavesVehicle() {
+		ProtobufEvents.PersonLeavesVehicleEvent.Builder le = ProtobufEvents.PersonLeavesVehicleEvent.newBuilder().setTime(42.0).
+				setPersId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).setVehId(ProtobufEvents.VehicleId.newBuilder().setId("K.I.T.T."));
+
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonLeavesVehicle).
+				setPersonLeavesVehicle(le).build();
+
+		Event e = ProtoEvent2Event.getEvent(pe);
+		Assert.assertTrue(e instanceof PersonLeavesVehicleEvent);
+		if (e instanceof PersonLeavesVehicleEvent ) {
+			Assert.assertEquals(42.0, e.getTime(), 0.);
+			Assert.assertEquals("Alice",((PersonLeavesVehicleEvent) e).getPersonId().toString());
+			Assert.assertEquals("K.I.T.T.",((PersonLeavesVehicleEvent) e).getVehicleId().toString());
+		}
+	}
+
+	@Test
+	public final void testProtoEvent2EventPersonMoney() {
+		ProtobufEvents.PersonMoneyEvent.Builder le = ProtobufEvents.PersonMoneyEvent.newBuilder().setTime(42.0).
+				setPersId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).setAmount(-123.45);
+
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonMoney).
+				setPersonMoney(le).build();
+
+		Event e = ProtoEvent2Event.getEvent(pe);
+		Assert.assertTrue(e instanceof PersonMoneyEvent);
+		if (e instanceof PersonMoneyEvent ) {
+			Assert.assertEquals(42.0, e.getTime(), 0.);
+			Assert.assertEquals("Alice",((PersonMoneyEvent) e).getPersonId().toString());
+			Assert.assertEquals(-123.45,((PersonMoneyEvent) e).getAmount(),0.);
+		}
+	}
+
+	@Test
+	public final void testProtoEvent2EventPersonStuck() {
+		ProtobufEvents.PersonStuckEvent.Builder le = ProtobufEvents.PersonStuckEvent.newBuilder().setTime(42.0).
+				setPersId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123")).
+				setLegMode("flying");
+
+
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonStuck).
+				setPersonStuck(le).build();
+
+		Event e = ProtoEvent2Event.getEvent(pe);
+		Assert.assertTrue(e instanceof PersonStuckEvent);
+		if (e instanceof PersonStuckEvent ) {
+			Assert.assertEquals(42.0, e.getTime(), 0.);
+			Assert.assertEquals("Alice",((PersonStuckEvent) e).getPersonId().toString());
+			Assert.assertEquals("link123",((PersonStuckEvent) e).getLinkId().toString());
+			Assert.assertEquals("flying",((PersonStuckEvent) e).getLegMode());
+		}
+	}
+
+	@Test
+	public final void testProtoEvent2EventTransitDriverStarts() {
+		ProtobufEvents.TransitDriverStartsEvent.Builder le = ProtobufEvents.TransitDriverStartsEvent.newBuilder().setTime(42.0).
+				setDriverId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).setVehId(ProtobufEvents.VehicleId.newBuilder().setId("K.I.T.T.")).
+				setTransitLineId(ProtobufEvents.TransitLineId.newBuilder().setId("tl11")).
+				setTransitRouteId(ProtobufEvents.TransitRouteId.newBuilder().setId("tr11")).
+				setDepartureId(ProtobufEvents.DepartureId.newBuilder().setId("d11"));
+
+
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.TransitDriverStarts).
+				setTransitDriverStarts(le).build();
+
+		Event e = ProtoEvent2Event.getEvent(pe);
+		Assert.assertTrue(e instanceof TransitDriverStartsEvent);
+		if (e instanceof TransitDriverStartsEvent ) {
+			Assert.assertEquals(42.0, e.getTime(), 0.);
+			Assert.assertEquals("Alice",((TransitDriverStartsEvent) e).getDriverId().toString());
+			Assert.assertEquals("K.I.T.T.", ((TransitDriverStartsEvent) e).getVehicleId().toString());
+			Assert.assertEquals("tl11",((TransitDriverStartsEvent) e).getTransitLineId().toString());
+			Assert.assertEquals("tr11",((TransitDriverStartsEvent) e).getTransitRouteId().toString());
+			Assert.assertEquals("d11",((TransitDriverStartsEvent) e).getDepartureId().toString());
+		}
+	}
+
+	@Test
+	public final void testProtoEvent2EventVehicleAborts() {
+		ProtobufEvents.VehicleAbortsEvent.Builder le = ProtobufEvents.VehicleAbortsEvent.newBuilder().setTime(42.0).
+				setVehId(ProtobufEvents.VehicleId.newBuilder().setId("K.I.T.T.")).
+				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123"));
+
+
+
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.VehicleAborts).
+				setVehicleAborts(le).build();
+
+		Event e = ProtoEvent2Event.getEvent(pe);
+		Assert.assertTrue(e instanceof VehicleAbortsEvent);
+		if (e instanceof VehicleAbortsEvent ) {
+			Assert.assertEquals(42.0, e.getTime(), 0.);
+			Assert.assertEquals("K.I.T.T.", ((VehicleAbortsEvent) e).getVehicleId().toString());
+			Assert.assertEquals("link123",((VehicleAbortsEvent) e).getLinkId().toString());
+		}
+	}
+
+	@Test
+	public final void testProtoEvent2EventVehicleEntersTraffic() {
+		ProtobufEvents.VehicleEntersTrafficEvent.Builder le = ProtobufEvents.VehicleEntersTrafficEvent.newBuilder().setTime(42.0).
+				setVehId(ProtobufEvents.VehicleId.newBuilder().setId("K.I.T.T.")).
+				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123")).setDriverId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).
+				setNetworkMode("super pursuit").setRelPosOnLink(3.1415);
+
+
+
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.VehicleEntersTraffic).
+				setVehicleEntersTraffic(le).build();
+
+		Event e = ProtoEvent2Event.getEvent(pe);
+		Assert.assertTrue(e instanceof VehicleEntersTrafficEvent);
+		if (e instanceof VehicleEntersTrafficEvent ) {
+			Assert.assertEquals(42.0, e.getTime(), 0.);
+			Assert.assertEquals("K.I.T.T.", ((VehicleEntersTrafficEvent) e).getVehicleId().toString());
+			Assert.assertEquals("link123",((VehicleEntersTrafficEvent) e).getLinkId().toString());
+			Assert.assertEquals("Alice",((VehicleEntersTrafficEvent) e).getPersonId().toString());
+			Assert.assertEquals("super pursuit",((VehicleEntersTrafficEvent) e).getNetworkMode());
+			Assert.assertEquals(3.1415,((VehicleEntersTrafficEvent) e).getRelativePositionOnLink(),0.);
+		}
+	}
+
+	@Test
+	public final void testProtoEvent2EventVehicleLeavesTraffic() {
+		ProtobufEvents.VehicleLeavesTrafficEvent.Builder le = ProtobufEvents.VehicleLeavesTrafficEvent.newBuilder().setTime(42.0).
+				setVehId(ProtobufEvents.VehicleId.newBuilder().setId("K.I.T.T.")).
+				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123")).setDriverId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).
+				setNetworkMode("super pursuit").setRelPosOnLink(3.1415);
+
+
+
+		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.VehicleLeavesTraffic).
+				setVehicleLeavesTraffic(le).build();
+
+		Event e = ProtoEvent2Event.getEvent(pe);
+		Assert.assertTrue(e instanceof VehicleLeavesTrafficEvent);
+		if (e instanceof VehicleLeavesTrafficEvent ) {
+			Assert.assertEquals(42.0, e.getTime(), 0.);
+			Assert.assertEquals("K.I.T.T.", ((VehicleLeavesTrafficEvent) e).getVehicleId().toString());
+			Assert.assertEquals("link123",((VehicleLeavesTrafficEvent) e).getLinkId().toString());
+			Assert.assertEquals("Alice",((VehicleLeavesTrafficEvent) e).getPersonId().toString());
+			Assert.assertEquals("super pursuit",((VehicleLeavesTrafficEvent) e).getNetworkMode());
+			Assert.assertEquals(3.1415,((VehicleLeavesTrafficEvent) e).getRelativePositionOnLink(),0.);
+		}
+	}
 }
