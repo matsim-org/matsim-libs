@@ -90,7 +90,7 @@ public class SinglePassengerPickupActivity
     @Override
     public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now)
     {
-        if (passenger != request.getPassenger()) {
+        if (passenger.getId().equals(request.getPassenger().getId())) {
             throw new IllegalArgumentException("I am waiting for a different passenger!");
         }
 
