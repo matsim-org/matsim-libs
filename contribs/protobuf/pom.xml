@@ -7,13 +7,13 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.matsim.contrib</groupId>
-    <artifactId>hybrid</artifactId>
-    <name>hybrid</name>
+    <artifactId>protobuf</artifactId>
+    <name>protobuf</name>
     <properties>
 
         <!-- protobuf paths -->
 
-        <!--<protobuf.input.directory>/Users/laemmel/svn/codesprint/matsim/contribs/hybrid/src/main/proto/</protobuf.input.directory>-->
+        <!--<protobuf.input.directory>/Users/laemmel/svn/codesprint/matsim/contribs/protobuf/src/main/proto/</protobuf.input.directory>-->
         <protobuf.input.directory>${project.basedir}/src/main/proto</protobuf.input.directory>
         <protobuf.output.directory>${project.build.directory}/generated-sources</protobuf.output.directory>
 
@@ -22,7 +22,8 @@
         <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
         <maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
         <maven-shade-plugin.version>2.4.2</maven-shade-plugin.version>
-        <os-maven-plugin.version>1.4.1.Final</os-maven-plugin.version>
+        <!--<os-maven-plugin.version>1.4.1.Final</os-maven-plugin.version>-->
+        <os-maven-plugin.version>1.2.3.Final</os-maven-plugin.version>
         <protobuf.version>3.0.0-beta-2</protobuf.version>
 
     </properties>
