@@ -5,13 +5,7 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -19,8 +13,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.facilities.ActivityFacilities;
+
+import com.google.inject.Inject;
 
 class AccessibilityComputationTestModule extends AbstractModule {
 	private final List<String> activityTypes;
@@ -41,13 +36,6 @@ class AccessibilityComputationTestModule extends AbstractModule {
 
 	@Override
 	public void install() {
-//		this.addTravelTimeBinding(TransportMode.car).toProvider(new Provider<TravelTime>() {
-//            @Inject Injector injector;
-//            @Override
-//            public TravelTime get() {
-//                return injector.getInstance(Key.get(TravelTimeCalculator.class, Names.named(TransportMode.car))).getLinkTravelTimes();
-//            }
-//        });
 		for (final String activityType : activityTypes) {
 			addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 				@Inject Scenario scenario;
@@ -56,7 +44,6 @@ class AccessibilityComputationTestModule extends AbstractModule {
 				@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 				@Override
 				public ControlerListener get() {
-//					System.err.println("travelTimes = " + travelTimes);
 					GridBasedAccessibilityControlerListenerV3 listener =
 							new GridBasedAccessibilityControlerListenerV3(
 									AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityType),

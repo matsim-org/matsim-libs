@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -38,6 +39,7 @@ import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
+import org.matsim.contrib.accessibility.utils.Coord2CoordTimeDistanceTravelDisutility;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -48,6 +50,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
@@ -438,17 +441,29 @@ public class AccessibilityIntegrationTest {
 		}
 	}
 
+	
 	private class GridBasedAccessibilityModule extends AbstractModule {
 		private final PtMatrix ptMatrix;
 		private final double cellSize;
+		@Inject Config config;
+		
 
 		public GridBasedAccessibilityModule(PtMatrix ptMatrix, double cellSize) {
 			this.ptMatrix = ptMatrix;
 			this.cellSize = cellSize;
 		}
+		
 
 		@Override
 		public void install() {
+			double walkSpeed = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);			
+			
+			// car is already bound, all other modes not
+			// the walk mode gets the coord2coord-based disutility
+			addTravelDisutilityFactoryBinding(TransportMode.bike).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.bike));	
+			addTravelDisutilityFactoryBinding(TransportMode.walk).toInstance(new Coord2CoordTimeDistanceTravelDisutility.Builder(TransportMode.walk).setWalkSpeed(walkSpeed));
+
+			
 			addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 				@Inject Scenario scenario;
 				@Inject ActivityFacilities opportunities;
@@ -462,7 +477,7 @@ public class AccessibilityIntegrationTest {
 					for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 						gacl.setComputingAccessibilityForMode(mode, true);
 					}
-//		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
+					// gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false );
 					// not sure why this is "false"; presumably, the test is not configured. kai, feb'14
 
 					// this will be called by the accessibility listener after the accessibility calculations are finished
