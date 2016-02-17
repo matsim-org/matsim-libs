@@ -129,22 +129,6 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// <activity ... > ... </activity>
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public void startActivity(final String act_type, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t<activity");
-		out.write(" type=\"" + act_type + "\"");
-		out.write(">\n");
-	}
-
-	@Override
-	public void endActivity(final BufferedWriter out) throws IOException {
-		out.write("\t\t\t</activity>\n\n");
-	}
-
-	//////////////////////////////////////////////////////////////////////
 	// <plan ... > ... </plan>
 	//////////////////////////////////////////////////////////////////////
 
