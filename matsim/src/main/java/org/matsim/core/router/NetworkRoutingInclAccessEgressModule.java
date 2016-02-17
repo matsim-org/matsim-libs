@@ -50,9 +50,30 @@ import org.matsim.facilities.Facility;
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
  * routes from a {@link Facility} to another {@link Facility}, as we need in MATSim.
  * 
- * @author thibautd
+ * @author thibautd, nagel
  */
-public final class NetworkRoutingInclEgressAccessModule implements RoutingModule {
+public final class NetworkRoutingInclAccessEgressModule implements RoutingModule {
+
+	private final class AccessEgressStageActivityTypes implements StageActivityTypes {
+		@Override public boolean isStageActivity(String activityType) {
+			if ( stageActivityType.equals( activityType ) ) {
+				return true ;
+			} else {
+				return false ;
+			}
+		}
+		@Override public boolean equals( Object obj ) {
+			if ( !(obj instanceof AccessEgressStageActivityTypes) ) {
+				return false ;
+			}
+			AccessEgressStageActivityTypes other = (AccessEgressStageActivityTypes) obj ;
+			return other.isStageActivity(stageActivityType) ;
+		}
+		@Override public int hashCode() {
+			return stageActivityType.hashCode() ;
+		}
+	}
+
 
 	private final String mode;
 	private final PopulationFactory populationFactory;
@@ -62,7 +83,7 @@ public final class NetworkRoutingInclEgressAccessModule implements RoutingModule
 	private final LeastCostPathCalculator routeAlgo;
 	private String stageActivityType;
 
-	public NetworkRoutingInclEgressAccessModule(
+	public NetworkRoutingInclAccessEgressModule(
 			final String mode,
 			final PopulationFactory populationFactory,
 			final Network network,
@@ -180,16 +201,7 @@ public final class NetworkRoutingInclEgressAccessModule implements RoutingModule
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
-		return new StageActivityTypes(){
-			@Override
-			public boolean isStageActivity(String activityType) {
-				if ( stageActivityType.equals( activityType ) ) {
-					return true ;
-				} else {
-					return false ;
-				}
-			}
-		} ;
+		return new AccessEgressStageActivityTypes() ;
 	}
 
 	@Override
@@ -205,7 +217,7 @@ public final class NetworkRoutingInclEgressAccessModule implements RoutingModule
 
 		/* Remove this and next three lines once debugged. */
 		if(fromLink == null || toLink == null){
-			Logger.getLogger(NetworkRoutingInclEgressAccessModule.class).error("  ==>  null from/to link for person " + person.getId().toString());
+			Logger.getLogger(NetworkRoutingInclAccessEgressModule.class).error("  ==>  null from/to link for person " + person.getId().toString());
 		}
 		if (fromLink == null) throw new RuntimeException("fromLink "+fromLinkId+" missing.");
 		if (toLink == null) throw new RuntimeException("toLink "+toLinkId+" missing.");
