@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.data.v20.Lanes;
@@ -58,7 +59,7 @@ import org.xml.sax.helpers.AttributesImpl;
 public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	
 	static final Logger log = Logger.getLogger(ParallelPopulationReaderMatsimV4.class);
-	
+
 	private final boolean isPopulationStreaming;
 	private final int numThreads;
 	private final BlockingQueue<List<Tag>> queue;
@@ -68,8 +69,10 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	private Thread[] threads;
 	private List<Tag> currentPersonXmlData;
 		
-	public ParallelPopulationReaderMatsimV4(final Scenario scenario) {
-		super(scenario);
+	public ParallelPopulationReaderMatsimV4(
+			final CoordinateTransformation coordinateTransformation,
+			final Scenario scenario) {
+		super( coordinateTransformation , scenario );
 		
 		/*
 		 * Check whether population streaming is activated
