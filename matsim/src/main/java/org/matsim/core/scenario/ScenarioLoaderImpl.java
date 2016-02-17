@@ -30,6 +30,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -117,16 +120,29 @@ public class ScenarioLoaderImpl {
 	 * Loads the network into the scenario of this class
 	 */
 	private void loadNetwork() {
-		String networkFileName = null;
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
-			networkFileName = this.config.network().getInputFile();
+			final String networkFileName = this.config.network().getInputFile();
+
 			log.info("loading network from " + networkFileName);
+
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+
 			if (this.config.network().isTimeVariantNetwork()) {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 			}
-			new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
+
+			if ( config.network().getInputCRS() == null ) {
+				new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
+			}
+			else {
+				final CoordinateTransformation transformation =
+						TransformationFactory.getCoordinateTransformation(
+								config.network().getInputCRS(),
+								config.global().getCoordinateSystem() );
+				new MatsimNetworkReader( transformation , this.scenario.getNetwork() ).parse( networkFileName );
+			}
+
 			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);

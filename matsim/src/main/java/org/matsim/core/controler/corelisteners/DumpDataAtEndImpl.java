@@ -38,6 +38,8 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -105,7 +107,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		if ( event.isUnexpected() ) {
 			return ;
 		}
-		
+
 		// dump plans
 		new PopulationWriter(population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
 		final ObjectAttributes personAttributes = population.getPersonAttributes();
@@ -115,7 +117,17 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			writer.writeFile( controlerIO.getOutputFilename( Controler.FILENAME_PERSON_ATTRIBUTES ) );
 		}
 		// dump network
-		new NetworkWriter(network).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
+		if ( config.network().getInputCRS() == null ) {
+			new NetworkWriter(network).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
+		}
+		else {
+			final CoordinateTransformation transformation =
+					TransformationFactory.getCoordinateTransformation(
+							config.global().getCoordinateSystem(),
+							config.network().getInputCRS() );
+			new NetworkWriter( transformation , network ).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
+		}
+
 		// dump config
 		new ConfigWriter(config).write(controlerIO.getOutputFilename(Controler.FILENAME_CONFIG));
 		// dump facilities
