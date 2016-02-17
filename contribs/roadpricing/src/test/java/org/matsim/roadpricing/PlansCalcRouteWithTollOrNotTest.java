@@ -33,6 +33,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouterModule;
@@ -40,6 +44,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
@@ -129,6 +134,8 @@ public class PlansCalcRouteWithTollOrNotTest {
 				new AbstractModule() {
 					@Override
 					public void install() {
+						install(new EventsManagerModule());
+						bind(OutputDirectoryHierarchy.class).asEagerSingleton();
 						bind(RoadPricingScheme.class).toInstance(toll);
 						addTravelTimeBinding(TransportMode.car).to(FreeSpeedTravelTime.class);
 						bind(PlansCalcRouteWithTollOrNot.class);

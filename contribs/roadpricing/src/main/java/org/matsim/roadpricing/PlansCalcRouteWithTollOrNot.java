@@ -28,8 +28,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -60,24 +62,19 @@ public class PlansCalcRouteWithTollOrNot implements PlanAlgorithm {
 	}
 
 	private void handlePlan(Plan plan) {
-		throw new RuntimeException("Currently unavailable.");
 		// This calculates a best-response plan from the two options, paying area toll or not.
 		// From what I understand, it may be simpler/better to just throw a coin and produce
 		// one of the two options.
-//		TravelDisutility untolledTravelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, config.planCalcScore());
-//		RoutingContextImpl untolledRoutingContext = new RoutingContextImpl(untolledTravelDisutility, travelTime);
-//		PlanRouter untolledPlanRouter = new PlanRouter(tripRouterFactory.get());
-//		untolledPlanRouter.run(plan);
-//		double routeCostWithAreaToll = sumNetworkModeCosts(plan) + roadPricingScheme.getTypicalCosts().iterator().next().amount;
-//		RoutingContextImpl tolledRoutingContext = new RoutingContextImpl(
-//				new TravelDisutilityIncludingToll(untolledTravelDisutility, roadPricingScheme, config),
-//				travelTime);
-//		new PlanRouter(tripRouterFactory.get()).run(plan);
-//		double routeCostWithoutAreaToll = sumNetworkModeCosts(plan);
-//		if (routeCostWithAreaToll < routeCostWithoutAreaToll) {
-//			// Change the plan back to the one without toll
-//			untolledPlanRouter.run(plan);
-//		}
+		TravelDisutility untolledTravelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, config.planCalcScore());
+		PlanRouter untolledPlanRouter = new PlanRouter(tripRouterFactory.get());
+		untolledPlanRouter.run(plan);
+		double routeCostWithAreaToll = sumNetworkModeCosts(plan) + roadPricingScheme.getTypicalCosts().iterator().next().amount;
+		new PlanRouter(tripRouterFactory.get()).run(plan);
+		double routeCostWithoutAreaToll = sumNetworkModeCosts(plan);
+		if (routeCostWithAreaToll < routeCostWithoutAreaToll) {
+			// Change the plan back to the one without toll
+			untolledPlanRouter.run(plan);
+		}
 	}
 
 	private double sumNetworkModeCosts(Plan plan) {
