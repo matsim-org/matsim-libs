@@ -17,6 +17,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.PtConstants;
 import playground.boescpa.ivtBaseline.IVTBaselineScoringFunctionFactory;
+import playground.boescpa.lib.tools.fileCreation.F2LConfigGroup;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
 import java.io.File;
 
@@ -45,7 +47,7 @@ public class RunLocationChoice {
         Logger.getLogger( org.matsim.pt.router.MultiNodeDijkstra.class ).setLevel( Level.ERROR );
 
         // It is suggested to use the config created with ChooseSecondaryFacilitiesConfigCreator.java.
-        final Config config = ConfigUtils.loadConfig(configFile, new DestinationChoiceConfigGroup());
+        final Config config = ConfigUtils.loadConfig(configFile, new BlackListedTimeAllocationMutatorConfigGroup(), new DestinationChoiceConfigGroup(), new F2LConfigGroup());
 
         // This is currently needed for location choice: initializing
         // the location choice writes K-values files to the output directory, which:

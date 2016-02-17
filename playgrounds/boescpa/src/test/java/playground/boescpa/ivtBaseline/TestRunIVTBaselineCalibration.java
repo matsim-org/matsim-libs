@@ -34,6 +34,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.boescpa.ivtBaseline.preparation.IVTConfigCreator;
+import playground.boescpa.lib.tools.fileCreation.F2LConfigGroup;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
 
 import static playground.boescpa.ivtBaseline.TestRunBaseline.createFacilities;
@@ -76,7 +77,7 @@ public class TestRunIVTBaselineCalibration {
 		// create config
 		String[] argsConfig = {pathToConfig, "100"};
 		IVTConfigCreator.main(argsConfig);
-		Config config = ConfigUtils.loadConfig(pathToConfig);
+		Config config = ConfigUtils.loadConfig(pathToConfig, new F2LConfigGroup());
 		config.setParam("controler", "outputDirectory", utils.getOutputDirectory() + "output/");
 		// Reduce iterations to one write out interval + 1
 		config.setParam("controler", "lastIteration", "11");
