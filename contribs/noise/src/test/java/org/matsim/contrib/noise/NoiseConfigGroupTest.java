@@ -25,9 +25,17 @@ package org.matsim.contrib.noise;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.noise.data.GridParameters;
+import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
+import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -41,13 +49,14 @@ public class NoiseConfigGroupTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	@Test
-	public final void test1(){
+	public final void test0(){
 		
-		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config1.xml";
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config0.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new GridParameters());
 				
 		GridParameters gridParameters = (GridParameters) config.getModule("noiseGrid");
 
+		// test the config parameters
 		Assert.assertEquals("wrong config parameter", 12345., gridParameters.getReceiverPointGap(), MatsimTestUtils.EPSILON);
 		
 		String actForRecPtGrid = gridParameters.getConsideredActivitiesForReceiverPointGridArray()[0] + "," + gridParameters.getConsideredActivitiesForReceiverPointGridArray()[1] + "," + gridParameters.getConsideredActivitiesForReceiverPointGridArray()[2];
@@ -55,12 +64,43 @@ public class NoiseConfigGroupTest {
 		
 		String actForSpatFct = gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[0] + "," + gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[1] + "," + gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[2];
 		Assert.assertEquals("wrong config parameter", "work,leisure,other", actForSpatFct);		
-
-//		GridParameters grid = ConfigUtils.addOrGetModule(config, GridParameters.GROUP_NAME, GridParameters.class);
-//		grid.setReceiverPointGap(250.);
-				
-//		GridParameters gridParameters = new GridParameters();
-//		gridParameters.setReceiverPointGap(250.);	
+			
 	}
+	
+	@Test
+	public final void test1(){
 		
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config1.xml";
+		Config config = ConfigUtils.loadConfig(configFile, new GridParameters());
+				
+		GridParameters gridParameters = (GridParameters) config.getModule("noiseGrid");
+
+		// see if the custom config group is written into the output config file
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		Controler controler = new Controler(scenario);
+		
+		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, new NoiseParameters());
+
+		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+			}
+		});
+		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		controler.run();
+//				
+//		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immisions/";
+//		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
+//
+//		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, gridParameters.getReceiverPointGap());
+//		readNoiseFile.run();
+//		
+
+	}
+
 }

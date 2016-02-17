@@ -4,8 +4,8 @@
 
 	<module name="noiseGrid" >
 		<param name="receiverPointGap" value="12345" />
-		<param name="consideredActivitiesForReceiverPointGrid" value="home,work" />
-		<param name="consideredActivitiesForSpatialFunctionality" value="home,work" />
+		<param name="consideredActivitiesForReceiverPointGrid" value="home,sleep,eat" />
+		<param name="consideredActivitiesForSpatialFunctionality" value="work,leisure,other" />
 	</module>
 
 	<module name="network" >

@@ -176,7 +176,7 @@ public class NoiseTest {
 		noiseParameters.setUseActualSpeedLevel(false);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		String outputFilePath = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		File file = new File(outputFilePath);
