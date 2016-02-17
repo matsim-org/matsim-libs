@@ -34,7 +34,6 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -48,11 +47,7 @@ import playground.ivt.kticompatibility.KtiActivityScoring;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.scoring.LineChangeScoringFunction;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author thibautd

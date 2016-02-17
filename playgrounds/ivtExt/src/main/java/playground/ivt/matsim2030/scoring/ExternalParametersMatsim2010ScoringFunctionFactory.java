@@ -2,11 +2,9 @@ package playground.ivt.matsim2030.scoring;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.BlackListedActivityScoringFunction;
-import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;

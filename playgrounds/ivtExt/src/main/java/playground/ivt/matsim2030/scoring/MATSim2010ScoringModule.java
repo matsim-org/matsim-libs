@@ -1,7 +1,6 @@
 package playground.ivt.matsim2030.scoring;
 
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 
 /**
