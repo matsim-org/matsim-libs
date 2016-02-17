@@ -90,7 +90,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		
-		if (this.noiseContext.getNoiseParams().getBusIdPrefixesSet() == null || this.noiseContext.getNoiseParams().getBusIdPrefixesSet().size() == 0) {
+		if (this.noiseContext.getNoiseParams().getBusIdIdentifierSet() == null || this.noiseContext.getNoiseParams().getBusIdIdentifierSet().size() == 0) {
 			if (cWarn1 == 0) {
 				log.warn("Simulated public transit detected. "
 						+ "To calculate noise caused by road vehicles, e.g. buses, "
@@ -101,7 +101,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 			
 		} else {
 			boolean isBus = false;
-			for (String busIdPrefix : this.noiseContext.getNoiseParams().getBusIdPrefixesSet()) {
+			for (String busIdPrefix : this.noiseContext.getNoiseParams().getBusIdIdentifierSet()) {
 				if (event.getTransitLineId().toString().contains(busIdPrefix)) {
 					isBus = true;
 					break;

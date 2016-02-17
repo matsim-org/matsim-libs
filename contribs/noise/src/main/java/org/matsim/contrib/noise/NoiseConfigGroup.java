@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -75,8 +76,37 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private NoiseAllocationApproach noiseAllocationApproach = NoiseAllocationApproach.AverageCost;
 		
 	private String[] hgvIdPrefixes = { "lkw" };
-	private Set<String> busIdPrefixes = new HashSet<String>();
+	private Set<String> busIdIdentifier = new HashSet<String>();
 	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
+	
+	// ########################################################################################################
+	
+	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> comments = super.getComments();
+		comments.put("annualCostRate", "annual noise cost rate [in EUR per exposed pulation unit]; following the German EWS approach" ) ;
+		comments.put("timeBinSizeNoiseComputation", "Specifies the temporal resolution, i.e. the time bin size [in seconds] to compute noise levels." ) ;
+		comments.put("scaleFactor", "Set to '1.' for a 100 percent sample size. Set to '10.' for a 10 percent sample size. Set to '100.' for a 1 percent sample size." ) ;
+		comments.put("relevantRadius", "Specifies the radius [in coordinate units] around each receiver point links are taken into account." ) ;
+		comments.put("tunnelLinkIdFile", "Specifies a csv file which contains all tunnel link IDs." ) ;
+		comments.put("tunnelLinkIDs", "Specifies a list of comma-seperated tunnel link IDs. Will be ignored in case a the tunnel link IDs are provided as file (see parameter 'tunnelLinkIdFile')." ) ;
+
+		comments.put("writeOutputIteration", "Specifies how often the noise-specific output is written out." ) ;
+		comments.put("useActualSpeedLevel", "Set to 'true' if the actual speed level should be used to compute noise levels. Set to 'false' if the freespeed level should be used to compute noise levels." ) ;
+		comments.put("allowForSpeedsOutsideTheValidRange", "Set to 'true' if speed levels below 30 km/h or above 80 km/h (HGV) / 130 km/h (car) should be used to compute noise levels. Set to 'false' if speed levels outside of the valid range should not be used to compute noise levels (recommended)." ) ;
+		
+		comments.put("throwNoiseEventsAffected", "Set to 'true' if noise events (providing information about the affected agent) should be thrown. Otherwise set to 'false'." ) ;
+		comments.put("computeNoiseDamages", "Set to 'true' if noise damages should be computed. Otherwise set to 'false'." ) ;
+		comments.put("computeCausingAgents", "Set to 'true' if the noise damages should be traced back and a causing agent should be identified. Otherwise set to 'false'." ) ;
+		comments.put("throwNoiseEventsCaused", "Set to 'true' if noise events (providing information about the causing agent) should be thrown. Otherwise set to 'false'." ) ;
+		comments.put("computePopulationUnits", "Set to 'true' if population densities should be computed. Otherwise set to 'false'." ) ;
+
+		comments.put("hgvIdPrefixes", "Specifies the HGV (heavy goods vehicles, trucks) ID prefix." ) ;
+		comments.put("busIdIdentifier", "Specifies the public transit vehicle ID identifiers. Buses are treated as HGV, other public transit vehicles are neglected." ) ;
+
+		
+		return comments;
+	}
 
 	// ########################################################################################################
 			
@@ -225,25 +255,25 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	
 	@StringSetter( "annualCostRate" )
 	public void setAnnualCostRate(double annualCostRate) {
-		log.info("Setting the annual cost rate to " + annualCostRate);
+		log.info("setting the annual cost rate to " + annualCostRate);
 		this.annualCostRate = annualCostRate;
 	}
 
 	@StringSetter( "timeBinSizeNoiseComputation" )
 	public void setTimeBinSizeNoiseComputation(double timeBinSizeNoiseComputation) {
-		log.info("Setting the time bin size for the computation of noise to " + timeBinSizeNoiseComputation);
+		log.info("setting the time bin size for the computation of noise to " + timeBinSizeNoiseComputation);
 		this.timeBinSizeNoiseComputation = timeBinSizeNoiseComputation;
 	}
 
 	@StringSetter( "scaleFactor" )
 	public void setScaleFactor(double scaleFactor) {
-		log.info("Setting the scale factor to " + scaleFactor);
+		log.info("setting the scale factor to " + scaleFactor);
 		this.scaleFactor = scaleFactor;
 	}
 
 	@StringSetter( "relevantRadius" )
 	public void setRelevantRadius(double relevantRadius) {
-		log.info("Setting the radius of relevant links around each receiver point to " + relevantRadius);
+		log.info("setting the radius of relevant links around each receiver point to " + relevantRadius);
 		this.relevantRadius = relevantRadius;
 	}
 	
@@ -313,7 +343,7 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( "tunnelLinkIdFile" )
 	public void setTunnelLinkIdFile(String tunnelLinkIdFile) {
-		log.info("Setting file which contains the tunnel link Ids to " + tunnelLinkIdFile + ".");
+		log.info("setting file which contains the tunnel link Ids to " + tunnelLinkIdFile + ".");
 		this.tunnelLinkIdFile = tunnelLinkIdFile;
 	}
 	
@@ -369,12 +399,12 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 	@StringGetter( "busIdPrefixes" )
 	private String getBusIdPrefixes() {
-		return CollectionUtils.setToString(busIdPrefixes);
+		return CollectionUtils.setToString(busIdIdentifier);
 	}
 
 	@StringSetter( "busIdPrefixes" )
 	public void setBusIdPrefixes(String busIdPrefixes) {		
-		this.setBusIdPrefixesSet(CollectionUtils.stringToSet(busIdPrefixes));
+		this.setBusIdIdentifierSet(CollectionUtils.stringToSet(busIdPrefixes));
 	}
 
 	@StringGetter( "tunnelLinkIDs" )
@@ -388,12 +418,12 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public void setHgvIdPrefixesArray(String[] hgvIdPrefix) {
-		log.info("Setting the HGV Id Prefixes to " + hgvIdPrefix.toString());
+		log.info("setting the HGV Id Prefixes to " + hgvIdPrefix.toString());
 		this.hgvIdPrefixes = hgvIdPrefix;
 	}
 
 	public void setTunnelLinkIDsSet(Set<Id<Link>> tunnelLinkIDs) {
-		log.info("Setting tunnel link IDs to " + tunnelLinkIDs.toString());
+		log.info("setting tunnel link IDs to " + tunnelLinkIDs.toString());
 		this.tunnelLinkIDs = tunnelLinkIDs;
 	}
 	
@@ -405,13 +435,13 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		return tunnelLinkIDs;
 	}
 	
-	public Set<String> getBusIdPrefixesSet() {
-		return busIdPrefixes;
+	public Set<String> getBusIdIdentifierSet() {
+		return busIdIdentifier;
 	}
 
-	public void setBusIdPrefixesSet(Set<String> busIdPrefixes) {
-		log.info("Setting the bus Id prefixes to : " + busIdPrefixes.toString());
-		this.busIdPrefixes = busIdPrefixes;
+	public void setBusIdIdentifierSet(Set<String> busIdPrefixes) {
+		log.info("setting the bus Id prefixes to : " + busIdPrefixes.toString());
+		this.busIdIdentifier = busIdPrefixes;
 	}
 	
 	private String linkIdSetToString (Set<Id<Link>> linkIds) {

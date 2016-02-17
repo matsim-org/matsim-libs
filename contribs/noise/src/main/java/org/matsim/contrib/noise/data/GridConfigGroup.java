@@ -25,6 +25,7 @@ package org.matsim.contrib.noise.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -84,6 +85,29 @@ public class GridConfigGroup extends ReflectiveConfigGroup {
 			throw new RuntimeException("NEITHER providing a considered activity type for the minimum and maximum coordinates of the receiver point grid area "
 					+ "NOR providing receiver point grid minimum and maximum coordinates. Aborting...");
 		}
+	}
+	
+	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> comments = super.getComments();
+		comments.put("receiverPointGap", "horizontal and vertical distance between receiver points in x-/y-coordinate units" ) ;
+		comments.put("transformationFactory", "coordinate system; so far only tested for 'TransformationFactory.DHDN_GK4'" ) ;
+		comments.put("consideredActivitiesForSpatialFunctionality", "Specifies the activity types that are considered when computing noise damages (= the activities at which being exposed to noise results in noise damages)." ) ;
+		comments.put("consideredActivitiesForReceiverPointGrid", "Creates a grid of noise receiver points which contains all agents' activity locations of the specified types." ) ;
+		comments.put("receiverPointsGridMinX", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
+				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
+		comments.put("receiverPointsGridMaxX", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
+				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
+		comments.put("receiverPointsGridMinY", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
+				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
+		comments.put("receiverPointsGridMaxY", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
+				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
+		
+		return comments;
 	}
 	
 	// ########################################################################################################
