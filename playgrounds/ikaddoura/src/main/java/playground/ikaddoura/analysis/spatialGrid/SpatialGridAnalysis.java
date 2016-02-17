@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.noise.NoiseWriter;
 import org.matsim.contrib.noise.data.Grid;
-import org.matsim.contrib.noise.data.GridParameters;
+import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.contrib.noise.events.NoiseEventsReader;
 import org.matsim.contrib.noise.utils.NoiseEventAnalysisHandler;
@@ -124,7 +124,7 @@ public class SpatialGridAnalysis {
 
 		// grid parameters 
 		
-		GridParameters gridParameters = new GridParameters();
+		GridConfigGroup gridParameters = new GridConfigGroup();
 		gridParameters.setReceiverPointGap(receiverPointGap);
 					
 //		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)

@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.noise.NoiseParameters;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.handler.NoiseEquations;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
@@ -50,7 +50,7 @@ public class NoiseContext {
 	private static final Logger log = Logger.getLogger(NoiseContext.class);
 			
 	private final Scenario scenario;
-	private final NoiseParameters noiseParams;
+	private final NoiseConfigGroup noiseParams;
 	private final Grid grid;
 			
 	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
@@ -75,7 +75,7 @@ public class NoiseContext {
 	
 	// ############################################
 	
-	public NoiseContext(Scenario scenario, GridParameters gridParameters, NoiseParameters noiseParameters) {
+	public NoiseContext(Scenario scenario, GridConfigGroup gridParameters, NoiseConfigGroup noiseParameters) {
 		this.scenario = scenario;
 		
 		this.grid = new Grid(scenario, gridParameters);
@@ -451,7 +451,7 @@ public class NoiseContext {
 		return noiseReceiverPoints;
 	}
 	
-	public final NoiseParameters getNoiseParams() {
+	public final NoiseConfigGroup getNoiseParams() {
 		return noiseParams;
 	}
 

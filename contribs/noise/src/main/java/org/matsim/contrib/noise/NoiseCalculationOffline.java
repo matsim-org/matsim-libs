@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.noise.data.GridParameters;
+import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -110,7 +110,7 @@ public class NoiseCalculationOffline {
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(lastIteration);
 				
-		GridParameters gridParameters = new GridParameters();
+		GridConfigGroup gridParameters = new GridConfigGroup();
 		gridParameters.setReceiverPointGap(receiverPointGap);
 						
 		// Define min and max x-y-coordinates (e.g. Greater Berlin area)
@@ -129,7 +129,7 @@ public class NoiseCalculationOffline {
 				
 		// ################################
 		
-		NoiseParameters noiseParameters = new NoiseParameters();
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
 		noiseParameters.setScaleFactor(10.);

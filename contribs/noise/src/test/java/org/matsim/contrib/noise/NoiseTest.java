@@ -45,9 +45,9 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.NoiseParameters;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseWriter;
-import org.matsim.contrib.noise.data.GridParameters;
+import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.data.NoiseReceiverPoint;
@@ -92,10 +92,10 @@ public class NoiseTest {
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		
-		GridParameters gridParameters = new GridParameters();
+		GridConfigGroup gridParameters = new GridConfigGroup();
 		gridParameters.setReceiverPointGap(250.);	
 		
-		NoiseParameters noiseParameters = new NoiseParameters();
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setScaleFactor(1.);
 		String[] consideredActivities = {"home", "work"};
 		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
@@ -165,13 +165,13 @@ public class NoiseTest {
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 		
-		GridParameters gridParameters = new GridParameters();
+		GridConfigGroup gridParameters = new GridConfigGroup();
 		gridParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
 		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
 		
-		NoiseParameters noiseParameters = new NoiseParameters();
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(false);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
@@ -921,13 +921,13 @@ public class NoiseTest {
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 		
-		GridParameters gridParameters = new GridParameters();
+		GridConfigGroup gridParameters = new GridConfigGroup();
 		gridParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
 		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
 		
-		NoiseParameters noiseParameters = new NoiseParameters();
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 		noiseParameters.setUseActualSpeedLevel(false);
@@ -1032,13 +1032,13 @@ public class NoiseTest {
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 		
-		GridParameters gridParameters = new GridParameters();
+		GridConfigGroup gridParameters = new GridConfigGroup();
 		gridParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
 		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
 		
-		NoiseParameters noiseParameters = new NoiseParameters();
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);

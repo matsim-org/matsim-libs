@@ -30,8 +30,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
-import org.matsim.contrib.noise.NoiseParameters;
-import org.matsim.contrib.noise.data.GridParameters;
+import org.matsim.contrib.noise.NoiseConfigGroup;
+import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
@@ -129,7 +129,7 @@ public class CNControler {
 		
 		// grid parameters
 		
-		GridParameters gridParameters = new GridParameters();
+		GridConfigGroup gridParameters = new GridConfigGroup();
 		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
@@ -141,7 +141,7 @@ public class CNControler {
 				
 		// noise parameters
 		
-		NoiseParameters noiseParameters = new NoiseParameters();
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 				
 		noiseParameters.setScaleFactor(10.);

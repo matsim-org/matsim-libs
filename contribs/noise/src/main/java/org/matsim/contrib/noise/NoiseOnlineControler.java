@@ -29,7 +29,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
-import org.matsim.contrib.noise.data.GridParameters;
+import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
@@ -66,7 +66,7 @@ public class NoiseOnlineControler {
 		
 		// grid parameters
 		
-		GridParameters gridParameters = new GridParameters();		
+		GridConfigGroup gridParameters = new GridConfigGroup();		
 		gridParameters.setReceiverPointGap(100.);
 		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
@@ -77,7 +77,7 @@ public class NoiseOnlineControler {
 				
 		// noise parameters
 
-		NoiseParameters noiseParameters = new NoiseParameters();		
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();		
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);		
 		noiseParameters.setScaleFactor(10.);
 		

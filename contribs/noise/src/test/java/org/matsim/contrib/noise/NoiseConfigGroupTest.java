@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.noise.data.GridParameters;
+import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
 import org.matsim.core.config.Config;
@@ -51,9 +51,9 @@ public class NoiseConfigGroupTest {
 	public final void test0(){
 		
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config0.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new GridParameters(), new NoiseParameters());
+		Config config = ConfigUtils.loadConfig(configFile, new GridConfigGroup(), new NoiseConfigGroup());
 				
-		GridParameters gridParameters = (GridParameters) config.getModule("noiseGrid");
+		GridConfigGroup gridParameters = (GridConfigGroup) config.getModule("noiseGrid");
 
 		// test the config parameters
 		Assert.assertEquals("wrong config parameter", 12345., gridParameters.getReceiverPointGap(), MatsimTestUtils.EPSILON);
@@ -64,7 +64,7 @@ public class NoiseConfigGroupTest {
 		String actForSpatFct = gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[0] + "," + gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[1] + "," + gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[2];
 		Assert.assertEquals("wrong config parameter", "work,leisure,other", actForSpatFct);	
 		
-		NoiseParameters noiseParameters = (NoiseParameters) config.getModule("noise");
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 
 		// test the config parameters
 		Assert.assertEquals("wrong config parameter", 12345789., noiseParameters.getRelevantRadius(), MatsimTestUtils.EPSILON);
@@ -81,10 +81,10 @@ public class NoiseConfigGroupTest {
 	public final void test1(){
 		
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config1.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new GridParameters(), new NoiseParameters());
+		Config config = ConfigUtils.loadConfig(configFile, new GridConfigGroup(), new NoiseConfigGroup());
 				
-		GridParameters gridParameters = (GridParameters) config.getModule("noiseGrid");
-		NoiseParameters noiseParameters = (NoiseParameters) config.getModule("noise");
+		GridConfigGroup gridParameters = (GridConfigGroup) config.getModule("noiseGrid");
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		
 		// see if the custom config group is written into the output config file
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -105,9 +105,9 @@ public class NoiseConfigGroupTest {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		
-		Config outputConfig = ConfigUtils.loadConfig(controler.getConfig().controler().getOutputDirectory() + "/output_config.xml.gz", new GridParameters(), new NoiseParameters());
-		GridParameters outputGridParameters = (GridParameters) outputConfig.getModule("noiseGrid");
-		NoiseParameters outputNoiseParameters = (NoiseParameters) outputConfig.getModule("noise");
+		Config outputConfig = ConfigUtils.loadConfig(controler.getConfig().controler().getOutputDirectory() + "/output_config.xml.gz", new GridConfigGroup(), new NoiseConfigGroup());
+		GridConfigGroup outputGridParameters = (GridConfigGroup) outputConfig.getModule("noiseGrid");
+		NoiseConfigGroup outputNoiseParameters = (NoiseConfigGroup) outputConfig.getModule("noise");
 		
 		Assert.assertEquals("input and output config parameters are not the same", gridParameters.toString(), outputGridParameters.toString());
 		Assert.assertEquals("input and output config parameters are not the same", noiseParameters.toString(), outputNoiseParameters.toString());

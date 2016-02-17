@@ -46,15 +46,15 @@ import org.matsim.core.utils.misc.StringUtils;
  * @author ikaddoura
  *
  */
-public class NoiseParameters extends ReflectiveConfigGroup {
+public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	
 	public static final String GROUP_NAME = "noise";
 	
-	public NoiseParameters() {
+	public NoiseConfigGroup() {
 		super(GROUP_NAME);
 	}
 	
-	private static final Logger log = Logger.getLogger(NoiseParameters.class);
+	private static final Logger log = Logger.getLogger(NoiseConfigGroup.class);
 
 	private double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
 	private double timeBinSizeNoiseComputation = 3600.0;

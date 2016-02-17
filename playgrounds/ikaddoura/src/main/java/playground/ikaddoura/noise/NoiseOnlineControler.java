@@ -30,8 +30,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
-import org.matsim.contrib.noise.NoiseParameters;
-import org.matsim.contrib.noise.data.GridParameters;
+import org.matsim.contrib.noise.NoiseConfigGroup;
+import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
@@ -71,7 +71,7 @@ public class NoiseOnlineControler {
 		
 		// grid parameters
 		
-		GridParameters gridParameters = new GridParameters();
+		GridConfigGroup gridParameters = new GridConfigGroup();
 		
 		// modify the default grid parameters
 		
@@ -87,7 +87,7 @@ public class NoiseOnlineControler {
 		
 		// noise parameters
 
-		NoiseParameters noiseParameters = new NoiseParameters();
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		
 		// modify the default noise parameters
 		

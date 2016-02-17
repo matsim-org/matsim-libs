@@ -49,7 +49,7 @@ public class Grid {
 	private static final Logger log = Logger.getLogger(Grid.class);
 			
 	private final Scenario scenario;
-	private final GridParameters gridParams;
+	private final GridConfigGroup gridParams;
 		
 	private final Map<Id<Person>, List<Coord>> personId2consideredActivityCoords = new HashMap<Id<Person>, List<Coord>>();
 	
@@ -69,7 +69,7 @@ public class Grid {
 	
 	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
 					
-	public Grid(Scenario scenario, GridParameters gridParams) {
+	public Grid(Scenario scenario, GridConfigGroup gridParams) {
 		
 		this.scenario = scenario;	
 		this.gridParams = gridParams;
@@ -293,7 +293,7 @@ public class Grid {
 		return receiverPoints;
 	}
 	
-	public GridParameters getGridParams() {
+	public GridConfigGroup getGridParams() {
 		return gridParams;
 	}
 

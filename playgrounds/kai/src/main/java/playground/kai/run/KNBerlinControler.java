@@ -9,9 +9,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
-import org.matsim.contrib.noise.NoiseParameters;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseWriter;
-import org.matsim.contrib.noise.data.GridParameters;
+import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.handler.NoiseTimeTracker;
 import org.matsim.contrib.noise.handler.PersonActivityTracker;
@@ -149,7 +149,7 @@ class KNBerlinControler {
 		// post-processing:
 
 		// grid parameters
-		GridParameters gridParameters = new GridParameters();
+		GridConfigGroup gridParameters = new GridConfigGroup();
 
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
@@ -160,7 +160,7 @@ class KNBerlinControler {
 		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
 
 		// noise parameters
-		NoiseParameters noiseParameters = new NoiseParameters();
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setScaleFactor(1./sampleFactor); // yyyyyy sample size!!!!
 
 

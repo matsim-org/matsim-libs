@@ -39,15 +39,15 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  * @author ikaddoura
  *
  */
-public class GridParameters extends ReflectiveConfigGroup {
+public class GridConfigGroup extends ReflectiveConfigGroup {
 	
 	public static final String GROUP_NAME = "noiseGrid";
 	
-	public GridParameters() {
+	public GridConfigGroup() {
 		super(GROUP_NAME);
 	}
 
-	private static final Logger log = Logger.getLogger(GridParameters.class);
+	private static final Logger log = Logger.getLogger(GridConfigGroup.class);
 
 	private double receiverPointGap = 250.;
 	private String transformationFactory = TransformationFactory.DHDN_GK4;
