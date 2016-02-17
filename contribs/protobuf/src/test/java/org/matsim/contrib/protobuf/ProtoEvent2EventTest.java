@@ -43,11 +43,9 @@ public class ProtoEvent2EventTest {
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof LinkEnterEvent);
-		if (e instanceof LinkEnterEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("link123", ((LinkEnterEvent) e).getLinkId().toString());
-			Assert.assertEquals("K.I.T.T.",((LinkEnterEvent) e).getVehicleId().toString());
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("link123", ((LinkEnterEvent) e).getLinkId().toString());
+		Assert.assertEquals("K.I.T.T.", ((LinkEnterEvent) e).getVehicleId().toString());
 	}
 
 	@Test
@@ -60,11 +58,9 @@ public class ProtoEvent2EventTest {
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof LinkLeaveEvent);
-		if (e instanceof LinkLeaveEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("link123", ((LinkLeaveEvent) e).getLinkId().toString());
-			Assert.assertEquals("K.I.T.T.",((LinkLeaveEvent) e).getVehicleId().toString());
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("link123", ((LinkLeaveEvent) e).getLinkId().toString());
+		Assert.assertEquals("K.I.T.T.", ((LinkLeaveEvent) e).getVehicleId().toString());
 	}
 
 	@Test
@@ -77,11 +73,9 @@ public class ProtoEvent2EventTest {
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof ActivityEndEvent);
-		if (e instanceof ActivityEndEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("link123", ((ActivityEndEvent) e).getLinkId().toString());
-			Assert.assertEquals("Bob",((ActivityEndEvent) e).getPersonId().toString());
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("link123", ((ActivityEndEvent) e).getLinkId().toString());
+		Assert.assertEquals("Bob", ((ActivityEndEvent) e).getPersonId().toString());
 	}
 
 	@Test
@@ -94,11 +88,9 @@ public class ProtoEvent2EventTest {
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof ActivityStartEvent);
-		if (e instanceof ActivityStartEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("link123", ((ActivityStartEvent) e).getLinkId().toString());
-			Assert.assertEquals("Bob",((ActivityStartEvent) e).getPersonId().toString());
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("link123", ((ActivityStartEvent) e).getLinkId().toString());
+		Assert.assertEquals("Bob", ((ActivityStartEvent) e).getPersonId().toString());
 	}
 
 	@Test
@@ -112,12 +104,10 @@ public class ProtoEvent2EventTest {
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof PersonArrivalEvent);
-		if (e instanceof PersonArrivalEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("link123", ((PersonArrivalEvent) e).getLinkId().toString());
-			Assert.assertEquals("Bob",((PersonArrivalEvent) e).getPersonId().toString());
-			Assert.assertEquals("crawling",((PersonArrivalEvent) e).getLegMode());
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("link123", ((PersonArrivalEvent) e).getLinkId().toString());
+		Assert.assertEquals("Bob", ((PersonArrivalEvent) e).getPersonId().toString());
+		Assert.assertEquals("crawling", ((PersonArrivalEvent) e).getLegMode());
 	}
 
 	@Test
@@ -131,12 +121,10 @@ public class ProtoEvent2EventTest {
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof PersonDepartureEvent);
-		if (e instanceof PersonDepartureEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("link123", ((PersonDepartureEvent) e).getLinkId().toString());
-			Assert.assertEquals("Alice",((PersonDepartureEvent) e).getPersonId().toString());
-			Assert.assertEquals("crawling", ((PersonDepartureEvent) e).getLegMode());
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("link123", ((PersonDepartureEvent) e).getLinkId().toString());
+		Assert.assertEquals("Alice", ((PersonDepartureEvent) e).getPersonId().toString());
+		Assert.assertEquals("crawling", ((PersonDepartureEvent) e).getLegMode());
 	}
 
 	@Test
@@ -149,11 +137,9 @@ public class ProtoEvent2EventTest {
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof PersonEntersVehicleEvent);
-		if (e instanceof PersonEntersVehicleEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("Alice",((PersonEntersVehicleEvent) e).getPersonId().toString());
-			Assert.assertEquals("K.I.T.T.",((PersonEntersVehicleEvent) e).getVehicleId().toString());
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("Alice", ((PersonEntersVehicleEvent) e).getPersonId().toString());
+		Assert.assertEquals("K.I.T.T.", ((PersonEntersVehicleEvent) e).getVehicleId().toString());
 	}
 
 	@Test
@@ -166,11 +152,9 @@ public class ProtoEvent2EventTest {
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof PersonLeavesVehicleEvent);
-		if (e instanceof PersonLeavesVehicleEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("Alice",((PersonLeavesVehicleEvent) e).getPersonId().toString());
-			Assert.assertEquals("K.I.T.T.",((PersonLeavesVehicleEvent) e).getVehicleId().toString());
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("Alice", ((PersonLeavesVehicleEvent) e).getPersonId().toString());
+		Assert.assertEquals("K.I.T.T.", ((PersonLeavesVehicleEvent) e).getVehicleId().toString());
 	}
 
 	@Test
@@ -183,11 +167,9 @@ public class ProtoEvent2EventTest {
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof PersonMoneyEvent);
-		if (e instanceof PersonMoneyEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("Alice",((PersonMoneyEvent) e).getPersonId().toString());
-			Assert.assertEquals(-123.45,((PersonMoneyEvent) e).getAmount(),0.);
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("Alice", ((PersonMoneyEvent) e).getPersonId().toString());
+		Assert.assertEquals(-123.45, ((PersonMoneyEvent) e).getAmount(), 0.);
 	}
 
 	@Test
@@ -202,12 +184,10 @@ public class ProtoEvent2EventTest {
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof PersonStuckEvent);
-		if (e instanceof PersonStuckEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("Alice",((PersonStuckEvent) e).getPersonId().toString());
-			Assert.assertEquals("link123",((PersonStuckEvent) e).getLinkId().toString());
-			Assert.assertEquals("flying",((PersonStuckEvent) e).getLegMode());
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("Alice", ((PersonStuckEvent) e).getPersonId().toString());
+		Assert.assertEquals("link123", ((PersonStuckEvent) e).getLinkId().toString());
+		Assert.assertEquals("flying", ((PersonStuckEvent) e).getLegMode());
 	}
 
 	@Test
@@ -224,14 +204,12 @@ public class ProtoEvent2EventTest {
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof TransitDriverStartsEvent);
-		if (e instanceof TransitDriverStartsEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("Alice",((TransitDriverStartsEvent) e).getDriverId().toString());
-			Assert.assertEquals("K.I.T.T.", ((TransitDriverStartsEvent) e).getVehicleId().toString());
-			Assert.assertEquals("tl11",((TransitDriverStartsEvent) e).getTransitLineId().toString());
-			Assert.assertEquals("tr11",((TransitDriverStartsEvent) e).getTransitRouteId().toString());
-			Assert.assertEquals("d11",((TransitDriverStartsEvent) e).getDepartureId().toString());
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("Alice", ((TransitDriverStartsEvent) e).getDriverId().toString());
+		Assert.assertEquals("K.I.T.T.", ((TransitDriverStartsEvent) e).getVehicleId().toString());
+		Assert.assertEquals("tl11", ((TransitDriverStartsEvent) e).getTransitLineId().toString());
+		Assert.assertEquals("tr11", ((TransitDriverStartsEvent) e).getTransitRouteId().toString());
+		Assert.assertEquals("d11", ((TransitDriverStartsEvent) e).getDepartureId().toString());
 	}
 
 	@Test
@@ -241,17 +219,14 @@ public class ProtoEvent2EventTest {
 				setLinkId(ProtobufEvents.LinkId.newBuilder().setId("link123"));
 
 
-
 		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.VehicleAborts).
 				setVehicleAborts(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof VehicleAbortsEvent);
-		if (e instanceof VehicleAbortsEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("K.I.T.T.", ((VehicleAbortsEvent) e).getVehicleId().toString());
-			Assert.assertEquals("link123",((VehicleAbortsEvent) e).getLinkId().toString());
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("K.I.T.T.", ((VehicleAbortsEvent) e).getVehicleId().toString());
+		Assert.assertEquals("link123", ((VehicleAbortsEvent) e).getLinkId().toString());
 	}
 
 	@Test
@@ -262,20 +237,17 @@ public class ProtoEvent2EventTest {
 				setNetworkMode("super pursuit").setRelPosOnLink(3.1415);
 
 
-
 		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.VehicleEntersTraffic).
 				setVehicleEntersTraffic(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof VehicleEntersTrafficEvent);
-		if (e instanceof VehicleEntersTrafficEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("K.I.T.T.", ((VehicleEntersTrafficEvent) e).getVehicleId().toString());
-			Assert.assertEquals("link123",((VehicleEntersTrafficEvent) e).getLinkId().toString());
-			Assert.assertEquals("Alice",((VehicleEntersTrafficEvent) e).getPersonId().toString());
-			Assert.assertEquals("super pursuit",((VehicleEntersTrafficEvent) e).getNetworkMode());
-			Assert.assertEquals(3.1415,((VehicleEntersTrafficEvent) e).getRelativePositionOnLink(),0.);
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("K.I.T.T.", ((VehicleEntersTrafficEvent) e).getVehicleId().toString());
+		Assert.assertEquals("link123", ((VehicleEntersTrafficEvent) e).getLinkId().toString());
+		Assert.assertEquals("Alice", ((VehicleEntersTrafficEvent) e).getPersonId().toString());
+		Assert.assertEquals("super pursuit", ((VehicleEntersTrafficEvent) e).getNetworkMode());
+		Assert.assertEquals(3.1415, ((VehicleEntersTrafficEvent) e).getRelativePositionOnLink(), 0.);
 	}
 
 	@Test
@@ -286,19 +258,16 @@ public class ProtoEvent2EventTest {
 				setNetworkMode("super pursuit").setRelPosOnLink(3.1415);
 
 
-
 		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.VehicleLeavesTraffic).
 				setVehicleLeavesTraffic(le).build();
 
 		Event e = ProtoEvent2Event.getEvent(pe);
 		Assert.assertTrue(e instanceof VehicleLeavesTrafficEvent);
-		if (e instanceof VehicleLeavesTrafficEvent ) {
-			Assert.assertEquals(42.0, e.getTime(), 0.);
-			Assert.assertEquals("K.I.T.T.", ((VehicleLeavesTrafficEvent) e).getVehicleId().toString());
-			Assert.assertEquals("link123",((VehicleLeavesTrafficEvent) e).getLinkId().toString());
-			Assert.assertEquals("Alice",((VehicleLeavesTrafficEvent) e).getPersonId().toString());
-			Assert.assertEquals("super pursuit",((VehicleLeavesTrafficEvent) e).getNetworkMode());
-			Assert.assertEquals(3.1415,((VehicleLeavesTrafficEvent) e).getRelativePositionOnLink(),0.);
-		}
+		Assert.assertEquals(42.0, e.getTime(), 0.);
+		Assert.assertEquals("K.I.T.T.", ((VehicleLeavesTrafficEvent) e).getVehicleId().toString());
+		Assert.assertEquals("link123", ((VehicleLeavesTrafficEvent) e).getLinkId().toString());
+		Assert.assertEquals("Alice", ((VehicleLeavesTrafficEvent) e).getPersonId().toString());
+		Assert.assertEquals("super pursuit", ((VehicleLeavesTrafficEvent) e).getNetworkMode());
+		Assert.assertEquals(3.1415, ((VehicleLeavesTrafficEvent) e).getRelativePositionOnLink(), 0.);
 	}
 }
