@@ -298,8 +298,9 @@ public class MarginalCongestionHandlerV3QsimTest {
 		
 		String configFile = testUtils.getPackageInputDirectory()+"MarginalCongestionHandlerV3QsimTest/configTestRouting.xml";
 
-		Controler controler = new Controler(configFile);
-		
+		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		Controler controler = new Controler( scenario );
+
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 		controler.addOverridingModule(new AbstractModule() {
