@@ -291,7 +291,7 @@ public class KNFreight4 {
 			@Override
 			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
-				TravelDisutility travelDisutility = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
+				TravelDisutility travelDisutility = ControlerDefaults.createDefaultTravelDisutilityFactory().createTravelDisutility(
 						travelTimes , scenario.getConfig().planCalcScore() );
 				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
 						travelDisutility, travelTimes) ;

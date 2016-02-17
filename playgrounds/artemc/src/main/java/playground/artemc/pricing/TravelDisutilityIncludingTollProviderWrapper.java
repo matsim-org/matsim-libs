@@ -30,7 +30,7 @@ public class TravelDisutilityIncludingTollProviderWrapper {
 		@Override
 		public TravelDisutilityFactory get() {
 			RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), scheme, scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney());
+			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(ControlerDefaults.createDefaultTravelDisutilityFactory(), scheme, scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney());
 			travelDisutilityFactory.setSigma(rpConfig.getRoutingRandomness());
 			return travelDisutilityFactory;
 		}
