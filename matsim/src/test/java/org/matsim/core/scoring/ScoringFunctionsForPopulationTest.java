@@ -32,7 +32,7 @@ public class ScoringFunctionsForPopulationTest {
 
 		ScoringFunctionFactory throwingScoringFunctionFactory = new ThrowingScoringFunctionFactory();
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(events, new EventsToActivities(events), new EventsToLegs(scenario.getNetwork(), events), config.plans(), scenario.getNetwork(), scenario.getPopulation(), throwingScoringFunctionFactory);
-
+		scoringFunctionsForPopulation.onIterationStarts();
 		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4));
 		scoringFunctionsForPopulation.finishScoringFunctions();
 	}
@@ -141,7 +141,7 @@ public class ScoringFunctionsForPopulationTest {
 			}
 		};
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(events, new EventsToActivities(events), new EventsToLegs(scenario.getNetwork(), events), config.plans(), scenario.getNetwork(), scenario.getPopulation(), scoringFunctionFactory);
-
+		scoringFunctionsForPopulation.onIterationStarts();
 		int MAX = 10000;
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
@@ -249,7 +249,7 @@ public class ScoringFunctionsForPopulationTest {
 			}
 		};
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(events, new EventsToActivities(events), new EventsToLegs(scenario.getNetwork(), events), config.plans(), scenario.getNetwork(), scenario.getPopulation(), scoringFunctionFactory);
-
+		scoringFunctionsForPopulation.onIterationStarts();
 		int MAX = 10;
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {

@@ -48,16 +48,12 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.rx.ObservableUtils;
-import rx.Notification;
 import rx.Observable;
 import rx.Observer;
-import rx.functions.Action1;
-import rx.subjects.PublishSubject;
 
 /**
  * This class helps EventsToScore by keeping ScoringFunctions for the entire Population - one per Person -, and dispatching Activities
@@ -67,7 +63,7 @@ import rx.subjects.PublishSubject;
  * @author michaz
  *
  */
-class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPlansService {
+class ScoringFunctionsForPopulation implements ExperiencedPlansService {
 
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
 	private final PlansConfigGroup plansConfigGroup;
@@ -97,7 +93,6 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		this.network = network;
 		this.population = population;
 		this.scoringFunctionFactory = scoringFunctionFactory;
-		reset();
 
 		// Merge three streams of different type into one and react on it.
 		// Otherwise, I would have to synchronize on the three scoreXX methods,
@@ -130,7 +125,15 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 				exception.set(e);
 			}
 		});
-		eventsManager.addHandler(this); // only so that I receive the reset() call!
+	}
+
+	void onIterationStarts() {
+		for (Person person : population.getPersons().values()) {
+			ScoringFunction data = scoringFunctionFactory.createNewScoringFunction(person);
+			this.agentScorers.put(person.getId(), data);
+			this.agentRecords.put(person.getId(), new PlanImpl());
+			this.partialScores.put(person.getId(), new TDoubleArrayList());
+		}
 	}
 
 	private void scorePersonEvent(HasPersonId o) {
@@ -176,15 +179,6 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		}
 	}
 
-	private void reset() {
-		for (Person person : population.getPersons().values()) {
-			ScoringFunction data = scoringFunctionFactory.createNewScoringFunction(person);
-			this.agentScorers.put(person.getId(), data);
-			this.agentRecords.put(person.getId(), new PlanImpl());
-			this.partialScores.put(person.getId(), new TDoubleArrayList());
-		}
-	}
-
 	/**
 	 * Returns the scoring function for the specified agent. If the agent
 	 * already has a scoring function, that one is returned. If the agent does
@@ -206,8 +200,8 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 
 	public void finishScoringFunctions() {
 		// Rethrow an exception in a scoring function (user code) if there was one.
-		if (exception.get() != null) {
-			Throwable throwable = exception.get();
+		Throwable throwable = exception.get();
+		if (throwable != null) {
 			if (throwable instanceof RuntimeException) {
 				throw ((RuntimeException) throwable);
 			} else {
@@ -254,12 +248,4 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 		}
 	}
 
-	@Override
-	public void handleEvent(Event event) {
-	}
-
-	@Override
-	public void reset(int iteration) {
-		reset();
-	}
 }
