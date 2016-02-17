@@ -26,6 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 
@@ -87,7 +88,7 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 	}
 
 	private static ActivityDurationEstimator getActivityDurationEstimations(Config config) {
-		Controler controler=new Controler(config);
+		Controler controler=new Controler(ScenarioUtils.loadScenario( config ) );
 		
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		controler.addControlerListener(eventHandlerAtStartupAdder);

@@ -71,8 +71,18 @@ public class ControlerTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testConstructor() {
-		MatsimServices controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+	public void testScenarioLoading() {
+		// used to use the String[] constructor, but this makes it use the output/equil/ output directory,
+		// which is problematic as we need a "false" run to check if the scenario is initialized after recent changes
+		// td feb 16
+		// Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		final Config config = utils.loadConfig( "test/scenarios/equil/config.xml" );
+		Controler controler = new Controler( config );
+
+		// need to run the controler to get Scenario initilized
+		controler.getConfig().controler().setLastIteration( 0 );
+		controler.run();
+
         assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
         assertNotNull(controler.getScenario().getPopulation());
         assertEquals(23, controler.getScenario().getNetwork().getLinks().size());
