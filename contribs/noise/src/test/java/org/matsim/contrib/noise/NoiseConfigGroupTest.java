@@ -84,13 +84,14 @@ public class NoiseConfigGroupTest {
 		Config config = ConfigUtils.loadConfig(configFile, new GridParameters(), new NoiseParameters());
 				
 		GridParameters gridParameters = (GridParameters) config.getModule("noiseGrid");
-
+		NoiseParameters noiseParameters = (NoiseParameters) config.getModule("noise");
+		
 		// see if the custom config group is written into the output config file
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
 		
-		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, new NoiseParameters());
+		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 
 		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
 		controler.addOverridingModule(new AbstractModule() {
@@ -103,14 +104,13 @@ public class NoiseConfigGroupTest {
 
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
-//				
-//		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immisions/";
-//		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
-//
-//		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, gridParameters.getReceiverPointGap());
-//		readNoiseFile.run();
-//		
-
+		
+		Config outputConfig = ConfigUtils.loadConfig(controler.getConfig().controler().getOutputDirectory() + "/output_config.xml.gz", new GridParameters(), new NoiseParameters());
+		GridParameters outputGridParameters = (GridParameters) outputConfig.getModule("noiseGrid");
+		NoiseParameters outputNoiseParameters = (NoiseParameters) outputConfig.getModule("noise");
+		
+		Assert.assertEquals("input and output config parameters are not the same", gridParameters.toString(), outputGridParameters.toString());
+		Assert.assertEquals("input and output config parameters are not the same", noiseParameters.toString(), outputNoiseParameters.toString());
 	}
 
 }

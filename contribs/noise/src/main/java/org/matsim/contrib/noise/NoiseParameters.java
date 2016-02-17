@@ -75,7 +75,7 @@ public class NoiseParameters extends ReflectiveConfigGroup {
 	private NoiseAllocationApproach noiseAllocationApproach = NoiseAllocationApproach.AverageCost;
 		
 	private String[] hgvIdPrefixes = { "lkw" };
-	private String[] busIdPrefixes = null;
+	private Set<String> busIdPrefixes = new HashSet<String>();
 	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 
 	// ########################################################################################################
@@ -369,12 +369,12 @@ public class NoiseParameters extends ReflectiveConfigGroup {
 
 	@StringGetter( "busIdPrefixes" )
 	private String getBusIdPrefixes() {
-		return CollectionUtils.arrayToString(busIdPrefixes);
+		return CollectionUtils.setToString(busIdPrefixes);
 	}
 
 	@StringSetter( "busIdPrefixes" )
 	public void setBusIdPrefixes(String busIdPrefixes) {		
-		this.setBusIdPrefixesArray(CollectionUtils.stringToArray(busIdPrefixes));
+		this.setBusIdPrefixesSet(CollectionUtils.stringToSet(busIdPrefixes));
 	}
 
 	@StringGetter( "tunnelLinkIDs" )
@@ -405,11 +405,11 @@ public class NoiseParameters extends ReflectiveConfigGroup {
 		return tunnelLinkIDs;
 	}
 	
-	public String[] getBusIdPrefixesArray() {
+	public Set<String> getBusIdPrefixesSet() {
 		return busIdPrefixes;
 	}
 
-	public void setBusIdPrefixesArray(String[] busIdPrefixes) {
+	public void setBusIdPrefixesSet(Set<String> busIdPrefixes) {
 		log.info("Setting the bus Id prefixes to : " + busIdPrefixes.toString());
 		this.busIdPrefixes = busIdPrefixes;
 	}
