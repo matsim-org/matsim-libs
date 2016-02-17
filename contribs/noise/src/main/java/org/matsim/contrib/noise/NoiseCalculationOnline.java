@@ -29,6 +29,9 @@ import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
 import org.matsim.contrib.noise.handler.NoisePricingHandler;
 import org.matsim.contrib.noise.handler.NoiseTimeTracker;
 import org.matsim.contrib.noise.handler.PersonActivityTracker;
+import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -50,7 +53,23 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	private PersonActivityTracker actTracker;
 	private NoisePricingHandler pricing;
 			
+	@Deprecated
 	public NoiseCalculationOnline(NoiseContext noiseContext) {
+		this.noiseContext = noiseContext;
+	}
+
+	public NoiseCalculationOnline(Controler controler) {
+		NoiseContext noiseContext = new NoiseContext(controler.getScenario());
+		
+		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+			}
+		});
+		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+		
 		this.noiseContext = noiseContext;
 	}
 
