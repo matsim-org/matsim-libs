@@ -397,13 +397,13 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		this.setHgvIdPrefixesArray(CollectionUtils.stringToArray(hgvIdPrefixes));
 	}
 
-	@StringGetter( "busIdPrefixes" )
+	@StringGetter( "busIdIdentifier" )
 	private String getBusIdPrefixes() {
 		return CollectionUtils.setToString(busIdIdentifier);
 	}
 
-	@StringSetter( "busIdPrefixes" )
-	public void setBusIdPrefixes(String busIdPrefixes) {		
+	@StringSetter( "busIdIdentifier" )
+	public void setBusIdIdentifiers(String busIdPrefixes) {		
 		this.setBusIdIdentifierSet(CollectionUtils.stringToSet(busIdPrefixes));
 	}
 
@@ -440,7 +440,7 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public void setBusIdIdentifierSet(Set<String> busIdPrefixes) {
-		log.info("setting the bus Id prefixes to : " + busIdPrefixes.toString());
+		log.info("setting the bus Id identifiers to : " + busIdPrefixes.toString());
 		this.busIdIdentifier = busIdPrefixes;
 	}
 	
