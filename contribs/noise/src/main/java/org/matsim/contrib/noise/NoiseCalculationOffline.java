@@ -21,21 +21,9 @@ package org.matsim.contrib.noise;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.noise.data.GridConfigGroup;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.scenario.ScenarioUtils;
-
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
@@ -44,6 +32,14 @@ import org.matsim.contrib.noise.handler.PersonActivityTracker;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile.OutputFormat;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
@@ -108,28 +104,28 @@ public class NoiseCalculationOffline {
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
-		config.controler().setLastIteration(lastIteration);
+		config.controler().setLastIteration(lastIteration);		
 				
-		GridConfigGroup gridParameters = new GridConfigGroup();
-		gridParameters.setReceiverPointGap(receiverPointGap);
-						
+		// ################################
+		
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+		
+		noiseParameters.setReceiverPointGap(receiverPointGap);
+
 		// Define min and max x-y-coordinates (e.g. Greater Berlin area)
 		double xMin = 4573258.;
 		double yMin = 5801225.;
 		double xMax = 4620323.;
 		double yMax = 5839639.;
-		gridParameters.setReceiverPointsGridMinX(xMin);
-		gridParameters.setReceiverPointsGridMinY(yMin);
-		gridParameters.setReceiverPointsGridMaxX(xMax);
-		gridParameters.setReceiverPointsGridMaxY(yMax);
+		noiseParameters.setReceiverPointsGridMinX(xMin);
+		noiseParameters.setReceiverPointsGridMinY(yMin);
+		noiseParameters.setReceiverPointsGridMaxX(xMax);
+		noiseParameters.setReceiverPointsGridMaxY(yMax);
 		
 		// Define activity types to be considered for noise damage calculation
 		String[] consideredActivitiesForDamages = {"home", "work"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
-				
-		// ################################
+		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
 		
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
 		noiseParameters.setScaleFactor(10.);
@@ -154,7 +150,7 @@ public class NoiseCalculationOffline {
 		File file = new File(outputFilePath);
 		file.mkdirs();
 					
-		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 				
 		EventsManager events = EventsUtils.createEventsManager();

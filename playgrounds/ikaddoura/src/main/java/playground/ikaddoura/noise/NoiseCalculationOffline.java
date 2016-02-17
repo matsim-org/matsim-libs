@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseWriter;
-import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
@@ -115,9 +114,9 @@ public class NoiseCalculationOffline {
 		config.controler().setLastIteration(lastIteration);
 		
 		// ################################
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		
-		GridConfigGroup gridParameters = new GridConfigGroup();
-		gridParameters.setReceiverPointGap(receiverPointGap);
+		noiseParameters.setReceiverPointGap(receiverPointGap);
 		
 		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
 		double xMin = 4590855.;
@@ -155,10 +154,10 @@ public class NoiseCalculationOffline {
 //		double xMax = 4598267.52;
 //		double yMax = 5820953.98;	
 		
-		gridParameters.setReceiverPointsGridMinX(xMin);
-		gridParameters.setReceiverPointsGridMinY(yMin);
-		gridParameters.setReceiverPointsGridMaxX(xMax);
-		gridParameters.setReceiverPointsGridMaxY(yMax);
+		noiseParameters.setReceiverPointsGridMinX(xMin);
+		noiseParameters.setReceiverPointsGridMinY(yMin);
+		noiseParameters.setReceiverPointsGridMaxX(xMax);
+		noiseParameters.setReceiverPointsGridMaxY(yMax);
 		
 //		 Berlin Activity Types
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
@@ -167,7 +166,7 @@ public class NoiseCalculationOffline {
 //		String[] consideredActivitiesForDamages = {"educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForDamages = {"leisure"};
 //		String[] consideredActivitiesForDamages = {"home", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
+		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
 		
 //		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga", "leisure"};
@@ -175,7 +174,6 @@ public class NoiseCalculationOffline {
 		
 		// ################################
 		
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
 		noiseParameters.setScaleFactor(10.);
@@ -250,7 +248,7 @@ public class NoiseCalculationOffline {
 		File file = new File(outputFilePath);
 		file.mkdirs();
 					
-		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 				
 		EventsManager events = EventsUtils.createEventsManager();

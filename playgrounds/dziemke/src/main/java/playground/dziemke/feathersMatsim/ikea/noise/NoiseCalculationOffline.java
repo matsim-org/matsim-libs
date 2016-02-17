@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseWriter;
-import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
@@ -88,8 +87,9 @@ public class NoiseCalculationOffline {
 
 		// ################################
 
-		GridConfigGroup gridParameters = new GridConfigGroup();
-		gridParameters.setReceiverPointGap(receiverPointGap);
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+
+		noiseParameters.setReceiverPointGap(receiverPointGap);
 
 		// Hasselt Coordinates:
 //		double xMin = 662600.;
@@ -106,23 +106,22 @@ public class NoiseCalculationOffline {
 		//double xMax = 0.;
 		//double yMax = 0.;
 
-		gridParameters.setReceiverPointsGridMinX(xMin);
-		gridParameters.setReceiverPointsGridMinY(yMin);
-		gridParameters.setReceiverPointsGridMaxX(xMax);
-		gridParameters.setReceiverPointsGridMaxY(yMax);
+		noiseParameters.setReceiverPointsGridMinX(xMin);
+		noiseParameters.setReceiverPointsGridMinY(yMin);
+		noiseParameters.setReceiverPointsGridMaxX(xMax);
+		noiseParameters.setReceiverPointsGridMaxY(yMax);
 
 		//		 Activity Types
 		String[] consideredActivitiesForDamages = {"home","work","n.a.","bringGet","dailyShopping","nonDailyShopping","services","socialVisit","leisure","touring","other"};
 
-		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
+		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
 
 		String[] consideredActivitiesForReceiverPointGrid = {"home","work","n.a.","bringGet","dailyShopping","nonDailyShopping","services","socialVisit","leisure","touring","other"};
 
-		gridParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 
 		// ################################
 
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
 		noiseParameters.setScaleFactor(2.);
@@ -161,7 +160,7 @@ public class NoiseCalculationOffline {
 		File file = new File(outputFilePath);
 		file.mkdirs();
 
-		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 
 		EventsManager events = EventsUtils.createEventsManager();

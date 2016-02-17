@@ -25,9 +25,11 @@ package org.matsim.contrib.noise;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,11 +39,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
 
 /**
+ * Provides the parameters required to build a simple grid with some basic spatial functionality.
  * Provides the parameters required to compute noise emissions, immissions and damages.
  * 
  * @author ikaddoura
@@ -56,6 +60,20 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	private static final Logger log = Logger.getLogger(NoiseConfigGroup.class);
+	
+	private double receiverPointGap = 250.;
+	private String transformationFactory = TransformationFactory.DHDN_GK4;
+
+	private String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
+	private String[] consideredActivitiesForSpatialFunctionality = {"home", "work"};
+	
+	// Setting all minimum and maximum coordinates to 0.0 means the receiver points are computed for the entire area for which any of the considered activities for the receiver point grid are found.
+	private double receiverPointsGridMinX = 0.;
+	private double receiverPointsGridMinY = 0.;
+	private double receiverPointsGridMaxX = 0.;
+	private double receiverPointsGridMaxY = 0.;
+	
+	// ####
 
 	private double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
 	private double timeBinSizeNoiseComputation = 3600.0;
@@ -84,12 +102,30 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
+		
+		comments.put("receiverPointGap", "horizontal and vertical distance between receiver points in x-/y-coordinate units" ) ;
+		comments.put("transformationFactory", "coordinate system; so far only tested for 'TransformationFactory.DHDN_GK4'" ) ;
+		comments.put("consideredActivitiesForSpatialFunctionality", "Specifies the activity types that are considered when computing noise damages (= the activities at which being exposed to noise results in noise damages)." ) ;
+		comments.put("consideredActivitiesForReceiverPointGrid", "Creates a grid of noise receiver points which contains all agents' activity locations of the specified types." ) ;
+		comments.put("receiverPointsGridMinX", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
+				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
+		comments.put("receiverPointsGridMaxX", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
+				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
+		comments.put("receiverPointsGridMinY", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
+				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
+		comments.put("receiverPointsGridMaxY", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
+				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
+		
 		comments.put("annualCostRate", "annual noise cost rate [in EUR per exposed pulation unit]; following the German EWS approach" ) ;
 		comments.put("timeBinSizeNoiseComputation", "Specifies the temporal resolution, i.e. the time bin size [in seconds] to compute noise levels." ) ;
 		comments.put("scaleFactor", "Set to '1.' for a 100 percent sample size. Set to '10.' for a 10 percent sample size. Set to '100.' for a 1 percent sample size." ) ;
 		comments.put("relevantRadius", "Specifies the radius [in coordinate units] around each receiver point links are taken into account." ) ;
 		comments.put("tunnelLinkIdFile", "Specifies a csv file which contains all tunnel link IDs." ) ;
-		comments.put("tunnelLinkIDs", "Specifies a list of comma-seperated tunnel link IDs. Will be ignored in case a the tunnel link IDs are provided as file (see parameter 'tunnelLinkIdFile')." ) ;
+		comments.put("tunnelLinkIDs", "Specifies the tunnel link IDs. Will be ignored in case a the tunnel link IDs are provided as file (see parameter 'tunnelLinkIdFile')." ) ;
 
 		comments.put("writeOutputIteration", "Specifies how often the noise-specific output is written out." ) ;
 		comments.put("useActualSpeedLevel", "Set to 'true' if the actual speed level should be used to compute noise levels. Set to 'false' if the freespeed level should be used to compute noise levels." ) ;
@@ -104,13 +140,35 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		comments.put("hgvIdPrefixes", "Specifies the HGV (heavy goods vehicles, trucks) ID prefix." ) ;
 		comments.put("busIdIdentifier", "Specifies the public transit vehicle ID identifiers. Buses are treated as HGV, other public transit vehicles are neglected." ) ;
 
-		
 		return comments;
 	}
 
 	// ########################################################################################################
 			
-	public void checkForConsistency() {
+	public void checkGridParametersForConsistency() {
+		
+		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
+		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
+
+		for (int i = 0; i < consideredActivitiesForSpatialFunctionality.length; i++) {
+			consideredActivitiesForDamagesList.add(consideredActivitiesForSpatialFunctionality[i]);
+		}
+
+		for (int i = 0; i < this.consideredActivitiesForReceiverPointGrid.length; i++) {
+			consideredActivitiesForReceiverPointGridList.add(consideredActivitiesForReceiverPointGrid[i]);
+		}
+		
+		if (this.receiverPointGap == 0.) {
+			throw new RuntimeException("The receiver point gap is 0. Aborting...");
+		}
+				
+		if (consideredActivitiesForReceiverPointGridList.size() == 0 && this.receiverPointsGridMinX == 0. && this.receiverPointsGridMinY == 0. && this.receiverPointsGridMaxX == 0. && receiverPointsGridMaxY == 0.) {
+			throw new RuntimeException("NEITHER providing a considered activity type for the minimum and maximum coordinates of the receiver point grid area "
+					+ "NOR providing receiver point grid minimum and maximum coordinates. Aborting...");
+		}
+	}
+
+	public void checkNoiseParametersForConsistency() {
 		
 		if (this.internalizeNoiseDamages) {
 			
@@ -220,6 +278,117 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 	// ########################################################################################################
 
+	@StringGetter( "receiverPointGap" )
+	public double getReceiverPointGap() {
+		return receiverPointGap;
+	}
+	
+	@StringSetter( "receiverPointGap" )
+	public void setReceiverPointGap(double receiverPointGap) {
+		log.info("setting the horizontal/vertical distance between each receiver point to " + receiverPointGap);
+		this.receiverPointGap = receiverPointGap;
+	}
+
+	@StringGetter( "receiverPointsGridMinX" )
+	public double getReceiverPointsGridMinX() {
+		return receiverPointsGridMinX;
+	}
+
+	@StringSetter( "receiverPointsGridMinX" )
+	public void setReceiverPointsGridMinX(double receiverPointsGridMinX) {
+		log.info("setting receiverPoints grid MinX Coordinate to " + receiverPointsGridMinX);
+		this.receiverPointsGridMinX = receiverPointsGridMinX;
+	}
+
+	@StringGetter( "receiverPointsGridMinY" )
+	public double getReceiverPointsGridMinY() {
+		return receiverPointsGridMinY;
+	}
+
+	@StringSetter( "receiverPointsGridMinY" )
+	public void setReceiverPointsGridMinY(double receiverPointsGridMinY) {
+		log.info("setting receiverPoints grid MinY Coordinate to " + receiverPointsGridMinY);
+		this.receiverPointsGridMinY = receiverPointsGridMinY;
+	}
+
+	@StringGetter( "receiverPointsGridMaxX" )
+	public double getReceiverPointsGridMaxX() {
+		return receiverPointsGridMaxX;
+	}
+
+	@StringSetter( "receiverPointsGridMaxX" )
+	public void setReceiverPointsGridMaxX(double receiverPointsGridMaxX) {
+		log.info("setting receiverPoints grid MaxX Coordinate to " + receiverPointsGridMaxX);
+		this.receiverPointsGridMaxX = receiverPointsGridMaxX;
+	}
+
+	@StringGetter( "receiverPointsGridMaxY" )
+	public double getReceiverPointsGridMaxY() {
+		return receiverPointsGridMaxY;
+	}
+
+	@StringSetter( "receiverPointsGridMaxY" )
+	public void setReceiverPointsGridMaxY(double receiverPointsGridMaxY) {
+		log.info("setting receiverPoints grid MaxY Coordinate to " + receiverPointsGridMaxY);
+		this.receiverPointsGridMaxY = receiverPointsGridMaxY;
+	}
+
+	@StringGetter( "transformationFactory" )
+	public String getTransformationFactory() {
+		return transformationFactory;
+	}
+
+	@StringSetter( "transformationFactory" )
+	public void setTransformationFactory(String transformationFactory) {
+		this.transformationFactory = transformationFactory;
+	}
+
+	public String[] getConsideredActivitiesForReceiverPointGridArray() {
+		return consideredActivitiesForReceiverPointGrid;
+	}
+
+	public void setConsideredActivitiesForReceiverPointGridArray(String[] consideredActivitiesForReceiverPointGrid) {
+		log.info("setting considered activities for receiver point grid to: ");
+		for (int i = 0; i < consideredActivitiesForReceiverPointGrid.length; i++) {
+			log.info(consideredActivitiesForReceiverPointGrid[i]);
+		}
+		this.consideredActivitiesForReceiverPointGrid = consideredActivitiesForReceiverPointGrid;		
+	}
+	
+	public String[] getConsideredActivitiesForSpatialFunctionalityArray() {		
+		return consideredActivitiesForSpatialFunctionality;
+	}
+
+	public void setConsideredActivitiesForSpatialFunctionalityArray(String[] consideredActivitiesForSpatialFunctionality) {
+		log.info("setting considered activities for spatial functionality to: ");
+		for (int i = 0; i < consideredActivitiesForSpatialFunctionality.length; i++) {
+			log.info(consideredActivitiesForSpatialFunctionality[i]);
+		}
+		this.consideredActivitiesForSpatialFunctionality = consideredActivitiesForSpatialFunctionality;
+	}
+
+	@StringGetter( "consideredActivitiesForReceiverPointGrid" )
+	private String getConsideredActivitiesForReceiverPointGrid() {
+		return CollectionUtils.arrayToString(consideredActivitiesForReceiverPointGrid);
+	}
+
+	@StringSetter( "consideredActivitiesForReceiverPointGrid" )
+	public void setConsideredActivitiesForReceiverPointGrid(String consideredActivitiesForReceiverPointGridString) {
+		this.setConsideredActivitiesForReceiverPointGridArray(CollectionUtils.stringToArray(consideredActivitiesForReceiverPointGridString));
+	}
+
+	@StringGetter( "consideredActivitiesForSpatialFunctionality" )
+	public String getConsideredActivitiesForSpatialFunctionality() {
+		return CollectionUtils.arrayToString(consideredActivitiesForSpatialFunctionality);
+	}
+
+	@StringSetter( "consideredActivitiesForSpatialFunctionality" )
+	public void setConsideredActivitiesForSpatialFunctionality(String consideredActivitiesForSpatialFunctionalityString) {		
+		this.setConsideredActivitiesForSpatialFunctionalityArray(CollectionUtils.stringToArray(consideredActivitiesForSpatialFunctionalityString));
+	}
+	
+	// ###
+	
 	@StringGetter( "throwNoiseEventsAffected" )
 	public boolean isThrowNoiseEventsAffected() {
 		return throwNoiseEventsAffected;

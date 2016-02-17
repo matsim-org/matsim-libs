@@ -47,7 +47,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseWriter;
-import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.data.NoiseReceiverPoint;
@@ -91,16 +90,16 @@ public class NoiseTest {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config1.xml";
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
-		
-		GridConfigGroup gridParameters = new GridConfigGroup();
-		gridParameters.setReceiverPointGap(250.);	
-		
+				
 		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
-		noiseParameters.setScaleFactor(1.);
-		String[] consideredActivities = {"home", "work"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
 		
-		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
+		noiseParameters.setReceiverPointGap(250.);	
+		noiseParameters.setScaleFactor(1.);
+		
+		String[] consideredActivities = {"home", "work"};
+		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
+		
+		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		
 		// test the grid of receiver points
 		Assert.assertEquals("wrong number of receiver points", 16, noiseContext.getReceiverPoints().size(), MatsimTestUtils.EPSILON);
@@ -165,13 +164,13 @@ public class NoiseTest {
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 		
-		GridConfigGroup gridParameters = new GridConfigGroup();
-		gridParameters.setReceiverPointGap(250.);	
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+		
+		noiseParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
+		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
 		
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(false);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
@@ -187,7 +186,7 @@ public class NoiseTest {
 		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 			
-		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
@@ -921,19 +920,16 @@ public class NoiseTest {
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 		
-		GridConfigGroup gridParameters = new GridConfigGroup();
-		gridParameters.setReceiverPointGap(250.);	
-		
-		String[] consideredActivities = {"home", "work"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
-		
 		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+		noiseParameters.setReceiverPointGap(250.);	
+		String[] consideredActivities = {"home", "work"};
+		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 		noiseParameters.setUseActualSpeedLevel(false);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		String outputFilePath = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		File file = new File(outputFilePath);
@@ -944,7 +940,7 @@ public class NoiseTest {
 		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 			
-		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
@@ -1031,14 +1027,13 @@ public class NoiseTest {
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
-		
-		GridConfigGroup gridParameters = new GridConfigGroup();
-		gridParameters.setReceiverPointGap(250.);	
+				
+		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+		noiseParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
+		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
 		
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
@@ -1054,7 +1049,7 @@ public class NoiseTest {
 		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 			
-		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 		
 		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);

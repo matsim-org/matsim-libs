@@ -75,13 +75,13 @@ public class NoiseContext {
 	
 	// ############################################
 	
-	public NoiseContext(Scenario scenario, GridConfigGroup gridParameters, NoiseConfigGroup noiseParameters) {
+	public NoiseContext(Scenario scenario, NoiseConfigGroup noiseParameters) {
 		this.scenario = scenario;
 		
-		this.grid = new Grid(scenario, gridParameters);
+		this.grid = new Grid(scenario, noiseParameters);
 		
 		this.noiseParams = noiseParameters;
-		this.noiseParams.checkForConsistency();
+		this.noiseParams.checkNoiseParametersForConsistency();
 		
 		this.currentTimeBinEndTime = noiseParams.getTimeBinSizeNoiseComputation();
 		

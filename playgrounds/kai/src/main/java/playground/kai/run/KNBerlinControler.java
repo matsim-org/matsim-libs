@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseWriter;
-import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.handler.NoiseTimeTracker;
 import org.matsim.contrib.noise.handler.PersonActivityTracker;
@@ -148,21 +147,18 @@ class KNBerlinControler {
 		// ===
 		// post-processing:
 
-		// grid parameters
-		GridConfigGroup gridParameters = new GridConfigGroup();
-
-		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
-
-		gridParameters.setReceiverPointGap(200.);
-
-		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
-
 		// noise parameters
 		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
-		noiseParameters.setScaleFactor(1./sampleFactor); // yyyyyy sample size!!!!
+				
+		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 
+		noiseParameters.setReceiverPointGap(200.);
+
+		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
+
+		noiseParameters.setScaleFactor(1./sampleFactor); // yyyyyy sample size!!!!
 
 		// yyyyyy Same link ids?  Otherwise ask student
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
@@ -222,7 +218,7 @@ class KNBerlinControler {
 		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 
-		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", true);
 
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);

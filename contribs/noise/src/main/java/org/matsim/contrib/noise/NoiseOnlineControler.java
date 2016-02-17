@@ -29,7 +29,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
-import org.matsim.contrib.noise.data.GridConfigGroup;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
@@ -63,21 +62,19 @@ public class NoiseOnlineControler {
 	}
 
 	public void run(String configFile) {
-		
-		// grid parameters
-		
-		GridConfigGroup gridParameters = new GridConfigGroup();		
-		gridParameters.setReceiverPointGap(100.);
-		
-		String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
-		gridParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);			
-			
-		String[] consideredActivitiesForDamages = {"home", "work"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
 				
 		// noise parameters
 
 		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();		
+		
+		noiseParameters.setReceiverPointGap(100.);
+		
+		String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);			
+			
+		String[] consideredActivitiesForDamages = {"home", "work"};
+		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
+		
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);		
 		noiseParameters.setScaleFactor(10.);
 		
@@ -85,7 +82,7 @@ public class NoiseOnlineControler {
 		
 		Controler controler = new Controler(configFile);
 
-		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), noiseParameters);
 		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -103,7 +100,7 @@ public class NoiseOnlineControler {
 		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immisions/";
 		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 
-		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, gridParameters.getReceiverPointGap());
+		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
 		readNoiseFile.run();
 		
 	}

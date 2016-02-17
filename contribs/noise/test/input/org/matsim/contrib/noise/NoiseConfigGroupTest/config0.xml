@@ -1,18 +1,18 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
 <config>
-
-	<module name="noiseGrid" >
+	
+	<module name="noise" >
+		
 		<param name="receiverPointGap" value="12345" />
 		<param name="consideredActivitiesForReceiverPointGrid" value="home,sleep,eat" />
 		<param name="consideredActivitiesForSpatialFunctionality" value="work,leisure,other" />
-	</module>
-	
-	<module name="noise" >
+		
 		<param name="relevantRadius" value="12345789" />
 		<param name="computeNoiseDamages" value="false" />
 		<param name="hgvIdPrefixes" value="lkw,LKW,HGV,hgv" />
 		<param name="tunnelLinkIDs" value="link1,link2" />
+		
 	</module>
 
 	<module name="network" >

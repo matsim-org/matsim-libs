@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.PtConstants;
 
@@ -49,7 +50,7 @@ public class Grid {
 	private static final Logger log = Logger.getLogger(Grid.class);
 			
 	private final Scenario scenario;
-	private final GridConfigGroup gridParams;
+	private final NoiseConfigGroup gridParams;
 		
 	private final Map<Id<Person>, List<Coord>> personId2consideredActivityCoords = new HashMap<Id<Person>, List<Coord>>();
 	
@@ -69,7 +70,7 @@ public class Grid {
 	
 	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
 					
-	public Grid(Scenario scenario, GridConfigGroup gridParams) {
+	public Grid(Scenario scenario, NoiseConfigGroup gridParams) {
 		
 		this.scenario = scenario;	
 		this.gridParams = gridParams;
@@ -85,7 +86,7 @@ public class Grid {
 			this.consideredActivitiesForReceiverPointGrid.add(consideredActTypesForReceiverPointGridArray[i]);
 		}
 
-		this.gridParams.checkForConsistency();
+		this.gridParams.checkGridParametersForConsistency();
 		initialize();
 	}
 	
@@ -293,7 +294,7 @@ public class Grid {
 		return receiverPoints;
 	}
 	
-	public GridConfigGroup getGridParams() {
+	public NoiseConfigGroup getGridParams() {
 		return gridParams;
 	}
 
