@@ -44,10 +44,10 @@ public class SinglePassengerPickupActivity
         this.pickupTask = pickupTask;
         this.request = request;
         this.pickupDuration = pickupDuration;
-        
+
         // Only happens for direct requests (not prescheduled)
-		tryPickupPassenger(pickupTask.getBeginTime());
-		
+        tryPickupPassenger(pickupTask.getBeginTime());
+
         if (!passengerAboard) {
             //try to predict the end time and stay alive
             endTime = Math.max(pickupTask.getBeginTime(), request.getT0()) + pickupDuration + 1.0;
@@ -72,23 +72,23 @@ public class SinglePassengerPickupActivity
     {
         return "PassengerPickup";
     }
-    
+
     private void tryPickupPassenger(double now) {
-		DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
-		passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
-		
-		if (passengerAboard) {
-			endTime = now + pickupDuration;
-		}
+        DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
+        passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
+
+        if (passengerAboard) {
+            endTime = now + pickupDuration;
+        }
     }
 
     @Override
     public void doSimStep(double now)
     {
-    	if (passengerWaiting && !passengerAboard) {
-    		tryPickupPassenger(now);
-    	}
-    	
+        if (passengerWaiting && !passengerAboard) {
+            tryPickupPassenger(now);
+        }
+
         if (!passengerAboard) {
             // try to predict the end time and stay alive
             endTime = Math.max(now, request.getT0()) + pickupDuration + 1.0;
@@ -102,7 +102,7 @@ public class SinglePassengerPickupActivity
         if (passenger.equals(request.getPassenger())) {
             throw new IllegalArgumentException("I am waiting for a different passenger!");
         }
-        
+
         passengerWaiting = true;
     }
 }
