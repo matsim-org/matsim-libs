@@ -78,10 +78,10 @@ public class NoiseOnlineControler {
 		gridParameters.setReceiverPointGap(100.);
 		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);			
+		gridParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);			
 			
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
+		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
 		
 		// ...
 		

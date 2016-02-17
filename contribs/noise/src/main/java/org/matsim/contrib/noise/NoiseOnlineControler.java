@@ -70,10 +70,10 @@ public class NoiseOnlineControler {
 		gridParameters.setReceiverPointGap(100.);
 		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
-		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);			
+		gridParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);			
 			
 		String[] consideredActivitiesForDamages = {"home", "work"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
+		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
 				
 		// noise parameters
 

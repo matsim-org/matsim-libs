@@ -25,10 +25,7 @@ package org.matsim.contrib.noise;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.data.GridParameters;
-import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -49,10 +46,15 @@ public class NoiseConfigGroupTest {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config1.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new GridParameters());
 				
-		GridParameters gridParameters = (GridParameters) config.getModule("grid");
-		System.out.println(gridParameters.getReceiverPointGap());
+		GridParameters gridParameters = (GridParameters) config.getModule("noiseGrid");
 
-		Assert.assertEquals("wrong config parameter", 12345., gridParameters.getReceiverPointGap(), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("wrong config parameter", 12345., gridParameters.getReceiverPointGap(), MatsimTestUtils.EPSILON);
+		
+		String actForRecPtGrid = gridParameters.getConsideredActivitiesForReceiverPointGridArray()[0] + "," + gridParameters.getConsideredActivitiesForReceiverPointGridArray()[1] + "," + gridParameters.getConsideredActivitiesForReceiverPointGridArray()[2];
+		Assert.assertEquals("wrong config parameter", "home,sleep,eat", actForRecPtGrid);		
+		
+		String actForSpatFct = gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[0] + "," + gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[1] + "," + gridParameters.getConsideredActivitiesForSpatialFunctionalityArray()[2];
+		Assert.assertEquals("wrong config parameter", "work,leisure,other", actForSpatFct);		
 
 //		GridParameters grid = ConfigUtils.addOrGetModule(config, GridParameters.GROUP_NAME, GridParameters.class);
 //		grid.setReceiverPointGap(250.);

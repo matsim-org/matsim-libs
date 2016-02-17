@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 
@@ -40,7 +41,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  */
 public class GridParameters extends ReflectiveConfigGroup {
 	
-	public static final String GROUP_NAME = "grid";
+	public static final String GROUP_NAME = "noiseGrid";
 	
 	public GridParameters() {
 		super(GROUP_NAME);
@@ -51,8 +52,8 @@ public class GridParameters extends ReflectiveConfigGroup {
 	private double receiverPointGap = 250.;
 	private String transformationFactory = TransformationFactory.DHDN_GK4;
 
-	private String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
-	private String[] consideredActivitiesForSpatialFunctionality = {"home", "work"};
+	private String[] consideredActivitiesForReceiverPointGridArray = {"home", "work"};
+	private String[] consideredActivitiesForSpatialFunctionalityArray = {"home", "work"};
 	
 	// Setting all minimum and maximum coordinates to 0.0 means the receiver points are computed for the entire area for which any of the considered activities for the receiver point grid are found.
 	private double receiverPointsGridMinX = 0.;
@@ -60,8 +61,8 @@ public class GridParameters extends ReflectiveConfigGroup {
 	private double receiverPointsGridMaxX = 0.;
 	private double receiverPointsGridMaxY = 0.;
 	
-	private String consideredActivitiesForReceiverPointGridString = null;
-	private String consideredActivitiesForSpatialFunctionalityString = null;
+	private String consideredActivitiesForReceiverPointGrid = null;
+	private String consideredActivitiesForSpatialFunctionality = null;
 
 	// ########################################################################################################
 			
@@ -70,12 +71,12 @@ public class GridParameters extends ReflectiveConfigGroup {
 		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
 		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
 
-		for (int i = 0; i < consideredActivitiesForSpatialFunctionality.length; i++) {
-			consideredActivitiesForDamagesList.add(consideredActivitiesForSpatialFunctionality[i]);
+		for (int i = 0; i < consideredActivitiesForSpatialFunctionalityArray.length; i++) {
+			consideredActivitiesForDamagesList.add(consideredActivitiesForSpatialFunctionalityArray[i]);
 		}
 
-		for (int i = 0; i < this.consideredActivitiesForReceiverPointGrid.length; i++) {
-			consideredActivitiesForReceiverPointGridList.add(consideredActivitiesForReceiverPointGrid[i]);
+		for (int i = 0; i < this.consideredActivitiesForReceiverPointGridArray.length; i++) {
+			consideredActivitiesForReceiverPointGridList.add(consideredActivitiesForReceiverPointGridArray[i]);
 		}
 		
 		if (this.receiverPointGap == 0.) {
@@ -97,7 +98,7 @@ public class GridParameters extends ReflectiveConfigGroup {
 	
 	@StringSetter( "receiverPointGap" )
 	public void setReceiverPointGap(double receiverPointGap) {
-		log.info("Setting the horizontal/vertical distance between each receiver point to " + receiverPointGap);
+		log.info("setting the horizontal/vertical distance between each receiver point to " + receiverPointGap);
 		this.receiverPointGap = receiverPointGap;
 	}
 
@@ -108,7 +109,7 @@ public class GridParameters extends ReflectiveConfigGroup {
 
 	@StringSetter( "receiverPointsGridMinX" )
 	public void setReceiverPointsGridMinX(double receiverPointsGridMinX) {
-		log.info("Setting receiverPoints grid MinX Coordinate to " + receiverPointsGridMinX);
+		log.info("setting receiverPoints grid MinX Coordinate to " + receiverPointsGridMinX);
 		this.receiverPointsGridMinX = receiverPointsGridMinX;
 	}
 
@@ -119,7 +120,7 @@ public class GridParameters extends ReflectiveConfigGroup {
 
 	@StringSetter( "receiverPointsGridMinY" )
 	public void setReceiverPointsGridMinY(double receiverPointsGridMinY) {
-		log.info("Setting receiverPoints grid MinY Coordinate to " + receiverPointsGridMinY);
+		log.info("setting receiverPoints grid MinY Coordinate to " + receiverPointsGridMinY);
 		this.receiverPointsGridMinY = receiverPointsGridMinY;
 	}
 
@@ -130,7 +131,7 @@ public class GridParameters extends ReflectiveConfigGroup {
 
 	@StringSetter( "receiverPointsGridMaxX" )
 	public void setReceiverPointsGridMaxX(double receiverPointsGridMaxX) {
-		log.info("Setting receiverPoints grid MaxX Coordinate to " + receiverPointsGridMaxX);
+		log.info("setting receiverPoints grid MaxX Coordinate to " + receiverPointsGridMaxX);
 		this.receiverPointsGridMaxX = receiverPointsGridMaxX;
 	}
 
@@ -141,7 +142,7 @@ public class GridParameters extends ReflectiveConfigGroup {
 
 	@StringSetter( "receiverPointsGridMaxY" )
 	public void setReceiverPointsGridMaxY(double receiverPointsGridMaxY) {
-		log.info("Setting receiverPoints grid MaxY Coordinate to " + receiverPointsGridMaxY);
+		log.info("setting receiverPoints grid MaxY Coordinate to " + receiverPointsGridMaxY);
 		this.receiverPointsGridMaxY = receiverPointsGridMaxY;
 	}
 
@@ -155,49 +156,52 @@ public class GridParameters extends ReflectiveConfigGroup {
 		this.transformationFactory = transformationFactory;
 	}
 
-	public String[] getConsideredActivitiesForReceiverPointGrid() {
+	public String[] getConsideredActivitiesForReceiverPointGridArray() {
+		return consideredActivitiesForReceiverPointGridArray;
+	}
+
+	public void setConsideredActivitiesForReceiverPointGridArray(String[] consideredActivitiesForReceiverPointGrid) {
+		log.info("setting considered activities for receiver point grid to: ");
+		for (int i = 0; i < consideredActivitiesForReceiverPointGrid.length; i++) {
+			log.info(consideredActivitiesForReceiverPointGrid[i]);
+		}
+		this.consideredActivitiesForReceiverPointGridArray = consideredActivitiesForReceiverPointGrid;		
+	}
+	
+	public String[] getConsideredActivitiesForSpatialFunctionalityArray() {		
+		return consideredActivitiesForSpatialFunctionalityArray;
+	}
+
+	public void setConsideredActivitiesForSpatialFunctionalityArray(String[] consideredActivitiesForSpatialFunctionality) {
+		log.info("setting considered activities for spatial functionality to: ");
+		for (int i = 0; i < consideredActivitiesForSpatialFunctionality.length; i++) {
+			log.info(consideredActivitiesForSpatialFunctionality[i]);
+		}
+		this.consideredActivitiesForSpatialFunctionalityArray = consideredActivitiesForSpatialFunctionality;
+	}
+
+	@StringGetter( "consideredActivitiesForReceiverPointGrid" )
+	private String getConsideredActivitiesForReceiverPointGrid() {
 		return consideredActivitiesForReceiverPointGrid;
 	}
 
-	public void setConsideredActivitiesForReceiverPointGrid(
-			String[] consideredActivitiesForReceiverPointGrid) {
-		this.consideredActivitiesForReceiverPointGrid = consideredActivitiesForReceiverPointGrid;
+	@StringSetter( "consideredActivitiesForReceiverPointGrid" )
+	public void setConsideredActivitiesForReceiverPointGrid(String consideredActivitiesForReceiverPointGridString) {
+		this.consideredActivitiesForReceiverPointGrid = consideredActivitiesForReceiverPointGridString;
+		
+		this.setConsideredActivitiesForReceiverPointGridArray(CollectionUtils.stringToArray(consideredActivitiesForReceiverPointGridString));
 	}
-	
-	public String[] getConsideredActivitiesForSpatialFunctionality() {		
+
+	@StringGetter( "consideredActivitiesForSpatialFunctionality" )
+	public String getConsideredActivitiesForSpatialFunctionality() {
 		return consideredActivitiesForSpatialFunctionality;
 	}
 
-	public void setConsideredActivitiesForSpatialFunctionality(
-			String[] consideredActivities) {
-		log.info("Setting considered activities to: ");
-		for (int i = 0; i < consideredActivities.length; i++) {
-			log.info(consideredActivities[i]);
-		}
-		this.consideredActivitiesForSpatialFunctionality = consideredActivities;
-	}
-
-	@StringGetter( "consideredActivitiesForReceiverPointGridString" )
-	public String getConsideredActivitiesForReceiverPointGridString() {
-		return consideredActivitiesForReceiverPointGridString;
-	}
-
-	@StringSetter( "consideredActivitiesForReceiverPointGridString" )
-	public void setConsideredActivitiesForReceiverPointGridString(String consideredActivitiesForReceiverPointGridString) {
-		// TODO: set the array
-		this.consideredActivitiesForReceiverPointGridString = consideredActivitiesForReceiverPointGridString;
-	}
-
-	@StringGetter( "consideredActivitiesForSpatialFunctionalityString" )
-	public String getConsideredActivitiesForSpatialFunctionalityString() {
-		return consideredActivitiesForSpatialFunctionalityString;
-	}
-
-	@StringSetter( "consideredActivitiesForSpatialFunctionalityString" )
-	public void setConsideredActivitiesForSpatialFunctionalityString(
-			String consideredActivitiesForSpatialFunctionalityString) {
-		// TODO: set the array
-		this.consideredActivitiesForSpatialFunctionalityString = consideredActivitiesForSpatialFunctionalityString;
+	@StringSetter( "consideredActivitiesForSpatialFunctionality" )
+	public void setConsideredActivitiesForSpatialFunctionality(String consideredActivitiesForSpatialFunctionalityString) {
+		this.consideredActivitiesForSpatialFunctionality = consideredActivitiesForSpatialFunctionalityString;
+		
+		this.setConsideredActivitiesForSpatialFunctionalityArray(CollectionUtils.stringToArray(consideredActivitiesForSpatialFunctionalityString));
 	}
 	
 }

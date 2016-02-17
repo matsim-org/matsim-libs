@@ -2,8 +2,10 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
 <config>
 
-	<module name="grid" >
+	<module name="noiseGrid" >
 		<param name="receiverPointGap" value="12345" />
+		<param name="consideredActivitiesForReceiverPointGrid" value="home,sleep,eat" />
+		<param name="consideredActivitiesForSpatialFunctionality" value="work,leisure,other" />
 	</module>
 
 	<module name="network" >

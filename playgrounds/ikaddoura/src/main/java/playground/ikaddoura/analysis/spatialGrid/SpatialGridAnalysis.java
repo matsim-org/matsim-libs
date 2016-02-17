@@ -145,7 +145,7 @@ public class SpatialGridAnalysis {
 //		gridParameters.setReceiverPointsGridMaxY(yMax);
 			
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+		gridParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 			
 		// scenario
 		

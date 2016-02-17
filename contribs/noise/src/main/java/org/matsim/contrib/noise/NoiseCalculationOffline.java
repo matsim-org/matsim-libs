@@ -126,7 +126,7 @@ public class NoiseCalculationOffline {
 		
 		// Define activity types to be considered for noise damage calculation
 		String[] consideredActivitiesForDamages = {"home", "work"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
+		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
 				
 		// ################################
 		

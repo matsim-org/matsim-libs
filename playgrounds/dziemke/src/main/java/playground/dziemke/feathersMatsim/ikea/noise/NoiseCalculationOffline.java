@@ -114,11 +114,11 @@ public class NoiseCalculationOffline {
 		//		 Activity Types
 		String[] consideredActivitiesForDamages = {"home","work","n.a.","bringGet","dailyShopping","nonDailyShopping","services","socialVisit","leisure","touring","other"};
 
-		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
+		gridParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
 
 		String[] consideredActivitiesForReceiverPointGrid = {"home","work","n.a.","bringGet","dailyShopping","nonDailyShopping","services","socialVisit","leisure","touring","other"};
 
-		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+		gridParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 
 		// ################################
 
