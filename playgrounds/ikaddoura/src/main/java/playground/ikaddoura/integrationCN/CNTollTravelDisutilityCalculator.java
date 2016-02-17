@@ -114,7 +114,7 @@ public class CNTollTravelDisutilityCalculator implements TravelDisutility{
 		} else {
 			
 			boolean isHGV = false;
-			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixesSet()) {
+			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixesArray()) {
 				if (personId.toString().startsWith(hgvPrefix)) {
 					isHGV = true;
 					break;

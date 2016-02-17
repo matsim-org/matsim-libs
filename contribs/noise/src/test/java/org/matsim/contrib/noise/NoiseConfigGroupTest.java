@@ -70,7 +70,7 @@ public class NoiseConfigGroupTest {
 		Assert.assertEquals("wrong config parameter", 12345789., noiseParameters.getRelevantRadius(), MatsimTestUtils.EPSILON);
 		Assert.assertFalse("wrong config parameter", noiseParameters.isComputeNoiseDamages());
 
-		String hgvIdPrefixes = noiseParameters.getHgvIdPrefixesSet()[0] + "," + noiseParameters.getHgvIdPrefixesSet()[1] + "," + noiseParameters.getHgvIdPrefixesSet()[2] + "," + noiseParameters.getHgvIdPrefixesSet()[3];
+		String hgvIdPrefixes = noiseParameters.getHgvIdPrefixesArray()[0] + "," + noiseParameters.getHgvIdPrefixesArray()[1] + "," + noiseParameters.getHgvIdPrefixesArray()[2] + "," + noiseParameters.getHgvIdPrefixesArray()[3];
 		Assert.assertEquals("wrong config parameter", "lkw,LKW,HGV,hgv", hgvIdPrefixes);		
 		
 		String tunnelLinkIds = noiseParameters.getTunnelLinkIDsSet().toArray()[0] + "," + noiseParameters.getTunnelLinkIDsSet().toArray()[1];

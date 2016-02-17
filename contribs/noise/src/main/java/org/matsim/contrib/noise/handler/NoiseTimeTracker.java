@@ -90,7 +90,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		
-		if (this.noiseContext.getNoiseParams().getBusIdPrefixesSet().isEmpty()) {
+		if (this.noiseContext.getNoiseParams().getBusIdPrefixesArray() == null || this.noiseContext.getNoiseParams().getBusIdPrefixesArray().length == 0) {
 			if (cWarn1 == 0) {
 				log.warn("Simulated public transit detected. "
 						+ "To calculate noise caused by road vehicles, e.g. buses, "
@@ -101,7 +101,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 			
 		} else {
 			boolean isBus = false;
-			for (String busIdPrefix : this.noiseContext.getNoiseParams().getBusIdPrefixesSet()) {
+			for (String busIdPrefix : this.noiseContext.getNoiseParams().getBusIdPrefixesArray()) {
 				if (event.getTransitLineId().toString().contains(busIdPrefix)) {
 					isBus = true;
 					break;
@@ -285,7 +285,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 			}
 		
 			boolean isHGV = false;
-			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixesSet()) {
+			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixesArray()) {
 				if (event.getVehicleId().toString().startsWith(hgvPrefix)) {
 					isHGV = true;
 					break;
@@ -586,7 +586,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 					double amount = 0.;
 					
 					boolean isHGV = false;
-					for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixesSet()) {
+					for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixesArray()) {
 						if (vehicleId.toString().startsWith(hgvPrefix)) {
 							isHGV = true;
 							break;

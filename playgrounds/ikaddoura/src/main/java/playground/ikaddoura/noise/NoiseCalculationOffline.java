@@ -187,11 +187,10 @@ public class NoiseCalculationOffline {
 		noiseParameters.setThrowNoiseEventsCaused(false);
 		
 		String[] hgvIdPrefixes = { "lkw" };
-		noiseParameters.setHgvIdPrefixesSet(hgvIdPrefixes);
+		noiseParameters.setHgvIdPrefixesArray(hgvIdPrefixes);
 		
-//		Set<String> busIdPrefixes = new HashSet<String>();
-//		busIdPrefixes.add("-B-");
-//		noiseParameters.setBusIdPrefixes(busIdPrefixes);
+//		String[] busIdPrefixes = { "-B-" };
+//		noiseParameters.setBusIdPrefixesArray(busIdPrefixes);
 		
 //		 Berlin Tunnel Link IDs
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
