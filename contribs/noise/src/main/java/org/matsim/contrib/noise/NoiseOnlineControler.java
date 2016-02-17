@@ -25,6 +25,8 @@ package org.matsim.contrib.noise;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -63,9 +65,8 @@ public class NoiseOnlineControler {
 
 	public void run(String configFile) {
 				
-		// noise parameters
-
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();		
+		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		
 		noiseParameters.setReceiverPointGap(100.);
 		
@@ -78,9 +79,7 @@ public class NoiseOnlineControler {
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);		
 		noiseParameters.setScaleFactor(10.);
 		
-		// controler
-		
-		Controler controler = new Controler(configFile);
+		Controler controler = new Controler(config);
 
 		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), noiseParameters);
 		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
