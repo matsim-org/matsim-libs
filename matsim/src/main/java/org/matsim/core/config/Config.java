@@ -26,6 +26,7 @@ import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.*;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
@@ -81,6 +82,7 @@ public class Config implements MatsimExtensionPoint {
 	private PtCountsConfigGroup ptCounts = null;
 	private VehiclesConfigGroup vehicles = null ;
 	private ChangeLegModeConfigGroup changeLegMode = null;
+	private JDEQSimConfigGroup jdeqSim = null;
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
 
@@ -173,6 +175,9 @@ public class Config implements MatsimExtensionPoint {
 
 		this.changeLegMode = new ChangeLegModeConfigGroup();
 		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, this.changeLegMode);
+
+		this.jdeqSim = new JDEQSimConfigGroup();
+		this.modules.put(JDEQSimConfigGroup.NAME, this.jdeqSim);
 
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		this.addConfigConsistencyChecker(new UnmaterializedConfigGroupChecker());
@@ -474,6 +479,10 @@ public class Config implements MatsimExtensionPoint {
 
 	public ChangeLegModeConfigGroup changeLegMode() {
 		return this.changeLegMode;
+	}
+
+	public JDEQSimConfigGroup jdeqSim() {
+		return this.jdeqSim;
 	}
 
 	// other:
