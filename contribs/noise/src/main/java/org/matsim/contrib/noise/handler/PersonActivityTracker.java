@@ -63,7 +63,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 	public PersonActivityTracker(NoiseContext noiseContext) {
 		this.noiseContext = noiseContext;
 		
-		String[] consideredActTypesArray = noiseContext.getGrid().getGridParams().getConsideredActivitiesForSpatialFunctionalityArray();
+		String[] consideredActTypesArray = noiseContext.getGrid().getGridParams().getConsideredActivitiesForDamageCalculationArray();
 		for (int i = 0; i < consideredActTypesArray.length; i++) {
 			this.consideredActivityTypes.add(consideredActTypesArray[i]);
 		}

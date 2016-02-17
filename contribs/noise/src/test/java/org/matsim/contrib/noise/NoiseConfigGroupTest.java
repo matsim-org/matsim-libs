@@ -60,7 +60,7 @@ public class NoiseConfigGroupTest {
 		String actForRecPtGrid = noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[0] + "," + noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[1] + "," + noiseParameters.getConsideredActivitiesForReceiverPointGridArray()[2];
 		Assert.assertEquals("wrong config parameter", "home,sleep,eat", actForRecPtGrid);		
 		
-		String actForSpatFct = noiseParameters.getConsideredActivitiesForSpatialFunctionalityArray()[0] + "," + noiseParameters.getConsideredActivitiesForSpatialFunctionalityArray()[1] + "," + noiseParameters.getConsideredActivitiesForSpatialFunctionalityArray()[2];
+		String actForSpatFct = noiseParameters.getConsideredActivitiesForDamageCalculationArray()[0] + "," + noiseParameters.getConsideredActivitiesForDamageCalculationArray()[1] + "," + noiseParameters.getConsideredActivitiesForDamageCalculationArray()[2];
 		Assert.assertEquals("wrong config parameter", "work,leisure,other", actForSpatFct);	
 		
 		Assert.assertEquals("wrong config parameter", 12345789., noiseParameters.getRelevantRadius(), MatsimTestUtils.EPSILON);

@@ -156,7 +156,7 @@ class KNBerlinControler {
 		noiseParameters.setReceiverPointGap(200.);
 
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
 
 		noiseParameters.setScaleFactor(1./sampleFactor); // yyyyyy sample size!!!!
 

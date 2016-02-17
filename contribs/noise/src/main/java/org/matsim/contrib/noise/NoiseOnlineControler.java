@@ -73,7 +73,7 @@ public class NoiseOnlineControler {
 		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);			
 			
 		String[] consideredActivitiesForDamages = {"home", "work"};
-		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
 		
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);		
 		noiseParameters.setScaleFactor(10.);

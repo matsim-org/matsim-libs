@@ -65,16 +65,13 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private String transformationFactory = TransformationFactory.DHDN_GK4;
 
 	private String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
-	private String[] consideredActivitiesForSpatialFunctionality = {"home", "work"};
+	private String[] consideredActivitiesForDamageCalculation = {"home", "work"};
 	
-	// Setting all minimum and maximum coordinates to 0.0 means the receiver points are computed for the entire area for which any of the considered activities for the receiver point grid are found.
 	private double receiverPointsGridMinX = 0.;
 	private double receiverPointsGridMinY = 0.;
 	private double receiverPointsGridMaxX = 0.;
 	private double receiverPointsGridMaxY = 0.;
 	
-	// ####
-
 	private double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
 	private double timeBinSizeNoiseComputation = 3600.0;
 	private double scaleFactor = 1.;
@@ -105,7 +102,7 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		
 		comments.put("receiverPointGap", "horizontal and vertical distance between receiver points in x-/y-coordinate units" ) ;
 		comments.put("transformationFactory", "coordinate system; so far only tested for 'TransformationFactory.DHDN_GK4'" ) ;
-		comments.put("consideredActivitiesForSpatialFunctionality", "Specifies the activity types that are considered when computing noise damages (= the activities at which being exposed to noise results in noise damages)." ) ;
+		comments.put("consideredActivitiesForDamageCalculation", "Specifies the activity types that are considered when computing noise damages (= the activities at which being exposed to noise results in noise damages)." ) ;
 		comments.put("consideredActivitiesForReceiverPointGrid", "Creates a grid of noise receiver points which contains all agents' activity locations of the specified types." ) ;
 		comments.put("receiverPointsGridMinX", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
 				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
@@ -150,8 +147,8 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
 		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
 
-		for (int i = 0; i < consideredActivitiesForSpatialFunctionality.length; i++) {
-			consideredActivitiesForDamagesList.add(consideredActivitiesForSpatialFunctionality[i]);
+		for (int i = 0; i < consideredActivitiesForDamageCalculation.length; i++) {
+			consideredActivitiesForDamagesList.add(consideredActivitiesForDamageCalculation[i]);
 		}
 
 		for (int i = 0; i < this.consideredActivitiesForReceiverPointGrid.length; i++) {
@@ -355,16 +352,16 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		this.consideredActivitiesForReceiverPointGrid = consideredActivitiesForReceiverPointGrid;		
 	}
 	
-	public String[] getConsideredActivitiesForSpatialFunctionalityArray() {		
-		return consideredActivitiesForSpatialFunctionality;
+	public String[] getConsideredActivitiesForDamageCalculationArray() {		
+		return consideredActivitiesForDamageCalculation;
 	}
 
-	public void setConsideredActivitiesForSpatialFunctionalityArray(String[] consideredActivitiesForSpatialFunctionality) {
+	public void setConsideredActivitiesForDamageCalculationArray(String[] consideredActivitiesForSpatialFunctionality) {
 		log.info("setting considered activities for spatial functionality to: ");
 		for (int i = 0; i < consideredActivitiesForSpatialFunctionality.length; i++) {
 			log.info(consideredActivitiesForSpatialFunctionality[i]);
 		}
-		this.consideredActivitiesForSpatialFunctionality = consideredActivitiesForSpatialFunctionality;
+		this.consideredActivitiesForDamageCalculation = consideredActivitiesForSpatialFunctionality;
 	}
 
 	@StringGetter( "consideredActivitiesForReceiverPointGrid" )
@@ -377,14 +374,14 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		this.setConsideredActivitiesForReceiverPointGridArray(CollectionUtils.stringToArray(consideredActivitiesForReceiverPointGridString));
 	}
 
-	@StringGetter( "consideredActivitiesForSpatialFunctionality" )
-	public String getConsideredActivitiesForSpatialFunctionality() {
-		return CollectionUtils.arrayToString(consideredActivitiesForSpatialFunctionality);
+	@StringGetter( "consideredActivitiesForDamageCalculation" )
+	public String getConsideredActivitiesForDamageCalculation() {
+		return CollectionUtils.arrayToString(consideredActivitiesForDamageCalculation);
 	}
 
 	@StringSetter( "consideredActivitiesForSpatialFunctionality" )
 	public void setConsideredActivitiesForSpatialFunctionality(String consideredActivitiesForSpatialFunctionalityString) {		
-		this.setConsideredActivitiesForSpatialFunctionalityArray(CollectionUtils.stringToArray(consideredActivitiesForSpatialFunctionalityString));
+		this.setConsideredActivitiesForDamageCalculationArray(CollectionUtils.stringToArray(consideredActivitiesForSpatialFunctionalityString));
 	}
 	
 	// ###

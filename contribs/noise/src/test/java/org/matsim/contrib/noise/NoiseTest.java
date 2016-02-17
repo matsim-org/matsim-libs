@@ -97,7 +97,7 @@ public class NoiseTest {
 		noiseParameters.setScaleFactor(1.);
 		
 		String[] consideredActivities = {"home", "work"};
-		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
 		
 		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
 		
@@ -169,7 +169,7 @@ public class NoiseTest {
 		noiseParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
-		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
 		
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(false);
@@ -923,7 +923,7 @@ public class NoiseTest {
 		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
 		noiseParameters.setReceiverPointGap(250.);	
 		String[] consideredActivities = {"home", "work"};
-		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 		noiseParameters.setUseActualSpeedLevel(false);
@@ -1032,7 +1032,7 @@ public class NoiseTest {
 		noiseParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
-		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivities);
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
 		
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(true);

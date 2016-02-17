@@ -107,8 +107,8 @@ public class NoiseContext {
 		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
 		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
 
-		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForSpatialFunctionalityArray().length; i++) {
-			consideredActivitiesForDamagesList.add(this.grid.getGridParams().getConsideredActivitiesForSpatialFunctionalityArray()[i]);
+		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForDamageCalculationArray().length; i++) {
+			consideredActivitiesForDamagesList.add(this.grid.getGridParams().getConsideredActivitiesForDamageCalculationArray()[i]);
 		}
 		
 		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForReceiverPointGridArray().length; i++) {

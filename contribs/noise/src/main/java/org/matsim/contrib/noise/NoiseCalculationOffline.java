@@ -124,7 +124,7 @@ public class NoiseCalculationOffline {
 		
 		// Define activity types to be considered for noise damage calculation
 		String[] consideredActivitiesForDamages = {"home", "work"};
-		noiseParameters.setConsideredActivitiesForSpatialFunctionalityArray(consideredActivitiesForDamages);
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
 		
 		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
