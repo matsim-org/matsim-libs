@@ -33,6 +33,7 @@ public class SinglePassengerPickupActivity
     private final double pickupDuration;
 
     private boolean passengerAboard = false;
+    private boolean passengerWaiting = false;
     private double endTime;
 
 
@@ -43,17 +44,13 @@ public class SinglePassengerPickupActivity
         this.pickupTask = pickupTask;
         this.request = request;
         this.pickupDuration = pickupDuration;
-
-        double now = pickupTask.getBeginTime();
-        DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
-        passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
-
-        if (passengerAboard) {
-            endTime = now + pickupDuration;
-        }
-        else {
-            //try to predict the end time
-            endTime = Math.max(now, request.getT0()) + pickupDuration;
+        
+        // Only happens for direct requests (not prescheduled)
+		tryPickupPassenger(pickupTask.getBeginTime());
+		
+        if (!passengerAboard) {
+            //try to predict the end time and stay alive
+            endTime = Math.max(pickupTask.getBeginTime(), request.getT0()) + pickupDuration + 1.0;
         }
     }
 
@@ -75,14 +72,26 @@ public class SinglePassengerPickupActivity
     {
         return "PassengerPickup";
     }
-
+    
+    private void tryPickupPassenger(double now) {
+		DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
+		passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
+		
+		if (passengerAboard) {
+			endTime = now + pickupDuration;
+		}
+    }
 
     @Override
     public void doSimStep(double now)
     {
+    	if (passengerWaiting && !passengerAboard) {
+    		tryPickupPassenger(now);
+    	}
+    	
         if (!passengerAboard) {
-            //try to predict the end time
-            endTime = Math.max(now, request.getT0()) + pickupDuration;
+            // try to predict the end time and stay alive
+            endTime = Math.max(now, request.getT0()) + pickupDuration + 1.0;
         }
     }
 
@@ -90,17 +99,10 @@ public class SinglePassengerPickupActivity
     @Override
     public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now)
     {
-        if (passenger != request.getPassenger()) {
+        if (passenger.equals(request.getPassenger())) {
             throw new IllegalArgumentException("I am waiting for a different passenger!");
         }
-
-        DynAgent driver = pickupTask.getSchedule().getVehicle().getAgentLogic().getDynAgent();
-        passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
-
-        if (!passengerAboard) {
-            throw new IllegalStateException("The passenger is not on the link or not available for departure!");
-        }
-
-        endTime = now + pickupDuration;
+        
+        passengerWaiting = true;
     }
 }
