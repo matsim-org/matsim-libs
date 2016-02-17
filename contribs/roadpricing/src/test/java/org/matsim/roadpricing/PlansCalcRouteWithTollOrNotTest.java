@@ -58,7 +58,6 @@ import com.google.inject.Singleton;
  * @author mrieser
  */
 
-@Ignore
 public class PlansCalcRouteWithTollOrNotTest {
 
 	@Rule
@@ -70,6 +69,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	public void testBestAlternatives() {
 		Config config = matsimTestUtils.loadConfig(null);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 
@@ -131,29 +131,10 @@ public class PlansCalcRouteWithTollOrNotTest {
 	private PlansCalcRouteWithTollOrNot testee(final Scenario scenario, final RoadPricingScheme toll) {
 		return Injector.createInjector(
 				scenario.getConfig(),
-				new AbstractModule() {
-					@Override
-					public void install() {
-						install(new EventsManagerModule());
-						bind(OutputDirectoryHierarchy.class).asEagerSingleton();
-						bind(RoadPricingScheme.class).toInstance(toll);
-						addTravelTimeBinding(TransportMode.car).to(FreeSpeedTravelTime.class);
-						bind(PlansCalcRouteWithTollOrNot.class);
-						install(new ScenarioByInstanceModule(scenario));
-						addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(
-								new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ) );
-						install(new TripRouterModule());
-						addControlerListenerBinding().to(RoadPricingControlerListener.class);
-
-						// add the events handler to calculate the tolls paid by agents
-						bind(CalcPaidToll.class).in(Singleton.class);
-						addEventHandlerBinding().to(CalcPaidToll.class);
-
-						bind(CalcAverageTolledTripLength.class).in(Singleton.class);
-						addEventHandlerBinding().to(CalcAverageTolledTripLength.class);
-
-					}
-				})
+				new ControlerDefaultsWithRoadPricingModule(toll),
+				new ScenarioByInstanceModule(scenario),
+				new ControlerDefaultCoreListenersModule(),
+				new NewControlerModule())
 				.getInstance(PlansCalcRouteWithTollOrNot.class);
 	}
 

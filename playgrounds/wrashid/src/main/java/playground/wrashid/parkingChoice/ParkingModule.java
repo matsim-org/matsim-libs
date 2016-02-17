@@ -2,6 +2,7 @@ package playground.wrashid.parkingChoice;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -29,7 +30,7 @@ public class ParkingModule {
 	
 	public ParkingModule(Controler controler, LinkedList<PParking> parkingCollection){
 		this.controler = controler;
-		
+		ConfigUtils.addOrGetModule(controler.getConfig(), "parkingChoice", ParkingConfigModule.class);
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		controler.addControlerListener(eventHandlerAtStartupAdder);
 		

@@ -19,13 +19,20 @@ package org.matsim.contrib.protobuf;
  *                                                                         *
  * *********************************************************************** */
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.contrib.hybrid.events.ProtobufEvents;
+import org.matsim.core.gbl.Gbl;
+
+import java.util.Map;
 
 /**
  * Created by laemmel on 16/02/16.
  */
 public abstract class Event2ProtoEvent {
+
+	private static final Logger log = Logger.getLogger(Event2ProtoEvent.class);
+	private static boolean REPORT_GENERIC_EVENT = true;
 
 	static ProtobufEvents.Event getProtoEvent(Event event) {
 		ProtobufEvents.Event.Builder eb = ProtobufEvents.Event.newBuilder();
@@ -50,9 +57,9 @@ public abstract class Event2ProtoEvent {
 					ProtobufEvents.ActivityEndEvent.Builder ae = ProtobufEvents.ActivityEndEvent.newBuilder()
 							.setTime(event.getTime())
 							.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((ActivityEndEvent) event).getLinkId().toString()))
-							.setFacilityId(ProtobufEvents.ActivityFacilityId.newBuilder().setId(((ActivityEndEvent) event).getFacilityId().toString()))
 							.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((ActivityEndEvent) event).getPersonId().toString()))
 							.setActType(((ActivityEndEvent) event).getActType());
+					if (((ActivityEndEvent) event).getFacilityId() != null)  ae.setFacilityId(ProtobufEvents.ActivityFacilityId.newBuilder().setId(((ActivityEndEvent) event).getFacilityId().toString()));
 					eb.setType(ProtobufEvents.Event.Type.ActivityEnd).setActEnd(ae);
 
 				}
@@ -61,9 +68,11 @@ public abstract class Event2ProtoEvent {
 						ProtobufEvents.ActivityStartEvent.Builder as = ProtobufEvents.ActivityStartEvent.newBuilder()
 								.setTime(event.getTime())
 								.setLinkId(ProtobufEvents.LinkId.newBuilder().setId(((ActivityStartEvent) event).getLinkId().toString()))
-								.setFacilityId(ProtobufEvents.ActivityFacilityId.newBuilder().setId(((ActivityStartEvent) event).getFacilityId().toString()))
 								.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((ActivityStartEvent) event).getPersonId().toString()))
 								.setActType(((ActivityStartEvent) event).getActType());
+						if (((ActivityStartEvent) event).getFacilityId() != null ) {
+							as.setFacilityId(ProtobufEvents.ActivityFacilityId.newBuilder().setId(((ActivityStartEvent) event).getFacilityId().toString()));
+						}
 						eb.setType(ProtobufEvents.Event.Type.ActivityStart).setActStart(as);
 					}
 					else {
@@ -159,7 +168,17 @@ public abstract class Event2ProtoEvent {
 																eb.setType(ProtobufEvents.Event.Type.VehicleLeavesTraffic).setVehicleLeavesTraffic(vl);
 															}
 															else {
-																throw new RuntimeException("Unsopported event type:" + event.getEventType());
+																if (Event2ProtoEvent.REPORT_GENERIC_EVENT) {
+																	Event2ProtoEvent.REPORT_GENERIC_EVENT = false;
+																	log.warn("Unknown event type: " + event.getEventType() + " creating generic protobuf event");
+																	log.warn(Gbl.ONLYONCE);
+//																throw new RuntimeException("Unsopported event type:" + event.getEventType());
+																}
+																ProtobufEvents.GenericEvent.Builder ge = ProtobufEvents.GenericEvent.newBuilder();
+																for (Map.Entry<String,String> e : event.getAttributes().entrySet()) {
+																	ge.addAttrVal(ProtobufEvents.AttrVal.newBuilder().setValue(e.getValue()).setAttribut(e.getKey()));
+																}
+																eb.setType(ProtobufEvents.Event.Type.GenericEvent).setGenericEvent(ge);
 															}
 														}
 													}

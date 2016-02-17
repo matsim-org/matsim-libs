@@ -23,16 +23,21 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+import playground.wrashid.parkingChoice.ParkingConfigModule;
 
 
 public class ActivityDurationEstimatorTest extends MatsimTestCase {
 
 	public void testConfig1(){
 		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/utils/chessConfig1.xml");
+		ConfigUtils.addOrGetModule(config, "parkingChoice", ParkingConfigModule.class);
+
 		ActivityDurationEstimator activityDurationEstimator = getActivityDurationEstimations(config);
 	
 		assertEquals(26254, activityDurationEstimator.getActivityDurationEstimations().get(0),1);
@@ -41,8 +46,9 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 	
 	public void testConfig2(){
 		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/utils/chessConfig2.xml");
-	
-		
+		ConfigUtils.addOrGetModule(config, "parkingChoice", ParkingConfigModule.class);
+
+
 		ActivityDurationEstimator activityDurationEstimator = getActivityDurationEstimations(config);
 	
 		assertEquals(28800, activityDurationEstimator.getActivityDurationEstimations().get(0),1);
@@ -61,7 +67,8 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 	
 	public void testConfig4(){
 		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/utils/chessConfig4.xml");
-		
+		ConfigUtils.addOrGetModule(config, "parkingChoice", ParkingConfigModule.class);
+
 		ActivityDurationEstimator activityDurationEstimator = getActivityDurationEstimations(config);
 	
 		assertEquals(51600, activityDurationEstimator.getActivityDurationEstimations().get(0),1);
@@ -71,7 +78,8 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 	//TODO: go through the numbers of this test...
 	public void testConfig5(){
 		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/utils/chessConfig5.xml");
-		
+		ConfigUtils.addOrGetModule(config, "parkingChoice", ParkingConfigModule.class);
+
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );
 		
 		ActivityDurationEstimator activityDurationEstimator = getActivityDurationEstimations(config);
@@ -87,7 +95,7 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 	}
 
 	private static ActivityDurationEstimator getActivityDurationEstimations(Config config) {
-		Controler controler=new Controler(config);
+		Controler controler=new Controler(ScenarioUtils.loadScenario( config ) );
 		
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		controler.addControlerListener(eventHandlerAtStartupAdder);
@@ -95,10 +103,7 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 		ActivityDurationEstimator activityDurationEstimator = new ActivityDurationEstimator(controler.getScenario(), Id.create(1, Person.class));
 		eventHandlerAtStartupAdder.addEventHandler(activityDurationEstimator);
 
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 		return activityDurationEstimator;
 	}

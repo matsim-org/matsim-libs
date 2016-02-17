@@ -58,7 +58,7 @@ public class TransferShares {
     public static void main(String args[]) throws IOException {
         refMatricesModena = loadRefMatrix(args[0]);
 
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[4], "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[3], "NO");
         loadZoneIdMapping(zones, "NUTS3_CODE");
 
         targetMatrix = loadTargetMatrix(args[1]);
@@ -71,12 +71,10 @@ public class TransferShares {
         logger.info("Writing new matrix...");
         ProgressLogger.init(zoneKeys.size(), 2, 10);
 
-        int cntZeros = 0;
+        int cntNoChange = 0;
         for (String i : zoneKeys) {
             for (String j : zoneKeys) {
                 double factor = calcFactor(i, j);
-
-                if(factor == 0) cntZeros++;
 
                 for (Map.Entry<String, NumericMatrix> entry : refMatricesModena.entrySet()) {
                     String dimension = entry.getKey();
@@ -84,6 +82,9 @@ public class TransferShares {
 
                     Double vol = refMatrix.get(i, j);
                     if (vol != null) {
+                        if(factor == 1) cntNoChange++;
+                        if(factor == 0) throw new RuntimeException("Factor = 0 must not occur.");
+
                         vol *= factor;
                         writer.write(i);
                         writer.write(COL_SEPARATOR);
@@ -101,7 +102,7 @@ public class TransferShares {
         ProgressLogger.terminate();
         writer.close();
 
-        if(cntZeros > 0) logger.warn(String.format("No volume found in target matrix for %s relations.", cntZeros));
+        if(cntNoChange > 0) logger.warn(String.format("No changes made for %s relations.", cntNoChange));
         logger.info("Done.");
     }
 
@@ -180,6 +181,8 @@ public class TransferShares {
             if (vol != null) refSum += vol;
         }
 
+        if(refSum == 0) return 0;
+
         Double targetSum = targetMatrix.get(i, j);
         if (targetSum == null) {
             String i_nuts3 = zoneIdMapping.get(i);
@@ -188,7 +191,7 @@ public class TransferShares {
             targetSum = targetMatrixNuts3.get(i_nuts3, j_nuts3);
         }
 
-        if (targetSum == null) return 0;
+        if (targetSum == null) return 1;
         else return targetSum / refSum;
     }
 

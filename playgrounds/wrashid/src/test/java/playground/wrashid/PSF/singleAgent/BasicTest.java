@@ -3,6 +3,7 @@ package playground.wrashid.PSF.singleAgent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 import playground.wrashid.PSF.ParametersPSF;
@@ -28,6 +29,7 @@ public class BasicTest extends MatsimTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		Config config = loadConfig("test/input/playground/wrashid/PSF/singleAgent/config.xml");
+		ConfigUtils.addOrGetModule(config, ParametersPSF.PSF_MODULE, ParametersPSF.class);
 
 		controler = new Controler(config);
 		controler.getConfig().controler().setCreateGraphs(false);

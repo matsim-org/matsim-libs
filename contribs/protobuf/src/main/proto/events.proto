@@ -30,7 +30,7 @@ option java_outer_classname = "ProtobufEvents";
 message Event {
 	enum Type { ActivityEnd = 0; ActivityStart = 1; LinkEnter = 2; LinkLeave = 3; PersonArrival = 4; PersonDeparture = 5;
 		PersonEntersVehicle = 6; PersonLeavesVehicle = 7; PersonMoney = 8; PersonStuck = 9; TransitDriverStarts = 10;
-		VehicleAborts = 11; VehicleEntersTraffic = 12; VehicleLeavesTraffic = 13;}
+		VehicleAborts = 11; VehicleEntersTraffic = 12; VehicleLeavesTraffic = 13; GenericEvent = 14;}
 	Type type =  1;
 	ActivityEndEvent actEnd = 2;
 	ActivityStartEvent actStart = 3;
@@ -46,6 +46,19 @@ message Event {
 	VehicleAbortsEvent vehicleAborts = 13;
 	VehicleEntersTrafficEvent vehicleEntersTraffic = 14;
 	VehicleLeavesTrafficEvent vehicleLeavesTraffic = 15;
+	GenericEvent genericEvent = 16;
+}
+
+message GenericEvent {
+	string type = 1;
+	double time = 2;
+	repeated AttrVal attrVal = 3;
+}
+
+message AttrVal {
+	string attribut = 1;
+	string value = 2;
+
 }
 
 message ActivityEndEvent {

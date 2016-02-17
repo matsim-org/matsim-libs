@@ -24,6 +24,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import playground.johannes.studies.matrix2014.analysis.MatrixDistanceCompare;
+import playground.johannes.studies.matrix2014.analysis.MatrixIntraVolumeShareCompare;
 import playground.johannes.studies.matrix2014.analysis.MatrixMarginalsCompare;
 import playground.johannes.studies.matrix2014.analysis.MatrixVolumeCompare;
 import playground.johannes.studies.matrix2014.matrix.ODPredicate;
@@ -46,10 +47,10 @@ public class MatrixCompare {
 
     public static void main(String args[]) throws IOException {
 //        String simFile = "/home/johannes/gsv/miv-matrix/simmatrices/miv.874.xml";
-        String simFile = "/home/johannes/sge/prj/matrix2014/runs/1059/output/2.7E10/matrix/matrix.txt.gz";
+        String simFile = "/home/johannes/sge/prj/matrix2014/runs/1103/output/1.9E10/matrix/matrix.txt.gz";
         String refFile = "/home/johannes/gsv/matrix2014/sim/data/matrices/itp.de.txt";
         String outDir = "/home/johannes/gsv/matrix2014/matrix-compare/";
-        double volumeThreshold = 1;
+        double volumeThreshold = 0;
 
         NumericMatrix simMatrix = NumericMatrixIO.read(simFile);
         NumericMatrix refMatrix = NumericMatrixIO.read(refFile);
@@ -99,9 +100,12 @@ public class MatrixCompare {
         MatrixMarginalsCompare marTask = new MatrixMarginalsCompare("matrix");
         marTask.setHistogramWriter(writer);
 
+        MatrixIntraVolumeShareCompare intraTask = new MatrixIntraVolumeShareCompare(ioContext);
+
         composite.addComponent(volTask);
         composite.addComponent(distTask);
         composite.addComponent(marTask);
+        composite.addComponent(intraTask);
 
         AnalyzerTaskRunner.run(new ImmutablePair<>(refMatrix, simMatrix), composite, ioContext);
     }

@@ -20,7 +20,9 @@
 
 package org.matsim.roadpricing;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

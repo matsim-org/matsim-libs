@@ -52,12 +52,15 @@ import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Map;
 
 @Singleton
 final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
@@ -102,6 +105,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	@Inject
 	private OutputDirectoryHierarchy controlerIO;
 
+	@Inject
+	private Map<Class<?>,AttributeConverter<?>> attributeConverters = Collections.emptyMap();
+
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		if ( event.isUnexpected() ) {
@@ -114,6 +120,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		if ( personAttributes!=null ) {
 			ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(personAttributes) ;
 			writer.setPrettyPrint(true);
+			writer.putAttributeConverters( attributeConverters );
 			writer.writeFile( controlerIO.getOutputFilename( Controler.FILENAME_PERSON_ATTRIBUTES ) );
 		}
 		// dump network

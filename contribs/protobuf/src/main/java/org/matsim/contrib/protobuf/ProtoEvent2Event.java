@@ -27,6 +27,8 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
+import java.util.Map;
+
 /**
  * Created by laemmel on 17/02/16.
  */
@@ -109,7 +111,17 @@ public abstract class ProtoEvent2Event {
 																		Id.createLinkId(pe.getVehicleAborts().getLinkId().getId()));
 															}
 															else {
-																throw new RuntimeException("Unsupported event type:" + pe.getType().toString());
+																if (pe.getType() == ProtobufEvents.Event.Type.GenericEvent) {
+																	GenericEvent ge = new GenericEvent(pe.getGenericEvent().getType(),pe.getGenericEvent().getTime());
+																	Map<String, String> map = ge.getAttributes();
+																	for (ProtobufEvents.AttrVal av : pe.getGenericEvent().getAttrValList()) {
+																		map.put(av.getAttribut(),av.getValue());
+																	}
+																	return ge;
+																} else {
+																	throw new RuntimeException("Unsupported event type: " + pe.getType());
+																}
+
 															}
 														}
 													}
