@@ -95,8 +95,7 @@ public class NoiseContext {
 	
 	public NoiseContext(Scenario scenario) {
 		this.scenario = scenario;
-		this.grid = new Grid(scenario);
-		
+				
 		if ((NoiseConfigGroup) this.scenario.getConfig().getModule("noise") == null) {
 			throw new RuntimeException("Could not find a noise config group. "
 					+ "Check if the custom module is loaded, e.g. 'ConfigUtils.loadConfig(configFile, new NoiseConfigGroup())'"
@@ -105,6 +104,8 @@ public class NoiseContext {
 		
 		this.noiseParams = (NoiseConfigGroup) this.scenario.getConfig().getModule("noise");
 		this.noiseParams.checkNoiseParametersForConsistency();
+		
+		this.grid = new Grid(scenario);
 				
 		this.currentTimeBinEndTime = noiseParams.getTimeBinSizeNoiseComputation();
 		

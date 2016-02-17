@@ -379,8 +379,8 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		return CollectionUtils.arrayToString(consideredActivitiesForDamageCalculation);
 	}
 
-	@StringSetter( "consideredActivitiesForSpatialFunctionality" )
-	public void setConsideredActivitiesForSpatialFunctionality(String consideredActivitiesForSpatialFunctionalityString) {		
+	@StringSetter( "consideredActivitiesForDamageCalculation" )
+	public void setConsideredActivitiesForDamageCalculation(String consideredActivitiesForSpatialFunctionalityString) {		
 		this.setConsideredActivitiesForDamageCalculationArray(CollectionUtils.stringToArray(consideredActivitiesForSpatialFunctionalityString));
 	}
 	

@@ -59,18 +59,21 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	}
 
 	public NoiseCalculationOnline(Controler controler) {
+		
 		NoiseContext noiseContext = new NoiseContext(controler.getScenario());
-		
-		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-			}
-		});
-		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-		
 		this.noiseContext = noiseContext;
+		
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getConfig().getModule("noise");
+		
+		if (noiseParameters.isInternalizeNoiseDamages()) {
+			final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(this.noiseContext);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				}
+			});
+		}
 	}
 
 	@Override

@@ -50,7 +50,7 @@ public class NoiseConfigGroupTest {
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 				
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
-
+		System.out.println(noiseParameters.toString());
 		// test the config parameters
 		Assert.assertEquals("wrong config parameter", 12345., noiseParameters.getReceiverPointGap(), MatsimTestUtils.EPSILON);
 		

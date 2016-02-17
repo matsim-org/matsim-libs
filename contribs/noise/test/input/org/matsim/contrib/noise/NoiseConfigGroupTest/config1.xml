@@ -1,16 +1,14 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
 <config>
-
-	<module name="noiseGrid" >
-		<param name="receiverPointGap" value="12345" />
-		<param name="consideredActivitiesForSpatialFunctionality" value="home" />
-	</module>
 	
 	<module name="noise" >
+		<param name="receiverPointGap" value="12345" />
+		<param name="consideredActivitiesForDamageCalculation" value="home" />
+		
 		<param name="internalizeNoiseDamages" value="false" />
 		<param name="relevantRadius" value="1000.0" />
-		<param name="scaleFactor" value="10.0" />
+		<param name="scaleFactor" value="10.0" />	
 	</module>
 
 	<module name="network" >

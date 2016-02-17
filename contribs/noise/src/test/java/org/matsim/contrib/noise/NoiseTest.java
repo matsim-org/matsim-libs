@@ -89,9 +89,9 @@ public class NoiseTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config1.xml";
 
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup()));
 				
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModule("noise");
 		
 		noiseParameters.setReceiverPointGap(250.);	
 		noiseParameters.setScaleFactor(1.);
@@ -158,13 +158,13 @@ public class NoiseTest {
 		
 		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
 		
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 		
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		
 		noiseParameters.setReceiverPointGap(250.);	
 		
@@ -914,13 +914,13 @@ public class NoiseTest {
 		
 		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
 		
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 		
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setReceiverPointGap(250.);	
 		String[] consideredActivities = {"home", "work"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
@@ -1022,13 +1022,13 @@ public class NoiseTest {
 		
 		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
 		
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 				
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
@@ -1038,7 +1038,7 @@ public class NoiseTest {
 		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		String outputFilePath = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		File file = new File(outputFilePath);

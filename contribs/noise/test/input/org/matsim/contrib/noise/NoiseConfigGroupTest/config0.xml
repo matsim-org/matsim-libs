@@ -6,7 +6,7 @@
 		
 		<param name="receiverPointGap" value="12345" />
 		<param name="consideredActivitiesForReceiverPointGrid" value="home,sleep,eat" />
-		<param name="consideredActivitiesForSpatialFunctionality" value="work,leisure,other" />
+		<param name="consideredActivitiesForDamageCalculation" value="work,leisure,other" />
 		
 		<param name="relevantRadius" value="12345789" />
 		<param name="computeNoiseDamages" value="false" />
