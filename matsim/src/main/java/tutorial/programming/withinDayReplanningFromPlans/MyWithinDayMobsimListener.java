@@ -23,6 +23,7 @@ package tutorial.programming.withinDayReplanningFromPlans;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
@@ -30,11 +31,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -47,7 +50,11 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.utils.EditRoutes;
 
 import javax.inject.Singleton;
@@ -64,7 +71,12 @@ class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 	@Inject private TripRouter tripRouter;
 	@Inject private Scenario scenario;
 	
-	@Inject private LeastCostPathCalculator pathCalculator ;
+	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory ;
+	
+	@Inject private Map<String, TravelTime> travelTimes ;
+	@Inject private Map<String, TravelDisutilityFactory> travelDisutilityFactories ;
+
+	@Inject private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
 	
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
@@ -141,6 +153,15 @@ class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		// =============================================================================================================
 		// =============================================================================================================
 		// EditRoutes at this point only works for car routes
+
+		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
+		
+		TravelDisutility travelDisutility = travelDisutilityFactories.get( TransportMode.car ).createTravelDisutility(travelTime, planCalcScoreConfigGroup ) ;
+
+		Network network = scenario.getNetwork() ;
+
+		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime ) ;
+
 		EditRoutes editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory() ) ;
 		
 		// new Route for current Leg.
