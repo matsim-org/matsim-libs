@@ -38,7 +38,6 @@ public class ModuleTest {
     public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test(expected = RuntimeException.class)
-    @Ignore
     public void testControlerWithoutRoadPricingDoesntWork() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
         Controler controler = new Controler(config);
