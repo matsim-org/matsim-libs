@@ -414,7 +414,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		return map ;
 	}
 	
-	@Deprecated // use mode-specific factors
+	@Deprecated // use mode-specific factors.  kai, apr'15
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
 		testForLocked() ;
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
@@ -423,7 +423,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		addParameterSet( pars );
 	}
 
-	@Deprecated // use mode-specific factors
+	@Deprecated // use mode-specific factors.  kai, apr'15
 	public void setTeleportedModeSpeed(String mode, double speed) {
 		testForLocked() ;
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
@@ -432,7 +432,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		addParameterSet( pars );
 	}
 	
-	@Deprecated // use mode-specific beeline distance factors!
+	@Deprecated // use mode-specific beeline distance factors! kai, apr'15
 	public void setBeelineDistanceFactor(double val) {
 		testForLocked() ;
 		// yyyy thinking about this: this should in design maybe not be different from the other teleportation factors (reset everything
@@ -450,7 +450,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	@SuppressWarnings("static-method")
 	public boolean isInsertingAccessEgressWalk() {
 		// not outside-configurable for the time being. kai, feb'16
-		return false ;
+		return true ;
 	}
 
 

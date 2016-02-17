@@ -100,12 +100,7 @@ public class PlanRouterTest {
                   		scenario.getNetwork(), 
                   		leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime, config.planCalcScore()), travelTime)
                   		).calcRoute(fromFacility, toFacility, departureTime, person);
-                  if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-                        ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute()).setVehicleId(newVehicleId);
-                  } else {
-                        ((NetworkRoute) TripStructureUtils.getLegs(trip).get(1).getRoute()).setVehicleId(newVehicleId);
-                        // yy I changed get(0) to get(1) since in the input file there is no intervening walk leg, but in the output there is. kai, feb'16
-                  }
+                  ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute()).setVehicleId(newVehicleId);
                   return trip;
               }
 

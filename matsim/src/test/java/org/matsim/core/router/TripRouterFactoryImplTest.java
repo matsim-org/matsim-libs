@@ -126,6 +126,9 @@ public class TripRouterFactoryImplTest {
 				PopulationUtils.createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
+		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			l = (Leg) trip.get(2) ;
+		}
 
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();
@@ -198,6 +201,9 @@ public class TripRouterFactoryImplTest {
 				PopulationUtils.createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
+		if ( scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			l = (Leg) trip.get(2) ;
+		}
 
 		// actual test
 		NetworkRoute r = (NetworkRoute) l.getRoute();

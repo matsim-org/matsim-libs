@@ -196,17 +196,19 @@ public class EditRoutes {
 	 */
 	@Deprecated // switch this to (a new) relocateCurrentTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
 	public static boolean relocateCurrentRoute( MobsimAgent agent, Id<Link> toLinkId, double now, Network network, TripRouter tripRouter ) {
-		Leg leg = WithinDayAgentUtils.getModifiableCurrentLeg(agent) ;
-		Person person = ((HasPerson) agent).getPerson() ;
-		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent) ;
-		return relocateCurrentLegRoute( leg, person, currentLinkIndex, toLinkId, now, network, tripRouter ) ;
+//		Leg leg = WithinDayAgentUtils.getModifiableCurrentLeg(agent) ;
+//		Person person = ((HasPerson) agent).getPerson() ;
+//		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent) ;
+//		return relocateCurrentLegRoute( leg, person, currentLinkIndex, toLinkId, now, network, tripRouter ) ;
+		throw new RuntimeException("currently not implemented: existing version was not consistent with access/egress legs") ;
 	}
 
 	public static boolean replanCurrentRoute( MobsimAgent agent, double now, Network network, TripRouter tripRouter ) {
 		Leg leg = WithinDayAgentUtils.getModifiableCurrentLeg(agent) ;
 		Person person = ((HasPerson) agent).getPerson() ;
 		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent) ;
-		return replanCurrentLegRoute( leg, person, currentLinkIndex, now, network, tripRouter ) ;
+//		return replanCurrentLegRoute( leg, person, currentLinkIndex, now, network, tripRouter ) ;
+		throw new RuntimeException("currently not implemented") ;
 	}
 
 	/**
@@ -274,80 +276,6 @@ public class EditRoutes {
 		return true;
 	}
 
-	/**
-	 * Re-locates a current route. The route is given by its leg.
-	 * 
-	 * @return true when replacing the route worked, false when something went wrong
-	 * 
-	 * @deprecated switch this to (a new) relocateCurrentTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
-	 */
-	@Deprecated // switch this to (a new) relocateCurrentTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
-	public static boolean relocateCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, Id<Link> toLinkId, double time, Network network, TripRouter tripRouter) {
-
-		Route route = leg.getRoute();
-
-		// if the route type is not supported (e.g. because it is a walking agent)
-		if (!(route instanceof NetworkRoute)) return false;
-
-		NetworkRoute oldRoute = (NetworkRoute) route;
-
-		/*
-		 *  Get the Id of the current Link.
-		 *  Create a List that contains all links of a route, including the Start- and EndLinks.
-		 */
-		List<Id<Link>> oldLinkIds = getRouteLinkIds(oldRoute);
-		Id<Link> currentLinkId = oldLinkIds.get(currentLinkIndex);
-
-		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(network.getLinks().get(currentLinkId));
-		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(network.getLinks().get(toLinkId));
-
-		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, time, person);
-
-		if (planElements.size() != 1) {
-			throw new RuntimeException("Expected a list of PlanElements containing exactly one element, " +
-					"but the returned list contained " + planElements.size() + " elements."); 
-		}
-
-		// The linkIds of the new Route
-		List<Id<Link>> newLinkIds = new ArrayList<Id<Link>>();
-
-		/*
-		 * Get those Links which have already been passed.
-		 * allLinkIds contains also the startLinkId, which should not
-		 * be part of the List - it is set separately. Therefore we start
-		 * at index 1.
-		 */
-		if (currentLinkIndex > 0) {
-			newLinkIds.addAll(oldLinkIds.subList(1, currentLinkIndex + 1));
-		}
-
-		Leg newLeg = (Leg) planElements.get(0);
-		Route newRoute = newLeg.getRoute();
-
-		// Merge old and new Route.
-		if (newRoute instanceof NetworkRoute) {
-			/*
-			 * Edit cdobler 25.5.2010
-			 * If the new leg ends at the current Link, we have to
-			 * remove that linkId from the linkIds List - it is stored
-			 * in the endLinkId field of the route.
-			 */
-			if (newLinkIds.size() > 0 && newLinkIds.get(newLinkIds.size() - 1).equals(newRoute.getEndLinkId())) {
-				newLinkIds.remove(newLinkIds.size() - 1);
-			}
-
-			newLinkIds.addAll(((NetworkRoute) newRoute).getLinkIds());
-		}
-		else {
-			log.warn("The Route data could not be copied to the old Route. Old Route will be used!");
-			return false;
-		}
-
-		// Overwrite old Route
-		oldRoute.setLinkIds(oldRoute.getStartLinkId(), newLinkIds, toFacility.getLinkId());
-
-		return true;
-	}
 
 	/**
 	 * We create a new Plan which contains only the Leg that should be replanned and its previous and next
@@ -360,16 +288,17 @@ public class EditRoutes {
 	 * The currentNodeIndex has to Point to the next Node
 	 * (which is the endNode of the current Link)
 	 */
-	public static boolean replanCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time, Network network, TripRouter tripRouter) {
-
-		Route route = leg.getRoute();
-
-		// if the route type is not supported (e.g. because it is a walking agent)
-		if (!(route instanceof NetworkRoute)) return false;
-
-		// This is just a special case of relocateCurrentLegRoute where the end link of the route is not changed.
-		return relocateCurrentLegRoute(leg, person, currentLinkIndex, route.getEndLinkId(), time, network, tripRouter);
-	}
+//	public static boolean replanCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time, Network network, TripRouter tripRouter) {
+//
+//		Route route = leg.getRoute();
+//
+//		// if the route type is not supported (e.g. because it is a walking agent)
+//		if (!(route instanceof NetworkRoute)) return false;
+//
+//		// This is just a special case of relocateCurrentLegRoute where the end link of the route is not changed.
+//		return relocateCurrentLegRoute(leg, person, currentLinkIndex, route.getEndLinkId(), time, network, tripRouter);
+//		throw new RuntimeException("currently not implemented: not consistent with access/egress legs" ) ;
+//	}
 
 	/**
 	 * We create a new Plan which contains only the Leg that should be replanned and its previous and next

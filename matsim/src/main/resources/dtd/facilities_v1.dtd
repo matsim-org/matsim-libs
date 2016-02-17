@@ -20,7 +20,6 @@
           id         CDATA #REQUIRED
           x          CDATA #REQUIRED
           y          CDATA #REQUIRED
-          linkId     CDATA #IMPLIED
           desc       CDATA #IMPLIED>
 
 <!ELEMENT activity   (capacity?,opentime*)>
@@ -58,7 +57,8 @@
      world file. -->
 
 <!-- ATTRIBUTE id:
-     Identification of a facility -->
+     Identification of a facility
+     format: unsigned integer -->
 
 <!-- ATTRIBUTE x:
      x-coordinate of that facility.
@@ -67,9 +67,6 @@
 <!-- ATTRIBUTE y:
      y-coordinate of that facility.
      format: real number -->
-
-<!-- ATTRIBUTE linkId:
-     id of a link in a network, on which this facility can be reached. -->
 
 <!-- ============================================================ -->
 
