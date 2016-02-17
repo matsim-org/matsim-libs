@@ -32,6 +32,7 @@ import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.contrib.taxi.util.stats.StatsCollector.StatsCalculator;
@@ -110,7 +111,7 @@ class TaxiLauncher
         contextImpl.setVrpData(taxiData);
 
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(
-                TaxiConfigUtils.getSchedulerConfig(config));
+                TaxiLauncherConfigUtils.getSchedulerConfig(config));
         if (schedulerParams.vehicleDiversion && !launcherParams.onlineVehicleTracker) {
             throw new IllegalStateException("Diversion requires online tracking");
         }
@@ -121,7 +122,7 @@ class TaxiLauncher
         contextImpl.setMobsimTimer(qSim.getSimTimer());
         qSim.addQueueSimulationListeners(optimizer);
 
-        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(TaxiUtils.TAXI_MODE,
+        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(TaxiModule.TAXI_MODE,
                 new TaxiRequestCreator(), optimizer, context, qSim);
         if (launcherParams.prebookTripsBeforeSimulation) {
             qSim.addQueueSimulationListeners(new BeforeSimulationTripPrebooker(passengerEngine));
@@ -134,7 +135,7 @@ class TaxiLauncher
                 schedulerParams.pickupDuration);
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
 
-        Configuration eTaxiConfig = TaxiConfigUtils.getETaxiConfig(config);
+        Configuration eTaxiConfig = TaxiLauncherConfigUtils.getETaxiConfig(config);
         if (!eTaxiConfig.isEmpty()) {
             ETaxiParams eTaxiParams = new ETaxiParams(eTaxiConfig);
             ETaxiUtils.initChargersAndVehicles(taxiData);

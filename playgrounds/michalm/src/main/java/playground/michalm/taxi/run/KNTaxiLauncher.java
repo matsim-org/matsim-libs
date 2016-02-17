@@ -25,11 +25,11 @@ import org.apache.commons.configuration.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.run.VrpPopulationUtils;
-import org.matsim.contrib.taxi.TaxiUtils;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -48,7 +48,7 @@ class KNTaxiLauncher
         SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(config);
 
         if (removeNonPassengers) {
-            VrpPopulationUtils.removePersonsNotUsingMode(TaxiUtils.TAXI_MODE, launcher.scenario);
+            VrpPopulationUtils.removePersonsNotUsingMode(TaxiModule.TAXI_MODE, launcher.scenario);
 
             if (endActivitiesAtTimeZero) {
                 setEndTimeForFirstActivities(launcher.scenario, 0);
@@ -80,13 +80,13 @@ class KNTaxiLauncher
         map.put(TaxiLauncherParams.ONLINE_VEHICLE_TRACKER, Boolean.FALSE);
         map.put(TaxiLauncherParams.OTF_VIS, "true");
 
-        String sPrefix = TaxiConfigUtils.SCHEDULER + TaxiConfigUtils.DELIMITER;
+        String sPrefix = TaxiLauncherConfigUtils.SCHEDULER + TaxiLauncherConfigUtils.DELIMITER;
         map.put(sPrefix + TaxiSchedulerParams.DESTINATION_KNOWN, Boolean.FALSE);
         map.put(sPrefix + TaxiSchedulerParams.VEHICLE_DIVERSION, Boolean.FALSE);
         map.put(sPrefix + TaxiSchedulerParams.PICKUP_DURATION, 1.);
         map.put(sPrefix + TaxiSchedulerParams.DROPOFF_DURATION, 1.);
 
-        String oPrefix = TaxiConfigUtils.OPTIMIZER + TaxiConfigUtils.DELIMITER;
+        String oPrefix = TaxiLauncherConfigUtils.OPTIMIZER + TaxiLauncherConfigUtils.DELIMITER;
         map.put(oPrefix + AbstractTaxiOptimizerParams.PARAMS_CLASS,
                 RuleBasedTaxiOptimizerParams.class.getName());
         map.put(oPrefix + AbstractTaxiOptimizerParams.ID, "KN");

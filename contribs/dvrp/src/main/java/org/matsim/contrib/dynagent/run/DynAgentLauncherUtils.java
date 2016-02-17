@@ -44,7 +44,7 @@ public class DynAgentLauncherUtils
     {
         QSim qSim = new QSim(scenario, events);
 
-        DynActivityEngine dynActivityEngine = new DynActivityEngine(events, qSim.getAgentCounter());
+        DynActivityEngine dynActivityEngine = new DynActivityEngine(events);
         qSim.addMobsimEngine(dynActivityEngine);
         qSim.addActivityHandler(dynActivityEngine);
 

@@ -33,6 +33,7 @@ import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.contrib.taxi.*;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
 import org.matsim.contrib.taxi.optimizer.rules.*;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -82,7 +83,7 @@ public class TaxiQSimProvider
         QSim qSim = DynAgentLauncherUtils.initQSim(sc, eventsManager);
         qSim.addQueueSimulationListeners(optimizer);
         context.setMobsimTimer(qSim.getSimTimer());
-        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(TaxiUtils.TAXI_MODE,
+        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(TaxiModule.TAXI_MODE,
                 new TaxiRequestCreator(), optimizer, context, qSim);
         LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
         TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,

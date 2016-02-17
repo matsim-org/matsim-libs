@@ -150,7 +150,7 @@ class MultiRunTaxiLauncher
 
     static void runAll(int runs, Configuration config)
     {
-        List<Configuration> optimConfigs = TaxiConfigUtils.getOptimizerConfigs(config);
+        List<Configuration> optimConfigs = TaxiLauncherConfigUtils.getOptimizerConfigs(config);
 
         MultiRunTaxiLauncher multiLauncher = new MultiRunTaxiLauncher(config);
         multiLauncher.initOutputFiles("");
@@ -166,6 +166,6 @@ class MultiRunTaxiLauncher
     public static void main(String[] args)
     {
         int runs = 1;
-        MultiRunTaxiLauncher.runAll(runs, TaxiConfigUtils.loadConfig(args[0]));
+        MultiRunTaxiLauncher.runAll(runs, TaxiLauncherConfigUtils.loadConfig(args[0]));
     }
 }

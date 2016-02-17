@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,34 +19,33 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.router.TaxiRoutingModule;
+import org.matsim.contrib.taxi.scheduler.*;
+import org.matsim.core.controler.AbstractModule;
+
+import com.google.inject.Singleton;
 
 
-public class TaxiConfigUtils
+public class TaxiModule
+    extends AbstractModule
 {
-    public static Config createConfig()
+    public static final String TAXI_MODE = "taxi";
+
+
+    @Override
+    public void install()
     {
-        Config config = VrpConfigUtils.createConfig();
-        updatePlansCalcRouteConfigGroup(config);
-        return config;
-    }
+        bindMobsim().toProvider(TaxiQSimProvider.class);//TODO ??????
+        addRoutingModuleBinding(TaxiModule.TAXI_MODE).to(TaxiRoutingModule.class);
 
+        bind(VrpData.class).to(TaxiData.class).in(Singleton.class);
 
-    public static Config loadConfig(final String file)
-    {
-        Config config = VrpConfigUtils.loadConfig(file);
-        updatePlansCalcRouteConfigGroup(config);
-        return config;
-    }
-
-
-    private static void updatePlansCalcRouteConfigGroup(Config config)
-    {
-        ModeRoutingParams taxiParams = new ModeRoutingParams();
-        taxiParams.setMode(TaxiModule.TAXI_MODE);
-        taxiParams.setTeleportedModeFreespeedFactor(1.1);//TODO probably should be larger than 1.0
-        config.plansCalcRoute().addModeRoutingParams(taxiParams);
+        //??????????????TODO
+        //bind(TravelTime)
+        //bind(TaxiSchedulerParams.class)
+        //bind(AbstractTaxiOptimizerParams)
     }
 }

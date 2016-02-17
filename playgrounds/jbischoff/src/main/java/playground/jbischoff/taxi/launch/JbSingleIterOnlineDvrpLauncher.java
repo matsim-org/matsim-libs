@@ -33,6 +33,7 @@ import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
 import org.matsim.contrib.taxi.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -174,7 +175,7 @@ import playground.michalm.util.MovingAgentsRegister;
         olutils.initVrpSimEngine(qSim, context, optimizer);
 
         PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-                TaxiUtils.TAXI_MODE, new TaxiRequestCreator(), optimizer, context, qSim);
+                TaxiModule.TAXI_MODE, new TaxiRequestCreator(), optimizer, context, qSim);
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new TaxiActionCreator(
                 passengerEngine, VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer()),

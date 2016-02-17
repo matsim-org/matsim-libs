@@ -25,7 +25,7 @@ import java.util.*;
 import org.apache.commons.configuration.*;
 
 
-class TaxiConfigUtils
+class TaxiLauncherConfigUtils
 {
     static final String OUTPUT_DIR = "outputDir";
 

@@ -29,7 +29,7 @@ public class KNTaxiLauncherTest
     public void test()
     {
         String paramFile = "./src/main/resources/mielec_2014_02/params.in";
-        Configuration config = TaxiConfigUtils.loadConfig(paramFile);
+        Configuration config = TaxiLauncherConfigUtils.loadConfig(paramFile);
         KNTaxiLauncher.run(config, false, false, false);//equivalent to (file, false, true)        
         KNTaxiLauncher.run(config, true, false, false);
         KNTaxiLauncher.run(config, true, true, false);

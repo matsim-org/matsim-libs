@@ -21,6 +21,8 @@ package org.matsim.contrib.dynagent.run;
 
 import java.util.*;
 
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -46,9 +48,10 @@ public class DynActivityEngine
     private final List<DynAgent> newDynAgents = new ArrayList<>();//will to be handled in the next timeStep
 
 
-    public DynActivityEngine(EventsManager eventsManager, AgentCounter agentCounter)
+    @Inject
+    public DynActivityEngine(EventsManager eventsManager)
     {
-        super(eventsManager, agentCounter);
+        super(eventsManager);
     }
 
 
@@ -62,7 +65,7 @@ public class DynActivityEngine
         beforeFirstSimStep = false;
         dynAgents.addAll(newDynAgents);
         newDynAgents.clear();
-        
+
         Iterator<DynAgent> dynAgentIter = dynAgents.iterator();
         while (dynAgentIter.hasNext()) {
             DynAgent agent = dynAgentIter.next();
@@ -84,7 +87,7 @@ public class DynActivityEngine
                 }
             }
         }
-        
+
         super.doSimStep(time);
     }
 
@@ -118,7 +121,7 @@ public class DynActivityEngine
             else {
                 newDynAgents.add((DynAgent)agent);
             }
-            
+
             internalInterface.registerAdditionalAgentOnLink(agent);
         }
 

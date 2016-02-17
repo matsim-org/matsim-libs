@@ -25,7 +25,7 @@ class SingleRunTaxiLauncher
     {
         super(config);
         optimParams = AbstractTaxiOptimizerParams
-                .createParams(TaxiConfigUtils.getOptimizerConfig(config));
+                .createParams(TaxiLauncherConfigUtils.getOptimizerConfig(config));
     }
 
 
@@ -90,6 +90,6 @@ class SingleRunTaxiLauncher
 
     public static void main(String... args)
     {
-        SingleRunTaxiLauncher.run(TaxiConfigUtils.loadConfig(args[0]));
+        SingleRunTaxiLauncher.run(TaxiLauncherConfigUtils.loadConfig(args[0]));
     }
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,9 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi;
+package org.matsim.contrib.taxi.router;
 
-public class TaxiUtils
+import java.util.*;
+
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.router.*;
+import org.matsim.facilities.Facility;
+
+
+public class TaxiRoutingModule
+    implements RoutingModule
 {
-    public static final String TAXI_MODE = "taxi";
+    @Override
+    public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility,
+            double departureTime, Person person)
+    {
+        Route route = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
+        route.setDistance(Double.NaN);
+        route.setTravelTime(Double.NaN);
+
+        Leg leg = new LegImpl(TaxiModule.TAXI_MODE);
+        leg.setDepartureTime(departureTime);
+        leg.setTravelTime(Double.NaN);
+        leg.setRoute(route);
+
+        return Arrays.asList(leg);
+    }
+
+
+    @Override
+    public StageActivityTypes getStageActivityTypes()
+    {
+        return EmptyStageActivityTypes.INSTANCE;
+    }
 }
