@@ -98,7 +98,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 					new KtiActivityScoring(
 						person.getSelectedPlan(),
 						params,
-						((MutableScenario) scenario).getActivityFacilities() )) );
+						scenario.getActivityFacilities() )) );
 
 		// standard modes
 		scoringFunctionAccumulator.addScoringFunction(
