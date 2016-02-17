@@ -25,12 +25,7 @@ import org.matsim.facilities.ActivityFacility;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author thibautd
