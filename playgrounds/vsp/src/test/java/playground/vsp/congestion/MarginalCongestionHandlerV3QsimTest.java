@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -297,8 +298,12 @@ public class MarginalCongestionHandlerV3QsimTest {
 	public final void testRouting(){
 		
 		String configFile = testUtils.getPackageInputDirectory()+"MarginalCongestionHandlerV3QsimTest/configTestRouting.xml";
+		
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
 
-		Controler controler = new Controler(configFile);
+		Controler controler = new Controler(config);
 		
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
