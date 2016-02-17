@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.noise.data.GridParameters;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.routing.NoiseTollDisutilityCalculatorFactory;
-import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -71,7 +70,7 @@ public class NoiseConfigGroupTest {
 		Assert.assertEquals("wrong config parameter", 12345789., noiseParameters.getRelevantRadius(), MatsimTestUtils.EPSILON);
 		Assert.assertFalse("wrong config parameter", noiseParameters.isComputeNoiseDamages());
 
-		String hgvIdPrefixes = noiseParameters.getHgvIdPrefixesSet().toArray()[0] + "," + noiseParameters.getHgvIdPrefixesSet().toArray()[1] + "," + noiseParameters.getHgvIdPrefixesSet().toArray()[2] + "," + noiseParameters.getHgvIdPrefixesSet().toArray()[3];
+		String hgvIdPrefixes = noiseParameters.getHgvIdPrefixesSet()[0] + "," + noiseParameters.getHgvIdPrefixesSet()[1] + "," + noiseParameters.getHgvIdPrefixesSet()[2] + "," + noiseParameters.getHgvIdPrefixesSet()[3];
 		Assert.assertEquals("wrong config parameter", "lkw,LKW,HGV,hgv", hgvIdPrefixes);		
 		
 		String tunnelLinkIds = noiseParameters.getTunnelLinkIDsSet().toArray()[0] + "," + noiseParameters.getTunnelLinkIDsSet().toArray()[1];

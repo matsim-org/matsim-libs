@@ -186,8 +186,7 @@ public class NoiseCalculationOffline {
 		noiseParameters.setThrowNoiseEventsAffected(false);
 		noiseParameters.setThrowNoiseEventsCaused(false);
 		
-		Set<String> hgvIdPrefixes = new HashSet<String>();
-		hgvIdPrefixes.add("lkw");
+		String[] hgvIdPrefixes = { "lkw" };
 		noiseParameters.setHgvIdPrefixesSet(hgvIdPrefixes);
 		
 //		Set<String> busIdPrefixes = new HashSet<String>();
