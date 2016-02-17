@@ -27,8 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
- * (2) Optionally throws noise immission damage events for the causing agent and the affected agent.
+ * An example how to run an offline noise computation.
  * 
  * @author ikaddoura
  *

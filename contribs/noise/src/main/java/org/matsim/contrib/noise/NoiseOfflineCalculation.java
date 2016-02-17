@@ -38,9 +38,12 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
 /**
-* @author ikaddoura
-*/
-
+ * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
+ * (2) Optionally throws noise immission damage events for the causing agent and the affected agent.
+ * 
+ * @author ikaddoura
+ *
+ */
 public class NoiseOfflineCalculation {
 	private static final Logger log = Logger.getLogger(NoiseOfflineCalculation.class);
 
