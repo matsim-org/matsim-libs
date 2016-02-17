@@ -70,6 +70,8 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	private Thread[] threads;
 	private List<Tag> currentPersonXmlData;
 
+	private final CoordinateTransformation coordinateTransformation;
+
 	public ParallelPopulationReaderMatsimV4(
 			final Scenario scenario ) {
 		this( new IdentityTransformation() , scenario );
@@ -79,6 +81,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 			final CoordinateTransformation coordinateTransformation,
 			final Scenario scenario) {
 		super( coordinateTransformation , scenario );
+		this.coordinateTransformation = coordinateTransformation;
 		
 		/*
 		 * Check whether population streaming is activated
@@ -108,7 +111,11 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		threads = new Thread[numThreads];
 		for (int i = 0; i < numThreads; i++) {
 			
-			ParallelPopulationReaderMatsimV4Runner runner = new ParallelPopulationReaderMatsimV4Runner(this.collectorScenario, this.queue);
+			ParallelPopulationReaderMatsimV4Runner runner =
+					new ParallelPopulationReaderMatsimV4Runner(
+							this.coordinateTransformation,
+							this.collectorScenario,
+							this.queue);
 			
 			Thread thread = new Thread(runner);
 			thread.setDaemon(true);
