@@ -114,16 +114,97 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		if ( event.isUnexpected() ) {
 			return ;
 		}
+		dumpPlans();
+		dumpNetwork();
+		dumpConfig();
+		dumpFacilities();
+		dumpNetworkChangeEvents();
 
-		// dump plans
-		new PopulationWriter(population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
-		final ObjectAttributes personAttributes = population.getPersonAttributes();
-		if ( personAttributes!=null ) {
-			ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(personAttributes) ;
-			writer.setPrettyPrint(true);
-			writer.putAttributeConverters( attributeConverters );
-			writer.writeFile( controlerIO.getOutputFilename( Controler.FILENAME_PERSON_ATTRIBUTES ) );
+		dumpTransitSchedule();
+		dumpTransitVehicles();
+		dumpVehicles();
+		dumpHouseholds();
+		dumpLanes();
+		dumpCounts();
+
+		if (!event.isUnexpected() && vspConfig.isWritingOutputEvents()) {
+			dumpOutputEvents();
 		}
+	}
+
+	private void dumpOutputEvents() {
+		try {
+			File toFile = new File(	controlerIO.getOutputFilename("output_events.xml.gz"));
+			File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), "events.xml.gz"));
+			IOUtils.copyFile(fromFile, toFile);
+		} catch ( Exception ee ) {
+			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
+					+ "generated in the final iteration") ;
+		}
+	}
+
+	private void dumpCounts() {
+		try {
+			if ( counts != null ) {
+				new CountsWriter(counts).write( controlerIO.getOutputFilename( Controler.FILENAME_COUNTS ) );
+			}
+		} catch ( Exception ee ) {}
+	}
+
+	private void dumpLanes() {
+		try {
+			new LaneDefinitionsWriter20(lanes).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
+		} catch ( Exception ee ) {}
+	}
+
+	private void dumpHouseholds() {
+		try {
+			new HouseholdsWriterV10(households).writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));
+		} catch ( Exception ee ) {}
+	}
+
+	private void dumpVehicles() {
+		try {
+			new VehicleWriterV1(vehicles).writeFile(controlerIO.getOutputFilename("output_vehicles.xml.gz"));
+		} catch ( Exception ee ) {}
+	}
+
+	private void dumpTransitVehicles() {
+		try {
+			if ( transitVehicles != null ) {
+				new VehicleWriterV1(transitVehicles).writeFile(controlerIO.getOutputFilename("output_transitVehicles.xml.gz"));
+			}
+		} catch ( Exception ee ) {}
+	}
+
+	private void dumpTransitSchedule() {
+		try {
+			if ( transitSchedule != null ) {
+				new TransitScheduleWriter(transitSchedule).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
+			}
+		} catch ( Exception ee ) { }
+	}
+
+	private void dumpNetworkChangeEvents() {
+		if (config.network().isTimeVariantNetwork()) {
+			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
+					((NetworkImpl) network).getNetworkChangeEvents());
+		}
+	}
+
+	private void dumpFacilities() {
+		// dump facilities
+		try {
+			new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
+		} catch ( Exception ee ) {}
+	}
+
+	private void dumpConfig() {
+		// dump config
+		new ConfigWriter(config).write(controlerIO.getOutputFilename(Controler.FILENAME_CONFIG));
+	}
+
+	private void dumpNetwork() {
 		// dump network
 		if ( config.network().getInputCRS() == null ) {
 			new NetworkWriter(network).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
@@ -136,50 +217,17 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 							config.network().getInputCRS() );
 			new NetworkWriter( transformation , network ).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
 		}
+	}
 
-		// dump config
-		new ConfigWriter(config).write(controlerIO.getOutputFilename(Controler.FILENAME_CONFIG));
-		// dump facilities
-		try {
-			new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
-		} catch ( Exception ee ) {}
-		if (config.network().isTimeVariantNetwork()) {
-			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
-					((NetworkImpl) network).getNetworkChangeEvents());
-		}
-		try {			
-			if ( transitSchedule != null ) {
-				new TransitScheduleWriter(transitSchedule).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
-			}
-		} catch ( Exception ee ) { }
-		try {
-			if ( transitVehicles != null ) {
-				new VehicleWriterV1(transitVehicles).writeFile(controlerIO.getOutputFilename("output_transitVehicles.xml.gz"));
-			}
-		} catch ( Exception ee ) {} 
-		try {
-			new VehicleWriterV1(vehicles).writeFile(controlerIO.getOutputFilename("output_vehicles.xml.gz"));
-		} catch ( Exception ee ) {}
-		try {
-			new HouseholdsWriterV10(households).writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));
-		} catch ( Exception ee ) {}
-		try {
-			new LaneDefinitionsWriter20(lanes).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
-		} catch ( Exception ee ) {}
-		try {
-			if ( counts != null ) {
-				new CountsWriter(counts).write( controlerIO.getOutputFilename( Controler.FILENAME_COUNTS ) );
-			}
-		} catch ( Exception ee ) {}
-		if (!event.isUnexpected() && vspConfig.isWritingOutputEvents()) {
-			try {
-				File toFile = new File(	controlerIO.getOutputFilename("output_events.xml.gz"));
-				File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), "events.xml.gz"));
-				IOUtils.copyFile(fromFile, toFile);
-			} catch ( Exception ee ) {
-				Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
-						+ "generated in the final iteration") ;
-			}
+	private void dumpPlans() {
+		// dump plans
+		new PopulationWriter(population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+		final ObjectAttributes personAttributes = population.getPersonAttributes();
+		if ( personAttributes!=null ) {
+			ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(personAttributes) ;
+			writer.setPrettyPrint(true);
+			writer.putAttributeConverters( attributeConverters );
+			writer.writeFile( controlerIO.getOutputFilename( Controler.FILENAME_PERSON_ATTRIBUTES ) );
 		}
 	}
 
