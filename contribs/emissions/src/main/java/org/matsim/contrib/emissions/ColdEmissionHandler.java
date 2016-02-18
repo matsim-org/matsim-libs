@@ -88,7 +88,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrival
     public void handleEvent(LinkLeaveEvent event) {
 		/*
 		 * TODO Perspectively change calculation and analysis completely from
-		 * vehicles to persons and use PersonEntersVehicle and
+		 * persons to vehicles and use PersonEntersVehicle and
 		 * PersonLeavesVehicle Events instead of PersonDeparture and
 		 * PersonArrival Events to determine engine start and stop time. 
 		 * Theresa Oct'2015
