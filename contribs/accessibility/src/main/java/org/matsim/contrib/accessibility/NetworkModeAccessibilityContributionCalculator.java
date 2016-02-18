@@ -93,20 +93,20 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		// captures the distance (as walk time) between the origin via the link to the node:
 		Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
 
-		// get stored network node (this is the nearest node next to an aggregated work place)
-		Node destinationNode = destination.getNearestNode();
-
+		
+		// === WALK TO NETWORK: ===
 		// TODO: extract this walk part?
 		// In the state found before modularization (june 15), this was anyway not consistent accross modes
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
-		// distance to road, and then to node:
+		// distance to road, and then to node.  (comment by thibaut?)
 		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
 
 		// disutilities to get on or off the network
 		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
-		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
-		double sumExpVjkWalk = destination.getSum();
 
+		// dzdzdz: replace the above by coord2coordTravelDisutility
+		
+		// === NETWORK ENTRY TO FIRST NODE: ===
 
 		// this contains the current toll based on the toll scheme
 		double road2NodeToll_money = getToll(nearestLink, scheme, departureTime); // tnicolai: add this to car disutility ??? depends on the road pricing scheme ...
@@ -123,14 +123,21 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		// travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
 		double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / travelTime.getLinkTravelTime(nearestLink, departureTime, null, null);
 		double road2NodeCongestedCarTime_h 			= distance.getDistanceRoad2Node() / (carSpeedOnNearestLink_meterpersec * 3600.);
-
-		double congestedCarDisutility = - lcpt.getTree().get(destinationNode.getId()).getCost();	// travel disutility congested car on road network (including toll)
 		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distance.getDistanceRoad2Node() * betaCarTD) + (toll_money * betaCarTMC);
-		// This is equivalent to the sum of the exponential of the utilities for all destinations (I had to write it on
-		// paper to check it is correct...)
-		// yy who is "I" in the above statement?  kai, aug'15
-		return Math.exp(logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) ) *
-				expVhiWalk * sumExpVjkWalk;
+		
+		// dzdzdz: replace the above by link disutility multiplied by fraction of link that is used according to the entry point.  (toll should be in there automatically??)
+
+		
+		// === FIRST NODE TO AGGREGATION OBJECT: ===
+		
+		// get stored network node (this is the nearest node next to an aggregated work place)
+		Node destinationNode = destination.getNearestNode();
+		
+		double congestedCarDisutility = - lcpt.getTree().get(destinationNode.getId()).getCost();	// travel disutility congested car on road network (including toll)
+
+		final double sumExpVjkWalk = destination.getSum();
+		return Math.exp(logitScaleParameter * (walkDisutilityMeasuringPoint2Road + congestedCarDisutilityRoad2Node + constCar + congestedCarDisutility) ) * sumExpVjkWalk;
+		
 	}
 
 	private static double getToll( final Link nearestLink, final RoadPricingScheme scheme, final double departureTime) {

@@ -79,11 +79,6 @@ import java.util.concurrent.ConcurrentHashMap;
 	private boolean useRawSum	; //= false;
 	private double logitScaleParameter;
 	private double inverseOfLogitScaleParameter;
-//	private double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-//	private double betaWalkTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
-//	private double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-//
-//	private double walkSpeedMeterPerHour = -1;
 
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0 ;
@@ -147,33 +142,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
 
-//		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
-//			log.error("marginal utility of distance for car different from zero but not used in accessibility computations");
-//		}
-//		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0.) {
-//			log.error("marginal utility of distance for pt different from zero but not used in accessibility computations");
-//		}
-//		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceRate() != 0.) {
-//			log.error("monetary distance cost rate for bike different from zero but not used in accessibility computations");
-//		}
-//		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
-//			log.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
-//		}
-
 		useRawSum = moduleAPCM.isUsingRawSumsWithoutLn();
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
 		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
-//		walkSpeedMeterPerHour = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
-//
-//		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-//		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
-//		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
 		
-		// new, dz
-//		private Map<String, TravelDisutility> travelDisutilities;
 		walkTravelDisutility = travelDisutilityFactories.get(TransportMode.walk).createTravelDisutility(
 				travelTimes.get(TransportMode.walk), scenario.getConfig().planCalcScore());
-		//
+
 	}
 
 	/**
@@ -202,46 +177,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 			Node nearestNode = ((NetworkImpl)network).getNearestNode( opportunity.getCoord() );
 
-//			// get Euclidian distance to nearest node
-//			double distance_meter 	= NetworkUtils.getEuclidianDistance(opportunity.getCoord(), nearestNode.getCoord());
-//			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
-//
-//			double VjkWalkTravelTime	= this.betaWalkTT * walkTravelTime_h;
-//			double VjkWalkPowerTravelTime=0.; // this.betaWalkTTPower * (walkTravelTime_h * walkTravelTime_h);
-//			double VjkWalkLnTravelTime	= 0.; // this.betaWalkLnTT * Math.log(walkTravelTime_h);
-//
-//			double VjkWalkDistance 		= this.betaWalkTD * distance_meter;
-//			double VjkWalkPowerDistnace	= 0.; //this.betaWalkTDPower * (distance_meter * distance_meter);
-//			double VjkWalkLnDistance 	= 0.; //this.betaWalkLnTD * Math.log(distance_meter);
-//
-//			double VjkWalkMoney			= this.betaWalkTMC * 0.; 			// no monetary costs for walking
-//			double VjkWalkPowerMoney	= 0.; //this.betaWalkTDPower * 0.; 	// no monetary costs for walking
-//			double VjkWalkLnMoney		= 0.; //this.betaWalkLnTMC *0.; 	// no monetary costs for walking
-//
-//			double expVjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkPowerTravelTime + VjkWalkLnTravelTime +
-//					VjkWalkDistance   + VjkWalkPowerDistnace   + VjkWalkLnDistance +
-//					VjkWalkMoney      + VjkWalkPowerMoney      + VjkWalkLnMoney) );
-			
-			
-			// new; based on MATSim disutility now; dz, feb'16
 			Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility = (Coord2CoordTimeDistanceTravelDisutility) this.walkTravelDisutility;
 			
 			double walkUtility = -walkTravelDisutility.getCoord2CoordTravelDisutility(opportunity.getCoord(), nearestNode.getCoord());
 			double expVjk = Math.exp(this.logitScaleParameter * walkUtility);
-			//
 			
-			
-			// add Vjk to sum
-//			if( opportunityClusterMap.containsKey( nearestNode.getId() ) ){
-//				AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() );
-//				jco.addObject( opportunity.getId(), expVjk);
-//			} else {
-//				// assign Vjk to given network node
-//				opportunityClusterMap.put(
-//						nearestNode.getId(),
-//						new AggregationObject(opportunity.getId(), null, null, nearestNode, expVjk) 
-//						);
-//			}
 			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
 			if ( jco == null ) {
 				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0. ); // initialize with zero!
@@ -253,16 +193,7 @@ import java.util.concurrent.ConcurrentHashMap;
 				log.warn(Gbl.ONLYONCE);
 			}
 			jco.addObject( opportunity.getId(), expVjk ) ;
-			// yyyy if we knew the activity type, we could to do capacities as follows:
-//			ActivityOption opt = opportunity.getActivityOptions().get("type") ;
-//			Assert.assertNotNull(opt);
-//			final double capacity = opt.getCapacity();
-//			Assert.assertNotNull(capacity) ; // we do not know what that would mean
-//			if ( capacity < Double.POSITIVE_INFINITY ) { // this is sometimes the value of "undefined" 
-//				jco.addObject( opportunity.getId(), capacity * expVjk ) ;
-//			} else {
-//				jco.addObject( opportunity.getId(), expVjk ) ; // fix if capacity is "unknown".
-//			}
+			
 			
 		}
 		log.info("Aggregated " + opportunities.getFacilities().size() + " number of opportunities to " + opportunityClusterMap.size() + " nodes.");

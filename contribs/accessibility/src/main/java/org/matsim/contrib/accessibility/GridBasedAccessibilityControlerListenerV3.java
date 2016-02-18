@@ -172,8 +172,13 @@ public final class GridBasedAccessibilityControlerListenerV3 implements Shutdown
 	}
 
 	private List<ActivityFacilities> additionalFacilityData = new ArrayList<>() ;
+	
+	/**
+	 * These are TWO spatial grids since one sums up "weights" (if available), the other one just counts.  
+	 * Assume that weight=income.  Then sum = sum of all incomes in cell.  sum/cnt = average income in cell.   
+	 */
 	private Map<String,Tuple<SpatialGrid,SpatialGrid>> additionalSpatialGrids = new TreeMap<>() ;
-	//(not sure if this is a bit odd ... but I always need TWO spatial grids. kai, mar'14)
+
 	private boolean lockedForAdditionalFacilityData = false;
 	
 	
