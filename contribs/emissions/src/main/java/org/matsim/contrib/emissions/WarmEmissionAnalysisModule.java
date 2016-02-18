@@ -142,10 +142,10 @@ public class WarmEmissionAnalysisModule {
 
 	public Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(
 			Id<Vehicle> vehicleId,
-			Integer roadType,
-			Double freeVelocity,
-			Double linkLength,
-			Double travelTime,
+			int roadType,
+			double freeVelocity,
+			double linkLength,
+			double travelTime,
 			Id<VehicleType> vehicleTypeId) {
 
 		Map<WarmPollutant, Double> warmEmissions;
@@ -183,10 +183,10 @@ public class WarmEmissionAnalysisModule {
 
 	private Map<WarmPollutant, Double> calculateWarmEmissions(
 			Id<Vehicle> vehicleId,
-			Double travelTime,
-			Integer roadType,
-			Double freeVelocity,
-			Double linkLength,
+			double travelTime,
+			int roadType,
+			double freeVelocity,
+			double linkLength,
 			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = new HashMap<>();

@@ -113,8 +113,8 @@ public class ColdEmissionAnalysisModule {
 	public void calculateColdEmissionsAndThrowEvent(
 			Id<Link> coldEmissionEventLinkId,
 			Id<Vehicle> vehicleId,
-			Double eventTime,
-			Double parkingDuration,
+			double eventTime,
+			double parkingDuration,
             int distance_km,
 			Id<VehicleType> vehicleTypeId) {
 
