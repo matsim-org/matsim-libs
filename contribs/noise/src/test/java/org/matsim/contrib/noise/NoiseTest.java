@@ -437,7 +437,6 @@ public class NoiseTest {
 			String[] keys = line.split(separator);
 			for(int i = 0; i < keys.length; i++){
 				idxFromKey.put(keys[i], i);
-				System.out.println(keys[i]);
 			}
 			
 			int idxLinkId = idxFromKey.get("Link Id");

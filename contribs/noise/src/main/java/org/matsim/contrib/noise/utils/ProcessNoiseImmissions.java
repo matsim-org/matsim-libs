@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
@@ -45,6 +46,8 @@ import org.matsim.core.utils.misc.Time;
  *
  */
 public class ProcessNoiseImmissions {
+	
+	private static final Logger log = Logger.getLogger(ProcessNoiseImmissions.class);
 
 	private final double startTime = 3600.;
 	private final double timeBinSize = 3600.;
@@ -85,7 +88,7 @@ public class ProcessNoiseImmissions {
 			
 			for (double time = startTime; time <= endTime; time = time + timeBinSize) {
 				
-				System.out.println("Reading time bin: " + time);
+				log.info("Reading time bin: " + time);
 
 				String fileName = workingDirectory + label + "_" + Double.toString(time) + ".csv";
 				BufferedReader br = IOUtils.getBufferedReader(fileName);
@@ -95,11 +98,11 @@ public class ProcessNoiseImmissions {
 
 				Map<Id<ReceiverPoint>, Double> rp2value = new HashMap<Id<ReceiverPoint>, Double>();
 				int lineCounter = 0;
-				System.out.println("Reading lines ");
+				log.info("Reading lines ");
 				while ((line = br.readLine()) != null) {
 					
 					if (lineCounter % 10000 == 0.) {
-						System.out.println("# " + lineCounter);
+						log.info("# " + lineCounter);
 					}
 					
 					String[] columns = line.split(separator);
@@ -127,12 +130,12 @@ public class ProcessNoiseImmissions {
 			Map<Id<ReceiverPoint>, Coord> rp2Coord = new HashMap<Id<ReceiverPoint>, Coord>();
 			int lineCounter = 0;
 			
-			System.out.println("Reading receiver points file");
+			log.info("Reading receiver points file");
 			
 			while( (line = br.readLine()) != null){
 				
 				if (lineCounter % 10000 == 0.) {
-					System.out.println("# " + lineCounter);
+					log.info("# " + lineCounter);
 				}
 				
 				String[] columns = line.split(this.separator);
@@ -229,7 +232,7 @@ public class ProcessNoiseImmissions {
 			}				
 			
 			bw.close();
-			System.out.println("Output written to " + outputFile);
+			log.info("Output written to " + outputFile);
 		}
 		
 		catch (IOException e1) {
