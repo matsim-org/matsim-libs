@@ -133,7 +133,7 @@ public class ObservableUtils {
                     }
                 }));
             }
-        }).onBackpressureBlock();
+        }).onBackpressureBuffer();
     }
 
     public static Observable<PersonExperiencedLeg> fromEventsToLegs(final EventsToLegs eventsToLegs) {
@@ -151,7 +151,7 @@ public class ObservableUtils {
                 };
                 eventsToLegs.addLegHandler(handler);
             }
-        }).onBackpressureBlock();
+        }).onBackpressureBuffer();
     }
 
     public static Observable<PersonExperiencedActivity> fromEventsToActivities(final EventsToActivities eventsToActivities) {
@@ -169,7 +169,7 @@ public class ObservableUtils {
                 };
                 eventsToActivities.addActivityHandler(handler);
             }
-        }).onBackpressureBlock();
+        }).onBackpressureBuffer();
     }
 
 

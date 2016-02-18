@@ -91,8 +91,8 @@ public class CapeTownControler {
 
 		/* Set the number of threads. */
 		config.global().setNumberOfThreads(machine.getThreads());
-		config.qsim().setNumberOfThreads(machine.getThreads());
-		config.parallelEventHandling().setNumberOfThreads(machine.getThreads());
+		config.qsim().setNumberOfThreads(Math.min(machine.getThreads(), 8));
+		config.parallelEventHandling().setNumberOfThreads(Math.min(machine.getThreads(), 8));
 		
 		/* Depending on the sample size we throttle the network. */
 		if(fraction == 1.0){
