@@ -316,17 +316,12 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config2.xml";
 
-<<<<<<< HEAD
 		Config config = ConfigUtils.loadConfig( configFile ) ;
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
 
-		final Controler controler = new Controler(config);
-		
-=======
-		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
 
->>>>>>> master
 		EventsManager events = controler.getEvents();
 				
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -405,15 +400,11 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config3.xml";
 
-<<<<<<< HEAD
 		Config config = ConfigUtils.loadConfig( configFile ) ;
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
 
-		final Controler controler = new Controler(config);
-=======
-		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		final Scenario scenario = ScenarioUtils.loadScenario( config);
 		Controler controler = new Controler( scenario );
->>>>>>> master
 		
 		EventsManager events = controler.getEvents();
 				
@@ -475,15 +466,11 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config4.xml";
 
-<<<<<<< HEAD
 		Config config = ConfigUtils.loadConfig( configFile ) ;
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
 
-		final Controler controler = new Controler(config);
-=======
-		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
->>>>>>> master
 		
 		EventsManager events = controler.getEvents();
 				

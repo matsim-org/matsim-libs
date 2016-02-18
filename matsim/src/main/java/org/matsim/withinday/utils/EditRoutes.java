@@ -104,7 +104,7 @@ public class EditRoutes {
 		route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 		route.setTravelTime((int) path.travelTime); // yyyy why int?  kai, dec'15
 		route.setTravelCost(path.travelCost);
-		route.setDistance(RouteUtils.calcDistance(route, this.network));
+		route.setDistance(RouteUtils.calcDistance(route,1.,1., this.network));
 		leg.setRoute(route);
 
 		return true;

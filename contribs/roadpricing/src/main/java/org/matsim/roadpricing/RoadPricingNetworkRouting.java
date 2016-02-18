@@ -67,7 +67,7 @@ public class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 						filteredNetwork,
 						travelDisutilityFactory.createTravelDisutility(travelTime, planCalcScoreConfigGroup),
 						travelTime);
-		return DefaultRoutingModules.createNetworkRouter(TransportMode.car, populationFactory,
+		return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car, populationFactory,
 				filteredNetwork, routeAlgo);
 	}
 }

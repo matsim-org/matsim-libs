@@ -118,7 +118,7 @@ VisData  {
 		final Coord dpCoord = dpfac.getCoord();
 		final Coord arCoord = arfac.getCoord();
 				
-		double dist = NetworkUtils.getEuclidianDistance( dpCoord, arCoord ) ;
+		double dist = NetworkUtils.getEuclideanDistance( dpCoord, arCoord ) ;
 		double travelTimeTmp = dist / speed ;
 		
 		if ( travelTimeTmp < travelTime ) {

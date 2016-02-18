@@ -178,7 +178,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		// for completeness. Note that if we are walking to a parked car, this can be different from the car link id!!  kai, dec'15
 		
 		// make simple assumption about distance and walking speed
-		double dist = CoordUtils.calcDistance(fromCoord,toCoord);
+		double dist = CoordUtils.calcEuclideanDistance(fromCoord,toCoord);
 
 		// create an empty route, but with realistic travel time
 		Route route = this.routeFactory.createRoute(Route.class, dpLinkId, arLinkId ); 
@@ -235,7 +235,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistance(route, this.network));
+			route.setDistance(RouteUtils.calcDistance(route, 1.0,1.0,this.network));
 			leg.setRoute(route);
 			travTime = (int) path.travelTime;
 		} else {
