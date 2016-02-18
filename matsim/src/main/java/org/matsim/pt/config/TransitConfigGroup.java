@@ -94,6 +94,10 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 		comments.put(TRANSIT_LINES_ATTRIBUTES, "Optional input file containing additional attributes for transit lines, stored as ObjectAttributes.");
 		comments.put(TRANSIT_STOPS_ATTRIBUTES, "Optional input file containing additional attributes for transit stop facilities, stored as ObjectAttributes.");
 		comments.put(USE_TRANSIT, "Set this parameter to true if transit should be simulated, false if not.");
+
+		comments.put( SCHEDULE_CRS , "The Coordinates Reference System in which the coordinates are expressed in the input file." +
+				" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
+				"be converted back at export. If not specified, no conversion happens." );
 		return comments;
 	}
 
