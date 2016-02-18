@@ -21,7 +21,7 @@ package org.matsim.contrib.protobuf;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
-import org.matsim.contrib.hybrid.events.ProtobufEvents;
+import org.matsim.contrib.protobuf.events.ProtobufEvents;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;

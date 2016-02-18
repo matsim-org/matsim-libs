@@ -23,7 +23,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.events.*;
-import org.matsim.contrib.hybrid.events.ProtobufEvents;
+import org.matsim.contrib.protobuf.events.ProtobufEvents;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**

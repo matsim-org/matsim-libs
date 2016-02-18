@@ -19,7 +19,7 @@ package org.matsim.contrib.protobuf;
  *                                                                         *
  * *********************************************************************** */
 
-import org.matsim.contrib.hybrid.events.ProtobufEvents;
+import org.matsim.contrib.protobuf.events.ProtobufEvents;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import java.io.FileInputStream;

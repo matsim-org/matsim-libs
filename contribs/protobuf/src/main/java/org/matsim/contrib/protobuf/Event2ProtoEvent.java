@@ -21,7 +21,7 @@ package org.matsim.contrib.protobuf;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.*;
-import org.matsim.contrib.hybrid.events.ProtobufEvents;
+import org.matsim.contrib.protobuf.events.ProtobufEvents;
 import org.matsim.core.gbl.Gbl;
 
 import java.util.Map;
