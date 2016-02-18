@@ -22,6 +22,7 @@
  */
 package org.matsim.contrib.noise;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
@@ -41,6 +42,7 @@ public class NoiseOnlineExampleTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
+	@Ignore
 	@Test
 	public final void test0(){
 		
