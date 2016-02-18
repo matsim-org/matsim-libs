@@ -12,7 +12,9 @@ import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -34,7 +36,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	private final double constCar;
 
 	private final Scenario scenario;
-	private final TravelTime ttc;
+	private final TravelTime travelTime;
 
 //	private final double departureTime;
 	private final double betaWalkTT;
@@ -45,7 +47,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	private final LeastCostPathTreeExtended lcpt;
 
 	public NetworkModeAccessibilityContributionCalculator(
-			final TravelTime ttc,
+			final TravelTime travelTime,
 			final TravelDisutilityFactory travelDisutilityFactory,
 			final Scenario scenario){
 		this.scenario = scenario;
@@ -59,15 +61,10 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
-		this.ttc = ttc;
+		this.travelTime = travelTime;
 
-		this.lcpt =
-				new LeastCostPathTreeExtended(
-						ttc,
-						travelDisutilityFactory.createTravelDisutility(
-								ttc,
-								planCalcScoreConfigGroup ),
-								this.scheme ) ;
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime,	planCalcScoreConfigGroup);
+		this.lcpt = new LeastCostPathTreeExtended(travelTime, travelDisutility, this.scheme);
 
 		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0. ) {
 			log.error( "marginal utility of distance for car different from zero but not used in accessibility computations");
@@ -98,6 +95,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 		// get the nearest link:
 		Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
+//		Link nearestLink = NetworkUtils.getNearestLink(scenario.getNetwork(), origin.getCoord()); // TODO this would actually be more correct, dz, feb'16
 
 		// captures the distance (as walk time) between the origin via the link to the node:
 		Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
@@ -130,7 +128,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		}
 
 		// travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
-		double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, departureTime, null, null);
+		double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / travelTime.getLinkTravelTime(nearestLink, departureTime, null, null);
 		double road2NodeCongestedCarTime_h 			= distance.getDistanceRoad2Node() / (carSpeedOnNearestLink_meterpersec * 3600.);
 
 		double congestedCarDisutility = - lcpt.getTree().get(destinationNode.getId()).getCost();	// travel disutility congested car on road network (including toll)

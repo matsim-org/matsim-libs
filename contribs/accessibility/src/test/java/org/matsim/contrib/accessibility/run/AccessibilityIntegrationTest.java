@@ -77,42 +77,42 @@ public class AccessibilityIntegrationTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
-	@SuppressWarnings("static-method")
-	@Test
-	public void testMainMethod() {
-		Config config = ConfigUtils.createConfig();
-		final AccessibilityConfigGroup acg = new AccessibilityConfigGroup();
-		acg.setCellSizeCellBasedAccessibility(100);
-		config.addModule( acg);
-		
-		config.controler().setLastIteration(1);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-
-		Network network = CreateTestNetwork.createTestNetwork();
-		
-		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(config) ;
-		builder.setNetwork(network);
-		Scenario sc = builder.build() ;
-
-		// creating test opportunities (facilities)
-		ActivityFacilities opportunities = sc.getActivityFacilities();
-		for ( Link link : sc.getNetwork().getLinks().values() ) {
-			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
-			Coord coord = link.getCoord();
-			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
-			{
-				ActivityOption option = new ActivityOptionImpl("w") ;
-				facility.addActivityOption(option);
-			}
-			{
-				ActivityOption option = new ActivityOptionImpl("h") ;
-				facility.addActivityOption(option);
-			}
-			opportunities.addActivityFacility(facility);
-		}
-
-		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(sc);
-	}
+//	@SuppressWarnings("static-method")
+//	@Test
+//	public void testMainMethod() {
+//		Config config = ConfigUtils.createConfig();
+//		final AccessibilityConfigGroup acg = new AccessibilityConfigGroup();
+//		acg.setCellSizeCellBasedAccessibility(100);
+//		config.addModule( acg);
+//		
+//		config.controler().setLastIteration(1);
+//		config.controler().setOutputDirectory(utils.getOutputDirectory());
+//
+//		Network network = CreateTestNetwork.createTestNetwork();
+//		
+//		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(config) ;
+//		builder.setNetwork(network);
+//		Scenario sc = builder.build() ;
+//
+//		// creating test opportunities (facilities)
+//		ActivityFacilities opportunities = sc.getActivityFacilities();
+//		for ( Link link : sc.getNetwork().getLinks().values() ) {
+//			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
+//			Coord coord = link.getCoord();
+//			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
+//			{
+//				ActivityOption option = new ActivityOptionImpl("w") ;
+//				facility.addActivityOption(option);
+//			}
+//			{
+//				ActivityOption option = new ActivityOptionImpl("h") ;
+//				facility.addActivityOption(option);
+//			}
+//			opportunities.addActivityFacility(facility);
+//		}
+//
+//		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(sc);
+//	}
 
 	@Test
 	public void testWithBoundingBox() {
@@ -490,7 +490,6 @@ public class AccessibilityIntegrationTest {
 					return gacl;
 				}
 			});
-
 		}
 	}
 }

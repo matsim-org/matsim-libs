@@ -14,21 +14,12 @@ public final class NetworkUtil {
 
 	private static final Logger log = Logger.getLogger(NetworkUtil.class);
 	
-	/**
-	 * This method calculates the distance between a point and a node via a link (which should contains the node) as the sum of
-	 * - the orthogonal distance between the point and the link and
-	 * - the distance between the intersection point of the orthogonal projection (from the point to the link) to the node.
-	 * If the orthogonal projection of the point to the line does not intersects the link, the method returns the euclidean distance between the point and the node.
-	 * @param point
-	 * @param link
-	 * @param destinationNode
-	 * 
-	 * @return Distances
-	 */
+	
 	public static Distances getDistances2Node(Coord point, Link link, Node destinationNode){
 		return getDistances2Node(point.getX(), point.getY(), link, destinationNode);
 	}
-		
+	
+	
 	/**
 	 * This method calculates the distance between a point and a node via a link (which should contains the node) as the sum of
 	 * <ul>

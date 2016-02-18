@@ -62,7 +62,7 @@ public class Coord2CoordTimeDistanceTravelDisutility implements TravelDisutility
 		public Coord2CoordTimeDistanceTravelDisutility createTravelDisutility(final TravelTime timeCalculator,
 				final PlanCalcScoreConfigGroup cnScoringGroup) {
 			if (mode != TransportMode.walk) {
-				throw new NullPointerException("This disutility only works prperly for the \"walk\" mode.");
+				throw new NullPointerException("This disutility only works properly for the \"walk\" mode.");
 			}
 			
 			final ModeParams params = cnScoringGroup.getModes().get( mode ) ;

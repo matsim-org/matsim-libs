@@ -227,7 +227,7 @@ import java.util.concurrent.ConcurrentHashMap;
 			Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility = (Coord2CoordTimeDistanceTravelDisutility) this.walkTravelDisutility;
 			
 			double walkUtility = -walkTravelDisutility.getCoord2CoordTravelDisutility(opportunity.getCoord(), nearestNode.getCoord());
-			double expVjk = Math.exp(walkUtility);
+			double expVjk = Math.exp(this.logitScaleParameter * walkUtility);
 			//
 			
 			

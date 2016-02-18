@@ -24,14 +24,17 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.utils.Coord2CoordTimeDistanceTravelDisutility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -94,6 +97,9 @@ final public class RunAccessibilityExample {
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 		controler.addOverridingModule(new AbstractModule() {
+//			@Inject Config config;
+			
+			
 			@Override
 			public void install() {
 				for ( final String actType : activityTypes ) {
@@ -111,6 +117,15 @@ final public class RunAccessibilityExample {
 							}
 						}
 					}
+					
+//					double walkSpeed = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);			
+//					
+//					// car is already bound, all other modes not
+//					// the walk mode gets the coord2coord-based disutility
+//					addTravelDisutilityFactoryBinding(TransportMode.bike).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.bike));	
+//					addTravelDisutilityFactoryBinding(TransportMode.walk).toInstance(new Coord2CoordTimeDistanceTravelDisutility.Builder(TransportMode.walk).setWalkSpeed(walkSpeed));
+
+					
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 
 						@Inject Map<String, TravelTime> travelTimes;
