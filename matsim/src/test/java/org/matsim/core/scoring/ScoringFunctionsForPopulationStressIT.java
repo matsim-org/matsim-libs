@@ -16,11 +16,11 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
-import java.util.Random;
-
 import static org.junit.Assert.assertEquals;
 
-public class ScoringFunctionsForPopulationTest {
+public class ScoringFunctionsForPopulationStressIT {
+
+	static final int MAX = 1000000;
 
 	@Test(expected = RuntimeException.class)
 	public void exceptionInScoringFunctionPropagates() {
@@ -80,11 +80,20 @@ public class ScoringFunctionsForPopulationTest {
 	}
 
 	@Test
-	public void works() {
+	public void workWithNewEventsManager() {
+		Config config = ConfigUtils.createConfig();
+		config.parallelEventHandling().setOneThreadPerHandler(true);
+		work(config);
+	}
+
+	@Test
+	public void workWithOldEventsManager() {
 		Config config = ConfigUtils.createConfig();
 		config.parallelEventHandling().setNumberOfThreads(8);
-		config.parallelEventHandling().setOneThreadPerHandler(true);
-		config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+		work(config);
+	}
+
+	private void work(Config config) {
 		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
 		work.setTypicalDuration(100.0);
 		config.planCalcScore().addActivityParams(work);
@@ -142,7 +151,6 @@ public class ScoringFunctionsForPopulationTest {
 		};
 		ScoringFunctionsForPopulation scoringFunctionsForPopulation = new ScoringFunctionsForPopulation(events, new EventsToActivities(events), new EventsToLegs(scenario.getNetwork(), events), config.plans(), scenario.getNetwork(), scenario.getPopulation(), scoringFunctionFactory);
 		scoringFunctionsForPopulation.onIterationStarts();
-		int MAX = 10000;
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
 			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0));
@@ -150,6 +158,7 @@ public class ScoringFunctionsForPopulationTest {
 			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car"));
 			events.processEvent(new PersonArrivalEvent(i*200+200, personId, Id.createLinkId(0), "car"));
+			events.afterSimStep(i*200+200);
 		}
 		events.finishProcessing();
 		scoringFunctionsForPopulation.finishScoringFunctions();
