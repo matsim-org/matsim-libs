@@ -85,13 +85,14 @@ public class PJDEQSimulation extends JDEQSimulation {
 		PMessageQueue queue=new PMessageQueue();
 
 		// set the maxTimeDelta
-		String JDEQ_SIM="JDEQSim";
-		String MAX_TIME_DELTA="maxTimeDelta";
-		String maxTimeDelta=this.scenario.getConfig().findParam(JDEQ_SIM, MAX_TIME_DELTA);
-
-		if (maxTimeDelta!=null){
-			queue.setMaxTimeDelta(Integer.parseInt(maxTimeDelta));
-		}
+		// commented this out, as the jdeqsim config group does not contain any parameter remotely named like time delta.
+//		String JDEQ_SIM="JDEQSim";
+//		String MAX_TIME_DELTA="maxTimeDelta";
+//		String maxTimeDelta=this.scenario.getConfig().findParam(JDEQ_SIM, MAX_TIME_DELTA);
+//
+//		if (maxTimeDelta!=null){
+//			queue.setMaxTimeDelta(Integer.parseInt(maxTimeDelta));
+//		}
 
 		PScheduler scheduler = new PScheduler(queue);
 		scheduler.getQueue().idOfMainThread = Thread.currentThread().getId();
