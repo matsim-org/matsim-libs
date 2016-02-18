@@ -22,14 +22,15 @@
  */
 package org.matsim.contrib.noise;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -42,7 +43,6 @@ public class NoiseOnlineExampleTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
-	@Ignore
 	@Test
 	public final void test0(){
 		
@@ -53,9 +53,11 @@ public class NoiseOnlineExampleTest {
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setWriteOutputIteration(1);
 		
-		Controler controler = new Controler(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
 		controler.addControlerListener(new NoiseCalculationOnline(controler));
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
 		controler.run();
 		
 		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";

@@ -69,7 +69,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	}
 
 	/**
-	 * In case noise damages are internalized, this constructor replaces the default travel disutility by a travel distutility which accounts for the noise tolls. 
+	 * In case noise damages are internalized, this constructor replaces the default travel disutility by a travel disutility which accounts for the noise tolls. 
 	 *
 	 */
 	public NoiseCalculationOnline(Controler controler) {
