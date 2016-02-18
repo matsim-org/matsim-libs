@@ -23,6 +23,8 @@ package org.matsim.counts;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -40,12 +42,27 @@ public class MatsimCountsReader extends MatsimXmlParser {
 	private final Counts counts;
 	private MatsimXmlParser delegate = null;
 
+	private final CoordinateTransformation coordinateTransformation;
+
 	/**
-	 * Creates a new reader for MATSim configuration files.
+	 * Creates a new reader for MATSim counts files.
 	 *
 	 * @param counts The Counts-object to store the configuration settings in.
 	 */
 	public MatsimCountsReader(final Counts counts) {
+		this( new IdentityTransformation() , counts );
+	}
+
+	/**
+	 * Creates a new reader for MATSim counts files.
+	 *
+	 * @param coordinateTransformation transformation from the CRS of the file to the internal CRS for MATSim
+	 * @param counts The Counts-object to store the configuration settings in.
+	 */
+	public MatsimCountsReader(
+			final CoordinateTransformation coordinateTransformation,
+			final Counts counts) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.counts = counts;
 	}
 
@@ -73,7 +90,7 @@ public class MatsimCountsReader extends MatsimXmlParser {
 		super.setDoctype(doctype);
 		// Currently the only counts-type is v1
 		if (COUNTS_V1.equals(doctype)) {
-			this.delegate = new CountsReaderMatsimV1(this.counts);
+			this.delegate = new CountsReaderMatsimV1( coordinateTransformation , this.counts);
 			log.info("using counts_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

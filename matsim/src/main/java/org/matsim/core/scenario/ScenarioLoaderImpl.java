@@ -29,6 +29,9 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -116,16 +119,30 @@ class ScenarioLoaderImpl {
 	 * Loads the network into the scenario of this class
 	 */
 	private void loadNetwork() {
-		String networkFileName = null;
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
-			networkFileName = this.config.network().getInputFile();
+			final String networkFileName = this.config.network().getInputFile();
+
 			log.info("loading network from " + networkFileName);
+
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
+
 			if (this.config.network().isTimeVariantNetwork()) {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 			}
-			new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
+
+			if ( config.network().getInputCRS() == null ) {
+				new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
+			}
+			else {
+				log.info( "re-projecting network from "+config.network().getInputCRS()+" to "+config.global().getCoordinateSystem()+" for import" );
+				final CoordinateTransformation transformation =
+						TransformationFactory.getCoordinateTransformation(
+								config.network().getInputCRS(),
+								config.global().getCoordinateSystem() );
+				new MatsimNetworkReader( transformation , this.scenario.getNetwork() ).parse( networkFileName );
+			}
+
 			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
@@ -139,7 +156,23 @@ class ScenarioLoaderImpl {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
-			new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
+
+			final String inputCRS = config.facilities().getInputCRS();
+			final String internalCRS = config.global().getCoordinateSystem();
+
+			if ( inputCRS == null ) {
+				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
+			}
+			else {
+				log.info( "re-projecting facilities from "+inputCRS+" to "+internalCRS+" for import" );
+
+				final CoordinateTransformation transformation =
+						TransformationFactory.getCoordinateTransformation(
+								inputCRS,
+								internalCRS );
+
+				new MatsimFacilitiesReader(transformation , this.scenario).parse(facilitiesFileName);
+			}
 			log.info("loaded " + this.scenario.getActivityFacilities().getFacilities().size() + " facilities from " + facilitiesFileName);
 		}
 		else {
@@ -161,7 +194,23 @@ class ScenarioLoaderImpl {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
-			new MatsimPopulationReader(this.scenario).parse(populationFileName);
+
+			if ( config.plans().getInputCRS() == null ) {
+				new MatsimPopulationReader(this.scenario).parse(populationFileName);
+			}
+			else {
+				final String inputCRS = config.plans().getInputCRS();
+				final String internalCRS = config.global().getCoordinateSystem();
+
+				log.info( "re-projecting population from "+inputCRS+" to "+internalCRS+" for import" );
+
+				final CoordinateTransformation transformation =
+						TransformationFactory.getCoordinateTransformation(
+								inputCRS,
+								internalCRS );
+
+				new MatsimPopulationReader(transformation , this.scenario).parse(populationFileName);
+			}
 
 			if (this.scenario.getPopulation() instanceof PopulationImpl) {
 				((PopulationImpl)this.scenario.getPopulation()).printPlansCount();
@@ -206,12 +255,29 @@ class ScenarioLoaderImpl {
 
 	private void loadTransit() throws UncheckedIOException {
 		final String transitScheduleFile = this.config.transit().getTransitScheduleFile();
+
 		if ( transitScheduleFile != null ) {
-			new TransitScheduleReader(this.scenario).readFile(transitScheduleFile);
+			final String inputCRS = config.transit().getInputScheduleCRS();
+			final String internalCRS = config.global().getCoordinateSystem();
+
+			if ( inputCRS == null ) {
+				new TransitScheduleReader(this.scenario).readFile(transitScheduleFile);
+			}
+			else {
+				log.info( "re-projecting transit schedule from "+inputCRS+" to "+internalCRS+" for import" );
+
+				final CoordinateTransformation transformation =
+						TransformationFactory.getCoordinateTransformation(
+								inputCRS,
+								internalCRS );
+
+				new TransitScheduleReader( transformation , this.scenario).readFile(transitScheduleFile);
+			}
 		}
 		else {
 			log.info("no transit schedule file set in config, not loading any transit schedule");
 		}
+
 		if ( this.config.transit().getTransitLinesAttributesFile() != null ) {
 			String transitLinesAttributesFileName = this.config.transit().getTransitLinesAttributesFile();
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
@@ -219,6 +285,7 @@ class ScenarioLoaderImpl {
 			reader.putAttributeConverters( attributeConverters );
 			reader.parse(transitLinesAttributesFileName);
 		}
+
 		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
 			String transitStopsAttributesFileName = this.config.transit().getTransitStopsAttributesFile();
 			log.info("loading transit stop facilities attributes from " + transitStopsAttributesFileName);

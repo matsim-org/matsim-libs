@@ -23,6 +23,7 @@ package org.matsim.core.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -33,14 +34,25 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
 public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
 
+	private final CoordinateTransformation coordinateTransformation;
 	private final Network network;
 
-	public PopulationWriterHandlerImplV4(final Network network) {
+	public PopulationWriterHandlerImplV4(
+			final Network network) {
+		this( new IdentityTransformation() , network );
+	}
+
+	public PopulationWriterHandlerImplV4(
+			final CoordinateTransformation coordinateTransformation,
+			final Network network) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.network = network;
 	}
 
@@ -129,22 +141,6 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// <activity ... > ... </activity>
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public void startActivity(final String act_type, final BufferedWriter out) throws IOException {
-		out.write("\t\t\t<activity");
-		out.write(" type=\"" + act_type + "\"");
-		out.write(">\n");
-	}
-
-	@Override
-	public void endActivity(final BufferedWriter out) throws IOException {
-		out.write("\t\t\t</activity>\n\n");
-	}
-
-	//////////////////////////////////////////////////////////////////////
 	// <plan ... > ... </plan>
 	//////////////////////////////////////////////////////////////////////
 
@@ -196,10 +192,11 @@ public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandl
 			out.write("\"");
 		}
 		if (act.getCoord() != null) {
+			final Coord coord = coordinateTransformation.transform( act.getCoord() );
 			out.write(" x=\"");
-			out.write(Double.toString(act.getCoord().getX()));
+			out.write(Double.toString( coord.getX() ));
 			out.write("\" y=\"");
-			out.write(Double.toString(act.getCoord().getY()));
+			out.write(Double.toString( coord.getY() ));
 			out.write("\"");
 		}
 		if (act.getStartTime() != Time.UNDEFINED_TIME) {

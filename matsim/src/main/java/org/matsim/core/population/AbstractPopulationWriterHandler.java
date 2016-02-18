@@ -87,10 +87,6 @@ public abstract class AbstractPopulationWriterHandler implements PopulationWrite
 
 	public abstract void endTravelCard(final BufferedWriter out) throws IOException;
 
-	public abstract void startActivity(final String act_type, final BufferedWriter out) throws IOException;
-
-	public abstract void endActivity(final BufferedWriter out) throws IOException;
-
 	public abstract void startPlan(final Plan plan, final BufferedWriter out) throws IOException;
 
 	public abstract void endPlan(final BufferedWriter out) throws IOException;

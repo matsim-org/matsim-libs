@@ -36,6 +36,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.data.v20.Lanes;
@@ -58,7 +60,7 @@ import org.xml.sax.helpers.AttributesImpl;
 public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 	
 	static final Logger log = Logger.getLogger(ParallelPopulationReaderMatsimV4.class);
-	
+
 	private final boolean isPopulationStreaming;
 	private final int numThreads;
 	private final BlockingQueue<List<Tag>> queue;
@@ -67,9 +69,19 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 
 	private Thread[] threads;
 	private List<Tag> currentPersonXmlData;
-		
-	public ParallelPopulationReaderMatsimV4(final Scenario scenario) {
-		super(scenario);
+
+	private final CoordinateTransformation coordinateTransformation;
+
+	public ParallelPopulationReaderMatsimV4(
+			final Scenario scenario ) {
+		this( new IdentityTransformation() , scenario );
+	}
+
+	public ParallelPopulationReaderMatsimV4(
+			final CoordinateTransformation coordinateTransformation,
+			final Scenario scenario) {
+		super( coordinateTransformation , scenario );
+		this.coordinateTransformation = coordinateTransformation;
 		
 		/*
 		 * Check whether population streaming is activated
@@ -99,7 +111,11 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		threads = new Thread[numThreads];
 		for (int i = 0; i < numThreads; i++) {
 			
-			ParallelPopulationReaderMatsimV4Runner runner = new ParallelPopulationReaderMatsimV4Runner(this.collectorScenario, this.queue);
+			ParallelPopulationReaderMatsimV4Runner runner =
+					new ParallelPopulationReaderMatsimV4Runner(
+							this.coordinateTransformation,
+							this.collectorScenario,
+							this.queue);
 			
 			Thread thread = new Thread(runner);
 			thread.setDaemon(true);
