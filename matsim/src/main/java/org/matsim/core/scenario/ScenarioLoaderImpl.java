@@ -156,7 +156,23 @@ class ScenarioLoaderImpl {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
-			new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
+
+			final String inputCRS = config.facilities().getInputCRS();
+			final String internalCRS = config.global().getCoordinateSystem();
+
+			if ( inputCRS == null ) {
+				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
+			}
+			else {
+				log.info( "re-projecting facilities from "+inputCRS+" to "+internalCRS+" for import" );
+
+				final CoordinateTransformation transformation =
+						TransformationFactory.getCoordinateTransformation(
+								inputCRS,
+								internalCRS );
+
+				new MatsimFacilitiesReader(transformation , this.scenario).parse(facilitiesFileName);
+			}
 			log.info("loaded " + this.scenario.getActivityFacilities().getFacilities().size() + " facilities from " + facilitiesFileName);
 		}
 		else {

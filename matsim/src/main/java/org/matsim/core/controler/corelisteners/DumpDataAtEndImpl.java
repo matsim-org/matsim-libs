@@ -195,7 +195,22 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpFacilities() {
 		// dump facilities
 		try {
-			new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
+			final String inputCRS = config.facilities().getInputCRS();
+			final String internalCRS = config.global().getCoordinateSystem();
+
+			if ( inputCRS == null ) {
+				new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
+			}
+			else {
+				log.info( "re-projecting facilities from "+internalCRS+" to "+inputCRS+" for export" );
+
+				final CoordinateTransformation transformation =
+						TransformationFactory.getCoordinateTransformation(
+								internalCRS,
+								inputCRS );
+
+				new FacilitiesWriter( transformation , activityFacilities ).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
+			}
 		} catch ( Exception ee ) {}
 	}
 
