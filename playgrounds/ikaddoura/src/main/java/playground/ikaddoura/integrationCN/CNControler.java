@@ -102,7 +102,7 @@ public class CNControler {
 
 	public void run(String outputDirectory, String configFile, boolean congestionPricing, boolean noisePricing, double sigma) {
 				
-		Config config = ConfigUtils.loadConfig(configFile);
+		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		if (outputDirectory == null) {
 			if (config.controler().getOutputDirectory() == null || config.controler().getOutputDirectory() == "") {
 				throw new RuntimeException("Either provide an output directory in the config file or the controler. Aborting...");
@@ -126,7 +126,7 @@ public class CNControler {
 		
 		NoiseContext noiseContext = null;
 		
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
