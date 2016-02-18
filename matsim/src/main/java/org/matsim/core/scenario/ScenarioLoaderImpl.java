@@ -178,7 +178,23 @@ class ScenarioLoaderImpl {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
-			new MatsimPopulationReader(this.scenario).parse(populationFileName);
+
+			if ( config.plans().getInputCRS() == null ) {
+				new MatsimPopulationReader(this.scenario).parse(populationFileName);
+			}
+			else {
+				final String inputCRS = config.plans().getInputCRS();
+				final String internalCRS = config.global().getCoordinateSystem();
+
+				log.info( "re-projecting population from "+inputCRS+" to "+internalCRS+" for import" );
+
+				final CoordinateTransformation transformation =
+						TransformationFactory.getCoordinateTransformation(
+								inputCRS,
+								internalCRS );
+
+				new MatsimPopulationReader(transformation , this.scenario).parse(populationFileName);
+			}
 
 			if (this.scenario.getPopulation() instanceof PopulationImpl) {
 				((PopulationImpl)this.scenario.getPopulation()).printPlansCount();

@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -221,7 +221,25 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpPlans() {
 		// dump plans
-		new PopulationWriter(population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+
+		final String inputCRS = config.plans().getInputCRS();
+		final String internalCRS = config.global().getCoordinateSystem();
+
+		if ( inputCRS == null ) {
+			new PopulationWriter(population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+		}
+		else {
+				log.info( "re-projecting population from "+internalCRS+" to "+inputCRS+" for export" );
+
+				final CoordinateTransformation transformation =
+						TransformationFactory.getCoordinateTransformation(
+								internalCRS,
+								inputCRS );
+
+			new PopulationWriter(transformation , population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+
+		}
+
 		final ObjectAttributes personAttributes = population.getPersonAttributes();
 		if ( personAttributes!=null ) {
 			ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(personAttributes) ;
