@@ -1,10 +1,11 @@
+package playground.gregor;
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransitionAreaI.java
+ *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,16 +19,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.simulation.physics;
-
-public interface TransitionAreaI {
-
-	public abstract boolean hasBufferSpace();
-
-	public abstract void addAgentTransitionBuffer(Sim2DAgent agent,
-			double linkDensity);
-
-	public abstract PhysicalSim2DEnvironment getPhysicalEnvironment();
-	
-
+/**
+ * Created by laemmel on 18/02/16.
+ */
+public class TransportMode {
+	public static String walkca;
 }
