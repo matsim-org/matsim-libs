@@ -255,12 +255,29 @@ class ScenarioLoaderImpl {
 
 	private void loadTransit() throws UncheckedIOException {
 		final String transitScheduleFile = this.config.transit().getTransitScheduleFile();
+
 		if ( transitScheduleFile != null ) {
-			new TransitScheduleReader(this.scenario).readFile(transitScheduleFile);
+			final String inputCRS = config.transit().getInputScheduleCRS();
+			final String internalCRS = config.global().getCoordinateSystem();
+
+			if ( inputCRS == null ) {
+				new TransitScheduleReader(this.scenario).readFile(transitScheduleFile);
+			}
+			else {
+				log.info( "re-projecting transit schedule from "+inputCRS+" to "+internalCRS+" for import" );
+
+				final CoordinateTransformation transformation =
+						TransformationFactory.getCoordinateTransformation(
+								inputCRS,
+								internalCRS );
+
+				new TransitScheduleReader( transformation , this.scenario).readFile(transitScheduleFile);
+			}
 		}
 		else {
 			log.info("no transit schedule file set in config, not loading any transit schedule");
 		}
+
 		if ( this.config.transit().getTransitLinesAttributesFile() != null ) {
 			String transitLinesAttributesFileName = this.config.transit().getTransitLinesAttributesFile();
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
@@ -268,6 +285,7 @@ class ScenarioLoaderImpl {
 			reader.putAttributeConverters( attributeConverters );
 			reader.parse(transitLinesAttributesFileName);
 		}
+
 		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
 			String transitStopsAttributesFileName = this.config.transit().getTransitStopsAttributesFile();
 			log.info("loading transit stop facilities attributes from " + transitStopsAttributesFileName);

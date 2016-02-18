@@ -180,7 +180,22 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpTransitSchedule() {
 		try {
 			if ( transitSchedule != null ) {
-				new TransitScheduleWriter(transitSchedule).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
+				final String inputCRS = config.transit().getInputScheduleCRS();
+				final String internalCRS = config.global().getCoordinateSystem();
+
+				if ( inputCRS == null ) {
+					new TransitScheduleWriter(transitSchedule).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
+				}
+				else {
+					log.info( "re-projecting transit schedule from "+internalCRS+" to "+inputCRS+" for export" );
+
+					final CoordinateTransformation transformation =
+							TransformationFactory.getCoordinateTransformation(
+									internalCRS,
+									inputCRS );
+
+					new TransitScheduleWriter( transformation , transitSchedule ).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
+				}
 			}
 		} catch ( Exception ee ) { }
 	}

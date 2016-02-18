@@ -43,11 +43,13 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	private static final String TRANSIT_STOPS_ATTRIBUTES = "transitStopsAttributesFile";
 	/*package*/ static final String VEHICLES_FILE = "vehiclesFile";
 	/*package*/ static final String TRANSIT_MODES = "transitModes";
+	private static final String SCHEDULE_CRS = "inputScheduleCRS";
 
 	private String transitScheduleFile = null;
 	private String vehiclesFile = null;
 	private String transitLinesAttributesFile = null;
 	private String transitStopsAttributesFile = null;
+	private String inputScheduleCRS = null;
 
 	private Set<String> transitModes;
 	
@@ -155,4 +157,13 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	}
 
 
+	@StringGetter( SCHEDULE_CRS )
+	public String getInputScheduleCRS() {
+		return inputScheduleCRS;
+	}
+
+	@StringSetter( SCHEDULE_CRS )
+	public void setInputScheduleCRS(String inputScheduleCRS) {
+		this.inputScheduleCRS = inputScheduleCRS;
+	}
 }
