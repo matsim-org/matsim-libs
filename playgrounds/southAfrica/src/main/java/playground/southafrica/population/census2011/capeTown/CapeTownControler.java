@@ -27,7 +27,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.utils.misc.Time;
 
 import playground.southafrica.utilities.Header;
 
@@ -53,18 +55,23 @@ public class CapeTownControler {
 		String folder = args[0];
 		folder += folder.endsWith("/") ? "" : "/";
 		Machine machine = Machine.valueOf(args[1]);
+		double fraction = Double.parseDouble(args[2]);
 		
-		Config config = setupConfig(folder, machine);
+		Config config = setupConfig(folder, machine, fraction);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		Controler controler = new Controler(config);
 		
 		/* Bind the travel time and disutility functions to all modes that will
-		 * assume teleportation via free-speed routing.*/
+		 * assume network routes. */
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addTravelTimeBinding("ride").to(networkTravelTime());
 				addTravelDisutilityFactoryBinding("ride").to(carTravelDisutilityFactoryKey());
+
+				addTravelTimeBinding("commercial").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("commercial").to(carTravelDisutilityFactoryKey());
 			}
 		});
 		
@@ -75,7 +82,7 @@ public class CapeTownControler {
 	}
 	
 	
-	private static Config setupConfig(String folder, Machine machine){
+	private static Config setupConfig(String folder, Machine machine, double fraction){
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, folder + "config.xml");
 		
@@ -84,13 +91,26 @@ public class CapeTownControler {
 
 		/* Set the number of threads. */
 		config.global().setNumberOfThreads(machine.getThreads());
-		config.qsim().setNumberOfThreads(machine.getThreads());
-		config.parallelEventHandling().setNumberOfThreads(machine.getThreads());
-		
-		/* Since this is a 10% sample, we throttle the network. */
-		config.qsim().setFlowCapFactor(0.3);
+		config.qsim().setNumberOfThreads(Math.min(machine.getThreads(), 8));
+		config.parallelEventHandling().setOneThreadPerHandler(true);
+
+		/* Depending on the sample size we throttle the network. */
+		if(fraction == 1.0){
+			/* Full model. */
+			config.qsim().setFlowCapFactor(1.0);
+			config.qsim().setStorageCapFactor(1.0);
+		} else if(fraction == 0.1){
+			config.qsim().setFlowCapFactor(0.1);
+			config.qsim().setStorageCapFactor(0.3);
+		} else if(fraction == 0.01){
+			config.qsim().setFlowCapFactor(0.01);
+			config.qsim().setStorageCapFactor(0.05);
+		} else{
+			throw new RuntimeException("Don't know how to adjust config for sample size " + fraction);
+		}
 		
 		config.controler().setLastIteration(100);
+		config.qsim().setEndTime(Time.parseTime("36:00:00"));
 		config.controler().setOutputDirectory(folder + "output/");
 		
 		/* Set up the input files. */

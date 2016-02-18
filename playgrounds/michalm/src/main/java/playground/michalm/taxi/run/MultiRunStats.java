@@ -4,8 +4,7 @@ import java.io.PrintWriter;
 
 import org.apache.commons.math3.stat.descriptive.*;
 import org.matsim.contrib.dvrp.data.VrpData;
-
-import playground.michalm.taxi.util.stats.TaxiStats;
+import org.matsim.contrib.taxi.util.stats.TaxiStats;
 
 
 public class MultiRunStats

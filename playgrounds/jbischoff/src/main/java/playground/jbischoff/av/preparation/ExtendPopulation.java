@@ -127,7 +127,7 @@ private Id<Link> getNearestInboundHubLinkId(Coord c2) {
 	double dist = Double.MAX_VALUE;
 	Link bestLink = null;
 	for (Link l : links){
-		double currentDist = CoordUtils.calcDistance(c2, l.getCoord());
+		double currentDist = CoordUtils.calcEuclideanDistance(c2, l.getCoord());
 		if (currentDist<dist) {
 			dist = currentDist;
 			bestLink = l;
@@ -155,7 +155,7 @@ private Id<Link> getNearestOutboundHubLinkId(Coord c1) {
 	double dist = Double.MAX_VALUE;
 	Link bestLink = null;
 	for (Link l : links){
-		double currentDist = CoordUtils.calcDistance(c1, l.getCoord());
+		double currentDist = CoordUtils.calcEuclideanDistance(c1, l.getCoord());
 		if (currentDist<dist) {
 			dist = currentDist;
 			bestLink = l;

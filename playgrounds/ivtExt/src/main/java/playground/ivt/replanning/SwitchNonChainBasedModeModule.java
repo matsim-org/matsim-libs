@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.ivt.replanning;
 
-import com.google.inject.Inject;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;

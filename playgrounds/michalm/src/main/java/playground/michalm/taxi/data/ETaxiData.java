@@ -23,12 +23,13 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.taxi.data.*;
 
 import playground.michalm.ev.Charger;
 
 
 public class ETaxiData
-    extends VrpDataImpl
+    extends TaxiData
 {
     private final Map<Id<TaxiRank>, TaxiRank> taxiRanks = new LinkedHashMap<>();
     private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();

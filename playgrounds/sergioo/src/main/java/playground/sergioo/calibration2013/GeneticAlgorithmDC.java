@@ -143,7 +143,7 @@ public class GeneticAlgorithmDC {
 									list = new ArrayList<Double>();
 									map.put(prevMode, list);
 								}
-								double distance = CoordUtils.calcDistance(prevActivity.getCoord(), ((Activity)planElement).getCoord());
+								double distance = CoordUtils.calcEuclideanDistance(prevActivity.getCoord(), ((Activity)planElement).getCoord());
 								sumDistances+=distance;
 								numSec++;
 								list.add(distance);

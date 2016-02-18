@@ -303,8 +303,9 @@ public class MarginalCongestionHandlerV3QsimTest {
 		
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
 
-		Controler controler = new Controler(config);
-		
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		Controler controler = new Controler( scenario );
+
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 		controler.addOverridingModule(new AbstractModule() {

@@ -35,25 +35,8 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 
 public class CharyparNagelScoringParameters implements MatsimParameters {
 
-	public static class Mode {
-		public Mode(
-				double marginalUtilityOfTraveling_s,
-				double marginalUtilityOfDistance_m,
-				double monetaryDistanceCostRate,
-				double constant) {
-			this.marginalUtilityOfTraveling_s = marginalUtilityOfTraveling_s;
-			this.marginalUtilityOfDistance_m = marginalUtilityOfDistance_m;
-			this.monetaryDistanceCostRate = monetaryDistanceCostRate;
-			this.constant = constant;
-		}
-		public final double marginalUtilityOfTraveling_s;
-		public final double marginalUtilityOfDistance_m;
-		public final double monetaryDistanceCostRate;
-		public final double constant;
-	}
-	
 	public final Map<String, ActivityUtilityParameters> utilParams;
-	public final Map<String, Mode> modeParams;
+	public final Map<String, ModeUtilityParameters> modeParams;
 	public final double marginalUtilityOfWaiting_s;
 	public final double marginalUtilityOfLateArrival_s;
 	public final double marginalUtilityOfEarlyDeparture_s;
@@ -70,7 +53,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 
 	private CharyparNagelScoringParameters(
 			final Map<String, ActivityUtilityParameters> utilParams,
-			final Map<String, Mode> modeParams,
+			final Map<String, ModeUtilityParameters> modeParams,
 			final double marginalUtilityOfWaiting_s,
 			final double marginalUtilityOfLateArrival_s,
 			final double marginalUtilityOfEarlyDeparture_s,
@@ -97,29 +80,9 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		this.simulationPeriodInDays = simulationPeriodInDays;
 	}
 
-	public static CharyparNagelScoringParametersBuilder getBuilder(
-			final Scenario scenario,
-			final Id<Person> person ) {
-		return new CharyparNagelScoringParametersBuilder(
-				scenario.getConfig().planCalcScore(),
-				scenario.getConfig().planCalcScore().getScoringParameters(
-						(String)
-						scenario.getPopulation().getPersonAttributes().getAttribute(
-								person.toString(),
-								scenario.getConfig().plans().getSubpopulationAttributeName() ) ),
-				scenario.getConfig().scenario() );
-	}
-
-	public static CharyparNagelScoringParametersBuilder getBuilder(
-			final PlanCalcScoreConfigGroup config,
-			final PlanCalcScoreConfigGroup.ScoringParameterSet scoringParameterSet,
-			final ScenarioConfigGroup scenarioConfig) {
-		return new CharyparNagelScoringParametersBuilder( config, scoringParameterSet, scenarioConfig );
-	}
-
-	public static final class CharyparNagelScoringParametersBuilder {
-		private final Map<String, ActivityUtilityParameters> utilParams;
-		private final Map<String, Mode> modeParams;
+	public static final class Builder {
+		private final Map<String, ActivityUtilityParameters.Builder> utilParams;
+		private final Map<String, ModeUtilityParameters.Builder> modeParams;
 
 		private double marginalUtilityOfWaiting_s;
 		private double marginalUtilityOfLateArrival_s;
@@ -133,7 +96,20 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		private boolean usingOldScoringBelowZeroUtilityDuration;
 		private int simulationPeriodInDays = 1;
 
-		private CharyparNagelScoringParametersBuilder(
+		public Builder(
+				final Scenario scenario,
+				final Id<Person> person ) {
+			this(
+					scenario.getConfig().planCalcScore(),
+					scenario.getConfig().planCalcScore().getScoringParameters(
+							(String)
+									scenario.getPopulation().getPersonAttributes().getAttribute(
+											person.toString(),
+											scenario.getConfig().plans().getSubpopulationAttributeName() ) ),
+					scenario.getConfig().scenario() );
+		}
+
+		public Builder(
 				final PlanCalcScoreConfigGroup configGroup,
 				final PlanCalcScoreConfigGroup.ScoringParameterSet scoringParameterSet,
 				final ScenarioConfigGroup scenarioConfig) {
@@ -154,26 +130,17 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			utilParams = new TreeMap<>() ;
 			for (ActivityParams params : scoringParameterSet.getActivityParams()) {
 				ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
-				utilParams.put(params.getActivityType(), factory.create() ) ;
+				utilParams.put(params.getActivityType(), factory ) ;
 			}
 
-			modeParams = new TreeMap<String, Mode>() ;
+			modeParams = new TreeMap<>() ;
 			Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = scoringParameterSet.getModes();
 			double worstMarginalUtilityOfTraveling_s = 0.0;
 			for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> mode : modes.entrySet()) {
 				String modeName = mode.getKey();
 				ModeParams params = mode.getValue();
-				double marginalUtilityOfTraveling_s = params.getMarginalUtilityOfTraveling() / 3600.0;
-				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, marginalUtilityOfTraveling_s);
-				double marginalUtilityOfDistance_m = params.getMarginalUtilityOfDistance();
-				double monetaryDistanceRate = params.getMonetaryDistanceRate();
-				double constant = params.getConstant();
-				Mode newModeParams = new Mode(
-						marginalUtilityOfTraveling_s,
-						marginalUtilityOfDistance_m,
-						monetaryDistanceRate,
-						constant);
-				modeParams.put(modeName, newModeParams);
+				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, params.getMarginalUtilityOfTraveling() / 3600. );
+				modeParams.put(modeName, new ModeUtilityParameters.Builder( params ) );
 			}
 
 			abortedPlanScore = Math.min(
@@ -186,70 +153,88 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			// kai, feb'12
 		}
 
-		public CharyparNagelScoringParametersBuilder withActivityParameters(String activityType, ActivityUtilityParameters params) {
+		public Builder setActivityParameters(String activityType, ActivityUtilityParameters.Builder params) {
 			this.utilParams.put( activityType , params );
 			return this;
 		}
 
-		public CharyparNagelScoringParametersBuilder withModeParameters(String mode, Mode params) {
+		public ActivityUtilityParameters.Builder getActivityParameters(String activityType) {
+			return this.utilParams.get( activityType );
+		}
+
+		public Builder setModeParameters(String mode, ModeUtilityParameters.Builder params) {
 			this.modeParams.put( mode , params );
 			return this;
 		}
 
-		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfWaiting_s(double marginalUtilityOfWaiting_s) {
+		public ModeUtilityParameters.Builder getModeParameters(String mode) {
+			return this.modeParams.get( mode  );
+		}
+
+		public Builder setMarginalUtilityOfWaiting_s(double marginalUtilityOfWaiting_s) {
 			this.marginalUtilityOfWaiting_s = marginalUtilityOfWaiting_s;
 			return this;
 		}
 
-		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfLateArrival_s(double marginalUtilityOfLateArrival_s) {
+		public Builder setMarginalUtilityOfLateArrival_s(double marginalUtilityOfLateArrival_s) {
 			this.marginalUtilityOfLateArrival_s = marginalUtilityOfLateArrival_s;
 			return this;
 		}
 
-		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfEarlyDeparture_s(double marginalUtilityOfEarlyDeparture_s) {
+		public Builder setMarginalUtilityOfEarlyDeparture_s(double marginalUtilityOfEarlyDeparture_s) {
 			this.marginalUtilityOfEarlyDeparture_s = marginalUtilityOfEarlyDeparture_s;
 			return this;
 		}
 
-		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfWaitingPt_s(double marginalUtilityOfWaitingPt_s) {
+		public Builder setMarginalUtilityOfWaitingPt_s(double marginalUtilityOfWaitingPt_s) {
 			this.marginalUtilityOfWaitingPt_s = marginalUtilityOfWaitingPt_s;
 			return this;
 		}
 
-		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfPerforming_s(double marginalUtilityOfPerforming_s) {
+		public Builder setMarginalUtilityOfPerforming_s(double marginalUtilityOfPerforming_s) {
 			this.marginalUtilityOfPerforming_s = marginalUtilityOfPerforming_s;
 			return this;
 		}
 
-		public CharyparNagelScoringParametersBuilder withUtilityOfLineSwitch(double utilityOfLineSwitch) {
+		public Builder setUtilityOfLineSwitch(double utilityOfLineSwitch) {
 			this.utilityOfLineSwitch = utilityOfLineSwitch;
 			return this;
 		}
 
-		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
+		public Builder setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
 			this.marginalUtilityOfMoney = marginalUtilityOfMoney;
 			return this;
 		}
 
-		public CharyparNagelScoringParametersBuilder withAbortedPlanScore(double abortedPlanScore) {
+		public Builder setAbortedPlanScore(double abortedPlanScore) {
 			this.abortedPlanScore = abortedPlanScore;
 			return this;
 		}
 
-		public CharyparNagelScoringParametersBuilder withScoreActs(boolean scoreActs) {
+		public Builder setScoreActs(boolean scoreActs) {
 			this.scoreActs = scoreActs;
 			return this;
 		}
 
-		public CharyparNagelScoringParametersBuilder withUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
+		public Builder setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
 			this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
 			return this;
 		}
 
-		public CharyparNagelScoringParameters create() {
+		public CharyparNagelScoringParameters build() {
+			final Map<String, ModeUtilityParameters> modes = new TreeMap<>();
+			for ( Map.Entry<String, ModeUtilityParameters.Builder> e : modeParams.entrySet() ) {
+				modes.put( e.getKey() , e.getValue().build() );
+			}
+
+			final Map<String, ActivityUtilityParameters> acts = new TreeMap<>();
+			for ( Map.Entry<String, ActivityUtilityParameters.Builder> e : utilParams.entrySet() ) {
+				acts.put( e.getKey() , e.getValue().build() );
+			}
+
 			return new CharyparNagelScoringParameters(
-					Collections.unmodifiableMap( utilParams ),
-					Collections.unmodifiableMap( modeParams ),
+					acts,
+					modes,
 					marginalUtilityOfWaiting_s,
 					marginalUtilityOfLateArrival_s,
 					marginalUtilityOfEarlyDeparture_s,

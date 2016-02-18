@@ -43,11 +43,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Collects and processes data on the mode shares, based on the travelled
@@ -168,7 +164,7 @@ public class ModeSharesEventHandler
 		departureLink = this.network.getLinks().get(departureEvent.getLinkId());
 		arrivalLink = this.network.getLinks().get(arrivalEvent.getLinkId());
 
-		distance = CoordUtils.calcDistance(
+		distance = CoordUtils.calcEuclideanDistance(
 				departureLink.getCoord(),
 				arrivalLink.getCoord());
 

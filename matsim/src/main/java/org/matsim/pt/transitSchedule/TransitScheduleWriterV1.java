@@ -24,11 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -46,10 +49,18 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSomeWriter {
 
+	private final CoordinateTransformation coordinateTransformation;
 
 	private final TransitSchedule schedule;
 
 	public TransitScheduleWriterV1(final TransitSchedule schedule) {
+		this( new IdentityTransformation() , schedule );
+	}
+
+	public TransitScheduleWriterV1(
+			final CoordinateTransformation coordinateTransformation,
+			final TransitSchedule schedule) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.schedule = schedule;
 	}
 
@@ -74,8 +85,9 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 		for (TransitStopFacility stop : this.schedule.getFacilities().values()) {
 			attributes.clear();
 			attributes.add(this.createTuple(Constants.ID, stop.getId().toString()));
-			attributes.add(this.createTuple("x", stop.getCoord().getX()));
-			attributes.add(this.createTuple("y", stop.getCoord().getY()));
+			final Coord coord = coordinateTransformation.transform( stop.getCoord() );
+			attributes.add(this.createTuple("x", coord.getX()));
+			attributes.add(this.createTuple("y", coord.getY()));
 			if (stop.getLinkId() != null) {
 				attributes.add(this.createTuple("linkRefId", stop.getLinkId().toString()));
 			}

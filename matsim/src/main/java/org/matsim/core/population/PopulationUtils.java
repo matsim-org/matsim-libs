@@ -378,7 +378,9 @@ public final class PopulationUtils {
 		} else {
 			ActivityFacility facility = facs.getFacilities().get( act.getFacilityId() ) ;
 			if ( facility==null || facility.getLinkId()==null ) {
-				Logger.getLogger( PopulationUtils.class ).warn("we have a facility id, but can't find the facility; this should not really happen") ;
+				if ( facility==null ) {
+					Logger.getLogger( PopulationUtils.class ).warn("we have a facility id, but can't find the facility; this should not really happen") ;
+				}
 				final Id<Link> linkIdFromActivity = act.getLinkId();
 				Gbl.assertIf( linkIdFromActivity!=null );
 				return linkIdFromActivity ;

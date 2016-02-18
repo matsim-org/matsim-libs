@@ -92,7 +92,7 @@ public class TollTravelCostCalculatorTest {
 		TravelTime timeCalculator = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 
 		double margUtlOfMoney = 1. ;
-        final TravelDisutilityFactory defaultDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
+        final TravelDisutilityFactory defaultDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory();
         
 		RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
 				defaultDisutilityFactory, scheme, margUtlOfMoney );

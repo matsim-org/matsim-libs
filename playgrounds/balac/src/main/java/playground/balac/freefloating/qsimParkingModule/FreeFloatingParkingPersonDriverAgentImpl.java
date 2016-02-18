@@ -312,7 +312,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		LegImpl walkLeg = new LegImpl("walk_ff");
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLink.getId());
-		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
+		final double dist = CoordUtils.calcEuclideanDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
 		final double estimatedNetworkDistance = dist * this.beelineFactor;
 
 		final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );

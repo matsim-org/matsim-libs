@@ -19,7 +19,6 @@ target
 accessibility/test/output/
 matsim4urbansim/.gitignore
 matsim4urbansim/test/.gitignore
-.gitignore
 #
 #contrib/signals
 signals/output

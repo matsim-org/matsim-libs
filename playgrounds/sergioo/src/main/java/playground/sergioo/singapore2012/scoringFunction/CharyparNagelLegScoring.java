@@ -132,7 +132,7 @@ public class CharyparNagelLegScoring implements BasicScoring, LegScoring, org.ma
 	private double getDistance(Route route) {
 		double dist;
 		if (route instanceof NetworkRoute) {
-			dist =  RouteUtils.calcDistance((NetworkRoute) route, network);
+			dist =  RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, network);
 		} else {
 			dist = route.getDistance();
 		}

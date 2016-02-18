@@ -324,9 +324,9 @@ public class TelAvivControlerListener implements StartupListener, IterationEndsL
 		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		double analysisBinSize = dccg.getAnalysisBinSize();
 		double analysisBoundary = dccg.getAnalysisBoundary();
-		String idExclusion = config.findParam("locationchoice", "idExclusion");
+		String idExclusion = dccg.getIdExclusion().toString();
 		ActTypeConverter converter = new ActTypeConverter(false);
-		Set<String> flexibleTypes = CollectionUtils.stringToSet(config.findParam("locationchoice", "flexible_types"));
+		Set<String> flexibleTypes = CollectionUtils.stringToSet(dccg.getFlexibleTypes());
   		for (String actType : flexibleTypes) {
   			String filename = TelAvivConfig.basePath + "/locationchoice/" + actType + "ReferenceShares.txt";
   			if (!new File(filename).exists()) {

@@ -6,15 +6,15 @@ import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 import playground.dhosse.prt.request.NPersonsVehicleRequestPathFinder;
 import playground.jbischoff.taxi.optimizer.rank.IdleRankVehicleFinder;
-import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.schedule.*;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener {
 

@@ -455,7 +455,7 @@ public class TransitQueryEngineForR implements Serializable {
                     .getRoutes().get(routeId).getRoute();
             try {
                 NetworkRoute subRoute = networkRoute.getSubRoute(fromLink.getId(), toLink.getId());
-                return RouteUtils.calcDistance(subRoute, scenario.getNetwork()) + toLink.getLength();
+                return RouteUtils.calcDistanceExcludingStartEndLink(subRoute, scenario.getNetwork()) + toLink.getLength();
 
             } catch (IllegalArgumentException e) {
                 //instead of going th elong way round, throw an err
@@ -1969,7 +1969,7 @@ public class TransitQueryEngineForR implements Serializable {
             }
             if (fromLink == null || toLink == null)
                 return false;
-            euclideanDistance = NetworkUtils.getEuclidianDistance(fromLink.getToNode().getCoord(), toLink.getToNode().getCoord());
+            euclideanDistance = NetworkUtils.getEuclideanDistance(fromLink.getToNode().getCoord(), toLink.getToNode().getCoord());
 
             NetworkRoute networkRoute = scenario.getTransitSchedule().getTransitLines().get(lineId)
                     .getRoutes().get(routeId).getRoute();

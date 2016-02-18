@@ -155,7 +155,7 @@ public class PseudoNetworkCreator {
 		if (fromNode == toNode) {
 			link.setLength(50);
 		} else {
-			link.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
+			link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
 		}
 		link.setFreespeed(150.0 / 3.6);
 		link.setCapacity(10000);

@@ -55,7 +55,7 @@ public class CompareEuclideanAndLinkLengths {
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
 		writer.write( "linkId\tlinkLength\teuclLength" );
 		for ( Link l : sc.getNetwork().getLinks().values() ) {
-			final double eucl = CoordUtils.calcDistance( l.getFromNode().getCoord() , l.getToNode().getCoord() );
+			final double eucl = CoordUtils.calcEuclideanDistance( l.getFromNode().getCoord() , l.getToNode().getCoord() );
 			writer.newLine();
 			writer.write( l.getId() +"\t"+ l.getLength() +"\t"+ eucl );
 		}

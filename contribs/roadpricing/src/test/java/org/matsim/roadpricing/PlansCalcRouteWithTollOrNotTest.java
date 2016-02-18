@@ -33,6 +33,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouterModule;
@@ -40,6 +44,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
@@ -53,7 +58,6 @@ import com.google.inject.Singleton;
  * @author mrieser
  */
 
-@Ignore
 public class PlansCalcRouteWithTollOrNotTest {
 
 	@Rule
@@ -65,6 +69,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	@Test
 	public void testBestAlternatives() {
 		Config config = matsimTestUtils.loadConfig(null);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 
@@ -126,27 +131,10 @@ public class PlansCalcRouteWithTollOrNotTest {
 	private PlansCalcRouteWithTollOrNot testee(final Scenario scenario, final RoadPricingScheme toll) {
 		return Injector.createInjector(
 				scenario.getConfig(),
-				new AbstractModule() {
-					@Override
-					public void install() {
-						bind(RoadPricingScheme.class).toInstance(toll);
-						addTravelTimeBinding(TransportMode.car).to(FreeSpeedTravelTime.class);
-						bind(PlansCalcRouteWithTollOrNot.class);
-						install(new ScenarioByInstanceModule(scenario));
-						addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(
-								new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ) );
-						install(new TripRouterModule());
-						addControlerListenerBinding().to(RoadPricingControlerListener.class);
-
-						// add the events handler to calculate the tolls paid by agents
-						bind(CalcPaidToll.class).in(Singleton.class);
-						addEventHandlerBinding().to(CalcPaidToll.class);
-
-						bind(CalcAverageTolledTripLength.class).in(Singleton.class);
-						addEventHandlerBinding().to(CalcAverageTolledTripLength.class);
-
-					}
-				})
+				new ControlerDefaultsWithRoadPricingModule(toll),
+				new ScenarioByInstanceModule(scenario),
+				new ControlerDefaultCoreListenersModule(),
+				new NewControlerModule())
 				.getInstance(PlansCalcRouteWithTollOrNot.class);
 	}
 

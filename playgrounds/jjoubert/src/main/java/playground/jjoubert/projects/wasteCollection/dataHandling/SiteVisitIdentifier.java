@@ -192,7 +192,7 @@ public class SiteVisitIdentifier {
 		while(iterator.hasNext() && !closeToSite){
 			String site = iterator.next();
 			Coord siteCoord = coordMap.get(site);
-			double distance = CoordUtils.calcDistance(c, siteCoord);
+			double distance = CoordUtils.calcEuclideanDistance(c, siteCoord);
 			if(distance <= DISTANCE_THRESHOLD){
 				closeToSite = true;
 				closestSite = site;

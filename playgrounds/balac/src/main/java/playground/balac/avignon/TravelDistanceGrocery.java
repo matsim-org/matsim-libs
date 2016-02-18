@@ -49,19 +49,19 @@ public class TravelDistanceGrocery {
 					if (((Activity) pe).getType().startsWith( "work")) {
 						if (previousLeg != null) {
 						if (previousLeg.getMode().equals( "car" )) {
-							distanceCar += RouteUtils.calcDistance((NetworkRoute)previousLeg.getRoute(), scenario.getNetwork());
+							distanceCar += RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute)previousLeg.getRoute(), scenario.getNetwork());
 					//		countC++;
 						}
 						else if (previousLeg.getMode().equals( "bike" )) {
-							distanceBike += CoordUtils.calcDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
+							distanceBike += CoordUtils.calcEuclideanDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
 					//		countB++;
 						}
 						else if (previousLeg.getMode().equals( "walk" )) {
-							distanceWalk += CoordUtils.calcDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
+							distanceWalk += CoordUtils.calcEuclideanDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
 						//	countW++;
 						}
 						else if (previousLeg.getMode().equals( "pt" )) {
-							distancePt += CoordUtils.calcDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
+							distancePt += CoordUtils.calcEuclideanDistance(previousActivity.getCoord(), ((Activity) pe).getCoord());
 						//	countPt++;
 						}
 						}

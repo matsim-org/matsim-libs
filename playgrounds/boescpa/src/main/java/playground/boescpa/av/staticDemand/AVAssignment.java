@@ -54,7 +54,7 @@ public class AVAssignment {
         int closestVehicle = -1;
         double minDistance = Double.MAX_VALUE;
         for (int i = 0; i < availableAVs.size(); i++) {
-            double distance = CoordUtils.calcDistance(requestStartLocation, availableAVs.get(i).getMyPosition());
+            double distance = CoordUtils.calcEuclideanDistance(requestStartLocation, availableAVs.get(i).getMyPosition());
             if (distance < minDistance) {
                 minDistance = distance;
                 closestVehicle = i;
@@ -69,7 +69,7 @@ public class AVAssignment {
         if (closestVehicle == -1) {
             return -1;
         }
-        double distance = CoordUtils.calcDistance(requestStartLocation, availableAVs.get(closestVehicle).getMyPosition());
+        double distance = CoordUtils.calcEuclideanDistance(requestStartLocation, availableAVs.get(closestVehicle).getMyPosition());
         if (distance <= Constants.getSearchRadiusLevelOfService()) {
             return closestVehicle;
         } else {
@@ -83,7 +83,7 @@ public class AVAssignment {
         if (closestVehicle == -1) {
             return -1;
         }
-        double distanceVehicles = CoordUtils.calcDistance(requestStartLocation, availableAVs.get(closestVehicle).getMyPosition());
+        double distanceVehicles = CoordUtils.calcEuclideanDistance(requestStartLocation, availableAVs.get(closestVehicle).getMyPosition());
         int searchTime = (int)requestToHandle.startTime + Constants.LEVEL_OF_SERVICE - StaticAVSim.getTime();
         if (distanceVehicles <= Constants.getSearchRadius(searchTime)) {
             return closestVehicle;

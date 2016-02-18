@@ -122,7 +122,7 @@ public class DistanceFillerAlgorithm implements PlanAlgorithm {
 			assert startCoord != null;
 			assert endCoord != null;
 
-			return factor * CoordUtils.calcDistance( startCoord , endCoord );
+			return factor * CoordUtils.calcEuclideanDistance( startCoord , endCoord );
 		}
 	}
 }

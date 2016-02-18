@@ -260,9 +260,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		startStationOW = station;
 		owVehId = station.getIDs().get(0);
 		this.carSharingVehicles.getOneWayVehicles().removeVehicle(station, owVehId);
-		routeStart.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startStationOW.getCoord()) * beelineFactor) / walkSpeed));
-
-		routeStart.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startStationOW.getCoord()) * beelineFactor);	
+		routeStart.setTravelTime( ((CoordUtils.calcEuclideanDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startStationOW.getLink().getCoord()) * beelineFactor) / walkSpeed));
+		
+		routeStart.setDistance(CoordUtils.calcEuclideanDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startStationOW.getLink().getCoord()) * beelineFactor);	
 
 		final Leg legWalkStart = new LegImpl( "walk_ow_sb" );
 		legWalkStart.setRoute(routeStart);
@@ -327,10 +327,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		GenericRouteImpl routeEnd = new GenericRouteImpl(endStationOW.getLinkId(),
 				route.getEndLinkId());
 
-		routeEnd.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(endStationOW.getLinkId()).getCoord(), 
-				this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor) / walkSpeed));
-
-		routeEnd.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(endStationOW.getLinkId()).getCoord(),
+	    routeEnd.setTravelTime( ((CoordUtils.calcEuclideanDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(endStationOW.getLink().getId()).getCoord(), 
+	    		this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor) / walkSpeed));
+		
+	    routeEnd.setDistance(CoordUtils.calcEuclideanDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(endStationOW.getLink().getId()).getCoord(),
 				this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor);	
 
 		legWalkEnd.setRoute(routeEnd);
@@ -444,10 +444,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				GenericRouteImpl routeEnd = new GenericRouteImpl(null,
 						route.getEndLinkId());
 
-				routeEnd.setTravelTime( ((CoordUtils.calcDistance(this.pickupStations.get(this.pickupStations.size() - 1).getCoord(), 
-						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor) / walkSpeed));
-
-				routeEnd.setDistance(CoordUtils.calcDistance(this.pickupStations.get(this.pickupStations.size() - 1).getCoord(),
+			    routeEnd.setTravelTime( ((CoordUtils.calcEuclideanDistance(this.pickupStations.get(this.pickupStations.size() - 1).getLink().getCoord(), 
+			    		this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor) / walkSpeed));
+				
+			    routeEnd.setDistance(CoordUtils.calcEuclideanDistance(this.pickupStations.get(this.pickupStations.size() - 1).getLink().getCoord(),
 						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord()) * beelineFactor);	
 
 				legWalkEnd.setRoute(routeEnd);
@@ -477,14 +477,14 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				this.pickupStations.add(pickUpStation);
 				this.twcsVehicleIDs.add(pickUpStation.getIDs().get(0));
 				GenericRouteImpl routeEnd = new GenericRouteImpl(route.getStartLinkId(),
-						pickUpStation.getLinkId());
-
-				routeEnd.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), 
-						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLinkId()).getCoord()) * beelineFactor) / walkSpeed));
-
-				routeEnd.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
-						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLinkId()).getCoord()) * beelineFactor);	
-
+						pickUpStation.getLink().getId());
+	
+			    routeEnd.setTravelTime( ((CoordUtils.calcEuclideanDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), 
+			    		this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor) / walkSpeed));
+				
+			    routeEnd.setDistance(CoordUtils.calcEuclideanDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
+						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor);	
+	
 				legWalkEnd.setRoute(routeEnd);
 				trip.add( legWalkEnd );
 
@@ -548,15 +548,15 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				this.pickupStations.add(pickUpStation);
 				this.twcsVehicleIDs.add(pickUpStation.getIDs().get(0));
 				GenericRouteImpl routeWalkStart = new GenericRouteImpl(route.getStartLinkId(),
-						pickUpStation.getLinkId());
-
-				routeWalkStart.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), 
-						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLinkId()).getCoord()) * beelineFactor) / walkSpeed));
-
-				routeWalkStart.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
-						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLinkId()).getCoord()) * beelineFactor);	
-
-				legWalkStart.setRoute(routeWalkStart);
+						pickUpStation.getLink().getId());
+	
+				routeWalkStart.setTravelTime( ((CoordUtils.calcEuclideanDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), 
+			    		this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor) / walkSpeed));
+				
+				routeWalkStart.setDistance(CoordUtils.calcEuclideanDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
+						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor);	
+	
+			    legWalkStart.setRoute(routeWalkStart);
 				trip.add( legWalkStart );
 
 				//vehicle leg of the round-trip carsharing trip
@@ -605,13 +605,13 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 				GenericRouteImpl routeWalkEnd = new GenericRouteImpl(pickUpStation.getLinkId(),
 						route.getEndLinkId());
-
-				routeWalkEnd.setTravelTime( ((CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord(), 
-						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLinkId()).getCoord()) * beelineFactor) / walkSpeed));
-
-				routeWalkEnd.setDistance(CoordUtils.calcDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord(),
-						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLinkId()).getCoord()) * beelineFactor);	
-
+	
+				routeWalkEnd.setTravelTime( ((CoordUtils.calcEuclideanDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord(), 
+			    		this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor) / walkSpeed));
+				
+				routeWalkEnd.setDistance(CoordUtils.calcEuclideanDistance(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()).getCoord(),
+						this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(pickUpStation.getLink().getId()).getCoord()) * beelineFactor);	
+	
 				legWalkEnd.setRoute(routeWalkEnd);
 				trip.add( legWalkEnd );
 
@@ -724,9 +724,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		double distanceSearch = Double.parseDouble(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("searchDistanceTwoWayCarsharing"));
 		TwoWayCarsharingStation closest = null;
 		for(TwoWayCarsharingStation station: location) {
-			if (CoordUtils.calcDistance(link.getCoord(), station.getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 
 		}
@@ -762,9 +762,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 		OneWayCarsharingStation closest = null;
 		for(OneWayCarsharingStation station: location) {
-			if (CoordUtils.calcDistance(link.getCoord(), station.getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 
 		}			
@@ -787,9 +787,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 		OneWayCarsharingStation closest = null;
 		for(OneWayCarsharingStation station: location) {
-			if (CoordUtils.calcDistance(link.getCoord(), station.getCoord()) < distanceSearch && station.getNumberOfAvailableParkingSpaces() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfAvailableParkingSpaces() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 
 		}		

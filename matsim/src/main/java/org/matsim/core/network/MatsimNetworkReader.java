@@ -25,6 +25,8 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -40,14 +42,27 @@ public class MatsimNetworkReader extends MatsimXmlParser implements MatsimSomeRe
 	private final static String NETWORK_V1 = "network_v1.dtd";
 
 	private MatsimXmlParser delegate = null;
-	private Network network;
+	private CoordinateTransformation transformation;
+
+	private final Network network;
 
 	/**
-	 * Creates a new reader for MATSim configuration files.
+	 * Creates a new reader for MATSim network files.
 	 *
 	 * @param network The network where to store the loaded data.
 	 */
 	public MatsimNetworkReader(Network network) {
+		this( new IdentityTransformation() , network );
+	}
+
+	/**
+	 * Creates a new reader for MATSim network files, that transforms coordinates
+	 *
+	 * @param transformation the transformation to use to convert the input data to the desired CRS
+	 * @param network The network where to store the loaded data.
+	 */
+	public MatsimNetworkReader(CoordinateTransformation transformation, Network network) {
+		this.transformation = transformation;
 		this.network = network;
 	}
 
@@ -79,7 +94,7 @@ public class MatsimNetworkReader extends MatsimXmlParser implements MatsimSomeRe
 		super.setDoctype(doctype);
 		// Currently the only network-type is v1
 		if (NETWORK_V1.equals(doctype)) {
-			this.delegate = new NetworkReaderMatsimV1(this.network);
+			this.delegate = new NetworkReaderMatsimV1(transformation , this.network);
 			log.info("using network_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

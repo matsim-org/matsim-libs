@@ -1,6 +1,5 @@
 package playground.balac.induceddemand.strategies;
 
-import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;

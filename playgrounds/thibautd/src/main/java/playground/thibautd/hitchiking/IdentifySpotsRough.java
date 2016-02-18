@@ -149,7 +149,7 @@ public class IdentifySpotsRough {
 		for (Node node : network.getNodes().values()) {
 			counter.incCounter();
 
-			if ( CoordUtils.calcDistance( node.getCoord() , CENTER ) > MAX_DIST_TO_CENTER ) {
+			if ( CoordUtils.calcEuclideanDistance( node.getCoord() , CENTER ) > MAX_DIST_TO_CENTER ) {
 				continue;
 			}
 
@@ -176,7 +176,7 @@ public class IdentifySpotsRough {
 		for (Node n : new ArrayList<Node>(hhNodes)) {
 			boolean reject = false;
 			for (Coord c : coords) {
-				if ( CoordUtils.calcDistance( c , n.getCoord() ) <= MIN_DIST ) {
+				if ( CoordUtils.calcEuclideanDistance( c , n.getCoord() ) <= MIN_DIST ) {
 					reject = true;
 					break;
 				}

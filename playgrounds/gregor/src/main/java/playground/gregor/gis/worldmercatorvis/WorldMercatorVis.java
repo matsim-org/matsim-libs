@@ -27,15 +27,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.operation.MathTransform;
-
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.events.EventsReaderXMLv1ExtendedSim2DVersion;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
 public class WorldMercatorVis {
 	public static void main(String [] args) throws NoSuchAuthorityCodeException, FactoryException {
@@ -54,10 +49,10 @@ public class WorldMercatorVis {
 		
 		new NetworkConverter(sc, transform).run();
 		
-		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-		
-		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
+//		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+//		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+//
+//		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
 		EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
 		InfoBox iBox = new InfoBox(dbg, sc);
 		dbg.addAdditionalDrawer(iBox);

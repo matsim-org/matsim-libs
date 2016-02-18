@@ -76,8 +76,8 @@ public class DistanceFromPAToShop {
 							double temp = Double.MAX_VALUE;
 							
 							for(Coord c2:pacoord) {
-								if (CoordUtils.calcDistance(c1, c2) < temp)
-									temp = CoordUtils.calcDistance(c1, c2);
+								if (CoordUtils.calcEuclideanDistance(c1, c2) < temp)
+									temp = CoordUtils.calcEuclideanDistance(c1, c2);
 								
 							}
 							in[(int)temp / 1000]++;
@@ -91,8 +91,8 @@ public class DistanceFromPAToShop {
 							double temp = Double.MAX_VALUE;
 							
 							for(Coord c2:pacoord) {
-								if (CoordUtils.calcDistance(c1, c2) < temp)
-									temp = CoordUtils.calcDistance(c1, c2);
+								if (CoordUtils.calcEuclideanDistance(c1, c2) < temp)
+									temp = CoordUtils.calcEuclideanDistance(c1, c2);
 								
 							}
 							out[(int)temp / 1000]++;

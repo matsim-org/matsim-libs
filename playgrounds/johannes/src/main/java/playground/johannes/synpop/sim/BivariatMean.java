@@ -282,4 +282,13 @@ public class BivariatMean implements Hamiltonian, AttributeChangeListener {
             }
         }
     }
+
+    public double[] getBinErrors() {
+        binCount = Math.max(referenceValues.size(), bucketCounts.size());
+        double[] errors = new double[binCount];
+        for(int i = 0; i < binCount; i++) {
+            errors[i] = calculateDiff(i);
+        }
+        return errors;
+    }
 }

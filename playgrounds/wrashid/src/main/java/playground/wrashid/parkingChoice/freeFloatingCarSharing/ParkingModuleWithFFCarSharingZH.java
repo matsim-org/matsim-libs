@@ -164,8 +164,10 @@ implements ParkingModuleWithFreeFloatingCarSharing, IterationStartsListener, Ite
 	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		super.notifyBeforeMobsim(event);
+		super.getParkingScoreManager().prepareForNewIteration();
+		super.getParkingInfrastructure().reset();
 		resetForNewIterationStart();
+		super.getParkingSimulation().prepareForNewIteration();
 	}
 	
 	@Override

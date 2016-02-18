@@ -198,7 +198,7 @@ public class ExtractAllStudyAreaActivities {
 				for(DigicoreActivity act : chain.getAllActivities()){
 					Coord actCoord = act.getCoord();
 					Coord closest = qt.getClosest(actCoord.getX(), actCoord.getY());
-					double dist = CoordUtils.calcDistance(actCoord, closest);
+					double dist = CoordUtils.calcEuclideanDistance(actCoord, closest);
 					if(dist <= this.width){
 						list.add(actCoord);
 					}

@@ -458,7 +458,7 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 		LegImpl walkLeg = new LegImpl(mode);
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(startLink.getId(), destinationLink.getId());
-		final double dist = CoordUtils.calcDistance(startLink.getCoord(), destinationLink.getCoord());
+		final double dist = CoordUtils.calcEuclideanDistance(startLink.getCoord(), destinationLink.getCoord());
 		final double estimatedNetworkDistance = dist * beelineFactor;
 
 		final int travTime = (int) (estimatedNetworkDistance / walkSpeed);
@@ -622,9 +622,9 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 		double distanceSearch = Double.parseDouble(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("searchDistanceTwoWayCarsharing"));
 		TwoWayCSStation closest = null;
 		for(TwoWayCSStation station: location) {
-			if (CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 			
 		}
@@ -750,9 +750,9 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 
 		OneWayCarsharingRDWithParkingStation closest = null;
 		for(OneWayCarsharingRDWithParkingStation station: location) {
-			if (CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 			
 		}			
@@ -775,9 +775,9 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 
 		OneWayCarsharingRDWithParkingStation closest = null;
 		for(OneWayCarsharingRDWithParkingStation station: location) {
-			if (CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfAvailableParkingSpaces() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfAvailableParkingSpaces() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 			
 		}		

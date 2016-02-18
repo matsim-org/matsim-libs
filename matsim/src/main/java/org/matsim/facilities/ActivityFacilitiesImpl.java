@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
@@ -72,10 +73,14 @@ public class ActivityFacilitiesImpl implements ActivityFacilities {
 	//////////////////////////////////////////////////////////////////////
 
 	public final ActivityFacilityImpl createAndAddFacility(final Id<ActivityFacility> id, final Coord center) {
+		return createAndAddFacility(id, center, null);
+	}
+	
+	public final ActivityFacilityImpl createAndAddFacility(final Id<ActivityFacility> id, final Coord center, final Id<Link> linkId) {
 		if (this.facilities.containsKey(id)) {
 			throw new IllegalArgumentException("Facility with id=" + id + " already exists.");
 		}
-		ActivityFacilityImpl f = new ActivityFacilityImpl(id, center);
+		ActivityFacilityImpl f = new ActivityFacilityImpl(id, center, linkId);
 		this.facilities.put(f.getId(),f);
 
 		// show counter

@@ -83,7 +83,7 @@ public class PersonMobilityToolModel extends AbstractPersonAlgorithm implements 
 		if ((home_coord == null) || (home_coord.equals(ZERO))) { throw new RuntimeException("No home coord defined!"); }
 		if ((work_coord != null) && (work_coord.equals(ZERO))) { throw new RuntimeException("Weird work coord defined!!!"); }
 		if (work_coord != null) {
-			distance = CoordUtils.calcDistance(work_coord, home_coord);
+			distance = CoordUtils.calcEuclideanDistance(work_coord, home_coord);
 		}
 
 		model.setAge(p.getAge());

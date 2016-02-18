@@ -112,7 +112,7 @@ public class NetworkScenarioCut implements NetworkRunnable {
 		Set<Node> nodesToRemove = new HashSet<>();
 		for (Node n : network.getNodes().values()) {
 			Coord coord = n.getCoord();
-			double distance = CoordUtils.calcDistance(coord, center);
+			double distance = CoordUtils.calcEuclideanDistance(coord, center);
 			if (distance > radius) {
 				nodesToRemove.add(n);
 			}

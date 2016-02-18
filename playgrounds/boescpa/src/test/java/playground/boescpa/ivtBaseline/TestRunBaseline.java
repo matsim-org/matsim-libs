@@ -42,6 +42,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.boescpa.ivtBaseline.preparation.*;
+import playground.boescpa.lib.tools.fileCreation.F2LConfigGroup;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
 
 import java.util.HashMap;
@@ -81,7 +82,7 @@ public class TestRunBaseline {
 		// create config
 		String[] argsConfig = {pathToConfig, "100"};
 		IVTConfigCreator.main(argsConfig);
-		Config config = ConfigUtils.loadConfig(pathToConfig);
+		Config config = ConfigUtils.loadConfig(pathToConfig, new F2LConfigGroup());
 		config.setParam("controler", "outputDirectory", utils.getOutputDirectory() + "output/");
 			// Reduce iterations to one write out interval + 1
 		config.setParam("controler", "lastIteration", "11");

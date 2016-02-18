@@ -28,7 +28,7 @@ public class DistanceBasedFilter {
 	}
 
 	public boolean accept(final Coord coord) {
-		return (CoordUtils.calcDistance(coord, this.center) <= this.radius);
+		return (CoordUtils.calcEuclideanDistance(coord, this.center) <= this.radius);
 	}
 
 	public boolean accept(final Node node) {

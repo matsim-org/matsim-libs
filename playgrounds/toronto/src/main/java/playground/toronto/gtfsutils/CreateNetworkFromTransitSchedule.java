@@ -206,7 +206,7 @@ public class CreateNetworkFromTransitSchedule {
 		//need to change link id naming
 		Long LinkId = Integer.parseInt(this.prefix) * (++this.linkIdCounter);
 		link = this.network.getFactory().createLink(Id.create(LinkId, Link.class), fromNode, toNode);
-		link.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
+		link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
 		//need to change it!
 		link.setFreespeed(30.0 / 3.6);
 		link.setCapacity(9999);

@@ -33,7 +33,7 @@ public class ZoneStationsCreator {
 			
 			Coord coordS = new Coord(Double.parseDouble(arr1[2]), Double.parseDouble(arr1[3]));
 			
-			if (CoordUtils.calcDistance(coordS, coord) < 10000) {
+			if (CoordUtils.calcEuclideanDistance(coordS, coord) < 10000) {
 				if (write) {
 				outLink.write(arr1[0] + "\t" + arr1[1] + "\t" +arr1[2] + "\t" +arr1[3] + "\t" +arr1[4] + "\t" +arr1[5] + "\t" + "1");
 				outLink.newLine();

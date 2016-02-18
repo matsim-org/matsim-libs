@@ -162,7 +162,7 @@ public class GTFS2MATSimTransitSchedule {
 			while(line!=null) {
 				Node fromNode = network.getNodes().get(Id.createNodeId(reader.readLine()));
 				Node toNode = network.getNodes().get(Id.createNodeId(reader.readLine()));
-				double length = CoordUtils.calcDistance(coordinateTransformation.transform(fromNode.getCoord()),coordinateTransformation.transform(toNode.getCoord()));
+				double length = CoordUtils.calcEuclideanDistance(coordinateTransformation.transform(fromNode.getCoord()),coordinateTransformation.transform(toNode.getCoord()));
 				Link link = linkFactory.createLink(Id.createLinkId(line), fromNode, toNode, network, length, DEFAULT_FREE_SPEED, DEFAULT_CAPACITY, 1);
 				Set<String> modes = new HashSet<String>();
 				modes.add("car");

@@ -60,16 +60,27 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 	private static final Logger log = Logger.getLogger(MultipleFifoOptimizer.class);
 	private int twmaxdepartures = 0;
 	private int fullBusDepartures = 0;
+
 	public enum CostCriteria {
 		ARRIVALTIME, BEELINE
 	}
 
-	private CostCriteria cost = CostCriteria.BEELINE;
+	private CostCriteria cost;
 
 	public MultipleFifoOptimizer(TaxibusOptimizerConfiguration optimConfig, LineDispatcher dispatcher,
 			boolean doUnscheduleAwaitingRequests) {
 		super(optimConfig, doUnscheduleAwaitingRequests);
 		this.dispatcher = dispatcher;
+		if (optimConfig.tbcg.getDistanceCalculationMode().equals("beeline")) {
+			cost = CostCriteria.BEELINE;
+		} else if (optimConfig.tbcg.getDistanceCalculationMode().equals("earliestArrival")) {
+			cost = CostCriteria.ARRIVALTIME;
+		} else {
+			throw new RuntimeException(
+					"No config parameter set for distance comparison, please check and assign in config. Valid parameters are \"beeline\" or \"earliestArrival\". ");
+
+		}
+
 		LeastCostPathCalculator router = new Dijkstra(optimConfig.context.getScenario().getNetwork(),
 				optimConfig.travelDisutility, optimConfig.travelTime);
 		routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router,
@@ -78,105 +89,104 @@ public class MultipleFifoOptimizer extends AbstractTaxibusOptimizer {
 			this.currentRequestPathsForLine.put(line, new LinkedHashSet<TaxibusVehicleRequestPath>());
 
 		}
+
 	}
 
 	@Override
 	protected void scheduleUnplannedRequests() {
 
-		
-		
 		Set<TaxibusRequest> handledRequests = new HashSet<>();
 		for (TaxibusRequest req : unplannedRequests) {
-			if (req.getT0()<this.optimConfig.context.getTime()+1800)
-				
+			if (req.getT0() < this.optimConfig.context.getTime() + 1800)
+
 			{
-			
-			
-			Set<TaxibusVehicleRequestPath> setToDepart =new HashSet<>();
-			TaxibusLine line = dispatcher.findLineForRequest(req);
-			if (line == null) {
-//				log.error("rejecting reqeuest" + req.getId() + " f " + req.getPassenger());
-				req.setRejected(true);
-				handledRequests.add(req);
-				continue;
-			}
 
-			Set<TaxibusVehicleRequestPath> requestPaths = this.currentRequestPathsForLine.get(line.getId());
-			TaxibusVehicleRequestPath best = null;
-
-			VrpPathWithTravelData bestPath = null;
-			double bestCriteria = Double.MAX_VALUE;
-
-			// go through existing open paths
-			for (TaxibusVehicleRequestPath taxibusVehicleRequestPath : requestPaths) {
-				if (taxibusVehicleRequestPath.getEarliestNextDeparture()>=taxibusVehicleRequestPath.getTwMax()){
-					setToDepart.add(taxibusVehicleRequestPath);
+				Set<TaxibusVehicleRequestPath> setToDepart = new HashSet<>();
+				TaxibusLine line = dispatcher.findLineForRequest(req);
+				if (line == null) {
+					// log.error("rejecting reqeuest" + req.getId() + " f " +
+					// req.getPassenger());
+					req.setRejected(true);
+					handledRequests.add(req);
 					continue;
 				}
-				double departureTime = taxibusVehicleRequestPath.getEarliestNextDeparture();
-				VrpPathWithTravelData path = calculateFromPickupToPickup(taxibusVehicleRequestPath.getLastPathAdded(),
-						req, departureTime);
-				double currentCriteria = getCriteriaFromPath(path);
-				if (req.getT0()>taxibusVehicleRequestPath.getTwMax()){
-					currentCriteria = Double.MAX_VALUE;
-					
-					setToDepart.add(taxibusVehicleRequestPath);
+
+				Set<TaxibusVehicleRequestPath> requestPaths = this.currentRequestPathsForLine.get(line.getId());
+				TaxibusVehicleRequestPath best = null;
+
+				VrpPathWithTravelData bestPath = null;
+				double bestCriteria = Double.MAX_VALUE;
+
+				// go through existing open paths
+				for (TaxibusVehicleRequestPath taxibusVehicleRequestPath : requestPaths) {
+					if (taxibusVehicleRequestPath.getEarliestNextDeparture() >= taxibusVehicleRequestPath.getTwMax()) {
+						setToDepart.add(taxibusVehicleRequestPath);
+						continue;
+					}
+					double departureTime = taxibusVehicleRequestPath.getEarliestNextDeparture();
+					VrpPathWithTravelData path = calculateFromPickupToPickup(
+							taxibusVehicleRequestPath.getLastPathAdded(), req, departureTime);
+					double currentCriteria = getCriteriaFromPath(path);
+					if (req.getT0() > taxibusVehicleRequestPath.getTwMax()) {
+						currentCriteria = Double.MAX_VALUE;
+
+						setToDepart.add(taxibusVehicleRequestPath);
+
+					}
+
+					if (currentCriteria < bestCriteria) {
+						bestCriteria = currentCriteria;
+						best = taxibusVehicleRequestPath;
+						bestPath = path;
+					}
 
 				}
-				
-				if (currentCriteria < bestCriteria) {
-					bestCriteria = currentCriteria;
-					best = taxibusVehicleRequestPath;
-					bestPath = path;
+				// see if it would be better to send out a new vehicle from
+				// storage
+				if ((requestPaths.size() < line.getMaximumOpenVehicles()) && line.isVehicleInHold()) {
+
+					Link hold = this.optimConfig.context.getScenario().getNetwork().getLinks()
+							.get(line.getHoldingPosition());
+					VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(hold, req.getFromLink(),
+							this.optimConfig.context.getTime(), routerWithCache, optimConfig.travelTime);
+					if (getCriteriaFromPath(path) < bestCriteria) {
+						Vehicle veh = line.getNextEmptyVehicle();
+						best = new TaxibusVehicleRequestPath(veh, req, path);
+						double twmax = Math.max(req.getT0(), path.getArrivalTime()) + line.getCurrentTwMax();
+						best.setTwMax(twmax);
+						handledRequests.add(req);
+
+					} else if (bestPath != null) {
+						best.addRequestAndPath(req, bestPath);
+						handledRequests.add(req);
+					}
+
+				}
+				if (best != null) {
+					requestPaths.add(best);
+					if (line.getCurrentOccupationRate() == best.requests.size()) {
+						fillPathWithDropOffsAndSchedule(best, line.getId());
+						requestPaths.remove(best);
+						fullBusDepartures++;
+						log.info(best.vehicle.getId() + " departs fully booked: " + fullBusDepartures);
+					}
+				}
+				for (TaxibusVehicleRequestPath ta : setToDepart) {
+					fillPathWithDropOffsAndSchedule(ta, line.getId());
+					requestPaths.remove(ta);
+					twmaxdepartures++;
+					log.info(ta.vehicle.getId() + " exceeds twmax: " + twmaxdepartures);
 				}
 
 			}
-			// see if it would be better to send out a new vehicle from
-			// storage
-			if ((requestPaths.size() < line.getMaximumOpenVehicles()) && line.isVehicleInHold()) {
-				
-				Link hold = this.optimConfig.context.getScenario().getNetwork().getLinks()
-						.get(line.getHoldingPosition());
-				VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(hold, req.getFromLink(),
-						this.optimConfig.context.getTime(), routerWithCache, optimConfig.travelTime);
-				if (getCriteriaFromPath(path) < bestCriteria) {
-					Vehicle veh = line.getNextEmptyVehicle();
-					best = new TaxibusVehicleRequestPath(veh, req, path);
-					double twmax = Math.max(req.getT0(), path.getArrivalTime()) + line.getCurrentTwMax();
-					best.setTwMax(twmax);
-					handledRequests.add(req);
-
-				} else if (bestPath != null) {
-					best.addRequestAndPath(req, bestPath);
-					handledRequests.add(req);
-				}
-
-			}
-			if (best != null) {
-				requestPaths.add(best);
-				if (line.getCurrentOccupationRate() == best.requests.size()) {
-					fillPathWithDropOffsAndSchedule(best, line.getId());
-					requestPaths.remove(best);
-					fullBusDepartures++;
-					log.info(best.vehicle.getId() + " departs fully booked: "+fullBusDepartures );
-				}
-			}
-			for (TaxibusVehicleRequestPath ta : setToDepart){
-				fillPathWithDropOffsAndSchedule(ta, line.getId());
-				requestPaths.remove(ta);
-				twmaxdepartures++;
-				log.info(ta.vehicle.getId() + " exceeds twmax: "+twmaxdepartures);
-			}
-
-		}}
+		}
 		unplannedRequests.removeAll(handledRequests);
 	}
 
 	private double getCriteriaFromPath(VrpPathWithTravelData path) {
 		switch (cost) {
 		case BEELINE:
-			return CoordUtils.calcDistance(path.getFromLink().getCoord(), path.getToLink().getCoord());
-			
+			return CoordUtils.calcEuclideanDistance(path.getFromLink().getCoord(), path.getToLink().getCoord());
 		case ARRIVALTIME:
 			return path.getArrivalTime();
 

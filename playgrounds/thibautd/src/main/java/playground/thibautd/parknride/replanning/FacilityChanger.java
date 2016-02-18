@@ -201,9 +201,9 @@ public class FacilityChanger {
 			final Coord pnr,
 			final Coord accessDest,
 			final Coord egressOr) {
-		return CoordUtils.calcDistance( origin , pnr ) * 2
-			+ CoordUtils.calcDistance( pnr , accessDest )
-			+ CoordUtils.calcDistance( pnr , egressOr );
+		return CoordUtils.calcEuclideanDistance( origin , pnr ) * 2
+			+ CoordUtils.calcEuclideanDistance( pnr , accessDest )
+			+ CoordUtils.calcEuclideanDistance( pnr , egressOr );
 	}
 
 	private void rerouteSubtour(

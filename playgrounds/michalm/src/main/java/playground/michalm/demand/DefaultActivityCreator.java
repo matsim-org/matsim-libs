@@ -23,13 +23,12 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.util.random.*;
+import org.matsim.contrib.zone.Zone;
+import org.matsim.contrib.zone.util.RandomPointUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 
 import com.vividsolutions.jts.geom.*;
-
-import playground.michalm.zone.*;
-import playground.michalm.zone.util.RandomPointUtils;
 
 
 public class DefaultActivityCreator

@@ -152,7 +152,7 @@ public final class TransitRouterNetwork implements Network {
 		}
 		
 		public TransitRouterNetworkLink(final Id<Link> id, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
-			this(id, fromNode, toNode, route, line, CoordUtils.calcDistance(toNode.stop.getStopFacility().getCoord(), fromNode.stop.getStopFacility().getCoord()));
+			this(id, fromNode, toNode, route, line, CoordUtils.calcEuclideanDistance(toNode.stop.getStopFacility().getCoord(), fromNode.stop.getStopFacility().getCoord()));
 		}
 
 		@Override

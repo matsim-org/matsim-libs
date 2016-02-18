@@ -21,6 +21,8 @@ package playground.wrashid.parkingSearch.planLevel.scenario;
 
 import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
 
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import playground.wrashid.parkingSearch.planLevel.init.InitializeParkings;
@@ -30,11 +32,18 @@ import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
 public class ParkingUtils {
 	private ParkingUtils(){} // do not instantiate
 
+	public static class ParkingConfigGroup extends ReflectiveConfigGroup {
+
+		// Put your parameters here!
+
+		public ParkingConfigGroup() {
+			super("parking", true);
+		}
+	}
+
 	public static ParkingBookKeeper initializeParking(MatsimServices controler) {
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		ConfigUtils.addOrGetModule(controler.getConfig(), "parking", ParkingConfigGroup.class);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		// add controler for initialization
 		controler.addControlerListener(new InitializeParkings());

@@ -94,7 +94,7 @@ public abstract class AbstractNetworkMapper implements ConvEvents.NetworkMapper 
 		Id<Node> presentSmallest = null;
 		double presentSmallestDist = Double.MAX_VALUE;
 		for (Node zone : mutualBaseGrid.getNodes().values()) {
-			Double dist = CoordUtils.calcDistance(zone.getCoord(),
+			Double dist = CoordUtils.calcEuclideanDistance(zone.getCoord(),
 					new Coord(start.getX() + (i * deltas[0]), start.getY() + (i * deltas[1])));
 			if (dist < presentSmallestDist) {
 				presentSmallestDist = dist;

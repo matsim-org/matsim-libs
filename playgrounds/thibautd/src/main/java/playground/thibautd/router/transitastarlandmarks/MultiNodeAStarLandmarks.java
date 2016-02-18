@@ -279,7 +279,7 @@ public class MultiNodeAStarLandmarks {
 	private double estimateRemainingTravelCostEuclidean(
 			final Node fromNode,
 			final Node toNode) {
-		double dist = CoordUtils.calcDistance( fromNode.getCoord(), toNode.getCoord() )
+		double dist = CoordUtils.calcEuclideanDistance( fromNode.getCoord(), toNode.getCoord() )
 				* preprocess.getMinTravelCostPerLength();
 		return dist * this.overdoFactor;
 	}

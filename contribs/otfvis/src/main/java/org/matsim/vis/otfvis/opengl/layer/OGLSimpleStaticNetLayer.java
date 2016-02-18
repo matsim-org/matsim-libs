@@ -24,7 +24,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.OTFClientControl;

@@ -30,11 +30,7 @@ import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author thibautd

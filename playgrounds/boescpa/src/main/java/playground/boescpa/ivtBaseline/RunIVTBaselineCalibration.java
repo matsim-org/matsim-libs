@@ -35,6 +35,7 @@ import org.matsim.pt.PtConstants;
 import playground.boescpa.ivtBaseline.counts.PTLinkCountsEventHandler;
 import playground.boescpa.ivtBaseline.counts.PTCountsIVTBaseline;
 import playground.boescpa.ivtBaseline.counts.PTStationCountsEventHandler;
+import playground.boescpa.lib.tools.fileCreation.F2LConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 
@@ -60,7 +61,7 @@ public class RunIVTBaselineCalibration {
 		OutputDirectoryLogging.catchLogEntries();
 
 		// It is suggested to use the config created by playground/boescpa/baseline/ConfigCreator.java.
-		final Config config = ConfigUtils.loadConfig(configFile, new BlackListedTimeAllocationMutatorConfigGroup());
+		final Config config = ConfigUtils.loadConfig(configFile, new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);

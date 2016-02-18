@@ -20,6 +20,7 @@
 package playground.telaviv.locationchoice.matsimdc;
 
 
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
@@ -34,6 +35,10 @@ public class DCControler {
 	
 	public DCControler(final String[] args) {
 		this.controler = new Controler(args);
+		
+		DestinationChoiceConfigGroup dccg = new DestinationChoiceConfigGroup();
+		this.controler.getConfig().addModule(dccg);
+		
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		/*
@@ -52,8 +57,8 @@ public class DCControler {
 
 		controler.addControlerListener(new DestinationChoiceInitializer(this.dcContext));
 
-		if (Double.parseDouble(controler.getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&
-				Double.parseDouble(controler.getConfig().findParam("locationchoice", "restraintFcnFactor")) > 0.0) {
+		if (dccg.getRestraintFcnExp() > 0.0 &&
+				dccg.getRestraintFcnFactor() > 0.0) {
 			controler.addControlerListener(new FacilitiesLoadCalculator(this.dcContext.getFacilityPenalties()));
 				}
 

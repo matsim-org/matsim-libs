@@ -195,7 +195,7 @@ public class ShoppingLegTripDurationAnalyzer implements PersonDepartureEventHand
 		
 		for (Leg leg : toLegsCar) {
 			toTravelTimesCar = toTravelTimesCar + leg.getTravelTime();
-			toDistancesCar = toDistancesCar + RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), scenario.getNetwork());
+			toDistancesCar = toDistancesCar + RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute)leg.getRoute(), scenario.getNetwork());
 		}
 		log.info("number of to-legsCar = " + toLegsCar.size());
 		log.info("mean to-traveltimesCar = " + toTravelTimesCar / toLegsCar.size());
@@ -222,7 +222,7 @@ public class ShoppingLegTripDurationAnalyzer implements PersonDepartureEventHand
 		
 		for (Leg leg : fromLegsCar) {
 			fromTravelTimesCar = fromTravelTimesCar + leg.getTravelTime();
-			fromDistancesCar = fromDistancesCar + RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), scenario.getNetwork());
+			fromDistancesCar = fromDistancesCar + RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute)leg.getRoute(), scenario.getNetwork());
 		}
 		log.info("number of from-legsCar = " + fromLegsCar.size());
 		log.info("mean from-traveltimesCar = " + fromTravelTimesCar / fromLegsCar.size());

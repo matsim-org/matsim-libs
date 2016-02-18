@@ -2,8 +2,8 @@ package playground.dhosse.prt.scheduler;
 
 import java.util.List;
 
-import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.schedule.TaxiPickupTask;
+import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 
 public class NPersonsPickupStayTask extends TaxiPickupTask {
 

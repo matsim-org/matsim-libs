@@ -21,19 +21,9 @@
 package herbie.running.controler;
 
 import herbie.running.config.HerbieConfigGroup;
-import herbie.running.controler.listeners.LegDistanceDistributionWriter;
-import herbie.running.replanning.TransitStrategyManager;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.router.TripRouter;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * Controler for the Herbie project.

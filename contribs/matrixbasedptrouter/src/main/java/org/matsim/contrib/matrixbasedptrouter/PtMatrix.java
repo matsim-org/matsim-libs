@@ -113,7 +113,7 @@ public final class PtMatrix {
 
 					PtStop destinationStop = ptStopIds[destination];
 					Coord destinationCoord = destinationStop.getCoord();
-					double distance = CoordUtils.calcDistance(originCoord, destinationCoord)
+					double distance = CoordUtils.calcEuclideanDistance(originCoord, destinationCoord)
 							* plansCalcRoute.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ;
 //							* plansCalcRoute.getBeelineDistanceFactor();
 
@@ -186,8 +186,8 @@ public final class PtMatrix {
 		PtStop fromPtStop = this.ptStops.getClosest(fromFacilityCoord.getX(), fromFacilityCoord.getY());
 		PtStop toPtStop   = this.ptStops.getClosest(toFacilityCoord.getX(), toFacilityCoord.getY());
 
-		double walkTravelTimeFromFacility2FromPtStop = CoordUtils.calcDistance(fromFacilityCoord, fromPtStop.getCoord()) / meterPerSecWalkSpeed;
-		double walkTravelTimeToPtStop2ToFacility = CoordUtils.calcDistance(toPtStop.getCoord(), toFacilityCoord) / meterPerSecWalkSpeed;
+		double walkTravelTimeFromFacility2FromPtStop = CoordUtils.calcEuclideanDistance(fromFacilityCoord, fromPtStop.getCoord()) / meterPerSecWalkSpeed;
+		double walkTravelTimeToPtStop2ToFacility = CoordUtils.calcEuclideanDistance(toPtStop.getCoord(), toFacilityCoord) / meterPerSecWalkSpeed;
 
 		double totalWalkTravelTime = walkTravelTimeFromFacility2FromPtStop + walkTravelTimeToPtStop2ToFacility;
 		return totalWalkTravelTime;
@@ -249,8 +249,8 @@ public final class PtMatrix {
 		PtStop fromPtStop = this.ptStops.getClosest(fromFacilityCoord.getX(), fromFacilityCoord.getY());
 		PtStop toPtStop   = this.ptStops.getClosest(toFacilityCoord.getX(), toFacilityCoord.getY());
 
-		double walkTravelDistanceFromFacility2FromPtStop = CoordUtils.calcDistance(fromFacilityCoord, fromPtStop.getCoord());
-		double walkTravelDistanceToPtStop2ToFacility = CoordUtils.calcDistance(toPtStop.getCoord(), toFacilityCoord);
+		double walkTravelDistanceFromFacility2FromPtStop = CoordUtils.calcEuclideanDistance(fromFacilityCoord, fromPtStop.getCoord());
+		double walkTravelDistanceToPtStop2ToFacility = CoordUtils.calcEuclideanDistance(toPtStop.getCoord(), toFacilityCoord);
 
 		double totalWalkTravelDistance = walkTravelDistanceFromFacility2FromPtStop + walkTravelDistanceToPtStop2ToFacility;
 		return totalWalkTravelDistance;

@@ -80,10 +80,10 @@ public abstract class WorldUtils {
 			double radius;
 			if (zoneMin == null || zoneMin.equals(aZone.getMax())) {
 				// the distance is center-to-center, only take 0.7 times the distance as radius
-				radius = 0.7*CoordUtils.calcDistance(zoneCenter, center);
+				radius = 0.7*CoordUtils.calcEuclideanDistance(zoneCenter, center);
 			} else {
 				// the other zone has an extent(min/max), so just use the full distance
-				radius = CoordUtils.calcDistance(aZone.getCoord(), center);
+				radius = CoordUtils.calcEuclideanDistance(aZone.getCoord(), center);
 			}
 			if (radius < shortestDistance) {
 				shortestDistance = radius;

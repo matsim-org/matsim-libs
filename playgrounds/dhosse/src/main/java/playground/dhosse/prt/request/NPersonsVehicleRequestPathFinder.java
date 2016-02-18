@@ -5,16 +5,16 @@ import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
 import playground.dhosse.prt.VehicleRequestPaths;
 import playground.dhosse.prt.scheduler.NPersonsPickupStayTask;
-import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.schedule.TaxiTask;
-import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
 
 
 public class NPersonsVehicleRequestPathFinder
