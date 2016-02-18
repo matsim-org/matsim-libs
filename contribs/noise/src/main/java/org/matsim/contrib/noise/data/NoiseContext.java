@@ -63,7 +63,7 @@ public class NoiseContext {
 	
 	// for routing purposes
 	
-	private Map<Double, Map<Id<Link>, NoiseLink>> timeInterval2linkId2noiseLinks = new HashMap<>();
+	private final Map<Double, Map<Id<Link>, NoiseLink>> timeInterval2linkId2noiseLinks = new HashMap<>();
 	
 	// time interval specific information
 	

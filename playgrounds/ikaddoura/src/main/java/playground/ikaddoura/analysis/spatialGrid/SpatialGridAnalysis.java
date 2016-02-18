@@ -121,10 +121,19 @@ public class SpatialGridAnalysis {
 		HashMap<Id<ReceiverPoint>, Double> rp2homeLocations = new HashMap<>();
 		HashMap<Id<ReceiverPoint>, Double> rp2totalCausedNoiseCost = new HashMap<>();
 		HashMap<Id<ReceiverPoint>, Double> rp2totalAffectedNoiseCost = new HashMap<>();
-
-		// grid parameters 
+			
+		// scenario
 		
-		NoiseConfigGroup gridParameters = new NoiseConfigGroup();
+//		String configFile = runDirectory + "output_config.xml.gz";
+		String populationFile = runDirectory + "output_plans.xml.gz";
+		String networkFile = runDirectory + "output_network.xml.gz";
+	
+//		Config config = ConfigUtils.loadConfig(configFile);		
+		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());		
+		config.plans().setInputFile(populationFile);
+		config.network().setInputFile(networkFile);
+		
+		NoiseConfigGroup gridParameters = (NoiseConfigGroup) config.getModule("noise");
 		gridParameters.setReceiverPointGap(receiverPointGap);
 					
 //		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
@@ -146,26 +155,13 @@ public class SpatialGridAnalysis {
 			
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
-			
-		// scenario
-		
-//		String configFile = runDirectory + "output_config.xml.gz";
-		String populationFile = runDirectory + "output_plans.xml.gz";
-		String networkFile = runDirectory + "output_network.xml.gz";
-	
-//		Config config = ConfigUtils.loadConfig(configFile);		
-		Config config = ConfigUtils.createConfig();		
-		config.plans().setInputFile(populationFile);
-		config.network().setInputFile(networkFile);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		File file = new File(outputFilePath);
 		file.mkdirs();
-		
-		// grid
-		
-		Grid grid = new Grid(scenario, gridParameters);
+				
+		Grid grid = new Grid(scenario);
 		
 		// events	
 		

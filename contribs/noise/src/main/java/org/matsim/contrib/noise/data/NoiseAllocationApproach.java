@@ -27,5 +27,5 @@ package org.matsim.contrib.noise.data;
  *
  */
 public enum NoiseAllocationApproach {
-        AverageCost, MarginalCost;
+        AverageCost, MarginalCost
 }

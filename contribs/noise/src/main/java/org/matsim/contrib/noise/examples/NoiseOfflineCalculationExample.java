@@ -20,11 +20,10 @@
 package org.matsim.contrib.noise.examples;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseOfflineCalculation;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
-import org.matsim.contrib.noise.utils.MergeNoiseCSVFile.OutputFormat;
-import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;

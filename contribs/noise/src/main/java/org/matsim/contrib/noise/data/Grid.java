@@ -69,27 +69,6 @@ public class Grid {
 	private final Map<Coord,Id<ReceiverPoint>> activityCoord2receiverPointId = new HashMap<Coord, Id<ReceiverPoint>>();
 	
 	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
-					
-	@Deprecated
-	public Grid(Scenario scenario, NoiseConfigGroup gridParams) {
-		
-		this.scenario = scenario;	
-		this.noiseParams = gridParams;
-		this.receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
-		
-		String[] consideredActTypesForDamagesArray = gridParams.getConsideredActivitiesForDamageCalculationArray();
-		for (int i = 0; i < consideredActTypesForDamagesArray.length; i++) {
-			this.consideredActivitiesForSpatialFunctionality.add(consideredActTypesForDamagesArray[i]);
-		}
-		
-		String[] consideredActTypesForReceiverPointGridArray = gridParams.getConsideredActivitiesForReceiverPointGridArray();
-		for (int i = 0; i < consideredActTypesForReceiverPointGridArray.length; i++) {
-			this.consideredActivitiesForReceiverPointGrid.add(consideredActTypesForReceiverPointGridArray[i]);
-		}
-
-		this.noiseParams.checkGridParametersForConsistency();
-		initialize();
-	}
 	
 	public Grid(Scenario scenario) {
 		this.scenario = scenario;	
