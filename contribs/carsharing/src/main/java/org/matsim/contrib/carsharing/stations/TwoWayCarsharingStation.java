@@ -22,11 +22,6 @@ public class TwoWayCarsharingStation extends AbstractCarSharingStation {
 		return numberOfVehicles;
 	}
 	
-	public Link getLink() {
-		
-		return link;
-	}
-	
 	public ArrayList<String> getIDs() {
 		
 		return vehicleIDs;

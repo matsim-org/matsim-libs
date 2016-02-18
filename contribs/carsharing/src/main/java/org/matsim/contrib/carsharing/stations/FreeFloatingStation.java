@@ -12,6 +12,8 @@ public class FreeFloatingStation extends AbstractCarSharingStation {
 	
 	public FreeFloatingStation(Link link, int numberOfVehicles, ArrayList<String> vehicleIDs) {
 		super(link) ;
+		// is a data class; should not keep object references! kai, feb'15
+		
 		this.numberOfVehicles = numberOfVehicles;
 		this.vehicleIDs = vehicleIDs;
 	}
@@ -19,11 +21,6 @@ public class FreeFloatingStation extends AbstractCarSharingStation {
 	public int getNumberOfVehicles() {
 		
 		return numberOfVehicles;
-	}
-	
-	public Link getLink() {
-		
-		return link;
 	}
 	
 	public ArrayList<String> getIDs() {

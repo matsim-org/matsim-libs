@@ -26,11 +26,6 @@ public final class OneWayCarsharingStation extends AbstractCarSharingStation {
 		return numberOfVehicles;
 	}
 	
-	public Link getLink() {
-		
-		return link;
-	}
-	
 	public int getNumberOfAvailableParkingSpaces() {
 		
 		return this.availableParkingSpaces ;

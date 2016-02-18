@@ -30,17 +30,21 @@ import org.matsim.facilities.Facility;
  *
  */
 abstract class AbstractCarSharingStation implements Facility {
-	Link link ;
+	private Coord coord;
+	private Id<Link> linkId;
+	private Id<Link> id;
 	AbstractCarSharingStation( Link link ) {
-		this.link = link ;
+		this.coord = link.getCoord() ;  // found it with this specification. kai, feb'16
+		this.linkId = link.getId();
+		this.id = link.getId() ; // found it with this specification. kai, feb'16
 	}
 	@Override
 	public Coord getCoord() {
-		return this.link.getCoord() ; // this is how I found it. kai, feb'16
+		return this.coord ;
 	}
 	@Override
 	public Id getId() {
-		return this.link.getId() ; // this is how I found it.  kai, feb'16
+		return this.id ;
 	}
 	@Override
 	public Map<String, Object> getCustomAttributes() {
@@ -49,6 +53,6 @@ abstract class AbstractCarSharingStation implements Facility {
 	}
 	@Override
 	public Id getLinkId() {
-		return this.link.getId();
+		return this.linkId ;
 	}
 }
