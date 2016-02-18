@@ -146,7 +146,22 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpCounts() {
 		try {
 			if ( counts != null ) {
-				new CountsWriter(counts).write( controlerIO.getOutputFilename( Controler.FILENAME_COUNTS ) );
+				final String inputCRS = config.counts().getInputCRS();
+				final String internalCRS = config.global().getCoordinateSystem();
+
+				if ( inputCRS == null ) {
+					new CountsWriter(counts).write(controlerIO.getOutputFilename(Controler.FILENAME_COUNTS));
+				}
+				else {
+					log.info( "re-projecting counts from "+internalCRS+" to "+inputCRS+" for export" );
+
+					final CoordinateTransformation transformation =
+							TransformationFactory.getCoordinateTransformation(
+									internalCRS,
+									inputCRS );
+
+					new CountsWriter( transformation , counts).write(controlerIO.getOutputFilename(Controler.FILENAME_COUNTS));
+				}
 			}
 		} catch ( Exception ee ) {}
 	}
