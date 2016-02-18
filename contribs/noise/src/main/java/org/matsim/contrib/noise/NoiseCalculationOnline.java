@@ -41,10 +41,12 @@ import org.matsim.core.controler.listener.StartupListener;
 
 
 /**
+ * Starts the noise computation as specified in the {@link NoiseConfigGroup}.
+ * 
  * @author ikaddoura
  *
  */
-public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimListener , StartupListener {
+public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimListener, StartupListener {
 	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
 	
 	private NoiseContext noiseContext;

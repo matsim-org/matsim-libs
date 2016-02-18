@@ -29,7 +29,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * An example how to run an offline noise computation.
+ * 
+ * An example how to compute noise levels, damages etc. for a single iteration (= offline noise computation). 
  * 
  * @author ikaddoura
  *

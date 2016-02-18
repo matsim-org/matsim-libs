@@ -26,36 +26,42 @@ import java.io.IOException;
 
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
+import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * An example how to use the noise module during a MATSim run (= online noise computation).
- * Depending on the specifications in the noise config group, noise damages may be internalized (average cost pricing vs. marginal cost pricing).
+ * 
+ * The {@link NoiseConfigGroup} specifies parameters that are relevant for the noise computation and if noise damages are internalized.
+ * For the internalization of noise damages, there is an average and a marginal cost pricing approach, see {@link NoiseAllocationApproach}.
+ * 
+ * For an example of how to compute noise levels, damages etc. for a final iteration (= offline noise computation), see {@link NoiseOfflineCalculationExample}. 
  * 
  * @author ikaddoura
  *
  */
 public class NoiseOnlineControlerExample {
 	
-	private static String configFile = "/pathToConfigFile/config.xml";
+	private static final String configFile = "./test/input/org/matsim/contrib/noise/config.xml";
 
 	public static void main(String[] args) throws IOException {
 				
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());		
 		Controler controler = new Controler(config);
 		controler.addControlerListener(new NoiseCalculationOnline(controler));
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 				
-		// processing the output, not necessary
-		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immisions/";
+		// optionally process the output data
+		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
 		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
-		readNoiseFile.run();
-		
+		readNoiseFile.run();	
 	}
 	
 }
