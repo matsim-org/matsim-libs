@@ -44,8 +44,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
  *
  */
 
-public class NoiseOnlineControler {
-	private static final Logger log = Logger.getLogger(NoiseOnlineControler.class);
+public class NoiseOnlineControlerIK {
+	private static final Logger log = Logger.getLogger(NoiseOnlineControlerIK.class);
 
 	private static String configFile;
 
@@ -61,7 +61,7 @@ public class NoiseOnlineControler {
 			configFile = "/Users/ihab/Desktop/test/config.xml";
 		}
 				
-		NoiseOnlineControler noiseImmissionControler = new NoiseOnlineControler();
+		NoiseOnlineControlerIK noiseImmissionControler = new NoiseOnlineControlerIK();
 		noiseImmissionControler.run(configFile);
 	}
 

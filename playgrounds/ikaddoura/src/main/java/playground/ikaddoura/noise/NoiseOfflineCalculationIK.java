@@ -42,8 +42,8 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author ikaddoura
  *
  */
-public class NoiseCalculationOffline {
-	private static final Logger log = Logger.getLogger(NoiseCalculationOffline.class);
+public class NoiseOfflineCalculationIK {
+	private static final Logger log = Logger.getLogger(NoiseOfflineCalculationIK.class);
 	
 	private static String runDirectory;
 	private static String outputDirectory;
