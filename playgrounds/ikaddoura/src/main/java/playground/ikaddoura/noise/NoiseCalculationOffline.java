@@ -30,7 +30,6 @@ import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseOfflineCalculation;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
-import org.matsim.contrib.noise.utils.MergeNoiseCSVFile.OutputFormat;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -236,8 +235,6 @@ public class NoiseCalculationOffline {
 		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
 		merger.setWorkingDirectory(workingDirectories);
 		merger.setLabel(labels);
-		merger.setOutputFormat(OutputFormat.xyt);
-		merger.setThreshold(-1.);
 		merger.run();
 	}
 }

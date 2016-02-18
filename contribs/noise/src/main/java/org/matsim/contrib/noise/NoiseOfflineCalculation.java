@@ -37,7 +37,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 /**
  * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
  * (2) Optionally throws noise immission damage events for the causing agent and the affected agent.
- * 
+ *
  * @author ikaddoura
  *
  */
@@ -53,6 +53,13 @@ public class NoiseOfflineCalculation {
 	public NoiseOfflineCalculation(Scenario scenario, String analysisOutputDirectory) {
 		this.scenario = scenario;
 		this.outputDirectory = analysisOutputDirectory;
+		
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModule("noise");
+		if (noiseParameters.isInternalizeNoiseDamages()) {
+			log.warn("If you intend to internalize noise damages, please run the online noise computation."
+					+ " This is an offline noise calculation which can only be used for analysis purposes.");
+			noiseParameters.setInternalizeNoiseDamages(false);
+		}
 	}
 
 	public void run() {

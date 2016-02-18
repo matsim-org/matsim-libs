@@ -44,7 +44,6 @@ import org.matsim.core.controler.listener.StartupListener;
  * @author ikaddoura
  *
  */
-
 public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimListener , StartupListener {
 	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
 	
@@ -52,17 +51,25 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 	private NoiseTimeTracker timeTracker;
 	private PersonActivityTracker actTracker;
 	private NoisePricingHandler pricing;
-			
+		
+	/**
+	 * Use this constructor if the default travel disutility was previously replaced in your own controler. 
+	 *
+	 */
 	public NoiseCalculationOnline(NoiseContext noiseContext) {
 		this.noiseContext = noiseContext;
 		
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) noiseContext.getScenario().getConfig().getModule("noise");
 		
 		if (noiseParameters.isInternalizeNoiseDamages()) {
-			log.warn("Internalizing noise damages. The default travel disutility has to be replaced by a travel distuility which accounts for noise tolls.");
+			log.warn("Internalizing noise damages. This requires that the default travel disutility is replaced by a travel distuility which accounts for noise tolls.");
 		}
 	}
 
+	/**
+	 * In case noise damages are internalized, this constructor replaces the default travel disutility by a travel distutility which accounts for the noise tolls. 
+	 *
+	 */
 	public NoiseCalculationOnline(Controler controler) {
 		
 		NoiseContext noiseContext = new NoiseContext(controler.getScenario());
