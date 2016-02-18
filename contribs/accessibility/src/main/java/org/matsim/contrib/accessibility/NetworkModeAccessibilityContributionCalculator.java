@@ -52,13 +52,6 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 			final Scenario scenario){
 		this.scenario = scenario;
 
-//		AccessibilityConfigGroup moduleAPCM =
-//				ConfigUtils.addOrGetModule(
-//						scenario.getConfig(),
-//						AccessibilityConfigGroup.GROUP_NAME,
-//						AccessibilityConfigGroup.class);
-//		this.departureTime = moduleAPCM.getTimeOfDay();
-
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
 		this.travelTime = travelTime;
