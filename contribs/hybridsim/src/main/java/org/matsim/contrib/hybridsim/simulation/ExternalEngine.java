@@ -63,9 +63,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceServiceGrpc.
 	//testing only
 	private final Set<Id<Person>> handled = new HashSet<>();
 	private GRPCExternalClient client;
-	private double onsetX = 1113711.9263903373;
-	private double onsetY = 7041180.26922217;
-	
+
 	public ExternalEngine(EventsManager eventsManager, Netsim sim) {
 		this.em = eventsManager;
 		this.sim = sim;
@@ -208,7 +206,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceServiceGrpc.
 			double angle = a.getAngle();
 			double dx = Math.cos(Math.PI*angle/180);
 			double dy = Math.sin(Math.PI*angle/180);
-			XYVxVyEventImpl e = new XYVxVyEventImpl(id, x+onsetX, y+onsetY, dx, dy, time);
+			XYVxVyEventImpl e = new XYVxVyEventImpl(id, x, y, dx, dy, time);
 			this.em.processEvent(e);
 		}
 
