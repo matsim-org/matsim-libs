@@ -73,8 +73,6 @@ public class NoiseOfflineCalculationExample {
 		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
 		merger.setWorkingDirectory(workingDirectories);
 		merger.setLabel(labels);
-		merger.setOutputFormat(OutputFormat.xyt);
-		merger.setThreshold(-1.);
 		merger.run();
 	}
 }
