@@ -60,8 +60,8 @@ public class NoiseOnlineControlerExample {
 		String workingDirectory = controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/";
 		String receiverPointsFile = controler.getConfig().controler().getOutputDirectory() + "/receiverPoints/receiverPoints.csv";
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
-		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
-		readNoiseFile.run();	
+		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
+		processNoiseImmissions.run();	
 	}
 	
 }

@@ -281,7 +281,6 @@ public final class MergeNoiseCSVFile {
 
 				log.info("Reading time bin: " + time);
 
-				// String fileName = workingDirectory + "100." + label + "_" + Double.toString(time) + ".csv";
 				String fileName = workingDirectory + label + "_" + Double.toString(time) + ".csv";
 
 				try ( BufferedReader br = IOUtils.getBufferedReader(fileName) ) {
