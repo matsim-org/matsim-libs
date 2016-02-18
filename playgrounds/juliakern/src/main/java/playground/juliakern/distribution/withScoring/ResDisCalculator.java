@@ -23,9 +23,11 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.emissions.*;
+import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.WarmEmissionAnalysisModule;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.router.util.TravelDisutility;
@@ -100,7 +102,7 @@ public class ResDisCalculator implements TravelDisutility{
 			}
 		}
 		
-		double expectedEmissionPrice = calculateExpectedEmissionDisutility(person, link, link.getLength(), link.getLength()/link.getFreespeed()); //TODO get some value from vehicle type/emission vehicles as approx for generated emissions. might also depend on link length
+		double expectedEmissionPrice = calculateExpectedEmissionDisutility(vehicle, link, link.getLength(), link.getLength()/link.getFreespeed()); //TODO get some value from vehicle type/emission vehicles as approx for generated emissions. might also depend on link length
 		
 		emissionValue = personXactivityDuration * expectedEmissionPrice * marginalUtilityOfMoney;
 		// TODO scale? -> Benjamin
@@ -119,7 +121,7 @@ public class ResDisCalculator implements TravelDisutility{
 	}
 
 	
-		private double calculateExpectedEmissionDisutility(Person person, Link link, double distance, double linkTravelTime) {
+		private double calculateExpectedEmissionDisutility(Vehicle vehicle, Link link, double distance, double linkTravelTime) {
 		double linkExpectedEmissionDisutility;
 
 		/* The following is an estimate of the warm emission costs that an agent (depending on her vehicle type and
@@ -127,25 +129,23 @@ public class ResDisCalculator implements TravelDisutility{
 		iteration. Cold emission costs are assumed not to change routing; they might change mode choice or
 		location choice (not implemented)! */
 		
-		Vehicle vehicle;
-		try{
-			vehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
-		}catch(NullPointerException e){
-			
-			vehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());	
-		}
+//		Vehicle vehicle;
+//		try{
+//			vehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(vehicle.getId());
+//		}catch(NullPointerException e){
+//			
+//			vehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(vehicle.getId());	
+//		}
 		
-		
-		VehicleType vehicleType = vehicle.getType();
-		String vehicleInformation = vehicleType.getId().toString();
+		Id<VehicleType> vehicleTypeId = vehicle.getType().getId();
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
 		Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
-					person.getId(),
+					vehicle.getId(),
 					Integer.parseInt(((LinkImpl) link).getType()),
 					link.getFreespeed(),
 					distance,
 					linkTravelTime,
-					vehicleInformation
+					vehicleTypeId
 					);
 		double expectedEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(expectedWarmEmissions);
 		linkExpectedEmissionDisutility = this.marginalUtilityOfMoney * expectedEmissionCosts ;

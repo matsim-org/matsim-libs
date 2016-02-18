@@ -31,6 +31,8 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 import playground.benjamin.internalization.EmissionCostModule;
 
@@ -79,9 +81,9 @@ public class EmissionRoadPricing {
 	private double getEmissionCost(Link link) {
 		
 		double freeTravelTime = Math.floor(link.getLength()/link.getFreespeed())+1;
-		Id<Person> personId = Id.createPersonId("555524.1#11613");
-		Map<WarmPollutant, Double> warmEmissions = this.weam.checkVehicleInfoAndCalculateWarmEmissions(personId, roadType, link.getFreespeed(), 
-				link.getLength(), freeTravelTime, HbefaVehicleCategory.PASSENGER_CAR.toString());
+		Id<Vehicle> vehicleId = Id.createVehicleId("555524.1#11613");
+		Map<WarmPollutant, Double> warmEmissions = this.weam.checkVehicleInfoAndCalculateWarmEmissions(vehicleId, roadType, link.getFreespeed(), 
+				link.getLength(), freeTravelTime, Id.create(HbefaVehicleCategory.PASSENGER_CAR.toString(), VehicleType.class));
 		double amount = ecm.calculateWarmEmissionCosts(warmEmissions);
 		return amount;
 	}

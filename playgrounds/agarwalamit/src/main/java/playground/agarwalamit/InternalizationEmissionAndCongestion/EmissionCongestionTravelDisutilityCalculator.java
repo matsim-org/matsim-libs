@@ -91,10 +91,10 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 
 		if(this.hotspotLinks == null){
 			// pricing applies for all links
-			linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(person, link, distance, linkTravelTime);
+			linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(v, link, distance, linkTravelTime);
 		} else {
 			// pricing applies for the current link
-			if(this.hotspotLinks.contains(link.getId())) linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(person, link, distance, linkTravelTime);
+			if(this.hotspotLinks.contains(link.getId())) linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(v, link, distance, linkTravelTime);
 			// pricing applies not for the current link
 			else linkExpectedEmissionDisutility = 0.0;
 		}
@@ -108,7 +108,7 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 			return linkTravelDisutility;
 	}
 
-	private double calculateExpectedEmissionDisutility(Person person, Link link, double distance, double linkTravelTime) {
+	private double calculateExpectedEmissionDisutility(Vehicle vehicle, Link link, double distance, double linkTravelTime) {
 		double linkExpectedEmissionDisutility;
 
 		/* The following is an estimate of the warm emission costs that an agent (depending on her vehicle type and
@@ -116,17 +116,16 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 		iteration. Cold emission costs are assumed not to change routing; they might change mode choice or
 		location choice (not implemented)! */
 
-		Vehicle vehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
-		VehicleType vehicleType = vehicle.getType();
-		String vehicleInformation = vehicleType.getId().toString();
+//		Vehicle vehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(vehicle.getId());
+		Id<VehicleType> vehicleTypeId = vehicle.getType().getId();
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
 		Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
-				person.getId(),
+				vehicle.getId(),
 				Integer.parseInt(((LinkImpl) link).getType()),
 				link.getFreespeed(),
 				distance,
 				linkTravelTime,
-				vehicleInformation
+				vehicleTypeId
 				);
 		double expectedEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(expectedWarmEmissions);
 		linkExpectedEmissionDisutility = this.marginalUtlOfMoney * expectedEmissionCosts ;

@@ -21,21 +21,26 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.types.*;
+import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
+import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
+import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
+import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
+import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.vehicles.VehicleType;
 
 
 /**
@@ -136,27 +141,27 @@ public class WarmEmissionAnalysisModule {
 	}
 
 	public Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(
-			Id personId,
+			Id<Vehicle> vehicleId,
 			Integer roadType,
 			Double freeVelocity,
 			Double linkLength,
 			Double travelTime,
-			String vehicleInformation) {
+			Id<VehicleType> vehicleTypeId) {
 
 		Map<WarmPollutant, Double> warmEmissions;
-		if(vehicleInformation == null){
-			throw new RuntimeException("Vehicle type description for person " + personId + "is missing. " +
+		if(vehicleTypeId == null){
+			throw new RuntimeException("Vehicle type description for vehicle " + vehicleId + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 		
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertString2Tuple(vehicleInformation);
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicleTypeId);
 		if (vehicleInformationTuple.getFirst() == null){
-			throw new RuntimeException("Vehicle category for person " + personId + " is not valid. " +
+			throw new RuntimeException("Vehicle category for vehicle " + vehicleId + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-		warmEmissions = calculateWarmEmissions(personId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
+		warmEmissions = calculateWarmEmissions(vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
 		
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
@@ -177,7 +182,7 @@ public class WarmEmissionAnalysisModule {
 	}
 
 	private Map<WarmPollutant, Double> calculateWarmEmissions(
-			Id personId,
+			Id<Vehicle> vehicleId,
 			Double travelTime,
 			Integer roadType,
 			Double freeVelocity,
@@ -244,7 +249,7 @@ public class WarmEmissionAnalysisModule {
 
                     int maxWarnCnt = 3;
                     if(vehAttributesNotSpecifiedCnt <= maxWarnCnt) {
-						logger.warn("Detailed vehicle attributes are not specified correctly for person " + personId + ": " + 
+						logger.warn("Detailed vehicle attributes are not specified correctly for vehicle " + vehicleId + ": " + 
 								"`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
 						if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 					}
@@ -297,12 +302,12 @@ public class WarmEmissionAnalysisModule {
 		return warmEmissionsOfEvent;
 	}
 
-	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertString2Tuple(String vehicleInformation) {
+	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleTypeId2VehicleInformationTuple(Id<VehicleType> vehicleTypeId) {
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
-		String[] vehicleInformationArray = vehicleInformation.split(";");
+		String[] vehicleInformationArray = vehicleTypeId.toString().split(";");
 
 		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
 			if(vehCat.toString().equals(vehicleInformationArray[0])){

@@ -119,7 +119,7 @@ public class ColdEmissionAnalysisModule {
 			Id<VehicleType> vehicleTypeId) {
 
 		Map<ColdPollutant, Double> coldEmissions;
-		if(vehicleTypeId.equals(null)){
+		if(vehicleTypeId == null){
 			throw new RuntimeException("Vehicle type description for vehicle " + vehicleId + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
