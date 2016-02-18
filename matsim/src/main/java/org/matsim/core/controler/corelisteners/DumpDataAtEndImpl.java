@@ -64,6 +64,7 @@ import java.util.Map;
 
 @Singleton
 final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
+	private static final Logger log = Logger.getLogger( DumpDataAtEndImpl.class );
 
 	@Inject
 	private Config config;
@@ -128,6 +129,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			new NetworkWriter(network).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
 		}
 		else {
+			log.info( "re-projecting network from "+config.global().getCoordinateSystem()+" to "+config.network().getInputCRS()+" for export" );
 			final CoordinateTransformation transformation =
 					TransformationFactory.getCoordinateTransformation(
 							config.global().getCoordinateSystem(),

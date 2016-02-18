@@ -135,6 +135,7 @@ class ScenarioLoaderImpl {
 				new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
 			}
 			else {
+				log.info( "re-projecting network from "+config.network().getInputCRS()+" to "+config.global().getCoordinateSystem()+" for import" );
 				final CoordinateTransformation transformation =
 						TransformationFactory.getCoordinateTransformation(
 								config.network().getInputCRS(),
