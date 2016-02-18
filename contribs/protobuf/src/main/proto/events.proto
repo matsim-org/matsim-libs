@@ -23,7 +23,7 @@ syntax = "proto3";
 package protobuf;
 
 option java_multiple_files = false;
-option java_package = "org.matsim.contrib.hybrid.events";
+option java_package = "org.matsim.contrib.protobuf.events";
 option java_outer_classname = "ProtobufEvents";
 
 
