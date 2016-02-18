@@ -68,6 +68,6 @@ public class TransitScheduleWriter implements MatsimSomeWriter {
 	 * @throws UncheckedIOException
 	 */
 	public void writeFileV1(final String filename) throws UncheckedIOException {
-		new TransitScheduleWriterV1(this.schedule).write(filename);
+		new TransitScheduleWriterV1( transformation , this.schedule).write(filename);
 	}
 }

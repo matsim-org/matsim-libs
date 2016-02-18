@@ -54,7 +54,7 @@ public class TransitScheduleReader implements MatsimSomeReader {
 		MatsimFileTypeGuesser guesser = new MatsimFileTypeGuesser(filename);
 		String systemId = guesser.getSystemId();
 		if (systemId.endsWith("transitSchedule_v1.dtd")) {
-			new TransitScheduleReaderV1(this.scenario).readFile(filename);
+			new TransitScheduleReaderV1( transformation , this.scenario).readFile(filename);
 		} else {
 			throw new UncheckedIOException("Unsupported file format: " + systemId);
 		}
