@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Client.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,11 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.hybridsim.events;
 
-import org.matsim.core.events.handler.EventHandler;
+package org.matsim.contrib.hybridsim.grpc;
 
-public interface ExternalAgentConstructEventHanlder extends EventHandler {
 
-	public void handleEvent(ExternalAgentConstructEvent event);
+import io.grpc.internal.ManagedChannelImpl;
+import io.grpc.netty.NegotiationType;
+import io.grpc.netty.NettyChannelBuilder;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.hybridsim.interfacedef.ExternInterfaceServiceGrpc;
+
+import java.util.concurrent.TimeUnit;
+
+public class GRPCExternalClient {
+	private static final Logger log = Logger.getLogger(GRPCExternalClient.class);
+
+
+	private final ExternInterfaceServiceGrpc.ExternInterfaceServiceBlockingStub blockingStub;
+	private final ManagedChannelImpl channel;
+
+	public GRPCExternalClient(String host, int port) {
+		this.channel = NettyChannelBuilder.forAddress(host, port).negotiationType(NegotiationType.PLAINTEXT).build();
+	this.blockingStub = ExternInterfaceServiceGrpc.newBlockingStub(this.channel);
+	}
+
+	public void shutdown() throws InterruptedException {
+		this.channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+	}
+	
+	public ExternInterfaceServiceGrpc.ExternInterfaceServiceBlockingStub getBlockingStub(){
+		return this.blockingStub;
+	}
+	
 }

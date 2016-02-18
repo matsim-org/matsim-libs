@@ -18,8 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.hybridsim.factories;
+package org.matsim.contrib.hybridsim.simulation;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -38,11 +40,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSimExternalNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
-import playground.gregor.hybridsim.simulation.ExternalEngine;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
 public class HybridMobsimProvider implements Provider<Mobsim>{
 	
 	private final Scenario sc;
@@ -50,7 +47,7 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 	private final HybridNetworkFactory netFac;
 
 	@Inject
-	HybridMobsimProvider(Scenario sc, EventsManager eventsManager,HybridNetworkFactory netFac) {
+	HybridMobsimProvider(Scenario sc, EventsManager eventsManager, HybridNetworkFactory netFac) {
 		this.sc = sc;
 		this.em = eventsManager;
 		this.netFac = netFac;

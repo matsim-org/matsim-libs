@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ExternalSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,10 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.hybridsim.grpc;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-public interface ExternalSim extends Runnable{
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+public class HybridNetworkFactory implements
+		NetsimNetworkFactory {
+
+	private final Map<String, NetsimNetworkFactory> facs = new LinkedHashMap<>();
 	
-	public void shutdown();
+	@Override
+	public QNode createNetsimNode(Node node, QNetwork network) {
+		return new QNode(node, network);
+	}
+
+	@Override
+	public QLinkInternalI createNetsimLink(Link link, QNetwork network,
+			QNode queueNode) {
+		
+		for (Entry<String, NetsimNetworkFactory> e : this.facs.entrySet()) {
+			if (link.getAllowedModes().contains(e.getKey())) {
+				return e.getValue().createNetsimLink(link, network, queueNode);
+			}
+		}
+		//default QLink
+		return new QLinkImpl(link, network, queueNode);
+	}
+	
+	public void putNetsimNetworkFactory(String key, NetsimNetworkFactory fac) {
+		this.facs.put(key, fac);
+	}
 
 }

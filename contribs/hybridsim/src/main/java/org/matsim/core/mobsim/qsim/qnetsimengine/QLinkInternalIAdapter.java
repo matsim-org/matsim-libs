@@ -16,29 +16,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.hybridsim.events;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Person;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-public class ExternalAgentConstructEvent extends Event{
+import org.matsim.api.core.v01.network.Link;
 
-	private Id<Person> id;
-	public ExternalAgentConstructEvent(double time, Id<Person> id) {
-		super(time);
-		this.id = id;
-	}
-	public static final String EVENT_TYPE = "ExternalAgentConstructEvent";
-	
-	
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-	
-	public Id<Person> getId() {
-		return this.id;
+public class QLinkInternalIAdapter {
+	private final QLinkInternalI ql;
+
+	QLinkInternalIAdapter(QLinkInternalI qLinkImpl) {
+		this.ql = qLinkImpl;
 	}
 
+	public boolean isAcceptingFromUpstream() {
+		return this.ql.isAcceptingFromUpstream();
+	}
+
+	public Link getLink() {
+		return this.ql.getLink();
+	}
+
+	public void addFromUpstream(QVehicle veh) {
+		this.ql.addFromUpstream(veh);
+
+	}
 }

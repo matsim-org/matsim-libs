@@ -18,15 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.hybridsim.grpc;
+package org.matsim.contrib.hybridsim.grpc;
 
 
 import io.grpc.internal.ServerImpl;
 import io.grpc.netty.NettyServerBuilder;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.hybrid.MATSimInterfaceServiceGrpc;
-import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceService;
+import org.matsim.contrib.hybridsim.interfacedef.MATSimInterfaceServiceGrpc;
 
 import java.util.concurrent.CyclicBarrier;
 
@@ -38,12 +37,12 @@ public class GRPCInternalServer implements Runnable{
 	private final int port = 9999;
 
 
-	private final MATSimInterfaceService mi;
+	private final MATSimInterfaceServiceGrpc.MATSimInterfaceService mi;
 
 	private final CyclicBarrier startupBarrier;
 	private ServerImpl server;
 
-	public GRPCInternalServer(MATSimInterfaceService mi, CyclicBarrier startupBarrier) {
+	public GRPCInternalServer(MATSimInterfaceServiceGrpc.MATSimInterfaceService mi, CyclicBarrier startupBarrier) {
 		Logger.getLogger("io.netty").setLevel(Level.OFF);
 		this.mi = mi;
 		this.startupBarrier = startupBarrier;
