@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
@@ -37,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * 
@@ -126,7 +128,8 @@ public class NoiseOnlineControlerIK {
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 				
-		Controler controler = new Controler(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
 		controler.addControlerListener(new NoiseCalculationOnline(controler));
 
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
