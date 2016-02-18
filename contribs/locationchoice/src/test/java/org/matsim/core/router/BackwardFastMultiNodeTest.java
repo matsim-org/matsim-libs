@@ -61,7 +61,7 @@ public class BackwardFastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
 		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardsFastMultiNodeDijkstraFactory(searchAllEndNodes).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -119,7 +119,7 @@ public class BackwardFastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
 		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardsFastMultiNodeDijkstraFactory(false).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -207,7 +207,7 @@ public class BackwardFastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
 		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardsFastMultiNodeDijkstraFactory(true).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		

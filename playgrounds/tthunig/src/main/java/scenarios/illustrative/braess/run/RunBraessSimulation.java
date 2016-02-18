@@ -169,8 +169,8 @@ public final class RunBraessSimulation {
 					if (strategies[i].getWeight() > 0.0){ // ReRoute is used
 						final CongestionTollTimeDistanceTravelDisutilityFactory factory =
 								new CongestionTollTimeDistanceTravelDisutilityFactory(
-										new Builder( TransportMode.car ),
-								tollHandler
+										new Builder( TransportMode.car, config.planCalcScore() ),
+								tollHandler, config.planCalcScore()
 							) ;
 						factory.setSigma(SIGMA);
 						controler.addOverridingModule(new AbstractModule(){
@@ -218,7 +218,7 @@ public final class RunBraessSimulation {
 			
 			// adapt sigma for randomized routing
 			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
+					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override

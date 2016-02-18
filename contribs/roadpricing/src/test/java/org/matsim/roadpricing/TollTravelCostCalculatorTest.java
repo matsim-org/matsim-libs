@@ -95,7 +95,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
 				defaultDisutilityFactory, scheme, margUtlOfMoney );
 //        travelDisutilityFactory.setSigma( 0. ) ;
-		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(timeCalculator, config.planCalcScore() ) ;
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(timeCalculator ) ;
 		
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
 		

@@ -133,8 +133,8 @@ public class WalkDistanceEstimator {
 		 *---------------------------------------------------------------------*/
 		// Set up router.
 		TravelTimeCalculator ttc = TravelTimeCalculator.create(sAll.getNetwork(), sAll.getConfig().travelTimeCalculator());
-		TravelDisutilityFactory tccf = new Builder( TransportMode.car );
-		TravelDisutility tc = tccf.createTravelDisutility(ttc.getLinkTravelTimes(), sAll.getConfig().planCalcScore());
+		TravelDisutilityFactory tccf = new Builder( TransportMode.car, sAll.getConfig().planCalcScore() );
+		TravelDisutility tc = tccf.createTravelDisutility(ttc.getLinkTravelTimes());
 		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(ttc);
 		new MatsimEventsReader(em).readFile(sb.getIterationEventsFile("100"));

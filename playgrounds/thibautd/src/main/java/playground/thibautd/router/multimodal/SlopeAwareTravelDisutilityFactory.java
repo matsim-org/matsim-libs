@@ -21,7 +21,6 @@ package playground.thibautd.router.multimodal;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -43,9 +42,8 @@ public class SlopeAwareTravelDisutilityFactory implements TravelDisutilityFactor
 
 	@Override
 	public TravelDisutility createTravelDisutility(
-			final TravelTime timeCalculator,
-			final PlanCalcScoreConfigGroup cnScoringGroup ) {
-		final TravelDisutility delegate = delegateFactory.createTravelDisutility( timeCalculator , cnScoringGroup );
+			final TravelTime timeCalculator ) {
+		final TravelDisutility delegate = delegateFactory.createTravelDisutility( timeCalculator );
 
 		return new TravelDisutility() {
 			@Override

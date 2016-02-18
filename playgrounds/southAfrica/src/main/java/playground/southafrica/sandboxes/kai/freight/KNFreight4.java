@@ -175,7 +175,7 @@ public class KNFreight4 {
 
 		PlanCalcScoreConfigGroup cnScoringGroup = ctrl.getConfig().planCalcScore() ;
 		TravelTime timeCalculator = ctrl.getLinkTravelTimes() ;
-		TravelDisutility trDisutil = ctrl.getTravelDisutilityFactory().createTravelDisutility(timeCalculator, cnScoringGroup) ;
+		TravelDisutility trDisutil = ctrl.getTravelDisutilityFactory().createTravelDisutility(timeCalculator) ;
 
 		CarrierPlanStrategyManagerFactory strategyManagerFactory  = KNFreight4.createMyStrategyManager(scenario, ctrl) ;
 		ctrl.getConfig().controler().setOverwriteFileSetting(
@@ -293,7 +293,7 @@ public class KNFreight4 {
 			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
 				TravelDisutility travelDisutility = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
-						travelTimes , scenario.getConfig().planCalcScore() );
+						travelTimes );
 				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
 						travelDisutility, travelTimes) ;
 

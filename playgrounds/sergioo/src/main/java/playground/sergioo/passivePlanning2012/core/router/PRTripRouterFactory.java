@@ -47,7 +47,7 @@ public class PRTripRouterFactory implements Provider<TripRouter> {
         PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
 
         TravelTime travelTime = travelTimes.get("car");
-        TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore());
+        TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"));
 
         LeastCostPathCalculator routeAlgo =
                 leastCostPathCalculatorFactory.createPathCalculator(

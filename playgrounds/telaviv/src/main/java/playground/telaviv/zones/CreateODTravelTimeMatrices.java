@@ -71,7 +71,7 @@ public class CreateODTravelTimeMatrices {
 		this.zoneMapping = zoneMapping;
 		this.travelTime = travelTime2;
 
-		travelCost = new Builder( TransportMode.car ).createTravelDisutility(travelTime2, scenario.getConfig().planCalcScore());
+		travelCost = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() ).createTravelDisutility(travelTime2);
 		getConnectorNodes();
 	}
 	

@@ -146,7 +146,7 @@ public class NoiseOnlineControler {
 		Controler controler = new Controler(configFile);
 
 		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
-		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
+		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext, controler.getConfig().planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

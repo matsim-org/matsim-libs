@@ -100,8 +100,7 @@ class PTripRouterFactoryImpl implements Provider<TripRouter> {
 		PlansCalcRouteConfigGroup routeConfigGroup = config.plansCalcRoute();
 		TravelDisutility travelCost =
 			travelDisutilityFactory.createTravelDisutility(
-                    travelTime,
-                    config.planCalcScore());
+                    travelTime);
 
 		LeastCostPathCalculator routeAlgo =
 			leastCostPathAlgorithmFactory.createPathCalculator(

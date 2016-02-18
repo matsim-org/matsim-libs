@@ -37,19 +37,22 @@ public final class VTTSNoiseTollTimeDistanceTravelDisutilityFactory implements T
 	private double sigma = 0. ;
 	private VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory;
 	private final NoiseContext noiseContext;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public VTTSNoiseTollTimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, NoiseContext noiseContext) {
+	public VTTSNoiseTollTimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, 
+			NoiseContext noiseContext, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.noiseContext = noiseContext;
 		this.vttsTimeDistanceTravelDisutilityFactory = vttsTimeDistanceTravelDisutilityFactory;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		
 		vttsTimeDistanceTravelDisutilityFactory.setSigma(sigma);
 		
 		return new NoiseTollTimeDistanceTravelDisutility(
-				vttsTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
+				vttsTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
 				this.noiseContext,
 				cnScoringGroup.getMarginalUtilityOfMoney(),
 				this.sigma

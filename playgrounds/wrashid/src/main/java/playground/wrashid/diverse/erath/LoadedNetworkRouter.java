@@ -108,8 +108,8 @@ public class LoadedNetworkRouter {
 		// add algorithm to estimate travel cost
 		// and which performs routing based on that
 		TravelTimeCalculator travelTimeCalculator= Events2TTCalculator.getTravelTimeCalculator(scenario, eventsFile);
-		TravelDisutilityFactory travelCostCalculatorFactory = new Builder( TransportMode.car );
-		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
+		TravelDisutilityFactory travelCostCalculatorFactory = new Builder( TransportMode.car, config.planCalcScore() );
+		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
 		plans.addAlgorithm(
 				new PlanRouter(
 						new TripRouterFactoryBuilderWithDefaults().build(

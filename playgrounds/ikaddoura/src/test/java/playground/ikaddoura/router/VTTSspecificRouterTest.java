@@ -79,7 +79,7 @@ public class VTTSspecificRouterTest {
 		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS.xml";
 		final Controler controler = new Controler(configFile1);
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
-		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler) ;
+		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()) ;
 		factory.setSigma(0.); // no randomness
 		
 		controler.addOverridingModule(new AbstractModule(){
@@ -251,7 +251,7 @@ public class VTTSspecificRouterTest {
 		final String configFile = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost.xml";
 		final Controler controler = new Controler(configFile);
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
-		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler) ;
+		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()) ;
 		factory.setSigma(0.); // no randomness
 		
 		controler.addOverridingModule(new AbstractModule(){
@@ -412,7 +412,7 @@ public class VTTSspecificRouterTest {
 		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost_largePopulation_1.xml";
 		final Controler controler1 = new Controler(configFile1);
 		final VTTSHandler vttsHandler1 = new VTTSHandler(controler1.getScenario());
-		final VTTSTimeDistanceTravelDisutilityFactory factory1 = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler1) ;
+		final VTTSTimeDistanceTravelDisutilityFactory factory1 = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler1, controler1.getConfig().planCalcScore()) ;
 		factory1.setSigma(0.); // no randomness
 		
 		controler1.addOverridingModule(new AbstractModule(){
@@ -467,7 +467,7 @@ public class VTTSspecificRouterTest {
 		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_withDistanceCost_largePopulation_1.xml";
 		final Controler controler1 = new Controler(configFile1);
 		final VTTSHandler vttsHandler1 = new VTTSHandler(controler1.getScenario());
-		final VTTSTimeDistanceTravelDisutilityFactory factory1 = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler1) ;
+		final VTTSTimeDistanceTravelDisutilityFactory factory1 = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler1, controler1.getConfig().planCalcScore()) ;
 		factory1.setSigma(0.); // no randomness
 		
 		controler1.addOverridingModule(new AbstractModule(){
@@ -526,7 +526,7 @@ public class VTTSspecificRouterTest {
 		final String configFile = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS.xml";
 		final Controler controler = new Controler(configFile);
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
-		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler) ;
+		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()) ;
 		factory.setSigma(3.0); // no randomness
 		
 		controler.addOverridingModule(new AbstractModule(){
@@ -603,7 +603,7 @@ public class VTTSspecificRouterTest {
 		
 		final Controler controler = new Controler(configFile1);
 
-		final Builder factory = new Builder( TransportMode.car );
+		final Builder factory = new Builder( TransportMode.car, controler.getConfig().planCalcScore() );
 		factory.setSigma(3.0);
 
 		controler.addOverridingModule(new AbstractModule(){

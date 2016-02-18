@@ -20,8 +20,8 @@ class CapacityFavoringStochasticCostCalculator implements TravelDisutility {
 			PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.timeCalculator = timeCalculator ;
 		
-		Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
-		this.delegate = builder.createTravelDisutility(timeCalculator, cnScoringGroup) ; 
+		Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, cnScoringGroup );
+		this.delegate = builder.createTravelDisutility(timeCalculator) ; 
 		
 	}
 	@Override

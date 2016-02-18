@@ -46,7 +46,7 @@ class InvertedRoutingModule implements RoutingModule {
 		TravelTime travelTime = null ; // new TravelTimeForInvertedNetwork() ;
 
 		TravelDisutility travelDisutility = tdf.createTravelDisutility(
-				travelTime, sc.getConfig().planCalcScore() 
+				travelTime 
 				) ;
 		
 		Network invertedNetwork = null ;

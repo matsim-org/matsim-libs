@@ -134,7 +134,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 						bind(PlansCalcRouteWithTollOrNot.class);
 						install(new ScenarioByInstanceModule(scenario));
 						addTravelDisutilityFactoryBinding(TransportMode.car).toInstance(
-								new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ) );
+								new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, scenario.getConfig().planCalcScore() ) );
 						install(new TripRouterModule());
 						addControlerListenerBinding().to(RoadPricingControlerListener.class);
 

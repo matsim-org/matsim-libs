@@ -1,5 +1,34 @@
 package playground.pieter.singapore.hits;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+import javax.management.timer.Timer;
+
 //import java.text.SimpleDateFormat;
 //import java.util.ArrayList;
 //import java.util.List;
@@ -12,7 +41,13 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.travelsummary.events2traveldiaries.travelcomponents.*;
+import org.matsim.contrib.travelsummary.events2traveldiaries.travelcomponents.Activity;
+import org.matsim.contrib.travelsummary.events2traveldiaries.travelcomponents.Journey;
+import org.matsim.contrib.travelsummary.events2traveldiaries.travelcomponents.Transfer;
+import org.matsim.contrib.travelsummary.events2traveldiaries.travelcomponents.TravellerChain;
+import org.matsim.contrib.travelsummary.events2traveldiaries.travelcomponents.Trip;
+import org.matsim.contrib.travelsummary.events2traveldiaries.travelcomponents.Wait;
+import org.matsim.contrib.travelsummary.events2traveldiaries.travelcomponents.Walk;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -50,19 +85,6 @@ import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetwo
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
-
-import javax.management.timer.Timer;
-
-import java.io.*;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Map.Entry;
 
 public class HITSAnalyserPostgresqlSummary {
 
@@ -183,8 +205,8 @@ public class HITSAnalyserPostgresqlSummary {
 
 		// now for car
 
-		TravelDisutility travelDisutility = new Builder( TransportMode.car )
-				.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
+		TravelDisutility travelDisutility = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() )
+				.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
 		carCongestedDijkstra = new Dijkstra(scenario.getNetwork(), travelDisutility,
 				travelTimeCalculator.getLinkTravelTimes());
 		HashSet<String> modeSet = new HashSet<>();

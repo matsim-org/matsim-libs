@@ -216,7 +216,7 @@ public final class Controler implements ControlerI, MatsimServices {
 	
 	@Override
 	public final TravelDisutility createTravelDisutilityCalculator() {
-        return getTravelDisutilityFactory().createTravelDisutility(this.injector.getInstance(TravelTime.class), getConfig().planCalcScore());
+        return getTravelDisutilityFactory().createTravelDisutility(this.injector.getInstance(TravelTime.class));
 	}
 
 	@Override

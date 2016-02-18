@@ -40,7 +40,7 @@ public class CATripRouterFactory implements  Provider<RoutingModule>{
 				scenario.getNetwork(),
 				new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore()),
 				scenario.getConfig().global().getNumberOfThreads()).createPathCalculator(scenario.getNetwork(),
-				travelDisutilities.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore()),
+				travelDisutilities.get("car").createTravelDisutility(travelTimes.get("car")),
 				travelTimes.get("car"));
 	}
 }

@@ -32,6 +32,7 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.UnknownTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.NetworkRouting;
@@ -56,13 +57,14 @@ public class MultiModalModule extends AbstractModule {
     @Override
     public void install() {
         PlansCalcRouteConfigGroup plansCalcRouteConfigGroup = getConfig().plansCalcRoute();
+        PlanCalcScoreConfigGroup cnScoringGroup = getConfig().planCalcScore();
         MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
         Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
         for (String mode : simulatedModes) {
             if (mode.equals(TransportMode.walk)) {
                 Provider<TravelTime> factory = new WalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
                 addTravelTimeBinding(mode).toProvider(factory);
-                addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode ) );
+                addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode, cnScoringGroup ) );
                 addRoutingModuleBinding(mode).toProvider(new NetworkRouting(mode));
             } else if (mode.equals(TransportMode.transit_walk)) {
 //                Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
@@ -72,7 +74,7 @@ public class MultiModalModule extends AbstractModule {
             } else if (mode.equals(TransportMode.bike)) {
                 Provider<TravelTime> factory = new BikeTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
                 addTravelTimeBinding(mode).toProvider(factory);
-                addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode ) );
+                addTravelDisutilityFactoryBinding(mode).toInstance( new RandomizingTimeDistanceTravelDisutility.Builder( mode, cnScoringGroup ) );
                 addRoutingModuleBinding(mode).toProvider(new NetworkRouting(mode));
             } else {
                 Provider<TravelTime> factory = additionalTravelTimeFactories.get(mode);
@@ -87,7 +89,7 @@ public class MultiModalModule extends AbstractModule {
                             " for mode " + mode + ".");
                 }
                 addTravelTimeBinding(mode).toProvider(factory);
-                addTravelDisutilityFactoryBinding(mode).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder( mode ));
+                addTravelDisutilityFactoryBinding(mode).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder( mode, cnScoringGroup ));
                 addRoutingModuleBinding(mode).toProvider(new NetworkRouting(mode));
             }
         }

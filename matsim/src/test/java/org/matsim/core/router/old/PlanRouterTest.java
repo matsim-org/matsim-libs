@@ -106,7 +106,7 @@ public class PlanRouterTest {
             public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
                 List<? extends PlanElement> trip = DefaultRoutingModules.createNetworkRouter("car", scenario.getPopulation().getFactory(), 
                 		scenario.getNetwork(), 
-                		leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime, config.planCalcScore()), travelTime)
+                		leastCostAlgoFactory.createPathCalculator(scenario.getNetwork(), disutilityFactory.createTravelDisutility(travelTime), travelTime)
                 		).calcRoute(fromFacility, toFacility, departureTime, person);
                 ((NetworkRoute) TripStructureUtils.getLegs(trip).get(0).getRoute()).setVehicleId(newVehicleId);
                 return trip;
