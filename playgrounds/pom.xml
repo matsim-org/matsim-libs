@@ -73,14 +73,11 @@
 	<modules>
 		<module>agarwalamit</module>
 		<module>andreas</module>
-		<!--<module>anhorni</module>-->
 		<module>artemc</module>
 		<module>balac</module>
 		<module>balmermi</module>
 		<module>benjamin</module>
 		<module>bvitins</module>
-		<!--<module>christoph</module>-->
-		<!--<module>ciarif</module>-->
 		<module>cottbus</module>
 		<module>dgrether</module>
 		<module>dhisingh</module>
@@ -89,7 +86,6 @@
 		<module>duncan</module>
 		<module>dziemke</module>
 		<module>farzadalemi</module>
-		<!--<module>fhuelsmann</module>-->
 		<module>gregor</module>
 		<module>gunnar</module>
 		<module>hbecker</module>
@@ -121,7 +117,6 @@
 		<module>smeintjes</module>
 		<module>smetzler</module>
 		<module>southAfrica</module>
-		<!--<module>staheale</module>-->
 		<module>stockholm</module>
 		<module>telaviv</module>
 		<module>thibautd</module>
