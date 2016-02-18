@@ -222,26 +222,23 @@ public class NoiseCalculationOffline {
 		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
 		noiseCalculation.run();	
 		
-		log.info("Processing the noise immissions...");
-		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
-		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", receiverPointGap);
+		// some processing of the output data
+		String outputFilePath = outputDirectory + "analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
+		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
 		process.run();
-		
-		log.info("Merging other information to one file...");
-		
+				
 		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
 		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" , outputFilePath + "/damages_receiverPoint/" };
 
 		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
 		merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
 		merger.setOutputDirectory(outputFilePath);
-		merger.setTimeBinSize(timeBinSize);
+		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
 		merger.setWorkingDirectory(workingDirectories);
 		merger.setLabel(labels);
 		merger.setOutputFormat(OutputFormat.xyt);
 		merger.setThreshold(-1.);
 		merger.run();
-		
 	}
 }
 		

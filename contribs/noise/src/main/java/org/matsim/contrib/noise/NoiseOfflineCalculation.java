@@ -28,9 +28,6 @@ import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
 import org.matsim.contrib.noise.handler.NoiseTimeTracker;
 import org.matsim.contrib.noise.handler.PersonActivityTracker;
-import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
-import org.matsim.contrib.noise.utils.MergeNoiseCSVFile.OutputFormat;
-import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
@@ -49,7 +46,6 @@ public class NoiseOfflineCalculation {
 
 	private String outputDirectory;
 	private Scenario scenario;
-	private NoiseConfigGroup noiseParameters;
 	
 	private NoiseContext noiseContext = null;
 	private NoiseTimeTracker timeTracker = null;
@@ -57,13 +53,6 @@ public class NoiseOfflineCalculation {
 	public NoiseOfflineCalculation(Scenario scenario, String analysisOutputDirectory) {
 		this.scenario = scenario;
 		this.outputDirectory = analysisOutputDirectory;
-		
-		if ((NoiseConfigGroup) this.scenario.getConfig().getModule("noise") == null) {
-			throw new RuntimeException("Could not find a noise config group. "
-					+ "Check if the custom module is loaded, e.g. 'ConfigUtils.loadConfig(configFile, new NoiseConfigGroup())'"
-					+ " Aborting...");
-		}
-		this.noiseParameters = (NoiseConfigGroup) this.scenario.getConfig().getModule("noise");
 	}
 
 	public void run() {
@@ -115,24 +104,6 @@ public class NoiseOfflineCalculation {
 		}
 		log.info("Noise calculation completed.");
 		
-		log.info("Processing the noise immissions...");
-		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", this.noiseParameters.getReceiverPointGap());
-		process.run();
-		
-		log.info("Merging other information to one file...");
-		
-		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
-		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" , outputFilePath + "/damages_receiverPoint/" };
-
-		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
-		merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
-		merger.setOutputDirectory(outputFilePath);
-		merger.setTimeBinSize(this.noiseParameters.getTimeBinSizeNoiseComputation());
-		merger.setWorkingDirectory(workingDirectories);
-		merger.setLabel(labels);
-		merger.setOutputFormat(OutputFormat.xyt);
-		merger.setThreshold(-1.);
-		merger.run();
 	}
 
 	public NoiseTimeTracker getTimeTracker() {

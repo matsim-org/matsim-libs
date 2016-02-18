@@ -21,6 +21,9 @@ package org.matsim.contrib.noise.examples;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.noise.NoiseOfflineCalculation;
+import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
+import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
+import org.matsim.contrib.noise.utils.MergeNoiseCSVFile.OutputFormat;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -54,7 +57,25 @@ public class NoiseOfflineCalculationExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
-		noiseCalculation.run();		
+		noiseCalculation.run();
+		
+		// some processing of the output data
+		String outputFilePath = outputDirectory + "analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
+		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
+		process.run();
+				
+		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
+		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" , outputFilePath + "/damages_receiverPoint/" };
+
+		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+		merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
+		merger.setOutputDirectory(outputFilePath);
+		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
+		merger.setWorkingDirectory(workingDirectories);
+		merger.setLabel(labels);
+		merger.setOutputFormat(OutputFormat.xyt);
+		merger.setThreshold(-1.);
+		merger.run();
 	}
 }
 		

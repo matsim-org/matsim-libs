@@ -1,6 +1,5 @@
 package playground.kai.run;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,13 +9,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.contrib.noise.NoiseConfigGroup;
-import org.matsim.contrib.noise.NoiseWriter;
-import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.handler.NoiseTimeTracker;
-import org.matsim.contrib.noise.handler.PersonActivityTracker;
+import org.matsim.contrib.noise.NoiseOfflineCalculation;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.utils.MergeNoiseCSVFile.OutputFormat;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
@@ -32,9 +27,6 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -45,7 +37,7 @@ class KNBerlinControler {
 		log.warn("here") ;
 
 		// ### prepare the config:
-		Config config = ConfigUtils.loadConfig( "/Users/nagel/kairuns/a100/config.xml" ) ;
+		Config config = ConfigUtils.loadConfig( "/Users/nagel/kairuns/a100/config.xml", new NoiseConfigGroup() ) ;
 
 		// paths:
 		//		config.network().setInputFile("/Users/nagel/");
@@ -148,7 +140,7 @@ class KNBerlinControler {
 		// post-processing:
 
 		// noise parameters
-		NoiseConfigGroup noiseParameters = new NoiseConfigGroup();
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModule("noise");
 				
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
@@ -209,40 +201,14 @@ class KNBerlinControler {
 		// ---
 
 		String outputDirectory = config.controler().getOutputDirectory() ;
-		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
-		File file = new File(outputFilePath);
-		file.mkdirs();
-
-		EventsManager events = EventsUtils.createEventsManager();
-
-		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		events.addHandler(eventWriter);
-
-		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", true);
-
-		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
-		timeTracker.setUseCompression(true);
-		events.addHandler(timeTracker);
-
-		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
-		events.addHandler(actTracker);
-
-		log.info("Reading events file...");
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(outputDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
-		log.info("Reading events file... Done.");
-
-		timeTracker.computeFinalTimeIntervals();
-
-		eventWriter.closeFile();
-		log.info("Noise calculation completed.");
-
+		
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
+		noiseCalculation.run();		
+		
 		// ---
 
+		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		mergeNoiseFiles(outputFilePath);
-
-
 
 	}
 
