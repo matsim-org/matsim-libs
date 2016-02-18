@@ -140,6 +140,7 @@
 		<module>deprecated</module>
 		<module>protobuf</module>
 		<module>hybridsim</module>
+		<module>noise</module>
 	</modules>
 	<repositories>
 		<repository>
