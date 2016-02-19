@@ -81,7 +81,7 @@
 		<module>cottbus</module>
 		<module>dgrether</module>
 		<module>dhisingh</module>
-		<module>dhosse</module>
+		<!--<module>dhosse</module>-->
 		<module>droeder</module>
 		<module>duncan</module>
 		<module>dziemke</module>
@@ -92,7 +92,7 @@
 		<module>ikaddoura</module>
 		<module>imob</module>
 		<module>ivtExt</module>
-		<module>jbischoff</module>
+		<!--<module>jbischoff</module>-->
 		<module>jjoubert</module>
 		<module>johannes</module>
 		<module>juliakern</module>
@@ -100,7 +100,7 @@
 		<module>kturner</module>
 		<module>lcrociani</module>
 		<module>lkroeger</module>
-		<module>michalm</module>
+		<!--<module>michalm</module>-->
 		<module>mrieser</module>
 		<module>muelleki</module>
 		<module>mzilske</module>
@@ -127,7 +127,7 @@
 		<module>vaadin-example</module>
 		<module>vsptelematics</module>
 		<module>vsp</module>
-		<module>vspshk</module>
+		<!--<module>vspshk</module>-->
 		<module>wbean</module>
 		<module>vbmh</module>
 	</modules>
