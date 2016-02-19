@@ -17,10 +17,10 @@ Eclipse users, however, need to invoke
 before eclipse is able to compile it. This step needs to be repeated after every ``git pull''.
 
 A bit more:
-\t cd contrib/protobuf
-\t mvn eclipse:clean   # removes pre-existing eclipse-specific settings
-\t mvn eclipse:eclipse
-\t mvn clean install
+	cd contrib/protobuf
+	mvn eclipse:clean   # removes pre-existing eclipse-specific settings
+	mvn eclipse:eclipse
+	mvn clean install
 
-It has worked when `target/generated-sources` shows up as source folder.   This is there `ProtobufEvents.java` is residing, which 
+`target/generated-sources` needs to show up as source folder.   This is where `ProtobufEvents.java` is residing, which 
 is otherwise denoted as missing at many places.
