@@ -19,13 +19,11 @@
 package playground.gregor.gctpeds;
 
 import playground.gregor.gctpeds.demand.DemandGenerator;
-import playground.gregor.gctpeds.network.NetworkFromOSM;
-import playground.gregor.gctpeds.trafficlights.NetworkChangeEventsGenerator;
 
 public class Generator {
 
 	public static void main(String [] args) {
-		NetworkFromOSM.main(null);
+//		NetworkFromOSM.main(null);
 //		NetworkChangeEventsGenerator.main(null);
 		DemandGenerator.main(null);
 	}

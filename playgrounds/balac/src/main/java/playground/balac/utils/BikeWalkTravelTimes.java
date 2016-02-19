@@ -28,8 +28,8 @@ public class BikeWalkTravelTimes {
 			Coord coordEnd = new Coord(Double.parseDouble(arr[3]), Double.parseDouble(arr[4]));
 		
 			outLink.write(arr[0] + " ");
-			double travelTimeWalk = CoordUtils.calcDistance(coordStart, coordEnd) * 1.3 / 1.1667;
-			double travelTimeBike = CoordUtils.calcDistance(coordStart, coordEnd) * 1.3 / 3.3;
+			double travelTimeWalk = CoordUtils.calcEuclideanDistance(coordStart, coordEnd) * 1.3 / 1.1667;
+			double travelTimeBike = CoordUtils.calcEuclideanDistance(coordStart, coordEnd) * 1.3 / 3.3;
 			outLink.write(Double.toString(travelTimeWalk) + " " + Double.toString(travelTimeBike));
 			outLink.newLine();
 			s = readLink.readLine();

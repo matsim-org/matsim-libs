@@ -20,7 +20,7 @@ public class DistributionCenters {
     static class DistributionCenter extends ActivityFacilityImpl {
 
         protected DistributionCenter(Id<ActivityFacility> id, Coord center) {
-            super(id, center);
+            super(id, center, null);
         }
     }
 

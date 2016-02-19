@@ -19,18 +19,13 @@
 
 package playground.jbischoff.taxi.berlin.demand;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.io.*;
 
 
 public class LorShapeReader

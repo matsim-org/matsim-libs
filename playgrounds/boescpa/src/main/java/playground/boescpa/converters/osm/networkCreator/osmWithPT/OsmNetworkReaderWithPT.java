@@ -316,7 +316,7 @@ public class OsmNetworkReaderWithPT {
 						length = 0.0;
 						lastNode = node;
 					} else if (node.ways == 1) {
-						length += CoordUtils.calcDistance(lastNode.coord, node.coord);
+						length += CoordUtils.calcEuclideanDistance(lastNode.coord, node.coord);
 						if (length <= MAX_LINKLENGTH) {
 							node.used = false;
 							lastNode = node;
@@ -376,7 +376,7 @@ public class OsmNetworkReaderWithPT {
 				for (int i = 1, n = way.nodes.size(); i < n; i++) {
 					OsmNode toNode = this.nodes.get(way.nodes.get(i));
 					if (toNode != lastToNode) {
-						length += CoordUtils.calcDistance(lastToNode.coord, toNode.coord);
+						length += CoordUtils.calcEuclideanDistance(lastToNode.coord, toNode.coord);
 						if (toNode.used) {
 							createLink(this.network, way, fromNode, toNode, length);
 							fromNode = toNode;

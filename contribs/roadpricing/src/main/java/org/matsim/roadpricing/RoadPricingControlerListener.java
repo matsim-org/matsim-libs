@@ -21,7 +21,6 @@
 package org.matsim.roadpricing;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -57,7 +56,6 @@ IterationEndsListener, ShutdownListener {
 
 	final static private Logger log = Logger.getLogger(RoadPricingControlerListener.class);
 
-	private Scenario scenario;
 	private final RoadPricingScheme scheme;
     private final CalcPaidToll calcPaidToll;
     private final CalcAverageTolledTripLength cattl;
@@ -65,8 +63,7 @@ IterationEndsListener, ShutdownListener {
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-    RoadPricingControlerListener(Scenario scenario, RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
-		this.scenario = scenario;
+    RoadPricingControlerListener(RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
 		this.scheme = scheme;
         this.calcPaidToll = calcPaidToll;
         this.cattl = cattl;

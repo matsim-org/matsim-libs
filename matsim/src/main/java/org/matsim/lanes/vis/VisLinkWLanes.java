@@ -160,7 +160,7 @@ public class VisLinkWLanes implements Serializable{
 	private void calcCoords(){
 		this.startCoord = new Coord(linkStart.x, linkStart.y);
 		this.endCoord = new Coord(linkEnd.x, linkEnd.y);
-		this.euklideanDistance = CoordUtils.calcDistance(startCoord, endCoord);
+		this.euklideanDistance = CoordUtils.calcEuclideanDistance(startCoord, endCoord);
 	}
 	
 	public double getEuklideanDistance() {

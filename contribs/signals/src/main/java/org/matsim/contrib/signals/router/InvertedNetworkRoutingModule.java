@@ -163,7 +163,7 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 		route.setLinkIds(fromLinkId, linkIds, toLinkId);
 		route.setTravelTime((int) path.travelTime);
 		route.setTravelCost(path.travelCost);
-		route.setDistance(RouteUtils.calcDistance(route, this.network));
+		route.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route, this.network));
 		return route;
 	}
 

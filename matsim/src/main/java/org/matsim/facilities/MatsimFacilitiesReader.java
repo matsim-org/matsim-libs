@@ -25,6 +25,8 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
@@ -57,16 +59,30 @@ public class MatsimFacilitiesReader extends MatsimXmlParser implements MatsimSom
 	private final static String FACILITIES_V1 = "facilities_v1.dtd";
 
 	private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
-	
+
+	private final CoordinateTransformation coordinateTransformation;
 	private final Scenario scenario;
 	private MatsimXmlParser delegate = null;
 
 	/**
 	 * Creates a new reader for MATSim facilities files.
 	 *
-	 * @param facilities The Facilities-object to store the facilities in.
+	 * @param scenario The scenario containing the Facilities-object to store the facilities in.
 	 */
 	public MatsimFacilitiesReader(final Scenario scenario) {
+		this( new IdentityTransformation() , scenario );
+	}
+
+	/**
+	 * Creates a new reader for MATSim facilities files.
+	 *
+	 * @param coordinateTransformation a transformation from the CRS of the data file to the CRS inside MATSim
+	 * @param scenario The scenario containing the Facilities-object to store the facilities in.
+	 */
+	public MatsimFacilitiesReader(
+			final CoordinateTransformation coordinateTransformation,
+			final Scenario scenario) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.scenario = scenario;
 	}
 
@@ -94,7 +110,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser implements MatsimSom
 		super.setDoctype(doctype);
 		// Currently the only facilities-type is v1
 		if (FACILITIES_V1.equals(doctype)) {
-			this.delegate = new FacilitiesReaderMatsimV1(this.scenario);
+			this.delegate = new FacilitiesReaderMatsimV1( coordinateTransformation , scenario );
 			log.info("using facilities_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

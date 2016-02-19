@@ -83,7 +83,7 @@ public class LayerImpl implements Layer {
 		while (loc_it.hasNext()) {
 			Zone loc = loc_it.next();
 			if (loc != excludeLocation) {
-				double distance = CoordUtils.calcDistance(loc.getCoord(), coord);
+				double distance = CoordUtils.calcEuclideanDistance(loc.getCoord(), coord);
 				if (distance == shortestDistance) { locs.add(loc); }
 				if (distance < shortestDistance) { shortestDistance = distance; locs.clear(); locs.add(loc); }
 			}

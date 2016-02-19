@@ -51,7 +51,7 @@ public class RaptorDisutility {
 		
 		// this assumes dwell time as in-vehicle time
 		double inVehicleTravelTime = routeSegment.travelTime;
-		double inVehicleBeelineDistance = CoordUtils.calcDistance(routeSegment.fromStop.getCoord(), routeSegment.toStop.getCoord());
+		double inVehicleBeelineDistance = CoordUtils.calcEuclideanDistance(routeSegment.fromStop.getCoord(), routeSegment.toStop.getCoord());
 		
 		cost += - inVehicleTravelTime * this.config.getMarginalUtilityOfTravelTimePt_utl_s();
 		cost += - inVehicleBeelineDistance * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
@@ -75,7 +75,7 @@ public class RaptorDisutility {
 		// say that the effective walk time is the transfer time minus some "buffer"
 		double walktime = transfertime - waittime;
 		
-		double walkDistance = CoordUtils.calcDistance(fromStop, toStop);
+		double walkDistance = CoordUtils.calcEuclideanDistance(fromStop, toStop);
 		
 		// weigh this "buffer" not with the walk time disutility, but with the wait time disutility:
 		// (note that this is the same "additional disutl of wait" as in the scoring function.  Its default is zero.
@@ -95,20 +95,20 @@ public class RaptorDisutility {
 		double timeCost = - getTravelTime(coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
 		// (sign: margUtl is negative; overall it should be positive because it is a cost.)
 		
-		double distanceCost = - CoordUtils.calcDistance(coord,toCoord) * config.getMarginalUtilityOfTravelDistancePt_utl_m() ;
+		double distanceCost = - CoordUtils.calcEuclideanDistance(coord,toCoord) * config.getMarginalUtilityOfTravelDistancePt_utl_m() ;
 		// (sign: same as above)
 		
 		return timeCost + distanceCost ;
 	}
 
 	protected double getTransferTime(Coord coord, Coord toCoord) {
-		double distance = CoordUtils.calcDistance(coord, toCoord);
+		double distance = CoordUtils.calcEuclideanDistance(coord, toCoord);
 		double initialTime = distance / config.getBeelineWalkSpeed();
 		return initialTime + this.config.getAdditionalTransferTime();
 	}
 	
 	protected double getTravelTime(Coord coord, Coord toCoord) {
-		double distance = CoordUtils.calcDistance(coord, toCoord);
+		double distance = CoordUtils.calcEuclideanDistance(coord, toCoord);
 		double initialTime = distance / config.getBeelineWalkSpeed();
 		return initialTime;
 	}

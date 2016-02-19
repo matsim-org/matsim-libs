@@ -36,7 +36,6 @@ import playground.gregor.casim.simulation.CAMobsimFactory;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
-import playground.gregor.sim2d_v4.scenario.TransportMode;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -87,7 +86,7 @@ public class CARunner implements IterationStartsListener {
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addRoutingModuleBinding(TransportMode.walkca).toProvider(CARoutingModule.class);
+				addRoutingModuleBinding("car").toProvider(CARoutingModule.class);
 			}
 		});
 

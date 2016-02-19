@@ -64,11 +64,11 @@ public class CreateStopsAndSchedule {
 
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(
-				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/networkptcgt.xml");
+				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/networkpt-feb.xml");
 		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(
-				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/transitvehicles.xml");
+				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/transitVehicles.xml");
 		new TransitScheduleReader(scenario).readFile(
-				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/transitschedule.xml");
+				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/bs-scheduleNetwork.xml");
 
 		final TransitScheduleFactory transitScheduleFactory = scenario.getTransitSchedule().getFactory();
 		final VehicleType type = new VehicleTypeImpl(Id.create("train", VehicleType.class));

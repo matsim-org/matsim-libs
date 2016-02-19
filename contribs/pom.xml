@@ -113,6 +113,7 @@
 		<module>cadytsIntegration</module>
 		<module>carsharing</module>
 		<module>dvrp</module>
+		<module>taxi</module>
 		<module>emissions</module>
 		<module>freight</module>
 		<module>gtfs2matsimtransitschedule</module>
@@ -137,6 +138,9 @@
 		<module>map2mapmatching</module>
 		<module>travelsummary</module>
 		<module>deprecated</module>
+		<module>protobuf</module>
+		<module>hybridsim</module>
+		<module>noise</module>
 	</modules>
 	<repositories>
 		<repository>

@@ -52,7 +52,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.OpeningTimeImpl;
@@ -263,11 +262,10 @@ public class FacilitiesCreator {
 			int i = 0;
 			for (Coord coord : coordinates) {
 				Id<ActivityFacility> id = Id.create(taz + "_" + i, ActivityFacility.class);
-				ActivityFacility facility = factory.createActivityFacility(id, coord);
+				Link link = network.getNearestLinkExactly(coord);
+				ActivityFacility facility = factory.createActivityFacility(id, coord, link.getId());
 				createAndAddActivityOptions(scenario, facility, zonalAttributes.get(taz));
 				activityFacilities.addActivityFacility(facility);
-				Link link = network.getNearestLinkExactly(coord);
-				((ActivityFacilityImpl) facility).setLinkId(link.getId());	
 				i++;
 				
 				// Also add a tta activity to all facilities. 
@@ -326,9 +324,8 @@ public class FacilitiesCreator {
 				Coord coord = new Coord(centerX + unitVectorX, centerY + unitVectorY);
 				
 				facility = activityFacilities.getFactory().createActivityFacility(
-						Id.create(externalLink.getId().toString(), ActivityFacility.class), coord);
+						Id.create(externalLink.getId().toString(), ActivityFacility.class), coord, externalLink.getId());
 				activityFacilities.addActivityFacility(facility);
-				((ActivityFacilityImpl) facility).setLinkId(externalLink.getId());
 				
 				ActivityOption activityOption = factory.createActivityOption(ttaActivityType); 
 				activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));

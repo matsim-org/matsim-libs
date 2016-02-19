@@ -181,7 +181,7 @@ public class ZHCutter {
 		if (coordCache.containsKey(coord)) {
 			return coordCache.get(coord);
 		} else {
-			boolean coordIsInArea = CoordUtils.calcDistance(center, coord) <= radius;
+			boolean coordIsInArea = CoordUtils.calcEuclideanDistance(center, coord) <= radius;
 			coordCache.put(coord, coordIsInArea);
 			return coordIsInArea;
 		}

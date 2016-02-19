@@ -54,7 +54,7 @@ public class OptimalDistanceTieUtilityModule extends AbstractModule {
 											final int ego,
 											final int alter ) {
 										final double distance =
-												CoordUtils.calcDistance(
+												CoordUtils.calcEuclideanDistance(
 														population.getCoord(ego),
 														population.getCoord(alter) );
 

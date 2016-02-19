@@ -52,6 +52,10 @@ public class EvacuationConfigModule extends ConfigGroup {
 	private String targetCRS;
 
 
+	public EvacuationConfigModule() {
+		super(GROUP_NAME);
+	}
+
 	public EvacuationConfigModule(String name) {
 		super(name);
 	}	

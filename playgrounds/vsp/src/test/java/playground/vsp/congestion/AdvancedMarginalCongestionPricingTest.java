@@ -45,6 +45,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -85,8 +86,8 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
+
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -148,8 +149,8 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
+
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -202,7 +203,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -234,8 +235,9 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config1.xml";
 
-		final Controler controler = new Controler(configFile);
-		
+		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		Controler controler = new Controler( scenario );
+
 		EventsManager events = controler.getEvents();
 				
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -309,8 +311,9 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config2.xml";
 
-		Controler controler = new Controler(configFile);
-		
+		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		Controler controler = new Controler( scenario );
+
 		EventsManager events = controler.getEvents();
 				
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -389,7 +392,8 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config3.xml";
 
-		Controler controler = new Controler(configFile);
+		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		Controler controler = new Controler( scenario );
 		
 		EventsManager events = controler.getEvents();
 				
@@ -451,7 +455,8 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config4.xml";
 
-		Controler controler = new Controler(configFile);
+		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		Controler controler = new Controler( scenario );
 		
 		EventsManager events = controler.getEvents();
 				

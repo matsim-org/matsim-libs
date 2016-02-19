@@ -20,27 +20,16 @@
 
 package playground.gregor.scenariogen.gct;
 
-import java.util.ArrayList;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
+import java.util.ArrayList;
 
 public class PopulationGenerator {
 
@@ -55,10 +44,10 @@ public class PopulationGenerator {
 
 		Config conf = ConfigUtils.loadConfig(config);
 		Scenario sc = ScenarioUtils.loadScenario(conf);
-		
-		Sim2DConfig s2conf = Sim2DConfigUtils.loadConfig(s2config);
-		Sim2DScenario s2sc = Sim2DScenarioUtils.loadSim2DScenario(s2conf);
-		s2sc.connect(sc);
+//
+//		Sim2DConfig s2conf = Sim2DConfigUtils.loadConfig(s2config);
+//		Sim2DScenario s2sc = Sim2DScenarioUtils.loadSim2DScenario(s2conf);
+//		s2sc.connect(sc);
 		
 
 		ArrayList<Link> sources = computeSources(sc);

@@ -51,6 +51,7 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
 import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
+import playground.jbischoff.utils.JbUtils;
 
 /**
  * @author  jbischoff
@@ -84,7 +85,7 @@ public class PopulationBasedTaxiVehicleCreator
 				
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-		this.geometry = readShapeFileAndExtractGeometry(shapeFile);	
+		this.geometry = JbUtils.readShapeFileAndExtractGeometry(shapeFile);	
 		this.wrs = new WeightedRandomSelection<>();
         readPopulationData();
 	}
@@ -119,27 +120,7 @@ public class PopulationBasedTaxiVehicleCreator
 		new VehicleWriter(vehicles).write(vehiclesFilePrefix+amount+".xml.gz");
 	}
 	
-	static Map<String,Geometry> readShapeFileAndExtractGeometry(String filename){
-		
-		Map<String,Geometry> geometry = new TreeMap<>();	
-		for (SimpleFeature ft : ShapeFileReader.getAllFeatures(filename)) {
-			
-				GeometryFactory geometryFactory= new GeometryFactory();
-				WKTReader wktReader = new WKTReader(geometryFactory);
 
-				try {
-					Geometry geo = wktReader.read((ft.getAttribute("the_geom")).toString());
-					String lor = ft.getAttribute("SCHLUESSEL").toString();
-					geometry.put(lor, geo);
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			 
-		}	
-		return geometry;
-	}
 
 	
 }

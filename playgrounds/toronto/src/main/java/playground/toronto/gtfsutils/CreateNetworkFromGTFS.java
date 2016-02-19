@@ -95,7 +95,7 @@ public class CreateNetworkFromGTFS{
 				Id<Link> linkID = Id.create(fromNodeID.toString()+"_"+toNodeID.toString(), Link.class);
 				if (ListofLinks.contains(linkID)!=true){
 					//System.out.println(linkID);
-					linklength = CoordUtils.calcDistance(fromNode.getCoord(),toNode.getCoord());
+					linklength = CoordUtils.calcEuclideanDistance(fromNode.getCoord(),toNode.getCoord());
 					//System.out.println(linklength);
 					if (linklength <= 2){
 						network.createAndAddLink(linkID, fromNode, toNode, linklength,linkspeed, linkcapacity, numlanes);

@@ -16,20 +16,20 @@ public class TrafficVolumeOnLinks {
 
 	static String outputDirectory="C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/output/";
 	static String[] cases={	
-			"Case0", 
+			//"Case0", 
 			"Case0_fcf_3",
-			"Case0_fcf_4",
-			"Case1",
+			//"Case0_fcf_4",
+			//"Case1",
 			"Case1_fcf_3",
-			"Case1_fcf_4",
-			//			"Case1b",
+			//"Case1_fcf_4",
+			//"Case1b",
 			"Case1b_fcf_3",
-			//			"Case1b_fcf_4",
-			"Case2",
+			//"Case1b_fcf_4",
+			//"Case2",
 			"Case2_fcf_3",
-			"Case2_fcf_4",
-			"Case2b"
-			//"Case2b_fcf_3"
+			//"Case2_fcf_4",
+			//"Case2b"
+			"Case2b_fcf_3"
 
 	};
 	static String[] hours={"time","0-1","1-2","2-3","3-4","4-5","5-6","6-7","7-8","8-9","9-10","10-11","11-12","12-13","13-14","14-15","15-16","16-17","17-18","18-19","19-20","20-21","21-22","22-23","23-24","0-24"};
@@ -45,11 +45,29 @@ public class TrafficVolumeOnLinks {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
-		linksList.add("1-2");
-		linksList.add("IKEA_link_HJ");
-		linksList.add("IKEA_link_JH");
-		linksList.add("Link4Residents1");
-		linksList.add("Link4Residents2");
+//		linksList.add("1-2");
+//		linksList.add("J-5");
+//		linksList.add("100157");
+//		linksList.add("100158");
+//		linksList.add("L-8");
+//		linksList.add("77194");
+//		linksList.add("11480");
+//		linksList.add("66499");
+//		linksList.add("77198");
+//		linksList.add("35430");
+//		linksList.add("78028");		
+//		linksList.add("2784");
+//		linksList.add("F-6");	
+//		linksList.add("IKEA_link_HJ");
+	//	linksList.add("IKEA_link_JM");	
+		
+		linksList.add("66502");
+		linksList.add("77196");
+//		linksList.add("78146");
+		//	linksList.add("IKEA_link_HJ");
+	//	linksList.add("IKEA_link_JH");
+	//	linksList.add("Link4Residents1");
+	//	linksList.add("Link4Residents2");
 
 		for(int j=0;j<linksList.size();j++){
 			linkName=linksList.get(j);
@@ -60,8 +78,8 @@ public class TrafficVolumeOnLinks {
 				outPutLines.add(hours[m]);
 			}
 			
-			System.out.println(outPutLines.get(2));
-			for(int i=0;i<=10;i++){
+			System.out.println("Analysing link "+linkName+"...");
+			for(int i=0;i<cases.length;i++){
 				
 				String output=outputDirectory+cases[i]+"/ITERS/it.20/run0.20.linkstats.txt.gz";
 				System.out.println(linkName+" --- "+cases[i]);
@@ -82,7 +100,7 @@ public class TrafficVolumeOnLinks {
 				br.close();
 			}
 
-			BufferedWriter bw=new BufferedWriter(new FileWriter(outputDirectory+"traffic_volumes/TrafficVolume_link_"+linkName+".csv"));
+			BufferedWriter bw=new BufferedWriter(new FileWriter(outputDirectory+"traffic_volumes/OD/TrafficVolume_link_"+linkName+".csv"));
 			for(int k=0;k<=25;k++){
 				bw.write(outPutLines.get(k));
 				bw.newLine();
@@ -91,5 +109,7 @@ public class TrafficVolumeOnLinks {
 			outPutLines.clear();
 			System.out.println(linkName+": Traffic volumes written to file.");
 		}
+		System.out.println("Done.");
 	}
+	
 }

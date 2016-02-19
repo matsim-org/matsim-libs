@@ -47,15 +47,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.utils.misc.Time;
 import playground.balmermi.world.World;
-import playground.meisterk.org.matsim.run.facilities.ShopsOf2005ToFacilities;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Pattern;
 
 
@@ -110,7 +105,7 @@ public class CompareScenarios {
 
 	}
 
-	private static final Logger log = Logger.getLogger(ShopsOf2005ToFacilities.class);
+	private static final Logger log = Logger.getLogger(CompareScenarios.class);
 
 	// transit agents have ids > 1'000'000'000
 	private static final String TRANSIT_PERSON_ID_PATTERN = "[0-9]{10}";

@@ -44,7 +44,7 @@ public class DetermineConstants {
 		double totalBeelineDist = 0;
 		for (Trip trip : filteredTrips) {
 			totalStreetDist += trip.distance;
-			totalBeelineDist += CoordUtils.calcDistance(
+			totalBeelineDist += CoordUtils.calcEuclideanDistance(
                     CoordUtils.createCoord(trip.startXCoord, trip.startYCoord),
                     CoordUtils.createCoord(trip.endXCoord, trip.endYCoord));
 		}

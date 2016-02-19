@@ -18,20 +18,10 @@
  * *********************************************************************** */
 package playground.gregor.gctpeds.demand;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -40,10 +30,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-
 import playground.gregor.casim.proto.CALinkInfos.CALinInfos;
 import playground.gregor.casim.proto.CALinkInfos.CALinInfos.CALinkInfo;
-import playground.gregor.sim2d_v4.scenario.TransportMode;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DemandGenerator {
 
@@ -88,7 +81,7 @@ public class DemandGenerator {
 				pl.addActivity(h);
 				h.setEndTime(dep);
 
-				Leg leg = fac.createLeg(TransportMode.walkca);
+				Leg leg = fac.createLeg("car");
 				pl.addLeg(leg);
 
 				Id<Link> workLink = getDest(o);
@@ -111,7 +104,7 @@ public class DemandGenerator {
 				pl.addActivity(h);
 				h.setEndTime(dep);
 
-				Leg leg = fac.createLeg(TransportMode.walkca);
+				Leg leg = fac.createLeg("car");
 				pl.addLeg(leg);
 
 				Id<Link> workLink = getDest(o);
@@ -127,7 +120,7 @@ public class DemandGenerator {
 		double weightSum = 0;
 		List<Location> cands = new ArrayList<>();
 		for (Location d : this.destinations) {
-			double dist = CoordUtils.calcDistance(o.l.getCoord(), d.l.getCoord());
+			double dist = CoordUtils.calcEuclideanDistance(o.l.getCoord(), d.l.getCoord());
 			if (dist > 50) {
 				double w = o.dep*d.arr*(dist*dist);
 				d.w = w;

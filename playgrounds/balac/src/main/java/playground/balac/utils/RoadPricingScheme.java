@@ -18,7 +18,7 @@ public class RoadPricingScheme {
 	
 	public static boolean outside(Node n, Coord coord) {
 		
-		if (CoordUtils.calcDistance(n.getCoord(), coord) > 8000)
+		if (CoordUtils.calcEuclideanDistance(n.getCoord(), coord) > 8000)
 		
 			return true;
 		else 
@@ -29,7 +29,7 @@ public class RoadPricingScheme {
 		
 		
 		
-		if (CoordUtils.calcDistance(n.getCoord(), coord) < 8000)
+		if (CoordUtils.calcEuclideanDistance(n.getCoord(), coord) < 8000)
 			
 			return true;
 		else 

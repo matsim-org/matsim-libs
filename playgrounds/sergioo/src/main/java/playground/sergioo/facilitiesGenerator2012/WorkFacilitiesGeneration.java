@@ -170,7 +170,6 @@ public class WorkFacilitiesGeneration {
 						pTCapacityFO += matrix.getElement(f, o, s);
 					if(pTCapacityFO>0) {
 						ActivityOptionImpl activityOption = new ActivityOptionImpl(optionText);
-						activityOption.setFacility(mPArea);
 						activityOption.setCapacity(pTCapacityFO/mPAreaData.getModeShare());
 						activityOption.addOpeningTime(openingTime);
 						mPArea.getActivityOptions().put(activityOption.getType(), activityOption);
@@ -198,7 +197,6 @@ public class WorkFacilitiesGeneration {
 					double capacity = activityOptionArea.getCapacity()*proportion;
 					if(capacity>0) {
 						ActivityOptionImpl activityOption = new ActivityOptionImpl(activityOptionArea.getType());
-						activityOption.setFacility(building);
 						activityOption.setCapacity(capacity);
 						activityOption.addOpeningTime(activityOptionArea.getOpeningTimes().first());
 						building.getActivityOptions().put(activityOption.getType(), activityOption);
@@ -546,7 +544,7 @@ public class WorkFacilitiesGeneration {
 							for(int p=0; p<n; p++)
 								if(linksStops.get(p).get(stopBase.getKey()).equals(link.getId()))
 									selected=true;
-							if(!selected && CoordUtils.calcDistance(link.getCoord(), stopBase.getValue())<CoordUtils.calcDistance(network.getLinks().get(nearest).getCoord(), stopBase.getValue()))
+							if(!selected && CoordUtils.calcEuclideanDistance(link.getCoord(), stopBase.getValue())<CoordUtils.calcEuclideanDistance(network.getLinks().get(nearest).getCoord(), stopBase.getValue()))
 								nearest = link.getId();
 						}
 					}
@@ -629,7 +627,7 @@ public class WorkFacilitiesGeneration {
 				Id<TransitStopFacility> stopId = Id.create(stopKey, TransitStopFacility.class);
 				double maxCapacityNearFacilities = 0;
 				for(ActivityFacility mPArea:mPAreas.values())
-					if(CoordUtils.calcDistance(stopsBase.get(stopKey), mPArea.getCoord())<MAX_TRAVEL_TIME*WALKING_SPEED) {
+					if(CoordUtils.calcEuclideanDistance(stopsBase.get(stopKey), mPArea.getCoord())<MAX_TRAVEL_TIME*WALKING_SPEED) {
 						double walkingTime = Double.MAX_VALUE;
 						for(int n=0; n<NUM_NEAR; n++) {
 							double walkingTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0, null, null).travelCost;
@@ -647,7 +645,7 @@ public class WorkFacilitiesGeneration {
 				if(stopsCapacities.get(stopId)>maxCapacityNearFacilities) {
 					double maxCapacityNear2Facilities = maxCapacityNearFacilities;
 					for(ActivityFacility mPArea:mPAreas.values())
-						if(CoordUtils.calcDistance(stopsBase.get(stopKey), mPArea.getCoord())<(MAX_TRAVEL_TIME*2/3)*PRIVATE_BUS_SPEED) {
+						if(CoordUtils.calcEuclideanDistance(stopsBase.get(stopKey), mPArea.getCoord())<(MAX_TRAVEL_TIME*2/3)*PRIVATE_BUS_SPEED) {
 							double walkingTime = Double.MAX_VALUE;
 							for(int n=0; n<NUM_NEAR; n++) {
 								double walkingTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0, null, null).travelCost;
@@ -672,7 +670,7 @@ public class WorkFacilitiesGeneration {
 						System.out.println("Far" + stopId);
 						double maxCapacityNear3Facilities = maxCapacityNear2Facilities;
 						for(ActivityFacility mPArea:mPAreas.values())
-							if(CoordUtils.calcDistance(stopsBase.get(stopKey), mPArea.getCoord())<MAX_TRAVEL_TIME*PRIVATE_BUS_SPEED) {
+							if(CoordUtils.calcEuclideanDistance(stopsBase.get(stopKey), mPArea.getCoord())<MAX_TRAVEL_TIME*PRIVATE_BUS_SPEED) {
 								double privateBusTime = Double.MAX_VALUE;
 								for(int n=0; n<NUM_NEAR; n++) {
 									double privateBusTimeA=aStarLandmarks.calcLeastCostPath(network.getLinks().get(links[n]).getToNode(), network.getLinks().get(mPArea.getLinkId()).getFromNode(), 0, null, null).travelCost*WALKING_SPEED/PRIVATE_BUS_SPEED;

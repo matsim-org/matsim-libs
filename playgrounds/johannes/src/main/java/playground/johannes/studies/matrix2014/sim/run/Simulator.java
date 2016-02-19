@@ -214,6 +214,7 @@ public class Simulator {
         FacilityMutatorBuilder mutatorBuilder = new FacilityMutatorBuilder(dataPool, random);
         mutatorBuilder.addToBlacklist(ActivityTypes.HOME);
         mutatorBuilder.setListener(attributeListeners.get(CommonKeys.ACTIVITY_FACILITY));
+        mutatorBuilder.setProximityProbability(Double.parseDouble(configGroup.getValue("proximityProba")));
         Mutator<? extends Attributable> mutator = mutatorBuilder.build();
         /*
         Create the markov engine...

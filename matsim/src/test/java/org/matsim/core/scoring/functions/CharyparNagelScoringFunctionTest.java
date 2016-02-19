@@ -121,7 +121,7 @@ public class CharyparNagelScoringFunctionTest {
 			factory.setPriority(1.0);
 			factory.setTypicalDuration_s(8.0 * 3600);
 			factory.setZeroUtilityComputation( new ActivityUtilityParameters.SameAbsoluteScore() );
-			ActivityUtilityParameters params = factory.create();
+			ActivityUtilityParameters params = factory.build();
 			assertEquals(zeroUtilDurW, params.getZeroUtilityDuration_h(), EPSILON);
 
 		}
@@ -132,7 +132,7 @@ public class CharyparNagelScoringFunctionTest {
 			factory.setPriority(1.0);
 			factory.setTypicalDuration_s(16.0 * 3600);
 			factory.setZeroUtilityComputation( new ActivityUtilityParameters.SameAbsoluteScore() );
-			ActivityUtilityParameters params = factory.create();
+			ActivityUtilityParameters params = factory.build();
 			assertEquals(zeroUtilDurH, params.getZeroUtilityDuration_h(), EPSILON);
 		}
 
@@ -143,7 +143,7 @@ public class CharyparNagelScoringFunctionTest {
 			factory.setPriority(2.0);
 			factory.setTypicalDuration_s(8.0 * 3600);
 			factory.setZeroUtilityComputation( new ActivityUtilityParameters.SameAbsoluteScore() );
-			ActivityUtilityParameters params = factory.create();
+			ActivityUtilityParameters params = factory.build();
 			assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration_h(), EPSILON);
 		}
 	}
@@ -678,7 +678,7 @@ public class CharyparNagelScoringFunctionTest {
 			NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link3.getId());
 			route1.setLinkIds(link1.getId(), Arrays.asList(link2.getId()), link3.getId());
 			route1.setTravelTime(firstLegTravelTime);
-			route1.setDistance(RouteUtils.calcDistance(route1, this.network));
+			route1.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route1, this.network));
 			route1.setVehicleId( Id.create( "dummy1Vehicle", Vehicle.class) );
 			leg.setRoute(route1);
 
@@ -701,7 +701,7 @@ public class CharyparNagelScoringFunctionTest {
 			leg.setTravelTime(thirdLegTravelTime);
 			Route route3 = new GenericRouteImpl(link5.getId(), link7.getId());
 			route3.setTravelTime(thirdLegTravelTime);
-			route3.setDistance(CoordUtils.calcDistance(link5.getCoord(), link7.getCoord()));
+			route3.setDistance(CoordUtils.calcEuclideanDistance(link5.getCoord(), link7.getCoord()));
 			leg.setRoute(route3);
 
 			ActivityImpl fourthActivity = this.plan.createAndAddActivity("w", link7.getId());
@@ -712,7 +712,7 @@ public class CharyparNagelScoringFunctionTest {
 			leg.setTravelTime(fourthLegTravelTime);
 			Route route4 = new GenericRouteImpl(link7.getId(), link9.getId());
 			route4.setTravelTime(fourthLegTravelTime);
-			route4.setDistance(CoordUtils.calcDistance(link7.getCoord(), link9.getCoord()));
+			route4.setDistance(CoordUtils.calcEuclideanDistance(link7.getCoord(), link9.getCoord()));
 			leg.setRoute(route4);
 
 			ActivityImpl fifthActivity = this.plan.createAndAddActivity("h", link9.getId());

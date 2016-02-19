@@ -91,9 +91,5 @@
 		<param name="transitModes" value="pt" />
 		<param name="useTransit" value="true" />
 	</module>
-	
-	<module name="changeLegModes">
-		<param name="modes" value="car,pt" />
-	</module>
 
 </config>

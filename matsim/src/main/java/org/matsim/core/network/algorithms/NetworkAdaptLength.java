@@ -40,7 +40,7 @@ public class NetworkAdaptLength implements NetworkRunnable {
 		log.info("  overLengthFactor: "+overLengthFactor);
 
 		for (Link l : network.getLinks().values()) {
-			double dist = overLengthFactor*CoordUtils.calcDistance(l.getFromNode().getCoord(),l.getToNode().getCoord());
+			double dist = overLengthFactor*CoordUtils.calcEuclideanDistance(l.getFromNode().getCoord(),l.getToNode().getCoord());
 			if (dist > l.getLength()) { l.setLength(dist); }
 			double len = Math.ceil(l.getLength());
 			l.setLength(len);

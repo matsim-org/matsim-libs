@@ -34,7 +34,6 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -42,21 +41,19 @@ import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Builder;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.kticompatibility.KtiActivityScoring;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.scoring.LineChangeScoringFunction;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author thibautd
+ * @deprecated use {@link MATSim2010ScoringModule} instead
  */
+@Deprecated
 public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final Scenario scenario;
@@ -98,7 +95,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 					new KtiActivityScoring(
 						person.getSelectedPlan(),
 						params,
-						((MutableScenario) scenario).getActivityFacilities() )) );
+						scenario.getActivityFacilities() )) );
 
 		// standard modes
 		scoringFunctionAccumulator.addScoringFunction(
@@ -169,8 +166,8 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			return individualParameters.get( person.getId() );
 		}
 
-		final CharyparNagelScoringParametersBuilder builder =
-				CharyparNagelScoringParameters.getBuilder( config, config.getScoringParameters( null ), scenarioConfig );
+		final Builder builder =
+				new Builder(config, config.getScoringParameters(null), scenarioConfig);
 		final Set<String> handledTypes = new HashSet<String>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			// XXX works only if no variation of type of activities between plans
@@ -224,13 +221,13 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 				typeBuilder.setTypicalDuration_s(typicalDuration);
 			}
 
-			builder.withActivityParameters(
+			builder.setActivityParameters(
 					act.getType(),
-					typeBuilder.create());
+					typeBuilder );
 		}
 
 		final CharyparNagelScoringParameters params =
-				builder.create();
+				builder.build();
 		individualParameters.put( person.getId() , params );
 		return params;
 	}

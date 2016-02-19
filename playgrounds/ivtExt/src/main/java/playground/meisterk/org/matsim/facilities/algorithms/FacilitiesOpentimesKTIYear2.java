@@ -25,15 +25,7 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTime.DayType;
-import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.facilities.*;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
 
@@ -76,8 +68,6 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 	@Override
 	public void run(final ActivityFacility facility) {
 
-		DayType[] days = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri, DayType.sat, DayType.sun };
-		DayType[] weekDays = new DayType[] { DayType.mon, DayType.tue, DayType.wed, DayType.thu, DayType.fri };
 		double startTime = -1.0;
 		double endTime = -1.0;
 
@@ -103,16 +93,12 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 			case 2:
 				// standard daily opentimes for industry sector
 				if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR2)) {
-					for (DayType day : weekDays) {
 						activities.get(FacilitiesProductionKTI.WORK_SECTOR2).addOpeningTime(new OpeningTimeImpl(
-								day,
 								7.0 * 3600,
 								18.0 * 3600));
-					}
 					// open times of the closest shop for services sector
 				} else if (activities.containsKey(FacilitiesProductionKTI.WORK_SECTOR3)) {
 					// eliminate lunch break
-					for (DayType day : days) {
 						SortedSet<OpeningTime> dailyOpentime = closestShopOpentimes;
 						if (dailyOpentime != null) {
 							switch(dailyOpentime.size()) {
@@ -130,10 +116,8 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 									break;
 							}
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
-									day,
 									startTime,
 									endTime));
-						}
 					}
 				}
 				break;
@@ -147,108 +131,62 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 					} else if (
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_KINDERGARTEN, activityType) ||
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_PRIMARY, activityType)) {
-						for (DayType day : weekDays) {
 							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
-									day,
 									8.0 * 3600,
 									12.0 * 3600));
 							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
-									day,
 									13.5 * 3600,
 									17.0 * 3600));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
-									day,
 									8.0 * 3600,
 									17.0 * 3600));
-						}
 					} else if (
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_SECONDARY, activityType) ||
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_OTHER, activityType)) {
-						for (DayType day : weekDays) {
 							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
-									day,
 									8.0 * 3600,
 									18.0 * 3600));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
-									day,
 									8.0 * 3600,
 									18.0 * 3600));
-						}
 					} else if (
 							Pattern.matches(FacilitiesProductionKTI.EDUCATION_HIGHER, activityType)) {
-						for (DayType day : weekDays) {
 							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
-									day,
 									7.0 * 3600,
 									22.0 * 3600));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
-									day,
 									7.0 * 3600,
 									22.0 * 3600));
-						}
-						activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
-								DayType.sat,
-								8.0 * 3600,
-								12.0 * 3600));
-						activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
-								DayType.sat,
-								8.0 * 3600,
-								12.0 * 3600));
-
 					} else if (
 							Pattern.matches(FacilitiesProductionKTI.LEISURE_SPORTS, activityType)) {
-						for (DayType day : days) {
-							if (
-									day.equals(DayType.mon) ||
-									day.equals(DayType.tue) ||
-									day.equals(DayType.wed) ||
-									day.equals(DayType.thu) ||
-									day.equals(DayType.fri)) {
 								startTime = 9.0 * 3600;
 								endTime = 22.0 * 3600;
-							} else if (
-									day.equals(DayType.sat) ||
-									day.equals(DayType.sun)) {
-								startTime = 9.0 * 3600;
-								endTime = 18.0 * 3600;
-							}
 							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
-									day,
 									startTime,
 									endTime));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
-									day,
 									startTime,
 									endTime));
-						}
 					} else if (
 							Pattern.matches(FacilitiesProductionKTI.LEISURE_GASTRO, activityType)) {
-						for (DayType day : days) {
 							startTime = 9.0 * 3600;
 							endTime = 24.0 * 3600;
 							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
-									day,
 									startTime,
 									endTime));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
-									day,
 									startTime,
 									endTime));
-						}
 					} else if (
 							Pattern.matches(FacilitiesProductionKTI.LEISURE_CULTURE, activityType)) {
-						for (DayType day : days) {
 							startTime = 14.0 * 3600;
 							endTime = 24.0 * 3600;
 							activities.get(activityType).addOpeningTime(new OpeningTimeImpl(
-									day,
 									startTime,
 									endTime));
 							activities.get(FacilitiesProductionKTI.WORK_SECTOR3).addOpeningTime(new OpeningTimeImpl(
-									day,
 									startTime,
 									endTime));
-						}
 					}
 				}
 		}

@@ -139,8 +139,6 @@ public class CreateTestExternalMATSimConfig {
 		// (i.e. config groups that are not fully specified in the file).  [[Not sure why this is needed??]]
 		
 		// matsim4urbansimParameter module
-		ConfigGroup matsim4UrbanSimModule = config.createModule( M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-		matsim4UrbanSimModule.addParam(M4UConfigUtils.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
 
 		ConfigGroup ippcm = config.createModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME ) ;
 		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS, this.ptStops);

@@ -325,7 +325,7 @@ import com.vividsolutions.jts.io.WKTReader;
 			Coord closest = null;
 			double closestDistance = Double.MAX_VALUE;
 			for (Coord coord : facilityMap.values()){
-				double distance = CoordUtils.calcDistance(coord, origin);
+				double distance = CoordUtils.calcEuclideanDistance(coord, origin);
 				if (distance<closestDistance) {
 					closestDistance = distance;
 					closest = coord;
@@ -352,7 +352,7 @@ import com.vividsolutions.jts.io.WKTReader;
 			double closestDistance = Double.MAX_VALUE;
 			for(String key : this.buildingsMap.keySet()){
 				ii = MGC.point2Coord(this.buildingsMap.get(key).getCentroid());
-				double distance = CoordUtils.calcDistance(ii, coord);
+				double distance = CoordUtils.calcEuclideanDistance(ii, coord);
 				if(distance<closestDistance){ 
 					closestDistance = distance;
 					closest = ii;

@@ -169,7 +169,7 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 		Id startPosition = departurePositions.remove(event.getPersonId());
 		if (startPosition == null) throw new RuntimeException("No departure position for agent " + event.getPersonId() + " was found!");
 
-		double distance = CoordUtils.calcDistance(this.network.getLinks().get(startPosition).getCoord(),
+		double distance = CoordUtils.calcEuclideanDistance(this.network.getLinks().get(startPosition).getCoord(),
 				this.network.getLinks().get(event.getLinkId()).getCoord());
 		
 		List<Double> modeTravelDistances = legTravelDistances.get(mode);

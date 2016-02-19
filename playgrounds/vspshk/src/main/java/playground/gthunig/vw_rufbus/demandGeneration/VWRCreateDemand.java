@@ -384,7 +384,7 @@ public class VWRCreateDemand {
 								currentCoord = scenario.getNetwork().getLinks().get(((Activity) pe).getLinkId()).getCoord();	
 							}
 							
-							double distance = CoordUtils.calcDistance(lastCoord, currentCoord);
+							double distance = CoordUtils.calcEuclideanDistance(lastCoord, currentCoord);
 							
 							if (distance>3000&&lastleg.getMode().equals("walk")){
 								lastleg.setMode("pt");
@@ -967,7 +967,7 @@ public class VWRCreateDemand {
 		}
 		Activity next = scenario.getPopulation().getFactory().createActivityFromCoord(nextActivity, nextDestination);
 		next.setMaximumDuration(duration);
-		double distance = CoordUtils.calcDistance(nextDestination, lastActivityCoord);
+		double distance = CoordUtils.calcEuclideanDistance(nextDestination, lastActivityCoord);
 		if (canChangeMode){
 			if (distance<500){
 				mode = "walk";
@@ -1086,7 +1086,7 @@ public class VWRCreateDemand {
 		Coord closest = null;
 		double closestDistance = Double.MAX_VALUE;
 		for (Coord coord : coordMap.values()) {
-			double distance = CoordUtils.calcDistance(coord, location);
+			double distance = CoordUtils.calcEuclideanDistance(coord, location);
 			if (distance < closestDistance) {
 				closestDistance = distance;
 				closest = coord;
@@ -1100,7 +1100,7 @@ public class VWRCreateDemand {
 		TreeMap<Double,Coord> closestCoords = new TreeMap<>();
 		Coord closest = null;
 		for (Coord coord : coordMap.values()) {
-			double distance = CoordUtils.calcDistance(coord, location);
+			double distance = CoordUtils.calcEuclideanDistance(coord, location);
 			closestCoords.put(distance, coord);
 		}
 		int drawscope = scope;
@@ -1126,7 +1126,7 @@ public class VWRCreateDemand {
 		double closestDistance = Double.MAX_VALUE;
 		for (Map<String, Coord> coordMap : coordMaps) {
 			for (Coord coord : coordMap.values()) {
-				double distance = CoordUtils.calcDistance(coord, location);
+				double distance = CoordUtils.calcEuclideanDistance(coord, location);
 				if (distance < closestDistance) {
 					closestDistance = distance;
 					closest = coord;
@@ -1159,7 +1159,7 @@ public class VWRCreateDemand {
 						boolean setAct = false;
 						Coord ac = ((Activity) pe).getCoord();
 						for (TransitStopFacility stop : scenario.getTransitSchedule().getFacilities().values()){
-							double dist = CoordUtils.calcDistance(stop.getCoord(), ac);
+							double dist = CoordUtils.calcEuclideanDistance(stop.getCoord(), ac);
 							if (dist<=distance){ 
 								setAct =true;
 								break;

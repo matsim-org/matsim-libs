@@ -483,7 +483,7 @@ public class NmbmQTBuilder {
 		if(qt.values().size() > number){
 		 /* Start the search radius with the distance to the closest person. */
 			Plan closestPlan = qt.getClosest(c.getX(), c.getY());
-			double radius = CoordUtils.calcDistance(c, ((ActivityImpl) closestPlan.getPlanElements().get(0)).getCoord());
+			double radius = CoordUtils.calcEuclideanDistance(c, ((ActivityImpl) closestPlan.getPlanElements().get(0)).getCoord());
 			Collection<Plan> plans = qt.getDisk(c.getX(), c.getY(), radius);
 			while(plans.size() < number){
 				/* Double the radius. If the radius happens to be zero (0), 
@@ -499,7 +499,7 @@ public class NmbmQTBuilder {
 		
 		/* Rank the plans based on distance. */
 		for(Plan plan : plansToRank){
-			double d = CoordUtils.calcDistance(c, ((ActivityImpl) plan.getPlanElements().get(0)).getCoord());
+			double d = CoordUtils.calcEuclideanDistance(c, ((ActivityImpl) plan.getPlanElements().get(0)).getCoord());
 			Tuple<Plan, Double> thisTuple = new Tuple<Plan, Double>(plan, d);
 			if(tuples.size() == 0){
 				tuples.add(thisTuple);

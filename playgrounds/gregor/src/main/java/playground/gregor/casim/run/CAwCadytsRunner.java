@@ -168,7 +168,7 @@ public class CAwCadytsRunner implements IterationStartsListener {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 
-				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder( controller.getScenario(), person.getId() ).create();
+				final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(controller.getScenario(), person.getId()).build();
 				
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controller.getScenario().getNetwork()));

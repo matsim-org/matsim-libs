@@ -43,7 +43,7 @@ public class FacilitiesCalcMinDist {
 			for (ActivityFacility f2 : facilities.getFacilities().values()) {
 				if (!f2.equals(f)) {
 					Coord c2 = f2.getCoord();
-					double dist = CoordUtils.calcDistance(c2, c);
+					double dist = CoordUtils.calcEuclideanDistance(c2, c);
 					if (dist < min_dist) { min_dist = dist; }
 					if (dist == 0.0) {
 						System.out.println("      dist=0! fid=" + f.getId() + " <=> f2id=" + f2.getId());

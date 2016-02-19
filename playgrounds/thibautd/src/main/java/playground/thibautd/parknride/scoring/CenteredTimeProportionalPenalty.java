@@ -92,7 +92,7 @@ public class CenteredTimeProportionalPenalty implements ParkingPenalty {
 	}
 
 	private double calcCostPerSecond(final Coord coord) {
-		double distToCenter = CoordUtils.calcDistance( coord , centerPoint );
+		double distToCenter = CoordUtils.calcEuclideanDistance( coord , centerPoint );
 		double cost = maxCostPerSecond - (distToCenter / zoneRadius) * maxCostPerSecond;
 		return cost > 0d ? cost : 0d;
 	}

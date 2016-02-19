@@ -1,0 +1,172 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+	<module name="network" >
+		<param name="inputNetworkFile" value="test/input/org/matsim/contrib/noise/network.xml" />
+	</module>
+	
+	<module name="plans" >
+		 <param name="inputPlansFile" value="test/input/org/matsim/contrib/noise/population.xml" />
+	</module>
+	
+	<module name="controler">
+		<param name="outputDirectory" value="test/output/org/matsim/contrib/noise/example" />
+		<param name="eventsFileFormat" value="xml" />
+		<param name="mobsim" value="qsim" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="10" />
+		<param name="writeEventsInterval" value="10" />
+		<param name="writePlansInterval" value="10" />
+	</module>
+	
+	<module name="noise" >
+
+		<!-- Set to 'true' if speed levels below 30 km/h or above 80 km/h (HGV) / 130 km/h (car) should be used to compute noise levels. Set to 'false' if speed levels outside of the valid range should not be used to compute noise levels (recommended). -->
+		<param name="allowForSpeedsOutsideTheValidRange" value="false" />
+
+		<!-- annual noise cost rate [in EUR per exposed pulation unit]; following the German EWS approach -->
+		<param name="annualCostRate" value="63.3127366206996" />
+
+		<!-- Specifies the public transit vehicle ID identifiers. Buses are treated as HGV, other public transit vehicles are neglected. -->
+		<param name="busIdIdentifier" value="" />
+
+		<!-- Set to 'true' if the noise damages should be traced back and a causing agent should be identified. Otherwise set to 'false'. -->
+		<param name="computeCausingAgents" value="true" />
+
+		<!-- Set to 'true' if noise damages should be computed. Otherwise set to 'false'. -->
+		<param name="computeNoiseDamages" value="true" />
+
+		<!-- Set to 'true' if population densities should be computed. Otherwise set to 'false'. -->
+		<param name="computePopulationUnits" value="true" />
+
+		<!-- Specifies the activity types that are considered when computing noise damages (= the activities at which being exposed to noise results in noise damages). -->
+		<param name="consideredActivitiesForDamageCalculation" value="home,work" />
+
+		<!-- Creates a grid of noise receiver points which contains all agents' activity locations of the specified types. -->
+		<param name="consideredActivitiesForReceiverPointGrid" value="home,work" />
+
+		<!-- Specifies the HGV (heavy goods vehicles, trucks) ID prefix. -->
+		<param name="hgvIdPrefixes" value="lkw" />
+
+		<param name="internalizeNoiseDamages" value="true" />
+
+		<!-- Possible values: AverageCost, MarginalCost -->
+		<param name="noiseAllocationApproach" value="AverageCost" />
+
+		<!-- horizontal and vertical distance between receiver points in x-/y-coordinate units -->
+		<param name="receiverPointGap" value="250.0" />
+
+		<!-- Specifies a boundary coordinate min/max x/y value of the receiver point grid. 0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types (see parameter 'consideredActivitiesForReceiverPointGrid'). -->
+		<param name="receiverPointsGridMaxX" value="0.0" />
+
+		<!-- Specifies a boundary coordinate min/max x/y value of the receiver point grid. 0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types (see parameter 'consideredActivitiesForReceiverPointGrid'). -->
+		<param name="receiverPointsGridMaxY" value="0.0" />
+
+		<!-- Specifies a boundary coordinate min/max x/y value of the receiver point grid. 0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types (see parameter 'consideredActivitiesForReceiverPointGrid'). -->
+		<param name="receiverPointsGridMinX" value="0.0" />
+
+		<!-- Specifies a boundary coordinate min/max x/y value of the receiver point grid. 0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types (see parameter 'consideredActivitiesForReceiverPointGrid'). -->
+		<param name="receiverPointsGridMinY" value="0.0" />
+
+		<!-- Specifies the radius [in coordinate units] around each receiver point links are taken into account. -->
+		<param name="relevantRadius" value="500.0" />
+
+		<!-- Set to '1.' for a 100 percent sample size. Set to '10.' for a 10 percent sample size. Set to '100.' for a 1 percent sample size. -->
+		<param name="scaleFactor" value="1.0" />
+
+		<!-- Set to 'true' if noise events (providing information about the affected agent) should be thrown. Otherwise set to 'false'. -->
+		<param name="throwNoiseEventsAffected" value="true" />
+
+		<!-- Set to 'true' if noise events (providing information about the causing agent) should be thrown. Otherwise set to 'false'. -->
+		<param name="throwNoiseEventsCaused" value="true" />
+
+		<!-- Specifies the temporal resolution, i.e. the time bin size [in seconds] to compute noise levels. -->
+		<param name="timeBinSizeNoiseComputation" value="3600.0" />
+
+		<!-- coordinate system; so far only tested for 'TransformationFactory.DHDN_GK4' -->
+		<param name="transformationFactory" value="DHDN_GK4" />
+
+		<!-- Specifies the tunnel link IDs. Will be ignored in case a the tunnel link IDs are provided as file (see parameter 'tunnelLinkIdFile'). -->
+		<param name="tunnelLinkIDs" value="null" />
+
+		<!-- Specifies a csv file which contains all tunnel link IDs. -->
+		<param name="tunnelLinkIdFile" value="null" />
+
+		<!-- Set to 'true' if the actual speed level should be used to compute noise levels. Set to 'false' if the freespeed level should be used to compute noise levels. -->
+		<param name="useActualSpeedLevel" value="true" />
+
+		<!-- Specifies how often the noise-specific output is written out. -->
+		<param name="writeOutputIteration" value="10" />
+		
+	</module>
+
+	<module name="qsim">
+		<param name="startTime" value="00:00:00" />
+		<param name="endTime" value="30:00:00" />
+		
+		<param name="snapshotStyle" value="queue" />	
+		<param name="snapshotperiod" value = "00:00:01"/>
+		<param name="vehicleBehavior" value="wait" />
+		
+		<param name="removeStuckVehicles" value="true" />
+		<param name="stuckTime" value="36000" />
+		
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
+				
+		<param name="flowCapacityFactor" value="1.00" />
+		<param name="storageCapacityFactor" value="1.00" />
+	</module>
+	
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="3" /> <!-- 0 means unlimited -->
+
+		<param name="ModuleProbability_1" value="0.0" />
+		<param name="Module_1" value="BestScore" />
+		
+		<param name="ModuleProbability_2" value="0.7" />
+		<param name="Module_2" value="ChangeExpBeta" />
+		
+		<param name="ModuleProbability_3" value="0.3" />
+		<param name="Module_3" value="ReRoute" />
+		<param name="ModuleDisableAfterIteration_3" value="90" />
+		
+	</module>
+	
+	<module name="planCalcScore">
+	
+		<param name="learningRate" value="1.0" />
+		<param name="BrainExpBeta" value="1.0" />
+		
+		<param name="activityType_0" value="home" />
+
+		<param name="activityPriority_0" value="1.0" />
+		<param name="activityTypicalDuration_0" value="16:00:00" />
+		<param name="activityMinimalDuration_0" value="undefined" />
+		<param name="activityOpeningTime_0" value="undefined" />
+		<param name="activityLatestStartTime_0" value="undefined" />
+		<param name="activityEarliestEndTime_0" value="undefined" />
+		<param name="activityClosingTime_0" value="undefined" />
+		<param name="scoringThisActivityAtAll_0" value="true" />
+
+		<!-- **************************** -->
+		<param name="activityType_1" value="work" />
+
+		<param name="activityPriority_1" value="1.0" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityMinimalDuration_1" value="undefined" />
+		<param name="activityOpeningTime_1" value="07:00:00" />
+		<param name="activityLatestStartTime_1" value="undefined" />
+		<param name="activityEarliestEndTime_1" value="undefined" />
+		<param name="activityClosingTime_1" value="18:00:00" />
+		<param name="scoringThisActivityAtAll_1" value="true" />
+		
+	</module>
+	
+	<module name="global">
+		<param name="coordinateSystem" value="Atlantis" />
+		<param name="numberOfThreads" value="4" />
+		<param name="randomSeed" value="1499" />
+	</module>
+	
+</config>

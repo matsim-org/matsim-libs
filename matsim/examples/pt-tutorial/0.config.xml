@@ -79,7 +79,7 @@
 		<param name="Module_3" value="TimeAllocationMutator" />
 
 		<param name="ModuleProbability_4" value="0.1" />
-		<param name="Module_4" value="ChangeLegMode" />
+		<param name="Module_4" value="ChangeTripMode" />
 	</module>
 
 	<module name="transit">
@@ -89,7 +89,7 @@
 		<param name="transitModes" value="pt" />
 	</module>
 	
-	<module name="changeLegModes">
+	<module name="changeLegMode">
 		<param name="modes" value="car,pt" />
 	</module>
 

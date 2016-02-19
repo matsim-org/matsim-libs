@@ -106,7 +106,7 @@ public class MergeCoord {
 				Coord oldCoord = new Coord(Double.parseDouble(trip[11]), Double.parseDouble(trip[12]));
 				Coord newCoord = coordMap.get(personId).get(wayId);
 
-				double distance = CoordUtils.calcDistance(newCoord, oldCoord);
+				double distance = CoordUtils.calcEuclideanDistance(newCoord, oldCoord);
 
 				if(distance < perimeter_radius){
 					trip[11] = String.valueOf(newCoord.getX());

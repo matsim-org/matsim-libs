@@ -36,6 +36,7 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -274,7 +275,11 @@ public class DeterministicMultithreadedReplanningTest {
 		private StrategyManager manager;
 
 		public TestControler(final Config config, final StrategyManager manager) {
-			controler = new Controler( config ) ;
+			this( ScenarioUtils.loadScenario( config ) , manager );
+		}
+
+		public TestControler(final Scenario scenario, final StrategyManager manager) {
+			controler = new Controler( scenario ) ;
 			controler.getConfig().controler().setCreateGraphs(false);
 			controler.getConfig().controler().setWriteEventsInterval(1);
 			controler.getConfig().controler().setDumpDataAtEnd(false);

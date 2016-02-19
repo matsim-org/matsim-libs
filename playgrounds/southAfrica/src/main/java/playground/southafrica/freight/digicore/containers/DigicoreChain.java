@@ -63,7 +63,7 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	public Double getDistance(){
 		double distance = 0.0;
 		for(int i = 0; i < this.size()-1; i++){
-			distance += CoordUtils.calcDistance(this.get(i).getCoord(), this.get(i+1).getCoord());
+			distance += CoordUtils.calcEuclideanDistance(this.get(i).getCoord(), this.get(i+1).getCoord());
 		}
 		return distance;
 	}

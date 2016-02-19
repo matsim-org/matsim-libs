@@ -36,7 +36,7 @@ import org.matsim.core.utils.misc.Time;
  * 
  * The sum terms are instances which implement BasicScoring as well as one of ActivityScoring, LegScoring, MoneyScoring or
  * AgentStuckScoring. They are notified about these events, and after finish() is called on them, they must be able to answer
- * getScore(). Instances of BasicScoring, like ScoringFunctions, must be able to reset() themselves between iterations, though 
+ * getScore(). Instances of BasicScoring, like ScoringFunctions, must be able to onIterationStarts() themselves between iterations, though
  * this is currently not used (fresh instances are created).
  * 
  * Note that the startActivity() and endActivity() as well as starLeg() and endLeg() are redundant. The start time as well as

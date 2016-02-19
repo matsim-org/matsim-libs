@@ -22,12 +22,17 @@ package playground.johannes.gsv.matrices.postprocess;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.utils.io.IOUtils;
+import playground.johannes.synpop.gis.Zone;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 import playground.johannes.synpop.matrix.NumericMatrix;
+import playground.johannes.synpop.matrix.ODMatrixOperations;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,16 +45,75 @@ public class TransferShares {
 
     private static final String COL_SEPARATOR = ";";
 
+    private static Map<String, NumericMatrix> refMatricesModena;
+
+    private static NumericMatrix targetMatrix;
+
+    private static NumericMatrix targetMatrixNuts3;
+
+    private static Map<String, String> zoneIdMapping;
+
+    private static Set<String> zoneKeys = new HashSet<>();
+
     public static void main(String args[]) throws IOException {
-        BufferedReader reader = IOUtils.getBufferedReader(args[0]);
+        refMatricesModena = loadRefMatrix(args[0]);
+
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[3], "NO");
+        loadZoneIdMapping(zones, "NUTS3_CODE");
+
+        targetMatrix = loadTargetMatrix(args[1]);
+        targetMatrixNuts3 = ODMatrixOperations.aggregate(targetMatrix, zones, "NUTS3_CODE");
+
         BufferedWriter writer = IOUtils.getBufferedWriter(args[2]);
+        writer.write("von;nach;zweck;jahr;Verkehrsmittel;Richtung;Tagestyp;Saison;fahrtenj");
+        writer.newLine();
+
+        logger.info("Writing new matrix...");
+        ProgressLogger.init(zoneKeys.size(), 2, 10);
+
+        int cntNoChange = 0;
+        for (String i : zoneKeys) {
+            for (String j : zoneKeys) {
+                double factor = calcFactor(i, j);
+
+                for (Map.Entry<String, NumericMatrix> entry : refMatricesModena.entrySet()) {
+                    String dimension = entry.getKey();
+                    NumericMatrix refMatrix = entry.getValue();
+
+                    Double vol = refMatrix.get(i, j);
+                    if (vol != null) {
+                        if(factor == 1) cntNoChange++;
+                        if(factor == 0) throw new RuntimeException("Factor = 0 must not occur.");
+
+                        vol *= factor;
+                        writer.write(i);
+                        writer.write(COL_SEPARATOR);
+                        writer.write(j);
+                        writer.write(COL_SEPARATOR);
+                        writer.write(dimension);
+                        writer.write(String.valueOf(vol));
+                        writer.newLine();
+                    }
+                }
+
+            }
+            ProgressLogger.step();
+        }
+        ProgressLogger.terminate();
+        writer.close();
+
+        if(cntNoChange > 0) logger.warn(String.format("No changes made for %s relations.", cntNoChange));
+        logger.info("Done.");
+    }
+
+    private static Map<String, NumericMatrix> loadRefMatrix(String file) throws IOException {
+        BufferedReader reader = IOUtils.getBufferedReader(file);
+
 
         Map<String, NumericMatrix> refMatrices = new HashMap<>();
 
         logger.info("Loading reference matrix...");
         String line = reader.readLine();
-        writer.write(line);
-        writer.newLine();
 
         while ((line = reader.readLine()) != null) {
             String tokens[] = line.split(COL_SEPARATOR);
@@ -66,19 +130,26 @@ public class TransferShares {
 
             String dimension = builder.toString();
             NumericMatrix m = refMatrices.get(dimension);
-            if(m == null) {
+            if (m == null) {
                 m = new NumericMatrix();
                 refMatrices.put(dimension, m);
             }
 
             m.add(from, to, volume);
+
+            zoneKeys.add(from);
+            zoneKeys.add(to);
         }
 
+        return refMatrices;
+    }
+
+    private static NumericMatrix loadTargetMatrix(String file) throws IOException {
         NumericMatrix targetMatrix = new NumericMatrix();
 
         logger.info("Loading target matrix...");
-        reader = IOUtils.getBufferedReader(args[1]);
-        line = reader.readLine();
+        BufferedReader reader = IOUtils.getBufferedReader(file);
+        String line = reader.readLine();
         while ((line = reader.readLine()) != null) {
             String tokens[] = line.split(COL_SEPARATOR);
 
@@ -89,47 +160,49 @@ public class TransferShares {
             targetMatrix.add(from, to, volume);
         }
 
+        return targetMatrix;
+    }
 
+//    private static Map<String, NumericMatrix> aggregate(Map<String, NumericMatrix> matrices, ZoneCollection zones,
+//                                                        String key) {
+//        Map<String, NumericMatrix> aggregates = new HashMap<>();
+//        for (Map.Entry<String, NumericMatrix> entry : matrices.entrySet()) {
+//            NumericMatrix aggr = ODMatrixOperations.aggregate(entry.getValue(), zones, key);
+//            aggregates.put(entry.getKey(), aggr);
+//        }
+//
+//        return aggregates;
+//    }
 
-        logger.info("Writing new matrix...");
-        Set<String> keys = targetMatrix.keys();
-        ProgressLogger.init(keys.size(), 2, 10);
-
-        for(String i : keys) {
-            for(String j : keys) {
-                Double targetSum = targetMatrix.get(i, j);
-                if(targetSum != null) {
-                    double refSum = 0;
-                    for(NumericMatrix refMatrix : refMatrices.values()) {
-                        Double vol = refMatrix.get(i, j);
-                        if(vol != null) refSum += vol;
-                    }
-
-                    double factor = targetSum/refSum;
-
-                    for(Map.Entry<String, NumericMatrix> entry : refMatrices.entrySet()) {
-                        String dimension = entry.getKey();
-                        NumericMatrix refMatrix = entry.getValue();
-
-                        Double vol = refMatrix.get(i, j);
-                        if(vol != null) {
-                            vol *= factor;
-                            writer.write(i);
-                            writer.write(COL_SEPARATOR);
-                            writer.write(j);
-                            writer.write(COL_SEPARATOR);
-                            writer.write(dimension);
-                            writer.write(String.valueOf(vol));
-                            writer.newLine();
-                        }
-                    }
-                }
-            }
-            ProgressLogger.step();
+    private static double calcFactor(String i, String j) {
+        double refSum = 0;
+        for (NumericMatrix refMatrix : refMatricesModena.values()) {
+            Double vol = refMatrix.get(i, j);
+            if (vol != null) refSum += vol;
         }
-        ProgressLogger.terminate();
-        writer.close();
 
-        logger.info("Done.");
+        if(refSum == 0) return 0;
+
+        Double targetSum = targetMatrix.get(i, j);
+        if (targetSum == null) {
+            String i_nuts3 = zoneIdMapping.get(i);
+            String j_nuts3 = zoneIdMapping.get(j);
+
+            targetSum = targetMatrixNuts3.get(i_nuts3, j_nuts3);
+        }
+
+        if (targetSum == null) return 1;
+        else return targetSum / refSum;
+    }
+
+    private static void loadZoneIdMapping(ZoneCollection zones, String key) {
+        zoneIdMapping = new HashMap<>();
+
+        for(Zone zone : zones.getZones()) {
+            String modenaKey = zone.getAttribute(zones.getPrimaryKey());
+            String nuts3Key = zone.getAttribute(key);
+
+            zoneIdMapping.put(modenaKey, nuts3Key);
+        }
     }
 }

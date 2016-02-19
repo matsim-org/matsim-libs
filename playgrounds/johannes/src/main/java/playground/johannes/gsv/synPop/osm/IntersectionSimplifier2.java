@@ -184,7 +184,7 @@ public class IntersectionSimplifier2 {
 				}
 
 				if (link != null) {
-					double d = NetworkUtils.getEuclidianDistance(node.getCoord(), seed.getCoord());
+					double d = NetworkUtils.getEuclideanDistance(node.getCoord(), seed.getCoord());
 					if (d < minDist) {
 						minDist = d;
 						nearest = node;

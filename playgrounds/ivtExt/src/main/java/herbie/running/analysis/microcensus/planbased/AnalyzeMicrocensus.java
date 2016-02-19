@@ -139,7 +139,7 @@ public class AnalyzeMicrocensus {
 					if (act.getType().startsWith(this.type) || this.type.equals("allTypes")) {
 						if (plan.getPreviousLeg(act).getMode().equals(this.mode)) {
 							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
-							double distance = CoordUtils.calcDistance(previousAct.getCoord(), act.getCoord());
+							double distance = CoordUtils.calcEuclideanDistance(previousAct.getCoord(), act.getCoord());
 							zh_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
 						}
 					}
@@ -158,7 +158,7 @@ public class AnalyzeMicrocensus {
 					if (act.getType().startsWith(this.type) || this.type.equals("allTypes")) {
 						if (plan.getPreviousLeg(act).getMode().equals(this.mode)) {
 							ActivityImpl previousAct = (ActivityImpl) (plan.getPlanElements().get(plan.getPlanElements().indexOf(act) - 2));
-							double distance = CoordUtils.calcDistance(previousAct.getCoord(), act.getCoord());
+							double distance = CoordUtils.calcEuclideanDistance(previousAct.getCoord(), act.getCoord());
 							ch_distanceDistribution.addVal(distance, p.getSelectedPlan().getScore());
 						
 							if (previousAct.getType().equals("h")) {

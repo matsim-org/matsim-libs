@@ -34,10 +34,6 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
 public class BiDQ {
 	
@@ -48,9 +44,9 @@ public class BiDQ {
 		Config conf = ConfigUtils.createConfig();
 		conf.global().setCoordinateSystem("EPSG:3395");
 		Scenario sc = ScenarioUtils.createScenario(conf);
-		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
+//		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+//		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+//		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 		Node n0 = fac.createNode(Id.create("0", Node.class), new Coord((double) 0, (double) 0));

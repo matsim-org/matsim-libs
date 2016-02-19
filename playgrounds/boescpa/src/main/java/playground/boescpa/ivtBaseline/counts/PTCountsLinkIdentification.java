@@ -92,8 +92,8 @@ public class PTCountsLinkIdentification {
 			Id<Link> currentMinLink = null;
 			for (Link link : network.getLinks().values()) {
 				if (link.getAllowedModes().contains(TransportMode.pt) && link.getId().toString().contains("pt")) {
-					distFromNode = CoordUtils.calcDistance(countInput.fromCoord, link.getFromNode().getCoord());
-					distToNode = CoordUtils.calcDistance(countInput.toCoord, link.getToNode().getCoord());
+					distFromNode = CoordUtils.calcEuclideanDistance(countInput.fromCoord, link.getFromNode().getCoord());
+					distToNode = CoordUtils.calcEuclideanDistance(countInput.toCoord, link.getToNode().getCoord());
 					if (distFromNode + distToNode <= (totalMinDist)){//*ALLOWED_DISTANCE_FACTOR_IF_MORE_EQUAL_STATION_DISTANCE)
 							//&& Math.abs(distFromNode - distToNode) < absMinDifferenceStation) {
 						totalMinDist = distFromNode + distToNode;

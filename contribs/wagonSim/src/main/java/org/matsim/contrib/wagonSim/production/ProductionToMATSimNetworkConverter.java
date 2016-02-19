@@ -170,7 +170,7 @@ public class ProductionToMATSimNetworkConverter {
 				Node toNode = network.getNodes().get(pNode.parentNode.id);
 				Link link = factory.createLink(Id.create(fromNode.getId().toString()+"-"+toNode.getId().toString(), Link.class),fromNode,toNode);
 				network.addLink(link);
-				link.setLength(CoordUtils.calcDistance(fromNode.getCoord(),toNode.getCoord()));
+				link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(),toNode.getCoord()));
 				link.setAllowedModes(defaultModes);
 				link.setNumberOfLanes(1);
 				link.setCapacity(DEFAULT_CAPACITY);
@@ -179,7 +179,7 @@ public class ProductionToMATSimNetworkConverter {
 				Node toNode = network.getNodes().get(sNode.id);
 				Link link = factory.createLink(Id.create(fromNode.getId().toString()+"-"+toNode.getId().toString(), Link.class),fromNode,toNode);
 				network.addLink(link);
-				link.setLength(CoordUtils.calcDistance(fromNode.getCoord(),toNode.getCoord()));
+				link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(),toNode.getCoord()));
 				link.setAllowedModes(defaultModes);
 				link.setNumberOfLanes(1);
 				link.setCapacity(DEFAULT_CAPACITY);
@@ -201,7 +201,7 @@ public class ProductionToMATSimNetworkConverter {
 			if (!network.getLinks().containsKey(linkId)) {
 				Link link = factory.createLink(linkId, fromNode, toNode);
 				network.addLink(link);
-				link.setLength(CoordUtils.calcDistance(fromNode.getCoord(),toNode.getCoord()));
+				link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(),toNode.getCoord()));
 				link.setAllowedModes(defaultModes);
 				link.setNumberOfLanes(1);
 				link.setCapacity(DEFAULT_CAPACITY);
@@ -213,7 +213,7 @@ public class ProductionToMATSimNetworkConverter {
 				if (!network.getLinks().containsKey(linkId)) {
 					Link link = factory.createLink(linkId,fromNode,toNode);
 					network.addLink(link);
-					link.setLength(CoordUtils.calcDistance(fromNode.getCoord(),toNode.getCoord()));
+					link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(),toNode.getCoord()));
 					link.setAllowedModes(defaultModes);
 					link.setNumberOfLanes(1);
 					link.setCapacity(DEFAULT_CAPACITY);

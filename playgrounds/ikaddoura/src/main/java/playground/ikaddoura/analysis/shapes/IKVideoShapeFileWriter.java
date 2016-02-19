@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -42,9 +44,6 @@ import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
-
-import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.noise2.data.ReceiverPoint;
 
 import com.vividsolutions.jts.geom.Coordinate;
 

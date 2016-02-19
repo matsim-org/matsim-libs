@@ -41,7 +41,7 @@ public class AAMScoringFunctionFactory implements ScoringFunctionFactory {
 
 		  scoringFunctionSum.addScoringFunction(
 	      new AAMLegScoringFunction((PlanImpl)person.getSelectedPlan(),
-				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.planCalcScore().getScoringParameters( null ), config.scenario()).create(),
+				  new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build(),
 	      this.config, 
 	      network));
 		  scoringFunctionSum.addScoringFunction(

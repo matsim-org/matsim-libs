@@ -185,7 +185,7 @@ public class DistanceDistributionJourneyEvents implements TransitDriverStartsEve
 			acts.put(event.getPersonId(), acts.get(event.getPersonId())==null?1:acts.get(event.getPersonId())+1);
 		}
 		if(chain.modes.get(chain.modes.size()-1).equals("walk")) {
-			Double distance = CoordUtils.calcDistance(locations.get(event.getPersonId()), network.getLinks().get(event.getLinkId()).getCoord());
+			Double distance = CoordUtils.calcEuclideanDistance(locations.get(event.getPersonId()), network.getLinks().get(event.getLinkId()).getCoord());
 			if(chain.modes.size() == chain.distances.size()) {
 				if(event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
 					chain.modes.set(chain.modes.size()-1, "pt");
