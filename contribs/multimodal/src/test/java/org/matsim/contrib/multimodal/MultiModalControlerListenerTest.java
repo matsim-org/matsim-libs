@@ -41,12 +41,14 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
@@ -68,6 +70,7 @@ public class MultiModalControlerListenerTest {
 	@Rule 
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testSimpleScenario() {
 		log.info("Run test single threaded...");
@@ -78,7 +81,7 @@ public class MultiModalControlerListenerTest {
 		runSimpleScenario(4);
 	}
 
-	void runSimpleScenario(int numberOfThreads) {
+	static void runSimpleScenario(int numberOfThreads) {
 
 		Config config = ConfigUtils.createConfig();
 
@@ -115,17 +118,18 @@ public class MultiModalControlerListenerTest {
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		Node node0 = scenario.getNetwork().getFactory().createNode(Id.create("n0", Node.class), new Coord(0.0, 0.0));
-		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new Coord(1.0, 0.0));
-		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new Coord(2.0, 0.0));
-		Node node3 = scenario.getNetwork().getFactory().createNode(Id.create("n3", Node.class), new Coord(3.0, 0.0));
+		final NetworkFactory nf = scenario.getNetwork().getFactory();
+		Node node0 = nf.createNode(Id.create("n0", Node.class), new Coord(0.0, 0.0));
+		Node node1 = nf.createNode(Id.create("n1", Node.class), new Coord(1.0, 0.0));
+		Node node2 = nf.createNode(Id.create("n2", Node.class), new Coord(2.0, 0.0));
+		Node node3 = nf.createNode(Id.create("n3", Node.class), new Coord(3.0, 0.0));
 
-		Link link0 = scenario.getNetwork().getFactory().createLink(Id.create("l0", Link.class), node0, node1);
-		Link link1 = scenario.getNetwork().getFactory().createLink(Id.create("l1", Link.class), node1, node2);
-		Link link2 = scenario.getNetwork().getFactory().createLink(Id.create("l2", Link.class), node1, node2);
-		Link link3 = scenario.getNetwork().getFactory().createLink(Id.create("l3", Link.class), node1, node2);
-		Link link4 = scenario.getNetwork().getFactory().createLink(Id.create("l4", Link.class), node1, node2);
-		Link link5 = scenario.getNetwork().getFactory().createLink(Id.create("l5", Link.class), node2, node3);
+		Link link0 = nf.createLink(Id.create("l0", Link.class), node0, node1);
+		Link link1 = nf.createLink(Id.create("l1", Link.class), node1, node2);
+		Link link2 = nf.createLink(Id.create("l2", Link.class), node1, node2);
+		Link link3 = nf.createLink(Id.create("l3", Link.class), node1, node2);
+		Link link4 = nf.createLink(Id.create("l4", Link.class), node1, node2);
+		Link link5 = nf.createLink(Id.create("l5", Link.class), node2, node3);
 
 		link0.setLength(1.0);
 		link1.setLength(1.0);
@@ -207,7 +211,8 @@ public class MultiModalControlerListenerTest {
 		// which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
 		config.controler().setMobsim("myMobsim");
 
-		config.qsim().setRemoveStuckVehicles(true);
+//		config.qsim().setRemoveStuckVehicles(true); // but why?  kai, feb'16
+		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(100.0);
 
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );
@@ -259,6 +264,16 @@ public class MultiModalControlerListenerTest {
 		controler.getEvents().addHandler(linkModeChecker);
 		
 		controler.run();
+		
+		/* NOTE: When I introduced access/egress legs, nearly everything in the following (besides bikeCount) changed.   
+		 * After setting removeStuckVehicles from true to false, the counts were stable.  So with access/egress legs, a
+		 * different number of vehicles got lost ... which makes sense, because they enter/leave the traffic at different times.
+		 *  
+		 * Also, after not losing vehicles vehicles any more, the travel times for the uncongested modes bike and walk were stable.
+		 * Predictably, the travel time for the congested mode changes.
+		 * 
+		 * kai, feb'16
+		 */
 
 		// check the number of link leave events
 		int carCount = linkModeChecker.leftCountPerMode.get(TransportMode.car);
@@ -266,45 +281,61 @@ public class MultiModalControlerListenerTest {
 		int walkCount = linkModeChecker.leftCountPerMode.get(TransportMode.walk);
 		Assert.assertEquals(
 				"unexpected number of link leave events for mode car with number of threads "+numberOfThreads,
-				513445, carCount);
+//				513445, carCount);
+				692259, carCount);
 		Assert.assertEquals(
 				"unexpected number of link leave events for mode bike with number of threads "+numberOfThreads,
 				4577, bikeCount);
 		Assert.assertEquals(
 				"unexpected number of link leave events for mode walk with number of threads "+numberOfThreads,
-				5834, walkCount);
+//				5834, walkCount);
+				7970, walkCount);
 
 		// check the total number of link left events
 		Assert.assertEquals(
 				"unexpected total number of link leave events with number of threads "+numberOfThreads,
-				523856, linkModeChecker.linkLeftCount);
+//				523856, linkModeChecker.linkLeftCount);
+				704806, linkModeChecker.linkLeftCount);
 
 		// check the total mode travel times
 		double carTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.car);
 		double bikeTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.bike);
 		double walkTravelTime = linkModeChecker.travelTimesPerMode.get(TransportMode.walk);
-		Assert.assertEquals(
+		Logger.getLogger( this.getClass() ).warn( "carTravelTime: " + carTravelTime ) ;
+		Logger.getLogger( this.getClass() ).warn( "bikeTravelTime: " + bikeTravelTime ) ;
+		Logger.getLogger( this.getClass() ).warn( "walkTravelTime: " + walkTravelTime ) ;
+		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			Assert.assertEquals(
+					"unexpected total travel time for car mode with number of threads "+numberOfThreads,
+					1.1186864E8, carTravelTime, MatsimTestUtils.EPSILON);
+		} else {
+			Assert.assertEquals(
 				"unexpected total travel time for car mode with number of threads "+numberOfThreads,
-				5.7263255E7, carTravelTime, MatsimTestUtils.EPSILON);
+//				5.7263255E7, carTravelTime, MatsimTestUtils.EPSILON);
+				1.11881636E8, carTravelTime, MatsimTestUtils.EPSILON);
+		}
 		Assert.assertEquals(
 				"unexpected total travel time for bike mode with number of threads "+numberOfThreads,
+//				480275.0, bikeTravelTime, MatsimTestUtils.EPSILON);
 				480275.0, bikeTravelTime, MatsimTestUtils.EPSILON);
 		Assert.assertEquals(
 				"unexpected total travel time for walk mode with number of threads "+numberOfThreads,
-				3259757.0, walkTravelTime, MatsimTestUtils.EPSILON);
+//				3259757.0, walkTravelTime, MatsimTestUtils.EPSILON);
+				3885025.0, walkTravelTime, MatsimTestUtils.EPSILON);
 	}
 
-	private Person createPerson(Scenario scenario, String id, String mode) {
-		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
+	private static Person createPerson(Scenario scenario, String id, String mode) {
+		final PopulationFactory pf = scenario.getPopulation().getFactory();
+		Person person = pf.createPerson(Id.create(id, Person.class));
 
-		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l0", Link.class));
-		Leg leg = scenario.getPopulation().getFactory().createLeg(mode);
-		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l5", Link.class));
+		Activity from = pf.createActivityFromLinkId("home", Id.create("l0", Link.class));
+		Leg leg = pf.createLeg(mode);
+		Activity to = pf.createActivityFromLinkId("home", Id.create("l5", Link.class));
 
 		from.setEndTime(8*3600);
 		leg.setDepartureTime(8*3600);
 
-		Plan plan = scenario.getPopulation().getFactory().createPlan();
+		Plan plan = pf.createPlan();
 		plan.addActivity(from);
 		plan.addLeg(leg);
 		plan.addActivity(to);
@@ -321,10 +352,13 @@ public class MultiModalControlerListenerTest {
 		int linkLeftCount = 0;
 
 		private final Network network;
+
 		// contains only modes for vehicles with wait2link events (needed to count link leave events)
 		private final Map<Id<Vehicle>, String> vehModes = new HashMap<>();
+
 		// contains also modes for teleported agents (needed to calculate travel times of all modes)
 		private final Map<Id<Person>, String> agModes = new HashMap<>();
+
 		private final Map<Id<Person>, Double> departures = new HashMap<>();
 		final Map<String, Integer> leftCountPerMode = new HashMap<>();
 		final Map<String, Double> travelTimesPerMode = new HashMap<>();
@@ -375,6 +409,9 @@ public class MultiModalControlerListenerTest {
 			// assume that the agent is allowed to travel on the link
 			Assert.assertEquals(true, link.getAllowedModes().contains(mode));
 
+			if ( mode.contains(TransportMode.access_walk) || mode.contains(TransportMode.egress_walk) ) {
+				return ;
+			}
 			this.linkLeftCount++;
 
 			int count = this.leftCountPerMode.get(mode);
@@ -383,12 +420,18 @@ public class MultiModalControlerListenerTest {
 
 		@Override
 		public void handleEvent(PersonArrivalEvent event) {
-			this.arrivalCount++;
-			
 			String mode = this.agModes.remove(event.getPersonId());
+			this.arrivalCount++;
 
 			double tripTravelTime = event.getTime() - this.departures.remove(event.getPersonId());
-			double modeTravelTime = this.travelTimesPerMode.get(mode);
+			if ( mode.contains(TransportMode.access_walk) || mode.contains(TransportMode.egress_walk) ) {
+				return ;
+			}
+			Double modeTravelTime = this.travelTimesPerMode.get(mode);
+			if ( modeTravelTime==null ) {
+				Logger.getLogger(this.getClass()).warn( "mode:" + mode );
+				Logger.getLogger(this.getClass()).warn( "travelTimesPerMode:" + this.travelTimesPerMode );
+			}
 			this.travelTimesPerMode.put(mode, modeTravelTime + tripTravelTime);
 		}
 	}

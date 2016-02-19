@@ -83,6 +83,22 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 		}
+		{
+			ActivityParams params = new ActivityParams("bike interaction") ;
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
+			ActivityParams params = new ActivityParams("other interaction") ;
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
+			ActivityParams params = new ActivityParams("walk interaction") ; 
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+			// bushwhacking_walk---network_walk---bushwhacking_walk
+		}
 	}
 
 

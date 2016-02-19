@@ -133,7 +133,11 @@ public class MultiModalPTCombinationTest {
 		Assert.assertEquals(7, ptPlan.getPlanElements().size());
 
 		Plan walkPlan = walkPerson.getSelectedPlan();
-		Assert.assertEquals(3, walkPlan.getPlanElements().size());
+		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			Assert.assertEquals(7, walkPlan.getPlanElements().size());
+		} else {
+			Assert.assertEquals(3, walkPlan.getPlanElements().size());
+		}
 		
 		/*
 		 * These tests fail since the TransitRouter (?) does not create NetworkRoutes.
@@ -209,9 +213,16 @@ public class MultiModalPTCombinationTest {
 		@Override
 		public void handleEvent(PersonArrivalEvent event) {
 			String mode = this.modes.remove(event.getPersonId());
+			if ( mode.contains(TransportMode.access_walk) || mode.contains(TransportMode.egress_walk) ) {
+				return ;
+			}
 			
 			double tripTravelTime = event.getTime() - this.departures.remove(event.getPersonId());
-			double modeTravelTime = this.travelTimesPerMode.get(mode);
+			Double modeTravelTime = this.travelTimesPerMode.get(mode);
+			if ( modeTravelTime==null ) {
+				Logger.getLogger(this.getClass()).warn("mode:" + mode );
+				Logger.getLogger(this.getClass()).warn("travelTimesPerMode:" + mode );
+			}
 			this.travelTimesPerMode.put(mode, modeTravelTime + tripTravelTime);
 		}
 
