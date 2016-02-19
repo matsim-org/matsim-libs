@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -88,14 +89,17 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final PopulationFactory populationFactory,
 			final Network network,
 			final LeastCostPathCalculator routeAlgo,
-			final ModeRouteFactory routeFactory) {
+			final ModeRouteFactory routeFactory, PlansCalcRouteConfigGroup calcRouteConfig) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.routeFactory = routeFactory;
 		this.mode = mode;
 		this.populationFactory = populationFactory;
 		this.stageActivityType = this.mode + " interaction";
-		throw new RuntimeException("not yet fully debugged") ;
+		if ( !calcRouteConfig.isInsertingAccessEgressWalk() ) {
+			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
+					+ "currently not supported; there are too many other problems") ;
+		}
 	}
 
 	@Override

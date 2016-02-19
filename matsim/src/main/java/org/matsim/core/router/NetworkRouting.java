@@ -80,7 +80,8 @@ public class NetworkRouting implements Provider<RoutingModule> {
 						travelTime);
 
 		if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {
-			return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo) ;
+			return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo,
+					plansCalcRouteConfigGroup) ;
 		} else {
 			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
 		}

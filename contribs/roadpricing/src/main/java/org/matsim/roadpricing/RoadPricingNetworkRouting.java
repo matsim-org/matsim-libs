@@ -72,7 +72,7 @@ public class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 						travelTime);
 		if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {
 			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car, populationFactory,
-					filteredNetwork, routeAlgo);
+					filteredNetwork, routeAlgo, plansCalcRouteConfigGroup);
 		} else {
 			return DefaultRoutingModules.createPureNetworkRouter(TransportMode.car, populationFactory,
 					filteredNetwork, routeAlgo);
