@@ -26,6 +26,7 @@ package playground.southafrica.population.freight;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -44,6 +45,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public class ChainChopperTest {
 
+	@Ignore
 	@Test
 	public void testChop1() {
 		Plan plan = buildPlan1();
