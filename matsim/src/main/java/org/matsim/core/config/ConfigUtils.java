@@ -22,19 +22,33 @@ package org.matsim.core.config;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Iterator;
 
 /**
  * @author mrieser
  */
 public abstract class ConfigUtils implements MatsimExtensionPoint {
-	
+
+	public static Config createConfig(URL context) {
+		Config config = createConfig();
+		config.setContext(context);
+		return config;
+	}
+
 	public static Config createConfig() {
 		Config config = new Config();
 		config.addCoreModules();
+		try {
+			config.setContext(new URL("file", null, "."));
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 		return config;
 	}
 
@@ -45,22 +59,26 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
         for (ConfigGroup customModule : customModules) {
             config.addModule(customModule);
         }
-
 		return config;
 	}
 
 	public static Config loadConfig(final String filename, ConfigGroup... customModules) throws UncheckedIOException {
+		return loadConfig(IOUtils.getUrlFromFileOrResource(filename), customModules);
+	}
+
+	public static Config loadConfig(final URL url, ConfigGroup... customModules) throws UncheckedIOException {
 		Config config = new Config();
 		config.addCoreModules();
 
-        for (ConfigGroup customModule : customModules) {
-            config.addModule(customModule);
-        }
+		for (ConfigGroup customModule : customModules) {
+			config.addModule(customModule);
+		}
 
-		new ConfigReader(config).parse(filename);
-
+		new ConfigReader(config).parse(url);
+		config.setContext(url);
 		return config;
 	}
+
 
 	/**
 	 * This does (hopefully) overwrite config settings if they are defined in the file.  So you can do
@@ -77,6 +95,29 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 			config.addCoreModules();
 		}
 		new ConfigReader(config).parse(filename);
+		try {
+			config.setContext(new URL("file", null, filename));
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static void loadConfig(final Config config, final URL url) throws UncheckedIOException {
+		if (config.global() == null) {
+			config.addCoreModules();
+		}
+		new ConfigReader(config).parse(url);
+		config.setContext(url);
+	}
+
+
+	public static Config loadConfig(URL url) {
+		Config config = new Config();
+		config.addCoreModules();
+		new ConfigReader(config).parse(url);
+		config.setContext(url);
+		return config;
+
 	}
 
 	/**

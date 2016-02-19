@@ -45,6 +45,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
 import com.google.inject.Inject;
+import java.net.URL;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -119,12 +120,12 @@ class ScenarioLoaderImpl {
 	 * Loads the network into the scenario of this class
 	 */
 	private void loadNetwork() {
+		URL networkUrl = null;
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
-			final String networkFileName = this.config.network().getInputFile();
-
-			log.info("loading network from " + networkFileName);
+			networkUrl = this.config.network().getInputFileURL(this.config.getContext());
+			log.info("loading network from " + networkUrl);
 			if ( config.network().getInputCRS() == null ) {
-				new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkFileName);
+				new MatsimNetworkReader(this.scenario.getNetwork()).parse(networkUrl);
 			}
 			else {
 				log.info( "re-projecting network from "+config.network().getInputCRS()+" to "+config.global().getCoordinateSystem()+" for import" );
@@ -132,7 +133,7 @@ class ScenarioLoaderImpl {
 						TransformationFactory.getCoordinateTransformation(
 								config.network().getInputCRS(),
 								config.global().getCoordinateSystem() );
-				new MatsimNetworkReader( transformation , this.scenario.getNetwork() ).parse( networkFileName );
+				new MatsimNetworkReader( transformation , this.scenario.getNetwork() ).parse(networkUrl);
 			}
 
 			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
@@ -147,7 +148,7 @@ class ScenarioLoaderImpl {
 
 	private void loadActivityFacilities() {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
-			String facilitiesFileName = this.config.facilities().getInputFile();
+			URL facilitiesFileName = this.config.facilities().getInputFileURL(config.getContext());
 			log.info("loading facilities from " + facilitiesFileName);
 
 			final String inputCRS = config.facilities().getInputCRS();
@@ -185,7 +186,7 @@ class ScenarioLoaderImpl {
 
 	private void loadPopulation() {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
-			String populationFileName = this.config.plans().getInputFile();
+			URL populationFileName = this.config.plans().getInputFileURL(this.config.getContext());
 			log.info("loading population from " + populationFileName);
 
 			if ( config.plans().getInputCRS() == null ) {
@@ -254,7 +255,7 @@ class ScenarioLoaderImpl {
 			final String internalCRS = config.global().getCoordinateSystem();
 
 			if ( inputCRS == null ) {
-				new TransitScheduleReader(this.scenario).readFile(transitScheduleFile);
+				new TransitScheduleReader(this.scenario).readURL(this.config.transit().getTransitScheduleFileURL(this.config.getContext()));
 			}
 			else {
 				log.info( "re-projecting transit schedule from "+inputCRS+" to "+internalCRS+" for import" );
@@ -292,7 +293,7 @@ class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.transit().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading transit vehicles from " + vehiclesFile);
-			new VehicleReaderV1(this.scenario.getTransitVehicles()).readFile(vehiclesFile);
+			new VehicleReaderV1(this.scenario.getTransitVehicles()).parse(this.config.transit().getVehiclesFileURL(this.config.getContext()));
 		}
 		else {
 			log.info("no transit vehicles file set in config, not loading any transit vehicles");

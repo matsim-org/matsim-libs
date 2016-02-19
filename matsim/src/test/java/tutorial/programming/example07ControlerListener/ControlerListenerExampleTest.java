@@ -25,10 +25,10 @@ import java.io.File;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 
-public class ControlerListnerExampleTest {
+public class ControlerListenerExampleTest {
 	
 	/**
-	 * Test method for {@link tutorial.programming.example07ControlerListener.RunControlerListnerExample#main(java.lang.String[])}.
+	 * Test method for {@link tutorial.programming.example07ControlerListener.RunControlerListenerExample#main(java.lang.String[])}.
 	 */
 	@SuppressWarnings("static-method")
 	@Test

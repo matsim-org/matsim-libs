@@ -28,6 +28,8 @@ import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 
+import java.net.URL;
+
 /**
  * Reads {@link TransitSchedule}s from file as long as the files are in one of the
  * supported file formats.
@@ -59,6 +61,10 @@ public class TransitScheduleReader implements MatsimSomeReader {
 			throw new UncheckedIOException("Unsupported file format: " + systemId);
 		}
 
+	}
+
+	public void readURL(final URL url) throws UncheckedIOException {
+		new TransitScheduleReaderV1( transformation , this.scenario).parse(url);
 	}
 
 }

@@ -31,6 +31,7 @@ import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,7 @@ public class Config implements MatsimExtensionPoint {
 	private static final Logger log = Logger.getLogger(Config.class);
 
 	private boolean locked = false;
+	private URL context;
 
 
 	// ////////////////////////////////////////////////////////////////////
@@ -519,4 +521,11 @@ public class Config implements MatsimExtensionPoint {
 		return vehicles;
 	}
 
+	public void setContext(URL context) {
+		this.context = context;
+	}
+
+	public URL getContext() {
+		return context;
+	}
 }

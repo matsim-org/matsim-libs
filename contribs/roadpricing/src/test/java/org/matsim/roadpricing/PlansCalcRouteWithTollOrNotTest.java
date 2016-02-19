@@ -67,7 +67,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	 */
 	@Test
 	public void testBestAlternatives() {
-		Config config = matsimTestUtils.loadConfig(null);
+		Config config = matsimTestUtils.createConfig();
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
@@ -156,7 +156,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	 */
 	@Test
 	public void testTolledActLink() {
-		Config config = matsimTestUtils.loadConfig(null);
+		Config config = matsimTestUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 
@@ -182,7 +182,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	 */
 	@Test
 	public void testAllAlternativesTolled() {
-		Config config = matsimTestUtils.loadConfig(null);
+		Config config = matsimTestUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 
@@ -230,7 +230,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 	@Test
 	public void testOutsideTollTime() {
-		Config config = matsimTestUtils.loadConfig(null);
+		Config config = matsimTestUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
 

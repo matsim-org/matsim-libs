@@ -264,7 +264,7 @@ public class FlowStorageSpillbackTest {
 			
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
 		
-		Config config = testUtils.loadConfig(null);
+		Config config = testUtils.loadConfig((String) null);
 		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();

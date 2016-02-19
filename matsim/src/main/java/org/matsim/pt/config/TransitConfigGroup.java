@@ -20,6 +20,8 @@
 
 package org.matsim.pt.config;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -112,6 +114,14 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 		return this.transitScheduleFile;
 	}
 
+	public URL getTransitScheduleFileURL(URL context) {
+		try {
+			return new URL(context, getTransitScheduleFile());
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@StringSetter( VEHICLES_FILE )
 	public void setVehiclesFile(final String filename) {
 		this.vehiclesFile = filename;
@@ -120,6 +130,14 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter( VEHICLES_FILE )
 	public String getVehiclesFile() {
 		return this.vehiclesFile;
+	}
+
+	public URL getVehiclesFileURL(URL context) {
+		try {
+			return new URL(context, getVehiclesFile());
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void setTransitModes(final Set<String> modes) {
