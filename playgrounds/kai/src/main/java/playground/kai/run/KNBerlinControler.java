@@ -38,6 +38,8 @@ class KNBerlinControler {
 
 		// ### prepare the config:
 		Config config = ConfigUtils.loadConfig( "/Users/nagel/kairuns/a100/config.xml", new NoiseConfigGroup() ) ;
+		
+		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 
 		// paths:
 		//		config.network().setInputFile("/Users/nagel/");
