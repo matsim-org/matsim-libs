@@ -41,6 +41,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static playground.boescpa.ivtBaseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
+
 /**
  * Identifies for a given from-to-relationship the according pt-link in the network.
  *
@@ -65,14 +67,13 @@ public class PTCountsLinkIdentification {
 
 	private static void writePTCounts(String pathToCountsOutput, Map<Id<Link>, CountInput> identifiedLinks) {
 		BufferedWriter writer = IOUtils.getBufferedWriter(pathToCountsOutput);
-		String delimiter = "; ";
 		try {
-			String header = "linkId; linkDescr; countVolumes";
+			String header = "linkId" + COUNTS_DELIMITER + "countStationDescr" + COUNTS_DELIMITER + "countVolumes";
 			writer.write(header);
 			writer.newLine();
 			for (Id<Link> linkId : identifiedLinks.keySet()) {
-				writer.write(linkId.toString() + delimiter);
-				writer.write(identifiedLinks.get(linkId).descr + delimiter);
+				writer.write(linkId.toString() + COUNTS_DELIMITER);
+				writer.write(identifiedLinks.get(linkId).descr + COUNTS_DELIMITER);
 				writer.write(Double.toString(identifiedLinks.get(linkId).counts));
 				writer.newLine();
 			}

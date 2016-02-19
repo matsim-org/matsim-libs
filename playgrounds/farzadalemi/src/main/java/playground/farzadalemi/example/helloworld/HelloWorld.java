@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.example;
+package playground.farzadalemi.example.helloworld;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
