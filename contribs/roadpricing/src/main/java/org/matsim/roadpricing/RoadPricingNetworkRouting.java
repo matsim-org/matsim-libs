@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -43,6 +44,8 @@ public class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 
 	@Inject
     PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	
+	@Inject PlansCalcRouteConfigGroup plansCalcRouteConfigGroup ;
 
 	@Inject
     Network network;
@@ -67,7 +70,13 @@ public class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 						filteredNetwork,
 						travelDisutilityFactory.createTravelDisutility(travelTime, planCalcScoreConfigGroup),
 						travelTime);
-		return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car, populationFactory,
-				filteredNetwork, routeAlgo);
+		if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {
+			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car, populationFactory,
+					filteredNetwork, routeAlgo);
+		} else {
+			return DefaultRoutingModules.createPureNetworkRouter(TransportMode.car, populationFactory,
+					filteredNetwork, routeAlgo);
+		}
+		// yyyyyy not so great that this differentiation is here; need to push it down a bit (again). kai, feb'2016
 	}
 }

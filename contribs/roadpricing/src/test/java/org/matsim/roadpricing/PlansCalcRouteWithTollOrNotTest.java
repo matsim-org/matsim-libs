@@ -25,7 +25,6 @@ package org.matsim.roadpricing;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -33,33 +32,23 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
-import org.matsim.core.events.EventsManagerModule;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
-
-import com.google.inject.Singleton;
 
 /**
  * Tests {@link PlansCalcRouteWithTollOrNot} as isolated as possible.
@@ -68,6 +57,7 @@ import com.google.inject.Singleton;
  */
 
 public class PlansCalcRouteWithTollOrNotTest {
+	private static final Logger log = Logger.getLogger( PlansCalcRouteWithTollOrNotTest.class );
 
 	@Rule
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
@@ -81,6 +71,8 @@ public class PlansCalcRouteWithTollOrNotTest {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
+		
+		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
@@ -99,13 +91,17 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Id id1 = Id.createPersonId("1");
 
 		// case 1: toll only in morning, it is cheaper to drive around
+		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 		runOnAll(testee(scenario, toll), population);
+		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 2: now add a toll in the afternoon too, so it is cheaper to pay the toll
 		Cost afternoonCost = toll.addCost(14*3600, 18*3600, 0.12);
+		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 		runOnAll(testee(scenario, toll), population);
+		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
@@ -128,10 +124,14 @@ public class PlansCalcRouteWithTollOrNotTest {
 	}
 
 	private static Leg getLeg1(Config config, Population population, Id id1) {
+		final List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements();
+		for ( PlanElement pe : planElements ) {
+			log.warn( pe );
+		}
 		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-			return (Leg) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(1));
+			return (Leg) (planElements.get(1));
 		} else {
-			return (Leg) (population.getPersons().get(id1).getPlans().get(0).getPlanElements().get(3));
+			return (Leg) (planElements.get(3));
 		}
 	}
 

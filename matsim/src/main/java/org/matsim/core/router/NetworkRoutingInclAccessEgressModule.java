@@ -95,6 +95,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.mode = mode;
 		this.populationFactory = populationFactory;
 		this.stageActivityType = this.mode + " interaction";
+		throw new RuntimeException("not yet fully debugged") ;
 	}
 
 	@Override
