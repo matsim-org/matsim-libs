@@ -61,8 +61,8 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
-import scenarios.analysis.TtGeneralAnalysis;
-import scenarios.analysis.TtListenerToBindGeneralAnalysis;
+import analysis.TtGeneralAnalysis;
+import analysis.TtListenerToBindGeneralAnalysis;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
 /**
