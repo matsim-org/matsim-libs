@@ -150,7 +150,7 @@ public class TripSpeedEstimator{
 							int hour = d1.getEndTimeGregorianCalendar().get(Calendar.HOUR_OF_DAY);
 							
 							double triptime = (((double)d2.getStartTimeGregorianCalendar().getTimeInMillis()) - ((double)d1.getEndTimeGregorianCalendar().getTimeInMillis()))/1000.0;
-							double crowFlyDistance = ((double)CoordUtils.calcDistance(d1.getCoord(), d2.getCoord()))/1000.0;
+							double crowFlyDistance = ((double)CoordUtils.calcEuclideanDistance(d1.getCoord(), d2.getCoord()))/1000.0;
 							
 							String s = String.format("%s,%d,%d,%.3f,%.0f\n", 
 									dv.getId().toString(),

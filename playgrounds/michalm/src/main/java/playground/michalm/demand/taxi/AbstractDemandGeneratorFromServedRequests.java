@@ -22,7 +22,7 @@ package playground.michalm.demand.taxi;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
+import org.matsim.contrib.taxi.TaxiUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;

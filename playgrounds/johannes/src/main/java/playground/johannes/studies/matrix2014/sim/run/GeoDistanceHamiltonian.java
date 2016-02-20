@@ -78,6 +78,7 @@ public class GeoDistanceHamiltonian {
                 hamiltonian,
                 configGroup);
         engine.getHamiltonian().addComponent(annealingHamiltonian);
+        engine.getEngineListeners().addComponent(annealingHamiltonian);
         /*
         Add the hamiltonian to the geo distance attribute change listener.
          */

@@ -77,6 +77,10 @@ public class VehicleLeavesTrafficEvent extends Event implements HasPersonId {
 		return networkMode;
 	}
 	
+	public double getRelativePositionOnLink() {
+		return relativePositionOnLink;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();

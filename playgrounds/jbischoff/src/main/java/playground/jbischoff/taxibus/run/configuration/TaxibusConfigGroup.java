@@ -25,14 +25,19 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	private static final String ZONESXML = "zonesXML";
 
 	private static final String BALANCING = "balanceLines";
+	private static final String VEHICLESONDISPATCH = "vehiclesDispatchedAtSameTime";
+	private static final String DISTANCEMEASURE = "distanceCalculationCostCriteria";
+	
 
 	private String taxiIdentifier = "taxibus";
 	private String vehiclesFile = null;
 	private String ranksFile = null;
 	private String outputDir = null;
+	private String distanceCalculationCostCriteria = "beeline";
 
 	private double pickupDuration = 60.0;
 	private double dropoffDuration = 120.0;
+	private int numberOfVehiclesDispatchedAtSameTime = 8;
 
 	private String algorithm;
 
@@ -77,7 +82,12 @@ public class TaxibusConfigGroup extends ConfigGroup {
 			this.linesFile = value;
 		} else if (BALANCING.equals(key)) {
 			this.balancingMethod = value;
+		} else if (DISTANCEMEASURE.equals(key)) {
+			this.distanceCalculationCostCriteria = value;
+		} else if (VEHICLESONDISPATCH.equals(key)) {
+			this.numberOfVehiclesDispatchedAtSameTime = Integer.parseInt(value);
 		}
+		
 
 		else {
 			log.error("unknown parameter: " + key + "...");
@@ -99,6 +109,8 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		map.put(ZONESSHP, zonesShpFile);
 		map.put(ZONESXML, zonesXmlFile);
 		map.put(BALANCING, balancingMethod);
+		map.put(DISTANCEMEASURE, distanceCalculationCostCriteria);
+		map.put(VEHICLESONDISPATCH, Integer.toString(numberOfVehiclesDispatchedAtSameTime));
 		return map;
 
 	}
@@ -118,6 +130,8 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		map.put(LINES, "Lines file, if required by algorithm. Uses zone IDs for reference");
 		map.put(BALANCING,
 				"Balancing vehicles between line. Possible parameters: same (returns to same line), return (return line), balanced (balances between lines)");
+		map.put(DISTANCEMEASURE, "Mode in which distance is measured. One of: beeline, earliestArrival");
+		map.put(VEHICLESONDISPATCH, "Number of vehicles dispatched at the same time - per line");
 		return map;
 	}
 
@@ -168,4 +182,10 @@ public class TaxibusConfigGroup extends ConfigGroup {
 	public String getBalancingMethod() {
 		return balancingMethod;
 	};
+	public int getNumberOfVehiclesDispatchedAtSameTime() {
+		return numberOfVehiclesDispatchedAtSameTime;
+	}
+	public String getDistanceCalculationMode() {
+		return distanceCalculationCostCriteria;
+	}
 }

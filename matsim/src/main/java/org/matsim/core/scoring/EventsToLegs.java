@@ -45,7 +45,6 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -136,6 +135,8 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	}
 	private Map<Id<Person>, LegImpl> legs = new HashMap<>();
 	private Map<Id<Person>, List<Id<Link>>> experiencedRoutes = new HashMap<>();
+	private Map<Id<Person>, Double> relPosOnDepartureLinkPerPerson = new HashMap<>();
+	private Map<Id<Person>, Double> relPosOnArrivalLinkPerPerson = new HashMap<>();
 	private Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
 	private Map<Id<Person>, PendingTransitTravel> transitTravels = new HashMap<>();
 	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
@@ -224,16 +225,18 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	    List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
 	    assert experiencedRoute.size() >= 1  ;
 	    PendingTransitTravel pendingTransitTravel;
-	    if (experiencedRoute != null && experiencedRoute.size() > 1) {
-		    // yy first condition always fulfilled?  (since otherwise the above assert would fail)?? kai, jan'16
-		    
+	    if (experiencedRoute.size() > 1) { // different links processed
 	        NetworkRoute networkRoute = RouteUtils.createNetworkRoute(experiencedRoute, null);
 	        networkRoute.setTravelTime(travelTime);
-
-	        networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, network));
-	        // TODO MATSIM-227: replace the above by taking distance from List<Id<Link>> experiencedRoute (minus first/last link)
-	        // and add manually distance on first/last link.  Newly based on VehicleEnters/LeavesTrafficEvents, which should (newly)
-	        // contain this information.  kai/mz, sep'15
+        
+	        /* use the relative position of vehicle enter/leave traffic events on first/last links
+	         * to calculate the correct route distance including the first/last link. 
+	         * (see MATSIM-227) tt feb'16
+	         */
+	        double relPosOnDepartureLink = relPosOnDepartureLinkPerPerson.get(event.getPersonId());
+		    double relPosOnArrivalLink = relPosOnArrivalLinkPerPerson.get(event.getPersonId());
+		    networkRoute.setDistance(RouteUtils.calcDistance(networkRoute, relPosOnDepartureLink, 
+		    		relPosOnArrivalLink, network));
 	        
 	        leg.setRoute(networkRoute);
 	    } else if ((pendingTransitTravel = transitTravels.remove(event.getPersonId())) != null) {
@@ -299,11 +302,17 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		delegate.handleEvent(event);
+
+		// remember the relative position on the link
+		relPosOnDepartureLinkPerPerson.put(event.getPersonId(), event.getRelativePositionOnLink());
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		delegate.handleEvent(event);
+		
+		// remember the relative position on the link
+		relPosOnArrivalLinkPerPerson.put(event.getPersonId(), event.getRelativePositionOnLink());
 	}
 
 }

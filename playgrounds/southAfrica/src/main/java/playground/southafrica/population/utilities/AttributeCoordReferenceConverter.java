@@ -47,7 +47,7 @@ import playground.southafrica.utilities.Header;
  */
 public class AttributeCoordReferenceConverter {
 	final private static Logger LOG = Logger.getLogger(AttributeCoordReferenceConverter.class);
-	final private static String OLD = "core.utils.geometry.CoordImpl";
+	final private static String OLD = "core.utils.geometry.Coord";
 	final private static String NEW = "api.core.v01.Coord";
 
 	/**
@@ -72,6 +72,7 @@ public class AttributeCoordReferenceConverter {
 			while((line=br.readLine()) != null){
 				String newLine = line.replaceFirst(OLD, NEW);
 				bw.write(newLine);
+				bw.newLine();
 				counter.incCounter();
 			}			
 		} catch (IOException e) {

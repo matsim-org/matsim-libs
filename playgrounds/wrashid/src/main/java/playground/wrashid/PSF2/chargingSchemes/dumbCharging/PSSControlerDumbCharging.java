@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -71,9 +72,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 	
 	public void prepareMATSimIterations(){
 		// use the right Controler (read parameter
-		Config config = new Config();
-		ConfigReader reader = new ConfigReader(config);
-		reader.readFile(configFilePath);
+		Config config = ConfigUtils.loadConfig(configFilePath, new ParametersPSF());
 		String tempStringValue = config.findParam(ParametersPSF.PSF_MODULE, "main.inputEventsForSimulationPath");
 		if (tempStringValue != null) {
 			// ATTENTION, this does not work at the moment, because the read
@@ -82,13 +81,13 @@ public class PSSControlerDumbCharging extends PSSControler {
 			// handlers...
 			//
 			// (As far as I can tell, the above lines come from Rashid, in 2011. kai, sep'2015) 
-			controler = new EventReadControler(configFilePath, tempStringValue).getControler();
+			controler = new EventReadControler(config, tempStringValue).getControler();
 			ParametersPSF2.isEventsFileBasedControler=true;
 			
 			setDumbScoringFunctionFactory(controler);
 			
 		} else {
-			controler = new Controler(configFilePath);
+			controler = new Controler(config);
 		}
 
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );

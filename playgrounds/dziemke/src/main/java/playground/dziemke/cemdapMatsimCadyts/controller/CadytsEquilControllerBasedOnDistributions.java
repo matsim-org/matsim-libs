@@ -28,7 +28,7 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Builder;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.counts.Counts;
 
@@ -121,10 +121,9 @@ public class CadytsEquilControllerBasedOnDistributions {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 
-				final CharyparNagelScoringParametersBuilder paramsBuilder = CharyparNagelScoringParameters.getBuilder(
-						ScenarioUtils.createScenario(config), person.getId());
+				final Builder paramsBuilder = new Builder(ScenarioUtils.createScenario(config), person.getId());
 
-				final CharyparNagelScoringParameters params = paramsBuilder.create();
+				final CharyparNagelScoringParameters params = paramsBuilder.build();
 
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));

@@ -24,10 +24,9 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.zone.*;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-
-import playground.michalm.zone.*;
 
 
 public class BerlinZoneUtils

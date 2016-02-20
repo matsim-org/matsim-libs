@@ -44,9 +44,9 @@ public class NetworkModifierOnlyCar extends AbstractNetworkModifier {
 	@Override
 	public boolean isLinkAffected(Link link) {
 		// Area:
-		boolean isAffected = CoordUtils.calcDistance(link.getFromNode().getCoord(), center) <= radius ||
-				CoordUtils.calcDistance(link.getToNode().getCoord(), center) <= radius ||
-				CoordUtils.calcDistance(link.getCoord(), center) <= radius;
+		boolean isAffected = CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), center) <= radius ||
+				CoordUtils.calcEuclideanDistance(link.getToNode().getCoord(), center) <= radius ||
+				CoordUtils.calcEuclideanDistance(link.getCoord(), center) <= radius;
 		// Mode:
 		if (isAffected) {
 			isAffected = link.getAllowedModes().contains("car");

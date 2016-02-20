@@ -81,7 +81,7 @@ public class NetworkCutter {
 		final Set<Id<Node>> nodesInAreaOfInterest = new HashSet<>();
 		int nodesOnBorder = 0;
 		for (Node node : network.getNodes().values()) {
-			double distance = CoordUtils.calcDistance(node.getCoord(), center);
+			double distance = CoordUtils.calcEuclideanDistance(node.getCoord(), center);
 			if (distance <= radius) {
 				nodesInAreaOfInterest.add(node.getId());
 				Node newNode = factory.createNode(node.getId(), node.getCoord());

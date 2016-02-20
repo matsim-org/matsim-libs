@@ -40,7 +40,7 @@ public class RoutingWalkLink extends AbstractRoutingLink {
 	public RoutingWalkLink(AbstractRoutingNode fromNode, AbstractRoutingNode toNode, WalkType type){
 		super(fromNode, toNode);
 		this.type = type;
-		this.length = CoordUtils.calcDistance(this.fromNode.getCoord(), this.toNode.getCoord());
+		this.length = CoordUtils.calcEuclideanDistance(this.fromNode.getCoord(), this.toNode.getCoord());
 	}
 	
 	public double getLength() { return this.length; }

@@ -263,7 +263,7 @@ private static String inputDir = "/Users/laemmel/devel/jps/input";
 
 		double flow = 1.6 * 1.2;
 		for (Link l : net.getLinks().values()) {
-			double length = CoordUtils.calcDistance(l.getFromNode().getCoord(),
+			double length = CoordUtils.calcEuclideanDistance(l.getFromNode().getCoord(),
 					l.getToNode().getCoord());
 			l.setLength(length);
 			l.setAllowedModes(modes);

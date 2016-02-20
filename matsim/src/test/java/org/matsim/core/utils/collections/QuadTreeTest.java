@@ -334,13 +334,13 @@ public class QuadTreeTest {
 				for ( double x2 : xPositions ) {
 					for ( double y2 : yPositions ) {
 						final Coord f2 = new Coord(x2, y2);
-						final double interfoci = CoordUtils.calcDistance( f1 , f2 );
+						final double interfoci = CoordUtils.calcEuclideanDistance( f1 , f2 );
 
 						for ( double distance : distances ) {
 							if ( distance < interfoci ) continue;
 							final Collection<Coord> expected = new ArrayList<Coord>();
 							for ( Coord coord : all ) {
-								if ( CoordUtils.calcDistance( coord , f1 ) + CoordUtils.calcDistance( coord , f2 ) <= distance ) {
+								if ( CoordUtils.calcEuclideanDistance( coord , f1 ) + CoordUtils.calcEuclideanDistance( coord , f2 ) <= distance ) {
 									expected.add( coord );
 								}
 							}

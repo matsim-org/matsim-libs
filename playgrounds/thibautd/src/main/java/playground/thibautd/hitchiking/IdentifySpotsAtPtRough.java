@@ -158,11 +158,11 @@ public class IdentifySpotsAtPtRough {
 		private final List<Coord> coords = new ArrayList<Coord>();
 
 		public boolean add(final Coord toAdd) {
-			if ( CoordUtils.calcDistance( CENTER , toAdd ) > MAX_DIST_TO_CENTER ) {
+			if ( CoordUtils.calcEuclideanDistance( CENTER , toAdd ) > MAX_DIST_TO_CENTER ) {
 				return false;
 			}
 			for (Coord c : coords) {
-				if ( CoordUtils.calcDistance( c , toAdd ) < MIN_DIST ) {
+				if ( CoordUtils.calcEuclideanDistance( c , toAdd ) < MIN_DIST ) {
 					return false;
 				}
 			}

@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.qsim.QSim;
 
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -59,7 +60,6 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 	 * no concurrent add operation can occur.
 	 * cdobler, sep'14
 	 */
-	//	private final List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
 	private final List<QLinkInternalI> linksList = new LinkedList<>();
 
 	/*
@@ -76,6 +76,13 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 
 	private boolean movingNodes;
 
+	/*package*/ long[] runTimes;
+	private long startTime = 0;
+	{	
+		if (QSim.analyzeRunTimes) runTimes = new long[QNetsimEngine.numObservedTimeSteps];
+		else runTimes = null;
+	}
+	
 	/*package*/ QNetsimEngineRunner(Phaser startBarrier, Phaser separationBarrier, Phaser endBarrier) {
 		this.startBarrier = startBarrier;
 		this.separationBarrier = separationBarrier;
@@ -84,9 +91,9 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 	QNetsimEngineRunner() {
 		// this is the execution path with invokeAll and the threadpool; it does not need (and should not use) the barriers.
 		// kai, jan'14
-		this.startBarrier = null ;
-		this.separationBarrier = null ;
-		this.endBarrier = null ;
+		this.startBarrier = null;
+		this.separationBarrier = null;
+		this.endBarrier = null;
 	}
 
 	/*package*/ void setTime(final double t) {
@@ -104,12 +111,12 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 		// kai, jan'14
 
 		// Check if Simulation is still running. Otherwise print CPU usage and end thread.
-		if (!simulationRunning) {
+		if (!this.simulationRunning) {
 			Gbl.printCurrentThreadCpuTime();
 			return false;
 		}
 
-		if ( this.movingNodes ) {
+		if (this.movingNodes) {
 			moveNodes();
 		} else {
 			moveLinks();
@@ -129,8 +136,10 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 			 */
 			startBarrier.arriveAndAwaitAdvance();
 
+			if (QSim.analyzeRunTimes) this.startTime = System.nanoTime();
+			
 			// Check if Simulation is still running. Otherwise print CPU usage and end thread.
-			if (!simulationRunning) {
+			if (!this.simulationRunning) {
 				Gbl.printCurrentThreadCpuTime();
 				return;
 			}
@@ -142,6 +151,12 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 
 			moveLinks();
 
+			if (QSim.analyzeRunTimes) {
+				long end = System.nanoTime();
+				int bin = (int) this.time;
+				if (bin < this.runTimes.length) this.runTimes[bin] = end - this.startTime;
+			}
+			
 			/*
 			 * The end of moving is synchronized with the endBarrier. If all threads 
 			 * reach this barrier the main thread can go on.

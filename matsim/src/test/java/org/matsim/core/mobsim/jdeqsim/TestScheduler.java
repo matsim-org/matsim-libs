@@ -1,18 +1,12 @@
 package org.matsim.core.mobsim.jdeqsim;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.matsim.core.mobsim.jdeqsim.util.DummyMessage;
 import org.matsim.core.mobsim.jdeqsim.util.DummyMessage1;
 import org.matsim.core.mobsim.jdeqsim.util.DummySimUnit;
 
 public class TestScheduler {
-
-	@Before
-	public void setUp() {
-		SimulationParameters.reset();
-	}
 
 	// the time at the end of the simulation is equal to the time of the last message processed
 	@Test

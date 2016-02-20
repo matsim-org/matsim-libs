@@ -572,7 +572,7 @@ public class CreateDemandV2 {
 				
 				((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), currentAct.getCoord()).getId());
 				
-				double ttime = CoordUtils.calcDistance(currentAct.getCoord(), c) / getSpeedForMode(legMode);
+				double ttime = CoordUtils.calcEuclideanDistance(currentAct.getCoord(), c) / getSpeedForMode(legMode);
 				
 				Activity nextAct = factory.createActivityFromCoord(nextActType, c);
 //				((ActivityImpl)nextAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), c).getId());
@@ -629,7 +629,7 @@ public class CreateDemandV2 {
 		List<ActivityFacility> result = new ArrayList<>();
 		
 		for(ActivityFacility facility : facilities){
-			if(CoordUtils.calcDistance(lastCoord, facility.getCoord()) <= distance){
+			if(CoordUtils.calcEuclideanDistance(lastCoord, facility.getCoord()) <= distance){
 				result.add(facility);
 			}
 		}
@@ -1225,7 +1225,7 @@ public class CreateDemandV2 {
 				
 				((ActivityImpl)currentAct).setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), currentAct.getCoord()).getId());
 				
-				double ttime = CoordUtils.calcDistance(currentAct.getCoord(), c) / getSpeedForMode(legMode);
+				double ttime = CoordUtils.calcEuclideanDistance(currentAct.getCoord(), c) / getSpeedForMode(legMode);
 				
 				Activity nextAct = factory.createActivityFromCoord(nextActType, c);
 				nextAct.setStartTime(currentAct.getEndTime() + ttime);
@@ -1393,7 +1393,7 @@ public class CreateDemandV2 {
 
 		for(ActivityFacility facility : facilities){
 			
-			double d = CoordUtils.calcDistance(current, facility.getCoord());
+			double d = CoordUtils.calcEuclideanDistance(current, facility.getCoord());
 			if(d <= distance) inRange.add(facility);
 			
 		}

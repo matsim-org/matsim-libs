@@ -117,7 +117,7 @@ public class CreateCountsFromEvents {
 							final Coord c = count.getCoord() != null ?
 									count.getCoord() :
 									network.getLinks().get( count.getLocId() ).getCoord();
-							return CoordUtils.calcDistance( c , center ) <= radius;
+							return CoordUtils.calcEuclideanDistance( c , center ) <= radius;
 						}
 						catch ( Exception e ) {
 							// ignore and proceed, as is the case in the default distance filter...

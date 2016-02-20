@@ -47,11 +47,11 @@ public class PersonsShoppingFacility {
 				if (pe instanceof Activity) {
 					if (((Activity) pe).getType().equals("shopgrocery")) {
 						
-						if ( (CoordUtils.calcDistance(((Activity)pe).getCoord(), coord) < 4000)) {
+						if ( (CoordUtils.calcEuclideanDistance(((Activity)pe).getCoord(), coord) < 4000)) {
 							
 							grocery++;
 							int index = plan.getPlanElements().indexOf(pe);
-							if ((CoordUtils.calcDistance(((Activity)plan.getPlanElements().get(index - 2)).getCoord(), coord) < 4000)) {
+							if ((CoordUtils.calcEuclideanDistance(((Activity)plan.getPlanElements().get(index - 2)).getCoord(), coord) < 4000)) {
 								previousIn++;
 							}
 							else

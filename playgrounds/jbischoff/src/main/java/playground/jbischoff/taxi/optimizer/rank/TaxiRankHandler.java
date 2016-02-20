@@ -19,15 +19,11 @@
 
 package playground.jbischoff.taxi.optimizer.rank;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.contrib.dvrp.data.Vehicle;
 
 import playground.michalm.taxi.data.TaxiRank;

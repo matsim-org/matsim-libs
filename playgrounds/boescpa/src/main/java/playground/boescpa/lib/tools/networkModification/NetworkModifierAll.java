@@ -44,8 +44,8 @@ public class NetworkModifierAll extends AbstractNetworkModifier {
 
 	@Override
 	public boolean isLinkAffected(Link link) {
-		return CoordUtils.calcDistance(link.getFromNode().getCoord(), center) <= radius ||
-				CoordUtils.calcDistance(link.getToNode().getCoord(), center) <= radius ||
-				CoordUtils.calcDistance(link.getCoord(), center) <= radius;
+		return CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), center) <= radius ||
+				CoordUtils.calcEuclideanDistance(link.getToNode().getCoord(), center) <= radius ||
+				CoordUtils.calcEuclideanDistance(link.getCoord(), center) <= radius;
 	}
 }

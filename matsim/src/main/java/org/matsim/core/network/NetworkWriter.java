@@ -23,10 +23,13 @@ package org.matsim.core.network;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimWriter;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -35,9 +38,16 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 	private static final Logger log = Logger.getLogger(NetworkWriter.class);
 	
 	private final Network network;
+	private final CoordinateTransformation transformation;
 
 	public NetworkWriter(final Network network) {
-		super();
+		this( new IdentityTransformation() , network );
+	}
+
+	public NetworkWriter(
+			final CoordinateTransformation transformation,
+			final Network network) {
+		this.transformation = transformation;
 		this.network = network;
 	}
 
@@ -51,7 +61,7 @@ public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	public void writeFileV1(final String filename) {
 		String dtd = "http://www.matsim.org/files/dtd/network_v1.dtd";
-		NetworkWriterHandler handler = new NetworkWriterHandlerImplV1();
+		NetworkWriterHandler handler = new NetworkWriterHandlerImplV1(transformation);
 
 		try {
 			openFile(filename);

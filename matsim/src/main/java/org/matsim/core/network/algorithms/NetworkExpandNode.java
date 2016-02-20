@@ -269,7 +269,7 @@ public class NetworkExpandNode {
 			Link fromLink = network.getLinks().get(turn.getFromLinkId());
 			Link toLink = network.getLinks().get(turn.getToLinkId());
 			Link l = network.getFactory().createLink(Id.create(fromLink.getId()+"-"+i, Link.class), fromLink.getToNode(), toLink.getFromNode());
-			double dist = CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord());
+			double dist = CoordUtils.calcEuclideanDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord());
 			if (dist < 0.1 * this.expRadius) {
 				// mostly the case when nodes are on top of each other
 				// use a small length, but not really hard-coded because of different coordinate systems ("1" is not always 1 meter)

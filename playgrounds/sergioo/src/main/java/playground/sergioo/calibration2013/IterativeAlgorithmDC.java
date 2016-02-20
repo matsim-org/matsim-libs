@@ -226,7 +226,7 @@ public class IterativeAlgorithmDC {
 											list = new ArrayList<Double>();
 											distances.put(prevMode, list);
 										}
-										double distance = CoordUtils.calcDistance(prevActivity.getCoord(), ((Activity)planElement).getCoord());
+										double distance = CoordUtils.calcEuclideanDistance(prevActivity.getCoord(), ((Activity)planElement).getCoord());
 										list.add(distance);
 										prevMode = null;
 									}

@@ -362,7 +362,7 @@ public class SchedulingNetwork implements Network {
 		}
 		if(fastest==Double.MAX_VALUE) {
 			String mode = modes.contains("car")?"car":"pt";
-			fastest = CoordUtils.calcDistance(origin, destination)*FACTORS.get(mode)/SPEEDS.get(mode);
+			fastest = CoordUtils.calcEuclideanDistance(origin, destination)*FACTORS.get(mode)/SPEEDS.get(mode);
 		}
 		addNodesAndLinks(fromNode, originId, modes, modes.contains("car")?originId:null, knownPlaces, agenda, path, modes.contains("car"), mobsimStatus);
 		if(mobsimStatus.isMobsimEnds() || now.getNow()+fastest>endTime)
@@ -426,7 +426,7 @@ public class SchedulingNetwork implements Network {
 				}
 				if(fastest==Double.MAX_VALUE) {
 					String mode = modes.contains("car")?"car":"pt";
-					fastest = CoordUtils.calcDistance(origin, destination)*FACTORS.get(mode)/SPEEDS.get(mode);
+					fastest = CoordUtils.calcEuclideanDistance(origin, destination)*FACTORS.get(mode)/SPEEDS.get(mode);
 				}
 				Set<String> activityTypes = new HashSet<String>(place.getActivityTypes(node.time));
 				if(activityTypes!=null)
@@ -476,12 +476,12 @@ public class SchedulingNetwork implements Network {
 									fastest = timeMode;
 							}
 							if(fastest==Double.MAX_VALUE)
-								fastest = CoordUtils.calcDistance(facilities.getFacilities().get(knownPlace.getFacilityId()).getCoord(), destination)*FACTORS.get("car")/SPEEDS.get("car");
+								fastest = CoordUtils.calcEuclideanDistance(facilities.getFacilities().get(knownPlace.getFacilityId()).getCoord(), destination)*FACTORS.get("car")/SPEEDS.get("car");
 							Set<String> originalModes = new HashSet<String>(modes);
 							for(String mode:originalModes) {
 								double travelTime = place.getTravelTime(mode, node.time, toFacilityId);
 								if(travelTime<0)
-									travelTime = CoordUtils.calcDistance(origin, facilities.getFacilities().get(toFacilityId).getCoord())*FACTORS.get(mode)/SPEEDS.get(mode);
+									travelTime = CoordUtils.calcEuclideanDistance(origin, facilities.getFacilities().get(toFacilityId).getCoord())*FACTORS.get(mode)/SPEEDS.get(mode);
 								if(endTime-fastest-timeInterval-travelTime>node.time || (fastest==0 && endTime-travelTime>node.time)) {
 									int variableEndTime = (int) (node.time+travelTime-(node.time+travelTime)%timeInterval)+timeInterval;
 									Id<Node> toNodeId = Id.createNodeId(toFacilityId.toString()+"("+variableEndTime+")");

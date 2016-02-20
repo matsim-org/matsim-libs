@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
@@ -41,8 +43,11 @@ import org.matsim.core.utils.misc.Time;
 /*package*/ class PopulationWriterHandlerImplV5 implements PopulationWriterHandler {
 	private static final Logger log = Logger.getLogger( PopulationWriterHandlerImplV5.class );
 
-	private static final int MAX_WARN_UNKNOWN_ROUTE = 10;
-	private int countWarnUnkownRoute = 0;
+	private final CoordinateTransformation coordinateTransformation;
+
+	PopulationWriterHandlerImplV5(CoordinateTransformation coordinateTransformation) {
+		this.coordinateTransformation = coordinateTransformation;
+	}
 
 	@Override
 	public void writeHeaderAndStartElement(final BufferedWriter out) throws IOException {
@@ -174,10 +179,11 @@ import org.matsim.core.utils.misc.Time;
 			out.write("\"");
 		}
 		if (act.getCoord() != null) {
+			final Coord coord = coordinateTransformation.transform( act.getCoord() );
 			out.write(" x=\"");
-			out.write(Double.toString(act.getCoord().getX()));
+			out.write(Double.toString( coord.getX() ));
 			out.write("\" y=\"");
-			out.write(Double.toString(act.getCoord().getY()));
+			out.write(Double.toString( coord.getY() ));
 			out.write("\"");
 		}
 		if (act.getStartTime() != Time.UNDEFINED_TIME) {

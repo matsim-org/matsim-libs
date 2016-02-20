@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -83,11 +84,12 @@ public class PtTutorialTest {
 		Assert.assertTrue(new File(config.controler().getOutputDirectory(), it1Plans).exists());
 		Assert.assertTrue(new File(config.controler().getOutputDirectory(), "output_config.xml.gz").exists());
 		
-		
-		// ---
-		
+		log.info( AbstractController.DIVIDER ) ;
+		log.info( AbstractController.DIVIDER ) ;
 		// try to restart from output:
-		
+		log.info( AbstractController.DIVIDER ) ;
+		log.info( AbstractController.DIVIDER ) ;
+
 		config.plans().setInputFile( config.controler().getOutputDirectory() + "/" + it1Plans ); 
 
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );

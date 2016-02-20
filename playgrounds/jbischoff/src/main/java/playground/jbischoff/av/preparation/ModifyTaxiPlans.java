@@ -59,7 +59,7 @@ public class ModifyTaxiPlans {
 			
 			Coord c1 = scenario.getNetwork().getLinks().get(act1.getLinkId()).getCoord();
 			Coord c2=  scenario.getNetwork().getLinks().get(act2.getLinkId()).getCoord();
-			if (CoordUtils.calcDistance(c1, c2)<3000){
+			if (CoordUtils.calcEuclideanDistance(c1, c2)<3000){
 				if (rnd.nextDouble()<0.1)
 				{		
 					Person p2 = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(person.getId().toString()+"_1"));

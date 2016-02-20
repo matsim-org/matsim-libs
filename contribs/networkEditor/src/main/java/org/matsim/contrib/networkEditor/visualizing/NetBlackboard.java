@@ -890,7 +890,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		final double midX = (selectionSquare.start.getX()+selectionSquare.end.getX())/2.0;
 		final double midY = (selectionSquare.start.getY()+selectionSquare.end.getY())/2.0;
 		Coord mid = inverseTransform(new Coord(midX, midY));
-		final double dist = CoordUtils.calcDistance(mid, inverseTransform(selectionSquare.end));
+		final double dist = CoordUtils.calcEuclideanDistance(mid, inverseTransform(selectionSquare.end));
 		//System.out.println("mid = " + mid + ", dist = " + dist);
 		Collection<Node> nodes = net.getNearestNodes(mid, dist*8);
 		Coord start = new Coord(selectionSquare.start.getX(), selectionSquare.start.getY()), end = new Coord(selectionSquare.end.getX(), selectionSquare.end.getY());
@@ -1024,7 +1024,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		double minDist = Double.MAX_VALUE;
 		Node selectedNode = null;
 		for(Node node:nodes) {            
-			double curDist = CoordUtils.calcDistance(coord, node.getCoord());
+			double curDist = CoordUtils.calcEuclideanDistance(coord, node.getCoord());
 			if(curDist < minDist) {
 				selectedNode = node;
 				minDist = curDist;
@@ -1358,9 +1358,9 @@ public class NetBlackboard extends javax.swing.JPanel {
 	 */
 	private double calculateRelation(Coord P1, Coord P2, Coord P3) {
 		double d = CoordUtils.distancePointLinesegment(P1, P2, P3);
-		double r = CoordUtils.calcDistance(P1, P3);
+		double r = CoordUtils.calcEuclideanDistance(P1, P3);
 		double dist1 = Math.sqrt((r*r)-(d*d)); //distance from P1 to the point;
-		double dist2 = CoordUtils.calcDistance(P1, P2);
+		double dist2 = CoordUtils.calcEuclideanDistance(P1, P2);
 		double rel = dist1/dist2;
 		return rel;
 	}
@@ -1615,7 +1615,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		if(node == null && link == null)
 			return new PairLinkNode(null, null);
 		Coord P3 = transform(node.getCoord());
-		double dist2 = CoordUtils.calcDistance(P3, Pos);
+		double dist2 = CoordUtils.calcEuclideanDistance(P3, Pos);
 		//System.out.println("dist1 = " + dist1 + ", dist2 = " + dist2 + ", tolerance = " + tolerance*(getWidth()+getHeight())/2.0);
 		if(dist1 > (tolerance*(getWidth()+getHeight())/2.0))
 			link = null;

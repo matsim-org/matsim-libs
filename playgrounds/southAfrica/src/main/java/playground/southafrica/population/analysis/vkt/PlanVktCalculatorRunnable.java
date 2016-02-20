@@ -156,7 +156,7 @@ public class PlanVktCalculatorRunnable implements Runnable {
 			if(route != null){
 				/* Use actual leg route. */
 				listOfLegLinks = RouteUtils.getLinksFromNodes(RouteUtils.getNodes((NetworkRoute) route, network));
-				vkt += RouteUtils.calcDistance((NetworkRoute) route, network);
+				vkt += RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, network);
 			} else{
 				/* Estimate leg route. */
 				double startTime = Math.max(((Activity) a1).getEndTime(), ((Activity) a2).getStartTime());

@@ -1,14 +1,30 @@
 package playground.artemc.heterogeneity.scoring;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.Config;
@@ -30,10 +46,6 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
 
 
 /**
@@ -58,24 +70,35 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 	}
 
 	private double calcScore(final Fixture f) {
-		HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory heterogeneousCharyparNagelScoringFunctionForAnalysisFactory 
-			= new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(f.config.planCalcScore(), f.scenario.getNetwork());
+		/* The following was deleted because route distance calculation was changed in the mobsim. 
+		 * Therefore, a leg no longer contains all information to calculate route distance correctly. 
+		 * (see MATSIM-227) tt feb'2016 
+		 */
+//		HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory heterogeneousCharyparNagelScoringFunctionForAnalysisFactory 
+//			= new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(f.config.planCalcScore(), f.scenario.getNetwork());
+//		heterogeneousCharyparNagelScoringFunctionForAnalysisFactory.setSimulationType("homo");
+//		ScoringFunction testee = heterogeneousCharyparNagelScoringFunctionForAnalysisFactory.createNewScoringFunction(PopulationUtils.createPerson(Id.create("1", Person.class)));
+//		for (PlanElement planElement : f.plan.getPlanElements()) {
+//			if (planElement instanceof Activity) {
+//				testee.handleActivity((Activity) planElement);
+//			} else if (planElement instanceof Leg) {
+//				testee.handleLeg((Leg) planElement);
+//			}
+//		}
+//		testee.finish();
+//		double score = testee.getScore();
+//		EventsManager eventsManager = EventsUtils.createEventsManager();
+//		EventsToScore eventsToScore = EventsToScore.createWithScoreUpdating(f.scenario, heterogeneousCharyparNagelScoringFunctionForAnalysisFactory, eventsManager);
+//		double scoreFromEvents = calcScoreFromEvents(eventsManager, eventsToScore, f);
+//		assertEquals("Score computed from the plan elements should be the same as score computed from stream of events constructed from plan elements.", score, scoreFromEvents, EPSILON);
+//		return score;
+
+		HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory heterogeneousCharyparNagelScoringFunctionForAnalysisFactory = new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(
+				f.config.planCalcScore(), f.scenario.getNetwork());
 		heterogeneousCharyparNagelScoringFunctionForAnalysisFactory.setSimulationType("homo");
-		ScoringFunction testee = heterogeneousCharyparNagelScoringFunctionForAnalysisFactory.createNewScoringFunction(PopulationUtils.createPerson(Id.create("1", Person.class)));
-		for (PlanElement planElement : f.plan.getPlanElements()) {
-			if (planElement instanceof Activity) {
-				testee.handleActivity((Activity) planElement);
-			} else if (planElement instanceof Leg) {
-				testee.handleLeg((Leg) planElement);
-			}
-		}
-		testee.finish();
-		double score = testee.getScore();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsToScore eventsToScore = EventsToScore.createWithScoreUpdating(f.scenario, heterogeneousCharyparNagelScoringFunctionForAnalysisFactory, eventsManager);
-		double scoreFromEvents = calcScoreFromEvents(eventsManager, eventsToScore, f);
-		assertEquals("Score computed from the plan elements should be the same as score computed from stream of events constructed from plan elements.", score, scoreFromEvents, EPSILON);
-		return score;
+		return calcScoreFromEvents(eventsManager, eventsToScore, f);
 	}
 
 	private double calcScore(final Fixture f, String sdHeterogeneityType) {
@@ -176,7 +199,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			factory.setPriority(1.0);
 			factory.setTypicalDuration_s(8.0 * 3600);
 			factory.setZeroUtilityComputation(new ActivityUtilityParameters.SameAbsoluteScore());
-			ActivityUtilityParameters params = factory.create();
+			ActivityUtilityParameters params = factory.build();
 			assertEquals(zeroUtilDurW, params.getZeroUtilityDuration_h(), EPSILON);
 
 		}
@@ -187,7 +210,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			factory.setPriority(1.0);
 			factory.setTypicalDuration_s(16.0 * 3600);
 			factory.setZeroUtilityComputation(new ActivityUtilityParameters.SameAbsoluteScore());
-			ActivityUtilityParameters params = factory.create();
+			ActivityUtilityParameters params = factory.build();
 			assertEquals(zeroUtilDurH, params.getZeroUtilityDuration_h(), EPSILON);
 		}
 
@@ -198,7 +221,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			factory.setPriority(2.0);
 			factory.setTypicalDuration_s(8.0 * 3600);
 			factory.setZeroUtilityComputation(new ActivityUtilityParameters.SameAbsoluteScore());
-			ActivityUtilityParameters params = factory.create();
+			ActivityUtilityParameters params = factory.build();
 			assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration_h(), EPSILON);
 		}
 	}
@@ -535,14 +558,14 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		double monetaryDistanceRateCar1 = -0.00001;
 		f.config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar1);
 
-		assertEquals(-0.25, calcScore(f), EPSILON);
+		assertEquals(-0.255, calcScore(f), EPSILON);
 
 		// test 2 where MonetaryDistanceCostRate is fixed to -1.0
 		double monetaryDistanceRateCar = -1.0;
 		f.config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 		f.config.planCalcScore().setMarginalUtilityOfMoney(0.5);
 
-		assertEquals(-12500.0, calcScore(f), EPSILON);
+		assertEquals(-12750.0, calcScore(f), EPSILON);
 	}
 
 	@Test
@@ -775,7 +798,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link3.getId());
 			route1.setLinkIds(link1.getId(), Arrays.asList(link2.getId()), link3.getId());
 			route1.setTravelTime(firstLegTravelTime);
-			route1.setDistance(RouteUtils.calcDistance(route1, this.network));
+			route1.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route1, this.network));
 			route1.setVehicleId(Id.createVehicleId("dummyVehicle1"));
 			leg.setRoute(route1);
 
@@ -798,7 +821,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			leg.setTravelTime(thirdLegTravelTime);
 			Route route3 = new GenericRouteImpl(link5.getId(), link7.getId());
 			route3.setTravelTime(thirdLegTravelTime);
-			route3.setDistance(CoordUtils.calcDistance(link5.getCoord(), link7.getCoord()));
+			route3.setDistance(CoordUtils.calcEuclideanDistance(link5.getCoord(), link7.getCoord()));
 			leg.setRoute(route3);
 
 			ActivityImpl fourthActivity = this.plan.createAndAddActivity("w", link7.getId());
@@ -809,7 +832,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 			leg.setTravelTime(fourthLegTravelTime);
 			Route route4 = new GenericRouteImpl(link7.getId(), link9.getId());
 			route4.setTravelTime(fourthLegTravelTime);
-			route4.setDistance(CoordUtils.calcDistance(link7.getCoord(), link9.getCoord()));
+			route4.setDistance(CoordUtils.calcEuclideanDistance(link7.getCoord(), link9.getCoord()));
 			leg.setRoute(route4);
 
 			ActivityImpl fifthActivity = this.plan.createAndAddActivity("h", link9.getId());

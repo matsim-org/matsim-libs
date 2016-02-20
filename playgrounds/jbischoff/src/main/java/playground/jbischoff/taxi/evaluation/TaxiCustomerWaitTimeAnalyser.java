@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
-import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
+import org.matsim.contrib.taxi.TaxiUtils;
 
 import com.google.common.math.DoubleMath;
 

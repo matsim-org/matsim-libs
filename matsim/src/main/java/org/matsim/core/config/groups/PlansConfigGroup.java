@@ -39,11 +39,13 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	private static final String INPUT_PERSON_ATTRIBUTES_FILE = "inputPersonAttributesFile";
 	private static final String NETWORK_ROUTE_TYPE = "networkRouteType";
 	private static final String SUBPOPULATION_ATTRIBUTE = "subpopulationAttributeName";
+	private static final String INPUT_CRS = "inputCRS";
 
 	private String inputFile = null;
 	private String networkRouteType = NetworkRouteType.LinkNetworkRoute;
 	private String inputPersonAttributeFile = null;
 	private String subpopulationAttributeName = "subpopulation";
+	private String inputCRS = null;
 	
 	//--
 	
@@ -82,6 +84,10 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		
 		comments.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
 		"activityStartTime. default=false") ;
+
+		comments.put( INPUT_CRS , "The Coordinates Reference System in which the coordinates are expressed in the input file." +
+				" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
+				"be converted back at export. If not specified, no conversion happens." );
 
 		return comments;
 	}
@@ -159,6 +165,17 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)
 	public void setRemovingUnneccessaryPlanAttributes(final boolean removingUnneccessaryPlanAttributes) {
 		this.removingUnneccessaryPlanAttributes = removingUnneccessaryPlanAttributes;
+	}
+
+
+	@StringGetter( INPUT_CRS )
+	public String getInputCRS() {
+		return inputCRS;
+	}
+
+	@StringSetter( INPUT_CRS )
+	public void setInputCRS(String inputCRS) {
+		this.inputCRS = inputCRS;
 	}
 
 

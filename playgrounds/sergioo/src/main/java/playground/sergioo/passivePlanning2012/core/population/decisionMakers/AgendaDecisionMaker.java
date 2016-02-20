@@ -174,7 +174,7 @@ public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMa
 							planElements.addAll(routeElements);
 						else {
 							Leg leg = new LegImpl("transit_walk");
-							double distance = WALK_FACTOR*CoordUtils.calcDistance(facilities.getFacilities().get(currentFacilityId).getCoord(), facilities.getFacilities().get(nextFacilityId).getCoord()); 
+							double distance = WALK_FACTOR*CoordUtils.calcEuclideanDistance(facilities.getFacilities().get(currentFacilityId).getCoord(), facilities.getFacilities().get(nextFacilityId).getCoord()); 
 							leg.setTravelTime((int)(distance/WALK_SPEED));
 							Route route = new GenericRouteImpl(facilities.getFacilities().get(currentFacilityId).getLinkId(),
 									facilities.getFacilities().get(nextFacilityId).getLinkId());
@@ -203,7 +203,7 @@ public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMa
 					planElements.addAll(routeElements);
 				else {
 					Leg leg = new LegImpl("transit_walk");
-					double distance = WALK_FACTOR*CoordUtils.calcDistance(facilities.getFacilities().get(currentFacilityId).getCoord(), facilities.getFacilities().get(endFacilityId).getCoord()); 
+					double distance = WALK_FACTOR*CoordUtils.calcEuclideanDistance(facilities.getFacilities().get(currentFacilityId).getCoord(), facilities.getFacilities().get(endFacilityId).getCoord()); 
 					leg.setTravelTime((int)(distance/WALK_SPEED));
 					Route route = new GenericRouteImpl(facilities.getFacilities().get(currentFacilityId).getLinkId(),
 							facilities.getFacilities().get(endFacilityId).getLinkId());

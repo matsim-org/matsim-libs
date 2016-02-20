@@ -21,6 +21,8 @@
 package org.matsim.counts;
 
 import org.matsim.core.api.internal.MatsimWriter;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 import java.io.IOException;
@@ -32,14 +34,20 @@ import java.util.Vector;
 
 public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {
 
-	private CountsWriterHandler handler = null;
+	private final CountsWriterHandler handler;
 	private final Counts counts;
 
 	public CountsWriter(final Counts counts) {
+		this( new IdentityTransformation() , counts );
+	}
+
+	public CountsWriter(
+			final CoordinateTransformation coordinateTransformation,
+			final Counts counts) {
 		this.counts = counts;
 
 		// use the newest writer-version by default
-		this.handler = new CountsWriterHandlerImplV1();
+		this.handler = new CountsWriterHandlerImplV1(coordinateTransformation);
 	}
 
 	@Override

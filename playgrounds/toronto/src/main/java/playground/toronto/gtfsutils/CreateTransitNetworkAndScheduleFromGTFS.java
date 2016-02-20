@@ -175,7 +175,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 						
 						//Get the stop-to-stop speed
 						double stopToStopTime = (int) ((st.getArrivalTime().getTime() - previousST.getDepartureTime().getTime()) / 1000); // in seconds
-						double dist = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()); //should be in meters
+						double dist = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()); //should be in meters
 						double freespeed = dist / stopToStopTime;
 						
 						if (copyLinks){

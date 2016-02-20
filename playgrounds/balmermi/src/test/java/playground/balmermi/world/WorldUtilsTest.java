@@ -105,7 +105,7 @@ public class WorldUtilsTest extends MatsimTestCase {
 		Zone zone = layer.createZone(Id.create("1", Zone.class), "4.5", "9", null, null, null, null);
 		Zone zone2 = layer.createZone(Id.create("2", Zone.class), "30", "15", "9", null, null, null);
 		Coord center = zone.getCoord();
-		final double distance = CoordUtils.calcDistance(center, zone2.getCoord());
+		final double distance = CoordUtils.calcEuclideanDistance(center, zone2.getCoord());
 
 		for (int i = 0; i < 700; i++) {
 			Coord c = WorldUtils.getRandomCoordInZone(zone, layer);
@@ -121,7 +121,7 @@ public class WorldUtilsTest extends MatsimTestCase {
 			if (c.getY() > maxY) {
 				maxY = c.getY();
 			}
-			int areaIndex = (int) (CoordUtils.calcDistance(c, center) / distance * 10);
+			int areaIndex = (int) (CoordUtils.calcEuclideanDistance(c, center) / distance * 10);
 			areaCounters[areaIndex]++;
 		}
 		assertTrue("random coordinates are not spread enough. minX = " + minX, minX < (4.5 - distance/2.0));

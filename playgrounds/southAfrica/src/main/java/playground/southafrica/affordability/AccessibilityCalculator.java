@@ -373,7 +373,7 @@ public class AccessibilityCalculator {
 							if(closestTaxiStop == null){
 								taxiStops.put(albersIntersection.getX(), albersIntersection.getY(), albersIntersection);
 							} else{
-								double distanceToClosestTaxiStop = CoordUtils.calcDistance(albersIntersection, closestTaxiStop); 
+								double distanceToClosestTaxiStop = CoordUtils.calcEuclideanDistance(albersIntersection, closestTaxiStop); 
 //								LOG.info("Distance: " + distanceToClosestTaxiStop);
 								if( distanceToClosestTaxiStop > 200){
 									taxiStops.put(albersIntersection.getX(), albersIntersection.getY(), albersIntersection);
@@ -893,7 +893,7 @@ public class AccessibilityCalculator {
 				ActivityImpl act = (ActivityImpl) pe;
 				if(act.getType().contains("e")){
 					Coord thisCoord = act.getCoord();
-					double distance = CoordUtils.calcDistance(homeCoord, thisCoord);
+					double distance = CoordUtils.calcEuclideanDistance(homeCoord, thisCoord);
 					if(distance > maxDistance){
 						maxDistance = distance;
 						coord = act.getCoord();
@@ -1014,8 +1014,8 @@ public class AccessibilityCalculator {
 			
 			@Override
 			public int compare(ActivityFacility o1, ActivityFacility o2) {
-				Double d1 = CoordUtils.calcDistance(homeCoord, o1.getCoord());
-				Double d2 = CoordUtils.calcDistance(homeCoord, o2.getCoord());
+				Double d1 = CoordUtils.calcEuclideanDistance(homeCoord, o1.getCoord());
+				Double d2 = CoordUtils.calcEuclideanDistance(homeCoord, o2.getCoord());
 				return d1.compareTo(d2);
 			}
 		};

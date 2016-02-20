@@ -73,14 +73,11 @@
 	<modules>
 		<module>agarwalamit</module>
 		<module>andreas</module>
-		<!--<module>anhorni</module>-->
 		<module>artemc</module>
 		<module>balac</module>
 		<module>balmermi</module>
 		<module>benjamin</module>
 		<module>bvitins</module>
-		<!--<module>christoph</module>-->
-		<!--<module>ciarif</module>-->
 		<module>cottbus</module>
 		<module>dgrether</module>
 		<module>dhisingh</module>
@@ -88,7 +85,7 @@
 		<module>droeder</module>
 		<module>duncan</module>
 		<module>dziemke</module>
-		<!--<module>fhuelsmann</module>-->
+		<module>farzadalemi</module>
 		<module>gregor</module>
 		<module>gunnar</module>
 		<module>hbecker</module>
@@ -103,10 +100,7 @@
 		<module>kturner</module>
 		<module>lcrociani</module>
 		<module>lkroeger</module>
-		<module>ma</module>
 		<module>michalm</module>
-		<module>mkillat</module>
-		<module>boku</module>
 		<module>mrieser</module>
 		<module>muelleki</module>
 		<module>mzilske</module>
@@ -123,15 +117,12 @@
 		<module>smeintjes</module>
 		<module>smetzler</module>
 		<module>southAfrica</module>
-		<!--<module>staheale</module>-->
 		<module>stockholm</module>
 		<module>telaviv</module>
 		<module>thibautd</module>
 		<module>tthunig</module>
 		<module>toronto</module>
-		<module>wisinee</module>
 		<module>wrashid</module>
-		<module>yalcin</module>
 		<module>ucsb</module>
 		<module>vaadin-example</module>
 		<module>vsptelematics</module>

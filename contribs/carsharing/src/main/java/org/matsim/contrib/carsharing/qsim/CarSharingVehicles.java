@@ -95,7 +95,7 @@ public class CarSharingVehicles {
 			    		
 			    		FreeFloatingStation oldStation = stationToLinkMap.get(l);
 			    		
-			    		log.warn("Merging freefloating carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+			    		log.warn("Merging freefloating carsharing stations that are mapped to the same link with id: " + oldStation.getLinkId().toString() + " .");
 
 			    		ArrayList<String> oldVehIDs = oldStation.getIDs();
 			    		ArrayList<String> newvehIDs = new ArrayList<String>();
@@ -153,7 +153,7 @@ public class CarSharingVehicles {
 			    		
 			    		OneWayCarsharingStation oldStation = stationToLinkMap.get(l);
 			    		
-			    		log.warn("Merging oneway carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+			    		log.warn("Merging oneway carsharing stations that are mapped to the same link with id: " + oldStation.getLinkId().toString() + " .");
 
 			    		ArrayList<String> oldVehIDs = oldStation.getIDs();
 			    		ArrayList<String> newvehIDs = new ArrayList<String>();
@@ -208,7 +208,7 @@ public class CarSharingVehicles {
 			    		
 			    		TwoWayCarsharingStation oldStation = stationToLinkMap.get(l);
 			    		
-			    		log.warn("Merging twoway carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+			    		log.warn("Merging twoway carsharing stations that are mapped to the same link with id: " + oldStation.getLinkId().toString() + " .");
 
 			    		ArrayList<String> oldVehIDs = oldStation.getIDs();
 			    		ArrayList<String> newvehIDs = new ArrayList<String>();

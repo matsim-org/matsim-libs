@@ -2,11 +2,7 @@ package herbie.running.analysis;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -225,7 +221,7 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 				Leg leg = (Leg) pe;
 				Route route = leg.getRoute();
 				if (route != null) {
-					double dist = RouteUtils.calcDistance((NetworkRoute) route, this.network);
+					double dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, this.network);
 					if (route.getEndLinkId() != null && route.getStartLinkId() != route.getEndLinkId()) {
 						dist += this.network.getLinks().get(route.getEndLinkId()).getLength();
 					}

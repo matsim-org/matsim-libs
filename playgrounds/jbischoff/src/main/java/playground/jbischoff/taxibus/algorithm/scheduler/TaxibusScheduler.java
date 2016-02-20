@@ -30,11 +30,11 @@ import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTask.TaxibusTaskType;
 import playground.jbischoff.taxibus.algorithm.scheduler.vehreqpath.TaxibusVehicleRequestPath;
-import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 
 
 public class TaxibusScheduler

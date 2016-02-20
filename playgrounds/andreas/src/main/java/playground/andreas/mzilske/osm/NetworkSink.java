@@ -84,7 +84,7 @@ public class NetworkSink implements SinkSource {
 				if (toMatsimNode == null) {
 					throw new RuntimeException("Missing node: "+toNode.getNodeId());
 				}
-				double length = CoordUtils.calcDistance(fromMatsimNode.getCoord(), toMatsimNode.getCoord());
+				double length = CoordUtils.calcEuclideanDistance(fromMatsimNode.getCoord(), toMatsimNode.getCoord());
 				createLink((NetworkImpl) this.network, entry, fromNode, toNode, length);
 				fromNode = toNode;
 			}

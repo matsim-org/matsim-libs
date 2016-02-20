@@ -19,9 +19,17 @@
  * *********************************************************************** */
 
 package org.matsim.counts;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 /*package*/ class CountsWriterHandlerImplV1 implements CountsWriterHandler {
+	private final CoordinateTransformation coordinateTransformation;
+
+	CountsWriterHandlerImplV1(CoordinateTransformation coordinateTransformation) {
+		this.coordinateTransformation = coordinateTransformation;
+	}
 
 	@Override
 	public void startCounts(final Counts counts, final BufferedWriter out) throws IOException {
@@ -52,8 +60,9 @@ import java.io.IOException;
 		out.write(" loc_id=\"" + count.getLocId() + "\"");
 		out.write(" cs_id=\"" + count.getCsId() + "\"");
 		if (count.getCoord() != null) {
-			out.write(" x=\"" + count.getCoord().getX() + "\"");
-			out.write(" y=\"" + count.getCoord().getY() + "\"");
+			final Coord coord = coordinateTransformation.transform( count.getCoord() );
+			out.write(" x=\"" + coord.getX() + "\"");
+			out.write(" y=\"" + coord.getY() + "\"");
 		}
 		out.write(">\n");
 	}

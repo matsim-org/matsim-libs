@@ -6,6 +6,8 @@ import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.*;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizers;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.*;
@@ -23,8 +25,6 @@ import playground.dhosse.prt.passenger.PrtRequestCreator;
 import playground.dhosse.prt.router.PrtTripRouterFactoryImpl;
 import playground.michalm.taxi.data.ETaxiData;
 import playground.michalm.taxi.data.file.*;
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.*;
-import playground.michalm.taxi.optimizer.TaxiOptimizers;
 
 public class PrtModule {
 	

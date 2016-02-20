@@ -115,7 +115,7 @@ public class NetworkPainterManager {
 		Node nearest = null;
 		double nearestDistance = Double.MAX_VALUE;
 		for(Node node:network.getNodes().values()) {
-			double distance = CoordUtils.calcDistance(coord, node.getCoord());
+			double distance = CoordUtils.calcEuclideanDistance(coord, node.getCoord());
 			if(distance<nearestDistance) {
 				nearestDistance = distance;
 				nearest = node;

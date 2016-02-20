@@ -116,7 +116,7 @@ public class ExtractNonPnrParkingDurations {
 			Double startOfParking = payedParkingStarts.remove( event.getPersonId() );
 			if (startOfParking == null) return;
 
-			final double dist = CoordUtils.calcDistance(
+			final double dist = CoordUtils.calcEuclideanDistance(
 					CENTER,
 					network.getLinks().get( event.getLinkId() ).getCoord());
 			try {

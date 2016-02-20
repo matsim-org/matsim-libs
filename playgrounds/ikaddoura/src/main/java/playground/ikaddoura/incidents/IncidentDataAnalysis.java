@@ -71,7 +71,9 @@ public class IncidentDataAnalysis {
  
 	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
 //	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/output-berlin/";
-	private final String outputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-berlin/";
+//	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/berlinXXX/";
+	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
+	private final String inputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-berlin/";
 	
 //	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
 //	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany-test/";
@@ -113,7 +115,7 @@ public class IncidentDataAnalysis {
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 
-	private void updateTrafficItems() {
+	private void updateTrafficItems() throws IOException {
 		Set<String> updateItemsToBeDeleted = new HashSet<>();
 
 		for (TrafficItem updateItem : this.trafficItems.values()) {
@@ -127,10 +129,19 @@ public class IncidentDataAnalysis {
 					TrafficItem originalItem = this.trafficItems.get(updateItem.getOriginalId());
 
 					if (updateItem.getOrigin().toString().equals(originalItem.getOrigin().toString()) && updateItem.getTo().toString().equals(originalItem.getTo().toString())) {
-						// everything seems ok, the updated traffic item's locations are the same
+						// the update and original traffic items' locations are the same
 						
 					} else {
-						throw new RuntimeException("An update message should only update the incident's endtime. The location should remain the same. Aborting...");
+						log.warn("An update message should only update the incident's endtime. The location should remain the same. Compare the following traffic items:");
+						log.warn("Original item: " + originalItem);
+						log.warn("New item: " + updateItem);
+						
+						if (updateItem.getOrigin().getDescription().toString().equals(originalItem.getOrigin().getDescription().toString()) && updateItem.getTo().getDescription().toString().equals(originalItem.getTo().getDescription().toString())) {
+							log.warn("The from and to locations' descriptions are the same. Ok... proceed.");
+							
+						} else {
+							throw new RuntimeException("Not even the from and to locations' descriptions are the same. Aborting...");
+						}						
 					}
 					originalItem.setEndTime(updateItem.getStartTime());
 					updateItemsToBeDeleted.add(updateItem.getId());
@@ -144,6 +155,9 @@ public class IncidentDataAnalysis {
 		for (String updateItemId : updateItemsToBeDeleted) {
 			this.trafficItems.remove(updateItemId);
 		}
+		
+		TrafficItemWriter writer = new TrafficItemWriter();
+		writer.writeCSVFile(trafficItems.values(), outputDirectory + "incidentData_afterUpdating.csv");
 
 	}
 
@@ -268,14 +282,21 @@ public class IncidentDataAnalysis {
 
 	private void collectTrafficItems() throws XMLStreamException, IOException {
 		
-		log.info("Collecting traffic items from all xml files in directory " + this.outputDirectory + "...");
+		log.info("Collecting traffic items from all xml files in directory " + this.inputDirectory + "...");
 	
-		File[] fileList = new File(outputDirectory).listFiles();
-
-		for(File f : fileList) {
-			
+		File[] fileList = new File(inputDirectory).listFiles();
+		
+		if (fileList.length == 0) {
+			throw new RuntimeException("No file in " + this.inputDirectory + ". Aborting...");
+		}
+		
+		boolean foundXMLFile = false;
+		
+		for (File f : fileList) {
+ 
 			if (f.getName().endsWith(".xml") || f.getName().endsWith(".xml.gz")) {
 				
+				foundXMLFile = true;
 				String inputXmlFile = f.toString();
 								
 				HereMapsTrafficItemXMLReader trafficItemReader = new HereMapsTrafficItemXMLReader();
@@ -401,12 +422,16 @@ public class IncidentDataAnalysis {
 				if (counterUpdatedEndTimesUpdateMessage > 0) log.info(" +++ " + counterUpdatedEndTimesUpdateMessage + " traffic items updated (canceled message).");
 				if (counterIgnoredNullInfoItem > 0) log.info(" +++ " + counterIgnoredNullInfoItem + " traffic items ignored (null info).");
 			}
-			log.info("Collecting traffic items from all xml files in directory " + this.outputDirectory + "... Done.");
+		}
+		
+		log.info("Collecting traffic items from all xml files in directory " + this.inputDirectory + "... Done.");
+		
+		if (!foundXMLFile) {
+			throw new RuntimeException("No *.xml or *.xml.gz file found in directory " + this.inputDirectory + ". Aborting...");
 		}
 		
 		TrafficItemWriter writer = new TrafficItemWriter();
-		writer.writeCSVFile(trafficItems.values(), outputDirectory + "incidentData.csv");
-		
+		writer.writeCSVFile(trafficItems.values(), outputDirectory + "incidentData_beforeUpdating.csv");
 	}
 	
 	private void computeIncidentPaths() {
@@ -420,7 +445,7 @@ public class IncidentDataAnalysis {
 			
 			final Coord coordFromGK4 = ct.transform(coordFromWGS84);
 			final Coord coordToGK4 = ct.transform(coordToWGS84);			
-			double beelineDistance = NetworkUtils.getEuclidianDistance(coordFromGK4, coordToGK4);
+			double beelineDistance = NetworkUtils.getEuclideanDistance(coordFromGK4, coordToGK4);
 			
 			Path incidentPath = null;
 			

@@ -19,7 +19,7 @@
 
 package playground.dhosse.prt;
 
-import playground.michalm.taxi.optimizer.BestDispatchFinder;
+import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 
 
 public interface VehicleRequestPathCost

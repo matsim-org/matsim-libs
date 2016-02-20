@@ -180,7 +180,7 @@ public class DefaultDelegateFactory implements Provider<TripRouter> {
 			}
 			
 			LeastCostPathCalculator routeAlgo = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
-			RoutingModule legRouterWrapper = DefaultRoutingModules.createNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
+			RoutingModule legRouterWrapper = DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
 			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
         	
             if (old != null) {

@@ -245,7 +245,7 @@ public class TravelDistanceStats {
 				if (pe instanceof Leg) {
 					final Leg leg = (Leg) pe;
 					if (leg.getRoute() instanceof NetworkRoute) {
-						planTravelDistance += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+						planTravelDistance += RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) leg.getRoute(), this.network);
 						numberOfLegs++;
 					} else {
 						double distance = leg.getRoute().getDistance();

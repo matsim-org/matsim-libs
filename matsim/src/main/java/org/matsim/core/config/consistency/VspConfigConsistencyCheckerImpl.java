@@ -71,6 +71,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		
 		boolean problem = false ; // ini
 		
+		// added feb'16
+		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			log.log( lvl, "found `plansCalcRoute.insertingAccessEgressWalk==false'; vsp should try out `true' and report. " ) ;
+		}
+		
 		// added apr'15
 		if ( !config.qsim().isUsingFastCapacityUpdate() ) {
 			log.log( lvl,  " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;

@@ -43,6 +43,7 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 	private static final String AVERAGECOUNTSOVERITERATIONS = "averageCountsOverIterations";
 	private static final String ANALYZEDMODES = "analyzedModes";
 	private static final String FILTERMODES = "filterModes";
+	private static final String INPUT_CRS = "inputCRS";
 	
 	private String outputFormat = "txt";
 
@@ -70,6 +71,7 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 
 	private String analyzedModes = TransportMode.car;
 	private boolean filterModes = false;
+	private String inputCRS = null;
 	
 	public CountsConfigGroup() {
 		super(GROUP_NAME);
@@ -99,6 +101,10 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 		comments.put(ANALYZEDMODES, "Transport modes that will be respected for the counts comparison. 'car' is default, which " +
 				"includes also bussed from the pt simulation module. Use this parameter in combination with 'filterModes' = true!");
 		comments.put(FILTERMODES, "If true, link counts from legs performed on modes not included in the 'analyzedModes' parameter are ignored.");
+
+		comments.put( INPUT_CRS , "The Coordinates Reference System in which the coordinates are expressed in the input file." +
+				" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
+				"be converted back at export. If not specified, no conversion happens." );
 		return comments;
 	}
 
@@ -196,5 +202,15 @@ public final class CountsConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( ANALYZEDMODES )
 	public void setAnalyzedModes(final String analyzedModes) {
 		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
+	}
+
+	@StringGetter( INPUT_CRS )
+	public String getInputCRS() {
+		return inputCRS;
+	}
+
+	@StringSetter( INPUT_CRS )
+	public void setInputCRS(String inputCRS) {
+		this.inputCRS = inputCRS;
 	}
 }

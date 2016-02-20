@@ -7,51 +7,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class MatsimRuntimeModifications {
 
 	private final MyRunnable runnable;
-	private final boolean dirtyShutdown;
 	// for tests
 	private volatile Throwable uncaughtException;
 
 	private AtomicBoolean unexpectedShutdown = new AtomicBoolean(false);
 
 	private static Logger log = Logger.getLogger(MatsimRuntimeModifications.class);
-
-	private class InterruptAndJoin extends Thread {
-		private final Thread controllerThread;
-		private AtomicBoolean unexpectedShutdown;
-
-		public InterruptAndJoin(Thread controllerThread, AtomicBoolean unexpectedShutdown) {
-			this.controllerThread = controllerThread;
-			this.unexpectedShutdown = unexpectedShutdown;
-		}
-
-		@Override
-		public void run() {
-			log.error("received unexpected shutdown request.");
-			unexpectedShutdown.set(true);
-			log.info("sending interrupt request to controllerThread");
-			controllerThread.interrupt();
-
-			if (!dirtyShutdown) {
-				// for me, the following code just makes the shutdown hang indefinitely (on mac, tested mostly with otfvis).
-				// Therefore, now providing a switch.  kai, mar'15
-				try {
-					// Wait until it has shut down.
-					log.info("waiting for controllerThread to terminate") ;
-					controllerThread.join();
-					log.info("controllerThread terminated") ;
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-				// The JVM will exit when this method returns.
-			}
-		}
-	}
-
-	private void logMemorizeAndRequestShutdown(Thread t, Throwable e) {
-		log.error("Getting uncaught Exception in Thread " + t.getName(), e);
-		uncaughtException = e;
-		unexpectedShutdown.set(true);
-	}
 
 	interface MyRunnable {
 		void run() throws UnexpectedShutdownException;
@@ -62,13 +23,12 @@ class MatsimRuntimeModifications {
 	static class UnexpectedShutdownException extends Exception {
 	}
 
-	MatsimRuntimeModifications(MyRunnable runnable, boolean dirtyShutdown) {
+	MatsimRuntimeModifications(MyRunnable runnable) {
 		this.runnable = runnable;
-		this.dirtyShutdown = dirtyShutdown;
 	}
 
-	static void run(MyRunnable runnable, boolean dirtyShutdown) {
-		new MatsimRuntimeModifications(runnable, dirtyShutdown).run();
+	static void run(MyRunnable runnable) {
+		new MatsimRuntimeModifications(runnable).run();
 	}
 
 	void run() {
@@ -78,12 +38,12 @@ class MatsimRuntimeModifications {
 			@Override
 			public void uncaughtException(Thread t, Throwable e) {
 				// We want to shut down when any Thread dies with an Exception.
-				logMemorizeAndRequestShutdown(t, e);
+				log.error("Getting uncaught Exception in Thread " + t.getName(), e);
+				uncaughtException = e;
+				unexpectedShutdown.set(true);
 				controllerThread.interrupt();
 			}
 		});
-		Thread shutdownHook = new InterruptAndJoin(controllerThread, unexpectedShutdown);
-		Runtime.getRuntime().addShutdownHook(shutdownHook);
 		try {
 			runnable.run();
 		} catch (UnexpectedShutdownException e) {
@@ -91,20 +51,10 @@ class MatsimRuntimeModifications {
 		} catch (Throwable e) {
 			// Don't let it fall through to the UncaughtExceptionHandler. We want to first log the Exception,
 			// then shut down.
-			logMemorizeAndRequestShutdown(Thread.currentThread(), e);
+			log.error("Getting uncaught Exception in Thread " + Thread.currentThread().getName(), e);
+			uncaughtException = e;
+			unexpectedShutdown.set(true);
 		} finally {
-			try {
-				Runtime.getRuntime().removeShutdownHook(shutdownHook);
-			} catch (IllegalStateException e) {
-				// Doesn't matter. Only means that we are already shutting down.
-				// But if we are not, this is neccessary because otherwise the
-				// shutdown hook will try to interrupt and join this thread later where
-				// it may already be used for something else.
-				// I still think all this JVM-stuff should go somewhere outside,
-				// where it is only used when e.g. run from the command line,
-				// and not e.g. from tests or scripts, where multiple
-				// instances of Controler can be run.
-			}
 			log.info("S H U T D O W N   ---   start shutdown.");
 			if (unexpectedShutdown.get()) {
 				log.error("ERROR --- This is an unexpected shutdown!");
@@ -140,7 +90,11 @@ class MatsimRuntimeModifications {
 			// be different from the run method of the "MATSim platform" which
 			// takes control of the JVM by installing hooks and exception
 			// handlers.
-			if (uncaughtException != null) {
+		}
+		if (uncaughtException != null) {
+			if (uncaughtException instanceof RuntimeException) {
+				throw ((RuntimeException) uncaughtException);
+			} else {
 				throw new RuntimeException(uncaughtException);
 			}
 		}

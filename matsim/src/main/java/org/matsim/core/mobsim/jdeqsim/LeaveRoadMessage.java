@@ -38,7 +38,7 @@ public class LeaveRoadMessage extends EventMessage {
 
 	public LeaveRoadMessage(Scheduler scheduler, Vehicle vehicle) {
 		super(scheduler, vehicle);
-		priority = SimulationParameters.PRIORITY_LEAVE_ROAD_MESSAGE;
+		priority = JDEQSimConfigGroup.PRIORITY_LEAVE_ROAD_MESSAGE;
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class LeaveRoadMessage extends EventMessage {
 
 		event = new LinkLeaveEvent(this.getMessageArrivalTime(), Id.create(vehicle.getOwnerPerson().getId(), org.matsim.vehicles.Vehicle.class), road.getLink().getId());
 
-		SimulationParameters.getProcessEventThread().processEvent(event);
+		eventsManager.processEvent(event);
 	}
 
 }

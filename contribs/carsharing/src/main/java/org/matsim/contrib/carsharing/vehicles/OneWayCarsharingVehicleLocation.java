@@ -38,10 +38,11 @@ public class OneWayCarsharingVehicleLocation {
 			for (String s : vehIDs) {
 				newvehIDs.add(s);
 			}
+			Link link = sc.getNetwork().getLinks().get( f.getLinkId() ) ;
 	    	
-			OneWayCarsharingStation fNew = new OneWayCarsharingStation(f.getLink(), f.getNumberOfVehicles(), newvehIDs,  f.getNumberOfAvailableParkingSpaces());		
+			OneWayCarsharingStation fNew = new OneWayCarsharingStation(link, f.getNumberOfVehicles(), newvehIDs,  f.getNumberOfAvailableParkingSpaces());		
 
-	    	vehicleLocationQuadTree.put(fNew.getLink().getCoord().getX(), fNew.getLink().getCoord().getY(), fNew);
+	    	vehicleLocationQuadTree.put(fNew.getCoord().getX(), fNew.getCoord().getY(), fNew);
 	    }
 	    
 	  

@@ -158,7 +158,7 @@ public class PTMapperOnlyBusses extends PTMapper {
 	 */
 	private Id<Link> findClosestLink(TransitStopFacility stopFacility) {
 		Link nearestLink = NetworkUtils.getNearestLink(this.network, stopFacility.getCoord());
-		if (NetworkUtils.getEuclidianDistance(stopFacility.getCoord(), nearestLink.getToNode().getCoord()) <= SEARCH_RADIUS) {
+		if (NetworkUtils.getEuclideanDistance(stopFacility.getCoord(), nearestLink.getToNode().getCoord()) <= SEARCH_RADIUS) {
 			// If nearest link is within search radius, return it.
 			return nearestLink.getId();
 		} else {
@@ -212,7 +212,7 @@ public class PTMapperOnlyBusses extends PTMapper {
 	private Set<Link> getLinksWithinSearchRadius(Coord centralCoords) {
 		Set<Link> linksWithinRadius = new HashSet<>();
 		for (Link link : this.network.getLinks().values()) {
-			if (NetworkUtils.getEuclidianDistance(centralCoords, link.getToNode().getCoord()) < SEARCH_RADIUS) {
+			if (NetworkUtils.getEuclideanDistance(centralCoords, link.getToNode().getCoord()) < SEARCH_RADIUS) {
 				linksWithinRadius.add(link);
 			}
 		}
@@ -387,7 +387,7 @@ public class PTMapperOnlyBusses extends PTMapper {
 		if (fromNode == toNode) {
 			link.setLength(50);
 		} else {
-			link.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
+			link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
 		}
 		link.setFreespeed(80.0 / 3.6);
 		link.setCapacity(10000);

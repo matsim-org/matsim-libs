@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -13,7 +14,6 @@ import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
 
 import playground.michalm.berlin.BerlinZoneUtils;
-import playground.michalm.zone.Zone;
 
 
 public class TaxiStatusToMatrix

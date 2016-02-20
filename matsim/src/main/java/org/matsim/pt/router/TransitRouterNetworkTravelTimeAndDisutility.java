@@ -197,14 +197,14 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		double timeCost = - getTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
 		// (sign: margUtl is negative; overall it should be positive because it is a cost.)
 		
-		double distanceCost = - CoordUtils.calcDistance(coord,toCoord) * config.getMarginalUtilityOfTravelDistancePt_utl_m() ;
+		double distanceCost = - CoordUtils.calcEuclideanDistance(coord,toCoord) * config.getMarginalUtilityOfTravelDistancePt_utl_m() ;
 		// (sign: same as above)
 		
 		return timeCost + distanceCost ;
 	}
 
 	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
-		double distance = CoordUtils.calcDistance(coord, toCoord);
+		double distance = CoordUtils.calcEuclideanDistance(coord, toCoord);
 		double initialTime = distance / config.getBeelineWalkSpeed();
 		return initialTime;
 	}

@@ -156,7 +156,7 @@ class PTripRouterFactoryImpl implements Provider<TripRouter> {
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					DefaultRoutingModules.createNetworkRouter(mainMode, populationFactory, 
+					DefaultRoutingModules.createPureNetworkRouter(mainMode, populationFactory, 
 					        network,
 						routeAlgo));
 		}

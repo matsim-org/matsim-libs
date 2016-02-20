@@ -9,6 +9,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
@@ -148,6 +149,18 @@ class MyMobsimAgent implements MobsimDriverAgent {
 	@Override
 	public Id<Vehicle> getPlannedVehicleId() {
 		return null ;
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 }

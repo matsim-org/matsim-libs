@@ -67,7 +67,7 @@ public class Raptor implements TransitRouter {
         if (nearestTransitStops.size() < 2) {
             // also enlarge search area if only one stop found, maybe a second one is near the border of the search area
             TransitStopFacility nearestTransitStop = this.transitRouterQuadTree.getNearestTransitStopFacility(coord);
-            double distance = CoordUtils.calcDistance(coord, nearestTransitStop.getCoord());
+            double distance = CoordUtils.calcEuclideanDistance(coord, nearestTransitStop.getCoord());
             nearestTransitStops = this.transitRouterQuadTree.getNearestTransitStopFacilities(coord, distance + this.config.getExtensionRadius());
         }
         Map<TransitStopFacility, InitialNode> wrappedNearestTransitStops2AccessCost = new LinkedHashMap<>();

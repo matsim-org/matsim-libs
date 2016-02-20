@@ -164,7 +164,7 @@ public class PatnaUrbanDemandGenerator {
 					Person person = factory.createPerson(Id.createPersonId(idPrefix+population.getPersons().size()));
 					population.addPerson(person);
 
-					double beelineDist = CoordUtils.calcDistance(homeZoneCoordTransform, workZoneCoordTransform);
+					double beelineDist = CoordUtils.calcEuclideanDistance(homeZoneCoordTransform, workZoneCoordTransform);
 					String travelMode = getTravelMode(parts [8], beelineDist);
 
 					Plan plan = createPlan( workZoneCoordTransform, homeZoneCoordTransform, travelMode, tripPurpose);

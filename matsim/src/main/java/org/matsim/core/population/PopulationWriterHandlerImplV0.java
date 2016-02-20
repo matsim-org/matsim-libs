@@ -23,6 +23,7 @@ package org.matsim.core.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -33,15 +34,19 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityOptionImpl;
 
 	/*package*/ class PopulationWriterHandlerImplV0 extends AbstractPopulationWriterHandler {
 
+	private final CoordinateTransformation coordinateTransformation;
 	private final Network network;
 
-	protected PopulationWriterHandlerImplV0(final Network network) {
+	protected PopulationWriterHandlerImplV0(
+			final CoordinateTransformation coordinateTransformation,
+			final Network network) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.network = network;
 	}
 
@@ -100,38 +105,6 @@ import org.matsim.facilities.ActivityOptionImpl;
 	}
 
 	//////////////////////////////////////////////////////////////////////
-	// <activity ... > ... </activity>
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public void startActivity(final String act_type, final BufferedWriter out) throws IOException {
-	}
-
-	@Override
-	public void endActivity(final BufferedWriter out) throws IOException {
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// <location ... > ... </location>
-	//////////////////////////////////////////////////////////////////////
-
-	@Override
-	public void startPrimaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
-	}
-
-	@Override
-	public void endPrimaryLocation(final BufferedWriter out) throws IOException {
-	}
-
-	@Override
-	public void startSecondaryLocation(final ActivityOptionImpl activity, final BufferedWriter out) throws IOException {
-	}
-
-	@Override
-	public void endSecondaryLocation(final BufferedWriter out) throws IOException {
-	}
-
-	//////////////////////////////////////////////////////////////////////
 	// <plan ... > ... </plan>
 	//////////////////////////////////////////////////////////////////////
 
@@ -161,8 +134,9 @@ import org.matsim.facilities.ActivityOptionImpl;
 		out.write("\t\t\t<act");
 		out.write(" type=\"" + act.getType() + "\"");
 		if (act.getCoord() != null) {
-			out.write(" x100=\"" + act.getCoord().getX() + "\"");
-			out.write(" y100=\"" + act.getCoord().getY() + "\"");
+			final Coord coord = coordinateTransformation.transform( act.getCoord() );
+			out.write(" x100=\"" + coord.getX() + "\"");
+			out.write(" y100=\"" + coord.getY() + "\"");
 		}
 		if (act.getLinkId() != null)
 			out.write(" link=\"" + act.getLinkId() + "\"");

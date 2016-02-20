@@ -294,7 +294,7 @@ public class OptimalWalkPlanFinderTest {
 			leg.setTravelTime(firstLegTravelTime);
 			Route route1 = new GenericRouteImpl(link1.getId(), link1.getId());
 			route1.setTravelTime(firstLegTravelTime);
-			route1.setDistance(CoordUtils.calcDistance(homeLocation, workLocation));
+			route1.setDistance(CoordUtils.calcEuclideanDistance(homeLocation, workLocation));
 			leg.setRoute(route1);
 
 			ActivityImpl secondActivity = this.plan.createAndAddActivity("work", workLocation);
@@ -306,7 +306,7 @@ public class OptimalWalkPlanFinderTest {
 			leg.setTravelTime(secondLegTravelTime);
 			Route route2 = new GenericRouteImpl(link1.getId(), link1.getId());
 			route2.setTravelTime(secondLegTravelTime);
-			route2.setDistance(CoordUtils.calcDistance(homeLocation, workLocation));
+			route2.setDistance(CoordUtils.calcEuclideanDistance(homeLocation, workLocation));
 			leg.setRoute(route2);
 
 			ActivityImpl lastActivity = this.plan.createAndAddActivity("home", homeLocation);

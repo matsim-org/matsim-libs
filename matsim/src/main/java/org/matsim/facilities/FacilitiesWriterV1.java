@@ -25,7 +25,10 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.SortedSet;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.internal.MatsimWriter;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
 
@@ -37,8 +40,17 @@ import org.matsim.core.utils.misc.Time;
 	private final String DTD = "http://www.matsim.org/files/dtd/facilities_v1.dtd";
 	
 	private final ActivityFacilities facilities;
+
+	private final CoordinateTransformation coordinateTransformation;
 	
 	public FacilitiesWriterV1(final ActivityFacilities facilities) {
+		this( new IdentityTransformation() , facilities );
+	}
+
+	public FacilitiesWriterV1(
+			final CoordinateTransformation coordinateTransformation,
+			final ActivityFacilities facilities) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.facilities = facilities;
 	}
 	
@@ -123,8 +135,12 @@ import org.matsim.core.utils.misc.Time;
 	public void startFacility(final ActivityFacilityImpl facility, final BufferedWriter out) throws IOException {
 		out.write("\t<facility");
 		out.write(" id=\"" + facility.getId() + "\"");
-		out.write(" x=\"" + facility.getCoord().getX() + "\"");
-		out.write(" y=\"" + facility.getCoord().getY() + "\"");
+		if (facility.getLinkId() != null) {
+			out.write(" linkId=\"" + facility.getLinkId().toString() + "\"");
+		}
+		final Coord coord = coordinateTransformation.transform( facility.getCoord() );
+		out.write(" x=\"" + coord.getX() + "\"");
+		out.write(" y=\"" + coord.getY() + "\"");
 		if (facility.getDesc() != null) { out.write(" desc=\"" + facility.getDesc() + "\""); }
 		out.write(">\n");
 	}

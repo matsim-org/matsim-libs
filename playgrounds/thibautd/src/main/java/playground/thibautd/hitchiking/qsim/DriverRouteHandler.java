@@ -218,7 +218,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 			routeToNextDest = r.getLinkIds().iterator();
 
 			// XXX: this assumes no cost of distance for hitch hiking in scoring f.
-			double dist = RouteUtils.calcDistance( r , network ) +
+			double dist = RouteUtils.calcDistanceExcludingStartEndLink( r , network ) +
 				network.getLinks().get( r.getEndLinkId() ).getLength();
 			double malusPerPerson = (dist * costOfDistance) /
 									(passengers.size() + 1d);

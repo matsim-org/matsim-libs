@@ -10,7 +10,6 @@
 		<param name="flowCapacityFactor" value="2.0" />
 		<param name="gapTravelSpeed" value="20.0" />
 		<param name="minimumInFlowCapacity" value="3600" />
-		<param name="simulationType" value="java" />
 		<param name="squeezeTime" value="9000" />
 		<param name="storageCapacityFactor" value="3.0" />
 	</module>

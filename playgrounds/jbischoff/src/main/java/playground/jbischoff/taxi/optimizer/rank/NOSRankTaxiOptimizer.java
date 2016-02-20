@@ -30,14 +30,14 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task.*;
-import org.matsim.contrib.util.DistanceUtils;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
+import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.scheduler.*;
+import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.router.util.*;
 
 import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
-import playground.michalm.taxi.optimizer.TaxiOptimizerContext;
-import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
-import playground.michalm.taxi.schedule.*;
-import playground.michalm.taxi.scheduler.*;
 
 
 /**

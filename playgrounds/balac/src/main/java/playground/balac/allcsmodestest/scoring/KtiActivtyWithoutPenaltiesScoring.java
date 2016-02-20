@@ -33,7 +33,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTime.DayType;
 import org.matsim.facilities.OpeningTimeImpl;
 
 import java.util.*;
@@ -64,11 +63,9 @@ public class KtiActivtyWithoutPenaltiesScoring implements ActivityScoring, Scori
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final ActivityFacilities facilities;
 
-	private static final DayType DEFAULT_DAY = DayType.wed;
 	private static final Set<OpeningTime> DEFAULT_OPENING_TIME =
 		Collections.<OpeningTime>singleton(
 			new OpeningTimeImpl(
-				DEFAULT_DAY,
 				Double.NEGATIVE_INFINITY,
 				Double.POSITIVE_INFINITY) );
 	

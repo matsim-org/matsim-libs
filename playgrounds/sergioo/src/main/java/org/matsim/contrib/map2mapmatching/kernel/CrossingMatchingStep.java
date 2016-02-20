@@ -177,11 +177,11 @@ public class CrossingMatchingStep extends MatchingStep {
 					if(region.isInside(node) && ((ComposedNode)node).getType().equals(Types.CROSSING) && !alreadyReducedA.contains(node)) {
 						Set<Node> nearestNodesToA = new HashSet<Node>();
 						for(Node nodeA:networkA.getNodes().values())
-							if(((ComposedNode)nodeA).getType().equals(Types.CROSSING) && CoordUtils.calcDistance(node.getCoord(), nodeA.getCoord())<radius && !alreadyReducedA.contains(nodeA))
+							if(((ComposedNode)nodeA).getType().equals(Types.CROSSING) && CoordUtils.calcEuclideanDistance(node.getCoord(), nodeA.getCoord())<radius && !alreadyReducedA.contains(nodeA))
 								nearestNodesToA.add(nodeA);
 						Set<Node> nearestNodesToB = new HashSet<Node>();
 						for(Node nodeB:networkB.getNodes().values())
-							if(((ComposedNode)nodeB).getType().equals(Types.CROSSING) && CoordUtils.calcDistance(node.getCoord(),nodeB.getCoord())<radius && !alreadyReducedB.contains(nodeB))
+							if(((ComposedNode)nodeB).getType().equals(Types.CROSSING) && CoordUtils.calcEuclideanDistance(node.getCoord(),nodeB.getCoord())<radius && !alreadyReducedB.contains(nodeB))
 								nearestNodesToB.add(nodeB);
 						for(int n=1; n<=nearestNodesToA.size(); n++) {
 							Set<Set<Node>> nodesSubsetsA = getSubsetsOfSize(nearestNodesToA, n);
@@ -408,7 +408,7 @@ public class CrossingMatchingStep extends MatchingStep {
 				double shortestDistance=Double.MAX_VALUE;
 				Link nearest = linksFrom.iterator().hasNext()?linksFrom.iterator().next():null;
 				for(Link linkFrom:linksFrom) {
-					double distance = CoordUtils.calcDistance(nearest.getCoord(), linkFrom.getCoord());
+					double distance = CoordUtils.calcEuclideanDistance(nearest.getCoord(), linkFrom.getCoord());
 					if(distance<shortestDistance && nearest.getCapacity()!=0) {
 						shortestDistance = distance;
 						nearest = linkFrom;

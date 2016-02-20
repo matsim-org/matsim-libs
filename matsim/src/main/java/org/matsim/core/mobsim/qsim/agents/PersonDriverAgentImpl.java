@@ -31,6 +31,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -190,6 +191,21 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	final void resetCaches() {
 		basicAgentDelegate.resetCaches();
 		driverAgentDelegate.resetCaches(); 
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		return this.basicAgentDelegate.getCurrentFacility();
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		return this.basicAgentDelegate.getDestinationFacility();
+	}
+
+	@Override
+	public final PlanElement getPreviousPlanElement() {
+		return this.basicAgentDelegate.getPreviousPlanElement();
 	}
 
 }
