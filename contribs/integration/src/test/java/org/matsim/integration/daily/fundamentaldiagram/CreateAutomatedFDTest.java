@@ -98,7 +98,7 @@ public class CreateAutomatedFDTest {
 	private TrafficDynamics trafficDynamics;
 	private final Map<Id<Person>,String> person2Mode = new HashMap<Id<Person>, String>();
 
-	@Parameters
+	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1}")
 	public static Collection<Object[]> createFds() {
 		Object[] [] fdData = new Object [][] { 
 				{LinkDynamics.FIFO, TrafficDynamics.queue},

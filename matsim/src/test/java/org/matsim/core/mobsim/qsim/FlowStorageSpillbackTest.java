@@ -86,7 +86,7 @@ public class FlowStorageSpillbackTest {
 		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
 	}
 	
-	@Parameters
+	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
 	public static Collection<Object> controlerTest () {
 		Object [] capacityUpdates = new Object [] { false, true };
 		return Arrays.asList(capacityUpdates);
