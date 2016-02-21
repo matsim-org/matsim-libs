@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -41,6 +42,8 @@ import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreNetwork;
 
 public class DigicoreNetworkWriterTest {
+	private static final Logger log = Logger.getLogger( DigicoreNetworkWriterTest.class);
+
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
@@ -78,26 +81,37 @@ public class DigicoreNetworkWriterTest {
 			String line = br.readLine();
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("NODES"));
 			line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("NodeId,Long,Lat"));
 			line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("3,1.0000,1.0000"));
 			line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("2,0.0000,1.0000"));
 			line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,0.0000,0.0000"));
 			line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("4,1.0000,0.0000"));
 			line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("ARCS"));
 			line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("From_Id,To_Id,From_Type,To_Type,Weight"));
 			line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,2,test,test,1"));
 			line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("3,1,test,test,1"));
 			line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,3,test,test,2"));
 			line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("4,1,test,test,3"));
 		} catch (IOException e) {
 			Assert.fail("Should not fail reading the file.");
