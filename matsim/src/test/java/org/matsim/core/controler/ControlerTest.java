@@ -82,7 +82,7 @@ public class ControlerTest {
 	}
 	
 	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> controlerTest () {
+	public static Collection<Object> parameterObjects () {
 		Object [] capacityUpdates = new Object [] { false, true };
 		return Arrays.asList(capacityUpdates);
 	}

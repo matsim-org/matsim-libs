@@ -58,7 +58,7 @@ public class ScoreStatsModuleTest {
 	}
 	
 	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}; isInsertingAccessEgressWalk = {1}")
-	public static Collection<Object[]> controlerTest () {
+	public static Collection<Object[]> parameterObjects () {
 		Object [] [] os = new Object [][] { 
 											{ false, true },
 											{ true, true },
