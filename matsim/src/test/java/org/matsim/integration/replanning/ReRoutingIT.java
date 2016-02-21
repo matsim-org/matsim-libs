@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration.always;
+package org.matsim.integration.replanning;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
