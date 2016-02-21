@@ -79,6 +79,7 @@ public class DigicoreNetworkWriterTest {
 		BufferedReader br = IOUtils.getBufferedReader(utils.getOutputDirectory() + "network.txt.gz");
 		try {
 			String line = br.readLine();
+			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("NODES"));
 			line = br.readLine();
 			log .warn( line );
