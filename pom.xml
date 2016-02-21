@@ -9,6 +9,6 @@
 	<modules>
 		<module>matsim</module>
 		<module>contribs</module>
-		<!--<module>playgrounds</module>-->
+		<module>playgrounds</module>
 	</modules>
 </project>
