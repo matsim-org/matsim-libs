@@ -84,36 +84,66 @@ public class DigicoreNetworkWriterTest {
 			line = br.readLine();
 			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("NodeId,Long,Lat"));
-			line = br.readLine();
-			log .warn( line );
-			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("3,1.0000,1.0000"));
-			line = br.readLine();
-			log .warn( line );
-			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("2,0.0000,1.0000"));
-			line = br.readLine();
-			log .warn( line );
-			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,0.0000,0.0000"));
-			line = br.readLine();
-			log .warn( line );
-			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("4,1.0000,0.0000"));
+			// ---
+//			line = br.readLine();
+//			log .warn( line );
+//			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("3,1.0000,1.0000"));
+//			line = br.readLine();
+//			log .warn( line );
+//			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("2,0.0000,1.0000"));
+//			line = br.readLine();
+//			log .warn( line );
+//			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,0.0000,0.0000"));
+//			line = br.readLine();
+//			log .warn( line );
+//			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("4,1.0000,0.0000"));
+			//
+			// The underlying HashMap, provided by the jung graph library, does not guarantee ordering.  Thus modifying the test
+			// to accept arbitrary orders. kai, feb'16
+			//
+			for ( int ii=0 ; ii<4 ; ii++ ) {
+				line = br.readLine() ;
+				log .warn( line );
+				boolean problem = true ;
+				if ( line.equalsIgnoreCase("3,1.0000,1.0000") ) problem = false ; 
+				if ( line.equalsIgnoreCase("2,0.0000,1.0000") ) problem = false ; 
+				if ( line.equalsIgnoreCase("1,0.0000,0.0000") ) problem = false ; 
+				if ( line.equalsIgnoreCase("4,1.0000,0.0000") ) problem = false ;
+				Assert.assertFalse( problem ) ;
+			}
+			// ---
 			line = br.readLine();
 			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("ARCS"));
 			line = br.readLine();
 			log .warn( line );
 			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("From_Id,To_Id,From_Type,To_Type,Weight"));
-			line = br.readLine();
-			log .warn( line );
-			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,2,test,test,1"));
-			line = br.readLine();
-			log .warn( line );
-			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("3,1,test,test,1"));
-			line = br.readLine();
-			log .warn( line );
-			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,3,test,test,2"));
-			line = br.readLine();
-			log .warn( line );
-			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("4,1,test,test,3"));
+			// ---
+//			line = br.readLine();
+//			log .warn( line );
+//			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,2,test,test,1"));
+//			line = br.readLine();
+//			log .warn( line );
+//			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("3,1,test,test,1"));
+//			line = br.readLine();
+//			log .warn( line );
+//			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,3,test,test,2"));
+//			line = br.readLine();
+//			log .warn( line );
+//			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("4,1,test,test,3"));
+			//
+			for ( int ii=0 ; ii<4 ; ii++ ) {
+				line = br.readLine();
+				log .warn( line );
+				boolean problem = true ;
+				if ( line.equalsIgnoreCase("1,2,test,test,1") ) problem = false ;
+				if ( line.equalsIgnoreCase("3,1,test,test,1") ) problem = false ;
+				if ( line.equalsIgnoreCase("1,3,test,test,2") ) problem = false ;
+				if ( line.equalsIgnoreCase("4,1,test,test,3") ) problem = false ;
+				Assert.assertFalse( problem );
+			}
+			//
+			// ---
 		} catch (IOException e) {
 			Assert.fail("Should not fail reading the file.");
 		}
@@ -168,7 +198,7 @@ public class DigicoreNetworkWriterTest {
 	 *  |/<-------
 	 *  1 <--- w:3 ---- 4
 	 */
-	private DigicoreNetwork buildSmallNetwork(){
+	private static DigicoreNetwork buildSmallNetwork(){
 		DigicoreNetwork dn = new DigicoreNetwork();
 
 		DigicoreActivity da1 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
