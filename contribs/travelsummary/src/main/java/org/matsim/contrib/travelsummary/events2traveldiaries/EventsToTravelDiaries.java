@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author pieterfourie, sergioo
@@ -67,7 +68,8 @@ public class EventsToTravelDiaries implements
     private TransitSchedule transitSchedule;
     private boolean isTransitScenario = false;
     private String diagnosticString = "39669_2";
-
+    private AtomicInteger eventCounter = new AtomicInteger(0);
+    private int maxEvents = Integer.MAX_VALUE;
 
     public EventsToTravelDiaries(TransitSchedule transitSchedule,
                                  Network network, Config config) {
@@ -77,7 +79,16 @@ public class EventsToTravelDiaries implements
         this.transitSchedule = transitSchedule;
         this.isTransitScenario = true;
     }
+    public EventsToTravelDiaries(TransitSchedule transitSchedule,
+                                 Network network, Config config, int maxEvents) {
+        this(transitSchedule,network,config);
+        this.maxEvents = maxEvents;
+    }
 
+    public EventsToTravelDiaries(Scenario scenario,int maxEvents) {
+        this(scenario);
+        this.maxEvents = maxEvents;
+    }
     public EventsToTravelDiaries(Scenario scenario) {
         this.network = scenario.getNetwork();
         isTransitScenario = scenario.getConfig().transit().isUseTransit() ;
@@ -142,38 +153,41 @@ public class EventsToTravelDiaries implements
 
     @Override
     public void handleEvent(ActivityEndEvent event) {
-        try {
-            if (isTransitScenario) {
-                if (transitDriverIds.contains(event.getPersonId()))
-                    return;
-            }
-            TravellerChain chain = chains.get(event.getPersonId());
-            locations.put(event.getPersonId(),
-                    network.getLinks().get(event.getLinkId()).getCoord());
-            if (chain == null) {
-                chain = new TravellerChain();
-                chains.put(event.getPersonId(), chain);
-                Activity act = chain.addActivity();
-                act.setCoord(network.getLinks().get(event.getLinkId())
-                        .getCoord());
-                act.setEndTime(event.getTime());
-                act.setFacility(event.getFacilityId());
-                act.setStartTime(0.0);
-                act.setType(event.getActType());
+        if (eventCounter.incrementAndGet() < maxEvents) {
+            try {
+                if (isTransitScenario) {
+                    if (transitDriverIds.contains(event.getPersonId()))
+                        return;
+                }
+                TravellerChain chain = chains.get(event.getPersonId());
+                locations.put(event.getPersonId(),
+                        network.getLinks().get(event.getLinkId()).getCoord());
+                if (chain == null) {
+                    chain = new TravellerChain();
+                    chains.put(event.getPersonId(), chain);
+                    Activity act = chain.addActivity();
+                    act.setCoord(network.getLinks().get(event.getLinkId())
+                            .getCoord());
+                    act.setEndTime(event.getTime());
+                    act.setFacility(event.getFacilityId());
+                    act.setStartTime(0.0);
+                    act.setType(event.getActType());
 
-            } else if (!event.getActType().equals(
-                    PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-                Activity act = chain.getActs().getLast();
-                act.setEndTime(event.getTime());
+                } else if (!event.getActType().equals(
+                        PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+                    Activity act = chain.getActs().getLast();
+                    act.setEndTime(event.getTime());
+                }
+            } catch (Exception e) {
+                System.err.println(e.getStackTrace());
+                System.err.println(event.toString());
             }
-        } catch (Exception e) {
-            System.err.println(e.getStackTrace());
-            System.err.println(event.toString());
         }
     }
 
     @Override
     public void handleEvent(ActivityStartEvent event) {
+        if (eventCounter.incrementAndGet() > maxEvents) return;
         try {
             if (isTransitScenario) {
                 if (transitDriverIds.contains(event.getPersonId()))
@@ -210,6 +224,7 @@ public class EventsToTravelDiaries implements
 
     @Override
     public void handleEvent(PersonArrivalEvent event) {
+        if (eventCounter.incrementAndGet() > maxEvents) return;
         try {
             if (isTransitScenario) {
                 if (transitDriverIds.contains(event.getPersonId()))
@@ -272,6 +287,7 @@ public class EventsToTravelDiaries implements
 
     @Override
     public void handleEvent(PersonDepartureEvent event) {
+        if (eventCounter.incrementAndGet() > maxEvents) return;
         try {
             if (transitDriverIds.contains(event.getPersonId()))
                 return;
@@ -362,6 +378,7 @@ public class EventsToTravelDiaries implements
 
     @Override
     public void handleEvent(PersonStuckEvent event) {
+        if (eventCounter.incrementAndGet() > maxEvents) return;
         try {
             if (!transitDriverIds.contains(event.getPersonId())) {
                 TravellerChain chain = chains.get(event.getPersonId());
@@ -377,6 +394,7 @@ public class EventsToTravelDiaries implements
 
     @Override
     public void handleEvent(PersonEntersVehicleEvent event) {
+        if (eventCounter.incrementAndGet() > maxEvents) return;
         try {
             if (transitDriverIds.contains(event.getPersonId()))
                 return;
@@ -419,6 +437,7 @@ public class EventsToTravelDiaries implements
 
     @Override
     public void handleEvent(PersonLeavesVehicleEvent event) {
+        if (eventCounter.incrementAndGet() > maxEvents) return;
         if (transitDriverIds.contains(event.getPersonId()))
             return;
         try {
@@ -443,6 +462,7 @@ public class EventsToTravelDiaries implements
 
     @Override
     public void handleEvent(LinkEnterEvent event) {
+        if (eventCounter.incrementAndGet() > maxEvents) return;
         try {
             if (ptVehicles.keySet().contains(event.getVehicleId())) {
                 PTVehicle ptVehicle = ptVehicles.get(event.getVehicleId());
@@ -462,6 +482,7 @@ public class EventsToTravelDiaries implements
 
     @Override
     public void handleEvent(LinkLeaveEvent event) {
+        if (eventCounter.incrementAndGet() > maxEvents) return;
         try {
             if (ptVehicles.keySet().contains(event.getVehicleId())) {
                 PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
@@ -488,6 +509,7 @@ public class EventsToTravelDiaries implements
 
     @Override
     public void handleEvent(TransitDriverStartsEvent event) {
+        if (eventCounter.incrementAndGet() > maxEvents) return;
         try {
             ptVehicles.put(
                     event.getVehicleId(),
@@ -503,6 +525,7 @@ public class EventsToTravelDiaries implements
 
     @Override
     public void handleEvent(TeleportationArrivalEvent event) {
+        if (eventCounter.incrementAndGet() > maxEvents) return;
         try {
             if (transitDriverIds.contains(event.getPersonId()))
                 return;
@@ -517,6 +540,7 @@ public class EventsToTravelDiaries implements
 
     @Override
     public void handleEvent(VehicleArrivesAtFacilityEvent event) {
+        if (eventCounter.incrementAndGet() > maxEvents) return;
         try {
             ptVehicles.get(event.getVehicleId()).lastStop = event
                     .getFacilityId();
