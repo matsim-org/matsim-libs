@@ -69,6 +69,19 @@ public class BasicStatistics implements Serializable {
 		this.max = Math.max(this.max, val);
 		this.size++;
 	}
+	
+	// TODO NEW
+	public BasicStatistics(final Iterable<Double> iterable) {
+		this();
+		this.addAll(iterable);
+	}
+	
+	// TODO NEW
+	public void addAll(final Iterable<Double> iterable) {
+		for (double val : iterable) {
+			this.add(val);
+		}
+	}
 
 	public int size() {
 		return this.size;

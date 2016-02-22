@@ -42,7 +42,6 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 import org.apache.commons.math3.util.FastMath;
-import org.apache.log4j.Logger;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Matrix;
@@ -59,21 +58,22 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	private final List<Transition<U>> transitions;
 
-	private final SurrogateObjectiveFunction<U> surrogateObjectiveFunction;
+	private SurrogateObjectiveFunction<U> surrogateObjectiveFunction;
 
-	private final int maxIterations = 10 * 1000; // TODO make configurable
+	private final int maxIterations = Integer.MAX_VALUE;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	TransitionSequencesAnalyzer(final List<Transition<U>> transitions,
-			final double equilibriumGapWeight, final double uniformityWeight) {
+			final double equilibriumGapWeight, final double uniformityGapWeight) {
 		if ((transitions == null) || (transitions.size() == 0)) {
 			throw new IllegalArgumentException(
 					"there must be at least one transition");
 		}
 		this.transitions = transitions;
 		this.surrogateObjectiveFunction = new SurrogateObjectiveFunction<>(
-				transitions, equilibriumGapWeight, uniformityWeight);
+				transitions, equilibriumGapWeight, uniformityGapWeight,
+				SurrogateObjectiveFunction.Bound.UPPER);
 	}
 
 	TransitionSequencesAnalyzer(
@@ -93,7 +93,12 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		return result;
 	}
 
-	// -------------------- GETTERS --------------------
+	// -------------------- SETTERS AND GETTERS --------------------
+
+	public void setBound(final SurrogateObjectiveFunction.Bound bound) {
+		this.surrogateObjectiveFunction.setBound(bound);
+
+	}
 
 	public double getEquilibriumGapWeight() {
 		return this.surrogateObjectiveFunction.getEquilibriumGapWeight();
@@ -135,10 +140,12 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	public SamplingStage<U> newOptimalSamplingStage(
 			final Transition<U> lastTransition,
-			final Double convergedObjectiveFunctionValue) {
+			final Double convergedObjectiveFunctionValue,
+			final Double convergedSurrogateObjectiveFunctionValue) {
 		final Vector alphas = this.optimalAlphas();
 		return new SamplingStage<>(alphas, this, lastTransition,
-				convergedObjectiveFunctionValue);
+				convergedObjectiveFunctionValue,
+				convergedSurrogateObjectiveFunctionValue);
 	}
 
 	public Vector optimalAlphas() {
@@ -155,25 +162,28 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 			// new SimpleValueChecker(1e-8, 1e-8));
 
 			PointValuePair result = null;
-			double initialBracketingRange = 1e-8;
+			final double eps = 1e-8; // 1e-8;
+			double initialBracketingRange = eps; // 1e-8;
 			do {
 				try {
 					final NonLinearConjugateGradientOptimizer solver = new NonLinearConjugateGradientOptimizer(
 							NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE, // FLETCHER_REEVES,
-							new SimpleValueChecker(1e-8, 1e-8), 1e-8, 1e-8,
+							new SimpleValueChecker(eps, eps), eps, eps,
 							initialBracketingRange);
 					result = solver.optimize(new ObjectiveFunction(
 							new MyObjectiveFunction()),
 							new ObjectiveFunctionGradient(new MyGradient()),
-							GoalType.MINIMIZE, new InitialGuess(
+							this.surrogateObjectiveFunction.getGoalTypeFromBound(),
+//							GoalType.MINIMIZE, 
+							new InitialGuess(
 									new double[this.transitions.size() - 1]),
 							new MaxEval(Integer.MAX_VALUE), new MaxIter(
 									this.maxIterations));
 				} catch (TooManyEvaluationsException e) {
 					initialBracketingRange *= 10.0;
-					Logger.getLogger(this.getClass().getName()).info(
-							"Extending initial bracketing range to "
-									+ initialBracketingRange);
+					// Logger.getLogger(this.getClass().getName()).info(
+					// "Extending initial bracketing range to "
+					// + initialBracketingRange);
 					result = null;
 				}
 			} while (result == null);
