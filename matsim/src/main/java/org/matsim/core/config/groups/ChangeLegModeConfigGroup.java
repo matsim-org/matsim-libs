@@ -11,7 +11,7 @@ public class ChangeLegModeConfigGroup extends ReflectiveConfigGroup {
 	public final static String CONFIG_PARAM_MODES = "modes";
 	public final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
 
-	private String[] modes = new String[] { TransportMode.car, TransportMode.pt };;
+	private String[] modes = new String[] { TransportMode.car, TransportMode.pt };
 	private boolean ignoreCarAvailability = true;
 
 	public ChangeLegModeConfigGroup() {

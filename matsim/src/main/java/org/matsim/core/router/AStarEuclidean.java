@@ -211,7 +211,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @return The travel cost when traveling between the two given nodes.
 	 */
 	protected double estimateRemainingTravelCost(final Node fromNode, final Node toNode) {
-		double dist = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord())
+		double dist = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord())
 				* getMinTravelCostPerLength();
 		return dist * this.overdoFactor;
 	}

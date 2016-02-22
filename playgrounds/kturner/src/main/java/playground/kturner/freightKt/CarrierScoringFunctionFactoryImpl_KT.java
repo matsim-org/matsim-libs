@@ -158,7 +158,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 				//Jedoch werden der Start- und Ziellink nicht mit einbezogen (weil nicht Teil der Route, sondern extra aufgeführt...!
                 Double dist = null;
 				if (leg.getRoute() instanceof NetworkRoute){
-					dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), scenario.getNetwork()); //Route selbst (ohne Start und Endlink
+					dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) leg.getRoute(), scenario.getNetwork()); //Route selbst (ohne Start und Endlink
 					dist += scenario.getNetwork().getLinks().get(leg.getRoute().getStartLinkId()).getLength();	//StartLink
 					dist += scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getLength(); //EndLink
 				}

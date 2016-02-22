@@ -42,6 +42,7 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
@@ -238,6 +239,18 @@ class MyAgent implements MobsimDriverAgent {
 
 	@Override
 	public boolean isWantingToArriveOnCurrentLink() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getDestinationFacility() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}

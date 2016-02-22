@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.util;
 
-import java.util.*;
+import java.util.EnumMap;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 

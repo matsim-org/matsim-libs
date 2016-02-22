@@ -27,13 +27,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.noise.data.NoiseAllocationApproach;
+import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
-import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
@@ -114,7 +114,7 @@ public class CNTollTravelDisutilityCalculator implements TravelDisutility{
 		} else {
 			
 			boolean isHGV = false;
-			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixes()) {
+			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixesArray()) {
 				if (personId.toString().startsWith(hgvPrefix)) {
 					isHGV = true;
 					break;

@@ -36,7 +36,7 @@ import com.vividsolutions.jts.io.WKTReader;
 	 
 	public class CreateDemand {
 
-//------FIELDS TO BE MODIFIED -----------------------------------------------------------------------------------------//		
+		//------FIELDS TO BE MODIFIED -----------------------------------------------------------------------------------------//		
 		//Modal-Split values representing the relative amount of car users
 		private final double MS_INNER_CITY = 0.5;
 		private final double MS_OUTSIDE = 1;
@@ -49,22 +49,24 @@ import com.vividsolutions.jts.io.WKTReader;
 		 * SCALEFACTOR 0.15 = 10%-Szenario
 		 * SCALEFACTOR 0.015 = 1%-Szenario
 		 */
-		private static double SCALEFACTOR = 0.015;
+		private static double SCALEFACTOR = 1.5;
 //------ FIELDS NOT TO BE MODIFIED ------------------------------------------------------------------------------------//
 		private Scenario scenario;
 		private Map<String,Geometry> shapeMap;
 		private Map<String,Geometry> buildingsMap;
 		private Map<String,Coord> kindergartens;
 		private Map<String,Coord> shops;
-		private static final Random rnd = new Random(42);		
+		private static final Random rnd = MatsimRandom.getRandom();	
 //----- FILE PATHS ----------------------------------------------------------------------------------------------------//
-		private static final String NETWORKFILE = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/ADDEDLINKS_cap60.xml";
-		private static final String KREISE = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/Landkreise/Kreise.shp";
-		private static final String BUILDINGS = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/BuildingsCottbus/BuildingsCottbus.shp";
-		private static final String SHOPS = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/shops.txt";
-		private static final String KINDERGARTEN = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/kindergaerten.txt";
+		private static final String INPUTFOLDER = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/Cottbus-pt/INPUT_mod/";
+
+		private static final String NETWORKFILE = INPUTFOLDER+"network.xml";
+		private static final String KREISE = INPUTFOLDER+"Landkreise/Kreise.shp";
+		private static final String BUILDINGS = INPUTFOLDER+"BuildingsCottbus/BuildingsCottbus.shp";
+		private static final String SHOPS = INPUTFOLDER+"shops.txt";
+		private static final String KINDERGARTEN = INPUTFOLDER+"kindergaerten.txt";
 		
-		private static final String PLANSFILEOUTPUT = "C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/plans_scale" + SCALEFACTOR + ".xml";
+		private static final String PLANSFILEOUTPUT = INPUTFOLDER+"plans_scale" + SCALEFACTOR + ".xml";
 //-------------------------------------------------------------------------------------------------------------------//
 		
 		
@@ -325,7 +327,7 @@ import com.vividsolutions.jts.io.WKTReader;
 			Coord closest = null;
 			double closestDistance = Double.MAX_VALUE;
 			for (Coord coord : facilityMap.values()){
-				double distance = CoordUtils.calcDistance(coord, origin);
+				double distance = CoordUtils.calcEuclideanDistance(coord, origin);
 				if (distance<closestDistance) {
 					closestDistance = distance;
 					closest = coord;
@@ -350,9 +352,9 @@ import com.vividsolutions.jts.io.WKTReader;
 			Coord closest = coord;
 			Coord ii = coord;
 			double closestDistance = Double.MAX_VALUE;
-			for(String key : this.buildingsMap.keySet()){
-				ii = MGC.point2Coord(this.buildingsMap.get(key).getCentroid());
-				double distance = CoordUtils.calcDistance(ii, coord);
+			for(Geometry g  : this.buildingsMap.values()){
+				ii = MGC.point2Coord(g.getCentroid());
+				double distance = CoordUtils.calcEuclideanDistance(ii, coord);
 				if(distance<closestDistance){ 
 					closestDistance = distance;
 					closest = ii;

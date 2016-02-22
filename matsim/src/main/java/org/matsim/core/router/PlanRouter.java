@@ -72,6 +72,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	 *
 	 * @return the internal TripRouter instance.
 	 */
+	@Deprecated // get TripRouter out of injection instead. kai, feb'16
 	public TripRouter getTripRouter() {
 		return routingHandler;
 	}

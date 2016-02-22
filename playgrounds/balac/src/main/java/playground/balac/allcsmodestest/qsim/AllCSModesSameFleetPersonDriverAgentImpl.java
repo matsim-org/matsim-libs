@@ -44,6 +44,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 import playground.balac.freefloating.qsim.FreeFloatingStation;
@@ -158,6 +159,8 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 			this.state = MobsimAgent.State.ACTIVITY ;
 			calculateAndSetDepartureTime(firstAct);
 		}
+		throw new RuntimeException("Should this class still be in use?  I think there is a delegated version of this, isn't there?  "
+				+ "This one here causes additional refactoring work. kai, feb'16" ) ;
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -407,7 +410,7 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		LegImpl walkLeg = new LegImpl(mode);
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(startLink.getId(), destinationLink.getId());
-		final double dist = CoordUtils.calcDistance(startLink.getCoord(), destinationLink.getCoord());
+		final double dist = CoordUtils.calcEuclideanDistance(startLink.getCoord(), destinationLink.getCoord());
 		final double estimatedNetworkDistance = dist * beelineFactor;
 
 		final int travTime = (int) (estimatedNetworkDistance / walkSpeed);
@@ -570,9 +573,9 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		double distanceSearch = Double.parseDouble(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("searchDistanceTwoWayCarsharing"));
 		OneWayCarsharingRDWithParkingStation closest = null;
 		for(OneWayCarsharingRDWithParkingStation station: location) {
-			if (CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 			
 		}
@@ -691,9 +694,9 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 
 		OneWayCarsharingRDWithParkingStation closest = null;
 		for(OneWayCarsharingRDWithParkingStation station: location) {
-			if (CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 			
 		}
@@ -718,9 +721,9 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 
 		OneWayCarsharingRDWithParkingStation closest = null;
 		for(OneWayCarsharingRDWithParkingStation station: location) {
-			if (CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfAvailableParkingSpaces() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfAvailableParkingSpaces() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 			
 		}		
@@ -980,6 +983,24 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		} else {
 			return false ;
 		}
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public PlanElement getPreviousPlanElement() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 }

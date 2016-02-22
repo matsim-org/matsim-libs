@@ -57,7 +57,7 @@ public class KtiLinkNetworkRouteImpl implements NetworkRoute, Cloneable {
 	@Override
 	public double getDistance() {
 
-		double distance = RouteUtils.calcDistance(this, this.network);
+		double distance = RouteUtils.calcDistanceExcludingStartEndLink(this, this.network);
 
 		if (!this.getStartLinkId().equals(this.getEndLinkId())) {
 			switch (this.simLegInterpretation) {

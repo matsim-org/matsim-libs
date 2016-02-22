@@ -26,10 +26,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.OpeningTime.DayType;
 import org.xml.sax.Attributes;
 
 /**
@@ -46,14 +48,21 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	private final static String CAPACITY = "capacity";
 	private final static String OPENTIME = "opentime";
 
-	private final Scenario scenario;
 	private final ActivityFacilities facilities;
 	private final ActivityFacilitiesFactory factory;
 	private ActivityFacility currfacility = null;
 	private ActivityOption curractivity = null;
-	
+
+	private final CoordinateTransformation coordinateTransformation;
+
 	public FacilitiesReaderMatsimV1(final Scenario scenario) {
-		this.scenario = scenario;
+		this( new IdentityTransformation() , scenario );
+	}
+
+	public FacilitiesReaderMatsimV1(
+			final CoordinateTransformation coordinateTransformation,
+			final Scenario scenario) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.facilities = scenario.getActivityFacilities();
 		this.factory = this.facilities.getFactory();
 	}
@@ -90,9 +99,18 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 	
 	private void startFacility(final Attributes atts) {
-		this.currfacility = this.factory.createActivityFacility(Id.create(atts.getValue("id"), ActivityFacility.class),
-				new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))));
+		this.currfacility =
+				this.factory.createActivityFacility(
+						Id.create(atts.getValue("id"), ActivityFacility.class),
+						coordinateTransformation.transform(
+							new Coord(
+									Double.parseDouble(atts.getValue("x")),
+									Double.parseDouble(atts.getValue("y")))));
 		this.facilities.addActivityFacility(this.currfacility);
+		String value = atts.getValue("linkId");
+		if (value != null) {
+			((ActivityFacilityImpl) this.currfacility).setLinkId(Id.create(value, Link.class));
+		}
 		((ActivityFacilityImpl) this.currfacility).setDesc(atts.getValue("desc"));
 	}
 	
@@ -107,17 +125,7 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 	
 	private void startOpentime(final Attributes atts) {
-		DayType day = getDayType(atts.getValue("day"));
-		this.curractivity.addOpeningTime(new OpeningTimeImpl(day, Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time"))));
-	}
-
-	
-	private DayType getDayType(String dt){
-		for (DayType d : DayType.values()) {
-			if (d.toString().equalsIgnoreCase(dt))
-				return d;
-		}
-		throw new IllegalArgumentException("Cannot detect daytype for String: " + dt);
+		this.curractivity.addOpeningTime(new OpeningTimeImpl(Time.parseTime(atts.getValue("start_time")), Time.parseTime(atts.getValue("end_time"))));
 	}
 
 	/**

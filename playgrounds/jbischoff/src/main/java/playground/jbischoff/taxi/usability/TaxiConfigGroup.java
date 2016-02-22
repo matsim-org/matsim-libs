@@ -1,7 +1,6 @@
 package playground.jbischoff.taxi.usability;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;

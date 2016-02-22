@@ -141,7 +141,7 @@ public class VisLane implements Serializable {
 	private void calcCoords(){
 		this.startCoord = new Coord(startPoint.x, startPoint.y);
 		this.endCoord = new Coord(endPoint.x, endPoint.y);
-		this.euklideanDistance = CoordUtils.calcDistance(startCoord, endCoord);
+		this.euklideanDistance = CoordUtils.calcEuclideanDistance(startCoord, endCoord);
 	}
 
 	public void addDrivingLane(int laneNumber, Point2D.Double  drivingLaneStart, Point2D.Double drivingLaneEnd) {

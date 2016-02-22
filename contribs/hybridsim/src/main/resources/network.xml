@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+<network>
+
+    <nodes>
+        <node id="-1" x="-5" y="1"/>
+        <node id="1" x="0" y="1"/>
+        <node id="2" x="5" y="1"/>
+        <node id="0" x="10" y="1"/>
+        <node id="-2" x="0" y="1"/>
+    </nodes>
+
+
+    <links capperiod="00:00:01" effectivecellsize="0.26" effectivelanewidth="0.71">
+
+        <link id="0" from="-1" to="1" length="5.0" freespeed="1.34" capacity="1.8886" permlanes="2.0" oneway="1" modes="car" />
+        <link id="1" from="1" to="2" length="5.0" freespeed="1.34" capacity="1.8886" permlanes="2.0" oneway="1" modes="car,2ext" />
+        <link id="2" from="2" to="0" length="5.0" freespeed="1.34" capacity="1.8886" permlanes="2.0" oneway="1" modes="car" />
+        <link id="3" from="0" to="-2" length="5.0" freespeed="1.34" capacity="1.8886" permlanes="2.0" oneway="1" modes="car,ext2" />
+
+    </links>
+
+
+
+</network>

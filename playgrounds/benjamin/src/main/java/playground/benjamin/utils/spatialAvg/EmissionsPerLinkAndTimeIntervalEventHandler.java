@@ -66,12 +66,12 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 		Double linkLenghtKm = links.get(linkId).getLength() / 1000.;
 		int timeInterval = (int) Math.floor(event.getTime() / simulationEndTime*noOfTimeBins);
 		Map<Id<Link>, EmissionsAndVehicleKm> currentInterval = intervals2links2emissions.get(timeInterval);
-		if(!currentInterval.containsKey(linkId)){
+		
+		EmissionsAndVehicleKm eavk = currentInterval.get(linkId);
+		if (eavk == null) {
 			currentInterval.put(linkId, new EmissionsAndVehicleKm(emissionValue, linkLenghtKm));
-		}else{
-			EmissionsAndVehicleKm eavk = currentInterval.get(linkId);
+		} else {
 			eavk.add(emissionValue, linkLenghtKm);
-			currentInterval.put(linkId, eavk);
 		}
 	}
 
@@ -81,12 +81,12 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 		Double emissionValue = event.getColdEmissions().get(coldPollutant);
 		int timeInterval = (int) Math.floor(event.getTime() / simulationEndTime * noOfTimeBins);
 		Map<Id<Link>, EmissionsAndVehicleKm> currentInterval = intervals2links2emissions.get(timeInterval);
-		if(!currentInterval.containsKey(linkId)){
+		
+		EmissionsAndVehicleKm eavk = currentInterval.get(linkId);
+		if (eavk == null) {
 			currentInterval.put(linkId, new EmissionsAndVehicleKm(emissionValue, 0.0));
-		}else{
-			EmissionsAndVehicleKm eavk = currentInterval.get(linkId);
+		} else {
 			eavk.add(emissionValue, 0.0);
-			currentInterval.put(linkId, eavk);
 		}
 	}
 

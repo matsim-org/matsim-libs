@@ -134,14 +134,7 @@ public class RouteUtils {
 	 * @param network
 	 * @return
 	 */
-	public static double calcDistance(final NetworkRoute route, final Network network) {
-		/*
-		 * TODO the route-distance does not contain the length of the
-		 * first or last link of the route, because the route doesn't
-		 * know those. Should be fixed somehow, but how? MR, jan07
-		 * yy But doesn't the route have startLinkId and endLinkId??  Presumably a development that happened after
-		 * the above comment was written.  kai, nov'13
-		 */
+	public static double calcDistanceExcludingStartEndLink(final NetworkRoute route, final Network network) {
 		double dist = 0;
 		for (Id<Link> linkId : route.getLinkIds()) {
 			dist += network.getLinks().get(linkId).getLength();
@@ -149,6 +142,31 @@ public class RouteUtils {
 		return dist;
 	}
 	
+
+	/**
+	 * Calculates the distance of the complete route, <b>including</b> the distance traveled
+	 * on the start- and end-link of the route.
+	 * 
+	 * @param networkRoute
+	 * @param relPosOnDepartureLink relative position on the departure link where vehicles start traveling
+	 * @param relPosOnArrivalLink relative position on the arrival link where vehicles stop traveling
+	 * @param network
+	 * @return
+	 */
+	public static double calcDistance(final NetworkRoute networkRoute, final double relPosOnDepartureLink, final double relPosOnArrivalLink, final Network network) {
+		// sum distance of all link besides departure and arrival link
+		double routeDistance = calcDistanceExcludingStartEndLink(networkRoute, network);
+		// add relative distance of departure link
+		routeDistance += network.getLinks().get(networkRoute.getStartLinkId()).getLength() * (1.0 - relPosOnDepartureLink);
+		if (!networkRoute.getStartLinkId().equals(networkRoute.getEndLinkId())){
+			// add relative distance of arrival link
+			routeDistance += network.getLinks().get(networkRoute.getEndLinkId()).getLength() * relPosOnArrivalLink;
+		} else { // i.e. departure = arrival link
+			// subtract relative distance of arrival link that is not traveled
+			routeDistance -= network.getLinks().get(networkRoute.getEndLinkId()).getLength() * (1.0 - relPosOnArrivalLink);
+		}
+		return routeDistance;
+	}
 
 	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds, final Network network) {
 		Id<Link> startLinkId = routeLinkIds.get(0);

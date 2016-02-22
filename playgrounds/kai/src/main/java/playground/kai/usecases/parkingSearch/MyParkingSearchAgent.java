@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -188,6 +189,24 @@ final class MyParkingSearchAgent implements MobsimDriverAgent, MobsimPassengerAg
 		} else {
 			return false ; // true if parking space is available 
 		}
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public PlanElement getPreviousPlanElement() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 	
 }

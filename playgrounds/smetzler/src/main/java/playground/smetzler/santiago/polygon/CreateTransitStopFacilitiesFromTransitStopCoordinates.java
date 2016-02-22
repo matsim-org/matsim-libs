@@ -108,7 +108,7 @@ public class CreateTransitStopFacilitiesFromTransitStopCoordinates {
 			TransitStopFacility bestStop = null;
 			
 			for (TransitStopFacility transitStop : linkId2Stops.get(linkId)) {
-				double distance = CoordUtils.calcDistance(transitStop.getCoord(), link.getToNode().getCoord());
+				double distance = CoordUtils.calcEuclideanDistance(transitStop.getCoord(), link.getToNode().getCoord());
 				if (distance < bestDistance) {
 					bestStop = transitStop;
 				}

@@ -144,7 +144,7 @@ public class CottbusTramLinkCreator {
 					Link ll = network.getFactory().createLink(Id.create("ptb"+i, Link.class), network.getNodes().get(lastId), network.getNodes().get(currentId));
 					
 					
-					Double d = CoordUtils.calcDistance(l.getFromNode().getCoord(), l.getToNode().getCoord());
+					Double d = CoordUtils.calcEuclideanDistance(l.getFromNode().getCoord(), l.getToNode().getCoord());
 					l.setCapacity(30);
 					l.setAllowedModes(modes);
 					l.setFreespeed(14);
@@ -169,7 +169,7 @@ public class CottbusTramLinkCreator {
 			Link l = network.getFactory().createLink(Id.create("ptl999", Link.class), network.getNodes().get(Id.create("26999281", Node.class)), network.getNodes().get(Id.create("243180738", Node.class)));
 			
 			Link ll = network.getFactory().createLink(Id.create("ptb999", Link.class), network.getNodes().get(Id.create("243180738", Node.class)), network.getNodes().get(Id.create("26999281", Node.class)));
-			Double d = CoordUtils.calcDistance(l.getFromNode().getCoord(), l.getToNode().getCoord());
+			Double d = CoordUtils.calcEuclideanDistance(l.getFromNode().getCoord(), l.getToNode().getCoord());
 
 			l.setCapacity(30);
 			l.setAllowedModes(modes);

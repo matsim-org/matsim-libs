@@ -237,7 +237,7 @@ public class MyCarrierSimulation {
 			public ScoringFunction createScoringFunction(Carrier carrier) {
 				SumScoringFunction sum = new SumScoringFunction() ;
 
-				final LegScoring legScoringFunction = new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters( null ), scenario.getConfig().scenario()).create(),
+				final LegScoring legScoringFunction = new CharyparNagelLegScoring(new CharyparNagelScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build(),
 						scenario.getNetwork() );
 				sum.addScoringFunction(legScoringFunction ) ;
 

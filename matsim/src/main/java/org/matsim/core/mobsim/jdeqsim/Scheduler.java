@@ -31,13 +31,18 @@ public class Scheduler {
 	
 	private static final Logger log = Logger.getLogger(Scheduler.class);
 	private double simTime = 0;
-	protected MessageQueue queue = null;
+	protected final MessageQueue queue;
 	private double simulationStartTime = System.currentTimeMillis();
+	private final double simulationEndTime;
 	private double hourlyLogTime = 3600;
 
 	public Scheduler(MessageQueue queue) {
-		super();
-		this.queue = queue;
+		this(queue, Double.MAX_VALUE);
+	}
+
+	public Scheduler(MessageQueue messageQueue, double simulationEndTime) {
+		this.queue = messageQueue;
+		this.simulationEndTime = simulationEndTime;
 	}
 
 	public void schedule(Message m) {
@@ -50,7 +55,7 @@ public class Scheduler {
 
 	public void startSimulation() {
 		Message m;
-		while (!queue.isEmpty() && simTime < SimulationParameters.getSimulationEndTime()) {
+		while (!queue.isEmpty() && simTime < simulationEndTime) {
 			m = queue.getNextMessage();
 			if (m != null) {
 				simTime = m.getMessageArrivalTime();

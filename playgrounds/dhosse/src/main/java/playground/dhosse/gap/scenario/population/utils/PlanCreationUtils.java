@@ -70,7 +70,7 @@ public class PlanCreationUtils {
 //	  	    rpb.setNumPoints(100);
 //	  	    Geometry g = rpb.getGeometry();
 	  	    
-	  	    d = CoordUtils.calcDistance(Global.gk4ToUTM32N.transform(new Coord(x, y)), other);
+	  	    d = CoordUtils.calcEuclideanDistance(Global.gk4ToUTM32N.transform(new Coord(x, y)), other);
 			
 	  	    inside = geometry.contains(point);
 	  	    

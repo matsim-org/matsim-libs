@@ -280,7 +280,7 @@ public class SurveyPlanPicker {
 			/* The closest plan's home coordinate. */
 			Coord closestHome = getQtPlanHomeCoordinate(closestPlan);
 			
-			double radius = CoordUtils.calcDistance(c, closestHome );
+			double radius = CoordUtils.calcEuclideanDistance(c, closestHome );
 			Collection<Plan> plans = qt.getDisk(c.getX(), c.getY(), radius);
 			while(plans.size() < number){
 				/* Double the radius. If the radius happens to be zero (0), 
@@ -299,7 +299,7 @@ public class SurveyPlanPicker {
 			/* Get the plan's home coordinate. */
 			Coord planHome = getQtPlanHomeCoordinate(plan);
 			
-			double d = CoordUtils.calcDistance(c, planHome);
+			double d = CoordUtils.calcEuclideanDistance(c, planHome);
 			Tuple<Plan, Double> thisTuple = new Tuple<Plan, Double>(plan, d);
 			if(tuples.size() == 0){
 				tuples.add(thisTuple);

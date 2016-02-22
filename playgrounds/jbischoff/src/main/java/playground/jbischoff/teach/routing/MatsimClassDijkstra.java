@@ -43,7 +43,7 @@ import org.matsim.vehicles.Vehicle;
 * 	
 //
  */
-public class MatsimClassDijkstra implements LeastCostPathCalculator {
+public final class MatsimClassDijkstra implements LeastCostPathCalculator {
 
 	private final Network network;
 	private Map<Id<Node>,Double> costToNode = new HashMap<Id<Node>, Double>();

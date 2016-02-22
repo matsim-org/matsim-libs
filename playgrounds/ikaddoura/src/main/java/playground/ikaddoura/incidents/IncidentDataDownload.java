@@ -81,19 +81,22 @@ public class IncidentDataDownload extends TimerTask {
 //			outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany-test/";
 //			area = Area.germany;
 			
-			outputDirectory = "../../../shared-svn/studies/ihab/incidents/berlin-test/";
+			outputDirectory = "../../../shared-svn/studies/ihab/incidents/berlinXXX/";
 			area = Area.berlin;
 
-			timeIntervalSec = 60;
+			timeIntervalSec = 0;
 
 		}
 				
-//		run in certain time intervals
-		Timer t = new Timer();
-		t.scheduleAtFixedRate(incidentDownload, 0, timeIntervalSec * 1000);		
-		
-		// run it once
-//		incidentDownload.run();
+		if (timeIntervalSec > 0) {
+			// run in certain time intervals
+			Timer t = new Timer();
+			t.scheduleAtFixedRate(incidentDownload, 0, timeIntervalSec * 1000);	
+			
+		} else {
+			// run it once
+			incidentDownload.run();
+		}
 	}
 
 	@Override

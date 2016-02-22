@@ -686,7 +686,7 @@ public class HITSAnalyserPostgresqlSummary {
 						if (j == 0) {
 							Walk walk = journey.addWalk();
 							Coord boardCoord = path.nodes.get(0).getCoord();
-							double walkDistanceAccessFromRouter = CoordUtils.calcDistance(origCoord, boardCoord);
+							double walkDistanceAccessFromRouter = CoordUtils.calcEuclideanDistance(origCoord, boardCoord);
 
 							double walkTimeAccessFromRouter = walkDistanceAccessFromRouter
 									/ transitRouterConfig.getBeelineWalkSpeed();
@@ -786,7 +786,7 @@ public class HITSAnalyserPostgresqlSummary {
 					Coord alightCoord = path.nodes.get(path.nodes.size() - 1).getCoord();
 					substage_id++;
 
-					double walkDistanceEgressFromRouter = CoordUtils.calcDistance(alightCoord, destCoord);
+					double walkDistanceEgressFromRouter = CoordUtils.calcEuclideanDistance(alightCoord, destCoord);
 					double walkTimeEgressFromRouter = walkDistanceEgressFromRouter
 							/ transitRouterConfig.getBeelineWalkSpeed();
 					Walk walk = journey.addWalk();
@@ -994,7 +994,7 @@ public class HITSAnalyserPostgresqlSummary {
 						if (i == 0) {
 							Walk walk = journey.addWalk();
 							Coord boardCoord = path.nodes.get(0).getCoord();
-							double walkDistanceAccessFromRouter = CoordUtils.calcDistance(origCoord, boardCoord);
+							double walkDistanceAccessFromRouter = CoordUtils.calcEuclideanDistance(origCoord, boardCoord);
 
 							double walkTimeAccessFromRouter = walkDistanceAccessFromRouter
 									/ transitRouterConfig.getBeelineWalkSpeed();
@@ -1008,7 +1008,7 @@ public class HITSAnalyserPostgresqlSummary {
 						}
 						if (i > 0) {// in-between transitStage
 							Coord boardCoord = path.nodes.get(0).getCoord();
-							double interModalTransferDistance = CoordUtils.calcDistance(walkOrigin, boardCoord);
+							double interModalTransferDistance = CoordUtils.calcEuclideanDistance(walkOrigin, boardCoord);
 							double interModalTransferTime = interModalTransferDistance
 									/ transitRouterConfig.getBeelineWalkSpeed();
 							Walk walk = journey.addWalk();
@@ -1110,7 +1110,7 @@ public class HITSAnalyserPostgresqlSummary {
 							Coord alightCoord = path.nodes.get(path.nodes.size() - 1).getCoord();
 							substage_id++;
 
-							double walkDistanceEgressFromRouter = CoordUtils.calcDistance(alightCoord, destCoord);
+							double walkDistanceEgressFromRouter = CoordUtils.calcEuclideanDistance(alightCoord, destCoord);
 							double walkTimeEgressFromRouter = walkDistanceEgressFromRouter
 									/ transitRouterConfig.getBeelineWalkSpeed();
 							Walk walk = journey.addWalk();

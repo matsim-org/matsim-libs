@@ -22,6 +22,8 @@ package org.matsim.core.config.groups;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import java.util.Map;
+
 public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "network";
@@ -32,8 +34,11 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 	private static final String CHANGE_EVENTS_INPUT_FILE = "inputChangeEventsFile";
 
 	private static final String LANEDEFINITIONSINPUTFILE = "laneDefinitionsFile";
+	private static final String INPUT_CRS = "inputCRS";
 
 	private String inputFile = null;
+
+	private String inputCRS = null;
 
 	private String changeEventsInputFile = null;
 
@@ -43,6 +48,17 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 
 	public NetworkConfigGroup() {
 		super(NetworkConfigGroup.GROUP_NAME);
+	}
+
+	@Override
+	public Map<String,String> getComments() {
+		final Map<String,String> comments = super.getComments();
+
+		comments.put( INPUT_CRS , "The Coordinates Reference System in which the coordinates are expressed in the input file." +
+				" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
+				"be converted back at export. If not specified, no conversion happens." );
+
+		return comments;
 	}
 
 	/* direct access */
@@ -85,4 +101,13 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 	}
 
 
+	@StringGetter( INPUT_CRS )
+	public String getInputCRS() {
+		return inputCRS;
+	}
+
+	@StringSetter( INPUT_CRS )
+	public void setInputCRS(String inputCRS) {
+		this.inputCRS = inputCRS;
+	}
 }

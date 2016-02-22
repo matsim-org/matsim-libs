@@ -28,8 +28,10 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 
 import com.google.inject.Inject;
@@ -45,13 +47,18 @@ import com.google.inject.Singleton;
  * @author mrieser, michaz
  */
 @Singleton
-final class PlansScoringImpl implements PlansScoring, ScoringListener, IterationEndsListener {
+final class PlansScoringImpl implements PlansScoring, ScoringListener, IterationStartsListener, IterationEndsListener {
 
 	@Inject private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
 	@Inject private ControlerConfigGroup controlerConfigGroup;
 	@Inject private Population population;
 	@Inject private OutputDirectoryHierarchy controlerIO;
 	@Inject private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		this.scoringFunctionsForPopulation.onIterationStarts();
+	}
 
 	@Override
 	public void notifyScoring(final ScoringEvent event) {

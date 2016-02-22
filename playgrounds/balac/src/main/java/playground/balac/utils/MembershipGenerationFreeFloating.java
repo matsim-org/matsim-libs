@@ -20,7 +20,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 public class MembershipGenerationFreeFloating {
 	
-	final private int numMembers = 5000;
+	final private int numMembers = 25000;
 	
 	private static double[] ageShares = {0.107 , 0.614 , 0.89, 0.987 , 1.0};
 	
@@ -44,7 +44,8 @@ public class MembershipGenerationFreeFloating {
 			}
 			
 		}
-		
+		ObjectAttributesXmlWriter betaWriterAll = new ObjectAttributesXmlWriter(bla);
+	//	betaWriterAll.writeFile("C:/Users/balacm/Desktop/personAttrinutesAllFFMembers.xml.gz");
 		//randomly choose a person and run the simple model
 		
 		Object[] personArray = scenario.getPopulation().getPersons().values().toArray();
@@ -151,7 +152,7 @@ public class MembershipGenerationFreeFloating {
 		}
 		
 		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(bla);
-		betaWriter.writeFile("C:/Users/balacm/Desktop/personAttrinutes10kmZoneFF.xml.gz");
+		betaWriter.writeFile("C:/Users/balacm/Desktop/personAttrinutes10kmZoneFF_5xmem.xml.gz");
 		
 	}
 
@@ -163,7 +164,7 @@ public class MembershipGenerationFreeFloating {
 		boolean insideBorders = false;
 		
 		Activity a = (Activity) p.getSelectedPlan().getPlanElements().get(0);
-		if (CoordUtils.calcDistance(a.getCoord(), coord) < 10000)
+		if (CoordUtils.calcEuclideanDistance(a.getCoord(), coord) < 10000)
 			insideBorders = true;
 		return insideBorders;
 	}

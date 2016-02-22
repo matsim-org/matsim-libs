@@ -2,6 +2,8 @@ package playground.southafrica.population.utilities.activityTypeManipulation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.population.Leg;
@@ -25,34 +27,8 @@ import playground.southafrica.utilities.Header;
  * @author jwjoubert
  */
 public class CapeTownActivityTypeManipulator extends ActivityTypeManipulator {
-	private Config config;
 
 	public CapeTownActivityTypeManipulator() {
-		this.config = ConfigUtils.createConfig();
-
-		/* Add the activities with only a single typical duration. */ 
-		/* Home full day. */
-		ActivityParams h = new ActivityParams("h");
-		h.setTypicalDuration(Time.parseTime("24:00:00"));
-		h.setScoringThisActivityAtAll(false);
-		this.config.planCalcScore().addActivityParams(h);
-		/* School-going kids. */
-		ActivityParams e1 = new ActivityParams("e1");
-		e1.setTypicalDuration(Time.parseTime("07:00:00"));
-		this.config.planCalcScore().addActivityParams(e1);
-		/* Dropping/collecting kids from school. */
-		ActivityParams e3 = new ActivityParams("e3");
-		e3.setTypicalDuration(Time.parseTime("00:05:00"));
-		this.config.planCalcScore().addActivityParams(e3);
-
-		/* Chopped chain starts. */
-		ActivityParams cs = new ActivityParams("chopStart");
-		cs.setTypicalDuration(Time.parseTime("00:00:01"));
-		this.config.planCalcScore().addActivityParams(cs);
-		/* Chopped chain ends. */
-		ActivityParams ce = new ActivityParams("chopEnd");
-		ce.setTypicalDuration(Time.parseTime("00:00:01"));
-		this.config.planCalcScore().addActivityParams(ce);
 	}
 
 	/**
@@ -67,7 +43,7 @@ public class CapeTownActivityTypeManipulator extends ActivityTypeManipulator {
 		String decileFile = args[1];
 		String outputPopulation = args[2];
 		CapeTownActivityTypeManipulator atm = new CapeTownActivityTypeManipulator();
-		atm.parseDecileFile(decileFile);
+		List<ActivityParams> listPersons = atm.parseDecileFile(decileFile);
 		atm.parsePopulation(population);
 		atm.run();
 		/* Write the population to file. */
@@ -78,7 +54,7 @@ public class CapeTownActivityTypeManipulator extends ActivityTypeManipulator {
 		decileFile = args[4];
 		outputPopulation = args[5];
 		atm = new CapeTownActivityTypeManipulator();
-		atm.parseDecileFile(decileFile);
+		List<ActivityParams> listCommercial = atm.parseDecileFile(decileFile);
 		atm.parsePopulation(population);
 		atm.run();
 		/* Write the population to file. */
@@ -86,10 +62,46 @@ public class CapeTownActivityTypeManipulator extends ActivityTypeManipulator {
 		/* ======================================================= */
 
 		/* Write the config to file. */
+		Config config = getBasicConfig();
+		for(ActivityParams ap : listPersons){
+			config.planCalcScore().addActivityParams(ap);
+		}
+		for(ActivityParams ap : listCommercial){
+			config.planCalcScore().addActivityParams(ap);
+		}
 		String outputConfig = args[6];
-		new ConfigWriter(atm.config).write(outputConfig);
+		new ConfigWriter(config).write(outputConfig);
 
 		Header.printFooter();
+	}
+	
+	private static Config getBasicConfig(){
+		Config config = ConfigUtils.createConfig();
+		
+		/* Add the activities with only a single typical duration. */ 
+		/* Home full day. */
+		ActivityParams h = new ActivityParams("h");
+		h.setTypicalDuration(Time.parseTime("24:00:00"));
+		h.setScoringThisActivityAtAll(false);
+		config.planCalcScore().addActivityParams(h);
+		/* School-going kids. */
+		ActivityParams e1 = new ActivityParams("e1");
+		e1.setTypicalDuration(Time.parseTime("07:00:00"));
+		config.planCalcScore().addActivityParams(e1);
+		/* Dropping/collecting kids from school. */
+		ActivityParams e3 = new ActivityParams("e3");
+		e3.setTypicalDuration(Time.parseTime("00:05:00"));
+		config.planCalcScore().addActivityParams(e3);
+		
+		/* Chopped chain starts. */
+		ActivityParams cs = new ActivityParams("chopStart");
+		cs.setTypicalDuration(Time.parseTime("00:01:00"));
+		config.planCalcScore().addActivityParams(cs);
+		/* Chopped chain ends. */
+		ActivityParams ce = new ActivityParams("chopEnd");
+		ce.setTypicalDuration(Time.parseTime("00:01:00"));
+		config.planCalcScore().addActivityParams(ce);
+		return config;
 	}
 
 	@Override
@@ -212,8 +224,9 @@ public class CapeTownActivityTypeManipulator extends ActivityTypeManipulator {
 
 
 	@Override
-	protected void parseDecileFile(String filename) {
+	protected List<ActivityParams> parseDecileFile(String filename) {
 		LOG.info("Parsing deciles from R output...");
+		List<ActivityParams> listOfConfigParameters = new ArrayList<>();
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		try {
 			String s = br.readLine(); /* Header */
@@ -256,11 +269,14 @@ public class CapeTownActivityTypeManipulator extends ActivityTypeManipulator {
 		for(String s : deciles.keySet()){
 			for(String ss : deciles.get(s).keySet()){
 				ActivityParams ap = new ActivityParams(deciles.get(s).get(ss).getFirst());
-				ap.setTypicalDuration(Time.parseTime(deciles.get(s).get(ss).getSecond()));
-				config.planCalcScore().addActivityParams(ap);
+				/* Make the typical duration of each activity at least 00:01:00 
+				 * (one minute). */
+				ap.setTypicalDuration(Math.max(60.0, Time.parseTime(deciles.get(s).get(ss).getSecond())));
+				listOfConfigParameters.add(ap);
 			}
 		}
 		LOG.info("Done.");
+		return listOfConfigParameters;
 	}
 
 }

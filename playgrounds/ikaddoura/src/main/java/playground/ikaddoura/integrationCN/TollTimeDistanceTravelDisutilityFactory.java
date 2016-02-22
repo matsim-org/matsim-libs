@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.ikaddoura.integrationCN;
 
+import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.vsp.congestion.handlers.TollHandler;
 
 

@@ -707,7 +707,7 @@ public class HITSAnalyser {
 										Coord boardCoord = path.nodes.get(0)
 												.getCoord();
 										walkDistanceAccessFromRouter = CoordUtils
-												.calcDistance(origCoord, boardCoord);
+												.calcEuclideanDistance(origCoord, boardCoord);
 										walkTimeAccessFromRouter = walkDistanceAccessFromRouter
 												/ transitRouterConfig
 														.getBeelineWalkSpeed();
@@ -742,7 +742,7 @@ public class HITSAnalyser {
 										Coord boardCoord = path.nodes.get(0)
 												.getCoord();
 										double interModalTransferDistance = CoordUtils
-												.calcDistance(walkOrigin,
+												.calcEuclideanDistance(walkOrigin,
 														boardCoord);
 										double interModalTransferTime = interModalTransferDistance
 												/ transitRouterConfig
@@ -941,7 +941,7 @@ public class HITSAnalyser {
 										substage_id++;
 
 										walkDistanceEgressFromRouter = CoordUtils
-												.calcDistance(alightCoord, destCoord);
+												.calcEuclideanDistance(alightCoord, destCoord);
 										walkTimeEgressFromRouter = walkDistanceEgressFromRouter
 												/ transitRouterConfig
 														.getBeelineWalkSpeed();

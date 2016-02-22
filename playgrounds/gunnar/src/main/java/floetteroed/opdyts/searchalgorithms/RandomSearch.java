@@ -45,10 +45,11 @@ import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
 import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.SamplingStage;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
+import floetteroed.opdyts.trajectorysampling.Transition;
+import floetteroed.opdyts.trajectorysampling.WeightOptimizer5;
 import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
@@ -155,9 +156,10 @@ public class RandomSearch<U extends DecisionVariable> {
 			}
 		}
 
-		final WeightOptimizer weightOptimizer;
+		final WeightOptimizer5 weightOptimizer;
 		if (adjustWeights) {
-			weightOptimizer = new WeightOptimizer(1.0);
+			weightOptimizer = new WeightOptimizer5(equilibriumGapWeight,
+					uniformityGapWeight);
 		} else {
 			weightOptimizer = null;
 		}
@@ -260,19 +262,21 @@ public class RandomSearch<U extends DecisionVariable> {
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
 				if (weightOptimizer != null) {
-					if ((bestObjectiveFunctionValue == null)
-							|| (newBestObjectiveFunctionValue < bestObjectiveFunctionValue)) {
-						final ConvergenceCriterionResult convergenceResult = sampler
-								.getDecisionVariable2convergenceResultView()
-								.get(newBestDecisionVariable);
-						final double[] newWeights = weightOptimizer
-								.updateWeights(
-										convergenceResult.finalEquilibiriumGap,
-										convergenceResult.finalUniformityGap,
-										convergenceResult.finalObjectiveFunctionValueStddev);
-						equilibriumGapWeight = newWeights[0];
-						uniformityGapWeight = newWeights[1];
-					}
+
+					final List<Transition<U>> allTransitions = sampler
+							.getTransitions(newBestDecisionVariable);
+					final double[] weights = weightOptimizer
+							.updateWeights(allTransitions);
+					equilibriumGapWeight = weights[0];
+					uniformityGapWeight = weights[1];
+					
+//					System.out.println(equilibriumGapWeight + "\t"
+//							+ uniformityGapWeight);
+//					try {
+//						System.in.read();
+//					} catch (IOException e) {
+//						e.printStackTrace();
+//					}
 				}
 
 			} else {

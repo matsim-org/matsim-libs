@@ -261,7 +261,7 @@ public class WalkDistanceEstimator {
 		for(MyZone sp : spList){
 			Coord centroid = new Coord(sp.getCentroid().getX(), sp.getCentroid().getY());
 			Node closest = ni.getNearestNode(centroid);
-			Double d = CoordUtils.calcDistance(centroid, closest.getCoord());
+			Double d = CoordUtils.calcEuclideanDistance(centroid, closest.getCoord());
 			distanceMap.put(sp.getId(), d);			
 			
 			// Report progress.

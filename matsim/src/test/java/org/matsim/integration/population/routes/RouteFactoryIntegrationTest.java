@@ -34,6 +34,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
@@ -75,7 +76,9 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 					if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
 						Route route = leg.getRoute();
-						assertTrue(route instanceof LinkNetworkRouteImpl); // that must be different from the class used below
+						assertTrue(route instanceof LinkNetworkRouteImpl  || route instanceof GenericRouteImpl ); // that must be different from the class used below
+						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise 
+						// test would be better. kai, feb'16
 					}
 				}
 			}
@@ -101,7 +104,10 @@ public class RouteFactoryIntegrationTest extends MatsimTestCase {
 					if (pe instanceof Leg) {
 						Leg leg = (Leg) pe;
 						Route route = leg.getRoute();
-						assertTrue("person: " + person.getId() + "; plan: " + planCounter, route instanceof CompressedNetworkRouteImpl);
+						assertTrue("person: " + person.getId() + "; plan: " + planCounter, 
+								route instanceof CompressedNetworkRouteImpl || route instanceof GenericRouteImpl );
+						// yy I added the "|| route instanceof GenericRouteImpl" to compensate for the added walk legs; a more precise 
+						// test would be better. kai, feb'16
 					}
 				}
 			}

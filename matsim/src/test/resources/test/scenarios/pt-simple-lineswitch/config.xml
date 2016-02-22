@@ -33,10 +33,6 @@
 		<param name="writeEventsInterval" value="1" />
 		<param name="writePlansInterval" value="50" />
 	</module>
-	
-	<module name="otfvis">
-		<param name="showTeleportation" value="true" />
-	</module>
 
 	<module name="qsim">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->

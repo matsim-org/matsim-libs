@@ -24,11 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -91,7 +87,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		// access
 		// ---------------------------------------------------------------------
 		final double distanceLeg1 =
-			CoordUtils.calcDistance( 
+			CoordUtils.calcEuclideanDistance( 
 					fromFacility.getCoord(),
 					stop1.getCoord() ) * KTI_CROWFLY_FACTOR;
 		final double travelTimeLeg1 = distanceLeg1 * config.getTeleportedModeSpeeds().get(TransportMode.walk);
@@ -127,7 +123,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		final double ptDistance =
 			// factor hard-coded KTI-like
-			KTI_CROWFLY_FACTOR * CoordUtils.calcDistance(
+			KTI_CROWFLY_FACTOR * CoordUtils.calcEuclideanDistance(
 				stop1.getCoord(),
 				stop2.getCoord() );
 		final double ptTravelTime =
@@ -153,7 +149,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		// egress
 		// ---------------------------------------------------------------------
 		final double distanceLeg2 =
-			CoordUtils.calcDistance( 
+			CoordUtils.calcEuclideanDistance( 
 					stop2.getCoord(),
 					toFacility.getCoord() ) * KTI_CROWFLY_FACTOR;
 		final double travelTimeLeg2 = distanceLeg2 * config.getTeleportedModeSpeeds().get(TransportMode.walk);

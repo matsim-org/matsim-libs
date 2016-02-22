@@ -74,7 +74,7 @@ public class MinTravelCostRoadPriceModel extends RetailerModelImpl
       double centerY = 247300.0;
 		Coord coord = new Coord(centerX, centerY);
       Collection<PersonPrimaryActivity> primaryActivities;
-      if (CoordUtils.calcDistance(link.getCoord(), coord) < 5000) {
+      if (CoordUtils.calcEuclideanDistance(link.getCoord(), coord) < 5000) {
     	  
 	      primaryActivities = Utils.getPersonPrimaryActivityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 2700.0D);
 
@@ -103,7 +103,7 @@ public class MinTravelCostRoadPriceModel extends RetailerModelImpl
 	      Collection<ActivityFacility> facilities1;
 	      Collection<ActivityFacility> facilities2;
 
-	      if (CoordUtils.calcDistance(link.getCoord(), coord) < 5000) {
+	      if (CoordUtils.calcEuclideanDistance(link.getCoord(), coord) < 5000) {
 		      facilities1 = Utils.getInsideShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 2700.0D);
 		      facilities2 = Utils.getOutsideShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 2700.0D);
 		      if (facilities1.size() ==0)
@@ -143,7 +143,7 @@ public class MinTravelCostRoadPriceModel extends RetailerModelImpl
 	  for (int s = 0; s < this.retailerFacilities.size(); ++s) {
 		  String linkId = this.first.get(solution.get(s));
 		 // Coord coord = new CoordImpl(1,1);
-		  if (CoordUtils.calcDistance(coord, this.availableLinks.get(Id.create(linkId, Link.class)).getCoord()) < 5000) {
+		  if (CoordUtils.calcEuclideanDistance(coord, this.availableLinks.get(Id.create(linkId, Link.class)).getCoord()) < 5000) {
 			  Utils.addInsideShopToShopsQuadTree(this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getX(), this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getY(), af);
 		  }
 		  else
@@ -160,7 +160,7 @@ public class MinTravelCostRoadPriceModel extends RetailerModelImpl
 
 	  for (int s = 0; s < this.retailerFacilities.size(); ++s) {
 		  String linkId = this.first.get(solution.get(s));		
-		  if (CoordUtils.calcDistance(coord, this.availableLinks.get(Id.create(linkId, Link.class)).getCoord()) < 5000) {
+		  if (CoordUtils.calcEuclideanDistance(coord, this.availableLinks.get(Id.create(linkId, Link.class)).getCoord()) < 5000) {
 			  Utils.removeInsideShopFromShopsQuadTree(this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getX(), this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getY(), af);
 		  }
 		  else

@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
@@ -49,11 +51,20 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 
 	private final Network network;
 
+	// final or settable?
+	private final CoordinateTransformation transformation;
+
     private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
 
 	public NetworkReaderMatsimV1(Network network) {
-		super();
-        this.network = network;
+		this( new IdentityTransformation() , network );
+	}
+
+	public NetworkReaderMatsimV1(
+			final CoordinateTransformation transformation,
+			final Network network) {
+		this.transformation = transformation;
+		this.network = network;
 	}
 
 	@Override
@@ -128,7 +139,13 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startNode(final Attributes atts) {
-		Node node = this.network.getFactory().createNode(Id.create(atts.getValue("id"), Node.class), new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))));
+		final Node node =
+				this.network.getFactory().createNode(
+						Id.create(atts.getValue("id"), Node.class),
+						transformation.transform(
+							new Coord(
+									Double.parseDouble(atts.getValue("x")),
+									Double.parseDouble(atts.getValue("y")))) );
 		this.network.addNode(node);
 		if (node instanceof NodeImpl) {
 			((NodeImpl) node).setType(atts.getValue("type"));

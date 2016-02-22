@@ -50,7 +50,7 @@ public class NetworkLinkDistanceFilter implements NetworkLinkFilter {
 	 */	
 	@Override
 	public boolean judgeLink(Link l) {
-		double dist = CoordUtils.calcDistance(l.getCoord(), this.distanceFilterNode.getCoord());
+		double dist = CoordUtils.calcEuclideanDistance(l.getCoord(), this.distanceFilterNode.getCoord());
 		return dist < this.distanceFilter;
 	}
 		

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.*;
 
@@ -182,6 +183,10 @@ public class NetworkUtils {
 		return links;
 	}
 
+	/**
+	 * @param list of links
+	 * @return list of link IDs
+	 */
 	public static List<Id<Link>> getLinkIds(final List<Link> links) {
 		List<Id<Link>> linkIds = new ArrayList<>();
 		if (links != null) {
@@ -262,7 +267,7 @@ public class NetworkUtils {
 
     /**
 	 * This method expects the nearest link to a given measure point. 
-	 * It calculates the euclidian distance for both nodes of the link, 
+	 * It calculates the euclidean distance for both nodes of the link, 
 	 * "fromNode" and "toNode" and returns the node with shorter distance
 	 */
 	public static Node getCloserNodeOnLink(Coord coord, Link link) {
@@ -271,8 +276,8 @@ public class NetworkUtils {
 		Node toNode = link.getToNode();
 		Node fromNode= link.getFromNode();
 		
-		double distanceToNode = getEuclidianDistance(coord, toNode.getCoord());
-		double distanceFromNode= getEuclidianDistance(coord, fromNode.getCoord());
+		double distanceToNode = getEuclideanDistance(coord, toNode.getCoord());
+		double distanceFromNode= getEuclideanDistance(coord, fromNode.getCoord());
 		
 		if(distanceToNode < distanceFromNode)
 			return toNode;
@@ -283,23 +288,15 @@ public class NetworkUtils {
 	 * returns the euclidean distance between two coordinates
 	 *
 	 */
-	public static double getEuclidianDistance(Coord origin, Coord destination){
-		double xDiff = origin.getX() - destination.getX();
-		double yDiff = origin.getY() - destination.getY();
-		double distance = Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
-
-		return distance;
+	public static double getEuclideanDistance(Coord origin, Coord destination){
+		return CoordUtils.calcEuclideanDistance(origin, destination);
 	}
 
 	/** 
 	 * returns the euclidean distance between two points (x1,y1) and (x2,y2)
 	 */
-	public static double getEuclidianDistance(double x1, double y1, double x2, double y2){
-		
-		double xDiff = x1 - x2;
-		double yDiff = y1 - y2;
-		double distance =  Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
-		return distance ;
+	public static double getEuclideanDistance(double x1, double y1, double x2, double y2){
+		return getEuclideanDistance(new Coord(x1,y1), new Coord(x2, y2));
 	}
 
     /**

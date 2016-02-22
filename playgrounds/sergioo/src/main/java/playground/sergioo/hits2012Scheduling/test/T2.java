@@ -108,7 +108,7 @@ public class T2 {
 			super();
 			this.home = home;
 			this.location = location;
-			this.euclideanDistance = CoordUtils.calcDistance(home.coord, location.coord);
+			this.euclideanDistance = CoordUtils.calcEuclideanDistance(home.coord, location.coord);
 		}
 	}
 	private static class LocationScore {

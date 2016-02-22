@@ -3,6 +3,7 @@ package playground.wrashid.PSF.PSS;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.MatsimEventsReader;
@@ -15,7 +16,7 @@ public class EventReadControler {
 	private String pathToEventsFile;
 	private static ArrayList<Event> buffer;
 
-	public EventReadControler(String configFilename, String pathToEventsFile) {
+	public EventReadControler(Config configFilename, String pathToEventsFile) {
 		
 		controler = new Controler(configFilename);
 		this.pathToEventsFile=pathToEventsFile;

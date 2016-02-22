@@ -197,7 +197,7 @@ public class Fcd {
 			}
 			
 			if(lastLink != null){
-				if(CoordUtils.calcDistance(link.getCoord(), lastLink.getCoord()) < this.minDistanceBetweenTwoActs){
+				if(CoordUtils.calcEuclideanDistance(link.getCoord(), lastLink.getCoord()) < this.minDistanceBetweenTwoActs){
 					lastEvent = currentEvent;
 					continue;
 				}

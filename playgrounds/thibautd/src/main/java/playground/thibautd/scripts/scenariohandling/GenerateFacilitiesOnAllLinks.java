@@ -27,7 +27,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesWriter;
 
@@ -54,8 +53,7 @@ public class GenerateFacilitiesOnAllLinks {
 			final ActivityFacility fac =
 				scenario.getActivityFacilities().getFactory().createActivityFacility(
 						Id.create(l.getId().toString(), ActivityFacility.class),
-						l.getCoord() );
-			((ActivityFacilityImpl) fac).setLinkId( l.getId() );
+						l.getCoord(), l.getId() );
 			f2l.newLine();
 			f2l.write( l.getId()+"\t"+l.getId() );
 

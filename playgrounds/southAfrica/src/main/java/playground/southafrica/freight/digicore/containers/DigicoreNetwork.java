@@ -22,6 +22,7 @@ package playground.southafrica.freight.digicore.containers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -49,15 +50,15 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id<ActivityFacility>, P
 	private List<String> activityTypes;
 	
 	private Map< Tuple<Pair<Id<ActivityFacility>>, Pair<String>>, Integer> weights 
-		= new HashMap<Tuple<Pair<Id<ActivityFacility>>,Pair<String>>, Integer>();
+		= new LinkedHashMap<Tuple<Pair<Id<ActivityFacility>>,Pair<String>>, Integer>();
 	
 	/* Different weight maps. */
 	private Map<Tuple<Id<ActivityFacility>, String>, Map<Id<ActivityFacility>, Integer>> nodeWeightMap = 
-			new HashMap<Tuple<Id<ActivityFacility>,String>, Map<Id<ActivityFacility>,Integer>>();
+			new LinkedHashMap<Tuple<Id<ActivityFacility>,String>, Map<Id<ActivityFacility>,Integer>>();
 	private Map<String, Map<Id<ActivityFacility>, Integer>> originWeightMaps = 
-			new HashMap<String, Map<Id<ActivityFacility>,Integer>>();
+			new LinkedHashMap<String, Map<Id<ActivityFacility>,Integer>>();
 	private Map<String, Map<Id<ActivityFacility>, Integer>> destinationWeightMaps = 
-			new HashMap<String, Map<Id<ActivityFacility>,Integer>>();
+			new LinkedHashMap<String, Map<Id<ActivityFacility>,Integer>>();
 	
 	private Map<Id<ActivityFacility>,Coord> coord = new HashMap<Id<ActivityFacility>, Coord>();
 	public int nodeCounter = 0;

@@ -26,6 +26,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 
@@ -147,6 +148,14 @@ public class GuidanceWithindayAgent implements MobsimDriverAgent {
 
 	public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 		delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
+	}
+
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		return this.delegate.getCurrentFacility();
+	}
+
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		return this.delegate.getDestinationFacility();
 	}
 	
 }

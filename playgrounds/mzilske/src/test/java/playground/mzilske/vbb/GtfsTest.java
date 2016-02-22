@@ -87,7 +87,7 @@ public class GtfsTest extends MatsimTestCase {
 				}
 				assertEquals(tr1.getDepartures().size(),tr2.getDepartures().size());
 				assertEquals(tr1.getRoute().getLinkIds().size(),tr2.getRoute().getLinkIds().size());
-				assertEquals(RouteUtils.calcDistance(tr1.getRoute(), sc1.getNetwork()),RouteUtils.calcDistance(tr2.getRoute(), sc2.getNetwork()));
+				assertEquals(RouteUtils.calcDistanceExcludingStartEndLink(tr1.getRoute(), sc1.getNetwork()),RouteUtils.calcDistanceExcludingStartEndLink(tr2.getRoute(), sc2.getNetwork()));
 			}
 		}
 	}

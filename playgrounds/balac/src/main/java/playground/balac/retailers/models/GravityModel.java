@@ -112,12 +112,12 @@ public class GravityModel extends RetailerModelImpl
                   dist = 10.0D;
                 }
               }
-              else if (CoordUtils.calcDistance(s.getCoord(), ((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getCoord()) == 0.0D) {
+              else if (CoordUtils.calcEuclideanDistance(s.getCoord(), ((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getCoord()) == 0.0D) {
                 dist = 10.0D;
               }
               else
               {
-                dist = CoordUtils.calcDistance(s.getCoord(), ((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getCoord());
+                dist = CoordUtils.calcEuclideanDistance(s.getCoord(), ((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getCoord());
               }
               ++count;
             }
@@ -210,12 +210,12 @@ public class GravityModel extends RetailerModelImpl
                     dist = 10.0D;
                   }
                 }
-                else if (CoordUtils.calcDistance(s.getCoord(), ((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getCoord()) == 0.0D) {
+                else if (CoordUtils.calcEuclideanDistance(s.getCoord(), ((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getCoord()) == 0.0D) {
                   dist = 10.0D;
                 }
                 else
                 {
-                  dist = CoordUtils.calcDistance(s.getCoord(), ((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getCoord());
+                  dist = CoordUtils.calcEuclideanDistance(s.getCoord(), ((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getCoord());
                 }
                 ++count;
               }

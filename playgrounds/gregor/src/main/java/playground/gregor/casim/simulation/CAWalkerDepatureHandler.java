@@ -26,14 +26,12 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.vehicles.Vehicle;
-
 import playground.gregor.casim.simulation.physics.CALink;
 import playground.gregor.casim.simulation.physics.CAVehicle;
-import playground.gregor.sim2d_v4.scenario.TransportMode;
 
 public class CAWalkerDepatureHandler implements DepartureHandler {
 
-	private static final String transportMode = TransportMode.walkca;
+	private static final String transportMode = "car";
 	private final CANetsimEngine engine;
 
 	public CAWalkerDepatureHandler(CANetsimEngine caEngine, Scenario sc) {

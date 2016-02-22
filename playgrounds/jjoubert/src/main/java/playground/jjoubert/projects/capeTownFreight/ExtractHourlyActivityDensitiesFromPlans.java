@@ -166,8 +166,8 @@ public class ExtractHourlyActivityDensitiesFromPlans {
 						Coord c2c = ct.transform(c2);
 						Coord c3c = ct.transform(c3);
 						Coord c4c = ct.transform(c4);
-						double d1 = CoordUtils.calcDistance(c1c, c2c);
-						double d2 = CoordUtils.calcDistance(c3c, c4c);
+						double d1 = CoordUtils.calcEuclideanDistance(c1c, c2c);
+						double d2 = CoordUtils.calcEuclideanDistance(c3c, c4c);
 						listWidths.add(d1);
 						listHeights.add(d2);
 					}

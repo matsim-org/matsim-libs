@@ -81,7 +81,7 @@ public class MinTravelCostRoadPriceModelV3 extends RetailerModelImpl
       
         boolean shopgroceryInside = false;     
         
-        if (CoordUtils.calcDistance(link.getCoord(), coord) < 4000) {
+        if (CoordUtils.calcEuclideanDistance(link.getCoord(), coord) < 4000) {
 			shopgroceryInside = true;
 			
 		}
@@ -103,12 +103,12 @@ public class MinTravelCostRoadPriceModelV3 extends RetailerModelImpl
         		if (pe instanceof Activity) {
     			
         			 if (!((Activity) pe).getType().equals("shopgrocery")) {
-                         if (CoordUtils.calcDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe).getLinkId()).getCoord(), coord) < 4000)
+                         if (CoordUtils.calcEuclideanDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe).getLinkId()).getCoord(), coord) < 4000)
         					lastPrimaryActivityInside = true;
         				else
             				lastPrimaryActivityInside = false;
 
-                         if(CoordUtils.calcDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe).getLinkId()).getCoord(), link.getCoord()) < 3000) {
+                         if(CoordUtils.calcEuclideanDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe).getLinkId()).getCoord(), link.getCoord()) < 3000) {
     						
         						lastPrimaryActivityInsideCatchmentArea = true;
 
@@ -129,13 +129,13 @@ public class MinTravelCostRoadPriceModelV3 extends RetailerModelImpl
         					if (pe1 instanceof Activity) {
         						if (((Activity) pe1).getType().equals("home") || ((Activity) pe1).getType().startsWith("work") || ((Activity) pe1).getType().startsWith("education") ||((Activity) pe1).getType().startsWith("leisure") ) {
 
-                                    if (CoordUtils.calcDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe1).getLinkId()).getCoord(), coord) < 4000) {
+                                    if (CoordUtils.calcEuclideanDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe1).getLinkId()).getCoord(), coord) < 4000) {
         								nextPrimaryActivityInside = true;
     		    					
         							}
         							else
         								nextPrimaryActivityInside = false;
-                                    if(CoordUtils.calcDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe1).getLinkId()).getCoord(), link.getCoord()) < 3000) {
+                                    if(CoordUtils.calcEuclideanDistance(controler.getScenario().getNetwork().getLinks().get(((Activity)pe1).getLinkId()).getCoord(), link.getCoord()) < 3000) {
     	    						
         								nextPrimaryActivityInsideCatchmentArea = true;
                                         linknpa = controler.getScenario().getNetwork().getLinks().get(((Activity)pe1).getLinkId());
@@ -288,7 +288,7 @@ public class MinTravelCostRoadPriceModelV3 extends RetailerModelImpl
       route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
       route.setTravelTime((int)path.travelTime);
       route.setTravelCost(path.travelCost);
-      route.setDistance(RouteUtils.calcDistance(route, network));
+      route.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route, network));
       leg.setRoute(route);
       travTime = (int)path.travelTime;
     }

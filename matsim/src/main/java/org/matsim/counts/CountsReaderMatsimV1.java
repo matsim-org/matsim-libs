@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -40,12 +42,21 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 	private final static String COUNT = "count";
 	private final static String VOLUME = "volume";
 
+	private final CoordinateTransformation coordinateTransformation;
+
 	private final Counts counts;
 	private Count currcount = null;
 
 	private static final Logger log = Logger.getLogger(CountsReaderMatsimV1.class);
 
 	public CountsReaderMatsimV1(final Counts counts) {
+		this( new IdentityTransformation(), counts );
+	}
+
+	public CountsReaderMatsimV1(
+			final CoordinateTransformation coordinateTransformation,
+			final Counts counts) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.counts = counts;
 	}
 
@@ -82,7 +93,11 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 		String x = meta.getValue("x");
 		String y = meta.getValue("y");
 		if (x != null && y != null) {
-			this.currcount.setCoord(new Coord(Double.parseDouble(x), Double.parseDouble(y)));
+			this.currcount.setCoord(
+					coordinateTransformation.transform(
+							new Coord(
+									Double.parseDouble(x),
+									Double.parseDouble(y))));
 		}
 	}
 

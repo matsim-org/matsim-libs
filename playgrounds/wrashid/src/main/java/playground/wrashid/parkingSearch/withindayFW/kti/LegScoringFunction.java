@@ -107,7 +107,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 			if (this.params.modeParams.get(TransportMode.car).marginalUtilityOfDistance_m != 0.0) {
 				Route route = leg.getRoute();
 				if (route instanceof NetworkRoute) {
-					dist = RouteUtils.calcDistance((NetworkRoute) route, network);
+					dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, network);
 				} else {
 					dist = route.getDistance();
 				}
@@ -119,7 +119,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 			if (this.params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m != 0.0) {
 				Route route = leg.getRoute();
 				if (route instanceof NetworkRoute) {
-					dist = RouteUtils.calcDistance((NetworkRoute) route, network);
+					dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, network);
 				} else {
 					dist = route.getDistance();
 				}

@@ -22,8 +22,6 @@ package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.misc.Time;
-
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import processing.core.PConstants;
 
 public class InfoBox implements ClockedVisDebuggerAdditionalDrawer, VisDebuggerOverlay {
@@ -37,7 +35,7 @@ public class InfoBox implements ClockedVisDebuggerAdditionalDrawer, VisDebuggerO
 	
 	public InfoBox(EventBasedVisDebuggerEngine dbg, Scenario sc) {
 		this.dbg = dbg;
-		this.dT = ((Sim2DScenario) sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME)).getSim2DConfig().getTimeStepSize();
+		this.dT = 0.1;//((Sim2DScenario) sc.getScenarioElement(Sim2DScenario.ELEMENT_NAME)).getSim2DConfig().getTimeStepSize();
 	}
 
 	@Override

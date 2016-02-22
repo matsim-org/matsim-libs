@@ -40,7 +40,7 @@ public class EnterRoadMessage extends EventMessage {
 
 	public EnterRoadMessage(Scheduler scheduler, Vehicle vehicle) {
 		super(scheduler, vehicle);
-		priority = SimulationParameters.PRIORITY_ENTER_ROAD_MESSAGE;
+		priority = JDEQSimConfigGroup.PRIORITY_ENTER_ROAD_MESSAGE;
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class EnterRoadMessage extends EventMessage {
 		} else {
 			event = new LinkEnterEvent(this.getMessageArrivalTime(), Id.create(vehicle.getOwnerPerson().getId(), org.matsim.vehicles.Vehicle.class), vehicle.getCurrentLinkId());
 		}
-		SimulationParameters.getProcessEventThread().processEvent(event);
+		eventsManager.processEvent(event);
 	}
 
 }

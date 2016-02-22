@@ -3,10 +3,10 @@ package playground.michalm.poznan.zone;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.zone.Zone;
+import org.matsim.contrib.zone.io.ZoneXmlWriter;
 
 import playground.michalm.util.visum.VisumMatrixReader;
-import playground.michalm.zone.*;
-import playground.michalm.zone.io.ZoneXmlWriter;
 
 
 public class PoznanPtapZoneCreator

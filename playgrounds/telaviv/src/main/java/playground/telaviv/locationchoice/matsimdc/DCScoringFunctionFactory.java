@@ -87,7 +87,7 @@ public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 			this.dcCalculator = new CalculateDestinationChoice(this.dcContext.getScenario());
 			this.dcCalculator.calculateVTODForDCModule();
 
-		this.params = CharyparNagelScoringParameters.getBuilder(this.config.planCalcScore(), this.config.planCalcScore().getScoringParameters( null ), this.controler.getConfig().scenario()).create();
+		this.params = new CharyparNagelScoringParameters.Builder(this.config.planCalcScore(), this.config.planCalcScore().getScoringParameters(null), this.controler.getConfig().scenario()).build();
 			
 			// actually not necessary here:
 //			this.dcCalculator.calculateDynamicFactors(

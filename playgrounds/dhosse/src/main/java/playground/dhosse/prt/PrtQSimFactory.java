@@ -6,6 +6,9 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
+import org.matsim.contrib.taxi.TaxiActionCreator;
+import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.*;
@@ -20,10 +23,6 @@ import playground.dhosse.prt.launch.PrtParameters.AlgorithmConfig;
 import playground.dhosse.prt.optimizer.PrtOptimizerConfiguration;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
 import playground.dhosse.prt.scheduler.PrtScheduler;
-import playground.michalm.taxi.TaxiActionCreator;
-import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.filter.*;
-import playground.michalm.taxi.scheduler.*;
 
 public class PrtQSimFactory implements MobsimFactory{
 	

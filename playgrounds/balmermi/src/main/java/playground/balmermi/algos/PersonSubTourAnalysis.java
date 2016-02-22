@@ -95,13 +95,13 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 		Coord prev = ((ActivityImpl)plan.getPlanElements().get(start)).getCoord();
 		for (int k=start+2; k<=i; k=k+2) {
 			Coord curr = ((ActivityImpl)plan.getPlanElements().get(k)).getCoord();
-			d = d + CoordUtils.calcDistance(curr, prev);
+			d = d + CoordUtils.calcEuclideanDistance(curr, prev);
 			prev = curr;
 		}
 		prev = ((ActivityImpl)plan.getPlanElements().get(j)).getCoord();
 		for (int k=j+2; k<=end; k=k+2) {
 			Coord curr = ((ActivityImpl)plan.getPlanElements().get(k)).getCoord();
-			d = d + CoordUtils.calcDistance(curr, prev);
+			d = d + CoordUtils.calcEuclideanDistance(curr, prev);
 			prev = curr;
 		}
 		d = d/1000.0;

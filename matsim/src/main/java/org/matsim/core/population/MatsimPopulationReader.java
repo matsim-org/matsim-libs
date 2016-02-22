@@ -24,6 +24,8 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
@@ -42,12 +44,21 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 	private final static String PLANS_V4 = "plans_v4.dtd";
 	private final static String POPULATION_V5 = "population_v5.dtd";
 
+	private final CoordinateTransformation coordinateTransformation;
+
 	private MatsimXmlParser delegate = null;
 	private final Scenario scenario;
 
 	private static final Logger log = Logger.getLogger(MatsimPopulationReader.class);
 
 	public MatsimPopulationReader(final Scenario scenario) {
+		this( new IdentityTransformation() , scenario );
+	}
+
+	public MatsimPopulationReader(
+			final CoordinateTransformation coordinateTransformation,
+			final Scenario scenario) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.scenario = scenario;
 	}
 
@@ -79,16 +90,28 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 		if (PLANS_V4.equals(doctype)) {
 			// Replaced non-parallel reader with parallel implementation. cdobler, mar'12.
 //			this.delegate = new PopulationReaderMatsimV4(this.scenario);
-			this.delegate = new ParallelPopulationReaderMatsimV4(this.scenario);
+			this.delegate =
+					new ParallelPopulationReaderMatsimV4(
+							coordinateTransformation,
+							this.scenario);
 			log.info("using plans_v4-reader.");
 		} else if (POPULATION_V5.equals(doctype)) {
-			this.delegate = new PopulationReaderMatsimV5(this.scenario);
+			this.delegate =
+					new PopulationReaderMatsimV5(
+							coordinateTransformation,
+							this.scenario);
 			log.info("using population_v5-reader.");
 		} else if (PLANS_V1.equals(doctype)) {
-			this.delegate = new PopulationReaderMatsimV1(this.scenario);
+			this.delegate =
+					new PopulationReaderMatsimV1(
+							coordinateTransformation,
+							this.scenario);
 			log.info("using plans_v1-reader.");
 		} else if (PLANS_V0.equals(doctype) || PLANS.equals(doctype)) {
-			this.delegate = new PopulationReaderMatsimV0(this.scenario);
+			this.delegate =
+					new PopulationReaderMatsimV0(
+							coordinateTransformation,
+							this.scenario);
 			log.info("using plans_v0-reader.");
 		} else {
 			throw new IllegalArgumentException("No population reader available for doctype \"" + doctype + "\".");

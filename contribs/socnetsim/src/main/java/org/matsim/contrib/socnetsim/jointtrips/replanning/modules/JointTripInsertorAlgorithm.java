@@ -248,8 +248,8 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			final Trip passengerTrip) {
 		final double timeDiff = Math.abs( driverTrip.departureTime - passengerTrip.departureTime );
 		final double detourDist = 
-			CoordUtils.calcDistance( driverTrip.departure.getCoord() , passengerTrip.departure.getCoord() ) +
-			CoordUtils.calcDistance( driverTrip.arrival.getCoord() , passengerTrip.arrival.getCoord() ) +
+			CoordUtils.calcEuclideanDistance( driverTrip.departure.getCoord() , passengerTrip.departure.getCoord() ) +
+			CoordUtils.calcEuclideanDistance( driverTrip.arrival.getCoord() , passengerTrip.arrival.getCoord() ) +
 			passengerTrip.length - driverTrip.length;
 			
 		return scale * (timeDiff + betaDetour * detourDist);
@@ -418,7 +418,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			this.departure = departure;
 			this.arrival = arrival;
 			this.departureTime = departureTime;
-			this.length = CoordUtils.calcDistance( departure.getCoord() , arrival.getCoord() );
+			this.length = CoordUtils.calcEuclideanDistance( departure.getCoord() , arrival.getCoord() );
 			this.agentId = agentId;
 		}
 	}

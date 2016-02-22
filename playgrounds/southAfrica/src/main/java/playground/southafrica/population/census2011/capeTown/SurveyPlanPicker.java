@@ -66,7 +66,11 @@ import playground.southafrica.utilities.RandomPermutation;
 /**
  * Class to assign the travel demand, i.e. activity chains, observed in the 
  * Travel Survey of 2013 for City of Cape Town, to a synthetic population of
- * agents for the same area.
+ * agents for the same area. 
+ * 
+ * <h5>Note:</h5> The output coordinate reference system of the population is
+ * changed to that of the travel diary. If that is a problem, you need to 
+ * manually transform the coordinates outside of this class.
  *
  * @author jwjoubert
  */
@@ -110,8 +114,11 @@ public class SurveyPlanPicker {
 	/**
 	 * Class to build a {@link QuadTree} of plans for different population
 	 * profiles.
-	 * @param surveyPopulationFolder containing the four population files (See {@link 
-	 * ComprehensivePopulationReader}).
+	 * 
+	 * @param areaShapefile the path to the shapefile that will be used as 
+	 * extent for the {@link QuadTree}s of different demographic signatures. 
+	 * It is important that this shapefile must be in the same Coordinate 
+	 * Reference System (CRS) as the plans that represent the travel diary.
 	 */
 	public SurveyPlanPicker(String areaShapefile) {
 		/* Get the QuadTree extent. */
@@ -325,7 +332,7 @@ public class SurveyPlanPicker {
 			/* The closest plan's home coordinate. */
 			Coord closestHome = getQtPlanHomeCoordinate(closestPlan);
 			
-			double radius = CoordUtils.calcDistance(c, closestHome );
+			double radius = CoordUtils.calcEuclideanDistance(c, closestHome );
 			Collection<Plan> plans = qt.getDisk(c.getX(), c.getY(), radius);
 			while(plans.size() < number){
 				/* Double the radius. If the radius happens to be zero (0), 
@@ -344,7 +351,7 @@ public class SurveyPlanPicker {
 			/* Get the plan's home coordinate. */
 			Coord planHome = getQtPlanHomeCoordinate(plan);
 			
-			double d = CoordUtils.calcDistance(c, planHome);
+			double d = CoordUtils.calcEuclideanDistance(c, planHome);
 			Tuple<Plan, Double> thisTuple = new Tuple<Plan, Double>(plan, d);
 			if(tuples.size() == 0){
 				tuples.add(thisTuple);

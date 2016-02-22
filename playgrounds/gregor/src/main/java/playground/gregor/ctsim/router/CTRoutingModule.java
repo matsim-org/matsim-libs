@@ -50,7 +50,7 @@ public class CTRoutingModule implements Provider<RoutingModule> {
 
 	@Override
 	public RoutingModule get() {
-		return DefaultRoutingModules.createNetworkRouter("walkct", scenario.getPopulation()
+		return DefaultRoutingModules.createPureNetworkRouter("walkct", scenario.getPopulation()
 				.getFactory(), scenario.getNetwork(), createRoutingAlgo());
 	}
 

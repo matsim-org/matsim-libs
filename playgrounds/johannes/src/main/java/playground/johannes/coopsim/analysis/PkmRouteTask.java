@@ -64,7 +64,7 @@ public class PkmRouteTask extends TrajectoryAnalyzerTask {
 					if (entry.getValue().test(t, leg, i)) {
 						if (leg.getRoute() instanceof NetworkRoute) {
 							NetworkRoute route = (NetworkRoute) leg.getRoute();
-							sum += RouteUtils.calcDistance(route, network);
+							sum += RouteUtils.calcDistanceExcludingStartEndLink(route, network);
 
 							Link startLink = network.getLinks().get(route.getStartLinkId());
 							sum += startLink.getLength() * startEndFactor;

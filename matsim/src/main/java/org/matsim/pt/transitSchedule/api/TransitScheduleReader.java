@@ -22,6 +22,8 @@ package org.matsim.pt.transitSchedule.api;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -35,16 +37,24 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 public class TransitScheduleReader implements MatsimSomeReader {
 
 	private final Scenario scenario;
+	private final CoordinateTransformation transformation;
+
+	public TransitScheduleReader(
+			final CoordinateTransformation transformation,
+			final Scenario scenario) {
+		this.transformation = transformation;
+		this.scenario = scenario;
+	}
 
 	public TransitScheduleReader(final Scenario scenario) {
-		this.scenario = scenario;
+		this( new IdentityTransformation() , scenario );
 	}
 
 	public void readFile(final String filename) throws UncheckedIOException {
 		MatsimFileTypeGuesser guesser = new MatsimFileTypeGuesser(filename);
 		String systemId = guesser.getSystemId();
 		if (systemId.endsWith("transitSchedule_v1.dtd")) {
-			new TransitScheduleReaderV1(this.scenario).readFile(filename);
+			new TransitScheduleReaderV1( transformation , this.scenario).readFile(filename);
 		} else {
 			throw new UncheckedIOException("Unsupported file format: " + systemId);
 		}

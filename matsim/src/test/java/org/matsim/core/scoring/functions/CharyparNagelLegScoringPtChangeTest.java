@@ -122,12 +122,9 @@ public class CharyparNagelLegScoringPtChangeTest {
 		conf.setUtilityOfLineSwitch( random.nextDouble() * 1000 );
 
 		final ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		
+
 		return new CharyparNagelLegScoring(
-				CharyparNagelScoringParameters.getBuilder(
-						conf,
-						conf.getScoringParameters( null ),
-						scenarioConfig).create(),
+				new CharyparNagelScoringParameters.Builder(conf, conf.getScoringParameters(null), scenarioConfig).build(),
 				network);
 	}
 

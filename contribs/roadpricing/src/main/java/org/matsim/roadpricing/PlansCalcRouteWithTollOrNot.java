@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -39,19 +39,14 @@ import java.util.Map;
 
 public class PlansCalcRouteWithTollOrNot implements PlanAlgorithm {
 
-	private Config config;
+	public static final String CAR_WITH_PAYED_AREA_TOLL = "car_with_payed_area_toll";
 	private RoadPricingScheme roadPricingScheme;
 	private Provider<TripRouter> tripRouterFactory;
-	private TravelDisutilityFactory travelDisutilityFactory;
-	private TravelTime travelTime;
 
 	@Inject
-	PlansCalcRouteWithTollOrNot(Config config, RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterFactory, Map<String, TravelDisutilityFactory> travelDisutilityFactory, Map<String, TravelTime> travelTime) {
-		this.config = config;
+	PlansCalcRouteWithTollOrNot(RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterFactory, Map<String, TravelDisutilityFactory> travelDisutilityFactory, Map<String, TravelTime> travelTime) {
 		this.roadPricingScheme = roadPricingScheme;
 		this.tripRouterFactory = tripRouterFactory;
-		this.travelDisutilityFactory = travelDisutilityFactory.get(TransportMode.car);
-		this.travelTime = travelTime.get(TransportMode.car);
 	}
 
 	@Override
@@ -60,24 +55,41 @@ public class PlansCalcRouteWithTollOrNot implements PlanAlgorithm {
 	}
 
 	private void handlePlan(Plan plan) {
-		throw new RuntimeException("Currently unavailable.");
 		// This calculates a best-response plan from the two options, paying area toll or not.
 		// From what I understand, it may be simpler/better to just throw a coin and produce
 		// one of the two options.
-//		TravelDisutility untolledTravelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, config.planCalcScore());
-//		RoutingContextImpl untolledRoutingContext = new RoutingContextImpl(untolledTravelDisutility, travelTime);
-//		PlanRouter untolledPlanRouter = new PlanRouter(tripRouterFactory.get());
-//		untolledPlanRouter.run(plan);
-//		double routeCostWithAreaToll = sumNetworkModeCosts(plan) + roadPricingScheme.getTypicalCosts().iterator().next().amount;
-//		RoutingContextImpl tolledRoutingContext = new RoutingContextImpl(
-//				new TravelDisutilityIncludingToll(untolledTravelDisutility, roadPricingScheme, config),
-//				travelTime);
-//		new PlanRouter(tripRouterFactory.get()).run(plan);
-//		double routeCostWithoutAreaToll = sumNetworkModeCosts(plan);
-//		if (routeCostWithAreaToll < routeCostWithoutAreaToll) {
-//			// Change the plan back to the one without toll
-//			untolledPlanRouter.run(plan);
-//		}
+		replaceCarModeWithTolledCarMode(plan);
+		PlanRouter untolledPlanRouter = new PlanRouter(tripRouterFactory.get());
+		untolledPlanRouter.run(plan);
+		double areaToll = roadPricingScheme.getTypicalCosts().iterator().next().amount;
+		double routeCostWithAreaToll = sumNetworkModeCosts(plan) + areaToll;
+		replaceTolledCarModeWithCarMode(plan);
+		new PlanRouter(tripRouterFactory.get()).run(plan);
+		double routeCostWithoutAreaToll = sumNetworkModeCosts(plan);
+		if (routeCostWithAreaToll < routeCostWithoutAreaToll) {
+			replaceCarModeWithTolledCarMode(plan);
+			untolledPlanRouter.run(plan);
+		}
+	}
+
+	private void replaceCarModeWithTolledCarMode(Plan plan) {
+		for (PlanElement planElement : plan.getPlanElements()) {
+			if (planElement instanceof Leg) {
+				if (((Leg) planElement).getMode().equals(TransportMode.car)) {
+					((Leg) planElement).setMode(CAR_WITH_PAYED_AREA_TOLL);
+				}
+			}
+		}
+	}
+
+	private void replaceTolledCarModeWithCarMode(Plan plan) {
+		for (PlanElement planElement : plan.getPlanElements()) {
+			if (planElement instanceof Leg) {
+				if (((Leg) planElement).getMode().equals(CAR_WITH_PAYED_AREA_TOLL)) {
+					((Leg) planElement).setMode("car");
+				}
+			}
+		}
 	}
 
 	private double sumNetworkModeCosts(Plan plan) {

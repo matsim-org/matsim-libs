@@ -27,7 +27,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
-import playground.gregor.sim2d_v4.scenario.TransportMode;
+import playground.gregor.TransportMode;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -51,7 +51,7 @@ public class CARoutingModule implements Provider<RoutingModule> {
 
 	@Override
 	public RoutingModule get() {
-		return DefaultRoutingModules.createNetworkRouter(TransportMode.walkca, scenario.getPopulation()
+		return DefaultRoutingModules.createPureNetworkRouter(TransportMode.walkca, scenario.getPopulation()
 				.getFactory(), scenario.getNetwork(), createRoutingAlgo());
 	}
 
