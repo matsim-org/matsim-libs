@@ -19,7 +19,6 @@
 
 package playground.andreas.aas.modules.cellBasedAccessibility.gis;
 
-import gnu.trove.TObjectDoubleHashMap;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -27,6 +26,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

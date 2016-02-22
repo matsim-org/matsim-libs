@@ -54,7 +54,7 @@ public class CompareMain {
 		@Override
 		public double groundDist(Feature f) {
 			VolumeOnLinkFeature other = (VolumeOnLinkFeature) f;
-			double spacialDistance = CoordUtils.calcDistance(link.getCoord(), other.link.getCoord());
+			double spacialDistance = CoordUtils.calcEuclideanDistance(link.getCoord(), other.link.getCoord());
 			int temporalDistance = Math.abs(hour - other.hour);
 			return (0.0 * spacialDistance) + (2.0 * temporalDistance);
 		}

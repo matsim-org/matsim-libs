@@ -24,14 +24,14 @@ import java.text.DecimalFormat;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.util.DistanceUtils;
+import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 
 import com.vividsolutions.jts.geom.Point;
 
 import playground.michalm.berlin.BerlinZoneUtils;
-import playground.michalm.zone.Zone;
 
 public class BeelineDistanceExractor
 {

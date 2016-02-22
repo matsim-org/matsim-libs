@@ -29,11 +29,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.util.random.WeightedRandomSelection;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
 import playground.michalm.berlin.BerlinZoneUtils;
-import playground.michalm.zone.Zone;
 
 import com.vividsolutions.jts.geom.Point;
 

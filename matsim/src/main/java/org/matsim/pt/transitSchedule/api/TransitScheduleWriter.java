@@ -21,6 +21,8 @@
 package org.matsim.pt.transitSchedule.api;
 
 import org.matsim.core.api.internal.MatsimSomeWriter;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 
@@ -33,8 +35,16 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 public class TransitScheduleWriter implements MatsimSomeWriter {
 
 	private final TransitSchedule schedule;
+	private final CoordinateTransformation transformation;
 
 	public TransitScheduleWriter(final TransitSchedule schedule) {
+		this( new IdentityTransformation() , schedule );
+	}
+
+	public TransitScheduleWriter(
+			final CoordinateTransformation transformation,
+			final TransitSchedule schedule) {
+		this.transformation = transformation;
 		this.schedule = schedule;
 	}
 
@@ -58,6 +68,6 @@ public class TransitScheduleWriter implements MatsimSomeWriter {
 	 * @throws UncheckedIOException
 	 */
 	public void writeFileV1(final String filename) throws UncheckedIOException {
-		new TransitScheduleWriterV1(this.schedule).write(filename);
+		new TransitScheduleWriterV1( transformation , this.schedule).write(filename);
 	}
 }

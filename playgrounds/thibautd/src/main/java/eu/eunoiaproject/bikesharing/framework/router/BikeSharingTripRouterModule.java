@@ -108,10 +108,7 @@ public class BikeSharingTripRouterModule extends AbstractModule {
 		public RoutingModule get() {
 			// XXX should be person-dependent
 			final CharyparNagelScoringParameters scoringParams =
-					CharyparNagelScoringParameters.getBuilder(
-							scenario.getConfig().planCalcScore(),
-							scenario.getConfig().planCalcScore().getScoringParameters( null ),
-							scenario.getConfig().scenario()).create();
+					new CharyparNagelScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build();
 			final Collection<InitialNodeRouter> initialNodeRouters = new ArrayList<InitialNodeRouter>( 2 );
 			initialNodeRouters.add(
 					new InitialNodeRouter(

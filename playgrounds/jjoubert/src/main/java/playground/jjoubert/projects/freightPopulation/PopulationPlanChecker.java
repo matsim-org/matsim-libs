@@ -317,7 +317,7 @@ public class PopulationPlanChecker {
 			Coord c1 = ((Activity)plan.getPlanElements().get(0)).getCoord();
 			for(int i = 2; i < plan.getPlanElements().size(); i+= 2){
 				Coord c2 = ((Activity)plan.getPlanElements().get(i)).getCoord();
-				distance += CoordUtils.calcDistance(c1, c2)*distanceMultiplier;
+				distance += CoordUtils.calcEuclideanDistance(c1, c2)*distanceMultiplier;
 				c1 = c2;
 			}
 			

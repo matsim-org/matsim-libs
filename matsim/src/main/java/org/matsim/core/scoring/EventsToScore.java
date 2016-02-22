@@ -60,6 +60,7 @@ public class EventsToScore implements BasicEventHandler {
 	@Inject
 	private EventsToScore(EventsManager eventsManager, ScoringFunctionsForPopulation scoringFunctionsForPopulation, EventsToActivities eventsToActivities, final Scenario scenario, NewScoreAssigner newScoreAssigner) {
 		this.scoringFunctionsForPopulation = scoringFunctionsForPopulation;
+		this.scoringFunctionsForPopulation.onIterationStarts();
 		this.eventsToActivities = eventsToActivities;
 		this.population = scenario.getPopulation();
 		this.newScoreAssigner = newScoreAssigner;
@@ -132,12 +133,13 @@ public class EventsToScore implements BasicEventHandler {
 	@Override
 	public void reset(int iteration) {
 		this.iteration = iteration;
+		this.scoringFunctionsForPopulation.onIterationStarts();
 	}
 
 	@Override
 	public void handleEvent(Event event) {
-		// I have to be a BasicEventHandler so that my reset method is
-		// called, EVEN THOUGH reset is actually on EventHandler
+		// I have to be a BasicEventHandler so that my onIterationStarts method is
+		// called, EVEN THOUGH onIterationStarts is actually on EventHandler
 		// and not on BasicEventHandler. :-)
 	}
 

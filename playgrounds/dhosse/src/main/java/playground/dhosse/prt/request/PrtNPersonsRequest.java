@@ -7,9 +7,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.RequestImpl;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-
-import playground.michalm.taxi.data.TaxiRequest;
 
 public class PrtNPersonsRequest extends RequestImpl implements PassengerRequest {
 	

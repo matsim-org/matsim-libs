@@ -108,8 +108,8 @@ public void run(final String[] args) throws IOException {
 		// add algorithm to estimate travel cost
 		// and which performs routing based on that
 		TravelTimeCalculator travelTimeCalculator = Events2TTCalculator.getTravelTimeCalculator(sc, eventsFile);
-	TravelDisutilityFactory travelCostCalculatorFactory = new Builder( TransportMode.car );
-		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
+	TravelDisutilityFactory travelCostCalculatorFactory = new Builder( TransportMode.car, config.planCalcScore() );
+		TravelDisutility travelCostCalculator = travelCostCalculatorFactory.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
 		plans.addAlgorithm(
 				new PlanRouter(
 				new TripRouterFactoryBuilderWithDefaults().build(

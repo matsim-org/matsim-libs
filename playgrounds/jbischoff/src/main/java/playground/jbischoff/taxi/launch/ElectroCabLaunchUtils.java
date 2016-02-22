@@ -32,7 +32,6 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria
 import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 
 import playground.jbischoff.energy.charging.taxi.*;
 import playground.jbischoff.taxi.evaluation.*;

@@ -36,6 +36,11 @@
 		<artifactId>analysis</artifactId>
 		<version>0.8.0-SNAPSHOT</version>
 	</dependency>
+	<dependency>
+		<groupId>org.matsim.contrib</groupId>
+		<artifactId>noise</artifactId>
+		<version>0.8.0-SNAPSHOT</version>
+	</dependency>
 	<!-- <dependency>
 		<groupId>playground</groupId>
 		<artifactId>vsp</artifactId>
@@ -54,11 +59,5 @@
 		<version>0.8.0-SNAPSHOT</version>
 		<scope>compile</scope>
 	</dependency> -->
-	<dependency>
-		<groupId>playground</groupId>
-		<artifactId>ikaddoura</artifactId>
-		<version>0.8.0-SNAPSHOT</version>
-		<scope>compile</scope>
-	</dependency>
   </dependencies>
 </project>

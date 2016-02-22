@@ -99,7 +99,7 @@ public final class RunBraessSimulation {
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.NONE;
+	private static final PricingType PRICING_TYPE = PricingType.V3;
 	public enum PricingType{
 		NONE, V3, V4, V8, V9, FLOWBASED
 	}
@@ -110,7 +110,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/abmtrans/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/congestionPricing/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -119,6 +119,106 @@ public final class RunBraessSimulation {
 	
 		controler.run();
 	}
+
+	private static Config defineConfig() {
+			Config config = ConfigUtils.createConfig();
+	
+			// set number of iterations
+			config.controler().setLastIteration( 100 );
+	
+			// able or enable signals and lanes
+			config.qsim().setUseLanes( LANE_TYPE.equals(LaneType.NONE)? false : true );
+			SignalSystemsConfigGroup signalConfigGroup = ConfigUtils
+					.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME,
+							SignalSystemsConfigGroup.class);
+			signalConfigGroup.setUseSignalSystems( SIGNAL_TYPE.equals(SignalControlType.NONE)? false : true );
+	
+			// set brain exp beta
+			config.planCalcScore().setBrainExpBeta( 20 );
+	
+			// choose between link to link and node to node routing
+			// (only has effect if lanes are used)
+			boolean link2linkRouting = false;
+			config.controler().setLinkToLinkRoutingEnabled(link2linkRouting);
+			
+			config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(link2linkRouting);
+			config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
+			
+			// set travelTimeBinSize (only has effect if reRoute is used)
+			config.travelTimeCalculator().setTraveltimeBinSize( 900 );
+			
+			config.travelTimeCalculator().setTravelTimeCalculatorType(
+					TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
+			// hash map and array produce same results. only difference: memory and time.
+			// for small time bins and sparse values hash map is better. theresa, may'15
+			
+			// define strategies:
+			{
+				StrategySettings strat = new StrategySettings() ;
+				strat.setStrategyName( DefaultStrategy.ReRoute.toString() );
+				strat.setWeight( 0.1 ) ;
+				strat.setDisableAfter( config.controler().getLastIteration() - 50 );
+				config.strategy().addStrategySettings(strat);
+			}
+			{
+				StrategySettings strat = new StrategySettings() ;
+				strat.setStrategyName( DefaultSelector.SelectRandom.toString() );
+				strat.setWeight( 0.0 ) ;
+				strat.setDisableAfter( config.controler().getLastIteration() - 50 );
+				config.strategy().addStrategySettings(strat);
+			}
+			{
+				StrategySettings strat = new StrategySettings() ;
+				strat.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
+				strat.setWeight( 0.9 ) ;
+				strat.setDisableAfter( config.controler().getLastIteration() );
+				config.strategy().addStrategySettings(strat);
+			}
+			{
+				StrategySettings strat = new StrategySettings() ;
+				strat.setStrategyName( DefaultSelector.BestScore.toString() );
+				strat.setWeight( 0.0 ) ;
+				strat.setDisableAfter( config.controler().getLastIteration() - 50 );
+				config.strategy().addStrategySettings(strat);
+			}
+			{
+				StrategySettings strat = new StrategySettings() ;
+				strat.setStrategyName( DefaultSelector.KeepLastSelected.toString() );
+				strat.setWeight( 0.0 ) ;
+				strat.setDisableAfter( config.controler().getLastIteration() );
+				config.strategy().addStrategySettings(strat);
+			}
+	
+			config.strategy().setMaxAgentPlanMemorySize( 5 );			
+			
+			config.qsim().setStuckTime(3600 * 10.);
+			
+			config.qsim().setStartTime(3600 * 8);
+			// set end time to shorten simulation run time. (set it to 2 hours after the last agent departs)
+			config.qsim().setEndTime(3600 * (8 + SIMULATION_PERIOD + 2));
+			
+			// adapt monetary distance cost rate (should be negative)
+			config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate( -0.0 );
+			
+			config.planCalcScore().setMarginalUtilityOfMoney( 1.0 ); // default is 1.0
+	
+			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );		
+			// note: the output directory is defined in createRunNameAndOutputDir(...) after all adaptations are done
+			
+			config.vspExperimental().setWritingOutputEvents(true);
+			config.planCalcScore().setWriteExperiencedPlans(true);
+	
+			config.controler().setWriteEventsInterval( config.controler().getLastIteration() );
+			config.controler().setWritePlansInterval( config.controler().getLastIteration() );
+			
+			ActivityParams dummyAct = new ActivityParams("dummy");
+			dummyAct.setTypicalDuration(12 * 3600);
+			config.planCalcScore().addActivityParams(dummyAct);
+			
+			config.controler().setCreateGraphs( true );
+			
+			return config;
+		}
 
 	private static Scenario prepareScenario(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -169,8 +269,8 @@ public final class RunBraessSimulation {
 					if (strategies[i].getWeight() > 0.0){ // ReRoute is used
 						final CongestionTollTimeDistanceTravelDisutilityFactory factory =
 								new CongestionTollTimeDistanceTravelDisutilityFactory(
-										new Builder( TransportMode.car ),
-								tollHandler
+										new Builder( TransportMode.car, config.planCalcScore() ),
+								tollHandler, config.planCalcScore()
 							) ;
 						factory.setSigma(SIGMA);
 						controler.addOverridingModule(new AbstractModule(){
@@ -218,7 +318,7 @@ public final class RunBraessSimulation {
 			
 			// adapt sigma for randomized routing
 			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
+					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -232,121 +332,6 @@ public final class RunBraessSimulation {
 		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, new TtAnalyzeBraess(), true));
 		
 		return controler;
-	}
-
-	private static Config defineConfig() {
-		Config config = ConfigUtils.createConfig();
-
-		// set number of iterations
-		config.controler().setLastIteration( 100 );
-
-		// able or enable signals and lanes
-		config.qsim().setUseLanes( LANE_TYPE.equals(LaneType.NONE)? false : true );
-		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils
-				.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME,
-						SignalSystemsConfigGroup.class);
-		signalConfigGroup.setUseSignalSystems( SIGNAL_TYPE.equals(SignalControlType.NONE)? false : true );
-
-		// set brain exp beta
-		config.planCalcScore().setBrainExpBeta( 20 );
-
-		// choose between link to link and node to node routing
-		// (only has effect if lanes are used)
-		boolean link2linkRouting = false;
-		config.controler().setLinkToLinkRoutingEnabled(link2linkRouting);
-		
-		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(link2linkRouting);
-		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
-		
-		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
-		
-		config.travelTimeCalculator().setTravelTimeCalculatorType(
-				TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
-		// hash map and array produce same results. only difference: memory and time.
-		// for small time bins and sparse values hash map is better. theresa, may'15
-		
-		// define strategies:
-		{
-			StrategySettings strat = new StrategySettings() ;
-			strat.setStrategyName( DefaultStrategy.ReRoute.toString() );
-			strat.setWeight( 0.1 ) ;
-			strat.setDisableAfter( config.controler().getLastIteration() - 50 );
-			config.strategy().addStrategySettings(strat);
-		}
-		{
-			StrategySettings strat = new StrategySettings() ;
-			strat.setStrategyName( DefaultSelector.SelectRandom.toString() );
-			strat.setWeight( 0.0 ) ;
-			strat.setDisableAfter( config.controler().getLastIteration() - 50 );
-			config.strategy().addStrategySettings(strat);
-		}
-		{
-			StrategySettings strat = new StrategySettings() ;
-			strat.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
-			strat.setWeight( 0.9 ) ;
-			strat.setDisableAfter( config.controler().getLastIteration() );
-			config.strategy().addStrategySettings(strat);
-		}
-		{
-			StrategySettings strat = new StrategySettings() ;
-			strat.setStrategyName( DefaultSelector.BestScore.toString() );
-			strat.setWeight( 0.0 ) ;
-			strat.setDisableAfter( config.controler().getLastIteration() - 50 );
-			config.strategy().addStrategySettings(strat);
-		}
-		{
-			StrategySettings strat = new StrategySettings() ;
-			strat.setStrategyName( DefaultSelector.KeepLastSelected.toString() );
-			strat.setWeight( 0.0 ) ;
-			strat.setDisableAfter( config.controler().getLastIteration() );
-			config.strategy().addStrategySettings(strat);
-		}
-
-		// choose maximal number of plans per agent. 0 means unlimited
-//		switch(INIT_ROUTES_TYPE){
-//		case ALL:
-//			config.strategy().setMaxAgentPlanMemorySize(3);
-//			break;
-//		case ONLY_OUTER:
-//			config.strategy().setMaxAgentPlanMemorySize(2);
-//			break;
-//		default:
-			config.strategy().setMaxAgentPlanMemorySize( 5 );
-//		}
-		
-		
-		config.qsim().setStuckTime(3600 * 10.);
-		
-		config.qsim().setStartTime(3600 * 8);
-		// set end time to shorten simulation run time. (set it to 2 hours after the last agent departs)
-		config.qsim().setEndTime(3600 * (8 + SIMULATION_PERIOD + 2));
-		
-		// adapt monetary distance cost rate
-		// (should be negative. use -12.0 to balance time [h] and distance [m].
-		// use -0.000015 to approximately balance the utility of travel time and
-		// distance in a scenario with 3 vs 11min travel time and 40 vs 50 km.
-		// use -0.0 to use only time.)
-		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate( -0.0 );
-		
-		config.planCalcScore().setMarginalUtilityOfMoney( 1.0 ); // default is 1.0
-
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );		
-		// note: the output directory is defined in createRunNameAndOutputDir(...) after all adaptations are done
-		
-		config.vspExperimental().setWritingOutputEvents(true);
-		config.planCalcScore().setWriteExperiencedPlans(true);
-
-		config.controler().setWriteEventsInterval( config.controler().getLastIteration() );
-		config.controler().setWritePlansInterval( config.controler().getLastIteration() );
-		
-		ActivityParams dummyAct = new ActivityParams("dummy");
-		dummyAct.setTypicalDuration(12 * 3600);
-		config.planCalcScore().addActivityParams(dummyAct);
-		
-		config.controler().setCreateGraphs( true );
-		
-		return config;
 	}
 
 	private static void createNetwork(Scenario scenario) {	

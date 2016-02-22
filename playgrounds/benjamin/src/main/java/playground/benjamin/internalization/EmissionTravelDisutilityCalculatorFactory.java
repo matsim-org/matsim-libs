@@ -41,14 +41,17 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
 	private final EmissionModule emissionModule;
 	private final EmissionCostModule emissionCostModule;
 	private Set<Id<Link>> hotspotLinks;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public EmissionTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule) {
+	public EmissionTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule,
+			PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup){
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator){
 		final EmissionTravelDisutilityCalculator etdc = new EmissionTravelDisutilityCalculator(timeCalculator, cnScoringGroup, emissionModule, emissionCostModule, hotspotLinks);
 
 		return new TravelDisutility(){

@@ -19,32 +19,20 @@
 
 package playground.dziemke.feathersMatsim.ikea.noise;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.contrib.noise.NoiseConfigGroup;
+import org.matsim.contrib.noise.NoiseOfflineCalculation;
+import org.matsim.contrib.noise.data.NoiseAllocationApproach;
+import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
+import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
+import org.matsim.contrib.noise.utils.MergeNoiseCSVFile.OutputFormat;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.ikaddoura.noise2.NoiseParameters;
-import playground.ikaddoura.noise2.NoiseWriter;
-import playground.ikaddoura.noise2.data.GridParameters;
-import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
-import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.noise2.handler.LinkSpeedCalculation;
-import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
-import playground.ikaddoura.noise2.handler.PersonActivityTracker;
 
 /**
  * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
@@ -81,16 +69,17 @@ public class NoiseCalculationOffline {
 			e1.printStackTrace();
 		}
 
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "run0.output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "run0.output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(lastIteration);
 
 		// ################################
+		
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 
-		GridParameters gridParameters = new GridParameters();
-		gridParameters.setReceiverPointGap(receiverPointGap);
+		noiseParameters.setReceiverPointGap(receiverPointGap);
 
 		// Hasselt Coordinates:
 //		double xMin = 662600.;
@@ -107,23 +96,22 @@ public class NoiseCalculationOffline {
 		//double xMax = 0.;
 		//double yMax = 0.;
 
-		gridParameters.setReceiverPointsGridMinX(xMin);
-		gridParameters.setReceiverPointsGridMinY(yMin);
-		gridParameters.setReceiverPointsGridMaxX(xMax);
-		gridParameters.setReceiverPointsGridMaxY(yMax);
+		noiseParameters.setReceiverPointsGridMinX(xMin);
+		noiseParameters.setReceiverPointsGridMinY(yMin);
+		noiseParameters.setReceiverPointsGridMaxX(xMax);
+		noiseParameters.setReceiverPointsGridMaxY(yMax);
 
 		//		 Activity Types
 		String[] consideredActivitiesForDamages = {"home","work","n.a.","bringGet","dailyShopping","nonDailyShopping","services","socialVisit","leisure","touring","other"};
 
-		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
 
 		String[] consideredActivitiesForReceiverPointGrid = {"home","work","n.a.","bringGet","dailyShopping","nonDailyShopping","services","socialVisit","leisure","touring","other"};
 
-		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 
 		// ################################
 
-		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setUseActualSpeedLevel(true);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(false);
 		noiseParameters.setScaleFactor(2.);
@@ -151,58 +139,31 @@ public class NoiseCalculationOffline {
 //			tunnelLinkIDs.add(Id.create("78155", Link.class));
 //			noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
 
-
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 
 		log.info("Loading scenario...");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		log.info("Loading scenario... Done.");
-
-		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
-		File file = new File(outputFilePath);
-		file.mkdirs();
-
-		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
-		noiseContext.initialize();
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
-
-		EventsManager events = EventsUtils.createEventsManager();
-
-		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
-		events.addHandler(timeTracker);
-
-		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
-			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation(noiseContext);
-			events.addHandler(linkSpeedCalculator);	
-		}
-
-		EventWriterXML eventWriter = null;
-		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
-			eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-			events.addHandler(eventWriter);	
-		}
-
-		if (noiseContext.getNoiseParams().isComputePopulationUnits()) {
-			PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
-			events.addHandler(actTracker);
-		}
-
-		log.info("Reading events file...");
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/run0." + config.controler().getLastIteration() + ".events.xml.gz");
-		log.info("Reading events file... Done.");
-
-		timeTracker.computeFinalTimeIntervals();
-
-		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
-			eventWriter.closeFile();
-		}
-		log.info("Noise calculation completed.");
-
-		log.info("Processing the noise immissions...");
-		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", receiverPointGap);
+		
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
+		noiseCalculation.run();
+		
+		String outputFilePath = outputDirectory + "analysis_it." + scenario.getConfig().controler().getLastIteration() + "/";
+		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv", noiseParameters.getReceiverPointGap());
 		process.run();
+				
+		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
+		final String[] workingDirectories = { outputFilePath + "/immissions/" , outputFilePath + "/consideredAgentUnits/" , outputFilePath + "/damages_receiverPoint/" };
 
+		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+		merger.setReceiverPointsFile(outputFilePath + "receiverPoints/receiverPoints.csv");
+		merger.setOutputDirectory(outputFilePath);
+		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
+		merger.setWorkingDirectory(workingDirectories);
+		merger.setLabel(labels);
+		merger.setOutputFormat(OutputFormat.xyt);
+		merger.setThreshold(-1.);
+		merger.run();
 	}
 }
 

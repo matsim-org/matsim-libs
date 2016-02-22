@@ -95,7 +95,7 @@ public class MembershipAssigner {
 	    Collection<TwoWayCSStation> nearbyStations = this.stations.getQuadTree().getDisk(c.getX(), c.getY(), 5000.0D);
 	    for (TwoWayCSStation station : nearbyStations) {
 	      access += station.getNumberOfVehicles() * Math.exp(-2.0D * 
-	    		  CoordUtils.calcDistance(this.scenario.getNetwork().getLinks().get(station.getLink().getId()).getCoord(), c) / 1000.0D);
+	    		  CoordUtils.calcEuclideanDistance(this.scenario.getNetwork().getLinks().get(station.getLink().getId()).getCoord(), c) / 1000.0D);
 	    }
 	    
 	    if (access == 0.0) {
@@ -137,7 +137,7 @@ public class MembershipAssigner {
 		    Collection<TwoWayCSStation> nearbyStations = this.stations.getQuadTree().getDisk(c.getX(), c.getY(), 5000.0D);
 		    for (TwoWayCSStation station : nearbyStations) {
 		      access += station.getNumberOfVehicles() * Math.exp(-2.0D * 
-		    		  CoordUtils.calcDistance(this.scenario.getNetwork().getLinks().get(station.getLink().getId()).getCoord(), c) / 1000.0D);
+		    		  CoordUtils.calcEuclideanDistance(this.scenario.getNetwork().getLinks().get(station.getLink().getId()).getCoord(), c) / 1000.0D);
 		    }
 		    
 		    if (access == 0.0) {

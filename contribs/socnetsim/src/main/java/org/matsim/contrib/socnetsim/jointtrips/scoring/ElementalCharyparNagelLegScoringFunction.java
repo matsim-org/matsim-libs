@@ -105,7 +105,7 @@ public class ElementalCharyparNagelLegScoringFunction implements LegScoring, Sco
 
 	protected double getDistance(Route route) {
 		if (route instanceof NetworkRoute) {
-			return  RouteUtils.calcDistance((NetworkRoute) route, network);
+			return  RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, network);
 		}
 
 		return route.getDistance();

@@ -81,7 +81,7 @@ public class AgentSnapshotInfoFactory {
 			euklidean = ((LinkImpl)link).getEuklideanDistance();
 		}
 		else {
-			euklidean = CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
+			euklidean = CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 		}
 		calculateAndSetPosition(info, link.getFromNode().getCoord(), link.getToNode().getCoord(),
 				distanceOnLink, link.getLength(), euklidean, lane);

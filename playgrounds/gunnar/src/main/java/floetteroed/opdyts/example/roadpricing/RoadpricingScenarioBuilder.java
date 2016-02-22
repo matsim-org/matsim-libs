@@ -83,7 +83,7 @@ class RoadpricingScenarioBuilder {
 		final Link link = this.net.getFactory().createLink(
 				Id.createLinkId(fromNode.getId().toString() + "_"
 						+ toNode.getId().toString()), fromNode, toNode);
-		link.setLength(CoordUtils.calcDistance(fromNode.getCoord(),
+		link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(),
 				toNode.getCoord()));
 		link.setNumberOfLanes(1);
 		link.setCapacity(1200);
@@ -274,7 +274,7 @@ class RoadpricingScenarioBuilder {
 				.setScoringFunctionFactory(new RandomizedCharyparNagelScoringFunctionFactory(
 						scenario));
 
-		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+		controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
 
 		controler.run();
 

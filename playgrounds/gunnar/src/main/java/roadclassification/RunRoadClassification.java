@@ -61,8 +61,7 @@ public class RunRoadClassification {
 		final String configFileName = path + "run_145f.output_config.xml";
 
 		final Config config = ConfigUtils.loadConfig(configFileName);
-		final File out = new File(config.findParam("controler",
-				"outputDirectory"));
+		final File out = new File(config.controler().getOutputDirectory());
 		if (out.exists()) {
 			IOUtils.deleteDirectory(out);
 		}

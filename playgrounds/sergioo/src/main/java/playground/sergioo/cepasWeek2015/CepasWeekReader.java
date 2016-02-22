@@ -320,7 +320,7 @@ public class CepasWeekReader {
 						double time = trip.day.ordinal()*DAY_IN_SECONDS + trip.startTime;
 						Coord locA = new Coord(stops.get(toString(lastTrip.endStop))[0], stops.get(toString(lastTrip.endStop))[1]);
 						Coord locB = new Coord(stops.get(toString(trip.startStop))[0], stops.get(toString(trip.startStop))[1]);
-						double distance = CoordUtils.calcDistance(cT.transform(locA), cT.transform(locB));
+						double distance = CoordUtils.calcEuclideanDistance(cT.transform(locA), cT.transform(locB));
 						if(trip.transfer==0 && distance<MAX_DISTANCE) {
 							activitiesList.add(new Activity(day, lastTrip.startTime + lastTrip.duration*MINUTE_IN_SECONDS, time-prevTime, /*lastTrip.endLocation*/lastTrip.endStop));
 						}

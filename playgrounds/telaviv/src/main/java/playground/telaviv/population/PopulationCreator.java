@@ -212,8 +212,8 @@ public class PopulationCreator {
 		TimeAllocationMutator timeAllocationMutator = new TimeAllocationMutator(config, null, timeMutationRange, true);
 		
 		final TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car );
-		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
+		TravelDisutilityFactory travelDisutilityFactory = new Builder( TransportMode.car, config.planCalcScore() );
+		final TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 		ReplanningContext context = new ReplanningContext() {
 			@Override
 			public int getIteration() {

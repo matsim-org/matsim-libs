@@ -11,7 +11,7 @@ public class ConvergenceCriterionResult {
 
 	public final Double finalObjectiveFunctionValueStddev;
 
-	public final Double finalEquilibiriumGap;
+	public final Double finalEquilbiriumGap;
 
 	public final Double finalUniformityGap;
 
@@ -26,7 +26,7 @@ public class ConvergenceCriterionResult {
 			final Integer lastTransitionSequenceLength) {
 		this.finalObjectiveFunctionValue = finalObjectiveFunctionValue;
 		this.finalObjectiveFunctionValueStddev = finalObjectiveFunctionValueStddev;
-		this.finalEquilibiriumGap = finalEquilibiriumGap;
+		this.finalEquilbiriumGap = finalEquilibiriumGap;
 		this.finalUniformityGap = finalUniformityGap;
 		this.lastDecisionVariable = lastDecisionVariable;
 		this.lastTransitionSequenceLength = lastTransitionSequenceLength;

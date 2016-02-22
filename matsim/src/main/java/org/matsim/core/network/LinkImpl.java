@@ -105,7 +105,7 @@ public class LinkImpl implements Link {
 		this.checkCapacitiySemantics();
 		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
-		this.euklideanDist = CoordUtils.calcDistance(this.from.getCoord(), this.to.getCoord());
+		this.euklideanDist = CoordUtils.calcEuclideanDistance(this.from.getCoord(), this.to.getCoord());
 		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
 			loopWarnCnt++ ;
 			log.warn("[from=to=" + this.to + " link is a loop]");
@@ -165,40 +165,53 @@ public class LinkImpl implements Link {
 	}
 
 	/**
-	 * Given that this calculates a scalar product, this may indeed calculate the orthogonal projection.  
-	 * But it does not say so, and I have no time to go through the exact calculation in detail.  Maybe somebody
-	 * else can figure it out and document it here.  kai, mar'11
+	 * Calculates the shortest distance of the given point to this link. Note that
+	 * the link has finite length, and thus the shortest distance cannot
+	 * always be the distance on the tangent to the link through <code>coord</code>. 
 	 */
 	public final double calcDistance(final Coord coord) {
-		// yyyy should, in my view, call the generalized utils method. kai, jul09
-		Coord fc = this.from.getCoord();
-		Coord tc =  this.to.getCoord();
-		double tx = tc.getX();    double ty = tc.getY();
-		double fx = fc.getX();    double fy = fc.getY();
-		double zx = coord.getX(); double zy = coord.getY();
-		double ax = tx-fx;        double ay = ty-fy;
-		double bx = zx-fx;        double by = zy-fy;
-		double la2 = ax*ax + ay*ay;
-		double lb2 = bx*bx + by*by;
-		if (la2 == 0.0) {  // from == to
-			return Math.sqrt(lb2);
-		}
-		double xla = ax*bx+ay*by; // scalar product
-		if (xla <= 0.0) {
-			return Math.sqrt(lb2);
-		}
-		if (xla >= la2) {
-			double cx = zx-tx;
-			double cy = zy-ty;
-			return Math.sqrt(cx*cx+cy*cy);
-		}
-		// lb2-xla*xla/la2 = lb*lb-x*x
-		double tmp = xla*xla;
-		tmp = tmp/la2;
-		tmp = lb2 - tmp;
-		// tmp can be slightly negativ, likely due to rounding errors (coord lies on the link!). Therefore, use at least 0.0
-		tmp = Math.max(0.0, tmp);
-		return Math.sqrt(tmp);
+		return CoordUtils.distancePointLinesegment(this.from.getCoord(), this.to.getCoord(), coord);
+		
+		/* should, in my view, call the generalized utils method. kai, jul09 */
+		/*
+		 * Given that this calculates a scalar product, this may indeed
+		 * calculate the orthogonal projection. But it does not say so, and I
+		 * have no time to go through the exact calculation in detail. Maybe
+		 * somebody else can figure it out and document it here. kai, mar'11
+		 */
+		/*
+		 * Probably this calculates the correct distance but the generalized
+		 * utils method also does so. duplicated code is not needed and was
+		 * removed therefore. tt, feb'16
+		 */
+//		Coord fc = this.from.getCoord();
+//		Coord tc =  this.to.getCoord();
+//		double tx = tc.getX();    double ty = tc.getY();
+//		double fx = fc.getX();    double fy = fc.getY();
+//		double zx = coord.getX(); double zy = coord.getY();
+//		double ax = tx-fx;        double ay = ty-fy;
+//		double bx = zx-fx;        double by = zy-fy;
+//		double la2 = ax*ax + ay*ay;
+//		double lb2 = bx*bx + by*by;
+//		if (la2 == 0.0) {  // from == to
+//			return Math.sqrt(lb2);
+//		}
+//		double xla = ax*bx+ay*by; // scalar product
+//		if (xla <= 0.0) {
+//			return Math.sqrt(lb2);
+//		}
+//		if (xla >= la2) {
+//			double cx = zx-tx;
+//			double cy = zy-ty;
+//			return Math.sqrt(cx*cx+cy*cy);
+//		}
+//		// lb2-xla*xla/la2 = lb*lb-x*x
+//		double tmp = xla*xla;
+//		tmp = tmp/la2;
+//		tmp = lb2 - tmp;
+//		// tmp can be slightly negativ, likely due to rounding errors (coord lies on the link!). Therefore, use at least 0.0
+//		tmp = Math.max(0.0, tmp);
+//		return Math.sqrt(tmp);
 	}
 
 	//////////////////////////////////////////////////////////////////////

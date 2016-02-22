@@ -22,7 +22,6 @@
 
 package org.matsim.roadpricing;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -38,7 +37,6 @@ public class ModuleTest {
     public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test(expected = RuntimeException.class)
-    @Ignore
     public void testControlerWithoutRoadPricingDoesntWork() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
         Controler controler = new Controler(config);
@@ -50,8 +48,9 @@ public class ModuleTest {
     @Test
     public void testControlerWithRoadPricingWorks() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
+        Scenario scenario = ScenarioUtils.loadScenario(config);
         Controler controler = new Controler(config);
-        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+        controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
         controler.run();
     }
 
@@ -60,7 +59,7 @@ public class ModuleTest {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Controler controler = new Controler(scenario);
-        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+        controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
         controler.run();
     }
 
@@ -76,11 +75,11 @@ public class ModuleTest {
 
 
         Controler controler1 = new Controler(scenario);
-        controler1.setModules(new ControlerDefaultsWithRoadPricingModule(roadPricingScheme));
+        controler1.setModules(new ControlerDefaultsWithRoadPricingModule(scenario, roadPricingScheme));
         controler1.run();
         config.controler().setOutputDirectory(utils.getOutputDirectory()+"/2");
         Controler controler2 = new Controler(scenario);
-        controler2.setModules(new ControlerDefaultsWithRoadPricingModule(roadPricingScheme));
+        controler2.setModules(new ControlerDefaultsWithRoadPricingModule(scenario, roadPricingScheme));
         controler2.run();
     }
 

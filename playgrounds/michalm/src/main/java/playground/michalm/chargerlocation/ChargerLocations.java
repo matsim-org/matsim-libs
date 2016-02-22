@@ -22,8 +22,7 @@ package playground.michalm.chargerlocation;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-
-import playground.michalm.zone.Zone;
+import org.matsim.contrib.zone.Zone;
 
 
 public class ChargerLocations

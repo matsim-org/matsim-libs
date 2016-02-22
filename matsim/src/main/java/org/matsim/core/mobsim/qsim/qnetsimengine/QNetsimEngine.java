@@ -66,7 +66,7 @@ public class QNetsimEngine implements MobsimEngine {
 
 	private static final int INFO_PERIOD = 3600;
 
-	/*package*/   QNetwork network;
+	private QNetwork network;
 
 	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
 
@@ -83,20 +83,25 @@ public class QNetsimEngine implements MobsimEngine {
 
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
 
-	private List<QNetsimEngineRunner> engines ;
+	private List<QNetsimEngineRunner> engines;
 
 	private Phaser startBarrier;
 	private Phaser endBarrier;
 
 	private final Set<QLinkInternalI> linksToActivateInitially = new HashSet<>();
 
-	/*package*/ InternalInterface internalInterface = null ;
+	/*package*/ InternalInterface internalInterface = null;
 
 	private int numOfRunners;
 
 	private ExecutorService pool;
 
 	private final boolean usingThreadpool;
+	
+	// for detailed run time analysis - used in combination with QSim.analyzeRunTimes
+	public static int numObservedTimeSteps = 24*3600;
+	public static boolean printRunTimesPerTimeStep = false;
+	
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
@@ -123,20 +128,20 @@ public class QNetsimEngine implements MobsimEngine {
 		this(sim, null);
 	}
 
-	public QNetsimEngine(final QSim sim, NetsimNetworkFactory netsimNetworkFactory ) {
+	public QNetsimEngine(final QSim sim, NetsimNetworkFactory netsimNetworkFactory) {
 		this.qsim = sim;
 
 		final Config config = sim.getScenario().getConfig();
 		final QSimConfigGroup qsimConfigGroup = config.qsim();
 		this.stucktimeCache = qsimConfigGroup.getStuckTime();
-		this.usingThreadpool = qsimConfigGroup.isUsingThreadpool() ;
+		this.usingThreadpool = qsimConfigGroup.isUsingThreadpool();
 
 
 		// configuring the car departure hander (including the vehicle behavior)
 		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().qsim();
 
-		VehicleBehavior vehicleBehavior = qSimConfigGroup.getVehicleBehavior() ;
-		switch( vehicleBehavior ) {
+		VehicleBehavior vehicleBehavior = qSimConfigGroup.getVehicleBehavior();
+		switch(vehicleBehavior) {
 		case exception:
 		case teleport:
 		case wait:
@@ -146,12 +151,12 @@ public class QNetsimEngine implements MobsimEngine {
 		}
 		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior);
 		
-		switch( qsimConfigGroup.getTrafficDynamics() ) {
+		switch(qsimConfigGroup.getTrafficDynamics()) {
 		case queue:
-			QueueWithBuffer.HOLES=false ;
+			QueueWithBuffer.HOLES = false;
 			break;
 		case withHoles:
-			QueueWithBuffer.HOLES = true ;
+			QueueWithBuffer.HOLES = true;
 			break;
 		default:
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
@@ -167,33 +172,32 @@ public class QNetsimEngine implements MobsimEngine {
 		
 		QueueWithBuffer.fastCapacityUpdate = qSimConfigGroup.isUsingFastCapacityUpdate() ;
 		
-		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)){
+		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
 			QueueWithBuffer.isSeepageAllowed = true;
 			QueueWithBuffer.seepMode = qSimConfigGroup.getSeepMode();
 			QueueWithBuffer.isSeepModeStorageFree = qSimConfigGroup.isSeepModeStorageFree();
-			log.info("Seepage is allowed. Seep mode is "+QueueWithBuffer.seepMode+".");
-			if(QueueWithBuffer.isSeepModeStorageFree) log.warn("Seep mode "+QueueWithBuffer.seepMode+" do not take storage space thus only considered for flow capacities.");
+			log.info("Seepage is allowed. Seep mode is " + QueueWithBuffer.seepMode + ".");
+			if(QueueWithBuffer.isSeepModeStorageFree) log.warn("Seep mode " + QueueWithBuffer.seepMode + " do not take storage space thus only considered for flow capacities.");
 			QueueWithBuffer.isRestrictingSeepage = qSimConfigGroup.isRestrictingSeepage();
 		}
 		
-		if ( QSimConfigGroup.SnapshotStyle.withHoles.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
-			QueueWithBuffer.VIS_HOLES = true ;
+		if (QSimConfigGroup.SnapshotStyle.withHoles.equals( qsimConfigGroup.getSnapshotStyle())) {
+			QueueWithBuffer.VIS_HOLES = true;
 		}
 
 		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
 		// first in ctors calling each other.  kai, feb'12
 		if (config.qsim().isUseLanes()) {
 			log.info("Lanes enabled...");
-			if ( netsimNetworkFactory != null ) {
+			if (netsimNetworkFactory != null) {
 				throw new RuntimeException("both `lanes' and `netsimNetworkFactory' are defined; don't know what that means; aborting") ;
 			}
-			network =
-					new QNetwork(
+			network = new QNetwork(
 							sim.getScenario().getNetwork(),
 							new QLanesNetworkFactory(new DefaultQNetworkFactory(), sim.getScenario().getLanes()));
-		} else if ( netsimNetworkFactory != null ){
+		} else if (netsimNetworkFactory != null){
 			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
-		} else if ( qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ  || qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ ) {
+		} else if (qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ || qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ) {
 			network = new QNetwork(sim.getScenario().getNetwork(), new NetsimNetworkFactory() {
 				@Override
 				public QLinkImpl createNetsimLink(final Link link, final QNetwork network2, final QNode toQueueNode) {
@@ -212,30 +216,29 @@ public class QNetsimEngine implements MobsimEngine {
 
 		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );
 
-
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 
-	private static int wrnCnt = 0 ;
+	private static int wrnCnt = 0;
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
-		if ( vehicles.put(veh.getId(), (QVehicle) veh) != null ) {
-			if ( wrnCnt < 1 ) {
+		if (this.vehicles.put(veh.getId(), (QVehicle) veh) != null) {
+			if (wrnCnt < 1) {
 				wrnCnt++ ;
-				log.warn( "existing vehicle in mobsim was just overwritten by other vehicle with same ID.  Not clear what this means.  Continuing anyways ...") ;
-				log.warn( Gbl.ONLYONCE ) ;
+				log.warn("existing vehicle in mobsim was just overwritten by other vehicle with same ID.  Not clear what this means.  Continuing anyways ...") ;
+				log.warn(Gbl.ONLYONCE);
 			}
 		}
 		QLinkInternalI qlink = network.getNetsimLinks().get(startLinkId);
-		if ( qlink==null ) {
-			throw new RuntimeException("requested link with id=" + startLinkId + " does not exist in network.  Possible vehicles "
+		if (qlink == null) {
+			throw new RuntimeException("requested link with id=" + startLinkId + " does not exist in network. Possible vehicles "
 					+ "or activities or facilities are registered to a different network.") ;
 		}
 		qlink.addParkedVehicle(veh);
 	}
 
-	private AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario){
+	private AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario) {
 		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
-		switch( snapshotStyle ) {
+		switch(snapshotStyle) {
 		case queue:
 			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		case withHoles:
@@ -273,22 +276,15 @@ public class QNetsimEngine implements MobsimEngine {
 			engine.afterSim();
 		}
 
-		/*
-		 * Triggering the startBarrier of the QSimEngineThreads.
-		 * They will check whether the Simulation is still running.
-		 * It is not, so the Threads will stop running.
-		 */
-		//        try {
-		//            this.startBarrier.await();
-		//        } catch (InterruptedException e) {
-		//            throw new RuntimeException(e);
-		//        } catch (BrokenBarrierException e) {
-		//            throw new RuntimeException(e);
-		//        }
-		if ( !this.usingThreadpool ) {
-			this.startBarrier.arriveAndAwaitAdvance();
+		if (this.usingThreadpool) {
+			this.pool.shutdown();
 		} else {
-			pool.shutdown();
+			/*
+			 * Triggering the startBarrier of the QSimEngineThreads.
+			 * They will check whether the Simulation is still running.
+			 * It is not, so the Threads will stop running.
+			 */
+			this.startBarrier.arriveAndAwaitAdvance();
 		}
 
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
@@ -311,7 +307,6 @@ public class QNetsimEngine implements MobsimEngine {
 
 		this.printSimLog(time);
 	}
-
 
 	/*
 	 * The Threads are waiting at the startBarrier.
@@ -348,7 +343,6 @@ public class QNetsimEngine implements MobsimEngine {
 		// So make sure that no thread sticks out in terms of slowness.  Difficult to achieve, though.  A decade back, we used a "typical" run
 		// as input for the domain decomposition under (b).
 
-		//        try {
 		// set current Time
 		for (QNetsimEngineRunner engine : this.engines) {
 			engine.setTime(time);
@@ -413,7 +407,6 @@ public class QNetsimEngine implements MobsimEngine {
 		return numNodes;
 	}
 
-
 	QSim getMobsim() {
 		return this.qsim;
 	}
@@ -423,7 +416,7 @@ public class QNetsimEngine implements MobsimEngine {
 	}
 
 	public NetsimNetwork getNetsimNetwork() {
-		return this.network ;
+		return this.network;
 	}
 
 	/**
@@ -444,16 +437,16 @@ public class QNetsimEngine implements MobsimEngine {
 	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
 		Id<Link> linkId = planAgent.getCurrentLinkId(); 
 		if (linkId != null) { // may be bushwacking
-			QLinkInternalI qLink = network.getNetsimLink(linkId);
+			QLinkInternalI qLink = this.network.getNetsimLink(linkId);
 			qLink.registerAdditionalAgentOnLink(planAgent);
 		}
 	}
 
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
-		if ( linkId==null) { // seems that this can happen in tests; not sure if it can happen in regular code. kai, jun'15
-			return null ;
+		if  (linkId == null) { // seems that this can happen in tests; not sure if it can happen in regular code. kai, jun'15
+			return null;
 		}
-		QLinkInternalI qLink = network.getNetsimLink(linkId);
+		QLinkInternalI qLink = this.network.getNetsimLink(linkId);
 		return qLink.unregisterAdditionalAgentOnLink(agentId);
 	}
 
@@ -477,26 +470,26 @@ public class QNetsimEngine implements MobsimEngine {
 
 	private void initQSimEngineThreads() {
 
-		this.engines = new ArrayList<>() ;
+		this.engines = new ArrayList<>();
 
 		this.startBarrier = new Phaser(this.numOfThreads + 1);
 		Phaser separationBarrier = new Phaser(this.numOfThreads);
 		this.endBarrier = new Phaser(this.numOfThreads + 1);
 
 		numOfRunners = this.numOfThreads;
-		if ( usingThreadpool ) {
+		if (this.usingThreadpool) {
 			// The number of runners should be larger than the number of threads, yes,
 			// but see MATSIM-404 - Simulation result still depends on the number of runners.
 //			numOfRunners *= 10 ;
 			this.pool = Executors.newFixedThreadPool(
 					this.numOfThreads,
-					new NamedThreadFactory()) ;
+					new NamedThreadFactory());
 		}
 
 		// setup threads
 		for (int i = 0; i < numOfRunners; i++) {
 			QNetsimEngineRunner engine ;
-			if ( usingThreadpool ) {
+			if (this.usingThreadpool) {
 				engine = new QNetsimEngineRunner();
 			} else {
 				engine = new QNetsimEngineRunner(this.startBarrier, separationBarrier, endBarrier);
@@ -505,8 +498,7 @@ public class QNetsimEngine implements MobsimEngine {
 				thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 				thread.start();
 			}
-			this.engines.add( engine ) ;
-
+			this.engines.add(engine);
 		}
 
 		/*
@@ -540,7 +532,7 @@ public class QNetsimEngine implements MobsimEngine {
 				// (must be of this type to work.  kai, feb'12)
 
 				// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
-				qLink.setNetElementActivator(this.engines.get(i)) ;
+				qLink.setNetElementActivator(this.engines.get(i));
 
 				/*
 				 * If the QLink contains agents that end their activity in the first time
@@ -565,12 +557,52 @@ public class QNetsimEngine implements MobsimEngine {
 		this.linksToActivateInitially.clear();
 	}
 
+	public void printEngineRunTimes() {
+		if (!QSim.analyzeRunTimes) return;
+		
+		if (printRunTimesPerTimeStep) log.info("detailed QNetsimEngineRunner run times per time step:");
+		{
+			StringBuffer sb = new StringBuffer();
+			sb.append("\t" + "time");
+			for (int i = 0; i < this.engines.size(); i++) {
+				sb.append("\t" + "thread_" + i); 
+			}
+			sb.append("\t" + "min");
+			sb.append("\t" + "max");
+			if (printRunTimesPerTimeStep) log.info(sb.toString());
+		}
+		long sum = 0;
+		long sumMin = 0;
+		long sumMax = 0;
+		for (int i = 0; i < numObservedTimeSteps; i++) {
+			StringBuffer sb = new StringBuffer();
+			sb.append("\t" + i);
+			long min = Long.MAX_VALUE;
+			long max = Long.MIN_VALUE;
+			for (QNetsimEngineRunner runner : this.engines) {
+				long runTime = runner.runTimes[i];
+				sum += runTime;
+				if (runTime < min) min = runTime;
+				if (runTime > max) max = runTime;
+				sb.append("\t" + runTime);
+			}
+			sb.append("\t" + min);
+			sb.append("\t" + max);
+			if (printRunTimesPerTimeStep) log.info(sb.toString());
+			sumMin += min;
+			sumMax += max;
+		}
+		log.info("sum min run times: " + sumMin);
+		log.info("sum max run times: " + sumMax);
+		log.info("sum all run times / num threads: " + sum / this.numOfThreads);
+	}
+	
 	private static class NamedThreadFactory implements ThreadFactory {
 		private int count = 0;
 
 		@Override
 		public Thread newThread(Runnable r) {
-			return new Thread( r , "QNetsimEngine_PooledThread_"+count );
+			return new Thread( r , "QNetsimEngine_PooledThread_" + count++);
 		}
 	}
 }

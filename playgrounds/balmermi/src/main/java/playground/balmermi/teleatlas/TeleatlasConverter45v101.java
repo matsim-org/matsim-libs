@@ -459,7 +459,7 @@ public class TeleatlasConverter45v101 {
 	}
 
 	private void setLinkLength(final Link link, final double length) {
-		double minLength = CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
+		double minLength = CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 		if (minLength > length) {
 			link.setLength(minLength);
 		} else {

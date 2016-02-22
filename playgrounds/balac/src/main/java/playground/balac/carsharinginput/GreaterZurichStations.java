@@ -55,7 +55,7 @@ public class GreaterZurichStations {
 			WGS84toCH1903LV03 b = new WGS84toCH1903LV03();  //transforming coord from WGS84 to CH1903LV03
 			coord = b.transform(coord);
 			
-			if (CoordUtils.calcDistance(coord, center) <= 30000.0) {
+			if (CoordUtils.calcEuclideanDistance(coord, center) <= 30000.0) {
 				
 				count++;
 				SimpleFeature ft = nodeFactory.createPoint(coord, new Object[] {Integer.toString(count)}, null);
@@ -78,7 +78,7 @@ public class GreaterZurichStations {
 			WGS84toCH1903LV03 b = new WGS84toCH1903LV03();  //transforming coord from WGS84 to CH1903LV03
 			coord = b.transform(coord);
 			
-			if (CoordUtils.calcDistance(coord, center) <= 30000.0) {
+			if (CoordUtils.calcEuclideanDistance(coord, center) <= 30000.0) {
 				
 				output.write(arr[3] + "\t" + arr[1] + "\t" + arr[5] + "\t" + arr[6] + "\t" + arr[7] + "\t" + arr[8] + "\t" + arr[9]);
 				output.newLine();

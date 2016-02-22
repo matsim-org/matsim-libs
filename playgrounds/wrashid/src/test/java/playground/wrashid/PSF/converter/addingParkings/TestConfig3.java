@@ -20,16 +20,19 @@
 package playground.wrashid.PSF.converter.addingParkings;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
+import playground.wrashid.PSF.ParametersPSF;
 
 public class TestConfig3 extends MatsimTestCase {
 
 	public void testConfig(){
 		String configFilePath = getPackageInputDirectory() + "config3.xml";
 		Config config = loadConfig(configFilePath);
+		ConfigUtils.addOrGetModule(config, ParametersPSF.PSF_MODULE, ParametersPSF.class);
 		
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );
 		// added by me to fix the test.  If you normally run with the default setting (now tryEndTimeThenDuration), I would suggest to remove

@@ -47,7 +47,7 @@ public class ControlerDefaults {
 	}
 
 	public static TravelDisutilityFactory createDefaultTravelDisutilityFactory(Scenario scenario) {
-		final Builder builder = new Builder( TransportMode.car );
+		final Builder builder = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() );
 		builder.setSigma(0.); // tendency to set this to 3. right away (i.e. through PlansCalcRouteConfigGroup default). kai/bk, mar'15
 		return builder;
 	}

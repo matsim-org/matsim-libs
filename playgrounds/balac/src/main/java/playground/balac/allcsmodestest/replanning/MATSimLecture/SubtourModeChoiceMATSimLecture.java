@@ -47,7 +47,7 @@ public class SubtourModeChoiceMATSimLecture extends AbstractMultithreadedModule 
 				config.subtourModeChoice().getModes(),
 				config.subtourModeChoice().getChainBasedModes(),
 				config.subtourModeChoice().considerCarAvailability(),
-				tripRouterProvider, CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.planCalcScore().getScoringParameters( null ), config.scenario()).create()
+				tripRouterProvider, new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build()
 		);
 	}
 

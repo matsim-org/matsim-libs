@@ -44,7 +44,7 @@ public class PathologicalExample {
 		_B.getRow(0).set(1, 0.0);
 		_B.getRow(1).set(0, -3.2);
 		_B.getRow(1).set(1, 1.0);
-		this.system = new LinearSystemSimulator(_A, _B, 0.1, rnd);
+		this.system = new LinearSystemSimulator(_A, _B, 0.1, rnd); // noise was 0.1
 		this.logFileName = logFileName;
 		this.populationSize = populationSize;
 	}
@@ -52,19 +52,23 @@ public class PathologicalExample {
 	public void run() {
 
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				150, 50);
+				100, 2);
 		final ObjectiveFunction objFct = new LinearSystemObjectiveFunction();
 
 		final int maxMemorizedTrajectoryLength = Integer.MAX_VALUE;
 		final boolean interpolate = true;
 		final int maxRandomSearchIterations = 10;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-		final boolean includeCurrentBest = true;
-		
+		final boolean includeCurrentBest = false;
+
+		final Vector min = new Vector(Double.NEGATIVE_INFINITY,
+				Double.NEGATIVE_INFINITY); // new Vector(-0.1, -0.1);
+		final Vector max = new Vector(Double.POSITIVE_INFINITY,
+				Double.POSITIVE_INFINITY); // new Vector(0.1, 0.1);
+
 		final RandomSearch<VectorDecisionVariable> randomSearch = new RandomSearch<>(
 				system, new VectorDecisionVariableRandomizer(2, 0.1,
-						MatsimRandom.getRandom(), this.system, new Vector(-0.1,
-								-0.1), new Vector(0.1, 0.1)),
+						MatsimRandom.getRandom(), this.system, min, max),
 				new VectorDecisionVariable(new Vector(2), this.system),
 				convergenceCriterion, maxRandomSearchIterations,
 				maxRandomSearchTransitions, this.populationSize,

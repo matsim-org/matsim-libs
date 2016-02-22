@@ -9,19 +9,21 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 
 public class CarsharingAgentFactory implements AgentFactory{
 	private final Netsim simulation;
-	private final Scenario scenario;
 	private CarSharingVehicles carSharingVehicles;
 
 	private TripRouter tripRouter;
+	private LeastCostPathCalculator pathCalculator;
 	
 	
-	public CarsharingAgentFactory(final Netsim simulation, final Scenario scenario, final Provider<TripRouter> tripRouterProvider, CarSharingVehicles carSharingVehicles) {
+	public CarsharingAgentFactory(final Netsim simulation, final Scenario scenario, final Provider<TripRouter> tripRouterProvider, 
+			CarSharingVehicles carSharingVehicles, LeastCostPathCalculator pathCalculator) {
 		this.simulation = simulation;
-		this.scenario = scenario;
 		this.carSharingVehicles = carSharingVehicles;
+		this.pathCalculator = pathCalculator;
 				
 		Provider<TripRouter> tripRouterFactory = tripRouterProvider;
 		
@@ -40,7 +42,7 @@ public class CarsharingAgentFactory implements AgentFactory{
 //		agent = new CarsharingPersonDriverAgentImplOLD(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()),
 //				this.simulation, this.scenario, this.carSharingVehicles, this.tripRouter); 
 		agent = new CarsharingPersonDriverAgentImpl(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation,
-				this.carSharingVehicles, this.tripRouter); 
+				this.carSharingVehicles, this.tripRouter, pathCalculator); 
 		return agent;
 	}
 }

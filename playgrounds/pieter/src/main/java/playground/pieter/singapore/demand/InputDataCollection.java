@@ -30,7 +30,6 @@ import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.facilities.OpeningTime.DayType;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
@@ -334,7 +333,7 @@ class InputDataCollection implements Serializable {
 						ActivityOptionImpl option = facility
 								.createAndAddActivityOption(activityType);
 						option.addOpeningTime(new OpeningTimeImpl(
-								DayType.wkday, Time.parseTime("10:00:00"), Time
+								Time.parseTime("10:00:00"), Time
 										.parseTime("22:00:00")));
 						option.setCapacity(secondaryCapacities
 								.get(activityType) * startCap);
@@ -346,7 +345,7 @@ class InputDataCollection implements Serializable {
 						ActivityOptionImpl option = facility
 								.createAndAddActivityOption(activityType);
 						option.addOpeningTime(new OpeningTimeImpl(
-								DayType.wkday, Time.parseTime("10:00:00"), Time
+								Time.parseTime("10:00:00"), Time
 										.parseTime("22:00:00")));
 						option.setCapacity(secondaryCapacities
 								.get(activityType));
@@ -488,7 +487,7 @@ class InputDataCollection implements Serializable {
 				facility.setDesc(rs.getString("property_type"));
 				ActivityOptionImpl actOption = facility
 						.createAndAddActivityOption("home");
-				actOption.setCapacity((double) rs.getInt("units"));
+				actOption.setCapacity(rs.getInt("units"));
 
 			}
 		} catch (SQLException | NoConnectionException e) {
@@ -675,8 +674,8 @@ class InputDataCollection implements Serializable {
 					double timePastSec = (double) timePastLong
 							/ (double) Timer.ONE_SECOND;
 					int agentsToGo = householdCount - counter;
-					double agentsPerSecond = (double) counter / timePastSec;
-					long timeToGo = (long) ((double) agentsToGo / agentsPerSecond);
+					double agentsPerSecond = counter / timePastSec;
+					long timeToGo = (long) (agentsToGo / agentsPerSecond);
 					inputLog.info(String
 							.format("%6d of %8d households done in %.3f seconds at %.3f hhs/sec, %s sec to go.",
 									counter, householdCount,

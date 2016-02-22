@@ -29,6 +29,7 @@ import org.matsim.core.population.ParallelPopulationReaderMatsimV4.EndTag;
 import org.matsim.core.population.ParallelPopulationReaderMatsimV4.PersonTag;
 import org.matsim.core.population.ParallelPopulationReaderMatsimV4.StartTag;
 import org.matsim.core.population.ParallelPopulationReaderMatsimV4.Tag;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.xml.sax.Attributes;
 
 /**
@@ -42,8 +43,11 @@ public class ParallelPopulationReaderMatsimV4Runner extends PopulationReaderMats
 	
 	private final BlockingQueue<List<Tag>> queue;
 	
-	public ParallelPopulationReaderMatsimV4Runner(Scenario scenario, BlockingQueue<List<Tag>> queue) {
-		super(scenario);
+	public ParallelPopulationReaderMatsimV4Runner(
+			final CoordinateTransformation coordinateTransformation,
+			final Scenario scenario,
+			final BlockingQueue<List<Tag>> queue) {
+		super(coordinateTransformation , scenario);
 		this.queue = queue;
 	}
 	

@@ -193,7 +193,7 @@ public class PopulationGenerator {
 			{
 				NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
 				for (Link l : sc.getNetwork().getLinks().values()) {
-					if (CoordUtils.calcDistance(to1, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcDistance(to1, l.getFromNode().getCoord()) < 0.1) {
+					if (CoordUtils.calcEuclideanDistance(to1, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to1, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
 						l.setNumberOfLanes(4/0.71);
 						l.setFreespeed(1.34);
@@ -201,7 +201,7 @@ public class PopulationGenerator {
 						continue;
 					}
 					for (Link ll : l.getToNode().getOutLinks().values()){
-						if (CoordUtils.calcDistance(to1, ll.getToNode().getCoord()) < 0.1){
+						if (CoordUtils.calcEuclideanDistance(to1, ll.getToNode().getCoord()) < 0.1){
 							l.setCapacity(0.5);
 							l.setNumberOfLanes(1);
 							l.setLength(.26);
@@ -234,7 +234,7 @@ public class PopulationGenerator {
 			{
 				NetworkChangeEvent e = fac.createNetworkChangeEvent(time+ 2*60+30);
 				for (Link l : sc.getNetwork().getLinks().values()) {
-					if (CoordUtils.calcDistance(to2, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcDistance(to2, l.getFromNode().getCoord()) < 0.1) {
+					if (CoordUtils.calcEuclideanDistance(to2, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to2, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
 						l.setNumberOfLanes(4/0.71);
 					
@@ -263,13 +263,13 @@ public class PopulationGenerator {
 			{
 				NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
 				for (Link l : sc.getNetwork().getLinks().values()) {
-					if (CoordUtils.calcDistance(to1, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcDistance(to1, l.getFromNode().getCoord()) < 0.1) {
+					if (CoordUtils.calcEuclideanDistance(to1, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to1, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
 						l.setNumberOfLanes(4/0.71);
 						continue;
 					}
 					for (Link ll : l.getToNode().getOutLinks().values()){
-						if (CoordUtils.calcDistance(to1, ll.getToNode().getCoord()) < 0.1){
+						if (CoordUtils.calcEuclideanDistance(to1, ll.getToNode().getCoord()) < 0.1){
 							ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 0.5);
 							e.setFlowCapacityChange(cv);
 //							ChangeValue cxv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, 1.34);
@@ -290,7 +290,7 @@ public class PopulationGenerator {
 			{
 				NetworkChangeEvent e = fac.createNetworkChangeEvent(time + 2*60+30);
 				for (Link l : sc.getNetwork().getLinks().values()) {
-					if (CoordUtils.calcDistance(to2, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcDistance(to2, l.getFromNode().getCoord()) < 0.1) {
+					if (CoordUtils.calcEuclideanDistance(to2, l.getToNode().getCoord()) < 0.1 || CoordUtils.calcEuclideanDistance(to2, l.getFromNode().getCoord()) < 0.1) {
 						l.setCapacity(4*3600);
 						l.setNumberOfLanes(4/0.71);
 					

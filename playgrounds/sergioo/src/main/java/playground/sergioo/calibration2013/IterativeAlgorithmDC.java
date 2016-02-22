@@ -169,7 +169,7 @@ public class IterativeAlgorithmDC {
 		final StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(scenario.getTransitSchedule(), scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (scenario.getConfig().qsim().getEndTime()-scenario.getConfig().qsim().getStartTime()));
 		events.addHandler(stopStopTimeCalculator);
 		new MatsimEventsReader(events).readFile(args[10]);
-		final TravelDisutilityFactory factory = new Builder( TransportMode.car );
+		final TravelDisutilityFactory factory = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() );
 		Map<String, TravelDisutilityFactory> factories = new HashMap<>();
 		factories.put(TransportMode.car, factory);
 
@@ -226,7 +226,7 @@ public class IterativeAlgorithmDC {
 											list = new ArrayList<Double>();
 											distances.put(prevMode, list);
 										}
-										double distance = CoordUtils.calcDistance(prevActivity.getCoord(), ((Activity)planElement).getCoord());
+										double distance = CoordUtils.calcEuclideanDistance(prevActivity.getCoord(), ((Activity)planElement).getCoord());
 										list.add(distance);
 										prevMode = null;
 									}

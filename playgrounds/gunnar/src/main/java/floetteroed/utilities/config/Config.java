@@ -141,7 +141,9 @@ public class Config {
 				}
 			}
 		}
-		return null;
+		// TODO NEW!
+		return new ArrayList<String>(0);
+		// return null;
 	}
 
 	public List<String> getList(final String... keys) {

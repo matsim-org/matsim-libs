@@ -63,5 +63,9 @@ public class GeneralParkingModule implements StartupListener, BeforeMobsimListen
 	protected final ParkingInfrastructureManager getParkingInfrastructureManager() {
 		return parkingInfrastructureManager;
 	}
+	
+	protected final ParkingChoiceSimulation getParkingSimulation() {
+		return parkingSimulation;
+	}	
 
 }

@@ -58,8 +58,8 @@ public class ChooseRandomTripModeZoneModel implements PlanAlgorithm {
 		double centerX = 683217.0; 
 		double centerY = 247300.0;
 		Coord coord = new Coord(centerX, centerY);
-		if (CoordUtils.calcDistance(t.get(rndIdx).getOriginActivity().getCoord(), coord) < 10500 &&
-				CoordUtils.calcDistance(t.get(rndIdx).getDestinationActivity().getCoord(), coord) < 10500) {
+		if (CoordUtils.calcEuclideanDistance(t.get(rndIdx).getOriginActivity().getCoord(), coord) < 10500 &&
+				CoordUtils.calcEuclideanDistance(t.get(rndIdx).getDestinationActivity().getCoord(), coord) < 10500) {
 			//don't change the trips between the same links
 			if (!t.get(rndIdx).getOriginActivity().getLinkId().toString().equals(t.get(rndIdx).getDestinationActivity().getLinkId().toString()))
 				setRandomTripMode(t.get(rndIdx), plan, ffcard, owcard);

@@ -198,7 +198,7 @@ public abstract class Gbl {
 			throw new RuntimeException("assertion error; follow stack trace") ;
 		}
 	}
-	public static void assertNonNull( Object obj ) {
+	public static void assertNotNull( Object obj ) {
 		if ( obj==null ) {
 			throw new RuntimeException( "object is null; follow stack trace" ) ;
 		}
@@ -225,5 +225,9 @@ public abstract class Gbl {
 	public static final String RETROFIT_CONTROLER = Gbl.CONTROLER_IS_NOW_FINAL + " I tried to adapt this to new syntax"
 			+ "but please check functionality. kai, mar'15" ;
 	
+	public static final String PROBLEM_WITH_ACCESS_EGRESS = "When the TripRouter also generates access/egress legs, within-day replanning "
+			+ "needs to sort out if it wants that, or if it just wants to replan the current leg.  kai, feb'16" ;
+
+
 	
 }

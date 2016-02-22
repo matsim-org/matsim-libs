@@ -3,6 +3,7 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -22,13 +23,15 @@ public class NetworkRouting implements Provider<RoutingModule> {
     Map<String, TravelTime> travelTimes;
 
 	@Inject
-	Map<String, TravelDisutilityFactory> travelDisutilityFactory;
+	Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 
 	@Inject
 	SingleModeNetworksCache singleModeNetworksCache;
 
 	@Inject
     PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	
+	@Inject PlansCalcRouteConfigGroup plansCalcRouteConfigGroup ;
 
 	@Inject
     Network network;
@@ -62,7 +65,7 @@ public class NetworkRouting implements Provider<RoutingModule> {
 			}
 		}
 
-		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactory.get(mode);
+		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactories.get(mode);
 		if (travelDisutilityFactory == null) {
 			throw new RuntimeException("No TravelDisutilityFactory bound for mode "+mode+".");
 		}
@@ -73,10 +76,14 @@ public class NetworkRouting implements Provider<RoutingModule> {
 		LeastCostPathCalculator routeAlgo =
 				leastCostPathCalculatorFactory.createPathCalculator(
 						filteredNetwork,
-						travelDisutilityFactory.createTravelDisutility(travelTime, planCalcScoreConfigGroup),
+						travelDisutilityFactory.createTravelDisutility(travelTime),
 						travelTime);
 
-		return DefaultRoutingModules.createNetworkRouter(mode, populationFactory,
-				filteredNetwork, routeAlgo);
+		if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {
+			return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo,
+					plansCalcRouteConfigGroup) ;
+		} else {
+			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
+		}
 	}
 }

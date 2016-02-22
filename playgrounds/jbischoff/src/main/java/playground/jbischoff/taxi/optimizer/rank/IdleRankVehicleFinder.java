@@ -26,14 +26,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.util.DistanceUtils;
+import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.scheduler.*;
+import org.matsim.contrib.util.distance.DistanceUtils;
 
-import com.google.common.collect.*;
+import com.google.common.collect.Iterables;
 
 import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.jbischoff.taxi.vehicles.ElectricTaxi;
-import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.scheduler.*;
 
 
 /**

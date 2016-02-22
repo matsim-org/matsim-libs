@@ -148,7 +148,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 			nextActivityFacilityMap.put(event.getPersonId(), facility);
 
 			Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-			double distanceToNextActivity = CoordUtils.calcDistance(facility.getCoord(), coord);
+			double distanceToNextActivity = CoordUtils.calcEuclideanDistance(facility.getCoord(), coord);
 
 			/*
 			 * If the agent is within distance 'd' to target activity or OR If the
@@ -180,7 +180,7 @@ public class ParkingAgentsTracker implements LinkEnterEventHandler, PersonArriva
 			if (!searchingAgents.contains(driverId)) {
 				Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
 				ActivityFacility facility = nextActivityFacilityMap.get(driverId);
-				double distanceToNextActivity = CoordUtils.calcDistance(facility.getCoord(), coord);
+				double distanceToNextActivity = CoordUtils.calcEuclideanDistance(facility.getCoord(), coord);
 
 				/*
 				 * If the agent is within the parking radius

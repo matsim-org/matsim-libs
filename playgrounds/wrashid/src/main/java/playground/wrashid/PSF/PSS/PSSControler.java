@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -173,18 +174,17 @@ public class PSSControler {
 	public void runMATSimIterations() {
 
 		// use the right Controler (read parameter
-		Config config = new Config();
-		ConfigReader reader = new ConfigReader(config);
-		reader.readFile(configFilePath);
+		Config config = ConfigUtils.loadConfig(configFilePath, new ParametersPSF());
+
 		String tempStringValue = config.findParam(ParametersPSF.PSF_MODULE, "main.inputEventsForSimulationPath");
 		if (tempStringValue != null) {
 			// ATTENTION, this does not work at the moment, because the read link from the
 			// event file is null and this causes some probelems in my handlers...
 			//
 			// (I think that the above is a statement by Rashid from 2011. kai, sep'2015)
-			controler = new EventReadControler(configFilePath,tempStringValue).getControler();
+			controler = new EventReadControler(config,tempStringValue).getControler();
 		} else {
-			controler = new Controler(configFilePath);
+			controler = new Controler(config);
 		}
 
 		controler.addControlerListener(new AddEnergyScoreListener());

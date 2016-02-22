@@ -119,7 +119,7 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 			TravelDisutility td) {
 		LeastCostPathCalculator routeAlgo = pathAlgoFactory.createPathCalculator( scenario.getNetwork(), td, tt);
 
-		final RoutingModule routingModule = DefaultRoutingModules.createNetworkRouter(TransportMode.car, scenario.getPopulation().getFactory(), 
+		final RoutingModule routingModule = DefaultRoutingModules.createPureNetworkRouter(TransportMode.car, scenario.getPopulation().getFactory(), 
 				scenario.getNetwork(), routeAlgo);
 
 		List<Id<Link>> links = null ;

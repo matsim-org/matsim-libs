@@ -100,7 +100,7 @@ public class OneTaxiOptimizer
 
         double t1 = p1.getArrivalTime();
         double t2 = t1 + PICKUP_DURATION;// 2 minutes for picking up the passenger
-        schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, "pickup", req));
+        schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, true, req));
 
         VrpPathWithTravelData p2 = VrpPaths.calcAndCreatePath(fromLink, toLink, t2, router,
                 travelTime);
@@ -108,7 +108,7 @@ public class OneTaxiOptimizer
 
         double t3 = p2.getArrivalTime();
         double t4 = t3 + 60;// 1 minute for dropping off the passenger
-        schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, "dropoff", req));
+        schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, false, req));
 
         //just wait (and be ready) till the end of the vehicle's time window (T1)
         double tEnd = Math.max(t4, vehicle.getT1());

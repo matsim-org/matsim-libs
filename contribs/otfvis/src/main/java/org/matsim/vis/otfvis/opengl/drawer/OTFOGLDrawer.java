@@ -20,8 +20,12 @@
 
 package org.matsim.vis.otfvis.opengl.drawer;
 
+import com.jogamp.opengl.*;
+import com.jogamp.opengl.awt.GLCanvas;
+import com.jogamp.opengl.awt.GLJPanel;
+import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.util.awt.AWTGLReadBufferUtil;
 import com.jogamp.opengl.util.awt.ImageUtil;
-import com.jogamp.opengl.util.awt.Screenshot;
 import com.jogamp.opengl.util.awt.TextRenderer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureCoords;
@@ -45,10 +49,6 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryHandler;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
 import org.matsim.vis.otfvis.opengl.gl.Point3f;
 
-import javax.media.opengl.*;
-import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.awt.GLJPanel;
-import javax.media.opengl.glu.GLU;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -118,8 +118,7 @@ public class OTFOGLDrawer implements GLEventListener {
 				Point3f newRectEnd = getOGLPos(e.getX(), e.getY());
 				currentRect = new Rectangle(new Point((int)newRectStart.getX(), (int)newRectStart.getY()));
 				currentRect.add(newRectEnd.getX(), newRectEnd.getY());
-				// This only redraws GUI Elements, no need to invalidate(), just redraw()
-				redraw();
+				canvas.display();
 			} else if (button == 2) {
 				int deltax = start.x - e.getX();
 				int deltay = start.y - e.getY();
@@ -130,7 +129,7 @@ public class OTFOGLDrawer implements GLEventListener {
 				float glDeltaX = excenter.x - center.x;
 				float glDeltaY = excenter.y - center.y;
 				viewBounds = new Rect(viewBounds.minX + glDeltaX, viewBounds.minY + glDeltaY, viewBounds.maxX + glDeltaX, viewBounds.maxY + glDeltaY);
-				redraw();
+				canvas.display();
 			}
 		}
 
@@ -178,9 +177,13 @@ public class OTFOGLDrawer implements GLEventListener {
 			if ((screenRect.getHeight() > 10)&& (screenRect.getWidth() > 10)) {
 				if (button == 1 || button == 4) {
 					if (button == 1) {
-						int deltax = Math.abs(start.x - e.getX());
-						int deltay = Math.abs(start.y - e.getY());
-						double ratio =( (start.y - e.getY()) > 0 ? 1:0) + Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
+						int startxy[] = new int[]{start.x, start.y};
+						canvas.getNativeSurface().convertToPixelUnits(startxy);
+						int endxy[] = new int[]{e.getX(), e.getY()};
+						canvas.getNativeSurface().convertToPixelUnits(endxy);
+						int deltax = Math.abs(startxy[0] - endxy[0]);
+						int deltay = Math.abs(startxy[1] - endxy[1]);
+						double ratio =( (startxy[1] - endxy[1]) > 0 ? 1:0) + Math.max((double)deltax/viewport[2], (double)deltay/viewport[3]);
 						Rectangle2D scaledNewViewBounds = quadTreeRectToRectangle2D(viewBounds.scale(ratio - 1, ratio - 1));
 						Rectangle2D scaledAndTranslatedNewViewBounds = new Rectangle2D.Double(scaledNewViewBounds.getX() + (currentRect.getCenterX() - viewBounds.centerX), scaledNewViewBounds.getY() + (currentRect.getCenterY() - viewBounds.centerY), scaledNewViewBounds.getWidth(), scaledNewViewBounds.getHeight());
 						Animator viewBoundsAnimator = PropertySetter.createAnimator(2020, OTFOGLDrawer.this, "viewBounds", quadTreeRectToRectangle2D(viewBounds), scaledAndTranslatedNewViewBounds);
@@ -280,7 +283,7 @@ public class OTFOGLDrawer implements GLEventListener {
 
 	private OTFQueryHandler queryHandler = null;
 
-	private Component canvas = null;
+	private final GLAutoDrawable canvas;
 
 	private final OTFScaleBarDrawer scaleBar;
 
@@ -314,20 +317,21 @@ public class OTFOGLDrawer implements GLEventListener {
 	
 	private int timeOfLastScreenshot = Integer.MAX_VALUE;
 
-	public OTFOGLDrawer(OTFClientQuadTree clientQ, OTFHostControlBar hostControlBar, OTFVisConfigGroup otfVisConfig) {
+	public OTFOGLDrawer(OTFClientQuadTree clientQ, OTFHostControlBar hostControlBar, OTFVisConfigGroup otfVisConfig, GLAutoDrawable canvas) {
 		Font font = new Font("SansSerif", Font.PLAIN, 32);
 		this.textRenderer = new TextRenderer(font, true, false);
 		this.clientQ = clientQ;
 		this.hostControlBar = hostControlBar;
 		this.otfVisConfig = otfVisConfig;
-		GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
-		this.canvas = createGLCanvas(this, caps);
-        VisGUIMouseHandler mouseMan = new VisGUIMouseHandler();
-		this.canvas.addMouseListener(mouseMan);
-		this.canvas.addMouseMotionListener(mouseMan);
-		this.canvas.addMouseWheelListener(mouseMan);
+		this.canvas = canvas;
+		canvas.addGLEventListener(this);
+
+		VisGUIMouseHandler mouseMan = new VisGUIMouseHandler();
+		((Component) canvas).addMouseListener(mouseMan);
+		((Component) canvas).addMouseMotionListener(mouseMan);
+		((Component) canvas).addMouseWheelListener(mouseMan);
 		this.scaleBar = new OTFScaleBarDrawer();
-		if (includeLogo == true) {
+		if (includeLogo) {
 			OTFGLOverlay matsimLogo = new OTFGLOverlay("matsim_logo_blue.png", -0.03f, 0.05f, 1.5f, false);
 			this.overlayItems.add(matsimLogo);
 		}
@@ -345,33 +349,47 @@ public class OTFOGLDrawer implements GLEventListener {
 		this.clientQ.clearCache();
 	}
 
-	private Component createGLCanvas(final OTFOGLDrawer drawer, final GLCapabilities caps) {
-		Component canvas;
-        boolean isMac = System.getProperty("os.name").equals("Mac OS X");
-        boolean isJava7 = System.getProperty("java.version").startsWith("1.7");
-		if (otfVisConfig.isMapOverlayMode() || (isMac && isJava7)) {
+	public static GLAutoDrawable createGLCanvas(OTFVisConfigGroup otfVisConfig) {
+		GLCapabilities caps = new GLCapabilities(GLProfile.get(GLProfile.GL2));
+		if (otfVisConfig.isMapOverlayMode()) {
             // A GLJPanel is an OpenGL component which is "more Swing compatible" than a GLCanvas.
             // The JOGL doc says the tradeoff is that it is slower than a GLCanvas.
             // We use it if we want to put map tiles behind the agent drawer, because it can be made translucent!
-            // On Java 7 on Mac, I get strange behavior (wrong layout on startup with no obvious fix), so I
-            // also use the "more compatible" version, which works.
             GLJPanel glJPanel = new GLJPanel(caps);
-            glJPanel.addGLEventListener(drawer);
             if (otfVisConfig.isMapOverlayMode()) {
                 glJPanel.setOpaque(false); // So that the map shines through
             }
-			canvas = glJPanel;
+			return glJPanel;
 		} else {
 			// This is the default JOGL component. JOGL doc recommends using it if you do not need a GLJPanel.
-			GLCanvas glCanvas = new GLCanvas(caps);
-			glCanvas.addGLEventListener(drawer);
-			canvas = glCanvas;
+			return new GLCanvas(caps);
 		}
-		return canvas;
 	}
 
 	@Override
 	public void display(GLAutoDrawable drawable) {
+		int time = this.hostControlBar.getOTFHostControl().getSimTime();
+		if (time != -1) {
+			this.now = time;
+			this.lastTime = Time.writeTime(time, ':');
+		}
+		QuadTree.Rect rect;
+		if (nRedrawn > 0) {
+			rect = this.getViewBoundsAsQuadTreeRect();
+		} else {
+			// The first time redraw() is called, it is important that clientQ.getSceneGraph() is called with the whole area rather with what may be visible.
+			// This is because the display-list based StaticNetLayer is initialized then, and it must contain the whole network.
+			// Secondly, we can't really know which part is visible the first time, because the window hasn't been opened and doesn't know its size yet.
+			// So we pass the size of the whole network here and don't rely on anybody else for that.
+			// michaz May '11
+			rect = new QuadTree.Rect((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
+			this.hostControlBar.getOTFHostControl().fetchTimeAndStatus();
+		}
+		this.currentSceneGraph  = this.clientQ.getSceneGraph(time, rect);
+		if (this.queryHandler != null) {
+			this.queryHandler.updateQueries();
+		}
+		hostControlBar.updateScaleLabel();
 		GL2 gl = drawable.getGL().getGL2();
 		OTFGLAbstractDrawable.setGl(drawable);
 		float[] components = otfVisConfig.getBackgroundColor().getColorComponents(new float[4]);
@@ -424,20 +442,25 @@ public class OTFOGLDrawer implements GLEventListener {
 			String nr = String.format("%07d", this.now);
 			try {
 				if (this.now % screenshotInterval == 0 && this.now <= timeOfLastScreenshot) {
-					Screenshot.writeToFile(new File("movie"+ this +" Frame" + nr + ".jpg"), drawable.getWidth(), drawable.getHeight());
+					AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGLProfile(), true);
+					glReadBufferUtil.readPixels(gl, false);
+					glReadBufferUtil.write(new File("movie" + this + " Frame" + nr + ".jpg"));
 				}
 			} catch (GLException e) {
 				e.printStackTrace();
 			} catch (IllegalArgumentException e) {
 				// could happen for folded displays on split screen... ignore
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 		if (this.current == null) {
-			this.current = Screenshot.readToBufferedImage(drawable.getWidth(), drawable.getHeight());
+			AWTGLReadBufferUtil glReadBufferUtil = new AWTGLReadBufferUtil(gl.getGLProfile(), true);
+			this.current = glReadBufferUtil.readPixelsToBufferedImage(gl, false);
 		}
 		gl.glDisable(GL.GL_BLEND);
+		if (viewBounds != null) { // has glInit arrived yet? Otherwise we are not yet fully initialized. :-(
+			fireChangeListeners();
+		}
+		++nRedrawn;
 	}
 	
 	private void displayLinkIds(Map<Coord, String> linkIds, GLAutoDrawable glAutoDrawable) {
@@ -483,12 +506,12 @@ public class OTFOGLDrawer implements GLEventListener {
 		}
 
 		// Calculate text location and color
-		int x = drawable.getWidth() - this.statusWidth - 5;
-		int y = drawable.getHeight() - 30;
+		int x = drawable.getSurfaceWidth() - this.statusWidth - 5;
+		int y = drawable.getSurfaceHeight() - 30;
 
 		// Render the text
 		this.textRenderer.setColor(Color.DARK_GRAY);
-		this.textRenderer.beginRendering(drawable.getWidth(), drawable.getHeight());
+		this.textRenderer.beginRendering(drawable.getSurfaceWidth(), drawable.getSurfaceHeight());
 		this.textRenderer.draw(status, x, y);
 		this.textRenderer.endRendering();
 	}
@@ -507,15 +530,14 @@ public class OTFOGLDrawer implements GLEventListener {
 		}
 	}
 
-	public Component getComponent() {
-		return this.canvas;
-	}
-
 	public SceneGraph getCurrentSceneGraph() {
 		return this.currentSceneGraph;
 	}
 
 	private Point3f getOGLPos(int x, int y) {
+		int[] xy = new int[2]; xy[0] = x; xy[1] = y;
+		canvas.getNativeSurface().convertToPixelUnits(xy);
+		x = xy[0]; y = xy[1];
 		double[] obj_pos = new double[3];
 		float winX, winY;//, winZ = cameraStart.getZ();
 		float posX, posY;//, posZ;
@@ -602,7 +624,7 @@ public class OTFOGLDrawer implements GLEventListener {
 					}
 				}
 			} );
-			popmen.show(this.canvas, e.getX(), e.getY());
+			popmen.show((Component) this.canvas, e.getX(), e.getY());
 			return;
 		}
 		if(this.queryHandler != null) this.queryHandler.handleClick(point,mouseButton);
@@ -622,25 +644,27 @@ public class OTFOGLDrawer implements GLEventListener {
 		gl.glClear( GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 
 		if (!glInited) {
+			// This method can (and will) be called several times.
+			// (Gl contexts can change without notice.)
 			float minEasting = (float)clientQ.getMinEasting();
 			float minNorthing = (float)clientQ.getMinNorthing();
 			float maxNorthing = (float)clientQ.getMaxNorthing();
-			double aspectRatio = (double) drawable.getWidth() / (double) drawable.getHeight();
-			double pixelRatio = (double) drawable.getHeight() / (double) (maxNorthing-minNorthing);
+			double aspectRatio = (double) drawable.getSurfaceWidth() / (double) drawable.getSurfaceHeight();
+			double pixelRatio = (double) drawable.getSurfaceHeight() / (double) (maxNorthing-minNorthing);
 			this.scale = 1.0f / (float) pixelRatio;
 			this.viewBounds =  new QuadTree.Rect(minEasting, minNorthing, minEasting + (maxNorthing - minNorthing) * aspectRatio, maxNorthing);
 			setZoomToNearestInteger();
+			this.hostControlBar.getOTFHostControl().fetchTimeAndStatus();
+			int time = this.hostControlBar.getOTFHostControl().getSimTime();
+			QuadTree.Rect rect = new QuadTree.Rect((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
+			this.currentSceneGraph = this.clientQ.getSceneGraph(time, rect);
 		}
 		marker = OTFOGLDrawer.createTexture(gl, MatsimResource.getAsInputStream("otfvis/marker.png"));
 		setFrustrum(gl);
-
-
 		for (OTFGLAbstractDrawable item : this.overlayItems) {
 			item.glInit();
 		}
-		if (currentSceneGraph != null) {
-			currentSceneGraph.glInit();
-		}
+		currentSceneGraph.glInit();
 		glInited = true;
 	}
 
@@ -665,33 +689,7 @@ public class OTFOGLDrawer implements GLEventListener {
 	}
 
 	public void redraw() {
-		int time = this.hostControlBar.getOTFHostControl().getSimTime();
-		if (time != -1) {
-			this.now = time;
-			this.lastTime = Time.writeTime(time, ':');
-		}
-		QuadTree.Rect rect;
-		if (nRedrawn > 0) {
-			rect = this.getViewBoundsAsQuadTreeRect();
-		} else {
-			// The first time redraw() is called, it is important that clientQ.getSceneGraph() is called with the whole area rather with what may be visible.
-			// This is because the display-list based StaticNetLayer is initialized then, and it must contain the whole network.
-			// Secondly, we can't really know which part is visible the first time, because the window hasn't been opened and doesn't know its size yet.
-			// So we pass the size of the whole network here and don't rely on anybody else for that.
-			// michaz May '11
-			rect = new QuadTree.Rect((float)clientQ.getMinEasting(), (float)clientQ.getMinNorthing(), (float)clientQ.getMaxEasting(), (float)clientQ.getMaxNorthing());
-			this.hostControlBar.getOTFHostControl().fetchTimeAndStatus();
-		}
-		this.currentSceneGraph  = this.clientQ.getSceneGraph(time, rect);
-		if (this.queryHandler != null) {
-			this.queryHandler.updateQueries();
-		}
-		hostControlBar.updateScaleLabel();
-		this.canvas.repaint();
-		if (viewBounds != null) { // has glInit arrived yet? Otherwise we are not yet fully initialized. :-(
-			fireChangeListeners();
-		}
-		++nRedrawn;
+		this.canvas.display();
 	}
 
 	private void renderFace(GL2 gl, Texture t) {
@@ -721,7 +719,6 @@ public class OTFOGLDrawer implements GLEventListener {
 			double pixelSizeX = (getViewBoundsAsQuadTreeRect().maxX - getViewBoundsAsQuadTreeRect().minX) / oldWidth;
 			double pixelSizeY = (getViewBoundsAsQuadTreeRect().maxY - getViewBoundsAsQuadTreeRect().minY) / oldHeight;
 			this.viewBounds = new QuadTree.Rect(getViewBoundsAsQuadTreeRect().minX, getViewBoundsAsQuadTreeRect().maxY - pixelSizeY * height, getViewBoundsAsQuadTreeRect().minX + pixelSizeX * width, getViewBoundsAsQuadTreeRect().maxY);
-			redraw();
 		}
 		oldWidth = width;
 		oldHeight = height;
@@ -730,13 +727,12 @@ public class OTFOGLDrawer implements GLEventListener {
 	private void scaleNetworkRelative(double scale) {
 		OTFOGLDrawer.this.scale *= scale;
 		viewBounds = viewBounds.scale(scale - 1, scale - 1);
-		redraw();
+		this.canvas.display();
 	}
 
 	public void setAlpha(float a){
 		this.alpha = a;
-		// This only redraws GUI Elements, no need to invalidate(), just redraw()
-		redraw();
+		this.canvas.display();
 	}
 
 	private void setFrustrum(GL2 gl) {
@@ -769,11 +765,10 @@ public class OTFOGLDrawer implements GLEventListener {
 	private void showZoomDialog() {
 		this.zoomD = new JDialog();
 		this.zoomD.setUndecorated(true);
-		this.zoomD.setLocationRelativeTo(this.canvas.getParent());
-		Point pD = this.canvas.getLocationOnScreen();
-		this.canvas.getParent();
+		this.zoomD.setLocationRelativeTo(((Component) this.canvas).getParent());
+		Point pD = ((Component) this.canvas).getLocationOnScreen();
 		this.zoomD.setLocation(pD);
-		this.zoomD.setPreferredSize(this.canvas.getSize());
+		this.zoomD.setPreferredSize(((Component) this.canvas).getSize());
 		GridLayout gbl = new GridLayout(3,3);
 		this.zoomD.getContentPane().setLayout( gbl );
 		ArrayList<JButton> buttons = new ArrayList<JButton>();
@@ -836,7 +831,7 @@ public class OTFOGLDrawer implements GLEventListener {
 				d.setVisible(true);
 				name = field.getText();
 		}
-		this.canvas.repaint();
+		((Component) this.canvas).repaint();
 		BufferedImage image = ImageUtil.createThumbnail(this.current, 300);
 		otfVisConfig.addZoom(new ZoomEntry(image,zoomstore, name));
 	}

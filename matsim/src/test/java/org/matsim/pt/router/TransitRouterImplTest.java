@@ -82,7 +82,7 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 29.0 * 60 + // agent takes the *:06 course, arriving in D at *:29
-				CoordUtils.calcDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -103,7 +103,7 @@ public class TransitRouterImplTest {
 		for (Leg leg : legs) {
 			actualTravelTime += leg.getTravelTime();
 		}
-		double expectedTravelTime = CoordUtils.calcDistance(fromCoord, toCoord) / config.getBeelineWalkSpeed();
+		double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -124,7 +124,7 @@ public class TransitRouterImplTest {
 		for (Leg leg : legs) {
 			actualTravelTime += leg.getTravelTime();
 		}
-		double expectedTravelTime = CoordUtils.calcDistance(fromCoord, toCoord) / config.getBeelineWalkSpeed();
+		double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -185,7 +185,7 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 31.0 * 60 + // agent takes the *:06 course, arriving in C at *:18, departing at *:21, arriving in K at*:31
-				CoordUtils.calcDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -221,7 +221,7 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 29.0 * 60 + // agent takes the *:46 course, arriving in C at *:58, departing at *:00, arriving in G at*:09
-				CoordUtils.calcDistance(f.schedule.getFacilities().get(Id.create("12", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("12", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -323,7 +323,7 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 4*3600 + 29.0 * 60 + // arrival at 05:29 at D
-				CoordUtils.calcDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -385,7 +385,7 @@ public class TransitRouterImplTest {
 	@Test
 	public void testSingleWalkOnly() {
 		WalkFixture f = new WalkFixture();
-		f.routerConfig.setSearchRadius(0.8 * CoordUtils.calcDistance(f.coord2, f.coord4));
+		f.routerConfig.setSearchRadius(0.8 * CoordUtils.calcEuclideanDistance(f.coord2, f.coord4));
 		f.routerConfig.setExtensionRadius(0.0);
 
 		TransitRouterImpl router = new TransitRouterImpl(f.routerConfig, f.schedule);
@@ -402,7 +402,7 @@ public class TransitRouterImplTest {
 	@Test
 	public void testDoubleWalkOnly() {
 		WalkFixture f = new WalkFixture();
-		f.routerConfig.setSearchRadius(0.8 * CoordUtils.calcDistance(f.coord2, f.coord4));
+		f.routerConfig.setSearchRadius(0.8 * CoordUtils.calcEuclideanDistance(f.coord2, f.coord4));
 		f.routerConfig.setExtensionRadius(0.0);
 
 		TransitRouterImpl router = new TransitRouterImpl(f.routerConfig, f.schedule);

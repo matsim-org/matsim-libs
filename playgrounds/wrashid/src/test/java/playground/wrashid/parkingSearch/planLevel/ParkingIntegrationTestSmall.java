@@ -28,6 +28,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.wrashid.parkingChoice.ParkingConfigModule;
 import playground.wrashid.parkingSearch.planLevel.scenario.ParkingUtils;
 
 public class ParkingIntegrationTestSmall {
@@ -38,7 +39,7 @@ public class ParkingIntegrationTestSmall {
 	// just to test, that the system runs without errors.
 	@Test
 	public void testScenario(){
-		Config config = ConfigUtils.loadConfig( utils.getPackageInputDirectory() + "chessConfig2.xml" ) ;
+		Config config = ConfigUtils.loadConfig( utils.getPackageInputDirectory() + "chessConfig2.xml", new ParkingConfigModule()) ;
 		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		

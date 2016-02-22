@@ -26,7 +26,9 @@ public class ScenarioByInstanceModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(Scenario.class).toInstance(scenario);
+		// if no network provided, assume it comes from somewhere else, and this module just provides
+		// the scenario "elements"
+		if ( scenario != null ) bind(Scenario.class).toInstance(scenario);
 		if (getConfig().transit().isUseTransit()) {
 			bind(TransitSchedule.class).toProvider(TransitScheduleProvider.class);
 			bind(Vehicles.class).annotatedWith(Transit.class).toProvider(TransitVehiclesProvider.class);

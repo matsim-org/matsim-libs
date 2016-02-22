@@ -47,7 +47,7 @@ public class KNTaxibusExample {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses(true);
+		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
 
 		final TaxiBusTravelTimesAnalyzer taxibusTravelTimesAnalyzer = new TaxiBusTravelTimesAnalyzer();
 		final TraveltimeAndDistanceEventHandler ttEventHandler = new TraveltimeAndDistanceEventHandler(scenario.getNetwork());

@@ -23,11 +23,11 @@ import java.util.Date;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.util.EnumCounter;
+import org.matsim.contrib.zone.Zone;
+import org.matsim.contrib.zone.util.ZoneFinder;
 import org.matsim.matrices.*;
 
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.*;
-import playground.michalm.zone.util.ZoneFinder;
 
 
 public class DemandAggregator

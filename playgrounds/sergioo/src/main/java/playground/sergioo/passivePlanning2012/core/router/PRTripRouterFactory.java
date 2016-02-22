@@ -47,7 +47,7 @@ public class PRTripRouterFactory implements Provider<TripRouter> {
         PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
 
         TravelTime travelTime = travelTimes.get("car");
-        TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore());
+        TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"));
 
         LeastCostPathCalculator routeAlgo =
                 leastCostPathCalculatorFactory.createPathCalculator(
@@ -85,7 +85,7 @@ public class PRTripRouterFactory implements Provider<TripRouter> {
         }
 
         for ( String mode : routeConfigGroup.getNetworkModes() ) {
-            final RoutingModule routingModule = DefaultRoutingModules.createNetworkRouter(mode, scenario.getPopulation().getFactory(), 
+            final RoutingModule routingModule = DefaultRoutingModules.createPureNetworkRouter(mode, scenario.getPopulation().getFactory(), 
 			        scenario.getNetwork(), routeAlgo);
 			final RoutingModule result = tripRouter.setRoutingModule( mode, routingModule);
 

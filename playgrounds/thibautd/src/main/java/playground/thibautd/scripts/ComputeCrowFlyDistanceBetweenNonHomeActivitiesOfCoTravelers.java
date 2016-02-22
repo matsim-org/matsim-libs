@@ -76,7 +76,7 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 			final Activity driverNonJoint = getOtherNonHome( driver , driverAct );
 
 			writer.newLine();
-			writer.write( passengerNonJoint.getType() +"\t"+ driverNonJoint.getType() +"\t"+ CoordUtils.calcDistance( passengerNonJoint.getCoord() , driverNonJoint.getCoord() ) );
+			writer.write( passengerNonJoint.getType() +"\t"+ driverNonJoint.getType() +"\t"+ CoordUtils.calcEuclideanDistance( passengerNonJoint.getCoord() , driverNonJoint.getCoord() ) );
 		}
 		writer.close();
 	}

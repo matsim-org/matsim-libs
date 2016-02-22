@@ -50,6 +50,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static playground.boescpa.ivtBaseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
+
 /**
  * Counts for selected train stations the number of passengers entering pt vehicles or leaving pt vehicles.
  *
@@ -90,7 +92,7 @@ public class PTStationCountsEventHandler implements TransitDriverStartsEventHand
 			stationReader.readLine(); // read header: stationNameAsInMATSimSchedule, 24 countVolumesEntering, 24 countVolumesLeaving
 			String line = stationReader.readLine();
 			while (line != null) {
-				String[] lineElements = line.split(";");
+				String[] lineElements = line.split(COUNTS_DELIMITER);
 				String stationName = lineElements[0].trim();
 				double[] countVolumesEntering = new double[24];
 				double[] countVolumesLeaving = new double[24];
@@ -181,7 +183,9 @@ public class PTStationCountsEventHandler implements TransitDriverStartsEventHand
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 			// write file head
-			writer.write("stationId\thour\tmatsimVolumeEntering\tcountVolumeEntering\trelativeErrorEntering\tmatsimVolumeLeaving\tcountVolumeLeaving\trelativeErrorLeaving");
+			writer.write("stationId" + COUNTS_DELIMITER + "hour" + COUNTS_DELIMITER +
+					"countVolumeEntering" + COUNTS_DELIMITER + "matsimVolumeEntering" + COUNTS_DELIMITER + "relativeVolumeEntering" + COUNTS_DELIMITER +
+					"countVolumeLeaving" + COUNTS_DELIMITER + "matsimVolumeLeaving" + COUNTS_DELIMITER + "relativeVolumeLeaving");
 			writer.newLine();
 			// write content
 			for (String station : stationsToMonitor.keySet()) {
@@ -196,10 +200,9 @@ public class PTStationCountsEventHandler implements TransitDriverStartsEventHand
 					double countVolumeLeaving = stationsToMonitor.get(station).getSecond()[i];
 					double relativeEntering = countVolumeEntering > 0 ? matsimVolumeEntering/countVolumeEntering : matsimVolumeEntering*100;
 					double relativeLeaving = countVolumeLeaving > 0 ? matsimVolumeLeaving/countVolumeLeaving : matsimVolumeLeaving*100;
-					writer.write(station + "\t");
-					writer.write(i + "\t");
-					writer.write(matsimVolumeEntering + "\t" + countVolumeEntering + "\t" + relativeEntering + "\t");
-					writer.write(matsimVolumeLeaving + "\t" + countVolumeLeaving + "\t" + relativeLeaving);
+					writer.write(station + COUNTS_DELIMITER + i + COUNTS_DELIMITER);
+					writer.write(countVolumeEntering + COUNTS_DELIMITER + matsimVolumeEntering + COUNTS_DELIMITER + relativeEntering + COUNTS_DELIMITER);
+					writer.write(countVolumeLeaving + COUNTS_DELIMITER + matsimVolumeLeaving + COUNTS_DELIMITER + relativeLeaving);
 					writer.newLine();
 				}
 			}

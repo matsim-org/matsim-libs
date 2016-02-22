@@ -2,6 +2,8 @@ package playground.southafrica.population.utilities.activityTypeManipulation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.population.Leg;
@@ -44,7 +46,7 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 		String outputConfig = args[3];
 		
 		NmbmActivityTypeManipulator atm = new NmbmActivityTypeManipulator();
-		atm.parseDecileFile(decileFile);
+		List<ActivityParams> configParameters = atm.parseDecileFile(decileFile);
 		atm.parsePopulation(population);
 		atm.run();
 		
@@ -53,6 +55,9 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 		pw.write(outputPopulation);
 		
 		/* Write the config to file. */
+		for(ActivityParams ap : configParameters){
+			atm.config.planCalcScore().addActivityParams(ap);
+		}
 		ConfigWriter cw = new ConfigWriter(atm.config);
 		cw.write(outputConfig);
 		
@@ -162,8 +167,9 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 
 	
 	@Override
-	protected void parseDecileFile(String filename) {
+	protected List<ActivityParams> parseDecileFile(String filename) {
 		LOG.info("Parsing deciles from R output...");
+		List<ActivityParams> listOfParameters = new ArrayList<>();
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		try {
 			String s = br.readLine(); /* Header */
@@ -207,10 +213,11 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 			for(String ss : deciles.get(s).keySet()){
 				ActivityParams ap = new ActivityParams(deciles.get(s).get(ss).getFirst());
 				ap.setTypicalDuration(Time.parseTime(deciles.get(s).get(ss).getSecond()));
-				config.planCalcScore().addActivityParams(ap);
+				listOfParameters.add(ap);
 			}
 		}
 		LOG.info("Done.");
+		return listOfParameters;
 	}
 
 }

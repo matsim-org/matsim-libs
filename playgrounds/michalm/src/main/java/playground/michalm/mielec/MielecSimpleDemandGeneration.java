@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.contrib.zone.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrix;
@@ -31,7 +32,6 @@ import playground.michalm.demand.*;
 import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
 import playground.michalm.util.array2d.*;
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.*;
 
 
 public class MielecSimpleDemandGeneration

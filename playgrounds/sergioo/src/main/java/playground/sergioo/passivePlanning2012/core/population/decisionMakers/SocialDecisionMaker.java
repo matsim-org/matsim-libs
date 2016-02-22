@@ -63,7 +63,7 @@ public class SocialDecisionMaker extends PlacesSharer implements EndTimeDecision
 			while(options.size()==0) {
 				for(KnownPlace knownPlace:knownPlaces.values()) {
 					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(knownPlace.getFacilityId());
-					if(CoordUtils.calcDistance(location, facility.getCoord())<maximumDistance)
+					if(CoordUtils.calcEuclideanDistance(location, facility.getCoord())<maximumDistance)
 						for(String type:knownPlace.getActivityTypes(time))
 							options.add(new Tuple<String, Id<ActivityFacility>>(type, knownPlace.getFacilityId()));
 				}

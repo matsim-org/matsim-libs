@@ -115,8 +115,8 @@ public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory
 			return individualParameters.get( person.getId() );
 		}
 
-		final CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder builder =
-				CharyparNagelScoringParameters.getBuilder( config, config.getScoringParameters( null ), scenarioConfig );
+		final CharyparNagelScoringParameters.Builder builder =
+				new CharyparNagelScoringParameters.Builder(config, config.getScoringParameters(null), scenarioConfig);
 		final Set<String> handledTypes = new HashSet<>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			// XXX works only if no variation of type of activities between plans
@@ -170,13 +170,13 @@ public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory
 				typeBuilder.setTypicalDuration_s(typicalDuration);
 			}
 
-			builder.withActivityParameters(
+			builder.setActivityParameters(
 					act.getType(),
-					typeBuilder.create());
+					typeBuilder );
 		}
 
 		final CharyparNagelScoringParameters params =
-				builder.create();
+				builder.build();
 		individualParameters.put( person.getId() , params );
 		return params;
 	}

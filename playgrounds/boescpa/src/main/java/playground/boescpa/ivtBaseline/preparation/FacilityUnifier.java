@@ -101,7 +101,6 @@ public class FacilityUnifier {
             newFacility.setDesc(((ActivityFacilityImpl)facility).getDesc());
         }
         for (ActivityOption activity : facility.getActivityOptions().values()) {
-            activity.setFacility(newFacility);
             newFacility.addActivityOption(activity);
         }
         return newFacility;
@@ -123,7 +122,6 @@ public class FacilityUnifier {
                 }
                 if (!containsMatchingActivity) {
                     for (ActivityOption activity : facilityImpl.getActivityOptions().values()) {
-                        activity.setFacility(poolFacility);
                         poolFacility.addActivityOption(activity);
                     }
                     poolFacility.setDesc(poolFacility.getDesc() + ", " + facilityImpl.getDesc());

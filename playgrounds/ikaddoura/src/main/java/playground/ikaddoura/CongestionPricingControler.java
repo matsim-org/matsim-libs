@@ -130,7 +130,7 @@ public class CongestionPricingControler {
 
 			if (router.equals("standard")) {
 
-				final Builder factory = new Builder( TransportMode.car );
+				final Builder factory = new Builder( TransportMode.car, config.planCalcScore() );
 				factory.setSigma(sigma);
 				controler.addOverridingModule(new AbstractModule(){
 					@Override
@@ -141,7 +141,7 @@ public class CongestionPricingControler {
 				
 			} else if (router.equals("VTTSspecific")) {
 
-				final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
+				final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, config.planCalcScore());
 				factory.setSigma(sigma);
 				
 				controler.addOverridingModule(new AbstractModule(){
@@ -164,7 +164,7 @@ public class CongestionPricingControler {
 			
 			if (router.equals("standard")) {
 
-				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(new Builder( TransportMode.car ), tollHandler);
+				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(new Builder( TransportMode.car, config.planCalcScore() ), tollHandler, config.planCalcScore());
 				factory.setSigma(sigma);
 				
 				controler.addOverridingModule(new AbstractModule() {
@@ -177,8 +177,8 @@ public class CongestionPricingControler {
 			} else if (router.equals("VTTSspecific")) {
 				
 				final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
-						new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
-						tollHandler
+						new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, config.planCalcScore()),
+						tollHandler, config.planCalcScore()
 					);
 				factory.setSigma(sigma);
 				

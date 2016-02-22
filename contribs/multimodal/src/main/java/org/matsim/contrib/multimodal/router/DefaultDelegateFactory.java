@@ -101,7 +101,7 @@ public class DefaultDelegateFactory implements Provider<TripRouter> {
 		TripRouter tripRouter = new TripRouter();
 
 		TravelTime travelTime = travelTimes.get("car");
-		TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore());
+		TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"));
 
 		Network network = this.scenario.getNetwork();
 		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
@@ -180,7 +180,7 @@ public class DefaultDelegateFactory implements Provider<TripRouter> {
 			}
 			
 			LeastCostPathCalculator routeAlgo = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
-			RoutingModule legRouterWrapper = DefaultRoutingModules.createNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
+			RoutingModule legRouterWrapper = DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
 			final RoutingModule old = tripRouter.setRoutingModule(mode, legRouterWrapper);
         	
             if (old != null) {

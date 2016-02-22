@@ -56,10 +56,7 @@ public class PtScoringTest {
 		config.planCalcScore().setWriteExperiencedPlans(true);
 
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
@@ -81,7 +78,7 @@ public class PtScoringTest {
 		
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
 		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
-		ActivityUtilityParameters params = builder.create() ;
+		ActivityUtilityParameters params = builder.build() ;
 		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
 
 
@@ -199,10 +196,7 @@ public class PtScoringTest {
 		config.planCalcScore().getModes().get(TransportMode.pt).setConstant(1.);
 
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
@@ -222,7 +216,7 @@ public class PtScoringTest {
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
 		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
-		ActivityUtilityParameters params = builder.create() ;
+		ActivityUtilityParameters params = builder.build() ;
 		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
 
 		double homeAct1End = 18060. ;
@@ -344,10 +338,7 @@ public class PtScoringTest {
 		config.planCalcScore().setMarginalUtlOfWaitingPt_utils_hr(-18.0) ;
 
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
@@ -367,7 +358,7 @@ public class PtScoringTest {
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
 		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
-		ActivityUtilityParameters params = builder.create() ;
+		ActivityUtilityParameters params = builder.build() ;
 		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
 
 
@@ -420,10 +411,7 @@ public class PtScoringTest {
 		config.planCalcScore().setWriteExperiencedPlans(true);
 
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
@@ -443,7 +431,7 @@ public class PtScoringTest {
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
 		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
-		ActivityUtilityParameters params = builder.create() ;
+		ActivityUtilityParameters params = builder.build() ;
 		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
 
 

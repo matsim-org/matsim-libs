@@ -67,7 +67,7 @@ public class PostProcessPopulation {
 			ActivityImpl activity = (ActivityImpl)person.getSelectedPlan().getPlanElements().get(2);
 //			System.out.println(activity.toString());
 			Coord facilityCoord = activity.getCoord();
-			double distance = CoordUtils.calcDistance(parkingCoord, facilityCoord);
+			double distance = CoordUtils.calcEuclideanDistance(parkingCoord, facilityCoord);
 			line.add(personId);
 			line.add(Double.toString((distance)));
 			list.add(line);

@@ -3,6 +3,7 @@ package playground.wrashid.PSF.singleAgent;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 import playground.wrashid.PSF.ParametersPSF;
@@ -35,6 +36,7 @@ public class AdvancedTest extends MatsimTestCase {
 
 	private void initTest(String configFile) {
 		Config config = loadConfig(configFile);
+		ConfigUtils.addOrGetModule(config, ParametersPSF.PSF_MODULE, ParametersPSF.class);
 		controler = new Controler(config);
 
 		controler.addControlerListener(new AddEnergyScoreListener());

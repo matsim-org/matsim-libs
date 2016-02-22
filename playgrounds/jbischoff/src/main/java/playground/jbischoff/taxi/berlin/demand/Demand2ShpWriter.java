@@ -19,35 +19,26 @@
 
 package playground.jbischoff.taxi.berlin.demand;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.geotools.feature.simple.*;
+import org.matsim.api.core.v01.*;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.matrices.*;
 import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.Matrix;
 import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.*;
 
 import playground.jbischoff.taxi.berlin.data.BeelineDistanceExractor;
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.Zone;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 
 
 public class Demand2ShpWriter

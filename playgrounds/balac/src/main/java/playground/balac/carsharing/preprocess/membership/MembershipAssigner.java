@@ -85,7 +85,7 @@ public class MembershipAssigner
     closestStations = this.carStations.findClosestStations(c, 3, 5000.0D);
     for (CarSharingStation station : closestStations)
     {
-      access += station.getCars() * Math.exp(-2.0D * CoordUtils.calcDistance(station.getCoord(), c) / 1000.0D);
+      access += station.getCars() * Math.exp(-2.0D * CoordUtils.calcEuclideanDistance(station.getCoord(), c) / 1000.0D);
     }
 
     return access;
@@ -113,7 +113,7 @@ public class MembershipAssigner
     closestStations = this.carStations.findClosestStations(c, 3, 5000.0D);
     for (CarSharingStation station : closestStations)
     {
-      access += station.getCars() * Math.exp(-2.0D * CoordUtils.calcDistance(station.getCoord(), c) / 1000.0D);
+      access += station.getCars() * Math.exp(-2.0D * CoordUtils.calcEuclideanDistance(station.getCoord(), c) / 1000.0D);
     }
 
     return access;

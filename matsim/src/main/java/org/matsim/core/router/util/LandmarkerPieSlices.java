@@ -233,7 +233,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 				if (angelDiff < minSectorSize * minAngelFactor) {
 					// Change landmark that is nearer to the center
 					int indexToChange = 0;
-					if (CoordUtils.calcDistance(this.center, this.landmarks[preInd].getCoord()) < CoordUtils.calcDistance(this.center, this.landmarks[i].getCoord())) {
+					if (CoordUtils.calcEuclideanDistance(this.center, this.landmarks[preInd].getCoord()) < CoordUtils.calcEuclideanDistance(this.center, this.landmarks[i].getCoord())) {
 						// Narrow the sector
 						sectorAngles[preInd][1] -= minSectorSize * minAngelFactor;
 						indexToChange = preInd;

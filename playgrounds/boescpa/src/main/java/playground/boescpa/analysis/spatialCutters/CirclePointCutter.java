@@ -53,7 +53,7 @@ public class CirclePointCutter implements SpatialCutter {
 		Boolean isConsidered = linkCache.get(link.getId());
 		if (isConsidered == null) {
 			isConsidered = false;
-			if (CoordUtils.calcDistance(link.getCoord(), center) <= radius) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), center) <= radius) {
 				isConsidered = true;
 			}
 			linkCache.put(link.getId(),isConsidered);

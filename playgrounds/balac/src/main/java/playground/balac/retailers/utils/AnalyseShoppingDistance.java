@@ -39,7 +39,7 @@ public class AnalyseShoppingDistance {
 								((Activity)p.getSelectedPlan().getPlanElements().get(counter - 2)).getType().startsWith("work") ||
 								((Activity)p.getSelectedPlan().getPlanElements().get(counter - 2)).getType().startsWith("education")) {
 							
-							distance = CoordUtils.calcDistance(((Activity) pe).getCoord(), ((Activity)p.getSelectedPlan().getPlanElements().get(counter - 2)).getCoord());
+							distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), ((Activity)p.getSelectedPlan().getPlanElements().get(counter - 2)).getCoord());
 							if (distance < 10000) {
 								bins[(int)distance/500]++;
 								number++;
@@ -53,7 +53,7 @@ public class AnalyseShoppingDistance {
 								((Activity)p.getSelectedPlan().getPlanElements().get(counter + 2)).getType().startsWith("education")) {
 							
 							
-							distance = CoordUtils.calcDistance(((Activity) pe).getCoord(), ((Activity)p.getSelectedPlan().getPlanElements().get(counter + 2)).getCoord());
+							distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), ((Activity)p.getSelectedPlan().getPlanElements().get(counter + 2)).getCoord());
 							if (distance < 10000) {
 								bins[(int)distance/500]++;
 								number++;

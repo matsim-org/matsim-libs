@@ -23,13 +23,12 @@
  */
 package playground.vsp.parkAndRide.prepare;
 
-import java.io.IOException;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.io.IOException;
 
 /**
  * @author Ihab

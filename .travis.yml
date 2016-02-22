@@ -1,6 +1,6 @@
 language: java
 script:
-  - cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn test -B -Dmaven.test.redirectTestOutputToFile
+  - cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn test --fail-at-end -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 env:
   global:
     - MAVEN_OPTS="-XX:MaxPermSize=1g -Xmx2g"

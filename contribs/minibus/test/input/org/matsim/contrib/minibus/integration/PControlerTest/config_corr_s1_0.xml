@@ -141,26 +141,6 @@
 
 <!-- ====================================================================== -->
 
-	<module name="bvgScoring">
-		<param name="offsetCar" value="-7.0" />
-		<param name="offsetPt" value="-1.0" />
-		<param name="offsetRide" value="-0.0" />
-		<param name="offsetBike" value="-4.0" />
-		<param name="offsetWalk" value="-0.0" />
-		
-		<param name="betaOffsetCar" value="1.0" />
-		<param name="betaOffsetPt" value="1.0" />
-		<param name="betaOffsetRide" value="1.0" />
-		<param name="betaOffsetBike" value="1.0" />
-		<param name="betaOffsetWalk" value="1.0" />
-		
-		<param name="monetaryDistanceCostRateRide" value="0.0" />
-		<param name="monetaryDistanceCostRateBike" value="0.0" />
-		<param name="monetaryDistanceCostRateWalk" value="0.0" />
-	</module>
-	
-<!-- ====================================================================== -->
-
 	<module name="transitRouter">
 		<param name="searchRadius" value="500" />
 		<param name="extensionRadius" value="200" />

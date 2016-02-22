@@ -65,8 +65,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 				new LeastCostPathTreeExtended(
 						ttc,
 						travelDisutilityFactory.createTravelDisutility(
-								ttc,
-								planCalcScoreConfigGroup ),
+								ttc ),
 								this.scheme ) ;
 
 		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0. ) {

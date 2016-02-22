@@ -132,7 +132,7 @@ public final class TransitRouterNetworkWW implements Network {
 			this.route = route;
 			this.line = line;
 			if(route==null)
-				this.length = CoordUtils.calcDistance(this.toNode.stop.getStopFacility().getCoord(), this.fromNode.stop.getStopFacility().getCoord());
+				this.length = CoordUtils.calcEuclideanDistance(this.toNode.stop.getStopFacility().getCoord(), this.fromNode.stop.getStopFacility().getCoord());
 			else {
 				this.length = 0;
 				for(Id<Link> linkId:route.getRoute().getSubRoute(fromNode.stop.getStopFacility().getLinkId(), toNode.stop.getStopFacility().getLinkId()).getLinkIds())

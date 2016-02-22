@@ -66,6 +66,8 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private Double beelineDistanceFactor = 1.3 ;
 
+	private boolean insertingAccessEgressWalk = false ;
+
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_TYPE = "teleportedModeParameters";
 
@@ -178,6 +180,19 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 		{
 			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.walk );
+			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
+			addParameterSet( walk );
+		}
+		
+		// the following two are deliberately different from "walk" since "walk" may become a network routing mode, but these two
+		// will not. kai, dec'15
+		{
+			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.access_walk );
+			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
+			addParameterSet( walk );
+		}
+		{
+			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.egress_walk );
 			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
 			addParameterSet( walk );
 		}
@@ -401,7 +416,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		return map ;
 	}
 	
-	@Deprecated // use mode-specific factors
+	@Deprecated // use mode-specific factors.  kai, apr'15
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
 		testForLocked() ;
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
@@ -410,7 +425,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		addParameterSet( pars );
 	}
 
-	@Deprecated // use mode-specific factors
+	@Deprecated // use mode-specific factors.  kai, apr'15
 	public void setTeleportedModeSpeed(String mode, double speed) {
 		testForLocked() ;
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
@@ -419,12 +434,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		addParameterSet( pars );
 	}
 	
-//	@SuppressWarnings("static-method")
-//	public double getBeelineDistanceFactor() {
-//		return beelineDistanceFactor;
-//	}
-
-	@Deprecated // use mode-specific beeline distance factors!
+	@Deprecated // use mode-specific beeline distance factors! kai, apr'15
 	public void setBeelineDistanceFactor(double val) {
 		testForLocked() ;
 		// yyyy thinking about this: this should in design maybe not be different from the other teleportation factors (reset everything
@@ -439,6 +449,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 	}
 
+	public boolean isInsertingAccessEgressWalk() {
+		return this.insertingAccessEgressWalk ;
+	}
+	public void setInsertingAccessEgressWalk( boolean val ) {
+		this.insertingAccessEgressWalk = val ;
+	}
 
 
 }

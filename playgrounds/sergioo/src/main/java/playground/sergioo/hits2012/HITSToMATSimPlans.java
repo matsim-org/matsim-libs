@@ -99,13 +99,13 @@ public class HITSToMATSimPlans {
 				Plan plan = factory.createPlan();
 				for(Trip trip:person.getTrips().values()) {
 					if(consistentLocation && !previousTrip.getEndPostalCode().equals(trip.getStartPostalCode()))
-						if(CoordUtils.calcDistance(cT.transform(Household.LOCATIONS.get(previousTrip.getEndPostalCode()).getCoord()), cT.transform(Household.LOCATIONS.get(trip.getStartPostalCode()).getCoord()))>MAX_DISTANCE)
+						if(CoordUtils.calcEuclideanDistance(cT.transform(Household.LOCATIONS.get(previousTrip.getEndPostalCode()).getCoord()), cT.transform(Household.LOCATIONS.get(trip.getStartPostalCode()).getCoord()))>MAX_DISTANCE)
 							consistentLocation = false;
 					if(consistentLocation) {
 						ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(Id.create(Integer.parseInt(previousTrip.getEndPostalCode()), ActivityFacility.class));
 						if(facility!=null) {
 							TripMode tripMode = new TripMode();
-							tripMode.distance = CoordUtils.calcDistance(cT.transform(Household.LOCATIONS.get(trip.getStartPostalCode()).getCoord()), cT.transform(Household.LOCATIONS.get(trip.getEndPostalCode()).getCoord()));
+							tripMode.distance = CoordUtils.calcEuclideanDistance(cT.transform(Household.LOCATIONS.get(trip.getStartPostalCode()).getCoord()), cT.transform(Household.LOCATIONS.get(trip.getEndPostalCode()).getCoord()));
 							String activityT = getActivity(previousTrip.getPurpose(), getSeconds(previousTrip.getEndTime()), getSeconds(trip.getStartTime()), person.getEducation()); 
 							Activity activity = factory.createActivityFromLinkId(activityT, facility.getLinkId());
 							((ActivityImpl)activity).setFacilityId(facility.getId());
@@ -202,7 +202,7 @@ public class HITSToMATSimPlans {
 				}
 				Trip trip = person.getTrips().values().iterator().next();
 				if(consistentLocation && !previousTrip.getEndPostalCode().equals(trip.getStartPostalCode()))
-					if(CoordUtils.calcDistance(cT.transform(Household.LOCATIONS.get(previousTrip.getEndPostalCode()).getCoord()), cT.transform(Household.LOCATIONS.get(trip.getStartPostalCode()).getCoord()))>MAX_DISTANCE)
+					if(CoordUtils.calcEuclideanDistance(cT.transform(Household.LOCATIONS.get(previousTrip.getEndPostalCode()).getCoord()), cT.transform(Household.LOCATIONS.get(trip.getStartPostalCode()).getCoord()))>MAX_DISTANCE)
 						consistentLocation = false;
 				if(consistentLocation) {
 					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(Id.create(Integer.parseInt(previousTrip.getEndPostalCode()), ActivityFacility.class));

@@ -170,7 +170,7 @@ public class IntersectionSimplifier implements NetworkRunnable {
 		link.setCapacity(capacity);
 		link.setFreespeed(freespeed);
 		link.setNumberOfLanes(lanes);
-		link.setLength(NetworkUtils.getEuclidianDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
+		link.setLength(NetworkUtils.getEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
 	}
 	
 	public static void main(String args[]) {

@@ -33,7 +33,7 @@ public class StartingLegMessage extends EventMessage {
 
 	public StartingLegMessage(Scheduler scheduler, Vehicle vehicle) {
 		super(scheduler, vehicle);
-		priority = SimulationParameters.PRIORITY_DEPARTUARE_MESSAGE;
+		priority = JDEQSimConfigGroup.PRIORITY_DEPARTUARE_MESSAGE;
 	}
 
 	@Override
@@ -68,18 +68,18 @@ public class StartingLegMessage extends EventMessage {
 
 	@Override
 	public void processEvent() {
-		Event event = null;
+		Event event;
 
 		// schedule ActEndEvent
 		event = new ActivityEndEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), vehicle
 				.getPreviousActivity().getFacilityId(), vehicle.getPreviousActivity().getType());
-		SimulationParameters.getProcessEventThread().processEvent(event);
+		eventsManager.processEvent(event);
 
 		// schedule AgentDepartureEvent
 		event = new PersonDepartureEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(),
 				vehicle.getCurrentLeg().getMode());
 
-		SimulationParameters.getProcessEventThread().processEvent(event);
+		eventsManager.processEvent(event);
 
 	}
 

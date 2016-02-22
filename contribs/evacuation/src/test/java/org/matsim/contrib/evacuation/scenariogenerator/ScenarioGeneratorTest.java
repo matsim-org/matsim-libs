@@ -34,6 +34,7 @@ import org.matsim.contrib.evacuation.model.config.EvacuationConfigModule;
 import org.matsim.contrib.evacuation.utils.NetworksComparator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -128,22 +129,11 @@ public class ScenarioGeneratorTest {
 		Assert.assertTrue("could not save road closures", saved);
 		
 		//simulate and check scenario
-		boolean simulateScenario = true;
-//		try {
-			Controler matsimController = new Controler(mc);
-			matsimController.getConfig().controler().setOverwriteFileSetting(
-					true ?
-							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-			matsimController.run();
-//		}
-//		catch (Exception e)
-//		{
-//			simulateScenario = false;
-//			e.printStackTrace();
-//		}
-//		assertTrue("scenario was not simulated",simulateScenario);
-		
+		ConfigUtils.addOrGetModule(mc, EvacuationConfigModule.GROUP_NAME, EvacuationConfigModule.class);
+		Controler matsimController = new Controler(mc);
+		matsimController.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		matsimController.run();
+
 		//parse events, check if closed roads are not being visited
 		LinkEnterEventHandler eventHandler = null;
 		EventsManager e = EventsUtils.createEventsManager();

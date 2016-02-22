@@ -109,7 +109,7 @@ public class CsSink  implements Sink{
 			for(Entry<String, OneWayCarsharingStation> cs : this.csStations.entrySet()){
 				
 				writer.newLine();
-				writer.write(cs.getKey() + "\tFOO\t" + cs.getValue().getLink().getCoord().getX() + "\t" + cs.getValue().getLink().getCoord().getY() + "\t0\t0\t" + cs.getValue().getNumberOfVehicles() + "\t" + cs.getValue().getNumberOfAvailableParkingSpaces());
+				writer.write(cs.getKey() + "\tFOO\t" + cs.getValue().getCoord().getX() + "\t" + cs.getValue().getCoord().getY() + "\t0\t0\t" + cs.getValue().getNumberOfVehicles() + "\t" + cs.getValue().getNumberOfAvailableParkingSpaces());
 				
 			}
 			

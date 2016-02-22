@@ -20,10 +20,7 @@
 
 package playground.gregor.quadtreerouting;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Envelope;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,7 +34,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.LinearQuadTreeLD;
 import playground.gregor.sim2d_v4.cgal.LinearQuadTreeLD.Quad;
@@ -47,12 +43,10 @@ import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.events.debug.RectEvent;
 import playground.gregor.sim2d_v4.experimental.Dijkstra;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
-import com.vividsolutions.jts.geom.Envelope;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class QuadTreeRouting {
 
@@ -69,9 +63,9 @@ public class QuadTreeRouting {
 		Config conf = ConfigUtils.createConfig();
 		conf.global().setCoordinateSystem("EPSG:3395");
 		Scenario sc = ScenarioUtils.createScenario(conf);
-		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
+//		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+//		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+//		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 		Node n0 = fac.createNode(Id.create("0", Node.class), new Coord(minX, minY));

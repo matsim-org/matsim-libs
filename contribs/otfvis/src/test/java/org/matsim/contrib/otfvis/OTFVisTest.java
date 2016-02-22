@@ -23,9 +23,6 @@
  */
 package org.matsim.contrib.otfvis;
 
-import java.io.File;
-import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,6 +33,9 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.File;
+import java.util.Arrays;
 
 /**
  * Simple test case to ensure the converting from eventsfile to .mvi-file

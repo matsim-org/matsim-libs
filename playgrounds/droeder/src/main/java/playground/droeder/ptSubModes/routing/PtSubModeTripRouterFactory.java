@@ -104,8 +104,7 @@ public class PtSubModeTripRouterFactory implements javax.inject.Provider<TripRou
 		PlansCalcRouteConfigGroup routeConfigGroup = config.plansCalcRoute();
 		TravelDisutility travelCost =
 			travelDisutilityFactory.createTravelDisutility(
-					travelTime,
-					config.planCalcScore() );
+					travelTime );
 
 		LeastCostPathCalculator routeAlgo =
 			leastCostPathAlgorithmFactory.createPathCalculator(
@@ -140,7 +139,7 @@ public class PtSubModeTripRouterFactory implements javax.inject.Provider<TripRou
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					DefaultRoutingModules.createNetworkRouter(mainMode, populationFactory,
+					DefaultRoutingModules.createPureNetworkRouter(mainMode, populationFactory,
 						network,
 						routeAlgo ));
 		}

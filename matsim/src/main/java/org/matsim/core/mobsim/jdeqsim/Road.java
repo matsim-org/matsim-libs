@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
@@ -34,6 +35,27 @@ import org.matsim.core.utils.misc.Time;
  */
 public class Road extends SimUnit {
 
+	// default
+	protected static JDEQSimConfigGroup config = new JDEQSimConfigGroup();
+
+	public static void setConfig(JDEQSimConfigGroup config) {
+		Road.config = config;
+	}
+
+	/**
+	 * this must be initialized before starting the simulation! mapping:
+	 * key=linkId used to find a road corresponding to a link
+	 */
+	static HashMap<Id<Link>, Road> allRoads = null;
+
+	public static HashMap<Id<Link>, Road> getAllRoads() {
+		return allRoads;
+	}
+
+	public static void setAllRoads(HashMap<Id<Link>, Road> allRoads) {
+		Road.allRoads = allRoads;
+	}
+
 	protected Link link;
 
 	// see method enterRequest for a detailed description of variable 'gap'
@@ -43,7 +65,7 @@ public class Road extends SimUnit {
 	 * all roads, which are interested in entering the road, but wasn't allowed
 	 * to do so yet
 	 */
-	private LinkedList<Vehicle> interestedInEnteringRoad = new LinkedList<Vehicle>();
+	private LinkedList<Vehicle> interestedInEnteringRoad = new LinkedList<>();
 	private double timeOfLastEnteringVehicle = Double.MIN_VALUE;
 	protected double timeOfLastLeavingVehicle = Double.MIN_VALUE;
 
@@ -69,17 +91,17 @@ public class Road extends SimUnit {
 	private double gapTravelTime = 0;
 
 	// the cars, which are currently on the road
-	protected LinkedList<Vehicle> carsOnTheRoad = new LinkedList<Vehicle>();
+	protected LinkedList<Vehicle> carsOnTheRoad = new LinkedList<>();
 	/**
 	 * for each of the cars in carsOnTheRoad, the earliest departure time from
 	 * road is written here
 	 */
-	protected LinkedList<Double> earliestDepartureTimeOfCar = new LinkedList<Double>();
+	protected LinkedList<Double> earliestDepartureTimeOfCar = new LinkedList<>();
 	/**
 	 * when trying to enter a road, a deadlock prevention message is put into
 	 * the queue this allows a car to enter the road, even if no space on it
 	 */
-	private LinkedList<DeadlockPreventionMessage> deadlockPreventionMessages = new LinkedList<DeadlockPreventionMessage>();
+	private LinkedList<DeadlockPreventionMessage> deadlockPreventionMessages = new LinkedList<>();
 
 	public Road(Scheduler scheduler, Link link) {
 		super(scheduler);
@@ -91,7 +113,7 @@ public class Road extends SimUnit {
 		 */
 		this.maxNumberOfCarsOnRoad = Math.round(link.getLength()
 				* NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link)
-				* SimulationParameters.getStorageCapacityFactor() / SimulationParameters.getCarSize());
+				* config.getStorageCapacityFactor() / config.getCarSize());
 
 		/**
 		 * it is assured here, that a road must have the space of at least one
@@ -101,10 +123,10 @@ public class Road extends SimUnit {
 			this.maxNumberOfCarsOnRoad = 1;
 		}
 
-		double maxInverseInFlowCapacity = 3600 / (SimulationParameters.getMinimumInFlowCapacity()
-				* SimulationParameters.getFlowCapacityFactor() * NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+		double maxInverseInFlowCapacity = 3600 / (config.getMinimumInFlowCapacity()
+				* config.getFlowCapacityFactor() * NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 
-		this.inverseOutFlowCapacity = 1 / (((LinkImpl) link).getFlowCapacity() * SimulationParameters.getFlowCapacityFactor());
+		this.inverseOutFlowCapacity = 1 / (((LinkImpl) link).getFlowCapacity() * config.getFlowCapacityFactor());
 
 		if (this.inverseOutFlowCapacity > maxInverseInFlowCapacity) {
 			this.inverseInFlowCapacity = maxInverseInFlowCapacity;
@@ -112,7 +134,7 @@ public class Road extends SimUnit {
 			this.inverseInFlowCapacity = this.inverseOutFlowCapacity;
 		}
 
-		this.gapTravelTime = link.getLength() / SimulationParameters.getGapTravelSpeed();
+		this.gapTravelTime = link.getLength() / config.getGapTravelSpeed();
 
 		// gap must be initialized to null because of the application logic
 		this.gap = null;
@@ -262,7 +284,7 @@ public class Road extends SimUnit {
 			 * gaps get used by the new cars (see leaveRoad)
 			 */
 			if (this.gap == null) {
-				this.gap = new LinkedList<Double>();
+				this.gap = new LinkedList<>();
 			} else {
 				this.gap.clear();
 			}
@@ -277,11 +299,11 @@ public class Road extends SimUnit {
 			if (this.deadlockPreventionMessages.size() > 0) {
 				this.deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(
 						this.deadlockPreventionMessages.getLast().getMessageArrivalTime()
-								+ SimulationParameters.getSqueezeTime(), this));
+								+ config.getSqueezeTime(), this));
 
 			} else {
 				this.deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(simTime
-						+ SimulationParameters.getSqueezeTime(), this));
+						+ config.getSqueezeTime(), this));
 			}
 
 			assert (this.interestedInEnteringRoad.size()==this.deadlockPreventionMessages.size()) :this.interestedInEnteringRoad.size() + " - " + this.deadlockPreventionMessages.size();
@@ -316,7 +338,7 @@ public class Road extends SimUnit {
 	}
 
 	public static Road getRoad(Id<Link> linkId) {
-		return SimulationParameters.getAllRoads().get(linkId);
+		return getAllRoads().get(linkId);
 	}
 
 }

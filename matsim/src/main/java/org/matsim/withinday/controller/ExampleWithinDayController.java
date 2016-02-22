@@ -20,14 +20,28 @@
 
 package org.matsim.withinday.controller;
 
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
@@ -51,10 +65,6 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
 /**
  * This class should give an example what is needed to run
  * simulations with WithinDayReplanning.
@@ -70,6 +80,7 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class ExampleWithinDayController implements StartupListener {
+	// yyyy I think that for the now existing guice approach this example has too many factories at too many levels. kai, feb'16
 
 	/*
 	 * Define the Probability that an Agent uses the
@@ -93,13 +104,16 @@ public class ExampleWithinDayController implements StartupListener {
 	protected ProbabilityFilterFactory duringActivityProbabilityFilterFactory;
 	protected ProbabilityFilterFactory duringLegProbabilityFilterFactory;
 	
-	protected Scenario scenario;
-	protected WithinDayControlerListener withinDayControlerListener;
-	private Provider<TripRouter> tripRouterProvider;
-	private MobsimDataProvider mobsimDataProvider;
-	private WithinDayEngine withinDayEngine;
-	private ActivityReplanningMap activityReplanningMap;
-	private LinkReplanningMap linkReplanningMap;
+	@Inject protected Scenario scenario;
+	@Inject protected WithinDayControlerListener withinDayControlerListener;
+	@Inject private Provider<TripRouter> tripRouterProvider;
+	@Inject private MobsimDataProvider mobsimDataProvider;
+	@Inject private WithinDayEngine withinDayEngine;
+	@Inject private ActivityReplanningMap activityReplanningMap;
+	@Inject private LinkReplanningMap linkReplanningMap;
+	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory;
+	@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
+	@Inject private Map<String,TravelTime> travelTimes ;
 
 
 	/*
@@ -133,23 +147,22 @@ public class ExampleWithinDayController implements StartupListener {
         });
 	}
 
-	@Inject
-	ExampleWithinDayController(Scenario scenario, WithinDayControlerListener withinDayControlerListener, Provider<TripRouter> tripRouterProvider, MobsimDataProvider mobsimDataProvider, WithinDayEngine withinDayEngine, ActivityReplanningMap activityReplanningMap, LinkReplanningMap linkReplanningMap) {
-		this.scenario = scenario;
-		this.withinDayControlerListener = withinDayControlerListener;
-		this.tripRouterProvider = tripRouterProvider;
-		this.mobsimDataProvider = mobsimDataProvider;
-		this.withinDayEngine = withinDayEngine;
-		this.activityReplanningMap = activityReplanningMap;
-		this.linkReplanningMap = linkReplanningMap;
-	}
-
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.initReplanners();
 	}
 	
 	private void initReplanners() {
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory() ;
+		Network network = this.scenario.getNetwork() ;
+		
+		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
+
+		TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get( TransportMode.car ) ;
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime) ;
+
+		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime ) ;
+		
 		this.initialIdentifierFactory = new InitialIdentifierImplFactory(this.mobsimDataProvider);
 		this.initialProbabilityFilterFactory = new ProbabilityFilterFactory(this.pInitialReplanning);
 		this.initialIdentifierFactory.addAgentFilterFactory(this.initialProbabilityFilterFactory);
@@ -170,7 +183,7 @@ public class ExampleWithinDayController implements StartupListener {
 		this.duringLegProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringLegReplanning);
 		this.duringLegIdentifierFactory.addAgentFilterFactory(this.duringLegProbabilityFilterFactory);
 		this.duringLegIdentifier = this.duringLegIdentifierFactory.createIdentifier();
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayEngine, this.tripRouterProvider);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayEngine, pathCalculator, routeFactory );
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		this.withinDayEngine.addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}

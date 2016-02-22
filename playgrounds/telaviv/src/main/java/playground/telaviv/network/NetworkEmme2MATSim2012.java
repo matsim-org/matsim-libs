@@ -402,7 +402,7 @@ public class NetworkEmme2MATSim2012 {
 			double length = 1000 * Double.parseDouble(parts[2]); // km -> convert to m
 
 			// if length is 0.0, try crow fly distance
-			if (length <= 0.0) length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
+			if (length <= 0.0) length = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord());
 			
 			// if length is still null, use 25.0m instead
 			if (length <= 0.0) length = 25.0;

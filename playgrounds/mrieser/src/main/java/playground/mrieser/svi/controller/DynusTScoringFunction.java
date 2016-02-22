@@ -111,7 +111,7 @@ public class DynusTScoringFunction implements ScoringFunction {
 								
 							} else if (prevLeg.getMode().equals(TransportMode.pt)) {
 								// currently, only teleportation based
-								double dist = CoordUtils.calcDistance(prevAct.getCoord(), act.getCoord());
+								double dist = CoordUtils.calcEuclideanDistance(prevAct.getCoord(), act.getCoord());
 								double tt = dist / 5.0; // assume average speed of 18km/h
 								
 								legScorer.startLeg(prevAct.getEndTime(), prevLeg);
@@ -123,7 +123,7 @@ public class DynusTScoringFunction implements ScoringFunction {
 								}
 							} else if (prevLeg.getMode().equals(TransportMode.walk)) {
 								// currently, only teleportation based
-								double dist = CoordUtils.calcDistance(prevAct.getCoord(), act.getCoord());
+								double dist = CoordUtils.calcEuclideanDistance(prevAct.getCoord(), act.getCoord());
 								double tt = dist; // assume 1m/s = 3.6km/h
 								
 								legScorer.startLeg(prevAct.getEndTime(), prevLeg);
@@ -135,7 +135,7 @@ public class DynusTScoringFunction implements ScoringFunction {
 								}
 							} else if (prevLeg.getMode().equals(TransportMode.bike)) {
 								// currently, only teleportation based
-								double dist = CoordUtils.calcDistance(prevAct.getCoord(), act.getCoord());
+								double dist = CoordUtils.calcEuclideanDistance(prevAct.getCoord(), act.getCoord());
 								double tt = dist / 3.0; // assume average speed of 3m/s = 10.8km/h
 								
 								legScorer.startLeg(prevAct.getEndTime(), prevLeg);

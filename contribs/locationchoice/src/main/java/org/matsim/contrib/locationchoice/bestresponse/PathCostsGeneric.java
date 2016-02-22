@@ -37,7 +37,7 @@ public class PathCostsGeneric extends PathCosts {
 	}
 	
 	private void calculateDirectDistance(Link startLink, Link endLink, double beelineDistanceFactor) {
-		double distance = CoordUtils.calcDistance(startLink.getCoord(), endLink.getCoord());
+		double distance = CoordUtils.calcEuclideanDistance(startLink.getCoord(), endLink.getCoord());
 		this.route.setDistance(beelineDistanceFactor * distance);
 	}
 }

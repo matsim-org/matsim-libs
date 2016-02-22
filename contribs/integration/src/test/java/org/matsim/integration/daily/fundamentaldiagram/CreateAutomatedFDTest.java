@@ -73,6 +73,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -428,6 +429,18 @@ public class CreateAutomatedFDTest {
 		@Override
 		public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public Facility<? extends Facility<?>> getCurrentFacility() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Facility<? extends Facility<?>> getDestinationFacility() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
 		}
 	}
 
