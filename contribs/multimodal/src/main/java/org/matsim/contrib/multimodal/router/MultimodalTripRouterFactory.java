@@ -120,7 +120,7 @@ public class MultimodalTripRouterFactory implements Provider<TripRouter> {
 			 */
 			TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());		
 			LeastCostPathCalculator routeAlgo = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
-			RoutingModule legRouterWrapper = DefaultRoutingModules.createNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
+			RoutingModule legRouterWrapper = DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
 			instance.setRoutingModule(mode, legRouterWrapper);
 		}
 

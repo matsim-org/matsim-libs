@@ -31,7 +31,7 @@ public class TwoWayCarsharingVehicleLocation {
 	    
 	    for(TwoWayCarsharingStation f: stations) {  
 	    	
-	    	vehicleLocationQuadTree.put(f.getLink().getCoord().getX(), f.getLink().getCoord().getY(), f);
+	    	vehicleLocationQuadTree.put(f.getCoord().getX(), f.getCoord().getY(), f);
 	    }
 	   
 	  }

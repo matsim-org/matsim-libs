@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -106,6 +107,10 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 									Double.parseDouble(atts.getValue("x")),
 									Double.parseDouble(atts.getValue("y")))));
 		this.facilities.addActivityFacility(this.currfacility);
+		String value = atts.getValue("linkId");
+		if (value != null) {
+			((ActivityFacilityImpl) this.currfacility).setLinkId(Id.create(value, Link.class));
+		}
 		((ActivityFacilityImpl) this.currfacility).setDesc(atts.getValue("desc"));
 	}
 	

@@ -222,7 +222,7 @@ public class EvacuationPatnaScenarioGenerator {
 
 			if(PatnaUtils.URBAN_MAIN_MODES.contains(leg.getMode())){
 				TripRouter router = new TripRouter();
-				router.setRoutingModule(leg.getMode(), DefaultRoutingModules.createNetworkRouter(leg.getMode(), popFact, scenario.getNetwork(), new Dijkstra(scenario.getNetwork(), new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTime()) , new FreeSpeedTravelTime())));
+				router.setRoutingModule(leg.getMode(), DefaultRoutingModules.createPureNetworkRouter(leg.getMode(), popFact, scenario.getNetwork(), new Dijkstra(scenario.getNetwork(), new OnlyTimeDependentTravelDisutility(new FreeSpeedTravelTime()) , new FreeSpeedTravelTime())));
 				List<? extends PlanElement> routeInfo = router.calcRoute(leg.getMode(), new ActivityWrapperFacility(home), new ActivityWrapperFacility(evacAct), home.getEndTime(), pOut);
 
 				Route route = ((Leg)routeInfo.get(0)).getRoute();

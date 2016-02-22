@@ -88,6 +88,10 @@ public class LongLinkSplitterTest {
 				newNetwork.getLinks().get(Id.createLinkId("BC_l0003")).getLength(), MatsimTestUtils.EPSILON);
 	}
 	
+	/**
+	 * This test can be ignored since it just writes the network locally to my
+	 * laptop (JWJoubert, Feb 2016) to check that is does what I want. 
+	 */
 	@Test
 	@Ignore
 	public void writeNetworks(){

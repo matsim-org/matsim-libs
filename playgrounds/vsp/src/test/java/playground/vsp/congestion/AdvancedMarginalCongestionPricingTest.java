@@ -36,6 +36,8 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
@@ -234,8 +236,11 @@ public class AdvancedMarginalCongestionPricingTest {
 	public final void test1(){
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config1.xml";
+		
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
 
-		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
 
 		EventsManager events = controler.getEvents();
@@ -311,7 +316,10 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config2.xml";
 
-		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
 
 		EventsManager events = controler.getEvents();
@@ -392,7 +400,10 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config3.xml";
 
-		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+
+		final Scenario scenario = ScenarioUtils.loadScenario( config);
 		Controler controler = new Controler( scenario );
 		
 		EventsManager events = controler.getEvents();
@@ -455,7 +466,10 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config4.xml";
 
-		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
 		
 		EventsManager events = controler.getEvents();

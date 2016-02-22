@@ -429,6 +429,12 @@ public class ControlerTest {
 		assertEquals(f.link3.getId(), act1b.getLinkId());
 		assertEquals(f.link1.getId(), act2a.getLinkId());
 		assertEquals(f.link3.getId(), act2b.getLinkId());
+		
+		int expectedPlanLength = 3 ;
+		if ( f.scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			// now 7 instead of earlier 3: h-wlk-iact-car-iact-walk-h
+			expectedPlanLength = 7 ;
+		}
 
 		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
 		//assertNotNull(leg1.getRoute());
@@ -437,11 +443,16 @@ public class ControlerTest {
 		for (Plan plan : new Plan[]{plan1, plan2}) {
 			assertEquals(
 					"unexpected plan length in "+plan.getPlanElements(),
-					3,
+					expectedPlanLength,
 					plan.getPlanElements().size());
 			assertNotNull(
 					"null route in plan "+plan.getPlanElements(),
 					((Leg) plan.getPlanElements().get( 1 )).getRoute());
+			if ( f.scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+				assertNotNull(
+					"null route in plan "+plan.getPlanElements(),
+					((Leg) plan.getPlanElements().get( 3 )).getRoute());
+			}
 		}
 	}
 

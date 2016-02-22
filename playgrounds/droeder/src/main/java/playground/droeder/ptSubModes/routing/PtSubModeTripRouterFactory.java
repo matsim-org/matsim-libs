@@ -140,7 +140,7 @@ public class PtSubModeTripRouterFactory implements javax.inject.Provider<TripRou
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
 			tripRouter.setRoutingModule(
 					mainMode,
-					DefaultRoutingModules.createNetworkRouter(mainMode, populationFactory,
+					DefaultRoutingModules.createPureNetworkRouter(mainMode, populationFactory,
 						network,
 						routeAlgo ));
 		}

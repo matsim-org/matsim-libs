@@ -56,7 +56,7 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 					"anyway ... This warning is suppressed after the first 10 warnings.") ;
 			expectedLinkWarnCount++;
 		}
-		Gbl.assertNonNull(newLinkId);
+		Gbl.assertNotNull(newLinkId);
 		this.basicPlanAgentDelegate.setCurrentLinkId( newLinkId ) ;
 		this.basicPlanAgentDelegate.incCurrentLinkIndex();
 		this.cachedNextLinkId = null; //reset cached nextLink

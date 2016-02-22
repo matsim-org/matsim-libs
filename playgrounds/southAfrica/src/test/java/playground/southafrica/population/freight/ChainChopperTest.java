@@ -61,7 +61,7 @@ public class ChainChopperTest {
 		Plan s2 = list.get(1);
 		Activity s2Start = ((Activity)s2.getPlanElements().get(0));
 		Assert.assertTrue("Wrong activity type at start.",s2Start.getType().equalsIgnoreCase("chopStart"));
-		Assert.assertEquals("Wrong chain start time.", 0.0, s2Start.getEndTime(), 0.1);
+		Assert.assertEquals("Wrong chain start time.", 60.0, s2Start.getEndTime(), 0.1);
 		Assert.assertEquals("Wrong coordinate.", 1.0, s2Start.getCoord().getY(), 0.1);
 		Assert.assertEquals("Wrong number of plan elements.", 3, s2.getPlanElements().size());
 	}

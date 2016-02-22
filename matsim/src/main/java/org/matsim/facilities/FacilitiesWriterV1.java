@@ -135,6 +135,9 @@ import org.matsim.core.utils.misc.Time;
 	public void startFacility(final ActivityFacilityImpl facility, final BufferedWriter out) throws IOException {
 		out.write("\t<facility");
 		out.write(" id=\"" + facility.getId() + "\"");
+		if (facility.getLinkId() != null) {
+			out.write(" linkId=\"" + facility.getLinkId().toString() + "\"");
+		}
 		final Coord coord = coordinateTransformation.transform( facility.getCoord() );
 		out.write(" x=\"" + coord.getX() + "\"");
 		out.write(" y=\"" + coord.getY() + "\"");

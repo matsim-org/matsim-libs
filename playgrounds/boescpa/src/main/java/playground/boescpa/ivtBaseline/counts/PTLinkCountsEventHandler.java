@@ -47,8 +47,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import static playground.boescpa.ivtBaseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
+
 /**
- * Counts the daily passengers on a given link.
+ * Counts the daily pt passengers on a given link.
  *
  * @author boescpa
  */
@@ -60,26 +62,30 @@ public class PTLinkCountsEventHandler implements LinkEnterEventHandler, TransitD
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
 	private final HashMap<String, Integer> ptCounts = new HashMap<>();
-	@Inject
-	public Config config;
+	private final Config config;
 
 	private final Map<String, Tuple<String, Double>> linksToMonitor = new HashMap<>();
+	private final Set<String> linksToMonitorCache = new HashSet<>();
 
 	@Inject
-	private PTLinkCountsEventHandler(@Named("pathToPTLinksToMonitor") final String pathToLinksList) {
+	private PTLinkCountsEventHandler(@Named("pathToPTLinksToMonitor") final String pathToLinksList, Config config) {
 		setLinksToMonitor(pathToLinksList);
+		this.config = config;
 	}
 
 	private void setLinksToMonitor(final String pathToLinksList) {
 		this.linksToMonitor.clear();
 		BufferedReader linkReader = IOUtils.getBufferedReader(pathToLinksList);
 		try {
-			linkReader.readLine(); // read header: linkId, linkDescr, countVolumes
+			linkReader.readLine(); // read header: linkId; countStationDescr; countVolume
 			String line = linkReader.readLine();
 			while (line != null) {
-				String[] lineElements = line.split(";");
-				this.linksToMonitor.put(lineElements[0].trim(),
-						new Tuple<>(lineElements[1].trim(), Double.parseDouble(lineElements[2])));
+				String[] lineElements = line.split(COUNTS_DELIMITER);
+				String linkToMonitor = lineElements[0].trim();
+				String countStationDescr = lineElements[1].trim();
+				double countVolume = Double.parseDouble(lineElements[2]);
+				this.linksToMonitor.put(linkToMonitor, new Tuple<>(countStationDescr, countVolume));
+				this.linksToMonitorCache.add(linkToMonitor);
 				line = linkReader.readLine();
 			}
 			linkReader.close();
@@ -91,7 +97,7 @@ public class PTLinkCountsEventHandler implements LinkEnterEventHandler, TransitD
 	@Override
 	public void reset(int iteration) {
 		ptCounts.clear();
-		for (String linkId : linksToMonitor.keySet()) {
+		for (String linkId : linksToMonitorCache) {
 			ptCounts.put(linkId, 0);
 		}
 		vehPassengers.clear();
@@ -139,7 +145,7 @@ public class PTLinkCountsEventHandler implements LinkEnterEventHandler, TransitD
 			return; // ignore non-transit vehicles
 		}
 		String linkId = event.getLinkId().toString();
-		if (ptCounts.keySet().contains(linkId)) {
+		if (linksToMonitorCache.contains(linkId)) {
 			Integer count = ptCounts.get(linkId);
 			Integer nPassengers = this.vehPassengers.get(vehicleId);
 			if (nPassengers != null) {
@@ -153,18 +159,18 @@ public class PTLinkCountsEventHandler implements LinkEnterEventHandler, TransitD
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(filename);
 			// write file head
-			writer.write("linkId\tlinkDescr\tmatsimVolumes\tcountVolumes\trelativeError");
+			writer.write("linkId"+ COUNTS_DELIMITER + "countStationDescr" + COUNTS_DELIMITER + "countVolume" + COUNTS_DELIMITER + "matsimVolume" + COUNTS_DELIMITER + "relativeVolume");
 			writer.newLine();
 			// write content
-			for (String linkId : ptCounts.keySet()) {
-				double matsimVolume = ptCounts.get(linkId)*config.ptCounts().getCountsScaleFactor();
+			for (String linkId : linksToMonitorCache) {
+				String countStationDescr = linksToMonitor.get(linkId).getFirst();
 				double countVolume = linksToMonitor.get(linkId).getSecond();
-				double relError = matsimVolume/countVolume;
-				writer.write(linkId + "\t");
-				writer.write(linksToMonitor.get(linkId).getFirst() + "\t");
-				writer.write(Long.toString((long)matsimVolume) + "\t");
-				writer.write(Long.toString((long)countVolume) + "\t");
-				writer.write(Double.toString(relError));
+				double matsimVolume = ptCounts.get(linkId)*config.ptCounts().getCountsScaleFactor();
+				double relVolume = countVolume > 0 ? matsimVolume/countVolume : matsimVolume*100;
+				writer.write(linkId + COUNTS_DELIMITER + countStationDescr + COUNTS_DELIMITER +
+						Long.toString((long)countVolume) + COUNTS_DELIMITER +
+						Long.toString((long)matsimVolume) + COUNTS_DELIMITER +
+						Double.toString(relVolume));
 				writer.newLine();
 			}
 			writer.close();
