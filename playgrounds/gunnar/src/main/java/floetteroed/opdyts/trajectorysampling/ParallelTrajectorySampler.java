@@ -42,6 +42,7 @@ import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
 import floetteroed.opdyts.logging.ConvergedObjectiveFunctionValue;
+import floetteroed.opdyts.logging.ConvergedSurrogateObjectiveFunctionValue;
 import floetteroed.opdyts.logging.EquilibriumGap;
 import floetteroed.opdyts.logging.EquilibriumGapWeight;
 import floetteroed.opdyts.logging.FreeMemory;
@@ -54,6 +55,7 @@ import floetteroed.opdyts.logging.TotalMemory;
 import floetteroed.opdyts.logging.UniformityGap;
 import floetteroed.opdyts.logging.UniformityGapWeight;
 import floetteroed.utilities.math.MathHelpers;
+import floetteroed.utilities.math.Vector;
 import floetteroed.utilities.statisticslogging.Statistic;
 import floetteroed.utilities.statisticslogging.StatisticsMultiWriter;
 
@@ -139,6 +141,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		this.addStatistic(logFileName, new SurrogateObjectiveFunctionValue<U>());
 		this.addStatistic(logFileName, new LastObjectiveFunctionValue<U>());
 		this.addStatistic(logFileName, new ConvergedObjectiveFunctionValue<U>());
+		this.addStatistic(logFileName, new ConvergedSurrogateObjectiveFunctionValue<U>());
 		this.addStatistic(logFileName, new EquilibriumGapWeight<U>());
 		this.addStatistic(logFileName, new EquilibriumGap<U>());
 		this.addStatistic(logFileName, new LastEquilibriumGap<U>());
@@ -184,6 +187,22 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 	@Override
 	public ObjectiveFunction getObjectiveFunction() {
 		return this.objectiveFunction;
+	}
+
+	// TODO NEW
+	public List<Transition<U>> getTransitions(final U decisionVariable) {
+		return this.decisionVariable2transitionSequence.get(decisionVariable)
+				.getTransitions();
+	}
+	
+	// TODO NEW
+	double isolatedSurrogateObjectiveFunction(final U decisionVariable) {
+		final TransitionSequencesAnalyzer<U> analyzer = new TransitionSequencesAnalyzer<U>(
+				this.decisionVariable2transitionSequence.get(decisionVariable)
+						.getTransitions(), this.equilibriumWeight,
+				this.uniformityWeight);
+		final Vector alphas = analyzer.optimalAlphas();
+		return analyzer.surrogateObjectiveFunctionValue(alphas);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -249,11 +268,19 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 				samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
 						decisionVariable2transitionSequence,
 						this.equilibriumWeight, this.uniformityWeight);
-				samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
-						this.decisionVariable2transitionSequence.get(
-								this.currentDecisionVariable)
-								.getLastTransition(),
-						convergenceResult.finalObjectiveFunctionValue);
+				samplingStage = samplingStageEvaluator
+						.newOptimalSamplingStage(
+								this.decisionVariable2transitionSequence.get(
+										this.currentDecisionVariable)
+										.getLastTransition(),
+								convergenceResult.finalObjectiveFunctionValue,
+								this.isolatedSurrogateObjectiveFunction(this.currentDecisionVariable));
+
+				// !!! TODO !!!
+				// The above call to isolatedSurrogateObjectiveFunctionValue
+				// does not account for the last transition!?
+				// !!! TODO !!!
+
 				this.samplingStages.add(samplingStage);
 				this.decisionVariable2convergenceResult.put(
 						this.currentDecisionVariable, convergenceResult);
@@ -297,7 +324,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 				samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
 						this.decisionVariable2transitionSequence.get(
 								this.currentDecisionVariable)
-								.getLastTransition(), null);
+								.getLastTransition(), null, null);
 				this.samplingStages.add(samplingStage);
 			}
 
