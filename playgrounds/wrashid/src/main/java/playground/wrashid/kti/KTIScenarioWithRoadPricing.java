@@ -54,7 +54,7 @@ public class KTIScenarioWithRoadPricing {
 					+ "If you really need to configure this via a config group, please construct your own config group for that purpose.  kai, sep'14");
 		
 			log.info( "adding the roadpricing listenner." );
-        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+        controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
         //		}
 //		else {
 //			log.info( "NOT adding the roadpricing listenner." );

@@ -38,13 +38,15 @@ import org.matsim.vehicles.Vehicle;
 public class NoiseTollDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
 	private NoiseContext noiseContext;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public NoiseTollDisutilityCalculatorFactory(NoiseContext noiseContext) {
+	public NoiseTollDisutilityCalculatorFactory(NoiseContext noiseContext, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.noiseContext = noiseContext;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		final TollTravelDisutilityCalculator ttdc = new TollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, noiseContext);
 
 		return new TravelDisutility(){

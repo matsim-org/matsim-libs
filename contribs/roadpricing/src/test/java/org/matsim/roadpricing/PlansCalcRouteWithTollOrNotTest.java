@@ -22,30 +22,33 @@
 
 package org.matsim.roadpricing;
 
-import org.junit.Ignore;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
-
-import com.google.inject.Singleton;
 
 /**
  * Tests {@link PlansCalcRouteWithTollOrNot} as isolated as possible.
@@ -53,7 +56,6 @@ import com.google.inject.Singleton;
  * @author mrieser
  */
 
-@Ignore
 public class PlansCalcRouteWithTollOrNotTest {
 	private static final Logger log = Logger.getLogger( PlansCalcRouteWithTollOrNotTest.class );
 
@@ -86,7 +88,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 
-		Id id1 = Id.createPersonId("1");
+		Id<Person> id1 = Id.createPersonId("1");
 
 		// case 1: toll only in morning, it is cheaper to drive around
 		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
@@ -121,7 +123,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 	}
 
-	private static Leg getLeg1(Config config, Population population, Id id1) {
+	private static Leg getLeg1(Config config, Population population, Id<Person> id1) {
 		final List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements();
 		for ( PlanElement pe : planElements ) {
 			log.warn( pe );
@@ -142,7 +144,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	private PlansCalcRouteWithTollOrNot testee(final Scenario scenario, final RoadPricingScheme toll) {
 		return Injector.createInjector(
 				scenario.getConfig(),
-				new ControlerDefaultsWithRoadPricingModule(toll),
+				new ControlerDefaultsWithRoadPricingModule(scenario, toll),
 				new ScenarioByInstanceModule(scenario),
 				new ControlerDefaultCoreListenersModule(),
 				new NewControlerModule())
@@ -168,7 +170,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Population population = scenario.getPopulation();
 
 		runOnAll(testee(scenario, toll), population);
-		Id id1 = Id.createPersonId("1");
+		Id<Person> id1 = Id.createPersonId("1");
 
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute()); // agent should take shortest route
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
@@ -196,13 +198,13 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 
 		runOnAll(testee(scenario, toll), population);
-		Id id1 = Id.createPersonId("1");
+		Id<Person> id1 = Id.createPersonId("1");
 
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute()); // agent should take shortest route
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 	}
 
-	private static Leg getLeg3(Config config, Population population, Id id1) {
+	private static Leg getLeg3(Config config, Population population, Id<Person> id1) {
 		List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements() ;
 		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			return (Leg) (planElements.get(3));
@@ -244,7 +246,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 
 		runOnAll(testee(scenario, toll), population);
-		Id id1 = Id.createPersonId("1");
+		Id<Person> id1 = Id.createPersonId("1");
 		Leg leg1 = getLeg1(config, population, id1);
 		Leg leg2 = getLeg3(config, population, id1);
 

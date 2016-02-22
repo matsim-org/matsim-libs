@@ -63,7 +63,7 @@ public class WalkBikeRouting {
 	
 		DefaultDelegateFactory defaultDelegateFactory = new DefaultDelegateFactory(controler.getScenario(), new FastDijkstraFactory());
 		MultimodalTripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(controler.getScenario(), multiModalTravelTimes,
-                ControlerDefaults.createDefaultTravelDisutilityFactory(), defaultDelegateFactory, new FastDijkstraFactory());
+                ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), defaultDelegateFactory, new FastDijkstraFactory());
 		
 		controler.setTripRouterFactory(multiModalTripRouterFactory);	
 		TripRouter tripRouter = multiModalTripRouterFactory.get();

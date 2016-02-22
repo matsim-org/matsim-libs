@@ -66,7 +66,7 @@ public class Controller {
 	}
 	
 	private void addListener(Controler c) {
-        c.setModules(new ControlerDefaultsWithRoadPricingModule());
+        c.setModules(new ControlerDefaultsWithRoadPricingModule(c.getScenario()));
         c.addOverridingModule(new AbstractModule() {
 			  @Override
 			  public void install() {

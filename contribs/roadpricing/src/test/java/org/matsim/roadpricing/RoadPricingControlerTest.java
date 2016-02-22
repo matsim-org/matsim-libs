@@ -60,7 +60,7 @@ public class RoadPricingControlerTest {
         ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(utils.getInputDirectory() + "distanceToll.xml");
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/tollcase/");
 		Controler controler2 = new Controler(config);
-        controler2.setModules(new ControlerDefaultsWithRoadPricingModule());
+        controler2.setModules(new ControlerDefaultsWithRoadPricingModule(controler2.getScenario()));
         controler2.getConfig().controler().setCreateGraphs(false);
 		controler2.getConfig().controler().setDumpDataAtEnd(false);
 		controler2.getConfig().controler().setWriteEventsInterval(0);

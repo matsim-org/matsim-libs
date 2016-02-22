@@ -25,6 +25,8 @@ import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
+import javax.inject.Provider;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -59,8 +61,6 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Provider;
-
 /**
  * Tests the correct working of {@link TravelDisutilityIncludingToll} by using it
  * to calculate some routes with {@link PlansCalcRoute}.
@@ -74,7 +74,6 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	public void testDisutilityResults() {
 		Config config = ConfigUtils.createConfig() ;
-        RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
 		Fixture.createNetwork2((MutableScenario)scenario);
@@ -92,7 +91,7 @@ public class TollTravelCostCalculatorTest {
 		TravelTime timeCalculator = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 
 		double margUtlOfMoney = 1. ;
-        final TravelDisutilityFactory defaultDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory();
+        final TravelDisutilityFactory defaultDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
         
 		RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
 				defaultDisutilityFactory, scheme, margUtlOfMoney );
