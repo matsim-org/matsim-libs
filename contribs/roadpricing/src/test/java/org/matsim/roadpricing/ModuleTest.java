@@ -48,8 +48,9 @@ public class ModuleTest {
     @Test
     public void testControlerWithRoadPricingWorks() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
+        Scenario scenario = ScenarioUtils.loadScenario(config);
         Controler controler = new Controler(config);
-        controler.setModules(new ControlerDefaultsWithRoadPricingModule(controler.getScenario()));
+        controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
         controler.run();
     }
 
