@@ -131,8 +131,8 @@ public class CNTest {
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
 
 		final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-				new Builder( TransportMode.car ),
-				tollHandler
+				new Builder( TransportMode.car, controler.getConfig().planCalcScore() ),
+				tollHandler, controler.getConfig().planCalcScore()
 			) ;
 		factory.setSigma(3.);
 		

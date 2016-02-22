@@ -118,7 +118,7 @@ public class EconomicsControler {
 
 		// congestion pricing
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
-		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

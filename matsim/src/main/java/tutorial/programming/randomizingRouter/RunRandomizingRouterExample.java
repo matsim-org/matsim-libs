@@ -47,7 +47,7 @@ public class RunRandomizingRouterExample {
 
 		Controler controler = new Controler( scenario ) ;
 
-		final Builder factory = new Builder( TransportMode.car );
+		final Builder factory = new Builder( TransportMode.car, config.planCalcScore() );
 		factory.setSigma(3.) ; 	// this sets the routing randomness (currently between time and money only, so be careful
 								// that you have a monetary term in the standard disutility, e.g. a distance cost)
 		

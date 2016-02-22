@@ -516,7 +516,7 @@ public class RblMerger {
 		HashMap<Id<TransitLine>,HashMap<Id<TransitRoute>,HashMap<Integer,NetworkRoute>>> line2route2timeBin2networkRouteMap = new HashMap<>();
 
 		TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
-		TravelDisutility travelCostCalculator = new Builder( TransportMode.car ).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
+		TravelDisutility travelCostCalculator = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() ).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
 		LeastCostPathCalculator routeAlgo = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), travelCostCalculator, travelTimeCalculator.getLinkTravelTimes());
 		
 		// for all lines

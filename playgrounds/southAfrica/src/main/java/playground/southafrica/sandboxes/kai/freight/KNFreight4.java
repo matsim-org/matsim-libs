@@ -37,6 +37,7 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierModule;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
+import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
@@ -174,7 +175,7 @@ public class KNFreight4 {
 
 		PlanCalcScoreConfigGroup cnScoringGroup = ctrl.getConfig().planCalcScore() ;
 		TravelTime timeCalculator = ctrl.getLinkTravelTimes() ;
-		TravelDisutility trDisutil = ctrl.getTravelDisutilityFactory().createTravelDisutility(timeCalculator, cnScoringGroup) ;
+		TravelDisutility trDisutil = ctrl.getTravelDisutilityFactory().createTravelDisutility(timeCalculator) ;
 
 		CarrierPlanStrategyManagerFactory strategyManagerFactory  = KNFreight4.createMyStrategyManager(scenario, ctrl) ;
 		ctrl.getConfig().controler().setOverwriteFileSetting(
@@ -291,8 +292,8 @@ public class KNFreight4 {
 			@Override
 			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
-				TravelDisutility travelDisutility = ControlerDefaults.createDefaultTravelDisutilityFactory().createTravelDisutility(
-						travelTimes , scenario.getConfig().planCalcScore() );
+				TravelDisutility travelDisutility = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility( 
+						travelTimes );
 				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), 
 						travelDisutility, travelTimes) ;
 

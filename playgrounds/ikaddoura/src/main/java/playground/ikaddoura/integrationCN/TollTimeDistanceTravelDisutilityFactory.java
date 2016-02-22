@@ -39,20 +39,23 @@ public final class TollTimeDistanceTravelDisutilityFactory implements TravelDisu
 	private Builder randomizedTimeDistanceTravelDisutilityFactory;
 	private final NoiseContext noiseContext;
 	private final TollHandler tollHandler;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public TollTimeDistanceTravelDisutilityFactory(Builder randomizedTimeDistanceTravelDisutilityFactory, NoiseContext noiseContext, TollHandler tollHandler) {
+	public TollTimeDistanceTravelDisutilityFactory(Builder randomizedTimeDistanceTravelDisutilityFactory, 
+			NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.noiseContext = noiseContext;
 		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
 		this.tollHandler = tollHandler;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		
 		randomizedTimeDistanceTravelDisutilityFactory.setSigma(sigma);
 		
 		return new TollTimeDistanceTravelDisutility(
-				randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
+				randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
 				this.noiseContext,
 				this.tollHandler,
 				cnScoringGroup.getMarginalUtilityOfMoney(),

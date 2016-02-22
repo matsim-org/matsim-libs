@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -96,7 +95,7 @@ public class NetworkRoutingModuleTest {
 		TravelTime timeObject = TravelTimeCalculator.create(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
 		{
-			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(timeObject, f.s.getConfig().planCalcScore());
+			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, f.s.getConfig().planCalcScore() ).createTravelDisutility(timeObject);
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 
@@ -124,7 +123,7 @@ public class NetworkRoutingModuleTest {
 			double monetaryDistanceRateCar = -1.;
 			f.s.getConfig().planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
-			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(timeObject, f.s.getConfig().planCalcScore());
+			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, f.s.getConfig().planCalcScore() ).createTravelDisutility(timeObject);
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 

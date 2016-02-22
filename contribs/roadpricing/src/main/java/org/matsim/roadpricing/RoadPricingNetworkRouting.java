@@ -1,9 +1,15 @@
 package org.matsim.roadpricing;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -14,12 +20,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Custom router which routes on the "car" network,
@@ -41,9 +41,6 @@ public class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 
 	@Inject
 	SingleModeNetworksCache singleModeNetworksCache;
-
-	@Inject
-    PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
 	
 	@Inject PlansCalcRouteConfigGroup plansCalcRouteConfigGroup ;
 
@@ -68,7 +65,7 @@ public class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 		LeastCostPathCalculator routeAlgo =
 				leastCostPathCalculatorFactory.createPathCalculator(
 						filteredNetwork,
-						travelDisutilityFactory.createTravelDisutility(travelTime, planCalcScoreConfigGroup),
+						travelDisutilityFactory.createTravelDisutility(travelTime),
 						travelTime);
 		if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {
 			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car, populationFactory,

@@ -92,7 +92,7 @@ public final class RunWithRoadPricing {
 		// use the road pricing module.
 		// (loads the road pricing scheme, uses custom travel disutility
 		// including tolls, etc.)
-		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+		controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		// run the controler:

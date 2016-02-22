@@ -101,7 +101,7 @@ public class DefaultDelegateFactory implements Provider<TripRouter> {
 		TripRouter tripRouter = new TripRouter();
 
 		TravelTime travelTime = travelTimes.get("car");
-		TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore());
+		TravelDisutility travelDisutility = travelDisutilityFactories.get("car").createTravelDisutility(travelTimes.get("car"));
 
 		Network network = this.scenario.getNetwork();
 		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();

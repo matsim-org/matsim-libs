@@ -101,7 +101,7 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		 * Create PlansCalcRoute object to reroute legs with adapted mode 
 		 */
 		TravelTime travelTimes = new FreeSpeedTravelTime();
-		TravelDisutility travelCosts = new Builder( TransportMode.car ).createTravelDisutility(travelTimes, config.planCalcScore());
+		TravelDisutility travelCosts = new Builder( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTimes);
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults() ;
 		builder.setLeastCostPathCalculatorFactory( new DijkstraFactory() );
 		builder.setTravelTime(travelTimes);

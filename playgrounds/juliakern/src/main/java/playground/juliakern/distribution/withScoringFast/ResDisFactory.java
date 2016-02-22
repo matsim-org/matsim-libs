@@ -37,20 +37,21 @@ public class ResDisFactory implements TravelDisutilityFactory {
 	private EmissionControlerListener ecl;
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
-
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	
-	public ResDisFactory(EmissionControlerListener ecl, EmissionModule emissionModule, EmissionCostModule emissionCostModule){
-		this.tdf  = new Builder( TransportMode.car );
+	public ResDisFactory(EmissionControlerListener ecl, EmissionModule emissionModule, 
+			EmissionCostModule emissionCostModule, PlanCalcScoreConfigGroup cnScoringGroup){
+		this.tdf  = new Builder( TransportMode.car, cnScoringGroup );
 		this.ecl = ecl;
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
-	
+		this.cnScoringGroup = cnScoringGroup;
 	}
 	
 	@Override
-	public TravelDisutility createTravelDisutility( TravelTime timeCalculator,	 PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility( TravelTime timeCalculator) {
 		double marginalutilityOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
-		final ResDisCalculator resdiscal = new ResDisCalculator(tdf.createTravelDisutility(timeCalculator, cnScoringGroup), ecl, marginalutilityOfMoney, this.emissionModule, this.emissionCostModule);
+		final ResDisCalculator resdiscal = new ResDisCalculator(tdf.createTravelDisutility(timeCalculator), ecl, marginalutilityOfMoney, this.emissionModule, this.emissionCostModule);
 		
 		return resdiscal;
 

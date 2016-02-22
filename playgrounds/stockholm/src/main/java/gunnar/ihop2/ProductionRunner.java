@@ -149,7 +149,7 @@ public class ProductionRunner {
 			}
 			if (useRoadPricing) {
 				controler
-						.setModules(new ControlerDefaultsWithRoadPricingModule());
+						.setModules(new ControlerDefaultsWithRoadPricingModule(controler.getScenario()));
 			}
 
 			controler.run();

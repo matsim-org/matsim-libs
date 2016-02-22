@@ -19,13 +19,16 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.router;
 
-import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -40,6 +43,8 @@ import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import junit.framework.Assert;
 
 
 /**
@@ -60,7 +65,7 @@ public class InvertertedNetworkLegRouterTest {
 	public void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
 		LinkToLinkTravelTimeStub tt = new LinkToLinkTravelTimeStub();
-		TravelDisutilityFactory tc = new Builder( TransportMode.car );
+		TravelDisutilityFactory tc = new Builder( TransportMode.car, f.s.getConfig().planCalcScore() );
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));

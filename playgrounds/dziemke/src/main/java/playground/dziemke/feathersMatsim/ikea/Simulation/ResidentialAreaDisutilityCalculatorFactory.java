@@ -11,9 +11,15 @@ import org.matsim.vehicles.Vehicle;
 
 public class ResidentialAreaDisutilityCalculatorFactory implements TravelDisutilityFactory{
 
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	
+	public ResidentialAreaDisutilityCalculatorFactory(PlanCalcScoreConfigGroup cnScoringGroup) {
+		super();
+		this.cnScoringGroup = cnScoringGroup;
+	}
+
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator,PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		final ResidentialAreaTravelDisutilityCalculator slagboomCalculator = new ResidentialAreaTravelDisutilityCalculator(timeCalculator, cnScoringGroup);
 		
 		return new TravelDisutility(){
