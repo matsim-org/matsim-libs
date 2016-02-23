@@ -285,7 +285,7 @@ class MATSim4UrbanSimParcel{
 
 		Controler controler = new Controler(scenario);
 		if (ConfigUtils.addOrGetModule(scenario.getConfig(), Matsim4UrbansimConfigGroup.GROUP_NAME, Matsim4UrbansimConfigGroup.class).isUsingRoadPricing()) {
-			controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
+			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 			//  this is a quick fix in order to make the SustainCity case studies work.  The more longterm goal is to
 			// remove those "configuration" flags completely from the config.  However, then some other mechanism needs to be found 
 			// to be able to configure externally written "scripts" (such as this one) in a simple way.  kai & michael z, feb'13

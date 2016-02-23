@@ -104,7 +104,7 @@ public class SantiagoScenarioRunner {
 		if(mapActs2Links) mapActivities2properLinks(scenario);
 		
 		// adding roadpricing contrib for cordon policies
-		controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
+		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 		
 		controler.run();
 	}

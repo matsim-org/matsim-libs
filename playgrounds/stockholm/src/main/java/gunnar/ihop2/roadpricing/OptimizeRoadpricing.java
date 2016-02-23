@@ -55,7 +55,7 @@ class OptimizeRoadpricing {
 		new RoadPricingReaderXMLv1(roadPricingScheme)
 				.parse(roadPricingConfigGroup.getTollLinksFile());
 		final AbstractModule roadpricingModule = new ControlerDefaultsWithRoadPricingModule(
-				scenario, roadPricingScheme);
+				roadPricingScheme);
 
 		/*
 		 * Create initial toll levels and their randomization.

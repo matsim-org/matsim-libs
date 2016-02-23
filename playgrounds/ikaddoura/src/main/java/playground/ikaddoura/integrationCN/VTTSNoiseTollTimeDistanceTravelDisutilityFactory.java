@@ -40,7 +40,8 @@ public final class VTTSNoiseTollTimeDistanceTravelDisutilityFactory implements T
 	private final NoiseContext noiseContext;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public VTTSNoiseTollTimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, NoiseContext noiseContext, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public VTTSNoiseTollTimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, 
+			NoiseContext noiseContext, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.noiseContext = noiseContext;
 		this.vttsTimeDistanceTravelDisutilityFactory = vttsTimeDistanceTravelDisutilityFactory;
 		this.cnScoringGroup = cnScoringGroup;

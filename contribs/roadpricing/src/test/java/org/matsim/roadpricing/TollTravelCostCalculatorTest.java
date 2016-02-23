@@ -25,8 +25,6 @@ import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
-import javax.inject.Provider;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -61,6 +59,8 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
 
+import javax.inject.Provider;
+
 /**
  * Tests the correct working of {@link TravelDisutilityIncludingToll} by using it
  * to calculate some routes with {@link PlansCalcRoute}.
@@ -74,7 +74,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	public void testDisutilityResults() {
 		Config config = ConfigUtils.createConfig() ;
-		
+
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
 		Fixture.createNetwork2((MutableScenario)scenario);
 		Network net = scenario.getNetwork() ;

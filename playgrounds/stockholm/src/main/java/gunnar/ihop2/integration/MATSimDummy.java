@@ -498,7 +498,7 @@ public class MATSimDummy {
 
 			if (useToll) {
 				controler
-						.setModules(new ControlerDefaultsWithRoadPricingModule(controler.getScenario()));
+						.setModules(new ControlerDefaultsWithRoadPricingModule());
 			}
 
 			controler.run();

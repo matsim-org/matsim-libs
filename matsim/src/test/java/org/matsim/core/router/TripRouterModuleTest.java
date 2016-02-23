@@ -22,6 +22,7 @@
 
 package org.matsim.core.router;
 
+import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -34,8 +35,6 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestUtils;
-
-import junit.framework.Assert;
 
 public class TripRouterModuleTest {
 
@@ -50,7 +49,7 @@ public class TripRouterModuleTest {
             Scenario scenario = ScenarioUtils.createScenario(config);
             LeastCostPathCalculatorFactory defaultLeastCostPathCalculatorFactory = TripRouterFactoryBuilderWithDefaults.createDefaultLeastCostPathCalculatorFactory(scenario);
             LeastCostPathCalculator pathCalculator = defaultLeastCostPathCalculatorFactory.createPathCalculator(
-                    scenario.getNetwork(), 
+                    scenario.getNetwork(),
                     ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(new FreeSpeedTravelTime()),
                     new FreeSpeedTravelTime());
             Assert.assertNotNull(pathCalculator);

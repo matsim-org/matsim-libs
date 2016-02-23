@@ -117,7 +117,7 @@ public class SpaceTimeProbability {
 					}
 				};
 				controler.addControlerListener(startupListener);
-                controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
+                controler.setModules(new ControlerDefaultsWithRoadPricingModule());
                 controler.run();
 				
 				Double link3Score = null;

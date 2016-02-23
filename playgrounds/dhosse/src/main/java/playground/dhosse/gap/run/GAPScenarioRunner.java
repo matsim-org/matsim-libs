@@ -291,7 +291,7 @@ public class GAPScenarioRunner {
 		rp.setRoutingRandomness(3.);
 		controler.getConfig().addModule(rp);
 
-		controler.setModules(new ControlerDefaultsWithRoadPricingModule(controler.getScenario()));
+		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 
 	}
 

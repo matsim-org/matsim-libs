@@ -256,7 +256,7 @@ public class GautengControler_subpopulations {
 		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( sc, baseValueOfTime, valueOfTimeMultiplier ) );
 		
 		// ROAD PRICING:
-        final AbstractModule module = new ControlerDefaultsWithRoadPricingModule(controler.getScenario(), new RoadPricingSchemeUsingTollFactor(
+        final AbstractModule module = new ControlerDefaultsWithRoadPricingModule(new RoadPricingSchemeUsingTollFactor(
                 roadPricingConfig.getTollLinksFile(), new SanralTollFactor_Subpopulation(sc)
         ));
 		controler.setModules(module);

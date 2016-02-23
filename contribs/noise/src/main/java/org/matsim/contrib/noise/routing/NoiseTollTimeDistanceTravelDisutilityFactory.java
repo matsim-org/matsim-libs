@@ -22,6 +22,7 @@ package org.matsim.contrib.noise.routing;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -38,7 +39,8 @@ public final class NoiseTollTimeDistanceTravelDisutilityFactory implements Trave
 	private final NoiseContext noiseContext;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public NoiseTollTimeDistanceTravelDisutilityFactory(Builder randomizedTimeDistanceTravelDisutilityFactory, NoiseContext noiseContext, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public NoiseTollTimeDistanceTravelDisutilityFactory(Builder randomizedTimeDistanceTravelDisutilityFactory,
+			NoiseContext noiseContext, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.noiseContext = noiseContext;
 		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
 		this.cnScoringGroup = cnScoringGroup;

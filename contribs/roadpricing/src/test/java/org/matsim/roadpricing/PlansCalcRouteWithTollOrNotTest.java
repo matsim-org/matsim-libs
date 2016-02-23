@@ -71,7 +71,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
-		
+
 		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 
 		// a basic toll where only the morning hours are tolled
@@ -88,7 +88,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 
-		Id<Person> id1 = Id.createPersonId("1");
+		Id id1 = Id.createPersonId("1");
 
 		// case 1: toll only in morning, it is cheaper to drive around
 		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
@@ -123,7 +123,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 	}
 
-	private static Leg getLeg1(Config config, Population population, Id<Person> id1) {
+	private static Leg getLeg1(Config config, Population population, Id id1) {
 		final List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements();
 		for ( PlanElement pe : planElements ) {
 			log.warn( pe );
@@ -144,7 +144,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 	private PlansCalcRouteWithTollOrNot testee(final Scenario scenario, final RoadPricingScheme toll) {
 		return Injector.createInjector(
 				scenario.getConfig(),
-				new ControlerDefaultsWithRoadPricingModule(scenario, toll),
+				new ControlerDefaultsWithRoadPricingModule(toll),
 				new ScenarioByInstanceModule(scenario),
 				new ControlerDefaultCoreListenersModule(),
 				new NewControlerModule())
@@ -170,7 +170,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Population population = scenario.getPopulation();
 
 		runOnAll(testee(scenario, toll), population);
-		Id<Person> id1 = Id.createPersonId("1");
+		Id id1 = Id.createPersonId("1");
 
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute()); // agent should take shortest route
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
@@ -198,13 +198,13 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 
 		runOnAll(testee(scenario, toll), population);
-		Id<Person> id1 = Id.createPersonId("1");
+		Id id1 = Id.createPersonId("1");
 
 		Fixture.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute()); // agent should take shortest route
 		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 	}
 
-	private static Leg getLeg3(Config config, Population population, Id<Person> id1) {
+	private static Leg getLeg3(Config config, Population population, Id id1) {
 		List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements() ;
 		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			return (Leg) (planElements.get(3));
@@ -225,7 +225,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 			} else {
 				return legs.get(1) ;
 			}
-		} 
+		}
 	}
 
 	@Test
@@ -246,7 +246,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 
 		runOnAll(testee(scenario, toll), population);
-		Id<Person> id1 = Id.createPersonId("1");
+		Id id1 = Id.createPersonId("1");
 		Leg leg1 = getLeg1(config, population, id1);
 		Leg leg2 = getLeg3(config, population, id1);
 

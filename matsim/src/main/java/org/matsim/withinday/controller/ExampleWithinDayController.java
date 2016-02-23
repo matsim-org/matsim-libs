@@ -20,15 +20,10 @@
 
 package org.matsim.withinday.controller;
 
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -64,6 +59,12 @@ import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
+
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
  * This class should give an example what is needed to run
@@ -114,6 +115,7 @@ public class ExampleWithinDayController implements StartupListener {
 	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory;
 	@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
 	@Inject private Map<String,TravelTime> travelTimes ;
+	@Inject private PlanCalcScoreConfigGroup planCalcScoreConfigGroup ;
 
 
 	/*
@@ -159,7 +161,7 @@ public class ExampleWithinDayController implements StartupListener {
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
 
 		TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get( TransportMode.car ) ;
-		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime) ;
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime ) ;
 
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime ) ;
 		

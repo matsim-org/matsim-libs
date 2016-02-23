@@ -24,12 +24,10 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -61,9 +59,8 @@ public class RoadPricingControlerTest {
 //        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
         ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(utils.getInputDirectory() + "distanceToll.xml");
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/tollcase/");
-		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler2 = new Controler(config);
-        controler2.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
+        controler2.setModules(new ControlerDefaultsWithRoadPricingModule());
         controler2.getConfig().controler().setCreateGraphs(false);
 		controler2.getConfig().controler().setDumpDataAtEnd(false);
 		controler2.getConfig().controler().setWriteEventsInterval(0);

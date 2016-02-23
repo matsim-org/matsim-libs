@@ -1,8 +1,5 @@
 package org.matsim.contrib.carsharing.qsim;
 
-import java.io.IOException;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -25,6 +22,9 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
+import java.io.IOException;
+import java.util.Map;
+
 /**
  *
  *
@@ -41,7 +41,7 @@ public class CarsharingQsimFactory implements Provider<Netsim>{
 	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory ;
 	@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
 	@Inject private Map<String,TravelTime> travelTimes ;
-	
+
 	@Override
 	public Netsim get() {
 		

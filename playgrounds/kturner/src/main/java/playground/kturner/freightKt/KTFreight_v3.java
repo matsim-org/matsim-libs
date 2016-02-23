@@ -455,7 +455,7 @@ public class KTFreight_v3 {
 		final Controler controler = new Controler( scenario ) ;
 
 		if (addingToll){		 //Add roadpricingScheme to MATSIM-Controler Added, KT, 02.12.2014
-			controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario, rpscheme));
+			controler.setModules(new ControlerDefaultsWithRoadPricingModule(rpscheme));
 		}
 
 		CarrierScoringFunctionFactory scoringFunctionFactory = createMyScoringFunction2(scenario);

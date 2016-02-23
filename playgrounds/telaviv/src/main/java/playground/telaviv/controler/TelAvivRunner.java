@@ -48,7 +48,7 @@ public class TelAvivRunner {
 		 * Add road pricing contrib.
 		 * It registers a adapted TravelDisutilityFactory which replaces the one used by default.
 		 */
-        controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
+        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 
         // use an adapted MobsimFactory
 		controler.addOverridingModule(new AbstractModule() {

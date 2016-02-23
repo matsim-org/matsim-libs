@@ -27,6 +27,8 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -34,23 +36,23 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.router.NetworkRouting;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import com.google.inject.Singleton;
+import org.matsim.core.router.util.TravelTime;
 
 public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
     private final RoadPricingScheme roadPricingScheme;
-    private final Scenario scenario;
 
-    public ControlerDefaultsWithRoadPricingModule(Scenario scenario) {
+    public ControlerDefaultsWithRoadPricingModule() {
         this.roadPricingScheme = null;
-        this.scenario = scenario;
     }
 
-    public ControlerDefaultsWithRoadPricingModule(Scenario scenario, RoadPricingScheme roadPricingScheme) {
+    public ControlerDefaultsWithRoadPricingModule(RoadPricingScheme roadPricingScheme) {
         this.roadPricingScheme = roadPricingScheme;
-        this.scenario = scenario;
     }
 
     @Override
@@ -75,7 +77,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
             }
         }));
 
-        addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(ControlerDefaults.createDefaultTravelDisutilityFactory(scenario));
+        addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.car, getConfig().planCalcScore()));
         addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
 
         addControlerListenerBinding().to(RoadPricingControlerListener.class);

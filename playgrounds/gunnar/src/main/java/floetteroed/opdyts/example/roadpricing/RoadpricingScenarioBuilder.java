@@ -274,7 +274,7 @@ class RoadpricingScenarioBuilder {
 				.setScoringFunctionFactory(new RandomizedCharyparNagelScoringFunctionFactory(
 						scenario));
 
-		controler.setModules(new ControlerDefaultsWithRoadPricingModule(scenario));
+		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 
 		controler.run();
 
