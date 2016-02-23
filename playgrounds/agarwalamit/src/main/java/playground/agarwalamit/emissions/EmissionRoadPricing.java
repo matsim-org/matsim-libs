@@ -23,7 +23,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
@@ -33,6 +32,8 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehiclesFactory;
 
 import playground.benjamin.internalization.EmissionCostModule;
 
@@ -81,9 +82,13 @@ public class EmissionRoadPricing {
 	private double getEmissionCost(Link link) {
 		
 		double freeTravelTime = Math.floor(link.getLength()/link.getFreespeed())+1;
+		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Id<Vehicle> vehicleId = Id.createVehicleId("555524.1#11613");
-		Map<WarmPollutant, Double> warmEmissions = this.weam.checkVehicleInfoAndCalculateWarmEmissions(vehicleId, roadType, link.getFreespeed(), 
-				link.getLength(), freeTravelTime, Id.create(HbefaVehicleCategory.PASSENGER_CAR.toString(), VehicleType.class));
+		Id<VehicleType> vehicleTypeId = Id.create(HbefaVehicleCategory.PASSENGER_CAR.toString(), VehicleType.class);
+		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
+		
+		Map<WarmPollutant, Double> warmEmissions = this.weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, link.getFreespeed(), 
+				link.getLength(), freeTravelTime);
 		double amount = ecm.calculateWarmEmissionCosts(warmEmissions);
 		return amount;
 	}

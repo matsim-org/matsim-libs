@@ -141,27 +141,26 @@ public class WarmEmissionAnalysisModule {
 	}
 
 	public Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(
-			Id<Vehicle> vehicleId,
+			Vehicle vehicle,
 			int roadType,
 			double freeVelocity,
 			double linkLength,
-			double travelTime,
-			Id<VehicleType> vehicleTypeId) {
+			double travelTime) {
 
 		Map<WarmPollutant, Double> warmEmissions;
-		if(vehicleTypeId == null){
-			throw new RuntimeException("Vehicle type description for vehicle " + vehicleId + "is missing. " +
+		if(vehicle == null || vehicle.getType() == null || vehicle.getType().getId() == null){
+			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 		
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicleTypeId);
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicle.getType().getId());
 		if (vehicleInformationTuple.getFirst() == null){
-			throw new RuntimeException("Vehicle category for vehicle " + vehicleId + " is not valid. " +
+			throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-		warmEmissions = calculateWarmEmissions(vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
+		warmEmissions = calculateWarmEmissions(vehicle.getId(), travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple);
 		
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){

@@ -115,15 +115,13 @@ public class EmissionTravelDisutilityCalculator implements TravelDisutility {
 		iteration. Cold emission costs are assumed not to change routing; they might change mode choice or
 		location choice (not implemented)! */
 
-		Id<VehicleType> vehicleTypeId = vehicle.getType().getId();
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
 		Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
-				vehicle.getId(),
+				vehicle,
 				Integer.parseInt(((LinkImpl) link).getType()),
 				link.getFreespeed(),
 				distance,
-				linkTravelTime,
-				vehicleTypeId
+				linkTravelTime
 				);
 		double expectedEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(expectedWarmEmissions);
 		linkExpectedEmissionDisutility = this.marginalUtlOfMoney * expectedEmissionCosts ;

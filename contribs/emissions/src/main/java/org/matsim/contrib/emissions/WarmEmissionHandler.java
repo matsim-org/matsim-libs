@@ -42,7 +42,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
 
@@ -172,15 +171,13 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 						EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 			}
 			Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
-			Id<VehicleType> vehicleTypeId = vehicle.getType().getId();
-
+			
 			Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
-					vehicleId,
+					vehicle,
 					roadType,
 					freeVelocity,
 					linkLength,
-					travelTime,
-					vehicleTypeId);
+					travelTime);
 
 			warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 		}
