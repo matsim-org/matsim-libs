@@ -136,12 +136,8 @@ public class IncidentDataAnalysis {
 						log.warn("Normal traffic item: " + originalItem);
 						log.warn("Update traffic item: " + updateItem);
 						
-						if (updateItem.getOrigin().getDescription().toString().equals(originalItem.getOrigin().getDescription().toString()) && updateItem.getTo().getDescription().toString().equals(originalItem.getTo().getDescription().toString())) {
-							log.warn("The from and to locations' descriptions are the same. Ok, probably some minor location coordinate corrections. Proceed...");
-							
-						} else {
-							log.warn("The from and to locations' descriptions are not the same. Assuming that this is still the update for the previous traffic item. Proceed....");
-						}						
+						log.warn("The from and to locations' descriptions are the same. Ok, probably some minor location coordinate corrections. Proceed...");
+						log.warn("The from and to locations' descriptions are not the same. Assuming that this is still the update for the previous traffic item. Proceed....");
 					}
 					originalItem.setEndTime(updateItem.getStartTime());
 					updateItemsToBeDeleted.add(updateItem.getId());
@@ -380,22 +376,10 @@ public class IncidentDataAnalysis {
 			// same locations, same messages, different end times...
 			
 			log.info("Only the start/end times differ...");
-			log.info("New item: " + item.toString());
-			log.info("Old item: " + trafficItems.get(item.getId()));
+			log.info("New item: " + item.toStringWithDownloadTime());
+			log.info("Existing item: " + trafficItems.get(item.getId()).toStringWithDownloadTime());
 			
-			if ( item.getDownloadTime() > trafficItems.get(item.getId()).getDownloadTime() ) {
-				log.info("Replacing the traffic item's end time in the map by the more recent information (but keep the previous start time).");
-				item.setStartTime(trafficItems.get(item.getId()).getStartTime());
-				trafficItems.put(item.getId(), item);
-			} else {
-				log.info("Do not modify the traffic item's end time in the map because it is the more recent information.");
-				if (item.getStartTime().equals(trafficItems.get(item.getId()).getStartTime())) {
-					log.info("Same start time. No need to adjust the incident's start time.");
-				} else {
-					log.info("Updating the incident's start time to the previous traffic item's start time.");
-					trafficItems.get(item.getId()).setStartTime(item.getStartTime());
-				}
-			}
+			updateLatestInfoButKeepPreviousStartTime(item);
 			
 		} else if (item.getOrigin().toString().equals(trafficItems.get(item.getId()).getOrigin().toString()) &&
 				item.getTo().toString().equals(trafficItems.get(item.getId()).getTo().toString()) &&
@@ -404,50 +388,71 @@ public class IncidentDataAnalysis {
 			// same locations, different messages
 			
 			log.warn("Same location but different messages...");
-			log.warn("New item: " + item.toString());
-			log.warn("Old item: " + trafficItems.get(item.getId()));
+			log.warn("New item: " + item.toStringWithDownloadTime());
+			log.warn("Existing item: " + trafficItems.get(item.getId()).toStringWithDownloadTime());
 			
 			if (tmc.trafficItemIsAnUpdate(item) && (!tmc.trafficItemIsAnUpdate(trafficItems.get(item.getId()))) ) {
 				// the new item is an update message but the existing one is not
 				
 				log.warn("The new item is a traffic update item, the existing item is normal traffic item. Setting the end time of the existing (normal) item to the start time of the new (update) item.");
+				
 				trafficItems.get(item.getId()).setEndTime(item.getStartTime());
 	
 			} else if ( (!tmc.trafficItemIsAnUpdate(item)) && tmc.trafficItemIsAnUpdate(trafficItems.get(item.getId())) ) {
 				// the existing item is an update message but the new one is not
 
 				log.warn("The existing item is a traffic update item, the new item is a normal traffic item. Setting the end time of the new (normal) item to the start time of the existing (update) item.");
+				
 				item.setEndTime(trafficItems.get(item.getId()).getStartTime());
-				log.warn("Replacing the exising (update) item by the new (normal) item."); 
+				
+				log.warn("Replacing the existing (update) item by the new (normal) item."); 
+				
 				trafficItems.put(item.getId(), item);
 			
 			} else {
+				
+				// just use the download time to find out what is the more recent information
 				
 				log.warn("Same traffic item IDs and location but different messages should only be possible if traffic item was updated by an update message.");
 				log.warn("Check if one of the following messages is an update message and if yes, add the code to " + tmc.getClass());
-				log.warn("New item: " + item.toString());
-				log.warn("Old item: " + trafficItems.get(item.getId()));
+				log.warn("New item: " + item.getTMCAlert().getPhraseCode().toString() + ": " + item.getTMCAlert().getDescription());
+				log.warn("Existing item: " + trafficItems.get(item.getId()).getTMCAlert().getPhraseCode() + ": " + trafficItems.get(item.getId()).getTMCAlert().getDescription());
 				
-				throw new RuntimeException("Aborting...");
+				updateLatestInfoButKeepPreviousStartTime(item);
+				
+				log.warn("Updated item: " + trafficItems.get(item.getId()).toStringWithDownloadTime());
 			}
+			
 		} else {
 			log.warn("Same traffic item ID should only be possible if the end time was updated or the traffic item was updated by an update message.");
 			log.warn("Check the difference between the following traffic items:");
-			log.warn("New item: " + item.toString());
-			log.warn("Old item: " + trafficItems.get(item.getId()));
+			log.warn("New item: " + item.toStringWithDownloadTime());
+			log.warn("Existing item: " + trafficItems.get(item.getId()).toStringWithDownloadTime());
 			
-			if ( item.getDownloadTime() > trafficItems.get(item.getId()).getDownloadTime() ) {
-				log.info("Updating the traffic item in the map by the more recent information (but keep the start time).");
-				item.setStartTime(trafficItems.get(item.getId()).getStartTime());
-				trafficItems.put(item.getId(), item);
+			updateLatestInfoButKeepPreviousStartTime(item);
+			
+			log.warn("Updated item: " + trafficItems.get(item.getId()).toStringWithDownloadTime());
+		}		
+	}
+
+	private void updateLatestInfoButKeepPreviousStartTime(TrafficItem item) {
+
+		if ( item.getDownloadTime() > trafficItems.get(item.getId()).getDownloadTime() ) {
+			log.info("Replacing the traffic item in the map by the more recent information (but keep the previous start time).");
+			
+			item.setStartTime(trafficItems.get(item.getId()).getStartTime());
+			trafficItems.put(item.getId(), item);
+		
+		} else {
+			
+			log.info("Do not replacing the traffic item in the map because it is the more recent information.");
+			
+			if (item.getStartTime().equals(trafficItems.get(item.getId()).getStartTime())) {
+				log.info("Same start time. No need to adjust the incident's start time.");
 			} else {
-				log.info("Do not modify the traffic item in the map because it is the more recent information.");
-				if (item.getStartTime().equals(trafficItems.get(item.getId()).getStartTime())) {
-					log.info("Same start time. No need to adjust the incident's start time.");
-				} else {
-					log.info("Updating the incident's start time to the previous traffic item's start time.");
-					trafficItems.get(item.getId()).setStartTime(item.getStartTime());
-				}
+				log.info("Updating the incident's start time to the previous traffic item's start time.");
+				
+				trafficItems.get(item.getId()).setStartTime(item.getStartTime());
 			}
 		}		
 	}

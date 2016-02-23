@@ -96,6 +96,11 @@ public class TrafficItem {
 				+ ", startTime=" + startTime + ", endTime=" + endTime + ", status=" + status + ", origin=" + origin
 				+ ", to=" + to + ", alert=" + alert + "]";
 	}
+	public String toStringWithDownloadTime() {
+		return "TrafficItem [id=" + id + ", downloadTime=" + downloadTime + ", originalId=" + originalId
+				+ ", startTime=" + startTime + ", endTime=" + endTime + ", status=" + status + ", origin=" + origin
+				+ ", to=" + to + ", alert=" + alert + "]";
+	}
 	
 }
 
