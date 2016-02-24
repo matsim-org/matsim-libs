@@ -65,14 +65,15 @@ public final class Coord2CoordTimeDistanceTravelDisutility implements TravelDisu
 				throw new NullPointerException("This disutility only works properly for the \"walk\" mode.");
 			}
 			
-			final ModeParams params = cnScoringGroup.getModes().get( mode ) ;
-			if ( params == null ) {
+			final ModeParams params = cnScoringGroup.getModes().get(mode) ;
+			if (params == null) {
 				throw new NullPointerException(mode + " is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
 			}
 			
 			// analogous to "RandomizingTimeDistanceTravelDisutility"
 			final double marginalCostOfTime_s = (-params.getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
-			final double marginalCostOfDistance_m = -params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney() ;
+			final double marginalCostOfDistance_m = -params.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney();
+			//
 
 			return new Coord2CoordTimeDistanceTravelDisutility(
 					timeCalculator,
@@ -83,8 +84,8 @@ public final class Coord2CoordTimeDistanceTravelDisutility implements TravelDisu
 		}
 
 		
-		public Builder setWalkSpeed( double val ) {
-			this.walkSpeed_m_s = val ;
+		public Builder setWalkSpeed(double walkSpeed_m_s) {
+			this.walkSpeed_m_s = walkSpeed_m_s;
 			return this;
 		}
 	}  
@@ -100,6 +101,11 @@ public final class Coord2CoordTimeDistanceTravelDisutility implements TravelDisu
 		this.marginalCostOfTime_s = marginalCostOfTime_s;
 		this.marginalCostOfDistance_m = marginalCostOfDistance_m;
 		this.walkSpeed_m_s = walkSpeed_m_s;
+		
+		if (walkSpeed_m_s == 0.) {
+			log.warn("The walk speed is currently set to " + walkSpeed_m_s + "m/s. It should be set to a reasonable value"
+					+ " in order to obtain meaningful results.");
+		}
 		
 		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.walk);
 		this.delegate = builder.createTravelDisutility(timeCalculator, cnScoringGroup);

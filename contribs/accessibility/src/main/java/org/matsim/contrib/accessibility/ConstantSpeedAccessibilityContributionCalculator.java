@@ -87,7 +87,7 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 		Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
 
 		// captures the distance (as walk time) between the origin via the link to the node:
-		Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
+		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
 
 		// get stored network node (this is the nearest node next to an aggregated work place)
 		Node destinationNode = destination.getNearestNode();

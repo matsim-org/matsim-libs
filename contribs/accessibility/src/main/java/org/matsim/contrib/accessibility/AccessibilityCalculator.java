@@ -1,5 +1,13 @@
 package org.matsim.contrib.accessibility;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -18,19 +26,11 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
-
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * improvements aug'12<ul>
@@ -88,8 +88,9 @@ import java.util.concurrent.ConcurrentHashMap;
 	private Scenario scenario;
 	private AccessibilityConfigGroup acg;
 
-	private TravelDisutility walkTravelDisutility;
+	private Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility;
 
+	
 	@Inject
 	AccessibilityCalculator(Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilityFactories, Scenario scenario, AccessibilityConfigGroup config) {
 		this.travelTimes = travelTimes;
@@ -98,22 +99,30 @@ import java.util.concurrent.ConcurrentHashMap;
 		this.acg = config;
 	}
 
+	
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface l){
 		this.zoneDataExchangeListeners.add(l);
 	}
 
+	
 	final void initDefaultContributionCalculators() {
 		calculators.put(
 				Modes4Accessibility.car,
 				new NetworkModeAccessibilityContributionCalculator(
 						travelTimes.get(TransportMode.car),
 						travelDisutilityFactories.get(TransportMode.car),
+						//
+						walkTravelDisutility,
+						//
 						scenario));
 		calculators.put(
 				Modes4Accessibility.freeSpeed,
 				new NetworkModeAccessibilityContributionCalculator(
 						new FreeSpeedTravelTime(),
 						travelDisutilityFactories.get(TransportMode.car),
+						//
+						walkTravelDisutility,
+						//
 						scenario));
 		calculators.put(
 				Modes4Accessibility.walk,
@@ -132,6 +141,7 @@ import java.util.concurrent.ConcurrentHashMap;
 						scenario.getConfig()));
 	}
 	
+	
 	/**
 	 * setting parameter for accessibility calculation
 	 * @param config TODO
@@ -146,11 +156,11 @@ import java.util.concurrent.ConcurrentHashMap;
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
 		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 		
-		walkTravelDisutility = travelDisutilityFactories.get(TransportMode.walk).createTravelDisutility(
+		this.walkTravelDisutility = (Coord2CoordTimeDistanceTravelDisutility) travelDisutilityFactories.get(TransportMode.walk).createTravelDisutility(
 				travelTimes.get(TransportMode.walk), scenario.getConfig().planCalcScore());
-
 	}
 
+	
 	/**
 	 * This aggregates the disutilities Vjk to get from node j to all k that are attached to j.
 	 * Finally the sum(Vjk) is assigned to node j, which is done in this method.
@@ -166,7 +176,8 @@ import java.util.concurrent.ConcurrentHashMap;
 	 * @param network giving the road network
 	 */
 	final void aggregateOpportunities(final ActivityFacilities opportunities, Network network){
-		// yyyy this method ignores the "capacities" of the facilities.  kai, mar'14
+		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
+		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
 
 		log.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
 		Map<Id<Node>, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<>();
@@ -176,10 +187,8 @@ import java.util.concurrent.ConcurrentHashMap;
 			bar.update();
 
 			Node nearestNode = ((NetworkImpl)network).getNearestNode( opportunity.getCoord() );
-
-			Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility = (Coord2CoordTimeDistanceTravelDisutility) this.walkTravelDisutility;
 			
-			double walkUtility = -walkTravelDisutility.getCoord2CoordTravelDisutility(opportunity.getCoord(), nearestNode.getCoord());
+			double walkUtility = -this.walkTravelDisutility.getCoord2CoordTravelDisutility(opportunity.getCoord(), nearestNode.getCoord());
 			double expVjk = Math.exp(this.logitScaleParameter * walkUtility);
 			
 			AggregationObject jco = opportunityClusterMap.get( nearestNode.getId() ) ;
@@ -193,8 +202,6 @@ import java.util.concurrent.ConcurrentHashMap;
 				log.warn(Gbl.ONLYONCE);
 			}
 			jco.addObject( opportunity.getId(), expVjk ) ;
-			
-			
 		}
 		log.info("Aggregated " + opportunities.getFacilities().size() + " number of opportunities to " + opportunityClusterMap.size() + " nodes.");
 		this.aggregatedOpportunities = opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
@@ -310,14 +317,17 @@ import java.util.concurrent.ConcurrentHashMap;
 		}
 	}
 
+	
 	public void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
 		this.acg.setComputingAccessibilityForMode(mode, val);
 	}
 
+	
 	public Set<Modes4Accessibility> getIsComputingMode() {
 		return this.acg.getIsComputingMode();
 	}
 
+	
 	/**
 	 * stores travel disutilities for different modes
 	 */
@@ -340,16 +350,18 @@ import java.util.concurrent.ConcurrentHashMap;
 		}
 	}
 
+	
 	public final void setPtMatrix(PtMatrix ptMatrix) {
 		this.ptMatrix = ptMatrix;
 	}
 
+	
 	ActivityFacilitiesImpl getMeasuringPoints() {
 		return measuringPoints;
 	}
 
+	
 	void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
 		this.measuringPoints = measuringPoints;
 	}
-
 }

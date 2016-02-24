@@ -1,11 +1,13 @@
 package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
+import org.matsim.contrib.accessibility.utils.Coord2CoordTimeDistanceTravelDisutility;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
@@ -16,6 +18,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
@@ -37,6 +40,9 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 
 	private final Scenario scenario;
 	private final TravelTime travelTime;
+	// new dz
+	private final Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility;
+	//
 
 //	private final double departureTime;
 	private final double betaWalkTT;
@@ -46,17 +52,25 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	private Node fromNode = null;
 	private final LeastCostPathTreeExtended lcpt;
 
+	
 	public NetworkModeAccessibilityContributionCalculator(
 			final TravelTime travelTime,
 			final TravelDisutilityFactory travelDisutilityFactory,
+			final Coord2CoordTimeDistanceTravelDisutility walkTravelDisutility,
+			//
 			final Scenario scenario){
 		this.scenario = scenario;
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
-		this.travelTime = travelTime;
+		this.travelTime = travelTime;		
 
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime,	planCalcScoreConfigGroup);
+		// new dz
+		System.err.println("travelDisutility = " + travelDisutility);
+		
+		this.walkTravelDisutility = walkTravelDisutility;
+		//
 		this.lcpt = new LeastCostPathTreeExtended(travelTime, travelDisutility, this.scheme);
 
 		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0. ) {
@@ -91,7 +105,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 //		Link nearestLink = NetworkUtils.getNearestLink(scenario.getNetwork(), origin.getCoord()); // TODO this would actually be more correct, dz, feb'16
 
 		// captures the distance (as walk time) between the origin via the link to the node:
-		Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
+		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
 
 		
 		// === WALK TO NETWORK: ===
@@ -100,11 +114,35 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
 		// distance to road, and then to node.  (comment by thibaut?)
 		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
+		//
+		System.err.println("origin.getCoord() = " + origin.getCoord() + " -- destination.getNearestNode() = " + destination.getNearestNode());
+		System.err.println("destination.getNumberOfObjects() = " + destination.getNumberOfObjects());
+		System.err.println("distance.getDistancePoint2Road() = " + distance.getDistancePoint2Road());
+//		System.err.println("this.walkSpeedMeterPerHour = " + this.walkSpeedMeterPerHour);
+//		System.err.println("walkTravelTimeMeasuringPoint2Road_h = " + walkTravelTimeMeasuringPoint2Road_h);
+		//
 
 		// disutilities to get on or off the network
 		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
+		//
+		System.err.println("walkDisutilityMeasuringPoint2Road = " + walkDisutilityMeasuringPoint2Road);
+		//
 
 		// dzdzdz: replace the above by coord2coordTravelDisutility
+		
+		// new dz
+		Coord projectionCoord = CoordUtils.orthogonalProjectionOnLineSegment(nearestLink.getFromNode().getCoord(), nearestLink.getToNode().getCoord(), origin.getCoord());
+		System.err.println("nearestLink.getFromNode().getCoord() = " + nearestLink.getFromNode().getCoord() + 
+				" -- nearestLink.getToNode().getCoord() = " + nearestLink.getToNode().getCoord());
+		System.err.println("NEW distance coord - from coord = " + CoordUtils.calcDistance(origin.getCoord(), nearestLink.getFromNode().getCoord()) + 
+				" -- NEW distance coord - to coord = " + CoordUtils.calcDistance(origin.getCoord(), nearestLink.getToNode().getCoord()));
+		System.err.println("projectionCoord = " + projectionCoord);
+		double walkUtility = -this.walkTravelDisutility.getCoord2CoordTravelDisutility(origin.getCoord(), projectionCoord);
+		
+//		walkDisutilityMeasuringPoint2Road = walkUtility;
+		System.err.println("NEW walkDisutility = " + walkUtility);
+		System.err.println("#############");
+		// end new
 		
 		// === NETWORK ENTRY TO FIRST NODE: ===
 
