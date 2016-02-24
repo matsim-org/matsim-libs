@@ -80,7 +80,8 @@ public class PathologicalExample {
 				maxMemorizedTrajectoryLength, includeCurrentBest);
 		randomSearch.setLogFileName(this.logFileName);
 		randomSearch.setConvergenceTrackingFileName(this.convFileName);
-
+		
+		// randomSearch.run(1.0, 1.0, false);
 		randomSearch.run();
 	}
 

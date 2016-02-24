@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import floetteroed.opdyts.DecisionVariable;
-import floetteroed.utilities.math.Vector;
 
 /**
  * 
@@ -26,15 +25,4 @@ class SingleTrajectoryAnalyzer {
 			}
 		}
 	}
-
-	double surrogateObjectiveFunction(final double equilibriumGapWeight,
-			final double uniformityGapWeight) {
-		return 0.0;
-//		final TransitionSequencesAnalyzer<DecisionVariable> analyzer = new TransitionSequencesAnalyzer<>(
-//				this.optimalTransitions, equilibriumGapWeight,
-//				uniformityGapWeight);
-//		final Vector alphas = analyzer.optimalAlphas();
-//		return analyzer.surrogateObjectiveFunctionValue(alphas);
-	}
-
 }

@@ -24,9 +24,7 @@
  */
 package floetteroed.opdyts.trajectorysampling;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
@@ -112,7 +110,7 @@ public class TransitionSequence<U extends DecisionVariable> {
 	}
 
 	// TODO is now public
-	public List<Transition<U>> getTransitions() {
+	public LinkedList<Transition<U>> getTransitions() {
 		return this.transitions;
 	}
 
