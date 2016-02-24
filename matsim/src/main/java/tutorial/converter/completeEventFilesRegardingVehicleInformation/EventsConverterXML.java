@@ -93,6 +93,7 @@ public class EventsConverterXML extends MatsimXmlParser{
 			case PersonDepartureEvent.EVENT_TYPE:
 				// remember person to (leg) mode relation
 				personToLegMode.put(Id.createPersonId(atts.getValue(PersonDepartureEvent.ATTRIBUTE_PERSON)), atts.getValue(PersonDepartureEvent.ATTRIBUTE_LEGMODE));
+				this.basicEventsReader.startTag(name, atts, context);
 				break;
 			case VehicleEntersTrafficEvent.EVENT_TYPE:
 			case "wait2link":

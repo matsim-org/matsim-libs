@@ -87,7 +87,7 @@ public class SocialCostController {
 				controler.getEvents().addHandler(scc);
 
 				// initialize the social costs disutility calculator
-				final SocialCostTravelDisutilityFactory factory = new SocialCostTravelDisutilityFactory(scc);
+				final SocialCostTravelDisutilityFactory factory = new SocialCostTravelDisutilityFactory(scc, controler.getConfig().planCalcScore());
 //				services.addOverridingModule(new AbstractModule() {
 //					@Override
 //					public void install() {
@@ -142,13 +142,15 @@ public class SocialCostController {
 	private static class SocialCostTravelDisutilityFactory implements TravelDisutilityFactory {
 
 		private final SocialCostCalculator scc;
+		private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-		public SocialCostTravelDisutilityFactory(SocialCostCalculator scc) {
+		public SocialCostTravelDisutilityFactory(SocialCostCalculator scc, PlanCalcScoreConfigGroup cnScoringGroup) {
 			this.scc = scc;
+			this.cnScoringGroup = cnScoringGroup;
 		}
 
 		@Override
-		public TravelDisutility createTravelDisutility(TravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
+		public TravelDisutility createTravelDisutility(TravelTime travelTime) {
 			return new SocialCostTravelDisutility(travelTime, scc, cnScoringGroup);
 		}
 	}

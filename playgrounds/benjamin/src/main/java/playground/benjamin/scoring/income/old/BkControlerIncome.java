@@ -86,7 +86,7 @@ public class BkControlerIncome {
 		else{
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/
-			final TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
+			final TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping, controler.getConfig().planCalcScore());
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {

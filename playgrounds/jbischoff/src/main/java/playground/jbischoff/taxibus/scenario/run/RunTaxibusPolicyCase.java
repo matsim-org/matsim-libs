@@ -60,7 +60,7 @@ public class RunTaxibusPolicyCase {
 
 	public static void main(String[] args) {
 
-		String configFileName = "../../../shared-svn/projects/vw_rufbus/scenario/input/configs/configSingleRunM.xml";
+		String configFileName = "../../../shared-svn/projects/vw_rufbus/scenario/input/configs/config75.xml";
 		if (args.length>0){
 			configFileName = args[0];
 		}

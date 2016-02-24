@@ -72,6 +72,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		boolean problem = false ; // ini
 		
 		// added feb'16
+		if ( !config.qsim().isUsingTravelTimeCheckInTeleportation() ) {
+			log.log( lvl, "found `qsim.usingTravelTimeCheckInTeleporation==false'; vsp should try out `true' and report." ) ;
+		}
+		
+		// added feb'16
 		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			log.log( lvl, "found `plansCalcRoute.insertingAccessEgressWalk==false'; vsp should try out `true' and report. " ) ;
 		}

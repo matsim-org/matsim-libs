@@ -185,10 +185,11 @@ public class Simulator {
         hamiltonianAnalyzers = new ConcurrentAnalyzerTask<>();
         analyzerTasks.addComponent(new AnalyzerTaskGroup<>(hamiltonianAnalyzers, ioContext, "hamiltonian"));
 
-        GeoDistanceHamiltonian.build(this, config);
-//        GeoDistanceLAU2Hamiltonian.build(this, config);
+//        GeoDistanceZoneHamiltonian.build(this, config);
+//        GeoDistanceHamiltonian.build(this, config);
+        GeoDistanceLAU2Hamiltonian.build(this, config);
 //        MeanDistanceHamiltonian.build(this, config);
-        MeanZoneDistanceHamiltonian.build(this, config);
+//        MeanZoneDistanceHamiltonian.build(this, config);
         ODCalibratorHamiltonian.build(this, config);
 
         engineListeners.addComponent(new HamiltonianLogger(hamiltonian,

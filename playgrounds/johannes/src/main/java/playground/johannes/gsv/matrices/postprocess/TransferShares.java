@@ -47,7 +47,9 @@ public class TransferShares {
 
     private static Map<String, NumericMatrix> refMatricesModena;
 
-    private static NumericMatrix targetMatrix;
+    private static Map<String, NumericMatrix> refMatricesNuts3;
+
+    private static NumericMatrix targetMatrixModena;
 
     private static NumericMatrix targetMatrixNuts3;
 
@@ -56,13 +58,14 @@ public class TransferShares {
     private static Set<String> zoneKeys = new HashSet<>();
 
     public static void main(String args[]) throws IOException {
-        refMatricesModena = loadRefMatrix(args[0]);
-
         ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[3], "NO");
         loadZoneIdMapping(zones, "NUTS3_CODE");
 
-        targetMatrix = loadTargetMatrix(args[1]);
-        targetMatrixNuts3 = ODMatrixOperations.aggregate(targetMatrix, zones, "NUTS3_CODE");
+        refMatricesModena = loadRefMatrix(args[0]);
+        refMatricesNuts3 = aggregate(refMatricesModena, zones, "NUTS3_CODE");
+
+        targetMatrixModena = loadTargetMatrix(args[1]);
+        targetMatrixNuts3 = ODMatrixOperations.aggregate(targetMatrixModena, zones, "NUTS3_CODE");
 
         BufferedWriter writer = IOUtils.getBufferedWriter(args[2]);
         writer.write("von;nach;zweck;jahr;Verkehrsmittel;Richtung;Tagestyp;Saison;fahrtenj");
@@ -163,35 +166,44 @@ public class TransferShares {
         return targetMatrix;
     }
 
-//    private static Map<String, NumericMatrix> aggregate(Map<String, NumericMatrix> matrices, ZoneCollection zones,
-//                                                        String key) {
-//        Map<String, NumericMatrix> aggregates = new HashMap<>();
-//        for (Map.Entry<String, NumericMatrix> entry : matrices.entrySet()) {
-//            NumericMatrix aggr = ODMatrixOperations.aggregate(entry.getValue(), zones, key);
-//            aggregates.put(entry.getKey(), aggr);
-//        }
-//
-//        return aggregates;
-//    }
-
-    private static double calcFactor(String i, String j) {
-        double refSum = 0;
-        for (NumericMatrix refMatrix : refMatricesModena.values()) {
-            Double vol = refMatrix.get(i, j);
-            if (vol != null) refSum += vol;
+    private static Map<String, NumericMatrix> aggregate(Map<String, NumericMatrix> matrices, ZoneCollection zones,
+                                                        String key) {
+        Map<String, NumericMatrix> aggregates = new HashMap<>();
+        for (Map.Entry<String, NumericMatrix> entry : matrices.entrySet()) {
+            NumericMatrix aggr = ODMatrixOperations.aggregate(entry.getValue(), zones, key);
+            aggregates.put(entry.getKey(), aggr);
         }
 
-        if(refSum == 0) return 0;
+        return aggregates;
+    }
 
-        Double targetSum = targetMatrix.get(i, j);
-        if (targetSum == null) {
+    private static double calcFactor(String i, String j) {
+        double factor = calcFactor(i, j, targetMatrixModena, refMatricesModena);
+
+        if(!Double.isNaN(factor)) return factor;
+        else {
             String i_nuts3 = zoneIdMapping.get(i);
             String j_nuts3 = zoneIdMapping.get(j);
 
-            targetSum = targetMatrixNuts3.get(i_nuts3, j_nuts3);
+            factor = calcFactor(i_nuts3, j_nuts3, targetMatrixNuts3, refMatricesNuts3);
+            if(!Double.isNaN(factor)) return factor;
+            else return 1.0;
         }
+    }
 
-        if (targetSum == null) return 1;
+    private static double calcFactor(String i, String j, NumericMatrix target, Map<String, NumericMatrix> references) {
+        double refSum = 0;
+        for (NumericMatrix refMatrix : references.values()) {
+            Double vol = refMatrix.get(i, j);
+            if (vol != null) refSum += vol;
+        }
+        /*
+        if there is no volume in the reference matrix, it can be ignored
+         */
+        if(refSum == 0) return 0;
+
+        Double targetSum = target.get(i, j);
+        if (targetSum == null) return Double.NaN;
         else return targetSum / refSum;
     }
 

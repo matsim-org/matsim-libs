@@ -46,8 +46,8 @@ public class ControlerDefaults {
 		return new CharyparNagelScoringFunctionFactory( scenario );
 	}
 
-	public static TravelDisutilityFactory createDefaultTravelDisutilityFactory() {
-		final Builder builder = new Builder( TransportMode.car );
+	public static TravelDisutilityFactory createDefaultTravelDisutilityFactory(Scenario scenario) {
+		final Builder builder = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() );
 		builder.setSigma(0.); // tendency to set this to 3. right away (i.e. through PlansCalcRouteConfigGroup default). kai/bk, mar'15
 		return builder;
 	}

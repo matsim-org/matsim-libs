@@ -41,15 +41,17 @@ public class CNTollDisutilityCalculatorFactory implements TravelDisutilityFactor
 
 	private final NoiseContext noiseContext;
 	private final TollHandler tollHandler;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
 	@Deprecated
-	public CNTollDisutilityCalculatorFactory(NoiseContext noiseContext, TollHandler tollHandler) {
+	public CNTollDisutilityCalculatorFactory(NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.noiseContext = noiseContext;
 		this.tollHandler = tollHandler;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		final CNTollTravelDisutilityCalculator ttdc = new CNTollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, noiseContext, tollHandler);
 
 		return new TravelDisutility(){

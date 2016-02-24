@@ -77,7 +77,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
             }
         }));
 
-        addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(ControlerDefaults.createDefaultTravelDisutilityFactory());
+        addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.car, getConfig().planCalcScore()));
         addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
 
         addControlerListenerBinding().to(RoadPricingControlerListener.class);
@@ -150,7 +150,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
         @Override
         public TravelDisutilityFactory get() {
             RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-            final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory();
+            final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
 //			if (!scheme.getType().equals(RoadPricingScheme.TOLL_TYPE_AREA)) {
                 RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
                         originalTravelDisutilityFactory, scheme, scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney()

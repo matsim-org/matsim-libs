@@ -211,9 +211,9 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS, congestion and noise toll payments
 			final VTTSTollTimeDistanceTravelDisutilityFactory factory = new VTTSTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, config.planCalcScore()),
 					noiseContext,
-					congestionTollHandler
+					congestionTollHandler, config.planCalcScore()
 				);
 			factory.setSigma(sigma);
 			
@@ -238,8 +238,8 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS and noise toll payments
 			final VTTSNoiseTollTimeDistanceTravelDisutilityFactory factory = new VTTSNoiseTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
-					noiseContext
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, config.planCalcScore()),
+					noiseContext, config.planCalcScore()
 				);
 			factory.setSigma(sigma);
 			
@@ -264,8 +264,8 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS and congestion toll payments
 			final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
-					congestionTollHandler
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, config.planCalcScore()),
+					congestionTollHandler, config.planCalcScore()
 				);
 			factory.setSigma(sigma);
 			
@@ -289,7 +289,7 @@ public class CNControler {
 			// base case
 						
 			// a router which accounts for the person- and trip-specific VTTS
-			final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
+			final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, config.planCalcScore());
 			factory.setSigma(sigma);
 			
 			controler.addOverridingModule(new AbstractModule(){

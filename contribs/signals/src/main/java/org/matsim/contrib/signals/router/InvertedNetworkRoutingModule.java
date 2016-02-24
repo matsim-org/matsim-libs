@@ -100,7 +100,7 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 		// original network, and looks up the link2link tttime in the l2ltravelTimes data structure)
 		
 		TravelDisutility travelCost = travelCostCalculatorFactory.createTravelDisutility(
-				travelTimesProxy, cnScoringGroup);
+				travelTimesProxy);
 
 		this.leastCostPathCalculator = leastCostPathCalcFactory.createPathCalculator(
 				this.invertedNetwork, travelCost, travelTimesProxy);

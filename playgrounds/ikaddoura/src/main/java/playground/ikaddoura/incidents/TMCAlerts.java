@@ -65,7 +65,8 @@ public class TMCAlerts {
 	
 	protected boolean trafficItemIsAnUpdate(TrafficItem trafficItem) {
 		
-		if (trafficItem.getTMCAlert().getPhraseCode().endsWith("87") ||
+		if (trafficItem.getTMCAlert().getPhraseCode().endsWith("86") ||
+				trafficItem.getTMCAlert().getPhraseCode().endsWith("87") ||
 				trafficItem.getTMCAlert().getPhraseCode().endsWith("88") ||
 				trafficItem.getTMCAlert().getPhraseCode().endsWith("89") ||
 				trafficItem.getTMCAlert().getPhraseCode().endsWith("90") ||

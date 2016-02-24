@@ -74,8 +74,7 @@ public class TollTravelCostCalculatorTest {
 	@Test
 	public void testDisutilityResults() {
 		Config config = ConfigUtils.createConfig() ;
-        RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-		
+
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
 		Fixture.createNetwork2((MutableScenario)scenario);
 		Network net = scenario.getNetwork() ;
@@ -92,12 +91,12 @@ public class TollTravelCostCalculatorTest {
 		TravelTime timeCalculator = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 
 		double margUtlOfMoney = 1. ;
-        final TravelDisutilityFactory defaultDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory();
+        final TravelDisutilityFactory defaultDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
         
 		RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
 				defaultDisutilityFactory, scheme, margUtlOfMoney );
 //        travelDisutilityFactory.setSigma( 0. ) ;
-		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(timeCalculator, config.planCalcScore() ) ;
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(timeCalculator ) ;
 		
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
 		
