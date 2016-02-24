@@ -3,13 +3,10 @@ package playground.balac.utils.parking;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.PC2.simulation.ParkingArrivalEvent;
 import org.matsim.contrib.parking.PC2.simulation.ParkingDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;

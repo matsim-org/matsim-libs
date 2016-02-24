@@ -20,11 +20,11 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 public class MembershipGenerationFreeFloating {
 	
-	final private int numMembers = 36000;
+	final private int numMembers = 6000;
 	
 	private static double[] ageShares = {0.107 , 0.614 , 0.89, 0.987 , 1.0};
 	
-	private static double menShare = 0.5;
+	private static double menShare = 0.8;
 	public void run (String[] args) {
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -153,7 +153,7 @@ public class MembershipGenerationFreeFloating {
 		}
 		
 		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(bla);
-		betaWriter.writeFile("C:/Users/balacm/Desktop/personAttrinutes10kmZoneFF_7xmem.xml.gz");
+		betaWriter.writeFile("C:/Users/balacm/Desktop/personAttrinutes10kmZoneFF_1xmemb.xml.gz");
 		
 	}
 
