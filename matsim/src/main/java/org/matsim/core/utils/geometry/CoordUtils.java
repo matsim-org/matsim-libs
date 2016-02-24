@@ -134,5 +134,47 @@ public abstract class CoordUtils {
 		}
 		return calcDistance(new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY), point);
 	}
-
+	
+	
+	/**
+	 * Calculates the coordinate of the intersection point of the orthogonal projection
+	 * of a given point on a line segment with that line segment. The line segment
+	 * is given by two points, <code>lineFrom</code> and <code>lineTo</code>. If the
+	 * projection point does not lie *on* the line segment (but only somewhere on
+	 * the extension of the line segment, i.e. the infinite line), the end point of
+	 * the line segment which is closest to the given point is returned.
+	 *
+	 * @param lineFrom The start point of the line segment
+	 * @param lineTo The end point of the line segment
+	 * @param point The point whose distance to the line segment should be calculated
+	 * @return the <code>coordinate</code> of the intersection point of the orthogonal
+	 * projection of a given point on a line segment with that line segment
+	 *
+	 * @author dziemke
+	 */
+	public static Coord orthogonalProjectionOnLineSegment(final Coord lineFrom, final Coord lineTo, final Coord point) {
+		/* Concerning explanation and usage of the dot product for these calculation, please
+		 * read comments of "distancePointLinesegment".
+		 */
+		double lineDX = lineTo.getX() - lineFrom.getX();
+		double lineDY = lineTo.getY() - lineFrom.getY();
+	
+		if ((lineDX == 0.0) && (lineDY == 0.0)) {
+			// the line segment is a point without dimension
+			return lineFrom;
+		}
+	
+		double u = ((point.getX() - lineFrom.getX())*lineDX + (point.getY() - lineFrom.getY())*lineDY) /
+							(lineDX*lineDX + lineDY*lineDY);
+	
+		if (u <= 0) {
+			// (x | y) is not on the line segment, but before lineFrom
+			return lineFrom;
+		}
+		if (u >= 1) {
+			// (x | y) is not on the line segment, but after lineTo
+			return lineTo;
+		}
+		return new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY);
+	}
 }
