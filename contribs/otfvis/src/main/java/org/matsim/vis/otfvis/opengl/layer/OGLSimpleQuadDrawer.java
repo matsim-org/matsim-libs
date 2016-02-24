@@ -6,7 +6,7 @@ package org.matsim.vis.otfvis.opengl.layer;
 import java.awt.geom.Point2D;
 import java.util.Map;
 
-import javax.media.opengl.GL2;
+import com.jogamp.opengl.GL2;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.vis.otfvis.OTFClientControl;

@@ -307,7 +307,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 			//nextActivityFacilityMap.put(personId, facility);
 
 			Coord coord = scenario.getNetwork().getLinks().get(event.getLinkId()).getCoord();
-			double distanceToNextActivity = CoordUtils.calcDistance(nextActivityLink.getCoord(), coord);
+			double distanceToNextActivity = CoordUtils.calcEuclideanDistance(nextActivityLink.getCoord(), coord);
 
 			/*
 			 * If the agent is within distance 'd' to target activity or OR If
@@ -396,7 +396,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 				
 				Link nextActivityLink = getNextActivityLink(personId);
 				
-				double distanceToNextActivity = CoordUtils.calcDistance(nextActivityLink.getCoord(), coord);
+				double distanceToNextActivity = CoordUtils.calcEuclideanDistance(nextActivityLink.getCoord(), coord);
 
 				/*
 				 * If the agent is within the parking radius

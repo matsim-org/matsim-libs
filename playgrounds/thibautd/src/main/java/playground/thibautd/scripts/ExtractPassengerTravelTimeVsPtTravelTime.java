@@ -124,7 +124,7 @@ public class ExtractPassengerTravelTimeVsPtTravelTime {
 			Coord o = network.getLinks().get( departureEvent.getLinkId() ).getCoord();
 			Coord d = network.getLinks().get( arrivalEvent.getLinkId() ).getCoord();
 
-			return CoordUtils.calcDistance( o , d );
+			return CoordUtils.calcEuclideanDistance( o , d );
 		}
 
 		private double calcPtTime(final double dist) {

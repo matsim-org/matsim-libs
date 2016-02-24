@@ -68,7 +68,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(coord);
-			double distance = CoordUtils.calcDistance(coord, nearestNode.stop.getStopFacility().getCoord());
+			double distance = CoordUtils.calcEuclideanDistance(coord, nearestNode.stop.getStopFacility().getCoord());
 			nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.config.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<Node, InitialNode>();
@@ -102,12 +102,12 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			return null;
 		}
 
-		double directWalkCost = CoordUtils.calcDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		double directWalkCost = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed() * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 		if (directWalkCost < pathCost) {
 			List<Leg> legs = new ArrayList<Leg>();
 			Leg leg = new LegImpl(TransportMode.transit_walk);
-			double walkDistance = CoordUtils.calcDistance(fromCoord, toCoord);
+			double walkDistance = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
 			Route walkRoute = new GenericRouteImpl(null, null);
 			walkRoute.setDistance(walkDistance);
 			leg.setRoute(walkRoute);
@@ -130,11 +130,11 @@ public class TransitRouterVariableImpl implements TransitRouter {
 		if (p == null) {
 			return null;
 		}
-		double directWalkCost = CoordUtils.calcDistance(fromCoord, toCoord)/this.config.getBeelineWalkSpeed()*(0-this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		double directWalkCost = CoordUtils.calcEuclideanDistance(fromCoord, toCoord)/this.config.getBeelineWalkSpeed()*(0-this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size()-1)).initialCost;
 		if (directWalkCost < pathCost)
-			return new Path(null, null, CoordUtils.calcDistance(fromCoord, toCoord)/this.config.getBeelineWalkSpeed(), directWalkCost);
-		double pathTravelTime = p.travelTime + (CoordUtils.calcDistance(fromCoord, p.nodes.get(0).getCoord())+CoordUtils.calcDistance(p.nodes.get(p.nodes.size()-1).getCoord(),toCoord))/this.config.getBeelineWalkSpeed();
+			return new Path(null, null, CoordUtils.calcEuclideanDistance(fromCoord, toCoord)/this.config.getBeelineWalkSpeed(), directWalkCost);
+		double pathTravelTime = p.travelTime + (CoordUtils.calcEuclideanDistance(fromCoord, p.nodes.get(0).getCoord())+CoordUtils.calcEuclideanDistance(p.nodes.get(p.nodes.size()-1).getCoord(),toCoord))/this.config.getBeelineWalkSpeed();
 		return new Path(p.nodes, p.links, pathTravelTime, pathCost);
 	}
 	
@@ -168,7 +168,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			else if(l.toNode.route!=null) {
 				//wait link
 				leg = new LegImpl(TransportMode.transit_walk);
-				walkDistance = CoordUtils.calcDistance(coord, l.toNode.stop.getStopFacility().getCoord()); 
+				walkDistance = CoordUtils.calcEuclideanDistance(coord, l.toNode.stop.getStopFacility().getCoord()); 
 				walkWaitTime = walkDistance/this.config.getBeelineWalkSpeed()/*+ttCalculator.getLinkTravelTime(l, time+walkDistance/this.config.getBeelineWalkSpeed(), person, null)*/;
 				walkRoute = new GenericRouteImpl(stop==null?null:stop.getStopFacility().getLinkId(), l.toNode.stop.getStopFacility().getLinkId());
 				walkRoute.setDistance(walkDistance);
@@ -181,7 +181,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			
 		}
 		leg = new LegImpl(TransportMode.transit_walk);
-		walkDistance = CoordUtils.calcDistance(coord, toCoord); 
+		walkDistance = CoordUtils.calcEuclideanDistance(coord, toCoord); 
 		walkWaitTime = walkDistance/this.config.getBeelineWalkSpeed();
 		walkRoute = new GenericRouteImpl(stop==null?null:stop.getStopFacility().getLinkId(), null);
 		walkRoute.setDistance(walkDistance);

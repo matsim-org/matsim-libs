@@ -66,7 +66,7 @@ final class RunFreight {
 				SumScoringFunction sum = new SumScoringFunction();
 
 				/* Add leg and money scoring. */
-				CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.planCalcScore().getScoringParameters( null ), config.scenario()).create();
+				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build();
 				final LegScoring legScoringFunction = new CharyparNagelLegScoring(params , scenario.getNetwork());
 				final MoneyScoring moneyScoringFunction = new CharyparNagelMoneyScoring(params);
 				sum.addScoringFunction(legScoringFunction);
@@ -86,7 +86,7 @@ final class RunFreight {
 
 				/* Create a basic ReRouting module. */
 				TravelTime travelTime = controler.getLinkTravelTimes();
-				TravelDisutility travelCost = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(travelTime, config.planCalcScore());
+				TravelDisutility travelCost = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(travelTime);
 				GenericPlanStrategyImpl<CarrierPlan, Carrier> rerouteStrategy = new GenericPlanStrategyImpl<CarrierPlan, Carrier>( new BestPlanSelector<CarrierPlan, Carrier>()) ;
 
 				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(), travelCost, travelTime);

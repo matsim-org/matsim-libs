@@ -39,14 +39,17 @@ import org.matsim.vehicles.Vehicle;
 
 		private final EmissionModule emissionModule;
 		private final EmissionResponsibilityCostModule emissionResponsibilityCostModule;
+		private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-		public EmissionResponsibilityTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionResponsibilityCostModule) {
+		public EmissionResponsibilityTravelDisutilityCalculatorFactory(EmissionModule emissionModule, 
+				EmissionResponsibilityCostModule emissionResponsibilityCostModule, PlanCalcScoreConfigGroup cnScoringGroup) {
 			this.emissionModule = emissionModule;
 			this.emissionResponsibilityCostModule = emissionResponsibilityCostModule;
+			this.cnScoringGroup = cnScoringGroup;
 		}
 
 		@Override
-		public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup){
+		public TravelDisutility createTravelDisutility(TravelTime timeCalculator){
 			final EmissionResponsibilityTravelDisutilityCalculator ertdc = new EmissionResponsibilityTravelDisutilityCalculator(timeCalculator, cnScoringGroup, emissionModule, emissionResponsibilityCostModule);
 
 			return new TravelDisutility(){

@@ -29,11 +29,18 @@ public class PlanCalcScoreConfigGroupTest {
 	public void testAddActivityParams() {
 		PlanCalcScoreConfigGroup c = new PlanCalcScoreConfigGroup();
 		Assert.assertNull(c.getActivityParams("type1"));
-		Assert.assertEquals(0, c.getActivityParams().size());
+
+//		Assert.assertEquals(0, c.getActivityParams().size());
+		Assert.assertEquals(4, c.getActivityParams().size());
+		// yyyyyy see PlanCalcScoreConfigGroup, where I am currently interaction activities hard-wired.  kai, feb'16
+		
 		ActivityParams ap = new ActivityParams("type1");
 		c.addActivityParams(ap);
 		Assert.assertEquals(ap, c.getActivityParams("type1"));
-		Assert.assertEquals(1, c.getActivityParams().size());
+
+		//		Assert.assertEquals(1, c.getActivityParams().size());
+		Assert.assertEquals(5, c.getActivityParams().size());
+		// yyyyyy see PlanCalcScoreConfigGroup, where I am currently adding car interaction activity hard-wired.  kai, feb'16
 	}
 
 	@Test

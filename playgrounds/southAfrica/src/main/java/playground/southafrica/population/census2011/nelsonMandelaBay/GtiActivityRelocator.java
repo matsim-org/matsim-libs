@@ -542,7 +542,7 @@ public class GtiActivityRelocator {
 		 /* Start the search radius with the distance to the closest facility. */
 			ActivityFacility closestFacility = qt.getClosest(c.getX(), c.getY());
 			
-			double radius = CoordUtils.calcDistance(c, closestFacility.getCoord() );
+			double radius = CoordUtils.calcEuclideanDistance(c, closestFacility.getCoord() );
 			Collection<ActivityFacility> facilities = qt.getDisk(c.getX(), c.getY(), radius);
 			while(facilities.size() < number){
 				/* Double the radius. If the radius happens to be zero (0), 
@@ -558,7 +558,7 @@ public class GtiActivityRelocator {
 		
 		/* Rank the facilities based on distance. */
 		for(ActivityFacility facility : facilitiesToRank){
-			double d = CoordUtils.calcDistance(c, facility.getCoord());
+			double d = CoordUtils.calcEuclideanDistance(c, facility.getCoord());
 			Tuple<ActivityFacility, Double> thisTuple = new Tuple<ActivityFacility, Double>(facility, d);
 			if(tuples.size() == 0){
 				tuples.add(thisTuple);

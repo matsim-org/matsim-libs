@@ -33,7 +33,7 @@ public class DistanceDistribution {
 					if(workLocation==null && trip.getPurpose().equals(Trip.Purpose.WORK.text))
 						workLocation = Household.LOCATIONS.get(trip.getEndPostalCode());
 				if(workLocation!=null) {
-					double homeWorkDistance = CoordUtils.calcDistance(homeLocation.getCoord(), workLocation.getCoord());
+					double homeWorkDistance = CoordUtils.calcEuclideanDistance(homeLocation.getCoord(), workLocation.getCoord());
 					if(homeWorkDistance>0) {
 						String[] homeWorkIndices = new String[person.getTrips().size()+1];
 						if(person.isStartHome())
@@ -78,11 +78,11 @@ public class DistanceDistribution {
 									actT2 = Trip.Purpose.HOME.text;
 								}
 								String accc = "";
-								if(CoordUtils.calcDistance(origin, destination) < CoordUtils.calcDistance(other, isOrigin?origin:destination))
+								if(CoordUtils.calcEuclideanDistance(origin, destination) < CoordUtils.calcEuclideanDistance(other, isOrigin?origin:destination))
 									accc = actT;
 								else
 									accc = actT2;
-								double distance = Math.min(CoordUtils.calcDistance(origin, destination), CoordUtils.calcDistance(other, isOrigin?origin:destination));
+								double distance = Math.min(CoordUtils.calcEuclideanDistance(origin, destination), CoordUtils.calcEuclideanDistance(other, isOrigin?origin:destination));
 								writer.println(distance/homeWorkDistance+","+accc);
 							}
 							origin = destination;

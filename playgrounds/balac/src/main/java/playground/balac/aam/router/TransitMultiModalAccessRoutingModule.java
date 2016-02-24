@@ -269,7 +269,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(facility.getCoord());
 			double distance =
-					CoordUtils.calcDistance(
+					CoordUtils.calcEuclideanDistance(
 							facility.getCoord(),
 							nearestNode.stop.getStopFacility().getCoord());
 			nearestNodes =

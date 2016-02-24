@@ -123,8 +123,7 @@ public class AccessEgressMultimodalTripRouterModule extends AbstractModule {
 
 			final TravelDisutility travelDisutility =
 							 	travelDisutilityFactories.get( mode ).createTravelDisutility(
-										travelTime,
-										scenario.getConfig().planCalcScore());
+										travelTime);
 			final TravelDisutility nonPersonnalizableDisutility =
 					new TravelDisutility() {
 						private final Person dummy = PopulationUtils.createPerson(Id.create("dummy", Person.class));

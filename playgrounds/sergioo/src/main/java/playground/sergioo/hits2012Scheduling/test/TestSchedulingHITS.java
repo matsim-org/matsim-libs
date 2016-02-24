@@ -122,7 +122,7 @@ public class TestSchedulingHITS {
 			super();
 			this.home = home;
 			this.location = location;
-			this.euclideanDistance = CoordUtils.calcDistance(home.coord, location.coord);
+			this.euclideanDistance = CoordUtils.calcEuclideanDistance(home.coord, location.coord);
 		}
 	}
 	private static class LocationScore {
@@ -463,7 +463,7 @@ public class TestSchedulingHITS {
 		eventsManager.addHandler(waitTimeCalculator);
 		eventsManager.addHandler(stopStopTimeCalculator);
 		new EventsReaderXMLv1(eventsManager).parse("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/events/150.events.xml.gz");*/
-		TravelDisutility disutilityFunction = (new OnlyTimeDependentTravelDisutilityFactory()).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
+		TravelDisutility disutilityFunction = (new OnlyTimeDependentTravelDisutilityFactory()).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
 		TransitRouterWSImplFactory factory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		TransitRouter transitRouter = factory.get();
 		PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();

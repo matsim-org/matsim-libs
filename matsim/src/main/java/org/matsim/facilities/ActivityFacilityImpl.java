@@ -60,13 +60,14 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 	 * @param id
 	 * @param center
 	 */
-	protected ActivityFacilityImpl(final Id<ActivityFacility> id, final Coord center) {
+	protected ActivityFacilityImpl(final Id<ActivityFacility> id, final Coord center, final Id<Link> linkId) {
 		this.id = id;
 		this.coord = center;
+		this.linkId = linkId;
 	}
 
 	public final double calcDistance(Coord otherCoord) {
-		return CoordUtils.calcDistance(this.coord, otherCoord);
+		return CoordUtils.calcEuclideanDistance(this.coord, otherCoord);
 	}
 
 	public final ActivityOptionImpl createAndAddActivityOption(final String type) {
@@ -82,10 +83,6 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 		if (this.activities.containsKey(type)) {
 			throw new RuntimeException(this + "[type=" + type + " already exists]");
 		}
-		if (option.getFacility() != null && option.getFacility() != this) {
-			throw new RuntimeException("This activity option already belongs to a different ActivityFacility!");
-		}
-		option.setFacility(this);
 		this.activities.put(type, option);
 	}
 	

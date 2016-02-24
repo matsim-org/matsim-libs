@@ -135,7 +135,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 		TravelTime travelTime = TravelTimeCalculator.create(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car ).createTravelDisutility(travelTime, sc.getConfig().planCalcScore() ) ;
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime ) ;
 		
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults() ;
 		builder.setLeastCostPathCalculatorFactory( new DijkstraFactory() );

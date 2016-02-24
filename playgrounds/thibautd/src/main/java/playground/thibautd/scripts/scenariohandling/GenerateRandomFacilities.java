@@ -29,7 +29,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesWriter;
 import playground.ivt.utils.ArgParser;
@@ -104,8 +103,7 @@ public class GenerateRandomFacilities {
 				final ActivityFacility facility =
 					sc.getActivityFacilities().getFactory().createActivityFacility(
 							Id.create( "fac-"+type+"-"+n , ActivityFacility.class ),
-							l.getCoord() );
-				((ActivityFacilityImpl) facility).setLinkId( l.getId() );
+							l.getCoord(), l.getId() );
 
 				final ActivityOption option = 
 					sc.getActivityFacilities().getFactory().createActivityOption(

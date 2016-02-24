@@ -36,13 +36,15 @@ import org.matsim.vehicles.Vehicle;
 public class IncomeTravelCostCalculatorFactory implements TravelDisutilityFactory {
 
 	private PersonHouseholdMapping personHouseholdMapping;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public IncomeTravelCostCalculatorFactory(PersonHouseholdMapping personHouseholdMapping) {
+	public IncomeTravelCostCalculatorFactory(PersonHouseholdMapping personHouseholdMapping, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.personHouseholdMapping = personHouseholdMapping;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 	
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		final IncomeTravelCostCalculator incomeTravelCostCalculator = new IncomeTravelCostCalculator(timeCalculator, cnScoringGroup, personHouseholdMapping);
 		
 		return new TravelDisutility() {

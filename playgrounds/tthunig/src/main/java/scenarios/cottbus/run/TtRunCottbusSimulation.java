@@ -61,8 +61,8 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
-import scenarios.analysis.TtGeneralAnalysis;
-import scenarios.analysis.TtListenerToBindGeneralAnalysis;
+import analysis.TtGeneralAnalysis;
+import analysis.TtListenerToBindGeneralAnalysis;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
 /**
@@ -283,8 +283,8 @@ public class TtRunCottbusSimulation {
 					if (strategies[i].getWeight() > 0.0){ // ReRoute is used
 						final CongestionTollTimeDistanceTravelDisutilityFactory factory =
 								new CongestionTollTimeDistanceTravelDisutilityFactory(
-										new Builder( TransportMode.car ),
-								tollHandler
+										new Builder( TransportMode.car, config.planCalcScore() ),
+								tollHandler, config.planCalcScore()
 							) ;
 						factory.setSigma(SIGMA);
 						controler.addOverridingModule(new AbstractModule(){
@@ -332,7 +332,7 @@ public class TtRunCottbusSimulation {
 			
 			// adapt sigma for randomized routing
 			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
+					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override

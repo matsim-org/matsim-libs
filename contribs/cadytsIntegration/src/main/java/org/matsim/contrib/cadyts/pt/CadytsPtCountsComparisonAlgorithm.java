@@ -152,7 +152,7 @@ class CadytsPtCountsComparisonAlgorithm {
 			return true;
 		}
 
-		double dist = CoordUtils.calcDistance(stopCoord, this.distanceFilterNode.getCoord());
+		double dist = CoordUtils.calcEuclideanDistance(stopCoord, this.distanceFilterNode.getCoord());
 		return dist < this.distanceFilter.doubleValue();
 	}
 

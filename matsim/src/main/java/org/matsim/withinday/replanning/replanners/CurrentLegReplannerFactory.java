@@ -22,29 +22,30 @@ package org.matsim.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.ActivityEndReschedulerProvider;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
-
-import javax.inject.Provider;
 
 public class CurrentLegReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
-	private final Provider<TripRouter> tripRouterFactory;
+	private final LeastCostPathCalculator pathCalculator;
+	private ModeRouteFactory modeRouteFactory;
 
 	public CurrentLegReplannerFactory(Scenario scenario, ActivityEndReschedulerProvider withinDayEngine,
-									  Provider<TripRouter> tripRouterFactory) {
+									  LeastCostPathCalculator pathCalculator, ModeRouteFactory modeRouteFactory) {
 		super(withinDayEngine);
 		this.scenario = scenario;
-		this.tripRouterFactory = tripRouterFactory;
+		this.pathCalculator = pathCalculator;
+		this.modeRouteFactory = modeRouteFactory;
 	}
 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CurrentLegReplanner(super.getId(), scenario,
 				this.getWithinDayEngine().getActivityRescheduler(), 
-				this.tripRouterFactory.get());
+				this.pathCalculator, modeRouteFactory);
 		return replanner;
 	}
 }

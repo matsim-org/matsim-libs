@@ -54,10 +54,7 @@ public class IntegrationTest  extends TestCase {
 		
 		controler.addControlerListener(afterMobSimListener);
 
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		controler.run();
 		assertFalse(someErrorHappened);

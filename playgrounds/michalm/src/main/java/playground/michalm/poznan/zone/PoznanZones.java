@@ -22,12 +22,11 @@ package playground.michalm.poznan.zone;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.zone.*;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
-
-import playground.michalm.zone.*;
 
 
 public class PoznanZones

@@ -25,6 +25,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -32,6 +33,8 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
  * {@link org.matsim.core.controler.listener.ControlerListener} that dumps the
@@ -47,6 +50,7 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 
 	static final private Logger log = Logger.getLogger(PlansDumpingImpl.class);
 
+	@Inject private Config config;
 	@Inject private Network network;
 	@Inject private Population population;
 	@Inject private IterationStopWatch stopwatch;
@@ -65,7 +69,22 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 				|| (event.getIteration() == (firstIteration + 1)))) {
 			stopwatch.beginOperation("dump all plans");
 			log.info("dumping plans...");
-			new PopulationWriter(population, network).write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
+			final String inputCRS = config.plans().getInputCRS();
+			final String internalCRS = config.global().getCoordinateSystem();
+
+			if ( inputCRS == null ) {
+				new PopulationWriter(population, network).write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
+			}
+			else {
+				log.info( "re-projecting population from "+internalCRS+" to "+inputCRS+" for export" );
+
+				final CoordinateTransformation transformation =
+						TransformationFactory.getCoordinateTransformation(
+								internalCRS,
+								inputCRS );
+
+				new PopulationWriter(transformation, population, network).write(controlerIO.getIterationFilename(event.getIteration(), "plans.xml.gz"));
+			}
 			log.info("finished plans dump.");
 			stopwatch.endOperation("dump all plans");
 		}

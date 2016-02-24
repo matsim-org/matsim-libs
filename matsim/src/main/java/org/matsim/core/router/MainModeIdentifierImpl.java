@@ -30,9 +30,28 @@ import org.matsim.api.core.v01.population.PlanElement;
  */
 public final class MainModeIdentifierImpl implements MainModeIdentifier {
 	@Override
-	public String identifyMainMode(
-			final List<? extends PlanElement> tripElements) {
+	public String identifyMainMode( final List<? extends PlanElement> tripElements) {
 		String mode = ((Leg) tripElements.get( 0 )).getMode();
-		return mode.equals( TransportMode.transit_walk ) ? TransportMode.pt : mode;
+//		return mode.equals( TransportMode.transit_walk ) ? TransportMode.pt : mode;
+		if ( mode.equals( TransportMode.transit_walk ) ) {
+			return TransportMode.pt ;
+			// (yy not conforming to std transport planning since that would look for mode with the highest "weight" 
+			// in the whole trip, but it is what I found and at least one test depends on it. kai, feb'16)
+		}
+		
+		for ( PlanElement pe : tripElements ) {
+			if ( pe instanceof Leg ) {
+				Leg leg = (Leg) pe ;
+				String mode2 = leg.getMode() ;
+				if ( !mode2.contains( TransportMode.access_walk ) && 
+						!mode2.contains( TransportMode.egress_walk) &&
+						!mode2.contains( TransportMode.transit_walk ) ) {
+					return mode2 ;
+				}
+			}
+		}
+
+		throw new RuntimeException( "could not identify main mode") ;
+		
 	}
 }

@@ -169,7 +169,7 @@ public class WeeklyPlans {
 			for(ActivityFacility facility:facilitiesWithType.get(type)) {
 				if(random==0)
 					next = true;
-				if(next && CoordUtils.calcDistance(facility.getCoord(), lastCoord)<MAX_DISTANCE)
+				if(next && CoordUtils.calcEuclideanDistance(facility.getCoord(), lastCoord)<MAX_DISTANCE)
 					return facility;
 				else
 					random--;

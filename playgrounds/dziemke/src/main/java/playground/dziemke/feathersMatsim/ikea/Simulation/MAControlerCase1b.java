@@ -20,7 +20,7 @@ public class MAControlerCase1b {
 //______________________________________________________________________________________________________________________		
 		
 
-		final ResidentialAreaDisutilityCalculatorFactory slagboomDisutilityCalculatorFactory = new ResidentialAreaDisutilityCalculatorFactory();
+		final ResidentialAreaDisutilityCalculatorFactory slagboomDisutilityCalculatorFactory = new ResidentialAreaDisutilityCalculatorFactory(config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

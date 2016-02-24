@@ -142,13 +142,15 @@ public class SocialCostControlerLinkOpt {
 	private static class SocialCostTravelDisutilityFactory implements TravelDisutilityFactory {
 
 		private final SocialCostCalculatorLinkOpt scc;
+		private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-		public SocialCostTravelDisutilityFactory(SocialCostCalculatorLinkOpt scc) {
+		public SocialCostTravelDisutilityFactory(SocialCostCalculatorLinkOpt scc, PlanCalcScoreConfigGroup cnScoringGroup) {
 			this.scc = scc;
+			this.cnScoringGroup = cnScoringGroup;
 		}
 
 		@Override
-		public TravelDisutility createTravelDisutility(TravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
+		public TravelDisutility createTravelDisutility(TravelTime travelTime) {
 			return new SocialCostTravelDisutility(travelTime, scc, cnScoringGroup);
 		}
 	}

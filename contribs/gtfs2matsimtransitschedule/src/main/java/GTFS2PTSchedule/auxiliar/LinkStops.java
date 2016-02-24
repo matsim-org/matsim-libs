@@ -107,9 +107,9 @@ public class LinkStops {
 			network.addNode(toNode);
 		double length = -1;
 		if(((LinkImpl)link).getOrigId()!=null)
-			length=link.getLength()*CoordUtils.calcDistance(link.getFromNode().getCoord(), toNode.getCoord())/CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
+			length=link.getLength()*CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), toNode.getCoord())/CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 		else
-			length = CoordUtils.calcDistance(coordinateTransformation.transform(link.getFromNode().getCoord()),coordinateTransformation.transform(toNode.getCoord()));
+			length = CoordUtils.calcEuclideanDistance(coordinateTransformation.transform(link.getFromNode().getCoord()),coordinateTransformation.transform(toNode.getCoord()));
 		Link newLink = new LinkFactoryImpl().createLink(Id.create(link.getId().toString()+"_"+i, Link.class), link.getFromNode(), toNode, network, length, link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 		if(((LinkImpl)link).getOrigId()!=null)
 			((LinkImpl)newLink).setOrigId(((LinkImpl)link).getOrigId());

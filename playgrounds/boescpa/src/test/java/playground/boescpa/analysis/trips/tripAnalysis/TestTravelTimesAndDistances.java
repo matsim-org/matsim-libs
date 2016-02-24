@@ -49,6 +49,10 @@ public class TestTravelTimesAndDistances {
 		// Run Scenario "equil"
 		final Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		config.setParam("controler", "outputDirectory", utils.getOutputDirectory());
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// (otherwise the numbers change; the simulation may still be correct. kai, feb'16)  
+		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);
 		controler.run();

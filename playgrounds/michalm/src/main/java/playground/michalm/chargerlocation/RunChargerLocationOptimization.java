@@ -25,13 +25,13 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.contrib.util.distance.*;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.michalm.berlin.BerlinZoneUtils;
 import playground.michalm.chargerlocation.ChargerLocationProblem.ChargerLocationSolution;
-import playground.michalm.util.distance.*;
-import playground.michalm.zone.Zone;
 
 
 public class RunChargerLocationOptimization

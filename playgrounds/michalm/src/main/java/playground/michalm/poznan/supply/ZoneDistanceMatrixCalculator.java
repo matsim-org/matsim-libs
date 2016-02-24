@@ -23,14 +23,14 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.contrib.util.distance.*;
+import org.matsim.contrib.zone.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrix;
 
 import playground.michalm.chargerlocation.*;
-import playground.michalm.util.distance.*;
 import playground.michalm.util.matrices.MatricesTxtWriter;
-import playground.michalm.zone.*;
 
 
 public class ZoneDistanceMatrixCalculator

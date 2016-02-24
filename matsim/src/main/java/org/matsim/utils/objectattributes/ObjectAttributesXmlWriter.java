@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -119,6 +120,13 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 	 */
 	public AttributeConverter putAttributeConverter(final Class<?> clazz, final AttributeConverter converter) {
 		return this.converters.put(clazz.getCanonicalName(), converter);
+	}
+
+	@Inject
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		for ( Map.Entry<Class<?>, AttributeConverter<?>> e : converters.entrySet() ) {
+			putAttributeConverter( e.getKey() , e.getValue() );
+		}
 	}
 
 	/**

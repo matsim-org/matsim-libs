@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Time;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus.MZ2010ExportChoiceSetRecordFiller;
 
 /**
  * @author thibautd

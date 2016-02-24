@@ -185,10 +185,11 @@ public class Simulator {
         hamiltonianAnalyzers = new ConcurrentAnalyzerTask<>();
         analyzerTasks.addComponent(new AnalyzerTaskGroup<>(hamiltonianAnalyzers, ioContext, "hamiltonian"));
 
-        GeoDistanceHamiltonian.build(this, config);
-//        GeoDistanceLAU2Hamiltonian.build(this, config);
+//        GeoDistanceZoneHamiltonian.build(this, config);
+//        GeoDistanceHamiltonian.build(this, config);
+        GeoDistanceLAU2Hamiltonian.build(this, config);
 //        MeanDistanceHamiltonian.build(this, config);
-        MeanZoneDistanceHamiltonian.build(this, config);
+//        MeanZoneDistanceHamiltonian.build(this, config);
         ODCalibratorHamiltonian.build(this, config);
 
         engineListeners.addComponent(new HamiltonianLogger(hamiltonian,
@@ -214,6 +215,7 @@ public class Simulator {
         FacilityMutatorBuilder mutatorBuilder = new FacilityMutatorBuilder(dataPool, random);
         mutatorBuilder.addToBlacklist(ActivityTypes.HOME);
         mutatorBuilder.setListener(attributeListeners.get(CommonKeys.ACTIVITY_FACILITY));
+        mutatorBuilder.setProximityProbability(Double.parseDouble(configGroup.getValue("proximityProba")));
         Mutator<? extends Attributable> mutator = mutatorBuilder.build();
         /*
         Create the markov engine...

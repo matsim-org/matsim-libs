@@ -193,7 +193,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	 */
 	private Double calcBeelineDistance(Coord from, Coord to) {
 		if(from == null || to == null) return Double.NaN;
-		return CoordUtils.calcDistance(from, to);
+		return CoordUtils.calcEuclideanDistance(from, to);
 	}
 
 	/**

@@ -23,6 +23,7 @@ package tutorial.programming.withinDayReplanningFromPlans;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
@@ -30,10 +31,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -43,7 +47,14 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.utils.EditRoutes;
 
 import javax.inject.Singleton;
@@ -57,19 +68,20 @@ class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
     
 	private static final Logger log = Logger.getLogger("dummy");
 	
-	private TripRouter tripRouter;
-	private Scenario scenario;
+	@Inject private TripRouter tripRouter;
+	@Inject private Scenario scenario;
+	
+	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory ;
+	
+	@Inject private Map<String, TravelTime> travelTimes ;
+	@Inject private Map<String, TravelDisutilityFactory> travelDisutilityFactories ;
 
-	@Inject
-	MyWithinDayMobsimListener(TripRouter tripRouter) {
-		this.tripRouter = tripRouter;
-	}
-
+	@Inject private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
+	
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
 		
 		Netsim mobsim = (Netsim) event.getQueueSimulation() ;
-		this.scenario = mobsim.getScenario();
 
 		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan(mobsim); 
 				
@@ -141,14 +153,28 @@ class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		// =============================================================================================================
 		// =============================================================================================================
 		// EditRoutes at this point only works for car routes
+
+		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
+		
+		TravelDisutility travelDisutility = travelDisutilityFactories.get( TransportMode.car ).createTravelDisutility(travelTime) ;
+
+		Network network = scenario.getNetwork() ;
+
+		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime ) ;
+
+		EditRoutes editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory() ) ;
 		
 		// new Route for current Leg.
-		EditRoutes.relocateCurrentLegRoute((Leg) plan.getPlanElements().get(planElementsIndex), ((HasPerson) agent).getPerson(), 
-				WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent), newDestinationLinkId, now, scenario.getNetwork(), tripRouter);
+		final Leg leg = (Leg) plan.getPlanElements().get(planElementsIndex);
+		final Person person = ((HasPerson) agent).getPerson();
+		final Integer linkIdx = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
+
+//		EditRoutes.relocateCurrentLegRoute(leg, person, linkIdx, newDestinationLinkId, now, scenario.getNetwork(), tripRouter);
+		editRoutes.relocateCurrentLegRoute(leg, person, linkIdx, newDestinationLinkId, now) ;
 		
 		// the route _from_ the modified activity also needs to be replanned:
 		Leg futureLeg = (Leg) plan.getPlanElements().get(planElementsIndex + 2);
-		EditRoutes.relocateFutureLegRoute(futureLeg, newDestinationLinkId, futureLeg.getRoute().getEndLinkId(), ((HasPerson) agent).getPerson(), 
+		EditRoutes.relocateFutureLegRoute(futureLeg, newDestinationLinkId, futureLeg.getRoute().getEndLinkId(), person, 
 				scenario.getNetwork(), tripRouter);
 		
 		// =============================================================================================================

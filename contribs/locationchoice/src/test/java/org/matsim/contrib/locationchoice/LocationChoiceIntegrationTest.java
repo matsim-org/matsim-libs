@@ -145,9 +145,13 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
 		System.err.println( " newPlan: " + newPlan ) ;
-		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
+		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
+		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			newWork = (Activity) newPlan.getPlanElements().get(6);
+		}
 		System.err.println( " newWork: " + newWork ) ;
 		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
+		assertNotNull( newWork ) ;
 		assertTrue( !newWork.getFacilityId().equals(Id.create(1, ActivityFacility.class) ) ) ; // should be different from facility number 1 !!
 		assertEquals( Id.create(63, ActivityFacility.class), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
 	}
@@ -323,7 +327,12 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		// I tricked it. :-)   michaz
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
-		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
+		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
+		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			newWork = (Activity) newPlan.getPlanElements().get(6);
+		}
+		assertNotNull( newWork ) ;
+		assertNotNull( newWork.getFacilityId() ) ;
 		assertTrue(newWork.getFacilityId().equals(Id.create(2, ActivityFacility.class)) || newWork.getFacilityId().equals(Id.create(3, ActivityFacility.class)));
 	}
 

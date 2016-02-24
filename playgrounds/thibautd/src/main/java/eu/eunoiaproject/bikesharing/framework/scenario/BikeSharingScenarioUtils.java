@@ -33,6 +33,7 @@ import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -194,13 +195,15 @@ public class BikeSharingScenarioUtils {
 					TransportMode.bike,
 					createSlopeAwareDisutilityFactory(
 							scorer,
-							TransportMode.bike));
+							TransportMode.bike,
+							scenario.getConfig().planCalcScore()));
 
 			accessEgressMultimodalTripRouterModule.setDisutilityFactoryForMode(
 					BikeSharingConstants.MODE,
 					createSlopeAwareDisutilityFactory(
 							scorer,
-							BikeSharingConstants.MODE));
+							BikeSharingConstants.MODE,
+							scenario.getConfig().planCalcScore()));
 		}
 
 		return new AbstractModule() {
@@ -214,10 +217,11 @@ public class BikeSharingScenarioUtils {
 
 	private static TravelDisutilityFactory createSlopeAwareDisutilityFactory(
 			final LinkSlopeScorer scorer,
-			final String mode ) {
+			final String mode, 
+			final PlanCalcScoreConfigGroup cnScoringGroup ) {
 		return new SlopeAwareTravelDisutilityFactory(
 				scorer,
-				new RandomizingTimeDistanceTravelDisutility.Builder( mode ) ) ;
+				new RandomizingTimeDistanceTravelDisutility.Builder( mode, cnScoringGroup ) ) ;
 	}
 }
 

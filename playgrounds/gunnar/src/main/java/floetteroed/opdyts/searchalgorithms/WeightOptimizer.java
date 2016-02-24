@@ -37,6 +37,14 @@ public class WeightOptimizer {
 
 	// -------------------- MEMBERS --------------------
 
+	private int it = 0;
+
+	private double finalEquilGapSum = 0.0;
+
+	private double finalUnifGapSum = 0.0;
+
+	private double finalSigma2sum = 0.0;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public WeightOptimizer(final double sigmaFactor) {
@@ -47,8 +55,18 @@ public class WeightOptimizer {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	public double[] updateWeights(final double finalEquilGap,
-			final double finalUnifGap, final double finalSigma) {
+	public double[] updateWeights(double finalEquilGap, double finalUnifGap,
+			double finalSigma) {
+
+		this.it++;
+		this.finalEquilGapSum += finalEquilGap;
+		this.finalUnifGapSum += finalUnifGap;
+		this.finalSigma2sum += finalSigma * finalSigma;
+
+		finalEquilGap = this.finalEquilGapSum / this.it;
+		finalUnifGap = this.finalUnifGapSum / this.it;
+		finalSigma = Math.sqrt(this.finalSigma2sum / this.it);
+
 		/*
 		 * Two criteria implemented here:
 		 * 

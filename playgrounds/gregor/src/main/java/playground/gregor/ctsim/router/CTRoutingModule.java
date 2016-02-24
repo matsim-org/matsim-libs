@@ -50,7 +50,7 @@ public class CTRoutingModule implements Provider<RoutingModule> {
 
 	@Override
 	public RoutingModule get() {
-		return DefaultRoutingModules.createNetworkRouter("walkct", scenario.getPopulation()
+		return DefaultRoutingModules.createPureNetworkRouter("walkct", scenario.getPopulation()
 				.getFactory(), scenario.getNetwork(), createRoutingAlgo());
 	}
 
@@ -59,7 +59,7 @@ public class CTRoutingModule implements Provider<RoutingModule> {
 				scenario.getNetwork(),
 				new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore()),
 				scenario.getConfig().global().getNumberOfThreads()).createPathCalculator(scenario.getNetwork(),
-				travelDisutilities.get("car").createTravelDisutility(travelTimes.get("car"), scenario.getConfig().planCalcScore()),
+				travelDisutilities.get("car").createTravelDisutility(travelTimes.get("car")),
 				travelTimes.get("car"));
 	}
 }

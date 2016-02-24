@@ -88,7 +88,7 @@ public class NetworkConverter {
 			Node prevNode = nodes[0];
 			for(int n=0; n<nodes.length-1; n++) {
 				if(network.getNodes().get(nodes[n].getId())==null) {
-					if(n+1==nodes.length-1 || CoordUtils.calcDistance(prevNode.getCoord(), nodes[n+1].getCoord())>MIN_DISTANCE) {
+					if(n+1==nodes.length-1 || CoordUtils.calcEuclideanDistance(prevNode.getCoord(), nodes[n+1].getCoord())>MIN_DISTANCE) {
 						network.addNode(nodes[n]);
 						Link link = network.getFactory().createLink(Id.createLinkId(linkLongId), prevNode, nodes[n+1]);
 						((LinkImpl)link).setOrigId(feature.getID());

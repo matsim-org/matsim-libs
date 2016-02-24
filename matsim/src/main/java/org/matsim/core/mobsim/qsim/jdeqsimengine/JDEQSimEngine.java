@@ -9,9 +9,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.jdeqsim.Road;
-import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.mobsim.jdeqsim.Vehicle;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -23,6 +23,7 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
 
     private final static Logger log = Logger.getLogger(JDEQSimEngine.class);
 
+    private JDEQSimConfigGroup config;
     private Scenario scenario;
     private EventsManager eventsManager;
     private Timer t;
@@ -30,7 +31,8 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
     private int numberOfAgents = 0;
     private AgentCounter agentCounter;
 
-    public JDEQSimEngine(Scenario scenario, EventsManager eventsManager, AgentCounter agentCounter, SteppableScheduler scheduler) {
+    public JDEQSimEngine(JDEQSimConfigGroup config, Scenario scenario, EventsManager eventsManager, AgentCounter agentCounter, SteppableScheduler scheduler) {
+        this.config = config;
         this.scheduler = scheduler;
         this.scenario = scenario;
         this.eventsManager = eventsManager;
@@ -39,17 +41,17 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
 
     @Override
     public void onPrepareSim() {
-        new JDEQSimulation(scenario, eventsManager); // Initialize JDEQSim static fields
+        new JDEQSimulation(config, scenario, eventsManager); // Initialize JDEQSim static fields
         t = new Timer();
         t.startTimer();
 
-        SimulationParameters.setAllRoads(new HashMap<Id<Link>, Road>());
+        Road.setAllRoads(new HashMap<Id<Link>, Road>());
 
         // initialize network
         Road road;
         for (Link link : this.scenario.getNetwork().getLinks().values()) {
             road = new Road(scheduler, link);
-            SimulationParameters.getAllRoads().put(link.getId(), road);
+            Road.getAllRoads().put(link.getId(), road);
         }
 
     }

@@ -118,7 +118,7 @@ public class CASimulationRunner implements IterationStartsListener{
 
 		final Controler controller = new Controler(scenario);
 		final MSATollHandler tollHandler = new MSATollHandler(controller.getScenario());
-		final MSATollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new MSATollDisutilityCalculatorFactory(tollHandler);
+		final MSATollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new MSATollDisutilityCalculatorFactory(tollHandler, c.planCalcScore());
 
 		if (Constants.MARGINAL_SOCIAL_COST_OPTIMIZATION) {
 			//////////////------------THIS IS FOR THE SYSTEM OPTIMUM SEARCH

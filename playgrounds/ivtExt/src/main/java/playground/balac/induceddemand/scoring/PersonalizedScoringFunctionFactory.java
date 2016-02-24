@@ -39,23 +39,14 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.ActivityUtilityParameters;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Mode;
+import org.matsim.core.scoring.functions.*;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.kticompatibility.KtiActivityScoring;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
 import playground.ivt.scoring.LineChangeScoringFunction;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 
@@ -175,8 +166,8 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 			return individualParameters.get( person.getId() );
 		}
 
-		final CharyparNagelScoringParametersBuilder builder =
-				CharyparNagelScoringParameters.getBuilder( config, config.getScoringParameters( null ), scenarioConfig );
+		final CharyparNagelScoringParameters.Builder builder =
+				new CharyparNagelScoringParameters.Builder(config, config.getScoringParameters(null), scenarioConfig);
 		final Set<String> handledTypes = new HashSet<String>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			
@@ -187,14 +178,16 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 					.getAttribute(person.getId().toString(), "performing_" + act.getType());
 			
 			if (performingUtility != null) 
-				builder.withMarginalUtilityOfPerforming_s(performingUtility);
+				builder.setMarginalUtilityOfPerforming_s(performingUtility);
 			
 			final Double travelingCarUtility =
 					(Double) personAttributes
 					.getAttribute(person.getId().toString(), "traveling_car" );
 			
-			builder.withModeParameters("car", new Mode(travelingCarUtility, 0.0, 0.0, 
-					config.getScoringParameters( null ).getOrCreateModeParams("car").getConstant()));
+			builder.setModeParameters("car",
+					new ModeUtilityParameters.Builder()
+						.setMarginalUtilityOfTraveling_s( travelingCarUtility )
+						.setConstant( config.getScoringParameters( null ).getOrCreateModeParams("car").getConstant() ) );
 			
 			
 			// XXX works only if no variation of type of activities between plans
@@ -248,13 +241,13 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 				typeBuilder.setTypicalDuration_s(typicalDuration);
 			}
 
-			builder.withActivityParameters(
+			builder.setActivityParameters(
 					act.getType(),
-					typeBuilder.create());
+					typeBuilder );
 		}
 
 		final CharyparNagelScoringParameters params =
-				builder.create();
+				builder.build();
 		individualParameters.put( person.getId() , params );
 		return params;
 	}

@@ -120,7 +120,7 @@ public class CarSharingStations
         orderedClosestStations.add(0, station);
       }
       else if (!orderedClosestStations.contains(station)) {
-        while (CoordUtils.calcDistance(coord, station.getCoord()) > CoordUtils.calcDistance(coord, ((CarSharingStation)orderedClosestStations.get(i)).getCoord()))
+        while (CoordUtils.calcEuclideanDistance(coord, station.getCoord()) > CoordUtils.calcEuclideanDistance(coord, ((CarSharingStation)orderedClosestStations.get(i)).getCoord()))
         {
           i++;
 

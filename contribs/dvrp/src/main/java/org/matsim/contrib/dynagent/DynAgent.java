@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.pt.*;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
@@ -302,4 +303,18 @@ public class DynAgent
     {
         return 1;
     }
+
+
+@Override
+public Facility<? extends Facility<?>> getCurrentFacility() {
+	// TODO Auto-generated method stub
+	throw new RuntimeException("not implemented") ;
+}
+
+
+@Override
+public Facility<? extends Facility<?>> getDestinationFacility() {
+	// TODO Auto-generated method stub
+	throw new RuntimeException("not implemented") ;
+}
 }

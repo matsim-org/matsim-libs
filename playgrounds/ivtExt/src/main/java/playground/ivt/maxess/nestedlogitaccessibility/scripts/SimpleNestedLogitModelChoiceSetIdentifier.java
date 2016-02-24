@@ -40,13 +40,7 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 import playground.ivt.utils.ConcurrentStopWatch;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author thibautd
@@ -276,7 +270,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 
 		Collection<ActivityFacility> prism = Collections.emptyList();
 
-		final double radius = Math.max( budget_m, 1.1 * CoordUtils.calcDistance( f1, f2 ) );
+		final double radius = Math.max( budget_m, 1.1 * CoordUtils.calcEuclideanDistance( f1, f2 ) );
 		for ( int i=1; prism.size() < nSamples; i++ ) {
 			prism = relevantFacilities.getElliptical(f1.getX(), f1.getY(), f2.getX(), f2.getY(), i * radius);
 		}

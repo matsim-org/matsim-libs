@@ -19,21 +19,15 @@
  * *********************************************************************** */
 package playground.jbischoff.taxi.emissions;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.data.VrpDataImpl;
+import org.matsim.api.core.v01.*;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.emissions.types.*;
+import org.matsim.core.config.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.*;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
 /**

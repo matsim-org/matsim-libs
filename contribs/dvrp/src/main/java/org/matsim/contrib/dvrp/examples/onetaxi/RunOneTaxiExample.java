@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
@@ -66,7 +65,7 @@ public class RunOneTaxiExample
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         context.setMobsimTimer(qSim.getSimTimer());
 
-        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(TaxiUtils.TAXI_MODE,
+        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine("taxi",
                 new OneTaxiRequestCreator(), optimizer, context, qSim);
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer,

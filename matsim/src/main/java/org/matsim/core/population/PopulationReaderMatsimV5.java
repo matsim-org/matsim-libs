@@ -34,6 +34,8 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -85,6 +87,8 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private final static String VALUE_NO = "no";
 	private final static String VALUE_UNDEF = "undef";
 
+	private final CoordinateTransformation coordinateTransformation;
+
 	private final Scenario scenario;
 	private final Population plans;
 
@@ -98,6 +102,13 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private ActivityImpl prevAct = null;
 
 	public PopulationReaderMatsimV5(final Scenario scenario) {
+		this( new IdentityTransformation() , scenario );
+	}
+
+	public PopulationReaderMatsimV5(
+			final CoordinateTransformation coordinateTransformation,
+			final Scenario scenario) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.scenario = scenario;
 		this.plans = scenario.getPopulation();
 	}
@@ -201,16 +212,15 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	}
 
 	private void startAct(final Attributes atts) {
-		Coord coord = null;
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
 			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), linkId);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-				coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
+				final Coord coord = parseCoord( atts );
 				this.curract.setCoord(coord);
 			}
 		} else if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
-			coord = new Coord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
+			final Coord coord = parseCoord( atts );
 			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), coord);
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
@@ -225,6 +235,13 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		if (this.routeDescription != null) {
 			finishLastRoute();
 		}
+	}
+
+	private Coord parseCoord(Attributes atts) {
+		return coordinateTransformation.transform(
+				new Coord(
+						Double.parseDouble(atts.getValue( ATTR_ACT_X )),
+						Double.parseDouble(atts.getValue( ATTR_ACT_Y )) ) );
 	}
 
 	private void finishLastRoute() {
@@ -247,13 +264,13 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		if (Double.isNaN(this.currRoute.getDistance())) {
 			if (this.currRoute instanceof NetworkRoute) {
 				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
-					this.currRoute.setDistance(RouteUtils.calcDistance((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
+					this.currRoute.setDistance(RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
 				}
 			} else {
 				Coord fromCoord = getCoord(this.prevAct);
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
-					double dist = CoordUtils.calcDistance(fromCoord, toCoord);
+					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
 					if ( this.scenario.getConfig().plansCalcRoute().
 							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
 						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().
@@ -352,13 +369,13 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		if (Double.isNaN(this.currRoute.getDistance())) {
 			if (this.currRoute instanceof NetworkRoute) {
 				if (!this.scenario.getNetwork().getLinks().isEmpty()) {
-					this.currRoute.setDistance(RouteUtils.calcDistance((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
+					this.currRoute.setDistance(RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) this.currRoute, this.scenario.getNetwork()));
 				}
 			} else {
 				Coord fromCoord = getCoord(this.prevAct);
 				Coord toCoord = getCoord(this.curract);
 				if (fromCoord != null && toCoord != null) {
-					double dist = CoordUtils.calcDistance(fromCoord, toCoord);
+					double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
 					if ( this.scenario.getConfig().plansCalcRoute().
 							getModeRoutingParams().containsKey(  this.currleg.getMode()  ) ) {
 						double estimatedNetworkDistance = dist * this.scenario.getConfig().plansCalcRoute().

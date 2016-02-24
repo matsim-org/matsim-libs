@@ -20,6 +20,7 @@
 
 package org.matsim.core.events;
 
+import java.io.InputStream;
 import java.util.Locale;
 import java.util.Stack;
 
@@ -65,6 +66,10 @@ public class MatsimEventsReader implements MatsimSomeReader {
 		} else {
 			throw new IllegalArgumentException("Cannot recognize the format of the events-file " + filename);
 		}
+	}
+
+	public void readStream(final InputStream stream) {
+		new XmlEventsReader(this.events).parse(stream);
 	}
 
 	private static class XmlEventsReader extends MatsimXmlParser {

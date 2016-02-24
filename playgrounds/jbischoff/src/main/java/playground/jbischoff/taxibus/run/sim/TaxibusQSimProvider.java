@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.router.DistanceAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
@@ -35,6 +36,11 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
+import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
+import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -92,6 +98,15 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 	private QSim createMobsim(Scenario sc, EventsManager eventsManager) {
 		initiate();
 		QSim qSim = DynAgentLauncherUtils.initQSim(sc, eventsManager);
+		
+		if (sc.getConfig().transit().isUseTransit()) {
+			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+			qSim.addDepartureHandler(transitEngine);
+			qSim.addAgentSource(transitEngine);
+			qSim.addMobsimEngine(transitEngine);
+		}
+		
 		qSim.addQueueSimulationListeners(optimizer);
 
 		context.setMobsimTimer(qSim.getSimTimer());
@@ -103,7 +118,11 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
 		TaxibusActionCreator actionCreator = new TaxibusActionCreator(passengerEngine, legCreator,
 				tbcg.getPickupDuration());
-		VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
+//        qSim.addAgentSource(new VrpAgentSource(actionCreator, context, optimizer, qSim));
+		qSim.addAgentSource(new VrpAgentSource(actionCreator, context, optimizer, qSim));
+        qSim.addAgentSource(new PopulationAgentSource(context.getScenario().getPopulation(),
+                new TransitAgentFactory(qSim), qSim));
+//		VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
 		if (tbcg.isOtfvis()) {
 			OTFClientLive.run(sc.getConfig(),
 					OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim));
@@ -121,7 +140,7 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		scheduler = new TaxibusScheduler(context, params);
 
 		optimConfig = new TaxibusOptimizerConfiguration(context, travelTime, travelDisutility, scheduler,
-				tbcg.getOutputDir());
+				tbcg.getOutputDir(),tbcg);
 
 		if (tbcg.getAlgorithmConfig().equals("line")) {
 

@@ -42,7 +42,7 @@ public class AnalyseShoppingBehaviour {
 		
 		for (Facility f : scenario1.getActivityFacilities().getFacilities().values()) {
 			
-			if (CoordUtils.calcDistance(f.getCoord(), coord) < 4000)
+			if (CoordUtils.calcEuclideanDistance(f.getCoord(), coord) < 4000)
 				numberInside++;
 		}
 		
@@ -69,7 +69,7 @@ public class AnalyseShoppingBehaviour {
 			for (PlanElement pe: plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 				 if (((Activity) pe).getType().equals("home")) {
-							if ( (CoordUtils.calcDistance(((Activity)pe).getCoord(), coord) < 4000.0)) {
+							if ( (CoordUtils.calcEuclideanDistance(((Activity)pe).getCoord(), coord) < 4000.0)) {
 								homeInside = true;
 							}
 						
@@ -77,7 +77,7 @@ public class AnalyseShoppingBehaviour {
 					}
 					else if (((Activity) pe).getType().startsWith("work")) {
 						hasWork = true;
-							if ( (CoordUtils.calcDistance(((Activity)pe).getCoord(), coord) < 4000.0)) {
+							if ( (CoordUtils.calcEuclideanDistance(((Activity)pe).getCoord(), coord) < 4000.0)) {
 								workInside = true;
 						}
 					
@@ -85,7 +85,7 @@ public class AnalyseShoppingBehaviour {
 				}
 					else if (((Activity) pe).getType().startsWith("education")) {
 						hasEducation = true;
-						if ( (CoordUtils.calcDistance(((Activity)pe).getCoord(), coord) < 4000.0)) {
+						if ( (CoordUtils.calcEuclideanDistance(((Activity)pe).getCoord(), coord) < 4000.0)) {
 							educationInside = true;
 						}
 						else
@@ -95,7 +95,7 @@ public class AnalyseShoppingBehaviour {
 			}
 					else if (((Activity) pe).getType().startsWith("leisure")) {
 						hasLeisure = true;
-						if ( (CoordUtils.calcDistance(((Activity)pe).getCoord(), coord) < 4000.0)) {
+						if ( (CoordUtils.calcEuclideanDistance(((Activity)pe).getCoord(), coord) < 4000.0)) {
 							leisureInside = true;
 					}
 				
@@ -103,7 +103,7 @@ public class AnalyseShoppingBehaviour {
 			}
 					else if (((Activity) pe).getType().startsWith("nongrocery")) {
 						hasNon = true;
-						if ( (CoordUtils.calcDistance(((Activity)pe).getCoord(), coord) < 4000.0)) {
+						if ( (CoordUtils.calcEuclideanDistance(((Activity)pe).getCoord(), coord) < 4000.0)) {
 							nonInside = true;
 					}
 				
@@ -118,7 +118,7 @@ public class AnalyseShoppingBehaviour {
 				if (pe instanceof Activity) {
 					if (((Activity) pe).getType().equals("shopgrocery") && scenario1.getActivityFacilities().getFacilities().containsKey(((Activity) pe).getFacilityId())) {
 						
-						if ( (CoordUtils.calcDistance(((Activity)pe).getCoord(), coord) > 4000)) {
+						if ( (CoordUtils.calcEuclideanDistance(((Activity)pe).getCoord(), coord) > 4000)) {
 							groceryInside = true;	
 							
 						}

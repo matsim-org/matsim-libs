@@ -26,7 +26,7 @@ public class StopCoord extends Coord implements Clusterable {
 		return id;
 	}
 	public double distanceFrom(StopCoord p) {
-		return CoordUtils.calcDistance(this, p);
+		return CoordUtils.calcEuclideanDistance(this, p);
 	}
 	public StopCoord centroidOf(Collection<StopCoord> ps) {
 		double x=0, y=0;

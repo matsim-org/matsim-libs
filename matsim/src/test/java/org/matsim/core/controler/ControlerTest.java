@@ -71,8 +71,18 @@ public class ControlerTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testConstructor() {
-		MatsimServices controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+	public void testScenarioLoading() {
+		// used to use the String[] constructor, but this makes it use the output/equil/ output directory,
+		// which is problematic as we need a "false" run to check if the scenario is initialized after recent changes
+		// td feb 16
+		// Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
+		final Config config = utils.loadConfig( "test/scenarios/equil/config.xml" );
+		Controler controler = new Controler( config );
+
+		// need to run the controler to get Scenario initilized
+		controler.getConfig().controler().setLastIteration( 0 );
+		controler.run();
+
         assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
         assertNotNull(controler.getScenario().getPopulation());
         assertEquals(23, controler.getScenario().getNetwork().getLinks().size());
@@ -419,6 +429,12 @@ public class ControlerTest {
 		assertEquals(f.link3.getId(), act1b.getLinkId());
 		assertEquals(f.link1.getId(), act2a.getLinkId());
 		assertEquals(f.link3.getId(), act2b.getLinkId());
+		
+		int expectedPlanLength = 3 ;
+		if ( f.scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			// now 7 instead of earlier 3: h-wlk-iact-car-iact-walk-h
+			expectedPlanLength = 7 ;
+		}
 
 		// check that BOTH plans have a route set, even when we only run 1 iteration where only one of them is used.
 		//assertNotNull(leg1.getRoute());
@@ -427,11 +443,16 @@ public class ControlerTest {
 		for (Plan plan : new Plan[]{plan1, plan2}) {
 			assertEquals(
 					"unexpected plan length in "+plan.getPlanElements(),
-					3,
+					expectedPlanLength,
 					plan.getPlanElements().size());
 			assertNotNull(
 					"null route in plan "+plan.getPlanElements(),
 					((Leg) plan.getPlanElements().get( 1 )).getRoute());
+			if ( f.scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+				assertNotNull(
+					"null route in plan "+plan.getPlanElements(),
+					((Leg) plan.getPlanElements().get( 3 )).getRoute());
+			}
 		}
 	}
 

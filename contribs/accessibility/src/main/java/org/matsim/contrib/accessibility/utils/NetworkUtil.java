@@ -100,7 +100,6 @@ public final class NetworkUtil {
 		Distances d = new Distances();
 		double distance = NetworkUtils.getEuclidianDistance(coord.getX(), coord.getY(), destinationNode.getCoord().getX(), destinationNode.getCoord().getY()) ;
 		d.setDistanceCoord2Intersection(distance);
-		// yyyy I have no idea what it is doing here. kai, mar'14
 
 		return d ;
 		

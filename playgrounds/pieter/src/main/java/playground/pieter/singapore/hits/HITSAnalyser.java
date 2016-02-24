@@ -1,5 +1,31 @@
 package playground.pieter.singapore.hits;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.management.timer.Timer;
+
 //import java.text.SimpleDateFormat;
 //import java.util.ArrayList;
 //import java.util.List;
@@ -42,6 +68,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
+
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import playground.sergioo.hitsRouter2013.MultiNodeDijkstra;
 import playground.sergioo.hitsRouter2013.TransitRouterVariableImpl;
@@ -49,17 +76,6 @@ import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetwo
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeStuckCalculator;
-
-import javax.management.timer.Timer;
-import java.io.*;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 public class HITSAnalyser {
 
 	private HITSData hitsData;
@@ -179,10 +195,9 @@ public class HITSAnalyser {
 		}
 
 		// now for car
-		TravelDisutility travelDisutility = new Builder( TransportMode.car )
+		TravelDisutility travelDisutility = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() )
 				.createTravelDisutility(travelTimeCalculator
-						.getLinkTravelTimes(), scenario.getConfig()
-						.planCalcScore());
+						.getLinkTravelTimes());
 		carCongestedDijkstra = new Dijkstra(scenario.getNetwork(),
 				travelDisutility, travelTimeCalculator.getLinkTravelTimes());
 		HashSet<String> modeSet = new HashSet<>();
@@ -692,7 +707,7 @@ public class HITSAnalyser {
 										Coord boardCoord = path.nodes.get(0)
 												.getCoord();
 										walkDistanceAccessFromRouter = CoordUtils
-												.calcDistance(origCoord, boardCoord);
+												.calcEuclideanDistance(origCoord, boardCoord);
 										walkTimeAccessFromRouter = walkDistanceAccessFromRouter
 												/ transitRouterConfig
 														.getBeelineWalkSpeed();
@@ -727,7 +742,7 @@ public class HITSAnalyser {
 										Coord boardCoord = path.nodes.get(0)
 												.getCoord();
 										double interModalTransferDistance = CoordUtils
-												.calcDistance(walkOrigin,
+												.calcEuclideanDistance(walkOrigin,
 														boardCoord);
 										double interModalTransferTime = interModalTransferDistance
 												/ transitRouterConfig
@@ -926,7 +941,7 @@ public class HITSAnalyser {
 										substage_id++;
 
 										walkDistanceEgressFromRouter = CoordUtils
-												.calcDistance(alightCoord, destCoord);
+												.calcEuclideanDistance(alightCoord, destCoord);
 										walkTimeEgressFromRouter = walkDistanceEgressFromRouter
 												/ transitRouterConfig
 														.getBeelineWalkSpeed();

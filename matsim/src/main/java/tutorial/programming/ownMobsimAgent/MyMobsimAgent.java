@@ -8,6 +8,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.facilities.Facility;
 
 class MyMobsimAgent implements MobsimAgent {
 
@@ -106,5 +107,17 @@ class MyMobsimAgent implements MobsimAgent {
     public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
         this.currentLinkId = linkId;
     }
+
+@Override
+public Facility<? extends Facility<?>> getCurrentFacility() {
+	// TODO Auto-generated method stub
+	throw new RuntimeException("not implemented") ;
+}
+
+@Override
+public Facility<? extends Facility<?>> getDestinationFacility() {
+	// TODO Auto-generated method stub
+	throw new RuntimeException("not implemented") ;
+}
 
 }

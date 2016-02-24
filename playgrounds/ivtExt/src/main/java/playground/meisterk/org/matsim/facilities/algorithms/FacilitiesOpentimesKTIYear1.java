@@ -22,13 +22,7 @@ package playground.meisterk.org.matsim.facilities.algorithms;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTime.DayType;
-import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.facilities.*;
 
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -67,9 +61,9 @@ public class FacilitiesOpentimesKTIYear1 {
 	}
 
 	private void loadOpeningTimes() {
-		openingTimes.put("work", new OpeningTimeImpl(DayType.wkday, Time.parseTime("7:00"), Time.parseTime("18:00")));
-		openingTimes.put("shop", new OpeningTimeImpl(DayType.wkday, Time.parseTime("8:00"), Time.parseTime("20:00")));
-		openingTimes.put("education", new OpeningTimeImpl(DayType.wkday, Time.parseTime("7:00"), Time.parseTime("18:00")));
-		openingTimes.put("leisure", new OpeningTimeImpl(DayType.wkday, Time.parseTime("6:00"), Time.parseTime("24:00")));
+		openingTimes.put("work", new OpeningTimeImpl(Time.parseTime("7:00"), Time.parseTime("18:00")));
+		openingTimes.put("shop", new OpeningTimeImpl(Time.parseTime("8:00"), Time.parseTime("20:00")));
+		openingTimes.put("education", new OpeningTimeImpl(Time.parseTime("7:00"), Time.parseTime("18:00")));
+		openingTimes.put("leisure", new OpeningTimeImpl(Time.parseTime("6:00"), Time.parseTime("24:00")));
 	}
 }

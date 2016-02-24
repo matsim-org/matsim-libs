@@ -25,13 +25,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.contrib.zone.*;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
-import playground.michalm.zone.Zone;
-import playground.michalm.zone.Zones;
 
 /**
  * @author  jbischoff
@@ -39,7 +38,7 @@ import playground.michalm.zone.Zones;
  */
 public class LinesUtils {
 
-	public static LineDispatcher createLineDispatcher(String linesFile, String zonesXml, String zonesShp, MatsimVrpContext context, TaxibusConfigGroup tbcg){
+	public static LineDispatcher createLineDispatcher(String linesFile, String zonesXml, String zonesShp, MatsimVrpContext context, final TaxibusConfigGroup tbcg){
 		final LineDispatcher dispatcher = new LineDispatcher(context,tbcg);
 		final Map<Id<Zone>,Zone> zones = Zones.readZones(zonesXml, zonesShp);
 		
@@ -56,7 +55,7 @@ public class LinesUtils {
 				Id<TaxibusLine> id = Id.create(from+"_"+to,TaxibusLine.class);
 				Id<Link> holdingPosition = Id.createLinkId(row[2]);
 				double twMax = Double.parseDouble(row[3]);
-				TaxibusLine line = new TaxibusLineImpl(id,holdingPosition, zones.get(Id.create(from,Zones.class)).getMultiPolygon(), zones.get(Id.create(to,Zones.class)).getMultiPolygon(),twMax);
+				TaxibusLine line = new TaxibusLineImpl(id,holdingPosition, zones.get(Id.create(from,Zones.class)).getMultiPolygon(), zones.get(Id.create(to,Zones.class)).getMultiPolygon(),twMax,tbcg.getNumberOfVehiclesDispatchedAtSameTime());
 				Id<TaxibusLine> rid = Id.create(to+"_"+from,TaxibusLine.class);
 				
 				line.setReturnRouteId(rid);

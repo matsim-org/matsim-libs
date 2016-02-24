@@ -192,7 +192,7 @@ public class MyCarrierSimulation {
 		public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
 				TravelTime travelTimes = controler.getLinkTravelTimes() ;
 				TravelDisutility travelCosts = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(
-						travelTimes , scenario.getConfig().planCalcScore() );
+						travelTimes );
 				LeastCostPathCalculator router = controler.getLeastCostPathCalculatorFactory().createPathCalculator(scenario.getNetwork(),
 						travelCosts, travelTimes) ;
 				GenericStrategyManager<CarrierPlan, Carrier> mgr = new GenericStrategyManager<CarrierPlan, Carrier>() ;
@@ -237,7 +237,7 @@ public class MyCarrierSimulation {
 			public ScoringFunction createScoringFunction(Carrier carrier) {
 				SumScoringFunction sum = new SumScoringFunction() ;
 
-				final LegScoring legScoringFunction = new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters( null ), scenario.getConfig().scenario()).create(),
+				final LegScoring legScoringFunction = new CharyparNagelLegScoring(new CharyparNagelScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build(),
 						scenario.getNetwork() );
 				sum.addScoringFunction(legScoringFunction ) ;
 

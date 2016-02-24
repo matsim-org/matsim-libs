@@ -49,11 +49,13 @@ public class TimeDistanceTollAndHeterogeneityBasedTravelDisutility implements Tr
 	public static class Builder implements TravelDisutilityFactory {
 		private final RoadPricingScheme scheme;
 		private double sigma = 0. ;
-		public Builder(RoadPricingScheme scheme ) {
+		private final PlanCalcScoreConfigGroup cnScoringGroup;
+		public Builder(RoadPricingScheme scheme, PlanCalcScoreConfigGroup cnScoringGroup ) {
 			this.scheme = scheme ;
+			this.cnScoringGroup = cnScoringGroup;
 		}
 		@Override
-		public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 			return new TimeDistanceTollAndHeterogeneityBasedTravelDisutility(timeCalculator, cnScoringGroup, this.sigma, this.scheme);
 		}
 		public void setSigma( double val ) {

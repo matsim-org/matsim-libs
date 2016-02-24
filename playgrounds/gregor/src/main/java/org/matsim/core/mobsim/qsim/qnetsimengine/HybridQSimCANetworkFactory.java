@@ -22,9 +22,8 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-
+import playground.gregor.TransportMode;
 import playground.gregor.casim.simulation.CANetsimEngine;
-import playground.gregor.sim2d_v4.scenario.TransportMode;
 
 
 

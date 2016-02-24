@@ -265,9 +265,9 @@ public class EventLog {
 
 		for (int i = 0; i < eventLog1.size(); i++) {
 			if (eventLog1.get(i).vehicleId == vehicleId) {
-				if (eventLog1.get(i).type.equalsIgnoreCase(SimulationParameters.START_LEG)) {
+				if (eventLog1.get(i).type.equalsIgnoreCase(JDEQSimConfigGroup.START_LEG)) {
 					startLegTime = eventLog1.get(i).time;
-				} else if (eventLog1.get(i).type.equalsIgnoreCase(SimulationParameters.END_LEG)) {
+				} else if (eventLog1.get(i).type.equalsIgnoreCase(JDEQSimConfigGroup.END_LEG)) {
 					travelTime += eventLog1.get(i).time - startLegTime;
 				}
 			}
@@ -290,9 +290,9 @@ public class EventLog {
 		HashMap<Integer, Double> startingTime = new HashMap<Integer, Double>();
 
 		for (int i = 0; i < eventLog1.size(); i++) {
-			if (eventLog1.get(i).type.equalsIgnoreCase(SimulationParameters.START_LEG)) {
+			if (eventLog1.get(i).type.equalsIgnoreCase(JDEQSimConfigGroup.START_LEG)) {
 				startingTime.put(eventLog1.get(i).vehicleId, eventLog1.get(i).time);
-			} else if (eventLog1.get(i).type.equalsIgnoreCase(SimulationParameters.END_LEG)) {
+			} else if (eventLog1.get(i).type.equalsIgnoreCase(JDEQSimConfigGroup.END_LEG)) {
 				travelTime += eventLog1.get(i).time - startingTime.get(eventLog1.get(i).vehicleId);
 			}
 		}

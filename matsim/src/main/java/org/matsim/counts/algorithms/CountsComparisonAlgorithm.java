@@ -170,7 +170,7 @@ public class CountsComparisonAlgorithm {
 					log.warn("Cannot find requested link: " + count.getLocId().toString());
 					return false;
 				}
-				double dist = CoordUtils.calcDistance(l.getCoord(), centerCoord);
+				double dist = CoordUtils.calcEuclideanDistance(l.getCoord(), centerCoord);
 				return dist < distance;
 			}
 			
@@ -183,7 +183,7 @@ public class CountsComparisonAlgorithm {
 			
 			@Override
 			public boolean isInRange(Count count) {
-				double dist = CoordUtils.calcDistance(count.getCoord(), centerCoord);
+				double dist = CoordUtils.calcEuclideanDistance(count.getCoord(), centerCoord);
 				return dist < distance;
 			}
 		};

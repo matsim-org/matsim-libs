@@ -8,12 +8,6 @@
 
 <config>
 
-
-
-	<module name="config" >
-		<param name="outputConfigFile" value="&OUTBASE;/output_config.xml" />
-	</module>
-
 <!-- ====================================================================== -->
 
 	<module name="controler" >
