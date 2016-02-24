@@ -25,8 +25,8 @@ public class CreateNetwork {
 		
 //		String outputXML =     "../smetzler/input/network/tempelhof_MATsim.xml";
 //		String outputBikeXML = "../smetzler/input/network/tempelhof_bikeatt_Oneway.xml";
-		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/tempelhof_MATsim.xml";
-		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/tempelhof_bikeatt_Oneway.xml";
+		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/tempelhof_MATsim_sepNet_bikeOnly_CustomFreespeedwSlopeOppo.xml";
+		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/tempelhof_bikeatt_sepNet_bikeOnly_CustomFreespeedwSlopeOppo.xml";
 		
 		
 		
@@ -40,7 +40,7 @@ public class CreateNetwork {
 		BikeCustomizedOsmNetworkReader bikeNetworkReader = new BikeCustomizedOsmNetworkReader(net,ct);
 		bikeNetworkReader.parse(inputOSM); 
 		
-		//new NetworkCleaner().run(net);
+		new NetworkCleaner().run(net);
 		new NetworkWriter(net).write(outputXML);
 		
 		//new bike attributes writer

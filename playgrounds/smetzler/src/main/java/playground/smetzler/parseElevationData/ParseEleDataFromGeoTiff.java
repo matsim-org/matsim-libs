@@ -29,7 +29,12 @@ public class ParseEleDataFromGeoTiff {
 
 	private void initTif() throws Exception {
 		// download data from http://earthexplorer.usgs.gov/ (login in required)
-		File tiffFile = new File("../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/n52_e013_1arc_v3.tif");
+//		// SRTM1
+//		File tiffFile = new File("../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/n52_e013_1arc_v3.tif");
+		// SRTM3 download: (http://srtm.csi.cgiar.org/SELECTION/listImages.asp)
+		File tiffFile = new File(
+				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/srtm3/srtm_39_02.tif");
+		
 		GeoTiffReader reader = new GeoTiffReader(tiffFile);
 
 		grid = reader.read(null);
