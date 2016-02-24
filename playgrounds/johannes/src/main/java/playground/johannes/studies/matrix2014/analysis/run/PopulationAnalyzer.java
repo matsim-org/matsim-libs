@@ -25,11 +25,10 @@ import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.facilities.ActivityFacilities;
-import playground.johannes.studies.matrix2014.analysis.LegStatsPerZone;
 import playground.johannes.studies.matrix2014.analysis.ValidateLAU2Attribute;
 import playground.johannes.studies.matrix2014.analysis.ValidatePopulationDensity;
 import playground.johannes.studies.matrix2014.gis.ValidateFacilities;
+import playground.johannes.studies.matrix2014.gis.ZoneSetLAU2Class;
 import playground.johannes.studies.matrix2014.sim.ValidatePersonWeight;
 import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.*;
@@ -72,6 +71,9 @@ public class PopulationAnalyzer {
         dataPool.register(new ZoneDataLoader(configGroup), ZoneDataLoader.KEY);
 
         ValidateFacilities.validate(dataPool, "nuts3");
+
+        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+        new ZoneSetLAU2Class().apply(lau2Zones);
         /*
         Load population...
          */
@@ -88,11 +90,11 @@ public class PopulationAnalyzer {
         Predicate<Segment> carPredicate = new LegAttributePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
         AnalyzerTaskComposite<Collection<? extends Person>> tasks = new AnalyzerTaskComposite<>();
 
-        ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
-        ActivityFacilities facilities = ((FacilityData)dataPool.get(FacilityDataLoader.KEY)).getAll();
-        LegStatsPerZone legStatsPerZone = new LegStatsPerZone(zoneData.getLayer("nuts3"), facilities, ioContext);
-        legStatsPerZone.setPredicate(carPredicate);
-        tasks.addComponent(legStatsPerZone);
+//        ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
+//        ActivityFacilities facilities = ((FacilityData)dataPool.get(FacilityDataLoader.KEY)).getAll();
+//        LegStatsPerZone legStatsPerZone = new LegStatsPerZone(zoneData.getLayer("nuts3"), facilities, ioContext);
+//        legStatsPerZone.setPredicate(carPredicate);
+//        tasks.addComponent(legStatsPerZone);
 
         ValidatePopulationDensity popDensity = new ValidatePopulationDensity(dataPool, "modena");
         popDensity.setIoContext(ioContext);
