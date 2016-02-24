@@ -22,7 +22,7 @@
  * contact: gunnar.floetteroed@abe.kth.se
  *
  */
-package vind;
+package floetteroed.opdyts.ntimestworoutes;
 
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;

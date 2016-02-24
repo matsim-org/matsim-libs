@@ -130,11 +130,11 @@ public class TransitionSequence<U extends DecisionVariable> {
 		return this.transitions.size();
 	}
 
-	public List<Double> getObjectiveFunctionValues() {
-		final List<Double> result = new ArrayList<Double>(this.size());
-		for (Transition<U> transition : this.transitions) {
-			result.add(transition.getToStateObjectiveFunctionValue());
-		}
-		return result;
-	}
+//	public List<Double> getObjectiveFunctionValues() {
+//		final List<Double> result = new ArrayList<Double>(this.size());
+//		for (Transition<U> transition : this.transitions) {
+//			result.add(transition.getToStateObjectiveFunctionValue());
+//		}
+//		return result;
+//	}
 }

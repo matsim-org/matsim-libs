@@ -141,7 +141,8 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		this.addStatistic(logFileName, new SurrogateObjectiveFunctionValue<U>());
 		this.addStatistic(logFileName, new LastObjectiveFunctionValue<U>());
 		this.addStatistic(logFileName, new ConvergedObjectiveFunctionValue<U>());
-		this.addStatistic(logFileName, new ConvergedSurrogateObjectiveFunctionValue<U>());
+		this.addStatistic(logFileName,
+				new ConvergedSurrogateObjectiveFunctionValue<U>());
 		this.addStatistic(logFileName, new EquilibriumGapWeight<U>());
 		this.addStatistic(logFileName, new EquilibriumGap<U>());
 		this.addStatistic(logFileName, new LastEquilibriumGap<U>());
@@ -194,7 +195,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		return this.decisionVariable2transitionSequence.get(decisionVariable)
 				.getTransitions();
 	}
-	
+
 	// TODO NEW
 	double isolatedSurrogateObjectiveFunction(final U decisionVariable) {
 		final TransitionSequencesAnalyzer<U> analyzer = new TransitionSequencesAnalyzer<U>(
@@ -263,8 +264,8 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 			 * Check for convergence.
 			 */
 			final ConvergenceCriterionResult convergenceResult = this.convergenceCriterion
-					.evaluate(currentTransitionSequence);
-			if (convergenceResult != null) {
+					.evaluate(currentTransitionSequence.getTransitions());
+			if (convergenceResult.converged) {
 				samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
 						decisionVariable2transitionSequence,
 						this.equilibriumWeight, this.uniformityWeight);

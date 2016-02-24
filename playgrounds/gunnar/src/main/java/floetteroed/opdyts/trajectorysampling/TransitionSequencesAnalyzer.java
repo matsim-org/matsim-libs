@@ -64,7 +64,7 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	TransitionSequencesAnalyzer(final List<Transition<U>> transitions,
+	public TransitionSequencesAnalyzer(final List<Transition<U>> transitions,
 			final double equilibriumGapWeight, final double uniformityGapWeight) {
 		if ((transitions == null) || (transitions.size() == 0)) {
 			throw new IllegalArgumentException(

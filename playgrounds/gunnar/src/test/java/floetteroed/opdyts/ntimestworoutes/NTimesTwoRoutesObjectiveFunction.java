@@ -1,6 +1,5 @@
 package floetteroed.opdyts.ntimestworoutes;
 
-import vind.VectorBasedObjectiveFunction;
 import floetteroed.utilities.math.Vector;
 
 /**

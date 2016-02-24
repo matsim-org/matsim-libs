@@ -9,12 +9,16 @@ import static java.lang.Double.parseDouble;
 import static java.lang.Integer.MAX_VALUE;
 import static java.lang.Integer.parseInt;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 import floetteroed.utilities.config.Config;
 import floetteroed.utilities.config.ConfigReader;
@@ -26,6 +30,8 @@ public class Run {
 	}
 
 	public static void main(String[] args) {
+
+		init();
 
 		final Random rnd = new Random();
 
@@ -87,6 +93,7 @@ public class Run {
 		/*
 		 * Read in group memberships.
 		 */
+		final RandomDictionary randomDict = new RandomDictionary(rnd);
 		final Map<String, LinkedList<String>> personLabel2groupInstances = new LinkedHashMap<>();
 		{
 			final List<String> persons = personsConfig.getList("allocation",
@@ -104,7 +111,7 @@ public class Run {
 							groupInstances);
 				}
 				for (int cnt = 0; cnt < parseInt(numbers.get(i)); cnt++) {
-					groupInstances.add(groups.get(i));
+					groupInstances.add(randomDict.getFakeName(groups.get(i)));
 				}
 			}
 		}
@@ -200,8 +207,24 @@ public class Run {
 		System.out.println(floor2groupsReport(bestResult, rooms));
 
 		System.out
-				.println("========== EXAMPLE ALLOCATION =================================");
+				.println("========== EXAMPLE ROOM ALLOCATION ============================");
 		System.out.println();
 		System.out.println(room2personsReport(bestResult, rooms));
 	}
+	
+	
+	public static void init() {
+		try {
+			Clip clip = AudioSystem.getClip();
+			clip.open(AudioSystem.getAudioInputStream(new File(
+					"./input/house/mario.wav")));
+//			clip.open(AudioSystem.getAudioInputStream(new File(
+//					"C:\\Nobackup\\Profilen\\git\\matsim\\playgrounds\\gunnar\\input\\house\\mario.wav")));
+			clip.loop(Clip.LOOP_CONTINUOUSLY);
+		} catch (Exception exc) {
+			exc.printStackTrace(System.out);
+		}
+	}
+
+
 }

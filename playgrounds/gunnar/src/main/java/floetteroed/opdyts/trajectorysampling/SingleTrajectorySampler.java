@@ -82,7 +82,7 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 	@Override
 	public Map<U, ConvergenceCriterionResult> getDecisionVariable2convergenceResultView() {
 		final Map<U, ConvergenceCriterionResult> result = new LinkedHashMap<>();
-			result.put(this.decisionVariable, this.convergenceResult);
+		result.put(this.decisionVariable, this.convergenceResult);
 		return Collections.unmodifiableMap(result);
 	}
 
@@ -108,7 +108,8 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 						this.decisionVariable, newState,
 						this.objectiveFunction.value(newState));
 			}
-			this.convergenceCriterion.evaluate(this.transitionSequence);
+			this.convergenceCriterion.evaluate(this.transitionSequence
+					.getTransitions());
 		}
 		this.fromState = newState;
 	}

@@ -190,6 +190,8 @@ class OptimizeRoadpricing {
 				MatsimRandom.getRandom(), parallelSampling, objectiveFunction,
 				maxMemorizedTrajectoryLength, includeCurrentBest);
 		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
+		randomSearch.setConvergenceTrackingFileName(originalOutputDirectory
+				+ "opdyts.conv");
 
 		/*
 		 * Run it.

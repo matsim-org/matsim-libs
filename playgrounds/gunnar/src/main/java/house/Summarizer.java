@@ -164,14 +164,21 @@ public class Summarizer {
 
 	public static String floor2groupsReport(final List<Person> solution,
 			final List<Room> allRooms) {
+		final Map<String, Set<Person>> group2allMembers = newGroup2members(solution);
 		final StringBuffer result = new StringBuffer();
 		for (Map.Entry<Integer, Set<Person>> floor2personsEntry : newFloor2persons(
 				solution, allRooms).entrySet()) {
 			result.append("FLOOR " + floor2personsEntry.getKey() + "\n");
-			for (Map.Entry<String, Set<Person>> group2membersEntry : newGroup2members(
+			for (Map.Entry<String, Set<Person>> group2membersOnThisFloorEntry : newGroup2members(
 					floor2personsEntry.getValue()).entrySet()) {
-				result.append("  Group " + group2membersEntry.getKey() + ": "
-						+ group2membersEntry.getValue().size() + " members\n");
+				result.append("  Group \""
+						+ group2membersOnThisFloorEntry.getKey()
+						+ "\": "
+						+ group2membersOnThisFloorEntry.getValue().size()
+						+ "/"
+						+ group2allMembers.get(
+								group2membersOnThisFloorEntry.getKey()).size()
+						+ " members\n");
 			}
 			result.append("\n");
 		}
