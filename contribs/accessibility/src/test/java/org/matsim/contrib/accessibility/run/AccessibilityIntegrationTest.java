@@ -460,8 +460,8 @@ public class AccessibilityIntegrationTest {
 			
 			// car is already bound, all other modes not
 			// the walk mode gets the coord2coord-based disutility
-			addTravelDisutilityFactoryBinding(TransportMode.bike).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.bike));	
-			addTravelDisutilityFactoryBinding(TransportMode.walk).toInstance(new Coord2CoordTimeDistanceTravelDisutility.Builder(TransportMode.walk).setWalkSpeed(walkSpeed));
+			addTravelDisutilityFactoryBinding(TransportMode.bike).toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.bike, config.planCalcScore()));	
+			addTravelDisutilityFactoryBinding(TransportMode.walk).toInstance(new Coord2CoordTimeDistanceTravelDisutility.Builder(TransportMode.walk, config.planCalcScore()).setWalkSpeed(walkSpeed));
 
 			
 			addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {

@@ -183,7 +183,7 @@ public class NetworkUtilTest {
 		
 		// from Coord F on only checking for correct projections as I will remove the distance calculation eventually anyways
 		Coord projectionF33 = NetworkUtil.getInteresectionOfProjection(f, link3, node3);
-//		Assert.assertEquals("projectionF33.getX()", 2000., projectionF33.getX(), MatsimTestUtils.EPSILON); // TODO
+		Assert.assertEquals("projectionF33.getX()", 2000., projectionF33.getX(), MatsimTestUtils.EPSILON); // TODO
 		Assert.assertEquals("projectionF33.getY()", 2000., projectionF33.getY(), MatsimTestUtils.EPSILON);
 		
 		Coord projectionF33_2 = CoordUtils.orthogonalProjectionOnLineSegment(link3.getFromNode().getCoord(), link3.getToNode().getCoord(), f);

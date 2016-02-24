@@ -157,7 +157,7 @@ import org.matsim.facilities.ActivityFacility;
 		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 		
 		this.walkTravelDisutility = (Coord2CoordTimeDistanceTravelDisutility) travelDisutilityFactories.get(TransportMode.walk).createTravelDisutility(
-				travelTimes.get(TransportMode.walk), scenario.getConfig().planCalcScore());
+				travelTimes.get(TransportMode.walk));
 	}
 
 	

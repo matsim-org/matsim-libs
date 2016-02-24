@@ -53,14 +53,16 @@ public final class Coord2CoordTimeDistanceTravelDisutility implements TravelDisu
 	public static class Builder implements TravelDisutilityFactory{
 		private final String mode;
 		private double walkSpeed_m_s = 0.; // TODO meaningful default
+		private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-		public Builder( final String mode ) {
+		public Builder( final String mode, final PlanCalcScoreConfigGroup cnScoringGroup ) {
 			this.mode = mode;
+			this.cnScoringGroup = cnScoringGroup;
+			
 		}
 
 		@Override
-		public Coord2CoordTimeDistanceTravelDisutility createTravelDisutility(final TravelTime timeCalculator,
-				final PlanCalcScoreConfigGroup cnScoringGroup) {
+		public Coord2CoordTimeDistanceTravelDisutility createTravelDisutility(final TravelTime timeCalculator) {
 			if (mode != TransportMode.walk) {
 				throw new NullPointerException("This disutility only works properly for the \"walk\" mode.");
 			}
@@ -107,8 +109,8 @@ public final class Coord2CoordTimeDistanceTravelDisutility implements TravelDisu
 					+ " in order to obtain meaningful results.");
 		}
 		
-		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.walk);
-		this.delegate = builder.createTravelDisutility(timeCalculator, cnScoringGroup);
+		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.walk, cnScoringGroup);
+		this.delegate = builder.createTravelDisutility(timeCalculator);
 	}
 
 
@@ -123,7 +125,7 @@ public final class Coord2CoordTimeDistanceTravelDisutility implements TravelDisu
 	 * As this is a beeline walk, this is time-*in*dependent
 	 */
 	public double getCoord2CoordTravelDisutility(final Coord fromCoord, final Coord toCoord) {
-		double distance_m 	= NetworkUtils.getEuclidianDistance(fromCoord, toCoord);
+		double distance_m 	= NetworkUtils.getEuclideanDistance(fromCoord, toCoord);
 		double walkTravelTime_s = distance_m / this.walkSpeed_m_s;
 
 		return this.marginalCostOfTime_s * walkTravelTime_s + this.marginalCostOfDistance_m * distance_m;

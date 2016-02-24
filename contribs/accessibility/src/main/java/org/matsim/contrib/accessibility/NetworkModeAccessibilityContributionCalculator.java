@@ -65,7 +65,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
 		this.travelTime = travelTime;		
 
-		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime,	planCalcScoreConfigGroup);
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 		// new dz
 		System.err.println("travelDisutility = " + travelDisutility);
 		
@@ -134,8 +134,8 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		Coord projectionCoord = CoordUtils.orthogonalProjectionOnLineSegment(nearestLink.getFromNode().getCoord(), nearestLink.getToNode().getCoord(), origin.getCoord());
 		System.err.println("nearestLink.getFromNode().getCoord() = " + nearestLink.getFromNode().getCoord() + 
 				" -- nearestLink.getToNode().getCoord() = " + nearestLink.getToNode().getCoord());
-		System.err.println("NEW distance coord - from coord = " + CoordUtils.calcDistance(origin.getCoord(), nearestLink.getFromNode().getCoord()) + 
-				" -- NEW distance coord - to coord = " + CoordUtils.calcDistance(origin.getCoord(), nearestLink.getToNode().getCoord()));
+		System.err.println("NEW distance coord - from coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getFromNode().getCoord()) + 
+				" -- NEW distance coord - to coord = " + CoordUtils.calcEuclideanDistance(origin.getCoord(), nearestLink.getToNode().getCoord()));
 		System.err.println("projectionCoord = " + projectionCoord);
 		double walkUtility = -this.walkTravelDisutility.getCoord2CoordTravelDisutility(origin.getCoord(), projectionCoord);
 		

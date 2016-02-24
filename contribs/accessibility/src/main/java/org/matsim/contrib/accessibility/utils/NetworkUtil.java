@@ -98,7 +98,7 @@ public final class NetworkUtil {
 		
 		
 		Distances d = new Distances();
-		double distance = NetworkUtils.getEuclidianDistance(coord.getX(), coord.getY(), destinationNode.getCoord().getX(), destinationNode.getCoord().getY()) ;
+		double distance = NetworkUtils.getEuclideanDistance(coord.getX(), coord.getY(), destinationNode.getCoord().getX(), destinationNode.getCoord().getY()) ;
 		d.setDistanceCoord2Intersection(distance);
 
 		return d ;
@@ -140,9 +140,9 @@ public final class NetworkUtil {
 	private static Distances orthogonalDistancePlusLinkIntersection(Coord coord, Node destinationNode, Coord intersection) {
 		Distances distances = new Distances();
 		
-		double distanceCoord2Intersection = NetworkUtils.getEuclidianDistance(coord, intersection);
+		double distanceCoord2Intersection = NetworkUtils.getEuclideanDistance(coord, intersection);
 		Coord destinationNodeCoord = destinationNode.getCoord();
-		double distanceIntersection2Node = NetworkUtils.getEuclidianDistance(intersection, destinationNodeCoord);
+		double distanceIntersection2Node = NetworkUtils.getEuclideanDistance(intersection, destinationNodeCoord);
 
 		distances.setDistanceCoord2Intersection(distanceCoord2Intersection);
 		distances.setDistanceIntersetion2Node(distanceIntersection2Node);
