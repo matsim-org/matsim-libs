@@ -323,8 +323,10 @@ public class ParallelEventsManager implements EventsManager {
 						}
 						events = new Event[eventsArraySize];
 						arrayPos = 0;
-					}
-					
+						
+						// Break while loop so that the thread can shutdown.
+						if (event instanceof LastEventOfIteration) break;
+					}	
 				}
 			} catch (InterruptedException e) {
 				hadException.set(true);

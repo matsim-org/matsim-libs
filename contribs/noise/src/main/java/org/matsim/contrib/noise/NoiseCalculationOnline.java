@@ -83,7 +83,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 			
 			log.info("Internalizing noise damages. The default travel disutility will be replaced by a travel distuility which accounts for noise tolls...");
 			
-			final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(this.noiseContext);
+			final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(this.noiseContext, controler.getConfig().planCalcScore());
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {

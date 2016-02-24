@@ -298,7 +298,7 @@ public class GeneticAlgorithmDC {
 		final StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(scenario.getTransitSchedule(), scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (scenario.getConfig().qsim().getEndTime()-scenario.getConfig().qsim().getStartTime()));
 		events.addHandler(stopStopTimeCalculator);
 		new MatsimEventsReader(events).readFile(args[10]);
-		final TravelDisutilityFactory factory = new Builder( TransportMode.car );
+		final TravelDisutilityFactory factory = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() );
 		final Provider<TransitRouter> transitRouterFactory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		DestinationChoiceBestResponseContext dcContext = new DestinationChoiceBestResponseContext(scenario);
 		dcContext.init();

@@ -143,7 +143,8 @@ public class SubPopMunichControler {
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
 			// this affects the router by overwriting its generalized cost function (TravelDisutility):
-			final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+			final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
+					emissionCostModule, config.planCalcScore());
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -155,7 +156,7 @@ public class SubPopMunichControler {
 		} else if(internalizeCongestion){
 
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
-			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler, config.planCalcScore());
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -168,7 +169,8 @@ public class SubPopMunichControler {
 
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
-			final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, tollHandler);
+			final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = 
+					new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, tollHandler, config.planCalcScore());
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {

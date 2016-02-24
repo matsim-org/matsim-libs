@@ -156,7 +156,7 @@ class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
 		
-		TravelDisutility travelDisutility = travelDisutilityFactories.get( TransportMode.car ).createTravelDisutility(travelTime, planCalcScoreConfigGroup ) ;
+		TravelDisutility travelDisutility = travelDisutilityFactories.get( TransportMode.car ).createTravelDisutility(travelTime) ;
 
 		Network network = scenario.getNetwork() ;
 

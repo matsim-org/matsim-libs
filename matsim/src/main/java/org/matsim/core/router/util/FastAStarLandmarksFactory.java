@@ -47,7 +47,7 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 	@Inject
 	FastAStarLandmarksFactory(Network network, Config config, Map<String,TravelTime> travelTime, Map<String,TravelDisutilityFactory> fsttc) {
 		//TODO: No guarantee that these are the same travel times for which the router is later requested.
-		this(network, fsttc.get(TransportMode.car).createTravelDisutility(travelTime.get(TransportMode.car), config.planCalcScore()), FastRouterType.ARRAY);
+		this(network, fsttc.get(TransportMode.car).createTravelDisutility(travelTime.get(TransportMode.car)), FastRouterType.ARRAY);
 	}
 
 	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc) {

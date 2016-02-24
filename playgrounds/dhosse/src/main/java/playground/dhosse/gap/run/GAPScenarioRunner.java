@@ -259,7 +259,7 @@ public class GAPScenarioRunner {
 				addTravelDisutilityFactoryBinding(TransportMode.ride)
 						.toInstance(
 								new RandomizingTimeDistanceTravelDisutility.Builder(
-										TransportMode.ride));
+										TransportMode.ride, config.planCalcScore()));
 				addRoutingModuleBinding(TransportMode.ride)
 						.toProvider(
 								new NetworkRouting(
@@ -368,7 +368,7 @@ public class GAPScenarioRunner {
 						addTravelDisutilityFactoryBinding(mode)
 								.toInstance(
 										new RandomizingTimeDistanceTravelDisutility.Builder(
-												mode));
+												mode, controler.getConfig().planCalcScore()));
 						addRoutingModuleBinding(mode)
 								.toProvider(
 										new NetworkRouting(
@@ -382,7 +382,7 @@ public class GAPScenarioRunner {
 						addTravelDisutilityFactoryBinding(mode)
 								.toInstance(
 										new RandomizingTimeDistanceTravelDisutility.Builder(
-												mode));
+												mode, controler.getConfig().planCalcScore()));
 						addRoutingModuleBinding(mode)
 								.toProvider(
 										new NetworkRouting(

@@ -62,7 +62,7 @@ import org.matsim.vehicles.VehicleTypeImpl;
  * @author dgrether
  * @author mrieser
  */
-public class QLinkTest extends MatsimTestCase {
+public final class QLinkTest extends MatsimTestCase {
 
 	public void testInit() {
 		Fixture f = new Fixture();
@@ -94,7 +94,7 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 
-	private PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(Person p, QSim simulation) {
+	private static PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(Person p, QSim simulation) {
 		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), simulation);
 		simulation.insertAgentIntoMobsim(agent); 
 		return agent;
@@ -261,7 +261,7 @@ public class QLinkTest extends MatsimTestCase {
 		QSim qsim = QSimUtils.createDefaultQSim(scenario, (EventsUtils.createEventsManager()));
 		NetsimNetwork queueNetwork = qsim.getNetsimNetwork();
 		dummify((QNetwork) queueNetwork);
-        QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(Id.create("1", Link.class));
+		QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(Id.create("1", Link.class));
 
 		QVehicle v1 = new QVehicle(new VehicleImpl(Id.create("1", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
 		Person p = createPerson(Id.createPersonId(1), scenario, link1, link2);

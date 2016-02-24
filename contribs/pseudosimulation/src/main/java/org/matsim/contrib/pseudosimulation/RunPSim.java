@@ -222,7 +222,7 @@ public class RunPSim {
         } else {
             //randomized routing for car and transit
             final Builder disutilityFactory =
-                    new Builder( TransportMode.car );
+                    new Builder( TransportMode.car, config.planCalcScore() );
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {

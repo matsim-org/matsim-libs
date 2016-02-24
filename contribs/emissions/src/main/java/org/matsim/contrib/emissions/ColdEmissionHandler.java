@@ -21,27 +21,20 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
-import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -50,18 +43,16 @@ import org.matsim.vehicles.Vehicles;
 /**
  * @author benjamin
  */
-public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
 
     private final Vehicles emissionVehicles;
     private final Network network;
     private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 
-    private final Map<Id<Person>, Double> personId2stopEngineTime = new TreeMap<>();
-    private final Map<Id<Person>, Double> personId2accumulatedDistance = new TreeMap<>();
-    private final Map<Id<Person>, Double> personId2parkingDuration = new TreeMap<>();
-    private final Map<Id<Person>, Id<Link>> personId2coldEmissionEventLinkId = new TreeMap<>();
-    
-    private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
+    private final Map<Id<Vehicle>, Double> vehicleId2stopEngineTime = new HashMap<>();
+    private final Map<Id<Vehicle>, Double> vehicleId2accumulatedDistance = new HashMap<>();
+    private final Map<Id<Vehicle>, Double> vehicleId2parkingDuration = new HashMap<>();
+    private final Map<Id<Vehicle>, Id<Link>> vehicleId2coldEmissionEventLinkId = new HashMap<>();
     
     public ColdEmissionHandler(
             Vehicles emissionVehicles,
@@ -76,110 +67,77 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrival
 
     @Override
     public void reset(int iteration) {
-        personId2stopEngineTime.clear();
-        personId2accumulatedDistance.clear();
-        personId2parkingDuration.clear();
-        personId2coldEmissionEventLinkId.clear();
+        vehicleId2stopEngineTime.clear();
+        vehicleId2accumulatedDistance.clear();
+        vehicleId2parkingDuration.clear();
+        vehicleId2coldEmissionEventLinkId.clear();
         coldEmissionAnalysisModule.reset();
-        delegate.reset(iteration);
     }
 
     @Override
     public void handleEvent(LinkLeaveEvent event) {
-		/*
-		 * TODO Perspectively change calculation and analysis completely from
-		 * vehicles to persons and use PersonEntersVehicle and
-		 * PersonLeavesVehicle Events instead of PersonDeparture and
-		 * PersonArrival Events to determine engine start and stop time. 
-		 * Theresa Oct'2015
-		 */
-		Id<Person> personId = delegate.getDriverOfVehicle(event.getVehicleId());
+		Id<Vehicle> vehicleId = event.getVehicleId();
         Id<Link> linkId = event.getLinkId();
         Link link = this.network.getLinks().get(linkId);
         double linkLength = link.getLength();
-        Double previousDistance = this.personId2accumulatedDistance.get(personId);
+        Double previousDistance = this.vehicleId2accumulatedDistance.get(vehicleId);
         if (previousDistance != null) {
             double distance = previousDistance + linkLength;
-            double parkingDuration = this.personId2parkingDuration.get(personId);
-            Id<Link> coldEmissionEventLinkId = this.personId2coldEmissionEventLinkId.get(personId);
-            Id<Vehicle> vehicleId = Id.create(personId, Vehicle.class);
-            String vehicleInformation = getVehicleInformation(personId, vehicleId);
+            double parkingDuration = this.vehicleId2parkingDuration.get(vehicleId);
+            Id<Link> coldEmissionEventLinkId = this.vehicleId2coldEmissionEventLinkId.get(vehicleId);
+            Id<VehicleType> vehicleTypeId = emissionVehicles.getVehicles().get(vehicleId).getType().getId();
             if ((distance / 1000) > 1.0) {
                 this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
                         coldEmissionEventLinkId,
-                        personId,
+                        vehicleId,
                         event.getTime(),
                         parkingDuration,
                         2,
-                        vehicleInformation);
-                this.personId2accumulatedDistance.remove(personId);
+                        vehicleTypeId);
+                this.vehicleId2accumulatedDistance.remove(vehicleId);
             } else {
-                this.personId2accumulatedDistance.put(personId, distance);
+                this.vehicleId2accumulatedDistance.put(vehicleId, distance);
             }
         }
     }
 
     @Override
-    public void handleEvent(PersonArrivalEvent event) {
-        if (!event.getLegMode().equals("car")) { // no emissions to calculate...
+    public void handleEvent(VehicleLeavesTrafficEvent event) {
+        if (!event.getNetworkMode().equals("car")) { // no emissions to calculate...
             return;
         }
-        Id<Person> personId = event.getPersonId();
+        Id<Vehicle> vehicleId = event.getVehicleId();
         Double stopEngineTime = event.getTime();
-        this.personId2stopEngineTime.put(personId, stopEngineTime);
+        this.vehicleId2stopEngineTime.put(vehicleId, stopEngineTime);
     }
 
+    // TODO actually, the engine starts before with the PersonEntersVehicleEvent
     @Override
-    public void handleEvent(PersonDepartureEvent event) {
-        if (!event.getLegMode().equals("car")) { // no engine to start...
+    public void handleEvent(VehicleEntersTrafficEvent event) {
+        if (!event.getNetworkMode().equals("car")) { // no engine to start...
             return;
         }
         Id<Link> linkId = event.getLinkId();
-        Id<Person> personId = event.getPersonId();
+        Id<Vehicle> vehicleId = event.getVehicleId();
         double startEngineTime = event.getTime();
-        this.personId2coldEmissionEventLinkId.put(personId, linkId);
+        this.vehicleId2coldEmissionEventLinkId.put(vehicleId, linkId);
 
         double parkingDuration;
-        if (this.personId2stopEngineTime.containsKey(personId)) {
-            double stopEngineTime = this.personId2stopEngineTime.get(personId);
+        if (this.vehicleId2stopEngineTime.containsKey(vehicleId)) {
+            double stopEngineTime = this.vehicleId2stopEngineTime.get(vehicleId);
             parkingDuration = startEngineTime - stopEngineTime;
 
         } else { //parking duration is assumed to be at least 12 hours when parking overnight
             parkingDuration = 43200.0;
         }
-        this.personId2parkingDuration.put(personId, parkingDuration);
-        this.personId2accumulatedDistance.put(personId, 0.0);
+        this.vehicleId2parkingDuration.put(vehicleId, parkingDuration);
+        this.vehicleId2accumulatedDistance.put(vehicleId, 0.0);
         this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
                 linkId,
-                personId,
+                vehicleId,
                 startEngineTime,
                 parkingDuration,
                 1,
-                getVehicleInformation(personId, Id.create(event.getPersonId(), Vehicle.class)));
+                emissionVehicles.getVehicles().get(vehicleId).getType().getId());
     }
-
-	private String getVehicleInformation(Id<Person> personId, Id<Vehicle> vehicleId) {
-	    String vehicleInformation;
-	
-	    if (!this.emissionVehicles.getVehicles().containsKey(vehicleId)) {
-	        throw new RuntimeException("No vehicle defined for person " + personId + ". " +
-	                "Please make sure that requirements for emission vehicles in " +
-	                EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-	    }
-	
-	    Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
-	    VehicleType vehicleType = vehicle.getType();
-	    vehicleInformation = vehicleType.getId().toString();
-	    return vehicleInformation;
-	}
-
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		delegate.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		delegate.handleEvent(event);
-	}
 }

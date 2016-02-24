@@ -95,8 +95,8 @@ public class MyZoneToZoneRouter {
 	public void prepareTravelTimeData(final String eventsFilename){
 		log.info("Processing the events file for zone-to-zone travel time calculation");
 		TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
-		TravelDisutilityFactory tccf = new Builder( TransportMode.car );
-		TravelDisutility travelCost = tccf.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
+		TravelDisutilityFactory tccf = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() );
+		TravelDisutility travelCost = tccf.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
 		
 		EventsManager em = EventsUtils.createEventsManager();
 		em.addHandler(travelTimeCalculator);

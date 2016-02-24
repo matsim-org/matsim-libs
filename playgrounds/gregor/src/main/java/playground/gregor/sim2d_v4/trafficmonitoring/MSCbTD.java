@@ -29,8 +29,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class MSCbTD implements TravelDisutility {
 
-	public MSCbTD(TravelTime timeCalculator,
-			PlanCalcScoreConfigGroup cnScoringGroup) {
+	public MSCbTD(TravelTime timeCalculator) {
 		// TODO Auto-generated constructor stub
 	}
 

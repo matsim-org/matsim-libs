@@ -88,7 +88,8 @@ public class RunHotspotPricingMunich {
 		
 		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
-		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
+				emissionCostModule, config.planCalcScore());
 		emissionTducf.setHotspotLinks(hotspotLinks);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

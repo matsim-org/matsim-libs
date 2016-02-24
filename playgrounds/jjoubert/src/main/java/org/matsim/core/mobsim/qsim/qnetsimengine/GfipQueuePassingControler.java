@@ -203,9 +203,6 @@ public class GfipQueuePassingControler {
 			break;
 		}
 
-		/* Random seed!! */
-		config.global().setRandomSeed(2014092401);
-
 		String[] modes ={
 				GfipMode.GFIP_A1.toString(), 
 				GfipMode.GFIP_A2.toString(),

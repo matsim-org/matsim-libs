@@ -76,7 +76,7 @@ public class NetworkRouting implements Provider<RoutingModule> {
 		LeastCostPathCalculator routeAlgo =
 				leastCostPathCalculatorFactory.createPathCalculator(
 						filteredNetwork,
-						travelDisutilityFactory.createTravelDisutility(travelTime, planCalcScoreConfigGroup),
+						travelDisutilityFactory.createTravelDisutility(travelTime),
 						travelTime);
 
 		if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {

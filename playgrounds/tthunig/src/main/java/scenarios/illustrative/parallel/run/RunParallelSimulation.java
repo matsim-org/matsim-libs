@@ -200,7 +200,7 @@ public final class RunParallelSimulation {
 			
 			// adapt sigma for randomized routing
 			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
+					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override

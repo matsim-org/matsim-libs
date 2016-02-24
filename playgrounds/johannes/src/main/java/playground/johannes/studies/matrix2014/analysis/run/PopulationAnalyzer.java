@@ -27,6 +27,8 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.studies.matrix2014.analysis.LegStatsPerZone;
+import playground.johannes.studies.matrix2014.analysis.ValidateLAU2Attribute;
+import playground.johannes.studies.matrix2014.analysis.ValidatePopulationDensity;
 import playground.johannes.studies.matrix2014.gis.ValidateFacilities;
 import playground.johannes.studies.matrix2014.sim.ValidatePersonWeight;
 import playground.johannes.synpop.analysis.*;
@@ -90,8 +92,14 @@ public class PopulationAnalyzer {
         ActivityFacilities facilities = ((FacilityData)dataPool.get(FacilityDataLoader.KEY)).getAll();
         LegStatsPerZone legStatsPerZone = new LegStatsPerZone(zoneData.getLayer("nuts3"), facilities, ioContext);
         legStatsPerZone.setPredicate(carPredicate);
-
         tasks.addComponent(legStatsPerZone);
+
+        ValidatePopulationDensity popDensity = new ValidatePopulationDensity(dataPool, "modena");
+        popDensity.setIoContext(ioContext);
+        tasks.addComponent(popDensity);
+
+        ValidateLAU2Attribute lau2Attr = new ValidateLAU2Attribute(dataPool);
+        tasks.addComponent(lau2Attr);
 
         AnalyzerTaskRunner.run(persons, tasks, ioContext);
 

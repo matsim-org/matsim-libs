@@ -71,15 +71,15 @@ public class NoiseOnlineControlerIK {
 		
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");		
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setReceiverPointGap(100.);
 		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);			
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 			
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
-								
+
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);		
 		noiseParameters.setScaleFactor(10.);
 		
