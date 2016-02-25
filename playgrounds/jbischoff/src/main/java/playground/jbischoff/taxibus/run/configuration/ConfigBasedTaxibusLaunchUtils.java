@@ -25,15 +25,12 @@ import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.population.algorithms.PermissibleModesCalculator;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LinesUtils;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
-import playground.jbischoff.taxibus.run.sim.TaxibusPermissibleModesCalculatorImpl;
 import playground.jbischoff.taxibus.run.sim.TaxibusQSimProvider;
 import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
-import playground.jbischoff.taxibus.scenario.strategies.TaxibusAndWOBScenarioPermissibleModesCalculator;
 
 /**
  * @author jbischoff
