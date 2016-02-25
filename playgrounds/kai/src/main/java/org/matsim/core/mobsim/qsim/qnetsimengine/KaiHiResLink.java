@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,13 +30,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkInternalI;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
-class KaiHiResLink extends QLinkInternalI {
+class KaiHiResLink extends QLinkI {
 
 	private final KaiHybridEngine hybridEngine;
 	private final QNode toQueueNode;
@@ -128,31 +129,7 @@ class KaiHiResLink extends QLinkInternalI {
 	}
 
 	@Override
-	double getLastMovementTimeOfFirstVehicle() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
-	}
-
-	@Override
-	QVehicle getFirstVehicle() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
-	}
-
-	@Override
-	boolean hasGreenForToLink(Id toLinkId) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
-	}
-
-	@Override
 	boolean isAcceptingFromUpstream() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
-	}
-
-	@Override
-	QVehicle popFirstVehicle() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}
@@ -236,5 +213,11 @@ class KaiHiResLink extends QLinkInternalI {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	List<QLaneI> getToNodeQueueLanes() {
+		return null ;
+	}
+
 
 }

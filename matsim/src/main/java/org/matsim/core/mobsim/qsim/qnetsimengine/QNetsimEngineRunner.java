@@ -60,7 +60,7 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 	 * no concurrent add operation can occur.
 	 * cdobler, sep'14
 	 */
-	private final List<QLinkInternalI> linksList = new LinkedList<>();
+	private final List<QLinkI> linksList = new LinkedList<>();
 
 	/*
 	 * Ensure that nodes and links are only activate during times where we expect it.
@@ -179,8 +179,8 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 	private void moveLinks() {
 		boolean remainsActive;
 		lockLinks = true;
-		QLinkInternalI link;
-		ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
+		QLinkI link;
+		ListIterator<QLinkI> simLinks = this.linksList.listIterator();
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
 
@@ -197,7 +197,7 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 	 * cdobler, sep'14
 	 */
 	@Override
-	protected void activateLink(QLinkInternalI link) {
+	protected void activateLink(QLinkI link) {
 		if (!lockLinks) linksList.add(link);
 		else throw new RuntimeException("Tried to activate a QLink at a time where this was not allowed. Aborting!");
 	}

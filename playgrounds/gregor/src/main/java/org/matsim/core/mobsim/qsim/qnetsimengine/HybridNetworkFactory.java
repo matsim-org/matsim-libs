@@ -37,7 +37,7 @@ public class HybridNetworkFactory implements
 	}
 
 	@Override
-	public QLinkInternalI createNetsimLink(Link link, QNetwork network,
+	public QLinkI createNetsimLink(Link link, QNetwork network,
 			QNode queueNode) {
 		
 		for (Entry<String, NetsimNetworkFactory> e : this.facs.entrySet()) {

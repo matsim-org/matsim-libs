@@ -11,7 +11,7 @@ public final class AssignmentEmulatingQLaneNetworkFactory implements NetsimNetwo
 	}
 
 	@Override
-	public QLinkInternalI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
+	public QLinkI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
 		LaneFactory roadFactory = new LaneFactory() {
 			@Override
 			public QLaneI createLane(QLinkImpl qLinkImpl) {

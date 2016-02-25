@@ -41,7 +41,7 @@ import org.matsim.vis.snapshotwriters.VisLink;
 
 public class QNetwork implements NetsimNetwork {
 
-	private final Map<Id<Link>, QLinkInternalI> links;
+	private final Map<Id<Link>, QLinkI> links;
 
 	private final Map<Id<Node>, QNode> nodes;
 
@@ -89,7 +89,7 @@ public class QNetwork implements NetsimNetwork {
 	}
 
 	@Override
-	public Map<Id<Link>, QLinkInternalI> getNetsimLinks() {
+	public Map<Id<Link>, QLinkI> getNetsimLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
@@ -104,7 +104,7 @@ public class QNetwork implements NetsimNetwork {
 	}
 
 	@Override
-	public QLinkInternalI getNetsimLink(final Id<Link> id) {
+	public QLinkI getNetsimLink(final Id<Link> id) {
 		return this.links.get(id);
 	}
 

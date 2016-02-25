@@ -20,7 +20,9 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,11 +33,11 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
-public class CAQTransitionLink extends QLinkInternalI{
+public class CAQTransitionLink extends QLinkI{
 	
-	private final QLinkInternalI ql;
+	private final QLinkI ql;
 
-	CAQTransitionLink(QLinkInternalI qLinkImpl) {
+	CAQTransitionLink(QLinkI qLinkImpl) {
 		this.ql = qLinkImpl;
 	}
 
@@ -174,29 +176,13 @@ public class CAQTransitionLink extends QLinkInternalI{
 	}
 
 	@Override
-	QVehicle popFirstVehicle() {
-
-		
-		return this.ql.popFirstVehicle();
-	}
-
-	@Override
-	QVehicle getFirstVehicle() {
-		return this.ql.getFirstVehicle();
-	}
-
-	@Override
-	double getLastMovementTimeOfFirstVehicle() {
-		return this.ql.getLastMovementTimeOfFirstVehicle();
-	}
-
-	@Override
-	boolean hasGreenForToLink(Id toLinkId) {
-		return this.ql.hasGreenForToLink(toLinkId);
-	}
-
-	@Override
 	public boolean isAcceptingFromUpstream() {
 		return this.ql.isAcceptingFromUpstream();
 	}
+
+	@Override
+	List<QLaneI> getToNodeQueueLanes() {
+		return this.ql.getToNodeQueueLanes() ;
+	}
+
 }

@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -48,7 +47,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-abstract class QLinkInternalI implements NetsimLink {
+abstract class QLinkI implements NetsimLink {
 	
 
 	abstract QNode getToNode() ;
@@ -144,10 +143,6 @@ abstract class QLinkInternalI implements NetsimLink {
 	abstract void addFromUpstream(final QVehicle veh);
 
 	abstract boolean isNotOfferingVehicle();
-
-	abstract double getLastMovementTimeOfFirstVehicle();
-
-	abstract boolean hasGreenForToLink(final Id<Link> toLinkId);
 
 	abstract boolean isAcceptingFromUpstream();
 

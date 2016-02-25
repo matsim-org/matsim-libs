@@ -49,13 +49,9 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
 /**
- * Separating out the "lane" functionality from the "link" functionality also for QLinkImpl.  Ultimate goal is to unite this class here
- * with QLane.
+ * Separating out the "lane" functionality from the "link" functionality.
  * <p/>
  * Design thoughts:<ul>
- * <li> It seems a bit doubtful why something this data structure needs to know something like "hasGreenForToLink(Id)".
- * The alternative, I guess, would be to have this in the surrounding QLink(Lanes)Impl.  Since the info is different for each lane,
- * after thinking about it it makes some sense to attach this directly to the lanes.  kai, jun'13
  * <li> A design problem with this class is that it pulls its knowledge (such as length, capacity,
  * ...) from the link, rather than getting it set explicitly.  As a result, one needs to replace
  * "pulling from the link" by "pulling from the laneData" for lanes. :-(  kai, sep'13
@@ -486,7 +482,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		QVehicle veh = pollFromVehQueue(veh2Remove); 
 
 		if(isSeepageAllowed && isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
-			// yyyy above line feels quite slow/consuming computer time.  Should be switched off completely when seepage is not used. kai, may'15
 
 		} else {
 			usedStorageCapacity -= veh.getSizeInEquivalents();

@@ -579,23 +579,4 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		}
 	}
 
-	// The following contains a number of methods that are defined in the upstream interfaces but
-	// not needed here.
-	// In principle, one would need two separate interfaces, one for the "QLane" and one for the
-	// "QLink". They would be
-	// combined into the QLinkImpl, whereas for QLane and QLinkLanesImpl they would be separate.
-	// Can't do this with
-	// abstract classes (no multiple inheritance), but we need to use them because we do not want
-	// _public_ interfaces here.
-
-	@Override
-	double getLastMovementTimeOfFirstVehicle() {
-		throw new UnsupportedOperationException("Method should not be called on this instance");
-	}
-
-	@Override
-	boolean hasGreenForToLink(Id<Link> toLinkId) {
-		throw new UnsupportedOperationException("Method should not be called on this instance");
-	}
-
 }

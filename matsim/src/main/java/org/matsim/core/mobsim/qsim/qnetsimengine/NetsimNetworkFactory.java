@@ -32,6 +32,6 @@ public interface NetsimNetworkFactory extends MatsimFactory {
 
 	QNode createNetsimNode(Node node, QNetwork network);
 
-	QLinkInternalI createNetsimLink(Link link, QNetwork network, QNode queueNode);
+	QLinkI createNetsimLink(Link link, QNetwork network, QNode queueNode);
 
 }

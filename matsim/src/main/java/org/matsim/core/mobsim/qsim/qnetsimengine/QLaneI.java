@@ -37,45 +37,23 @@ import org.matsim.vis.snapshotwriters.VisData;
  */
 abstract class QLaneI {
 	
-//	boolean doSimStep( final double now ) ;
-	
 	abstract void addFromWait( final QVehicle veh, final double now);
 
 	abstract boolean isAcceptingFromWait();
 
 	abstract void updateRemainingFlowCapacity();
 
-//	int vehInQueueCount();
-
 	abstract boolean isActive();
 
 	abstract double getSimulatedFlowCapacity();
-
-//	boolean isAcceptingFromUpstream();
 
 	abstract void recalcTimeVariantAttributes(final double now);
 
 	abstract QVehicle getVehicle( final Id<Vehicle> vehicleId);
 
-//	Collection<MobsimVehicle> getAllVehicles();
-
-//	QVehicle popFirstVehicle();
-
-//	boolean hasGreenForToLink( final Id<Link> toLinkId);
-
 	abstract double getStorageCapacity();
 
-//	boolean isNotOfferingVehicle();
-
-//	void clearVehicles();
-
-//	void addFromUpstream(final QVehicle veh);
-
 	abstract VisData getVisData();
-
-//	QVehicle getFirstVehicle();
-
-//	double getLastMovementTimeOfFirstVehicle();
 
 	/**
 	 * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the link can also be served.
