@@ -7,6 +7,8 @@ package floetteroed.opdyts.convergencecriteria;
  */
 public class ConvergenceCriterionResult {
 
+	public final boolean converged;
+	
 	public final Double finalObjectiveFunctionValue;
 
 	public final Double finalObjectiveFunctionValueStddev;
@@ -19,11 +21,12 @@ public class ConvergenceCriterionResult {
 
 	public final Integer lastTransitionSequenceLength;
 
-	public ConvergenceCriterionResult(final Double finalObjectiveFunctionValue,
+	public ConvergenceCriterionResult(final boolean converged, final Double finalObjectiveFunctionValue,
 			final Double finalObjectiveFunctionValueStddev,
 			final Double finalEquilibiriumGap, final Double finalUniformityGap,
 			final Object lastDecisionVariable,
 			final Integer lastTransitionSequenceLength) {
+		this.converged = converged;
 		this.finalObjectiveFunctionValue = finalObjectiveFunctionValue;
 		this.finalObjectiveFunctionValueStddev = finalObjectiveFunctionValueStddev;
 		this.finalEquilbiriumGap = finalEquilibiriumGap;

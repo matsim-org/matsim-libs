@@ -24,7 +24,6 @@ package org.matsim.roadpricing;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -41,7 +40,7 @@ public class RoadPricingTravelDisutilityFactory implements TravelDisutilityFacto
 
 	@Inject
 	RoadPricingTravelDisutilityFactory(Scenario scenario, RoadPricingScheme roadPricingScheme) {
-		this(ControlerDefaults.createDefaultTravelDisutilityFactory(), roadPricingScheme, scenario.getConfig());
+		this(ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), roadPricingScheme, scenario.getConfig());
 	}
 
 	public RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, double marginalUtilityOfMoney) {
@@ -55,7 +54,7 @@ public class RoadPricingTravelDisutilityFactory implements TravelDisutilityFacto
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		if ( this.sigma != 0. ) {
 			if ( previousTravelDisutilityFactory instanceof Builder) {
 				((Builder) previousTravelDisutilityFactory).setSigma( this.sigma );
@@ -64,7 +63,7 @@ public class RoadPricingTravelDisutilityFactory implements TravelDisutilityFacto
 			}
 		}
 		return new TravelDisutilityIncludingToll(
-				previousTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
+				previousTravelDisutilityFactory.createTravelDisutility(timeCalculator),
 				this.scheme,
 				this.marginalUtilityOfMoney,
 				this.sigma

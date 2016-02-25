@@ -110,8 +110,8 @@ public class DigicoreNetworkWriter {
 		
 		/* Write the arcs/edges. */
 		log.info("  Writing arcs (" + network.getWeights().size() + ")");
-		log.info("  (Note: number of edges written is type-specific. It is likely to be more than the)");
-		log.info("  (      actual number of edges stipulated in the weight-less graph itself.        )");
+		log.info("  (Note: number of edges written is type-specific. It is likely to be more than )");
+		log.info("  (      the actual number of edges stipulated in the weight-less graph itself. )");
 		Counter arcCounter = new Counter("   arcs: ");
 		bw.write("ARCS");
 		bw.newLine();

@@ -171,7 +171,7 @@ public class RunEmissionPricing {
 		EmissionModule emissionModule = ecl.emissionModule;
 		EmissionCostModule emissionCostModule = new EmissionCostModule(1.0);
 		// add travel disutility
-		final TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl, emissionModule, emissionCostModule);
+		final TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl, emissionModule, emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

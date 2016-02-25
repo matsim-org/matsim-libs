@@ -19,6 +19,7 @@
 package playground.johannes.studies.matrix2014.sim.run;
 
 import gnu.trove.list.array.TDoubleArrayList;
+import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.core.config.Config;
@@ -40,6 +41,8 @@ import java.util.Set;
  * @author jillenberger
  */
 public class GeoDistanceLAU2Hamiltonian {
+
+    private static final Logger logger = Logger.getLogger(GeoDistanceLAU2Hamiltonian.class);
 
     public static final String MODULE_NAME = "geoDistanceHamiltonian";
 
@@ -69,6 +72,9 @@ public class GeoDistanceLAU2Hamiltonian {
 
             Set<Attributable> refLegs = getCarLegs(engine.getRefPersons(), predicate);
             Set<Attributable> simLegs = getCarLegs(engine.getSimPersons(), predicate);
+
+            logger.info(String.format("Building distance hamiltonian for lau2 class %s, %s ref legs, %s sim " +
+                    "legs.", classIdx, refLegs.size(), simLegs.size()));
             /*
             Create and add the hamiltonian.
             */

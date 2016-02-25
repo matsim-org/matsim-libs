@@ -511,6 +511,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 
 	private static final String USE_LANES="useLanes" ;
 	private boolean useLanes = false ;
+
 	@StringGetter(USE_LANES)
 	public boolean isUseLanes() {
 		return this.useLanes;
@@ -546,4 +547,11 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.isRestrictingSeepage = isRestrictingSeepage;
 	}
 	// ---
+	private boolean usingTravelTimeCheckInTeleportation = false ;
+	public boolean isUsingTravelTimeCheckInTeleportation() {
+		return this.usingTravelTimeCheckInTeleportation ;
+	}
+	public boolean setUsingTravelTimeCheckInTeleportation( boolean val ) {
+		return this.usingTravelTimeCheckInTeleportation = val ;
+	}
 }

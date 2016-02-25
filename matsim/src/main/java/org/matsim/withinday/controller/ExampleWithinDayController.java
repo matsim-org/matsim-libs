@@ -161,7 +161,7 @@ public class ExampleWithinDayController implements StartupListener {
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
 
 		TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get( TransportMode.car ) ;
-		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, planCalcScoreConfigGroup ) ;
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime ) ;
 
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime ) ;
 		

@@ -14,17 +14,20 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouter;
+import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterConfig;
+import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterImpl;
+//import org.matsim.pt.router.TransitRouter;
+//import org.matsim.pt.router.TransitRouterConfig;
+//import org.matsim.pt.router.TransitRouterImpl;
 
 /**
- * @author dziemke
+ * @author dziemke, gthunig
  */
 class ThreadedMatrixCreator implements Runnable {
 	private static final Logger log = Logger.getLogger(ThreadedMatrixCreator.class);
@@ -65,7 +68,7 @@ class ThreadedMatrixCreator implements Runnable {
 //		transitRouterConfig.setBeelineWalkConnectionDistance(beelineWalkConnectionDistance);
 //		transitRouterConfig.setBeelineWalkSpeed(beelineWalkSpeed);
 //		transitRouterConfig.setExtensionRadius(extensionRadius);
-//		transitRouterConfig.setSearchRadius(searchRadius);
+//		transitRouterConfig.setSearchRadius(200);
 		
 		TransitRouter transitRouter = new TransitRouterImpl(transitRouterConfig, transitSchedule);
 	    

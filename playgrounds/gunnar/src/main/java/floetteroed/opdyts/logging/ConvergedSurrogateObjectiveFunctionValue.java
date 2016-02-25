@@ -21,7 +21,7 @@ public class ConvergedSurrogateObjectiveFunctionValue<U extends DecisionVariable
 
 	@Override
 	public String value(final SamplingStage<U> samplingStage) {
-		final Double value = samplingStage.getConvergedSurrogateObjectiveFunctionValue();
+		final Double value = samplingStage.getEvaluatedSurrogateObjectiveFunctionValue();
 		if (value == null) {
 			return "";
 		} else {

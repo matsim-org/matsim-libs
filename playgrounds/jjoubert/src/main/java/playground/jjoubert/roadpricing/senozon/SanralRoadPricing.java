@@ -22,7 +22,6 @@ package playground.jjoubert.roadpricing.senozon;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.MatsimServices;
@@ -87,9 +86,8 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 
 				@Override
 				public TravelDisutility createTravelDisutility(
-						TravelTime timeCalculator,
-						PlanCalcScoreConfigGroup cnScoringGroup) {
-					return new SanralTravelDisutilityIncludingToll(previousTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup), SanralRoadPricing.this.scheme);
+						TravelTime timeCalculator) {
+					return new SanralTravelDisutilityIncludingToll(previousTravelDisutilityFactory.createTravelDisutility(timeCalculator), SanralRoadPricing.this.scheme);
 				}
 
 			};

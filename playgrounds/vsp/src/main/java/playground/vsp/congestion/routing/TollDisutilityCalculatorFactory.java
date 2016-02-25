@@ -39,14 +39,16 @@ import playground.vsp.congestion.handlers.TollHandler;
 public class TollDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
 	private TollHandler tollHandler;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
 	@Deprecated
-	public TollDisutilityCalculatorFactory(TollHandler tollHandler) {
+	public TollDisutilityCalculatorFactory(TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.tollHandler = tollHandler;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		final TollTravelDisutilityCalculator ttdc = new TollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, tollHandler);
 
 		return new TravelDisutility(){

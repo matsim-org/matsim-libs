@@ -596,9 +596,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	final Collection<MobsimVehicle> getAllVehicles() {
+		/* since it is an instance of arrayList, insertion order is maintained. Thus, correcting the order or insertion.
+		 * It will be more complicated for passingQueue. amit feb'16
+		 */
 		Collection<MobsimVehicle> vehicles = new ArrayList<>();
-		vehicles.addAll(vehQueue);
 		vehicles.addAll(buffer);
+		vehicles.addAll(vehQueue);
 		return vehicles ;
 	}
 

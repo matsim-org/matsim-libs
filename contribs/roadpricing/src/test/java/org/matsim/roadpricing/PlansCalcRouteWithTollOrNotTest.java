@@ -71,7 +71,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		Fixture.createNetwork2(scenario);
-		
+
 		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 
 		// a basic toll where only the morning hours are tolled
@@ -225,7 +225,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 			} else {
 				return legs.get(1) ;
 			}
-		} 
+		}
 	}
 
 	@Test

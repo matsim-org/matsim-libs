@@ -45,11 +45,11 @@ import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
 import floetteroed.opdyts.trajectorysampling.ParallelTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.SamplingStage;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
 import floetteroed.opdyts.trajectorysampling.Transition;
-import floetteroed.opdyts.trajectorysampling.WeightOptimizer5;
 import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
@@ -107,6 +107,8 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	private String logFileName = null;
 
+	private String convergenceTrackingFileName = null;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public RandomSearch(final Simulator<U> simulator,
@@ -138,9 +140,23 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.logFileName = logFileName;
 	}
 
+	public void setConvergenceTrackingFileName(
+			final String convergenceTrackingFileName) {
+		this.convergenceTrackingFileName = convergenceTrackingFileName;
+	}
+
 	// -------------------- IMPLEMENTATION --------------------
 
 	private int transitions = 0;
+
+	private void deleteIfPossible(final String fileName) {
+		if (fileName != null) {
+			final File file = new File(fileName);
+			if (file.exists()) {
+				file.delete();
+			}
+		}
+	}
 
 	public void run() {
 		this.run(0.0, 0.0, true);
@@ -149,17 +165,12 @@ public class RandomSearch<U extends DecisionVariable> {
 	public void run(double equilibriumGapWeight, double uniformityGapWeight,
 			final boolean adjustWeights) {
 
-		if (this.logFileName != null) {
-			final File logFile = new File(this.logFileName);
-			if (logFile.exists()) {
-				logFile.delete();
-			}
-		}
+		this.deleteIfPossible(this.logFileName);
+		this.deleteIfPossible(this.convergenceTrackingFileName);
 
-		final WeightOptimizer5 weightOptimizer;
+		final SelfTuner weightOptimizer;
 		if (adjustWeights) {
-			weightOptimizer = new WeightOptimizer5(equilibriumGapWeight,
-					uniformityGapWeight);
+			weightOptimizer = new SelfTuner(1.0, 0.05, 10, 0.1);
 		} else {
 			weightOptimizer = null;
 		}
@@ -261,22 +272,49 @@ public class RandomSearch<U extends DecisionVariable> {
 								newBestDecisionVariable).finalObjectiveFunctionValue;
 				transitionsPerIteration = sampler.getTotalTransitionCnt();
 
+				if (this.convergenceTrackingFileName != null) {
+					try {
+						if (!new File(this.convergenceTrackingFileName)
+								.exists()) {
+							final PrintWriter writer = new PrintWriter(
+									this.convergenceTrackingFileName);
+							writer.println("Raw Objective Function Value\tAveraged Objective Function Value\tConverged");
+							writer.flush();
+							writer.close();
+						}
+						final BufferedWriter writer = new BufferedWriter(
+								new FileWriter(
+										this.convergenceTrackingFileName, true));
+						final List<Transition<U>> transitions = sampler
+								.getTransitions(newBestDecisionVariable);
+						for (int i = 0; i < transitions.size(); i++) {
+							final ConvergenceCriterionResult convRes = this.convergenceCriterion
+									.evaluate(transitions.subList(0, i + 1));
+							writer.write(transitions.get(i)
+									.getToStateObjectiveFunctionValue()
+									+ "\t"
+									+ (convRes.finalObjectiveFunctionValue != null ? convRes.finalObjectiveFunctionValue
+											: "") + "\t" + convRes.converged);
+							writer.newLine();
+						}
+						writer.flush();
+						writer.close();
+					} catch (IOException e) {
+						Logger.getLogger(this.getClass().getName()).warn(
+								e.getMessage());
+					}
+				}
+
 				if (weightOptimizer != null) {
 
 					final List<Transition<U>> allTransitions = sampler
 							.getTransitions(newBestDecisionVariable);
-					final double[] weights = weightOptimizer
-							.updateWeights(allTransitions);
-					equilibriumGapWeight = weights[0];
-					uniformityGapWeight = weights[1];
-					
-//					System.out.println(equilibriumGapWeight + "\t"
-//							+ uniformityGapWeight);
-//					try {
-//						System.in.read();
-//					} catch (IOException e) {
-//						e.printStackTrace();
-//					}
+					weightOptimizer.update(allTransitions,
+							newBestObjectiveFunctionValue);
+					equilibriumGapWeight = weightOptimizer
+							.getEquilibriumGapWeight();
+					uniformityGapWeight = weightOptimizer
+							.getUniformityGapWeight();
 				}
 
 			} else {

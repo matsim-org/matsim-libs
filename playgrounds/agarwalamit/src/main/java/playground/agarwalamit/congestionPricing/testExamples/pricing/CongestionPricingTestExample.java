@@ -105,7 +105,7 @@ class CongestionPricingTestExample {
 
 		if(isComparing){
 			TollHandler tollHandler = new TollHandler(sc);
-			final TollDisutilityCalculatorFactory fact = new TollDisutilityCalculatorFactory(tollHandler);
+			final TollDisutilityCalculatorFactory fact = new TollDisutilityCalculatorFactory(tollHandler, controler.getConfig().planCalcScore());
 
 			controler.addOverridingModule(new AbstractModule() {
 				@Override

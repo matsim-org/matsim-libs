@@ -21,6 +21,7 @@ package playground.johannes.studies.matrix2014.analysis;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.synpop.analysis.*;
@@ -78,12 +79,24 @@ public class LegStatsPerZone implements AnalyzerTask<Collection<? extends Person
                 pred = new ZonePredicate(personZoneMapping, zone);
             }
 
+            ioContext.append(zone.getAttribute(zones.getPrimaryKey()));
+
+            DiscretizerBuilder builder1 = new StratifiedDiscretizerBuilder(50, 50);
+            DiscretizerBuilder builder2 = new PassThroughDiscretizerBuilder(new LinearDiscretizer(10000), "linear10");
+            DiscretizerBuilder builder3 = new PassThroughDiscretizerBuilder(new LinearDiscretizer(25000), "linear25");
+            DiscretizerBuilder builder4 = new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear50");
+
+            HistogramWriter writer = new HistogramWriter(ioContext, builder1);
+            writer.addBuilder(builder2);
+            writer.addBuilder(builder3);
+            writer.addBuilder(builder4);
+
             NumericAnalyzer analyzer = NumericLegAnalyzer.create(
                     CommonKeys.LEG_GEO_DISTANCE,
                     true,
                     pred,
                     zone.getAttribute(zones.getPrimaryKey()),
-                    null);
+                    writer);
             tasks.addComponent(analyzer);
         }
 

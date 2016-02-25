@@ -9,11 +9,11 @@
   <artifactId>dziemke</artifactId>
   <name>dziemke</name>
   <dependencies>
-    <!-- <dependency>
+     <dependency>
 	    <groupId>playground</groupId>
 	    <artifactId>mzilske</artifactId>
 	    <version>0.8.0-SNAPSHOT</version>
-    </dependency> -->
+    </dependency>
   	<dependency>
 		<groupId>org.matsim.contrib</groupId>
 		<artifactId>otfvis</artifactId>

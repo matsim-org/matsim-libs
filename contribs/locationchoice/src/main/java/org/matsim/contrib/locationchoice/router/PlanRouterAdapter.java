@@ -89,8 +89,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 		TravelTime time = controler.getLinkTravelTimes();
 		TravelDisutility disutility =
 			controler.getTravelDisutilityFactory().createTravelDisutility(
-					time,
-					controler.getConfig().planCalcScore());
+					time);
 
         LeastCostPathCalculatorFactory factory = controler.getLeastCostPathCalculatorFactory();
         Network network = controler.getScenario().getNetwork();

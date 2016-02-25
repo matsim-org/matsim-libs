@@ -64,7 +64,7 @@ public class SamplingStage<U extends DecisionVariable> {
 
 	private final Double convergedObjectiveFunctionValue;
 	
-	private final Double convergedSurrogateObjectiveFunctionValue;
+	private final Double evaluatedSurrogateObjectiveFunctionValue;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -72,7 +72,7 @@ public class SamplingStage<U extends DecisionVariable> {
 			final TransitionSequencesAnalyzer<U> evaluator,
 			final Transition<U> lastTransition,
 			final Double convergedObjectiveFunctionValue,
-			final Double convergedSurrogateObjectiveFunctionValue) {
+			final Double evaluatedSurrogateObjectiveFunctionValue) {
 
 		this.alphas = alphas.copy();
 		this.equilibriumGapWeight = evaluator.getEquilibriumGapWeight();
@@ -92,7 +92,7 @@ public class SamplingStage<U extends DecisionVariable> {
 		this.lastEquilibriumGap = lastTransition.getDelta().euclNorm();
 
 		this.convergedObjectiveFunctionValue = convergedObjectiveFunctionValue;
-		this.convergedSurrogateObjectiveFunctionValue = convergedSurrogateObjectiveFunctionValue;
+		this.evaluatedSurrogateObjectiveFunctionValue = evaluatedSurrogateObjectiveFunctionValue;
 	}
 
 	// -------------------- PACKAGE PRIVATE FUNCTIONALITY --------------------
@@ -152,7 +152,7 @@ public class SamplingStage<U extends DecisionVariable> {
 		return this.convergedObjectiveFunctionValue;
 	}
 
-	public Double getConvergedSurrogateObjectiveFunctionValue() {
-		return this.convergedSurrogateObjectiveFunctionValue;
+	public Double getEvaluatedSurrogateObjectiveFunctionValue() {
+		return this.evaluatedSurrogateObjectiveFunctionValue;
 	}
 }

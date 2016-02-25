@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
-import org.matsim.core.gbl.MatsimRandom;
-
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.analysis.LogFileAnalyzer;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
@@ -26,10 +24,13 @@ public class PathologicalExample {
 
 	private final String logFileName;
 
+	private final String convFileName;
+
 	private final int populationSize;
 
 	public PathologicalExample(final int populationSize,
-			final String logFileName, final Random rnd) {
+			final String logFileName, final String convFileName,
+			final Random rnd) {
 		final Matrix _A = new Matrix(2, 2);
 		_A.getRow(0).set(0, 0.0);
 		_A.getRow(0).set(1, 0.9);
@@ -44,20 +45,24 @@ public class PathologicalExample {
 		_B.getRow(0).set(1, 0.0);
 		_B.getRow(1).set(0, -3.2);
 		_B.getRow(1).set(1, 1.0);
-		this.system = new LinearSystemSimulator(_A, _B, 0.1, rnd); // noise was 0.1
+		this.system = new LinearSystemSimulator(_A, _B, 0.1, rnd); // noise was
+																	// 0.1
 		this.logFileName = logFileName;
+		this.convFileName = convFileName;
 		this.populationSize = populationSize;
 	}
 
 	public void run() {
 
+		final Random rnd = new Random();
+
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				100, 2);
+				200, 100);
 		final ObjectiveFunction objFct = new LinearSystemObjectiveFunction();
 
 		final int maxMemorizedTrajectoryLength = Integer.MAX_VALUE;
 		final boolean interpolate = true;
-		final int maxRandomSearchIterations = 10;
+		final int maxRandomSearchIterations = 5;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
 		final boolean includeCurrentBest = false;
 
@@ -67,15 +72,16 @@ public class PathologicalExample {
 				Double.POSITIVE_INFINITY); // new Vector(0.1, 0.1);
 
 		final RandomSearch<VectorDecisionVariable> randomSearch = new RandomSearch<>(
-				system, new VectorDecisionVariableRandomizer(2, 0.1,
-						MatsimRandom.getRandom(), this.system, min, max),
-				new VectorDecisionVariable(new Vector(2), this.system),
-				convergenceCriterion, maxRandomSearchIterations,
-				maxRandomSearchTransitions, this.populationSize,
-				MatsimRandom.getRandom(), interpolate, objFct,
+				system, new VectorDecisionVariableRandomizer(2, 0.1, rnd,
+						this.system, min, max), new VectorDecisionVariable(
+						new Vector(2), this.system), convergenceCriterion,
+				maxRandomSearchIterations, maxRandomSearchTransitions,
+				this.populationSize, rnd, interpolate, objFct,
 				maxMemorizedTrajectoryLength, includeCurrentBest);
 		randomSearch.setLogFileName(this.logFileName);
-
+		randomSearch.setConvergenceTrackingFileName(this.convFileName);
+		
+		// randomSearch.run(1.0, 1.0, false);
 		randomSearch.run();
 	}
 
@@ -102,7 +108,10 @@ public class PathologicalExample {
 			for (int repl = 1; repl <= maxRepl; repl++) {
 				final String logFileName = "./small-system_pop-size-"
 						+ populationSize + "_repl-" + repl + ".log";
-				new PathologicalExample(populationSize, logFileName, rnd).run();
+				final String convFileName = "./small-system_pop-size-"
+						+ populationSize + "_repl-" + repl + ".conv";
+				new PathologicalExample(populationSize, logFileName,
+						convFileName, rnd).run();
 				final LogFileAnalyzer lfa = new LogFileAnalyzer(logFileName);
 				final List<Integer> its = lfa.getTotalTransitions();
 				final List<Double> gaps = lfa.getObjectiveFunctionValueGaps();

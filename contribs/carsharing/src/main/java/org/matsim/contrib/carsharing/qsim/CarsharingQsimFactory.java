@@ -3,7 +3,6 @@ package org.matsim.contrib.carsharing.qsim;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -42,9 +41,7 @@ public class CarsharingQsimFactory implements Provider<Netsim>{
 	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory ;
 	@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
 	@Inject private Map<String,TravelTime> travelTimes ;
-	
-	@Inject private PlanCalcScoreConfigGroup planCalcScoreConfigGroup ;
-	
+
 	@Override
 	public Netsim get() {
 		
@@ -76,7 +73,7 @@ public class CarsharingQsimFactory implements Provider<Netsim>{
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
 
 		TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get( TransportMode.car ) ;
-		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, planCalcScoreConfigGroup ) ;
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime) ;
 
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(sc.getNetwork(), travelDisutility, travelTime ) ;
 

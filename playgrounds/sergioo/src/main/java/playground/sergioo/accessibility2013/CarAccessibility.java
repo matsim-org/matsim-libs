@@ -26,7 +26,7 @@ public class CarAccessibility {
 		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
 		eventsManager.addHandler(travelTimeCalculator);
 		(new EventsReaderXMLv1(eventsManager)).parse(args[2]);
-		TravelDisutility disutilityFunction = (new Builder( TransportMode.car )).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
+		TravelDisutility disutilityFunction = (new Builder( TransportMode.car, scenario.getConfig().planCalcScore() )).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
 		PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
 		preProcessDijkstra.run(scenario.getNetwork());
 		MultiDestinationDijkstra dijkstra = new MultiDestinationDijkstra(scenario.getNetwork(), disutilityFunction, travelTimeCalculator.getLinkTravelTimes(), preProcessDijkstra);

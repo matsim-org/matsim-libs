@@ -69,7 +69,7 @@ public class PatnaUrbanControler {
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
-		final RandomizingTimeDistanceTravelDisutility.Builder builder =  new RandomizingTimeDistanceTravelDisutility.Builder("bike");
+		final RandomizingTimeDistanceTravelDisutility.Builder builder =  new RandomizingTimeDistanceTravelDisutility.Builder("bike", config.planCalcScore());
 		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
