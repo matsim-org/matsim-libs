@@ -148,9 +148,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private static int spaceCapWarningCount = 0;
 	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
 	static boolean VIS_HOLES = false ;
-	static double hole_speed = 15.0;
-	// yyyy probably should neither be non-private nor static.  kai/amit, nov'15
-	
+	private final double HOLE_SPEED = 15.0;
+
 	
 	/**
 	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
@@ -495,7 +494,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		if ( QueueWithBuffer.HOLES ) {
 			QueueWithBuffer.Hole hole = new QueueWithBuffer.Hole() ;
-			double offset = length*3600./hole_speed/1000. ;
+			double offset = length*3600./HOLE_SPEED/1000. ;
 			hole.setEarliestLinkExitTime( now + 1.0*offset + 0.0*MatsimRandom.getRandom().nextDouble()*offset ) ;
 			hole.setSizeInEquivalents(veh2Remove.getSizeInEquivalents());
 			holes.add( hole ) ;
@@ -817,7 +816,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				// holes:
 				if ( !holes.isEmpty() ) {
 					double spacing = snapshotInfoBuilder.calculateVehicleSpacing(length, holes.size(), getStorageCapacity() );
-					double freespeedTraveltime = length / (hole_speed*1000./3600.);
+					double freespeedTraveltime = length / (HOLE_SPEED*1000./3600.);
 					double lastDistanceFromFromNode = Double.NaN;
 					for (Hole hole : holes) {
 						lastDistanceFromFromNode = createHolePositionAndReturnDistance(snapshotInfoBuilder, now, lastDistanceFromFromNode,

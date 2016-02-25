@@ -163,13 +163,6 @@ public class QNetsimEngine implements MobsimEngine {
 					+ qsimConfigGroup.getTrafficDynamics() ) ;
 		}
 
-		if(QueueWithBuffer.HOLES && config.getModule("WITH_HOLE")!=null){
-			QueueWithBuffer.hole_speed = Double.valueOf(config.getParam("WITH_HOLE", "HOLE_SPEED"));
-			if (QueueWithBuffer.hole_speed!=15) {
-				log.warn("Hole speed is set to "+QueueWithBuffer.hole_speed+". Default hardcoded value is 15.");
-			}
-		}
-		
 		QueueWithBuffer.fastCapacityUpdate = qSimConfigGroup.isUsingFastCapacityUpdate() ;
 		
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
