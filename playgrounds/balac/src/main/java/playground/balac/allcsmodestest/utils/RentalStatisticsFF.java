@@ -12,7 +12,7 @@ public class RentalStatisticsFF {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
-		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/1.500.FF_CS");
+		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/1.300.FF_CS");
 		int[] rentalTimes = new int[30];
 		int[] distance = new int[100];
 

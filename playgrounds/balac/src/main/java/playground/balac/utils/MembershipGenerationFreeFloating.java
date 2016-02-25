@@ -20,7 +20,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 public class MembershipGenerationFreeFloating {
 	
-	final private int numMembers = 25000;
+	final private int numMembers = 6000;
 	
 	private static double[] ageShares = {0.107 , 0.614 , 0.89, 0.987 , 1.0};
 	
@@ -35,9 +35,10 @@ public class MembershipGenerationFreeFloating {
 		ObjectAttributes bla = new ObjectAttributes();
 		
 		new ObjectAttributesXmlReader(bla).parse(args[2]);
-		
+		int h = 0;
 		for(Person p : scenario.getPopulation().getPersons().values()) {
-			
+			if (withinBorders(p))
+				h++;
 			if ( ((String) bla.getAttribute(p.getId().toString(), "FF_CARD")).equals("true")) {
 				bla.putAttribute(p.getId().toString(), "FF_CARD", "false");
 
@@ -84,7 +85,7 @@ public class MembershipGenerationFreeFloating {
 			
 			double randomDouble = MatsimRandom.getRandom().nextDouble();
 			
-			if (randomDouble < 0.8) {
+			if (randomDouble < menShare) {
 				
 				randomDouble = MatsimRandom.getRandom().nextDouble();
 				
@@ -152,7 +153,7 @@ public class MembershipGenerationFreeFloating {
 		}
 		
 		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(bla);
-		betaWriter.writeFile("C:/Users/balacm/Desktop/personAttrinutes10kmZoneFF_5xmem.xml.gz");
+		betaWriter.writeFile("C:/Users/balacm/Desktop/personAttrinutes10kmZoneFF_1xmemb.xml.gz");
 		
 	}
 

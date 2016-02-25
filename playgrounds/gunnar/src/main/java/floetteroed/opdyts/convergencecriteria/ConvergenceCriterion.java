@@ -24,7 +24,10 @@
  */
 package floetteroed.opdyts.convergencecriteria;
 
-import floetteroed.opdyts.trajectorysampling.TransitionSequence;
+import java.util.List;
+
+import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.trajectorysampling.Transition;
 
 /**
  * 
@@ -39,7 +42,7 @@ public interface ConvergenceCriterion {
 	 * @param transitionSequence
 	 *            convergence is evaluated for this sequence
 	 */
-	public ConvergenceCriterionResult evaluate(
-			final TransitionSequence<?> transitionSequence);
+	public <U extends DecisionVariable> ConvergenceCriterionResult evaluate(
+			final List<Transition<U>> transitionSequence);
 
 }
