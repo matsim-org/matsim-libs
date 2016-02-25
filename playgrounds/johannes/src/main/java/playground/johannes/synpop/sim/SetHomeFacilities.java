@@ -243,6 +243,11 @@ public class SetHomeFacilities implements PersonsTask {
 
                 accumulatedWSum += wsum;
             }
+
+            if(personIdx >= persons.size()) {
+                logger.debug(String.format("%s zones unprocessed.", probabilities.size() - (zoneIdx + 1)));
+                break;
+            }
         }
 
         ProgressLogger.terminate();

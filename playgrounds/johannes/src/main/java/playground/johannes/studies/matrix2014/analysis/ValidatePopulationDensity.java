@@ -55,9 +55,12 @@ public class ValidatePopulationDensity implements AnalyzerTask<Collection<? exte
 
     private FileIOContext ioContext;
 
-    public ValidatePopulationDensity(DataPool dataPool, String layerName) {
+    public final TObjectDoubleMap<Zone> zoneWeights;
+
+    public ValidatePopulationDensity(DataPool dataPool, TObjectDoubleMap<Zone> zoneWeights, String layerName) {
         zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer(layerName);
         facilities = ((FacilityData) dataPool.get(FacilityDataLoader.KEY)).getAll();
+        this.zoneWeights = zoneWeights;
     }
 
     public void setIoContext(FileIOContext ioContext) {
@@ -95,9 +98,10 @@ public class ValidatePopulationDensity implements AnalyzerTask<Collection<? exte
         for (Zone zone : zones.getZones()) {
             double inhabs = 0;
             String val = zone.getAttribute(ZoneData.POPULATION_KEY);
+            double w = zoneWeights.get(zone);
             if(val != null) {
                 try {
-                    inhabs = Double.parseDouble(val);
+                    inhabs = Double.parseDouble(val) * w;
                 } catch (NumberFormatException e) {
                     logger.debug(e.getLocalizedMessage());
                 }
