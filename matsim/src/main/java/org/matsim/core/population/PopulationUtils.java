@@ -33,10 +33,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -68,6 +66,8 @@ import org.matsim.facilities.ActivityFacility;
  * @author nagel, ikaddoura
  */
 public final class PopulationUtils {
+	private static final Logger log = Logger.getLogger( PopulationUtils.class );
+
 	/**
 	 * Is a namespace, so don't instantiate:
 	 */
@@ -369,6 +369,7 @@ public final class PopulationUtils {
 		return Time.UNDEFINED_TIME ;
 	}
 
+	private static int missingFacilityCnt = 0 ;
 	public static Id<Link> computeLinkIdFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		// the following might eventually become configurable by config. kai, feb'16
 		if ( act.getFacilityId()==null ) {
@@ -379,7 +380,13 @@ public final class PopulationUtils {
 			ActivityFacility facility = facs.getFacilities().get( act.getFacilityId() ) ;
 			if ( facility==null || facility.getLinkId()==null ) {
 				if ( facility==null ) {
-					Logger.getLogger( PopulationUtils.class ).warn("we have a facility id, but can't find the facility; this should not really happen") ;
+					if ( missingFacilityCnt < 10 ) {
+						log.warn("we have a facility ID for an activity, but can't find the facility; this should not really happen. Falling back on link ID.") ;
+						missingFacilityCnt++ ;
+						if ( missingFacilityCnt==10 ) {
+							log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+						}
+					}
 				}
 				final Id<Link> linkIdFromActivity = act.getLinkId();
 				Gbl.assertIf( linkIdFromActivity!=null );
