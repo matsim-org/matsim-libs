@@ -218,6 +218,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		}
 	}
 
+	@Override
 	List<QLaneI> getToNodeQueueLanes() {
 		return this.toNodeLaneQueues;
 	}
@@ -426,11 +427,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	QVehicle popFirstVehicle() {
-		throw new UnsupportedOperationException("Method should not be called on this instance");
-	}
-
-	@Override
 	boolean isAcceptingFromUpstream() {
 		return this.firstLaneQueue.isAcceptingFromUpstream();
 	}
@@ -594,11 +590,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	@Override
 	double getLastMovementTimeOfFirstVehicle() {
-		throw new UnsupportedOperationException("Method should not be called on this instance");
-	}
-
-	@Override
-	QVehicle getFirstVehicle() {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 

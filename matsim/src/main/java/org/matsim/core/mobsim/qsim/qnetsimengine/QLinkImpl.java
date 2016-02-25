@@ -20,6 +20,10 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -35,9 +39,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisData;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
@@ -279,16 +280,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	}
 
 	@Override
-	QVehicle popFirstVehicle() {
-		return road.popFirstVehicle();
-	}
-
-	@Override
-	QVehicle getFirstVehicle() {
-		return this.road.getFirstVehicle() ;
-	}
-
-	@Override
 	double getLastMovementTimeOfFirstVehicle() {
 		return this.road.getLastMovementTimeOfFirstVehicle();
 	}
@@ -363,6 +354,13 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 			return positions;
 		}
 
+	}
+
+	@Override
+	List<QLaneI> getToNodeQueueLanes() {
+		List<QLaneI> list = new ArrayList<>() ;
+		list.add( this.road ) ;
+		return list ;
 	}
 
 }

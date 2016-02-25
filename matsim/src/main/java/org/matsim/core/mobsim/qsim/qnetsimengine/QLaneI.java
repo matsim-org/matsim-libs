@@ -19,7 +19,11 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
@@ -31,7 +35,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author nagel
  *
  */
-abstract class QLaneI extends QInternalI {
+abstract class QLaneI {
 	
 //	boolean doSimStep( final double now ) ;
 	
@@ -85,5 +89,35 @@ abstract class QLaneI extends QInternalI {
 	abstract void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) ;
 
 	abstract void changeEffectiveNumberOfLanes( final double val, final double now ) ;
+
+	/**
+	 * Seems ok as public interface function. kai, aug'15
+	 */
+	abstract boolean doSimStep(final double now);
+
+	/**
+	 * Seems ok as public interface function. kai, aug'15 
+	 */
+	abstract void clearVehicles();
+
+	abstract Collection<MobsimVehicle> getAllVehicles();
+
+	/**
+	 * <br>
+	 * seems ok as public interface function. kai, aug'15
+	 */
+	abstract void addFromUpstream(final QVehicle veh);
+
+	abstract boolean isNotOfferingVehicle();
+
+	abstract QVehicle popFirstVehicle();
+
+	abstract QVehicle getFirstVehicle();
+
+	abstract double getLastMovementTimeOfFirstVehicle();
+
+	abstract boolean hasGreenForToLink(final Id<Link> toLinkId);
+
+	abstract boolean isAcceptingFromUpstream();
 
 }
