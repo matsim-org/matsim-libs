@@ -55,7 +55,7 @@ public class TravelTimeStatistics   {
 		
 		
 		
-		String run = "vw060TBTW15";
+		String run = "vw073";
 //		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String inputFile = folder + run + ".output_events.xml.gz";
@@ -95,6 +95,7 @@ public class TravelTimeStatistics   {
 		allTT.addMode("taxibus");
 
 		ptTT.addMode("pt");
+		ptTT.addMode("transit_walk");
 
 		tbTT.addMode("taxibus");
 
@@ -115,7 +116,7 @@ public class TravelTimeStatistics   {
 		ptTT.writeOutput(folder);
 		tbTT.writeOutput(folder);
 		analyser.writeOutput(folder);
-
+		a.writeOutput(folder);
 		a.printOutput();
 	}
 	

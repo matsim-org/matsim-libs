@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 import playground.jbischoff.taxibus.scenario.analysis.WobDistanceAnalyzer;
@@ -49,18 +50,22 @@ import playground.jbischoff.taxibus.scenario.analysis.WobDistanceAnalyzer;
  * @author jbischoff
  *
  */
-public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHandler, PersonDepartureEventHandler, ActivityEndEventHandler, LinkEnterEventHandler {
+public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHandler, PersonDepartureEventHandler,
+		ActivityEndEventHandler, LinkEnterEventHandler {
 	Map<Id<Person>, String> lastActivity = new HashMap<>();
 	Map<Id<Person>, Double> lastDeparture = new HashMap<>();
 	Map<Id<Person>, Double> currentDistance = new HashMap<>();
-	DecimalFormat df = new DecimalFormat( "##,##0.00" );
+	DecimalFormat df = new DecimalFormat("##,##0.00");
 
 	Map<String, Double> ttToActivity = new TreeMap<>();
 	Map<String, Double> distanceToActivity = new TreeMap<>();
 	Map<String, Integer> legsToActivity = new HashMap<>();
 	ArrayList<String> monitoredModes = new ArrayList<>();
-	ArrayList<String> outboundLegs = new ArrayList<>(Arrays.asList(new String[] { "home--work_vw_flexitime","home--work_vw_shift1","home--work_vw_shift2", "home--work"}));
-	ArrayList<String> inboundLegs = new ArrayList<>(Arrays.asList(new String[] { "work--home" ,"work_vw_flexitime--home" ,"work_vw_shift1--home" ,"work_vw_shift2--home"}));
+	ArrayList<String> outboundLegs = new ArrayList<>(Arrays.asList(
+			new String[] { "home--work_vw_flexitime", "home--work_vw_shift1", "home--work_vw_shift2", "home--work" }));
+	ArrayList<String> inboundLegs = new ArrayList<>(Arrays.asList(
+			new String[] { "work--home", "work_vw_flexitime--home", "work_vw_shift1--home", "work_vw_shift2--home" }));
+	ArrayList<String> trips = new ArrayList<>();
 	private final Network network;
 
 	public TraveltimeAndDistanceEventHandler(Network network) {
@@ -69,22 +74,24 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 
 	@Override
 	public void reset(int iteration) {
-		
+
 	}
-	public void addMode(String monitoredMode){
+
+	public void addMode(String monitoredMode) {
 		this.monitoredModes.add(monitoredMode);
 	}
-	
+
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (!this.monitoredModes.contains(event.getLegMode()))
 			return;
 		if (!isRelevantPerson(event.getPersonId()))
 			return;
-
-		this.lastDeparture.put(event.getPersonId(), event.getTime());
-		if (event.getLegMode().equals("car")){
-			this.currentDistance.put(event.getPersonId(), 0.0);
+		if (!lastDeparture.containsKey(event.getPersonId())) {
+			this.lastDeparture.put(event.getPersonId(), event.getTime());
+			if (event.getLegMode().equals("car")) {
+				this.currentDistance.put(event.getPersonId(), 0.0);
+			}
 		}
 	}
 
@@ -99,9 +106,11 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 			double travelTime = event.getTime() - departureTime;
 			String as = buildActivityString(this.lastActivity.get(event.getPersonId()), event.getActType());
 			addTTtoActivity(as, travelTime);
-			if (currentDistance.containsKey(event.getPersonId())){
-			addDistancetoActivity(as, currentDistance.remove(event.getPersonId()));
+			if (currentDistance.containsKey(event.getPersonId())) {
+				addDistancetoActivity(as, currentDistance.remove(event.getPersonId()));
 			}
+			String tripString = event.getPersonId() + "\t" + modeString() +"\t"+  as +"\t"+Time.writeTime(travelTime)+"\t"+Time.writeTime(departureTime);
+			trips.add(tripString);
 		}
 		// else {
 		// System.err.println(event.getPersonId() + " at act
@@ -110,11 +119,11 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 	}
 
 	boolean isRelevantPerson(Id<Person> personId) {
-//		return (personId.toString().endsWith("vw") ? true : false);
-		return ((personId.toString().startsWith("BS_WB")||(personId.toString().startsWith("WB_BS"))) ? true : false);
-//		return (personId.toString().startsWith("BS_WB") ? true : false);
+		// return (personId.toString().endsWith("vw") ? true : false);
+		return ((personId.toString().startsWith("BS_WB") || (personId.toString().startsWith("WB_BS"))) ? true : false);
+		// return (personId.toString().startsWith("BS_WB") ? true : false);
 
-//		return true;
+		// return true;
 	}
 
 	@Override
@@ -127,8 +136,6 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 		this.lastActivity.put(event.getPersonId(), event.getActType());
 
 	}
-	
-	
 
 	private void addTTtoActivity(String activityString, double traveltime) {
 		int legs = 1;
@@ -139,10 +146,10 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 		this.legsToActivity.put(activityString, legs);
 		this.ttToActivity.put(activityString, traveltime);
 	}
+
 	private void addDistancetoActivity(String activityString, double distance) {
-		int legs = 1;
 		if (this.distanceToActivity.containsKey(activityString)) {
-			distance += this.distanceToActivity .get(activityString);
+			distance += this.distanceToActivity.get(activityString);
 		}
 		this.distanceToActivity.put(activityString, distance);
 	}
@@ -156,21 +163,20 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 		System.out.println("Activity\tLegs\tAveTT");
 		for (Entry<String, Double> e : this.ttToActivity.entrySet()) {
 			double legs = this.legsToActivity.get(e.getKey());
-			double distance = 0.0; 
-			if (this.distanceToActivity.containsKey(e.getKey())) distance = distanceToActivity.get(e.getKey());
+			double distance = 0.0;
+			if (this.distanceToActivity.containsKey(e.getKey()))
+				distance = distanceToActivity.get(e.getKey());
 			distance = distance / legs;
-			System.out.println(
-					e.getKey() + "\t" + legs + "\t" + WobDistanceAnalyzer.prettyPrintSeconds(e.getValue() / legs) + "\t"+distance);
+			System.out.println(e.getKey() + "\t" + legs + "\t"
+					+ WobDistanceAnalyzer.prettyPrintSeconds(e.getValue() / legs) + "\t" + distance);
 		}
 
 	}
-	public void writeOutput(String folder){
-		String modeString = ""; 
-		for (String mode : this.monitoredModes){
-			modeString+=mode;
-		}
-		
-		BufferedWriter writer = IOUtils.getBufferedWriter(folder+"/act_travelTimes_"+modeString+".txt");
+
+	public void writeOutput(String folder) {
+		String modeString = modeString();
+		writeTrips(folder + "/agent_travelTimes_" + modeString + ".txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(folder + "/act_travelTimes_" + modeString + ".txt");
 		int inboundLegCount = 0;
 		double inboundTravelTime = 0;
 		double inboundDistance = 0;
@@ -178,67 +184,99 @@ public class TraveltimeAndDistanceEventHandler implements ActivityStartEventHand
 		int outboundLegCount = 0;
 		double outboundTravelTime = 0;
 		boolean writeDistance = false;
-		if ((this.monitoredModes.size() == 1)&&this.monitoredModes.get(0).equals("car")){
+		if ((this.monitoredModes.size() == 1) && this.monitoredModes.get(0).equals("car")) {
 			writeDistance = true;
 		}
-			
+
 		try {
-			writer.append("Modes analysed: "+this.monitoredModes.toString());
+			writer.append("Modes analysed: " + this.monitoredModes.toString());
 			writer.newLine();
 			writer.append("Activity\tLegs\tAverageTT");
-			if (writeDistance) writer.append("\tDistance");
+			if (writeDistance)
+				writer.append("\tDistance");
 			writer.newLine();
-			
+
 			for (Entry<String, Double> e : this.ttToActivity.entrySet()) {
-			double legs = this.legsToActivity.get(e.getKey());
-			double distance = 0.0; 
-			if (this.distanceToActivity.containsKey(e.getKey())) distance = distanceToActivity.get(e.getKey());
-			distance = distance / 1000;
-			writer.append(e.getKey() + "\t" + Math.round(legs) + "\t" + WobDistanceAnalyzer.prettyPrintSeconds(e.getValue() / legs));
-			if (writeDistance) writer.append( "\t"+df.format(distance/legs));
-			writer.newLine();
-			
-			if (inboundLegs.contains(e.getKey())){
-				inboundLegCount += legs;
-				inboundTravelTime += e.getValue();
-				inboundDistance += distance;
+				double legs = this.legsToActivity.get(e.getKey());
+				double distance = 0.0;
+				if (this.distanceToActivity.containsKey(e.getKey()))
+					distance = distanceToActivity.get(e.getKey());
+				distance = distance / 1000;
+				writer.append(e.getKey() + "\t" + Math.round(legs) + "\t"
+						+ WobDistanceAnalyzer.prettyPrintSeconds(e.getValue() / legs));
+				if (writeDistance)
+					writer.append("\t" + df.format(distance / legs));
+				writer.newLine();
+
+				if (inboundLegs.contains(e.getKey())) {
+					inboundLegCount += legs;
+					inboundTravelTime += e.getValue();
+					inboundDistance += distance;
+				} else if (outboundLegs.contains(e.getKey())) {
+					outboundLegCount += legs;
+					outboundTravelTime += e.getValue();
+					outboundDistance += distance;
+				}
 			}
-			else if (outboundLegs.contains(e.getKey())){
-				outboundLegCount += legs;
-				outboundTravelTime += e.getValue();
-				outboundDistance += distance;
-			}
-			}
 			writer.newLine();
-			writer.append("Morgenspitze" + "\t" + outboundLegCount + "\t" + WobDistanceAnalyzer.prettyPrintSeconds(outboundTravelTime/outboundLegCount));
-			if (writeDistance) writer.append("\t"+df.format(outboundDistance/outboundLegCount));
+			writer.append("Morgenspitze" + "\t" + outboundLegCount + "\t"
+					+ WobDistanceAnalyzer.prettyPrintSeconds(outboundTravelTime / outboundLegCount));
+			if (writeDistance)
+				writer.append("\t" + df.format(outboundDistance / outboundLegCount));
 			writer.newLine();
-			writer.append("Abendspitze" + "\t" + inboundLegCount + "\t" + WobDistanceAnalyzer.prettyPrintSeconds(inboundTravelTime/inboundLegCount));
-			if (writeDistance) writer.append("\t"+df.format(inboundDistance/inboundLegCount));
+			writer.append("Abendspitze" + "\t" + inboundLegCount + "\t"
+					+ WobDistanceAnalyzer.prettyPrintSeconds(inboundTravelTime / inboundLegCount));
+			if (writeDistance)
+				writer.append("\t" + df.format(inboundDistance / inboundLegCount));
 			writer.flush();
 			writer.close();
 
-			
-			
-			
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-	
+
+	}
+
+	private String modeString() {
+		String modeString = "";
+		for (String mode : this.monitoredModes) {
+			modeString += mode;
+		}
+		return modeString;
+	}
+
+	private void writeTrips(String tripStatsfile) {
+		BufferedWriter bw = IOUtils.getBufferedWriter(tripStatsfile);
+		
+			try {
+				bw.write("Peson\tActivityChain\tTravelTime\tDepartureTime");
+				for (String s : trips){
+					bw.newLine();
+					bw.write(s);
+
+				}
+				bw.flush();
+				bw.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+		}
+			
+		
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		Id<Person> pid = vId2PId(event.getVehicleId());
-		if (currentDistance.containsKey(pid)){
+		if (currentDistance.containsKey(pid)) {
 			double length = network.getLinks().get(event.getLinkId()).getLength() + currentDistance.get(pid);
 			currentDistance.put(pid, length);
-			
+
 		}
 	}
-	
-	private Id<Person> vId2PId(Id<Vehicle> vid){
+
+	private Id<Person> vId2PId(Id<Vehicle> vid) {
 		return Id.createPersonId(vid.toString());
 	}
 }
