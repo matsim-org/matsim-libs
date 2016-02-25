@@ -52,16 +52,15 @@ public class MatrixBasesPtInputTest {
 	private static final Logger log = Logger.getLogger(MatrixBasesPtInputTest.class);
 
 	@Test
-	public final void test() {
-//		String transitScheduleFile = "../../matsim/examples/pt-tutorial/transitschedule.xml";
-		String transitScheduleFile = "examples/pt-tutorial/transitschedule.xml";
-//		String /networkFile = "../../matsim/examples/pt-tutorial/multimodalnetwork.xml";
+	public final void testLeastCostPathTree() {
+        final long timeStart = System.currentTimeMillis();
+
+        String transitScheduleFile = "examples/pt-tutorial/transitschedule.xml";
 		String networkFile = "examples/pt-tutorial/multimodalnetwork.xml";
 		String outputRoot = utils.getOutputDirectory();
-        System.out.println("outputRoot = " + outputRoot);
+        log.info("outputRoot = " + outputRoot);
 
         double departureTime = 8. * 60 * 60;
-
 		
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -213,6 +212,9 @@ public class MatrixBasesPtInputTest {
             }
             Assert.assertTrue(Arrays.asList(line) + " was not expected", contained);
         }
+
+        final long timeEnd = System.currentTimeMillis();
+        System.out.println("Verlaufszeit der Schleife: " + (timeEnd - timeStart) + " Millisek.");
     }
 
 	public static ArrayList<String[]> readCSVLine(String filePath, String splitString) {
