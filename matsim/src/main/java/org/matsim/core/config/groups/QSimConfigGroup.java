@@ -104,7 +104,10 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 
 	// ---
 	private final static String FAST_CAPACITY_UPDATE = "usingFastCapacityUpdate";
-	private boolean usingFastCapacityUpdate = true ;
+	/**
+	 * See Javadoc of {@link QueueWithBuffer}
+	 */
+	private boolean usingFastCapacityUpdate = false ;
 	// ---
 	private static final String VEHICLES_SOURCE = "vehiclesSource";
 	public static enum VehiclesSource { defaultVehicle, fromVehiclesData } ;
@@ -236,9 +239,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		map.put(USE_DEFAULT_VEHICLES, "[DEPRECATED, use" + VEHICLES_SOURCE + " instead]  If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties.");
 		map.put(USING_THREADPOOL, "if the qsim should use as many runners as there are threads (Christoph's dissertation version)"
 				+ " or more of them, together with a thread pool (seems to be faster in some situations, but is not tested).") ;
-		map.put(FAST_CAPACITY_UPDATE, "normally, the qsim accumulates fractional flows up to one flow unit.  This is impractical with "
-				+ " with smaller PCEs.  If this switch is set to true, cars can enter a link if the accumulated flow is >=0, and the accumulated flow can go "
-				+ "into negative.  Will probably become the default eventually.") ;
+		map.put(FAST_CAPACITY_UPDATE, "normally, the qsim accumulates fractional flows up to one flow unit in every time step.  If this switch is set to true, "
+				+ "flows are updated only if an agent wants to enter the link or an agent is added to buffer."
+				+ "Will probably become the default eventually.") ;
 		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
 		{	
 			StringBuilder stb = new StringBuilder() ;

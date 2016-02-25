@@ -59,6 +59,9 @@ import org.matsim.vis.snapshotwriters.VisData;
  * <li> A design problem with this class is that it pulls its knowledge (such as length, capacity,
  * ...) from the link, rather than getting it set explicitly.  As a result, one needs to replace
  * "pulling from the link" by "pulling from the laneData" for lanes. :-(  kai, sep'13
+ * <li> In fast capacity update, the flows are not accumulated in every time step, 
+ * rather updated only if an agent wants to enter the link or an agent is added to buffer. 
+ * Improvement of 15-20% in the computational performance is observed. amit feb'16
  * </ul>
  *
  * @author nagel
@@ -352,8 +355,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				
 				flowcap_accumulate.setValue(newFlowCap);
 				flowcap_accumulate.setTimeStep( now );
-		
-			
 		}
 	}
 
