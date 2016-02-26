@@ -22,9 +22,9 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.api.core.v01.network.Link;
 
 public class QLinkInternalIAdapter {
-	private final QLinkInternalI ql;
+	private final QLinkI ql;
 
-	QLinkInternalIAdapter(QLinkInternalI qLinkImpl) {
+	QLinkInternalIAdapter(QLinkI qLinkImpl) {
 		this.ql = qLinkImpl;
 	}
 

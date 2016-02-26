@@ -39,7 +39,7 @@ public class HybridQSimExternalNetworkFactory implements
 	}
 
 	@Override
-	public QLinkInternalI createNetsimLink(Link link, QNetwork network,
+	public QLinkI createNetsimLink(Link link, QNetwork network,
 			QNode queueNode) {
 		if (link.getAllowedModes().contains("2ext")) {
 			return new QSimExternalTransitionLink(link, network, this.e);
