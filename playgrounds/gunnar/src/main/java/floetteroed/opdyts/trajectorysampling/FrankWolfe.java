@@ -29,6 +29,8 @@ public class FrankWolfe {
 
 	private final LineSearch lineSearch;
 
+	private final double equivalentAveragingIterations;
+
 	// private final int dim;
 
 	private final int maxIts = 1000;
@@ -38,19 +40,20 @@ public class FrankWolfe {
 	private Double value = null;
 
 	private double[] point = null;
-	
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public FrankWolfe(final MultivariateFunction objectiveFunction,
 			final MultivariateVectorFunction gradientFunction,
 			final LineSearch lineSearch,
 			// final int dim,
-			final double eps) {
+			final double eps, final double equivalentAveragingIterations) {
 		this.objectiveFunction = objectiveFunction;
 		this.gradientFunction = gradientFunction;
 		this.lineSearch = lineSearch;
 		// this.dim = dim;
 		this.eps = eps;
+		this.equivalentAveragingIterations = equivalentAveragingIterations;
 	}
 
 	// -------------------- INTERNALS --------------------
@@ -126,13 +129,22 @@ public class FrankWolfe {
 			 * Construct constraints.
 			 */
 			final List<LinearConstraint> constraints = new ArrayList<LinearConstraint>(
-					initialPoint.length + 1);
+					2 * initialPoint.length + 1);
 			// non-negative
 			for (int i = 0; i < initialPoint.length; i++) {
 				final double[] coeffs = new double[initialPoint.length];
 				coeffs[i] = 1.0;
 				constraints.add(new LinearConstraint(coeffs, Relationship.GEQ,
 						0.0));
+			}
+			// upper bound
+			final double maxVal = 1.0 / Math.min(
+					this.equivalentAveragingIterations, initialPoint.length);
+			for (int i = 0; i < initialPoint.length; i++) {
+				final double[] coeffs = new double[initialPoint.length];
+				coeffs[i] = 1.0;
+				constraints.add(new LinearConstraint(coeffs, Relationship.LEQ,
+						maxVal));
 			}
 			// sum is one
 			final double coeffs[] = new double[initialPoint.length];
@@ -178,9 +190,9 @@ public class FrankWolfe {
 			residual = Math.abs(linearObjFctApprox.value(this.point)
 					- this.value);
 
-//			Logger.getLogger(this.getClass().getName()).info(
-//					"it " + it + ": val = " + this.value + ", residual="
-//							+ residual);
+//			 Logger.getLogger(this.getClass().getName()).info(
+//			 "it " + it + ": val = " + this.value + ", residual="
+//			 + residual);
 
 		} while ((residual > this.eps) && (it < this.maxIts));
 	}

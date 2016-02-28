@@ -167,7 +167,8 @@ public class RandomSearch<U extends DecisionVariable> {
 
 		final SelfTuner weightOptimizer;
 		if (adjustWeights) {
-			weightOptimizer = new SelfTuner(1.0, 0.05, 1, 0.01);
+			weightOptimizer = new SelfTuner(1.0, 0.05, 1, 0.01,
+					this.convergenceCriterion.effectiveAveragingIterations());
 		} else {
 			weightOptimizer = null;
 		}

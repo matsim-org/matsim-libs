@@ -34,7 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.ObjectiveFunction;
@@ -225,7 +226,9 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 				samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
 						this.allTransitionSequences
 								.getAllTransitionsInInsertionOrder(),
-						this.equilibriumWeight, this.uniformityWeight);
+						this.equilibriumWeight, this.uniformityWeight,
+						this.convergenceCriterion
+								.effectiveAveragingIterations());
 				samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
 						this.allTransitionSequences.getTransitions(
 								this.currentDecisionVariable).getLast(),
@@ -274,7 +277,9 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 				samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
 						this.allTransitionSequences
 								.getAllTransitionsInInsertionOrder(),
-						this.equilibriumWeight, this.uniformityWeight);
+						this.equilibriumWeight, this.uniformityWeight,
+						this.convergenceCriterion
+								.effectiveAveragingIterations());
 				samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
 						this.allTransitionSequences.getTransitions(
 								this.currentDecisionVariable).getLast(),

@@ -70,18 +70,27 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	private final int maxIterations = Integer.MAX_VALUE;
 
+	private final double equivalentAveragingIterations;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public TransitionSequencesAnalyzer(final List<Transition<U>> transitions,
-			final double equilibriumGapWeight, final double uniformityGapWeight) {
+			double equilibriumGapWeight, double uniformityGapWeight,
+			final double equivalentAveragingIterations) {
 		if ((transitions == null) || (transitions.size() == 0)) {
 			throw new IllegalArgumentException(
 					"there must be at least one transition");
 		}
 		this.transitions = transitions;
+
+//		equilibriumGapWeight = 0.0;
+		uniformityGapWeight = 0.0;
+//		Logger.getLogger(this.getClass().getName()).warn(
+//				"Setting uniformity gap weights to zero.");
+
 		this.surrogateObjectiveFunction = new SurrogateObjectiveFunction<>(
-				transitions, equilibriumGapWeight, Math.max(0.0,
-						uniformityGapWeight));
+				transitions, equilibriumGapWeight, uniformityGapWeight);
+		this.equivalentAveragingIterations = equivalentAveragingIterations;
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -222,7 +231,8 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 			final double[] lastInitialPoint) {
 
 		final FrankWolfe fw = new FrankWolfe(new MyObjectiveFunction2(),
-				new MyGradient2(), new MyLineSearch(), 1e-6);
+				new MyGradient2(), new MyLineSearch(), 1e-6,
+				this.equivalentAveragingIterations);
 		fw.run(this.newInitialPoint(this.transitions.size(), lastInitialPoint));
 		final double[] result = fw.getPoint();
 		final Vector alphas = new Vector(result);
@@ -246,7 +256,13 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 	}
 
 	public Vector optimalAlphas(final double[] initialPoint) {
-		return this.alphasFromPoint(this.optimalPoint(initialPoint));
+		final FrankWolfe fw = new FrankWolfe(new MyObjectiveFunction2(),
+				new MyGradient2(), new MyLineSearch(), 1e-6,
+				this.equivalentAveragingIterations);
+		fw.run(this.newInitialPoint(this.transitions.size(), initialPoint));
+		final double[] result = fw.getPoint();
+		return new Vector(result);
+		// return this.alphasFromPoint(this.optimalPoint(initialPoint));
 	}
 
 	private Vector alphasFromPoint(final double[] point) {

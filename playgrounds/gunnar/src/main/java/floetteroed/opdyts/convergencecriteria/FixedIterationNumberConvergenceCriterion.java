@@ -71,7 +71,7 @@ public class FixedIterationNumberConvergenceCriterion implements
 	public double effectiveAveragingIterations() {
 		return this.averagingIterations;
 	}
-	
+
 	@Override
 	public <U extends DecisionVariable> ConvergenceCriterionResult evaluate(
 			final List<Transition<U>> transitionSequence) {
@@ -88,12 +88,15 @@ public class FixedIterationNumberConvergenceCriterion implements
 			}
 
 			// gap statistics
+			double deltaSquareLengthSum = 0.0;
 			final Vector totalDelta = transitionSequence
 					.get(transitionSequence.size() - this.averagingIterations)
 					.getDelta().copy();
 			for (int i = transitionSequence.size() - this.averagingIterations
 					+ 1; i < transitionSequence.size(); i++) {
 				totalDelta.add(transitionSequence.get(i).getDelta());
+				deltaSquareLengthSum += transitionSequence.get(i).getDelta()
+						.innerProd(transitionSequence.get(i).getDelta());
 			}
 
 			// package the results
@@ -104,12 +107,13 @@ public class FixedIterationNumberConvergenceCriterion implements
 							/ Math.sqrt(this.averagingIterations),
 					totalDelta.euclNorm() / this.averagingIterations,
 					1.0 / this.averagingIterations, transitionSequence.get(0)
-							.getDecisionVariable(), transitionSequence.size());
+							.getDecisionVariable(), transitionSequence.size(),
+					deltaSquareLengthSum / this.averagingIterations);
 
 		} else {
 
 			return new ConvergenceCriterionResult(false, null, null, null,
-					null, null, null);
+					null, null, null, null);
 
 		}
 

@@ -26,6 +26,8 @@ package floetteroed.opdyts.trajectorysampling;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Matrix;
 import floetteroed.utilities.math.Vector;
@@ -38,6 +40,8 @@ import floetteroed.utilities.math.Vector;
 public class SurrogateObjectiveFunction<U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
+
+	private final double eps = 1e-8;
 
 	private final List<Transition<U>> transitions;
 
@@ -99,7 +103,11 @@ public class SurrogateObjectiveFunction<U extends DecisionVariable> {
 						* this.deltaCovariances.get(i, j);
 			}
 		}
-		return Math.sqrt(Math.max(result, 0.0));
+		if (result + this.eps < 0) {
+			Logger.getLogger(this.getClass().getName()).warn(
+					"Negative equilibrium gap.");
+		}
+		return Math.sqrt(result + this.eps);
 	}
 
 	double surrogateObjectiveFunctionValue(final Vector alphas) {
@@ -124,7 +132,7 @@ public class SurrogateObjectiveFunction<U extends DecisionVariable> {
 		final double equilibriumGap = this.equilibriumGap(alphas);
 		for (int i = 0; i < alphas.size(); i++) {
 			result.set(i, alphas.innerProd(this.deltaCovariances.getRow(i))
-					/ (equilibriumGap + 1e-8));
+					/ (equilibriumGap + 0.0));
 		}
 		return result;
 	}
