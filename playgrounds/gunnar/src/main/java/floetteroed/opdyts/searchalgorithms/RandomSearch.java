@@ -85,8 +85,6 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	private final ObjectiveFunction objectBasedObjectiveFunction;
 
-	private final int maxMemoryLength;
-
 	private final boolean includeCurrentBest;
 
 	// -------------------- MEMBERS --------------------
@@ -119,7 +117,7 @@ public class RandomSearch<U extends DecisionVariable> {
 			final int populationSize, final Random rnd,
 			final boolean interpolate,
 			final ObjectiveFunction objectBasedObjectiveFunction,
-			final int maxMemoryLength, final boolean includeCurrentBest) {
+			final boolean includeCurrentBest) {
 		this.simulator = simulator;
 		this.randomizer = randomizer;
 		this.initialDecisionVariable = initialDecisionVariable;
@@ -130,7 +128,6 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.rnd = rnd;
 		this.interpolate = interpolate;
 		this.objectBasedObjectiveFunction = objectBasedObjectiveFunction;
-		this.maxMemoryLength = maxMemoryLength;
 		this.includeCurrentBest = includeCurrentBest;
 	}
 
@@ -170,7 +167,7 @@ public class RandomSearch<U extends DecisionVariable> {
 
 		final SelfTuner weightOptimizer;
 		if (adjustWeights) {
-			weightOptimizer = new SelfTuner(1.0, 0.05, 10, 0.1);
+			weightOptimizer = new SelfTuner(1.0, 0.05, 1, 0.01);
 		} else {
 			weightOptimizer = null;
 		}
@@ -211,7 +208,6 @@ public class RandomSearch<U extends DecisionVariable> {
 						this.objectBasedObjectiveFunction,
 						this.convergenceCriterion, this.rnd,
 						equilibriumGapWeight, uniformityGapWeight, (it > 0));
-				sampler.setMaxMemoryLength(this.maxMemoryLength);
 
 				if (this.logFileName != null) {
 					sampler.addStatistic(this.logFileName,
@@ -310,7 +306,8 @@ public class RandomSearch<U extends DecisionVariable> {
 					final List<Transition<U>> allTransitions = sampler
 							.getTransitions(newBestDecisionVariable);
 					weightOptimizer.update(allTransitions,
-							newBestObjectiveFunctionValue);
+							sampler.getDecisionVariable2convergenceResultView()
+									.get(newBestDecisionVariable));
 					equilibriumGapWeight = weightOptimizer
 							.getEquilibriumGapWeight();
 					uniformityGapWeight = weightOptimizer

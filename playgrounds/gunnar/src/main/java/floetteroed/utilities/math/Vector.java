@@ -659,4 +659,22 @@ public class Vector implements Serializable {
 					min.data[i], max.data[i]);
 		}
 	}
+
+	// TODO NEW
+	public String toStringCSV() {
+		final StringBuffer result = new StringBuffer(
+				Double.toString(this.data[0]));
+		for (int i = 1; i < this.data.length; i++) {
+			result.append(",");
+			result.append(Double.toString(this.data[i]));
+		}
+		return result.toString();
+	}
+	
+	// TODO NEW
+	public double[] toArray() {
+		final double[] result = new double[this.data.length];
+		System.arraycopy(this.data, 0, result, 0, this.data.length);		
+		return result;
+	}
 }

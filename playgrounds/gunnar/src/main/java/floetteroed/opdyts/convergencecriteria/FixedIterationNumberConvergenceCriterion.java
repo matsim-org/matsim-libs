@@ -68,6 +68,11 @@ public class FixedIterationNumberConvergenceCriterion implements
 	// --------------- IMPLEMENTATION OF ConvergenceCriterion ---------------
 
 	@Override
+	public double effectiveAveragingIterations() {
+		return this.averagingIterations;
+	}
+	
+	@Override
 	public <U extends DecisionVariable> ConvergenceCriterionResult evaluate(
 			final List<Transition<U>> transitionSequence) {
 
@@ -95,7 +100,8 @@ public class FixedIterationNumberConvergenceCriterion implements
 			final boolean converged = (transitionSequence.size() >= this.iterationsToConvergence);
 			return new ConvergenceCriterionResult(converged,
 					objectiveFunctionValueStats.getAvg(),
-					objectiveFunctionValueStats.getStddev(),
+					objectiveFunctionValueStats.getStddev()
+							/ Math.sqrt(this.averagingIterations),
 					totalDelta.euclNorm() / this.averagingIterations,
 					1.0 / this.averagingIterations, transitionSequence.get(0)
 							.getDecisionVariable(), transitionSequence.size());

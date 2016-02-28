@@ -16,23 +16,16 @@ class TransitionSequenceSet<U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
-	private final int maxSequenceLength;
-
 	private final Map<U, TransitionSequence<U>> decisionVariable2transitionSequence = new LinkedHashMap<>();
 
 	private final LinkedList<Transition<U>> transitionsInInsertionOrder = new LinkedList<Transition<U>>();
 
 	// -------------------- CONSTRUCTION --------------------
 
-	TransitionSequenceSet(final int maxSequenceLength) {
-		this.maxSequenceLength = maxSequenceLength;
+	TransitionSequenceSet() {
 	}
 
-	// -------------------- CONTENT ACCESS --------------------
-
-	int getMaxSequenceLength() {
-		return this.maxSequenceLength;
-	}
+	// -------------------- SETTERS --------------------
 
 	void addTransition(final SimulatorState fromState,
 			final U decisionVariable, final SimulatorState toState,
@@ -48,10 +41,12 @@ class TransitionSequenceSet<U extends DecisionVariable> {
 			transitionSequence.addTransition(fromState, decisionVariable,
 					toState, objectiveFunctionValue);
 		}
-		transitionSequence.shrinkToMaximumLength(this.maxSequenceLength);
+		// transitionSequence.shrinkToMaximumLength(this.maxSequenceLength);
 		this.transitionsInInsertionOrder.add(transitionSequence
 				.getLastTransition());
 	}
+
+	// -------------------- GETTERS --------------------
 
 	int size() {
 		return this.transitionsInInsertionOrder.size();

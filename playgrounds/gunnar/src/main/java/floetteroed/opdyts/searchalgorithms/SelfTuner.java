@@ -1,13 +1,12 @@
 package floetteroed.opdyts.searchalgorithms;
 
-import static java.lang.Math.abs;
-
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
 
 import floetteroed.opdyts.DecisionVariable;
-import floetteroed.opdyts.trajectorysampling.SurrogateObjectiveFunction;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
 import floetteroed.opdyts.trajectorysampling.Transition;
 import floetteroed.opdyts.trajectorysampling.TransitionSequencesAnalyzer;
 import floetteroed.utilities.math.LeastAbsoluteDeviations;
@@ -80,7 +79,19 @@ public class SelfTuner {
 
 	public <U extends DecisionVariable> void update(
 			final List<Transition<U>> transitions,
-			final double lastFinalObjFctVal) {
+			final ConvergenceCriterionResult convCritResult) {
+
+		// final double f = 2.0;
+		// this.equilibriumGapWeight = f
+		// * convCritResult.finalObjectiveFunctionValueStddev
+		// / (2.0 * convCritResult.finalEquilbiriumGap);
+		// this.uniformityGapWeight = f
+		// * convCritResult.finalObjectiveFunctionValueStddev
+		// / (2.0 * convCritResult.finalUniformityGap);
+
+		//////////////////////////////////////////////////////////////////
+		
+		final double lastFinalObjFctVal = convCritResult.finalObjectiveFunctionValue;
 
 		double lastEquilibriumGap;
 		double lastUniformityGap;
@@ -100,8 +111,7 @@ public class SelfTuner {
 			final TransitionSequencesAnalyzer<U> analyzer = new TransitionSequencesAnalyzer<>(
 					transitions, this.equilibriumGapWeight,
 					this.uniformityGapWeight);
-			analyzer.setBound(SurrogateObjectiveFunction.Bound.UPPER);
-			final Vector alphas = analyzer.optimalAlphas();
+			final Vector alphas = analyzer.optimalAlphas(null); // TODO
 			lastEquilibriumGap = analyzer.equilibriumGap(alphas);
 			lastUniformityGap = alphas.innerProd(alphas);
 			lastMeanObjFctVal = analyzer.originalObjectiveFunctionValue(alphas);
@@ -126,11 +136,12 @@ public class SelfTuner {
 								* (this.finalObjFctVals.get(i) - this.meanObjFctVals
 										.get(i)));
 			}
+
 			try {
 				lad.solve();
 			} catch (Exception e) {
-				Logger.getLogger(this.getClass().getName()).warning(
-						e.getMessage());
+				Logger.getLogger(this.getClass().getName())
+						.warn(e.getMessage());
 			}
 
 			final Vector newCoeffs = lad.getCoefficients();
@@ -147,9 +158,13 @@ public class SelfTuner {
 			this.equilibriumGapWeight = newEquilibriumGapWeight;
 			this.uniformityGapWeight = newUniformityGapWeight;
 
+			Logger.getLogger(this.getClass().getName()).info(
+					"v=" + this.equilibriumGapWeight + ", w="
+							+ this.uniformityGapWeight);
 		} while ((it < this.maxIts)
-				&& ((abs(deltaEquilibriumGapWeight) > this.convergenceThreshold
-						* this.equilibriumGapWeight) || (abs(deltaUniformityGapWeight) > this.convergenceThreshold
+				&& ((Math.abs(deltaEquilibriumGapWeight) > this.convergenceThreshold
+						* this.equilibriumGapWeight) || (Math
+						.abs(deltaUniformityGapWeight) > this.convergenceThreshold
 						* this.uniformityGapWeight)));
 
 		this.equilibriumGaps.addFirst(lastEquilibriumGap);

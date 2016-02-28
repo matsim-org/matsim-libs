@@ -87,7 +87,6 @@ public class RunRoadClassification {
 		almostRealLinkSettings.add(addNoise(new LinkSettings(16.0, 3000.0, 2.0)));
 		almostRealLinkSettings.add(addNoise(new LinkSettings(25.0, 4000.0, 2.5)));
 
-		int maxMemoryLength = 100;
 		boolean interpolate = false;
 		int maxIterations = 100;
 		int maxTransitions = 1000;
@@ -140,7 +139,7 @@ public class RunRoadClassification {
 				convergenceCriterion, 
 				// selfTuner, 
 				maxIterations, maxTransitions, populationSize,
-				MatsimRandom.getRandom(), interpolate, objectiveFunction, maxMemoryLength, false);
+				MatsimRandom.getRandom(), interpolate, objectiveFunction, false);
 		randomSearch.setLogFileName(scenario.getConfig().controler().getOutputDirectory() + "optimization.log");
 		randomSearch.run();
 		for (DecisionVariable decisionVariable : randomSearch.getBestDecisionVariablesView()) {

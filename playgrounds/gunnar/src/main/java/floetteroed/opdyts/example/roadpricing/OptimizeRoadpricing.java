@@ -180,7 +180,6 @@ class OptimizeRoadpricing {
 		/*
 		 * RandomSearch specification.
 		 */
-		final int maxMemorizedTrajectoryLength = Integer.MAX_VALUE;
 		final int maxRandomSearchIterations = 1000;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
@@ -188,7 +187,7 @@ class OptimizeRoadpricing {
 				convergenceCriterion, maxRandomSearchIterations,
 				maxRandomSearchTransitions, randomSearchPopulationSize,
 				MatsimRandom.getRandom(), parallelSampling, objectiveFunction,
-				maxMemorizedTrajectoryLength, includeCurrentBest);
+				includeCurrentBest);
 		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
 		randomSearch.setConvergenceTrackingFileName(originalOutputDirectory
 				+ "opdyts.conv");

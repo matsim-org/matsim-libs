@@ -45,4 +45,5 @@ public interface ConvergenceCriterion {
 	public <U extends DecisionVariable> ConvergenceCriterionResult evaluate(
 			final List<Transition<U>> transitionSequence);
 
+	public double effectiveAveragingIterations();
 }

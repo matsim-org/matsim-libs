@@ -172,7 +172,6 @@ class Talk_2015_09_03 {
 //					new ObjectiveFunctionChangeConvergenceCriterion(
 //							1e-4, 1e-4, simulate ? 10 : 10);
 
-					final int maxMemoryLength = Integer.MAX_VALUE; // TODO NEW
 					final RandomSearch<NTimesTwoRoutesDecisionVariableMixedDiscrCont> search = new RandomSearch<>(
 							system, randomization,
 							randomization.newRandomDecisionVariable(),
@@ -180,7 +179,7 @@ class Talk_2015_09_03 {
 							// selfTuner,
 							maxIterations, maxTransitions, populationSize, rnd,
 							interpolate, objectiveFunction,
-							maxMemoryLength, false);
+							false);
 
 					search.run();
 

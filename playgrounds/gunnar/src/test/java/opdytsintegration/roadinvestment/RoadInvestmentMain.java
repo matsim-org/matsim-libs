@@ -217,7 +217,6 @@ class RoadInvestmentMain {
 								link2freespeed, link2capacity));
 			}
 		};
-		int maxMemoryLength = Integer.MAX_VALUE;
 		boolean keepBestSolution = true;
 		boolean interpolate = true;
 		int maxIterations = 10;
@@ -232,7 +231,7 @@ class RoadInvestmentMain {
 				// selfTuner,
 				maxIterations, maxTransitions, populationSize,
 				MatsimRandom.getRandom(), interpolate, objectiveFunction,
-				maxMemoryLength, false);
+				false);
 		randomSearch.setLogFileName("./randomSearchLog.txt");
 		randomSearch.run();
 

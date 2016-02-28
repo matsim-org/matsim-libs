@@ -36,15 +36,13 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  * 
  */
-public class TransitionSequence<U extends DecisionVariable> {
+class TransitionSequence<U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
 	private final LinkedList<Transition<U>> transitions = new LinkedList<Transition<U>>();
 
 	private SimulatorState lastState = null;
-
-	private int iterations = 0;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -87,8 +85,6 @@ public class TransitionSequence<U extends DecisionVariable> {
 		this.transitions.add(new Transition<>(decisionVariable, delta, toState
 				.getReferenceToVectorRepresentation(), objectiveFunctionValue));
 		this.lastState = toState;
-
-		this.iterations++;
 	}
 
 	void shrinkToMaximumLength(final int maximumLength) {
@@ -100,8 +96,7 @@ public class TransitionSequence<U extends DecisionVariable> {
 
 	// -------------------- GETTERS --------------------
 
-	// TODO is now public
-	public DecisionVariable getDecisionVariable() {
+	DecisionVariable getDecisionVariable() {
 		return this.transitions.getFirst().getDecisionVariable();
 	}
 
@@ -109,30 +104,16 @@ public class TransitionSequence<U extends DecisionVariable> {
 		return this.lastState;
 	}
 
-	// TODO is now public
-	public LinkedList<Transition<U>> getTransitions() {
+	LinkedList<Transition<U>> getTransitions() {
 		return this.transitions;
 	}
 
-	// TODO NEW
-	// remember: transitions are added at the end (and removed from the front)
 	Transition<U> getLastTransition() {
+		// transitions are added at the end (and removed from the front)
 		return this.transitions.getLast();
 	}
 
-	public int iterations() {
-		return this.iterations;
-	}
-
-	public int size() {
+	int size() {
 		return this.transitions.size();
 	}
-
-//	public List<Double> getObjectiveFunctionValues() {
-//		final List<Double> result = new ArrayList<Double>(this.size());
-//		for (Transition<U> transition : this.transitions) {
-//			result.add(transition.getToStateObjectiveFunctionValue());
-//		}
-//		return result;
-//	}
 }
