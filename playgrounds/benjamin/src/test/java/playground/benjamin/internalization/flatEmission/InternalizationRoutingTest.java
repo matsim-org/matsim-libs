@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -302,11 +301,17 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		//		scg.addStrategySettings(reRoute);
 
 		// define emission tool input files	
+//
+		// since same files are used for multiple test, files are added to ONE MORE level up then the test package directory
+		String packageInputDir = this.getPackageInputDirectory();
+		String inputFilesDir = packageInputDir.substring(0, packageInputDir.lastIndexOf('/') );
+		inputFilesDir = inputFilesDir.substring(0, inputFilesDir.lastIndexOf('/') + 1);
+//
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 		controler.getConfig().addModule(ecg);
-		ecg.setEmissionRoadTypeMappingFile(this.getClassInputDirectory() + "roadTypeMapping.txt");
-		ecg.setAverageWarmEmissionFactorsFile(this.getClassInputDirectory() + "EFA_HOT_vehcat_2005average.txt");
-		ecg.setAverageColdEmissionFactorsFile(this.getClassInputDirectory() + "EFA_ColdStart_vehcat_2005average.txt");
+		ecg.setEmissionRoadTypeMappingFile(inputFilesDir + "/roadTypeMapping.txt");
+		ecg.setAverageWarmEmissionFactorsFile(inputFilesDir + "/EFA_HOT_vehcat_2005average.txt");
+		ecg.setAverageColdEmissionFactorsFile(inputFilesDir + "/EFA_ColdStart_vehcat_2005average.txt");
 
 		// TODO: the following does not work yet. Need to force services to always write events in the last iteration.
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;

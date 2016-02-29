@@ -67,20 +67,6 @@ import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
  */
 @RunWith(Parameterized.class)
 public class TestExposurePricing {
-
-	private String inputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/testScenario/input/";
-
-	private String emissionInputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/hbefaForMatsim/";
-	private String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
-	private String emissionVehicleFile = inputPath + "emissionVehicles_1pct.xml.gz";
-
-	private String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
-	private String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
-
-	private boolean isUsingDetailedEmissionCalculation = true;
-	private String detailedWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_2005detailed.txt";
-	private String detailedColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_SubSegm_2005detailed.txt";
-
 	private Logger logger = Logger.getLogger(TestExposurePricing.class);
 
 	private Double xMin = 0.0;
@@ -109,7 +95,7 @@ public class TestExposurePricing {
 		this.noOfTimeBins = noOfTimeBins;
 	}
 
-	@Parameters
+	@Parameters(name = "{index}: considerCO2 == {0}; noOfTimeBins == {1}")
 	public static Collection<Object[]> considerCO2 () {
 		Object[][] object = new Object [][] { 
 				{true, 24},
@@ -311,6 +297,23 @@ public class TestExposurePricing {
 	}
 
 	private Scenario minimalControlerSetting() {
+	
+		// since same files are used for multiple test, files are added to ONE MORE level up then the test package directory
+		String packageInputDir = helper.getPackageInputDirectory();
+		String inputFilesDir = packageInputDir.substring(0, packageInputDir.lastIndexOf('/') );
+		inputFilesDir = inputFilesDir.substring(0, inputFilesDir.lastIndexOf('/') + 1);
+
+		String roadTypeMappingFile = inputFilesDir + "/roadTypeMapping.txt";
+		String emissionVehicleFile = inputFilesDir + "/equil_emissionVehicles_1pct.xml.gz";
+
+		String averageFleetWarmEmissionFactorsFile = inputFilesDir + "/EFA_HOT_vehcat_2005average.txt";
+		String averageFleetColdEmissionFactorsFile = inputFilesDir + "/EFA_ColdStart_vehcat_2005average.txt";
+
+		boolean isUsingDetailedEmissionCalculation = true;
+		String detailedWarmEmissionFactorsFile = inputFilesDir + "/EFA_HOT_SubSegm_2005detailed.txt";
+		String detailedColdEmissionFactorsFile = inputFilesDir + "/EFA_ColdStart_SubSegm_2005detailed.txt";
+		
+		
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
 		Scenario sc = equilTestSetUp.createConfig();
 		// TODO : I have used link speed as 100/3.6 m/s instead of 100 m/s thus check the difference in the result
@@ -338,7 +341,7 @@ public class TestExposurePricing {
 
 	private void addReRoutingStrategy(Scenario sc) {
 		StrategyConfigGroup scg = sc.getConfig().strategy();
-		StrategySettings strategySettingsR = new StrategySettings(Id.create("2", StrategySettings.class));
+		StrategySettings strategySettingsR = new StrategySettings();
 		strategySettingsR.setStrategyName("ReRoute");
 		strategySettingsR.setWeight(1000);
 		strategySettingsR.setDisableAfter(10);

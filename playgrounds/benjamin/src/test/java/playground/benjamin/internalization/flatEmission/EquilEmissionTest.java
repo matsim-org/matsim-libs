@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -64,22 +64,12 @@ import playground.benjamin.internalization.InternalizeEmissionsControlerListener
 
 @RunWith(Parameterized.class)
 public class EquilEmissionTest {
+	
+	@Rule
+	public MatsimTestUtils helper = new MatsimTestUtils();
 
 	private static final Logger logger = Logger.getLogger(EquilEmissionTest.class);
 
-	private String inputPath = "../../../../repos/shared-svn/projects/detailedEval/emissions/";
-	private String outputDir = "../../../../repos/shared-svn/projects/detailedEval/emissions/testScenario/output/";
-
-	private String emissionInputPath = inputPath+"/hbefaForMatsim/";
-	private String roadTypeMappingFile = emissionInputPath + "roadTypeMapping.txt";
-	private String emissionVehicleFile = inputPath + "/testScenario/input/emissionVehicles_1pct.xml.gz";
-
-	private String averageFleetWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_vehcat_2005average.txt";
-	private String averageFleetColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_vehcat_2005average.txt";
-
-	private boolean isUsingDetailedEmissionCalculation = true;
-	private String detailedWarmEmissionFactorsFile = emissionInputPath + "EFA_HOT_SubSegm_2005detailed.txt";
-	private String detailedColdEmissionFactorsFile = emissionInputPath + "EFA_ColdStart_SubSegm_2005detailed.txt";
 	private DecimalFormat df = new DecimalFormat("#.###");
 
 	private boolean isConsideringCO2Costs ;
@@ -89,16 +79,15 @@ public class EquilEmissionTest {
 		logger.info("Each parameter will be used in all the tests i.e. all tests will be run while inclusing and excluding CO2 costs.");
 	}
 
-	@Parameters
+	@Parameters(name = "{index}: considerCO2 == {0}")
 	public static List<Object> considerCO2 () {
 		Object[] considerCO2 = new Object [] { true, false };
 		return Arrays.asList(considerCO2);
 	}
 
-	@Ignore
 	@Test
 	public void emissionTollTest () {
-
+		
 		EquilTestSetUp equilTestSetUp = new EquilTestSetUp();
 
 		Scenario sc = equilTestSetUp.createConfig();
@@ -109,7 +98,7 @@ public class EquilEmissionTest {
 		emissionSettings(sc);
 
 		Controler controler = new Controler(sc);
-		String outputDirectory = outputDir + "/emissionToll/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
+		String outputDirectory = helper.getOutputDirectory() + "/" + (isConsideringCO2Costs ? "considerCO2Costs/" : "notConsiderCO2Costs/");
 		sc.getConfig().controler().setOutputDirectory(outputDirectory);
 
 		EmissionModule emissionModule = new EmissionModule(sc);
@@ -200,7 +189,23 @@ public class EquilEmissionTest {
 	}
 	
 	private void emissionSettings(Scenario scenario){
+		
+		// since same files are used for multiple test, files are added to ONE MORE level up then the test package directory
+		String packageInputDir = helper.getPackageInputDirectory();
+		String inputFilesDir = packageInputDir.substring(0, packageInputDir.lastIndexOf('/') );
+		inputFilesDir = inputFilesDir.substring(0, inputFilesDir.lastIndexOf('/') + 1);
+		
+		String roadTypeMappingFile = inputFilesDir + "/roadTypeMapping.txt";
+		String emissionVehicleFile = inputFilesDir + "/equil_emissionVehicles_1pct.xml.gz";
 
+		String averageFleetWarmEmissionFactorsFile = inputFilesDir + "/EFA_HOT_vehcat_2005average.txt";
+		String averageFleetColdEmissionFactorsFile = inputFilesDir + "/EFA_ColdStart_vehcat_2005average.txt";
+
+		boolean isUsingDetailedEmissionCalculation = true;
+		String detailedWarmEmissionFactorsFile = inputFilesDir + "/EFA_HOT_SubSegm_2005detailed.txt";
+		String detailedColdEmissionFactorsFile = inputFilesDir + "/EFA_ColdStart_SubSegm_2005detailed.txt";
+		
+		
 		Config config = scenario.getConfig();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 		ecg.setEmissionRoadTypeMappingFile(roadTypeMappingFile);
