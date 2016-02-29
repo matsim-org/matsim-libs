@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -41,7 +42,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -54,6 +54,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.StringUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -72,9 +73,14 @@ public class IncidentDataAnalysis {
 	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
 	private final String inputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-berlin/";
 	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
+
+//	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
+//	private final String inputDirectory = "/Users/ihab/Desktop/testXmlFiles/";
+//	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-test/";
 	
 //	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
-//	private final String outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany-test/";
+//	private final String inputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-germany/";
+//	private final String outputDirectory = "/Users/ihab/Desktop/output-germany-analysis/";
 	
 	private final boolean writeCSVFileForEachXMLFile = false;
 		
@@ -85,6 +91,7 @@ public class IncidentDataAnalysis {
 	private final Map<String, Path> trafficItemId2path = new HashMap<>();
 	private final TMCAlerts tmc = new TMCAlerts();
 	private final Set<String> trafficItemsToBeChecked = new HashSet<>();
+	private final TrafficItemWriter writer = new TrafficItemWriter();
 
 	private Scenario scenario = null;
 	private Network carNetwork = null;
@@ -104,7 +111,10 @@ public class IncidentDataAnalysis {
 		}
 		
 		collectTrafficItems(); // traffic items that have the same traffic item IDs are updated by the more recent information or by the update traffic item
+		adjustTimeFormat();		
 		updateTrafficItems(); // update all traffic items that are updated or canceled by another traffic item
+		writer.writeCSVFile(trafficItems.values(), outputDirectory + "incidentData.csv");
+		
 		loadScenario();
 		computeCarNetwork();
 		computeIncidentPaths();
@@ -112,6 +122,35 @@ public class IncidentDataAnalysis {
 		
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}
+
+	private void adjustTimeFormat() {
+		
+		for (TrafficItem item : this.trafficItems.values()) {
+			item.setStartTime(convert(item.getStartTime()));
+			item.setEndTime(convert(item.getEndTime()));
+		}
+	}
+	
+	private String convert(String datetimeString) {
+		
+		// current format: MM/DD/YYYY HH:MM:SS
+		// target format: YYYY/MM/DD HH:MM:SS
+
+		String dateTimeDelimiter = " ";
+		String[] datetime = StringUtils.explode(datetimeString, dateTimeDelimiter.charAt(0));
+		String dateStr = datetime[0];
+		String timeStr = datetime[1];
+		
+		String dateDelimiter = "/";
+		String[] date = StringUtils.explode(dateStr, dateDelimiter.charAt(0));
+		String month = date[0];
+		String day = date[1];
+		String year = date[2];
+		
+		String newFormat = year + "/" + month + "/" + day + " " + timeStr;
+		return newFormat;
+	}
+	
 
 	private void updateTrafficItems() throws IOException {
 		
@@ -151,10 +190,6 @@ public class IncidentDataAnalysis {
 		for (String updateItemId : updateItemsToBeDeleted) {
 			this.trafficItems.remove(updateItemId);
 		}
-		
-		TrafficItemWriter writer = new TrafficItemWriter();
-		writer.writeCSVFile(trafficItems.values(), outputDirectory + "incidentData_afterUpdating.csv");
-
 	}
 
 	private void computeCarNetwork() {
@@ -214,7 +249,7 @@ public class IncidentDataAnalysis {
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 						
 		for (String id : this.trafficItemId2path.keySet()) {
-			
+						
 			if (this.trafficItemId2path.get(id) == null) {
 				// no path identified
 				log.warn("Skipping traffic item " + id + " because there is no path.");
@@ -359,10 +394,7 @@ public class IncidentDataAnalysis {
 		
 		if (!foundXMLFile) {
 			throw new RuntimeException("No *.xml or *.xml.gz file found in directory " + this.inputDirectory + ". Aborting...");
-		}
-		
-		TrafficItemWriter writer = new TrafficItemWriter();
-		writer.writeCSVFile(trafficItems.values(), outputDirectory + "incidentData_beforeUpdating.csv");
+		}		
 	}
 	
 	private void update(TrafficItem item) {
@@ -477,36 +509,63 @@ public class IncidentDataAnalysis {
 			Link nearestLinkTo = NetworkUtils.getNearestLink(carNetwork, coordToGK4);
 			
 			incidentPath = computePath(nearestLinkFrom.getToNode(), nearestLinkTo.getFromNode());
-			double pathDistance = computePathDistance(incidentPath);
 			
-			// then see if the path is plausible
-			boolean tryToFindABetterPath = false;
-			if (pathDistance > 2. * beelineDistance) {
-				log.warn("No good path identified for incident " + id + ". The path distance is at least twice as long as the beeline distance. Trying to identify a more plausible path...");
-				tryToFindABetterPath = true;
-			}
-				
-			if (tryToFindABetterPath) {
-				double pathDistanceBeelineDifference = Double.MAX_VALUE;
+			double[] incidentVector = computeVector(coordFromGK4, coordToGK4);			
+			
+			// now cut the ends to avoid circles and other weird effects		
+			
+			boolean plausibleLinksIdentified = false;
+			boolean implausibleLinksAtEndOfPath = false;
+			
+			Set<Id<Link>> linkIDsToCutOut = new HashSet<>();		
 
-				Collection<Node> nearestNodesAroundFromCoord = ((NetworkImpl) carNetwork).getNearestNodes(coordFromGK4, 250.);
-				Collection<Node> nearestNodesAroundToCoord = ((NetworkImpl) carNetwork).getNearestNodes(coordFromGK4, 250.);
+			for (Link link : incidentPath.links) {	
 				
-				for (Node nodeArroundFromCoord : nearestNodesAroundFromCoord) {
-					for (Node nodeAroundToCoord : nearestNodesAroundToCoord) {
+				double[] linkVector = computeVector(link.getFromNode().getCoord(), link.getToNode().getCoord());
+				double scalar = computeScalarProduct(incidentVector, linkVector);
+					
+				if (implausibleLinksAtEndOfPath) {
+					linkIDsToCutOut.add(link.getId());
+					
+				} else {
+					if (scalar <= 0) {
+						// orthogonal or more than 90 degrees
+						linkIDsToCutOut.add(link.getId());
 						
-						Path path = computePath(nodeArroundFromCoord, nodeAroundToCoord);
-						double pathDifference = Math.abs(computePathDistance(path) - beelineDistance);
-						
-						if (pathDifference < pathDistanceBeelineDifference) {
-							pathDistanceBeelineDifference = pathDifference;
-							incidentPath = path;
+						if (plausibleLinksIdentified) {
+							implausibleLinksAtEndOfPath = true;
 						}
+						
+					} else {
+						plausibleLinksIdentified = true;
 					}
 				}
 			}
 			
-			if (pathDistance > 2. * beelineDistance) {
+			if (linkIDsToCutOut.size() > 0) {
+
+				if (incidentPath.links.size() > 0 && linkIDsToCutOut.size() == incidentPath.links.size()) {
+					log.warn("All network links of incident " + id + " have a different direction than the incident itself. "
+							+ "The inplausible paths will be written into 'incidentsLinksToBeChecked.shp'");
+					this.trafficItemsToBeChecked.add(id);
+
+				} else {
+					
+					log.info("Cutting implausible network links from path...");
+					log.info("Previous path distance: " + computePathDistance(incidentPath));
+					log.info("Previous number of links in path: " + incidentPath.links.size());
+					
+					for (Id<Link> cutLinkId : linkIDsToCutOut) {
+						incidentPath.links.remove(this.scenario.getNetwork().getLinks().get(cutLinkId));
+					}
+
+					log.info("New path distance: " + computePathDistance(incidentPath));
+					log.info("New number of links in path: " + incidentPath.links.size());
+					
+				}
+			}
+			
+			if (computePathDistance(incidentPath) > 2. * beelineDistance) {
 				log.warn("No good path identified for incident " + id + ". The path distance is at least twice as long as the beeline distance."
 						+ "The inplausible paths will be written into 'incidentsLinksToBeChecked.shp'. Maybe try a better network resolution.");
 				this.trafficItemsToBeChecked.add(id);
@@ -518,8 +577,23 @@ public class IncidentDataAnalysis {
 			
 			this.trafficItemId2path.put(id, incidentPath);
 		}
-		
 		log.info("Processing traffic items... Done.");		
+	}
+	
+	private double[] computeVector(Coord from, Coord to) {
+		double[] vector = {to.getX() - from.getX(), to.getY() - from.getY()};
+		return vector;
+	}
+	
+	private double computeScalarProduct(double[] v1, double[] v2) {
+		
+		double skalarprodukt = 0;
+
+		for (int i = 0; i < v1.length; i++) {
+			skalarprodukt = skalarprodukt + v1[i] * v2[i];
+		}
+
+		return skalarprodukt;
 	}
 
 	private double computePathDistance(Path path) {
