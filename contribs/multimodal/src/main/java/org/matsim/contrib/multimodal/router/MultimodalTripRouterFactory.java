@@ -118,9 +118,9 @@ public class MultimodalTripRouterFactory implements Provider<TripRouter> {
 			 * We cannot use the travel disutility object from the routingContext since it
 			 * has not been created for the modes used here.
 			 */
-			TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());		
+			TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime);		
 			LeastCostPathCalculator routeAlgo = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
-			RoutingModule legRouterWrapper = DefaultRoutingModules.createNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
+			RoutingModule legRouterWrapper = DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, subNetwork, routeAlgo ); 
 			instance.setRoutingModule(mode, legRouterWrapper);
 		}
 

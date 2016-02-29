@@ -143,10 +143,10 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		ReplanningContext replanningContext = this.getReplanningContext();
 		
 		MultiNodeDijkstra forwardMultiNodeDijkstra = (MultiNodeDijkstra) this.forwardMultiNodeDijsktaFactory.createPathCalculator(this.scenario.getNetwork(), 
-				travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car), scenario.getConfig().planCalcScore()), travelTimes.get(TransportMode.car));
+				travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
 
 		BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra = (BackwardFastMultiNodeDijkstra) this.backwardMultiNodeDijsktaFactory.createPathCalculator(
-				this.scenario.getNetwork(), travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car), scenario.getConfig().planCalcScore()), travelTimes.get(TransportMode.car));
+				this.scenario.getNetwork(), travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)), travelTimes.get(TransportMode.car));
 		
 		// this one corresponds to the "frozen epsilon" paper(s)
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here

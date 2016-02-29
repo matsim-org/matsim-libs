@@ -49,6 +49,10 @@ public class RunParkingExample {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("src/main/ressources/config.xml");
+		run(config);
+	}
+
+	public static void run(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);

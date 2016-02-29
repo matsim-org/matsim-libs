@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.kai.run;
 
-import scenarios.braess.run.RunBraessSimulation;
+import scenarios.illustrative.braess.run.RunBraessSimulation;
 
 /**
  * @author nagel

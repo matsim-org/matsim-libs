@@ -49,8 +49,8 @@ public class MSATollTravelDisutilityCalculator implements TravelDisutility {
 		this.distanceCostRateCar = cnScoringGroup.getOrCreateModeParams(Constants.CA_LINK_MODE).getMonetaryDistanceRate();
 		this.marginalUtlOfTravelTime = (-cnScoringGroup.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() / 3600.0) + (cnScoringGroup.getPerforming_utils_hr() / 3600.0);
 		this.tollHandler = tollHandler;
-		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
-		this.delegate = builder.createTravelDisutility(timeCalculator, cnScoringGroup);
+		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, cnScoringGroup );
+		this.delegate = builder.createTravelDisutility(timeCalculator);
 	}
 
 	@Override

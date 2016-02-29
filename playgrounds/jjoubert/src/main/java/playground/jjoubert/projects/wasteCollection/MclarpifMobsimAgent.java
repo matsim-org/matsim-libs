@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.facilities.Facility;
 
 /**
  * @author jwjoubert
@@ -104,6 +105,18 @@ public class MclarpifMobsimAgent implements MobsimAgent {
 	public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 }

@@ -42,15 +42,18 @@ public class EmissionCongestionTravelDisutilityCalculatorFactory implements Trav
 	private final EmissionCostModule emissionCostModule;
 	private Set<Id<Link>> hotspotLinks;
 	private TollHandler tollHandler;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	
-	public EmissionCongestionTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule, TollHandler tollHandler) {
+	public EmissionCongestionTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule, 
+			TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.emissionModule = emissionModule;
 		this.emissionCostModule = emissionCostModule;
 		this.tollHandler = tollHandler;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup){
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator){
 		final EmissionCongestionTravelDisutilityCalculator ectdc = new EmissionCongestionTravelDisutilityCalculator(timeCalculator, cnScoringGroup, this.emissionModule, this.emissionCostModule, this.hotspotLinks, this.tollHandler);
 
 		return new TravelDisutility(){

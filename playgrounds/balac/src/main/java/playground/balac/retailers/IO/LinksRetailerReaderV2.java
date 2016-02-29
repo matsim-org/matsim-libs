@@ -231,12 +231,12 @@ public class LinksRetailerReaderV2
         	  int counter = 0;        	 
         		 
         		 for(Link l:freeLinks.values()) {
-        			 if (CoordUtils.calcDistance(l.getCoord(), link.getCoord()) < 2500)
+        			 if (CoordUtils.calcEuclideanDistance(l.getCoord(), link.getCoord()) < 2500)
         				 counter++;
         		 }
         		 for(Link l:currentLinks.values()) {
         			 
-        			 if (CoordUtils.calcDistance(l.getCoord(), link.getCoord()) < 2500)
+        			 if (CoordUtils.calcEuclideanDistance(l.getCoord(), link.getCoord()) < 2500)
         				 counter++;
         		 }
         		 

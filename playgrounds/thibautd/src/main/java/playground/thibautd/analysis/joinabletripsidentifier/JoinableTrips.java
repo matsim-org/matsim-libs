@@ -152,7 +152,7 @@ public class JoinableTrips {
 										entry.getTripId());
 								currentJoinableTrip.addPassage(
 										Passage.Type.pickUp,
-										CoordUtils.calcDistance(currentCoord, info.getCoord()),
+										CoordUtils.calcEuclideanDistance(currentCoord, info.getCoord()),
 										eventTime - entry.getDepartureTime());
 							}
 						}
@@ -182,7 +182,7 @@ public class JoinableTrips {
 										entry.getTripId());
 								currentJoinableTrip.addPassage(
 										Passage.Type.dropOff,
-										CoordUtils.calcDistance(currentCoord, info.getCoord()),
+										CoordUtils.calcEuclideanDistance(currentCoord, info.getCoord()),
 										eventTime - entry.getArrivalTime());
 							}
 						}
@@ -439,7 +439,7 @@ public class JoinableTrips {
 		 */
 		public double getDistance(final Network network) {
 			if (distance == UNDEFINED_DISTANCE) {
-				distance = CoordUtils.calcDistance(
+				distance = CoordUtils.calcEuclideanDistance(
 						network.getLinks().get(originLinkId).getCoord(),
 						network.getLinks().get(destinationLinkId).getCoord());
 			}

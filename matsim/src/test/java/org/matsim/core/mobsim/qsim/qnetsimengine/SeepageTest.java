@@ -19,6 +19,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,6 +27,9 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -62,7 +66,21 @@ import org.matsim.vehicles.VehicleUtils;
  * Tests that in congested part, walk (seep mode) can overtake (seep) car mode.
  * 
  */
+@RunWith(Parameterized.class)
 public class SeepageTest {
+	
+	private final boolean isUsingFastCapacityUpdate;
+	
+	public SeepageTest(boolean isUsingFastCapacityUpdate) {
+		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
+	}
+	
+	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
+	public static Collection<Object> parameterObjects () {
+		Object [] capacityUpdates = new Object [] { false, true };
+		return Arrays.asList(capacityUpdates);
+	}
+	
 	/**
 	 *  Two carAgents end act at time 948 and 949 sec and walkAgent ends act at 49 sec.
 	 *  Link length is 1 km and flow capacity 1 PCU/min. Speed of car and walk is 20 mps and 1 mps.
@@ -78,6 +96,8 @@ public class SeepageTest {
 		Scenario sc = net.scenario;
 		sc.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
 
+		sc.getConfig().qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
+		
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>();
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car,VehicleType.class));
 		car.setMaximumVelocity(20);
@@ -135,9 +155,15 @@ public class SeepageTest {
 		int walkTravelTime = travelTime1.get(Id.createLinkId("2")).intValue(); 
 		int carTravelTime = travelTime2.get(Id.createLinkId("2")).intValue();
 
-		Assert.assertEquals("Wrong car travel time", 116, carTravelTime);
-		Assert.assertEquals("Wrong walk travel time.", 1010, walkTravelTime);
-		Assert.assertEquals("Seepage is not implemented", 894, walkTravelTime-carTravelTime);
+		if(this.isUsingFastCapacityUpdate) {
+			Assert.assertEquals("Wrong car travel time", 115, carTravelTime);
+			Assert.assertEquals("Wrong walk travel time.", 1009, walkTravelTime);
+			Assert.assertEquals("Seepage is not implemented", 894, walkTravelTime-carTravelTime);
+		} else {
+			Assert.assertEquals("Wrong car travel time", 116, carTravelTime);
+			Assert.assertEquals("Wrong walk travel time.", 1010, walkTravelTime);
+			Assert.assertEquals("Seepage is not implemented", 894, walkTravelTime-carTravelTime);
+		}
 	}
 
 	private static final class SimpleNetwork{

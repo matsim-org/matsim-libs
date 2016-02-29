@@ -172,7 +172,7 @@ public class FindAccessibility
           orderedClosestStationsWork.add(0, stationWork);
         }
         else if (!orderedClosestStationsWork.contains(stationWork)) {
-          while (CoordUtils.calcDistance(pwcs.getCoordWork(), stationWork.getCoord()) > CoordUtils.calcDistance(pwcs.getCoordWork(), ((Station)orderedClosestStationsWork.get(i)).getCoord()))
+          while (CoordUtils.calcEuclideanDistance(pwcs.getCoordWork(), stationWork.getCoord()) > CoordUtils.calcEuclideanDistance(pwcs.getCoordWork(), ((Station)orderedClosestStationsWork.get(i)).getCoord()))
           {
             i++;
 
@@ -213,7 +213,7 @@ public class FindAccessibility
           orderedClosestStationsHome.add(0, stationHome);
         }
         else if (!orderedClosestStationsHome.contains(stationHome)) {
-          while (CoordUtils.calcDistance(pwcs.getCoordHome(), stationHome.getCoord()) > CoordUtils.calcDistance(pwcs.getCoordHome(), ((Station)orderedClosestStationsHome.get(i)).getCoord()))
+          while (CoordUtils.calcEuclideanDistance(pwcs.getCoordHome(), stationHome.getCoord()) > CoordUtils.calcEuclideanDistance(pwcs.getCoordHome(), ((Station)orderedClosestStationsHome.get(i)).getCoord()))
           {
             i++;
 
@@ -248,11 +248,11 @@ public class FindAccessibility
       }
 
       for (Object finalOrderedClosestStationsHome = pwcs.getOrderedClosestStationsHome().iterator(); ((Iterator)finalOrderedClosestStationsHome).hasNext(); ) { Station stationHome = (Station)((Iterator)finalOrderedClosestStationsHome).next();
-        accessibilityHome += stationHome.getCars() * Math.exp(-2.0D * CoordUtils.calcDistance(stationHome.getCoord(), pwcs.getCoordHome()) / 1000.0D);
+        accessibilityHome += stationHome.getCars() * Math.exp(-2.0D * CoordUtils.calcEuclideanDistance(stationHome.getCoord(), pwcs.getCoordHome()) / 1000.0D);
       }
 
       for (Object finalOrderedClosestStationsHome = pwcs.getOrderedClosestStationsWork().iterator(); ((Iterator)finalOrderedClosestStationsHome).hasNext(); ) { Station stationWork = (Station)((Iterator)finalOrderedClosestStationsHome).next();
-        accessibilityWork += stationWork.getCars() * Math.exp(-2.0D * CoordUtils.calcDistance(stationWork.getCoord(), pwcs.getCoordWork()) / 1000.0D);
+        accessibilityWork += stationWork.getCars() * Math.exp(-2.0D * CoordUtils.calcEuclideanDistance(stationWork.getCoord(), pwcs.getCoordWork()) / 1000.0D);
       }
       pwcs.setAccessibilityHome(Double.valueOf(accessibilityHome));
       pwcs.setAccessibilityWork(Double.valueOf(accessibilityWork));

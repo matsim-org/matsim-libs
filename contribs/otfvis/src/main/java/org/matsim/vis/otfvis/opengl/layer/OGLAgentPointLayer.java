@@ -20,19 +20,8 @@
 
 package org.matsim.vis.otfvis.opengl.layer;
 
-import java.awt.Color;
-import java.awt.geom.Point2D;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-
+import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.util.texture.Texture;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.OTFClientControl;
@@ -42,8 +31,14 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 
-import com.jogamp.common.nio.Buffers;
-import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL2;
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.util.*;
+import java.util.List;
 
 
 /**

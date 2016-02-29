@@ -47,6 +47,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -158,12 +159,14 @@ public final class Controler implements ControlerI, MatsimServices {
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 
 			// load scenario:
-			scenario  = ScenarioUtils.createScenario(this.config);
-			ScenarioUtils.loadScenario(scenario) ;
+			//scenario  = ScenarioUtils.createScenario(this.config);
+			//ScenarioUtils.loadScenario(scenario) ;
 		}
 		this.config.parallelEventHandling().makeLocked();
 		this.scenario = scenario;
-		this.overrides = new ScenarioByInstanceModule(this.scenario);
+		this.overrides = scenario == null ?
+				new ScenarioByConfigModule() :
+				new ScenarioByInstanceModule(this.scenario);
 	}
 
 	/**
@@ -179,7 +182,8 @@ public final class Controler implements ControlerI, MatsimServices {
 				for (AbstractModule module : modules) {
 					install(module);
 				}
-				install(new ScenarioByInstanceModule(scenario));
+				// should not be necessary: created in the controler
+				//install(new ScenarioByInstanceModule(scenario));
 			}
 		}), overrides));
 		ControlerI controler = injector.getInstance(ControlerI.class);
@@ -216,7 +220,7 @@ public final class Controler implements ControlerI, MatsimServices {
 	
 	@Override
 	public final TravelDisutility createTravelDisutilityCalculator() {
-        return getTravelDisutilityFactory().createTravelDisutility(this.injector.getInstance(TravelTime.class), getConfig().planCalcScore());
+        return getTravelDisutilityFactory().createTravelDisutility(this.injector.getInstance(TravelTime.class));
 	}
 
 	@Override
@@ -239,6 +243,12 @@ public final class Controler implements ControlerI, MatsimServices {
 		if (this.injectorCreated) {
 			return this.injector.getInstance(Scenario.class);
 		} else {
+			if ( scenario == null ) {
+				log.error( "Trying to get Scenario before it was instanciated.");
+				log.error( "When passing a config file or a config file path to the Controler constructor," );
+				log.error( "Scenario will be loaded first when the run() method is invoked." );
+				throw new IllegalStateException( "Trying to get Scenario before is was instanciated." );
+			}
 			return this.scenario;
 		}
     }

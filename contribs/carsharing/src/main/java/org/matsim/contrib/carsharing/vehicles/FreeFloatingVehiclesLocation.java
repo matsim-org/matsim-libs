@@ -33,7 +33,7 @@ public class FreeFloatingVehiclesLocation {
 	    
 	    for(FreeFloatingStation f: stations) {  
 	    	
-	    	vehicleLocationQuadTree.put(f.getLink().getCoord().getX(), f.getLink().getCoord().getY(), f);
+	    	vehicleLocationQuadTree.put(f.getCoord().getX(), f.getCoord().getY(), f);
 	    }
 	   
 	  }	
@@ -61,7 +61,7 @@ public class FreeFloatingVehiclesLocation {
 			
 			for(FreeFloatingStation ffStation: stations) {
 				
-				if (ffStation.getLink().getId().toString().equals(link.getId().toString())) {
+				if (ffStation.getLinkId().toString().equals(link.getId().toString())) {
 					
 					ArrayList<String> vehIDs = ffStation.getIDs();
 					ArrayList<String> newvehIDs = new ArrayList<String>();
@@ -100,7 +100,7 @@ public class FreeFloatingVehiclesLocation {
 		
 		FreeFloatingStation f = vehicleLocationQuadTree.getClosest(link.getCoord().getX(), link.getCoord().getY());
 		
-		if ( f.getLink().getId().toString().equals(link.getId().toString())) {
+		if ( f.getLinkId().toString().equals(link.getId().toString())) {
 			
 			if (f.getNumberOfVehicles() == 1)
 				vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);

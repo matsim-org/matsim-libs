@@ -87,7 +87,7 @@ public class TransitRouterImpl implements TransitRouter {
         if (nearestNodes.size() < 2) {
             // also enlarge search area if only one stop found, maybe a second one is near the border of the search area
             TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(coord);
-            double distance = CoordUtils.calcDistance(coord, nearestNode.stop.getStopFacility().getCoord());
+            double distance = CoordUtils.calcEuclideanDistance(coord, nearestNode.stop.getStopFacility().getCoord());
             nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.config.getExtensionRadius());
         }
         Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<>();

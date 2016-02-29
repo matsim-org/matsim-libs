@@ -3,6 +3,7 @@ package playground.wrashid.PSF;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.parking.lib.GeneralLib;
 
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import playground.wrashid.PSF.data.HubLinkMapping;
 import playground.wrashid.PSF.data.HubPriceInfo;
@@ -11,8 +12,13 @@ import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionGal
 import playground.wrashid.PSF.data.powerCharging.DefaultChargingPower;
 import playground.wrashid.PSF.data.powerCharging.FacilityChargingPowerMapper;
 
-public class ParametersPSF {
-	private ParametersPSF(){} // do not instantiate
+public class ParametersPSF extends ReflectiveConfigGroup {
+
+	// Should be refactored to a real ConfigGroup.
+
+	public ParametersPSF() {
+		super(PSF_MODULE, true);
+	}
 
 	private static final Logger log = Logger.getLogger(ParametersPSF.class);
 

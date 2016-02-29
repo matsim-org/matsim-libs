@@ -93,7 +93,7 @@ public final class CreateNewPlan extends AbstractPStrategyModule {
 			TransitStopFacility stop1 = operator.getRouteProvider().getRandomTransitStop(operator.getCurrentIteration());
 			TransitStopFacility stop2 = operator.getRouteProvider().getRandomTransitStop(operator.getCurrentIteration());
 
-			while (CoordUtils.calcDistance(stop1.getCoord(), stop2.getCoord()) < this.minInitialStopDistance) {
+			while (CoordUtils.calcEuclideanDistance(stop1.getCoord(), stop2.getCoord()) < this.minInitialStopDistance) {
 				stop2 = operator.getRouteProvider().getRandomTransitStop(operator.getCurrentIteration());
 			}
 			

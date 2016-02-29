@@ -49,7 +49,7 @@ public class TramLinkCreator {
 		Set<String> modes = new HashSet<String>();
 		modes.add("tram");
 		for (Link l : newLinks){
-			Double d = CoordUtils.calcDistance(l.getFromNode().getCoord(), l.getToNode().getCoord());
+			Double d = CoordUtils.calcEuclideanDistance(l.getFromNode().getCoord(), l.getToNode().getCoord());
 			l.setCapacity(60);
 			l.setAllowedModes(modes);
 			l.setFreespeed(14);

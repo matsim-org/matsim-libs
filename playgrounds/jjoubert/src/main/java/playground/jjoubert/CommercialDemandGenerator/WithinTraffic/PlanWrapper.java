@@ -141,7 +141,7 @@ public class PlanWrapper {
 					 * the two activities. */
 					Activity previousActivity = tmpPlan.getPreviousActivity(tmpPlan.getPreviousLeg(act));
 					double chopFraction = (Time.MIDNIGHT*dayCount - previousActivity.getEndTime()) / (act.getStartTime() - previousActivity.getEndTime());
-					double distance = CoordUtils.calcDistance(act.getCoord(), previousActivity.getCoord()) * chopFraction;
+					double distance = CoordUtils.calcEuclideanDistance(act.getCoord(), previousActivity.getCoord()) * chopFraction;
 					double dy = act.getCoord().getY() - previousActivity.getCoord().getY();
 					double dx = act.getCoord().getX() - previousActivity.getCoord().getX();
 					double angle = Math.atan(dy / dx);

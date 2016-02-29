@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.replanning.ReplanningContext;
@@ -48,7 +47,7 @@ public class OverrideCarTraveltimeTest {
 
     private static class InterestingTravelDisutilityFactory implements TravelDisutilityFactory {
         @Override
-        public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+        public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
             return new TravelDisutility() {
                 @Override
                 public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
@@ -77,7 +76,7 @@ public class OverrideCarTraveltimeTest {
         @Override
         public void notifyReplanning(ReplanningEvent event) {
             Assert.assertEquals(42.0, travelTimes.get(TransportMode.car).getLinkTravelTime(null, 0.0, null, null), 0.0);
-            Assert.assertEquals(37.0, travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car), config.planCalcScore()).getLinkTravelDisutility(null, 0.0, null, null), 0.0);
+            Assert.assertEquals(37.0, travelDisutilities.get(TransportMode.car).createTravelDisutility(travelTimes.get(TransportMode.car)).getLinkTravelDisutility(null, 0.0, null, null), 0.0);
         }
     }
 }

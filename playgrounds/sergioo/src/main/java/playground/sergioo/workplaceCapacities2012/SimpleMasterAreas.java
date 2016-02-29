@@ -106,7 +106,6 @@ public class SimpleMasterAreas {
 			double capacity = buildingsR.getDouble(7)*mPAreasPlotRatio.get(areaId)/workerAreas.get(mPArea.getType());
 			if(capacity>0) {
 				ActivityOptionImpl activityOption = new ActivityOptionImpl("work");
-				activityOption.setFacility(building);
 				activityOption.setCapacity(capacity);
 				activityOption.addOpeningTime(new OpeningTimeImpl(0, 24*3600));
 				building.getActivityOptions().put(activityOption.getType(), activityOption);

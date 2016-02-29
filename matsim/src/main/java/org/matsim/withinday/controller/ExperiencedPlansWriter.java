@@ -20,9 +20,11 @@
 
 package org.matsim.withinday.controller;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -34,11 +36,14 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 import javax.inject.Inject;
 
 public class ExperiencedPlansWriter implements AfterMobsimListener {
+	private static final Logger log = Logger.getLogger( ExperiencedPlansWriter.class );
 
 	public static String EXPERIENCEDPLANSFILE = "experiencedPlans.xml.gz";
 
@@ -76,6 +81,23 @@ public class ExperiencedPlansWriter implements AfterMobsimListener {
 		}
 
 		String outputFile = controlerIO.getIterationFilename(event.getIteration(), EXPERIENCEDPLANSFILE);
-		new PopulationWriter(experiencedPopulation, scenario.getNetwork()).write(outputFile);
+
+		final Config config = scenario.getConfig();
+		final String inputCRS = config.plans().getInputCRS();
+		final String internalCRS = config.global().getCoordinateSystem();
+
+		if ( inputCRS == null ) {
+			new PopulationWriter(experiencedPopulation, scenario.getNetwork()).write(outputFile);
+		}
+		else {
+			log.info( "re-projecting \"experienced\" population from "+internalCRS+" to "+inputCRS+" for export" );
+
+			final CoordinateTransformation transformation =
+					TransformationFactory.getCoordinateTransformation(
+							internalCRS,
+							inputCRS );
+
+			new PopulationWriter(transformation, experiencedPopulation, scenario.getNetwork()).write(outputFile);
+		}
 	}
 }

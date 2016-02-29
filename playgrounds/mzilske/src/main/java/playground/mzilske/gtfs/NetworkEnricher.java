@@ -76,7 +76,7 @@ class NetworkEnricher {
 						addLink = false;
 					}
 					if(addLink){
-						double length = CoordUtils.calcDistance(n1.getCoord(), n2.getCoord());						
+						double length = CoordUtils.calcEuclideanDistance(n1.getCoord(), n2.getCoord());						
 						double freespeed = 50/3.6;
 						Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(Id.create(linkId + "." + shapeCounter, Link.class), n1, n2, length, freespeed, 1500, 1);											
 						// Change the linktype to pt
@@ -93,7 +93,7 @@ class NetworkEnricher {
 				if(!n2.getCoord().equals(n1.getCoord())){
 					if(fromNodes.containsKey(n1.getId())){
 						if(!(fromNodes.get(n1.getId()).contains(n2.getId()))){
-							double length = CoordUtils.calcDistance(n1.getCoord(), n2.getCoord());
+							double length = CoordUtils.calcEuclideanDistance(n1.getCoord(), n2.getCoord());
 							double freespeed = 50/3.6;
 							Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(Id.create(linkId + "." + shapeCounter, Link.class), n1, n2, length, freespeed, 1500, 1);						
 							// Change the linktype to pt
@@ -106,7 +106,7 @@ class NetworkEnricher {
 						}
 					}else{
 						fromNodes.put(n1.getId(), new ArrayList<Id>());
-						double length = CoordUtils.calcDistance(n1.getCoord(), n2.getCoord());
+						double length = CoordUtils.calcEuclideanDistance(n1.getCoord(), n2.getCoord());
 						double freespeed = 50/3.6;
 						Link newLink = ((NetworkImpl) sc.getNetwork()).createAndAddLink(Id.create(linkId + "." + shapeCounter, Link.class), n1, n2, length, freespeed, 1500, 1);						
 						// Change the linktype to pt

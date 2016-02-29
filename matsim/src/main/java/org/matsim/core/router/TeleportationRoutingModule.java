@@ -97,7 +97,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 
 	/* package */ double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		// make simple assumption about distance and walking speed
-		double dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
+		double dist = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord());
 		// create an empty route, but with realistic travel time
 		Route route = this.routeFactory.createRoute(Route.class, fromAct.getLinkId(), toAct.getLinkId());
 		double estimatedNetworkDistance = dist * beelineDistanceFactor;

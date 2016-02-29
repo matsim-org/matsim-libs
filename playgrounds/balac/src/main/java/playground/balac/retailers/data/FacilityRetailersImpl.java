@@ -31,13 +31,12 @@ public class FacilityRetailersImpl extends ActivityFacilityImpl
   private boolean retailer = true;
   public FacilityRetailersImpl(Id<ActivityFacility> id, Coord center)
   {
-    super(id, center);
+    super(id, center, null);
     retailer = true;
   }
   public FacilityRetailersImpl(Id<ActivityFacility> id, Coord center, Id<Link> linkId)
   {
-    super(id, center);
-    super.setLinkId(linkId);
+    super(id, center, linkId);
     retailer = true;
   }
  

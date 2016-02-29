@@ -180,7 +180,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			else { throw new RuntimeException("mode=" + trip_mode + " not known!"); }
 
 			// get col (trip dist)
-			double trip_dist = CoordUtils.calcDistance(prev_act.getCoord(), next_act.getCoord());
+			double trip_dist = CoordUtils.calcEuclideanDistance(prev_act.getCoord(), next_act.getCoord());
 			int trip_col = -1;
 			if (trip_dist < 1000) { trip_col = 0; }
 			else if (trip_dist < 5000) { trip_col = 1; }

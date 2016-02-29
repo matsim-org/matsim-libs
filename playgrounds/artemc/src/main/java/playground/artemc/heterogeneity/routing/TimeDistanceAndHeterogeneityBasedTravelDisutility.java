@@ -42,8 +42,12 @@ public class TimeDistanceAndHeterogeneityBasedTravelDisutility implements Travel
 	// === start Builder ===
 	public static class Builder implements TravelDisutilityFactory {
 		private double sigma = 0. ;
+		private final PlanCalcScoreConfigGroup cnScoringGroup;
+		public Builder(PlanCalcScoreConfigGroup cnScoringGroup){
+			this.cnScoringGroup = cnScoringGroup;
+		}
 		@Override
-		public TimeDistanceAndHeterogeneityBasedTravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		public TimeDistanceAndHeterogeneityBasedTravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 			return new TimeDistanceAndHeterogeneityBasedTravelDisutility(timeCalculator, cnScoringGroup, this.sigma);
 		}
 		public void setSigma( double val ) {

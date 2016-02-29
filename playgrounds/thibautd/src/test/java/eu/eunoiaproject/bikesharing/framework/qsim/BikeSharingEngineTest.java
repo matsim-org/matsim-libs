@@ -46,6 +46,7 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.population.LegImpl;
+import org.matsim.facilities.Facility;
 
 /**
  * @author thibautd
@@ -306,6 +307,24 @@ public class BikeSharingEngineTest {
 		@Override
 		public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkIdArg) {
 			this.linkId = linkIdArg;
+		}
+
+		@Override
+		public PlanElement getPreviousPlanElement() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Facility<? extends Facility<?>> getCurrentFacility() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Facility<? extends Facility<?>> getDestinationFacility() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
 		}
 	}
 }

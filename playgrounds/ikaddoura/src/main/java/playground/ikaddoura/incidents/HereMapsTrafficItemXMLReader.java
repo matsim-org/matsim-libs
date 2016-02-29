@@ -21,11 +21,11 @@ package playground.ikaddoura.incidents;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -55,22 +55,33 @@ public class HereMapsTrafficItemXMLReader {
 		return trafficItems;
 	}
 
-	public void readStream(String trafficItemXMLFile) throws FileNotFoundException, XMLStreamException, FactoryConfigurationError {
+	public void readStream(String trafficItemXMLFile) throws XMLStreamException, FactoryConfigurationError, IOException {
 		
-		log.info("Reading stream from: " + trafficItemXMLFile);
+		log.info("Reading stream from file: " + trafficItemXMLFile);
 		
-		FileInputStream stream = new FileInputStream(new File(trafficItemXMLFile));
-		XMLStreamReader in = XMLInputFactory.newInstance().createXMLStreamReader(stream);
-
 		String[] fileNameData = trafficItemXMLFile.split("_");
 		long downloadTime = Long.valueOf(fileNameData[2]);
+		
+		XMLStreamReader in = null;
+		
+		if (trafficItemXMLFile.endsWith(".xml.gz")) {
+			GZIPInputStream stream = new GZIPInputStream(new FileInputStream(new File(trafficItemXMLFile)));
+			in = XMLInputFactory.newInstance().createXMLStreamReader(stream);			
+
+		} else if (trafficItemXMLFile.endsWith(".xml")) {
+			FileInputStream stream = new FileInputStream(new File(trafficItemXMLFile));
+			in = XMLInputFactory.newInstance().createXMLStreamReader(stream);			
+
+		} else {
+			throw new RuntimeException("This traffic item xml reader can only read *.xml or *.xml.gz files. Aborting...");
+		}
 		
 		this.readStream(in, downloadTime);
 	}
 	
 	public void readStream(URL url) throws XMLStreamException, IOException {
 
-		log.info("Reading stream from: " + url);
+		log.info("Reading stream from URL: " + url);
 
 		XMLStreamReader in = XMLInputFactory.newInstance().createXMLStreamReader(url.openStream());
 		this.readStream(in, System.currentTimeMillis());		

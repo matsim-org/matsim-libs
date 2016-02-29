@@ -38,7 +38,6 @@ public class LogFileAnalyzer extends AbstractTabularFileHandlerWithHeaderLine {
 	public LogFileAnalyzer(final String logFileName) throws IOException {
 		final TabularFileParser parser = new TabularFileParser();
 		parser.setDelimiterTags(new String[] { "\t" });
-		// parser.setDelimiterRegex("\\s");
 		parser.setOmitEmptyColumns(false);
 		parser.parse(logFileName, this);
 	}

@@ -23,53 +23,48 @@
  */
 package playground.southafrica.projects.mapMatching;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.FastDijkstra;
-import org.matsim.core.router.LinkWrapperFacility;
-import org.matsim.core.router.NetworkRoutingModule;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelDisutilityUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.Vehicle;
 
-import playground.southafrica.population.utilities.PopulationUtils;
+import playground.southafrica.projects.digicore.DigicoreUtils;
+import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -87,15 +82,91 @@ public class SomeBits {
 	public static void main(String[] args) {
 		Header.printHeader(SomeBits.class.toString(), args);
 		
-		/* Read in the network. */ 
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(sc.getNetwork()).parse(args[0]);
+		Map<String, Integer> map = new TreeMap<String, Integer>();
+		File file = new File(args[0]);
+		String id = file.getName().substring(0, file.getName().indexOf("."));
+		if(!map.containsKey(id)){
+			map.put(id, map.size()+1);
+		}
+		int newId = map.get(id);
 		
-		QuadTree<Link> qt = buildQuadTreeFromNetwork(sc.getNetwork());
-		findRouteBetweenRandomPoints(sc.getNetwork());
+		splitTrips(file, String.valueOf(newId));
+		
+//		/* Read in the network. */ 
+//		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		new MatsimNetworkReader(sc.getNetwork()).parse(args[0]);
+//		
+//		QuadTree<Link> qt = buildQuadTreeFromNetwork(sc.getNetwork());
+//		findRouteBetweenRandomPoints(sc.getNetwork());
 		
 		Header.printFooter();
 	}
+	
+
+	public static void splitTrips(File file, String newId){
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "EPSG:3857");
+		String id = file.getName().substring(0, file.getName().indexOf("."));
+		File folder = file.getParentFile();
+		String folderName = folder.getAbsolutePath() + (folder.getAbsolutePath().endsWith("/") ? "" : "/") + newId + "/";
+		File newFolder = new File(folderName);
+		if(newFolder.exists() && newFolder.isDirectory()){
+			LOG.warn("The output folder exists and will be deleted: " + folderName);
+			FileUtils.delete(newFolder);
+		}
+		newFolder.mkdirs();
+		
+		LOG.info("Splitting trips for " + id );
+		LOG.info("  Writing trips to " + folderName);
+		BufferedReader br = IOUtils.getBufferedReader(file.getAbsolutePath());
+		int trips = 0;
+		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(folderName + newId + "_" + String.format("%03d.csv", trips));
+		try{
+			String line = br.readLine();
+			String[] sa = line.split(",");
+			long previousTime = Long.parseLong(sa[2]);
+			
+			while((line = br.readLine()) != null){
+				sa = line.split(",");
+				long time = Long.parseLong(sa[2]);
+				double diff = ((double)(time - previousTime)) / 1000.0;
+				double lon = Double.parseDouble(sa[3]);
+				double lat = Double.parseDouble(sa[4]);
+				Coord c = ct.transform(CoordUtils.createCoord(lon, lat));
+				
+				/* Get a more usable date format. */
+				Calendar cal = DigicoreUtils.getCalendarSince1996(time);
+				double MatsimTime = Time.parseTime(DigicoreUtils.getTimeOfDayFromCalendar(cal));
+				String cleanLine = String.format("%.2f,%.2f,%.3f\n", c.getX(), c.getY(), MatsimTime);
+				if(diff <= Time.parseTime("00:01:00")){
+					bw.write(cleanLine);
+				} else{
+					bw.close();
+					trips++;
+					bw = IOUtils.getAppendingBufferedWriter(folderName + newId + "_" + String.format("%03d.csv", trips));
+					bw.write(cleanLine);
+//					LOG.info("  diff: " + ((double)diff)/1000.0 + "sec");
+				}
+				previousTime = time;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot read from " + file.getAbsolutePath());
+		} finally{
+			try {
+				br.close();
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + file.getAbsolutePath());
+			}
+		}
+		
+		
+		LOG.info("Done splitting");
+		LOG.info("Trips recorded: " + trips);
+	}
+
+	
 	
 	/**
 	 * Build a {@link QuadTree} from a network. Each link is added, using
@@ -222,5 +293,6 @@ public class SomeBits {
 		double d = 0.0;
 		return d;
 	}
-
+	
+	
 }

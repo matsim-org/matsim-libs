@@ -37,19 +37,22 @@ public final class VTTSCongestionTollTimeDistanceTravelDisutilityFactory impleme
 	private double sigma = 0. ;
 	private VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory;
 	private final TollHandler tollHandler;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public VTTSCongestionTollTimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, TollHandler tollHandler) {
+	public VTTSCongestionTollTimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, 
+			TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.tollHandler = tollHandler;
 		this.vttsTimeDistanceTravelDisutilityFactory = vttsTimeDistanceTravelDisutilityFactory;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		
 		vttsTimeDistanceTravelDisutilityFactory.setSigma(sigma);
 		
 		return new CongestionTollTimeDistanceTravelDisutility(
-				vttsTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
+				vttsTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
 				this.tollHandler,
 				cnScoringGroup.getMarginalUtilityOfMoney(),
 				this.sigma

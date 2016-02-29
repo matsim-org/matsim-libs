@@ -373,7 +373,7 @@ public class LegTripDurationAnalyzer implements PersonDepartureEventHandler, Per
 		
 		for (Leg leg : toLegsCar) {
 			toTravelTimesCar = toTravelTimesCar + leg.getTravelTime();
-			toDistancesCar = toDistancesCar + RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), scenario.getNetwork());
+			toDistancesCar = toDistancesCar + RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute)leg.getRoute(), scenario.getNetwork());
 		}
 		log.info("number of " + activityType + "-to-legsCar = " + toLegsCar.size());
 		log.info("mean " + activityType + "-to-traveltimesCar = " + toTravelTimesCar / toLegsCar.size());
@@ -400,7 +400,7 @@ public class LegTripDurationAnalyzer implements PersonDepartureEventHandler, Per
 		
 		for (Leg leg : fromLegsCar) {
 			fromTravelTimesCar = fromTravelTimesCar + leg.getTravelTime();
-			fromDistancesCar = fromDistancesCar + RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), scenario.getNetwork());
+			fromDistancesCar = fromDistancesCar + RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute)leg.getRoute(), scenario.getNetwork());
 		}
 		
 		log.info("number of " + activityType + "-from-legsCar = " + fromLegsCar.size());

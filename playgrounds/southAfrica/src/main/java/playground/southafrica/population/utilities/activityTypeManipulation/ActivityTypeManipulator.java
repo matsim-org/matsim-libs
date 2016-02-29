@@ -20,6 +20,7 @@
 
 package playground.southafrica.population.utilities.activityTypeManipulation;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -30,7 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -60,16 +61,12 @@ public abstract class ActivityTypeManipulator {
 		= new TreeMap<String, TreeMap<String, Tuple<String,String>>>();
 
 	
-	protected void parsePopulation(String population, String network){
+	protected void parsePopulation(String population){
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		/* Read the population file. */
 		MatsimPopulationReader mpr = new MatsimPopulationReader(sc);
 		mpr.readFile(population);
-		
-		/* Read the network file. */
-		MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
-		mnr.readFile(network);		
 		
 		LOG.info("Population: " + sc.getPopulation().getPersons().size());
 		LOG.info("Network: " + sc.getNetwork().getNodes().size() + " nodes; " 
@@ -108,6 +105,6 @@ public abstract class ActivityTypeManipulator {
 	
 	abstract protected void adaptActivityTypes(Plan plan);
 	
-	abstract protected void parseDecileFile(String filename);
+	abstract protected List<ActivityParams> parseDecileFile(String filename);
 
 }

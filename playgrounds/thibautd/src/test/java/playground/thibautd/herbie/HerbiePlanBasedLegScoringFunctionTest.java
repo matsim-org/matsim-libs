@@ -281,7 +281,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 		double monetaryDistanceRatePt = -2;
 		config.planCalcScore().getModes().get(TransportMode.pt).setMonetaryDistanceRate(monetaryDistanceRatePt);
-		params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore(), config.planCalcScore().getScoringParameters( null ), config.scenario()).create();
+		params = new CharyparNagelScoringParameters.Builder(config.planCalcScore(), config.planCalcScore().getScoringParameters(null), config.scenario()).build();
 	}
 
 	//private void initPlans() {

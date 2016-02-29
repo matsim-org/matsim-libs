@@ -239,7 +239,7 @@ public class TripsPrism {
 			Record passengerRecord = iterator.next();
 
 			Coord passengerOrigin = getOriginLink( passengerRecord ).getCoord();
-			remainingDistance -= CoordUtils.calcDistance( passengerOrigin , driverOrigin );
+			remainingDistance -= CoordUtils.calcEuclideanDistance( passengerOrigin , driverOrigin );
 
 			if (remainingDistance < 0) {
 				iterator.remove();
@@ -247,14 +247,14 @@ public class TripsPrism {
 			}
 
 			Coord passengerDestination = getDestinationLink( passengerRecord ).getCoord();
-			remainingDistance -= CoordUtils.calcDistance( passengerDestination , passengerOrigin );
+			remainingDistance -= CoordUtils.calcEuclideanDistance( passengerDestination , passengerOrigin );
 
 			if (remainingDistance < 0) {
 				iterator.remove();
 				continue;
 			}
 
-			remainingDistance -= CoordUtils.calcDistance( passengerDestination , driverDestination );
+			remainingDistance -= CoordUtils.calcEuclideanDistance( passengerDestination , driverDestination );
 
 			if (remainingDistance < 0) {
 				iterator.remove();

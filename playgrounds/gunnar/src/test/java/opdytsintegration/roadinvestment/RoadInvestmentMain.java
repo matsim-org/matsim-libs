@@ -22,7 +22,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
-import floetteroed.opdyts.convergencecriteria.ObjectiveFunctionChangeConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
+import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
@@ -46,16 +48,40 @@ class RoadInvestmentMain {
 		final DecisionVariable decisionVariable = new RoadInvestmentDecisionVariable(
 				betaPay, betaAlloc, link2freespeed, link2capacity);
 
-		// TODO move this out of this function and make non-stateful
-		final ObjectiveFunctionChangeConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
-				1e-3, 1e-3, 5);
+		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
+				100, 10);
+		// final ObjectiveFunctionChangeConvergenceCriterion
+		// convergenceCriterion =
+		// new ObjectiveFunctionChangeConvergenceCriterion(
+		// 1e-3, 1e-3, 5);
 
 		SingleTrajectorySampler<DecisionVariable> sampler = new SingleTrajectorySampler<>(
 				decisionVariable, objectiveFunction, convergenceCriterion);
 		system.run(sampler);
 
-		return sampler.getDecisionVariable2finalObjectiveFunctionValueView()
-				.entrySet().iterator().next();
+		final Map.Entry<DecisionVariable, ConvergenceCriterionResult> decVar2convRes = sampler
+				.getDecisionVariable2convergenceResultView().entrySet()
+				.iterator().next();
+		return new Map.Entry<DecisionVariable, Double>() {
+
+			@Override
+			public DecisionVariable getKey() {
+				return decVar2convRes.getKey();
+			}
+
+			@Override
+			public Double getValue() {
+				return decVar2convRes.getValue().finalObjectiveFunctionValue;
+			}
+
+			@Override
+			public Double setValue(Double value) {
+				throw new UnsupportedOperationException();
+			}
+		};
+
+		// return sampler.getDecisionVariable2finalObjectiveFunctionValueView()
+		// .entrySet().iterator().next();
 	}
 
 	static void enumerateDecisionVariables() {
@@ -69,7 +95,8 @@ class RoadInvestmentMain {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
-		Simulator system = new MATSimSimulator(stateFactory, scenario, new TimeDiscretization(5 * 3600, 10 * 60, 18), null);
+		Simulator system = new MATSimSimulator(stateFactory, scenario,
+				new TimeDiscretization(5 * 3600, 10 * 60, 18), null);
 		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
 
 		Map<DecisionVariable, Double> decVar2objFct = new LinkedHashMap<>();
@@ -98,7 +125,8 @@ class RoadInvestmentMain {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
-		Simulator system = new MATSimSimulator(stateFactory, scenario, new TimeDiscretization(5 * 3600, 10 * 60, 18), null);
+		Simulator system = new MATSimSimulator(stateFactory, scenario,
+				new TimeDiscretization(5 * 3600, 10 * 60, 18), null);
 		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
 
 		Map<DecisionVariable, Double> decVar2objFct = new LinkedHashMap<>();
@@ -120,8 +148,9 @@ class RoadInvestmentMain {
 
 		System.out.println("STARTED ...");
 
-//		final TrajectorySamplingSelfTuner selfTuner = new TrajectorySamplingSelfTuner(
-//				0.0, 0.0, 0.0, 0.95, 1.0);
+		// final TrajectorySamplingSelfTuner selfTuner = new
+		// TrajectorySamplingSelfTuner(
+		// 0.0, 0.0, 0.0, 0.95, 1.0);
 
 		Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
 		config.controler()
@@ -140,42 +169,51 @@ class RoadInvestmentMain {
 		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
 
 		final int minimumAverageIterations = 5;
-		final ObjectiveFunctionChangeConvergenceCriterion convergenceCriterion = new ObjectiveFunctionChangeConvergenceCriterion(
-				1e-1, 1e-1, minimumAverageIterations);
+		final FixedIterationNumberConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
+				100, 10);
+		// final ObjectiveFunctionChangeConvergenceCriterion
+		// convergenceCriterion = new
+		// ObjectiveFunctionChangeConvergenceCriterion(
+		// 1e-1, 1e-1, minimumAverageIterations);
 
 		Simulator system = new MATSimSimulator(// decisionVariables,
-				stateFactory, scenario, new TimeDiscretization(5 * 3600, 10 * 60, 18), null);
-		DecisionVariableRandomizer<RoadInvestmentDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadInvestmentDecisionVariable>() {			
-//			public RoadInvestmentDecisionVariable newRandomDecisionVariable() {
-//				return new RoadInvestmentDecisionVariable(MatsimRandom
-//						.getRandom().nextDouble(), MatsimRandom.getRandom()
-//						.nextDouble(), link2freespeed, link2capacity);
-//			}
+				stateFactory, scenario, new TimeDiscretization(5 * 3600,
+						10 * 60, 18), null);
+		DecisionVariableRandomizer<RoadInvestmentDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadInvestmentDecisionVariable>() {
+			// public RoadInvestmentDecisionVariable newRandomDecisionVariable()
+			// {
+			// return new RoadInvestmentDecisionVariable(MatsimRandom
+			// .getRandom().nextDouble(), MatsimRandom.getRandom()
+			// .nextDouble(), link2freespeed, link2capacity);
+			// }
 
 			@Override
 			public List<RoadInvestmentDecisionVariable> newRandomVariations(
 					RoadInvestmentDecisionVariable decisionVariable) {
 				return Arrays.asList(
 						new RoadInvestmentDecisionVariable(Math.max(
-						0,
-						Math.min(1, decisionVariable.betaPay() + 0.1
-								* MatsimRandom.getRandom().nextGaussian())),
-						Math.max(
+								0,
+								Math.min(1, decisionVariable.betaPay()
+										+ 0.1
+										* MatsimRandom.getRandom()
+												.nextGaussian())), Math.max(
 								0,
 								Math.min(1, decisionVariable.betaAlloc()
 										+ 0.1
 										* MatsimRandom.getRandom()
 												.nextGaussian())),
-						link2freespeed, link2capacity), 						new RoadInvestmentDecisionVariable(Math.max(
+								link2freespeed, link2capacity),
+						new RoadInvestmentDecisionVariable(Math.max(
 								0,
-								Math.min(1, decisionVariable.betaPay() + 0.1
-										* MatsimRandom.getRandom().nextGaussian())),
-								Math.max(
-										0,
-										Math.min(1, decisionVariable.betaAlloc()
-												+ 0.1
-												* MatsimRandom.getRandom()
-														.nextGaussian())),
+								Math.min(1, decisionVariable.betaPay()
+										+ 0.1
+										* MatsimRandom.getRandom()
+												.nextGaussian())), Math.max(
+								0,
+								Math.min(1, decisionVariable.betaAlloc()
+										+ 0.1
+										* MatsimRandom.getRandom()
+												.nextGaussian())),
 								link2freespeed, link2capacity));
 			}
 		};
@@ -185,15 +223,16 @@ class RoadInvestmentMain {
 		int maxIterations = 10;
 		int maxTransitions = Integer.MAX_VALUE;
 		int populationSize = 10;
-		RandomSearch<RoadInvestmentDecisionVariable> randomSearch = new RandomSearch<>(system, randomizer,
-				new RoadInvestmentDecisionVariable(MatsimRandom
-						.getRandom().nextDouble(), MatsimRandom.getRandom()
-						.nextDouble(), link2freespeed, link2capacity),
-				convergenceCriterion, 
-				//selfTuner, 
-				maxIterations, maxTransitions,
-				populationSize, MatsimRandom.getRandom(), interpolate,
-				objectiveFunction, maxMemoryLength, false);
+		RandomSearch<RoadInvestmentDecisionVariable> randomSearch = new RandomSearch<>(
+				system, randomizer, new RoadInvestmentDecisionVariable(
+						MatsimRandom.getRandom().nextDouble(), MatsimRandom
+								.getRandom().nextDouble(), link2freespeed,
+						link2capacity),
+				convergenceCriterion,
+				// selfTuner,
+				maxIterations, maxTransitions, populationSize,
+				MatsimRandom.getRandom(), interpolate, objectiveFunction,
+				maxMemoryLength, false);
 		randomSearch.setLogFileName("./randomSearchLog.txt");
 		randomSearch.run();
 

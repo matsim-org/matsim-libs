@@ -23,12 +23,12 @@ import java.io.*;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.matrices.Matrix;
 
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.util.visum.VisumMatrixReader;
-import playground.michalm.zone.Zone;
 
 
 public class VisumDemandDataReader

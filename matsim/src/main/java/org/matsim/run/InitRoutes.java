@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.gbl.MatsimRandom;
@@ -149,7 +148,7 @@ public class InitRoutes {
 				addTravelTimeBinding("car").toInstance(timeCostCalc);
 				addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
 					@Override
-					public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+					public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 						return timeCostCalc;
 					}
 				});

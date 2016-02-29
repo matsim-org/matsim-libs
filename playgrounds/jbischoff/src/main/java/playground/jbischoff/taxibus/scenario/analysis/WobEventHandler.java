@@ -159,7 +159,7 @@ class WobEventHandler implements PersonDepartureEventHandler,
 			Link destinationLink = this.network.getLinks().get(
 					event.getLinkId());
 
-			double beelineDistance = NetworkUtils.getEuclidianDistance(
+			double beelineDistance = NetworkUtils.getEuclideanDistance(
 					startLink.getCoord(), destinationLink.getCoord());
 			String s = personId + "_" + leg;
 			this.drivenDistances = this.drivenDistances+drivenDistance;

@@ -74,7 +74,7 @@ public class ModalSplit {
 					if (((Activity) pe).getType().equals( "shopgrocery" ) && (Math.sqrt(Math.pow(((Activity) pe).getCoord().getX() - centerX, 2) + (Math.pow(((Activity) pe).getCoord().getY() - centerY, 2))) <= 5000))// && a.contains(((Activity) pe).getFacilityId())) 
 						
 						if (previousLeg.getMode().equals( "car" )) {
-							distance+= RouteUtils.calcDistance((NetworkRoute) previousLeg.getRoute(), scenario.getNetwork());
+							distance+= RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) previousLeg.getRoute(), scenario.getNetwork());
 							countCar++;
 							count++;
 						}

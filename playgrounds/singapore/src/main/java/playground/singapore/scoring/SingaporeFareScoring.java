@@ -53,7 +53,7 @@ public class SingaporeFareScoring implements LegScoring {
 					String[] parts = (((Leg)planElement).getRoute()).getRouteDescription().split("===");
 					Id fromLinkId = transitSchedule.getFacilities().get(Id.create(parts[1], TransitStopFacility.class)).getLinkId();
 					Id toLinkId = transitSchedule.getFacilities().get(Id.create(parts[4], TransitStopFacility.class)).getLinkId();
-					return RouteUtils.calcDistance(transitSchedule.getTransitLines().get(Id.create(parts[2], TransitLine.class)).getRoutes().get(Id.create(parts[3], TransitRoute.class)).getRoute().getSubRoute(fromLinkId, toLinkId), network);
+					return RouteUtils.calcDistanceExcludingStartEndLink(transitSchedule.getTransitLines().get(Id.create(parts[2], TransitLine.class)).getRoutes().get(Id.create(parts[3], TransitRoute.class)).getRoute().getSubRoute(fromLinkId, toLinkId), network);
 				}
 				else
 					num--;

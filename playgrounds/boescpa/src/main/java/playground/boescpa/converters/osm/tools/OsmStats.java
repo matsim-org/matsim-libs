@@ -247,9 +247,9 @@ public class OsmStats {
 					for (int i = 1; i < nodesOfWay.size(); i++) {
 						OsmNode nextNode = nodes.get(nodesOfWay.get(i));
 						if (nextNode.isInSHPArea) {
-							lengthIn += lengthFactor * (Math.round(CoordUtils.calcDistance(currentNode.coord, nextNode.coord)));
+							lengthIn += lengthFactor * (Math.round(CoordUtils.calcEuclideanDistance(currentNode.coord, nextNode.coord)));
 						} else {
-							lengthOut += lengthFactor * (Math.round(CoordUtils.calcDistance(currentNode.coord, nextNode.coord)));
+							lengthOut += lengthFactor * (Math.round(CoordUtils.calcEuclideanDistance(currentNode.coord, nextNode.coord)));
 						}
 						currentNode = nextNode;
 					}

@@ -604,8 +604,8 @@ public class TransitQueueNetworkTest extends TestCase {
         f.simEngine.doSimStep(239);
         assertEquals(2, f.qlink2.getAllVehicles().size());
         vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
-        assertEquals(f.normalVehicle2, vehicles[0]);
-        assertEquals(f.transitVehicle, vehicles[1]);
+        assertEquals(f.transitVehicle, vehicles[0]);
+        assertEquals(f.normalVehicle2, vehicles[1]);
         assertEquals(1, f.qlink3.getAllVehicles().size());
         vehicles = f.qlink3.getAllVehicles().toArray(vehicles);
         assertEquals(f.normalVehicle, vehicles[0]);
@@ -722,8 +722,8 @@ public class TransitQueueNetworkTest extends TestCase {
         f.simEngine.doSimStep(239);
         assertEquals(2, f.qlink2.getAllVehicles().size());
         vehicles = f.qlink2.getAllVehicles().toArray(vehicles);
-        assertEquals(f.normalVehicle2, vehicles[0]);
-        assertEquals(f.transitVehicle, vehicles[1]);
+        assertEquals(f.transitVehicle, vehicles[0]);
+        assertEquals(f.normalVehicle2, vehicles[1]);
         assertEquals(1, f.qlink3.getAllVehicles().size());
 
         // time 240: transitVeh moved to qlink3, normalVeh2 moved to qlink2.buffer

@@ -24,13 +24,13 @@ package playground.ikaddoura.integrationCN;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.vsp.congestion.handlers.TollHandler;
 
 /**
@@ -41,15 +41,17 @@ public class CNTollDisutilityCalculatorFactory implements TravelDisutilityFactor
 
 	private final NoiseContext noiseContext;
 	private final TollHandler tollHandler;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
 	@Deprecated
-	public CNTollDisutilityCalculatorFactory(NoiseContext noiseContext, TollHandler tollHandler) {
+	public CNTollDisutilityCalculatorFactory(NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.noiseContext = noiseContext;
 		this.tollHandler = tollHandler;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		final CNTollTravelDisutilityCalculator ttdc = new CNTollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, noiseContext, tollHandler);
 
 		return new TravelDisutility(){

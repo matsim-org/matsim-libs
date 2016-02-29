@@ -111,6 +111,7 @@ public class CapeTownChoiceSetRecordFiller implements ChoiceDataSetWriter.Choice
 				personAttributes.getAttribute(
 						decisionMaker.getId().toString(),
 						"yearOfBirth" );
+		if ( birth.equals( "Unknown" ) ) return -99;
 		final double age = 2012 - Integer.valueOf( birth );
 		codebook.writeMeaning( ""+age );
 		return age;
@@ -165,7 +166,7 @@ public class CapeTownChoiceSetRecordFiller implements ChoiceDataSetWriter.Choice
 		codebook.openPage( name );
 		// writing meaning is done in calculation method
 		// awful, just hacked in quickly. Should be refactored before being used in other converters
-		codebook.writeCoding( value );
+		codebook.writeCoding( value.doubleValue() );
 		map.put( name, value );
 		codebook.closePage();
 	}

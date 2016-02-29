@@ -3,7 +3,9 @@ package playground.balac.utils;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -11,10 +13,14 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 public class MembershipGenerationFreeFloating {
 	
-	final private int numMembers = 22750;
+	final private int numMembers = 6000;
 	
 	private static double[] ageShares = {0.107 , 0.614 , 0.89, 0.987 , 1.0};
 	
@@ -26,7 +32,21 @@ public class MembershipGenerationFreeFloating {
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
+		ObjectAttributes bla = new ObjectAttributes();
 		
+		new ObjectAttributesXmlReader(bla).parse(args[2]);
+		int h = 0;
+		for(Person p : scenario.getPopulation().getPersons().values()) {
+			if (withinBorders(p))
+				h++;
+			if ( ((String) bla.getAttribute(p.getId().toString(), "FF_CARD")).equals("true")) {
+				bla.putAttribute(p.getId().toString(), "FF_CARD", "false");
+
+			}
+			
+		}
+		ObjectAttributesXmlWriter betaWriterAll = new ObjectAttributesXmlWriter(bla);
+	//	betaWriterAll.writeFile("C:/Users/balacm/Desktop/personAttrinutesAllFFMembers.xml.gz");
 		//randomly choose a person and run the simple model
 		
 		Object[] personArray = scenario.getPopulation().getPersons().values().toArray();
@@ -45,11 +65,12 @@ public class MembershipGenerationFreeFloating {
 		//split the agents into men and women groups
 		
 		for (Person p: scenario.getPopulation().getPersons().values()) {
-			
-			if (PersonUtils.getSex(p).equals("m"))
-				men.put(p.getId(), p);
-			else
-				women.put(p.getId(), p);
+			if (withinBorders(p)){
+				if (PersonUtils.getSex(p).equals("m"))
+					men.put(p.getId(), p);
+				else
+					women.put(p.getId(), p);
+			}
 		}
 		
 		Object[] mArray =  men.values().toArray();
@@ -60,11 +81,11 @@ public class MembershipGenerationFreeFloating {
 		
 		while(i < numMembers) {
 			
-			
+			System.out.println(i);
 			
 			double randomDouble = MatsimRandom.getRandom().nextDouble();
 			
-			if (randomDouble < 0.8) {
+			if (randomDouble < menShare) {
 				
 				randomDouble = MatsimRandom.getRandom().nextDouble();
 				
@@ -123,16 +144,30 @@ public class MembershipGenerationFreeFloating {
 			
 		}
 		
+		int j = 0;
 		
 		for (Person p: addedMembers.values()){
 			
-			
-			PersonUtils.addTravelcard(scenario.getPopulation().getPersons().get(p.getId()), "ffProgram");
+			System.out.println(j++);
+			bla.putAttribute(p.getId().toString(), "FF_CARD", "true");
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4("./plans_ff_members.xml.gz");		
-
+		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(bla);
+		betaWriter.writeFile("C:/Users/balacm/Desktop/personAttrinutes10kmZoneFF_1xmemb.xml.gz");
 		
+	}
+
+	private boolean withinBorders(Person p) {
+		double centerX = 683217.0; 
+		double centerY = 247300.0;
+		Coord coord = new Coord(centerX, centerY);
+
+		boolean insideBorders = false;
+		
+		Activity a = (Activity) p.getSelectedPlan().getPlanElements().get(0);
+		if (CoordUtils.calcEuclideanDistance(a.getCoord(), coord) < 10000)
+			insideBorders = true;
+		return insideBorders;
 	}
 
 	private Person findPerson (int index, Map<Id, Person> addedMembers, Object[] potentialMembers) {

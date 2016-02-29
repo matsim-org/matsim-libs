@@ -60,7 +60,7 @@ public final class ParkingScoreManager {
 		
 		double linkLength = link.getLength();		
 		
-		double walkDistance = CoordUtils.calcDistance(destCoord, parking.getCoordinate()) 
+		double walkDistance = CoordUtils.calcEuclideanDistance(destCoord, parking.getCoordinate()) 
 				* scenario.getConfig().plansCalcRoute().getBeelineDistanceFactors().get("walk")* beelineDistanceFactor;
 		
 		double walkSpeed = linkLength / this.walkTravelTime.getLinkTravelTime(link, 0, person, null);

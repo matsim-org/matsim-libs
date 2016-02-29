@@ -69,7 +69,7 @@ public class CongestionPricingControlerEqualVTTS {
 		Controler controler = new Controler(configFile);
 
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
-		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler, controler.getConfig().planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

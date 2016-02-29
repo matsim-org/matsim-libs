@@ -1,14 +1,15 @@
 package playground.dhosse.prt.launch;
 
-import static playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource.*;
+import static org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource.*;
+
+import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams.*;
+import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
+import org.matsim.contrib.taxi.optimizer.fifo.FifoTaxiOptimizer;
+import org.matsim.contrib.taxi.optimizer.mip.MIPTaxiOptimizer;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 
 import playground.dhosse.prt.optimizer.PrtNPersonsOptimizer;
-import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.AbstractTaxiOptimizerParams.*;
-import playground.michalm.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
-import playground.michalm.taxi.optimizer.fifo.FifoTaxiOptimizer;
-import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
-import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 
 public class PrtParameters {
 

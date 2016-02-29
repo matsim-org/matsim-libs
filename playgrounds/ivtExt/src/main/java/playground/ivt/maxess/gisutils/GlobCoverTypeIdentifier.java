@@ -18,19 +18,15 @@
  * *********************************************************************** */
 package playground.ivt.maxess.gisutils;
 
-import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.processing.operation.Mosaic;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.geometry.DirectPosition2D;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.geometry.DirectPosition;
-import org.opengis.referencing.operation.TransformException;
 
 import java.io.File;
-import java.util.Arrays;
 
 /**
  * @author thibautd

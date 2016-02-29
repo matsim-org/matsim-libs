@@ -23,11 +23,12 @@
  */
 package playground.andreas.aas.modules.cellBasedAccessibility.gis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import com.vividsolutions.jts.geom.Geometry;
 
 import java.awt.Color;
 
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import playground.andreas.aas.modules.cellBasedAccessibility.gis.graph.spatial.io.ColorUtils;
 import playground.andreas.aas.modules.cellBasedAccessibility.gis.graph.spatial.io.Colorizable;
 
@@ -45,7 +46,7 @@ public class MyColorizer implements Colorizable{
 	
 	private boolean logscale;
 	
-	public MyColorizer(TObjectDoubleHashMap<?> values) {
+	public MyColorizer(TObjectDoubleHashMap<Geometry> values) {
 		this.values = values;
 		
 		max = - Double.MAX_VALUE;

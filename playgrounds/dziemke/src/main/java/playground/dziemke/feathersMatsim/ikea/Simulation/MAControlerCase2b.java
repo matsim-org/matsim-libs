@@ -12,7 +12,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 public class MAControlerCase2b {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/configCase2b.xml");
+		Config config = ConfigUtils.loadConfig("C:/Users/jeffw_000/Desktop/Dropbox/Uni/Master/Masterarbeit/MT/workspace new/ikeaStudy/input/Case2/configCase2b_fc_3.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
 		Controler controler = new Controler(config);
@@ -20,7 +20,7 @@ public class MAControlerCase2b {
 //______________________________________________________________________________________________________________________		
 		
 
-		final ResidentialAreaDisutilityCalculatorFactory slagboomDisutilityCalculatorFactory = new ResidentialAreaDisutilityCalculatorFactory();
+		final ResidentialAreaDisutilityCalculatorFactory slagboomDisutilityCalculatorFactory = new ResidentialAreaDisutilityCalculatorFactory(config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

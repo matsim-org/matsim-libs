@@ -48,6 +48,9 @@ class MyControler {
 		} else {
 			config = ConfigUtils.loadConfig("examples/equil/config.xml") ;
 		}
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		

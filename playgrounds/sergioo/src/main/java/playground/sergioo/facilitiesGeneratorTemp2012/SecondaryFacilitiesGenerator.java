@@ -450,7 +450,7 @@ public class SecondaryFacilitiesGenerator {
 				Coord coord = new Coord(resultFacilities.getDouble(2), resultFacilities.getDouble(3));
 				postalCode = postalCodes.keySet().iterator().next();
 				for(Entry<Integer, Coord> postalCodeE:postalCodes.entrySet())
-					if(CoordUtils.calcDistance(coord, postalCodeE.getValue())<CoordUtils.calcDistance(coord, postalCodes.get(postalCode)))
+					if(CoordUtils.calcEuclideanDistance(coord, postalCodeE.getValue())<CoordUtils.calcEuclideanDistance(coord, postalCodes.get(postalCode)))
 						postalCode = postalCodeE.getKey();
 			}
 			buildingsPostalCodes.put(Id.create(resultFacilities.getInt(1), ActivityFacility.class), postalCode);

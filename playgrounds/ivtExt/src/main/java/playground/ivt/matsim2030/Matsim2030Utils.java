@@ -46,11 +46,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -67,17 +63,12 @@ import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import playground.ivt.matsim2030.router.TransitRouterWithThinnedNetworkFactory;
-import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
+import playground.ivt.matsim2030.scoring.MATSim2010ScoringModule;
 import playground.ivt.utils.TripModeShares;
 
 import javax.inject.Provider;
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -236,7 +227,7 @@ public class Matsim2030Utils {
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			final Node from = link.getFromNode();
 			final Node to = link.getToNode();
-			if ((CoordUtils.calcDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcDistance(to.getCoord(), center) <= radius)) {
+			if ((CoordUtils.calcEuclideanDistance(from.getCoord(), center) <= radius) || (CoordUtils.calcEuclideanDistance(to.getCoord(), center) <= radius)) {
 				areaOfInterest.put(link.getId(),link);
 			}
 		}
@@ -408,11 +399,7 @@ public class Matsim2030Utils {
 	}
 
 	public static void initializeScoring( final Controler controler ) {
- 		final MATSim2010ScoringFunctionFactory scoringFunctionFactory =
-			new MATSim2010ScoringFunctionFactory(
-					controler.getScenario(),
-					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ) ); 	
-		controler.setScoringFunctionFactory( scoringFunctionFactory );
+		controler.addOverridingModule( new MATSim2010ScoringModule() );
 	}
 
 	public static Provider<TripRouter> createTripRouterFactory(final Scenario scenario) {

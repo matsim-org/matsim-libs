@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.vehicles.Vehicle;
 
 public class FFParkingEventsHandler implements PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, LinkLeaveEventHandler{
 	HashMap<Id, ArrayList<RentalInfoFF>> ffRentalsStats = new HashMap<Id, ArrayList<RentalInfoFF>>();
@@ -59,6 +60,8 @@ public class FFParkingEventsHandler implements PersonLeavesVehicleEventHandler, 
 			Id perid = personVehicles.get(event.getVehicleId());
 			
 			RentalInfoFF info = ffRentalsStats.get(perid).get(ffRentalsStats.get(perid).size() - 1);
+			info.vehId = event.getVehicleId();
+
 			info.distance += network.getLinks().get(event.getLinkId()).getLength();
 			
 		}
@@ -135,10 +138,13 @@ public class FFParkingEventsHandler implements PersonLeavesVehicleEventHandler, 
 		private double accessEndTime = 0.0;
 		private double egressStartTime = 0.0;
 		private double egressEndTime = 0.0;
+		private Id<Vehicle> vehId = null;
 		public String toString() {
 			
 			return personId + " " + Double.toString(startTime) + " " + Double.toString(endTime) + " " +
-			startLinkId.toString() + " " +	endLinkId.toString()+ " " + Double.toString(distance)+ " " + Double.toString(accessEndTime - accessStartTime)+ " " + Double.toString(egressEndTime - egressStartTime);
+			startLinkId.toString() + " " +	endLinkId.toString()+ " " + Double.toString(distance)+ " " 
+					+ Double.toString(accessEndTime - accessStartTime)+ " " + Double.toString(egressEndTime - egressStartTime) + " "
+					+ vehId;
 		}
 	}
 

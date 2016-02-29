@@ -29,6 +29,10 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.noise.NoiseCalculationOnline;
+import org.matsim.contrib.noise.NoiseConfigGroup;
+import org.matsim.contrib.noise.data.NoiseAllocationApproach;
+import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -40,12 +44,6 @@ import org.matsim.core.scenario.MutableScenario;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
-import playground.ikaddoura.noise2.NoiseCalculationOnline;
-import playground.ikaddoura.noise2.NoiseParameters;
-import playground.ikaddoura.noise2.data.GridParameters;
-import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
-import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.noise2.routing.VTTSNoiseTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
@@ -104,7 +102,7 @@ public class CNControler {
 
 	public void run(String outputDirectory, String configFile, boolean congestionPricing, boolean noisePricing, double sigma) {
 				
-		Config config = ConfigUtils.loadConfig(configFile);
+		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		if (outputDirectory == null) {
 			if (config.controler().getOutputDirectory() == null || config.controler().getOutputDirectory() == "") {
 				throw new RuntimeException("Either provide an output directory in the config file or the controler. Aborting...");
@@ -128,21 +126,16 @@ public class CNControler {
 		
 		NoiseContext noiseContext = null;
 		
-		// grid parameters
-		
-		GridParameters gridParameters = new GridParameters();
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 				
-		gridParameters.setReceiverPointGap(100.);
+		noiseParameters.setReceiverPointGap(100.);
 			
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
-				
-		// noise parameters
-		
-		NoiseParameters noiseParameters = new NoiseParameters();
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
+						
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
 				
 		noiseParameters.setScaleFactor(10.);
@@ -190,7 +183,7 @@ public class CNControler {
 		tunnelLinkIDs.add(Id.create("4989", Link.class));
 		tunnelLinkIDs.add(Id.create("73496", Link.class));
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
-		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
+		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 			
 		if (noisePricing) {	
 			noiseParameters.setInternalizeNoiseDamages(true);
@@ -200,7 +193,7 @@ public class CNControler {
 		
 		noiseParameters.setWriteOutputIteration(10);
 		
-		noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
+		noiseContext = new NoiseContext(controler.getScenario());
 
 		// congestion
 		
@@ -218,9 +211,9 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS, congestion and noise toll payments
 			final VTTSTollTimeDistanceTravelDisutilityFactory factory = new VTTSTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, config.planCalcScore()),
 					noiseContext,
-					congestionTollHandler
+					congestionTollHandler, config.planCalcScore()
 				);
 			factory.setSigma(sigma);
 			
@@ -245,8 +238,8 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS and noise toll payments
 			final VTTSNoiseTollTimeDistanceTravelDisutilityFactory factory = new VTTSNoiseTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
-					noiseContext
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, config.planCalcScore()),
+					noiseContext, config.planCalcScore()
 				);
 			factory.setSigma(sigma);
 			
@@ -271,8 +264,8 @@ public class CNControler {
 			
 			// a router which accounts for the person- and trip-specific VTTS and congestion toll payments
 			final VTTSCongestionTollTimeDistanceTravelDisutilityFactory factory = new VTTSCongestionTollTimeDistanceTravelDisutilityFactory(
-					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler),
-					congestionTollHandler
+					new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, config.planCalcScore()),
+					congestionTollHandler, config.planCalcScore()
 				);
 			factory.setSigma(sigma);
 			
@@ -296,7 +289,7 @@ public class CNControler {
 			// base case
 						
 			// a router which accounts for the person- and trip-specific VTTS
-			final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
+			final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, config.planCalcScore());
 			factory.setSigma(sigma);
 			
 			controler.addOverridingModule(new AbstractModule(){

@@ -42,6 +42,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
@@ -124,6 +125,9 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 			this.state = MobsimAgent.State.ACTIVITY ;
 			calculateAndSetDepartureTime(firstAct);
 		}
+		throw new RuntimeException("Should this class still be in use?  I think there is a delegated version of this, isn't there?  "
+				+ "This one here causes additional refactoring work. kai, feb'16" ) ;
+
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -308,7 +312,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		LegImpl walkLeg = new LegImpl("walk_ff");
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLink.getId());
-		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
+		final double dist = CoordUtils.calcEuclideanDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
 		final double estimatedNetworkDistance = dist * this.beelineFactor;
 
 		final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );
@@ -713,6 +717,24 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		} else {
 			return false ;
 		}
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public PlanElement getPreviousPlanElement() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 }

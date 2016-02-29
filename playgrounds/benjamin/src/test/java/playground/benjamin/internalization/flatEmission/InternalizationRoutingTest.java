@@ -80,7 +80,6 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	private EmissionModule emissionModule;
 	private EmissionCostModule emissionCostModule;
 
-	@Ignore
 	public void testDistanceRouting() {
 		this.config = super.loadConfig(null);
 		this.scenario = ScenarioUtils.createScenario(this.config);
@@ -116,7 +115,6 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
 	}
 	
-	@Ignore
 	public void testTimeRouting() {
 		this.config = super.loadConfig(null);
 		this.scenario = ScenarioUtils.createScenario(this.config);
@@ -153,7 +151,6 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
 	}
 
-	@Ignore
 	public void testTimeDistanceRouting() {
 		this.config = super.loadConfig(null);
 		this.scenario = ScenarioUtils.createScenario(this.config);
@@ -190,7 +187,6 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
 	}
 
-	@Ignore
 	public void testTimeDistanceEmissionRouting() {
 		this.config = super.loadConfig(null);
 		this.scenario = ScenarioUtils.createScenario(this.config);
@@ -240,7 +236,8 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	}
 
 	private void installEmissionDisutilityCalculatorFactory() {
-		final EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+		final EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, 
+				emissionCostModule, config.planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

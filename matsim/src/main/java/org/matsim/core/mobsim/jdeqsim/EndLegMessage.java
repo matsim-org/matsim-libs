@@ -47,7 +47,7 @@ public class EndLegMessage extends EventMessage {
 		// need the time interpretation info here.  Attaching it to the message feels weird.  The scheduler seems a pure simulation object.
 		// Consequence: attach it to Vehicle
 		super(scheduler, vehicle);
-		this.priority = SimulationParameters.PRIORITY_ARRIVAL_MESSAGE;
+		this.priority = JDEQSimConfigGroup.PRIORITY_ARRIVAL_MESSAGE;
 		if ( vehicle == null ) {
 			this.activityDurationInterpretation = PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ;
 			// need this for some test cases. kai, nov'13
@@ -106,18 +106,18 @@ public class EndLegMessage extends EventMessage {
 			event = new LinkEnterEvent(this.getMessageArrivalTime(), Id.create(vehicle.getOwnerPerson().getId().toString(), org.matsim.vehicles.Vehicle.class), 
 					vehicle.getCurrentLinkId());
 
-			SimulationParameters.getProcessEventThread().processEvent(event);
+			eventsManager.processEvent(event);
 		}
 
 		// schedule VehicleLeavesTrafficEvent
 		Id<org.matsim.vehicles.Vehicle> vehicleId = Id.create( this.vehicle.getOwnerPerson().getId() , org.matsim.vehicles.Vehicle.class ) ;
 		event = new VehicleLeavesTrafficEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), 
 				vehicleId, this.vehicle.getCurrentLeg().getMode(), 1.0 );
-		SimulationParameters.getProcessEventThread().processEvent(event);
+		eventsManager.processEvent(event);
 
 		// schedule AgentArrivalEvent
 		event = new PersonArrivalEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), this.vehicle.getCurrentLeg().getMode());
-		SimulationParameters.getProcessEventThread().processEvent(event);
+		eventsManager.processEvent(event);
 
 		// schedule ActStartEvent
 		Activity nextAct = this.vehicle.getNextActivity();
@@ -128,7 +128,7 @@ public class EndLegMessage extends EventMessage {
 		}
 
 		event = new ActivityStartEvent(actStartEventTime, this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), nextAct.getFacilityId(), nextAct.getType());
-		SimulationParameters.getProcessEventThread().processEvent(event);
+		eventsManager.processEvent(event);
 
 	}
 

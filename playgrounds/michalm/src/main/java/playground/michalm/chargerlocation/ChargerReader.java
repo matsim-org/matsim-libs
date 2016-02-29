@@ -25,13 +25,13 @@ import java.util.Map;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.network.*;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.michalm.berlin.BerlinZoneUtils;
 import playground.michalm.ev.*;
 import playground.michalm.taxi.data.*;
-import playground.michalm.zone.Zone;
 
 
 public class ChargerReader

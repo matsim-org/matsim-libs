@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Time;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus.MZ2010ExportChoiceSetRecordFiller;
 
 /**
  * @author thibautd
@@ -63,21 +62,22 @@ public class RecordFillerUtils {
 
 	public static long getId( final ChoiceSet<Trip> cs ) {
 		final Id<Person> id = cs.getDecisionMaker().getId();
-		final Long longId = Long.getLong( id.toString() );
-
-		if ( longId != null ) return longId;
-
-		// TODO store table number to id
-		// (could also be done offline, as String hashCode should be stable according to documentation)
-		long value = id.toString().hashCode();
-
-		while ( idMappings.containsKey( value ) && !idMappings.get( value ).equals( id ) ) {
-			log.warn( "Already a numerical ID "+value+" (for id "+idMappings.get( value )+") when adding "+id );
-			value++;
+		try {
+			return Long.valueOf( id.toString() );
 		}
+		catch ( NumberFormatException e ) {
+			// TODO store table number to id
+			// (could also be done offline, as String hashCode should be stable according to documentation)
+			long value = id.toString().hashCode();
 
-		idMappings.put( value , id );
-		return value;
+			while ( idMappings.containsKey( value ) && !idMappings.get( value ).equals( id ) ) {
+				log.warn( "Already a numerical ID " + value + " (for id " + idMappings.get( value ) + ") when adding " + id );
+				value++;
+			}
+
+			idMappings.put( value, id );
+			return value;
+		}
 	}
 
 	public static double getDistance( Trip trip ) {

@@ -170,8 +170,8 @@ public class Bast2Counts {
 			
 			Link link1 = network.getNearestLinkExactly(MatsimCoordUtils.pointToCoord(countPos));
 			Node toNode = link1.getToNode();
-			double dist1 = CoordUtils.calcDistance(toNode.getCoord(), MatsimCoordUtils.pointToCoord(direct1));
-			double dist2 = CoordUtils.calcDistance(toNode.getCoord(), MatsimCoordUtils.pointToCoord(direct2));
+			double dist1 = CoordUtils.calcEuclideanDistance(toNode.getCoord(), MatsimCoordUtils.pointToCoord(direct1));
+			double dist2 = CoordUtils.calcEuclideanDistance(toNode.getCoord(), MatsimCoordUtils.pointToCoord(direct2));
 			
 			double returnVal;
 			if(dist1 < dist2) {

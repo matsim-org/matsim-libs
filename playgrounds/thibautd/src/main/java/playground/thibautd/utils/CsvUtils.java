@@ -19,7 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.utils;
 
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,21 +42,31 @@ public class CsvUtils {
 
 		StringBuilder currentField = new StringBuilder();
 		boolean inquote = false;
+		boolean escape = false;
 		for ( char c : line.toCharArray() ) {
 			if ( !inquote && c == sep ) {
 				fields.add( currentField.toString() );
 				currentField = new StringBuilder();
 			}
-			else if ( c == quote ) {
+			else if ( !escape && c == quote ) {
 				inquote = !inquote;
 			}
-			else {
+			else if (escape || c != '\\' ) {
 				currentField.append( c );
 			}
+			escape = !escape && c == '\\';
 		}
 		fields.add( currentField.toString() );
 
 		return fields.toArray( new String[ fields.size() ] );
+	}
+
+	public static TitleLine parseTitleLine(
+			final char sep,
+			final char quote,
+			final String line ) {
+		final String[] names = parseCsvLine( sep , quote , line );
+		return new TitleLine( names );
 	}
 
 	public static String buildCsvLine(
@@ -75,14 +89,50 @@ public class CsvUtils {
 		return line.toString();
 	}
 
-	private static String escapeField(
+	public static String escapeField(
 			final char sep,
 			final char quote,
 			final String string) {
-		if  ( sep == quote ) {} // just to get rid of warning...
-		// TODO: quote only if contains sep or white space.
-		// TODO: escape quotes!
-		return quote+string+quote;
+		// only escape quotation marks and separators
+		if ( string.indexOf( sep ) < 0 &&
+				string.indexOf( quote ) < 0 &&
+				string.indexOf( '\\' ) < 0 ) return string;
+
+		final StringBuffer buffer = new StringBuffer();
+		buffer.append( '"' );
+		for ( char c : string.toCharArray() ) {
+			if ( c == quote || c == '\\' ) {
+				buffer.append( '\\' );
+			}
+			buffer.append( c );
+		}
+		buffer.append( '"' );
+
+		return buffer.toString();
+	}
+
+	public static class TitleLine {
+		private final TObjectIntMap<String> map = new TObjectIntHashMap<>();
+		private final String[] names;
+
+		public TitleLine( final String[] names ) {
+			for ( int i = 0; i < names.length; i++ ) {
+				map.put( names[ i ] , i );
+			}
+			this.names = names;
+		}
+
+		public String[] getNames() {
+			return names;
+		}
+
+		public int getIndexOfField( final String name ) {
+			return map.get( name );
+		}
+
+		public int getNField() {
+			return map.size();
+		}
 	}
 }
 

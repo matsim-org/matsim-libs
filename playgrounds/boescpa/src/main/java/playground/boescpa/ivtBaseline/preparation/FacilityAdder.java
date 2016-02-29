@@ -83,7 +83,7 @@ public class FacilityAdder {
 		double distanceToSelectedFacility = Double.MAX_VALUE;
         for (ActivityFacility facility : facilities.getFacilities().values()) {
             if (facility.getActivityOptions().containsKey(actType)) {
-                double distanceToCurrentFacility = CoordUtils.calcDistance(actCoord, facility.getCoord());
+                double distanceToCurrentFacility = CoordUtils.calcEuclideanDistance(actCoord, facility.getCoord());
                 if (distanceToCurrentFacility < distanceToSelectedFacility) {
                     distanceToSelectedFacility = distanceToCurrentFacility;
                     selectedFacility = facility;

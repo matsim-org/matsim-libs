@@ -50,7 +50,7 @@ public class TripRouterModuleTest {
             LeastCostPathCalculatorFactory defaultLeastCostPathCalculatorFactory = TripRouterFactoryBuilderWithDefaults.createDefaultLeastCostPathCalculatorFactory(scenario);
             LeastCostPathCalculator pathCalculator = defaultLeastCostPathCalculatorFactory.createPathCalculator(
                     scenario.getNetwork(),
-                    ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(new FreeSpeedTravelTime(), config.planCalcScore()),
+                    ControlerDefaults.createDefaultTravelDisutilityFactory(scenario).createTravelDisutility(new FreeSpeedTravelTime()),
                     new FreeSpeedTravelTime());
             Assert.assertNotNull(pathCalculator);
         }

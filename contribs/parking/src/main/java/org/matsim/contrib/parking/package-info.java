@@ -1,6 +1,11 @@
 /**
- * It looks to us like that PC2 and parkingChoice are two implementations of the same or at least overlapping functionality.   Since PC2 
- * seems newer, documentation and refactoring of the contrib concentrates on that one.  kai, jul'15
+ * This is probably an implementation of an approach where<ul>
+ * <li> parking spaces on a per link basis are limited (somehow taken from external data)
+ * <li> cars that attempt to park are <i>always</i> accepted but the drivers obtain a negative score for this
+ * <li> over the iterations, parking supply is balanced with parking demand
+ * </ul>
+ * As said, this is our speculation.  
+ * 
  * 
  * @author (of documentation) nagel
  */

@@ -73,7 +73,7 @@ public class ComparePlans {
 				PlanElement planElement1 = plan1.getPlanElements().get(p1), planElement2 = plan2.getPlanElements().get(p2);
 				if(planElement1 instanceof Leg && planElement2 instanceof Leg) {
 					if(((Leg)planElement1).getMode().equals("car") && ((Leg)planElement2).getMode().equals("transit_walk")) {
-						String line = personId+s+l+s+((Leg)planElement1).getTravelTime()+s+RouteUtils.calcDistance(((NetworkRoute)((Leg)planElement1).getRoute()), network);
+						String line = personId+s+l+s+((Leg)planElement1).getTravelTime()+s+RouteUtils.calcDistanceExcludingStartEndLink(((NetworkRoute)((Leg)planElement1).getRoute()), network);
 						double time=0, distance=0, fare=0, numTransfers=0, walk=0;
 						while(!(planElement2 instanceof Activity) || ((Activity)planElement2).getType().equals("pt interaction")) {
 							if(planElement2 instanceof Leg) {
@@ -90,7 +90,7 @@ public class ComparePlans {
 						writer.println(line);
 					}
 					else if(((Leg)planElement2).getMode().equals("car") && ((Leg)planElement1).getMode().equals("transit_walk")) {
-						String line = personId+s+l+s+((Leg)planElement2).getTravelTime()+s+RouteUtils.calcDistance(((NetworkRoute)((Leg)planElement2).getRoute()), network);
+						String line = personId+s+l+s+((Leg)planElement2).getTravelTime()+s+RouteUtils.calcDistanceExcludingStartEndLink(((NetworkRoute)((Leg)planElement2).getRoute()), network);
 						double time=0, distance=0, fare=0, numTransfers=0, walk=0;
 						while(!(planElement1 instanceof Activity) || ((Activity)planElement1).getType().equals("pt interaction")) {
 							if(planElement1 instanceof Leg) {

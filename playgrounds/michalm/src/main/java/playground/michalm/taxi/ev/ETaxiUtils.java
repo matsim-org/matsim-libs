@@ -23,13 +23,14 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.taxi.util.stats.StatsCalculators;
+import org.matsim.contrib.taxi.util.stats.StatsCollector.StatsCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 import playground.michalm.ev.*;
 import playground.michalm.taxi.data.*;
-import playground.michalm.taxi.util.stats.StatsCalculators;
-import playground.michalm.taxi.util.stats.StatsCollector.StatsCalculator;
+import playground.michalm.taxi.util.stats.EStatsCalculators;
 
 
 public class ETaxiUtils
@@ -81,7 +82,7 @@ public class ETaxiUtils
     public static StatsCalculator<String> createStatsCollection(ETaxiData taxiData)
     {
         return StatsCalculators.combineStatsCalculators(
-                StatsCalculators.createMeanSocCalculator(taxiData),
-                StatsCalculators.createDischargedVehiclesCounter(taxiData));
+                EStatsCalculators.createMeanSocCalculator(taxiData),
+                EStatsCalculators.createDischargedVehiclesCounter(taxiData));
     }
 }

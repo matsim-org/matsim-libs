@@ -69,7 +69,7 @@ public class MaxProfitWithLandPrices extends RetailerModelImpl
       double centerY = 247300.0;
         Coord coord = new Coord(centerX, centerY);
       Collection<PersonPrimaryActivity> primaryActivities;
-      if (CoordUtils.calcDistance(link.getCoord(), coord) < 5000) {
+      if (CoordUtils.calcEuclideanDistance(link.getCoord(), coord) < 5000) {
     	  
 	      primaryActivities = Utils.getPersonPrimaryActivityQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
 
@@ -100,7 +100,7 @@ public class MaxProfitWithLandPrices extends RetailerModelImpl
 	      double centerY = 247300.0;
           Coord coord = new Coord(centerX, centerY);
 	      Collection<ActivityFacility> facilities;
-	      if (CoordUtils.calcDistance(link.getCoord(), coord) < 5000) {
+	      if (CoordUtils.calcEuclideanDistance(link.getCoord(), coord) < 5000) {
 		      facilities = Utils.getShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
 
 	      }
@@ -108,7 +108,7 @@ public class MaxProfitWithLandPrices extends RetailerModelImpl
 	    	  facilities = Utils.getShopsQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), 5000.0D);
 	      }
 	        
-	      landPrice = CoordUtils.calcDistance(link.getCoord(), coord) * (-0.00001) + 1.0;
+	      landPrice = CoordUtils.calcEuclideanDistance(link.getCoord(), coord) * (-0.00001) + 1.0;
 	      link.setLandPrice(landPrice);
 	      int numberShops = facilities.size();
 	      

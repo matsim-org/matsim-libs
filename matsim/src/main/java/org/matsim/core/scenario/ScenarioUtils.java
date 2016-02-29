@@ -48,7 +48,9 @@ public class ScenarioUtils {
 	 *
 	 */
 	public static Scenario loadScenario(final Config config) {
-		return ScenarioLoaderImpl.loadScenario(config);
+		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(config);
+		Scenario scenario = scenarioLoader.loadScenario();
+		return scenario;
 	}
 
 	/**
@@ -58,7 +60,8 @@ public class ScenarioUtils {
 	 *
 	 */
 	public static void loadScenario(final Scenario scenario) {
-		ScenarioLoaderImpl.loadScenario(scenario);
+		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(scenario);
+		scenarioLoader.loadScenario();
 	}
 	
 	public final static class ScenarioBuilder {

@@ -88,7 +88,7 @@ public class RunTRBModel {
 				// increase distance by 1 (normally meter) to avoid linking with all agents
 				// living in the same place.
 				// TODO: test sensitivity of the results to this
-				return pars.getB_logDist() * Math.log( CoordUtils.calcDistance( ego.getCoord(), alter.getCoord() ) + 1 )
+				return pars.getB_logDist() * Math.log( CoordUtils.calcEuclideanDistance( ego.getCoord(), alter.getCoord() ) + 1 )
 						+ pars.getB_sameGender() * dummy( ego.isMale() == alter.isMale() )
 						+ pars.getB_ageDiff0() * dummy( ageClassDifference == 0 )
 						+ pars.getB_ageDiff2() * dummy( ageClassDifference == 2 )

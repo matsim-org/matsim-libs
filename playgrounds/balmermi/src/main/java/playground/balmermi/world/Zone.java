@@ -105,35 +105,35 @@ public class Zone extends AbstractLocation {
 		} else if ((x < minX) && (maxY < y)) {
 			// case 2
 			Coord refPt = new Coord(minX, maxY);
-			return CoordUtils.calcDistance(refPt, coord);
+			return CoordUtils.calcEuclideanDistance(refPt, coord);
 		} else if ((minX <= x) && (x <= maxX) && (maxY < y)) {
 			// case 3
 			Coord refPt = new Coord(x, maxY);
-			return CoordUtils.calcDistance(refPt, coord);
+			return CoordUtils.calcEuclideanDistance(refPt, coord);
 		} else if ((maxX < x) && (maxY < y)) {
 			// case 4
 			Coord refPt = new Coord(maxX, maxY);
-			return CoordUtils.calcDistance(refPt, coord);
+			return CoordUtils.calcEuclideanDistance(refPt, coord);
 		} else if ((x < minX) && (minY <= y) && (y <= maxY)) {
 			// case 5
 			Coord refPt = new Coord(minX, y);
-			return CoordUtils.calcDistance(refPt, coord);
+			return CoordUtils.calcEuclideanDistance(refPt, coord);
 		} else if ((maxX < x) && (minY <= y) && (y <= maxY)) {
 			// case 6
 			Coord refPt = new Coord(maxX, y);
-			return CoordUtils.calcDistance(refPt, coord);
+			return CoordUtils.calcEuclideanDistance(refPt, coord);
 		} else if ((x < minX) && (y < minY)) {
 			// case 7
 			Coord refPt = new Coord(minX, minY);
-			return CoordUtils.calcDistance(refPt, coord);
+			return CoordUtils.calcEuclideanDistance(refPt, coord);
 		} else if ((minX <= x) && (x <= maxX) && (y < minY)) {
 			// case 8
 			Coord refPt = new Coord(x, minY);
-			return CoordUtils.calcDistance(refPt, coord);
+			return CoordUtils.calcEuclideanDistance(refPt, coord);
 		} else if ((maxX < x) && (y < maxY)) {
 			// case 9
 			Coord refPt = new Coord(maxX, minY);
-			return CoordUtils.calcDistance(refPt, coord);
+			return CoordUtils.calcEuclideanDistance(refPt, coord);
 		} else {
 			throw new RuntimeException("This should never happen!");
 		}

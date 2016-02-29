@@ -45,13 +45,13 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
-import scenarios.analysis.TtAbstractAnalysisTool;
-import scenarios.analysis.TtListenerToBindAndWriteAnalysis;
-import scenarios.braess.analysis.TtAnalyzeBraess;
-import scenarios.braess.createInput.TtCreateBraessPopulation;
-import scenarios.braess.createInput.TtCreateBraessPopulation.InitRoutes;
-import scenarios.braess.run.RunBraessSimulation;
-import scenarios.braess.run.RunBraessSimulation.PricingType;
+import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
+import scenarios.illustrative.analysis.TtListenerToBindAndWriteAnalysis;
+import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
+import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
+import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
+import scenarios.illustrative.braess.run.RunBraessSimulation;
+import scenarios.illustrative.braess.run.RunBraessSimulation.PricingType;
 
 /**
  * Test to fix the route distribution and travel times in Braess's scenario.

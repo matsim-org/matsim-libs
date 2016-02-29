@@ -52,7 +52,7 @@ public class SimPopulationBuilder {
         DataPool dataPool = engine.getDataPool();
 
         Set<Person> simPersons;
-        if(simPopFile == null) {
+        if (simPopFile == null) {
 
             int size = (int) Double.parseDouble(config.getParam(Simulator.MODULE_NAME, "populationSize"));
             simPersons = (Set<Person>) clonePersons(engine.getRefPersons(),
@@ -65,19 +65,28 @@ public class SimPopulationBuilder {
             Initializing simulation population...
             */
             logger.info("Assigning home locations...");
-            ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
-            ZoneCollection modenaZones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
-
-            ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(
-                    MiDKeys.PERSON_LAU2_CLASS,
-                    lau2Zones,
-                    engine.getLegPredicate());
-            zoneMobilityRate.analyze(engine.getRefPersons(), null);
-
-            new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
+            boolean useZoneWeights = true;
+            String val = config.findParam(Simulator.MODULE_NAME, "useZoneWeights");
+            if (val != null) {
+                useZoneWeights = Boolean.parseBoolean(val);
+            }
 
             SetHomeFacilities setHomeFacilities = new SetHomeFacilities(dataPool, "modena", engine.getRandom());
-            setHomeFacilities.setZoneWeights(zoneMobilityRate.getMobilityRatePerZone(modenaZones));
+
+            if (useZoneWeights) {
+                ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+                ZoneCollection modenaZones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
+
+                ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(
+                        MiDKeys.PERSON_LAU2_CLASS,
+                        lau2Zones,
+                        engine.getLegPredicate());
+                zoneMobilityRate.analyze(engine.getRefPersons(), null);
+
+                new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
+                setHomeFacilities.setZoneWeights(zoneMobilityRate.getMobilityRatePerZone(modenaZones));
+            }
+
             setHomeFacilities.apply(simPersons);
 
             logger.info("Assigning random activity locations...");

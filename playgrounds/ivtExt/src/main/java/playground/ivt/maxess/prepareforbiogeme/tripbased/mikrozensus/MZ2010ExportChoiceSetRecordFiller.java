@@ -70,6 +70,9 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 		put( "P_LICENSE", getLicense( cs.getDecisionMaker() ), values );
 		put( "P_EMPLOYMENT", getEmployment( cs.getDecisionMaker() ), values );
 
+		put( "HH_SIZE" , getHouseholdSize( cs.getDecisionMaker() ) , values );
+		put( "HH_MONTHINCOME" , getHouseholdIncome( cs.getDecisionMaker() ) , values );
+
 		values.put("C_CHOICE", RecordFillerUtils.getChoice(cs));
 
 		for ( Map.Entry<String,Trip> alt : cs.getNamedAlternatives().entrySet() ) {
@@ -93,6 +96,46 @@ public class MZ2010ExportChoiceSetRecordFiller  implements ChoiceDataSetWriter.C
 		}
 
 		return values;
+	}
+
+	private Number getHouseholdIncome( Person decisionMaker ) {
+		final String income = ( String ) personAttributes.getAttribute(
+				decisionMaker.getId().toString(),
+				"householdIncome" );
+		codebook.writeMeaning( income );
+		switch ( income ) {
+			case "no Answer":
+				return -98;
+			case "do not know":
+				return -97;
+			case "less than CHF 2000":
+				return 1000;
+			case "CHF 2000 to 4000":
+				return 3000;
+			case "CHF 4001 to 6000":
+				return 5000;
+			case "CHF 6001 to 8000":
+				return 7000;
+			case "CHF 8001 to 10000":
+				return 8000;
+			case "CHF 10001 to 12000":
+				return 11000;
+			case "CHF 12001 to 14000":
+				return 13000;
+			case "CHF 14001 to 16000":
+				return 15000;
+			case "greater than CHF 16000":
+				return 17000;
+		}
+		throw new IllegalArgumentException( income );
+	}
+
+	private Number getHouseholdSize( Person decisionMaker ) {
+		final Integer size = ( Integer ) personAttributes.getAttribute(
+				decisionMaker.getId().toString(),
+				"householdSize" );
+		codebook.writeMeaning( ""+size );
+		return size;
 	}
 
 	private double calcPriceAuto( final double distance_m ) {

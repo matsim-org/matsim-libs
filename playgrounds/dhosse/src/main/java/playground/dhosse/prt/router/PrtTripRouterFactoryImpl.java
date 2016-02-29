@@ -111,7 +111,7 @@ public class PrtTripRouterFactoryImpl implements Provider<TripRouter> {
 
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
 
-			RoutingModule module = DefaultRoutingModules.createNetworkRouter(mainMode, populationFactory, network, routeAlgoPtFreeFlow) ;
+			RoutingModule module = DefaultRoutingModules.createPureNetworkRouter(mainMode, populationFactory, network, routeAlgoPtFreeFlow) ;
 			tripRouter.setRoutingModule(mainMode, module) ;
 			
 		}

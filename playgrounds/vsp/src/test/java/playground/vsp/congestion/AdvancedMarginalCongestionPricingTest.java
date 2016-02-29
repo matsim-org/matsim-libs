@@ -36,6 +36,8 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
@@ -45,6 +47,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -85,8 +88,8 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
+
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -148,8 +151,8 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
+
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -202,7 +205,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		
 		ScenarioConfigGroup scenarioConfig = new ScenarioConfigGroup();
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters( null ), scenarioConfig).create();
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(plansCalcScoreConfigGroup, plansCalcScoreConfigGroup.getScoringParameters(null), scenarioConfig).build();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -233,9 +236,13 @@ public class AdvancedMarginalCongestionPricingTest {
 	public final void test1(){
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config1.xml";
-
-		final Controler controler = new Controler(configFile);
 		
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		Controler controler = new Controler( scenario );
+
 		EventsManager events = controler.getEvents();
 				
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -266,7 +273,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		});
 		
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
-		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler, controler.getConfig().planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -309,8 +316,12 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config2.xml";
 
-		Controler controler = new Controler(configFile);
-		
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		Controler controler = new Controler( scenario );
+
 		EventsManager events = controler.getEvents();
 				
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
@@ -341,7 +352,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		});
 		
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
-		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler, controler.getConfig().planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -389,7 +400,11 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config3.xml";
 
-		Controler controler = new Controler(configFile);
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+
+		final Scenario scenario = ScenarioUtils.loadScenario( config);
+		Controler controler = new Controler( scenario );
 		
 		EventsManager events = controler.getEvents();
 				
@@ -421,7 +436,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		});
 		
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
-		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler, controler.getConfig().planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -451,7 +466,11 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config4.xml";
 
-		Controler controler = new Controler(configFile);
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+
+		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		Controler controler = new Controler( scenario );
 		
 		EventsManager events = controler.getEvents();
 				
@@ -483,7 +502,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		});
 		
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
-		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler, controler.getConfig().planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

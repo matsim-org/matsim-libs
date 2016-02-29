@@ -24,7 +24,6 @@ import java.util.List;
 
 public interface MatsimServices {
 
-
 	IterationStopWatch getStopwatch();
 
 	TravelTime getLinkTravelTimes();
@@ -41,12 +40,10 @@ public interface MatsimServices {
 
 	Scenario getScenario();
 
-	@Deprecated // preferably use "@Inject EventsManager events" or "addEventHandlerBinding().toInstance(...) from AbstractModule". kai/mz, nov'15
 	EventsManager getEvents();
 
 	com.google.inject.Injector getInjector();
 
-	@Deprecated
 	CalcLinkStats getLinkStats();
 
 	VolumesAnalyzer getVolumes();
@@ -55,7 +52,6 @@ public interface MatsimServices {
 
 	TravelDisutilityFactory getTravelDisutilityFactory();
 
-	@Deprecated // see javadoc above
 	StrategyManager getStrategyManager();
 
 	OutputDirectoryHierarchy getControlerIO();

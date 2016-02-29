@@ -32,8 +32,8 @@
           <includes>
             <include>**/SomeNonExistingTestName</include>
           </includes>
-          <forkMode>once</forkMode>
-          <argLine>-Xmx2000m -Djava.awt.headless=true</argLine>
+          <forkMode>always</forkMode>
+          <argLine>-Xmx1500m -Djava.awt.headless=true</argLine>
           <enableAssertions>false</enableAssertions>
         </configuration>
       </plugin>

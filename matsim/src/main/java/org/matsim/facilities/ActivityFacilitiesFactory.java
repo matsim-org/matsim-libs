@@ -22,6 +22,7 @@ package org.matsim.facilities;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimFactory;
 
 /**
@@ -31,6 +32,10 @@ import org.matsim.core.api.internal.MatsimFactory;
 public interface ActivityFacilitiesFactory extends MatsimFactory {
 
 	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord);
+	
+	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Id<Link> linkId);
+	
+	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord, Id<Link> linkId);
 
 	public ActivityOption createActivityOption(String type);
 

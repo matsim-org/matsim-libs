@@ -35,6 +35,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -62,6 +64,8 @@ import org.xml.sax.Attributes;
 	private final static String ATTR_X100 = "x100";
 	private final static String ATTR_Y100 = "y100";
 
+	private final CoordinateTransformation coordinateTransformation;
+
 	private final Population plans;
 	private final Network network;
 	private Person currperson = null;
@@ -74,7 +78,15 @@ import org.xml.sax.Attributes;
 
 	private static final Logger log = Logger.getLogger(PopulationReaderMatsimV0.class);
 
-	protected PopulationReaderMatsimV0(final Scenario scenario) {
+	protected PopulationReaderMatsimV0(
+			final Scenario scenario) {
+		this( new IdentityTransformation() , scenario );
+	}
+
+	protected PopulationReaderMatsimV0(
+			final CoordinateTransformation coordinateTransformation,
+			final Scenario scenario) {
+		this.coordinateTransformation = coordinateTransformation;
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
 	}
@@ -159,17 +171,16 @@ import org.xml.sax.Attributes;
 			log.info("The attribute 'zone' of <act> will be ignored");
 		}
 
-		Coord coord = null;
 		ActivityImpl act;
 		if (atts.getValue("link") != null) {
 			Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), linkId);
 			if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
-				coord = new Coord(Double.parseDouble(atts.getValue(ATTR_X100)), Double.parseDouble(atts.getValue(ATTR_Y100)));
+				final Coord coord = parseCoord( atts );
 				act.setCoord(coord);
 			}
 		} else if (atts.getValue(ATTR_X100) != null && atts.getValue(ATTR_Y100) != null) {
-			coord = new Coord(Double.parseDouble(atts.getValue(ATTR_X100)), Double.parseDouble(atts.getValue(ATTR_Y100)));
+			final Coord coord = parseCoord( atts );
 			act = this.currplan.createAndAddActivity(atts.getValue("type"), coord);
 		} else {
 			throw new IllegalArgumentException("Either the coords or the link must be specified for an Act.");
@@ -184,6 +195,13 @@ import org.xml.sax.Attributes;
 			this.currroute = null;
 		}
 		this.prevAct = act;
+	}
+
+	private Coord parseCoord(Attributes atts) {
+		return coordinateTransformation.transform(
+				new Coord(
+						Double.parseDouble(atts.getValue( ATTR_X100 )),
+						Double.parseDouble(atts.getValue( ATTR_Y100 )) ) );
 	}
 
 	private void startLeg(final Attributes atts) {

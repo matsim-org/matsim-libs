@@ -60,7 +60,24 @@ public abstract class Event {
 		eventXML.append(" />");
 		return eventXML.toString();
 	}
-	
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Event)) {
+			return false;
+		} else {
+			Event other = (Event) obj;
+			return time == other.getTime() &&
+					getEventType().equals(other.getEventType()) &&
+					getAttributes().equals(other.getAttributes());
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return getAttributes().hashCode(); // Two equal events must at least have the same attributes, so they will get the same hashCode like this.
+	}
+
 }
 
 

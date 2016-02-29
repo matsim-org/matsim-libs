@@ -307,7 +307,7 @@ public class CAExperimentsGRID {
 			Network net, double w) {
 		Link con1 = fac.createLink(
 				Id.create(n.getId() + "_" + nR.getId(), Link.class), n, nR);
-		double length = CoordUtils.calcDistance(n.getCoord(), nR.getCoord());
+		double length = CoordUtils.calcEuclideanDistance(n.getCoord(), nR.getCoord());
 		con1.setLength(length);
 		Set<String> modes = new HashSet<String>();
 		modes.add("walkca");

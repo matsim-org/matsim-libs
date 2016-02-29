@@ -44,6 +44,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
@@ -129,6 +130,9 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 			this.state = MobsimAgent.State.ACTIVITY ;
 			calculateAndSetDepartureTime(firstAct);
 		}
+		throw new RuntimeException("Should this class still be in use?  I think there is a delegated version of this, isn't there?  "
+				+ "This one here causes additional refactoring work. kai, feb'16" ) ;
+
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------------------
@@ -334,7 +338,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		LegImpl walkLeg = new LegImpl("walk_rb");
 		
 		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getStartLinkId(), startLink.getId());
-		final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
+		final double dist = CoordUtils.calcEuclideanDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(), startLink.getCoord());
 		final double estimatedNetworkDistance = dist * this.beelineFactor;
 
 		final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );
@@ -516,7 +520,7 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		Link link = map.get(scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()));
 		map.remove(scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()));
 		GenericRouteImpl walkRoute = new GenericRouteImpl(link.getId(), route.getEndLinkId());
-		final double dist = CoordUtils.calcDistance(link.getCoord(), scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
+		final double dist = CoordUtils.calcEuclideanDistance(link.getCoord(), scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
 		final double estimatedNetworkDistance = dist * this.beelineFactor;
 
 		final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );
@@ -548,9 +552,9 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		double distanceSearch = Double.parseDouble(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("searchDistanceTwoWayCarsharing"));
 		TwoWayCSStation closest = null;
 		for(TwoWayCSStation station: location) {
-			if (CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord());
+				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 			
 		}
@@ -793,6 +797,24 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		} else {
 			return false ;
 		}
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public PlanElement getPreviousPlanElement() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 }

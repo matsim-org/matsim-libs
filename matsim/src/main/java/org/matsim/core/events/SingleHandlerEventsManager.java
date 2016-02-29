@@ -55,8 +55,8 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
@@ -164,7 +164,7 @@ public class SingleHandlerEventsManager implements EventsManager {
 		if (this.eventHandler instanceof VehicleArrivesAtFacilityEventHandler) this.isVehicleArrivesAtFacilityHandler = true;
 		else this.isVehicleArrivesAtFacilityHandler = false;
 		
-		if (this.eventHandler instanceof VehicleArrivesAtFacilityEventHandler) this.isVehicleLeavesTrafficHandler = true;
+		if (this.eventHandler instanceof VehicleLeavesTrafficEventHandler) this.isVehicleLeavesTrafficHandler = true;
 		else this.isVehicleLeavesTrafficHandler = false;
 
 		if (this.eventHandler instanceof VehicleAbortsEventHandler) this.isVehicleAbortsHandler = true;

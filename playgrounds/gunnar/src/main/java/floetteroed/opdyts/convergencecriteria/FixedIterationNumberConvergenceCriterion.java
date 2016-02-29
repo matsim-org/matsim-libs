@@ -27,7 +27,9 @@ package floetteroed.opdyts.convergencecriteria;
 import java.util.ArrayList;
 import java.util.List;
 
-import floetteroed.opdyts.trajectorysampling.TransitionSequence;
+import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.trajectorysampling.Transition;
+import floetteroed.utilities.math.BasicStatistics;
 import floetteroed.utilities.math.Vector;
 
 /**
@@ -44,16 +46,6 @@ public class FixedIterationNumberConvergenceCriterion implements
 
 	private final int averagingIterations;
 
-	private List<Double> finalWeights = null;
-
-	private Double finalEquilbiriumGap = null;
-
-	private Double finalUniformityGap = null;
-
-	// -------------------- MEMBERS --------------------
-
-	private Double finalObjectiveFunctionValue = null;
-
 	// -------------------- CONSTRUCTION --------------------
 
 	public FixedIterationNumberConvergenceCriterion(
@@ -62,80 +54,95 @@ public class FixedIterationNumberConvergenceCriterion implements
 		this.averagingIterations = averagingIterations;
 	}
 
+	// -------------------- INTERNALS --------------------
+
+	private <U extends DecisionVariable> List<Double> objectiveFunctionValues(
+			final List<Transition<U>> transitions) {
+		final List<Double> result = new ArrayList<Double>(transitions.size());
+		for (Transition<?> transition : transitions) {
+			result.add(transition.getToStateObjectiveFunctionValue());
+		}
+		return result;
+	}
+
 	// --------------- IMPLEMENTATION OF ConvergenceCriterion ---------------
 
 	@Override
-	public void evaluate(final TransitionSequence<?> transitionSequence) {
-		if ((transitionSequence.iterations() < this.iterationsToConvergence)) {
-			this.finalObjectiveFunctionValue = null;
-		} else {
-			final List<Double> objectiveFunctionValues = transitionSequence
-					.getObjectiveFunctionValues();
-			this.finalObjectiveFunctionValue = 0.0;
+	public <U extends DecisionVariable> ConvergenceCriterionResult evaluate(
+			final List<Transition<U>> transitionSequence) {
+
+		if (transitionSequence.size() >= this.averagingIterations) {
+
+			// objective function statistics
+			final List<Double> objectiveFunctionValues = this
+					.objectiveFunctionValues(transitionSequence);
+			final BasicStatistics objectiveFunctionValueStats = new BasicStatistics();
 			for (int i = transitionSequence.size() - this.averagingIterations; i < transitionSequence
 					.size(); i++) {
-				this.finalObjectiveFunctionValue += objectiveFunctionValues
-						.get(i);
-			}
-			this.finalObjectiveFunctionValue /= this.averagingIterations;
-
-			// TODO >>> NEW >>>
-			this.finalWeights = new ArrayList<>(transitionSequence.size());
-			for (int i = 0; i < transitionSequence.size()
-					- this.averagingIterations; i++) {
-				this.finalWeights.add(0.0);
-			}
-			for (int i = transitionSequence.size() - this.averagingIterations; i < transitionSequence
-					.size(); i++) {
-				this.finalWeights.add(1.0 / this.averagingIterations);
+				objectiveFunctionValueStats.add(objectiveFunctionValues.get(i));
 			}
 
-			// TODO >>> EVEN NEWER >>>
-			
-			final Vector totalDelta = transitionSequence.getTransitions()
+			// gap statistics
+			final Vector totalDelta = transitionSequence
 					.get(transitionSequence.size() - this.averagingIterations)
 					.getDelta().copy();
 			for (int i = transitionSequence.size() - this.averagingIterations
 					+ 1; i < transitionSequence.size(); i++) {
-				totalDelta.add(transitionSequence.getTransitions().get(i)
-						.getDelta());
+				totalDelta.add(transitionSequence.get(i).getDelta());
 			}
-			final double finalWeight = 1.0 / this.averagingIterations;
-			totalDelta.mult(finalWeight);
-			this.finalEquilbiriumGap = totalDelta.euclNorm();
-			this.finalUniformityGap = finalWeight;
-			
-			// TODO <<< NEW <<<
+
+			// package the results
+			final boolean converged = (transitionSequence.size() >= this.iterationsToConvergence);
+			return new ConvergenceCriterionResult(converged,
+					objectiveFunctionValueStats.getAvg(),
+					objectiveFunctionValueStats.getStddev(),
+					totalDelta.euclNorm() / this.averagingIterations,
+					1.0 / this.averagingIterations, transitionSequence.get(0)
+							.getDecisionVariable(), transitionSequence.size());
+
+		} else {
+
+			return new ConvergenceCriterionResult(false, null, null, null,
+					null, null, null);
+
 		}
-	}
 
-	@Override
-	public boolean isConverged() {
-		return (this.finalObjectiveFunctionValue != null);
-	}
-
-	@Override
-	public Double getFinalObjectiveFunctionValue() {
-		return this.finalObjectiveFunctionValue;
-	}
-
-	@Override
-	public void reset() {
-		this.finalObjectiveFunctionValue = null;
-	}
-
-	@Override
-	public List<Double> getFinalWeights() {
-		return this.finalWeights;
-	}
-
-	@Override
-	public Double getFinalEquilbriumGap() {
-		return this.finalEquilbiriumGap;
-	}
-
-	@Override
-	public Double getFinalUniformityGap() {
-		return this.finalUniformityGap;
+		// if ((transitionSequence.iterations() < this.iterationsToConvergence))
+		// {
+		//
+		// return null;
+		//
+		// } else {
+		//
+		// // objective function statistics
+		// final List<Double> objectiveFunctionValues = transitionSequence
+		// .getObjectiveFunctionValues();
+		// final BasicStatistics objectiveFunctionValueStats = new
+		// BasicStatistics();
+		// for (int i = transitionSequence.size() - this.averagingIterations; i
+		// < transitionSequence
+		// .size(); i++) {
+		// objectiveFunctionValueStats.add(objectiveFunctionValues.get(i));
+		// }
+		//
+		// // gap statistics
+		// final Vector totalDelta = transitionSequence.getTransitions()
+		// .get(transitionSequence.size() - this.averagingIterations)
+		// .getDelta().copy();
+		// for (int i = transitionSequence.size() - this.averagingIterations
+		// + 1; i < transitionSequence.size(); i++) {
+		// totalDelta.add(transitionSequence.getTransitions().get(i)
+		// .getDelta());
+		// }
+		//
+		// // package the results
+		// return new ConvergenceCriterionResult(
+		// objectiveFunctionValueStats.getAvg(),
+		// objectiveFunctionValueStats.getStddev(),
+		// totalDelta.euclNorm() / this.averagingIterations,
+		// 1.0 / this.averagingIterations,
+		// transitionSequence.getDecisionVariable(),
+		// transitionSequence.size());
+		// }
 	}
 }

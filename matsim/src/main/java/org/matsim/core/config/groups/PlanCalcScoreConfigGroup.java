@@ -76,6 +76,29 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		this.addParameterSet( new ModeParams( TransportMode.walk ) );
 		this.addParameterSet( new ModeParams( TransportMode.bike ) );
 		this.addParameterSet( new ModeParams( TransportMode.other ) );
+		
+		// yyyyyy find better solution for this. kai, dec'15
+		{
+			ActivityParams params = new ActivityParams("car interaction") ;
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
+			ActivityParams params = new ActivityParams("bike interaction") ;
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
+			ActivityParams params = new ActivityParams("other interaction") ;
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
+			ActivityParams params = new ActivityParams("walk interaction") ; 
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+			// bushwhacking_walk---network_walk---bushwhacking_walk
+		}
 	}
 
 
@@ -1137,7 +1160,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 	}
-
 
 	private static class ReflectiveDelegate extends ReflectiveConfigGroup {
 		private ReflectiveDelegate() {

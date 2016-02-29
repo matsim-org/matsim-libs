@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.qsim;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +30,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -95,10 +99,23 @@ import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
+@RunWith(Parameterized.class)
 public class QSimTest {
 
 	private final static Logger log = Logger.getLogger(QSimTest.class);
 
+	private final boolean isUsingFastCapacityUpdate;
+	
+	public QSimTest(boolean isUsingFastCapacityUpdate) {
+		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
+	}
+	
+	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
+	public static Collection<Object> parameterObjects () {
+		Object [] capacityUpdates = new Object [] { false, true };
+		return Arrays.asList(capacityUpdates);
+	}
+	
 	private QSim createQSim(MutableScenario scenario, EventsManager events) {
 		QSim qSim1 = new QSim(scenario, events);
 		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
@@ -138,7 +155,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testSingleAgent() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a single person with leg from link1 to link3
 		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
@@ -175,7 +192,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testTwoAgent() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
 		for (int i = 0; i < 2; i++) {
@@ -215,7 +232,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testTeleportationSingleAgent() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a single person with leg from link1 to link3
 		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
@@ -261,7 +278,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testSingleAgentImmediateDeparture() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a single person with leg from link1 to link3
 		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
@@ -305,7 +322,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testSingleAgent_EmptyRoute() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a single person with leg from link1 to link1
 		Person person = PopulationUtils.createPerson(Id.create(0, Person.class));
@@ -373,7 +390,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testSingleAgent_LastLinkIsLoop() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Link loopLink = f.network.createAndAddLink(Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1);
 
 		// add a single person with leg from link1 to loop-link
@@ -442,7 +459,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testAgentWithoutLeg() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
@@ -469,7 +486,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testAgentWithoutLegWithEndtime() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
@@ -497,7 +514,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testAgentWithLastActWithEndtime() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
@@ -531,7 +548,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testFlowCapacityDriving() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
@@ -572,9 +589,15 @@ public class QSimTest {
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(1000, volume[8]); // all the rest
+		if(this.isUsingFastCapacityUpdate) {
+			Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
+			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+			Assert.assertEquals(999, volume[8]); // all the rest
+		} else {
+			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
+			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+			Assert.assertEquals(1000, volume[8]); // all the rest
+		}
 	}
 
 	
@@ -586,7 +609,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testFlowCapacityDrivingFraction() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
 		
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
@@ -640,7 +663,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testFlowCapacityStarting() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 10000; i++) {
@@ -671,9 +694,15 @@ public class QSimTest {
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(1000, volume[8]); // all the rest
+		if(this.isUsingFastCapacityUpdate) {
+			Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
+			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+			Assert.assertEquals(999, volume[8]); // all the rest
+		} else {
+			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
+			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+			Assert.assertEquals(1000, volume[8]); // all the rest
+		}
 	}
 
 	/**
@@ -685,7 +714,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testFlowCapacityMixed() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 5000; i++) {
@@ -729,9 +758,16 @@ public class QSimTest {
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(1000, volume[8]); // all the rest
+		if(this.isUsingFastCapacityUpdate) {
+			Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
+			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+			Assert.assertEquals(999, volume[8]); // all the rest
+		} else {
+			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
+			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
+			Assert.assertEquals(1000, volume[8]); // all the rest	
+		}
+		
 	}
 
 	/**
@@ -741,7 +777,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testVehicleTeleportationTrue() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
@@ -794,7 +830,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testWaitingForCar() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
 		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
@@ -885,7 +921,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testVehicleTeleportationFalse() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
@@ -936,7 +972,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testAssignedVehicles() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
 		PlanImpl plan = PersonUtils.createAndAddPlan(person, true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link2.getId());
@@ -990,7 +1026,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testCircleAsRoute() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
@@ -1047,7 +1083,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testRouteWithEndLinkTwice() {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Link link4 = f.network.createAndAddLink(Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0); // close the network
 
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
@@ -1193,7 +1229,7 @@ public class QSimTest {
 	 * @author mrieser
 	 **/
 	private LogCounter runConsistentRoutesTestSim(final String startLinkId, final String linkIds, final String endLinkId, final EventsManager events) {
-		Fixture f = new Fixture();
+		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		/* enhance network */
 		Node node5 = f.network.createAndAddNode(Id.create("5", Node.class), new Coord(3100, 0));
@@ -1237,6 +1273,8 @@ public class QSimTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 
+		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
+		
 		// build simple network with 1 link
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(0.0, 0.0));
@@ -1296,7 +1334,9 @@ public class QSimTest {
 	public void testCleanupSim_EarlyEnd() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
-
+		
+		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
+		
 		double simEndTime = 8.0*3600;
 
 		// build simple network with 2 links
@@ -1444,11 +1484,13 @@ public class QSimTest {
 		final ArrayList<Id<Link>> linkIdsNone;
 		final ArrayList<Id<Link>> linkIds2;
 
-		public Fixture() {
+		public Fixture(boolean isUsingFastCapacityUpdate) {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = scenario.getConfig();
 			this.config.qsim().setFlowCapFactor(1.0);
 			this.config.qsim().setStorageCapFactor(1.0);
+			
+			this.config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 			/* build network */
 			this.network = (NetworkImpl) this.scenario.getNetwork();

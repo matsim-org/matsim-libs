@@ -132,7 +132,7 @@ public class RandomLocationDistributor {
 			y = (zoneCoordinate.getY() - radius) + (random.nextDouble() * 2 * radius);
 			p = new Coord(x, y);
 			
-			distance = CoordUtils.calcDistance(zoneCoordinate, p);
+			distance = CoordUtils.calcEuclideanDistance(zoneCoordinate, p);
 			
 		} while ( distance > radius );
 		return p;
@@ -191,7 +191,7 @@ public class RandomLocationDistributor {
 	 * @return true if coordinate lies within the radius
 	 */
 	public boolean coordinatesInRadius(Coord coordinateA, Coord coordinateB){
-		double distance = CoordUtils.calcDistance(coordinateA, coordinateB);
+		double distance = CoordUtils.calcEuclideanDistance(coordinateA, coordinateB);
 		boolean withinRadius = (distance <= radius);
 		return withinRadius;
 	}
