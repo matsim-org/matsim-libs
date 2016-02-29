@@ -38,6 +38,7 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import playground.boescpa.lib.tools.coordUtils.CoordFilter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,21 +78,20 @@ public class PopulationCutter {
         int radius = Integer.parseInt(args[3]);
 
         PopulationCutter cutter = new PopulationCutter(scenario);
-        cutter.createSubscenario(config.plans().getInputFile(), args[4], center, radius);
+		log.info(" Area of interest (AOI): center=" + center + "; radius=" + radius);
+        cutter.createSubscenario(config.plans().getInputFile(), args[4], new CoordFilter.CoordFilterCircle(center, radius), center, radius);
     }
 
-    private void createSubscenario(String populationInputFile, String populationOutputFile, Coord center, int radius) {
+    private void createSubscenario(String populationInputFile, String populationOutputFile, CoordFilter coordFilter, Coord centerAlternative, int radiusAlternative) {
         PopulationImpl population = (PopulationImpl)scenario.getPopulation();
         Network network = scenario.getNetwork();
 
-        log.info(" Area of interest (AOI): center=" + center + "; radius=" + radius);
         // Identify all links within area of interest:
         final Map<Id<Link>, Link> areaOfInterest = new HashMap<>();
         for (Link link : network.getLinks().values()) {
             final Node from = link.getFromNode();
             final Node to = link.getToNode();
-            if ((CoordUtils.calcEuclideanDistance(from.getCoord(), center) <= radius)
-                    || (CoordUtils.calcEuclideanDistance(to.getCoord(), center) <= radius)) {
+            if (coordFilter.coordCheck(from.getCoord()) || coordFilter.coordCheck(to.getCoord())) {
                 areaOfInterest.put(link.getId(),link);
             }
         }
@@ -105,7 +105,7 @@ public class PopulationCutter {
 
         log.info(" Adding person modules...");
         PersonIntersectAreaFilter filter = new PersonIntersectAreaFilter(pop_writer, areaOfInterest, network);
-        filter.setAlternativeAOI(center, radius);
+        filter.setAlternativeAOI(centerAlternative, radiusAlternative);
         population.addAlgorithm(filter);
 
         log.info(" Reading, processing, writing plans...");

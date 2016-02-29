@@ -35,6 +35,7 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
+import playground.boescpa.lib.tools.coordUtils.CoordFilter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,18 +48,14 @@ import java.util.Set;
 public class ScheduleCutter {
 
     private final static Logger log = Logger.getLogger(ScheduleCutter.class);
-    private final int radius;
-    private final Coord center;
+    private final CoordFilter coordFilter;
     private final TransitSchedule schedule;
 	private final Vehicles vehicles;
 
-    public ScheduleCutter(TransitSchedule schedule, Vehicles vehicles, Coord center, int radius) {
-        this.radius = radius;
-        this.center = center;
-        this.schedule = schedule;
+    public ScheduleCutter(TransitSchedule schedule, Vehicles vehicles, CoordFilter coordFilter) {
+        this.coordFilter = coordFilter;
+		this.schedule = schedule;
 		this.vehicles = vehicles;
-
-        log.info(" Area of interest (AOI): center=" + this.center + "; radius=" + this.radius);
     }
 
     public static void main(String[] args) {
@@ -81,10 +78,12 @@ public class ScheduleCutter {
 		new VehicleReaderV1(vehicles).readFile(config.transit().getVehiclesFile());
 
         // Cut schedule
+		Coord center = new Coord(Double.parseDouble(args[1]), Double.parseDouble(args[2]));
+		int radius = Integer.parseInt(args[3]);
+		log.info(" Area of interest (AOI): center=" + center + "; radius=" + radius);
         ScheduleCutter cutter = new ScheduleCutter(
                 scenario.getTransitSchedule(), vehicles,
-                new Coord(Double.parseDouble(args[1]), Double.parseDouble(args[2])),
-                Integer.parseInt(args[3]));
+				new CoordFilter.CoordFilterCircle(center, radius));
         cutter.cutSchedule();
 
         // Write schedule and vehicles
@@ -102,7 +101,7 @@ public class ScheduleCutter {
         // Identify all stops inside specified area:
         Set<Id<TransitStopFacility>> stopsInArea = new HashSet<>();
         for (TransitStopFacility stop : schedule.getFacilities().values()) {
-            if (CoordUtils.calcEuclideanDistance(stop.getCoord(), center) <= radius) {
+            if (coordFilter.coordCheck(stop.getCoord())) {
                 stopsInArea.add(stop.getId());
             }
         }
