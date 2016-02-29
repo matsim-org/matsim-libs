@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.ikaddoura.incidents.data.TrafficItem;
@@ -125,7 +126,7 @@ public class TMCAlerts {
 				
 				// ####### specific codes ########
 				
-				if (containsOrEndsWith(trafficItem, "C1")) { // closed
+				if (containsOrEndsWith(trafficItem, "C1") || containsOrEndsWith(trafficItem, "C6") || containsOrEndsWith(trafficItem, "C14") || containsOrEndsWith(trafficItem, "C35")) { // closed
 					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
 							link.getAllowedModes(),
 							1.0,
@@ -134,14 +135,22 @@ public class TMCAlerts {
 					);
 				
 				} else if (containsOrEndsWith(trafficItem, "C31")) { // closed for cars
+					
+					Set<String> allowedModes = link.getAllowedModes();
+					if (allowedModes.contains(TransportMode.car)) {
+						allowedModes.remove(TransportMode.car);
+					}
 					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
+							allowedModes,
 							1.0,
 							1.0,
 							0.22227
 					);
 				
-				} else if (containsOrEndsWith(trafficItem, "D1") || containsOrEndsWith(trafficItem, "D2") || containsOrEndsWith(trafficItem, "D3") || containsOrEndsWith(trafficItem, "D4") || containsOrEndsWith(trafficItem, "D5")) { // eine bestimmte Zahl an Fahrstreifen gesperrt
+				} else if (containsOrEndsWith(trafficItem, "D1") || containsOrEndsWith(trafficItem, "D2") || containsOrEndsWith(trafficItem, "D3") || 
+						containsOrEndsWith(trafficItem, "D4") || containsOrEndsWith(trafficItem, "D5") || containsOrEndsWith(trafficItem, "D8") ||
+						containsOrEndsWith(trafficItem, "D10") || containsOrEndsWith(trafficItem, "D24")) { // one (or maybe more?) lane(s) closed
+					
 					double remainingNumberOfLanes = 0.;
 					if (link.getNumberOfLanes() == 1.) {
 						remainingNumberOfLanes = 1.;
@@ -169,6 +178,51 @@ public class TMCAlerts {
 							remainingNumberOfLanes,
 							reduceSpeedToNextFreeSpeedLevel(link)
 					);
+					
+				} else if (containsOrEndsWith(trafficItem, "D6")) { // two lanes closed
+					double remainingNumberOfLanes = 0.;
+					if (link.getNumberOfLanes() <= 2.) {
+						remainingNumberOfLanes = 1.;
+						if (warnCnt <= 3) {
+							log.warn("2 lanes closed even though the road segment contains less than three lanes. Setting the lane number to 1.0.");
+							if (warnCnt == 2) {
+								log.warn("Furhter messages of this type are not printed out.");
+							}
+							warnCnt++;
+						}
+					} else {
+						remainingNumberOfLanes = link.getNumberOfLanes() - 2.;
+					}
+					
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							remainingNumberOfLanes * (link.getCapacity() / link.getNumberOfLanes()),
+							remainingNumberOfLanes,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+					
+				} else if (containsOrEndsWith(trafficItem, "D7")) { // three lanes closed
+					double remainingNumberOfLanes = 0.;
+					if (link.getNumberOfLanes() <= 3.) {
+						remainingNumberOfLanes = 1.;
+						if (warnCnt <= 3) {
+							log.warn("3 lanes closed even though the road segment contains less than four lanes. Setting the lane number to 1.0.");
+							if (warnCnt == 2) {
+								log.warn("Furhter messages of this type are not printed out.");
+							}
+							warnCnt++;
+						}
+					} else {
+						remainingNumberOfLanes = link.getNumberOfLanes() - 3.;
+					}
+					
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							remainingNumberOfLanes * (link.getCapacity() / link.getNumberOfLanes()),
+							remainingNumberOfLanes,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);	
+					
 					
 				} else if (containsOrEndsWith(trafficItem, "D15")) { // reduction to one lane
 					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
@@ -219,7 +273,17 @@ public class TMCAlerts {
 							1.0,
 							reduceSpeedToNextFreeSpeedLevel(link)
 					);
-				
+					
+				} else if (containsOrEndsWith(trafficItem, "U8")) { // allow emergency vehicles to pass
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							link.getCapacity() / 2.0,
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+
+					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
+
 				// #######  other codes are decoded using more general code categories ######## 
 				
 				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("B")) { // accidents, e.g. B1: accident, .. TODO: Adjust according to type
@@ -253,6 +317,18 @@ public class TMCAlerts {
 					
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 					
+				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("G")) { // snow, aquaplaning, hazardous driving
+					
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							link.getCapacity() / 2.0,
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+					
+					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
+					
+					
 				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("P")) { // dangerous situations, e.g. P39: Personen auf der Fahrbahn
 					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
 							link.getAllowedModes(),
@@ -263,7 +339,16 @@ public class TMCAlerts {
 
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 
-					
+				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("R")) { // dangerous situations
+					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
+							link.getAllowedModes(),
+							link.getCapacity() / 2.0,
+							1.0,
+							reduceSpeedToNextFreeSpeedLevel(link)
+					);
+
+					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
+				
 				} else {
 					if (unconsideredCodes.contains(trafficItem.getTMCAlert().getPhraseCode())) {
 						// warning for code already logged
