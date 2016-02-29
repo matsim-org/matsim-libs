@@ -56,7 +56,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-abstract class AbstractQLink extends QLinkInternalI {
+abstract class AbstractQLink extends QLinkI {
 
 	public enum HandleTransitStopResult {
 		continue_driving, rehandle, accepted

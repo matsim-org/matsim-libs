@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
-public class CALink extends QLinkInternalI {
+public class CALink extends QLinkI {
 
 	private final Link l;
 	private final int dir;
@@ -199,33 +200,14 @@ public class CALink extends QLinkInternalI {
 	}
 
 	@Override
-	QVehicle popFirstVehicle() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	QVehicle getFirstVehicle() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	double getLastMovementTimeOfFirstVehicle() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	boolean hasGreenForToLink(Id toLinkId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	boolean isAcceptingFromUpstream() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	@Override
+	List<QLaneI> getToNodeQueueLanes() {
+		return null ;
 	}
 
 }

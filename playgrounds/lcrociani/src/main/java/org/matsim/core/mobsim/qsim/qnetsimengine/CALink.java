@@ -6,10 +6,10 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 
 public class CALink {
-	private final QLinkInternalI ql;
+	private final QLinkI ql;
 	private final QNetwork network;
 	
-	public CALink(QNetwork network, QLinkInternalI qLinkImpl) {
+	public CALink(QNetwork network, QLinkI qLinkImpl) {
 		this.network = network;
 		this.ql = qLinkImpl;
 	}

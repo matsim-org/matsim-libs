@@ -43,13 +43,13 @@ public final class HybridQSimCANetworkFactory implements NetsimNetworkFactory {
 	}
 
 	@Override
-	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+	public QLinkI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
 		boolean sim2DQTransitionLink = false;
 		boolean qSim2DTransitionLink = link.getAllowedModes().contains(TransportMode.walkca);
 
 		
 		
-		QLinkInternalI qLink = null;
+		QLinkI qLink = null;
 		if (qSim2DTransitionLink) {
 			qLink = new CALink(link,1);
 		} else {

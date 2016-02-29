@@ -88,7 +88,7 @@ public class QNetsimEngine implements MobsimEngine {
 	private Phaser startBarrier;
 	private Phaser endBarrier;
 
-	private final Set<QLinkInternalI> linksToActivateInitially = new HashSet<>();
+	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 
 	/*package*/ InternalInterface internalInterface = null;
 
@@ -221,7 +221,7 @@ public class QNetsimEngine implements MobsimEngine {
 				log.warn(Gbl.ONLYONCE);
 			}
 		}
-		QLinkInternalI qlink = network.getNetsimLinks().get(startLinkId);
+		QLinkI qlink = network.getNetsimLinks().get(startLinkId);
 		if (qlink == null) {
 			throw new RuntimeException("requested link with id=" + startLinkId + " does not exist in network. Possible vehicles "
 					+ "or activities or facilities are registered to a different network.") ;
@@ -285,7 +285,7 @@ public class QNetsimEngine implements MobsimEngine {
 		 * in the buffer (such links are *not* active, as the buffer gets emptied
 		 * when handling the nodes.
 		 */
-		for (QLinkInternalI link : network.getNetsimLinks().values()) {
+		for (QLinkI link : network.getNetsimLinks().values()) {
 			link.clearVehicles();
 		}
 	}
@@ -430,7 +430,7 @@ public class QNetsimEngine implements MobsimEngine {
 	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
 		Id<Link> linkId = planAgent.getCurrentLinkId(); 
 		if (linkId != null) { // may be bushwacking
-			QLinkInternalI qLink = this.network.getNetsimLink(linkId);
+			QLinkI qLink = this.network.getNetsimLink(linkId);
 			qLink.registerAdditionalAgentOnLink(planAgent);
 		}
 	}
@@ -439,7 +439,7 @@ public class QNetsimEngine implements MobsimEngine {
 		if  (linkId == null) { // seems that this can happen in tests; not sure if it can happen in regular code. kai, jun'15
 			return null;
 		}
-		QLinkInternalI qLink = this.network.getNetsimLink(linkId);
+		QLinkI qLink = this.network.getNetsimLink(linkId);
 		return qLink.unregisterAdditionalAgentOnLink(agentId);
 	}
 

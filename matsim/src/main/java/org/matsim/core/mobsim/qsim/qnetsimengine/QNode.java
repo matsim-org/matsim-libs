@@ -39,8 +39,8 @@ public class QNode implements NetsimNode {
 
 	private static final Logger log = Logger.getLogger(QNode.class);
 
-	private final QLinkInternalI[] inLinksArrayCache;
-	private final QLinkInternalI[] tempLinks;
+	private final QLinkI[] inLinksArrayCache;
+	private final QLinkI[] tempLinks;
 	
 	/*
 	 * This needs to be atomic since this allows us to ensure that an node which is
@@ -66,8 +66,8 @@ public class QNode implements NetsimNode {
 		this.node = n;
 		this.network = network;
 		int nofInLinks = this.node.getInLinks().size();
-		this.inLinksArrayCache = new QLinkInternalI[nofInLinks];
-		this.tempLinks = new QLinkInternalI[nofInLinks];
+		this.inLinksArrayCache = new QLinkI[nofInLinks];
+		this.tempLinks = new QLinkI[nofInLinks];
 		this.random = MatsimRandom.getRandom();
 		if (network.simEngine.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads() > 1) {
 			// This could just as well be the "normal" case. The second alternative
@@ -159,7 +159,7 @@ public class QNode implements NetsimNode {
 		int inLinksCounter = 0;
 		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents
-		for (QLinkInternalI link : this.inLinksArrayCache) {
+		for (QLinkI link : this.inLinksArrayCache) {
 			if (!link.isNotOfferingVehicle()) {
 				this.tempLinks[inLinksCounter] = link;
 				inLinksCounter++;
@@ -177,7 +177,7 @@ public class QNode implements NetsimNode {
 			double rndNum = random.nextDouble() * inLinksCapSum;
 			double selCap = 0.0;
 			for (int i = 0; i < inLinksCounter; i++) {
-				QLinkInternalI link = this.tempLinks[i];
+				QLinkI link = this.tempLinks[i];
 				if (link != null) {
                     selCap += link.getLink().getCapacity(now);
                     if (selCap >= rndNum) {
@@ -193,8 +193,8 @@ public class QNode implements NetsimNode {
 		return true;
 	}
 
-	private void moveLink(final QLinkInternalI link, final double now){
-		if ( link instanceof QLinkLanesImpl ) {
+	private void moveLink(final QLinkI link, final double now){
+//		if ( link instanceof QLinkLanesImpl ) {
 			// This cannot be moved to QLinkLanesImpl since we want to be able to serve other lanes if one lane is blocked.
 			// kai, feb'12
 			// yyyy but somehow I think this should be solved "under the hood" in QLinkLanesImpl.  kai, sep'13
@@ -202,29 +202,29 @@ public class QNode implements NetsimNode {
 			// else {} branch: link.isNotOfferingVehicle():boolean would return sequentially the state of the single
 			//lanes. Each call would have side effects on a state machine within QLinkLanesImpl. Proposal: think
 			//about a better interface first, then solve under the hood. dg, mar'14
-			for (QLaneI lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
-					while (! lane.isNotOfferingVehicle()) {
-						QVehicle veh = lane.getFirstVehicle();
-						Id<Link> nextLink = veh.getDriver().chooseNextLinkId();
-						if (! (lane.hasGreenForToLink(nextLink) && moveVehicleOverNode(veh, lane, now))) {
-							break;
-						}
+			for (QLaneI lane : link.getToNodeQueueLanes()) {
+				while (! lane.isNotOfferingVehicle()) {
+					QVehicle veh = lane.getFirstVehicle();
+					Id<Link> nextLink = veh.getDriver().chooseNextLinkId();
+					if (! (lane.hasGreenForToLink(nextLink) && moveVehicleOverNode(veh, lane, now))) {
+						break;
 					}
 				}
 			}
-		else {
-			while (!link.isNotOfferingVehicle()) {
-				QVehicle veh = link.getFirstVehicle();
-				if (!moveVehicleOverNode(veh, link, now)) {
-					break;
-				}
-			}
-		}
+//		} 
+//		else {
+//			while (!link.isNotOfferingVehicle()) {
+//				QVehicle veh = link.getFirstVehicle();
+//				if (!moveVehicleOverNode(veh, link, now)) {
+//					break;
+//				}
+//			}
+//		}
 	}
 
 
 	@SuppressWarnings("static-method")
-	private boolean checkNextLinkSemantics(Link currentLink, Id<Link> nextLinkId, QLinkInternalI nextQLink, QVehicle veh){
+	private boolean checkNextLinkSemantics(Link currentLink, Id<Link> nextLinkId, QLinkI nextQLink, QVehicle veh){
 		if (nextQLink == null){
 			//throw new IllegalStateException
 			log.warn("The link id " + nextLinkId + " is not available in the simulation network, but vehicle " + veh.getId() + 
@@ -246,7 +246,7 @@ public class QNode implements NetsimNode {
 	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
-	private boolean moveVehicleOverNode(final QVehicle veh, final QInternalI fromLaneBuffer, final double now) {
+	private boolean moveVehicleOverNode(final QVehicle veh, final QLaneI fromLaneBuffer, final double now) {
 		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = veh.getCurrentLink();
 
@@ -265,7 +265,7 @@ public class QNode implements NetsimNode {
 			return true;
 		}
 
-		QLinkInternalI nextQueueLink = network.getNetsimLinks().get(nextLinkId);
+		QLinkI nextQueueLink = network.getNetsimLinks().get(nextLinkId);
 		if ( !checkNextLinkSemantics(currentLink, nextLinkId, nextQueueLink, veh) ) {
 			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now ) ;
 			return true ;
@@ -297,7 +297,7 @@ public class QNode implements NetsimNode {
 	}
 
 	private static int wrnCnt = 0 ;
-	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final QInternalI fromLane, final double now) {
+	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final QLaneI fromLane, final double now) {
 		fromLane.popFirstVehicle();
 		
 		// first treat the passengers:
@@ -318,13 +318,13 @@ public class QNode implements NetsimNode {
 	
 	}
 
-	private static void moveVehicleFromInlinkToOutlink(final QVehicle veh, final QInternalI fromLane, QLinkInternalI nextQueueLink) {
+	private static void moveVehicleFromInlinkToOutlink(final QVehicle veh, final QLaneI fromLane, QLinkI nextQueueLink) {
 		fromLane.popFirstVehicle();
 		veh.getDriver().notifyMoveOverNode(nextQueueLink.getLink().getId());
 		nextQueueLink.addFromUpstream(veh);
 	}
 
-	private boolean vehicleIsStuck(final QInternalI fromLaneBuffer, final double now) {
+	private boolean vehicleIsStuck(final QLaneI fromLaneBuffer, final double now) {
 		return (now - fromLaneBuffer.getLastMovementTimeOfFirstVehicle()) > network.simEngine.getStuckTime();
 	}
 

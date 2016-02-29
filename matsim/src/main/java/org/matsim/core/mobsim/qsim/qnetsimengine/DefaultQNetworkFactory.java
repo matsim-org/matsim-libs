@@ -32,7 +32,7 @@ final class DefaultQNetworkFactory implements NetsimNetworkFactory {
 	public DefaultQNetworkFactory() {}
 	
 	@Override
-	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+	public QLinkI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
 		return new QLinkImpl(link, network, toQueueNode);
 	}
 

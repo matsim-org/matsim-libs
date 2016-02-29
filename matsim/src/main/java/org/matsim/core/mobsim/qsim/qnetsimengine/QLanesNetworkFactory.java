@@ -42,8 +42,8 @@ class QLanesNetworkFactory implements NetsimNetworkFactory {
 	}
 
 	@Override
-	public QLinkInternalI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
-		QLinkInternalI ql = null;
+	public QLinkI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
+		QLinkI ql = null;
 		LanesToLinkAssignment20 l2l = this.laneDefinitions.getLanesToLinkAssignments().get(link.getId());
 		if (l2l != null){
 			List<ModelLane> lanes = LanesUtils.createLanes(link, l2l);

@@ -20,6 +20,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -46,7 +47,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-abstract class QLinkInternalI extends QInternalI implements NetsimLink {
+abstract class QLinkI implements NetsimLink {
 	
 
 	abstract QNode getToNode() ;
@@ -122,5 +123,27 @@ abstract class QLinkInternalI extends QInternalI implements NetsimLink {
 	 * yy Can't we get this functionality from {@link #getAdditionalAgentsOnLink()}?
 	 */
 	abstract Set<MobsimAgent> getAgentsWaitingForCar(Id<Vehicle> vehicleId) ;
+
+	abstract List<QLaneI> getToNodeQueueLanes() ;
+
+	/**
+	 * Seems ok as public interface function. kai, aug'15
+	 */
+	abstract boolean doSimStep(final double now);
+
+	/**
+	 * Seems ok as public interface function. kai, aug'15 
+	 */
+	abstract void clearVehicles();
+
+	/**
+	 * <br>
+	 * seems ok as public interface function. kai, aug'15
+	 */
+	abstract void addFromUpstream(final QVehicle veh);
+
+	abstract boolean isNotOfferingVehicle();
+
+	abstract boolean isAcceptingFromUpstream();
 
 }

@@ -38,7 +38,7 @@ public final class KaiHybridNetworkFactory implements NetsimNetworkFactory {
 	}
 
 	@Override
-	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+	public QLinkI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
 		if ( link.getId().toString().equals("15") ) {
 			KaiHiResLink hiResLink = new KaiHiResLink(link, network, toQueueNode, hybridEngine ) ;
 			this.hybridEngine.registerHiResLink(hiResLink);

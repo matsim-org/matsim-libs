@@ -7,11 +7,11 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 
 public class CAQLink {
-	private final QLinkInternalI ql;
+	private final QLinkI ql;
 	private final TransitionArea transitionArea;
 	private final QNetwork network;
 	
-	CAQLink(QNetwork network, QLinkInternalI qLinkImpl, TransitionArea transitionArea) {
+	CAQLink(QNetwork network, QLinkI qLinkImpl, TransitionArea transitionArea) {
 		this.network = network;
 		this.ql = qLinkImpl;
 		this.transitionArea = transitionArea;

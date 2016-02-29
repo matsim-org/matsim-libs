@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.network.Link;
 
 public class Sim2DQAdapterLink {
 	
-	private final QLinkInternalI ql;
+	private final QLinkI ql;
 
-	Sim2DQAdapterLink(QLinkInternalI qLinkImpl) {
+	Sim2DQAdapterLink(QLinkI qLinkImpl) {
 		this.ql = qLinkImpl;
 	}
 
