@@ -28,6 +28,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -51,12 +53,13 @@ import playground.boescpa.lib.tools.fileMerging.VehicleMerger;
 
 /**
  * Main to create multimodal MATSim environment from OSM and HAFAS.
- * More difficult to use but also more powerful than OSM2MixedConverter.
+ * Less straight forward to use but also more powerful than OSM2MixedConverter.
  *
  * @author boescpa
  */
 public class OSM2MixedIVT {
 
+	private static final CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
 	private final static double maxBeelineWalkConnectingDistance =
 			new TransitRouterConfig(ConfigUtils.createConfig()).getBeelineWalkConnectionDistance(); // = 100
 
@@ -131,7 +134,8 @@ public class OSM2MixedIVT {
 		new VehicleWriterV1(mixedVehicles).writeFile(outbase + "MixedVehicles.xml.gz");
 
 		// **************** Cut Schedule ****************
-		new ScheduleCutter(mixedSchedule, null, new CoordFilter.CoordFilterRectangle(cutNW, cutSE)).cutSchedule();
+		new ScheduleCutter(mixedSchedule, null, new CoordFilter.CoordFilterRectangle(
+				transformation.transform(cutNW), transformation.transform(cutSE))).cutSchedule();
 
 		// **************** Route Schedule ****************
 		new NetworkReaderMatsimV1(mixedScenario.getNetwork()).parse(networkPath);
@@ -166,7 +170,8 @@ public class OSM2MixedIVT {
 		new VehicleWriterV1(onlyPTVehicles).writeFile(outbase + "OnlyPTVehicles.xml.gz");
 
 		// **************** Cut Schedule ****************
-		new ScheduleCutter(onlyPTSchedule, null, new CoordFilter.CoordFilterRectangle(cutNW, cutSE)).cutSchedule();
+		new ScheduleCutter(onlyPTSchedule, null, new CoordFilter.CoordFilterRectangle(
+				transformation.transform(cutNW), transformation.transform(cutSE))).cutSchedule();
 
 		// **************** Route Schedule ****************
 		final Network onlyPTNetwork = onlyPTScenario.getNetwork();
