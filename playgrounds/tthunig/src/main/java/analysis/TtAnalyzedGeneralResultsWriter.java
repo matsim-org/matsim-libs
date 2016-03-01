@@ -24,10 +24,28 @@ package analysis;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.LinkImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import com.google.inject.Inject;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * Class to write all calculated results of the analyze tool that is given in the constructor.
@@ -35,10 +53,11 @@ import org.apache.log4j.Logger;
  * @author tthunig
  *
  */
-class TtAnalyzedGeneralResultsWriter {
+public final class TtAnalyzedGeneralResultsWriter {
 
 	private static final Logger log = Logger.getLogger(TtAnalyzedGeneralResultsWriter.class);
 	
+	private Scenario scenario;
 	private TtGeneralAnalysis handler;
 	private String outputDirBase;
 	private PrintStream overallItWritingStream;
@@ -48,10 +67,14 @@ class TtAnalyzedGeneralResultsWriter {
 		DepPerTime, ArrPerTime, TripsPerDuration, TripsPerDist, TripsPerAvgSpeed
 	}
 	
-	public TtAnalyzedGeneralResultsWriter(TtGeneralAnalysis handler, String outputDirBase, int lastIteration) {
+	private CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
+	
+	@Inject
+	public TtAnalyzedGeneralResultsWriter(Scenario scenario, TtGeneralAnalysis handler) {
 		this.handler = handler;
-		this.outputDirBase = outputDirBase;
-		this.lastIteration = lastIteration;
+		this.outputDirBase = scenario.getConfig().controler().getOutputDirectory();
+		this.lastIteration = scenario.getConfig().controler().getLastIteration();
+		this.scenario = scenario;
 		
 		// prepare file for the results of all iterations
 		prepareOverallItWriting();
@@ -109,7 +132,6 @@ class TtAnalyzedGeneralResultsWriter {
 		writeRelCumFreqData(outputDir, RelCumFreqType.TripsPerDuration, handler.getRelativeCumulativeFrequencyOfTripsPerDuration());
 		writeRelCumFreqData(outputDir, RelCumFreqType.TripsPerDist, handler.getRelativeCumulativeFrequencyOfTripsPerDistance());
 		writeRelCumFreqData(outputDir, RelCumFreqType.TripsPerAvgSpeed, handler.getRelativeCumulativeFrequencyOfTripsPerSpeed());
-		// TODO spatial analysis
 	}
 
 	private void writeRelCumFreqData(String outputDir, RelCumFreqType type, Map<Double, Double> relCumFreqMap) {
@@ -156,5 +178,80 @@ class TtAnalyzedGeneralResultsWriter {
 	public void closeAllStreams() {
 		this.overallItWritingStream.close();
 	}
+
+	public void writeSpatialAnaylsis(int iteration) {		
+		PolygonFeatureFactory factory = createFeatureType(this.crs);
+		GeometryFactory geofac = new GeometryFactory();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		Map<Id<Link>, Double> totalDelayPerLink = handler.getTotalDelayPerLink();
+		Map<Id<Link>, Double> avgDelayPerLink = handler.getAvgDelayPerLink();
+		Map<Id<Link>, Integer> numberOfVehPerLink = handler.getNumberOfVehPerLink();
+		
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			Id<Link> linkId = link.getId();
+			
+			double linkTotalDelay = 0.0;
+			if (totalDelayPerLink.containsKey(linkId))
+				linkTotalDelay = totalDelayPerLink.get(linkId);
+			
+			double linkAvgDelay = 0.0;
+			if (avgDelayPerLink.containsKey(linkId))
+				linkAvgDelay = avgDelayPerLink.get(linkId);
+			
+			int linkNumberOfVeh = 0;
+			if (numberOfVehPerLink.containsKey(linkId))
+				linkNumberOfVeh = numberOfVehPerLink.get(linkId);
+			
+			features.add(createFeature(link, geofac, factory, linkTotalDelay, linkAvgDelay, linkNumberOfVeh));
+		}
+		
+		ShapeFileWriter.writeGeometries(features, this.outputDirBase + "ITERS/it." + iteration + "/analysis/spatialAnalysis.shp");
+	}
+	
+	private PolygonFeatureFactory createFeatureType(CoordinateReferenceSystem crs) {
+		PolygonFeatureFactory.Builder builder = new PolygonFeatureFactory.Builder();
+		builder.setCrs(crs);
+		builder.setName("link");
+		builder.addAttribute("ID", String.class);
+		builder.addAttribute("fromID", String.class);
+		builder.addAttribute("toID", String.class);
+		builder.addAttribute("length", Double.class);
+		builder.addAttribute("freespeed", Double.class);
+		builder.addAttribute("capacity", Double.class);
+		builder.addAttribute("lanes", Double.class);
+		builder.addAttribute("type", String.class);
+	
+		builder.addAttribute("totalDelay", Double.class);
+		builder.addAttribute("avgDelayPerVeh", Double.class);
+		builder.addAttribute("#veh", Integer.class);
+		// TODO avg speed per link
+		
+//		// absolute flow values of run1
+//		for (int i = firstHour; i < lastHour; i++){
+//			builder.addAttribute("h" + (i + 1)+"_abs1", Double.class);
+//		}
+		
+		return builder.create();
+	}
+	
+	private SimpleFeature createFeature(Link link, GeometryFactory geofac, PolygonFeatureFactory factory, double linkTotalDelay, double linkAvgDelay, int linkNumberOfVeh) {
+		Coordinate[] coords = PolygonFeatureGenerator.createPolygonCoordsForLink(link, 20.0);
+		List<Object> attribs = new ArrayList<>();
+		attribs.add(link.getId().toString());
+		attribs.add(link.getFromNode().getId().toString());
+		attribs.add(link.getToNode().getId().toString());
+		attribs.add(link.getLength());
+		attribs.add(link.getFreespeed());
+		attribs.add(link.getCapacity());
+		attribs.add(link.getNumberOfLanes());
+		attribs.add(((LinkImpl) link).getType());
+		attribs.add(linkTotalDelay);
+		attribs.add(linkAvgDelay);
+		attribs.add(linkNumberOfVeh);
+	
+		return factory.createPolygon(coords, attribs.toArray(), link.getId().toString());
+	}
+
 	
 }

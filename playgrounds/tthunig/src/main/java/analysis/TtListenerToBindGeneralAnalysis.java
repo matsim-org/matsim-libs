@@ -45,8 +45,6 @@ public class TtListenerToBindGeneralAnalysis implements StartupListener, Iterati
 
 	private static final Logger log = Logger.getLogger(TtListenerToBindGeneralAnalysis.class);
 	
-	private TtAnalyzedGeneralResultsWriter writer;
-	
 	@Inject
 	private Scenario scenario;
 	
@@ -56,13 +54,13 @@ public class TtListenerToBindGeneralAnalysis implements StartupListener, Iterati
 	@Inject
 	private TtGeneralAnalysis handler;
 	
+	@Inject
+	private TtAnalyzedGeneralResultsWriter writer;
+	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// add the analysis tool as events handler to the events manager
 		eventsManager.addHandler(handler);
-				
-		// prepare the results writer
-		this.writer = new TtAnalyzedGeneralResultsWriter(handler, scenario.getConfig().controler().getOutputDirectory(), scenario.getConfig().controler().getLastIteration());
 	}
 
 	@Override
@@ -73,6 +71,8 @@ public class TtListenerToBindGeneralAnalysis implements StartupListener, Iterati
 	
 		// handle last iteration
 		if (event.getIteration() == scenario.getConfig().controler().getLastIteration()) {
+			// write spatial analysis
+			writer.writeSpatialAnaylsis(event.getIteration());
 			// close overall writing stream
 			writer.closeAllStreams();
 			// plot overall iteration results
