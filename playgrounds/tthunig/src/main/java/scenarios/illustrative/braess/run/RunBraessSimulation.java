@@ -88,18 +88,19 @@ public final class RunBraessSimulation {
 	
 	private static final int NUMBER_OF_PERSONS = 3600; // per hour
 	private static final int SIMULATION_PERIOD = 1; // in hours
+	private static final double SIMULATION_START_TIME = 0.0; // seconds from midnight
 	
 	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.NONE;
 	// initial score for all initial plans
 	private static final Double INIT_PLAN_SCORE = null;
 
 	/// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_ONE_SECOND_Z;
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.V3;
+	private static final PricingType PRICING_TYPE = PricingType.NONE;
 	public enum PricingType{
 		NONE, V3, V4, V8, V9, FLOWBASED
 	}
@@ -110,7 +111,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/congestionPricing/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/abmtrans/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -145,7 +146,7 @@ public final class RunBraessSimulation {
 			config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 			
 			// set travelTimeBinSize (only has effect if reRoute is used)
-			config.travelTimeCalculator().setTraveltimeBinSize( 900 );
+			config.travelTimeCalculator().setTraveltimeBinSize( 10 );
 			
 			config.travelTimeCalculator().setTravelTimeCalculatorType(
 					TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
@@ -193,9 +194,9 @@ public final class RunBraessSimulation {
 			
 			config.qsim().setStuckTime(3600 * 10.);
 			
-			config.qsim().setStartTime(3600 * 8);
+			config.qsim().setStartTime(3600 * SIMULATION_START_TIME);
 			// set end time to shorten simulation run time. (set it to 2 hours after the last agent departs)
-			config.qsim().setEndTime(3600 * (8 + SIMULATION_PERIOD + 2));
+			config.qsim().setEndTime(3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2));
 			
 			// adapt monetary distance cost rate (should be negative)
 			config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate( -0.0 );
@@ -352,6 +353,7 @@ public final class RunBraessSimulation {
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
 		popCreator.setSimulationPeriod(SIMULATION_PERIOD);
+		popCreator.setSimulationStartTime(SIMULATION_START_TIME);
 		
 		popCreator.createPersons(INIT_ROUTES_TYPE, INIT_PLAN_SCORE);
 	}
@@ -384,6 +386,7 @@ public final class RunBraessSimulation {
 		if (SIMULATION_PERIOD != 1){
 			runName += "_" + SIMULATION_PERIOD + "h";
 		}
+		runName += "_start" + (int)SIMULATION_START_TIME; 
 		
 		switch(INIT_ROUTES_TYPE){
 		case ALL:
