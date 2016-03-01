@@ -218,7 +218,7 @@ public final class FixBraessBehaviorTest{
 		TtCreateBraessPopulation popCreator = 
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(2000);
-		
+		popCreator.setSimulationStartTime(8*3600);
 		popCreator.createPersons(InitRoutes.ALL, 110.);
 	}
 	

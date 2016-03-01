@@ -134,7 +134,7 @@ public final class TtCreateBraessPopulation {
 			Activity startAct = population.getFactory()
 					.createActivityFromLinkId("dummy", Id.createLinkId("0_1"));
 			// distribute agents uniformly between simulationStartTime and (simulationStartTime + simulationPeriod) am.
-			startAct.setEndTime(simulationStartTime * 3600 + (double)(i)/(numberOfPersons * simulationPeriod) * simulationPeriod * 3600);
+			startAct.setEndTime(simulationStartTime + (double)(i)/(numberOfPersons * simulationPeriod) * simulationPeriod * 3600);
 		
 			// create a drain activity at link 5_6
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
