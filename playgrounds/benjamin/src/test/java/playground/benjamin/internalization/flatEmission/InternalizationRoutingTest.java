@@ -17,7 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.internalization;
+package playground.benjamin.internalization.flatEmission;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -26,7 +29,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -52,8 +59,9 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import java.util.HashSet;
-import java.util.Set;
+import playground.benjamin.internalization.EmissionCostModule;
+import playground.benjamin.internalization.EmissionTravelDisutilityCalculatorFactory;
+import playground.benjamin.internalization.InternalizeEmissionsControlerListener;
 
 /**
  * @author benjamin
@@ -105,7 +113,7 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		logger.info("Person is driving on route " + handler.actualRoadSelected + "; expected route: " + expectedRoad);
 		assertTrue("Person was expected to be routed through link "+ expectedRoad +", but was " + handler.getActualRoadSelected(), handler.expectedRoadSelected() == true);
 	}
-
+	
 	public void testTimeRouting() {
 		this.config = super.loadConfig(null);
 		this.scenario = ScenarioUtils.createScenario(this.config);
@@ -293,11 +301,17 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		//		scg.addStrategySettings(reRoute);
 
 		// define emission tool input files	
+//
+		// since same files are used for multiple test, files are added to ONE MORE level up then the test package directory
+		String packageInputDir = this.getPackageInputDirectory();
+		String inputFilesDir = packageInputDir.substring(0, packageInputDir.lastIndexOf('/') );
+		inputFilesDir = inputFilesDir.substring(0, inputFilesDir.lastIndexOf('/') + 1);
+//
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup() ;
 		controler.getConfig().addModule(ecg);
-		ecg.setEmissionRoadTypeMappingFile(this.getClassInputDirectory() + "roadTypeMapping.txt");
-		ecg.setAverageWarmEmissionFactorsFile(this.getClassInputDirectory() + "EFA_HOT_vehcat_2005average.txt");
-		ecg.setAverageColdEmissionFactorsFile(this.getClassInputDirectory() + "EFA_ColdStart_vehcat_2005average.txt");
+		ecg.setEmissionRoadTypeMappingFile(inputFilesDir + "/roadTypeMapping.txt");
+		ecg.setAverageWarmEmissionFactorsFile(inputFilesDir + "/EFA_HOT_vehcat_2005average.txt");
+		ecg.setAverageColdEmissionFactorsFile(inputFilesDir + "/EFA_ColdStart_vehcat_2005average.txt");
 
 		// TODO: the following does not work yet. Need to force services to always write events in the last iteration.
 		VspExperimentalConfigGroup vcg = controler.getConfig().vspExperimental() ;

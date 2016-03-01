@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.analysis.emission;
+package playground.benjamin.internalization;
 /**
  * @author amit
  * These values are taken from Maibach et al. (2008)
@@ -34,7 +34,16 @@ public enum EmissionCostFactors {
 	public double getCostFactor(){
 		return costFactors;
 	}
-	private EmissionCostFactors(final double costFactor){
+	
+	public static double getCostFactor ( String pollutant ) {
+		double cf = 0.;
+		for (EmissionCostFactors ecf : EmissionCostFactors.values() ){
+			if ( ecf.toString().equalsIgnoreCase(pollutant) ) return ecf.getCostFactor();
+		}
+		return cf;
+	}
+	
+	private EmissionCostFactors(double costFactor){
 		this.costFactors = costFactor;
 	}
 }
