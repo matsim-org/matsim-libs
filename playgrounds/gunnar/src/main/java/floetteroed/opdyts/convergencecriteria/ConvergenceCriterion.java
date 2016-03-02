@@ -46,4 +46,7 @@ public interface ConvergenceCriterion {
 			final List<Transition<U>> transitionSequence);
 
 	public double effectiveAveragingIterations();
+	
+	public double totalIterations();
+	
 }

@@ -190,9 +190,9 @@ public class FrankWolfe {
 			residual = Math.abs(linearObjFctApprox.value(this.point)
 					- this.value);
 
-//			 Logger.getLogger(this.getClass().getName()).info(
-//			 "it " + it + ": val = " + this.value + ", residual="
-//			 + residual);
+			 Logger.getLogger(this.getClass().getName()).info(
+			 "it " + it + ": val = " + this.value + ", residual="
+			 + residual);
 
 		} while ((residual > this.eps) && (it < this.maxIts));
 	}

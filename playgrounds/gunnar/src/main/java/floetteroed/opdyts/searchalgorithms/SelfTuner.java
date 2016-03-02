@@ -114,7 +114,7 @@ public class SelfTuner {
 			lastMeanObjFctVal = analyzer.originalObjectiveFunctionValue(alphas);
 
 			final LeastAbsoluteDeviations lad = new LeastAbsoluteDeviations();
-			lad.setLowerBounds(0.0, 0.0);
+			lad.setLowerBounds(0.0, Double.NEGATIVE_INFINITY);
 			// an initial measurement equation pulling towards zero weights
 			lad.add(new Vector(this.initialPointWeight
 					* this.average(this.equilibriumGaps, lastEquilibriumGap),

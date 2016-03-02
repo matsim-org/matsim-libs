@@ -31,7 +31,9 @@ public class Run {
 
 	public static void main(String[] args) {
 
-		init();
+		// final String mario = "./input/house/mario.wav";
+		final String mario = "mario.wav";
+		init(mario);
 
 		final Random rnd = new Random();
 
@@ -213,11 +215,11 @@ public class Run {
 	}
 	
 	
-	public static void init() {
+	public static void init(final String file) {
 		try {
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(new File(
-					"./input/house/mario.wav")));
+					file)));
 			clip.loop(Clip.LOOP_CONTINUOUSLY);
 		} catch (Exception exc) {
 			exc.printStackTrace(System.out);

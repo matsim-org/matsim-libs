@@ -71,6 +71,11 @@ public class FixedIterationNumberConvergenceCriterion implements
 	public double effectiveAveragingIterations() {
 		return this.averagingIterations;
 	}
+	
+	@Override
+	public double totalIterations() {
+		return this.iterationsToConvergence;
+	}
 
 	@Override
 	public <U extends DecisionVariable> ConvergenceCriterionResult evaluate(

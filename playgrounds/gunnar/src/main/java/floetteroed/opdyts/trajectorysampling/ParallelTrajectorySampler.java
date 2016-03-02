@@ -227,8 +227,14 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 						this.allTransitionSequences
 								.getAllTransitionsInInsertionOrder(),
 						this.equilibriumWeight, this.uniformityWeight,
-						this.convergenceCriterion
-								.effectiveAveragingIterations());
+						Math.min(
+								this.convergenceCriterion
+										.effectiveAveragingIterations(),
+								this.samplingStages.size()
+										* this.convergenceCriterion
+												.effectiveAveragingIterations()
+										/ this.convergenceCriterion
+												.totalIterations()));
 				samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
 						this.allTransitionSequences.getTransitions(
 								this.currentDecisionVariable).getLast(),
@@ -278,8 +284,14 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 						this.allTransitionSequences
 								.getAllTransitionsInInsertionOrder(),
 						this.equilibriumWeight, this.uniformityWeight,
-						this.convergenceCriterion
-								.effectiveAveragingIterations());
+						Math.min(
+								this.convergenceCriterion
+										.effectiveAveragingIterations(),
+								this.samplingStages.size()
+										* this.convergenceCriterion
+												.effectiveAveragingIterations()
+										/ this.convergenceCriterion
+												.totalIterations()));
 				samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
 						this.allTransitionSequences.getTransitions(
 								this.currentDecisionVariable).getLast(),
