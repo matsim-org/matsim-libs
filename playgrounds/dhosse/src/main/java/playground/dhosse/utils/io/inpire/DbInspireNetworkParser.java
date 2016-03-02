@@ -38,18 +38,23 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		GeometryUtils.writeNetwork2Shapefile(scenario.getNetwork(), "/home/dhosse/shp/", "EPSG:32632");
 	}
 
+	private static final String TAG_DESIGN_SPEED = "DesignSpeed";
 	private static final String TAG_DIRECTION = "direction";
 	private static final String TAG_ELEMENT = "element";
 	private static final String TAG_END_NODE = "endNode";
 	private static final String TAG_FORM_OF_NODE = "formOfNode";
-	private static final String TAG_GML_POS = "pos";
 	private static final String TAG_GML_POS_LIST = "posList";
 	private static final String TAG_LINK = "link";
-	private static final String TAG_MARKER_POST = "MarkerPost";
+	//TODO not yet implemented by db
+//	private static final String TAG_MARKER_POST = "MarkerPost";
+	private static final String TAG_NUMBER_OF_TRACKS = "NumberOfTracks";
+	private static final String TAG_N_TRACKS = "numberOfTracks";
 	private static final String TAG_RAILWAY_LINK = "RailwayLink";
 	private static final String TAG_RAILWAY_LINK_SEQ = "RailwayLinkSequence";
 	private static final String TAG_RAILWAY_NODE = "RailwayNode";
-	private static final String TAG_RAILWAY_STATION_NODE = "RailwayStationNode";
+	//TODO
+//	private static final String TAG_RAILWAY_STATION_NODE = "RailwayStationNode";
+	private static final String TAG_SPEED = "speed";
 	private static final String TAG_START_NODE = "startNode";
 	private static final String TAG_TFD = "TrafficFlowDirection";
 	
@@ -71,11 +76,15 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 	private RailwayLinkSequence currentLinkSeq = null;
 	private RailwayNode currentNode = null;
 	private TrafficFlowDirection currentTfd = null;
+	private DesignSpeed currentDesignSpeed = null;
+	private NumberOfTracks currentNumberOfTracks = null;
 	
 	private Map<String, RailwayLink> railwayLinks;
 	private Map<String, RailwayLinkSequence> railwayLinkSequences;
 	private Map<String, RailwayNode> railwayNodes;
 	private Map<String, TrafficFlowDirection> trafficFlowDirections;
+	private Map<String, DesignSpeed> designSpeeds;
+	private Map<String, NumberOfTracks> numberOfTracks;
 	
 	private boolean cleanNetwork = false;
 	
@@ -94,6 +103,8 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		this.railwayLinkSequences = new HashMap<>();
 		this.railwayNodes = new HashMap<>();
 		this.trafficFlowDirections = new HashMap<>();
+		this.designSpeeds = new HashMap<>();
+		this.numberOfTracks = new HashMap<>();
 		this.ct = TransformationFactory.getCoordinateTransformation("EPSG:4258", toCRS);
 		this.cleanNetwork = cleanNetwork;
 		this.setValidating(false);
@@ -145,16 +156,20 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			
 		} else if(TAG_ELEMENT.equals(name)){
 			
-			if(this.currentTfd != null){
-				
-				setLinkSeqRef(atts);
-				
-			}
+			setLinkSeqRef(atts);
+			
+		} else if(TAG_DESIGN_SPEED.equals(name)){
+			
+			startDesignSpeed(atts);
+			
+		} else if(TAG_NUMBER_OF_TRACKS.equals(name)){
+			
+			startNumberOfTracks(atts);
 			
 		}
 		
 	}
-
+	
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 
@@ -175,15 +190,6 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			setFormOfNode(content);
 			
 		}
-//		else if(TAG_GML_POS.equals(name)){
-//			
-//			if(this.currentNode != null){
-//				
-//				setNodePosition(content);
-//				
-//			}
-//			
-//		}
 		else if(TAG_RAILWAY_LINK_SEQ.equals(name)){
 			
 			endLinkSequence();
@@ -200,27 +206,31 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 				
 			}
 			
+		} else if(TAG_SPEED.equals(name)){
+			
+			setDesignSpeed(content);
+			
+		} else if(TAG_DESIGN_SPEED.equals(name)){
+			
+			endDesignSpeed();
+			
+		} else if(TAG_NUMBER_OF_TRACKS.equals(name)){
+			
+			endNumberOfTracks();
+			
+		} else if(TAG_N_TRACKS.equals(name)){
+			
+			setNumberOfTracks(content);
+			
 		}
 		
 	}
 	
 	private void convert(){
 		
-//		for(RailwayNode node : this.railwayNodes.values()){
-//			
-//			Id<Node> nodeId = Id.createNodeId(node.id);
-//			Node nn = this.network.getFactory().createNode(nodeId, node.coord);
-//			this.network.addNode(nn);
-//			
-//		}
-
 		int nodesCounter = 0;
 		
 		for(RailwayLink link : this.railwayLinks.values()){
-			
-//			if(link.fromNodeId.equals("Node-1482517_2")){
-//				System.out.println();
-//			}
 			
 			if(link.fromNodeId.equals("")){
 				link.fromNodeId = "Node_" + Integer.toString(nodesCounter);
@@ -270,6 +280,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			Link ll = this.network.getFactory().createLink(linkId, this.network.getNodes().get(fromNodeId),
 					this.network.getNodes().get(toNodeId));
 			ll.setAllowedModes(this.modes);
+			ll.setCapacity(30);
 			ll.setLength(link.length);
 			this.network.addLink(ll);
 			
@@ -291,6 +302,10 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			
 			String trafficFlowDirection = this.trafficFlowDirections.get(seq.id).direction;
 			
+			double designSpeed = this.designSpeeds.containsKey(seq.id) ? this.designSpeeds.get(seq.id).v : 120 / 3.6;
+			
+			int nTracks = this.numberOfTracks.containsKey(seq.id) ? this.numberOfTracks.get(seq.id).nTracks : 1;
+			
 			if(trafficFlowDirection.equalsIgnoreCase(VAL_BOTH_DIRECTIONS)){
 				
 				for(String id : seq.railwayLinkIds){
@@ -299,6 +314,9 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 					Link ref = this.network.getLinks().get(linkId);
 					
 					if(ref != null){
+						
+						ref.setNumberOfLanes(nTracks);
+						ref.setFreespeed(designSpeed);
 
 						Link reverse = this.network.getFactory().createLink(Id.createLinkId(id + "_2"), ref.getToNode(), ref.getFromNode());
 						reverse.setAllowedModes(this.modes);
@@ -337,9 +355,9 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 						Link reverse = this.network.getFactory().createLink(Id.createLinkId(id + "_2"), ref.getToNode(), ref.getFromNode());
 						reverse.setAllowedModes(this.modes);
 						reverse.setCapacity(ref.getCapacity());
-						reverse.setFreespeed(ref.getFreespeed());
+						reverse.setFreespeed(designSpeed);
 						reverse.setLength(ref.getLength());
-						reverse.setNumberOfLanes(ref.getNumberOfLanes());
+						reverse.setNumberOfLanes(nTracks);
 						
 						this.network.addLink(reverse);
 						this.network.removeLink(ref.getId());
@@ -497,13 +515,67 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 	
 	private void setLinkSeqRef(Attributes atts) {
 		
-		this.currentTfd.refId = atts.getValue(ATT_XLINK).replace(PREFIX, "");
+		String refId = atts.getValue(ATT_XLINK).replace(PREFIX, "");
+		
+		if(this.currentTfd != null){
+			
+			this.currentTfd.refId = refId;
+			
+		} else if(this.currentNumberOfTracks != null){
+			
+			this.currentNumberOfTracks.refId = refId;
+			
+		} else if(this.currentDesignSpeed != null){
+			
+			this.currentDesignSpeed.refId = refId;
+			
+		}
 		
 	}
 	
 	private void setDirection(String content) {
 		
 		this.currentTfd.direction = content;
+		
+	}
+	
+	private void startDesignSpeed(Attributes att){
+		
+		this.currentDesignSpeed = new DesignSpeed();
+		
+	}
+	
+	private void endDesignSpeed(){
+		
+		this.designSpeeds.put(this.currentDesignSpeed.refId, this.currentDesignSpeed);
+		this.currentDesignSpeed = null;
+		
+	}
+	
+	private void setDesignSpeed(String content){
+		
+		double speed = Double.parseDouble(content) / 3.6;
+		this.currentDesignSpeed.v = speed;
+		
+	}
+	
+	private void startNumberOfTracks(Attributes atts){
+		
+		this.currentNumberOfTracks = new NumberOfTracks();
+		
+	}
+	
+	private void endNumberOfTracks(){
+		
+		this.numberOfTracks.put(this.currentNumberOfTracks.refId, this.currentNumberOfTracks);
+		this.currentNumberOfTracks = null;
+		
+	}
+	
+	private void setNumberOfTracks(String content){
+		
+		int nTracks = Integer.parseInt(content);
+		this.currentNumberOfTracks.nTracks = nTracks;
 		
 	}
 	
@@ -561,6 +633,24 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		private String direction;
 		
 		TrafficFlowDirection(){};
+		
+	}
+	
+	class DesignSpeed{
+		
+		private String refId;
+		private double v;
+		
+		DesignSpeed(){};
+		
+	}
+	
+	class NumberOfTracks{
+		
+		private String refId;
+		private int nTracks;
+		
+		NumberOfTracks(){};
 		
 	}
 
