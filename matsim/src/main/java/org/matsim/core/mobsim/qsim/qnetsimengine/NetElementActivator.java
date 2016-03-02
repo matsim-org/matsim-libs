@@ -22,11 +22,11 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 abstract class NetElementActivator {
 
-	protected abstract void activateNode(final QNode node);
+	abstract void activateNode(final QNode node);
 	
 	abstract int getNumberOfSimulatedNodes();
 	
-	protected abstract void activateLink(final QLinkI link);
+	abstract void activateLink(final QLinkI link);
 
 	abstract int getNumberOfSimulatedLinks();
 } 
