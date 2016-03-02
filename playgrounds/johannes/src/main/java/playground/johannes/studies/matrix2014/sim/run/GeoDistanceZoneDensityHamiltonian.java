@@ -26,6 +26,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
@@ -70,7 +71,15 @@ public class GeoDistanceZoneDensityHamiltonian {
         /*
         Create the geo distance discretizer.
          */
-        Discretizer discretizer = new StackedDiscreitzer();
+//        Discretizer discretizer = new StackedDiscreitzer();
+        TDoubleArrayList borders = new TDoubleArrayList();
+        borders.add(-1);
+        for(int d = 2000; d < 10000; d += 2000) borders.add(d);
+        for(int d = 10000; d < 50000; d += 10000) borders.add(d);
+        for(int d = 50000; d < 500000; d += 50000) borders.add(d);
+        for(int d = 500000; d < 1000000; d += 100000) borders.add(d);
+        borders.add(Double.MAX_VALUE);
+        Discretizer discretizer =  new FixedBordersDiscretizer(borders.toArray());
         /*
         Index zones
          */
@@ -110,7 +119,10 @@ public class GeoDistanceZoneDensityHamiltonian {
             /*
             Create and add the hamiltonian.
             */
-                logger.info(String.format("Number of legs in class %s: %s", i, simLegs.size()));
+                logger.info(String.format("Initializing hamiltonian (class %s) with %s ref legs and %s sim legs.",
+                        i,
+                        refLegs.size(),
+                        simLegs.size()));
                 UnivariatFrequency hamiltonian = new UnivariatFrequency(
                         refLegs,
                         simLegs,
@@ -191,7 +203,7 @@ public class GeoDistanceZoneDensityHamiltonian {
             String val = zone.getAttribute(ZoneFacilityDensity.FACILITY_DENSITY_KEY);
             if(val != null) rhos.add(Double.parseDouble(val));
         }
-        Discretizer discr = FixedSampleSizeDiscretizer.create(rhos.toArray(), 1, 10);
+        Discretizer discr = FixedSampleSizeDiscretizer.create(rhos.toArray(), 1, 5);
 
         TObjectIntMap indices = new TObjectIntHashMap(
                 Constants.DEFAULT_CAPACITY,
@@ -241,6 +253,7 @@ public class GeoDistanceZoneDensityHamiltonian {
 
     private static class StackedDiscreitzer implements Discretizer {
 
+        private DummyDiscretizer dummy = new DummyDiscretizer();
         private LinearDiscretizer d2 = new LinearDiscretizer(2000);
         private LinearDiscretizer d10 = new LinearDiscretizer(10000);
         private LinearDiscretizer d50 = new LinearDiscretizer(50000);
@@ -267,9 +280,27 @@ public class GeoDistanceZoneDensityHamiltonian {
             if(value >= 500000) d = d100;
             else if(value >= 50000) d = d50;
             else if(value >= 10000) d = d10;
-            else d = d2;
-
+            else if(value >= 2000) d = d2;
+            else d = dummy;
             return d;
+        }
+
+        private class DummyDiscretizer implements Discretizer {
+
+            @Override
+            public double discretize(double value) {
+                return 2000;
+            }
+
+            @Override
+            public int index(double value) {
+                return 0;
+            }
+
+            @Override
+            public double binWidth(double value) {
+                return 2000;
+            }
         }
     }
 

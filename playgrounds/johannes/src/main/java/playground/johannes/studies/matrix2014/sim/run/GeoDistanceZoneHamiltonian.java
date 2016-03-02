@@ -19,11 +19,13 @@
 package playground.johannes.studies.matrix2014.sim.run;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.stats.Discretizer;
+import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
@@ -67,15 +69,15 @@ public class GeoDistanceZoneHamiltonian {
         /*
         Create the geo distance discretizer.
          */
-//        TDoubleArrayList borders = new TDoubleArrayList();
-//        borders.add(-1);
-//        for (int d = 2000; d < 10000; d += 2000) borders.add(d);
-//        for (int d = 10000; d < 50000; d += 10000) borders.add(d);
-//        for (int d = 50000; d < 500000; d += 50000) borders.add(d);
-//        for (int d = 500000; d < 1000000; d += 100000) borders.add(d);
-//        borders.add(Double.MAX_VALUE);
-//        Discretizer discretizer = new FixedBordersDiscretizer(borders.toArray());
-        Discretizer discretizer = new StackedDiscreitzer();
+        TDoubleArrayList borders = new TDoubleArrayList();
+        borders.add(-1);
+        for (int d = 2000; d < 10000; d += 2000) borders.add(d);
+        for (int d = 10000; d < 50000; d += 10000) borders.add(d);
+        for (int d = 50000; d < 500000; d += 50000) borders.add(d);
+        for (int d = 500000; d < 1000000; d += 100000) borders.add(d);
+        borders.add(Double.MAX_VALUE);
+        Discretizer discretizer = new FixedBordersDiscretizer(borders.toArray());
+//        Discretizer discretizer = new StackedDiscreitzer();
         /*
         Index zones
          */

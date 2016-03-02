@@ -36,7 +36,7 @@ import playground.johannes.synpop.sim.SetHomeFacilities;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -117,8 +117,8 @@ public class SimPopulationBuilder {
         double wsum1 = 0;
         double wsum2 = 0;
 
-        Set<Person> persons1 = new HashSet<>();
-        Set<Person> persons2 = new HashSet<>();
+        Set<Person> persons1 = new LinkedHashSet<>();
+        Set<Person> persons2 = new LinkedHashSet<>();
 
         TripsCounter counter = new TripsCounter(legPredicate);
         for (Person p : refPersons) {
@@ -146,7 +146,7 @@ public class SimPopulationBuilder {
         for (Person p : simPersons1) p.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w1));
         for (Person p : simPersons2) p.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w2));
 
-        Set<Person> all = new HashSet<>();
+        Set<Person> all = new LinkedHashSet<>();
         all.addAll(simPersons1);
         all.addAll(simPersons2);
 
