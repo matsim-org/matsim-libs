@@ -48,6 +48,8 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 abstract class QLinkI implements NetsimLink {
+	// yyyy might make make sense to also pass the "isAccepting/addFromUpstream" through something like 
+	// "getFromNodeQueueLanes". kai, feb'16
 	
 
 	abstract QNode getToNode() ;
