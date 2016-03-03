@@ -334,9 +334,5 @@ public class CarPassingBusTest {
 		@Override
 		public void reset(int iteration) {
 		}
-
-		public Map<Id<Vehicle>, Map<Id<Link>, Tuple<Double, Double> >> getVehicle2LinkEnterLeaveTimes(){
-			return this.vehicleEnterLeaveTimes;
-		}
 	}
 }
