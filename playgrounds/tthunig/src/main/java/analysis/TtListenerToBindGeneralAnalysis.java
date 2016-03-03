@@ -27,11 +27,8 @@ import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.StartupListener;
 
 import com.google.inject.Inject;
 
@@ -41,7 +38,7 @@ import com.google.inject.Inject;
  * @author tthunig
  *
  */
-public class TtListenerToBindGeneralAnalysis implements StartupListener, IterationEndsListener {
+public class TtListenerToBindGeneralAnalysis implements IterationEndsListener {
 
 	private static final Logger log = Logger.getLogger(TtListenerToBindGeneralAnalysis.class);
 	
@@ -49,19 +46,7 @@ public class TtListenerToBindGeneralAnalysis implements StartupListener, Iterati
 	private Scenario scenario;
 	
 	@Inject
-	private EventsManager eventsManager;
-	
-	@Inject
-	private TtGeneralAnalysis handler;
-	
-	@Inject
 	private TtAnalyzedGeneralResultsWriter writer;
-	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		// add the analysis tool as events handler to the events manager
-		eventsManager.addHandler(handler);
-	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {

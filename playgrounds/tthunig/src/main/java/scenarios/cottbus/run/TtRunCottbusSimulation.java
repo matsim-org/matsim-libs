@@ -191,8 +191,8 @@ public class TtRunCottbusSimulation {
 //		config.qsim().setStuckTime(3600 * 10.);
 		config.qsim().setRemoveStuckVehicles(false);
 		
-		config.qsim().setStorageCapFactor( 0.7 );
-		config.qsim().setFlowCapFactor( 0.7 );
+		config.qsim().setStorageCapFactor( 0.5 );
+		config.qsim().setFlowCapFactor( 0.5 );
 		
 		config.qsim().setStartTime(3600 * 6); 
 
@@ -346,9 +346,10 @@ public class TtRunCottbusSimulation {
 		controler.addOverridingModule(new AbstractModule() {			
 			@Override
 			public void install() {
-				this.addControlerListenerBinding().to(TtListenerToBindGeneralAnalysis.class);
-				this.bind(TtGeneralAnalysis.class);
+				this.bind(TtGeneralAnalysis.class).asEagerSingleton();
+				this.addEventHandlerBinding().to(TtGeneralAnalysis.class);
 				this.bind(TtAnalyzedGeneralResultsWriter.class);
+				this.addControlerListenerBinding().to(TtListenerToBindGeneralAnalysis.class);
 			}
 		});
 		
