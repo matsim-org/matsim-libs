@@ -48,7 +48,6 @@ import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -262,9 +261,6 @@ public class CarPassingBusTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(eventHandler);
 		
-		EventWriterXML ewx = new EventWriterXML(helper.getOutputDirectory()+"/events.xml.gz");
-		events.addHandler(ewx);
-
 		QSim qSim1 = new QSim(this.scenario, events);
 		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);
@@ -293,7 +289,6 @@ public class CarPassingBusTest {
 		}
 		
 		sim.run();
-		ewx.closeFile();
 	}
 	
 	private static class LinkEnterLeaveTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
