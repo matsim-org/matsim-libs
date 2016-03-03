@@ -21,6 +21,7 @@ import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -150,6 +151,7 @@ public class GeometryUtils {
 				addAttribute("capacity", Double.class).
 				addAttribute("freespeed", Double.class).
 				addAttribute("modes", String.class).
+				addAttribute("nLanes", Integer.class).
 				create();
 
 		for (Link link : network.getLinks().values()) {
@@ -159,7 +161,8 @@ public class GeometryUtils {
 			SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
 					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),
 					link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(),
-					link.getCapacity(), link.getFreespeed(), CollectionUtils.setToString(link.getAllowedModes())}, null);
+					link.getCapacity(), link.getFreespeed(), CollectionUtils.setToString(link.getAllowedModes()),
+					link.getNumberOfLanes()}, null);
 			linkFeatures.add(ft);
 		}
 		
@@ -221,6 +224,31 @@ public class GeometryUtils {
 		}
 		
 		ShapeFileWriter.writeGeometries(features, shapefile);
+		
+	}
+	
+	public static void writeStopFacilities2Shapefile(Collection<? extends TransitStopFacility> facilities, String shapefile, String crs){
+		
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		PointFeatureFactory factory = new PointFeatureFactory.Builder().
+				setCrs(MGC.getCRS(crs)).
+				setName("stops").
+				addAttribute("ID", String.class).
+				addAttribute("name", String.class).
+				addAttribute("linkId", String.class).
+				create();
+		
+		for(TransitStopFacility facility : facilities){
+			
+			SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(facility.getCoord()),
+					new Object[]{facility.getId().toString(), facility.getName(),
+					facility.getLinkId().toString()},
+					null);
+			features.add(feature);
+			
+		}
+		
+		ShapeFileWriter.writeGeometries(features, shapefile + "/stops.shp");
 		
 	}
 	
