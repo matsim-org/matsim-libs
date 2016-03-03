@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package tutorial.programming.simpleadaptivesignalengine;
+package tutorial.programming.simpleAdaptiveSignalEngine;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.simpleadaptivesignalengine;
+package tutorial.programming.simpleAdaptiveSignalEngine;
 
 import java.io.IOException;
 import java.io.Writer;
