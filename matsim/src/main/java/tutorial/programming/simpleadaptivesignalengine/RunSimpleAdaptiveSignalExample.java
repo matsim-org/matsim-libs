@@ -22,6 +22,8 @@
 
 package tutorial.programming.simpleadaptivesignalengine;
 
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -30,7 +32,13 @@ public class RunSimpleAdaptiveSignalExample {
 
 	public static void main(String[] args) {
 		
-		final Controler controler = new Controler( "examples/daganzo/config.xml" ) ;
+		final Config config = ConfigUtils.loadConfig("examples/daganzo/config.xml");
+		config.controler().setOutputDirectory("output/simpleAdaptiveSignalEngineExample/");
+		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
+		config.vspExperimental().setWritingOutputEvents(true);
+		// remove unmaterialized module
+		config.removeModule("otfvis");
+		final Controler controler = new Controler(config);
 		
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
 		controler.addOverridingModule(new AbstractModule() {

@@ -38,7 +38,9 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SignalizeableItem;
@@ -48,13 +50,16 @@ import org.matsim.core.utils.io.IOUtils;
  * @author nagel
  *
  */
-class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, LinkEnterEventHandler, LinkLeaveEventHandler {
+class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, MobsimInitializedListener, LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private Queue<Double> vehicleExitTimesOnLink5 = new LinkedList<Double>() ;
 	private long cnt4 = 0 ;
 	private long cnt5 = 0 ;
 	private OutputDirectoryHierarchy controlerIO;
 	private Writer out ;
+	
+	private SignalizeableItem link4;
+	private SignalizeableItem link5;
 	
 	class Result {
 		int iteration ;
@@ -70,14 +75,19 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, LinkEnterEven
 	}
 
 	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		Netsim mobsim = (Netsim) e.getQueueSimulation() ;
-		double now = mobsim.getSimTimer().getTimeOfDay() ;
+		link4 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(Id.createLinkId("4")) ;
+		link5 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(Id.createLinkId("5")) ;
+		link4.setSignalized(true);
+		link5.setSignalized(true);
+	}
 
-		SignalizeableItem link4 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(Id.create("4", Link.class)) ;
-		SignalizeableItem link5 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(Id.create("5", Link.class)) ;
+	@Override
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+		double now = e.getSimulationTime();
 		final Double dpTime = this.vehicleExitTimesOnLink5.peek();
-		if ( dpTime !=null && dpTime < now && (long)now%4 < 4  ) {
+		if ( dpTime !=null && dpTime < now ) {
 			link4.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
 			link5.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
 		} else {
@@ -85,7 +95,7 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, LinkEnterEven
 			link5.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
 		}
 
-//		if ( time<20.*60 && (long)time%2==0 ) { 
+//		if ( now<20.*60 && (long)now%2==0 ) { 
 //			link4.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
 //		} else {
 //			link4.setSignalStateAllTurningMoves(SignalGroupState.GREEN) ;
