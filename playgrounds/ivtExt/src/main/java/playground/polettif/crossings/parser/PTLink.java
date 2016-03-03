@@ -16,39 +16,36 @@
  *                                                                         *
  * *********************************************************************** */
 
+package playground.polettif.crossings.parser;
 
-package playground.polettif;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
-public class HelloWorldPolettifTest {
+/*
+ * Public transport link with crossings on it
+ */
+public class PTLink {
 	
-	@Test
-	public final void testMain() {
-		try {
-			String inputConfigFile = "C:/Users/polettif/Desktop/input/small/config_02.xml";
-			Config config = ConfigUtils.loadConfig(inputConfigFile) ;
-			config.controler().setLastIteration(1);
-			config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+	private Id<Link> ptId;
+	private ArrayList<String> crossingIds = new ArrayList<>();
 
-			Scenario scenario = ScenarioUtils.loadScenario(config) ;
-
-			Controler controler = new Controler(scenario) ;
-
-			controler.run();
-		} catch ( Exception ee ) {
-			Logger.getLogger(this.getClass()).fatal("there was an exception: \n" + ee ) ;
-
-			// if one catches an exception, then one needs to explicitly fail the test:
-			Assert.fail();
-		}
+	public PTLink(String ptId) {
+		this.ptId = Id.createLinkId(ptId);
 	}
+	
+	public void addCrossingLink(String crossingId) {
+		this.crossingIds.add(crossingId);
+	}
+	
+	public Id<Link> getId() {
+		return ptId;
+	}
+	
+	public List<String> getCrossingLinks() {
+		return crossingIds;
+	}
+ 	
 }

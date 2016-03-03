@@ -16,39 +16,41 @@
  *                                                                         *
  * *********************************************************************** */
 
+package playground.polettif.crossings;
 
-package playground.polettif;
-
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioUtils;
-
-public class HelloWorldPolettifTest {
+public class LinkChangeEvent {
 	
-	@Test
-	public final void testMain() {
-		try {
-			String inputConfigFile = "C:/Users/polettif/Desktop/input/small/config_02.xml";
-			Config config = ConfigUtils.loadConfig(inputConfigFile) ;
-			config.controler().setLastIteration(1);
-			config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-
-			Scenario scenario = ScenarioUtils.loadScenario(config) ;
-
-			Controler controler = new Controler(scenario) ;
-
-			controler.run();
-		} catch ( Exception ee ) {
-			Logger.getLogger(this.getClass()).fatal("there was an exception: \n" + ee ) ;
-
-			// if one catches an exception, then one needs to explicitly fail the test:
-			Assert.fail();
-		}
+	private String linkId1;
+	private String linkId2;
+	private String starttime;
+	private String stoptime;
+	private String capacity;
+     
+	public LinkChangeEvent(String linkId1, String linkId2, String starttime, String stoptime, String capacity) {
+		this.linkId1 = linkId1;
+		this.linkId2 = linkId2;
+		this.starttime = starttime;
+		this.stoptime = stoptime;
+		this.capacity = capacity;
+	}
+	
+	public String getLinkId1() {
+		return linkId1;
+	}
+	
+	public String getLinkId2() {
+		return linkId2;
+	}
+	
+	public String getStarttime() {
+		return starttime;
+	}
+	
+	public String getStoptime() {
+		return stoptime;
+	}
+	
+	public String getCapacity() {
+		return capacity;
 	}
 }

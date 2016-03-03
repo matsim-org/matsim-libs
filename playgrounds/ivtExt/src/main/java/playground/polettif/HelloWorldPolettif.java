@@ -26,9 +26,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
- * Created by polettif on 24.02.2016.
- */
 public class HelloWorldPolettif {
 
 	public static void main(String[] args) {
