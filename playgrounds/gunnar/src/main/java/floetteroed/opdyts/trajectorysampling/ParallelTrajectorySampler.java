@@ -34,8 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
+import java.util.logging.Logger;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.ObjectiveFunction;
@@ -167,6 +166,10 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		return this.samplingStages;
 	}
 
+	public List<Transition<U>> getTransitions() {
+		return this.allTransitionSequences.getAllTransitionsInInsertionOrder();
+	}
+	
 	@Override
 	public ObjectiveFunction getObjectiveFunction() {
 		return this.objectiveFunction;
@@ -175,7 +178,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 	public List<Transition<U>> getTransitions(final U decisionVariable) {
 		return this.allTransitionSequences.getTransitions(decisionVariable);
 	}
-
+	
 	// -------------------- IMPLEMENTATION --------------------
 
 	public void initialize() {
@@ -226,15 +229,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 				samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
 						this.allTransitionSequences
 								.getAllTransitionsInInsertionOrder(),
-						this.equilibriumWeight, this.uniformityWeight,
-						Math.min(
-								this.convergenceCriterion
-										.effectiveAveragingIterations(),
-								this.samplingStages.size()
-										* this.convergenceCriterion
-												.effectiveAveragingIterations()
-										/ this.convergenceCriterion
-												.totalIterations()));
+						this.equilibriumWeight, this.uniformityWeight);
 				samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
 						this.allTransitionSequences.getTransitions(
 								this.currentDecisionVariable).getLast(),
@@ -283,15 +278,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 				samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
 						this.allTransitionSequences
 								.getAllTransitionsInInsertionOrder(),
-						this.equilibriumWeight, this.uniformityWeight,
-						Math.min(
-								this.convergenceCriterion
-										.effectiveAveragingIterations(),
-								this.samplingStages.size()
-										* this.convergenceCriterion
-												.effectiveAveragingIterations()
-										/ this.convergenceCriterion
-												.totalIterations()));
+						this.equilibriumWeight, this.uniformityWeight);
 				samplingStage = samplingStageEvaluator.newOptimalSamplingStage(
 						this.allTransitionSequences.getTransitions(
 								this.currentDecisionVariable).getLast(),

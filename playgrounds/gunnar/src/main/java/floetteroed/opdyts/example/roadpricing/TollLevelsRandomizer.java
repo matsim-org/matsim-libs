@@ -71,7 +71,6 @@ class TollLevelsRandomizer implements DecisionVariableRandomizer<TollLevels> {
 
 					@Override
 					public double constrain(double originalValue) {
-						// TODO more consistent with theo to not constraint this
 						return Math.max(0, originalValue);
 					}
 				});

@@ -19,7 +19,7 @@ import floetteroed.utilities.math.Vector;
  *
  */
 public class PathologicalExample {
-
+	
 	private final LinearSystemSimulator system;
 
 	private final String logFileName;
@@ -61,9 +61,9 @@ public class PathologicalExample {
 		final ObjectiveFunction objFct = new LinearSystemObjectiveFunction();
 
 		final boolean interpolate = true;
-		final int maxRandomSearchIterations = 5;
+		final int maxRandomSearchIterations = 10;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-		final boolean includeCurrentBest = false;
+		final boolean includeCurrentBest = true;
 
 		final Vector min = new Vector(Double.NEGATIVE_INFINITY,
 				Double.NEGATIVE_INFINITY); // new Vector(-0.1, -0.1);

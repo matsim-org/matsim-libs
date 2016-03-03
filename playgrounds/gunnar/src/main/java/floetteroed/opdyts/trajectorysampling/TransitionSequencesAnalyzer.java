@@ -37,18 +37,7 @@ import java.util.Map;
 
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
-import org.apache.commons.math3.exception.TooManyEvaluationsException;
-import org.apache.commons.math3.optim.InitialGuess;
-import org.apache.commons.math3.optim.MaxEval;
-import org.apache.commons.math3.optim.MaxIter;
-import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.optim.SimpleValueChecker;
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
-import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
-import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 import org.apache.commons.math3.util.FastMath;
-import org.apache.log4j.Logger;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.trajectorysampling.FrankWolfe.LineSearch;
@@ -70,27 +59,18 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 
 	private final int maxIterations = Integer.MAX_VALUE;
 
-	private final double equivalentAveragingIterations;
-
 	// -------------------- CONSTRUCTION --------------------
 
 	public TransitionSequencesAnalyzer(final List<Transition<U>> transitions,
-			double equilibriumGapWeight, double uniformityGapWeight,
-			final double equivalentAveragingIterations) {
+			final double equilibriumGapWeight, final double uniformityGapWeight) {
 		if ((transitions == null) || (transitions.size() == 0)) {
 			throw new IllegalArgumentException(
 					"there must be at least one transition");
 		}
 		this.transitions = transitions;
-
-//		equilibriumGapWeight = 0.0;
-		uniformityGapWeight = 0.0;
-//		Logger.getLogger(this.getClass().getName()).warn(
-//				"Setting uniformity gap weights to zero.");
-
 		this.surrogateObjectiveFunction = new SurrogateObjectiveFunction<>(
-				transitions, equilibriumGapWeight, uniformityGapWeight);
-		this.equivalentAveragingIterations = equivalentAveragingIterations;
+				transitions, equilibriumGapWeight, Math.max(0.0,
+						uniformityGapWeight));
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -230,14 +210,22 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 			final Double convergedObjectiveFunctionValue,
 			final double[] lastInitialPoint) {
 
-		final FrankWolfe fw = new FrankWolfe(new MyObjectiveFunction2(),
-				new MyGradient2(), new MyLineSearch(), 1e-6,
-				this.equivalentAveragingIterations);
-		fw.run(this.newInitialPoint(this.transitions.size(), lastInitialPoint));
-		final double[] result = fw.getPoint();
+		final double[] result = this.newOptimalPoint(lastInitialPoint);
 		final Vector alphas = new Vector(result);
 		return new SamplingStage<>(alphas, this, lastTransition,
 				convergedObjectiveFunctionValue, Double.NaN, result);
+
+	}
+
+	public double[] newOptimalPoint(final double[] lastInitialPoint) {
+
+		final FrankWolfe fw = new FrankWolfe(new MyObjectiveFunction2(),
+				new MyGradient2(), new MyLineSearch(), 1e-6);
+		fw.run(this.newInitialPoint(this.transitions.size(), lastInitialPoint));
+		return fw.getPoint();
+		// final Vector alphas = new Vector(result);
+		// return new SamplingStage<>(alphas, this, lastTransition,
+		// convergedObjectiveFunctionValue, Double.NaN, result);
 
 		// this.writeProblem();
 		// this.runMATLAB();
@@ -255,54 +243,50 @@ public class TransitionSequencesAnalyzer<U extends DecisionVariable> {
 		// convergedObjectiveFunctionValue, solutionValue, optimalPoint);
 	}
 
-	public Vector optimalAlphas(final double[] initialPoint) {
-		final FrankWolfe fw = new FrankWolfe(new MyObjectiveFunction2(),
-				new MyGradient2(), new MyLineSearch(), 1e-6,
-				this.equivalentAveragingIterations);
-		fw.run(this.newInitialPoint(this.transitions.size(), initialPoint));
-		final double[] result = fw.getPoint();
-		return new Vector(result);
-		// return this.alphasFromPoint(this.optimalPoint(initialPoint));
-	}
+	// public Vector optimalAlphas(final double[] initialPoint) {
+	// return this.alphasFromPoint(this.optimalPoint(initialPoint));
+	// }
 
-	private Vector alphasFromPoint(final double[] point) {
-		return proba(newVectPlusOneZero(point));
-	}
+	// private Vector alphasFromPoint(final double[] point) {
+	// return proba(newVectPlusOneZero(point));
+	// }
 
-	private double[] optimalPoint(final double[] initialPoint) {
-		if (this.transitions.size() == 1) {
-			return new double[0];
-		} else {
-			PointValuePair result = null;
-			final double eps = 1e-8;
-			double initialBracketingRange = eps;
-			do {
-				try {
-					final NonLinearConjugateGradientOptimizer solver = new NonLinearConjugateGradientOptimizer(
-							NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE, // FLETCHER_REEVES,
-							new SimpleValueChecker(eps, eps), eps, eps,
-							initialBracketingRange);
-					result = solver.optimize(
-							new ObjectiveFunction(new MyObjectiveFunction()),
-							new ObjectiveFunctionGradient(new MyGradient()),
-							GoalType.MINIMIZE,
-							new InitialGuess(
-									(initialPoint != null) ? initialPoint
-											: new double[this.transitions
-													.size() - 1]), new MaxEval(
-									Integer.MAX_VALUE), new MaxIter(
-									this.maxIterations));
-				} catch (TooManyEvaluationsException e) {
-					initialBracketingRange *= 10.0;
-					Logger.getLogger(this.getClass().getName()).info(
-							"Extending initial bracketing range to "
-									+ initialBracketingRange);
-					result = null;
-				}
-			} while (result == null);
-			return result.getPoint();
-		}
-	}
+	// private double[] optimalPoint(final double[] initialPoint) {
+	// if (this.transitions.size() == 1) {
+	// return new double[0];
+	// } else {
+	// PointValuePair result = null;
+	// final double eps = 1e-8;
+	// double initialBracketingRange = eps;
+	// do {
+	// try {
+	// final NonLinearConjugateGradientOptimizer solver = new
+	// NonLinearConjugateGradientOptimizer(
+	// NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE, //
+	// FLETCHER_REEVES,
+	// new SimpleValueChecker(eps, eps), eps, eps,
+	// initialBracketingRange);
+	// result = solver.optimize(
+	// new ObjectiveFunction(new MyObjectiveFunction()),
+	// new ObjectiveFunctionGradient(new MyGradient()),
+	// GoalType.MINIMIZE,
+	// new InitialGuess(
+	// (initialPoint != null) ? initialPoint
+	// : new double[this.transitions
+	// .size() - 1]), new MaxEval(
+	// Integer.MAX_VALUE), new MaxIter(
+	// this.maxIterations));
+	// } catch (TooManyEvaluationsException e) {
+	// initialBracketingRange *= 10.0;
+	// Logger.getLogger(this.getClass().getName()).info(
+	// "Extending initial bracketing range to "
+	// + initialBracketingRange);
+	// result = null;
+	// }
+	// } while (result == null);
+	// return result.getPoint();
+	// }
+	// }
 
 	/*
 	 * An unconstrained nonlinear optimization routine is used to compute

@@ -167,8 +167,7 @@ public class RandomSearch<U extends DecisionVariable> {
 
 		final SelfTuner weightOptimizer;
 		if (adjustWeights) {
-			weightOptimizer = new SelfTuner(1.0, 0.05, 1, 0.01,
-					this.convergenceCriterion.effectiveAveragingIterations());
+			weightOptimizer = new SelfTuner(1.0, 0.05, 1, 0.01);
 		} else {
 			weightOptimizer = null;
 		}
@@ -304,11 +303,18 @@ public class RandomSearch<U extends DecisionVariable> {
 
 				if (weightOptimizer != null) {
 
-					final List<Transition<U>> allTransitions = sampler
-							.getTransitions(newBestDecisionVariable);
-					weightOptimizer.update(allTransitions,
-							sampler.getDecisionVariable2convergenceResultView()
-									.get(newBestDecisionVariable));
+					// final List<Transition<U>> allTransitions = sampler
+					// .getTransitions(newBestDecisionVariable);
+					// weightOptimizer.update(allTransitions,
+					// sampler.getDecisionVariable2convergenceResultView()
+					// .get(newBestDecisionVariable));
+					// weightOptimizer.update(sampler.getSamplingStages(),
+					// sampler.getDecisionVariable2convergenceResultView()
+					// .get(newBestDecisionVariable));
+					weightOptimizer
+							.update(sampler.getSamplingStages(),
+									sampler.getDecisionVariable2convergenceResultView()
+											.get(newBestDecisionVariable).finalObjectiveFunctionValue);
 					equilibriumGapWeight = weightOptimizer
 							.getEquilibriumGapWeight();
 					uniformityGapWeight = weightOptimizer
