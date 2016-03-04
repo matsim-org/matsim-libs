@@ -17,70 +17,66 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.taxibus.scenario.run;
+package playground.jbischoff.av.preparation;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.taxi.TaxiUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
-
 /**
  * @author  jbischoff
  *
  */
-public class CreateHubPassengers {
+public class WobPlansFilter {
+
 	public static void main(String[] args) {
-	String dir = "../../../shared-svn/projects/vw_rufbus/scenario/input/";
-	String inputPlans = dir + "VW083PC.output_plans.xml.gz";
-	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	Population newpop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
-	new MatsimPopulationReader(scenario).readFile(inputPlans);
-	
-	for (Person p : scenario.getPopulation().getPersons().values()){
-		Plan plan = p.getSelectedPlan();
-		Person newPerson = PopulationUtils.createPerson(p.getId());
-		newPerson.addPlan(plan);
-		newpop.addPerson(newPerson);
-		if (p.getId().toString().startsWith("BS_WB")){
-			PlanElement pE = plan.getPlanElements().get(1) ;
-			if (pE instanceof Leg){
-				if (((Leg) pE).getMode().equals(TaxibusUtils.TAXIBUS_MODE)){
-					((Leg) pE).setRoute(null);
-//					Activity hub = newpop.getFactory().createActivityFromLinkId("tb_hub", Id.createLinkId(57195));
-					Activity hub = newpop.getFactory().createActivityFromLinkId("tb_hub", Id.createLinkId(15073));
-					hub.setMaximumDuration(60);
-					Leg newleg = newpop.getFactory().createLeg(TaxibusUtils.TAXIBUS_MODE);
-					plan.getPlanElements().add(2, hub);
-					plan.getPlanElements().add(3, newleg);
-					
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw078.taxiplans_alltrips.xml.gz");
+		Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		for (Person p : scenario.getPopulation().getPersons().values()){
+			boolean copyPerson = false;
+			Plan plan = p.getSelectedPlan();
+			for (PlanElement pe : plan.getPlanElements()){
+				if (pe instanceof Leg){
+					if (((Leg) pe).getMode().equals(TaxiUtils.TAXI_MODE)){
+						copyPerson = true;
+					}
 				}
 			}
-		for (int i = plan.getPlanElements().size()-1; i>4;i--){
-			plan.getPlanElements().remove(i);
+			if (copyPerson){
+				Person p2 = pop2.getFactory().createPerson(p.getId());
+				p2.addPlan(plan);
+				pop2.addPerson(p2);
+			}
 		}
+		new  PopulationWriter(pop2).write("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw078.onlyTaxiplans_alltrips.xml.gz");
+		replaceCarLegsByTeleport(pop2);
+		new  PopulationWriter(pop2).write("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw078.onlyTaxiplansCarTeleport_alltrips.xml.gz");
+	}
+	
+	static void replaceCarLegsByTeleport(Population pop){
+		for (Person p : pop.getPersons().values()){
+			Plan plan = p.getSelectedPlan();
+			for (PlanElement pe : plan.getPlanElements()){
+				if (pe instanceof Leg){
+					if (((Leg) pe).getMode().equals(TransportMode.car))
+							{
+						((Leg) pe).setMode(TransportMode.ride);
+						((Leg) pe).setRoute(null);
+					}
+				}
+			}
 		}
-		
-		
-		
-		
 	}
-	new PopulationWriter(newpop).write(dir+"hubPlansVW083PC_l295.xml.gz");
-	
-	
-	
-		
-		
-	}
+
 }

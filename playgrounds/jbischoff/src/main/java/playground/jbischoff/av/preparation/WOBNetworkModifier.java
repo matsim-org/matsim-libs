@@ -17,57 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.utils;
+package playground.jbischoff.av.preparation;
 
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 
 /**
  * @author  jbischoff
  *
  */
-public class JbUtils {
-
-	
-	public static int getHour(double time){
-		int hour = (int) Math.floor(time/(3600));
-		if (hour>23){
-			hour = hour%24;
-		}
-		return hour;
-	}
-	
-	public static Map<String,Geometry> readShapeFileAndExtractGeometry(String filename){
-		return readShapeFileAndExtractGeometry(filename, "SCHLUESSEL");
-	}
-
-	public static Map<String,Geometry> readShapeFileAndExtractGeometry(String filename, String key){
+public class WOBNetworkModifier {
+	public static void main(String[] args) {
 		
-		Map<String,Geometry> geometry = new TreeMap<>();	
-		for (SimpleFeature ft : ShapeFileReader.getAllFeatures(filename)) {
-			
-				GeometryFactory geometryFactory= new GeometryFactory();
-				WKTReader wktReader = new WKTReader(geometryFactory);
-
-				try {
-					Geometry geo = wktReader.read((ft.getAttribute("the_geom")).toString());
-					String lor = ft.getAttribute(key).toString();
-					geometry.put(lor, geo);
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		Network network = NetworkUtils.createNetwork();
+		Network network2 = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/network_nopt.xml");
+		for (Node node : network.getNodes().values()){
+			node.getInLinks().clear();
+			node.getOutLinks().clear();
+		}
+		for (Link link : network.getLinks().values()){
+			if (!link.getAllowedModes().contains("vw")&&(link.getAllowedModes().size()==1)) {
+				if (!network2.getNodes().containsKey(link.getFromNode().getId())){
+					network2.addNode(link.getFromNode());
 				}
-
-			 
-		}	
-		return geometry;
+				if (!network2.getNodes().containsKey(link.getToNode().getId())){
+					network2.addNode(link.getToNode());
+				}
+				network2.addLink(link);
+			}
+		}
+		new NetworkCleaner().run(network2);
+		new NetworkWriter(network2).write("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/network_noptvw.xml");
 	}
 }

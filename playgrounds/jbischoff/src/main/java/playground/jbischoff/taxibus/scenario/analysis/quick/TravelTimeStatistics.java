@@ -55,7 +55,7 @@ public class TravelTimeStatistics   {
 		
 		
 		
-		String run = "vw073";
+		String run = "VW083PC-huba39";
 //		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String folder = "D:/runs-svn/vw_rufbus/" + run + "/";
 		String inputFile = folder + run + ".output_events.xml.gz";
@@ -93,7 +93,8 @@ public class TravelTimeStatistics   {
 		allTT.addMode("car");
 		allTT.addMode("pt");
 		allTT.addMode("taxibus");
-
+		allTT.addMode("transit_walk");
+		
 		ptTT.addMode("pt");
 		ptTT.addMode("transit_walk");
 
