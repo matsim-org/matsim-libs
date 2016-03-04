@@ -72,11 +72,11 @@ public class PurposeSplitFFFromEvents {
 						purposeSplit[3]++;
 						count++; 
 						}
-				/*else if (event.getActType().startsWith("home")) {
+				else if (event.getActType().startsWith("home")) {
 						purposeSplit[4]++;
 				
 				count++; 
-				}*/
+				}
 				
 			}
 			
@@ -96,7 +96,7 @@ public class PurposeSplitFFFromEvents {
 		@Override
 		public void handleEvent(PersonArrivalEvent event) {
 
-			if (event.getLegMode().equals("freefloating")) {
+			if (event.getLegMode().equals("walk_ff")) {
 				
 				mapFix.put(event.getPersonId(), true);
 				

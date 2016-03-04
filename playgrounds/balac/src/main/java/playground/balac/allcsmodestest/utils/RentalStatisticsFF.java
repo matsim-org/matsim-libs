@@ -28,31 +28,35 @@ public class RentalStatisticsFF {
 		double di = 0.0;
 		double time1 = 0.0;
 		
+		double egressDistance = 0.0;
+		double accessdistance = 0.0;
 		
 		while(s != null) {
 			String[] arr = s.split("\\s");
-			if (Double.parseDouble(arr[5]) != 0.0) {
-			double time = Double.parseDouble(arr[6]);
-			distance[(int)(time * 0.9 / 130.0)]++;
-			bla.add(Double.parseDouble(arr[0]));
-			usedCars.add(arr[8]);
-			double startTime = Double.parseDouble(arr[1]);
-			rentalStart[(int)((startTime) / 3600)]++;			
-
-			double endTime = Double.parseDouble(arr[2]);
-			rentalTimes[(int)((endTime - startTime) / 3600)]++;
-			di += Double.parseDouble(arr[5]);
-			time1 += endTime -startTime;
-			if (endTime - startTime < 1800) 
-				count1++;
-			count++;
+			if (Double.parseDouble(arr[5]) != 0.0 && Double.parseDouble(arr[6]) < 1800) {
+				double time = Double.parseDouble(arr[6]);
+				accessdistance += time * 1.05;
+				//distance[(int)(time / 1.05)]++;
+				bla.add(Double.parseDouble(arr[0]));
+				usedCars.add(arr[8]);
+				double startTime = Double.parseDouble(arr[1]);
+				rentalStart[(int)((startTime) / 3600)]++;			
+	
+				double endTime = Double.parseDouble(arr[2]);
+				rentalTimes[(int)((endTime - startTime) / 3600)]++;
+				di += Double.parseDouble(arr[5]);
+				time1 += endTime -startTime;
+				if (endTime - startTime < 1800) 
+					count1++;
+				count++;
 			}
 			s = readLink.readLine();		
 			
 		}
 		System.out.println("Number of different users is: " + bla.size());
 		System.out.println("Number of used cars: " + usedCars.size());
-		System.out.println(countZero);
+		System.out.println("Avg. access distance: " + accessdistance/count);
+		System.out.println(count);
 		System.out.println(di/count);
 		System.out.println(time1/count);
 		for (int i = 0; i < rentalTimes.length; i++) 
@@ -63,6 +67,7 @@ public class RentalStatisticsFF {
 		System.out.println();
 		for (int i = 0; i < rentalStart.length; i++) 
 			System.out.println((double)rentalStart[i]/(double)count * 100.0);
+		System.out.println("Turnover is: " + time1 / 60.0 * 0.37);
 		
 	}
 

@@ -62,7 +62,7 @@ public class CarsUsedLocationsffSHP {
 				String[] arr = s.split("\\s");
 			
 					
-					SimpleFeature ft = nodeFactory.createPoint(network.getLinks().get(Id.create(arr[3], Link.class)).getCoord(), new Object[] {Integer.toString(i)}, null);
+					SimpleFeature ft = nodeFactory.createPoint(network.getLinks().get(Id.create(arr[4], Link.class)).getCoord(), new Object[] {Integer.toString(i)}, null);
 					featuresMovedIncrease.add(ft);
 					
 				
@@ -72,7 +72,7 @@ public class CarsUsedLocationsffSHP {
 				s = readLink2.readLine();
 			}
 	        
-	        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/used_ff_interval_peak_new.shp");
+	        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/used_ff_low_1x.shp");
 	     
 
 	}
