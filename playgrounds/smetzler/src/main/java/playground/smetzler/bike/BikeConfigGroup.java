@@ -34,11 +34,14 @@ public class BikeConfigGroup extends ConfigGroup {
 
 	private static final String INPUT_NETWORK_ATTRIBUTE_FILE = "inputNetworkObjectattributeFile";
 	private static final String INPUT_REFERENCE_BIKE_SPEED = "referenceBikeSpeed";
+	private static final String INPUT_COMFORT = "marginalUtilityOfComfort";
 
 
 
 	private String networkAttFile = null;
-	private double referenceBikeSpeed = 6.01;
+	private double referenceBikeSpeed;
+	private double marginalUtilityOfComfort;
+	
 
 
 	public BikeConfigGroup() {
@@ -54,6 +57,8 @@ public class BikeConfigGroup extends ConfigGroup {
 			setNetworkAttFile(value);
 		} else if (INPUT_REFERENCE_BIKE_SPEED.equals(key)) {
 			setReferenceBikeSpeed(Double.parseDouble(value));
+		} else if (INPUT_COMFORT.equals(key)) {
+			setMarginalUtilityOfComfort(Double.parseDouble(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -66,6 +71,8 @@ public class BikeConfigGroup extends ConfigGroup {
 			return getNetworkAttFile();
 		} else if (INPUT_REFERENCE_BIKE_SPEED.equals(key)) {
 			return Double.toString(getReferenceBikeSpeed());
+		} else if (INPUT_COMFORT.equals(key)) {
+			return Double.toString(getMarginalUtilityOfComfort());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -78,6 +85,7 @@ public class BikeConfigGroup extends ConfigGroup {
 		TreeMap<String, String> map = new TreeMap<>();
 		map.put(INPUT_NETWORK_ATTRIBUTE_FILE, getValue(INPUT_NETWORK_ATTRIBUTE_FILE));
 		map.put(INPUT_REFERENCE_BIKE_SPEED, getValue(INPUT_REFERENCE_BIKE_SPEED));
+		map.put(INPUT_COMFORT, getValue(INPUT_COMFORT));
 		return map;
 	}
 
@@ -86,6 +94,8 @@ public class BikeConfigGroup extends ConfigGroup {
 		Map<String,String> map = super.getComments();
 		map.put(INPUT_NETWORK_ATTRIBUTE_FILE, "Path to a file containing information for the network's links (required file format: ObjectAttributes).");
 		map.put(INPUT_REFERENCE_BIKE_SPEED, "ReferenceBikeSpeed // 6.01 according to Prakin and Rotheram");
+		map.put(INPUT_COMFORT, "MarginalUtilityOfComfort");
+
 		return map;
 	}
 	void setNetworkAttFile(String file) {
@@ -101,10 +111,15 @@ public class BikeConfigGroup extends ConfigGroup {
 	}
 
 	public double getReferenceBikeSpeed() {
-		// used in core at following places:
-		// (1) In the Controler where it may configure the router for "prepareForSim".
-		// (2) In within-day
 		return this.referenceBikeSpeed;
+	}
+	
+	public void setMarginalUtilityOfComfort(final double value) {
+		this.marginalUtilityOfComfort = value;
+	}
+
+	public double getMarginalUtilityOfComfort() {
+		return this.marginalUtilityOfComfort;
 	}
 
 }
