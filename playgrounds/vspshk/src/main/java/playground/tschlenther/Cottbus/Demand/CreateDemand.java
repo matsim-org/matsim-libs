@@ -52,7 +52,7 @@ import com.vividsolutions.jts.io.WKTReader;
 		/*
 		 * adds some additional activities
 		 */
-		private static final boolean ENRICHPLANS = false;
+		private static final boolean ENRICHPLANS = true;
 
 //------ FIELDS NOT TO BE MODIFIED ------------------------------------------------------------------------------------//
 		private Scenario scenario;
@@ -62,7 +62,8 @@ import com.vividsolutions.jts.io.WKTReader;
 		private Map<String,Coord> kindergartens;
 		private Map<String,Coord> shops;
 		private enum LanduseType {HOME, WORK};
-		private static final Random rnd = MatsimRandom.getRandom();	
+		private static final Random rnd = MatsimRandom.getRandom();
+		private int personcount = 0;
 //----- FILE PATHS ----------------------------------------------------------------------------------------------------//
 		private static final String INPUTFOLDER = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/Cottbus-pt/INPUT_mod/";
 
@@ -99,7 +100,7 @@ import com.vividsolutions.jts.io.WKTReader;
 			this.kindergartens = readFacilityLocations(KINDERGARTEN);
 			
 			
-			
+			// the network covers only SPN & CB. Agents from LDS,LOS are put in
 			//create Persons for every home zone - work zone - relation 
 			//CB-CB
 			double commuters = 22709*SCALEFACTOR;								//amount of 'commuters' for this h-w-relation
@@ -107,11 +108,13 @@ import com.vividsolutions.jts.io.WKTReader;
 			
 			//CB-LDS
 			commuters = 399*SCALEFACTOR;
-			createPersons("12052000", "12061000", commuters, MS_OUTSIDE);
+//			createPersons("12052000", "12061000", commuters, MS_OUTSIDE);
+			createPersons("12052000", "12071000", commuters, MS_OUTSIDE);
 			
 			//CB-LOS
 			commuters = 139*SCALEFACTOR;
-			createPersons("12052000", "12067000", commuters, MS_OUTSIDE);
+//			createPersons("12052000", "12067000", commuters, MS_OUTSIDE);
+			createPersons("12052000", "12071000", commuters, MS_OUTSIDE);
 			
 			//CB-SPN
 			commuters = 4338*SCALEFACTOR;
@@ -119,19 +122,23 @@ import com.vividsolutions.jts.io.WKTReader;
 					
 			//LDS-CB
 			commuters = 1322*SCALEFACTOR;
-			createPersons("12061000", "12052000", commuters, MS_OUTSIDE);
+//			createPersons("12061000", "12052000", commuters, MS_OUTSIDE);
+			createPersons("12071000", "12052000", commuters, MS_OUTSIDE);
 					
 			//LDS-SPN
 			commuters = 522*SCALEFACTOR;
-			createPersons("12061000", "12071000", commuters, MS_OUTSIDE);
+			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12061000", "12071000", commuters, MS_OUTSIDE);
 			
 			//LOS-CB
 			commuters = 382*SCALEFACTOR;
-			createPersons("12067000", "12052000", commuters, MS_OUTSIDE);
+//			createPersons("12067000", "12052000", commuters, MS_OUTSIDE);
+			createPersons("12071000", "12052000", commuters, MS_OUTSIDE);
 			
 			//LOS-SPN
 			commuters = 449*SCALEFACTOR;
-			createPersons("12067000", "12071000", commuters, MS_OUTSIDE);
+			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12067000", "12071000", commuters, MS_OUTSIDE);
 			
 			//SPN-CB
 			commuters = 11869*SCALEFACTOR;
@@ -139,11 +146,13 @@ import com.vividsolutions.jts.io.WKTReader;
 			
 			//SPN-LDS
 			commuters = 408*SCALEFACTOR;
-			createPersons("12071000", "12061000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12061000", commuters, MS_OUTSIDE);
+			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
 			
 			//SPN-LOS
 			commuters = 466*SCALEFACTOR;
-			createPersons("12071000", "12067000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12067000", commuters, MS_OUTSIDE);
+			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
 			
 			//SPN-SPN
 			commuters = 22524*SCALEFACTOR;
@@ -175,7 +184,7 @@ import com.vividsolutions.jts.io.WKTReader;
 				Coord workc = this.setBuildingFromZone(work,LanduseType.WORK);
 				
 				double personalRandom = rnd.nextDouble();
-				createOnePerson(i, homec, workc, mode, homeZone+ "_"+workZone+ "_", personalRandom);
+				createOnePerson(homec, workc, mode, homeZone+ "_"+workZone+ "_", personalRandom);
 			}
 		}
 		
@@ -193,9 +202,9 @@ import com.vividsolutions.jts.io.WKTReader;
 		 * @param toFromPrefix
 		 * @param activityChain
 		 */
-		private void createOnePerson(int i, Coord coord, Coord coordWork, String mode, String toFromPrefix, double activityChain) {
-			Id<Person> personId = Id.createPersonId(toFromPrefix+i);
-			
+		private void createOnePerson(Coord coord, Coord coordWork, String mode, String toFromPrefix, double activityChain) {
+			Id<Person> personId = Id.createPersonId(toFromPrefix+this.personcount);
+			this.personcount++;
 			// create the Person and Plan instances
 			Person person = scenario.getPopulation().getFactory().createPerson(personId); 
 			Plan plan = scenario.getPopulation().getFactory().createPlan(); 
