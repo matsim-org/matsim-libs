@@ -111,19 +111,31 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 	private final static String TAG_SURFACE = "surface";
 	private final static String TAG_SMOOTHNESS = "smoothness";
 	private final static String TAG_BICYCLE = "bicycle";
+	private final static String TAG_NOONEWAYBIKE = "oneway:bicycle";
+	
+	
+//	private final static String TAG_SIGNAL = "traffic_signal";
+	
+	
 
 	private ObjectAttributes bikeAttributes = new ObjectAttributes();
 	private int countCyclewaytype = 0;
 	private int countSurface = 0;
 	private int countSmoothness = 0;
+	private int countSignalLinks = 0;
 	boolean firsttimeParseGeoTiff = true;
 
 	Set<String> modesB = new HashSet<String>();
 
+	List<Long> signalNodes = new ArrayList<Long>();
+//	List<Long> crossingNodes = new ArrayList<Long>();
+	List<Long> monitorNodes = new ArrayList<Long>();
+	
 
+	Long currentNodeID = null;
 	//
 
-	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS, TAG_CYCLEWAYTYPE, TAG_SURFACE, TAG_SMOOTHNESS, TAG_BICYCLE};
+	private final static String[] ALL_TAGS = new String[] {TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS, TAG_CYCLEWAYTYPE, TAG_SURFACE, TAG_SMOOTHNESS, TAG_BICYCLE, TAG_NOONEWAYBIKE};
 
 	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
 	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
@@ -189,7 +201,9 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 
 			this.setHighwayDefaults(8, "pedestrian", 	 1,  10.0/3.6, 1.0,  50); // falls bicycle=yes, sonst nur schieben(=langsam!)
 
-			this.setHighwayDefaults(8, "footway", 1,  15.0/3.6, 1.0,  300); // wenn bicycle=yes
+			this.setHighwayDefaults(8, "footway", 		 1,  10.0/3.6, 1.0,  50); // wenn bicycle=yes
+			
+//			this.setHighwayDefaults(9, "steps", 		 1,  2.0/3.6, 1.0,  50);
 
 
 			/// unterscheidung der einzelenen cyclewaytypes? http://wiki.openstreetmap.org/wiki/Key:highway
@@ -269,8 +283,12 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		log.info("BikeObjectAttributs for cyclewaytype created: " + countCyclewaytype);
 		log.info("BikeObjectAttributs for surface created: " + countSurface);
 		log.info("BikeObjectAttributs for smoothness created: " + countSmoothness);
-
-
+		
+		log.info("No of Signalnodes: " + signalNodes.size());
+		log.info("BikeObjectAttributs for signalLink created: " + countSignalLinks);
+		
+		log.info("No of Pegelnodes: " + monitorNodes.size());
+		
 		if (this.unknownHighways.size() > 0) {
 			log.info("The following highway-types had no defaults set and were thus NOT converted:");
 			for (String highwayType : this.unknownHighways) {
@@ -523,6 +541,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		double freespeedFactor = defaults.freespeedFactor;
 		boolean oneway = defaults.oneway;
 		boolean onewayReverse = false;
+		boolean onewayReverseBikeallowed = false;
+
 
 		// check if there are tags that overwrite defaults
 		// - check tag "junction"
@@ -551,6 +571,19 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 
+		// check tag "onewayTagBike" (Wenn eine Einbahnstraße für der Radverkehr geoeffnet ist)
+		String noonewayTagBike = way.tags.get(TAG_NOONEWAYBIKE);
+		if (noonewayTagBike != null) {
+			System.out.println("onewayTagBike");
+			if ("no".equals(noonewayTagBike)) {
+				onewayReverseBikeallowed = true;
+			} 
+			else {
+				onewayReverseBikeallowed = false;
+				log.warn("Could not interpret oneway tag:" + onewayTag + ". Ignoring it.");
+			}
+		}
+		
 		// In case trunks, primary and secondary roads are marked as oneway,
 		// the default number of lanes should be two instead of one.
 		if(highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary")){
@@ -605,15 +638,15 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		}
 
 		String bicycleTag = way.tags.get(TAG_BICYCLE);
-		//		System.out.println("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"+ "                  " + bicycleTag );
 		// only create link, if both nodes were found, node could be null, since nodes outside a layer were dropped
 		Id<Node> fromId = Id.create(fromNode.id, Node.class);
 		Id<Node> toId = Id.create(toNode.id, Node.class);
 		if(network.getNodes().get(fromId) != null && network.getNodes().get(toId) != null){
 			String origId = Long.toString(way.id);
 
+			///////BIKE //////
 			//hin
-			if (!onewayReverse) {
+			if (!onewayReverse ) {
 				Link bikel = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
 				if ((defaults.hierarchy != 8) || 
 					(defaults.hierarchy == 8) && (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated"))) 
@@ -634,7 +667,11 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			}
 			
 			//rueck
-			if (!oneway) {
+			if (!oneway || onewayReverseBikeallowed) {
+				if (onewayReverseBikeallowed)
+				{
+					System.out.println("bla");
+				}
 				Link bikel = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
 				if ((defaults.hierarchy != 8) || 
 					(defaults.hierarchy == 8) && (bicycleTag!= null && (bicycleTag.equals("yes") || bicycleTag.equals("designated")))
@@ -653,6 +690,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 					this.id++;
 				}
 			}
+			
+
 
 			
 
@@ -806,12 +845,12 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 //			else if (highwayTag.equals("steps")) 				{bike_freespeed= PUSHING_SECTION_SPEED / 2;}
 			
 			else {bike_freespeed= 15;
-			log.info(highwayTag + " surface not recognized");
+			log.info(highwayTag + " highwayTag not recognized");
 			}
 		}
 		else {
 			bike_freespeed= 15;
-			log.info("no surface info");
+			log.info("no highway info");
 		}
 		
 		
@@ -847,6 +886,8 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			else if (surfaceTag.equals("salt")) 				{bike_freespeed= 6;} 
 			else if (surfaceTag.equals("sand"))					{bike_freespeed= 6;} 
 			else if (surfaceTag.equals("wood")) 				{bike_freespeed= 6;} 
+			
+			else if (surfaceTag.equals("bricks")) 				{bike_freespeed= 14;}
 
 			else {bike_freespeed= 15;
 			log.info(surfaceTag + " surface not recognized");
@@ -854,7 +895,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		}
 		else {
 			bike_freespeed= 15;
-			log.info("no surface info");
+			//log.info("no surface info");
 		}
 		
 
@@ -870,28 +911,35 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 
 		if (slopeTag > 0.10) {								//// bergauf
 			slopeSpeedFactor= 0.1;
-		} else if (slopeTag <= 0.10 && slopeTag > 0.05) {		
+		} else if (slopeTag <=  0.10 && slopeTag >  0.05) {		
 			slopeSpeedFactor= 0.4;		
-		} else if (slopeTag <= 0.05 && slopeTag> 0.03) {
+		} else if (slopeTag <=  0.05 && slopeTag >  0.03) {
 			slopeSpeedFactor= 0.6;	
-		} else if (slopeTag <= 0.03 && slopeTag> 0.01) {
+		} else if (slopeTag <=  0.03 && slopeTag >  0.01) {
 			slopeSpeedFactor= 0.8;
-		} else if (slopeTag<= 0.01 && slopeTag> -0.01) { 	//// eben
+		} else if (slopeTag <=  0.01 && slopeTag > -0.01) { 	//// eben
 			slopeSpeedFactor= 1;
-		} else if (slopeTag<= -0.01 && slopeTag> -0.03) {	//// bergab
+		} else if (slopeTag <= -0.01 && slopeTag > -0.03) {	//// bergab
 			slopeSpeedFactor= 1.2;
-		} else if (slopeTag<= -0.03 && slopeTag> -0.05) {	
+		} else if (slopeTag <= -0.03 && slopeTag > -0.05) {	
 			slopeSpeedFactor= 1.3;
-		} else if (slopeTag<= -0.05 && slopeTag> -0.10) {	
+		} else if (slopeTag <= -0.05 && slopeTag > -0.10) {	
 			slopeSpeedFactor= 1.4;
-		} else if (slopeTag<= -0.10) {	
+		} else if (slopeTag <= -0.10) {	
 			slopeSpeedFactor= 1.5;
 		}
-		System.out.println("slopeTag "+ slopeTag);
-		System.out.println("slopeSpeedFactor "+ slopeSpeedFactor);
+
 		
-		//bike_freespeed incl. slope
-		bike_freespeed= bike_freespeed*slopeSpeedFactor;
+		// Geschwindigkeit von links, die auf eine Ampel führen, wird um 10% reduziert
+		double signalSpeedReductionFactor = 1;
+		for (Long SigNodeID : signalNodes) {
+			if (toNode.id == SigNodeID){
+				signalSpeedReductionFactor= 0.9;
+			}
+		}
+		
+		//bike_freespeed incl. slope und signal
+		bike_freespeed= bike_freespeed*slopeSpeedFactor*signalSpeedReductionFactor;
 		
 		return bike_freespeed/3.6;
 	}
@@ -927,6 +975,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		return realSlope;
 	}
 
+	// schreiben der Bike-Attribute: wichtig fuer Disutility und Visualisierung
 	private void bikeLinkAtts(final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length, boolean hinweg, long matsimID) {
 
 		String matsimId = Long.toString(matsimID); 		// MAsim Link ID
@@ -967,38 +1016,32 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			bikeAttributes.putAttribute(matsimId, "bicycleTag", bicycleTag);
 			//countHighway++;
 		};
+		
+		
+		/// Crossing and Signal
+//		for (Long CroNodeID : crossingNodes) {
+//			if (toNode.id == CroNodeID)
+//				bikeAttributes.putAttribute(matsimId, "junctionTag", 1);   
+//		};
+		//info hier
+		for (Long SigNodeID : signalNodes) {
+			if (toNode.id == SigNodeID){
+				bikeAttributes.putAttribute(matsimId, "junctionTag", 1);
+				countSignalLinks++;}
+		};
 
-		//crossing info is in den nodes
-		//String crossingsTag = node.tags.get(TAG_CROSSING);???
-		//String crossingsTag = way.tags.get(TAG_HIGHWAY) == crossing;???
+		
+		///monitoring tag
+		//iterates over all nodes that are on this way, is one of them a pegelnode?
+		for(int i=0; i<way.nodes.size(); i++) {
+			Long AllWayNodesIDs = way.nodes.get(i).longValue();
+			for (Long MoniNodeID : monitorNodes) {
+				if (MoniNodeID.equals(AllWayNodesIDs)) {
+					bikeAttributes.putAttribute(matsimId, "pegel", 1);   
+				}
+			};
+		}
 
-
-//		//elevation:
-//		ParseEleDataFromGeoTiff tiffObject = new ParseEleDataFromGeoTiff();
-//		try {
-//			double heightFrom = tiffObject.parseGeoTiff(fromNode.coord.getX(), fromNode.coord.getY(), firsttimeParseGeoTiff);
-//			firsttimeParseGeoTiff = false;
-//			double heightTo = tiffObject.parseGeoTiff(toNode.coord.getX(), toNode.coord.getY(), firsttimeParseGeoTiff);
-//			double eleDiff = heightTo - heightFrom;
-//			double slope = eleDiff/length;
-//
-//			if (hinweg){
-//				//				System.out.println("hinweg soll true " + hinweg);
-//				bikeAttributes.putAttribute(matsimId, "eleDiff", eleDiff);
-//				bikeAttributes.putAttribute(matsimId, "slope", slope);
-//			}
-//			else
-//			{
-//				//				System.out.println("hinweg soll false " + hinweg);
-//				bikeAttributes.putAttribute(matsimId, "eleDiff", -1*eleDiff);
-//				bikeAttributes.putAttribute(matsimId, "slope", -1*slope);
-//			}
-//
-//			//			System.out.println("matsimId " + matsimId);
-//			//			System.out.println("eleDiff " + eleDiff);
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();}	
 		//new end
 
 	}
@@ -1035,6 +1078,10 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 		public boolean used = false;
 		public int ways = 0;
 		public final Coord coord;
+//		public final Map<String, String> Nodetags = new HashMap<String, String>(4);
+
+		//public final Map<String, String> NodeTags = new HashMap<String, String>(4);
+
 
 		public OsmNode(final long id, final Coord coord) {
 			this.id = id;
@@ -1117,11 +1164,22 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 
 		@Override
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+		
 			if ("node".equals(name)) {
 				if (this.loadNodes) {
 					Long id = Long.valueOf(atts.getValue("id"));
+					currentNodeID = id;
 					double lat = Double.parseDouble(atts.getValue("lat"));
 					double lon = Double.parseDouble(atts.getValue("lon"));
+					
+//					String signal = atts.getValue("tags");
+//					System.out.println(StringCache.get(atts.getValue("k")));
+					
+//					String key = StringCache.get(atts.getValue("k"));
+//					if (key.equals(TAG_HIGHWAY)){
+//						System.out.println(key);
+//						System.out.println(StringCache.get(atts.getValue("v")));
+//					}
 					this.nodes.put(id, new OsmNode(id, this.transform.transform(new Coord(lon, lat))));
 					this.nodeCounter.incCounter();
 				} else if (this.mergeNodes) {
@@ -1129,6 +1187,7 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 					if (node != null) {
 						double lat = Double.parseDouble(atts.getValue("lat"));
 						double lon = Double.parseDouble(atts.getValue("lon"));
+
 						Coord c = this.transform.transform(new Coord(lon, lat));
 						node.coord.setXY(c.getX(), c.getY());
 						this.nodeCounter.incCounter();
@@ -1141,6 +1200,24 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 					this.currentWay.nodes.add(Long.parseLong(atts.getValue("ref")));
 				}
 			} else if ("tag".equals(name)) {
+				///new
+				String TagKey = StringCache.get(atts.getValue("k"));
+				if (TagKey.equals("highway")){
+					String TagVal = StringCache.get(atts.getValue("v"));
+					if (TagVal.equals("traffic_signals")) {
+						signalNodes.add(currentNodeID);}
+//					if (TagVal.equals("crossing")) {
+//						crossingNodes.add(currentNodeID);}
+				}
+				//counts
+				if (TagKey.equals("monitoring:traffic")){
+					String TagVal = StringCache.get(atts.getValue("v"));
+					if (TagVal.equals("bicycle")) {
+						monitorNodes.add(currentNodeID);}
+				}
+				
+				//new end			
+				
 				if (this.currentWay != null) {
 					String key = StringCache.get(atts.getValue("k"));
 					for (String tag : ALL_TAGS) {
@@ -1218,5 +1295,4 @@ public class BikeCustomizedOsmNetworkReader implements MatsimSomeReader {
 			return s;
 		}
 	}
-
 }
