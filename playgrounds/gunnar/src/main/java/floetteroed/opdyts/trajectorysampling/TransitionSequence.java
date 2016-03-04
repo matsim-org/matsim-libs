@@ -44,6 +44,8 @@ class TransitionSequence<U extends DecisionVariable> {
 
 	private SimulatorState lastState = null;
 
+	private int additionCnt = 0;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	TransitionSequence(final SimulatorState fromState,
@@ -85,6 +87,7 @@ class TransitionSequence<U extends DecisionVariable> {
 		this.transitions.add(new Transition<>(decisionVariable, delta, toState
 				.getReferenceToVectorRepresentation(), objectiveFunctionValue));
 		this.lastState = toState;
+		this.additionCnt++;
 	}
 
 	void shrinkToMaximumLength(final int maximumLength) {
@@ -115,5 +118,9 @@ class TransitionSequence<U extends DecisionVariable> {
 
 	int size() {
 		return this.transitions.size();
+	}
+
+	int additionCnt() {
+		return this.additionCnt;
 	}
 }

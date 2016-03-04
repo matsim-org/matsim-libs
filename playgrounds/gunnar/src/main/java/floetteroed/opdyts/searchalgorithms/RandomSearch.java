@@ -87,6 +87,8 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	private final boolean includeCurrentBest;
 
+	private int maxMemory = Integer.MAX_VALUE;
+
 	// -------------------- MEMBERS --------------------
 
 	private List<DecisionVariable> bestDecisionVariables = new ArrayList<DecisionVariable>();
@@ -142,6 +144,10 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.convergenceTrackingFileName = convergenceTrackingFileName;
 	}
 
+	public void setMaxMemory(final int maxMemory) {
+		this.maxMemory = maxMemory;
+	}
+
 	// -------------------- IMPLEMENTATION --------------------
 
 	private int transitions = 0;
@@ -167,7 +173,8 @@ public class RandomSearch<U extends DecisionVariable> {
 
 		final SelfTuner weightOptimizer;
 		if (adjustWeights) {
-			weightOptimizer = new SelfTuner(1.0, 0.05, 1, 0.01);
+			weightOptimizer = new SelfTuner(0.95);
+			// weightOptimizer = new SelfTuner(1.0, 0.05, 1, 0.01);
 		} else {
 			weightOptimizer = null;
 		}
@@ -207,7 +214,8 @@ public class RandomSearch<U extends DecisionVariable> {
 				sampler = new ParallelTrajectorySampler<>(candidates,
 						this.objectBasedObjectiveFunction,
 						this.convergenceCriterion, this.rnd,
-						equilibriumGapWeight, uniformityGapWeight, (it > 0));
+						equilibriumGapWeight, uniformityGapWeight, (it > 0),
+						this.maxMemory);
 
 				if (this.logFileName != null) {
 					sampler.addStatistic(this.logFileName,
@@ -285,7 +293,9 @@ public class RandomSearch<U extends DecisionVariable> {
 								.getTransitions(newBestDecisionVariable);
 						for (int i = 0; i < transitions.size(); i++) {
 							final ConvergenceCriterionResult convRes = this.convergenceCriterion
-									.evaluate(transitions.subList(0, i + 1));
+									.evaluate(
+											transitions.subList(0, i + 1),
+											sampler.additionCnt(newBestDecisionVariable));
 							writer.write(transitions.get(i)
 									.getToStateObjectiveFunctionValue()
 									+ "\t"

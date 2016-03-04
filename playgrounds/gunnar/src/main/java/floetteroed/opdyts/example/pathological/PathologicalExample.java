@@ -56,14 +56,15 @@ public class PathologicalExample {
 
 		final Random rnd = new Random();
 
+		final int avgIts = 100;
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				200, 100);
+				200, avgIts);
 		final ObjectiveFunction objFct = new LinearSystemObjectiveFunction();
 
 		final boolean interpolate = true;
 		final int maxRandomSearchIterations = 10;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
-		final boolean includeCurrentBest = true;
+		final boolean includeCurrentBest = false;
 
 		final Vector min = new Vector(Double.NEGATIVE_INFINITY,
 				Double.NEGATIVE_INFINITY); // new Vector(-0.1, -0.1);
@@ -79,8 +80,8 @@ public class PathologicalExample {
 				includeCurrentBest);
 		randomSearch.setLogFileName(this.logFileName);
 		randomSearch.setConvergenceTrackingFileName(this.convFileName);
+		randomSearch.setMaxMemory(avgIts);
 		
-		// randomSearch.run(1.0, 1.0, false);
 		randomSearch.run();
 	}
 

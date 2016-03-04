@@ -191,7 +191,8 @@ class OptimizeRoadpricing {
 		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
 		randomSearch.setConvergenceTrackingFileName(originalOutputDirectory
 				+ "opdyts.conv");
-
+		randomSearch.setMaxMemory(averageIterations);
+		
 		/*
 		 * Run it.
 		 */

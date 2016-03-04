@@ -109,7 +109,7 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 						this.objectiveFunction.value(newState));
 			}
 			this.convergenceCriterion.evaluate(this.transitionSequence
-					.getTransitions());
+					.getTransitions(), this.transitionSequence.additionCnt());
 		}
 		this.fromState = newState;
 	}

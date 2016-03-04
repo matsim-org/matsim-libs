@@ -24,6 +24,8 @@
  */
 package floetteroed.opdyts.trajectorysampling;
 
+import static java.util.Collections.unmodifiableMap;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
@@ -64,9 +66,7 @@ public class SamplingStage<U extends DecisionVariable> {
 
 	private final Double convergedObjectiveFunctionValue;
 
-	private final Double evaluatedSurrogateObjectiveFunctionValue;
-
-	private final double[] internalSolutionPoint;
+	private final Map<Transition<?>, Double> transition2lastSolutionView;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -74,8 +74,7 @@ public class SamplingStage<U extends DecisionVariable> {
 			final TransitionSequencesAnalyzer<U> evaluator,
 			final Transition<U> lastTransition,
 			final Double convergedObjectiveFunctionValue,
-			final Double evaluatedSurrogateObjectiveFunctionValue,
-			final double[] internalSolutionPoint) {
+			final Map<Transition<?>, Double> transition2lastSolution) {
 
 		this.alphas = alphas.copy();
 		this.equilibriumGapWeight = evaluator.getEquilibriumGapWeight();
@@ -95,9 +94,8 @@ public class SamplingStage<U extends DecisionVariable> {
 		this.lastEquilibriumGap = lastTransition.getDelta().euclNorm();
 
 		this.convergedObjectiveFunctionValue = convergedObjectiveFunctionValue;
-		this.evaluatedSurrogateObjectiveFunctionValue = evaluatedSurrogateObjectiveFunctionValue;
 
-		this.internalSolutionPoint = internalSolutionPoint;
+		this.transition2lastSolutionView = unmodifiableMap(transition2lastSolution);
 	}
 
 	// -------------------- PACKAGE PRIVATE FUNCTIONALITY --------------------
@@ -157,12 +155,7 @@ public class SamplingStage<U extends DecisionVariable> {
 		return this.convergedObjectiveFunctionValue;
 	}
 
-	@Deprecated
-	public Double getEvaluatedSurrogateObjectiveFunctionValue() {
-		return this.evaluatedSurrogateObjectiveFunctionValue;
-	}
-
-	double[] internalSolutionPoint() {
-		return this.internalSolutionPoint;
+	Map<Transition<?>, Double> transition2lastSolutionView() {
+		return this.transition2lastSolutionView;
 	}
 }

@@ -42,7 +42,6 @@ import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
 import floetteroed.opdyts.logging.ConvergedObjectiveFunctionValue;
-import floetteroed.opdyts.logging.ConvergedSurrogateObjectiveFunctionValue;
 import floetteroed.opdyts.logging.EquilibriumGap;
 import floetteroed.opdyts.logging.EquilibriumGapWeight;
 import floetteroed.opdyts.logging.FreeMemory;
@@ -90,7 +89,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 
 	private boolean initialized = false;
 
-	private TransitionSequenceSet<U> allTransitionSequences = new TransitionSequenceSet<>();
+	private TransitionSequenceSet<U> allTransitionSequences;
 
 	private SimulatorState fromState = null;
 
@@ -106,7 +105,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 			final ObjectiveFunction objectBasedObjectiveFunction,
 			final ConvergenceCriterion convergenceCriterion, final Random rnd,
 			final double equilibriumWeight, final double uniformityWeight,
-			final boolean appendToLogFile) {
+			final boolean appendToLogFile, final int maxMemory) {
 		this.decisionVariablesToBeTriedOut = new LinkedHashSet<U>(
 				decisionVariables);
 		this.objectiveFunction = objectBasedObjectiveFunction;
@@ -115,6 +114,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		this.equilibriumWeight = equilibriumWeight;
 		this.uniformityWeight = uniformityWeight;
 		this.statisticsWriter = new StatisticsMultiWriter<>(appendToLogFile);
+		this.allTransitionSequences = new TransitionSequenceSet<U>(maxMemory);
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -130,8 +130,6 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		this.addStatistic(logFileName, new SurrogateObjectiveFunctionValue<U>());
 		this.addStatistic(logFileName, new LastObjectiveFunctionValue<U>());
 		this.addStatistic(logFileName, new ConvergedObjectiveFunctionValue<U>());
-		this.addStatistic(logFileName,
-				new ConvergedSurrogateObjectiveFunctionValue<U>());
 		this.addStatistic(logFileName, new EquilibriumGapWeight<U>());
 		this.addStatistic(logFileName, new EquilibriumGap<U>());
 		this.addStatistic(logFileName, new LastEquilibriumGap<U>());
@@ -169,7 +167,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 	public List<Transition<U>> getTransitions() {
 		return this.allTransitionSequences.getAllTransitionsInInsertionOrder();
 	}
-	
+
 	@Override
 	public ObjectiveFunction getObjectiveFunction() {
 		return this.objectiveFunction;
@@ -178,7 +176,11 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 	public List<Transition<U>> getTransitions(final U decisionVariable) {
 		return this.allTransitionSequences.getTransitions(decisionVariable);
 	}
-	
+
+	public int additionCnt(final U decisionVariable) {
+		return this.allTransitionSequences.additionCnt(decisionVariable);
+	}
+
 	// -------------------- IMPLEMENTATION --------------------
 
 	public void initialize() {
@@ -224,7 +226,9 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 			 */
 			final ConvergenceCriterionResult convergenceResult = this.convergenceCriterion
 					.evaluate(this.allTransitionSequences
-							.getTransitions(this.currentDecisionVariable));
+							.getTransitions(this.currentDecisionVariable),
+							this.allTransitionSequences
+									.additionCnt(this.currentDecisionVariable));
 			if (convergenceResult.converged) {
 				samplingStageEvaluator = new TransitionSequencesAnalyzer<U>(
 						this.allTransitionSequences
@@ -237,7 +241,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 						this.samplingStages == null ? null
 								: this.samplingStages.get(
 										samplingStages.size() - 1)
-										.internalSolutionPoint());
+										.transition2lastSolutionView());
 				this.samplingStages.add(samplingStage);
 				this.decisionVariable2convergenceResult.put(
 						this.currentDecisionVariable, convergenceResult);
@@ -286,7 +290,7 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 						this.samplingStages.size() == 0 ? null
 								: this.samplingStages.get(
 										samplingStages.size() - 1)
-										.internalSolutionPoint());
+										.transition2lastSolutionView());
 				this.samplingStages.add(samplingStage);
 			}
 
