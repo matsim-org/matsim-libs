@@ -62,8 +62,8 @@ public class BikeQSimFactory implements Provider<Mobsim> {
 		modeVehicleTypes.put("car", car);
 
 		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
-		bike.setMaximumVelocity(20.0/3.6);
-		bike.setPcuEquivalents(0.25);
+		bike.setMaximumVelocity(30.0/3.6);
+		bike.setPcuEquivalents(0.0);
 		modeVehicleTypes.put("bike", bike);
 
 //		VehicleType bicycles = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
