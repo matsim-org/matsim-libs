@@ -26,29 +26,22 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.facilities.ActivityFacilities;
-import playground.johannes.studies.matrix2014.analysis.ValidateLAU2Attribute;
-import playground.johannes.studies.matrix2014.analysis.ValidatePopulationDensity;
-import playground.johannes.studies.matrix2014.analysis.ZoneMobilityRate;
-import playground.johannes.studies.matrix2014.gis.TransferZoneAttribute;
 import playground.johannes.studies.matrix2014.gis.ValidateFacilities;
 import playground.johannes.studies.matrix2014.gis.ZoneSetLAU2Class;
-import playground.johannes.studies.matrix2014.sim.ValidatePersonWeight;
 import playground.johannes.studies.matrix2014.sim.run.ZoneFacilityTask;
 import playground.johannes.synpop.analysis.AnalyzerTaskComposite;
 import playground.johannes.synpop.analysis.FileIOContext;
 import playground.johannes.synpop.analysis.LegAttributePredicate;
 import playground.johannes.synpop.analysis.Predicate;
-import playground.johannes.synpop.data.*;
-import playground.johannes.synpop.data.io.PopulationIO;
+import playground.johannes.synpop.data.CommonKeys;
+import playground.johannes.synpop.data.CommonValues;
+import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.gis.*;
-import playground.johannes.synpop.processing.TaskRunner;
-import playground.johannes.synpop.processing.ValidateMissingAttribute;
-import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.util.Executor;
 
 import java.util.Collection;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * @author johannes
@@ -85,18 +78,18 @@ public class PopulationAnalyzer {
         /*
         Load population...
          */
-        logger.info("Loading persons...");
-        Set<Person> persons = PopulationIO.loadFromXML(config.findParam(MODULE_NAME, "simPopulation"), new PlainFactory());
-        logger.info(String.format("Loaded %s persons.", persons.size()));
-
-        logger.info("Loading persons...");
-        Set<Person> refPersons = PopulationIO.loadFromXML(config.findParam(MODULE_NAME, "popInputFile"), new
-                PlainFactory());
-        logger.info(String.format("Loaded %s persons.", persons.size()));
-
-        logger.info("Validating persons...");
-        TaskRunner.validatePersons(new ValidateMissingAttribute(CommonKeys.PERSON_WEIGHT), persons);
-        TaskRunner.validatePersons(new ValidatePersonWeight(), persons);
+//        logger.info("Loading persons...");
+//        Set<Person> persons = PopulationIO.loadFromXML(config.findParam(MODULE_NAME, "simPopulation"), new PlainFactory());
+//        logger.info(String.format("Loaded %s persons.", persons.size()));
+//
+//        logger.info("Loading persons...");
+//        Set<Person> refPersons = PopulationIO.loadFromXML(config.findParam(MODULE_NAME, "popInputFile"), new
+//                PlainFactory());
+//        logger.info(String.format("Loaded %s persons.", persons.size()));
+//
+//        logger.info("Validating persons...");
+//        TaskRunner.validatePersons(new ValidateMissingAttribute(CommonKeys.PERSON_WEIGHT), persons);
+//        TaskRunner.validatePersons(new ValidatePersonWeight(), persons);
         /*
         Build analyzer...
          */
@@ -110,25 +103,25 @@ public class PopulationAnalyzer {
 //        LegStatsPerZone legStatsPerZone = new LegStatsPerZone(zoneData.getLayer("nuts3"), facilities, ioContext);
 //        legStatsPerZone.setPredicate(carPredicate);
 //        tasks.addComponent(legStatsPerZone);
-
-        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(
-                MiDKeys.PERSON_LAU2_CLASS,
-                lau2Zones,
-                carPredicate);
-        zoneMobilityRate.analyze(refPersons, null);
-
-        new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
-
-        ValidatePopulationDensity popDensity = new ValidatePopulationDensity(
-                dataPool,
-                zoneMobilityRate.getMobilityRatePerZone(modenaZones),
-                "modena");
-
-        popDensity.setIoContext(ioContext);
-        tasks.addComponent(popDensity);
-
-        ValidateLAU2Attribute lau2Attr = new ValidateLAU2Attribute(dataPool);
-        tasks.addComponent(lau2Attr);
+//
+//        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(
+//                MiDKeys.PERSON_LAU2_CLASS,
+//                lau2Zones,
+//                carPredicate);
+//        zoneMobilityRate.analyze(refPersons, null);
+//
+//        new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
+//
+//        ValidatePopulationDensity popDensity = new ValidatePopulationDensity(
+//                dataPool,
+//                zoneMobilityRate.getMobilityRatePerZone(modenaZones),
+//                "modena");
+//
+//        popDensity.setIoContext(ioContext);
+//        tasks.addComponent(popDensity);
+//
+//        ValidateLAU2Attribute lau2Attr = new ValidateLAU2Attribute(dataPool);
+//        tasks.addComponent(lau2Attr);
 
         ZoneFacilityTask fTask = new ZoneFacilityTask(facilities, ioContext);
 

@@ -31,7 +31,10 @@ import playground.johannes.synpop.analysis.FileIOContext;
 import playground.johannes.synpop.analysis.StatsContainer;
 import playground.johannes.synpop.gis.Zone;
 import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneData;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
@@ -54,15 +57,34 @@ public class ZoneFacilityTask implements AnalyzerTask<ZoneCollection> {
         new ZoneFacilityCount(facilities).apply(zones);
         new ZoneFacilityDensity().apply(zones);
 
-        TDoubleArrayList values = new TDoubleArrayList();
-        for(Zone zone : zones.getZones()) {
-            String val = zone.getAttribute(ZoneFacilityDensity.FACILITY_DENSITY_KEY);
-            if(val != null) {
-                values.add(Double.parseDouble(val));
+        TDoubleArrayList rhoValues = new TDoubleArrayList();
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/zoneStats.txt", ioContext.getPath())));
+
+            writer.write("id\tfDensity\tfCount\tpop");
+            writer.newLine();
+
+            for (Zone zone : zones.getZones()) {
+                String rhoVal = zone.getAttribute(ZoneFacilityDensity.FACILITY_DENSITY_KEY);
+                if (rhoVal != null) {
+                    rhoValues.add(Double.parseDouble(rhoVal));
+                }
+
+                writer.write(zone.getAttribute(zones.getPrimaryKey()));
+                writer.write("\t");
+                writer.write(rhoVal);
+                writer.write("\t");
+                writer.write(zone.getAttribute(ZoneFacilityCount.FACILITY_COUNT_KEY));
+                writer.write("\t");
+                writer.write(zone.getAttribute(ZoneData.POPULATION_KEY));
+                writer.newLine();
             }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        double[] nativeValues = values.toArray();
+        double[] nativeValues = rhoValues.toArray();
 
         Discretizer discr20 = FixedSampleSizeDiscretizer.create(nativeValues, 1, 20);
         TDoubleDoubleHashMap hist20 = Histogram.createHistogram(nativeValues, discr20, true);

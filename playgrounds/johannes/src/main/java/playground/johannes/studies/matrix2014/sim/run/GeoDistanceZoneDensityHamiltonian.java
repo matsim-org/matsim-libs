@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
-import org.matsim.contrib.common.stats.FixedSampleSizeDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
@@ -203,7 +202,8 @@ public class GeoDistanceZoneDensityHamiltonian {
             String val = zone.getAttribute(ZoneFacilityDensity.FACILITY_DENSITY_KEY);
             if(val != null) rhos.add(Double.parseDouble(val));
         }
-        Discretizer discr = FixedSampleSizeDiscretizer.create(rhos.toArray(), 1, 5);
+//        Discretizer discr = FixedSampleSizeDiscretizer.create(rhos.toArray(), 1, 5);
+        Discretizer discr = new LinearDiscretizer(rhos.toArray(), 10);
 
         TObjectIntMap indices = new TObjectIntHashMap(
                 Constants.DEFAULT_CAPACITY,
