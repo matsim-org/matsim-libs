@@ -5,8 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -17,12 +19,24 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 import org.xml.sax.Attributes;
 
 import playground.dhosse.scenarios.generic.utils.Modes;
 
+/**
+ * Parses a given journey information file provided by the Deutsche Bahn
+ * (<a href="http://data.deutschebahn.com/apis/fahrplan/">DB-Fahrplan</a>.
+ * 
+ * @author dhosse
+ *
+ */
 public class DbJourneyInformationParser extends MatsimXmlParser {
 
+	private static final Logger log = Logger.getLogger(DbJourneyInformationParser.class);
+	
 	private static final String TAG_NAMES = "Names";
 	private static final String TAG_NAME = "Name";
 	private static final String TAG_NOTES = "Notes";
@@ -49,18 +63,28 @@ public class DbJourneyInformationParser extends MatsimXmlParser {
 	private static final String ATT_ROUTE_IDX_TO = "routeIdxTo";
 	private static final String ATT_TRACK = "track";
 	
+	private int cnt = 0;
+	
 	private TransitSchedule schedule;
+	private Vehicles transitVehicles;
+	
 	private TransitRoute currentRoute;
 	
 	private CoordinateTransformation transform;
 	
 	private LinkedList<StopEntry> stops;
 	
-	public DbJourneyInformationParser(final TransitSchedule schedule, String toCRS){
+	public DbJourneyInformationParser(final Scenario scenario, String toCRS){
 		
-		this.schedule = schedule;
+		log.info("Parser for DB journey information.");
+		
+		this.schedule = scenario.getTransitSchedule();
+		this.transitVehicles = scenario.getTransitVehicles();
+		this.transitVehicles.addVehicleType(VehicleUtils.getDefaultVehicleType());
+		
 		this.transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				toCRS);
+		
 		this.setValidating(false);
 		
 	}
@@ -75,13 +99,6 @@ public class DbJourneyInformationParser extends MatsimXmlParser {
 		} else if(TAG_STOP.equals(name)){
 			
 			startStop(atts, context);
-			
-		} else if("Note".equals(name)){
-			for(int i = 0; i < atts.getLength(); i++){
-				System.out.println(atts.getValue(i));
-			}
-		}
-		else {
 			
 		}
 		
@@ -111,16 +128,12 @@ public class DbJourneyInformationParser extends MatsimXmlParser {
 		String departureDate = atts.getValue(ATT_DEPARTURE_DATE);
 		String track = atts.getValue(ATT_TRACK);
 		
+		Coord coord = this.transform.transform(new Coord(Double.parseDouble(lon), Double.parseDouble(lat)));
 		Id<TransitStopFacility> facilityId = Id.create(id, TransitStopFacility.class);
-		
 		if(!this.schedule.getFacilities().containsKey(facilityId)){
-			
-			Coord coord = this.transform.transform(new Coord(Double.parseDouble(lon), Double.parseDouble(lat)));
-			
-			TransitStopFacility stop = this.schedule.getFactory()
-					.createTransitStopFacility(facilityId, coord, false);
-			stop.setName(name);
-			this.schedule.addStopFacility(stop);
+
+			this.schedule.addStopFacility(this.schedule.getFactory().createTransitStopFacility(facilityId,
+					coord, false));
 			
 		}
 		
@@ -151,6 +164,8 @@ public class DbJourneyInformationParser extends MatsimXmlParser {
 		List<TransitRouteStop> stopsList = new ArrayList<>();
 		
 		for(StopEntry entry : this.stops){
+
+			Id<TransitStopFacility> facilityId = Id.create(entry.id, TransitStopFacility.class);
 			
 			if(idx == 0){
 				
@@ -159,8 +174,6 @@ public class DbJourneyInformationParser extends MatsimXmlParser {
 				firstDeparture = entry.departureTime;
 				
 			}
-			
-			Id<TransitStopFacility> facilityId = Id.create(entry.id, TransitStopFacility.class);
 			
 			TransitRouteStop stop = this.schedule.getFactory().createTransitRouteStop(
 					this.schedule.getFacilities().get(facilityId), entry.arrivalTime - firstArrival,
@@ -173,10 +186,19 @@ public class DbJourneyInformationParser extends MatsimXmlParser {
 		
 		this.currentRoute = this.schedule.getFactory().createTransitRoute(Id.create("0", TransitRoute.class),
 				null, stopsList, Modes.TRAIN);
-		this.currentRoute.addDeparture(this.schedule.getFactory().createDeparture(Id.create("0", Departure.class), firstDeparture));
-		TransitLine line = this.schedule.getFactory().createTransitLine(Id.create("0", TransitLine.class));
+		
+		Id<Vehicle> vehicleId = Id.createVehicleId(cnt);
+		Vehicle v = this.transitVehicles.getFactory().createVehicle(vehicleId, VehicleUtils.getDefaultVehicleType());
+		this.transitVehicles.addVehicle(v);
+		
+		Departure dep = this.schedule.getFactory().createDeparture(Id.create("0", Departure.class), firstDeparture);
+		dep.setVehicleId(vehicleId);
+		this.currentRoute.addDeparture(dep);
+		
+		TransitLine line = this.schedule.getFactory().createTransitLine(Id.create(cnt, TransitLine.class));
 		line.addRoute(currentRoute);
 		this.schedule.addTransitLine(line);
+		cnt++;
 		
 	}
 	

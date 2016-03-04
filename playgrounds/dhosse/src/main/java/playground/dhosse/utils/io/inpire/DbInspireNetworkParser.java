@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -17,6 +18,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -28,6 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.Attributes;
 
+import playground.boescpa.converters.osm.ptMapping.PseudoNetworkCreator;
 import playground.dhosse.scenarios.generic.utils.Modes;
 import playground.dhosse.utils.GeometryUtils;
 
@@ -57,6 +60,8 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 				"/home/dhosse/shp/", "EPSG:32632");
 		
 	}
+	
+	private static final Logger log = Logger.getLogger(DbInspireNetworkParser.class);
 
 	private static final String TAG_DESIGN_SPEED = "DesignSpeed";
 	private static final String TAG_DIRECTION = "direction";
@@ -70,6 +75,8 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 //	private static final String TAG_MARKER_POST = "MarkerPost";
 	private static final String TAG_NUMBER_OF_TRACKS = "NumberOfTracks";
 	private static final String TAG_N_TRACKS = "numberOfTracks";
+	private static final String TAG_RAILWAY_LINE = "RailwayLine";
+	private static final String TAG_RAILWAY_LINE_CODE = "railwayLineCode";
 	private static final String TAG_RAILWAY_LINK = "RailwayLink";
 	private static final String TAG_RAILWAY_LINK_SEQ = "RailwayLinkSequence";
 	private static final String TAG_RAILWAY_NODE = "RailwayNode";
@@ -101,6 +108,8 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 	private DesignSpeed currentDesignSpeed = null;
 	private NumberOfTracks currentNumberOfTracks = null;
 	
+	private RailwayLine currentRailwayLine = null;
+	
 	private RailwayStationNode currentStation = null;
 	
 	private Map<String, RailwayLink> railwayLinks;
@@ -110,8 +119,11 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 	private Map<String, DesignSpeed> designSpeeds;
 	private Map<String, NumberOfTracks> numberOfTracks;
 	private Map<String, RailwayStationNode> stations;
+	private Map<String, RailwayLine> railwayLines;
 	
 	private boolean cleanNetwork = false;
+	
+	private Map<String, String> linkId2LineId = new HashMap<>();
 	
 	public DbInspireNetworkParser(final Scenario scenario, String toCRS){
 		
@@ -134,6 +146,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		this.designSpeeds = new HashMap<>();
 		this.numberOfTracks = new HashMap<>();
 		this.stations = new HashMap<>();
+		this.railwayLines = new HashMap<>();
 		
 		this.ct = TransformationFactory.getCoordinateTransformation("EPSG:4258", toCRS);
 		this.cleanNetwork = cleanNetwork;
@@ -146,7 +159,25 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 	public void parse(String filename){
 		
 		super.parse(filename);
+		log.info("Converting...");
 		convert();
+		logConversionInfo();
+		
+	}
+	
+	private void logConversionInfo(){
+		
+		log.info("Conversion statistics");
+		log.info("INSPIRE");
+		log.info("Number of railway nodes:           " + this.railwayNodes.size());
+		log.info("Number of railway links:           " + this.railwayLinks.size());
+		log.info("Number of railway link sequences:  " + this.railwayLinkSequences.size());
+		log.info("Number of railway station nodes:   " + this.stations.size());
+		log.info("Number of railway lines:           " + this.railwayLines.size());
+		log.info("MATSim:");
+		log.info("Number of nodes:                   " + this.network.getNodes().size());
+		log.info("Number of links:                   " + this.network.getLinks().size());
+		log.info("Number of transit stop facilities: " + this.schedule.getFacilities().size());
 		
 	}
 
@@ -175,11 +206,14 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			
 		} else if(TAG_LINK.equals(name)){
 			
-			if(this.currentLinkSeq != null && atts.getValue(ATT_XLINK) != null){
-				
-				addLinkIdToSequence(atts);
-				
-			}
+//			if(this.currentRailwayLine != null){
+//				for(int i = 0; i < atts.getLength(); i++){
+//					System.out.println(atts.getLocalName(i));
+//					System.out.println(atts.getValue(i));
+//				}
+//			}
+			
+			addLinkIdToSequence(atts);
 			
 		} else if(TAG_TFD.equals(name)){
 			
@@ -200,6 +234,12 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		} else if(TAG_RAILWAY_STATION_NODE.equals(name)){
 			
 			startStation(atts);
+			
+		} else if(TAG_RAILWAY_LINE.equals(name)){
+			
+			this.currentRailwayLine = new RailwayLine();
+			String id = atts.getValue(ATT_GML_ID);
+			this.currentRailwayLine.id = id;
 			
 		}
 		
@@ -269,6 +309,15 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			
 			handleText(content);
 			
+		} else if(TAG_RAILWAY_LINE.equals(name)){
+			
+			this.railwayLines.put(this.currentRailwayLine.id, this.currentRailwayLine);
+			this.currentRailwayLine = null;
+			
+		} else if(TAG_RAILWAY_LINE_CODE.equals(name)){
+			
+			this.currentRailwayLine.id = content;
+			
 		}
 		
 	}
@@ -312,6 +361,18 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 	}
 	
 	private void convert(){
+		
+		createLinks();
+		
+		if(this.cleanNetwork){
+			new NetworkCleaner().run(this.network);
+		}
+		
+		createTransitStopFacilities();
+		
+	}
+	
+	private void createLinks(){
 		
 		int nodesCounter = 0;
 		
@@ -367,6 +428,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			ll.setAllowedModes(this.modes);
 			ll.setCapacity(30);
 			ll.setLength(link.length);
+			((LinkImpl)ll).setOrigId(this.linkId2LineId.get(link.id));
 			this.network.addLink(ll);
 			
 			if(!fromNode.getOutLinks().containsKey(ll.getId())){
@@ -382,6 +444,12 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			}
 				
 		}
+		
+		setLinkProperties();
+		
+	}
+	
+	private void setLinkProperties(){
 		
 		for(RailwayLinkSequence seq : this.railwayLinkSequences.values()){
 			
@@ -411,6 +479,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 						reverse.setFreespeed(ref.getFreespeed());
 						reverse.setLength(ref.getLength());
 						reverse.setNumberOfLanes(ref.getNumberOfLanes());
+						((LinkImpl)reverse).setOrigId(((LinkImpl)ref).getOrigId());
 						
 						this.network.addLink(reverse);
 						
@@ -446,6 +515,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 						reverse.setFreespeed(designSpeed);
 						reverse.setLength(ref.getLength());
 						reverse.setNumberOfLanes(nTracks);
+						((LinkImpl)reverse).setOrigId(((LinkImpl)ref).getOrigId());
 						
 						this.network.addLink(reverse);
 						this.network.removeLink(ref.getId());
@@ -472,9 +542,9 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			
 		}
 		
-		if(this.cleanNetwork){
-			new NetworkCleaner().run(this.network);
-		}
+	}
+	
+	private void createTransitStopFacilities(){
 		
 		for(RailwayStationNode s : this.stations.values()){
 			
@@ -487,7 +557,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 			for(Link l : nearestNode.getInLinks().values()){
 				
 				TransitStopFacility facility = this.schedule.getFactory()
-						.createTransitStopFacility(Id.create(s.id + "_" + i, TransitStopFacility.class),
+						.createTransitStopFacility(Id.create(s.id.replace(SPACE, "") + "_" + i, TransitStopFacility.class),
 								s.coord, false);
 				facility.setLinkId(l.getId());
 				facility.setName(s.name);
@@ -598,8 +668,29 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 	
 	private void addLinkIdToSequence(Attributes atts){
 	
-		String id = atts.getValue(ATT_XLINK).replace(PREFIX, "");
-		this.currentLinkSeq.railwayLinkIds.add(id);
+		String id = atts.getValue(ATT_XLINK);
+		
+		if(id != null){
+
+			id = id.replace(PREFIX, "");
+			if(this.currentLinkSeq != null){
+				this.currentLinkSeq.railwayLinkIds.add(id);
+			} else if(this.currentRailwayLine != null){
+				this.currentRailwayLine.linkIds.add(id);
+				this.linkId2LineId.put(id, this.currentRailwayLine.id);
+			}
+			
+		} else{
+			
+			if(this.currentRailwayLine != null){
+				
+				id = atts.getValue("href").replace(PREFIX, "");
+				System.out.println(id + "\t" + this.currentRailwayLine.id);
+				
+				
+			}
+			
+		}
 		
 	}
 	
@@ -693,6 +784,7 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		private String id;
 		private String fromNodeId;
 		private String toNodeId;
+		private String lineId;
 		private double length;
 		private Coord fromCoord;
 		private Coord toCoord;
@@ -807,6 +899,17 @@ public class DbInspireNetworkParser extends MatsimXmlParser {
 		
 		RailwayStationNode(String id){
 			this.id = id;
+		}
+		
+	}
+	
+	class RailwayLine{
+		
+		private String id;
+		private Set<String> linkIds;
+		
+		RailwayLine(){
+			this.linkIds = new HashSet<>();
 		}
 		
 	}
