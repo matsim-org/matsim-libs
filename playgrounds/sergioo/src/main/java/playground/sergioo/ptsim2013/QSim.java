@@ -397,8 +397,8 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public NetsimNetwork getNetsimNetwork() {
-		return this.netEngine.getNetsimNetwork();
+	public org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork getNetsimNetwork() {
+		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override
