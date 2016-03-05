@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.conveyal.gtfs.GTFSFeed;
 import org.apache.log4j.Logger;
 import org.geotools.temporal.object.Utils;
 import org.matsim.api.core.v01.Id;
@@ -33,6 +34,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.contrib.gtfs.GtfsConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -52,7 +54,6 @@ import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
-import playground.mzilske.gtfs.GtfsConverter;
 import playground.santiago.SantiagoScenarioConstants;
 
 /**
@@ -75,7 +76,7 @@ public class SantiagoGtfsConvert {
 		/* TODO: Michaels converter somehow doesnt add lines from frequencies.txt if a line 
  		with the same stops already exists from stops.txt; Here a problem mainly for metro in off-peak.
 		Simply comment out line 448 in GtfsConverter. */
-		GtfsConverter converter = new GtfsConverter(inputPath, scenario, transform) ;
+		GtfsConverter converter = new GtfsConverter(GTFSFeed.fromFile(inputPath), scenario, transform) ;
 		converter.convert() ;
 		
 		File output = new File(outputPath);

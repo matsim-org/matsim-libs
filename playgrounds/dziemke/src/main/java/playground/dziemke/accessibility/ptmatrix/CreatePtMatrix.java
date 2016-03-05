@@ -1,10 +1,12 @@
 package playground.dziemke.accessibility.ptmatrix;
 
+import com.conveyal.gtfs.GTFSFeed;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.gtfs.GtfsConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -16,9 +18,9 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.dziemke.accessibility.ptmatrix.MatrixBasedPtInputUtils;
 import playground.dziemke.accessibility.ptmatrix.ThreadedMatrixCreator;
-import playground.mzilske.gtfs.GtfsConverter;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +36,7 @@ public class CreatePtMatrix {
     public static void main(String[] args) {
         final long timeStart = System.currentTimeMillis();
 
+        // FIXME: Use the zipped GTFS file instead, please.
         String gtfsPath = "playgrounds/dziemke/input/createPtMatrix";
 //        String networkFile = "examples/pt-tutorial/multimodalnetwork.xml";
         String outputRoot = "";
@@ -47,8 +50,8 @@ public class CreatePtMatrix {
 
         CoordinateTransformation ct =
                 TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:25832");
-        GtfsConverter converter = new GtfsConverter(gtfsPath, scenario, ct );
-        converter.setDate(20151008);
+        GtfsConverter converter = new GtfsConverter(GTFSFeed.fromFile(gtfsPath), scenario, ct );
+        converter.setDate(LocalDate.of(2015,10,8));
         converter.convert();
 
         Map<Id<Coord>, Coord> ptMatrixLocationsMap = new HashMap<>();

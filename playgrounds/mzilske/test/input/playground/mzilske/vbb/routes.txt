@@ -1,2 +1,0 @@
-route_id,route_short_name,route_long_name,route_type
-TEST_ROUTE,"Test Route","The GTFS Test Route",3
