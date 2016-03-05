@@ -17,9 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 /**
  * Calculates the maximum speed a vehicle can travel with on a specific link 

@@ -17,9 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 /**
  * A simple link speed calculator taking the vehicle's max speed and the link's
@@ -27,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
  * 
  * @author mrieser / Senozon AG
  */
-/*package*/ class DefaultLinkSpeedCalculator implements LinkSpeedCalculator {
+public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator {
 
 	@Override
 	public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {

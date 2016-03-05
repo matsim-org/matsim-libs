@@ -16,11 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq;
 
 import java.util.AbstractQueue;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 public final class FIFOVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle>  {
 	

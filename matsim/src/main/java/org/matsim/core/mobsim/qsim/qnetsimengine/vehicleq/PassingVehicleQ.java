@@ -1,8 +1,10 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq;
 
 import java.util.*;
 
-final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+
+public final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
 
 	public PassingVehicleQ() {} // to find calls 
 	
