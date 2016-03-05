@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
 
 /**

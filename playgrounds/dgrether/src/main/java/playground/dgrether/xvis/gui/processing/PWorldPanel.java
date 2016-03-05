@@ -35,10 +35,10 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLinkWLanes;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 import org.matsim.lanes.vis.VisSignal;
 import org.matsim.contrib.signals.otfvis.VisSignalGroup;
 import org.matsim.contrib.signals.otfvis.VisSignalSystem;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
 import playground.dgrether.xvis.control.XVisControl;
 import playground.dgrether.xvis.control.events.SignalGroupsSelectionEvent;

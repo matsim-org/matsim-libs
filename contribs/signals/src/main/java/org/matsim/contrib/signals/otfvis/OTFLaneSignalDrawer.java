@@ -26,10 +26,11 @@ import java.util.Map;
 
 
 import com.jogamp.opengl.GL2;
+
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 import org.matsim.lanes.vis.VisSignal;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneGraph;

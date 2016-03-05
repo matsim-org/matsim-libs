@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.contrib.signals.model.SignalGroup;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 public class SignalGroupStateChangedEventMapper implements EventsReaderXMLv1.CustomEventMapper {
