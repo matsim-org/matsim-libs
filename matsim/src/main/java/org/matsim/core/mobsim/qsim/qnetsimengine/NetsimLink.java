@@ -28,10 +28,6 @@ import org.matsim.vis.snapshotwriters.VisLink;
 
 public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
 	
-	void recalcTimeVariantAttributes(double time);
-	// yyyy my intuition says that this should be moved to the InternalInterface.  kai, dec'11
-
-
 	@Override
 	Collection<MobsimVehicle> getAllVehicles();
 	// not terribly efficient, but a possible method also for general mobsims
