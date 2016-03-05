@@ -31,7 +31,7 @@ import org.matsim.lanes.LanesUtils;
 import java.util.List;
 
 
-class QLanesNetworkFactory implements NetsimNetworkFactory {
+class QLanesNetworkFactory extends NetsimNetworkFactory {
 
 	private final NetsimNetworkFactory delegate;
 	private final Lanes laneDefinitions;

@@ -26,7 +26,7 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
-public class HybridNetworkFactory implements
+public class HybridNetworkFactory extends
 		NetsimNetworkFactory {
 
 	private final Map<String, NetsimNetworkFactory> facs = new LinkedHashMap<>();
