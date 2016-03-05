@@ -48,6 +48,9 @@ abstract class QLinkI implements NetsimLink, TimeVariantLink {
 	// yyyy might make make sense to also pass the "isAccepting/addFromUpstream" through something like 
 	// "getFromNodeQueueLanes". kai, feb'16
 	
+	// yyyy my intuition is to unify all the "registerDriverAgentForCar" etc. methods into something like
+	// registerAdditionalAgentOnLink( MobsimAgent agent, String reason ) ;
+	
 
 	abstract QNode getToNode() ;
 
