@@ -206,7 +206,7 @@ public class CALink extends QLinkI {
 	}
 	
 	@Override
-	List<QLaneI> getToNodeQueueLanes() {
+	List<QLaneI> getOfferingQLanes() {
 		return null ;
 	}
 

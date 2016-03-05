@@ -215,7 +215,7 @@ class KaiHiResLink extends QLinkI {
 	}
 	
 	@Override
-	List<QLaneI> getToNodeQueueLanes() {
+	List<QLaneI> getOfferingQLanes() {
 		return null ;
 	}
 

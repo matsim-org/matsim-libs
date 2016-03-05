@@ -123,7 +123,7 @@ abstract class QLinkI implements NetsimLink, TimeVariantLink {
 	 */
 	abstract Set<MobsimAgent> getAgentsWaitingForCar(Id<Vehicle> vehicleId) ;
 
-	abstract List<QLaneI> getToNodeQueueLanes() ;
+	abstract List<QLaneI> getOfferingQLanes() ;
 
 	/**
 	 * Seems ok as public interface function. kai, aug'15
@@ -136,7 +136,6 @@ abstract class QLinkI implements NetsimLink, TimeVariantLink {
 	abstract void clearVehicles();
 
 	/**
-	 * <br>
 	 * seems ok as public interface function. kai, aug'15
 	 */
 	abstract void addFromUpstream(final QVehicle veh);

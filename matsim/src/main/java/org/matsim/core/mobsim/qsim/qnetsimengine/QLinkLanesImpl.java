@@ -219,7 +219,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	List<QLaneI> getToNodeQueueLanes() {
+	List<QLaneI> getOfferingQLanes() {
 		return this.toNodeLaneQueues;
 	}
 

@@ -347,7 +347,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	}
 
 	@Override
-	List<QLaneI> getToNodeQueueLanes() {
+	List<QLaneI> getOfferingQLanes() {
 		List<QLaneI> list = new ArrayList<>() ;
 		list.add( this.qlane ) ;
 		return list ;

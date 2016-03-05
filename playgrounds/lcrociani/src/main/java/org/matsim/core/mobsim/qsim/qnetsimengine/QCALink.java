@@ -110,7 +110,7 @@ public class QCALink extends AbstractQLink {
 	}
 	
 	@Override
-	List<QLaneI> getToNodeQueueLanes() {
+	List<QLaneI> getOfferingQLanes() {
 		throw new RuntimeException("not implemented") ;
 	}
 

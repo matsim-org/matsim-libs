@@ -204,7 +204,7 @@ public class QNode implements NetsimNode {
 			// else {} branch: link.isNotOfferingVehicle():boolean would return sequentially the state of the single
 			//lanes. Each call would have side effects on a state machine within QLinkLanesImpl. Proposal: think
 			//about a better interface first, then solve under the hood. dg, mar'14
-			for (QLaneI lane : link.getToNodeQueueLanes()) {
+			for (QLaneI lane : link.getOfferingQLanes()) {
 				while (! lane.isNotOfferingVehicle()) {
 					QVehicle veh = lane.getFirstVehicle();
 					Id<Link> nextLink = veh.getDriver().chooseNextLinkId();

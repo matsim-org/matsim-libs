@@ -170,7 +170,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 		// time step 2, vehicle leaves link
 		f.qlink1.doSimStep(2.0);
-		assertEquals(veh, f.qlink1.getToNodeQueueLanes().get(0).popFirstVehicle());
+		assertEquals(veh, f.qlink1.getOfferingQLanes().get(0).popFirstVehicle());
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.qlane).vehInQueueCount());
 		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
@@ -261,7 +261,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		// vehicle leaves link
-		assertEquals(veh, f.qlink1.getToNodeQueueLanes().get(0).popFirstVehicle());
+		assertEquals(veh, f.qlink1.getOfferingQLanes().get(0).popFirstVehicle());
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.qlane).vehInQueueCount());
 		assertNull("vehicle should not be on link anymore.", f.qlink1.getVehicle(id1));
@@ -328,7 +328,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(1, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertFalse(qlink.isNotOfferingVehicle());
 		// v1 leaves buffer
-		assertEquals(v1, qlink.getToNodeQueueLanes().get(0).popFirstVehicle());
+		assertEquals(v1, qlink.getOfferingQLanes().get(0).popFirstVehicle());
 		assertEquals(1, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertTrue(qlink.isNotOfferingVehicle());
 		// time step 3, v2 moves to buffer
@@ -336,7 +336,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(0, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertFalse(qlink.isNotOfferingVehicle());
 		// v2 leaves buffer
-		assertEquals(v2, qlink.getToNodeQueueLanes().get(0).popFirstVehicle());
+		assertEquals(v2, qlink.getOfferingQLanes().get(0).popFirstVehicle());
 		assertEquals(0, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertTrue(qlink.isNotOfferingVehicle());
 		// time step 4, empty link
@@ -401,7 +401,7 @@ public final class QLinkTest extends MatsimTestCase {
 		f.qlink2.doSimStep(5.0); // first veh moves to buffer, used vehicle equivalents: 5
 		assertTrue(f.qlink2.isAcceptingFromUpstream());
 		assertFalse(f.qlink2.isNotOfferingVehicle());
-		f.qlink2.getToNodeQueueLanes().get(0).popFirstVehicle();  // first veh leaves buffer
+		f.qlink2.getOfferingQLanes().get(0).popFirstVehicle();  // first veh leaves buffer
 		assertTrue(f.qlink2.isAcceptingFromUpstream());
 
 		f.qlink2.addFromUpstream(veh25); // used vehicle equivalents: 7.5

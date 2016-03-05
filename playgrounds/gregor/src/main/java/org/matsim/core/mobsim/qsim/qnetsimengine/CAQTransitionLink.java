@@ -181,8 +181,8 @@ public class CAQTransitionLink extends QLinkI{
 	}
 
 	@Override
-	List<QLaneI> getToNodeQueueLanes() {
-		return this.ql.getToNodeQueueLanes() ;
+	List<QLaneI> getOfferingQLanes() {
+		return this.ql.getOfferingQLanes() ;
 	}
 
 }
