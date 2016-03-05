@@ -28,6 +28,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;

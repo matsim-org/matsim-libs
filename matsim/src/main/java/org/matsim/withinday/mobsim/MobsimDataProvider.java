@@ -29,8 +29,8 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Collection;

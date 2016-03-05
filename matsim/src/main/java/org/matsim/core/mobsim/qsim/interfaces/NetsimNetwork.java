@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueLink
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,22 +16,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collection;
+package org.matsim.core.mobsim.qsim.interfaces;
 
-import org.matsim.api.core.v01.Customizable;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimNetworkObject;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.vis.snapshotwriters.VisLink;
+import org.matsim.vis.snapshotwriters.VisNetwork;
 
-public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
-	
+/**
+ * @author nagel
+ *
+ */
+public interface NetsimNetwork extends VisNetwork, MatsimNetworkObject {
+	// yyyy "extends VisNetwork" possibly a temporary fix
+
 	@Override
-	Collection<MobsimVehicle> getAllVehicles();
-	// not terribly efficient, but a possible method also for general mobsims
+	Network getNetwork();
 
-	Collection<MobsimVehicle> getAllNonParkedVehicles();
-	// not terribly efficient, but a possible method also for general mobsims
+	Map<Id<Link>, ? extends NetsimLink> getNetsimLinks();
+	// yyyy this should arguable be getQLinks() or getMobsimLinks().  Esthetically less pleasing, but imho easier to use.  kai, may'10
+
+	Map<Id<Node>, ? extends NetsimNode> getNetsimNodes() ;
+
+	/**
+	 * Convenience method for getLinks().get( id ).  May be renamed
+	 */
+	public NetsimLink getNetsimLink(final Id<Link> id) ;
+
+	/**
+	 * Convenience method for getNodes().get( id ).  May be renamed
+	 */
+	public NetsimNode getNetsimNode(final Id<Node> id) ;
 
 }
