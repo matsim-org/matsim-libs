@@ -1,4 +1,5 @@
 language: java
+jdk: oraclejdk8
 script:
   - cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn test --fail-at-end -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 env:
