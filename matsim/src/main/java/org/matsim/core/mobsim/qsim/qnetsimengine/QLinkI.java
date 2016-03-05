@@ -35,15 +35,10 @@ import org.matsim.vehicles.Vehicle;
  * <p/>
  * Contains all the logic for the QLinks which make up the QNetwork.
  * <p/>
- * My current intuition is that the QSim and even the QNetsimEngine are now more general, and could deal with more general links and nodes.
- * However, the links and nodes need to work together.  The QLinks are, in consequence, those links which (are simple enough
- * to) work together with the QNodes.  
- * (The somewhat separate logic for QLinkLanesImpl in QNodes is already an exception to this, and optimally it should be removed.)
+ * One can argue that the QNetsimEngine could treat more general links than just "queues".  However, in the end they live with 
+ * "(qlane.)addFromUpstream" and "(qlane.)addFromUpstream", which is quite restricted, since it does not pass the velocity.
+ * Not passing the velocity means that it cannot be used for more general mobsims.
  * 
- * @author nagel
- *
- */
-/**
  * @author nagel
  *
  */
