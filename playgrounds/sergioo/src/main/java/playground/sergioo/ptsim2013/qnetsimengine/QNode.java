@@ -33,8 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 /**

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * NetElementActivator.java
+ * QueueLink
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.sergioo.ptsim2013.qnetsimengine;
 
-public abstract class NetElementActivator {
+import java.util.Collection;
 
-	protected abstract void activateNode(final QNode node);
-	
-	abstract int getNumberOfSimulatedNodes();
-	
-	protected abstract void activateLink(final NetsimLink link);
+import org.matsim.api.core.v01.Customizable;
+import org.matsim.core.api.internal.MatsimNetworkObject;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.vis.snapshotwriters.VisLink;
 
-	abstract int getNumberOfSimulatedLinks();
-} 
+public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
+	
+	void recalcTimeVariantAttributes(double time);
+	// yyyy my intuition says that this should be moved to the InternalInterface.  kai, dec'11
+
+
+	@Override
+	Collection<MobsimVehicle> getAllVehicles();
+	// not terribly efficient, but a possible method also for general mobsims
+
+	Collection<MobsimVehicle> getAllNonParkedVehicles();
+	// not terribly efficient, but a possible method also for general mobsims
+
+}

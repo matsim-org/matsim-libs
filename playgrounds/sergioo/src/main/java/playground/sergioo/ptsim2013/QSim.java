@@ -37,7 +37,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.interfaces.*;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -48,6 +47,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
 import playground.sergioo.ptsim2013.pt.TransitQSimEngine;
+import playground.sergioo.ptsim2013.qnetsimengine.NetsimNetwork;
 import playground.sergioo.ptsim2013.qnetsimengine.PTQNetsimEngine;
 
 import java.util.*;
