@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
 public class HybridNetworkFactory extends
-		NetsimNetworkFactory {
+		QNetworkFactory {
 
-	private final Map<String, NetsimNetworkFactory> facs = new LinkedHashMap<>();
+	private final Map<String, QNetworkFactory> facs = new LinkedHashMap<>();
 	
 	@Override
 	public QNode createNetsimNode(Node node, QNetwork network) {
@@ -40,7 +40,7 @@ public class HybridNetworkFactory extends
 	public QLinkI createNetsimLink(Link link, QNetwork network,
 			QNode queueNode) {
 		
-		for (Entry<String, NetsimNetworkFactory> e : this.facs.entrySet()) {
+		for (Entry<String, QNetworkFactory> e : this.facs.entrySet()) {
 			if (link.getAllowedModes().contains(e.getKey())) {
 				return e.getValue().createNetsimLink(link, network, queueNode);
 			}
@@ -49,7 +49,7 @@ public class HybridNetworkFactory extends
 		return new QLinkImpl(link, network, queueNode);
 	}
 	
-	public void putNetsimNetworkFactory(String key, NetsimNetworkFactory fac) {
+	public void putNetsimNetworkFactory(String key, QNetworkFactory fac) {
 		this.facs.put(key, fac);
 	}
 

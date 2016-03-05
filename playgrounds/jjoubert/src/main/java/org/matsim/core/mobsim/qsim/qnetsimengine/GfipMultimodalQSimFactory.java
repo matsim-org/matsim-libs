@@ -101,7 +101,7 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 		qSim.addActivityHandler(activityEngine);
 		
 		/* This is the crucial part for changing the queue type. */ 
-		NetsimNetworkFactory netsimNetworkFactory = new NetsimNetworkFactory() {
+		QNetworkFactory netsimNetworkFactory = new QNetworkFactory() {
 			@Override
 			public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
 				VehicleQ<QVehicle> vehicleQ = null;
