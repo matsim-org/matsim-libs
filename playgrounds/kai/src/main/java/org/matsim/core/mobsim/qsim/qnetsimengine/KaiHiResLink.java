@@ -30,10 +30,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
 class KaiHiResLink extends QLinkI {
@@ -49,10 +45,8 @@ class KaiHiResLink extends QLinkI {
 		this.toQueueNode = toQueueNode;
 		this.hybridEngine = engine;
 	}
-
-	@Override
-	void addFromUpstream(QVehicle veh) {
-		// TODO Auto-generated method stub
+	
+	@Override QLaneI getAcceptingQLane() { 
 		throw new UnsupportedOperationException() ;
 	}
 
@@ -124,12 +118,6 @@ class KaiHiResLink extends QLinkI {
 
 	@Override
 	boolean isNotOfferingVehicle() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
-	}
-
-	@Override
-	boolean isAcceptingFromUpstream() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}

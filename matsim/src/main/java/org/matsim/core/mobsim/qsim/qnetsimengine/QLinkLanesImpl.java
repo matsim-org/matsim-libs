@@ -224,31 +224,31 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		return this.toNodeLaneQueues;
 	}
 
-	/**
-	 * Adds a vehicle to the link.
-	 * 
-	 * @param veh
-	 *            the vehicle
-	 */
-	@Override
-	void addFromUpstream(final QVehicle veh) {
-		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-		activateLink();
-		this.firstLaneQueue.addFromUpstream(veh);
-		this.network.simEngine
-				.getMobsim()
-				.getEventsManager()
-				.processEvent(
-						new LaneEnterEvent(now, veh.getId(), this.getLink().getId(),
-								((QueueWithBuffer) this.firstLaneQueue).getId()));
-
-		veh.setCurrentLink(this.getLink());
-		this.network.simEngine
-				.getMobsim()
-				.getEventsManager()
-				.processEvent(
-						new LinkEnterEvent(now, veh.getId(), this.getLink().getId()));
-	}
+//	/**
+//	 * Adds a vehicle to the link.
+//	 * 
+//	 * @param veh
+//	 *            the vehicle
+//	 */
+//	@Override
+//	void addFromUpstream(final QVehicle veh) {
+//		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+//		activateLink();
+//		this.firstLaneQueue.addFromUpstream(veh);
+//		this.network.simEngine
+//				.getMobsim()
+//				.getEventsManager()
+//				.processEvent(
+//						new LaneEnterEvent(now, veh.getId(), this.getLink().getId(),
+//								((QueueWithBuffer) this.firstLaneQueue).getId()));
+//
+//		veh.setCurrentLink(this.getLink());
+//		this.network.simEngine
+//				.getMobsim()
+//				.getEventsManager()
+//				.processEvent(
+//						new LinkEnterEvent(now, veh.getId(), this.getLink().getId()));
+//	}
 
 	@Override
 	void clearVehicles() {
@@ -428,11 +428,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	boolean isAcceptingFromUpstream() {
-		return this.firstLaneQueue.isAcceptingFromUpstream();
-	}
-
-	@Override
 	public void recalcTimeVariantAttributes(double time) {
 		for (QLaneI lane : this.laneQueues.values()) {
 			lane.recalcTimeVariantAttributes(time);
@@ -578,6 +573,11 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 			return positions;
 		}
+	}
+	
+	@Override
+	QLaneI getAcceptingQLane() {
+		return this.firstLaneQueue ;
 	}
 
 }

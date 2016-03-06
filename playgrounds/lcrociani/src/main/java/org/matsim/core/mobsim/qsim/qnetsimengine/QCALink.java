@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
 public class QCALink extends AbstractQLink {
@@ -24,6 +25,7 @@ public class QCALink extends AbstractQLink {
 	private final CAEnvironment environmentCA;
 	private final CAAgentFactory agentFactoryCA;
 	private final TransitionArea transitionArea;
+	private CALane qlane;
 
 	public QCALink(Link link, QNetwork network, QLinkI qLink, CAEnvironment environmentCA, CAAgentFactory agentFactoryCA, TransitionArea transitionArea) {
 		super(link, network);
@@ -33,6 +35,12 @@ public class QCALink extends AbstractQLink {
 		this.environmentCA = environmentCA;
 		this.agentFactoryCA = agentFactoryCA;
 		this.transitionArea = transitionArea;
+		this.qlane = new CALane() ;
+	}
+	
+	@Override
+	QLaneI getAcceptingQLane() {
+		return this.qlane ;
 	}
 	
 	public Id<Link> getLinkId(){
@@ -75,17 +83,6 @@ public class QCALink extends AbstractQLink {
 		throw new RuntimeException("Method not needed for the moment");
 	}
 
-	@Override
-	void addFromUpstream(QVehicle veh) {
-		Pedestrian pedestrian = this.agentFactoryCA.buildPedestrian(environmentCA.getId(),veh,transitionArea);		
-				
-		double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-		this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
-				now, veh.getId(), this.getLink().getId()));
-		this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new CAAgentConstructEvent(
-				now, pedestrian));
-	}
-
 	public void notifyMoveOverBorderNode(QVehicle vehicle, Id<Link> nextLinkId){
 		double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
@@ -100,11 +97,6 @@ public class QCALink extends AbstractQLink {
 		throw new RuntimeException("Method not needed for the moment");
 	}
 	
-	@Override
-	boolean isAcceptingFromUpstream() {
-		return transitionArea.acceptPedestrians();
-	}
-
 	public TransitionArea getTransitionArea() {
 		return transitionArea;
 	}
@@ -114,5 +106,145 @@ public class QCALink extends AbstractQLink {
 		throw new RuntimeException("not implemented") ;
 	}
 
+	class CALane extends QLaneI {
+
+		@Override
+		void addFromWait(QVehicle veh, double now) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		boolean isAcceptingFromWait() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		void updateRemainingFlowCapacity() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		boolean isActive() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		double getSimulatedFlowCapacity() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		void recalcTimeVariantAttributes(double now) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		QVehicle getVehicle(Id<Vehicle> vehicleId) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		double getStorageCapacity() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		VisData getVisData() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		void addTransitSlightlyUpstreamOfStop(QVehicle veh) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		void changeUnscaledFlowCapacityPerSecond(double val, double now) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		void changeEffectiveNumberOfLanes(double val, double now) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		boolean doSimStep(double now) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		void clearVehicles() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		Collection<MobsimVehicle> getAllVehicles() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		void addFromUpstream(QVehicle veh) {
+			Pedestrian pedestrian = agentFactoryCA.buildPedestrian(environmentCA.getId(),veh,transitionArea);		
+			
+			double now = qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+//			qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
+//					now, veh.getId(), getLink().getId()));
+			// now done by QNode
+			qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new CAAgentConstructEvent(
+					now, pedestrian));
+		}
+
+		@Override
+		boolean isNotOfferingVehicle() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		QVehicle popFirstVehicle() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		QVehicle getFirstVehicle() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		double getLastMovementTimeOfFirstVehicle() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		boolean hasGreenForToLink(Id<Link> toLinkId) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		boolean isAcceptingFromUpstream() {
+			return transitionArea.acceptPedestrians();
+		}
+		
+	}
 
 }

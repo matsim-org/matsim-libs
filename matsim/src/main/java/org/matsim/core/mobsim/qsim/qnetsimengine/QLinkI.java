@@ -137,13 +137,8 @@ abstract class QLinkI implements NetsimLink, TimeVariantLink {
 	 */
 	abstract void clearVehicles();
 
-	/**
-	 * seems ok as public interface function. kai, aug'15
-	 */
-	abstract void addFromUpstream(final QVehicle veh);
-
 	abstract boolean isNotOfferingVehicle();
 
-	abstract boolean isAcceptingFromUpstream();
+	abstract QLaneI getAcceptingQLane() ;
 
 }

@@ -125,21 +125,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 
 
-	/**
-	 * Adds a vehicle to the link (i.e. the "queue").
-	 *
-	 * @param veh
-	 *          the vehicle
-	 */
-	@Override
-	final void addFromUpstream(final QVehicle veh) {
-		qlane.addFromUpstream(veh);
-		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
-		this.network.simEngine.getMobsim().getEventsManager().processEvent(
-				new LinkEnterEvent(now, veh.getId(), this.link.getId()));
-
-	}
-
 	@Override
 	void clearVehicles() {
 		super.clearVehicles();
@@ -199,11 +184,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	@Override
 	boolean isNotOfferingVehicle() {
 		return qlane.isNotOfferingVehicle();
-	}
-
-	@Override
-	boolean isAcceptingFromUpstream() {
-		return qlane.isAcceptingFromUpstream();
 	}
 
 	@Override
@@ -348,11 +328,13 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	}
 
-	@Override
-	List<QLaneI> getOfferingQLanes() {
+	@Override List<QLaneI> getOfferingQLanes() {
 		List<QLaneI> list = new ArrayList<>() ;
 		list.add( this.qlane ) ;
 		return list ;
+	}
+	@Override QLaneI getAcceptingQLane() {
+		return qlane ;
 	}
 
 }

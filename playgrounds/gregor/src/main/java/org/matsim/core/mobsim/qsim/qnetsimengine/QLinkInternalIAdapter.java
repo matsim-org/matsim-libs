@@ -29,7 +29,7 @@ public class QLinkInternalIAdapter {
 	}
 
 	public boolean isAcceptingFromUpstream() {
-		return this.ql.isAcceptingFromUpstream();
+		return this.ql.getAcceptingQLane().isAcceptingFromUpstream();
 	}
 
 	public Link getLink() {
@@ -37,7 +37,7 @@ public class QLinkInternalIAdapter {
 	}
 
 	public void addFromUpstream(QVehicle veh) {
-		this.ql.addFromUpstream(veh);
+		this.ql.getAcceptingQLane().addFromUpstream(veh);
 
 	}
 }

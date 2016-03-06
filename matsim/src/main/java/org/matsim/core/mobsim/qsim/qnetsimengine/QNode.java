@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
@@ -225,8 +226,7 @@ public class QNode implements NetsimNode {
 	}
 
 
-	@SuppressWarnings("static-method")
-	private boolean checkNextLinkSemantics(Link currentLink, Id<Link> nextLinkId, QLinkI nextQLink, QVehicle veh){
+	private static boolean checkNextLinkSemantics(Link currentLink, Id<Link> nextLinkId, QLinkI nextQLink, QVehicle veh){
 		if (nextQLink == null){
 			//throw new IllegalStateException
 			log.warn("The link id " + nextLinkId + " is not available in the simulation network, but vehicle " + veh.getId() + 
@@ -272,9 +272,11 @@ public class QNode implements NetsimNode {
 			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now ) ;
 			return true ;
 		}
+		
+		QLaneI nextQueueLane = nextQueueLink.getAcceptingQLane() ;
 
-		if (nextQueueLink.isAcceptingFromUpstream()) {
-			moveVehicleFromInlinkToOutlink(veh, fromLaneBuffer, nextQueueLink);
+		if (nextQueueLane.isAcceptingFromUpstream()) {
+			moveVehicleFromInlinkToOutlink(veh, fromLaneBuffer, nextLinkId, nextQueueLane);
 			return true;
 		}
 
@@ -287,7 +289,7 @@ public class QNode implements NetsimNode {
 				moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now);
 				return false ;
 			} else {
-				moveVehicleFromInlinkToOutlink(veh, fromLaneBuffer, nextQueueLink);
+				moveVehicleFromInlinkToOutlink(veh, fromLaneBuffer, nextLinkId, nextQueueLane);
 				return true; 
 				// (yyyy why is this returning `true'?  Since this is a fix to avoid gridlock, this should proceed in small steps. 
 				// kai, feb'12) 
@@ -320,10 +322,14 @@ public class QNode implements NetsimNode {
 	
 	}
 
-	private static void moveVehicleFromInlinkToOutlink(final QVehicle veh, final QLaneI fromLane, QLinkI nextQueueLink) {
+	private void moveVehicleFromInlinkToOutlink(final QVehicle veh, final QLaneI fromLane, Id<Link> nextLinkId, QLaneI nextQueueLane) {
 		fromLane.popFirstVehicle();
-		veh.getDriver().notifyMoveOverNode(nextQueueLink.getLink().getId());
-		nextQueueLink.addFromUpstream(veh);
+		veh.getDriver().notifyMoveOverNode( nextLinkId );
+		nextQueueLane.addFromUpstream(veh);
+		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+		this.network.simEngine.getMobsim().getEventsManager().processEvent(
+				new LinkEnterEvent(now, veh.getId(), nextLinkId ));
+
 	}
 
 	private boolean vehicleIsStuck(final QLaneI fromLaneBuffer, final double now) {

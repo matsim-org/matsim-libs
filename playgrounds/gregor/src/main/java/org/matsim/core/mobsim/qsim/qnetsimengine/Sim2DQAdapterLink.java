@@ -33,7 +33,7 @@ public class Sim2DQAdapterLink {
 
 
 	public boolean isAcceptingFromUpstream() {
-		return this.ql.isAcceptingFromUpstream();
+		return this.ql.getAcceptingQLane().isAcceptingFromUpstream();
 	}
 
 
@@ -44,7 +44,7 @@ public class Sim2DQAdapterLink {
 	
 
 	public void addFromUpstream(QVehicle veh) {
-		this.ql.addFromUpstream(veh);
+		this.ql.getAcceptingQLane().addFromUpstream(veh);
 		
 	}
 }

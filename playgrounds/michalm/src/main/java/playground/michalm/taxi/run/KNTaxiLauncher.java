@@ -68,7 +68,7 @@ class KNTaxiLauncher
 
     private static Configuration createConfig()
     {
-        String inputDir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
+        String inputDir = "../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
         Map<String, Object> map = new HashMap<>();
         map.put(TaxiLauncherParams.NET_FILE, inputDir + "network.xml");
 
