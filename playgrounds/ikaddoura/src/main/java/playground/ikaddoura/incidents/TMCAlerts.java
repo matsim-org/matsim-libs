@@ -25,46 +25,37 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkFactoryImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.incidents.data.TrafficItem;
 
 /** 
+* Provides the MATSim interpretation of traffic incident codes and some log information.
+* 
 * @author ikaddoura
 */
 
 public class TMCAlerts {
+	
 	private static final Logger log = Logger.getLogger(TMCAlerts.class);
-	private Set<String> unconsideredCodes = new HashSet<>();
-	private Set<String> loggedCodeAssumedAsCapacityHalving = new HashSet<>();
-	private Set<String> loggedCodeAssumedAsMinusOneLane = new HashSet<>();
+	
+	private final Set<String> unconsideredCodes = new HashSet<>();
+	private final Set<String> loggedCodeAssumedAsCapacityHalving = new HashSet<>();
+	private final Set<String> loggedCodeAssumedAsMinusOneLane = new HashSet<>();
 	private int warnCnt = 0;
 	
-	private Object[] createIncidentObject(Object[] incidentObject, Link link, TrafficItem trafficItem,
-			Set<String> changedAllowedModes,
-			double changedCapacity,
-			double remainingNumberOfLanes,
-			double changedFreeSpeed) {
-
-		if (incidentObject == null) {
-			incidentObject = new Object[] {link.getId(), trafficItem.getId(), (trafficItem.getOrigin().getDescription() + " --> " + trafficItem.getTo().getDescription()), trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription(), link.getLength(),
-					
-					// the parameters under normal conditions
-					link.getAllowedModes(), link.getCapacity(), link.getNumberOfLanes(), link.getFreespeed(),
-						
-					// incident specific values
-					changedAllowedModes, changedCapacity, remainingNumberOfLanes, changedFreeSpeed,
-						
-					// start and end time
-					trafficItem.getStartTime(), trafficItem.getEndTime()
-			};			
-		} else {
-			throw new RuntimeException("This should not happen. Aborting...");
-		}
-		
-		return incidentObject;
-	}
+	private Network network = null;
+	private NetworkFactoryImpl nf = null;
 	
-	protected boolean trafficItemIsAnUpdate(TrafficItem trafficItem) {
+	public TMCAlerts() {
+		network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
+		nf = new NetworkFactoryImpl(network);
+	}
+
+	public final boolean trafficItemIsAnUpdate(TrafficItem trafficItem) {
 		
 		if (trafficItem.getTMCAlert().getPhraseCode().endsWith("86") ||
 				trafficItem.getTMCAlert().getPhraseCode().endsWith("87") ||
@@ -112,27 +103,28 @@ public class TMCAlerts {
 		}
 	}
 	
-	public Object[] getIncidentObject(Link link, TrafficItem trafficItem) {
-		Object[] incidentObject = null;
-		
-//		log.info(trafficItem.getTMCAlert().getPhraseCode());
+	public final Link computeTrafficIncident(Link link, TrafficItem trafficItem) {
+		Link incidentLink = null;
 		
 		if (trafficItem.getTMCAlert() != null && trafficItem.getTMCAlert().getPhraseCode() != null) {
 			
 			if (trafficItemIsAnUpdate(trafficItem)) {
-				// incident / warning cleared or no longer valid
+				// skip update traffic items
 				
 			} else {
 				
+				incidentLink = nf.createLink(link.getId(), link.getFromNode(), link.getToNode());
+				
 				// ####### specific codes ########
 				
-				if (containsOrEndsWith(trafficItem, "C1") || containsOrEndsWith(trafficItem, "C6") || containsOrEndsWith(trafficItem, "C14") || containsOrEndsWith(trafficItem, "C35")) { // closed
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							1.0,
-							1.0,
-							0.22227
-					);
+				if (containsOrEndsWith(trafficItem, "C1") || containsOrEndsWith(trafficItem, "C6")
+						|| containsOrEndsWith(trafficItem, "C7") || containsOrEndsWith(trafficItem, "C14")
+						|| containsOrEndsWith(trafficItem, "C35")) { // closed
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(1.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(0.22227);
 				
 				} else if (containsOrEndsWith(trafficItem, "C31")) { // closed for cars
 					
@@ -140,12 +132,11 @@ public class TMCAlerts {
 					if (allowedModes.contains(TransportMode.car)) {
 						allowedModes.remove(TransportMode.car);
 					}
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							allowedModes,
-							1.0,
-							1.0,
-							0.22227
-					);
+					
+					incidentLink.setAllowedModes(allowedModes);
+					incidentLink.setCapacity(1.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(0.22227);
 				
 				} else if (containsOrEndsWith(trafficItem, "D1") || containsOrEndsWith(trafficItem, "D2") || containsOrEndsWith(trafficItem, "D3") || 
 						containsOrEndsWith(trafficItem, "D4") || containsOrEndsWith(trafficItem, "D5") || containsOrEndsWith(trafficItem, "D8") ||
@@ -172,12 +163,10 @@ public class TMCAlerts {
 						loggedCodeAssumedAsMinusOneLane.add(trafficItem.getTMCAlert().getDescription());
 					}
 					
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							remainingNumberOfLanes * (link.getCapacity() / link.getNumberOfLanes()),
-							remainingNumberOfLanes,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(remainingNumberOfLanes * (link.getCapacity() / link.getNumberOfLanes()));
+					incidentLink.setNumberOfLanes(remainingNumberOfLanes);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 					
 				} else if (containsOrEndsWith(trafficItem, "D6")) { // two lanes closed
 					double remainingNumberOfLanes = 0.;
@@ -193,13 +182,11 @@ public class TMCAlerts {
 					} else {
 						remainingNumberOfLanes = link.getNumberOfLanes() - 2.;
 					}
-					
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							remainingNumberOfLanes * (link.getCapacity() / link.getNumberOfLanes()),
-							remainingNumberOfLanes,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+										
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(remainingNumberOfLanes * (link.getCapacity() / link.getNumberOfLanes()));
+					incidentLink.setNumberOfLanes(remainingNumberOfLanes);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 					
 				} else if (containsOrEndsWith(trafficItem, "D7")) { // three lanes closed
 					double remainingNumberOfLanes = 0.;
@@ -216,136 +203,117 @@ public class TMCAlerts {
 						remainingNumberOfLanes = link.getNumberOfLanes() - 3.;
 					}
 					
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							remainingNumberOfLanes * (link.getCapacity() / link.getNumberOfLanes()),
-							remainingNumberOfLanes,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);	
-					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(remainingNumberOfLanes * (link.getCapacity() / link.getNumberOfLanes()));
+					incidentLink.setNumberOfLanes(remainingNumberOfLanes);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 					
 				} else if (containsOrEndsWith(trafficItem, "D15")) { // reduction to one lane
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							(link.getCapacity() / link.getNumberOfLanes()),
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity((link.getCapacity() / link.getNumberOfLanes()));
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 				
 				} else if (containsOrEndsWith(trafficItem, "D16")) { // reduction to two lanes
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							2.0 * (link.getCapacity() / link.getNumberOfLanes()),
-							2.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(2.0 * (link.getCapacity() / link.getNumberOfLanes()));
+					incidentLink.setNumberOfLanes(2.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 				
 				} else if (containsOrEndsWith(trafficItem, "E1") || containsOrEndsWith(trafficItem, "E7") || containsOrEndsWith(trafficItem, "E11") ) { // construction work
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							link.getCapacity() / 2.0,
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(link.getCapacity() / 2.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 					
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 					
 				} else if (containsOrEndsWith(trafficItem, "E14")) { // abwechselnd in beide Richtungen nur ein Fahrstreifen frei
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							1.5 * (link.getCapacity() / link.getNumberOfLanes()),
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(1.5 * (link.getCapacity() / link.getNumberOfLanes()));
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 				
 				} else if (containsOrEndsWith(trafficItem, "E15") || containsOrEndsWith(trafficItem, "E16") || containsOrEndsWith(trafficItem, "E17") || containsOrEndsWith(trafficItem, "E18")) { // water, gas, buried cables, buried services main work
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							link.getCapacity() / 2.0,
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(link.getCapacity() / 2.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 				
 				} else if (containsOrEndsWith(trafficItem, "F15")) { // water, gas, buried cables, buried services main work
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							link.getCapacity() / 2.0,
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(link.getCapacity() / 2.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 					
 				} else if (containsOrEndsWith(trafficItem, "U8")) { // allow emergency vehicles to pass
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							link.getCapacity() / 2.0,
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(link.getCapacity() / 2.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 
 				// #######  other codes are decoded using more general code categories ######## 
 				
 				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("B")) { // accidents, e.g. B1: accident, .. TODO: Adjust according to type
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							link.getCapacity() / 2.0,
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(link.getCapacity() / 2.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 					
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 					
 				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("E")) { // (other) construction work types
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							link.getCapacity() / 2.0,
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(link.getCapacity() / 2.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 					
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 					
 				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("F")) { // obstruction hazards, e.g. F14 broken water pipe, F15 gas leak, F16 fire, F17 animals on road
-										
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							link.getCapacity() / 2.0,
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+						
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(link.getCapacity() / 2.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 					
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 					
 				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("G")) { // snow, aquaplaning, hazardous driving
-					
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							link.getCapacity() / 2.0,
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(link.getCapacity() / 2.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 					
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 					
-					
 				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("P")) { // dangerous situations, e.g. P39: Personen auf der Fahrbahn
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							link.getCapacity() / 2.0,
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(link.getCapacity() / 2.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 
 				} else if (trafficItem.getTMCAlert().getPhraseCode().contains("R")) { // dangerous situations
-					incidentObject = createIncidentObject(incidentObject, link, trafficItem, 
-							link.getAllowedModes(),
-							link.getCapacity() / 2.0,
-							1.0,
-							reduceSpeedToNextFreeSpeedLevel(link)
-					);
+					
+					incidentLink.setAllowedModes(link.getAllowedModes());
+					incidentLink.setCapacity(link.getCapacity() / 2.0);
+					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 				
@@ -359,8 +327,8 @@ public class TMCAlerts {
 				}
 			}
 		}
-		
-		return incidentObject;
+				
+		return incidentLink;
 	}
 
 	private void logCodeConsideredAsCapacityAndSpeedReduction(String alertCode, String description) {
@@ -372,7 +340,7 @@ public class TMCAlerts {
 		}
 	}
 
-	private boolean containsOrEndsWith(TrafficItem trafficItem, String code) {
+	private static boolean containsOrEndsWith(TrafficItem trafficItem, String code) {
 		if (trafficItem.getTMCAlert().getPhraseCode() == null) {
 			log.warn("Alert with no code: " + trafficItem.toString());
 			return false;

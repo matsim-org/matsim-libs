@@ -33,6 +33,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.misc.StringUtils;
 
 import playground.ikaddoura.incidents.data.TrafficItem;
 
@@ -126,9 +127,9 @@ public class HereMapsTrafficItemXMLReader {
 					} else if (in.getLocalName().equals("ORIGINAL_TRAFFIC_ITEM_ID")) {
 						trafficItem.setOriginalId(in.getElementText());
 					} else if (in.getLocalName().equals("START_TIME")) {
-						trafficItem.setStartTime(in.getElementText());
+						trafficItem.setStartTime(convertDateTimeFormat(in.getElementText()));
 					} else if (in.getLocalName().equals("END_TIME")) {
-						trafficItem.setEndTime(in.getElementText());
+						trafficItem.setEndTime(convertDateTimeFormat(in.getElementText()));
 					} else if (in.getLocalName().equals("TRAFFIC_ITEM_STATUS_SHORT_DESC")) {
 						trafficItem.setStatus(in.getElementText());
 					}
@@ -214,6 +215,30 @@ public class HereMapsTrafficItemXMLReader {
 		}
 
 		in.close();
+	}
+	
+	private String convertDateTimeFormat(String datetimeString) {
+		
+		// current format: MM/DD/YYYY HH:MM:SS
+		// target format: YYYY/MM/DD HH:MM:SS
+
+		String dateTimeDelimiter = " ";
+		String[] datetime = StringUtils.explode(datetimeString, dateTimeDelimiter.charAt(0));
+		String dateStr = datetime[0];
+		String timeStr = datetime[1];
+		
+		String dateDelimiter = "/";
+		String[] date = StringUtils.explode(dateStr, dateDelimiter.charAt(0));
+		String month = date[0];
+		String day = date[1];
+		String year = date[2];
+		
+		if (year.length() != 4) {
+			throw new RuntimeException("Expecting the traffic incidents to have the time format MM/DD/YYYY HH:MM:SS. This is something else: " + datetimeString + " Aborting...");
+		}
+		
+		String newFormat = year + "/" + month + "/" + day + " " + timeStr;
+		return newFormat;
 	}
 	
 }

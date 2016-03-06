@@ -32,8 +32,8 @@ import playground.ikaddoura.incidents.data.TrafficItem;
 * @author ikaddoura
 */
 
-public class TrafficItemWriter {
-	private static final Logger log = Logger.getLogger(TrafficItemWriter.class);
+public class Incident2CSVWriter {
+	private static final Logger log = Logger.getLogger(Incident2CSVWriter.class);
 
 	public void writeCSVFile(Collection<TrafficItem> collection, String outputFile) throws IOException {
 		try ( BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile)) ) {
