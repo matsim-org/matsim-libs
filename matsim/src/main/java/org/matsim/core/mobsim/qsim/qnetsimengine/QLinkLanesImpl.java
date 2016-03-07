@@ -147,7 +147,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * Initializes a QueueLink with one QueueLane.
 	 */
 	QLinkLanesImpl(final Link link2, QNetwork network, final QNode toNode, List<ModelLane> lanes) {
-		super(link2, network);
+		super(link2, toNode, network);
 		this.toQueueNode = toNode;
 		this.laneQueues = new LinkedHashMap<>();
 		this.toNodeLaneQueues = new ArrayList<>();

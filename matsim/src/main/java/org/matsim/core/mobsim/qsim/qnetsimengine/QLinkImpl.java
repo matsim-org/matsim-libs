@@ -67,11 +67,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	}
 
-	/**
-	 * Reference to the QueueNode which is at the end of each QueueLink instance
-	 */
-	private final QNode toQNode;
-
 	private final VisData visdata;
 
 	public final QLaneI qlane;
@@ -89,21 +84,19 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final VehicleQ<QVehicle> vehicleQueue) {
 		// yy get rid of this c'tor (since the one with queueWithBuffer is more flexible)?
-		super(link2, network) ;
+		super(link2, toNode, network) ;
 		//--
 		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this) ;
 		builder.setVehicleQueue(vehicleQueue);
 		this.qlane = builder.build() ;
 		//--
-		this.toQNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
 	}
 	
 	public QLinkImpl( final Link link2, QNetwork network, final QNode toNode, final QLaneI queueWithBuffer ) {
-		super(link2, network) ;
+		super(link2, toNode, network) ;
 		this.qlane = queueWithBuffer ;
-		this.toQNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
 	}
@@ -113,12 +106,11 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 * 
 	 */
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final LaneFactory roadFactory) {
-		super(link2, network) ;
+		super(link2, toNode, network) ;
 		// The next line must must by contract stay within the constructor,
 		// so that the caller can use references to the created roads to wire them together,
 		// if it must.
 		this.qlane = roadFactory.createLane(this); 
-		this.toQNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
 	}
@@ -227,11 +219,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	double getSpaceCap() {
 		return this.qlane.getStorageCapacity();
-	}
-
-	@Override
-	public QNode getToNode() {
-		return this.toQNode;
 	}
 
 	/**

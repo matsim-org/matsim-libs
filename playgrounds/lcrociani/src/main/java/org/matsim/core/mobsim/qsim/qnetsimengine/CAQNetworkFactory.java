@@ -89,7 +89,7 @@ public class CAQNetworkFactory extends QNetworkFactory {
 			transitionArea = createTransitionArea(borderNode, environmentCA);
 		QCALink linkQCA = new QCALink(link, network, qLink, environmentCA, this.agentFactoryCA, transitionArea);
 		this.engineCA.registerHiResLink(linkQCA);
-		environmentCA.addTransitionArea(linkQCA.getLinkId(), transitionArea);
+		environmentCA.addTransitionArea(linkQCA.getLink().getId(), transitionArea);
 		return linkQCA;
 	}
 

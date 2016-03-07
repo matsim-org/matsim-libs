@@ -19,7 +19,6 @@ import org.matsim.vis.snapshotwriters.VisData;
 
 public class QCALink extends AbstractQLink {
 
-	private final Link link;
 	private final QNetwork qNetwork;
 	//private QLinkInternalI qLink;
 	private final CAEnvironment environmentCA;
@@ -28,8 +27,7 @@ public class QCALink extends AbstractQLink {
 	private CALane qlane;
 
 	public QCALink(Link link, QNetwork network, QLinkI qLink, CAEnvironment environmentCA, CAAgentFactory agentFactoryCA, TransitionArea transitionArea) {
-		super(link, network);
-		this.link = link;
+		super(link, null, network);
 		//this.qLink = qLink;
 		this.qNetwork = network;
 		this.environmentCA = environmentCA;
@@ -43,20 +41,9 @@ public class QCALink extends AbstractQLink {
 		return this.qlane ;
 	}
 	
-	public Id<Link> getLinkId(){
-		return link.getId();
-	}
-
-	@Override
-	public Link getLink() {
-		// TODO Auto-generated method stub
-		return link;
-	}
-
 	@Override
 	public void recalcTimeVariantAttributes(double time) {
-		// NOT NEEDED
-		throw new RuntimeException("Method not needed for the moment");
+		this.qlane.recalcTimeVariantAttributes(time);
 	}
 
 	@Override
@@ -72,12 +59,6 @@ public class QCALink extends AbstractQLink {
 	}
 
 	@Override
-	QNode getToNode() {
-		// NOT NEEDED
-		throw new RuntimeException("Method not needed for the moment");
-	}
-
-	@Override
 	boolean doSimStep(double now) {
 		// NOT NEEDED
 		throw new RuntimeException("Method not needed for the moment");
@@ -86,15 +67,14 @@ public class QCALink extends AbstractQLink {
 	public void notifyMoveOverBorderNode(QVehicle vehicle, Id<Link> nextLinkId){
 		double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
-				now, vehicle.getId(), this.link.getId()));
+				now, vehicle.getId(), getLink().getId()));
 		getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
 				now, vehicle.getId(), nextLinkId));
 	}
 	
 	@Override
 	boolean isNotOfferingVehicle() {
-		// NOT NEEDED
-		throw new RuntimeException("Method not needed for the moment");
+		return this.qlane.isNotOfferingVehicle() ;
 	}
 	
 	public TransitionArea getTransitionArea() {
@@ -107,97 +87,10 @@ public class QCALink extends AbstractQLink {
 	}
 
 	class CALane extends QLaneI {
-
 		@Override
-		void addFromWait(QVehicle veh, double now) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
+		boolean isAcceptingFromUpstream() {
+			return transitionArea.acceptPedestrians();
 		}
-
-		@Override
-		boolean isAcceptingFromWait() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		void updateRemainingFlowCapacity() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		boolean isActive() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		double getSimulatedFlowCapacity() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		void recalcTimeVariantAttributes(double now) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		QVehicle getVehicle(Id<Vehicle> vehicleId) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		double getStorageCapacity() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		VisData getVisData() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		void addTransitSlightlyUpstreamOfStop(QVehicle veh) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		void changeUnscaledFlowCapacityPerSecond(double val, double now) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		void changeEffectiveNumberOfLanes(double val, double now) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		boolean doSimStep(double now) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		void clearVehicles() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		Collection<MobsimVehicle> getAllVehicles() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
 		@Override
 		void addFromUpstream(QVehicle veh) {
 			Pedestrian pedestrian = agentFactoryCA.buildPedestrian(environmentCA.getId(),veh,transitionArea);		
@@ -211,40 +104,98 @@ public class QCALink extends AbstractQLink {
 		}
 
 		@Override
-		boolean isNotOfferingVehicle() {
-			// TODO Auto-generated method stub
+		void updateRemainingFlowCapacity() {
 			throw new RuntimeException("not implemented") ;
 		}
 
+		// === simulation logic (I am a bit surprised that it works completely without) ===
+		@Override
+		boolean doSimStep(double now) {
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		boolean isActive() {
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		void clearVehicles() {
+			throw new RuntimeException("not implemented") ;
+		}
+
+		// === information about the link (might be useful in some cases) ===
+		@Override
+		Collection<MobsimVehicle> getAllVehicles() {
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		VisData getVisData() {
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		QVehicle getVehicle(Id<Vehicle> vehicleId) {
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		double getSimulatedFlowCapacity() {
+			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		double getStorageCapacity() {
+			throw new RuntimeException("not implemented") ;
+		}
+
+		// === functionality for arrival/departure area ===
+		@Override
+		void addFromWait(QVehicle veh, double now) {
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		boolean isAcceptingFromWait() {
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		void addTransitSlightlyUpstreamOfStop(QVehicle veh) {
+			throw new RuntimeException("not implemented") ;
+		}
+
+		// === functionality for downstream end (not needed) ===
+		@Override
+		boolean isNotOfferingVehicle() {
+			throw new RuntimeException("not implemented") ;
+		}
 		@Override
 		QVehicle popFirstVehicle() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
-
 		@Override
 		QVehicle getFirstVehicle() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
-
 		@Override
 		double getLastMovementTimeOfFirstVehicle() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
-
 		@Override
 		boolean hasGreenForToLink(Id<Link> toLinkId) {
-			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+		
+		// === time-dependent link characteristics (not needed) ===
+		@Override
+		void changeUnscaledFlowCapacityPerSecond(double val, double now) {
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		void changeEffectiveNumberOfLanes(double val, double now) {
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		void recalcTimeVariantAttributes(double now) {
 			throw new RuntimeException("not implemented") ;
 		}
 
-		@Override
-		boolean isAcceptingFromUpstream() {
-			return transitionArea.acceptPedestrians();
-		}
-		
+
 	}
 
 }

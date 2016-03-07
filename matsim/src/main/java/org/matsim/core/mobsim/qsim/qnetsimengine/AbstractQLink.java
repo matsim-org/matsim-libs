@@ -58,7 +58,7 @@ import org.matsim.vehicles.Vehicle;
  */
 abstract class AbstractQLink extends QLinkI {
 	// yy The way forward might be to separate the "service link/network" from the "movement link/network".  The 
-	// service link would do thinks like park agents, accept additional agents on link, accept passengers or drivers waiting for
+	// service link would do things like park agents, accept additional agents on link, accept passengers or drivers waiting for
 	// cars, etc.  Both the thread-based parallelization and the visualization then would have to treat those service links
 	// separately, which feels fairly messy.  Maybe better leave things as they are.  kai, mar'16  
 
@@ -87,7 +87,6 @@ abstract class AbstractQLink extends QLinkI {
 
 	private final Map<Id<Person>, MobsimDriverAgent> driversWaitingForPassengers = new LinkedHashMap<>();
 
-	// vehicleId
 	private final Map<Id<Vehicle>, Set<MobsimAgent>> passengersWaitingForCars = new LinkedHashMap<>();
 
 	/**
@@ -95,25 +94,27 @@ abstract class AbstractQLink extends QLinkI {
 	 * has come. They are then filled into the vehQueue, depending on free space
 	 * in the vehQueue
 	 */
-	/*package*/ private final Queue<QVehicle> waitingList = new LinkedList<>();
+	private final Queue<QVehicle> waitingList = new LinkedList<>();
 
 
 	private final boolean insertingWaitingVehiclesBeforeDrivingVehicles;
 
-	/**
-	 * A list containing all transit vehicles that are at a stop but not
-	 * blocking other traffic on the lane.
-	 */
-
 	private boolean active = false;
 
 	private TransitQLink transitQLink;
+	
+	private final QNode toQNode ;
 
-	AbstractQLink(Link link, QNetwork network) {
+	AbstractQLink(Link link, QNode toQNode, QNetwork network) {
 		this.link = link ;
+		this.toQNode = toQNode ;
 		this.qnetwork = network;
 		this.insertingWaitingVehiclesBeforeDrivingVehicles =
 				network.simEngine.getMobsim().getScenario().getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
+	}
+	
+	@Override QNode getToNode() {
+		return toQNode ;
 	}
 
 	/** 
