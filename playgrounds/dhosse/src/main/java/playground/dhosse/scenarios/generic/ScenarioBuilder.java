@@ -8,6 +8,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 
 import playground.dhosse.scenarios.generic.facilities.FacilitiesCreator;
 import playground.dhosse.scenarios.generic.network.NetworkCreator;
+import playground.dhosse.scenarios.generic.population.io.commuters.CommuterFileReader;
 
 public class ScenarioBuilder {
 
@@ -66,8 +67,11 @@ public class ScenarioBuilder {
 		
 		log.info("########## demand generation");
 		//TODO demand generation
-		//read mid data
 		//read commuter data
+		CommuterFileReader cReader = new CommuterFileReader();
+		cReader.read(configuration.getReverseCommuterFile(), true);
+		cReader.read(configuration.getCommuterFile(), false);
+		//read mid data
 		//read tracking data
 		
 		log.info("########## Scenario created!");

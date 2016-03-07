@@ -152,6 +152,7 @@ public class GeometryUtils {
 				addAttribute("freespeed", Double.class).
 				addAttribute("modes", String.class).
 				addAttribute("nLanes", Integer.class).
+				addAttribute("origId", String.class).
 				create();
 
 		for (Link link : network.getLinks().values()) {
@@ -162,7 +163,7 @@ public class GeometryUtils {
 					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),
 					link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(),
 					link.getCapacity(), link.getFreespeed(), CollectionUtils.setToString(link.getAllowedModes()),
-					link.getNumberOfLanes()}, null);
+					link.getNumberOfLanes(), ((LinkImpl)link).getOrigId()}, null);
 			linkFeatures.add(ft);
 		}
 		
