@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.incidents;
+package playground.ikaddoura.incidents.io;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +35,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+import playground.ikaddoura.incidents.TMCAlerts;
 import playground.ikaddoura.incidents.data.TrafficItem;
 
 /**

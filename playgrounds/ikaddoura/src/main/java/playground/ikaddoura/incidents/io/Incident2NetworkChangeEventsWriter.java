@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.incidents;
+package playground.ikaddoura.incidents.io;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +26,8 @@ import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
+import playground.ikaddoura.incidents.DateTime;
+import playground.ikaddoura.incidents.TMCAlerts;
 import playground.ikaddoura.incidents.data.TrafficItem;
 
 /**

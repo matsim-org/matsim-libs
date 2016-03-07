@@ -42,6 +42,10 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.incidents.data.TrafficItem;
+import playground.ikaddoura.incidents.io.HereMapsTrafficItemXMLReader;
+import playground.ikaddoura.incidents.io.Incident2CSVWriter;
+import playground.ikaddoura.incidents.io.Incident2NetworkChangeEventsWriter;
+import playground.ikaddoura.incidents.io.Incident2SHPWriter;
 
 /**
  * @author ikaddoura
