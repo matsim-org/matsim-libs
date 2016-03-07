@@ -69,9 +69,9 @@ abstract class AbstractQLink extends QLinkI {
 
 	private static final Logger log = Logger.getLogger(AbstractQLink.class);
 
-	final Link link;
+	private final Link link;
 
-	final QNetwork qnetwork ;
+	private final QNetwork qnetwork ;
 	private NetElementActivationRegistry netElementActivationRegistry;
 	// (NOTE: via the qnetwork you reach the QNetsimEngine.  That is the "global" thing.  In contrast, via the netElementActivator,
 	// you reach the QNetsimEngineRunner.  That is the thread that runs the QLink.  Kai, mar'16
@@ -95,19 +95,19 @@ abstract class AbstractQLink extends QLinkI {
 	 * has come. They are then filled into the vehQueue, depending on free space
 	 * in the vehQueue
 	 */
-	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<>();
+	/*package*/ private final Queue<QVehicle> waitingList = new LinkedList<>();
 
 
-	/*package*/ final boolean insertingWaitingVehiclesBeforeDrivingVehicles;
+	private final boolean insertingWaitingVehiclesBeforeDrivingVehicles;
 
 	/**
 	 * A list containing all transit vehicles that are at a stop but not
 	 * blocking other traffic on the lane.
 	 */
 
-	boolean active = false;
+	private boolean active = false;
 
-	TransitQLink transitQLink;
+	private TransitQLink transitQLink;
 
 	AbstractQLink(Link link, QNetwork network) {
 		this.link = link ;
@@ -128,6 +128,7 @@ abstract class AbstractQLink extends QLinkI {
 			netElementActivationRegistry.registerLinkAsActive(this);
 			this.active = true;
 		}
+		// This is a bit involved since we do not want to ask the registry in every time step if the link is already active.
 	}
 	private static int wrnCnt = 0 ;
 	@Override
@@ -383,7 +384,7 @@ abstract class AbstractQLink extends QLinkI {
 		return customAttributes;
 	}
 
-	/*package*/ void setNetElementActivator(NetElementActivationRegistry qSimEngineRunner) {
+	/*package*/ void setNetElementActivationRegistry(NetElementActivationRegistry qSimEngineRunner) {
 		this.netElementActivationRegistry = qSimEngineRunner;
 	}
 
@@ -432,6 +433,39 @@ abstract class AbstractQLink extends QLinkI {
 		Set<MobsimAgent> set = passengersWaitingForCars.get(vehicleId);
 		if (set != null) return Collections.unmodifiableSet(set);
 		else return null;
+	}
+
+	@Override
+	public Link getLink() {
+		return link;
+	}
+
+	boolean isInsertingWaitingVehiclesBeforeDrivingVehicles() {
+		return insertingWaitingVehiclesBeforeDrivingVehicles;
+	}
+
+	QNetwork getQnetwork() {
+		return qnetwork;
+	}
+
+	boolean isActive() {
+		return active;
+	}
+
+	void setActive(boolean active) {
+		this.active = active;
+	}
+
+	Queue<QVehicle> getWaitingList() {
+		return waitingList;
+	}
+
+	TransitQLink getTransitQLink() {
+		return transitQLink;
+	}
+
+	void setTransitQLink(TransitQLink transitQLink) {
+		this.transitQLink = transitQLink;
 	}
 
 }

@@ -529,7 +529,7 @@ public class QNetsimEngine implements MobsimEngine {
 				// (must be of this type to work.  kai, feb'12)
 
 				// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
-				qLink.setNetElementActivator(this.engines.get(i));
+				qLink.setNetElementActivationRegistry(this.engines.get(i));
 
 				/*
 				 * If the QLink contains agents that end their activity in the first time

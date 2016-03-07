@@ -551,7 +551,7 @@ public final class QLinkTest extends MatsimTestCase {
             node.setNetElementActivator(netElementActivator);
         }
         for (QLinkI link : network.getNetsimLinks().values()) {
-            ((QLinkImpl) link).setNetElementActivator(netElementActivator);
+            ((QLinkImpl) link).setNetElementActivationRegistry(netElementActivator);
         }
     }
 

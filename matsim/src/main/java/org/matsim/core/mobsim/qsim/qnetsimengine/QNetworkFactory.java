@@ -28,7 +28,7 @@ import org.matsim.core.api.internal.MatsimFactory;
 /**
  * @author dgrether
  */
-abstract class QNetworkFactory implements MatsimFactory {
+public abstract class QNetworkFactory implements MatsimFactory {
 
 	abstract QNode createNetsimNode(Node node, QNetwork network);
 

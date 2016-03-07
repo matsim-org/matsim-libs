@@ -98,7 +98,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 	AssignmentEmulatingQLane(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id id ) {
 		this.id = id ;
 		this.qLink = qLinkImpl;
-		this.network = qLinkImpl.qnetwork ;
+		this.network = qLinkImpl.getQnetwork() ;
 		this.vehQueue = vehicleQueue ;
 
 	}
@@ -146,7 +146,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 			if ( driver instanceof AbstractTransitDriverAgent ) {
 				AbstractTransitDriverAgent transitDriver = (AbstractTransitDriverAgent) driver ;
-			HandleTransitStopResult handleTransitStop = qLink.transitQLink.handleTransitStop(now, veh, transitDriver, qLink.link.getId());
+			HandleTransitStopResult handleTransitStop = qLink.getTransitQLink().handleTransitStop(now, veh, transitDriver, qLink.getLink().getId());
 			if (handleTransitStop == HandleTransitStopResult.accepted) {
 				// vehicle has been accepted into the transit vehicle queue of the link.
 				removeVehicleFromQueue(now) ;
@@ -228,14 +228,14 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 	@Override
 	public final QVehicle popFirstVehicle() {
-		double now = qLink.qnetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = qLink.getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = buffer.poll();
 		if (this.generatingEvents) {
-			this.qLink.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
+			this.qLink.getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
 					now, veh.getId(), this.qLink.getLink().getId(), this.getId()
 			));
 		}
-		qLink.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
+		qLink.getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
 				now, veh.getId(), this.qLink.getLink().getId()
 		));
 		return veh;
@@ -248,21 +248,21 @@ class AssignmentEmulatingQLane extends QLaneI {
 	
 	@Override
 	public final void clearVehicles() {
-		double now = qLink.qnetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = qLink.getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : vehQueue) {
-			qLink.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+			qLink.getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
-			qLink.qnetwork.simEngine.getMobsim().getAgentCounter().incLost();
-			qLink.qnetwork.simEngine.getMobsim().getAgentCounter().decLiving();
+			qLink.getQnetwork().simEngine.getMobsim().getAgentCounter().incLost();
+			qLink.getQnetwork().simEngine.getMobsim().getAgentCounter().decLiving();
 		}
 		vehQueue.clear();
 
 		for (QVehicle veh : buffer) {
-			qLink.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+			qLink.getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
-			qLink.qnetwork.simEngine.getMobsim().getAgentCounter().incLost();
-			qLink.qnetwork.simEngine.getMobsim().getAgentCounter().decLiving();
+			qLink.getQnetwork().simEngine.getMobsim().getAgentCounter().incLost();
+			qLink.getQnetwork().simEngine.getMobsim().getAgentCounter().decLiving();
 		}
 		buffer.clear();
 	}
@@ -273,7 +273,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 		qLink.activateLink();
 		this.vehEnterTimeMap.put( veh.getId(), now ) ;
 		
-		double linkTravelTime = this.length / this.network.simEngine.getLinkSpeedCalculator().getMaximumVelocity(veh, this.qLink.link, now);
+		double linkTravelTime = this.length / this.network.simEngine.getLinkSpeedCalculator().getMaximumVelocity(veh, this.qLink.getLink(), now);
 		// yyyyyy needs to be replaced by density-dependent travel time. kai, jul'14
 		System.exit(-1) ;
 		
@@ -302,7 +302,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 		vehQueue.add(veh);
 
 		if (this.generatingEvents) {
-			this.qLink.qnetwork.simEngine.getMobsim().getEventsManager()
+			this.qLink.getQnetwork().simEngine.getMobsim().getEventsManager()
 			.processEvent(new LaneEnterEvent(now, veh.getId(), this.qLink.getLink().getId(), this.getId()));
 		}
 	}
@@ -359,7 +359,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 	Id getId() {
 		// need this so we can generate lane events although we do not need them here. kai, sep'13
 		// yyyy would probably be better to have this as a final variable set during construction. kai, sep'13
-		return this.qLink.link.getId() ;
+		return this.qLink.getLink().getId() ;
 	}
 
 	class VisDataImpl implements VisData {

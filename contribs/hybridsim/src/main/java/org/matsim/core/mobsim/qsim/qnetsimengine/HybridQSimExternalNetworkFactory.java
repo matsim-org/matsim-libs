@@ -24,8 +24,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.hybridsim.simulation.ExternalEngine;
 
 
-public class HybridQSimExternalNetworkFactory implements
-		NetsimNetworkFactory {
+ public class HybridQSimExternalNetworkFactory extends QNetworkFactory {
 
 	private final ExternalEngine e;
 

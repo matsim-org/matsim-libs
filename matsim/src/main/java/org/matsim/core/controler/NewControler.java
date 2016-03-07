@@ -37,6 +37,7 @@ import java.util.*;
 
 class NewControler extends AbstractController implements ControlerI {
 
+	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(NewControler.class);
 
 	private final Config config;
@@ -72,6 +73,7 @@ class NewControler extends AbstractController implements ControlerI {
 		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
 	}
 
+	@Override
 	public final void run() {
 		super.setupOutputDirectory(outputDirectoryHierarchy);
 		super.run(this.config);

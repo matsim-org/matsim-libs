@@ -97,7 +97,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		//--
 		this.toQNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
-	  super.transitQLink = new TransitQLink(this.qlane);
+		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
 	}
 	
 	public QLinkImpl( final Link link2, QNetwork network, final QNode toNode, final QLaneI queueWithBuffer ) {
@@ -105,7 +105,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		this.qlane = queueWithBuffer ;
 		this.toQNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
-	  super.transitQLink = new TransitQLink(this.qlane);
+		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
 	}
 	
 	/** 
@@ -114,13 +114,13 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final LaneFactory roadFactory) {
 		super(link2, network) ;
-        // The next line must must by contract stay within the constructor,
+		// The next line must must by contract stay within the constructor,
 		// so that the caller can use references to the created roads to wire them together,
 		// if it must.
 		this.qlane = roadFactory.createLane(this); 
 		this.toQNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
-	  super.transitQLink = new TransitQLink(this.qlane);
+		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
 	}
 
 
@@ -136,17 +136,22 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	boolean doSimStep(double now) {
 		qlane.updateRemainingFlowCapacity();
 
-		if ( this.insertingWaitingVehiclesBeforeDrivingVehicles ) {
+		if ( this.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
 			this.moveWaitToRoad(now);
-			this.transitQLink.handleTransitVehiclesInStopQueue(now);
+			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);
 			qlane.doSimStep(now);
 		} else {
-			this.transitQLink.handleTransitVehiclesInStopQueue(now);
+			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);
 			qlane.doSimStep(now);
 			this.moveWaitToRoad(now);
 		}
-		this.active = this.checkForActivity();
-		return active;
+		this.setActive(this.checkForActivity());
+		return isActive();
+		// yy seems to me that for symmetry there should be something like
+		// 			netElementActivationRegistry.registerLinkAsActive(this);
+		// and may be a qlink.deactivateLink(...) around it (analogous to qlink.activateLink).  
+		// That is, do NOT pass the deactivation of the link rather implicitly via returning a false here.
+		// kai, mar'16
 	}
 
 
@@ -158,15 +163,15 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	private void moveWaitToRoad(final double now) {
 		while (qlane.isAcceptingFromWait() ) {
-			QVehicle veh = this.waitingList.poll();
+			QVehicle veh = this.getWaitingList().poll();
 			if (veh == null) {
 				return;
 			}
 
-			this.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+			this.getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(
 					new VehicleEntersTrafficEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId(), veh.getDriver().getMode(), 1.0));
 
-			if ( this.transitQLink.addTransitToStopQueue(now, veh, this.getLink().getId()) ) {
+			if ( this.getTransitQLink().addTransitToStopQueue(now, veh, this.getLink().getId()) ) {
 				continue ;
 			}
 
@@ -189,8 +194,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	@Override
 	public void recalcTimeVariantAttributes(double now) {
 
-		qlane.changeUnscaledFlowCapacityPerSecond(((LinkImpl)this.link).getFlowCapacity(now), now);
-		qlane.changeEffectiveNumberOfLanes(this.link.getNumberOfLanes(now), now);
+		qlane.changeUnscaledFlowCapacityPerSecond(((LinkImpl)this.getLink()).getFlowCapacity(now), now);
+		qlane.changeEffectiveNumberOfLanes(this.getLink().getNumberOfLanes(now), now);
 		
 		qlane.recalcTimeVariantAttributes(now);
 	}
@@ -201,7 +206,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		if (ret != null) {
 			return ret;
 		}
-		for (QVehicle veh : this.waitingList) {
+		for (QVehicle veh : this.getWaitingList()) {
 			if (veh.getId().equals(vehicleId))
 				return veh;
 		}
@@ -211,8 +216,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	@Override
 	public Collection<MobsimVehicle> getAllNonParkedVehicles(){
 		Collection<MobsimVehicle> vehicles = new ArrayList<>();
-		vehicles.addAll(this.transitQLink.getTransitVehicleStopQueue());
-		vehicles.addAll(this.waitingList);
+		vehicles.addAll(this.getTransitQLink().getTransitVehicleStopQueue());
+		vehicles.addAll(this.getWaitingList());
 		vehicles.addAll( qlane.getAllVehicles() ) ;
 		return vehicles;
 	}
@@ -222,11 +227,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	double getSpaceCap() {
 		return this.qlane.getStorageCapacity();
-	}
-
-	@Override
-	public Link getLink() {
-		return this.link;
 	}
 
 	@Override
@@ -258,7 +258,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		 * link active until buffercap has accumulated (so a newly arriving vehicle
 		 * is not delayed).
 		 */
-		return qlane.isActive()  || !this.waitingList.isEmpty() || !this.transitQLink.getTransitVehicleStopQueue().isEmpty() ;
+		return qlane.isActive()  || !this.getWaitingList().isEmpty() || !this.getTransitQLink().getTransitVehicleStopQueue().isEmpty() ;
 	}
 
 	@Override
@@ -287,20 +287,20 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		private VisLinkWLanes visLink = null;
 
 		private VisDataImpl() {
-			double nodeOffset = QLinkImpl.this.qnetwork.simEngine.getMobsim().getScenario().getConfig().qsim().getNodeOffset(); 
+			double nodeOffset = QLinkImpl.this.getQnetwork().simEngine.getMobsim().getScenario().getConfig().qsim().getNodeOffset(); 
 			if (nodeOffset != 0.0) {
 				nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 				visModelBuilder = new VisLaneModelBuilder();
 				CoordinateTransformation transformation = new IdentityTransformation();
 				visLink = visModelBuilder.createVisLinkLanes(transformation, QLinkImpl.this, nodeOffset, null);
-				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkImpl.this.qnetwork.getLinkWidthCalculatorForVis();
+				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkImpl.this.getQnetwork().getLinkWidthCalculatorForVis();
 				visModelBuilder.recalculatePositions(visLink, linkWidthCalculator);
 			}
 		}
 
 		@Override
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo( Collection<AgentSnapshotInfo> positions) {
-			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.qnetwork.simEngine.getAgentSnapshotInfoBuilder();
+			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQnetwork().simEngine.getAgentSnapshotInfoBuilder();
 
 			VisData roadVisData = qlane.getVisData() ;
 			if (visLink != null) {
@@ -314,13 +314,13 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 			// initialize a bit away from the lane
 
 			// treat vehicles from transit stops
-			cnt2 = snapshotInfoBuilder.positionVehiclesFromTransitStop(positions, link, transitQLink.getTransitVehicleStopQueue(), cnt2 );
+			cnt2 = snapshotInfoBuilder.positionVehiclesFromTransitStop(positions, getLink(), getTransitQLink().getTransitVehicleStopQueue(), cnt2 );
 
 			// treat vehicles from waiting list:
-			cnt2 = snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkImpl.this.link, cnt2,
-					QLinkImpl.this.waitingList);
+			cnt2 = snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkImpl.this.getLink(), cnt2,
+					QLinkImpl.this.getWaitingList());
 
-			cnt2 = snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.link,
+			cnt2 = snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.getLink(),
 					QLinkImpl.this.getAdditionalAgentsOnLink(), cnt2);
 
 			return positions;

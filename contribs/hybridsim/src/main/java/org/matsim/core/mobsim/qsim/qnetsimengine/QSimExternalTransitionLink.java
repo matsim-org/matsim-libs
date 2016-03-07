@@ -55,29 +55,8 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	}
 
 	@Override
-	void addFromUpstream(QVehicle veh) {
-		Id<Link> nextL = veh.getDriver().chooseNextLinkId();
-		Id<Node> leaveId = this.net.getLinks().get(nextL).getToNode().getId();
-		this.e.addFromUpstream(this.link.getFromNode().getId(), leaveId, veh);
-		double now = this.e.getMobsim().getSimTimer().getTimeOfDay();
-		this.em.processEvent(new LinkEnterEvent(now, veh.getId(), this.link
-				.getId()));
-
-	}
-
-	@Override
 	boolean isNotOfferingVehicle() {
 		return true;
-	}
-
-	@Override
-	boolean isAcceptingFromUpstream() {
-		return this.e.hasSpace(this.link.getFromNode().getId());
-	}
-
-	@Override
-	public Link getLink() {
-		return super.link;
 	}
 
 	@Override
@@ -101,7 +80,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	}
 
 	@Override
-	List<QLaneI> getToNodeQueueLanes() {
+	List<QLaneI> getOfferingQLanes() {
 		List<QLaneI> list = new ArrayList<>() ;
 		list.add( fakeLane ) ;
 		return list ;
@@ -111,11 +90,19 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		// Please ask if you need this and have problems. kai, feb'16
 	}
 	
+	@Override
+	QLaneI getAcceptingQLane() {
+		return this.fakeLane ;
+	}
+	
 	private final class FakeLane extends QLaneI {
 		@Override
-		void addFromUpstream(QVehicle arg0) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
+		void addFromUpstream(QVehicle veh) {
+			Id<Link> nextL = veh.getDriver().chooseNextLinkId();
+			Id<Node> leaveId = net.getLinks().get(nextL).getToNode().getId();
+			e.addFromUpstream( getLink().getFromNode().getId(), leaveId, veh);
+			double now = e.getMobsim().getSimTimer().getTimeOfDay();
+			em.processEvent(new LinkEnterEvent(now, veh.getId(), getLink().getId()));
 		}
 
 		@Override
@@ -207,8 +194,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 
 		@Override
 		boolean isAcceptingFromUpstream() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
+			return e.hasSpace(getLink().getFromNode().getId());
 		}
 
 		@Override

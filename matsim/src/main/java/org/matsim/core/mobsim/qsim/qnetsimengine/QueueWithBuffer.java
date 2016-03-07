@@ -242,8 +242,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			double length, double effectiveNumberOfLanes, double flowCapacity_s) {
 		this.id = id ;
 		this.qLink = qLinkImpl;
-		this.link = qLinkImpl.link ;
-		this.network = qLinkImpl.qnetwork ;
+		this.link = qLinkImpl.getLink() ;
+		this.network = qLinkImpl.getQnetwork() ;
 		this.vehQueue = vehicleQueue ;
 
 		this.length = length;
@@ -448,7 +448,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			MobsimDriverAgent driver = veh.getDriver();
 
 			if (driver instanceof TransitDriverAgent) {
-				HandleTransitStopResult handleTransitStop = qLink.transitQLink.handleTransitStop(now, veh, (TransitDriverAgent) driver, this.qLink.link.getId());
+				HandleTransitStopResult handleTransitStop = qLink.getTransitQLink().handleTransitStop(now, veh, (TransitDriverAgent) driver, this.qLink.getLink().getId());
 				if (handleTransitStop == HandleTransitStopResult.accepted) {
 					// vehicle has been accepted into the transit vehicle queue of the link.
 					removeVehicleFromQueue(now,veh) ;

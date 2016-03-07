@@ -73,7 +73,7 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 		this.netFac.putNetsimNetworkFactory("2ext", eFac);
 		this.netFac.putNetsimNetworkFactory("ext2", eFac);
 		
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, this.netFac);
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, this.netFac );
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 

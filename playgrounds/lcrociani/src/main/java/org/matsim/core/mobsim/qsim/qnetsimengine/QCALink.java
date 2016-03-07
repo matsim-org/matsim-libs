@@ -85,9 +85,9 @@ public class QCALink extends AbstractQLink {
 
 	public void notifyMoveOverBorderNode(QVehicle vehicle, Id<Link> nextLinkId){
 		double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-		qnetwork.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
+		getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
 				now, vehicle.getId(), this.link.getId()));
-		qnetwork.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
+		getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
 				now, vehicle.getId(), nextLinkId));
 	}
 	

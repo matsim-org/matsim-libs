@@ -19,17 +19,16 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class HybridNetworkFactory implements
-		NetsimNetworkFactory {
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
-	private final Map<String, NetsimNetworkFactory> facs = new LinkedHashMap<>();
+public class HybridNetworkFactory extends QNetworkFactory {
+
+	private final Map<String, QNetworkFactory> facs = new LinkedHashMap<>();
 	
 	@Override
 	public QNode createNetsimNode(Node node, QNetwork network) {
@@ -40,7 +39,7 @@ public class HybridNetworkFactory implements
 	public QLinkI createNetsimLink(Link link, QNetwork network,
 			QNode queueNode) {
 		
-		for (Entry<String, NetsimNetworkFactory> e : this.facs.entrySet()) {
+		for (Entry<String, QNetworkFactory> e : this.facs.entrySet()) {
 			if (link.getAllowedModes().contains(e.getKey())) {
 				return e.getValue().createNetsimLink(link, network, queueNode);
 			}
@@ -49,7 +48,7 @@ public class HybridNetworkFactory implements
 		return new QLinkImpl(link, network, queueNode);
 	}
 	
-	public void putNetsimNetworkFactory(String key, NetsimNetworkFactory fac) {
+	public void putNetsimNetworkFactory(String key, QNetworkFactory fac) {
 		this.facs.put(key, fac);
 	}
 
