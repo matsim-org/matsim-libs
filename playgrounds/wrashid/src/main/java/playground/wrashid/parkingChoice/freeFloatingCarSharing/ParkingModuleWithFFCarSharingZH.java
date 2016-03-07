@@ -34,7 +34,9 @@ import java.util.HashMap;
 public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule 
 implements ParkingModuleWithFreeFloatingCarSharing, IterationStartsListener, IterationEndsListener {
 
-	private Collection<ParkingCoordInfo> initialDesiredVehicleCoordinates;
+	public Collection<ParkingCoordInfo> initialDesiredVehicleCoordinates;
+	
+
 	private HashMap<Id, PC2Parking> currentVehicleLocation;
 	private QuadTree<Id> vehicleLocations;
 	private AverageWalkDistanceStatsZH averageWalkDistanceStatsZH;
@@ -52,7 +54,6 @@ implements ParkingModuleWithFreeFloatingCarSharing, IterationStartsListener, Ite
 	}
 
 	
-	// TODO: we are not considering, that the number of vehicles is too limited, that no vehicle is available
 	@Override
 	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double departureTime) {
 		Id vehicleId = vehicleLocations.getClosest(coord.getX(), coord.getY());
@@ -67,8 +68,6 @@ implements ParkingModuleWithFreeFloatingCarSharing, IterationStartsListener, Ite
 		
 		
 		PC2Parking parking=currentVehicleLocation.get(vehicleId);
-		getParkingInfrastructureManager().unParkVehicle(parking, departureTime, personId);
-		
 		vehicleLocations.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 
         NetworkImpl network = (NetworkImpl) getControler().getScenario().getNetwork();
@@ -84,9 +83,16 @@ implements ParkingModuleWithFreeFloatingCarSharing, IterationStartsListener, Ite
 		
 
 		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, parking.getCoordinate())
-				.getId());
+				.getId(), parking);
 	}
 
+	@Override
+	public void makeFFVehicleUnavailable(Id vehicleId, PC2Parking parking, double departureTime, Id personId) {
+		getParkingInfrastructureManager().unParkVehicle(parking, departureTime, personId);
+		
+	}
+	
+	
 
 	private double getAverageActDuration() {
 		double averageActDuration = 135*60;
@@ -183,9 +189,10 @@ implements ParkingModuleWithFreeFloatingCarSharing, IterationStartsListener, Ite
 		averageWalkDistanceStatsZH.printStatistics();
 		
 		eventsManager.finishProcessing();
-		eventsWriter.reset(0);
-		
-		System.out.println();
+		eventsWriter.reset(0);		
+	}
+	public Collection<ParkingCoordInfo> getInitialDesiredVehicleCoordinates() {
+		return initialDesiredVehicleCoordinates;
 	}
 	
 }
