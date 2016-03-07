@@ -1,8 +1,8 @@
 package playground.dhosse.gap.scenario.mid;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,8 +14,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.dhosse.gap.Global;
-import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
-import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtilsV2;
+import playground.dhosse.gap.scenario.mid.MiDTravelChain.MiDTravelStage;
 import playground.dhosse.utils.EgapHashGenerator;
 
 public class MiDCSVReader {
@@ -69,7 +68,7 @@ public class MiDCSVReader {
 						
 						if(!times.contains("NULL")){
 							
-							MiDTravelChain tChain = new MiDTravelChain(previousPId, legs.split("_"), acts.split("_"), times.split("_"), distance.split("_"));
+							MiDTravelChain tChain = new MiDTravelChain(previousPId, legs.split("_"), acts.split("_"), times.split("_"), distance.split("_"),"0");
 							templates.addTravelChainToPattern(pHash, acts, tChain);
 							
 						}
@@ -156,11 +155,126 @@ public class MiDCSVReader {
 			
 			reader.close();
 			
+			BufferedWriter writer = IOUtils.getBufferedWriter("./home/dhosse/travelchains.csv");
+			
+			for(Entry<String, Map<String, List<MiDTravelChain>>> entry : templates.personGroupId2TravelPattern2TravelChains.entrySet()){
+				
+				for(Entry<String, List<MiDTravelChain>> pattern : entry.getValue().entrySet()){
+					
+					for(MiDTravelChain chain : pattern.getValue()){
+						
+						for(MiDTravelStage stage : chain.getStages()){
+							
+							String purpose = identify(stage.getPreviousActType(), stage.getNextActType());
+							
+							writer.write(stage.getDepartureTime() + "," + purpose + "\n");
+							
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+			writer.flush();
+			writer.close();
+			
 				
 		} catch (IOException e) {
 		
 			e.printStackTrace();
 		
+		}
+		
+	}
+	
+	private static String identify(String prev, String next){
+
+		if(prev.equals(Global.ActType.home.name())){
+			
+			if(next.equals(Global.ActType.education.name())){
+				return "WB";
+			} else if(next.equals(Global.ActType.leisure.name())){
+				return "WF";
+			} else if(next.equals(Global.ActType.shop.name())){
+				return "WE";
+			} else if(next.equals(Global.ActType.work.name())){
+				return "WA";
+			} else {
+				return "WS";
+			}
+			
+		} else if(prev.equals(Global.ActType.education.name())){
+			
+			if(next.equals(Global.ActType.home.name())){
+				return "BW";
+			} else if(next.equals(Global.ActType.leisure.name())){
+				return "BF";
+			} else if(next.equals(Global.ActType.shop.name())){
+				return "BE";
+			} else if(next.equals(Global.ActType.work.name())){
+				return "BA";
+			} else {
+				return "BS";
+			}
+			
+		} else if(prev.equals(Global.ActType.leisure.name())){
+			
+			if(next.equals(Global.ActType.education.name())){
+				return "FB";
+			} else if(next.equals(Global.ActType.home.name())){
+				return "FW";
+			} else if(next.equals(Global.ActType.shop.name())){
+				return "FE";
+			} else if(next.equals(Global.ActType.work.name())){
+				return "FA";
+			} else {
+				return "FS";
+			}
+			
+		} else if(prev.equals(Global.ActType.shop.name())){
+			
+			if(next.equals(Global.ActType.education.name())){
+				return "EB";
+			} else if(next.equals(Global.ActType.leisure.name())){
+				return "EF";
+			} else if(next.equals(Global.ActType.home.name())){
+				return "EW";
+			} else if(next.equals(Global.ActType.work.name())){
+				return "EA";
+			} else {
+				return "ES";
+			}
+			
+		} else if(prev.equals(Global.ActType.work.name())){
+			
+			if(next.equals(Global.ActType.education.name())){
+				return "AB";
+			} else if(next.equals(Global.ActType.leisure.name())){
+				return "AF";
+			} else if(next.equals(Global.ActType.shop.name())){
+				return "AE";
+			} else if(next.equals(Global.ActType.home.name())){
+				return "AW";
+			} else {
+				return "AS";
+			}
+			
+		} else {
+			
+			if(next.equals(Global.ActType.education.name())){
+				return "SB";
+			} else if(next.equals(Global.ActType.leisure.name())){
+				return "SF";
+			} else if(next.equals(Global.ActType.shop.name())){
+				return "SE";
+			} else if(next.equals(Global.ActType.work.name())){
+				return "SA";
+			} else {
+				return "SW";
+			}
+			
 		}
 		
 	}
@@ -223,43 +337,6 @@ public class MiDCSVReader {
 		void addWaypoint(MiDWaypoint p){
 			
 			this.waypoints.addLast(p);
-			
-		}
-		
-		public String generateHash(){
-			
-			String ageBounds = null;
-			if(this.age < 10){
-				ageBounds = "0-9";
-			} else if(this.age >= 10 && this.age < 20){
-				ageBounds = "10-19";
-			} else if(this.age >= 20 && this.age < 30){
-				ageBounds = "20-29";
-			} else if(this.age >= 30 && this.age < 40){
-				ageBounds = "30-39";
-			} else if(this.age >= 40 && this.age < 50){
-				ageBounds = "40-49";
-			} else if(this.age >= 50 && this.age < 60){
-				ageBounds = "50-59";
-			} else if(this.age >= 60 && this.age < 70){
-				ageBounds = "60-69";
-			} else if(this.age >= 70 && this.age < 80){
-				ageBounds = "70-79";
-			} else{
-				ageBounds = "80-";
-			}
-			
-//			System.out.println("age: " + this.age + ", sex: " + this.sex + ", age: " + ageBounds + ", car available: " + this.carAvail + ", license: " + this.hasLicense + ", employed: " + this.isEmployed);
-//			for(MiDWaypoint p : this.waypoints){
-//				System.out.print(p.purpose + "\t");
-//			}
-//			System.out.println("\ndistance stats - mean: " + this.distanceStats.getMean() + ", std dev: " + this.distanceStats.getStdDev());
-//			System.out.println("duration stats - mean: " + this.durationStats.getMean() + ", std dev: " + this.durationStats.getStdDev());
-//			System.out.println("start time stats - mean: " + Time.writeTime(this.startTimeStats.getMean()) + ", std dev: " + Time.writeTime(this.startTimeStats.getStdDev()));
-//			System.out.println("end time stats - mean: " + Time.writeTime(this.endTimeStats.getMean()) + ", std dev: " + Time.writeTime(this.endTimeStats.getStdDev()));
-//			System.out.println("######################################################################");
-			
-			return (this.sex + "_" + ageBounds + "_" + this.carAvail + "_" + this.hasLicense + "_" + this.isEmployed);
 			
 		}
 		

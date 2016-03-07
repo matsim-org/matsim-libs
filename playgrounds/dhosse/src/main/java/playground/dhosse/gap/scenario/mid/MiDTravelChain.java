@@ -1,22 +1,29 @@
 package playground.dhosse.gap.scenario.mid;
 
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import org.matsim.core.utils.misc.Time;
 
 import playground.dhosse.gap.Global;
+import playground.dhosse.scenarios.generic.utils.ActivityTypes;
 
 public class MiDTravelChain {
 	
 	private LinkedList<MiDTravelStage> stages = new LinkedList<>();
 	private double c = 0.;
 	private double maxD = 0.;
+	private double weight;
 	
-	public MiDTravelChain(String pId,String[] legs, String[] acts, String[] times, String[] lengths){
+	public MiDTravelChain(String pId,String[] legs, String[] acts, String[] times, String[] lengths, String weight){
+		
+		String mainAct = null;
 		
 		//acts.length() = legs.length + 1 (because of first activity: home / other)
 		for(int i = 0; i < legs.length; i++){
 			
+			setMainActType(mainAct, acts[i]);
 			if(isPrimaryActType(acts[i + 1])){
 			if(!lengths[i].equals("NULL")){
 
@@ -38,9 +45,43 @@ public class MiDTravelChain {
 				
 			}
 			
+			this.weight = Double.parseDouble(weight);
 			this.stages.addLast(new MiDTravelStage(legs[i], acts[i], acts[i+1], Time.parseTime(times[i].split("-")[0]), Time.parseTime(times[i].split("-")[1]),lengths[i]));
 			
 		}
+		
+	}
+	
+	private String setMainActType(String mainAct, String act){
+		
+		if(mainAct == null){
+			
+			return act;
+			
+		} else {
+			
+			if(mainAct.equals(ActivityTypes.WORK) || mainAct.equals(ActivityTypes.EDUCATION)){
+				
+				return mainAct;
+				
+			} else {
+				
+				return "";
+				
+			}
+			
+		}
+		
+	}
+	
+	private String getMainAct(String act1, String act2){
+		
+		Set<String> acts = new HashSet<>();
+		acts.add(ActivityTypes.LEISURE);
+		acts.add(ActivityTypes.SHOPPING);
+		acts.add(ActivityTypes.OTHER);
+		
+		return "";
 		
 	}
 	

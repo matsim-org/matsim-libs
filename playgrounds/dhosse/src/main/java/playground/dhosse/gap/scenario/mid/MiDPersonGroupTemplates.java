@@ -13,7 +13,7 @@ import org.matsim.core.utils.misc.Time;
 
 public class MiDPersonGroupTemplates {
 
-	Map<String, Map<String, List<MiDTravelChain>>> personGroupId2TravelPattern2TravelChains = new HashMap<>();
+	public Map<String, Map<String, List<MiDTravelChain>>> personGroupId2TravelPattern2TravelChains = new HashMap<>();
 	Map<String, Double> personGroupId2TotalWeight = new HashMap<>();
 	
 	public void setWeights(){
