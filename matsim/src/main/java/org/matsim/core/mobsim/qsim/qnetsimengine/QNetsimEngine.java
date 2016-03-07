@@ -536,7 +536,7 @@ public class QNetsimEngine implements MobsimEngine {
 				 * step, the link should be activated.
 				 */
 				if (linksToActivateInitially.remove(qLink)) {
-					this.engines.get(i).activateLink(qLink);
+					this.engines.get(i).registerLinkAsActive(qLink);
 				}
 
 				links[i]++;

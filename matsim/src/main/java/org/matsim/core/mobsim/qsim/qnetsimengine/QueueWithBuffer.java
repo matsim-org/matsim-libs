@@ -243,7 +243,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		this.id = id ;
 		this.qLink = qLinkImpl;
 		this.link = qLinkImpl.link ;
-		this.network = qLinkImpl.network ;
+		this.network = qLinkImpl.qnetwork ;
 		this.vehQueue = vehicleQueue ;
 
 		this.length = length;

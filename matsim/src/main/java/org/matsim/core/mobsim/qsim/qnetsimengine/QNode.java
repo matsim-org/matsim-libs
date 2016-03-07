@@ -56,7 +56,7 @@ public class QNode implements NetsimNode {
 	private final Node node;
 
 	// necessary if Nodes are (de)activated
-	private NetElementActivator activator = null;
+	private NetElementActivationRegistry activator = null;
 
 	// for Customizable
 	private final Map<String, Object> customAttributes = new HashMap<>();
@@ -114,7 +114,7 @@ public class QNode implements NetsimNode {
 	 * The ParallelQSim replaces the activator with the QSimEngineRunner 
 	 * that handles this node.
 	 */
-	/*package*/ void setNetElementActivator(NetElementActivator activator) {
+	/*package*/ void setNetElementActivator(NetElementActivationRegistry activator) {
 		this.activator = activator;
 	}
 
@@ -132,7 +132,7 @@ public class QNode implements NetsimNode {
 		 * true, the value is changed to true and the activator is informed.
 		 */
 		if (this.active.compareAndSet(false, true)) {
-			this.activator.activateNode(this);
+			this.activator.registerNodeAsActive(this);
 		}
 	}
 

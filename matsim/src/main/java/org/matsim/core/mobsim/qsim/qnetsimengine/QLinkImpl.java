@@ -163,7 +163,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 				return;
 			}
 
-			this.network.simEngine.getMobsim().getEventsManager().processEvent(
+			this.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
 					new VehicleEntersTrafficEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId(), veh.getDriver().getMode(), 1.0));
 
 			if ( this.transitQLink.addTransitToStopQueue(now, veh, this.getLink().getId()) ) {
@@ -287,20 +287,20 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		private VisLinkWLanes visLink = null;
 
 		private VisDataImpl() {
-			double nodeOffset = QLinkImpl.this.network.simEngine.getMobsim().getScenario().getConfig().qsim().getNodeOffset(); 
+			double nodeOffset = QLinkImpl.this.qnetwork.simEngine.getMobsim().getScenario().getConfig().qsim().getNodeOffset(); 
 			if (nodeOffset != 0.0) {
 				nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 				visModelBuilder = new VisLaneModelBuilder();
 				CoordinateTransformation transformation = new IdentityTransformation();
 				visLink = visModelBuilder.createVisLinkLanes(transformation, QLinkImpl.this, nodeOffset, null);
-				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkImpl.this.network.getLinkWidthCalculatorForVis();
+				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkImpl.this.qnetwork.getLinkWidthCalculatorForVis();
 				visModelBuilder.recalculatePositions(visLink, linkWidthCalculator);
 			}
 		}
 
 		@Override
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo( Collection<AgentSnapshotInfo> positions) {
-			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
+			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.qnetwork.simEngine.getAgentSnapshotInfoBuilder();
 
 			VisData roadVisData = qlane.getVisData() ;
 			if (visLink != null) {

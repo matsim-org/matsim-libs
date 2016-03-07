@@ -327,14 +327,14 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			if (nextQueue != null) {
 				if (nextQueue.isAcceptingFromUpstream()) {
 					((QueueWithBuffer) queue).removeFirstVehicle();
-					this.network.simEngine
+					this.qnetwork.simEngine
 							.getMobsim()
 							.getEventsManager()
 							.processEvent(
 									new LaneLeaveEvent(now, veh.getId(), this.getLink()
 											.getId(), ((QueueWithBuffer) queue).getId()));
 					nextQueue.addFromUpstream(veh);
-					this.network.simEngine
+					this.qnetwork.simEngine
 							.getMobsim()
 							.getEventsManager()
 							.processEvent(
@@ -392,7 +392,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				return movedWaitToRoad;
 			}
 			movedWaitToRoad = true;
-			this.network.simEngine
+			this.qnetwork.simEngine
 					.getMobsim()
 					.getEventsManager()
 					.processEvent(
@@ -524,7 +524,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		private VisLinkWLanes visLink = null;
 
 		VisDataImpl() {
-			double nodeOffset = QLinkLanesImpl.this.network.simEngine.getMobsim().getScenario()
+			double nodeOffset = QLinkLanesImpl.this.qnetwork.simEngine.getMobsim().getScenario()
 					.getConfig().qsim().getNodeOffset();
 			if (nodeOffset != 0.0) {
 				nodeOffset = nodeOffset + 2.0; // +2.0: eventually we need a bit space for the
@@ -533,7 +533,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				CoordinateTransformation transformation = new IdentityTransformation();
 				visLink = visModelBuilder.createVisLinkLanes(transformation, QLinkLanesImpl.this,
 						nodeOffset, lanes);
-				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkLanesImpl.this.network
+				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkLanesImpl.this.qnetwork
 						.getLinkWidthCalculatorForVis();
 				visModelBuilder.recalculatePositions(visLink, linkWidthCalculator);
 			}
@@ -542,7 +542,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		@Override
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(
 				final Collection<AgentSnapshotInfo> positions) {
-			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkLanesImpl.this.network.simEngine
+			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkLanesImpl.this.qnetwork.simEngine
 					.getAgentSnapshotInfoBuilder();
 
 			if (visLink != null) {
