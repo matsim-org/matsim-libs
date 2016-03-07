@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -22,11 +21,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.matrices.Matrix;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 import playground.dhosse.gap.GAPMatrices;
 import playground.dhosse.gap.Global;
@@ -35,10 +31,10 @@ import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
 import playground.dhosse.gap.scenario.mid.MiDTravelChain;
 import playground.dhosse.gap.scenario.mid.MiDTravelChain.MiDTravelStage;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
-import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
 import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
 import playground.dhosse.gap.scenario.population.utils.LegModeCreator;
 import playground.dhosse.gap.scenario.population.utils.PlanCreationUtils;
+import playground.dhosse.scenarios.generic.population.io.commuters.CommuterDataElement;
 import playground.dhosse.utils.EgapHashGenerator;
 
 public class CreateDemandV2 {

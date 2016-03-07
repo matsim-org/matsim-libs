@@ -503,7 +503,7 @@ public class EgapPopulationUtils {
 		
 		if(age < 10){
 			
-			if(rnd <= 0.4912){
+			if(rnd <= 0.4175){
 				
 				return 0;
 				

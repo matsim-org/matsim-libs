@@ -1,4 +1,4 @@
-package playground.dhosse.gap.scenario.population.io;
+package playground.dhosse.scenarios.generic.population.io.commuters;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,7 +37,6 @@ public class CommuterFileReader {
 	private List<String> relationHashes = new ArrayList<>();
 
 	public CommuterFileReader(){
-//		this.homeId2commuterRelations = new ArrayList<CommuterDataElement>();
 		this.homeId2commuterRelations = new HashMap<String, CommuterDataElement>();
 		this.filteredMunicipalities = new LinkedList<String>();
 		this.relationHashes = new ArrayList<>();

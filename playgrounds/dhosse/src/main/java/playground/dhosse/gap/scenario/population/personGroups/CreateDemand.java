@@ -1,7 +1,6 @@
 package playground.dhosse.gap.scenario.population.personGroups;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,7 +23,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -37,10 +35,9 @@ import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
 import playground.dhosse.gap.scenario.mid.MiDTravelChain;
 import playground.dhosse.gap.scenario.mid.MiDTravelChain.MiDTravelStage;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
-import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
 import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
-import playground.dhosse.gap.scenario.population.utils.LegModeCreator;
 import playground.dhosse.gap.scenario.population.utils.PlanCreationUtils;
+import playground.dhosse.scenarios.generic.population.io.commuters.CommuterDataElement;
 import playground.dhosse.utils.EgapHashGenerator;
 
 import com.vividsolutions.jts.geom.Geometry;

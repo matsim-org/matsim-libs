@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -14,8 +13,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
@@ -25,27 +22,23 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Geometry;
-
-import playground.agarwalamit.munich.inputs.ActivityClassifier;
 import playground.dhosse.gap.GAPMatrices;
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.analysis.SpatialAnalysis;
 import playground.dhosse.gap.scenario.config.ConfigCreator;
 import playground.dhosse.gap.scenario.counts.CountsCreator;
-import playground.dhosse.gap.scenario.facilities.FacilitiesCreator;
 import playground.dhosse.gap.scenario.population.Municipalities;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
-import playground.dhosse.gap.scenario.population.io.CommuterFileReader;
+import playground.dhosse.scenarios.generic.population.io.commuters.CommuterFileReader;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
@@ -118,7 +111,7 @@ public class GAPScenarioBuilder {
 //		new NetworkWriter(scenario.getNetwork()).write(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz");
 //		SpatialAnalysis.writeNetworkToShape(Global.matsimInputDir + "Netzwerk/merged-networkV2.xml.gz", "/home/dhosse/Dokumente/net.shp");
 		
-		new MatsimNetworkReader(scenario.getNetwork()).readFile(Global.runInputDir + "merged-networkV2_20150929.xml");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(Global.runInputDir + "networkMultimodal.xml.gz");
 		new NetworkCleaner().run(scenario.getNetwork());
 		
 		//create public transport
@@ -136,10 +129,10 @@ public class GAPScenarioBuilder {
 		setWorkLocations(new QuadTree<ActivityFacility>(boundary[0], boundary[1], boundary[2], boundary[3]));
 
 		//createFacilities
-		FacilitiesCreator.initAmenities(scenario);
-		FacilitiesCreator.readWorkplaces(scenario, Global.dataDir + "20150929_Unternehmen_Adressen_geokoordiniert.csv");
-		new FacilitiesWriter(scenario.getActivityFacilities()).write(Global.matsimInputDir + "facilities/facilities.xml.gz");
-		new ObjectAttributesXmlWriter(scenario.getActivityFacilities().getFacilityAttributes()).writeFile(Global.matsimInputDir + "facilities/facilityAttributes.xml.gz");
+//		FacilitiesCreator.initAmenities(scenario);
+//		FacilitiesCreator.readWorkplaces(scenario, Global.dataDir + "20150929_Unternehmen_Adressen_geokoordiniert.csv");
+//		new FacilitiesWriter(scenario.getActivityFacilities()).write(Global.matsimInputDir + "facilities/facilities.xml.gz");
+//		new ObjectAttributesXmlWriter(scenario.getActivityFacilities().getFacilityAttributes()).writeFile(Global.matsimInputDir + "facilities/facilityAttributes.xml.gz");
 		
 		initQuadTrees(scenario);
 		
@@ -147,30 +140,30 @@ public class GAPScenarioBuilder {
 		new PopulationWriter(scenario.getPopulation()).write(Global.matsimInputDir + "Pläne/plansV2.xml.gz");
 		
 		//create activity parameters for all types of activities
-		ActivityClassifier aaip = new ActivityClassifier(scenario);
-		aaip.run();
-		
-		SortedMap<String, Double> acts = aaip.getActivityType2TypicalDuration();
-		
-		for(String act : acts.keySet()){
-			
-			ActivityParams params = new ActivityParams();
-			params.setActivityType(act);
-			params.setTypicalDuration(acts.get(act));
-			params.setMinimalDuration(acts.get(act)/2);
-			params.setClosingTime(Time.UNDEFINED_TIME);
-			params.setEarliestEndTime(Time.UNDEFINED_TIME);
-			params.setLatestStartTime(Time.UNDEFINED_TIME);
-			params.setOpeningTime(Time.UNDEFINED_TIME);
-			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-			config.planCalcScore().addActivityParams(params);
-			
-		}
+//		ActivityClassifier aaip = new ActivityClassifier(scenario);
+//		aaip.run();
+//		
+//		SortedMap<String, Double> acts = aaip.getActivityType2TypicalDuration();
+//		
+//		for(String act : acts.keySet()){
+//			
+//			ActivityParams params = new ActivityParams();
+//			params.setActivityType(act);
+//			params.setTypicalDuration(acts.get(act));
+////			params.setMinimalDuration(acts.get(act)/2);
+//			params.setClosingTime(Time.UNDEFINED_TIME);
+//			params.setEarliestEndTime(Time.UNDEFINED_TIME);
+//			params.setLatestStartTime(Time.UNDEFINED_TIME);
+//			params.setOpeningTime(Time.UNDEFINED_TIME);
+//			params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
+//			config.planCalcScore().addActivityParams(params);
+//			
+//		}
 		
 		ConfigCreator.configureQSimAndCountsConfigGroups(config);
 		
 		//write population to file
-		new PopulationWriter(aaip.getOutPopulation()).write("/home/dhosse/Dokumente/01_eGAP/plansV6.xml.gz");
+//		new PopulationWriter(aaip.getOutPopulation()).write("/home/dhosse/Dokumente/01_eGAP/plansV7.xml.gz");
 		
 		//write config file
 		new ConfigWriter(config).write(Global.matsimInputDir + "configV2.xml");
@@ -226,7 +219,7 @@ public class GAPScenarioBuilder {
 	 * This is needed to shoot activity coordinates in municipalities or counties.
 	 * 
 	 */
-	private static void initMunicipalities(Scenario scenario){
+	public static void initMunicipalities(Scenario scenario){
 		
 		Municipalities.addEntry("09180112", (int) (446), 1559, 526);					//Bad Kohlgrub
 		Municipalities.addEntry("09180113", (int) (169), 772, 223);						//Bad Bayersoien

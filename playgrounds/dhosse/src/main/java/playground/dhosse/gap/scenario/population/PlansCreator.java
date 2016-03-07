@@ -23,19 +23,19 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.scenario.GAPScenarioBuilder;
 import playground.dhosse.gap.scenario.mid.MiDCSVReader;
 import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
 import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
 import playground.dhosse.gap.scenario.mid.MiDSurveyPerson;
-import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
-import playground.dhosse.gap.scenario.population.io.CommuterFileReader;
 import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
+import playground.dhosse.scenarios.generic.population.io.commuters.CommuterDataElement;
+import playground.dhosse.scenarios.generic.population.io.commuters.CommuterFileReader;
 import playground.dhosse.utils.EgapHashGenerator;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 public class PlansCreator {
 	
