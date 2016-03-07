@@ -85,6 +85,7 @@ public class GeoDistanceZoneHamiltonian {
         ZoneCollection zones = ((ZoneData) engine.getDataPool().get(ZoneDataLoader.KEY)).getLayer("nuts3");
         TObjectIntMap<Zone> indices = indexZones(engine.getSimPersons(), facilities, zones);
 
+        Map<String, Set<Attributable>> simLegsMap = getSimLegs(engine.getSimPersons(), engine.getLegPredicate());
 //        logger.debug("Copy person attribute to leg...");
 //        TaskRunner.run(new CopyPersonAttToLeg(PERSON_ZONE_IDX), engine.getSimPersons());
 
@@ -108,7 +109,9 @@ public class GeoDistanceZoneHamiltonian {
                     engine.getLegPredicate(),
                     new LegPersonAttributePredicate(PERSON_ZONE_IDX, String.valueOf(i)));
 
-            Set<Attributable> simLegs = getCarLegs(engine.getSimPersons(), pred);
+//            Set<Attributable> simLegs = getCarLegs(engine.getSimPersons(), pred);
+            Set<Attributable> simLegs = simLegsMap.get(String.valueOf(i));
+
             if(simLegs.size() > 0) {
             /*
             Create and add the hamiltonian.
@@ -179,6 +182,29 @@ public class GeoDistanceZoneHamiltonian {
         }
 
         return legs;
+    }
+
+    private static Map<String, Set<Attributable>> getSimLegs(Set<? extends Person> persons, Predicate<Segment> predicate) {
+        Map<String, Set<Attributable>> legsMap = new HashMap<>();
+        for (Person p : persons) {
+            String zoneIndex = p.getAttribute(PERSON_ZONE_IDX);
+
+            if(zoneIndex == null) throw new NullPointerException();
+
+            Episode e = p.getEpisodes().get(0);
+            for (Segment leg : e.getLegs()) {
+                if (predicate.test(leg)) {
+                    Set<Attributable> legs = legsMap.get(zoneIndex);
+                    if(legs == null) {
+                        legs = new HashSet<>();
+                        legsMap.put(zoneIndex, legs);
+                    }
+                    legs.add(leg);
+                }
+            }
+        }
+
+        return legsMap;
     }
 
     private static TObjectIntMap indexZones(Set<? extends Person> simPersons, ActivityFacilities facilities,

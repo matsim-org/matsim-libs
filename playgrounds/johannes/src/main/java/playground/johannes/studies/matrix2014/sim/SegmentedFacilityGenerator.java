@@ -20,6 +20,8 @@
 package playground.johannes.studies.matrix2014.sim;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.apache.log4j.Logger;
+import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -30,13 +32,17 @@ import playground.johannes.synpop.sim.ValueGenerator;
 import playground.johannes.synpop.sim.data.CachedElement;
 import playground.johannes.synpop.sim.data.CachedPerson;
 import playground.johannes.synpop.sim.data.CachedSegment;
+import playground.johannes.synpop.util.Executor;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author johannes
  */
 public class SegmentedFacilityGenerator implements ValueGenerator {
+
+    private static final Logger logger = Logger.getLogger(SegmentedFacilityGenerator.class);
 
     private final Object FACILITY_SEGMENTS_KEY = new Object();
 
@@ -50,7 +56,7 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
 
     private final List<ActivityFacility>[] allFacilities;
 
-    private final double localProba = 0.95;
+    private double localProba = 0.5;
 
     private final double threshold = 50000;
 
@@ -76,27 +82,68 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
         blacklist.add(type);
     }
 
-    private Map<Zone, List<ActivityFacility>[]> buildSegments(String type) {
-        QuadTree<ActivityFacility> spatialIndex = facilityData.getQuadTree(type);
-        Map<Zone, List<ActivityFacility>[]> map = new HashMap<>();
+    public void setLocalSegmentProbability(double proba) {
+        this.localProba = proba;
+    }
 
-        for(Zone zone : zones.getZones()) {
-            double x = zone.getGeometry().getCentroid().getX();
-            double y = zone.getGeometry().getCentroid().getY();
-            List<ActivityFacility> local = new ArrayList<>(spatialIndex.getDisk(x, y, threshold));
-            List<ActivityFacility> global = new ArrayList<>(facilities.getFacilities().values());
-            global.removeAll(local);
-            map.put(zone, new List[]{local, global});
+    private Map<Zone, List<ActivityFacility>[]> buildSegments(String type) {
+        logger.debug("Initializing facility segments...");
+
+        final QuadTree<ActivityFacility> spatialIndex = facilityData.getQuadTree(type);
+        final Map<Zone, List<ActivityFacility>[]> map = new ConcurrentHashMap<>();
+
+        int n = Executor.getFreePoolSize();
+        n = Math.max(n, 1);
+        List<Zone>[] segments = org.matsim.contrib.common.collections.CollectionUtils.split(zones.getZones(), n);
+
+        List<Runnable> threads = new ArrayList<>();
+        for(int i = 0; i < n; i++) {
+            threads.add(new RunThread(segments[i], spatialIndex, map, threshold));
         }
 
+        ProgressLogger.init(zones.getZones().size(), 2, 10);
+        Executor.submitAndWait(threads);
+        ProgressLogger.terminate();
+
         return map;
+    }
+
+    private static class RunThread implements Runnable {
+
+        private final List<Zone> zones;
+
+        private final QuadTree<ActivityFacility> spatialIndex;
+
+        private final Map<Zone, List<ActivityFacility>[]> map;
+
+        private final double threshold;
+
+        public RunThread(List<Zone> zones, QuadTree<ActivityFacility> spatialIndex, Map<Zone, List<ActivityFacility>[]> map, double threshold) {
+            this.zones = zones;
+            this.spatialIndex = spatialIndex;
+            this.map = map;
+            this.threshold = threshold;
+        }
+
+        @Override
+        public void run() {
+            for(Zone zone : zones) {
+                double x = zone.getGeometry().getCentroid().getX();
+                double y = zone.getGeometry().getCentroid().getY();
+                List<ActivityFacility> local = new ArrayList<>(spatialIndex.getDisk(x, y, threshold));
+                List<ActivityFacility> global = new ArrayList<>(spatialIndex.getRing(x, y, threshold, 2000000));
+                map.put(zone, new List[]{local, global});
+
+                ProgressLogger.step();
+            }
+        }
     }
 
     @Override
     public Object newValue(CachedElement act) {
         CachedPerson person = (CachedPerson) ((CachedSegment) act).getEpisode().getPerson();
 
-        String type = person.getAttribute(CommonKeys.ACTIVITY_TYPE);
+        String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
         boolean ignore = true;
         if (type != null) {
             ignore = blacklist.contains(type);
@@ -104,7 +151,7 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
 
         if (!ignore) {
             List<ActivityFacility>[] segments = (List<ActivityFacility>[]) person.getData(FACILITY_SEGMENTS_KEY);
-            if (segments == null) segments = initSegments(person);
+            if (segments == null) segments = initSegments(act);
 
             List<ActivityFacility> facilityList;
             if (random.nextDouble() > localProba) facilityList = segments[1];
