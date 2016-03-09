@@ -134,8 +134,9 @@ public class Incident2NetworkChangeEventsWriter {
 //			log.info("Creating network change event for traffic item " + item.getId() + " (" + this.trafficItemId2path.get(item.getId()).links.size() + " links)." );
 			
 			counter++;
-			if (counter % 1000 == 0) {
-				log.info("Traffic item: " + counter + " (" + (int) (( counter / (double) this.trafficItems.size()) * 100) + "%)"); 
+			if (counter % 100 == 0) {
+				log.info("Number of processed traffic item: " + counter + " (" + (int) (( counter / (double) this.trafficItems.size()) * 100) + "%)"); 
+				log.info("Number of day-relevant network incidents: " + dayNetworkIncidents.size());
 			}
 			
 			double startTime = Double.NEGATIVE_INFINITY;
@@ -196,7 +197,8 @@ public class Incident2NetworkChangeEventsWriter {
 					if (incident.getIncidentLink() != null) {
 						
 						if (dayLinkIds.contains(link.getId())) {
-														
+												
+							System.out.println("Iterating through existing incidents");
 							// check the existing incidents
 							ListIterator<NetworkIncident> it = dayNetworkIncidents.listIterator();
 							while (it.hasNext()) {
@@ -204,7 +206,8 @@ public class Incident2NetworkChangeEventsWriter {
 									
 								if (incident.getLink().getId().toString().equals(existingIncident.getLink().getId().toString())) {
 									// same link
-									
+									System.out.print(".");
+
 									if (incident.parametersToString().equals(existingIncident.parametersToString())) {
 										// all relevant parameters (start time, end time, flow capacity, freespeed, number of lanes) are the same --> no need to add the incident
 										
