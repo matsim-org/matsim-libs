@@ -92,7 +92,7 @@ public class QCALink extends AbstractQLink {
 			return transitionArea.acceptPedestrians();
 		}
 		@Override
-		void addFromUpstream(QVehicle veh) {
+		void addFromUpstream(QVehicle veh, double now) {
 			Pedestrian pedestrian = agentFactoryCA.buildPedestrian(environmentCA.getId(),veh,transitionArea);		
 			
 			double now = qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
@@ -104,7 +104,7 @@ public class QCALink extends AbstractQLink {
 		}
 
 		@Override
-		void updateRemainingFlowCapacity() {
+		void updateRemainingFlowCapacity(double now) {
 			throw new RuntimeException("not implemented") ;
 		}
 
@@ -118,7 +118,7 @@ public class QCALink extends AbstractQLink {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
-		void clearVehicles() {
+		void clearVehicles(double now) {
 			throw new RuntimeException("not implemented") ;
 		}
 
@@ -136,7 +136,7 @@ public class QCALink extends AbstractQLink {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
-		double getSimulatedFlowCapacity() {
+		double getSimulatedFlowCapacityPerTimeStep() {
 			throw new RuntimeException("not implemented") ;
 		}
 
@@ -151,7 +151,7 @@ public class QCALink extends AbstractQLink {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
-		boolean isAcceptingFromWait() {
+		boolean isAcceptingFromWait(double now) {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
@@ -165,7 +165,7 @@ public class QCALink extends AbstractQLink {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
-		QVehicle popFirstVehicle() {
+		QVehicle popFirstVehicle(double now) {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
@@ -183,11 +183,11 @@ public class QCALink extends AbstractQLink {
 		
 		// === time-dependent link characteristics (not needed) ===
 		@Override
-		void changeUnscaledFlowCapacityPerSecond(double val, double now) {
+		void changeUnscaledFlowCapacityPerSecond(double val) {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
-		void changeEffectiveNumberOfLanes(double val, double now) {
+		void changeEffectiveNumberOfLanes(double val) {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override

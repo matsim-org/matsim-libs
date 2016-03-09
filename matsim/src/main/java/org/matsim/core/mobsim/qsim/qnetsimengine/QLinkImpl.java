@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -86,7 +85,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		// yy get rid of this c'tor (since the one with queueWithBuffer is more flexible)?
 		super(link2, toNode, network) ;
 		//--
-		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this) ;
+		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this, qsimConfig) ;
 		builder.setVehicleQueue(vehicleQueue);
 		this.qlane = builder.build() ;
 		//--
@@ -121,12 +120,12 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	void clearVehicles() {
 		super.clearVehicles();
 
-		qlane.clearVehicles();
+		qlane.clearVehicles(now);
 	}
 
 	@Override
 	boolean doSimStep(double now) {
-		qlane.updateRemainingFlowCapacity();
+		qlane.updateRemainingFlowCapacity(now);
 
 		if ( this.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
 			this.moveWaitToRoad(now);
@@ -154,7 +153,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 *          the current time
 	 */
 	private void moveWaitToRoad(final double now) {
-		while (qlane.isAcceptingFromWait() ) {
+		while (qlane.isAcceptingFromWait(now) ) {
 			QVehicle veh = this.getWaitingList().poll();
 			if (veh == null) {
 				return;
@@ -185,11 +184,9 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override
 	public void recalcTimeVariantAttributes(double now) {
-
-		qlane.changeUnscaledFlowCapacityPerSecond(((LinkImpl)this.getLink()).getFlowCapacity(now), now);
-		qlane.changeEffectiveNumberOfLanes(this.getLink().getNumberOfLanes(now), now);
-		
-		qlane.recalcTimeVariantAttributes(now);
+		qlane.changeUnscaledFlowCapacityPerSecond( ((LinkImpl) this.getLink()).getFlowCapacityPerSec(now) );
+		qlane.changeEffectiveNumberOfLanes(this.getLink().getNumberOfLanes(now));
+		qlane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
 	}
 
 	@Override
@@ -229,8 +226,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
-	double getSimulatedFlowCapacity() {
-		return this.qlane.getSimulatedFlowCapacity() ;
+	double getSimulatedFlowCapacityPerTimeStep() {
+		return this.qlane.getSimulatedFlowCapacityPerTimeStep() ;
 	}
 
 	@Override

@@ -97,7 +97,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	
 	private final class FakeLane extends QLaneI {
 		@Override
-		void addFromUpstream(QVehicle veh) {
+		void addFromUpstream(QVehicle veh, double now) {
 			Id<Link> nextL = veh.getDriver().chooseNextLinkId();
 			Id<Node> leaveId = net.getLinks().get(nextL).getToNode().getId();
 			e.addFromUpstream( getLink().getFromNode().getId(), leaveId, veh);
@@ -118,19 +118,19 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 
 		@Override
-		void changeEffectiveNumberOfLanes(double arg0, double arg1) {
+		void changeEffectiveNumberOfLanes(double arg0) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		void changeUnscaledFlowCapacityPerSecond(double arg0, double arg1) {
+		void changeUnscaledFlowCapacityPerSecond(double arg0) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		void clearVehicles() {
+		void clearVehicles(double now) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
@@ -163,7 +163,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 
 		@Override
-		double getSimulatedFlowCapacity() {
+		double getSimulatedFlowCapacityPerTimeStep() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
@@ -198,7 +198,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 
 		@Override
-		boolean isAcceptingFromWait() {
+		boolean isAcceptingFromWait(double now) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
@@ -216,7 +216,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 
 		@Override
-		QVehicle popFirstVehicle() {
+		QVehicle popFirstVehicle(double now) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
@@ -228,7 +228,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 
 		@Override
-		void updateRemainingFlowCapacity() {
+		void updateRemainingFlowCapacity(double now) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}

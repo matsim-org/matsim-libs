@@ -74,11 +74,11 @@ class ClusterLink implements Link {
 	}
 
 	public double getFlowCapacity() {
-		return link.getFlowCapacity();
+		return link.getFlowCapacityPerSec();
 	}
 
 	public double getFlowCapacity(Double time) {
-		return link.getFlowCapacity(time);
+		return link.getFlowCapacityPerSec(time);
 	}
 
 	public final String getOrigId() {
@@ -90,7 +90,7 @@ class ClusterLink implements Link {
 	}
 
 	public final double getEuklideanDistance() {
-		return link.getEuklideanDistance();
+		return link.getEuklideanLength();
 	}
 
 	public double getCapacity() {
@@ -174,10 +174,10 @@ class ClusterLink implements Link {
 		return link.getCoord();
 	}
 
-	public Network getNetwork() {
-		return link.getNetwork();
-	}
-
+//	public Network getNetwork() {
+//		return link.getNetwork();
+//	}
+//
 	public NodeCluster getRootCluster() {
 		return rootCluster;
 	}

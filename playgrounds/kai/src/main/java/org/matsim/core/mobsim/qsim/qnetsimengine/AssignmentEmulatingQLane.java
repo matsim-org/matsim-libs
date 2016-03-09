@@ -112,12 +112,12 @@ class AssignmentEmulatingQLane extends QLaneI {
 		qLink.getToNode().activateNode();
 	}
 	@Override
-	public final boolean isAcceptingFromWait() {
+	public final boolean isAcceptingFromWait(double now) {
 		return true ; // we always accept
 	}
 
 	@Override
-	public final void updateRemainingFlowCapacity() {
+	public final void updateRemainingFlowCapacity(double now) {
 		// not doing anything
 	}
 
@@ -198,14 +198,6 @@ class AssignmentEmulatingQLane extends QLaneI {
 	}
 
 	@Override
-	public final void recalcTimeVariantAttributes( final double now) {
-		freespeedTravelTime = this.length / qLink.getLink().getFreespeed(now);
-		if (Double.isNaN(freespeedTravelTime)) {
-			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
-		}
-	}
-
-	@Override
 	public final QVehicle getVehicle(final Id vehicleId) {
 		for (QVehicle veh : this.vehQueue) {
 			if (veh.getId().equals(vehicleId))
@@ -227,7 +219,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 	}
 
 	@Override
-	public final QVehicle popFirstVehicle() {
+	public final QVehicle popFirstVehicle(double now) {
 		double now = qLink.getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = buffer.poll();
 		if (this.generatingEvents) {
@@ -247,7 +239,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 	}
 	
 	@Override
-	public final void clearVehicles() {
+	public final void clearVehicles(double now) {
 		double now = qLink.getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : vehQueue) {
@@ -268,7 +260,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 	}
 
 	@Override
-	public final void addFromUpstream(final QVehicle veh) {
+	public final void addFromUpstream(final QVehicle veh, double now) {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		qLink.activateLink();
 		this.vehEnterTimeMap.put( veh.getId(), now ) ;
@@ -330,30 +322,14 @@ class AssignmentEmulatingQLane extends QLaneI {
 		this.vehQueue.addFirst(veh) ;
 	}
 
-	final void changeLength(final double laneLengthMeters, double now) {
-		this.length = laneLengthMeters;
-		this.freespeedTravelTime = this.length / this.qLink.getLink().getFreespeed();
-		if (Double.isNaN(this.freespeedTravelTime)) {
-			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a lane. Please check the attributes lane length and freespeed of link!");
-		}
-		// be defensive (might now be called twice):
-		this.recalcTimeVariantAttributes(now);
-	}
-	
 	@Override
-	public final void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) {
+	public final void changeUnscaledFlowCapacityPerSecond( final double val ) {
 		// irrelevant so we ignore it
-		
-		// be defensive (someone might assume that this also pulls in the free speed)
-		this.recalcTimeVariantAttributes(now);
 	}
 	
 	@Override
-	public final void changeEffectiveNumberOfLanes( final double val, final double now ) {
+	public final void changeEffectiveNumberOfLanes( final double val ) {
 		// this variable will not do anything so we will ignore it.
-
-		// be defensive (maybe someone calls the above function and assumes it also pulls the speed)
-		this.recalcTimeVariantAttributes(now);
 	}
 	
 	Id getId() {
@@ -414,7 +390,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 			}
 			else {
 				snapshotInfoBuilder.positionAgentOnLink(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
-						AssignmentEmulatingQLane.this.length, ((LinkImpl)link).getEuklideanDistance() , veh, lastDistanceFromFromNode, lane, speedValue);
+						AssignmentEmulatingQLane.this.length, ((LinkImpl)link).getEuklideanLength() , veh, lastDistanceFromFromNode, lane, speedValue);
 			}
 			return lastDistanceFromFromNode;
 		}
@@ -425,7 +401,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 	}
 
 	@Override
-	double getSimulatedFlowCapacity() {
+	double getSimulatedFlowCapacityPerTimeStep() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
@@ -437,6 +413,10 @@ class AssignmentEmulatingQLane extends QLaneI {
 	@Override
 	boolean hasGreenForToLink(Id toLinkId) {
 		return true ;
+	}
+	@Override
+	void changeSpeedMetersPerSecond( double val ) {
+		throw new RuntimeException("not implemented") ;
 	}
 
 }

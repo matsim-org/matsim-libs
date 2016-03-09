@@ -151,7 +151,7 @@ class TimeVariantLinkImpl extends LinkImpl {
 	 * @return the flow capacity at time <tt>time</tt>.
 	 */
 	@Override
-	public synchronized double getFlowCapacity(final double time) {
+	public synchronized double getFlowCapacityPerSec(final double time) {
 
 		if (variableFlowCapacity.isRecalcRequired()) {
 			recalcFlowCapacity();
@@ -176,7 +176,7 @@ class TimeVariantLinkImpl extends LinkImpl {
 	 */
 	@Override
 	public synchronized double getCapacity(final double time) {
-		return getFlowCapacity() * getCapacityPeriod();
+		return getFlowCapacityPerSec() * getCapacityPeriod();
 	}
 
 
@@ -207,16 +207,16 @@ class TimeVariantLinkImpl extends LinkImpl {
 
 	
 	private synchronized void recalcFreespeed() {
-	    variableFreespeed.recalc(changeEvents, TimeVariantAttribute.FREESPEED_GETTER, freespeed);
+	    variableFreespeed.recalc(changeEvents, TimeVariantAttribute.FREESPEED_GETTER, this.getFreespeed() );
 	}
 
 	private synchronized void recalcFlowCapacity() {
-	    double baseFlowCapacity = this.capacity / getCapacityPeriod();
+	    double baseFlowCapacity = this.getCapacity() / getCapacityPeriod();
 	    variableFlowCapacity.recalc(changeEvents, TimeVariantAttribute.FLOW_CAPACITY_GETTER, baseFlowCapacity);
 	}
 
 	private synchronized void recalcLanes() {
-		variableLanes.recalc(changeEvents, TimeVariantAttribute.LANES_GETTER, nofLanes);
+		variableLanes.recalc(changeEvents, TimeVariantAttribute.LANES_GETTER, this.getNumberOfLanes() );
 	}
 }
 

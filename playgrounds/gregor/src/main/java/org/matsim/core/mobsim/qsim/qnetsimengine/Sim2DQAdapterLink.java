@@ -44,7 +44,7 @@ public class Sim2DQAdapterLink {
 	
 
 	public void addFromUpstream(QVehicle veh) {
-		this.ql.getAcceptingQLane().addFromUpstream(veh);
+		this.ql.getAcceptingQLane().addFromUpstream(veh, now);
 		
 	}
 }

@@ -78,7 +78,7 @@ public class AgentSnapshotInfoFactory {
 		info.setId(agentId) ;
 		double euklidean;
 		if (link instanceof LinkImpl){ //as for LinkImpl instances the Euklidean distance is already computed we can save computing time
-			euklidean = ((LinkImpl)link).getEuklideanDistance();
+			euklidean = ((LinkImpl)link).getEuklideanLength();
 		}
 		else {
 			euklidean = CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());

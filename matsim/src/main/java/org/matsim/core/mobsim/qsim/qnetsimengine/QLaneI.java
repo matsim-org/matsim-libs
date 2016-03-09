@@ -39,15 +39,13 @@ abstract class QLaneI {
 	
 	abstract void addFromWait( final QVehicle veh, final double now);
 
-	abstract boolean isAcceptingFromWait();
+	abstract boolean isAcceptingFromWait(double now);
 
-	abstract void updateRemainingFlowCapacity();
+	abstract void updateRemainingFlowCapacity(double now);
 
 	abstract boolean isActive();
 
-	abstract double getSimulatedFlowCapacity();
-
-	abstract void recalcTimeVariantAttributes(final double now);
+	abstract double getSimulatedFlowCapacityPerTimeStep();
 
 	abstract QVehicle getVehicle( final Id<Vehicle> vehicleId);
 
@@ -64,9 +62,9 @@ abstract class QLaneI {
 	 */
 	abstract void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
 	
-	abstract void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) ;
+	abstract void changeUnscaledFlowCapacityPerSecond( final double val ) ;
 
-	abstract void changeEffectiveNumberOfLanes( final double val, final double now ) ;
+	abstract void changeEffectiveNumberOfLanes( final double val ) ;
 
 	/**
 	 * Seems ok as public interface function. kai, aug'15
@@ -75,20 +73,22 @@ abstract class QLaneI {
 
 	/**
 	 * Seems ok as public interface function. kai, aug'15 
+	 * @param now TODO
 	 */
-	abstract void clearVehicles();
+	abstract void clearVehicles(double now);
 
 	abstract Collection<MobsimVehicle> getAllVehicles();
 
 	/**
 	 * <br>
 	 * seems ok as public interface function. kai, aug'15
+	 * @param now TODO
 	 */
-	abstract void addFromUpstream(final QVehicle veh);
+	abstract void addFromUpstream(final QVehicle veh, double now);
 
 	abstract boolean isNotOfferingVehicle();
 
-	abstract QVehicle popFirstVehicle();
+	abstract QVehicle popFirstVehicle(double now);
 
 	abstract QVehicle getFirstVehicle();
 
@@ -97,5 +97,7 @@ abstract class QLaneI {
 	abstract boolean hasGreenForToLink(final Id<Link> toLinkId);
 
 	abstract boolean isAcceptingFromUpstream();
+
+	abstract void changeSpeedMetersPerSecond(double val) ;
 
 }

@@ -140,7 +140,7 @@ public class Worker extends Thread implements BasicEventHandler{
 		Collections.sort(strings);
 		StringBuilder eventStr = new StringBuilder();
 		for (String str : strings) {
-			eventStr.append("_");
+			eventStr.append("|");
 			eventStr.append(str);
 		}
 		return eventStr.toString();

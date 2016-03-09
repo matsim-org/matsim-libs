@@ -32,13 +32,13 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
@@ -125,10 +125,10 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * The QueueLane instance which always exists.
 	 */
 	private QLaneI firstLaneQueue;
+
 	/**
 	 * A List holding all QueueLane instances of the QueueLink
 	 */
-
 	private final LinkedHashMap<Id<Lane>, QLaneI> laneQueues;
 
 	/**
@@ -155,12 +155,12 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		this.nextQueueToLinkCache = new LinkedHashMap<>(); // maps a lane id to a map containing the
 															// downstream queues indexed by a
 															// downstream link
-		this.initLaneQueues(lanes);
+		this.initLaneQueues();
 		this.visdata = this.new VisDataImpl();
 		this.setTransitQLink(new TransitQLink(this.firstLaneQueue));
 	}
 
-	private void initLaneQueues(List<ModelLane> lanes) {
+	private void initLaneQueues() {
 		Stack<QLaneI> stack = new Stack<>();
 		Map<Id<Lane>, QLaneI> queueByIdMap = new HashMap<>();
 		Map<Id<Lane>, Set<Id<Link>>> laneIdToLinksMap = new HashMap<>();
@@ -171,7 +171,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			// QLaneI queue = new QueueWithBuffer(this, new FIFOVehicleQ(), laneId,
 			// lane.getLength(), noEffectiveLanes,
 			// (lane.getLaneData().getCapacityVehiclesPerHour()/3600.0));
-			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this);
+			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this, qsimConfig);
 			builder.setVehicleQueue(new FIFOVehicleQ());
 			builder.setId(laneId);
 			builder.setLength(lane.getLength());
@@ -179,7 +179,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			builder.setFlowCapacity_s(lane.getLaneData().getCapacityVehiclesPerHour() / 3600.);
 			QLaneI queue = builder.build();
 			// --
-			((QueueWithBuffer) queue).generatingEvents = true;
+			((QueueWithBuffer) queue).generatingLaneEvents = true;
 			queueByIdMap.put(laneId, queue);
 			firstLaneQueue = queue;
 			stack.push(queue);
@@ -210,7 +210,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 					}
 				}
 			}
-			queue.recalcTimeVariantAttributes(Time.UNDEFINED_TIME);
+			queue.changeSpeedMetersPerSecond( this.getLink().getFreespeed() );
+			
 		}
 		// reverse the order in the linked map, i.e. upstream to downstream
 		while (!stack.isEmpty()) {
@@ -254,7 +255,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	void clearVehicles() {
 		super.clearVehicles();
 		for (QLaneI lane : this.laneQueues.values()) {
-			lane.clearVehicles();
+			lane.clearVehicles(now);
 		}
 	}
 
@@ -279,7 +280,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	private boolean moveLanes(double now) {
 		boolean activeLane = false;
 		for (QLaneI queue : this.laneQueues.values()) {
-			queue.updateRemainingFlowCapacity();
+			queue.updateRemainingFlowCapacity(now);
 			
 			/* part A */
 			if (!this.toNodeLaneQueues.contains(queue)) {
@@ -318,22 +319,22 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		return activeLane;
 	}
 
-	private void moveBufferToNextLane(final double now, QLaneI queue) {
+	private void moveBufferToNextLane(final double now, QLaneI qlane) {
 		QVehicle veh;
-		while (!queue.isNotOfferingVehicle()) {
-			veh = queue.getFirstVehicle();
+		while (!qlane.isNotOfferingVehicle()) {
+			veh = qlane.getFirstVehicle();
 			Id<Link> toLinkId = veh.getDriver().chooseNextLinkId();
-			QLaneI nextQueue = this.chooseNextLane(queue, toLinkId);
+			QLaneI nextQueue = this.chooseNextLane(qlane, toLinkId);
 			if (nextQueue != null) {
 				if (nextQueue.isAcceptingFromUpstream()) {
-					((QueueWithBuffer) queue).removeFirstVehicle();
+					((QueueWithBuffer) qlane).removeFirstVehicle(now);
 					this.getQnetwork().simEngine
 							.getMobsim()
 							.getEventsManager()
 							.processEvent(
 									new LaneLeaveEvent(now, veh.getId(), this.getLink()
-											.getId(), ((QueueWithBuffer) queue).getId()));
-					nextQueue.addFromUpstream(veh);
+											.getId(), ((QueueWithBuffer) qlane).getId()));
+					nextQueue.addFromUpstream(veh, now);
 					this.getQnetwork().simEngine
 							.getMobsim()
 							.getEventsManager()
@@ -348,7 +349,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				b.append("Person Id: ");
 				b.append(veh.getDriver().getId());
 				b.append(" is on Lane Id ");
-				b.append(((QueueWithBuffer) queue).getId());
+				b.append(((QueueWithBuffer) qlane).getId());
 				b.append(" on Link Id ");
 				b.append(this.getLink().getId());
 				b.append(" and wants to drive to Link Id ");
@@ -386,7 +387,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 */
 	private boolean moveWaitToRoad(final double now) {
 		boolean movedWaitToRoad = false;
-		while (this.firstLaneQueue.isAcceptingFromWait()) {
+		while (this.firstLaneQueue.isAcceptingFromWait(now)) {
 			QVehicle veh = this.getWaitingList().poll();
 			if (veh == null) {
 				return movedWaitToRoad;
@@ -428,9 +429,11 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	public void recalcTimeVariantAttributes(double time) {
+	public void recalcTimeVariantAttributes(double now) {
 		for (QLaneI lane : this.laneQueues.values()) {
-			lane.recalcTimeVariantAttributes(time);
+			lane.changeEffectiveNumberOfLanes( getLink().getNumberOfLanes( now ) ) ;
+			lane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
+			lane.changeUnscaledFlowCapacityPerSecond( ((LinkImpl)getLink()).getFlowCapacityPerSec(now) );
 		}
 	}
 
@@ -489,7 +492,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 *         relation to the SimulationTimer's simticktime.
 	 */
 	double getSimulatedFlowCapacity() {
-		return this.firstLaneQueue.getSimulatedFlowCapacity();
+		return this.firstLaneQueue.getSimulatedFlowCapacityPerTimeStep();
 	}
 
 	/**

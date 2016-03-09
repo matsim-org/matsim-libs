@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
@@ -114,7 +115,7 @@ public class QNode implements NetsimNode {
 	 * The ParallelQSim replaces the activator with the QSimEngineRunner 
 	 * that handles this node.
 	 */
-	/*package*/ void setNetElementActivator(NetElementActivationRegistry activator) {
+	/*package*/ void setNetElementActivationRegistry(NetElementActivationRegistry activator) {
 		this.activator = activator;
 	}
 
@@ -263,20 +264,20 @@ public class QNode implements NetsimNode {
 			log.error( "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
 					+ " currentLink=" + currentLink.getId().toString()
 					+ ". The agent is removed from the simulation.");
-			moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now);
+			moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now, currentLink.getId());
 			return true;
 		}
 
 		QLinkI nextQueueLink = network.getNetsimLinks().get(nextLinkId);
 		if ( !checkNextLinkSemantics(currentLink, nextLinkId, nextQueueLink, veh) ) {
-			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now ) ;
+			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now, currentLink.getId() ) ;
 			return true ;
 		}
 		
 		QLaneI nextQueueLane = nextQueueLink.getAcceptingQLane() ;
 
 		if (nextQueueLane.isAcceptingFromUpstream()) {
-			moveVehicleFromInlinkToOutlink(veh, fromLaneBuffer, nextLinkId, nextQueueLane);
+			moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLaneBuffer, nextLinkId, nextQueueLane);
 			return true;
 		}
 
@@ -286,10 +287,10 @@ public class QNode implements NetsimNode {
 			 * die here, we have a config setting for that!
 			 */
 			if (network.simEngine.getMobsim().getScenario().getConfig().qsim().isRemoveStuckVehicles()) {
-				moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now);
+				moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now, currentLink.getId());
 				return false ;
 			} else {
-				moveVehicleFromInlinkToOutlink(veh, fromLaneBuffer, nextLinkId, nextQueueLane);
+				moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLaneBuffer, nextLinkId, nextQueueLane);
 				return true; 
 				// (yyyy why is this returning `true'?  Since this is a fix to avoid gridlock, this should proceed in small steps. 
 				// kai, feb'12) 
@@ -301,8 +302,11 @@ public class QNode implements NetsimNode {
 	}
 
 	private static int wrnCnt = 0 ;
-	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final QLaneI fromLane, final double now) {
-		fromLane.popFirstVehicle();
+	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final QLaneI fromLane, final double now, Id<Link> currentLinkId) {
+		fromLane.popFirstVehicle(now);
+		// -->
+		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
+		// <--
 		
 		// first treat the passengers:
 		for ( PassengerAgent pp : veh.getPassengers() ) {
@@ -322,14 +326,20 @@ public class QNode implements NetsimNode {
 	
 	}
 
-	private void moveVehicleFromInlinkToOutlink(final QVehicle veh, final QLaneI fromLane, Id<Link> nextLinkId, QLaneI nextQueueLane) {
-		fromLane.popFirstVehicle();
-		veh.getDriver().notifyMoveOverNode( nextLinkId );
-		nextQueueLane.addFromUpstream(veh);
+	private void moveVehicleFromInlinkToOutlink(final QVehicle veh, Id<Link> currentLinkId, final QLaneI fromLane, Id<Link> nextLinkId, QLaneI nextQueueLane) {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
-		this.network.simEngine.getMobsim().getEventsManager().processEvent(
-				new LinkEnterEvent(now, veh.getId(), nextLinkId ));
 
+		fromLane.popFirstVehicle(now);
+		// -->
+		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
+		// <--
+
+		veh.getDriver().notifyMoveOverNode( nextLinkId );
+
+		nextQueueLane.addFromUpstream(veh, now);
+		// -->
+		this.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId ));
+		// <--
 	}
 
 	private boolean vehicleIsStuck(final QLaneI fromLaneBuffer, final double now) {

@@ -745,7 +745,7 @@ public class PTQLink implements NetsimLink, TimeVariantLink {
 	}
 
 	private void calculateFlowCapacity(final double time) {
-		this.flowCapacityPerTimeStep = ((LinkImpl)this.getLink()).getFlowCapacity(time);
+		this.flowCapacityPerTimeStep = ((LinkImpl)this.getLink()).getFlowCapacityPerSec(time);
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep
 				* network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
@@ -794,7 +794,7 @@ public class PTQLink implements NetsimLink, TimeVariantLink {
 			//
 			// Alternative would be to have link entry capacity constraint.  This, however, does not work so well with the
 			// current "parallel" logic, where capacity constraints are modeled only on the link.  kai, nov'10
-			double bnFlowCap_s = ((LinkImpl)this.link).getFlowCapacity() ;
+			double bnFlowCap_s = ((LinkImpl)this.link).getFlowCapacityPerSec() ;
 
 			// ( c * n_cells - cap * L ) / (L * c) = (n_cells/L - cap/c) ;
 			congestedDensity_veh_m = this.storageCapacity/this.link.getLength() - (bnFlowCap_s*3600.)/(15.*1000) ;
