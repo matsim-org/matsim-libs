@@ -55,8 +55,8 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 
 	private static final Logger log = Logger.getLogger(ExternalEngine.class);
 
-//	private final CyclicBarrier simStepBarrier = new CyclicBarrier(2);
-	private final Map<Id<Person>, QVehicle> vehicles = new HashMap<>();
+	//	private final CyclicBarrier simStepBarrier = new CyclicBarrier(2);
+	private final Map<String, QVehicle> vehicles = new HashMap<>();
 	private final Map<Id<Link>, QLinkInternalIAdapter> adapters = new HashMap<>();
 	private final EventsManager em;
 	private final Netsim sim;
@@ -69,7 +69,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 		this.em = eventsManager;
 		this.sim = sim;
 		this.net = sim.getScenario().getNetwork();
-		this.client = new GRPCExternalClient("localhost",8989);
+		this.client = new GRPCExternalClient("localhost", 8989);
 	}
 
 	public void registerAdapter(QLinkInternalIAdapter external2qAdapterLink) {
@@ -214,8 +214,35 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 		HybridSimProto.Empty resp = this.client.getBlockingStub().simulatedTimeInerval(req);
 
 		//retrieve trajectories
+		HybridSimProto.Empty reqTr = HybridSimProto.Empty.getDefaultInstance();
+		HybridSimProto.Trajectories trs = this.client.getBlockingStub().receiveTrajectories(reqTr);
+		for (HybridSimProto.Trajectory tr : trs.getTrajectoriesList()) {
+			QVehicle veh = this.vehicles.get(tr.getId());
+			Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
+			if (veh.getDriver().chooseNextLinkId().toString().equals(tr.getLinkId())) {
+
+				this.em.processEvent(new LinkLeaveEvent(time, veh.getId(), veh.getCurrentLink().getId()));
+				veh.getDriver().notifyMoveOverNode(nextLinkId);
+				this.em.processEvent(new LinkEnterEvent(time, veh.getId(), nextLinkId));
+			}
+			//TODO xyvxvy events
+		}
 
 		//retrieve agents
+		HybridSimProto.Empty reqRtrv = HybridSimProto.Empty.getDefaultInstance();
+		HybridSimProto.Agents rtrvs = this.client.getBlockingStub().retrieveAgents(reqRtrv);
+		//TODO check whether qsim has sapce (isAccaptingFromUpstream())
+		for (HybridSimProto.Agent agent : rtrvs.getAgentsList()) {
+			QVehicle v = this.vehicles.remove(agent.getId());
+			QLinkInternalIAdapter ql = this.adapters.get(v.getDriver().chooseNextLinkId());
+			if (!ql.isAcceptingFromUpstream()) {
+				throw new RuntimeException("DS link is full, spill-back to external is not yet implemented!");
+			}
+			this.em.processEvent(new LinkLeaveEvent(time, v.getId(), v.getCurrentLink().getId()));
+			v.getDriver().notifyMoveOverNode(ql.getLink().getId());
+			ql.addFromUpstream(v);
+		}
+
 	}
 
 	//rpc MATSim --> extern
@@ -260,7 +287,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 
 		PersonDriverAgentImpl driver = (PersonDriverAgentImpl) veh.getDriver();
 
-		this.vehicles.put(driver.getId(), veh);
+		this.vehicles.put(driver.getId().toString(), veh);
 		Id<Link> currentLinkId = driver.getCurrentLinkId();
 
 
@@ -275,7 +302,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 		HybridSimProto.Leg.Builder lb = ab.getLegBuilder();
 //		ab.setLeg(lb);
 
-		for (Id<Link> linkId : linkIds ) {
+		for (Id<Link> linkId : linkIds) {
 
 			if (!extRd && linkId == currentLinkId) {
 				Link l = this.net.getLinks().get(linkId);
@@ -284,7 +311,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 			}
 			if (extRd) {
 				Link l = this.net.getLinks().get(linkId);
-				if (!l.getAllowedModes().contains("ext")){
+				if (!l.getAllowedModes().contains("ext")) {
 					break;
 				}
 				HybridSimProto.Link.Builder llb = HybridSimProto.Link.newBuilder();
@@ -301,9 +328,9 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 
 		HybridSimProto.Boolean resp = this.client.getBlockingStub().transferAgent(ab.build());
 
-		if (resp.getVal()) {
-			log.info("success!");
-		}
+//		if (resp.getVal()) {
+//			log.info("success!");
+//		}
 
 
 //		double now = this.sim.getSimTimer().getTimeOfDay();
@@ -314,15 +341,11 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 //		this.em.processEvent(new LinkEnterEvent(now, veh.getId(), nextLId));
 
 
-
 //		Interfacedef.MATSim2ExternPutAgent.Agent.Builder ab = Interfacedef.MATSim2ExternPutAgent.Agent.newBuilder();
 //		ab.setEnterNode(enterId.toString()).setId(driverId.toString()).setLeaveNode(leaveId.toString());
 //		Interfacedef.MATSim2ExternPutAgent addReq = Interfacedef.MATSim2ExternPutAgent.newBuilder().setAgent(ab).build();
 //		Interfacedef.MATSim2ExternPutAgentConfirmed addReqResp = this.client.getBlockingStub().reqMATSim2ExternPutAgent(addReq);
 	}
-
-
-
 
 
 }

@@ -42,7 +42,7 @@ public class Example {
 
 	private static final Logger log = Logger.getLogger(Example.class);
 
-	public static void main(String [] args) throws IOException {
+	public static void main(String [] args) throws IOException, InterruptedException {
 
 		ExternalRunner r = new ExternalRunner();
 		Thread t1 = new Thread(r);
@@ -51,6 +51,8 @@ public class Example {
 		Config c = ConfigUtils.createConfig();
 		c.network().setInputFile("./src/main/resources/network.xml");
 		c.plans().setInputFile("./src/main/resources/population.xml");
+		c.controler().setLastIteration(0);
+		c.controler().setWriteEventsInterval(1);
 
 		final Scenario sc = ScenarioUtils.loadScenario(c);
 		final Controler controller = new Controler(sc);
@@ -78,20 +80,30 @@ public class Example {
 			}
 		});
 		controller.run();
-
 	}
 
 	private static final class ExternalRunner implements Runnable {
 
+
+		private Process process;
+
+		public ExternalRunner() {
+		}
+
 		@Override
 		public void run() {
-			Process process = null;
 			try {
-				process = new ProcessBuilder("/usr/local/bin/jpscore","./src/main/resources/corridor_ini.xml").start();
+				//TODO: this requires jpscore from the sumo_grpc branch to be installed
+				//probably it would be good to have jpscore as a maven dependency [gl Mar'16]
+				this.process = new ProcessBuilder("/usr/local/bin/jpscore","./src/main/resources/corridor_ini.xml").start();
 				logToLog(process);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+
+		public void destroy() {
+			this.process.destroy();
 		}
 	}
 
@@ -102,7 +114,7 @@ public class Example {
 			BufferedReader br = new BufferedReader(isr);
 			String l = br.readLine();
 			while (l != null) {
-				log.info(l);
+				log.info("FROM EXTERN:" + l);
 				l = br.readLine();
 			}
 		}
@@ -112,7 +124,7 @@ public class Example {
 			BufferedReader br = new BufferedReader(isr);
 			String l = br.readLine();
 			while (l != null) {
-				log.error(l);
+				log.error("FROM EXTERN:" + l);
 				l = br.readLine();
 			}
 		}
