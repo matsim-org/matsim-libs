@@ -126,16 +126,16 @@ public class Incident2Network {
 
 				} else {
 					
-					log.info("Cutting implausible network links from path...");
-					log.info("Previous path distance: " + computePathDistance(incidentPath));
-					log.info("Previous number of links in path: " + incidentPath.links.size());
+//					log.info("Cutting implausible network links from path...");
+//					log.info("Previous path distance: " + computePathDistance(incidentPath));
+//					log.info("Previous number of links in path: " + incidentPath.links.size());
 					
 					for (Id<Link> cutLinkId : linkIDsToCutOut) {
 						incidentPath.links.remove(scenario.getNetwork().getLinks().get(cutLinkId));
 					}
 
-					log.info("New path distance: " + computePathDistance(incidentPath));
-					log.info("New number of links in path: " + incidentPath.links.size());
+//					log.info("New path distance: " + computePathDistance(incidentPath));
+//					log.info("New number of links in path: " + incidentPath.links.size());
 					
 				}
 			}

@@ -27,14 +27,20 @@ import org.matsim.api.core.v01.network.Link;
 
 public class NetworkIncident {
 
+	private String id = null;
 	private double startTime = 0.;
 	private double endTime = 0.;
 	private Link link = null;
 	private Link incidentLink = null;
 	
-	public NetworkIncident(double startTime, double endTime) {
+	public NetworkIncident(String id, double startTime, double endTime) {
+		this.id = id;
 		this.startTime = startTime;
 		this.endTime = endTime;
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public Link getLink() {
@@ -57,22 +63,19 @@ public class NetworkIncident {
 		return endTime;
 	}
 
-	public void setStartTime(double startTime) {
-		this.startTime = startTime;
-	}
-
-	public void setEndTime(double endTime) {
-		this.endTime = endTime;
-	}
-
-	@Override
-	public String toString() {
+	public String parametersToString() {
 		return "NetworkIncident [startTime=" + startTime + ", endTime=" + endTime + ", incidentLink=" + incidentLink.getCapacity() + "-" + incidentLink.getFreespeed() + "-" + incidentLink.getNumberOfLanes()
 				+ ", link=" + link.getCapacity() + "-" + link.getFreespeed() + "-" + link.getNumberOfLanes() + "]";
 	}
 
 	public void setIncidentLink(Link trafficIncidentLink) {
 		this.incidentLink = trafficIncidentLink;
+	}
+
+	@Override
+	public String toString() {
+		return "NetworkIncident [id=" + id + ", startTime=" + startTime + ", endTime=" + endTime + ", link=" + link.getCapacity() + "-" + link.getFreespeed() + "-" + link.getNumberOfLanes()
+				+ ", incidentLink=" + incidentLink.getCapacity() + "-" + incidentLink.getFreespeed() + "-" + incidentLink.getNumberOfLanes() + "]";
 	}
 
 }
