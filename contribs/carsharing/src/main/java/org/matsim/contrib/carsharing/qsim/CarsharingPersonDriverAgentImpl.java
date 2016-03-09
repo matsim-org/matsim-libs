@@ -465,7 +465,8 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		}
 		else if (currentLeg.getMode().equals("freefloating")) {
 
-			this.carSharingVehicles.getFreeFLoatingVehicles().addVehicle(scenario.getNetwork().getLinks().get(this.getDestinationLinkId()), ffVehId);
+			this.carSharingVehicles.getFreeFLoatingVehicles()
+				.addVehicle(scenario.getNetwork().getLinks().get(this.getDestinationLinkId()), ffVehId);
 			ffVehId = null;
 		}
 	}
@@ -478,24 +479,27 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				scenario.getConfig().getModule("TwoWayCarsharing");
 		
 		Link link = scenario.getNetwork().getLinks().get(linkId);
-
-		Collection<TwoWayCarsharingStation> location = this.carSharingVehicles.getTwoWayVehicles().getQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), Double.parseDouble(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("searchDistanceTwoWayCarsharing")));
+		double searchDistance = twConfigGroup.getsearchDistance();
+		Collection<TwoWayCarsharingStation> location = 
+				this.carSharingVehicles.getTwoWayVehicles().getQuadTree().getDisk(link.getCoord().getX(), 
+						link.getCoord().getY(), searchDistance );
 		if (location.isEmpty()) 
 			return null;
 		
-		double distanceSearch = twConfigGroup.getsearchDistance();
 		TwoWayCarsharingStation closest = null;
 		for(TwoWayCarsharingStation station: location) {
-			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord()) < searchDistance 
+					&& station.getNumberOfVehicles() > 0) {
 				closest = station;
-				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord());
+				searchDistance = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord());
 			}	
 		}
 		return closest;
 	}	
 
 	private FreeFloatingStation findClosestAvailableCar(Link link) {
-		FreeFloatingStation location = this.carSharingVehicles.getFreeFLoatingVehicles().getQuadTree().getClosest(link.getCoord().getX(), link.getCoord().getY());
+		FreeFloatingStation location = this.carSharingVehicles
+				.getFreeFLoatingVehicles().getQuadTree().getClosest(link.getCoord().getX(), link.getCoord().getY());
 		return location;
 	}
 
@@ -508,12 +512,15 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				scenario.getConfig().getModule("OneWayCarsharing");
 		double distanceSearch = owConfigGroup.getsearchDistance() ;
 
-		Collection<OneWayCarsharingStation> location = this.carSharingVehicles.getOneWayVehicles().getQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), distanceSearch);
+		Collection<OneWayCarsharingStation> location = 
+				this.carSharingVehicles.getOneWayVehicles().getQuadTree().getDisk(link.getCoord().getX(), 
+						link.getCoord().getY(), distanceSearch);
 		if (location.isEmpty()) return null;
 
 		OneWayCarsharingStation closest = null;
 		for(OneWayCarsharingStation station: location) {
-			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord()) < distanceSearch && station.getNumberOfVehicles() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord()) < distanceSearch 
+					&& station.getNumberOfVehicles() > 0) {
 				closest = station;
 				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord());
 			}
@@ -531,12 +538,15 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		double distanceSearch = owConfigGroup.getsearchDistance();
 
-		Collection<OneWayCarsharingStation> location = this.carSharingVehicles.getOneWayVehicles().getQuadTree().getDisk(link.getCoord().getX(), link.getCoord().getY(), distanceSearch);
+		Collection<OneWayCarsharingStation> location = 
+				this.carSharingVehicles.getOneWayVehicles().getQuadTree().getDisk(link.getCoord().getX(), 
+						link.getCoord().getY(), distanceSearch);
 		if (location.isEmpty()) return null;
 
 		OneWayCarsharingStation closest = null;
 		for(OneWayCarsharingStation station: location) {
-			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord()) < distanceSearch && station.getNumberOfAvailableParkingSpaces() > 0) {
+			if (CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord()) < distanceSearch 
+					&& station.getNumberOfAvailableParkingSpaces() > 0) {
 				closest = station;
 				distanceSearch = CoordUtils.calcEuclideanDistance(link.getCoord(), station.getCoord());
 			}
