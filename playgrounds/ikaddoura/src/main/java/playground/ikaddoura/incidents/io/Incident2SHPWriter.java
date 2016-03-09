@@ -114,7 +114,7 @@ public class Incident2SHPWriter {
 	
 	public Object[] getIncidentObject(Link link, TrafficItem trafficItem) {
 		
-		Link incidentLink = tmc.computeTrafficIncident(link, trafficItem);
+		Link incidentLink = tmc.getTrafficIncidentLink(link, trafficItem);
 
 		if (incidentLink == null) {
 			return null;
@@ -147,8 +147,8 @@ public class Incident2SHPWriter {
 				incidentLink.getFreespeed(),
 					
 				// start and end time
-				trafficItem.getStartTime(),
-				trafficItem.getEndTime()
+				trafficItem.getStartDateTime(),
+				trafficItem.getEndDateTime()
 		};
 		return incidentObject;
 	}

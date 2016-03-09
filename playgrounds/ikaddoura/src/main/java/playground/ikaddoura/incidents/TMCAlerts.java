@@ -47,15 +47,7 @@ public class TMCAlerts {
 	private final Set<String> loggedCodeAssumedAsMinusOneLane = new HashSet<>();
 	private int warnCnt = 0;
 	
-	private Network network = null;
-	private NetworkFactoryImpl nf = null;
-	
-	public TMCAlerts() {
-		network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
-		nf = new NetworkFactoryImpl(network);
-	}
-
-	public final boolean trafficItemIsAnUpdate(TrafficItem trafficItem) {
+	public static final boolean trafficItemIsAnUpdate(TrafficItem trafficItem) {
 		
 		if (trafficItem.getTMCAlert().getPhraseCode().endsWith("86") ||
 				trafficItem.getTMCAlert().getPhraseCode().endsWith("87") ||
@@ -103,7 +95,7 @@ public class TMCAlerts {
 		}
 	}
 	
-	public final Link computeTrafficIncident(Link link, TrafficItem trafficItem) {
+	public final Link getTrafficIncidentLink(Link link, TrafficItem trafficItem) {
 		Link incidentLink = null;
 		
 		if (trafficItem.getTMCAlert() != null && trafficItem.getTMCAlert().getPhraseCode() != null) {
@@ -112,6 +104,9 @@ public class TMCAlerts {
 				// skip update traffic items
 				
 			} else {
+				
+				Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
+				NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 								
 				// closed roads
 				if (containsOrEndsWith(trafficItem, "C1")
@@ -322,7 +317,7 @@ public class TMCAlerts {
 		}
 	}
 	
-	private double reduceSpeedToNextFreeSpeedLevel(Link link) {
+	private static double reduceSpeedToNextFreeSpeedLevel(Link link) {
 		double changedFreeSpeed = 0.;
 
 			if (link.getFreespeed() >= 16.66667) {

@@ -28,8 +28,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -56,9 +59,9 @@ public class Incident2Network {
 	private final Map<String, Path> trafficItemId2path = new HashMap<>();
 	private final Set<String> trafficItemsToCheck = new HashSet<>();
 	
-	public Incident2Network(Scenario scenario, Network carNetwork, Map<String, TrafficItem> trafficItems) {
+	public Incident2Network(Scenario scenario, Map<String, TrafficItem> trafficItems) {
 		this.scenario = scenario;
-		this.carNetwork = carNetwork;
+		this.carNetwork = loadCarNetwork(scenario);
 		this.trafficItems = trafficItems;
 	}
 
@@ -128,7 +131,7 @@ public class Incident2Network {
 					log.info("Previous number of links in path: " + incidentPath.links.size());
 					
 					for (Id<Link> cutLinkId : linkIDsToCutOut) {
-						incidentPath.links.remove(carNetwork.getLinks().get(cutLinkId));
+						incidentPath.links.remove(scenario.getNetwork().getLinks().get(cutLinkId));
 					}
 
 					log.info("New path distance: " + computePathDistance(incidentPath));
@@ -177,6 +180,30 @@ public class Incident2Network {
 		}	
 		
 		return pathDistance;
+	}
+	
+	private Network loadCarNetwork(Scenario scenario) {
+		log.info("Creating car network... ");
+
+		Network carNetwork = NetworkUtils.createNetwork();
+		NetworkFactory factory = new NetworkFactoryImpl(carNetwork);
+		
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			if (link.getAllowedModes().contains(TransportMode.car)) {
+				
+				if (!carNetwork.getNodes().containsKey(link.getFromNode().getId())) {
+					carNetwork.addNode(factory.createNode(link.getFromNode().getId(), link.getFromNode().getCoord()));
+				}
+				if (!carNetwork.getNodes().containsKey(link.getToNode().getId())) {
+					carNetwork.addNode(factory.createNode(link.getToNode().getId(), link.getToNode().getCoord()));
+				}
+				
+				carNetwork.addLink(factory.createLink(link.getId(), link.getFromNode(), link.getToNode()));
+			}
+		}	
+		
+		log.info("Creating car network... Done.");
+		return carNetwork;
 	}
 
 	public Map<String, Path> getTrafficItemId2path() {
