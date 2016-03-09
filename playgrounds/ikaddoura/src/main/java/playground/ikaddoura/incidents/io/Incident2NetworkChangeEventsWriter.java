@@ -78,8 +78,15 @@ public class Incident2NetworkChangeEventsWriter {
 			
 			log.info("Writing network change events for day " + DateTime.secToDateTimeString(dateInSec));
 			
-			final List<NetworkIncident> dayNetworkIncidents = getDayNetworkIncidents(dateInSec);
-			final List<NetworkChangeEvent> allChangeEvents = getNetworkChangeEvents(dayNetworkIncidents);
+			List<NetworkIncident> dayNetworkIncidents = new ArrayList<>();
+			dayNetworkIncidents = getDayNetworkIncidents(dateInSec);
+			
+			log.info("Network incidents: " + dayNetworkIncidents.size());
+			
+			List<NetworkChangeEvent> allChangeEvents = new ArrayList<>();
+			allChangeEvents = getNetworkChangeEvents(dayNetworkIncidents);
+			
+			log.info("Network change events: " + allChangeEvents.size());
 			
 			new NetworkChangeEventsWriter().write(outputDirectory + "networkChangeEvents_" + DateTime.secToDateTimeString(dateInSec) + ".xml.gz", allChangeEvents);
 			dateInSec = dateInSec + 24 * 3600.;
@@ -121,10 +128,16 @@ public class Incident2NetworkChangeEventsWriter {
 	private List<NetworkIncident> getDayNetworkIncidents(double dateInSec) {
 		List<NetworkIncident> dayNetworkIncidents = new ArrayList<>();
 		Set<Id<Link>> dayLinkIds = new HashSet<>();
+		int counter = 0;
 		
 		for (TrafficItem item : this.trafficItems.values()) {
 //			log.info("Creating network change event for traffic item " + item.getId() + " (" + this.trafficItemId2path.get(item.getId()).links.size() + " links)." );
-		
+			
+			counter++;
+			if (counter % 1000 == 0) {
+				log.info("Traffic item: " + counter + " (" + (int) (( counter / (double) this.trafficItems.size()) * 100) + "%)"); 
+			}
+			
 			double startTime = Double.NEGATIVE_INFINITY;
 			double endTime = Double.NEGATIVE_INFINITY;
 			

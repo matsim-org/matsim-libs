@@ -47,6 +47,8 @@ public class TMCAlerts {
 	private final Set<String> loggedCodeAssumedAsMinusOneLane = new HashSet<>();
 	private int warnCnt = 0;
 	
+	private final boolean printLogStatements = false;
+	
 	public static final boolean trafficItemIsAnUpdate(TrafficItem trafficItem) {
 		
 		if (trafficItem.getTMCAlert().getPhraseCode().endsWith("86") ||
@@ -158,11 +160,13 @@ public class TMCAlerts {
 						remainingNumberOfLanes = link.getNumberOfLanes() - 1.;
 					}
 					
-					if (loggedCodeAssumedAsMinusOneLane.contains(trafficItem.getTMCAlert().getDescription())) {
-						// warning for this message already logged
-					} else {
-						log.warn("Assuming that there is only one lane closed. Check the message: " + trafficItem.getTMCAlert().getDescription());
-						loggedCodeAssumedAsMinusOneLane.add(trafficItem.getTMCAlert().getDescription());
+					if (printLogStatements) {
+						if (loggedCodeAssumedAsMinusOneLane.contains(trafficItem.getTMCAlert().getDescription())) {
+							// warning for this message already logged
+						} else {
+							log.warn("Assuming that there is only one lane closed. Check the message: " + trafficItem.getTMCAlert().getDescription());
+							loggedCodeAssumedAsMinusOneLane.add(trafficItem.getTMCAlert().getDescription());
+						}
 					}
 					
 					incidentLink = nf.createLink(link.getId(), link.getFromNode(), link.getToNode());
@@ -282,12 +286,14 @@ public class TMCAlerts {
 					logCodeConsideredAsCapacityAndSpeedReduction(trafficItem.getTMCAlert().getPhraseCode(), trafficItem.getTMCAlert().getDescription());
 					
 				} else {
-					if (unconsideredCodes.contains(trafficItem.getTMCAlert().getPhraseCode())) {
-						// warning for code already logged
-					} else {
-						log.warn("+++ Code " +  trafficItem.getTMCAlert().getPhraseCode() + " / message: " + trafficItem.getTMCAlert().getDescription() + " is not defined! Check if code is important and needs to be added. +++");
-						unconsideredCodes.add(trafficItem.getTMCAlert().getPhraseCode());
-					}				
+					if (printLogStatements) {
+						if (unconsideredCodes.contains(trafficItem.getTMCAlert().getPhraseCode())) {
+							// warning for code already logged
+						} else {
+							log.warn("+++ Code " +  trafficItem.getTMCAlert().getPhraseCode() + " / message: " + trafficItem.getTMCAlert().getDescription() + " is not defined! Check if code is important and needs to be added. +++");
+							unconsideredCodes.add(trafficItem.getTMCAlert().getPhraseCode());
+						}	
+					}			
 				}
 			}
 		}
@@ -296,11 +302,13 @@ public class TMCAlerts {
 	}
 
 	private void logCodeConsideredAsCapacityAndSpeedReduction(String alertCode, String description) {
-		if (loggedCodeAssumedAsCapacityHalving.contains(alertCode)) {
-			// warning for code already logged
-		} else {
-			log.warn("Code " +  alertCode + " / message: " + description + " is interpreted as an incident where the capacity is halved, the speed is reduced and the number of lanes is set to 1 lane.");
-			loggedCodeAssumedAsCapacityHalving.add(alertCode);
+		if (printLogStatements) {
+			if (loggedCodeAssumedAsCapacityHalving.contains(alertCode)) {
+				// warning for code already logged
+			} else {
+				log.warn("Code " +  alertCode + " / message: " + description + " is interpreted as an incident where the capacity is halved, the speed is reduced and the number of lanes is set to 1 lane.");
+				loggedCodeAssumedAsCapacityHalving.add(alertCode);
+			}
 		}
 	}
 

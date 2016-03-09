@@ -111,10 +111,10 @@ public class IncidentDataAnalysis {
 		final Map<String, Path> trafficItemId2path = networkMapper.getTrafficItemId2path();
 		final Set<String> trafficItemsToCheck = networkMapper.getTrafficItemsToCheck();
 
-		// write shape file
-		final Incident2SHPWriter shpWriter = new Incident2SHPWriter(this.tmc, this.trafficItems, trafficItemId2path);
-		shpWriter.writeIncidentLinksToShapeFile(outputDirectory + "incidentLinks.shp", this.trafficItems.keySet());
-		shpWriter.writeIncidentLinksToShapeFile(outputDirectory + "incidentLinksToCheck.shp", trafficItemsToCheck);
+//		// write shape file
+//		final Incident2SHPWriter shpWriter = new Incident2SHPWriter(this.tmc, this.trafficItems, trafficItemId2path);
+//		shpWriter.writeIncidentLinksToShapeFile(outputDirectory + "incidentLinks.shp", this.trafficItems.keySet());
+//		shpWriter.writeIncidentLinksToShapeFile(outputDirectory + "incidentLinksToCheck.shp", trafficItemsToCheck);
 
 		// write network change events
 		final Incident2NetworkChangeEventsWriter nceWriter = new Incident2NetworkChangeEventsWriter(this.tmc, this.trafficItems, trafficItemId2path);
