@@ -242,9 +242,9 @@ public class Incident2NetworkChangeEventsWriter {
 
 										} else {
 																			
-											log.warn("Different incident parameters and overlapping times.");
-											log.warn("Incident: " + incident);
-											log.warn("Existing incident: " + existingIncident);
+//											log.warn("Different incident parameters and overlapping times.");
+//											log.warn("Incident: " + incident);
+//											log.warn("Existing incident: " + existingIncident);
 
 											NetworkIncident firstPartIncident = null;
 											NetworkIncident middlePartIncident = null;
