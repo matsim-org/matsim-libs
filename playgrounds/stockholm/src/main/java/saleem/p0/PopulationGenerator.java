@@ -73,8 +73,8 @@ public class PopulationGenerator {
 			 * we keep the home coordinates for later use (see below).
 			 * Note that we use the CoordinateTransformation created above.
 			 */
-//			Coord homeCoordinates = new Coord(683474.55573, 4826700.65288);
-			Coord homeCoordinates = new Coord(686661.13571, 4827510.51845);
+			Coord homeCoordinates = new Coord(683474.55573, 4826700.65288);
+//			Coord homeCoordinates = new Coord(686661.13571, 4827510.51845);
 			Activity activity1 = populationFactory.createActivityFromCoord("home", homeCoordinates);
 			activity1.setEndTime(21600 + i*0.72); // leave at 6 o'clock, one vehicle entering after other in a short while so that there is no peak at one second
 			//activity1.setEndTime(21600);
@@ -105,8 +105,8 @@ public class PopulationGenerator {
 			Person person = populationFactory.createPerson(Id.createPersonId(key));
 			population.addPerson(person);
 			Plan plan = populationFactory.createPlan();
-//			Coord homeCoordinates = new Coord(683474.55573, 4826700.65288);
-			Coord homeCoordinates = new Coord(686661.13571, 4826063.88649);
+			Coord homeCoordinates = new Coord(683474.55573, 4826700.65288);
+//			Coord homeCoordinates = new Coord(686661.13571, 4826063.88649);
 
 			Activity activity1 = populationFactory.createActivityFromCoord("home", homeCoordinates);
 			activity1.setEndTime(21600 + i*1.2); // leave at 6 o'clock

@@ -159,7 +159,7 @@ public class P0ControlHandler implements BasicEventHandler{
 				bintime = event.getTime() - event.getTime()%500;
 				if(averagedelaylink2!=0)delaysLink2.put(bintime, averagedelaylink2);
 				if(averagedelaylink4!=0)delaysLink4.put(bintime, averagedelaylink4);
-				adjustCapacityP0(bintime-500);
+				adjustCapacityP0(1, 1,bintime-500);
 				double abspreslink2 = averagedelaylink2*satcapacity2;
 				double abspres1ink4 = averagedelaylink4*satcapacity4;	
 				double abspresdiff = Math.abs(abspreslink2 - abspres1ink4);
@@ -200,9 +200,10 @@ public class P0ControlHandler implements BasicEventHandler{
 			lastcapacitiesLink4.put(key, capacitiesLink4.get(key));
 		}
 	}
-	public void adjustCapacityP0(double time) {
-		   double p2 = averagedelaylink2 * satcapacity2;//where satcapacity2 and satcapacity4 refer to saturation capacity, and capacity2 and capacity4 refer to flow capacities
-		   double p4 = averagedelaylink4 * satcapacity4;
+	public void adjustCapacityP0(double w2, double w4, double time) {
+		
+		   double p2 = averagedelaylink2 * w2;//where w2 and w4 are equal to saturationflow2 and saturationflow4 for unblocked junctions, and 1 each for blocked junctions
+		   double p4 = averagedelaylink4 * w4;
 		   if(iter==0){
 			   return;
 		   }
