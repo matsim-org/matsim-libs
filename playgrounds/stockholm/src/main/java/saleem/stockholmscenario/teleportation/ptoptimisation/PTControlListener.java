@@ -14,7 +14,7 @@ public class PTControlListener implements StartupListener, IterationStartsListen
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// TODO Auto-generated method stub
-			adapter = new TransitScheduleAdapter(scenario);
+			adapter = new TransitScheduleAdapter();
 	}
 
 	@Override
