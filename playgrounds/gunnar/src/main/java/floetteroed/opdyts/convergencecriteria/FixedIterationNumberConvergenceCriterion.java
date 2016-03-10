@@ -68,11 +68,6 @@ public class FixedIterationNumberConvergenceCriterion implements
 	// --------------- IMPLEMENTATION OF ConvergenceCriterion ---------------
 
 	@Override
-	public double effectiveAveragingIterations() {
-		return this.averagingIterations;
-	}
-
-	@Override
 	public <U extends DecisionVariable> ConvergenceCriterionResult evaluate(
 			final List<Transition<U>> mostRecentTransitionSequence,
 			final int totalTransitionSequenceLength) {

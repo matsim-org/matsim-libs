@@ -27,6 +27,7 @@ import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import floetteroed.utilities.Units;
 import floetteroed.utilities.config.ConfigReader;
 import floetteroed.utilities.math.MathHelpers;
@@ -191,13 +192,18 @@ class OptimizeRoadpricing {
 		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
 		randomSearch.setConvergenceTrackingFileName(originalOutputDirectory
 				+ "opdyts.conv");
-		randomSearch.setMaxMemory(averageIterations);
-		
+		randomSearch.setMaxTotalMemory(averageIterations);
+
 		/*
 		 * Run it.
 		 */
-		randomSearch.run(initialEquilibriumWeight, initialUniformityWeight,
-				adjustWeights);
+		if (adjustWeights) {
+			final SelfTuner selfTuner = new SelfTuner(0.95);
+			selfTuner.setNoisySystem(true);
+			randomSearch.run(selfTuner);
+		} else {
+			randomSearch.run(initialEquilibriumWeight, initialUniformityWeight);
+		}
 
 		System.out.println("... DONE.");
 	}

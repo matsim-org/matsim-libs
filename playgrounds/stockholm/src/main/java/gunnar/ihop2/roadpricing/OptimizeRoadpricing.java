@@ -126,7 +126,7 @@ class OptimizeRoadpricing {
 		/*
 		 * Run it.
 		 */
-		randomSearch.run();
+		randomSearch.run(0, 0);
 
 		System.out.println("... DONE.");
 	}

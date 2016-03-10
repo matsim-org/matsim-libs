@@ -25,6 +25,7 @@
 package floetteroed.opdyts.trajectorysampling;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
@@ -90,11 +91,13 @@ class TransitionSequence<U extends DecisionVariable> {
 		this.additionCnt++;
 	}
 
-	void shrinkToMaximumLength(final int maximumLength) {
+	List<Transition<U>> shrinkToMaximumLength(final int maximumLength) {
+		final List<Transition<U>> removed = new LinkedList<>();
 		while (this.transitions.size() > maximumLength) {
 			// old transitions are removed from the front
-			this.transitions.removeFirst();
+			removed.add(this.transitions.removeFirst());
 		}
+		return removed;
 	}
 
 	// -------------------- GETTERS --------------------

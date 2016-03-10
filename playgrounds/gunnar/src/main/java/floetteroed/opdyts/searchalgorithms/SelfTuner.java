@@ -22,7 +22,7 @@ public class SelfTuner {
 
 	// -------------------- MEMBERS --------------------
 
-	final double measWeightFact;
+	final double inertia;
 
 	// most recent ones first
 	private final LinkedList<List<Double>> equililibriumGaps = new LinkedList<>();
@@ -40,10 +40,16 @@ public class SelfTuner {
 
 	private double uniformityGapWeight = 0.0;
 
+	private boolean noisySystem = false;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public SelfTuner(final double inertia) {
-		this.measWeightFact = Math.sqrt(inertia);
+		this.inertia = Math.sqrt(inertia);
+	}
+
+	public void setNoisySystem(final boolean noisySystem) {
+		this.noisySystem = noisySystem;
 	}
 
 	// -------------------- GETTERS --------------------
@@ -66,13 +72,13 @@ public class SelfTuner {
 			{
 				int i = 0;
 				if (equilGaps != null) {
-					x.set(i++, this.measWeightFact * equilGaps.get(k));
+					x.set(i++, this.inertia * equilGaps.get(k));
 				}
 				if (unifGaps != null) {
-					x.set(i, this.measWeightFact * unifGaps.get(k));
+					x.set(i, this.inertia * unifGaps.get(k));
 				}
 			}
-			regr.update(x, this.measWeightFact
+			regr.update(x, this.inertia
 					* abs(avgObjFctVals.get(k) - finalObjFctVal));
 		}
 	}
@@ -92,9 +98,13 @@ public class SelfTuner {
 		int i = 0;
 		if (useEquilGap) {
 			this.equilibriumGapWeight = regr.getCoefficients().get(i++);
+		} else {
+			this.equilibriumGapWeight = 0.0;
 		}
 		if (useUnifGap) {
 			this.uniformityGapWeight = regr.getCoefficients().get(i);
+		} else {
+			this.uniformityGapWeight = 0.0;
 		}
 	}
 
@@ -115,25 +125,26 @@ public class SelfTuner {
 		this.avgObjFctVals.addFirst(newAvgObjFctVals);
 		this.finalObjFctVals.addFirst(newFinalObjFctVal);
 
-		this.fit(true, true);
-		if (this.equilibriumGapWeight < 0.0) {
-			this.equilibriumGapWeight = 0.0;
-			if (this.uniformityGapWeight < 0.0) {
-				this.uniformityGapWeight = 0.0;
+		if (this.noisySystem) {
+			this.fit(true, true);
+			if ((this.equilibriumGapWeight < 0.0)) {
+				if (this.uniformityGapWeight > 0.0) {
+					this.fit(false, true);
+				} else {
+					// both non-positive, constrain to (0, 0)
+				}
 			} else {
-				this.fit(false, true);
-				this.uniformityGapWeight = Math.max(0.0,
-						this.uniformityGapWeight);
+				if (this.uniformityGapWeight < 0.0) {
+					this.fit(true, false);
+				} else {
+					// both non-negative, no constraint needed
+				}
 			}
 		} else {
-			if (this.uniformityGapWeight < 0.0) {
-				this.fit(true, false);
-				this.uniformityGapWeight = Math.max(0.0,
-						this.uniformityGapWeight);
-			} else {
-				// nothing to do, all weights non-negative
-			}
+			this.fit(true, false);
 		}
+		this.equilibriumGapWeight = Math.max(0.0, this.equilibriumGapWeight);
+		this.uniformityGapWeight = Math.max(0.0, this.uniformityGapWeight);
 
 		Logger.getLogger(this.getClass().getName()).info(
 				"v=" + this.equilibriumGapWeight + ", w="

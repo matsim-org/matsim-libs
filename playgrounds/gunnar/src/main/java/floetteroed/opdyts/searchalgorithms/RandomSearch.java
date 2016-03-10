@@ -30,8 +30,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -65,6 +63,8 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	public static final String RANDOM_SEARCH_ITERATION = "Random Search Iteration";
 
+	public static final String BEST_OVERALL_SOLUTION = "Best Overall Solution";
+
 	private final Simulator<U> simulator;
 
 	private final DecisionVariableRandomizer<U> randomizer;
@@ -87,23 +87,13 @@ public class RandomSearch<U extends DecisionVariable> {
 
 	private final boolean includeCurrentBest;
 
-	private int maxMemory = Integer.MAX_VALUE;
+	private int maxTotalMemory = Integer.MAX_VALUE;
+
+	private int maxMemoryPerTrajectory = Integer.MAX_VALUE;
+
+	private boolean maintainAllTrajectories = true;
 
 	// -------------------- MEMBERS --------------------
-
-	private List<DecisionVariable> bestDecisionVariables = new ArrayList<DecisionVariable>();
-
-	private List<Double> bestObjectiveFunctionValues = new ArrayList<Double>();
-
-	private List<Integer> transitionEvaluations = new ArrayList<Integer>();
-
-	private List<Double> interpolatedObjectiveFunctionValueWeights = new ArrayList<Double>();
-
-	private List<Double> equilibriumGapWeights = new ArrayList<Double>();
-
-	private List<Double> uniformityGapWeights = new ArrayList<Double>();
-
-	private List<Double> offsets = new ArrayList<Double>();
 
 	private String logFileName = null;
 
@@ -144,8 +134,16 @@ public class RandomSearch<U extends DecisionVariable> {
 		this.convergenceTrackingFileName = convergenceTrackingFileName;
 	}
 
-	public void setMaxMemory(final int maxMemory) {
-		this.maxMemory = maxMemory;
+	public void setMaxTotalMemory(final int maxTotalMemory) {
+		this.maxTotalMemory = maxTotalMemory;
+	}
+
+	public void setMaxMemoryPerTrajectory(final int maxMemoryPerTrajectory) {
+		this.maxMemoryPerTrajectory = maxMemoryPerTrajectory;
+	}
+
+	public void setMaintainAllTrajectories(final boolean maintainAllTrajectories) {
+		this.maintainAllTrajectories = maintainAllTrajectories;
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -161,23 +159,30 @@ public class RandomSearch<U extends DecisionVariable> {
 		}
 	}
 
-	public void run() {
-		this.run(0.0, 0.0, true);
+	// public void run() {
+	// this.run(0.0, 0.0, true);
+	// }
+
+	public void run(double equilibriumGapWeight, double uniformityGapWeight) {
+		this.run(equilibriumGapWeight, uniformityGapWeight, null);
 	}
 
-	public void run(double equilibriumGapWeight, double uniformityGapWeight,
-			final boolean adjustWeights) {
+	public void run(final SelfTuner selfTuner) {
+		this.run(0.0, 0.0, selfTuner);
+	}
+
+	private void run(double equilibriumGapWeight, double uniformityGapWeight,
+			SelfTuner weightOptimizer) {
 
 		this.deleteIfPossible(this.logFileName);
 		this.deleteIfPossible(this.convergenceTrackingFileName);
 
-		final SelfTuner weightOptimizer;
-		if (adjustWeights) {
-			weightOptimizer = new SelfTuner(0.95);
-			// weightOptimizer = new SelfTuner(1.0, 0.05, 1, 0.01);
-		} else {
-			weightOptimizer = null;
-		}
+		// final SelfTuner weightOptimizer;
+		// if (adjustWeights) {
+		// weightOptimizer = new SelfTuner(0.95); // TODO
+		// } else {
+		// weightOptimizer = null;
+		// }
 
 		U bestDecisionVariable = this.initialDecisionVariable;
 		Double bestObjectiveFunctionValue = null;
@@ -191,11 +196,6 @@ public class RandomSearch<U extends DecisionVariable> {
 							+ ", transitions " + this.transitions + " of "
 							+ this.maxTransitions + " ====================");
 
-			this.interpolatedObjectiveFunctionValueWeights.add(1.0);
-			this.equilibriumGapWeights.add(equilibriumGapWeight);
-			this.uniformityGapWeights.add(uniformityGapWeight);
-			this.offsets.add(Double.NaN);
-
 			final Set<U> candidates = new LinkedHashSet<U>();
 			if (this.includeCurrentBest) {
 				candidates.add(bestDecisionVariable);
@@ -208,14 +208,20 @@ public class RandomSearch<U extends DecisionVariable> {
 			int transitionsPerIteration = 0;
 			U newBestDecisionVariable;
 			double newBestObjectiveFunctionValue;
+
 			if (this.interpolate) {
+
+				/*
+				 * >>>>>>>>>>>>>>>>>>>> PARALLEL SAMPLING >>>>>>>>>>>>>>>>>>>>
+				 */
 
 				final ParallelTrajectorySampler<U> sampler;
 				sampler = new ParallelTrajectorySampler<>(candidates,
 						this.objectBasedObjectiveFunction,
 						this.convergenceCriterion, this.rnd,
 						equilibriumGapWeight, uniformityGapWeight, (it > 0),
-						this.maxMemory);
+						this.maxTotalMemory, this.maxMemoryPerTrajectory,
+						this.maintainAllTrajectories);
 
 				if (this.logFileName != null) {
 					sampler.addStatistic(this.logFileName,
@@ -251,7 +257,7 @@ public class RandomSearch<U extends DecisionVariable> {
 							new Statistic<SamplingStage<U>>() {
 								@Override
 								public String label() {
-									return "Best Overall Solution";
+									return BEST_OVERALL_SOLUTION;
 								}
 
 								@Override
@@ -312,15 +318,6 @@ public class RandomSearch<U extends DecisionVariable> {
 				}
 
 				if (weightOptimizer != null) {
-
-					// final List<Transition<U>> allTransitions = sampler
-					// .getTransitions(newBestDecisionVariable);
-					// weightOptimizer.update(allTransitions,
-					// sampler.getDecisionVariable2convergenceResultView()
-					// .get(newBestDecisionVariable));
-					// weightOptimizer.update(sampler.getSamplingStages(),
-					// sampler.getDecisionVariable2convergenceResultView()
-					// .get(newBestDecisionVariable));
 					weightOptimizer
 							.update(sampler.getSamplingStages(),
 									sampler.getDecisionVariable2convergenceResultView()
@@ -331,7 +328,15 @@ public class RandomSearch<U extends DecisionVariable> {
 							.getUniformityGapWeight();
 				}
 
+				/*
+				 * <<<<<<<<<<<<<<<<<<<< PARALLEL SAMPLING <<<<<<<<<<<<<<<<<<<<
+				 */
+
 			} else {
+
+				/*
+				 * >>>>>>>>>>>>>>>>>>>> SEQUENTIAL SAMPLING >>>>>>>>>>>>>>>>>>>>
+				 */
 
 				if (bestObjectiveFunctionValue != null) {
 					try {
@@ -376,6 +381,10 @@ public class RandomSearch<U extends DecisionVariable> {
 					transitionsPerIteration += singleSampler
 							.getTotalTransitionCnt();
 				}
+
+				/*
+				 * <<<<<<<<<<<<<<<<<<<< SEQUENTIAL SAMPLING <<<<<<<<<<<<<<<<<<<<
+				 */
 			}
 
 			if (bestObjectiveFunctionValue == null
@@ -383,42 +392,7 @@ public class RandomSearch<U extends DecisionVariable> {
 				bestDecisionVariable = newBestDecisionVariable;
 				bestObjectiveFunctionValue = newBestObjectiveFunctionValue;
 			}
-
-			this.bestDecisionVariables.add(bestDecisionVariable);
-			this.bestObjectiveFunctionValues.add(bestObjectiveFunctionValue);
-			this.transitionEvaluations.add(transitionsPerIteration);
 			this.transitions += transitionsPerIteration;
 		}
-	}
-
-	// -------------------- RESULT ACCESS --------------------
-
-	public List<DecisionVariable> getBestDecisionVariablesView() {
-		return Collections.unmodifiableList(this.bestDecisionVariables);
-	}
-
-	public List<Double> getBestObjectiveFunctionValuesView() {
-		return Collections.unmodifiableList(this.bestObjectiveFunctionValues);
-	}
-
-	public List<Integer> getTransitionEvalautionsView() {
-		return Collections.unmodifiableList(this.transitionEvaluations);
-	}
-
-	public List<Double> getInterpolatedObjectiveFunctionValueWeightsView() {
-		return Collections
-				.unmodifiableList(this.interpolatedObjectiveFunctionValueWeights);
-	}
-
-	public List<Double> getEquilibriumGapWeightsView() {
-		return Collections.unmodifiableList(this.equilibriumGapWeights);
-	}
-
-	public List<Double> getUniformityWeightsView() {
-		return Collections.unmodifiableList(this.uniformityGapWeights);
-	}
-
-	public List<Double> getOffsetsView() {
-		return Collections.unmodifiableList(this.offsets);
 	}
 }

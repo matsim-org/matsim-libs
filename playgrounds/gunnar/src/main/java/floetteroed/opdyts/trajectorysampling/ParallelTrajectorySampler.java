@@ -105,7 +105,9 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 			final ObjectiveFunction objectBasedObjectiveFunction,
 			final ConvergenceCriterion convergenceCriterion, final Random rnd,
 			final double equilibriumWeight, final double uniformityWeight,
-			final boolean appendToLogFile, final int maxMemory) {
+			final boolean appendToLogFile, final int maxTotalMemory,
+			final int maxMemoryPerTrajectory,
+			final boolean maintainAllTrajectories) {
 		this.decisionVariablesToBeTriedOut = new LinkedHashSet<U>(
 				decisionVariables);
 		this.objectiveFunction = objectBasedObjectiveFunction;
@@ -114,7 +116,8 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		this.equilibriumWeight = equilibriumWeight;
 		this.uniformityWeight = uniformityWeight;
 		this.statisticsWriter = new StatisticsMultiWriter<>(appendToLogFile);
-		this.allTransitionSequences = new TransitionSequenceSet<U>(maxMemory);
+		this.allTransitionSequences = new TransitionSequenceSet<U>(
+				maxTotalMemory, maxMemoryPerTrajectory, maintainAllTrajectories);
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -270,7 +273,10 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 				this.fromState.implementInSimulation();
 			}
 			this.currentDecisionVariable.implementInSimulation();
-			this.statisticsWriter.writeToFile(null);
+			this.statisticsWriter.writeToFile(null, EquilibriumGapWeight.LABEL,
+					Double.toString(this.equilibriumWeight),
+					UniformityGapWeight.LABEL,
+					Double.toString(this.uniformityWeight));
 
 		} else {
 

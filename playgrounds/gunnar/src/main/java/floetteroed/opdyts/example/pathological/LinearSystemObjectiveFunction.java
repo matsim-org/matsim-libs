@@ -11,15 +11,15 @@ import floetteroed.utilities.math.Vector;
  */
 public class LinearSystemObjectiveFunction implements ObjectiveFunction {
 
-	public LinearSystemObjectiveFunction() {
+	private final Vector coeffs;
+	
+	public LinearSystemObjectiveFunction(double... coeffs) {
+		this.coeffs = new Vector(coeffs);
 	}
 
 	@Override
 	public double value(final SimulatorState state) {
 		final Vector x = ((VectorState) state).getX();
-		// final Vector dx = Vector.diff(x, new Vector(10.0, 10.0));
-		// final double _Q = dx.innerProd(dx);
-		final double _Q = -x.get(0);
-		return _Q;
+		return coeffs.innerProd(x);
 	}
 }
