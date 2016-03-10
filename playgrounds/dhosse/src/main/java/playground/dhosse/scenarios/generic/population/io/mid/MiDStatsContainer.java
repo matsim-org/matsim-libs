@@ -1,4 +1,4 @@
-package playground.dhosse.gap.scenario.mid;
+package playground.dhosse.scenarios.generic.population.io.mid;
 
 import org.matsim.contrib.minibus.genericUtils.RecursiveStatsContainer;
 

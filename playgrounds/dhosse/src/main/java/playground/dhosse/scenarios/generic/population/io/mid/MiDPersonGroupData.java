@@ -1,15 +1,11 @@
-package playground.dhosse.gap.scenario.mid;
+package playground.dhosse.scenarios.generic.population.io.mid;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.population.Person;
 
 import playground.dhosse.gap.Global;
-import playground.dhosse.gap.scenario.mid.MiDCSVReader.MiDData;
-import playground.dhosse.gap.scenario.mid.MiDCSVReader.MiDWaypoint;
 
 /**
  * 
@@ -31,7 +27,6 @@ public class MiDPersonGroupData {
 	private final int lowerBoundAge;
 	private final int upperBoundAge;
 	private final int sex;
-	private List<MiDData> data;
 	
 	//average number of legs per person and day
 	private double legsPerPersonAndDay;
@@ -65,7 +60,6 @@ public class MiDPersonGroupData {
 		this.lowerBoundAge = a0;
 		this.upperBoundAge = aX;
 		this.sex = sex;
-		this.data = new ArrayList<>();
 		
 		this.activityOptions.put(Global.ActType.work.name(), new ActivityOption(Global.ActType.work.name(), 0.));
 		this.activityOptions.put(Global.ActType.education.name(), new ActivityOption(Global.ActType.education.name(), 0.));
@@ -87,7 +81,6 @@ public class MiDPersonGroupData {
 		this.lowerBoundAge = a0;
 		this.upperBoundAge = aX;
 		this.sex = 0;
-		this.data = new ArrayList<>();
 		
 		this.activityOptions.put(Global.ActType.work.name(), new ActivityOption(Global.ActType.work.name(), 0.));
 		this.activityOptions.put(Global.ActType.education.name(), new ActivityOption(Global.ActType.education.name(), 0.));
@@ -156,113 +149,6 @@ public class MiDPersonGroupData {
 
 	public void setpCarAvail(double pCarAvail) {
 		this.pCarAvail = pCarAvail;
-	}
-	
-	public void addData(MiDData data){
-		this.data.add(data);
-	}
-	
-	public void addData(List<MiDData> data){
-		
-		if(data != null){
-
-			for(MiDData d : data){
-				
-				for(MiDWaypoint wp : d.getWayPoints()){
-					
-					if(wp.purpose.equals(Global.ActType.home.name())){
-						if(wp.distance != Double.NEGATIVE_INFINITY){
-							this.home.handleDistance(wp.distance);
-						}
-						if(wp.duration != Double.NEGATIVE_INFINITY){
-							this.home.handleDuration(wp.duration);
-						}
-						if(wp.startTime != Double.NEGATIVE_INFINITY){
-							this.home.handleStartTime(wp.startTime);
-						}
-						if(wp.endTime != Double.NEGATIVE_INFINITY){
-							this.home.handleEndTime(wp.endTime);
-						}
-					} else if(wp.purpose.equals(Global.ActType.work.name())){
-						if(wp.distance != Double.NEGATIVE_INFINITY){
-							this.work.handleDistance(wp.distance);
-						}
-						if(wp.duration != Double.NEGATIVE_INFINITY){
-							this.work.handleDuration(wp.duration);
-						}
-						if(wp.startTime != Double.NEGATIVE_INFINITY){
-							this.work.handleStartTime(wp.startTime);
-						}
-						if(wp.endTime != Double.NEGATIVE_INFINITY){
-							this.work.handleEndTime(wp.endTime);
-						}
-					} else if(wp.purpose.equals(Global.ActType.education.name())){
-						if(wp.distance != Double.NEGATIVE_INFINITY){
-							this.education.handleDistance(wp.distance);
-						}
-						if(wp.duration != Double.NEGATIVE_INFINITY){
-							this.education.handleDuration(wp.duration);
-						}
-						if(wp.startTime != Double.NEGATIVE_INFINITY){
-							this.education.handleStartTime(wp.startTime);
-						}
-						if(wp.endTime != Double.NEGATIVE_INFINITY){
-							this.education.handleEndTime(wp.endTime);
-						}
-					} else if(wp.purpose.equals(Global.ActType.shop.name())){
-						if(wp.distance != Double.NEGATIVE_INFINITY){
-							this.shop.handleDistance(wp.distance);
-						}
-						if(wp.duration != Double.NEGATIVE_INFINITY){
-							this.shop.handleDuration(wp.duration);
-						}
-						if(wp.startTime != Double.NEGATIVE_INFINITY){
-							this.shop.handleStartTime(wp.startTime);
-						}
-						if(wp.endTime != Double.NEGATIVE_INFINITY){
-							this.shop.handleEndTime(wp.endTime);
-						}
-					} else if(wp.purpose.equals(Global.ActType.leisure.name())){
-							if(wp.distance != Double.NEGATIVE_INFINITY){
-								this.leisure.handleDistance(wp.distance);
-							}
-							if(wp.duration != Double.NEGATIVE_INFINITY){
-								this.leisure.handleDuration(wp.duration);
-							}
-							if(wp.startTime != Double.NEGATIVE_INFINITY){
-								this.leisure.handleStartTime(wp.startTime);
-							}
-							if(wp.endTime != Double.NEGATIVE_INFINITY){
-								this.leisure.handleEndTime(wp.endTime);
-							}
-						} else if(wp.purpose.equals(Global.ActType.other.name())){
-							if(wp.distance != Double.NEGATIVE_INFINITY){
-								this.other.handleDistance(wp.distance);
-							}
-							if(wp.duration != Double.NEGATIVE_INFINITY){
-								this.other.handleDuration(wp.duration);
-							}
-							if(wp.startTime != Double.NEGATIVE_INFINITY){
-								this.other.handleStartTime(wp.startTime);
-							}
-							if(wp.endTime != Double.NEGATIVE_INFINITY){
-								this.other.handleEndTime(wp.endTime);
-							}
-						}
-				}
-				
-				this.data.add(d);
-				
-			}
-			
-		}
-		
-	}
-	
-	public List<MiDData> getData(){
-		
-		return this.data;
-		
 	}
 
 	public MiDStatsContainer getHomeStats() {
