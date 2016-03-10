@@ -280,7 +280,7 @@ public class GeometryUtils {
 	 */
 	public static String geometryToWKB(Geometry g, CoordinateTransformation transformation){
 		
-		StringBuilder wkb = new StringBuilder(LITTLE_ENDIAN);
+		StringBuilder wkb = new StringBuilder(BIG_ENDIAN);
 		
 		if(g instanceof Point){
 			
