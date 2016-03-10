@@ -1,6 +1,6 @@
 package playground.wrashid.parkingChoice.freeFloatingCarSharing;
 
-import com.google.inject.Provider;
+import com.google.inject.name.Names;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -13,7 +13,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -22,8 +21,10 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.controler.listener.FFListener;
-import playground.balac.freefloating.qsimParkingModule.FreeFloatingQsimFactory;
 import playground.balac.freefloating.routerparkingmodule.FreeFloatingRoutingModule;
+import playground.balac.onewaycarsharingredisgned.config.OneWayCarsharingRDConfigGroup;
+import playground.wrashid.freefloating.qsim.FreeFloatingQsimFactory;
+import playground.wrashid.parkingChoice.config.ParkingChoiceConfigGroup;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,8 +38,11 @@ public static void main(final String[] args) throws IOException {
     	final Config config = ConfigUtils.loadConfig(args[0]);
     	FreeFloatingConfigGroup configGroup = new FreeFloatingConfigGroup();
     	config.addModule(configGroup);
+    	ParkingChoiceConfigGroup configGroupP = new ParkingChoiceConfigGroup();
+    	config.addModule(configGroupP);
 		final Scenario sc = ScenarioUtils.loadScenario(config);
-		
+		OneWayCarsharingRDConfigGroup configGroupOW = new OneWayCarsharingRDConfigGroup();
+    	config.addModule(configGroupOW);
 		
 		final Controler controler = new Controler( sc );
 					
@@ -83,22 +87,44 @@ public static void main(final String[] args) throws IOException {
 		    //controler.addOverridingModule( new ScoreTrackingModule() );
 		  
 		    final ParkingModuleWithFFCarSharingZH parkingModule = new ParkingModuleWithFFCarSharingZH(controler, freefloatingCars);
+		    
+		    controler.addOverridingModule(new AbstractModule() {
+
+				@Override
+				public void install() {
+			
+					bind(ParkingModuleWithFFCarSharingZH.class).toInstance(parkingModule);
+					
+				}
+		    }
+		    );
+		    controler.addOverridingModule(new AbstractModule() {
+
+				@Override
+				public void install() {
+					bind(ArrayList.class)
+					.annotatedWith(Names.named("initialFFCars"))
+					.toInstance(freefloatingCars);			
+					
+				}
+				
+			});		
 		    controler.addOverridingModule(
 		    		new AbstractModule() {
 
 						@Override
 						public void install() {
 		
-							bindMobsim().toProvider(new Provider<Mobsim>() {
-								@Override
-								public Mobsim get() {
-									return new FreeFloatingQsimFactory(sc, controler,
-											parkingModule, freefloatingCars).createMobsim(controler.getScenario(), controler.getEvents());
-						}
-					});
+							bindMobsim().toProvider(FreeFloatingQsimFactory.class);
 				}
 			});
 		}
+		controler.addOverridingModule( new AbstractModule() {
+			@Override
+			public void install() {
+				this.addPlanStrategyBinding("RandomTripToCarsharingStrategy").to( playground.balac.allcsmodestest.replanning.RandomTripToCarsharingStrategy.class ) ;
+			}
+		});
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override

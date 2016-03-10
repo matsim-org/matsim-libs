@@ -25,13 +25,13 @@ import org.matsim.facilities.ActivityFacility;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.scenario.GAPScenarioBuilder;
-import playground.dhosse.gap.scenario.mid.MiDCSVReader;
-import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
-import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
-import playground.dhosse.gap.scenario.mid.MiDSurveyPerson;
 import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
 import playground.dhosse.scenarios.generic.population.io.commuters.CommuterDataElement;
 import playground.dhosse.scenarios.generic.population.io.commuters.CommuterFileReader;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDCsvReader;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDPersonGroupData;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDPersonGroupTemplates;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDSurveyPerson;
 import playground.dhosse.utils.EgapHashGenerator;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -96,7 +96,7 @@ public class PlansCreator {
 	
 	private static void createPersonsWithDemographicData(Scenario scenario, Map<String, CommuterDataElement> relations){
 		
-		MiDCSVReader reader = new MiDCSVReader();
+		MiDCsvReader reader = new MiDCsvReader();
 //		reader.read(Global.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey_m.csv");
 		Map<String, MiDSurveyPerson> persons = reader.getPersons();
 		

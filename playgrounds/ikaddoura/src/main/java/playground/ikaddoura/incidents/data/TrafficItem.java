@@ -28,8 +28,8 @@ public class TrafficItem {
 	private String id;
 	private double downloadTime;
 	private String originalId;
-	private String startTime;
-	private String endTime;
+	private String startDateTime;
+	private String endDateTime;
 	private String status;
 
 	private TMCLocation origin = new TMCLocation();
@@ -57,17 +57,17 @@ public class TrafficItem {
 	public void setTMCAlert(TMCAlert alert) {
 		this.alert = alert;
 	}
-	public String getStartTime() {
-		return startTime;
+	public String getStartDateTime() {
+		return startDateTime;
 	}
-	public void setStartTime(String string) {
-		this.startTime = string;
+	public void setStartDateTime(String startDateTime) {
+		this.startDateTime = startDateTime;
 	}
-	public String getEndTime() {
-		return endTime;
+	public String getEndDateTime() {
+		return endDateTime;
 	}
-	public void setEndTime(String endTime) {
-		this.endTime = endTime;
+	public void setEndDateTime(String endDateTime) {
+		this.endDateTime = endDateTime;
 	}
 	public String getStatus() {
 		return status;
@@ -93,14 +93,13 @@ public class TrafficItem {
 	@Override
 	public String toString() {
 		return "TrafficItem [id=" + id + ", originalId=" + originalId
-				+ ", startTime=" + startTime + ", endTime=" + endTime + ", status=" + status + ", origin=" + origin
+				+ ", startDateTime=" + startDateTime + ", endDateTime=" + endDateTime + ", status=" + status + ", origin=" + origin
 				+ ", to=" + to + ", alert=" + alert + "]";
 	}
 	public String toStringWithDownloadTime() {
 		return "TrafficItem [id=" + id + ", downloadTime=" + downloadTime + ", originalId=" + originalId
-				+ ", startTime=" + startTime + ", endTime=" + endTime + ", status=" + status + ", origin=" + origin
+				+ ", startTime=" + startDateTime + ", endTime=" + endDateTime + ", status=" + status + ", origin=" + origin
 				+ ", to=" + to + ", alert=" + alert + "]";
 	}
-	
 }
 

@@ -1,6 +1,6 @@
 package playground.dhosse.utils;
 
-import playground.dhosse.gap.scenario.mid.MiDSurveyPerson;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDSurveyPerson;
 
 public class EgapHashGenerator {
 	

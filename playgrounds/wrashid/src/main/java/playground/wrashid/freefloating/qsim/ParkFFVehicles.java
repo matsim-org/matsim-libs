@@ -1,4 +1,4 @@
-package playground.balac.freefloating.qsimParkingModule;
+package playground.wrashid.freefloating.qsim;
 
 import java.util.Collection;
 import java.util.HashMap;

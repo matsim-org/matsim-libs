@@ -6,7 +6,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.TransportMode;
 
 import playground.dhosse.gap.Global;
-import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDPersonGroupData;
 import playground.dhosse.utils.EgapHashGenerator;
 
 public class EgapPopulationUtilsV2 {

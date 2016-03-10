@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.incidents;
+package playground.ikaddoura.incidents.io;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -127,9 +127,9 @@ public class HereMapsTrafficItemXMLReader {
 					} else if (in.getLocalName().equals("ORIGINAL_TRAFFIC_ITEM_ID")) {
 						trafficItem.setOriginalId(in.getElementText());
 					} else if (in.getLocalName().equals("START_TIME")) {
-						trafficItem.setStartTime(convertDateTimeFormat(in.getElementText()));
+						trafficItem.setStartDateTime(convertDateTimeFormat(in.getElementText()));
 					} else if (in.getLocalName().equals("END_TIME")) {
-						trafficItem.setEndTime(convertDateTimeFormat(in.getElementText()));
+						trafficItem.setEndDateTime(convertDateTimeFormat(in.getElementText()));
 					} else if (in.getLocalName().equals("TRAFFIC_ITEM_STATUS_SHORT_DESC")) {
 						trafficItem.setStatus(in.getElementText());
 					}

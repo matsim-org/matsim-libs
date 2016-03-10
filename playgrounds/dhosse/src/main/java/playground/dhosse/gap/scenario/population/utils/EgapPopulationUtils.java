@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import playground.dhosse.gap.Global;
-import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDPersonGroupData;
 import playground.dhosse.utils.EgapHashGenerator;
 
 /**

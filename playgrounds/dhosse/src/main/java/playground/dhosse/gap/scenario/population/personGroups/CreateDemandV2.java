@@ -27,14 +27,14 @@ import org.matsim.matrices.Matrix;
 import playground.dhosse.gap.GAPMatrices;
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.scenario.GAPScenarioBuilder;
-import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
-import playground.dhosse.gap.scenario.mid.MiDTravelChain;
-import playground.dhosse.gap.scenario.mid.MiDTravelChain.MiDTravelStage;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
 import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
 import playground.dhosse.gap.scenario.population.utils.LegModeCreator;
 import playground.dhosse.gap.scenario.population.utils.PlanCreationUtils;
 import playground.dhosse.scenarios.generic.population.io.commuters.CommuterDataElement;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDPersonGroupTemplates;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDTravelChain;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDTravelChain.MiDTravelStage;
 import playground.dhosse.utils.EgapHashGenerator;
 
 public class CreateDemandV2 {

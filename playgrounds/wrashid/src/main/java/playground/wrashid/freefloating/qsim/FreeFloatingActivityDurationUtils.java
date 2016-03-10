@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.balac.freefloating.qsimParkingModule;
+package playground.wrashid.freefloating.qsim;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.config.groups.PlansConfigGroup;

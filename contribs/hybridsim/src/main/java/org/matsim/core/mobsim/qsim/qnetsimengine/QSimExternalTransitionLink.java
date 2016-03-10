@@ -24,9 +24,15 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.hybridsim.simulation.ExternalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
@@ -56,9 +62,9 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 
 	@Override
 	void addFromUpstream(QVehicle veh) {
-		Id<Link> nextL = veh.getDriver().chooseNextLinkId();
-		Id<Node> leaveId = this.net.getLinks().get(nextL).getToNode().getId();
-		this.e.addFromUpstream(this.link.getFromNode().getId(), leaveId, veh);
+
+		this.e.addFromUpstream(veh);
+		veh.getDriver().chooseNextLinkId();
 		double now = this.e.getMobsim().getSimTimer().getTimeOfDay();
 		this.em.processEvent(new LinkEnterEvent(now, veh.getId(), this.link
 				.getId()));

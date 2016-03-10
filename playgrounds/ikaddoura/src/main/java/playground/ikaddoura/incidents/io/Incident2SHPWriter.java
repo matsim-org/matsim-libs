@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.incidents;
+package playground.ikaddoura.incidents.io;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +35,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+import playground.ikaddoura.incidents.TMCAlerts;
 import playground.ikaddoura.incidents.data.TrafficItem;
 
 /**
@@ -113,7 +114,7 @@ public class Incident2SHPWriter {
 	
 	public Object[] getIncidentObject(Link link, TrafficItem trafficItem) {
 		
-		Link incidentLink = tmc.computeTrafficIncident(link, trafficItem);
+		Link incidentLink = tmc.getTrafficIncidentLink(link, trafficItem);
 
 		if (incidentLink == null) {
 			return null;
@@ -146,8 +147,8 @@ public class Incident2SHPWriter {
 				incidentLink.getFreespeed(),
 					
 				// start and end time
-				trafficItem.getStartTime(),
-				trafficItem.getEndTime()
+				trafficItem.getStartDateTime(),
+				trafficItem.getEndDateTime()
 		};
 		return incidentObject;
 	}

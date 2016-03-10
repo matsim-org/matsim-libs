@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.incidents;
+package playground.ikaddoura.incidents.io;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -59,8 +59,8 @@ public class Incident2CSVWriter {
 						+ item.getTo().getLatitude() + ";"
 						+ item.getTo().getDescription() + ";"
 						+ item.getTo().getCountryCode() + ";"
-						+ item.getStartTime() + ";"
-						+ item.getEndTime() + ";"
+						+ item.getStartDateTime() + ";"
+						+ item.getEndDateTime() + ";"
 						+ item.getStatus() + ";"
 						+ item.getTMCAlert().getPhraseCode() + ";"
 						+ item.getTMCAlert().getAltertDuration() + ";"

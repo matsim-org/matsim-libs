@@ -1,7 +1,11 @@
-package org.matsim.contrib.carsharing.qsim;
+package playground.wrashid.freefloating.qsim;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -12,6 +16,7 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -20,29 +25,25 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
-import java.io.IOException;
-import java.util.Map;
+import playground.wrashid.parkingChoice.freeFloatingCarSharing.ParkingModuleWithFFCarSharingZH;
 
-/**
- *
- *
- *
- */
 
-public class CarsharingQsimFactory implements Provider<Netsim>{
-
+public class FreeFloatingQsimFactory implements Provider<Netsim>{
 
 	@Inject private  Scenario sc;
+	@Inject private  Provider<TripRouter> tripRouterProvider;	
 	@Inject private  EventsManager eventsManager;
 	
 	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory ;
 	@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
 	@Inject private Map<String,TravelTime> travelTimes ;
 
+	@Inject private ParkingModuleWithFFCarSharingZH parkingModule;	
+	
 	@Override
 	public Netsim get() {
-		
 		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
@@ -61,13 +62,7 @@ public class CarsharingQsimFactory implements Provider<Netsim>{
 		qSim.addMobsimEngine(teleportationEngine);
 				
 		AgentFactory agentFactory = null;			
-			
-		try {
-			CarSharingVehicles carSharingVehicles = new CarSharingVehicles(sc);
-		//added part
-		//a simple way to place vehicles at the original location at the start of each simulation
-		carSharingVehicles.readVehicleLocations();
-				
+						
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
 
 		TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get( TransportMode.car ) ;
@@ -75,24 +70,21 @@ public class CarsharingQsimFactory implements Provider<Netsim>{
 
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(sc.getNetwork(), travelDisutility, travelTime ) ;
 
-		agentFactory = new CarsharingAgentFactory(qSim, sc, carSharingVehicles, pathCalculator);		
+		agentFactory = new FreeFloatingAgentFactory(qSim, this.sc,  parkingModule, this.tripRouterProvider, pathCalculator);
 		
-		if (sc.getConfig().network().isTimeVariantNetwork()) 
+		
+		
+		if (sc.getConfig().network().isTimeVariantNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
-		
+		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 		
 		//we need to park carsharing vehicles on the network
-		ParkCSVehicles parkSource = new ParkCSVehicles(sc.getPopulation(), agentFactory, qSim,
-				carSharingVehicles.getFreeFLoatingVehicles(), carSharingVehicles.getOneWayVehicles(), carSharingVehicles.getTwoWayVehicles());
+		ParkFFVehicles parkSource = new ParkFFVehicles(sc.getPopulation(), agentFactory, qSim, this.parkingModule.getInitialDesiredVehicleCoordinates(), this.sc);
+
 		qSim.addAgentSource(agentSource);
 		qSim.addAgentSource(parkSource);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+				
 		return qSim;
 	}
-		
 }
