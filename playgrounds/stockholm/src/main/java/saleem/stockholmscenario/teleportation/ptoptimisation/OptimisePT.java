@@ -2,14 +2,12 @@ package saleem.stockholmscenario.teleportation.ptoptimisation;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import opdytsintegration.TimeDiscretization;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.Config;
@@ -92,7 +90,7 @@ public class OptimisePT {
 				MatsimRandom.getRandom(), interpolate, objectiveFunction,
 				includeCurrentBest);
 		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
-		randomSearch.run();
+		randomSearch.run(0.0, 0.0);
 
 		System.out.println("... DONE.");
 	}
