@@ -44,7 +44,7 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
 
     private static final Logger logger = Logger.getLogger(SegmentedFacilityGenerator.class);
 
-    private final Object FACILITY_SEGMENTS_KEY = new Object();
+    private final Object LOCAL_FACILITIES_KEY = new Object();
 
     private final ActivityFacilities facilities;
 
@@ -52,9 +52,9 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
 
     private final ZoneCollection zones;
 
-    private final Map<String, Map<Zone, List<ActivityFacility>[]>> typeMap;
+    private final Map<String, Map<Zone, List<ActivityFacility>>> typeMap;
 
-    private final List<ActivityFacility>[] allFacilities;
+    private final List<ActivityFacility> allFacilities;
 
     private double localProba = 0.5;
 
@@ -72,8 +72,7 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
         this.random = random;
         typeMap = new HashMap<>();
 
-        ArrayList<ActivityFacility> list = new ArrayList(facilities.getFacilities().values());
-        allFacilities = new List[]{list, list};
+        allFacilities = new ArrayList(facilities.getFacilities().values());
 
         blacklist = new ArrayList<>();
     }
@@ -86,11 +85,11 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
         this.localProba = proba;
     }
 
-    private Map<Zone, List<ActivityFacility>[]> buildSegments(String type) {
+    private Map<Zone, List<ActivityFacility>> buildSegments(String type) {
         logger.debug("Initializing facility segments...");
 
         final QuadTree<ActivityFacility> spatialIndex = facilityData.getQuadTree(type);
-        final Map<Zone, List<ActivityFacility>[]> map = new ConcurrentHashMap<>();
+        final Map<Zone, List<ActivityFacility>> map = new ConcurrentHashMap<>();
 
         int n = Executor.getFreePoolSize();
         n = Math.max(n, 1);
@@ -114,11 +113,11 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
 
         private final QuadTree<ActivityFacility> spatialIndex;
 
-        private final Map<Zone, List<ActivityFacility>[]> map;
+        private final Map<Zone, List<ActivityFacility>> map;
 
         private final double threshold;
 
-        public RunThread(List<Zone> zones, QuadTree<ActivityFacility> spatialIndex, Map<Zone, List<ActivityFacility>[]> map, double threshold) {
+        public RunThread(List<Zone> zones, QuadTree<ActivityFacility> spatialIndex, Map<Zone, List<ActivityFacility>> map, double threshold) {
             this.zones = zones;
             this.spatialIndex = spatialIndex;
             this.map = map;
@@ -131,8 +130,7 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
                 double x = zone.getGeometry().getCentroid().getX();
                 double y = zone.getGeometry().getCentroid().getY();
                 List<ActivityFacility> local = new ArrayList<>(spatialIndex.getDisk(x, y, threshold));
-                List<ActivityFacility> global = new ArrayList<>(spatialIndex.getRing(x, y, threshold, 2000000));
-                map.put(zone, new List[]{local, global});
+                map.put(zone, local);
 
                 ProgressLogger.step();
             }
@@ -150,15 +148,24 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
         }
 
         if (!ignore) {
-            List<ActivityFacility>[] segments = (List<ActivityFacility>[]) person.getData(FACILITY_SEGMENTS_KEY);
-            if (segments == null) segments = initSegments(act);
+            Map<String, List<ActivityFacility>> typedFacils = (Map<String, List<ActivityFacility>>) person.getData(LOCAL_FACILITIES_KEY);
+            if(typedFacils == null) {
+                typedFacils = new IdentityHashMap<>();
+                person.setData(LOCAL_FACILITIES_KEY, typedFacils);
+            }
 
-            List<ActivityFacility> facilityList;
-            if (random.nextDouble() > localProba) facilityList = segments[1];
-            else facilityList = segments[0];
+            List<ActivityFacility> facils = typedFacils.get(type);
+            if (facils == null) {
+                facils = initLocalFacilities(act);
+                typedFacils.put(type, facils);
+            }
 
-            ActivityFacility facility = facilityList.get(random.nextInt(facilityList.size()));
-
+            ActivityFacility facility;
+            if (random.nextDouble() > localProba) {
+                facility = facilityData.randomFacility(type);
+            } else {
+                facility = facils.get(random.nextInt(facils.size()));
+            }
             return facility;
 
         } else {
@@ -166,7 +173,7 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
         }
     }
 
-    private List<ActivityFacility>[] initSegments(CachedElement act) {
+    private List<ActivityFacility> initLocalFacilities(CachedElement act) {
         CachedPerson person = (CachedPerson) ((CachedSegment)act).getEpisode().getPerson();
         ActivityFacility home = PersonAttributeUtils.getHomeFacility(person, facilities);
 
@@ -175,7 +182,7 @@ public class SegmentedFacilityGenerator implements ValueGenerator {
         } else {
             String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 
-            Map<Zone, List<ActivityFacility>[]> zoneMap = typeMap.get(type);
+            Map<Zone, List<ActivityFacility>> zoneMap = typeMap.get(type);
             if (zoneMap == null) {
                 zoneMap = buildSegments(type);
                 typeMap.put(type, zoneMap);
