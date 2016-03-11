@@ -118,7 +118,7 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Trans
 	private void registerExit(final Id<Person> person, final Id<TransitStopFacility> stop, final int time_s) {
 		this.advanceToTime(time_s);
 		this.avg(stop).dec(time_s);
-		this.personStops.remove(person, stop);
+		this.personStops.remove(person);
 	}
 
 	public void advanceToEnd() {
