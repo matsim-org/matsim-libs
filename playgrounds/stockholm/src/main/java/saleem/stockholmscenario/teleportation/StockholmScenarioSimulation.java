@@ -15,7 +15,6 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-import saleem.stockholmscenario.teleportation.ptoptimisation.PTControlListener;
 import saleem.stockholmscenario.teleportation.ptoptimisation.TransitScheduleAdapter;
 
 public class StockholmScenarioSimulation {
