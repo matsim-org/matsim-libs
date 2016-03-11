@@ -13,13 +13,11 @@ import opdytsintegration.RecursiveCountAverage;
 import opdytsintegration.TimeDiscretization;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
@@ -36,7 +34,7 @@ import floetteroed.utilities.DynamicData;
  * @author Mohammad Saleem
  *
  */
-public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler {
+public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler {
 
 	// -------------------- MEMBERS --------------------
 
@@ -47,10 +45,11 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Vehic
 	private final Map<Id<TransitStopFacility>, RecursiveCountAverage> stop2avg = new LinkedHashMap<>();
 
 	private int lastCompletedBin = -1;
+	private int totalStuckOutsideStops = 0;
 
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
-	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehStops = new HashMap<>();
+	private final Map<Id<Person>, Id<TransitStopFacility>> personStops = new HashMap<>();
 	
 	
 	// -------------------- CONSTRUCTION --------------------
@@ -104,20 +103,22 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Vehic
 		}
 		return avg;
 	}
-
 	private boolean relevant(Id<TransitStopFacility> stop) {
 		return ((this.relevantStops == null) || this.relevantStops
 				.contains(stop));
 	}
 
-	private void registerEntry(final Id<TransitStopFacility> stop, final int time_s) {
+	private void registerEntry(final Id<Person> person, final Id<TransitStopFacility> stop, final int time_s) {
 		this.advanceToTime(time_s);
 		this.avg(stop).inc(time_s);
+		this.personStops.put(person, stop);
+
 	}
 
-	private void registerExit(final Id<TransitStopFacility> stop, final int time_s) {
+	private void registerExit(final Id<Person> person, final Id<TransitStopFacility> stop, final int time_s) {
 		this.advanceToTime(time_s);
 		this.avg(stop).dec(time_s);
+		this.personStops.remove(person, stop);
 	}
 
 	public void advanceToEnd() {
@@ -127,13 +128,18 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Vehic
 	 public Set<Id<TransitStopFacility>> observedStopSetView() {
 		 return Collections.unmodifiableSet(this.occupancies_veh.keySet());
 	 }
-
+	 
 	// -------------------- CONTENT ACCESS --------------------
 
 	public double getOccupancy_veh(final Id<TransitStopFacility> stop, final int bin) {
 		return this.occupancies_veh.getBinValue(stop, bin);
 	}
-
+	public int getTotalStuckOutsideStops(){
+		return this.totalStuckOutsideStops;
+	}
+	public int getTotalLeftOnStopsAtEnd(){
+		return this.personStops.size();
+	}
 	// ---------- IMPLEMENTATION OF *EventHandler INTERFACES ----------
 
 	@Override
@@ -143,19 +149,15 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Vehic
 		this.lastCompletedBin = -1;
 		this.transitDrivers.clear();
 		this.transitVehicles.clear();
-		this.vehStops.clear();
+		this.personStops.clear();
 	}
 
 	@Override
 	public void handleEvent(AgentWaitingForPtEvent event) {
 		Id<TransitStopFacility> stopid = event.getWaitingAtStopId();
 		if(relevant(stopid)){
-			this.registerEntry(stopid, (int) event.getTime());
+			this.registerEntry(event.getPersonId(), stopid, (int) event.getTime());
 		}
-	}
-	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		this.vehStops.put(event.getVehicleId(), event.getFacilityId());
 	}
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
@@ -168,12 +170,16 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Vehic
 		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
 			return; // ignore transit drivers or persons entering non-transit vehicles
 		}
-		
-		Id<Vehicle> vehId = event.getVehicleId();
-		Id<TransitStopFacility> stopId = this.vehStops.get(vehId);
+		Id<Person> personId = event.getPersonId();
+		Id<TransitStopFacility> stopId = personStops.get(event.getPersonId());
 		double time = event.getTime();
 		if(relevant(stopId)){
-			this.registerExit(stopId, (int) time);
+			this.registerExit(personId, stopId, (int) time);
 		}
+	}
+
+	@Override
+	public void handleEvent(PersonStuckEvent event) {
+		totalStuckOutsideStops++;
 	}
 }
