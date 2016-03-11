@@ -102,8 +102,9 @@ public class PathologicalExample {
 
 		final boolean naive = false;
 		final String path = "./output/pathological/"
-				+ (naive ? "naive/" : "proposed/");
-		for (int populationSize : new int[] { 2 }) { // , 4, 8, 16, 32, 64, 128, 256 }) {
+				+ "test/";
+//				+ (naive ? "naive/" : "proposed/");
+		for (int populationSize : new int[] { 2, 4, 8, 16, 32, 64, 128, 256 }) {
 			for (int seed : new int[] { 1000, 2000, 3000, 4000, 5000, 6000,
 					7000, 8000, 9000, 10000 }) {
 				final Random rnd = new Random(seed);
