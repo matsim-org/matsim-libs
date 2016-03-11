@@ -74,7 +74,7 @@ public class IncidentDataAnalysis {
 	
 	private final boolean writeCSVFileForEachXMLFile = false;
 
-	private final String startDateTime = "2016/02/14";
+	private final String startDateTime = "2016/02/13";
 	private final String endDateTime = "2016/02/15";
 		
 // ##################################################################
