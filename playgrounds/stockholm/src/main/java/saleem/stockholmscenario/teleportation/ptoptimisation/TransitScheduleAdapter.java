@@ -26,6 +26,9 @@ import org.matsim.vehicles.Vehicles;
 import saleem.stockholmscenario.utils.CollectionUtil;
 
 public class TransitScheduleAdapter {
+	/*With 5% chance of selecting a line, and 50% chance of randomly adding and vehicles to it 
+	 * and 50% chance of randomly deleting vehicles from it, and adjusting departure times.
+	 */
 	public TransitSchedule updateSchedule(Vehicles vehicles, TransitSchedule schedule){
 		CollectionUtil<TransitLine> cutil = new CollectionUtil<TransitLine>();
 		VehicleRemover vehremover = new VehicleRemover(vehicles, schedule);
@@ -45,6 +48,7 @@ public class TransitScheduleAdapter {
 		}
 		return schedule;
 	}
+	//With 5% chance of selecting a line, and 50% chance of randomly adding vehicles to it and adjusting departure times.
 	public PTSchedule updateScheduleAdd(Scenario scenario, Vehicles vehicles, TransitSchedule schedule){
 		CollectionUtil<TransitLine> cutil = new CollectionUtil<TransitLine>();
 		VehicleAdder vehadder = new VehicleAdder(vehicles, schedule);
@@ -60,6 +64,7 @@ public class TransitScheduleAdapter {
 		}
 		return new PTSchedule(scenario, schedule, vehicles);
 	}
+	//With 5% chance of selecting a line, and 50% chance of randomly deleting vehicles from it and adjusting departure times.
 	public PTSchedule updateScheduleRemove(Scenario scenario, Vehicles vehicles, TransitSchedule schedule){
 		CollectionUtil<TransitLine> cutil = new CollectionUtil<TransitLine>();
 		VehicleRemover vehremover = new VehicleRemover(vehicles, schedule);
@@ -84,12 +89,6 @@ public class TransitScheduleAdapter {
 		VehicleWriterV1 vwriter = new VehicleWriterV1(vehicles);
 		vwriter.writeFile(path);
 	}
-	//Add vehicles to the transitschedule according to the sample size
-//	public void addVehicles(double sample){
-//		VehicleAdder vehadder = new VehicleAdder(scenario);
-//		vehadder.addVehicles(sample);
-//		
-//	}
 	/*This is a function to create a deep copy of transit schedule. The deep copy is not fully deep and may also copy references. All those components 
 	of the transit schedule which are expected to be randomised for optimisation are deep copied. 
 	*/ 
@@ -128,6 +127,7 @@ public class TransitScheduleAdapter {
 		}
 		return newschedule;
 	}
+	//Creates a deep copy of Vehicles object
 	public Vehicles deepCopyVehicles(Vehicles vehicles){
 		Vehicles newvehicles = VehicleUtils.createVehiclesContainer();
 		//Add all vehicle types
@@ -179,15 +179,6 @@ public class TransitScheduleAdapter {
         Vehicles vehiclesadded = adapter.deepCopyVehicles(controler.getScenario().getTransitVehicles());
         Vehicles vehiclesdeleted = adapter.deepCopyVehicles(controler.getScenario().getTransitVehicles());
 
-        
-//        adapter.writeSchedule(scheduleboth, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\UpdatedSchedule.xml");
-//		adapter.writeSchedule(scheduleadded, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\UpdatedScheduleAdded.xml");
-//		adapter.writeSchedule(scheduledeleted, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\UpdatedScheduleDeleted.xml");
-//		adapter.writeVehicles(vehiclesboth, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\UpdatedVehicles.xml");
-//		adapter.writeVehicles(vehiclesadded, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\UpdatedVehiclesAdded.xml");
-//		adapter.writeVehicles(vehiclesdeleted, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\UpdatedVehiclesDeleted.xml");
-////		
-		
         adapter.updateSchedule(vehiclesboth, scheduleboth);
 		adapter.writeSchedule(scheduleboth, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\UpdatedSchedule.xml");
 		adapter.writeVehicles(vehiclesboth, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\UpdatedVehicles.xml");

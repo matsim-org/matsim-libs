@@ -123,9 +123,11 @@ public class PTSchedule implements DecisionVariable{
 		}
 	}
 	/*
-	 * Update the transit schedule and vehicles objects associated with the current main scenario. Empty the transit schedule and vehicles objects
-	 * by removing all existing vehicle types, vehicles, stop facilities and transit lines, and add back from an updated vehicles object and 
-	 * transit schedule object into the transit schedule and vehicles object associated with the scenario.
+	 * The implementInSimulation function updates the transit schedule and vehicles objects associated with the current main scenario. 
+	 * Empty the transit schedule and vehicles objects by removing all existing vehicle types, vehicles, stop facilities and transit lines, 
+	 * and add back from an updated vehicles object and transit schedule object into the transit schedule and vehicles object associated with the scenario.
+	 * The updated vehicles object and transit schedule object are the ones that are produced by the PTScheduleRandomiser by adding and deleting 
+	 * vehicles and departures to the selected transit schedule.
 	*/
 	@Override
 	public void implementInSimulation() {
@@ -133,9 +135,10 @@ public class PTSchedule implements DecisionVariable{
 		TransitScheduleAdapter adapter = new TransitScheduleAdapter();
 		TransitSchedule copiedschedule = adapter.deepCopyTransitSchedule(schedule);
 		Vehicles copiedvehicles = adapter.deepCopyVehicles(vehicles);
-		removeEntireScheduleAndVehicles();
-		addVehicles(copiedvehicles);
-		addTransitSchedule(copiedschedule);
+		removeEntireScheduleAndVehicles();//Removes all vehicle types, vehicles, stop facilities and transit lines from a transit schedule
+		addVehicles(copiedvehicles);//Adds all vehicle types and vehicles from an updated stand alone vehicles object into the current scenario vehicles object
+		addTransitSchedule(copiedschedule);//Add all stop facilities and transit lines from a stand alone updated transit schedule into the current scenario transit schedule
+		
 	}
 
 }

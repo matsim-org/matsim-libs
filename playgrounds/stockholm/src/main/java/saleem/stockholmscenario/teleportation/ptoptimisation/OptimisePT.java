@@ -59,7 +59,7 @@ public class OptimisePT {
 		CollectionUtil<VehicleType> cutil = new CollectionUtil<VehicleType>();
 		ArrayList<VehicleType> vehcilestypes = cutil.toArrayList(vehicles.getVehicleTypes().values().iterator());
 		Iterator vehtypes = vehcilestypes.iterator();
-		while(vehtypes.hasNext()){
+		while(vehtypes.hasNext()){//Set flow and storage capacities according to sample size
 			VehicleType vt = (VehicleType)vehtypes.next();
 			VehicleCapacity cap = vt.getCapacity();
 			cap.setSeats((int)Math.ceil(cap.getSeats()*samplesize));
@@ -73,7 +73,7 @@ public class OptimisePT {
 		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
 		NetworkWriter networkWriter =  new NetworkWriter(network);
 		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
-		final PTSchedule ptschedule = new PTSchedule(scenario, scenario.getTransitSchedule(),scenario.getTransitVehicles());
+		final PTSchedule ptschedule = new PTSchedule(scenario, scenario.getTransitSchedule(),scenario.getTransitVehicles());//Decision Variable
 		final DecisionVariableRandomizer<PTSchedule> decisionVariableRandomizer = 
 				new PTScheduleRandomiser(scenario, ptschedule);
 //		Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = scenario.getTransitSchedule().getFacilities();

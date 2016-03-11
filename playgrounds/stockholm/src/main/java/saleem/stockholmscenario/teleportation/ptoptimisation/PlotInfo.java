@@ -7,11 +7,11 @@ import org.jfree.chart.plot.XYPlot;
 import org.matsim.core.utils.charts.XYLineChart;
 
 public class PlotInfo {
-	public void PlotWaitingPassengers(ArrayList<Double> times, ArrayList<Double> waitingpassengers ){
+	public void PlotWaitingPassengers(String path, ArrayList<Double> times, ArrayList<Double> waitingpassengers ){
 		 XYLineChart chart = new XYLineChart("Waiting Passengers Plot", "Time", "Waiting Passengers");
 		 chart.addSeries("", toArray(times), toArray(waitingpassengers));
 		 chart.addMatsimLogo();
-		 chart.saveAsPng("C:\\Results Matsim\\Optimisation\\WaitingPassengers.png", 800, 600);
+		 chart.saveAsPng(path, 800, 600);
 	}
 	public double[] toArray(ArrayList<Double> alist){//Converting a list to array
 		double[] array = new double[alist.size()];

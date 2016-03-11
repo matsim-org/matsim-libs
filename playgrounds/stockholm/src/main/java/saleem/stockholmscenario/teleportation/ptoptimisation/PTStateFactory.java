@@ -20,7 +20,6 @@ public class PTStateFactory implements MATSimStateFactory<PTSchedule>{
 
 	public MATSimState newState(final Population population,
 			final Vector stateVector, final PTSchedule decisionVariable) {
-			return new PTState(population, stateVector, decisionVariable,
-				this.timeDiscretization, this.occupancyScale);
+			return new PTState(population, stateVector, this.occupancyScale);
 	}
 }

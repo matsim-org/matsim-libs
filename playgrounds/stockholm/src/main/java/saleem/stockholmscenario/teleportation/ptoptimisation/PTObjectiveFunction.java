@@ -22,7 +22,7 @@ import floetteroed.utilities.math.Vector;
 public class PTObjectiveFunction implements ObjectiveFunction {
 
 	@Override
-	public double value(SimulatorState state) {
+	public double value(SimulatorState state) {//Simple summation of selected plan scores
 		double result = 0;
 		// TODO Auto-generated method stub
 		final PTState ptstate = (PTState) state;

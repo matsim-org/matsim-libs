@@ -45,11 +45,11 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Trans
 	private final Map<Id<TransitStopFacility>, RecursiveCountAverage> stop2avg = new LinkedHashMap<>();
 
 	private int lastCompletedBin = -1;
-	private int totalStuckOutsideStops = 0;
+	private int totalStuck = 0;
 
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
-	private final Map<Id<Person>, Id<TransitStopFacility>> personStops = new HashMap<>();
+	private final Map<Id<Person>, Id<TransitStopFacility>> personStops = new HashMap<>();//To maintain person to stop mapping
 	
 	
 	// -------------------- CONSTRUCTION --------------------
@@ -111,14 +111,14 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Trans
 	private void registerEntry(final Id<Person> person, final Id<TransitStopFacility> stop, final int time_s) {
 		this.advanceToTime(time_s);
 		this.avg(stop).inc(time_s);
-		this.personStops.put(person, stop);
+		this.personStops.put(person, stop);//Register person against the stop
 
 	}
 
 	private void registerExit(final Id<Person> person, final Id<TransitStopFacility> stop, final int time_s) {
 		this.advanceToTime(time_s);
 		this.avg(stop).dec(time_s);
-		this.personStops.remove(person);
+		this.personStops.remove(person);//Remove person mapping to the stop
 	}
 
 	public void advanceToEnd() {
@@ -135,7 +135,7 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Trans
 		return this.occupancies_veh.getBinValue(stop, bin);
 	}
 	public int getTotalStuckOutsideStops(){
-		return this.totalStuckOutsideStops;
+		return this.totalStuck;
 	}
 	public int getTotalLeftOnStopsAtEnd(){
 		return this.personStops.size();
@@ -179,7 +179,7 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Trans
 	}
 
 	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		totalStuckOutsideStops++;
+	public void handleEvent(PersonStuckEvent event) {//Just to check stuck people at the end
+		totalStuck++;
 	}
 }

@@ -31,13 +31,13 @@ class PTScheduleRandomiser implements DecisionVariableRandomizer<PTSchedule> {
 		TransitSchedule schedule = this.ptschedule.schedule;
 		Vehicles vehicles = this.ptschedule.vehicles;
 		final List<PTSchedule> result = new ArrayList<>(2);
-		//To ensure two independent copies of the existing schedule, and not changing with in
-		result.add(adapter.updateScheduleAdd(scenario, adapter.deepCopyVehicles(vehicles), adapter.deepCopyTransitSchedule(schedule)));
-		result.add(adapter.updateScheduleRemove(scenario, adapter.deepCopyVehicles(vehicles), adapter.deepCopyTransitSchedule(schedule)));
+		//Ensuring two independent copies of the existing schedule, and not changing with in the current schedule
+		result.add(adapter.updateScheduleAdd(scenario, adapter.deepCopyVehicles(vehicles), adapter.deepCopyTransitSchedule(schedule)));//Randomly add vehicles
+		result.add(adapter.updateScheduleRemove(scenario, adapter.deepCopyVehicles(vehicles), adapter.deepCopyTransitSchedule(schedule)));//Randomly remove vehicles
 		str = str + vehicles.getVehicles().size() + "		" +
 				result.get(0).vehicles.getVehicles().size() + "		" + 
 				result.get(1).vehicles.getVehicles().size() + "		" + "\n";
-		writeToTextFile(str, "C:\\Results Matsim\\Optimisation\\vehicles.txt");
+		writeToTextFile(str, "C:\\Results Matsim\\Optimisation\\vehicles.txt");//Write the number of vehicles statistics to a file
 		return result;
 	}
 	

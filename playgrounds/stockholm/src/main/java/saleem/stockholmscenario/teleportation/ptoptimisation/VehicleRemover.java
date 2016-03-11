@@ -45,10 +45,11 @@ public class VehicleRemover {
 //				int a =0;
 //
 //	}
-	/*Removes departures to a certain line. Slightly different logic than removing vehicles from transit schedule randomly.
-	 *  Here all the route in the line are traversed, and departures are decreased by a fraction of 10. 
+	/*  Removes departures from a certain line. All the route in the line are traversed, all departures for each route are traversed, 
+	 *  and for each departure, it is removed with a fraction percent (10%) chance. Times are adjusted accordingly.
 	 *  Corresponding vehicles are also removed.
-	 *  */	@SuppressWarnings({ "rawtypes", "unchecked" })
+	 *  */
+	 @SuppressWarnings({ "rawtypes", "unchecked" })
 	public void removeDeparturesFromLine(TransitLine tline, double fraction){
 		CollectionUtil cutil = new CollectionUtil();
 		DepartureTimesManager dtm = new DepartureTimesManager();
@@ -65,24 +66,14 @@ public class VehicleRemover {
 					troute.removeDeparture(departure);
 					System.out.println("Deleted Departure: " + departure.getId() + " " + troute.getId() + " " + departure.getVehicleId());
 					vehicles.removeVehicle(departure.getVehicleId());
-//					if(i+1<depsize){
-//						double time = dtm.adjustTimeDepartureRemoved(departures, i);
-//						Departure nextdeparture = departures.get(i+1);//Remove next departure and add again with adjusted time
-//						troute.removeDeparture(nextdeparture);
-//						Departure newdeparture = schedule.getFactory().createDeparture(nextdeparture.getId(), time);
-//						newdeparture.setVehicleId(nextdeparture.getVehicleId());
-//						troute.addDeparture(newdeparture);
-//					}
-//					Code below is just for debugging purposes, no functional use
-//					String str = "Departure Removed: " + departure.getId() + " From Route: " + troute.getId();
-//					if(i+1>=size){
-//						str = str + " : added at the end";
-//					}
-//					if(previosdeleted == i-1){
-//						str = str + " : parallel";
-//					}
-//					previosdeleted = i;
-//					System.out.println(str);
+					if(i+1<depsize){
+						double time = dtm.adjustTimeDepartureRemoved(departures, i);
+						Departure nextdeparture = departures.get(i+1);//Remove next departure and add again with adjusted time
+						troute.removeDeparture(nextdeparture);
+						Departure newdeparture = schedule.getFactory().createDeparture(nextdeparture.getId(), time);
+						newdeparture.setVehicleId(nextdeparture.getVehicleId());
+						troute.addDeparture(newdeparture);
+					}
 				}
 			}
 			//Remove empty routes and lines

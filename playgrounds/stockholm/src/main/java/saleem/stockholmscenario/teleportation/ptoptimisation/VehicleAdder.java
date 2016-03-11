@@ -46,8 +46,8 @@ public class VehicleAdder {
 //		} 
 //		vehicles.getVehicleTypes().get(Id.create("BUS", VehicleType.class));
 //	}
-	/*Adds departures to a certain line. Slightly different logic than adding vehicles to transit schedule randomly.
-	 *  Here all the route in the line are traversed, and departures are increased by a fraction of 10. 
+	/*  Adds departures to a certain line. All the route in the line are traversed, all departures for each route are traversed, 
+	 *  and for each departure, a new departure is added with a fraction percent (10%) chance. Times are adjusted accordingly.
 	 *  Corresponding vehicles are also added.
 	 *  */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -66,9 +66,9 @@ public class VehicleAdder {
 				if(Math.random()<=fraction){
 					Id<Vehicle> vehid= Id.create("VehAdded"+(int)Math.floor(1000000 * Math.random()), Vehicle.class);
 					if(!(vehicles.getVehicles().containsKey(vehid))){//If same vehicle has not been added before
-//						double time = departures.get(i).getDepartureTime();
-//						time = dtm.adjustTimeDepartureAdded(departures, i);//Adjust time for the departure too be added
-						double time = Math.ceil(86400 * Math.random());//Random time with in 24 hours
+						double time = departures.get(i).getDepartureTime();
+						time = dtm.adjustTimeDepartureAdded(departures, i);//Adjust time for the departure too be added
+//						double time = Math.ceil(86400 * Math.random());//Random time with in 24 hours
 						Departure departure = schedule.getFactory().createDeparture(Id.create("DepAdded"+(int)Math.floor(1000000 * Math.random()), Departure.class), time);
 						departure.setVehicleId(vehid);
 						if(!depadded.contains(departure.getId())){

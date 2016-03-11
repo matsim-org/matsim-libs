@@ -232,6 +232,7 @@ public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 			}
 			
 		}
+		//To plot waiting passengers
 		double binOccupancy = 0.0;
 		for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
 			for (Id<TransitStopFacility> stopId : this.relevantStopIds) {
@@ -243,9 +244,10 @@ public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 			
 		}
 		PlotInfo pinfo = new PlotInfo();
-		pinfo.PlotWaitingPassengers(times, waitingpassengers);
+		pinfo.PlotWaitingPassengers("C:\\Results Matsim\\Optimisation\\waitingPassengers.png", times, waitingpassengers);
 		System.out.println("Stuck Agents: " + this.occupancyAnalyser.getTotalStuckOutsideStops());
 		System.out.println("Stuck Agents Left on Stops: " + this.occupancyAnalyser.getTotalLeftOnStopsAtEnd());
+		
 		/*
 		 * (2) Add instantaneous state vector to the list of past state vectors
 		 * and ensure that the size of this list is equal to what the memory
