@@ -95,7 +95,6 @@ public class QCALink extends AbstractQLink {
 		void addFromUpstream(QVehicle veh, double now) {
 			Pedestrian pedestrian = agentFactoryCA.buildPedestrian(environmentCA.getId(),veh,transitionArea);		
 			
-			double now = qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 //			qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
 //					now, veh.getId(), getLink().getId()));
 			// now done by QNode

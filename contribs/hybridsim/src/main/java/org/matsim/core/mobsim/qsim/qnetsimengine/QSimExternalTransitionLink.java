@@ -101,7 +101,6 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 			Id<Link> nextL = veh.getDriver().chooseNextLinkId();
 			Id<Node> leaveId = net.getLinks().get(nextL).getToNode().getId();
 			e.addFromUpstream( getLink().getFromNode().getId(), leaveId, veh);
-			double now = e.getMobsim().getSimTimer().getTimeOfDay();
 			em.processEvent(new LinkEnterEvent(now, veh.getId(), getLink().getId()));
 		}
 

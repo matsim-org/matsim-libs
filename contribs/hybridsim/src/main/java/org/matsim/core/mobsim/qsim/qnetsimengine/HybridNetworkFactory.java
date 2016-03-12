@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 
 public class HybridNetworkFactory extends QNetworkFactory {
 
@@ -44,6 +45,7 @@ public class HybridNetworkFactory extends QNetworkFactory {
 				return e.getValue().createNetsimLink(link, network, queueNode);
 			}
 		}
+		VehicleQ<QVehicle> linkSpeedCalculator = null ; // this may not work. kai, mar'16
 		//default QLink
 		return new QLinkImpl(link, network, queueNode, linkSpeedCalculator);
 	}
