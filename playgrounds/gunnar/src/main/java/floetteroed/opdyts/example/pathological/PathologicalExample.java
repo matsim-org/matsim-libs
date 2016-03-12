@@ -24,13 +24,15 @@ public class PathologicalExample {
 
 	private final String convFileName;
 
+	private final String outerLogFileName;
+
 	private final int populationSize;
 
 	private final boolean naive;
 
 	public PathologicalExample(final int populationSize,
 			final String logFileName, final String convFileName,
-			final Random rnd, final boolean naive) {
+			final String outerLogFileName, final Random rnd, final boolean naive) {
 		final Matrix _A = new Matrix(2, 2);
 		_A.getRow(0).set(0, 0.0);
 		_A.getRow(0).set(1, 0.9);
@@ -45,6 +47,7 @@ public class PathologicalExample {
 		this.system = new LinearSystemSimulator(_A, _B, sigmaNoise, rnd);
 		this.logFileName = logFileName;
 		this.convFileName = convFileName;
+		this.outerLogFileName = outerLogFileName;
 		this.populationSize = populationSize;
 		this.naive = naive;
 	}
@@ -79,7 +82,8 @@ public class PathologicalExample {
 				includeCurrentBest);
 		randomSearch.setLogFileName(this.logFileName);
 		randomSearch.setConvergenceTrackingFileName(this.convFileName);
-
+		randomSearch.setOuterIterationLogFileName(this.outerLogFileName);
+		
 		randomSearch.setMaintainAllTrajectories(true);
 		randomSearch.setMaxTotalMemory(Integer.MAX_VALUE);
 
@@ -97,23 +101,26 @@ public class PathologicalExample {
 
 	public static void main(String[] args) throws IOException {
 
-//		System.err.println("MAKE SURE THAT DATA IS SECURED");
-//		System.exit(-1);
+		// System.err.println("MAKE SURE THAT DATA IS SECURED");
+		// System.exit(-1);
 
-		final boolean naive = false;
-		final String path = "./output/pathological/"
-				+ "test/";
-//				+ (naive ? "naive/" : "proposed/");
-		for (int populationSize : new int[] { 2, 4, 8, 16, 32, 64, 128, 256 }) {
-			for (int seed : new int[] { 1000, 2000, 3000, 4000, 5000, 6000,
-					7000, 8000, 9000, 10000 }) {
+		final boolean naive = true;
+		final String path = "./output/pathological/" + "test/";
+		// + (naive ? "naive/" : "proposed/");
+//		for (int populationSize : new int[] { 2, 4, 8, 16, 32, 64, 128, 256 }) {
+//			for (int seed : new int[] { 1000, 2000, 3000, 4000, 5000, 6000,
+//					7000, 8000, 9000, 10000 }) {
+		for (int populationSize : new int[] { 2 }) {
+			for (int seed : new int[] { 2000 }) {
 				final Random rnd = new Random(seed);
 				final String logFileName = path + "popSize" + populationSize
 						+ "_seed" + seed + ".log";
 				final String convFileName = path + "popSize" + populationSize
 						+ "_seed" + seed + ".conv";
+				final String outerLogFileName = path + "popSize"
+						+ populationSize + "_seed" + seed + ".opt";
 				new PathologicalExample(populationSize, logFileName,
-						convFileName, rnd, naive).run();
+						convFileName, outerLogFileName, rnd, naive).run();
 			}
 		}
 	}

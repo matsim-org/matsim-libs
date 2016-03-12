@@ -122,6 +122,11 @@ class OptimizeRoadpricing {
 		final boolean adjustWeights = Boolean.parseBoolean(myConfig.get(
 				"opdyts", "adjustweights"));
 
+		final int maxRandomSearchIterations = Integer.parseInt(myConfig.get(
+				"opdyts", "maxiterations"));
+		final int maxRandomSearchTransitions = Integer.parseInt(myConfig.get(
+				"opdyts", "maxtransitions"));
+
 		/*
 		 * Create the MATSim scenario.
 		 */
@@ -181,8 +186,6 @@ class OptimizeRoadpricing {
 		/*
 		 * RandomSearch specification.
 		 */
-		final int maxRandomSearchIterations = 1000;
-		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer, initialTollLevels,
 				convergenceCriterion, maxRandomSearchIterations,
@@ -191,7 +194,9 @@ class OptimizeRoadpricing {
 				includeCurrentBest);
 		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
 		randomSearch.setConvergenceTrackingFileName(originalOutputDirectory
-				+ "opdyts.conv");
+				+ "opdyts.con");
+		randomSearch.setOuterIterationLogFileName(originalOutputDirectory
+				+ "opdyts.opt");
 		randomSearch.setMaxTotalMemory(averageIterations);
 
 		/*

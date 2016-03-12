@@ -87,6 +87,8 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 
 	// runtime variables
 
+	private int totalTransitionCnt = 0;
+
 	private boolean initialized = false;
 
 	private TransitionSequenceSet<U> allTransitionSequences;
@@ -150,7 +152,8 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 	}
 
 	public int getTotalTransitionCnt() {
-		return this.allTransitionSequences.size();
+		return this.totalTransitionCnt;
+		// return this.allTransitionSequences.size();
 	}
 
 	@Override
@@ -184,6 +187,10 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 		return this.allTransitionSequences.additionCnt(decisionVariable);
 	}
 
+	public StatisticsMultiWriter<SamplingStage<U>> getStatisticsWriter() {
+		return this.statisticsWriter;
+	}
+
 	// -------------------- IMPLEMENTATION --------------------
 
 	public void initialize() {
@@ -200,6 +207,8 @@ public class ParallelTrajectorySampler<U extends DecisionVariable> implements
 	}
 
 	public void afterIteration(final SimulatorState newState) {
+
+		this.totalTransitionCnt++;
 
 		Logger.getLogger(this.getClass().getName()).info(
 				"Trajectory sampling iteration " + this.samplingStages.size());

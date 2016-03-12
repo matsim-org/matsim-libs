@@ -59,6 +59,8 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	private TransitionSequence<U> transitionSequence = null;
 
+	private int totalTransitionCnt = 0;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public SingleTrajectorySampler(final U decisionVariable,
@@ -105,6 +107,7 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	@Override
 	public void afterIteration(SimulatorState newState) {
+		this.totalTransitionCnt++;
 		if (this.fromState != null) {
 			if (this.transitionSequence == null) {
 				this.transitionSequence = new TransitionSequence<U>(
@@ -124,11 +127,12 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	@Override
 	public int getTotalTransitionCnt() {
-		if (this.transitionSequence != null) {
-			return this.transitionSequence.size();
-		} else {
-			return 0;
-		}
+		return this.totalTransitionCnt;
+		// if (this.transitionSequence != null) {
+		// return this.transitionSequence.size();
+		// } else {
+		// return 0;
+		// }
 	}
 
 	@Override
