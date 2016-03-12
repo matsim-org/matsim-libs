@@ -26,6 +26,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -36,6 +37,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -73,18 +75,18 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	public void testFreespeed() {
 		Config config = loadConfig(null);
 		config.network().setTimeVariantNetwork(true);
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		NetworkImpl network = createNetwork(scenario);
+		Network network = createNetwork(scenario);
 		Link link1 = network.getLinks().get(Id.create("1", Link.class));
 		Link link2 = network.getLinks().get(Id.create("2", Link.class));
 		Link link3 = network.getLinks().get(Id.create("3", Link.class));
 
 		// add a freespeed change to 20 at 8am.
-		NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(8*3600.0);
+		NetworkChangeEvent change = ((NetworkImpl)network).getFactory().createNetworkChangeEvent(8*3600.0);
 		change.addLink(link2);
 		change.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, 20));
-		network.addNetworkChangeEvent(change);
+		((NetworkImpl)network).addNetworkChangeEvent(change);
 
 		// create a population
 		Population plans = scenario.getPopulation();
@@ -120,24 +122,24 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		config.network().setTimeVariantNetwork(true);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
-		NetworkImpl network = createNetwork(scenario);
+		Network network = createNetwork(scenario);
 		Link link1 = network.getLinks().get(Id.create("1", Link.class));
 		Link link2 = network.getLinks().get(Id.create("2", Link.class));
 		Link link3 = network.getLinks().get(Id.create("3", Link.class));
 		/*
 		 * Create a network change event that reduces the capacity.
 		 */
-		NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(0);
+		NetworkChangeEvent change1 = ((NetworkImpl)network).getFactory().createNetworkChangeEvent(0);
 		change1.addLink(link2);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
-		network.addNetworkChangeEvent(change1);
+		((NetworkImpl)network).addNetworkChangeEvent(change1);
 		/*
 		 * Create a network event the restores the capacity to its original value.
 		 */
-		NetworkChangeEvent change2 = network.getFactory().createNetworkChangeEvent(3600);
+		NetworkChangeEvent change2 = ((NetworkImpl)network).getFactory().createNetworkChangeEvent(3600);
 		change2.addLink(link2);
 		change2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1/capacityFactor));
-		network.addNetworkChangeEvent(change2);
+		((NetworkImpl)network).addNetworkChangeEvent(change2);
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
@@ -186,9 +188,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		config.qsim().setStartTime(0.0);
 		final double simEndTime = 7200.0;
 		config.qsim().setEndTime(simEndTime);
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
+		Scenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
+		
 
-		NetworkImpl network = createNetwork(scenario);
+		Network network = createNetwork(scenario);
 		final Id<Link> id1 = Id.create("1", Link.class);
 		final Id<Link> id2 = Id.create("2", Link.class);
 		final Id<Link> id3 = Id.create("3", Link.class);
@@ -199,10 +202,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		/*
 		 * Create a network change event that reduces the capacity.
 		 */
-		NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(0);
+		NetworkChangeEvent change1 = ((NetworkImpl)network).getFactory().createNetworkChangeEvent(0);
 		change1.addLink(link2);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
-		network.addNetworkChangeEvent(change1);
+		((NetworkImpl)network).addNetworkChangeEvent(change1);
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
@@ -260,7 +263,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 * @return a network.
 	 * @author illenberger
 	 */
-	private NetworkImpl createNetwork(MutableScenario scenario) {
+	private static Network createNetwork(Scenario scenario) {
 		// create a network
 		NetworkFactoryImpl nf = (NetworkFactoryImpl) scenario.getNetwork().getFactory();
 		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
@@ -290,7 +293,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 * @return a list of persons where the ordering corresponds to the departure times.
 	 * @author illenberger
 	 */
-	private List<Person> createPersons(final double depTime, final Link depLink, final Link destLink, final NetworkImpl network,
+	private static List<Person> createPersons(final double depTime, final Link depLink, final Link destLink, final Network network,
 			final int count) {
 		double departureTime = depTime;
 		List<Person> persons = new ArrayList<Person>(count);

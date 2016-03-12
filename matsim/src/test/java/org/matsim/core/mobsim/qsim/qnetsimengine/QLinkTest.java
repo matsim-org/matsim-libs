@@ -109,6 +109,8 @@ public final class QLinkTest extends MatsimTestCase {
 		Person p = PopulationUtils.createPerson(Id.create("1", Person.class));
 		p.addPlan(new PlanImpl());
 		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
+		
+		double now = 0. ;
 
 		f.qlink1.getAcceptingQLane().addFromUpstream(v, now);
 		assertEquals(1, ((QueueWithBuffer) f.qlink1.qlane).vehInQueueCount());
@@ -145,7 +147,10 @@ public final class QLinkTest extends MatsimTestCase {
 		plan.addActivity(new ActivityImpl("work", f.link2.getId()));
 		PersonDriverAgentImpl driver = createAndInsertPersonDriverAgentImpl(p, f.sim);
 		veh.setDriver(driver);
-		driver.endActivityAndComputeNextState(0);
+		
+		double now = 0. ;
+		
+		driver.endActivityAndComputeNextState( now );
 		
 		// start test, check initial conditions
 		assertTrue(f.qlink1.isNotOfferingVehicle());
@@ -160,16 +165,20 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals("vehicle not found on link.", veh, f.qlink1.getVehicle(id1));
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
+		now = 1. ;
+		
 		// time step 1, vehicle should be now in the buffer
-		f.qlink1.doSimStep(1.0);
+		f.qlink1.doSimStep(now);
 		assertFalse(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.qlane).vehInQueueCount());
 		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1));
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
+		
+		now = 2. ;
 
 		// time step 2, vehicle leaves link
-		f.qlink1.doSimStep(2.0);
+		f.qlink1.doSimStep(now);
 		assertEquals(veh, f.qlink1.getOfferingQLanes().get(0).popFirstVehicle(now));
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.qlane).vehInQueueCount());
@@ -239,6 +248,8 @@ public final class QLinkTest extends MatsimTestCase {
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		f.qlink1.addParkedVehicle(veh);
+		
+		double now = 0. ;
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.isNotOfferingVehicle());
@@ -252,9 +263,11 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals("vehicle not found in waiting list.", veh, f.qlink1.getVehicle(id1));
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
+		
+		now = 1. ;
 
 		// time step 1, vehicle should be now in the buffer
-		f.qlink1.doSimStep(1.0);
+		f.qlink1.doSimStep( now);
 		assertFalse(f.qlink1.isNotOfferingVehicle());
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.qlane).vehInQueueCount());
 		assertEquals("vehicle not found in buffer.", veh, f.qlink1.getVehicle(id1));
@@ -305,7 +318,10 @@ public final class QLinkTest extends MatsimTestCase {
 		PersonDriverAgentImpl pa2 = createAndInsertPersonDriverAgentImpl(p2, qsim);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
-		pa2.endActivityAndComputeNextState(0);
+		
+		double now = 0. ;
+		
+		pa2.endActivityAndComputeNextState( now );
 
 
 		// start test
@@ -315,32 +331,44 @@ public final class QLinkTest extends MatsimTestCase {
 		qlink.getAcceptingQLane().addFromUpstream(v1, now);
 		assertEquals(1, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertTrue(qlink.isNotOfferingVehicle());
+		
+		now = 1. ;
+		
 		// time step 1, v1 is moved to buffer
-		qlink.doSimStep(1.0);
+		qlink.doSimStep(now);
 		assertEquals(0, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertFalse(qlink.isNotOfferingVehicle());
 		// add v2, still time step 1
 		qlink.getAcceptingQLane().addFromUpstream(v2, now);
 		assertEquals(1, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertFalse(qlink.isNotOfferingVehicle());
+		
+		now = 2. ;
+		
 		// time step 2, v1 still in buffer, v2 cannot enter buffer, so still on link
-		qlink.doSimStep(2.0);
+		qlink.doSimStep( now );
 		assertEquals(1, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertFalse(qlink.isNotOfferingVehicle());
 		// v1 leaves buffer
 		assertEquals(v1, qlink.getOfferingQLanes().get(0).popFirstVehicle(now));
 		assertEquals(1, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertTrue(qlink.isNotOfferingVehicle());
+		
+		now = 3. ;
+		
 		// time step 3, v2 moves to buffer
-		qlink.doSimStep(3.0);
+		qlink.doSimStep(now);
 		assertEquals(0, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertFalse(qlink.isNotOfferingVehicle());
 		// v2 leaves buffer
 		assertEquals(v2, qlink.getOfferingQLanes().get(0).popFirstVehicle(now));
 		assertEquals(0, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertTrue(qlink.isNotOfferingVehicle());
+		
+		now = 4. ;
+		
 		// time step 4, empty link
-		qlink.doSimStep(4.0);
+		qlink.doSimStep(now);
 		assertEquals(0, ((QueueWithBuffer) qlink.qlane).vehInQueueCount());
 		assertTrue(qlink.isNotOfferingVehicle());
 	}
@@ -372,24 +400,27 @@ public final class QLinkTest extends MatsimTestCase {
 		mediumVehType.setPcuEquivalents(2.5);
 		VehicleType largeVehType = new VehicleTypeImpl(Id.create("largeVehicleType", VehicleType.class));
 		largeVehType.setPcuEquivalents(5);
+		
+		double now = 0.0 ;
+		
 		QVehicle veh1 = new QVehicle(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehType));
 		Person p1 = createPerson2(Id.createPersonId(5), f);
 		PersonDriverAgentImpl driver1 = createAndInsertPersonDriverAgentImpl(p1, f.sim);
 		veh1.setDriver(driver1);
 		driver1.setVehicle(veh1);
-		driver1.endActivityAndComputeNextState(0.0);
+		driver1.endActivityAndComputeNextState( now );
 		QVehicle veh25 = new QVehicle(new VehicleImpl(Id.create(2, Vehicle.class), mediumVehType));
 		Person p2 = createPerson2(Id.createPersonId(6), f);
 		PersonDriverAgentImpl driver25 = createAndInsertPersonDriverAgentImpl(p2, f.sim);
 		veh25.setDriver(driver25);
 		driver25.setVehicle(veh25);
-		driver25.endActivityAndComputeNextState(0.0);
+		driver25.endActivityAndComputeNextState( now );
 		QVehicle veh5 = new QVehicle(new VehicleImpl(Id.create(3, Vehicle.class), largeVehType));
 		Person p3 = createPerson2(Id.createPersonId(7), f);
 		PersonDriverAgentImpl driver5 = createAndInsertPersonDriverAgentImpl(p3, f.sim);
 		veh5.setDriver(driver5);
 		driver5.setVehicle(veh5);
-		driver5.endActivityAndComputeNextState(0.0);
+		driver5.endActivityAndComputeNextState( now );
 
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), EPSILON);
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh5, now);  // used vehicle equivalents: 5
@@ -398,7 +429,10 @@ public final class QLinkTest extends MatsimTestCase {
 		assertFalse(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
 
 		assertTrue(f.qlink2.isNotOfferingVehicle());
-		f.qlink2.doSimStep(5.0); // first veh moves to buffer, used vehicle equivalents: 5
+		
+		now = 5.0 ;
+
+		f.qlink2.doSimStep( now ); // first veh moves to buffer, used vehicle equivalents: 5
 		assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
 		assertFalse(f.qlink2.isNotOfferingVehicle());
 		f.qlink2.getOfferingQLanes().get(0).popFirstVehicle(now);  // first veh leaves buffer
@@ -410,8 +444,10 @@ public final class QLinkTest extends MatsimTestCase {
 		assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh1, now);  // used vehicle equivalents: 10.5
 		assertFalse(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
+		
+		now = 6.0 ;
 
-		f.qlink2.doSimStep(6.0); // first veh moves to buffer, used vehicle equivalents: 5.5
+		f.qlink2.doSimStep(now); // first veh moves to buffer, used vehicle equivalents: 5.5
 		assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh1, now);  // used vehicle equivalents: 6.5
 		f.qlink2.getAcceptingQLane().addFromUpstream(veh25, now); // used vehicle equivalents: 9.0

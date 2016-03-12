@@ -34,19 +34,50 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsManagerModule;
+import org.matsim.core.mobsim.DefaultMobsimModule;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.ActivityEnginePlugin;
+import org.matsim.core.mobsim.qsim.PopulationPlugin;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimModule;
+import org.matsim.core.mobsim.qsim.QSimProvider;
+import org.matsim.core.mobsim.qsim.TeleportationPlugin;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
+import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
+import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.scenario.ScenarioByConfigModule;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.EventsLogger;
 
+import com.google.inject.Guice;
+import com.google.inject.Module;
+import com.google.inject.Provides;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -86,13 +117,51 @@ public class LinkSpeedCalculatorIntegrationTest {
 	@Test
 	public void testIntegration_Slow() {
 		Fixture f = new Fixture();
-		EventsCollector collector = new EventsCollector();
-		f.events.addHandler(collector);
-		f.events.addHandler(new EventsLogger());
 
-	// Use a vehicle link speed of 5.0.
-		QSim qsim = configureQSim(f, new CustomLinkSpeedCalculator(5.0));
-		qsim.run();
+		final Scenario scenario = f.scenario ;
+		scenario.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		
+//		final com.google.inject.AbstractModule localQSimModule = new com.google.inject.AbstractModule () {
+//			@Override
+//			protected void configure() {
+//				bind(Mobsim.class).toProvider(QSimProvider.class);
+//			}
+//
+//			@Provides
+//			Collection<AbstractQSimPlugin> provideQSimPlugins(TransitConfigGroup transitConfigGroup, NetworkConfigGroup networkConfigGroup, Config config) {
+//				final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
+//				plugins.add(new MessageQueuePlugin(config));
+//				plugins.add(new ActivityEnginePlugin(config));
+//				plugins.add(new QNetsimEnginePlugin(config));
+//				plugins.add(new TeleportationPlugin(config));
+//				plugins.add(new PopulationPlugin(config));
+//				return plugins;
+//			}
+//		} ;
+
+		AbstractModule overridingModule = new AbstractModule(){
+			@Override public void install() {
+//				// Use a vehicle link speed of 5.0.
+				this.bind( LinkSpeedCalculator.class ).toInstance( new CustomLinkSpeedCalculator(5.0) ) ; ; 
+				this.bind( QNetworkFactory.class ).to( DefaultQNetworkFactory.class ) ;
+			}
+		} ;
+
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
+				new ScenarioByInstanceModule( scenario ) ,
+				new EventsManagerModule() ,
+				new DefaultMobsimModule() ,
+				overridingModule
+		) ;
+
+		EventsManager eventsManager = injector.getInstance( EventsManager.class ) ;
+		eventsManager.initProcessing(); 
+
+		EventsCollector collector = new EventsCollector();
+		eventsManager.addHandler(collector);
+		eventsManager.addHandler(new EventsLogger());
+
+		((QSim) injector.getInstance( Mobsim.class )).run();
 		
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
@@ -134,7 +203,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		Assert.assertEquals(6, lle.getTime() - lee.getTime(), 1e-8);
 	}
 	
-	private QSim configureQSim(Fixture f, LinkSpeedCalculator linkSpeedCalculator) {
+	private static QSim configureQSim(Fixture f, LinkSpeedCalculator linkSpeedCalculator) {
 		QSim qsim = new QSim(f.scenario, f.events);
 		
 		// handle activities

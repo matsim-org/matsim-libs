@@ -43,7 +43,7 @@ import org.matsim.contrib.hybridsim.simulation.ExternalEngine;
 		if (link.getAllowedModes().contains("2ext")) {
 			return new QSimExternalTransitionLink(link, network, this.e);
 		}
-		QLinkImpl ret = new QLinkImpl(link, network, queueNode);
+		QLinkImpl ret = new QLinkImpl(link, network, queueNode, linkSpeedCalculator);
 		if (link.getAllowedModes().contains("ext2")) {
 			this.e.registerAdapter(new QLinkInternalIAdapter(ret));
 		}

@@ -34,11 +34,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
@@ -171,9 +176,16 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			// QLaneI queue = new QueueWithBuffer(this, new FIFOVehicleQ(), laneId,
 			// lane.getLength(), noEffectiveLanes,
 			// (lane.getLaneData().getCapacityVehiclesPerHour()/3600.0));
-			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this, qsimConfig);
+
+			QSimConfigGroup qsimConfig = getQnetwork().simEngine.getMobsim().getScenario().getConfig().qsim() ;
+			EventsManager events = getQnetwork().simEngine.getMobsim().getEventsManager() ;
+			double effectiveCellSize = ((NetworkImpl) getQnetwork().getNetwork()).getEffectiveCellSize() ;
+			AgentCounter agentCounter = getQnetwork().simEngine.getMobsim().getAgentCounter() ;
+			LinkSpeedCalculator linkSpeedCalculator = getQnetwork().simEngine.getLinkSpeedCalculator() ;
+			AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = getQnetwork().simEngine.getAgentSnapshotInfoBuilder() ;
+			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this, qsimConfig, events, effectiveCellSize, agentCounter, linkSpeedCalculator, agentSnapshotInfoBuilder);
 			builder.setVehicleQueue(new FIFOVehicleQ());
-			builder.setId(laneId);
+			builder.setLaneId(laneId);
 			builder.setLength(lane.getLength());
 			builder.setEffectiveNumberOfLanes(noEffectiveLanes);
 			builder.setFlowCapacity_s(lane.getLaneData().getCapacityVehiclesPerHour() / 3600.);
@@ -254,6 +266,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	@Override
 	void clearVehicles() {
 		super.clearVehicles();
+
+		double now = getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 		for (QLaneI lane : this.laneQueues.values()) {
 			lane.clearVehicles(now);
 		}
@@ -542,6 +556,9 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				final Collection<AgentSnapshotInfo> positions) {
 			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkLanesImpl.this.getQnetwork().simEngine
 					.getAgentSnapshotInfoBuilder();
+			
+			double now = getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+
 
 			if (visLink != null) {
 				for (QLaneI ql : QLinkLanesImpl.this.laneQueues.values()) {
@@ -554,7 +571,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			}
 
 			for (QLaneI road : QLinkLanesImpl.this.getQueueLanes().values()) {
-				road.getVisData().addAgentSnapshotInfo(positions);
+				road.getVisData().addAgentSnapshotInfo(positions, now);
 			}
 
 			int cnt2 = 10;

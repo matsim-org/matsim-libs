@@ -44,7 +44,7 @@ public final class KaiHybridNetworkFactory extends QNetworkFactory {
 			this.hybridEngine.registerHiResLink(hiResLink);
 			return hiResLink ;
 		} else {
-			return new QLinkImpl(link, network, toQueueNode);
+			return new QLinkImpl(link, network, toQueueNode, linkSpeedCalculator);
 		}
 	}
 

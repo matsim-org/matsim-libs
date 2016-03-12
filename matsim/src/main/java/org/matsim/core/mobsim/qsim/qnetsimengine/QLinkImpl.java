@@ -28,12 +28,17 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
@@ -72,20 +77,28 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
+	 * @param linkSpeedCalculator TODO
 	 */
-	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode) {
-		this(link2, network, toNode, new FIFOVehicleQ());
+	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, LinkSpeedCalculator linkSpeedCalculator) {
+		this(link2, network, toNode, new FIFOVehicleQ(), linkSpeedCalculator);
 	}
 
 	/** 
 	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
+	 * @param linkSpeedCalculator TODO
 	 * 
 	 */
-	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final VehicleQ<QVehicle> vehicleQueue) {
+	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final VehicleQ<QVehicle> vehicleQueue, LinkSpeedCalculator linkSpeedCalculator) {
 		// yy get rid of this c'tor (since the one with queueWithBuffer is more flexible)?
 		super(link2, toNode, network) ;
 		//--
-		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this, qsimConfig) ;
+		QSimConfigGroup qsimConfig = network.simEngine.getMobsim().getScenario().getConfig().qsim() ;
+		EventsManager events = network.simEngine.getMobsim().getEventsManager() ;
+		double effectiveCellSize = ((NetworkImpl) network.getNetwork()).getEffectiveCellSize() ;
+		AgentCounter agentCounter = network.simEngine.getMobsim().getAgentCounter() ;
+		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = network.simEngine.getAgentSnapshotInfoBuilder() ;
+		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this, qsimConfig, events,
+				effectiveCellSize, agentCounter, linkSpeedCalculator, agentSnapshotInfoBuilder) ;
 		builder.setVehicleQueue(vehicleQueue);
 		this.qlane = builder.build() ;
 		//--
@@ -118,8 +131,9 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override
 	void clearVehicles() {
+		double now = this.getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+		
 		super.clearVehicles();
-
 		qlane.clearVehicles(now);
 	}
 
@@ -286,13 +300,14 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo( Collection<AgentSnapshotInfo> positions) {
 			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQnetwork().simEngine.getAgentSnapshotInfoBuilder();
 
-			VisData roadVisData = qlane.getVisData() ;
+			QLaneI.VisData roadVisData = qlane.getVisData() ;
 			if (visLink != null) {
 				((QueueWithBuffer.VisDataImpl)roadVisData).setVisInfo(visLink.getLinkStartCoord(), visLink.getLinkEndCoord(), visLink.getEuklideanDistance()) ;
 				// yyyy not so great but an elegant solution needs more thinking about visualizer structure. kai, jun'13
 			}
 
-			positions = roadVisData.addAgentSnapshotInfo(positions) ;
+			double now = getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+			positions = roadVisData.addAgentSnapshotInfo(positions,now) ;
 
 			int cnt2 = 10 ; // a counter according to which non-moving items can be "spread out" in the visualization
 			// initialize a bit away from the lane

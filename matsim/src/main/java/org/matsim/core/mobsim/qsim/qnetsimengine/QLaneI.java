@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
 /**
@@ -50,6 +51,10 @@ abstract class QLaneI {
 	abstract QVehicle getVehicle( final Id<Vehicle> vehicleId);
 
 	abstract double getStorageCapacity();
+	
+	static interface VisData {
+		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions, double now ) ;
+	}
 
 	abstract VisData getVisData();
 

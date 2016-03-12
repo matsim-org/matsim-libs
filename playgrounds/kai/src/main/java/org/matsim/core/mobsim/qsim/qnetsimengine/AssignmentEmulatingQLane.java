@@ -220,7 +220,6 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 	@Override
 	public final QVehicle popFirstVehicle(double now) {
-		double now = qLink.getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = buffer.poll();
 		if (this.generatingEvents) {
 			this.qLink.getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
@@ -240,7 +239,6 @@ class AssignmentEmulatingQLane extends QLaneI {
 	
 	@Override
 	public final void clearVehicles(double now) {
-		double now = qLink.getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : vehQueue) {
 			qLink.getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(
@@ -261,7 +259,6 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 	@Override
 	public final void addFromUpstream(final QVehicle veh, double now) {
-		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		qLink.activateLink();
 		this.vehEnterTimeMap.put( veh.getId(), now ) ;
 		
@@ -338,18 +335,17 @@ class AssignmentEmulatingQLane extends QLaneI {
 		return this.qLink.getLink().getId() ;
 	}
 
-	class VisDataImpl implements VisData {
+	class VisDataImpl implements QLaneI.VisData {
 
 
 		private VisLinkWLanes otfLink;
 
 		@Override
-		public final Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
+		public final Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions, double now ) {
 			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = AssignmentEmulatingQLane.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			double numberOfVehiclesDriving = AssignmentEmulatingQLane.this.buffer.size() + AssignmentEmulatingQLane.this.vehQueue.size();
 			if (numberOfVehiclesDriving > 0) {
-				double now = AssignmentEmulatingQLane.this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 				Link link = AssignmentEmulatingQLane.this.qLink.getLink();
 //				double spacing = snapshotInfoBuilder.calculateVehicleSpacing(AssignmentEmulatingQLane.this.length, numberOfVehiclesDriving,
 //						AssignmentEmulatingQLane.this.getStorageCapacity(), AssignmentEmulatingQLane.this.bufferStorageCapacity);

@@ -266,7 +266,8 @@ public class LinkImpl implements Link {
 
 	@Override
 	public double getCapacity() {
-		return getCapacity(Time.UNDEFINED_TIME);
+		return this.capacity;
+//		return getCapacity(Time.UNDEFINED_TIME);
 	}
 
 	@Override
@@ -282,7 +283,8 @@ public class LinkImpl implements Link {
 
 	@Override
 	public double getFreespeed() {
-		return getFreespeed(Time.UNDEFINED_TIME);
+		return this.freespeed;
+//		return getFreespeed(Time.UNDEFINED_TIME);
 	}
 
 	/**
@@ -315,7 +317,8 @@ public class LinkImpl implements Link {
 
 	@Override
 	public double getNumberOfLanes() {
-		return getNumberOfLanes(Time.UNDEFINED_TIME);
+		return this.nofLanes;
+//		return this.getNumberOfLanes(Time.UNDEFINED_TIME);
 	}
 
 	@Override

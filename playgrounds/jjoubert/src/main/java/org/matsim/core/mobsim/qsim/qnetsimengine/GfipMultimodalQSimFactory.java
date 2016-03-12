@@ -121,7 +121,7 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 				default:
 					throw new RuntimeException("Do not know what VehicleQ to use with queue type " + queueType.toString());
 				}
-				return new QLinkImpl(link, network, toQueueNode, vehicleQ);
+				return new QLinkImpl(link, network, toQueueNode, vehicleQ, linkSpeedCalculator);
 			}
 			@Override
 			public QNode createNetsimNode(final Node node, QNetwork network) {
