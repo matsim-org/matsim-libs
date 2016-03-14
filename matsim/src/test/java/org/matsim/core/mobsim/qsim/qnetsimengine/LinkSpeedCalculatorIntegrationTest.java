@@ -58,6 +58,8 @@ import org.matsim.core.mobsim.qsim.TeleportationPlugin;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
 import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
@@ -114,45 +116,67 @@ public class LinkSpeedCalculatorIntegrationTest {
 		Assert.assertEquals(11, lle.getTime() - lee.getTime(), 1e-8);
 	}
 	
+	@SuppressWarnings("static-method")
 	@Test
 	public void testIntegration_Slow() {
 		Fixture f = new Fixture();
 
 		final Scenario scenario = f.scenario ;
-		scenario.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		final Config config = scenario.getConfig() ;
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		
-//		final com.google.inject.AbstractModule localQSimModule = new com.google.inject.AbstractModule () {
-//			@Override
-//			protected void configure() {
-//				bind(Mobsim.class).toProvider(QSimProvider.class);
-//			}
-//
-//			@Provides
-//			Collection<AbstractQSimPlugin> provideQSimPlugins(TransitConfigGroup transitConfigGroup, NetworkConfigGroup networkConfigGroup, Config config) {
-//				final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
-//				plugins.add(new MessageQueuePlugin(config));
-//				plugins.add(new ActivityEnginePlugin(config));
-//				plugins.add(new QNetsimEnginePlugin(config));
-//				plugins.add(new TeleportationPlugin(config));
-//				plugins.add(new PopulationPlugin(config));
-//				return plugins;
-//			}
-//		} ;
+		final AbstractQSimPlugin localNetsimPlugin = new AbstractQSimPlugin(config){
+			@Override
+			public Collection<? extends Module> modules() {
+				Collection<Module> result = new ArrayList<>();
+				result.add(new com.google.inject.AbstractModule() {
+					@Override
+					protected void configure() {
+						bind(QNetsimEngine.class).asEagerSingleton();
+						bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).asEagerSingleton();
+						bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
+						bind( LinkSpeedCalculator.class ).toInstance( new CustomLinkSpeedCalculator(5.0) ) ; ; 
+					}
+				});
+				return result;
+			}
+			@Override
+			public Collection<Class<? extends DepartureHandler>> departureHandlers() {
+				Collection<Class<? extends DepartureHandler>> result = new ArrayList<>();
+				result.add(VehicularDepartureHandler.class);
+				return result;
+			}
+			@Override
+			public Collection<Class<? extends MobsimEngine>> engines() {
+				Collection<Class<? extends MobsimEngine>> result = new ArrayList<>();
+				result.add(QNetsimEngine.class);
+				return result;
+			}
+		} ;
 
-		AbstractModule overridingModule = new AbstractModule(){
-			@Override public void install() {
-//				// Use a vehicle link speed of 5.0.
-				this.bind( LinkSpeedCalculator.class ).toInstance( new CustomLinkSpeedCalculator(5.0) ) ; ; 
-				this.bind( QNetworkFactory.class ).to( DefaultQNetworkFactory.class ) ;
+		
+		final com.google.inject.AbstractModule localQSimModule = new com.google.inject.AbstractModule () {
+			@Override
+			protected void configure() {
+				bind(Mobsim.class).toProvider(QSimProvider.class);
+			}
+			@Provides
+			Collection<AbstractQSimPlugin> provideQSimPlugins(TransitConfigGroup transitConfigGroup, NetworkConfigGroup networkConfigGroup, Config config) {
+				final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
+				plugins.add(new MessageQueuePlugin(config));
+				plugins.add(new ActivityEnginePlugin(config));
+				plugins.add( localNetsimPlugin );
+				plugins.add(new TeleportationPlugin(config));
+				plugins.add(new PopulationPlugin(config));
+				return plugins;
 			}
 		} ;
 
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
 				new ScenarioByInstanceModule( scenario ) ,
-				new EventsManagerModule() ,
-				new DefaultMobsimModule() ,
-				overridingModule
-		) ;
+				new EventsManagerModule() , 
+				new AbstractModule() { @Override public void install() { install( localQSimModule ) ; } }
+				) ;
 
 		EventsManager eventsManager = injector.getInstance( EventsManager.class ) ;
 		eventsManager.initProcessing(); 
