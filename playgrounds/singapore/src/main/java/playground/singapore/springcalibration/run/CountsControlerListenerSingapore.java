@@ -1,24 +1,4 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * CountControlerListener.java
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
-package org.matsim.counts;
+package playground.singapore.springcalibration.run;
 
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -35,6 +15,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
@@ -51,9 +32,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author dgrether
+ * @author anhorni
  */
-class CountsControlerListener implements StartupListener, IterationEndsListener {
+class CountsControlerListenerSingapore implements StartupListener, IterationEndsListener {
 
 	/*
 	 * String used to identify the operation in the IterationStopWatch.
@@ -76,7 +57,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
     private int iterationsUsed = 0;
 
     @Inject
-    CountsControlerListener(GlobalConfigGroup globalConfigGroup, Network network, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
+    CountsControlerListenerSingapore(GlobalConfigGroup globalConfigGroup, Network network, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
         this.globalConfigGroup = globalConfigGroup;
         this.network = network;
         this.controlerConfigGroup = controlerConfigGroup;
@@ -129,7 +110,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 
                 if (this.config.getOutputFormat().contains("html") ||
                         this.config.getOutputFormat().contains("all")) {
-                    CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(controlerIO.getIterationPath(event.getIteration()), cca.getComparison(), event.getIteration());
+                    CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(controlerIO.getIterationPath(event.getIteration()) + "/screenline/", cca.getComparison(), event.getIteration());
                     cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
                     cgw.addGraphsCreator(new CountsErrorGraphCreator("errors"));
                     cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
@@ -138,7 +119,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
                 }
                 if (this.config.getOutputFormat().contains("kml") ||
                         this.config.getOutputFormat().contains("all")) {
-                    String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare.kmz");
+                    String filename = controlerIO.getIterationFilename(event.getIteration(), "/screenline/countscompare.kmz");
                     CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
                             cca.getComparison(), network, TransformationFactory.getCoordinateTransformation(globalConfigGroup.getCoordinateSystem(), TransformationFactory.WGS84));
                     kmlWriter.setIterationNumber(event.getIteration());
@@ -146,7 +127,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
                 }
                 if (this.config.getOutputFormat().contains("txt") ||
                         this.config.getOutputFormat().contains("all")) {
-                    String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare.txt");
+                    String filename = controlerIO.getIterationFilename(event.getIteration(), "/screenline/countscompare.txt");
                     CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
                     ctw.writeFile(filename);
                 }
