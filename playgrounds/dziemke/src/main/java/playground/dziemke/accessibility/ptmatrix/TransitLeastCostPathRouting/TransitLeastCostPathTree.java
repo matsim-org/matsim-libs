@@ -127,19 +127,23 @@ public class TransitLeastCostPathTree {
         augmentIterationId();
 
         //find the best node
-        double minCost = Double.POSITIVE_INFINITY;
+        double minTime = Double.POSITIVE_INFINITY;
         Node minCostNode = null;
         for (Node currentNode: toNodes.keySet()) {
             DijkstraNodeData data = getData(currentNode);
             InitialData initData = toNodes.get(currentNode);
-            double cost = data.getCost() + initData.initialCost;
-            if (cost == 0.0 && !fromNodes.containsKey(currentNode)) {
-                continue;
+            double time = data.getTime() + initData.initialTime;
+            if (time != 0.0 || fromNodes.containsKey(currentNode)) {
+                if (time < minTime) {
+                    minTime = time;
+                    minCostNode = currentNode;
+                }
             }
-            if (cost < minCost) {
-                minCost = cost;
-                minCostNode = currentNode;
-            }
+
+        }
+
+        if (minCostNode == null) {
+            return null;
         }
 
         // now construct the path
@@ -153,6 +157,11 @@ public class TransitLeastCostPathTree {
             nodes.add(0, tmpLink.getFromNode());
             tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
         }
+
+        if (!fromNodes.keySet().contains(nodes.get(0))) {
+            return null;
+        }
+
         DijkstraNodeData startNodeData = getData(nodes.get(0));
         DijkstraNodeData toNodeData = getData(minCostNode);
 
@@ -165,7 +174,7 @@ public class TransitLeastCostPathTree {
         this.person = person;
         this.customDataManager.reset();
 
-        Set<Node> endNodes = new HashSet<Node>(toNodes.keySet());
+        Set<Node> endNodes = new HashSet<>(toNodes.keySet());
 
         augmentIterationId();
 
@@ -212,8 +221,8 @@ public class TransitLeastCostPathTree {
         Node toNode = minCostNode;
 
         // now construct the path
-        List<Node> nodes = new LinkedList<Node>();
-        List<Link> links = new LinkedList<Link>();
+        List<Node> nodes = new LinkedList<>();
+        List<Link> links = new LinkedList<>();
 
         nodes.add(0, toNode);
         Link tmpLink = getData(toNode).getPrevLink();
