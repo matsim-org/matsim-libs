@@ -67,7 +67,11 @@ public class NetworkIncident {
 		return "NetworkIncident [startTime=" + startTime + ", endTime=" + endTime + ", incidentLink=" + incidentLink.getCapacity() + "-" + incidentLink.getFreespeed() + "-" + incidentLink.getNumberOfLanes()
 				+ ", link=" + link.getCapacity() + "-" + link.getFreespeed() + "-" + link.getNumberOfLanes() + "]";
 	}
-
+	
+	public String incidentLinkParametersToString() {
+		return "IncidentLink=" + incidentLink.getCapacity() + "-" + incidentLink.getFreespeed() + "-" + incidentLink.getNumberOfLanes() + "]";
+	}
+	
 	public void setIncidentLink(Link trafficIncidentLink) {
 		this.incidentLink = trafficIncidentLink;
 	}
