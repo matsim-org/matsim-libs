@@ -3,8 +3,10 @@ package playground.singapore.springcalibration.run;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -44,11 +46,11 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
     private GlobalConfigGroup globalConfigGroup;
     private Network network;
     private ControlerConfigGroup controlerConfigGroup;
-    private final CountsConfigGroup config;
-    private final Set<String> analyzedModes;
-    private final VolumesAnalyzer volumesAnalyzer;
-    private final IterationStopWatch iterationStopwatch;
-    private final OutputDirectoryHierarchy controlerIO;
+    private CountsConfigGroup config;
+    private Set<String> analyzedModes;
+    private VolumesAnalyzer volumesAnalyzer;
+    private IterationStopWatch iterationStopwatch;
+    private OutputDirectoryHierarchy controlerIO;
 
     @com.google.inject.Inject(optional=true)
     private Counts<Link> counts = null;
@@ -57,19 +59,24 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
     private int iterationsUsed = 0;
 
     @Inject
-    CountsControlerListenerSingapore(GlobalConfigGroup globalConfigGroup, Network network, ControlerConfigGroup controlerConfigGroup, CountsConfigGroup countsConfigGroup, VolumesAnalyzer volumesAnalyzer, IterationStopWatch iterationStopwatch, OutputDirectoryHierarchy controlerIO) {
-        this.globalConfigGroup = globalConfigGroup;
-        this.network = network;
-        this.controlerConfigGroup = controlerConfigGroup;
-        this.config = countsConfigGroup;
-        this.volumesAnalyzer = volumesAnalyzer;
-		this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());
-        this.iterationStopwatch = iterationStopwatch;
-        this.controlerIO = controlerIO;
+    CountsControlerListenerSingapore() {
 	}
 
 	@Override
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
+		Scenario scenario = controlerStartupEvent.getServices().getScenario();
+		Config config = controlerStartupEvent.getServices().getConfig();
+		
+		this.globalConfigGroup = config.global();
+		this.network = scenario.getNetwork();
+		this.controlerConfigGroup = config.controler();
+		this.config = config.counts();
+		this.volumesAnalyzer = controlerStartupEvent.getServices().getVolumes();
+		this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());
+        this.iterationStopwatch = controlerStartupEvent.getServices().getStopwatch();
+        this.controlerIO = controlerStartupEvent.getServices().getControlerIO();
+		
+		
         if (counts != null) {
             for (Id<Link> linkId : counts.getCounts().keySet()) {
                 this.linkStats.put(linkId, new double[24]);
