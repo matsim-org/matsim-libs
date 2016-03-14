@@ -33,7 +33,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.router.MultiNodeDijkstra;
+//import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterNetwork.TransitRouterNetworkNode;
@@ -134,7 +134,7 @@ public class TransitRouterImpl implements TransitRouter {
         Path p = this.transitLeastCostPathTree.getPath(wrappedToNodes);
 
         if (p == null) {
-            return null;
+            return this.createDirectWalkLegList(null, fromCoord, toCoord);
         }
 
         double directWalkCost = getWalkDisutility(person, fromCoord, toCoord);
