@@ -193,14 +193,6 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 				for (int i = 0; i < 24; i++) {
 					newVolume[i] += volumesForMode[i];
 				}
-				
-				Id<Link> id = Id.createLinkId(linkId.toString() + "_HW");
-				double[] volumesForMode_HW = volumes.getVolumesPerHourForLink(id, mode);
-				if (volumesForMode_HW == null) continue;
-				for (int i = 0; i < 24; i++) {
-					newVolume[i] += volumesForMode_HW[i];
-				}
-				
 			}
 			return newVolume;
 		} else {
