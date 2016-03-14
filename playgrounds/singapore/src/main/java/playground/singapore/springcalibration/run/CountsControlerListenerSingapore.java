@@ -180,10 +180,9 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
 				if (volumesForMode == null) continue;
 				for (int i = 0; i < 24; i++) {
 					newVolume[i] += volumesForMode[i];
-				}
-				
-				Id<Link> id = Id.createLinkId(linkId.toString() + "_HW");
-				double[] volumesForMode_HW = volumes.getVolumesPerHourForLink(id, mode);
+				}				
+				Id<Link> linkIdHW = Id.createLinkId(linkId.toString() + "_HW");
+				double[] volumesForMode_HW = volumes.getVolumesPerHourForLink(linkIdHW, mode);
 				if (volumesForMode_HW == null) continue;
 				for (int i = 0; i < 24; i++) {
 					newVolume[i] += volumesForMode_HW[i];
@@ -192,7 +191,12 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
 			}
 			return newVolume;
 		} else {
-			return volumes.getVolumesPerHourForLink(linkId);
+			double[] newVolume = new double[24];
+			Id<Link> linkIdHW = Id.createLinkId(linkId.toString() + "_HW");
+			for (int i = 0; i < 24; i++) {
+				newVolume[i] += volumes.getVolumesPerHourForLink(linkId)[i] + volumes.getVolumesPerHourForLink(linkIdHW)[i];
+			}
+			return newVolume;
 		}
 	}
 	
