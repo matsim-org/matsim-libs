@@ -70,11 +70,14 @@ public static void main(String[] args) throws IOException {
 			
 			boolean previousActInArea = false;
 			Coord previousCoord = null;
+			double previousEndtime  = Time.UNDEFINED_TIME;
 			for (int i = 0;i < plan.getPlanElements().size();i = i+2){
 			if (i == 0){
 				Activity act0 = (Activity) plan.getPlanElements().get(0);
-				if (geometry.contains(MGC.coord2Point(act0.getCoord()))) {previousActInArea = true;
+				if (geometry.contains(MGC.coord2Point(act0.getCoord()))) {
+					previousActInArea = true;
 				previousCoord = act0.getCoord();
+				previousEndtime = act0.getEndTime();
 				}
 				else break;
 			} else {
@@ -91,12 +94,13 @@ public static void main(String[] args) throws IOException {
 						Id<Link> start = leg.getRoute().getStartLinkId();
 						Id<Link> end = leg.getRoute().getEndLinkId();
 						starts.add(previousCoord.getX()+";"+previousCoord.getY()+";"+Time.writeTime(leg.getDepartureTime()));
-						ends.add(currentCoord.getX()+";"+currentCoord.getY()+";"+Time.writeTime(leg.getTravelTime()+leg.getDepartureTime()));
+						ends.add(currentCoord.getX()+";"+currentCoord.getY()+";"+Time.writeTime(currentAct.getStartTime()));
 						leg.setRoute(new GenericRouteImpl(start, end));
 					}
 				}
 				previousActInArea = currentActInArea;
 				previousCoord = currentCoord;
+				previousEndtime = currentAct.getStartTime();
 			}	
 			}
 			Person p2 = pop2.getFactory().createPerson(p.getId());

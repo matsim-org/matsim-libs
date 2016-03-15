@@ -19,8 +19,10 @@
 
 package playground.jbischoff.av.preparation;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -31,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -71,8 +74,10 @@ public class WobPlansFilter {
 				if (pe instanceof Leg){
 					if (((Leg) pe).getMode().equals(TransportMode.car))
 							{
+						Id<Link> start = ((Leg) pe).getRoute().getStartLinkId();
+						Id<Link> end = ((Leg) pe).getRoute().getStartLinkId();
 						((Leg) pe).setMode(TransportMode.ride);
-						((Leg) pe).setRoute(null);
+						((Leg) pe).setRoute(new GenericRouteImpl(start, end));
 					}
 				}
 			}
