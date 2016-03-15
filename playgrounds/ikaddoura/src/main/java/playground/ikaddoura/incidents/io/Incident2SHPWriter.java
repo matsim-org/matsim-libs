@@ -21,6 +21,7 @@ package playground.ikaddoura.incidents.io;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,11 +32,14 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+import playground.ikaddoura.incidents.DateTime;
 import playground.ikaddoura.incidents.TMCAlerts;
+import playground.ikaddoura.incidents.data.NetworkIncident;
 import playground.ikaddoura.incidents.data.TrafficItem;
 
 /**
@@ -50,14 +54,85 @@ public class Incident2SHPWriter {
 	TMCAlerts tmc = null;
 	Map<String, TrafficItem> trafficItems = null;
 	Map<String, Path> trafficItemId2path = null;
-	PolylineFeatureFactory factory = null;
 	
 	public Incident2SHPWriter(TMCAlerts tmc, Map<String, TrafficItem> trafficItems, Map<String, Path> trafficItemId2path) {
 		this.tmc = tmc;
 		this.trafficItems = trafficItems;
 		this.trafficItemId2path = trafficItemId2path;
+	}
+
+	public static void writeDailyIncidentLinksToShapeFile(List<NetworkIncident> incidents, String outputDirectory, double dateInSec) {
 		
-		factory = new PolylineFeatureFactory.Builder()
+		String outputShpFile = outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateTimeString(dateInSec) + ".shp";
+		
+		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
+				.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
+				.setName("Link")
+				.addAttribute("LinkId", String.class)
+				.addAttribute("IncidentId", String.class)
+				
+				.addAttribute("Capacity", Double.class)
+				.addAttribute("Freespeed", Double.class)
+				.addAttribute("Lanes", Double.class)
+				.addAttribute("Modes", String.class)
+				
+				.addAttribute("IncCap", Double.class)
+				.addAttribute("IncSpeed", Double.class)
+				.addAttribute("IncLanes", Double.class)
+				.addAttribute("IncModes", String.class)
+				
+				.addAttribute("IncStart", String.class)
+				.addAttribute("IncEnd", String.class)
+				.create();
+		
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		for (NetworkIncident incident : incidents) {	
+			Link link = incident.getLink();
+			Link incidentLink = incident.getIncidentLink();
+			
+			Object[] incidentObject = new Object[] {
+					link.getId().toString(),
+					incident.getId(),
+					
+					// the parameters under normal conditions
+					link.getCapacity(),
+					link.getFreespeed(),
+					link.getNumberOfLanes(),
+					link.getAllowedModes(),
+
+					// incident specific values
+					incidentLink.getCapacity(),
+					incidentLink.getFreespeed(),
+					incidentLink.getNumberOfLanes(),
+					incidentLink.getAllowedModes(),
+
+					// start and end time
+					DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(incident.getStartTime()),
+					DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(incident.getEndTime())
+			};
+			
+			SimpleFeature feature = factory.createPolyline(
+					new Coordinate[] {
+							new Coordinate(MGC.coord2Coordinate(incident.getLink().getFromNode().getCoord())),
+							new Coordinate(MGC.coord2Coordinate(incident.getLink().getToNode().getCoord())) }
+					, incidentObject
+					, null);
+			features.add(feature);
+		}
+		
+		if (features.isEmpty()) {
+			log.warn("No traffic incidents. Nothing to write into a shape file.");
+		} else {
+			log.info("Writing out incident shapefile... ");
+			ShapeFileWriter.writeGeometries(features, outputShpFile);
+			log.info("Writing out incident shapefile... Done.");
+		}
+	}
+	
+	public void writeTrafficItemLinksToShapeFile(String outputShpFile, Set<String> itemIdsToPrint) {
+		
+		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
 				.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
 				.setName("Link")
 				.addAttribute("LinkId", String.class)
@@ -77,9 +152,6 @@ public class Incident2SHPWriter {
 				.addAttribute("IncStart", String.class)
 				.addAttribute("IncEnd", String.class)
 				.create();
-	}
-
-	public void writeIncidentLinksToShapeFile(String outputShpFile, Set<String> itemIdsToPrint) {
 		
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
@@ -112,7 +184,7 @@ public class Incident2SHPWriter {
 		}
 	}
 	
-	public Object[] getIncidentObject(Link link, TrafficItem trafficItem) {
+	private Object[] getIncidentObject(Link link, TrafficItem trafficItem) {
 		
 		Link incidentLink = tmc.getTrafficIncidentLink(link, trafficItem);
 

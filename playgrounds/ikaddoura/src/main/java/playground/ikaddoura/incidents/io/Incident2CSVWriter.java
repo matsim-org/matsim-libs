@@ -23,9 +23,11 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import playground.ikaddoura.incidents.data.NetworkIncident;
 import playground.ikaddoura.incidents.data.TrafficItem;
 
 /**
@@ -35,7 +37,7 @@ import playground.ikaddoura.incidents.data.TrafficItem;
 public class Incident2CSVWriter {
 	private static final Logger log = Logger.getLogger(Incident2CSVWriter.class);
 
-	public void writeCSVFile(Collection<TrafficItem> collection, String outputFile) throws IOException {
+	public static void writeTrafficItems(Collection<TrafficItem> collection, String outputFile) throws IOException {
 		try ( BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile)) ) {
 			
 			bw.write("Traffic Item ID;Original Traffic Item ID;Download Time;"
@@ -69,9 +71,29 @@ public class Incident2CSVWriter {
 						+ item.getTMCAlert().getDescription());
 				bw.newLine();
 			}
-			
-			log.info("Output written to " + outputFile);
+			log.info("Traffic items written to " + outputFile);
 		}
+	}
+
+	public static void writeProcessedNetworkIncidents(List<NetworkIncident> processedNetworkIncidents, String outputFile) throws IOException {
+		try ( BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile)) ) {
+			
+			bw.write("Link Id;Incident Id;Original Capacity;"
+					+ "Original Freespeed;Original Number Of Lanes;Incident Capacity;Incident Freespeed; Incident Number Of Lanes");
+			bw.newLine();
+		
+			for (NetworkIncident incident : processedNetworkIncidents) {
+				bw.write(incident.getLink().getId().toString() + ";"
+						+ incident.getId() + ";"
+						+ incident.getLink().getCapacity()
+						+ ";" + incident.getLink().getFreespeed()
+						+ ";" + incident.getLink().getNumberOfLanes()
+						+ ";" + incident.getIncidentLink().getCapacity()
+						+ ";" + incident.getIncidentLink().getFreespeed()
+						+ ";" + incident.getIncidentLink().getNumberOfLanes());
+			}
+		}
+		log.info("Traffic incidents written to " + outputFile);
 	}
 }
 

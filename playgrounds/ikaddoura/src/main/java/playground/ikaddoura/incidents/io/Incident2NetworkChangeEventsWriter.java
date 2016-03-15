@@ -19,12 +19,12 @@
 
 package playground.ikaddoura.incidents.io;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -74,7 +74,7 @@ public class Incident2NetworkChangeEventsWriter {
 		this.trafficItemId2path = trafficItemId2path;		
 	}
 
-	public void writeIncidentLinksToNetworkChangeEventFile(String startDateTime, String endDateTime, String outputDirectory) {
+	public void writeIncidentLinksToNetworkChangeEventFile(String startDateTime, String endDateTime, String outputDirectory) throws IOException {
 				
 		final double startDate = DateTime.parseDateTimeToDateTimeSeconds(startDateTime);
 		final double endDate = DateTime.parseDateTimeToDateTimeSeconds(endDateTime);
@@ -91,11 +91,12 @@ public class Incident2NetworkChangeEventsWriter {
 			List<NetworkChangeEvent> allChangeEvents = getNetworkChangeEvents(processedNetworkIncidents);
 
 			new NetworkChangeEventsWriter().write(outputDirectory + "networkChangeEvents_" + DateTime.secToDateTimeString(dateInSec) + ".xml.gz", allChangeEvents);
+			Incident2CSVWriter.writeProcessedNetworkIncidents(processedNetworkIncidents, outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateTimeString(dateInSec) + ".csv");
+			Incident2SHPWriter.writeDailyIncidentLinksToShapeFile(processedNetworkIncidents, outputDirectory, dateInSec);
 			dateInSec = dateInSec + 24 * 3600.;
 		}
 		
 		log.info("Writing network change events completed.");
-
 	}
 	
 	private List<NetworkIncident> processLinkIncidents() {
@@ -402,22 +403,6 @@ public class Incident2NetworkChangeEventsWriter {
 		}
 		log.info("Collecting all incidents that are relevant for this day... Done.");
 	}
-	
-//	private static Link getMoreRestrictiveIncidentLink(NetworkIncident incident1, NetworkIncident incident2) {
-//		Link trafficIncidentLink1 = incident1.getIncidentLink();
-//		Link trafficIncidentLink2 = incident2.getIncidentLink();
-//		
-//		if (trafficIncidentLink1 == null && trafficIncidentLink2 == null) {
-//			return null;
-//		} else if (trafficIncidentLink1 == null && trafficIncidentLink2 != null) {
-//			return incident2.getIncidentLink();
-//		} else if (trafficIncidentLink1 != null && trafficIncidentLink2 == null) {
-//			return incident1.getIncidentLink();
-//		} else {
-//			Link moreRestrictiveIncidentLink = getMoreRestrictiveIncidentLink(trafficIncidentLink1, trafficIncidentLink2);
-//			return moreRestrictiveIncidentLink;
-//		}
-//	}
 
 	private static Link getMoreRestrictiveIncidentLink(Link incidentLink1, Link incidentLink2) {
 		if (incidentLink1.getCapacity() < incidentLink2.getCapacity()) {
@@ -435,7 +420,13 @@ public class Incident2NetworkChangeEventsWriter {
 				} else if (incidentLink1.getNumberOfLanes() > incidentLink2.getNumberOfLanes()) {
 					return incidentLink2;
 				} else {
-					return incidentLink1;
+					if (incidentLink1.getAllowedModes().size() < incidentLink2.getAllowedModes().size()) {
+						return incidentLink1;
+					} else if (incidentLink1.getAllowedModes().size() > incidentLink2.getAllowedModes().size()) {
+						return incidentLink2;
+					} else {
+						return incidentLink1;
+					}
 				}
 			}
 		}

@@ -29,15 +29,9 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -99,23 +93,20 @@ public class IncidentDataAnalysis {
 		collectTrafficItems(); // traffic items that have the same traffic item IDs are updated by the more recent information or by the update traffic item
 		updateTrafficItems(); // update all traffic items that are updated or canceled by another traffic item
 		
-		// write csv file
-		final Incident2CSVWriter csvWriter = new Incident2CSVWriter();
-		csvWriter.writeCSVFile(trafficItems.values(), outputDirectory + "incidentData.csv");
-		
-		final Scenario scenario = loadScenario();
-		
+		// write CSV file which contains all information (start point, end point, type, ...) 
+		Incident2CSVWriter.writeTrafficItems(trafficItems.values(), outputDirectory + "incidentData.csv");
+				
 		// map incidents on network
-		final Incident2Network networkMapper = new Incident2Network(scenario, this.trafficItems);
+		final Incident2Network networkMapper = new Incident2Network(loadScenario(), this.trafficItems);
 		networkMapper.computeIncidentPaths();
 		final Map<String, Path> trafficItemId2path = networkMapper.getTrafficItemId2path();
 		final Set<String> trafficItemsToCheck = networkMapper.getTrafficItemsToCheck();
 
-//		// write shape file
+//		// write shape file which contains relevant incidents mapped to network links
 //		final Incident2SHPWriter shpWriter = new Incident2SHPWriter(this.tmc, this.trafficItems, trafficItemId2path);
-//		shpWriter.writeIncidentLinksToShapeFile(outputDirectory + "incidentLinks.shp", this.trafficItems.keySet());
-//		shpWriter.writeIncidentLinksToShapeFile(outputDirectory + "incidentLinksToCheck.shp", trafficItemsToCheck);
-
+//		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks.shp", this.trafficItems.keySet());
+//		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks_WARNING.shp", trafficItemsToCheck);
+		
 		// write network change events
 		final Incident2NetworkChangeEventsWriter nceWriter = new Incident2NetworkChangeEventsWriter(this.tmc, this.trafficItems, trafficItemId2path);
 		nceWriter.writeIncidentLinksToNetworkChangeEventFile(this.startDateTime, this.endDateTime, this.outputDirectory); 
@@ -149,8 +140,7 @@ public class IncidentDataAnalysis {
 				if (writeCSVFileForEachXMLFile) {
 					String outputCSVFile = inputXmlFile.substring(0, inputXmlFile.length() - 4) + ".csv";
 					log.info("Writing xml file to csv file: " + outputCSVFile);
-					Incident2CSVWriter writer = new Incident2CSVWriter();
-					writer.writeCSVFile(trafficItemReader.getTrafficItems(), outputCSVFile);
+					Incident2CSVWriter.writeTrafficItems(trafficItemReader.getTrafficItems(), outputCSVFile);
 				}
 				
 				int counterNew = 0;
