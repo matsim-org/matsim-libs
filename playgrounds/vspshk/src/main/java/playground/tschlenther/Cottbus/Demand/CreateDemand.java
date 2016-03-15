@@ -47,12 +47,12 @@ import com.vividsolutions.jts.io.WKTReader;
 		 * SCALEFACTOR 0.15 = 10%-Szenario
 		 * SCALEFACTOR 0.015 = 1%-Szenario
 		 */
-		private static double SCALEFACTOR = 1.5;
+		private static double SCALEFACTOR = 1.4;
 
 		/*
 		 * adds some additional activities
 		 */
-		private static final boolean ENRICHPLANS = true;
+		private static final boolean ENRICHPLANS = false;
 
 //------ FIELDS NOT TO BE MODIFIED ------------------------------------------------------------------------------------//
 		private Scenario scenario;
@@ -65,17 +65,17 @@ import com.vividsolutions.jts.io.WKTReader;
 		private static final Random rnd = MatsimRandom.getRandom();
 		private int personcount = 0;
 //----- FILE PATHS ----------------------------------------------------------------------------------------------------//
-		private static final String INPUTFOLDER = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/Cottbus-pt/INPUT_mod/";
+		private static final String INPUTFOLDER = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/Cottbus-pt/INPUT_mod/public/input/";
 
 		private static final String NETWORKFILE = INPUTFOLDER+"network.xml";
-		private static final String KREISE = INPUTFOLDER+"Landkreise/Kreise.shp";
-		private static final String RESIDENTIAL = INPUTFOLDER+ "landuse/residential.shp";
-		private static final String COMMERCIAL = INPUTFOLDER+ "landuse/residential.shp";
-		private static final String INDUSTRIAL = INPUTFOLDER+ "landuse/industrial.shp";
-		private static final String SHOPS = INPUTFOLDER+"shops.txt";
-		private static final String KINDERGARTEN = INPUTFOLDER+"kindergaerten.txt";
+		private static final String KREISE = INPUTFOLDER+"../../Landkreise/Kreise.shp";
+		private static final String RESIDENTIAL = INPUTFOLDER+ "../../landuse/residential.shp";
+		private static final String COMMERCIAL = INPUTFOLDER+ "../../landuse/residential.shp";
+		private static final String INDUSTRIAL = INPUTFOLDER+ "../../landuse/industrial.shp";
+		private static final String SHOPS = INPUTFOLDER+"../../shops.txt";
+		private static final String KINDERGARTEN = INPUTFOLDER+"../../kindergaerten.txt";
 		
-		private static final String PLANSFILEOUTPUT = INPUTFOLDER+"plans_scale" + SCALEFACTOR + Boolean.toString(ENRICHPLANS)+ ".xml";
+		private static final String PLANSFILEOUTPUT = INPUTFOLDER+"plans_scale" + SCALEFACTOR + Boolean.toString(ENRICHPLANS)+ ".xml.gz";
 //-------------------------------------------------------------------------------------------------------------------//
 		
 		
@@ -127,7 +127,7 @@ import com.vividsolutions.jts.io.WKTReader;
 					
 			//LDS-SPN
 			commuters = 522*SCALEFACTOR;
-			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
 //			createPersons("12061000", "12071000", commuters, MS_OUTSIDE);
 			
 			//LOS-CB
@@ -137,7 +137,7 @@ import com.vividsolutions.jts.io.WKTReader;
 			
 			//LOS-SPN
 			commuters = 449*SCALEFACTOR;
-			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
 //			createPersons("12067000", "12071000", commuters, MS_OUTSIDE);
 			
 			//SPN-CB
@@ -147,16 +147,16 @@ import com.vividsolutions.jts.io.WKTReader;
 			//SPN-LDS
 			commuters = 408*SCALEFACTOR;
 //			createPersons("12071000", "12061000", commuters, MS_OUTSIDE);
-			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
 			
 			//SPN-LOS
 			commuters = 466*SCALEFACTOR;
 //			createPersons("12071000", "12067000", commuters, MS_OUTSIDE);
-			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
 			
 			//SPN-SPN
 			commuters = 22524*SCALEFACTOR;
-			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
 			
 			System.out.println(this.shapeMap.keySet());
 		

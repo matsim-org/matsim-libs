@@ -74,7 +74,7 @@ public class PopulationBasedTaxiVehicleCreator
 
 	
 	public static void main(String[] args) {
-		for (int i = 20000; i<80000 ; i=i+5000 ){
+		for (int i = 10000; i<30000 ; i=i+1000 ){
 			PopulationBasedTaxiVehicleCreator tvc = new PopulationBasedTaxiVehicleCreator();
 			System.out.println(i);
 			tvc.run(i);

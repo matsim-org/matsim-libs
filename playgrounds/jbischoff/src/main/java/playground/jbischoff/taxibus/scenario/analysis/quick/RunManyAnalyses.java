@@ -29,7 +29,7 @@ public class RunManyAnalyses {
 
 	public static void main(String[] args) {
 
-		String[] runs = {"VW083PC-hubl295","VW083PC-huba39"};
+		String[] runs = {"vw079	"};
 		for (int i = 0; i<runs.length;i++){
 			String[] file = {"D:/runs-svn/vw_rufbus/"+runs[i]+"/"+runs[i]+".output_events.xml.gz"};
 //			String[] file = {"D:/runs-svn/vw_rufbus/delievery/20160121/runs/"+runs[i]+"/"+runs[i]+".output_events.xml.gz"};
