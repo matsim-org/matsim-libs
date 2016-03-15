@@ -13,6 +13,6 @@ public class GTFSReaderTest {
 
 	@Test
 	public void test() throws Exception {
-		 convertGTFS2MATSimTransitSchedule("./test/playground/polettif/gtfs_sample/", utils.getOutputDirectory()+"converted_gtfs_sample.xml");
+	//	 convertGTFS2MATSimTransitSchedule("./test/playground/polettif/gtfs_sample/", utils.getOutputDirectory()+"converted_gtfs_sample.xml");
 	}
 }
