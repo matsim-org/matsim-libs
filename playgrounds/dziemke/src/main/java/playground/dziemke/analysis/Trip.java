@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.households.Household;
 
@@ -40,6 +41,10 @@ public class Trip {
 	private boolean tripComplete = false;
 	
 	private double weight;
+	
+	//
+	private Double beelineDistance_m = Double.NaN;
+	//
 	
 	
 	// constructor
@@ -257,5 +262,34 @@ public class Trip {
 
 	public void setWeight(double weight) {
 		this.weight = weight;
+	}
+	
+	/**
+	 * @param network
+	 * @return beeline distance of this trip in meters
+	 */
+	public double getBeelineDistance(Network network) {
+		if (beelineDistance_m.isNaN()) {
+			calculateBeelineDistance(network);
+		}
+		return beelineDistance_m;
+	}
+
+
+	private void calculateBeelineDistance(Network network) {
+    	Link departureLink = network.getLinks().get(departureLinkId);
+    	Link arrivalLink = network.getLinks().get(arrivalLinkId);
+
+    	// TODO use coords of toNode instead of center coord of link
+    	double arrivalCoordX = arrivalLink.getCoord().getX();
+    	double arrivalCoordY = arrivalLink.getCoord().getY();
+    	double departureCoordX = departureLink.getCoord().getX();
+    	double departureCoordY = departureLink.getCoord().getY();
+    	
+    	double horizontalDistance_m = (Math.abs(departureCoordX - arrivalCoordX)) / 1000;
+    	double verticalDistance_m = (Math.abs(departureCoordY - arrivalCoordY)) / 1000;
+
+    	this.beelineDistance_m = Math.sqrt(horizontalDistance_m * horizontalDistance_m 
+    			+ verticalDistance_m * verticalDistance_m);
 	}
 }
