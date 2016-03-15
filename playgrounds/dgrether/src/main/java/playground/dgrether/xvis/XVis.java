@@ -29,9 +29,12 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
@@ -106,10 +109,18 @@ public class XVis {
 
 	private void startXVis(String filename) throws IOException {
 		MatsimFileTypeGuesser guesser = new MatsimFileTypeGuesser(filename);
-		MutableScenario scenario =  null;
+		Scenario scenario =  null;
 		if (MatsimFileTypeGuesser.FileType.Config.equals(guesser.getGuessedFileType())) {
 			Config config = ConfigUtils.loadConfig(filename);
-			scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
+			scenario = ScenarioUtils.loadScenario(config);
+			
+			// add missing scenario elements
+			SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
+					SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+			if (signalsConfigGroup.isUseSignalSystems()) {
+				scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
+						new SignalsScenarioLoader(signalsConfigGroup).loadSignalsData());
+			}
 		}
 		else 	if (MatsimFileTypeGuesser.FileType.Network.equals(guesser.getGuessedFileType())){
 			Config config = ConfigUtils.createConfig();
