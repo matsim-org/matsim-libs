@@ -13,7 +13,7 @@ public class CreateCrossingsTimetableTest {
 
 	@Test
 	public void testRun() {
-	/*
+
 		String inputNetworkFile, inputConfigFile, inputEventsFile, inputCrossingsFile, outputNetworkChangeEventsFile;
 
 		String base = "C:/Users/polettif/Desktop/";
@@ -42,7 +42,7 @@ public class CreateCrossingsTimetableTest {
 		Scenario scenario02 = ScenarioUtils.loadScenario(config02);
 		Controler controler02 = new Controler(scenario02);
 		controler02.run();
-		*/
+
 	}
 
 }
