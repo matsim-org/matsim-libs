@@ -139,11 +139,11 @@ class ArticleFigureCreator {
 						"./output/roadpricing/latex/ObjFctVals_popSize"
 								+ populationSize + ".tex");
 				writer.println(afcNaive.asPSTricksSnippet(xFact, 1.0, "\\tiny{"
-						+ populationSize + "}", "[linestyle=dashed]",
-						"$\\circ$", WhatToWrite.ObjFctVals));
+						+ populationSize + "}", "[linestyle=solid]",
+						"$\\times$", WhatToWrite.ObjFctVals));
 				writer.println(afcProposed.asPSTricksSnippet(xFact, 1.0,
 						"\\tiny{" + populationSize + "}", "[linestyle=solid]",
-						"$\\bullet$", WhatToWrite.ObjFctVals));
+						"$\\times$", WhatToWrite.ObjFctVals));
 				writer.flush();
 				writer.close();
 			} catch (FileNotFoundException e) {
@@ -156,7 +156,7 @@ class ArticleFigureCreator {
 								+ populationSize + ".tex");
 				writer.println(afcProposed.asPSTricksSnippet(xFact, 1.0,
 						"\\tiny{" + populationSize + "}", "[linestyle=solid]",
-						"", WhatToWrite.EquilGaps));
+						"$\\times$", WhatToWrite.EquilGaps));
 				writer.flush();
 				writer.close();
 			} catch (FileNotFoundException e) {
@@ -169,7 +169,7 @@ class ArticleFigureCreator {
 								+ populationSize + ".tex");
 				writer.println(afcProposed.asPSTricksSnippet(xFact, 1.0,
 						"\\tiny{" + populationSize + "}", "[linestyle=solid]",
-						"", WhatToWrite.UnifGaps));
+						"$\\times$", WhatToWrite.UnifGaps));
 				writer.flush();
 				writer.close();
 			} catch (FileNotFoundException e) {
