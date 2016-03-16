@@ -113,6 +113,11 @@ public class SignalsViaCSVWriter {
 								// use end time of the simulation
 								endTime = scenario.getConfig().qsim().getEndTime();
 							}
+							// handle case start time = end time
+							if (time.equals(endTime)){
+								// a whole day is meant
+								endTime += 24*3600;
+							}
 							while (time <= endTime) {
 								signalsCSVWriter.write(signal.getId() + ";" + signalCoord.getX() + ";" + signalCoord.getY() + ";" + (time + signalGroupSetting.getOnset()) + ";" + SIGNAL_STATE_GREEN);
 								signalsCSVWriter.newLine();
