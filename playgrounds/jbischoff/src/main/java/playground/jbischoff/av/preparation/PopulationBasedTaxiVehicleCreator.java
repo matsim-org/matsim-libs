@@ -63,7 +63,7 @@ public class PopulationBasedTaxiVehicleCreator
 
 	private String networkFile = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/network_noptvw.xml";
 	private String shapeFile = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/zones_via.shp";
-	private String vehiclesFilePrefix = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/v";
+	private String vehiclesFilePrefix = "../../../shared-svn/projects/vw_rufbus/av_simulation/vehicles/v";
 	private String populationData = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/pop.csv";
 	
 	private Scenario scenario ;
@@ -113,7 +113,7 @@ public class PopulationBasedTaxiVehicleCreator
 		for (int i = 0 ; i< amount; i++){
 		Point p = TaxiDemandWriter.getRandomPointInFeature(random, geometry.get(wrs.select()));
 		Link link = ((NetworkImpl) scenario.getNetwork()).getNearestLinkExactly(MGC.point2Coord(p));
-        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(25*3600));
+        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(27*3600));
         vehicles.add(v);
 
 		}
