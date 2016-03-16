@@ -237,12 +237,13 @@ public class TMCAlerts {
 					incidentLink.setNumberOfLanes(2.0);
 					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 					
+				// one alternating lane closed per direction
 				} else if (containsOrEndsWith(trafficItem, "E14")) {
 					
 					incidentLink = nf.createLink(link.getId(), link.getFromNode(), link.getToNode());
 					incidentLink.setAllowedModes(link.getAllowedModes());
-					incidentLink.setCapacity(1.5 * (link.getCapacity() / link.getNumberOfLanes()));
-					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setCapacity((link.getNumberOfLanes() - 0.5) * (link.getCapacity() / link.getNumberOfLanes()));
+					incidentLink.setNumberOfLanes(link.getNumberOfLanes() - 0.5);
 					incidentLink.setFreespeed(reduceSpeedToNextFreeSpeedLevel(link));
 								
 				// accidents, e.g. B1: accident, .. TODO: Adjust according to type
