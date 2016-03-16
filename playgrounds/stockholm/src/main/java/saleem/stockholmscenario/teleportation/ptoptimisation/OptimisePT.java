@@ -1,7 +1,5 @@
 package saleem.stockholmscenario.teleportation.ptoptimisation;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Set;
 
 import opdytsintegration.TimeDiscretization;
@@ -21,11 +19,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreatePseudoNetwork;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.Vehicles;
 
-import saleem.stockholmscenario.utils.CollectionUtil;
+import saleem.stockholmscenario.teleportation.PTCapacityAdjusmentPerSample;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
@@ -59,23 +54,10 @@ public class OptimisePT {
 		final ObjectiveFunction objectiveFunction = new PTObjectiveFunction(); // TODO this is minimized
 		
 		
-		// perhaps turn this into a packaged facility
+		PTCapacityAdjusmentPerSample capadjuster = new PTCapacityAdjusmentPerSample();
+		capadjuster.adjustStoarageAndFlowCapacity(scenario, samplesize);
+		
 		Network network = scenario.getNetwork();
-		Vehicles vehicles = scenario.getTransitVehicles();
-		CollectionUtil<VehicleType> cutil = new CollectionUtil<VehicleType>();
-		ArrayList<VehicleType> vehcilestypes = cutil.toArrayList(vehicles.getVehicleTypes().values().iterator());
-		Iterator vehtypes = vehcilestypes.iterator();
-		while(vehtypes.hasNext()){//Set flow and storage capacities according to sample size
-			VehicleType vt = (VehicleType)vehtypes.next();
-			VehicleCapacity cap = vt.getCapacity();
-			cap.setSeats((int)Math.ceil(cap.getSeats()*samplesize));
-			cap.setStandingRoom((int)Math.ceil(cap.getStandingRoom()*samplesize));
-			vt.setCapacity(cap);
-			vt.setPcuEquivalents(vt.getPcuEquivalents()*samplesize);
-			System.out.println("Sample Size is: " + samplesize);
-		}
-		
-		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
 		NetworkWriter networkWriter =  new NetworkWriter(network);
