@@ -14,7 +14,7 @@ import saleem.stockholmscenario.utils.CollectionUtil;
 public class PTCapacityAdjusmentPerSample {
 	public void adjustStoarageAndFlowCapacity(Scenario scenario, double samplesize){
 
-		// perhaps turn this into a packaged facility
+		// Changing vehicle and road capacity according to sample size
 		Vehicles vehicles = scenario.getTransitVehicles();
 		CollectionUtil<VehicleType> cutil = new CollectionUtil<VehicleType>();
 		ArrayList<VehicleType> vehcilestypes = cutil.toArrayList(vehicles.getVehicleTypes().values().iterator());

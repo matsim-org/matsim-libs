@@ -31,6 +31,7 @@ public static void main(String[] args) {
         Controler controler = new Controler(config);
 		Scenario scenario = controler.getScenario();
 		
+		// Changing vehicle and road capacity according to sample size
 		PTCapacityAdjusmentPerSample capadjuster = new PTCapacityAdjusmentPerSample();
 		capadjuster.adjustStoarageAndFlowCapacity(scenario, samplesize);
 		

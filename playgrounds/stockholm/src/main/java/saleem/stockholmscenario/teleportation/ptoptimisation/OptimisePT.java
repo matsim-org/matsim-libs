@@ -53,7 +53,7 @@ public class OptimisePT {
 				3600, 24); // OK to start with
 		final ObjectiveFunction objectiveFunction = new PTObjectiveFunction(); // TODO this is minimized
 		
-		
+		// Changing vehicle and road capacity according to sample size
 		PTCapacityAdjusmentPerSample capadjuster = new PTCapacityAdjusmentPerSample();
 		capadjuster.adjustStoarageAndFlowCapacity(scenario, samplesize);
 		
