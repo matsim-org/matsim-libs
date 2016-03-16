@@ -30,11 +30,11 @@ public class ArentzePopulation extends IndexedPopulation {
 	private final boolean[] isMale;
 	private final Coord[] coord;
 
-	protected ArentzePopulation(
+	public ArentzePopulation(
 			final Id[] ids,
 			final char[] ageCategory,
 			final boolean[] isMale,
-			final Coord[] coord) {
+			final Coord[] coord ) {
 		super(ids);
 		this.ageCategory = ageCategory;
 		this.isMale = isMale;
