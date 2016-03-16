@@ -6,12 +6,15 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -88,7 +91,7 @@ public class ToolsTest {
 	 */
 
 	@Test
-	public void testGetAzimuth() throws Exception {
+	public void testGetAzimuth() {
 		assertEquals(0, 200*Tools.getAzimuth(A,D)/Math.PI, testDelta);
 		assertEquals(50, 200*Tools.getAzimuth(A,C)/Math.PI, testDelta);
 		assertEquals(100, 200*Tools.getAzimuth(A,B)/Math.PI, testDelta);
@@ -121,56 +124,24 @@ public class ToolsTest {
 	}
 
 	@Test
-	public void testDummyFindNearestLink() {
-		NetworkWriter writer = new NetworkWriter(network);
-		writer.write(utils.getClassInputDirectory()+"net.xml");
-		System.out.println(utils.getClassInputDirectory());
-//		System.out.println("P to A: " + CoordUtils.calcEuclideanDistance(A,P));
-//		System.out.println("P to AB: "+ CoordUtils.distancePointLinesegment(A,B,P));
-//		System.out.println("P to AX: "+ CoordUtils.distancePointLinesegment(A,X, P));
+	public void checkTestDistances() {
+		System.out.println("P to A: " + CoordUtils.calcEuclideanDistance(A,P));
+		System.out.println("P to AB: "+ CoordUtils.distancePointLinesegment(A,B,P));
+		System.out.println("P to AX: "+ CoordUtils.distancePointLinesegment(A,X, P));
 	}
 
 	@Test
-	public void testFindNearestLink() {
-		Map<Double, String> hash = new HashMap<>();
-
-
-		hash.put(3.0, "1");
-		hash.put(1.0, "2");
-		hash.put(4.0, "3");
-		hash.put(2.0, "4");
-
-		Map<Double, String> sorted = new TreeMap<>(hash);
-
-		for(Map.Entry<Double, String> e : sorted.entrySet()) {
-			System.out.println(e.getKey() + ": "+e.getValue());
-		}
-
-		// dummy.toString();
-
-	//	findNearestLink(network, new Coord(0.9, 0.1), 3, 0.25, 0.2);
+	public void testFindNearestLink() throws Exception {
+	//	assertEquals("found the wrong link!", Id.createLinkId("link:A:B"), getNearestLinkBrute(network, P).getId());
 	}
 
 	@Test
 	public void testSplitLink() throws Exception {
 
-		// init
-
-		// setup split points ("stopFacilities")
-//		Coord splitPoint13X = Tools.getClosestPointOnLine(network.getLinks().get(Id.createLinkId("l13")), pX);
-
-//		Coord splitPoint42X = Tools.getClosestPointOnLink(network.getLinks().get(Id.createLinkId("l42")), pX);
-//		Coord splitPoint13X = Tools.getClosestPointOnLine(pA, pC, pX);
-
-//		Assert.equals(new Coord(0.5, 0.5), splitPoint13X);
-//		Assert.equals(new Coord(0.0, 3.0), splitPoint531);
-//		Assert.equals(new Coord(1.0, 2.0), splitPoint13X);
-
-		network = splitLink(network, "link:A:C", X);
-		network = splitLink(network, Id.createLinkId("link:D:B"), Y);
+//		network = splitLink(network, Id.createLinkId("link:D:B"), Y);
 //		network.addLink(networkFactory.createLink(Id.createLinkId("l42"), network.getNodes().get(Id.createNodeId("pD")), network.getNodes().get(Id.createNodeId("B"))));
 
-		new NetworkWriter(network).write("C:/Users/polettif/Desktop/data/test/net.xml");
+//		new NetworkWriter(network).write("C:/Users/polettif/Desktop/data/test/network_new.xml");
 	}
 
 }
