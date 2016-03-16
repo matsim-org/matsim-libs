@@ -73,14 +73,16 @@ public class VehicleAdder {
 						departure.setVehicleId(vehid);
 						if(!depadded.contains(departure.getId())){
 							depadded.add(departure.getId());
-							troute.addDeparture(departure);
-							System.out.println("Added Departure: " + departure.getId() + " " + troute.getId() + " " + departure.getVehicleId());
-							Vehicle vehicle = vehicleinstances.get(troute.getDepartures().get(troute.getDepartures().keySet().iterator().next()).getVehicleId());
-							//To remove the chances of null pointer exception
-							while(vehicle==null)vehicle = vehicleinstances.get(troute.getDepartures().get(troute.getDepartures().keySet().iterator().next()).getVehicleId());
-							VehicleType vtype = vehicle.getType();
-							Vehicle veh = new VehicleImpl(vehid, vtype);
-							vehicles.addVehicle(veh);
+							if(!troute.getDepartures().containsKey(departure.getId())){//If not already added a departure with the same id
+								troute.addDeparture(departure);
+								System.out.println("Added Departure: " + departure.getId() + " " + troute.getId() + " " + departure.getVehicleId());
+								Vehicle vehicle = vehicleinstances.get(troute.getDepartures().get(troute.getDepartures().keySet().iterator().next()).getVehicleId());
+								//To remove the chances of null pointer exception
+								while(vehicle==null)vehicle = vehicleinstances.get(troute.getDepartures().get(troute.getDepartures().keySet().iterator().next()).getVehicleId());
+								VehicleType vtype = vehicle.getType();
+								Vehicle veh = new VehicleImpl(vehid, vtype);
+								vehicles.addVehicle(veh);
+							}
 						}
 						
 //						System.out.println("Departure Added: " + departure.getId() + " based on " + troute.getId() + " : " + departures.get(i).getId());

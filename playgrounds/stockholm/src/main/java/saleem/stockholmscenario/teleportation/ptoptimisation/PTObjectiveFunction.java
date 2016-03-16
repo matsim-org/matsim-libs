@@ -1,5 +1,8 @@
 package saleem.stockholmscenario.teleportation.ptoptimisation;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -20,7 +23,7 @@ import floetteroed.utilities.math.Vector;
  *
  */
 public class PTObjectiveFunction implements ObjectiveFunction {
-
+	String str = "";
 	@Override
 	public double value(SimulatorState state) {//Simple summation of selected plan scores
 		double result = 0;
@@ -29,9 +32,22 @@ public class PTObjectiveFunction implements ObjectiveFunction {
 		for (Id<Person> personId : ptstate.getPersonIdView()) {
 			final Plan selectedPlan = ptstate
 				.getSelectedPlan(personId);
-			result += selectedPlan.getScore();
+			result -= selectedPlan.getScore();
 		}
 		result /= ptstate.getPersonIdView().size();
+		str = str + result	+ "\n";
+		writeToTextFile(str, "C:\\Results Matsim\\Optimisation\\scores.txt");//Write the number of vehicles statistics to a file
 		return result;	
-		}
+	}
+	public void writeToTextFile(String str, String path){
+		try { 
+			File file=new File(path);
+			FileOutputStream fileOutputStream=new FileOutputStream(file);
+		    fileOutputStream.write(str.getBytes());
+		    fileOutputStream.close();
+	       
+	    } catch(Exception ex) {
+	        //catch logic here
+	    }
+	}
 }
