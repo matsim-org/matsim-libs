@@ -439,7 +439,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		this.ways.clear();
 	}
 
-	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
+	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, 
+			final double length) {
 		String highway = way.tags.get(TAG_HIGHWAY);
 
         if ("no".equals(way.tags.get(TAG_ACCESS))) {
@@ -551,6 +552,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setNumberOfLanes(nofLanes);
 				if (l instanceof LinkImpl) {
 					((LinkImpl) l).setOrigId(origId);
+					((LinkImpl) l).setType( highway );
 				}
 				network.addLink(l);
 				this.id++;
@@ -563,6 +565,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setNumberOfLanes(nofLanes);
 				if (l instanceof LinkImpl) {
 					((LinkImpl) l).setOrigId(origId);
+					((LinkImpl) l).setType( highway );
 				}
 				network.addLink(l);
 				this.id++;
