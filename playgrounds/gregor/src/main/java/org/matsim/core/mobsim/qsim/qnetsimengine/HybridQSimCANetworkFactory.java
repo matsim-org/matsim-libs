@@ -53,7 +53,7 @@ public final class HybridQSimCANetworkFactory extends QNetworkFactory {
 		if (qSim2DTransitionLink) {
 			qLink = new CALink(link,1);
 		} else {
-			qLink = new QLinkImpl(link, network, toQueueNode, linkSpeedCalculator);
+			qLink = new QLinkImpl(link, network, toQueueNode);
 			throw new RuntimeException("Not yet implemented!");
 		}
 

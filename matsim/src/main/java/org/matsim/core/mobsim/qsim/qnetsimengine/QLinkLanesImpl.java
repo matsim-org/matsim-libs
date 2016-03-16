@@ -181,15 +181,14 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			EventsManager events = getQnetwork().simEngine.getMobsim().getEventsManager() ;
 			double effectiveCellSize = ((NetworkImpl) getQnetwork().getNetwork()).getEffectiveCellSize() ;
 			AgentCounter agentCounter = getQnetwork().simEngine.getMobsim().getAgentCounter() ;
-			LinkSpeedCalculator linkSpeedCalculator = getQnetwork().simEngine.getLinkSpeedCalculator() ;
 			AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = getQnetwork().simEngine.getAgentSnapshotInfoBuilder() ;
-			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this, qsimConfig, events, effectiveCellSize, agentCounter, linkSpeedCalculator, agentSnapshotInfoBuilder);
+			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(qsimConfig, events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder);
 			builder.setVehicleQueue(new FIFOVehicleQ());
 			builder.setLaneId(laneId);
 			builder.setLength(lane.getLength());
 			builder.setEffectiveNumberOfLanes(noEffectiveLanes);
 			builder.setFlowCapacity_s(lane.getLaneData().getCapacityVehiclesPerHour() / 3600.);
-			QLaneI queue = builder.build();
+			QLaneI queue = builder.build(this);
 			// --
 			((QueueWithBuffer) queue).generatingLaneEvents = true;
 			queueByIdMap.put(laneId, queue);
@@ -236,32 +235,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	List<QLaneI> getOfferingQLanes() {
 		return this.toNodeLaneQueues;
 	}
-
-//	/**
-//	 * Adds a vehicle to the link.
-//	 * 
-//	 * @param veh
-//	 *            the vehicle
-//	 */
-//	@Override
-//	void addFromUpstream(final QVehicle veh) {
-//		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-//		activateLink();
-//		this.firstLaneQueue.addFromUpstream(veh);
-//		this.network.simEngine
-//				.getMobsim()
-//				.getEventsManager()
-//				.processEvent(
-//						new LaneEnterEvent(now, veh.getId(), this.getLink().getId(),
-//								((QueueWithBuffer) this.firstLaneQueue).getId()));
-//
-//		veh.setCurrentLink(this.getLink());
-//		this.network.simEngine
-//				.getMobsim()
-//				.getEventsManager()
-//				.processEvent(
-//						new LinkEnterEvent(now, veh.getId(), this.getLink().getId()));
-//	}
 
 	@Override
 	void clearVehicles() {

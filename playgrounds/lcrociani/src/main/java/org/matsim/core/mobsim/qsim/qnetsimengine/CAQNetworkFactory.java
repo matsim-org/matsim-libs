@@ -39,7 +39,7 @@ public class CAQNetworkFactory extends QNetworkFactory {
 	@Override
 	public QLinkI createNetsimLink(Link link, QNetwork network,	QNode toQueueNode) {
 		QLinkI qLink = null;
-		qLink = new QLinkImpl(link, network, toQueueNode, linkSpeedCalculator);
+		qLink = new QLinkImpl(link, network, toQueueNode);
 
 		boolean isCAQLink = link.getAllowedModes().contains(Constants.TO_Q_LINK_MODE);
 		boolean isQCALink = link.getAllowedModes().contains(Constants.TO_CA_LINK_MODE);

@@ -46,7 +46,7 @@ public class HybridNetworkFactory extends
 			}
 		}
 		//default QLink
-		return new QLinkImpl(link, network, queueNode, linkSpeedCalculator);
+		return new QLinkImpl(link, network, queueNode);
 	}
 	
 	public void putNetsimNetworkFactory(String key, QNetworkFactory fac) {

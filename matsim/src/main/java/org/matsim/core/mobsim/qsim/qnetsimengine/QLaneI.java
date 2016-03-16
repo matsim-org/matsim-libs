@@ -22,11 +22,13 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.VisData;
+
 
 /**
  * Essentially an interface, but since I do not want the methods public for the time being, it is incarnated as an abstract class.
@@ -36,7 +38,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author nagel
  *
  */
-abstract class QLaneI {
+abstract class QLaneI implements Identifiable<Lane> {
 	
 	abstract void addFromWait( final QVehicle veh, final double now);
 

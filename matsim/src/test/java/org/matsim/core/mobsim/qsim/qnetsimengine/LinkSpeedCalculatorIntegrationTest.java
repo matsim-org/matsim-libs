@@ -19,6 +19,12 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,57 +38,36 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.ActivityEnginePlugin;
-import org.matsim.core.mobsim.qsim.PopulationPlugin;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimModule;
-import org.matsim.core.mobsim.qsim.QSimProvider;
-import org.matsim.core.mobsim.qsim.TeleportationPlugin;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
-import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.Builder;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.EventsLogger;
-
-import com.google.inject.Guice;
-import com.google.inject.Module;
-import com.google.inject.Provides;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 /**
  * @author mrieser / Senozon AG
@@ -125,58 +110,32 @@ public class LinkSpeedCalculatorIntegrationTest {
 		final Config config = scenario.getConfig() ;
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		
-		final AbstractQSimPlugin localNetsimPlugin = new AbstractQSimPlugin(config){
-			@Override
-			public Collection<? extends Module> modules() {
-				Collection<Module> result = new ArrayList<>();
-				result.add(new com.google.inject.AbstractModule() {
-					@Override
-					protected void configure() {
-						bind(QNetsimEngine.class).asEagerSingleton();
-						bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).asEagerSingleton();
-						bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
-						bind( LinkSpeedCalculator.class ).toInstance( new CustomLinkSpeedCalculator(5.0) ) ; ; 
-					}
-				});
-				return result;
-			}
-			@Override
-			public Collection<Class<? extends DepartureHandler>> departureHandlers() {
-				Collection<Class<? extends DepartureHandler>> result = new ArrayList<>();
-				result.add(VehicularDepartureHandler.class);
-				return result;
-			}
-			@Override
-			public Collection<Class<? extends MobsimEngine>> engines() {
-				Collection<Class<? extends MobsimEngine>> result = new ArrayList<>();
-				result.add(QNetsimEngine.class);
-				return result;
-			}
-		} ;
-
+		Collection<AbstractModule> defaultsModules = new ArrayList<>() ;
+		defaultsModules.add( new ScenarioByInstanceModule( scenario ) ) ;
+		defaultsModules.add( new EventsManagerModule() ) ;
+		defaultsModules.add( new DefaultMobsimModule() ) ;
 		
-		final com.google.inject.AbstractModule localQSimModule = new com.google.inject.AbstractModule () {
-			@Override
-			protected void configure() {
-				bind(Mobsim.class).toProvider(QSimProvider.class);
-			}
-			@Provides
-			Collection<AbstractQSimPlugin> provideQSimPlugins(TransitConfigGroup transitConfigGroup, NetworkConfigGroup networkConfigGroup, Config config) {
-				final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();
-				plugins.add(new MessageQueuePlugin(config));
-				plugins.add(new ActivityEnginePlugin(config));
-				plugins.add( localNetsimPlugin );
-				plugins.add(new TeleportationPlugin(config));
-				plugins.add(new PopulationPlugin(config));
-				return plugins;
+		AbstractModule overrides = new AbstractModule() {
+			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(5.0) ;
+			@Override public void install() {
+				bind(QNetworkFactory.class).toInstance( new QNetworkFactory(){
+					@Override QNode createNetsimNode(Node node, QNetwork network) {
+						return new QNode( node, network) ;
+					}
+					@Override QLinkI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
+						Builder builder = new QLinkImpl.Builder() ;
+						AgentSnapshotInfoFactory agentSnapshotInfoFactory = QNetwork.getAgentSnapshotInfoFactory() ;
+						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, agentSnapshotInfoFactory );
+						builder.setAgentSnapshotInfoBuilder(positionInfoBuilder);
+						builder.setLinkSpeedCalculator(linkSpeedCalculator);
+						builder.setNetwork(network);
+						return builder.build(link, queueNode) ;
+					}
+				} ) ;
 			}
 		} ;
-
-		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(),
-				new ScenarioByInstanceModule( scenario ) ,
-				new EventsManagerModule() , 
-				new AbstractModule() { @Override public void install() { install( localQSimModule ) ; } }
-				) ;
+		
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override( defaultsModules, overrides ) ) ; 
 
 		EventsManager eventsManager = injector.getInstance( EventsManager.class ) ;
 		eventsManager.initProcessing(); 
@@ -185,7 +144,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		eventsManager.addHandler(collector);
 		eventsManager.addHandler(new EventsLogger());
 
-		((QSim) injector.getInstance( Mobsim.class )).run();
+		injector.getInstance( Mobsim.class ).run();
 		
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
@@ -202,15 +161,50 @@ public class LinkSpeedCalculatorIntegrationTest {
 		Assert.assertEquals(21, lle.getTime() - lee.getTime(), 1e-8);
 	}
 	
+	@SuppressWarnings("static-method")
 	@Test
 	public void testIntegration_Fast() {
 		Fixture f = new Fixture();
-		EventsCollector collector = new EventsCollector();
-		f.events.addHandler(collector);
-		f.events.addHandler(new EventsLogger());
 
-		QSim qsim = configureQSim(f, new CustomLinkSpeedCalculator(20.0));
-		qsim.run();
+		final Scenario scenario = f.scenario ;
+		final Config config = scenario.getConfig() ;
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		
+		Collection<AbstractModule> defaultsModules = new ArrayList<>() ;
+		defaultsModules.add( new ScenarioByInstanceModule( scenario ) ) ;
+		defaultsModules.add( new EventsManagerModule() ) ;
+		defaultsModules.add( new DefaultMobsimModule() ) ;
+		
+		AbstractModule overrides = new AbstractModule() {
+			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(20.0) ;
+			@Override public void install() {
+				bind(QNetworkFactory.class).toInstance( new QNetworkFactory(){
+					Builder builder = new QLinkImpl.Builder() ;
+					AgentSnapshotInfoFactory agentSnapshotInfoFactory = QNetwork.getAgentSnapshotInfoFactory() ;
+					AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, agentSnapshotInfoFactory );
+					@Override QNode createNetsimNode(Node node, QNetwork network) {
+						return new QNode( node, network) ;
+					}
+					@Override QLinkI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
+						builder.setNetwork(network);
+						builder.setLinkSpeedCalculator(linkSpeedCalculator);
+						builder.setAgentSnapshotInfoBuilder(positionInfoBuilder);
+						return builder.build(link, queueNode) ;
+					}
+				} ) ;
+			}
+		} ;
+		
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override( defaultsModules, overrides ) ) ; 
+
+		EventsManager eventsManager = injector.getInstance( EventsManager.class ) ;
+		eventsManager.initProcessing(); 
+
+		EventsCollector collector = new EventsCollector();
+		eventsManager.addHandler(collector);
+		eventsManager.addHandler(new EventsLogger());
+
+		injector.getInstance( Mobsim.class ).run();
 		
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);

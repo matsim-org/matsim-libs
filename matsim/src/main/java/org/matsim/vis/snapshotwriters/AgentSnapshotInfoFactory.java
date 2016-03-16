@@ -20,6 +20,8 @@
 
 package org.matsim.vis.snapshotwriters;
 
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -41,7 +43,7 @@ public class AgentSnapshotInfoFactory {
 	private static final double PI_HALF = Math.PI / 2.0;
 	private SnapshotLinkWidthCalculator linkWidthCalculator;
 
-
+	@Inject
 	public AgentSnapshotInfoFactory(SnapshotLinkWidthCalculator widthCalculator) {
 		this.linkWidthCalculator = widthCalculator;
 	}

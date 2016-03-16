@@ -54,6 +54,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 import javax.inject.Inject;
 
@@ -111,22 +112,6 @@ public class QNetsimEngine implements MobsimEngine {
 		this.internalInterface = internalInterface;
 	}
 
-	//	/**
-	//	 * A design thought to provide a configurable default factory that also allows to make the direct constructors non-public.
-	//	 * 
-	//	 * @author nagel
-	//	 */
-	//	public static final class Builder implements QNetsimEngineFactory {
-	//		private NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory = null ;
-	//		public void setNetworkFactory( NetsimNetworkFactory<QNode, ? extends QLinkInternalI> factory ) {
-	//			this.netsimNetworkFactory = factory ;
-	//		}
-	//		@Override
-	//		public QNetsimEngine createQSimEngine(Netsim sim) {
-	//			return new QNetsimEngine( (QSim) sim, netsimNetworkFactory ) ;
-	//		}
-	//	}
-
 	public QNetsimEngine(final QSim sim) {
 		this(sim, null);
 	}
@@ -155,63 +140,45 @@ public class QNetsimEngine implements MobsimEngine {
 		}
 		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior);
 		
-		switch(qsimConfigGroup.getTrafficDynamics()) {
-		case queue:
-			QueueWithBuffer.HOLES = false;
-			break;
-		case withHoles:
-			QueueWithBuffer.HOLES = true;
-			break;
-		default:
-			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
-					+ qsimConfigGroup.getTrafficDynamics() ) ;
-		}
-
-		QueueWithBuffer.fastCapacityUpdate = qSimConfigGroup.isUsingFastCapacityUpdate() ;
-		
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
-			QueueWithBuffer.isSeepageAllowed = true;
-			QueueWithBuffer.seepMode = qSimConfigGroup.getSeepMode();
-			QueueWithBuffer.isSeepModeStorageFree = qSimConfigGroup.isSeepModeStorageFree();
-			log.info("Seepage is allowed. Seep mode is " + QueueWithBuffer.seepMode + ".");
-			if(QueueWithBuffer.isSeepModeStorageFree) log.warn("Seep mode " + QueueWithBuffer.seepMode + " do not take storage space thus only considered for flow capacities.");
-			QueueWithBuffer.isRestrictingSeepage = qSimConfigGroup.isRestrictingSeepage();
+			log.info("Seepage is allowed. Seep mode is " + qSimConfigGroup.getSeepMode() + ".");
+			if(qSimConfigGroup.isSeepModeStorageFree()) {
+				log.warn("Seep mode " + qSimConfigGroup.getSeepMode() + " does not take storage space thus only considered for flow capacities.");
+			}
 		}
 		
-		if (QSimConfigGroup.SnapshotStyle.withHoles.equals( qsimConfigGroup.getSnapshotStyle())) {
-			QueueWithBuffer.VIS_HOLES = true;
-		}
+		AgentSnapshotInfoFactory agentSnapshotInfoFactory = QNetwork.getAgentSnapshotInfoFactory() ;
+		this.positionInfoBuilder = createAgentSnapshotInfoBuilder( sim.getScenario(), agentSnapshotInfoFactory );
 
 		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
 		// first in ctors calling each other.  kai, feb'12
-		if (config.qsim().isUseLanes()) {
-			log.info("Lanes enabled...");
-			if (netsimNetworkFactory != null) {
-				throw new RuntimeException("both `lanes' and `netsimNetworkFactory' are defined; don't know what that means; aborting") ;
-			}
-			network = new QNetwork(
-							sim.getScenario().getNetwork(),
-							new QLanesNetworkFactory(new DefaultQNetworkFactory(), sim.getScenario().getLanes()));
-		} else if (netsimNetworkFactory != null){
+//		if (config.qsim().isUseLanes()) {
+//			log.info("Lanes enabled...");
+//			if (netsimNetworkFactory != null) {
+//				throw new RuntimeException("both `lanes' and `netsimNetworkFactory' are defined; don't know what that means; aborting") ;
+//			}
+//			network = new QNetwork(
+//							sim.getScenario().getNetwork(),
+//							new QLanesNetworkFactory(new DefaultQNetworkFactory(), sim.getScenario().getLanes()));
+//		} else 
+		if (netsimNetworkFactory != null){
 			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
-		} else if (qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ || qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ) {
-			network = new QNetwork(sim.getScenario().getNetwork(), new QNetworkFactory() {
-				@Override
-				public QLinkImpl createNetsimLink(final Link link, final QNetwork network2, final QNode toQueueNode) {
-					return new QLinkImpl(link, network2, toQueueNode, new PassingVehicleQ(), linkSpeedCalculator);
-				}
-				@Override
-				public QNode createNetsimNode(final Node node, QNetwork network2) {
-					return new QNode(node, network2);
-				}
-			});
+//		} else if (qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ || qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ) {
+//			network = new QNetwork(sim.getScenario().getNetwork(), new QNetworkFactory() {
+//				@Override
+//				public QLinkImpl createNetsimLink(final Link link, final QNetwork network2, final QNode toQueueNode) {
+//					return new QLinkImpl(link, network2, toQueueNode, new PassingVehicleQ(), linkSpeedCalculator, positionInfoBuilder );
+//				}
+//				@Override
+//				public QNode createNetsimNode(final Node node, QNetwork network2) {
+//					return new QNode(node, network2);
+//				}
+//			});
 		} else {
 			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
 		}
 		network.getLinkWidthCalculatorForVis().setLinkWidthForVis(qsimConfigGroup.getLinkWidthForVis());
 		network.initialize(this);
-
-		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );
 
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
@@ -233,20 +200,20 @@ public class QNetsimEngine implements MobsimEngine {
 		qlink.addParkedVehicle(veh);
 	}
 
-	private AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario) {
+	static AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
 		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
 		switch(snapshotStyle) {
 		case queue:
-			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
+			return new QueueAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
 		case withHoles:
 			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
 			// ??? kai, nov'15
-			return new WithHolesAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
+			return new WithHolesAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
 		case equiDist:
-			return new EquiDistAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
+			return new EquiDistAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
 		default:
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
-			return new EquiDistAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
+			return new EquiDistAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
 		}
 	}
 

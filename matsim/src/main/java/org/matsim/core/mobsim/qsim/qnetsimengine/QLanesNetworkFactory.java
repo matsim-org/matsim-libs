@@ -30,16 +30,14 @@ import org.matsim.lanes.LanesUtils;
 
 import java.util.List;
 
+import javax.inject.Inject;
 
-class QLanesNetworkFactory extends QNetworkFactory {
 
-	private final QNetworkFactory delegate;
-	private final Lanes laneDefinitions;
+public class QLanesNetworkFactory extends QNetworkFactory {
 
-	public QLanesNetworkFactory(QNetworkFactory delegate, Lanes laneDefintions){
-		this.delegate = delegate;
-		this.laneDefinitions = laneDefintions;
-	}
+	@Inject private Lanes laneDefinitions;
+
+	private final QNetworkFactory delegate = new DefaultQNetworkFactory() ;
 
 	@Override
 	public QLinkI createNetsimLink(Link link, QNetwork network, QNode queueNode) {

@@ -30,10 +30,12 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
@@ -59,6 +61,30 @@ import org.matsim.vis.snapshotwriters.VisData;
 public final class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(QLinkImpl.class);
+	
+	static class Builder {
+		private QNetwork network;
+		private VehicleQ<QVehicle> vehicleQueue = new FIFOVehicleQ() ;
+		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+		private AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder;
+		QLinkImpl build( Link link, QNode toNode ) {
+			Gbl.assertNotNull( network );
+			Gbl.assertNotNull( agentSnapshotInfoBuilder );
+			return new QLinkImpl( link, network, toNode, linkSpeedCalculator, agentSnapshotInfoBuilder ) ;
+		}
+		final void setNetwork(QNetwork network) {
+			this.network = network;
+		}
+		final void setVehicleQueue(VehicleQ<QVehicle> vehicleQueue) {
+			this.vehicleQueue = vehicleQueue;
+		}
+		final void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
+			this.linkSpeedCalculator = linkSpeedCalculator;
+		}
+		final void setAgentSnapshotInfoBuilder(AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder) {
+			this.agentSnapshotInfoBuilder = agentSnapshotInfoBuilder;
+		}
+	}
 
 	public interface LaneFactory {
 
@@ -67,28 +93,29 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		 * it will call back this factory within the constructor (!) to obtain a road and pass
 		 * itself to the creation method.
 		 */
-		public QLaneI createLane(QLinkImpl qLinkImpl);
+		public QLaneI createLane(AbstractQLink qLinkImpl);
 
 	}
 
 	private final VisData visdata;
 
-	public final QLaneI qlane;
+	/* package, for some tests */ final QLaneI qlane;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
-	 * @param linkSpeedCalculator TODO
 	 */
-	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, LinkSpeedCalculator linkSpeedCalculator) {
-		this(link2, network, toNode, new FIFOVehicleQ(), linkSpeedCalculator);
+	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode) {
+		this(link2, network, toNode, new DefaultLinkSpeedCalculator(), network.simEngine.getAgentSnapshotInfoBuilder() );
 	}
 
 	/** 
 	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
 	 * @param linkSpeedCalculator TODO
+	 * @param agentSnapshotInfoBuilder TODO
 	 * 
 	 */
-	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final VehicleQ<QVehicle> vehicleQueue, LinkSpeedCalculator linkSpeedCalculator) {
+	QLinkImpl(final Link link2, QNetwork network, final QNode toNode, LinkSpeedCalculator linkSpeedCalculator, 
+			AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder) {
 		// yy get rid of this c'tor (since the one with queueWithBuffer is more flexible)?
 		super(link2, toNode, network) ;
 		//--
@@ -96,11 +123,12 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		EventsManager events = network.simEngine.getMobsim().getEventsManager() ;
 		double effectiveCellSize = ((NetworkImpl) network.getNetwork()).getEffectiveCellSize() ;
 		AgentCounter agentCounter = network.simEngine.getMobsim().getAgentCounter() ;
-		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = network.simEngine.getAgentSnapshotInfoBuilder() ;
-		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this, qsimConfig, events,
-				effectiveCellSize, agentCounter, linkSpeedCalculator, agentSnapshotInfoBuilder) ;
-		builder.setVehicleQueue(vehicleQueue);
-		this.qlane = builder.build() ;
+		Gbl.assertNotNull(agentSnapshotInfoBuilder);
+		//--
+		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(qsimConfig, events, effectiveCellSize,
+				agentCounter, agentSnapshotInfoBuilder) ;
+		builder.setLinkSpeedCalculator(linkSpeedCalculator);
+		this.qlane = builder.build(this) ;
 		//--
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 		super.setTransitQLink( new TransitQLink(this.qlane) ) ;

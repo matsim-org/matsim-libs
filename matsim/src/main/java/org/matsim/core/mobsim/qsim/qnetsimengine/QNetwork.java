@@ -50,8 +50,8 @@ public class QNetwork implements NetsimNetwork {
 	private final Network network;
 
 	private final QNetworkFactory queueNetworkFactory;
-	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-	private final 	AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+	private static final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+	private static final 	AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 
 	
 	QNetsimEngine simEngine;
@@ -115,9 +115,8 @@ public class QNetwork implements NetsimNetwork {
 		return this.nodes.get(id);
 	}
 
-	@Override
-	public  AgentSnapshotInfoFactory getAgentSnapshotInfoFactory(){
-		return this.snapshotInfoFactory;
+	public  static AgentSnapshotInfoFactory getAgentSnapshotInfoFactory(){
+		return snapshotInfoFactory;
 	}
 
 

@@ -20,23 +20,18 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 
 
 /**
  * @author dgrether
  */
-final class DefaultQNetworkFactory extends QNetworkFactory {
+public final class DefaultQNetworkFactory extends QNetworkFactory {
 
-	@Inject LinkSpeedCalculator linkSpeedCalculator ;
-	
 	@Override
 	public QLinkI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
-		return new QLinkImpl(link, network, toQueueNode, linkSpeedCalculator);
+		return new QLinkImpl(link, network, toQueueNode);
 	}
 
 	@Override
