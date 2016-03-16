@@ -54,13 +54,13 @@ public class IncidentDataAnalysis {
 //	private final String inputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-berlin/";
 //	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
 	
-	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-	private final String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-berlin/";
-	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
-
 //	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-//	private final String inputDirectory = "/Users/ihab/Desktop/testXmlFiles1/";
-//	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-test/";
+//	private final String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-berlin/";
+//	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
+
+	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
+	private final String inputDirectory = "/Users/ihab/Desktop/testXmlFiles/";
+	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
 //	
 //	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
 //	private final String inputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-germany/";
@@ -68,8 +68,8 @@ public class IncidentDataAnalysis {
 	
 	private final boolean writeCSVFileForEachXMLFile = false;
 
-	private final String startDateTime = "2016/02/12";
-	private final String endDateTime = "2016/02/25";
+	private final String startDateTime = "2016/03/15";
+	private final String endDateTime = "2016/03/15";
 		
 // ##################################################################
 	
@@ -102,10 +102,10 @@ public class IncidentDataAnalysis {
 		final Map<String, Path> trafficItemId2path = networkMapper.getTrafficItemId2path();
 		final Set<String> trafficItemsToCheck = networkMapper.getTrafficItemsToCheck();
 
-//		// write shape file which contains relevant incidents mapped to network links
-//		final Incident2SHPWriter shpWriter = new Incident2SHPWriter(this.tmc, this.trafficItems, trafficItemId2path);
-//		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks.shp", this.trafficItems.keySet());
-//		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks_WARNING.shp", trafficItemsToCheck);
+		// write shape file which contains relevant incidents mapped to network links
+		final Incident2SHPWriter shpWriter = new Incident2SHPWriter(this.tmc, this.trafficItems, trafficItemId2path);
+		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks.shp", this.trafficItems.keySet());
+		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks_WARNING.shp", trafficItemsToCheck);
 		
 		// write network change events
 		final Incident2NetworkChangeEventsWriter nceWriter = new Incident2NetworkChangeEventsWriter(this.tmc, this.trafficItems, trafficItemId2path);
