@@ -91,6 +91,12 @@ public class Incident2SHPWriter {
 			Link link = incident.getLink();
 			Link incidentLink = incident.getIncidentLink();
 			
+			double endTime = incident.getEndTime();
+			if ((int) endTime == 24 * 3600) {
+				endTime = endTime - 1.;
+				// in order to have the TimeManager QGIS Plugin running...
+			}
+			
 			Object[] incidentObject = new Object[] {
 					link.getId().toString(),
 					incident.getId(),
@@ -109,7 +115,7 @@ public class Incident2SHPWriter {
 
 					// start and end time
 					DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(incident.getStartTime()),
-					DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(incident.getEndTime())
+					DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(endTime)
 			};
 			
 			SimpleFeature feature = factory.createPolyline(

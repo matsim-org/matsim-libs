@@ -109,7 +109,21 @@ public class DateTime {
 		double seconds = (dateTimeInSec - (year * 12 * 30.436875 * 24 * 3600.) - (month * 30.436875 * 24 * 3600.) - (day * 24 * 3600.)) / 3600.;
 		String time = Time.writeTime(seconds);
 
-		String dateTime = year + "-" + month + "-" + day;
+		String monthStr = null;
+		if (month < 10) {
+			monthStr = "0" + String.valueOf(month);
+		} else {
+			monthStr = String.valueOf(month);
+		}
+		
+		String dayStr = null;
+		if (day < 10) {
+			dayStr = "0" + String.valueOf(day);
+		} else {
+			dayStr = String.valueOf(day);
+		}
+		
+		String dateTime = String.valueOf(year) + "-" + monthStr + "-" + dayStr;
 
 		if (seconds > 0.) {
 			dateTime = dateTime + "_" + time;

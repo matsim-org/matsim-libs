@@ -57,7 +57,8 @@ import playground.ikaddoura.incidents.data.TrafficItem;
 public class Incident2NetworkChangeEventsWriter {
 
 	private static final Logger log = Logger.getLogger(Incident2NetworkChangeEventsWriter.class);
-
+	private final double dayEndTime = (24 * 3600.) - 1.;
+	
 	private boolean debug = true;
 	
 	private Map<String, TrafficItem> trafficItems = null;
@@ -338,14 +339,14 @@ public class Incident2NetworkChangeEventsWriter {
 					|| DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) > dateInSec + (24 * 3600.)) {
 				// traffic item ends on a previous day or starts on a later day --> the traffic item is not relevant for this day
 			
-			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) < dateInSec
-					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) > dateInSec + (24 * 3600.)) {
+			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) <= dateInSec
+					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) >= dateInSec + (24 * 3600.)) {
 				// traffic item starts on a previous day and ends on a later day
 				
 				startTime = 0.;
-				endTime = 24. * 3600.;
+				endTime = dayEndTime;
 				
-			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) < dateInSec
+			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) <= dateInSec
 					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) > dateInSec
 					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) < dateInSec + (24 * 3600.)) {
 				// traffic item starts on a previous day and ends on this day
@@ -353,13 +354,13 @@ public class Incident2NetworkChangeEventsWriter {
 				startTime = 0.;
 				endTime = DateTime.parseDateTimeToTimeSeconds(item.getEndDateTime());
 									
-			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) > dateInSec
-					&& DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) < dateInSec + (24 * 3600.)
-					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) > dateInSec + (24 * 3600.)) {
+			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) >= dateInSec
+					&& DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) <= dateInSec + (24 * 3600.)
+					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) >= dateInSec + (24 * 3600.)) {
 				// traffic item starts on this day and ends on a later day
 
 				startTime = DateTime.parseDateTimeToTimeSeconds(item.getStartDateTime());
-				endTime = 24. * 3600.;
+				endTime = dayEndTime;
 								
 			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) > dateInSec
 					&& DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) < dateInSec + (24 * 3600.)
