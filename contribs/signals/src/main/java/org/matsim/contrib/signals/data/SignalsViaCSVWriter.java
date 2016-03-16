@@ -167,21 +167,21 @@ public class SignalsViaCSVWriter {
 			// vertical link 
 			deltaX = 0;
 			if (toNodeCoord.getY() < fromNodeCoord.getY()){
-				deltaY = -SIGNAL_COORD_NODE_OFFSET;
+				deltaY = -1;
 			} else {
-				deltaY = SIGNAL_COORD_NODE_OFFSET;
+				deltaY = 1;
 			}
 			
 		} else {
 			// this case includes the case when the link is horizontal
 			double m = (toNodeCoord.getY() - fromNodeCoord.getY()) / (toNodeCoord.getX() - fromNodeCoord.getX());
-			deltaX = SIGNAL_COORD_NODE_OFFSET / (Math.sqrt(1 + m * m));
+			deltaX = 1 / (Math.sqrt(1 + m * m));
 			deltaY = m * deltaX;
 		}
 		
 		// calculate x and y coord where the signal should be drawn
-		double x = toNodeCoord.getX() - deltaX + stepNumber * deltaY * (SIGNAL_COORD_LINK_OFFSET / SIGNAL_COORD_NODE_OFFSET);
-		double y = toNodeCoord.getY() - deltaY - stepNumber * deltaX * (SIGNAL_COORD_LINK_OFFSET / SIGNAL_COORD_NODE_OFFSET);
+		double x = toNodeCoord.getX() - SIGNAL_COORD_NODE_OFFSET * deltaX + stepNumber * deltaY * SIGNAL_COORD_LINK_OFFSET;
+		double y = toNodeCoord.getY() - SIGNAL_COORD_NODE_OFFSET * deltaY - stepNumber * deltaX * SIGNAL_COORD_LINK_OFFSET;
 		
 //		log.info("... done!");
 		return new Coord(x, y);
