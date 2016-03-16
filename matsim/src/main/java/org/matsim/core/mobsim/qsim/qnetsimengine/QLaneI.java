@@ -44,8 +44,6 @@ abstract class QLaneI implements Identifiable<Lane> {
 
 	abstract boolean isAcceptingFromWait(double now);
 
-	abstract void updateRemainingFlowCapacity(double now);
-
 	abstract boolean isActive();
 
 	abstract double getSimulatedFlowCapacityPerTimeStep();
@@ -73,24 +71,12 @@ abstract class QLaneI implements Identifiable<Lane> {
 
 	abstract void changeEffectiveNumberOfLanes( final double val ) ;
 
-	/**
-	 * Seems ok as public interface function. kai, aug'15
-	 */
 	abstract boolean doSimStep(final double now);
 
-	/**
-	 * Seems ok as public interface function. kai, aug'15 
-	 * @param now TODO
-	 */
 	abstract void clearVehicles(double now);
 
 	abstract Collection<MobsimVehicle> getAllVehicles();
 
-	/**
-	 * <br>
-	 * seems ok as public interface function. kai, aug'15
-	 * @param now TODO
-	 */
 	abstract void addFromUpstream(final QVehicle veh, double now);
 
 	abstract boolean isNotOfferingVehicle();

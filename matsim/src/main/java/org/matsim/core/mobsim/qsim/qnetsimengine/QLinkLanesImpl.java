@@ -268,7 +268,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	private boolean moveLanes(double now) {
 		boolean activeLane = false;
 		for (QLaneI queue : this.laneQueues.values()) {
-			queue.updateRemainingFlowCapacity(now);
 			
 			/* part A */
 			if (!this.toNodeLaneQueues.contains(queue)) {

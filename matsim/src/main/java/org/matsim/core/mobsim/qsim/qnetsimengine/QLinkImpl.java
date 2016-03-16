@@ -173,8 +173,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override
 	boolean doSimStep(double now) {
-		qlane.updateRemainingFlowCapacity(now);
-
 		if ( this.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
 			this.moveWaitToRoad(now);
 			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);

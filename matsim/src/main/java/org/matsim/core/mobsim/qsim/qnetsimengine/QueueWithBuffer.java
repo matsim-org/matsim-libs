@@ -147,7 +147,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 * this has accumulated to one).  There is no need to keep it this way; it just seems to make it easier to keep track of
 	 * changes.  kai, sep'14
 	 */
-	static class FlowcapAccumulate {
+	private static class FlowcapAccumulate {
 		private double timeStep = 0.;//Double.NEGATIVE_INFINITY ;
 		private double value = 0. ;
 		double getTimeStep(){
@@ -350,8 +350,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	@Override
-	 final void updateRemainingFlowCapacity(double now) {
+	private final void updateRemainingFlowCapacity(double now) {
 		if(!qsimConfig.isUsingFastCapacityUpdate() ){
 			remainingflowCap = flowCapacityPerTimeStep;
 			if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {
@@ -402,6 +401,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	final boolean doSimStep(final double now ) {
+		this.updateRemainingFlowCapacity(now);
 		if(qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles) this.processArrivalOfHoles( now ) ;
 		this.moveQueueToBuffer(now);
 		return true ;
@@ -855,16 +855,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-//	static boolean isSeepageAllowed ;
-//	private static String seepMode ; 
-//	static boolean isSeepModeStorageFree ;
-
 	private int maxSeepModeAllowed = 4;
 	private int noOfSeepModeBringFwd = 0;
-	/**
-	 * basically required to get more data points in the congested branch of FD
-	 */
-//	static boolean isRestrictingSeepage = true;
 	
 	private QVehicle peekFromVehQueue(double now){
 		QVehicle returnVeh = vehQueue.peek();
