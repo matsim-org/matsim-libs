@@ -107,4 +107,10 @@ abstract class QLaneI implements Identifiable<Lane> {
 
 	abstract void changeSpeedMetersPerSecond(double val) ;
 
+	/**
+	 * When multiple lanes lead to the same next link, the QLinkLanesImpl needs to decide which lane to use.  It uses
+	 * the one with the smallest load.
+	 */
+	abstract double getLoadIndicator() ;
+
 }

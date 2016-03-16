@@ -445,10 +445,6 @@ abstract class AbstractQLink extends QLinkI {
 		return insertingWaitingVehiclesBeforeDrivingVehicles;
 	}
 
-	QNetwork getQnetwork() {
-		return qnetwork;
-	}
-
 	boolean isActive() {
 		return active;
 	}

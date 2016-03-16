@@ -40,13 +40,11 @@ import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.ModelLane;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.vis.VisLane;
@@ -148,11 +146,15 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	private final Map<Id<Lane>, Map<Id<Link>, List<QLaneI>>> nextQueueToLinkCache;
 
+	private QNetwork qnetwork;
+	// keeping a second reference here since I don't want to make the back pointer package-open in AbstractQLink.  kai, mar'16
+
 	/**
 	 * Initializes a QueueLink with one QueueLane.
 	 */
 	QLinkLanesImpl(final Link link2, QNetwork network, final QNode toNode, List<ModelLane> lanes) {
 		super(link2, toNode, network);
+		this.qnetwork = network ;
 		this.toQueueNode = toNode;
 		this.laneQueues = new LinkedHashMap<>();
 		this.toNodeLaneQueues = new ArrayList<>();
@@ -160,12 +162,12 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		this.nextQueueToLinkCache = new LinkedHashMap<>(); // maps a lane id to a map containing the
 															// downstream queues indexed by a
 															// downstream link
-		this.initLaneQueues();
+		this.initLaneQueues(network);
 		this.visdata = this.new VisDataImpl();
 		this.setTransitQLink(new TransitQLink(this.firstLaneQueue));
 	}
 
-	private void initLaneQueues() {
+	private void initLaneQueues(QNetwork qnetwork) {
 		Stack<QLaneI> stack = new Stack<>();
 		Map<Id<Lane>, QLaneI> queueByIdMap = new HashMap<>();
 		Map<Id<Lane>, Set<Id<Link>>> laneIdToLinksMap = new HashMap<>();
@@ -177,11 +179,11 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			// lane.getLength(), noEffectiveLanes,
 			// (lane.getLaneData().getCapacityVehiclesPerHour()/3600.0));
 
-			QSimConfigGroup qsimConfig = getQnetwork().simEngine.getMobsim().getScenario().getConfig().qsim() ;
-			EventsManager events = getQnetwork().simEngine.getMobsim().getEventsManager() ;
-			double effectiveCellSize = ((NetworkImpl) getQnetwork().getNetwork()).getEffectiveCellSize() ;
-			AgentCounter agentCounter = getQnetwork().simEngine.getMobsim().getAgentCounter() ;
-			AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = getQnetwork().simEngine.getAgentSnapshotInfoBuilder() ;
+			QSimConfigGroup qsimConfig = qnetwork.simEngine.getMobsim().getScenario().getConfig().qsim() ;
+			EventsManager events = qnetwork.simEngine.getMobsim().getEventsManager() ;
+			double effectiveCellSize = ((NetworkImpl) qnetwork.getNetwork()).getEffectiveCellSize() ;
+			AgentCounter agentCounter = qnetwork.simEngine.getMobsim().getAgentCounter() ;
+			AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = qnetwork.simEngine.getAgentSnapshotInfoBuilder() ;
 			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(qsimConfig, events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder);
 			builder.setVehicleQueue(new FIFOVehicleQ());
 			builder.setLaneId(laneId);
@@ -190,7 +192,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			builder.setFlowCapacity_s(lane.getLaneData().getCapacityVehiclesPerHour() / 3600.);
 			QLaneI queue = builder.build(this);
 			// --
-			((QueueWithBuffer) queue).generatingLaneEvents = true;
 			queueByIdMap.put(laneId, queue);
 			firstLaneQueue = queue;
 			stack.push(queue);
@@ -240,7 +241,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	void clearVehicles() {
 		super.clearVehicles();
 
-		double now = getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+		double now = qnetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 		for (QLaneI lane : this.laneQueues.values()) {
 			lane.clearVehicles(now);
 		}
@@ -276,7 +277,9 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			} else {
 				// move vehicles from the lane buffer to the link buffer, i.e. prepare moving them
 				// to the next link
-				((QueueWithBuffer) queue).moveQueueToBuffer(now);
+//				((QueueWithBuffer) queue).moveQueueToBuffer(now);
+				// yy just commented out the above line.  Can't say why it might needed; doSimStep also calls moveQueueToBuffer.
+				// Tests run ok, but it may have capacity ramifications outside tests.  kai, mar'16
 			}
 			/* end of part A */
 			
@@ -314,15 +317,15 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			QLaneI nextQueue = this.chooseNextLane(qlane, toLinkId);
 			if (nextQueue != null) {
 				if (nextQueue.isAcceptingFromUpstream()) {
-					((QueueWithBuffer) qlane).removeFirstVehicle(now);
-					this.getQnetwork().simEngine
+					((QueueWithBuffer) qlane).popFirstVehicle(now);
+					qnetwork.simEngine
 							.getMobsim()
 							.getEventsManager()
 							.processEvent(
 									new LaneLeaveEvent(now, veh.getId(), this.getLink()
 											.getId(), ((QueueWithBuffer) qlane).getId()));
 					nextQueue.addFromUpstream(veh, now);
-					this.getQnetwork().simEngine
+					qnetwork.simEngine
 							.getMobsim()
 							.getEventsManager()
 							.processEvent(
@@ -349,8 +352,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	private QLaneI chooseNextLane(QLaneI queue, Id<Link> toLinkId) {
-		List<QLaneI> toQueues = this.nextQueueToLinkCache.get(((QueueWithBuffer) queue).getId())
-				.get(toLinkId);
+		List<QLaneI> toQueues = this.nextQueueToLinkCache.get(queue.getId()).get(toLinkId);
 		QLaneI retLane = toQueues.get(0);
 		if (toQueues.size() == 1) {
 			return retLane;
@@ -358,7 +360,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		// else chose lane by storage cap
 		for (int i = 1; i < toQueues.size(); i++) {
 			QLaneI toQueue = toQueues.get(i);
-			if (((QueueWithBuffer) toQueue).usedStorageCapacity < ((QueueWithBuffer) retLane).usedStorageCapacity) {
+			if (((QueueWithBuffer) toQueue).getLoadIndicator() < ((QueueWithBuffer) retLane).getLoadIndicator()) {
 				retLane = toQueue;
 			}
 		}
@@ -380,7 +382,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				return movedWaitToRoad;
 			}
 			movedWaitToRoad = true;
-			this.getQnetwork().simEngine
+			qnetwork.simEngine
 					.getMobsim()
 					.getEventsManager()
 					.processEvent(
@@ -509,7 +511,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		private VisLinkWLanes visLink = null;
 
 		VisDataImpl() {
-			double nodeOffset = QLinkLanesImpl.this.getQnetwork().simEngine.getMobsim().getScenario()
+			double nodeOffset = qnetwork.simEngine.getMobsim().getScenario()
 					.getConfig().qsim().getNodeOffset();
 			if (nodeOffset != 0.0) {
 				nodeOffset = nodeOffset + 2.0; // +2.0: eventually we need a bit space for the
@@ -518,7 +520,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				CoordinateTransformation transformation = new IdentityTransformation();
 				visLink = visModelBuilder.createVisLinkLanes(transformation, QLinkLanesImpl.this,
 						nodeOffset, lanes);
-				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkLanesImpl.this.getQnetwork()
+				SnapshotLinkWidthCalculator linkWidthCalculator = qnetwork
 						.getLinkWidthCalculatorForVis();
 				visModelBuilder.recalculatePositions(visLink, linkWidthCalculator);
 			}
@@ -527,10 +529,10 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		@Override
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(
 				final Collection<AgentSnapshotInfo> positions) {
-			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkLanesImpl.this.getQnetwork().simEngine
+			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = qnetwork.simEngine
 					.getAgentSnapshotInfoBuilder();
 			
-			double now = getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+			double now = qnetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 
 
 			if (visLink != null) {

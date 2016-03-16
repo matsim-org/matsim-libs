@@ -101,6 +101,9 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	/* package, for some tests */ final QLaneI qlane;
 
+	private QNetwork qnetwork;
+	// memorizing the back pointer separately here because I don't want to make it package-available. kai, mar'16
+
 	/**
 	 * Initializes a QueueLink with one QueueLane.
 	 */
@@ -118,6 +121,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 			AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder) {
 		// yy get rid of this c'tor (since the one with queueWithBuffer is more flexible)?
 		super(link2, toNode, network) ;
+		this.qnetwork = network ;
 		//--
 		QSimConfigGroup qsimConfig = network.simEngine.getMobsim().getScenario().getConfig().qsim() ;
 		EventsManager events = network.simEngine.getMobsim().getEventsManager() ;
@@ -136,6 +140,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	
 	public QLinkImpl( final Link link2, QNetwork network, final QNode toNode, final QLaneI queueWithBuffer ) {
 		super(link2, toNode, network) ;
+		this.qnetwork = network ;
 		this.qlane = queueWithBuffer ;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
@@ -147,6 +152,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final LaneFactory roadFactory) {
 		super(link2, toNode, network) ;
+		this.qnetwork = network ;
 		// The next line must must by contract stay within the constructor,
 		// so that the caller can use references to the created roads to wire them together,
 		// if it must.
@@ -159,7 +165,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override
 	void clearVehicles() {
-		double now = this.getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+		double now = qnetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 		
 		super.clearVehicles();
 		qlane.clearVehicles(now);
@@ -201,7 +207,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 				return;
 			}
 
-			this.getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(
+			qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
 					new VehicleEntersTrafficEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId(), veh.getDriver().getMode(), 1.0));
 
 			if ( this.getTransitQLink().addTransitToStopQueue(now, veh, this.getLink().getId()) ) {
@@ -313,20 +319,20 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		private VisLinkWLanes visLink = null;
 
 		private VisDataImpl() {
-			double nodeOffset = QLinkImpl.this.getQnetwork().simEngine.getMobsim().getScenario().getConfig().qsim().getNodeOffset(); 
+			double nodeOffset = qnetwork.simEngine.getMobsim().getScenario().getConfig().qsim().getNodeOffset(); 
 			if (nodeOffset != 0.0) {
 				nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 				visModelBuilder = new VisLaneModelBuilder();
 				CoordinateTransformation transformation = new IdentityTransformation();
 				visLink = visModelBuilder.createVisLinkLanes(transformation, QLinkImpl.this, nodeOffset, null);
-				SnapshotLinkWidthCalculator linkWidthCalculator = QLinkImpl.this.getQnetwork().getLinkWidthCalculatorForVis();
+				SnapshotLinkWidthCalculator linkWidthCalculator = qnetwork.getLinkWidthCalculatorForVis();
 				visModelBuilder.recalculatePositions(visLink, linkWidthCalculator);
 			}
 		}
 
 		@Override
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo( Collection<AgentSnapshotInfo> positions) {
-			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.getQnetwork().simEngine.getAgentSnapshotInfoBuilder();
+			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = qnetwork.simEngine.getAgentSnapshotInfoBuilder();
 
 			QLaneI.VisData roadVisData = qlane.getVisData() ;
 			if (visLink != null) {
@@ -334,7 +340,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 				// yyyy not so great but an elegant solution needs more thinking about visualizer structure. kai, jun'13
 			}
 
-			double now = getQnetwork().simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+			double now = qnetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 			positions = roadVisData.addAgentSnapshotInfo(positions,now) ;
 
 			int cnt2 = 10 ; // a counter according to which non-moving items can be "spread out" in the visualization
