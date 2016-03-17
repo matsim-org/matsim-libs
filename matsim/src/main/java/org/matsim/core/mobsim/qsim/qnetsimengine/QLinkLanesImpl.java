@@ -184,13 +184,14 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			double effectiveCellSize = ((NetworkImpl) qnetwork.getNetwork()).getEffectiveCellSize() ;
 			AgentCounter agentCounter = qnetwork.simEngine.getMobsim().getAgentCounter() ;
 			AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = qnetwork.simEngine.getAgentSnapshotInfoBuilder() ;
-			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(qsimConfig, events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder);
+			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( new QueueWithBufferContext( events, effectiveCellSize,
+					agentCounter, agentSnapshotInfoBuilder, qsimConfig ) ) ;
 			builder.setVehicleQueue(new FIFOVehicleQ());
 			builder.setLaneId(laneId);
 			builder.setLength(lane.getLength());
 			builder.setEffectiveNumberOfLanes(noEffectiveLanes);
 			builder.setFlowCapacity_s(lane.getLaneData().getCapacityVehiclesPerHour() / 3600.);
-			QLaneI queue = builder.build(this);
+			QLaneI queue = builder.createLane(this);
 			// --
 			queueByIdMap.put(laneId, queue);
 			firstLaneQueue = queue;

@@ -129,10 +129,10 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		AgentCounter agentCounter = network.simEngine.getMobsim().getAgentCounter() ;
 		Gbl.assertNotNull(agentSnapshotInfoBuilder);
 		//--
-		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(qsimConfig, events, effectiveCellSize,
-				agentCounter, agentSnapshotInfoBuilder) ;
+		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( new QueueWithBufferContext( events, effectiveCellSize,
+				agentCounter, agentSnapshotInfoBuilder, qsimConfig ) ) ;
 		builder.setLinkSpeedCalculator(linkSpeedCalculator);
-		this.qlane = builder.build(this) ;
+		this.qlane = builder.createLane(this) ;
 		//--
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
