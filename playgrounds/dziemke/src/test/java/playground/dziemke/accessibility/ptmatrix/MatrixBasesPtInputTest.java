@@ -21,6 +21,7 @@ package playground.dziemke.accessibility.ptmatrix;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -51,6 +52,7 @@ public class MatrixBasesPtInputTest {
 	
 	private static final Logger log = Logger.getLogger(MatrixBasesPtInputTest.class);
 
+    @Ignore
 	@Test
 	public final void testLeastCostPathTree() {
         final long timeStart = System.currentTimeMillis();
