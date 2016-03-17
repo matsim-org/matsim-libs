@@ -37,6 +37,7 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import playground.ikaddoura.incidents.DateTime;

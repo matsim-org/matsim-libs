@@ -47,7 +47,7 @@ public class TMCAlerts {
 	private final Set<String> loggedCodeAssumedAsMinusOneLane = new HashSet<>();
 	private int warnCnt = 0;
 	
-	private final boolean printLogStatements = false;
+	private final boolean printLogStatements = true;
 	
 	public static final boolean trafficItemIsAnUpdate(TrafficItem trafficItem) {
 		

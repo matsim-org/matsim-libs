@@ -48,28 +48,15 @@ import playground.ikaddoura.incidents.io.Incident2SHPWriter;
  *
  */
 public class IncidentDataAnalysis {
-	private static final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
- 
-//	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-//	private final String inputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-berlin/";
-//	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
-	
-//	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-//	private final String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-berlin/";
-//	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
+	private final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
 
-	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-	private final String inputDirectory = "/Users/ihab/Desktop/testXmlFiles/";
-	private final String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
-//	
-//	private final String networkFile = "../../../shared-svn/studies/ihab/incidents/network/germany-network-mainroads.xml";
-//	private final String inputDirectory = "/Users/ihab/Desktop/repomgr-ik/output-germany/";
-//	private final String outputDirectory = "/Users/ihab/Desktop/output-germany-analysis/";
+	private String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
+	private String inputDirectory = "/Users/ihab/Desktop/testXmlFiles/";
+	private String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
 	
-	private final boolean writeCSVFileForEachXMLFile = false;
-
-	private final String startDateTime = "2016/03/15";
-	private final String endDateTime = "2016/03/15";
+	private boolean writeCSVFileForEachXMLFile = false;
+	private String startDateTime = "2016/03/15";
+	private String endDateTime = "2016/03/15";
 		
 // ##################################################################
 	
@@ -77,8 +64,29 @@ public class IncidentDataAnalysis {
 	private final TMCAlerts tmc = new TMCAlerts();
 
 	public static void main(String[] args) throws XMLStreamException, IOException {
+		
 		IncidentDataAnalysis incidentAnalysis = new IncidentDataAnalysis();
 		incidentAnalysis.run();	
+	}
+	
+	public IncidentDataAnalysis() {
+		log.warn("Using the default constructor...");
+	}
+	
+	public IncidentDataAnalysis(
+			String networkFile,
+			String inputDirectory,
+			String outputDirectory,
+			boolean writeCSVFileForEachXMLFile,
+			String startDateTime,
+			String endDateTime) {
+		
+		this.networkFile = networkFile;
+		this.inputDirectory = inputDirectory;
+		this.outputDirectory = outputDirectory;
+		this.writeCSVFileForEachXMLFile = writeCSVFileForEachXMLFile;
+		this.startDateTime = startDateTime;
+		this.endDateTime = endDateTime;
 	}
 
 	public void run() throws XMLStreamException, IOException {
@@ -91,6 +99,8 @@ public class IncidentDataAnalysis {
 		}
 		
 		collectTrafficItems(); // traffic items that have the same traffic item IDs are updated by the more recent information or by the update traffic item
+//		Incident2CSVWriter.writeTrafficItems(trafficItems.values(), outputDirectory + "incidentData_beforeConsideringUpdateMessages.csv");
+	
 		updateTrafficItems(); // update all traffic items that are updated or canceled by another traffic item
 		
 		// write CSV file which contains all information (start point, end point, type, ...) 
@@ -271,7 +281,7 @@ public class IncidentDataAnalysis {
 	
 	private void updateTrafficItems() throws IOException {
 		
-		log.info("Updating all traffic items using the update message codes...");
+		log.info("Updating all traffic items using the update message codes or the original Id information...");
 		Set<String> updateItemsToBeDeleted = new HashSet<>();
 
 		for (TrafficItem updateItem : this.trafficItems.values()) {
@@ -292,15 +302,56 @@ public class IncidentDataAnalysis {
 						log.warn("Normal traffic item: " + originalItem);
 						log.warn("Update traffic item: " + updateItem);
 						
-						log.warn("The from and to locations' descriptions are the same. Ok, probably some minor location coordinate corrections. Proceed...");
-						log.warn("The from and to locations' descriptions are not the same. Assuming that this is still the update for the previous traffic item. Proceed....");
+						log.warn("If the from and to locations' descriptions are the same: Ok, probably some minor location coordinate corrections. Proceed...");
+						log.warn("If the from and to locations' descriptions are not the same: Assuming that this is still the update for the previous traffic item. Proceed....");
 					}
 					originalItem.setEndDateTime(updateItem.getStartDateTime());
 					updateItemsToBeDeleted.add(updateItem.getId());
 				}
 				
 			} else {
-				// nothing to update
+
+				// some traffic items have no update code but provide update information for an existing traffic item
+				
+				if (updateItem.getId().equals(updateItem.getOriginalId())) {
+					// The item's Id and original Id are the same. Considering this item not to be an update item.
+					
+				} else {
+					// This item is considered as an update item providing information for an existing traffic item (original Id).
+					
+					if (this.trafficItems.get(updateItem.getOriginalId()) == null) {
+						// original traffic item not in map
+						
+					} else {
+						TrafficItem originalItem = this.trafficItems.get(updateItem.getOriginalId());
+
+						if (updateItem.getOrigin().toString().equals(originalItem.getOrigin().toString())
+								&& updateItem.getTo().toString().equals(originalItem.getTo().toString())
+								&& updateItem.getTMCAlert().getPhraseCode().equals(originalItem.getTMCAlert().getPhraseCode())) {
+							
+							// the update and original traffic items' locations and alert codes are the same
+							// only update the end time
+							
+							originalItem.setEndDateTime(updateItem.getEndDateTime());
+							
+						} else {
+							
+							log.warn("An update item should only update the incident's endtime. The location and alert code should remain the same. Compare the following traffic items:");
+							log.warn("Original traffic item: " + originalItem);
+							log.warn("Update traffic item: " + updateItem);
+							
+							log.warn("If the from and to locations' descriptions are the same: Ok, probably some minor location coordinate corrections. Proceed...");
+							log.warn("If the from and to locations' descriptions are not the same: Assuming that this is still the update for the previous traffic item. Proceed....");
+							
+							originalItem.setEndDateTime(updateItem.getEndDateTime());
+							originalItem.setOrigin(updateItem.getOrigin());
+							originalItem.setTo(updateItem.getTo());
+							originalItem.setTMCAlert(updateItem.getTMCAlert());
+						}
+						
+						updateItemsToBeDeleted.add(updateItem.getId());
+					}
+				}				
 			}
 		}
 		log.info("+++ " + updateItemsToBeDeleted.size() + " original traffic item(s) updated according to update message(s)");
@@ -338,6 +389,10 @@ public class IncidentDataAnalysis {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		log.info("Loading scenario... Done.");
 		return scenario;
+	}
+
+	public Map<String, TrafficItem> getTrafficItems() {
+		return trafficItems;
 	}
 	
 }
