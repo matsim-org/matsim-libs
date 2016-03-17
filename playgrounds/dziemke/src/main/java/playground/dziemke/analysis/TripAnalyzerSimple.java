@@ -126,8 +126,8 @@ public class TripAnalyzerSimple {
 
 	    		// calculate travel times and store them in a map
 	    		// trip.getArrivalTime() / trip.getDepartureTime() yields values in seconds!
-	    		double departureTime_s = trip.getDepartureTime();
-	    		double arrivalTime_s = trip.getArrivalTime();
+	    		double departureTime_s = trip.getDepartureTime_s();
+	    		double arrivalTime_s = trip.getArrivalTime_s();
 	    		double tripDuration_s = arrivalTime_s - departureTime_s;
 	    		double tripDuration_min = tripDuration_s / 60.;
 	    		double tripDuration_h = tripDuration_min / 60.;

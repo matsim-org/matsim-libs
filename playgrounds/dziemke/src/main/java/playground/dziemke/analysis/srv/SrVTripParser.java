@@ -60,14 +60,14 @@ public class SrVTripParser {
 	private static final String USE_OTHER_CAR_POOL = "V_ANDPKW_MF";
 	private static final String ARRIVAL_ZONE_ID = "ZIEL_TEILBEZIRK2";
 	// departure time corresponds to "beginn" of trip
-	private static final String DEPARTURE_TIME = "V_BEGINN";
-	private static final String ARRIVAL_TIME = "V_ANKUNFT";
-	private static final String DISTANCE_BEELINE = "V_LAENGE";
+	private static final String DEPARTURE_TIME_MIN = "V_BEGINN"; // in min (Ahrens2010SrVDatenaufbereitung, p.47)
+	private static final String ARRIVAL_TIME_MIN = "V_ANKUNFT"; // in min (Ahrens2010SrVDatenaufbereitung, p.47)
+	private static final String DISTANCE_BEELINE_KM = "V_LAENGE"; // in km (Ahrens2010SrVDatenaufbereitung, p.47)
 	//private static final String MODE = "E_HVM";
-	private static final String DURATION = "E_DAUER";
-	private static final String SPEED = "E_GESCHW";
-	private static final String DISTANCE_ROUTED_FASTEST = "E_LAENGE_SCHNELL";
-	private static final String DISTANCE_ROUTED_SHORTEST = "E_LAENGE_KUERZ";
+	private static final String DURATION_MIN = "E_DAUER"; // in min (Ahrens2010SrVDatenaufbereitung, p.48)
+	private static final String SPEED_KM_H = "E_GESCHW"; // in km/h (Ahrens2010SrVDatenaufbereitung, p.48)
+	private static final String DISTANCE_ROUTED_FASTEST_KM = "E_LAENGE_SCHNELL"; // in km (Ahrens2010SrVDatenaufbereitung, p.48)
+	private static final String DISTANCE_ROUTED_SHORTEST_KM = "E_LAENGE_KUERZ"; // in km (Ahrens2010SrVDatenaufbereitung, p.49)
 	
 	private static final String WEIGHT = "GEWICHT_W";
 	
@@ -115,20 +115,20 @@ public class SrVTripParser {
 				//String activityEndActType = new String(entries[columnNumbers.get(ACTIVITY_END_ACT_TYPE)]);
 				String activityEndActType = transformActType(new Integer(entries[columnNumbers.get(ACTIVITY_END_ACT_TYPE)]));
 				Id<Zone> departureZoneId = Id.create(entries[columnNumbers.get(DEPARTURE_ZONE_ID)], Zone.class);
-				Double departureTime = new Double(entries[columnNumbers.get(DEPARTURE_TIME)]);
+				Double departureTime_min = new Double(entries[columnNumbers.get(DEPARTURE_TIME_MIN)]);
 				Integer useHouseholdCar = new Integer(entries[columnNumbers.get(USE_HOUSEHOLD_CAR)]);
 				Integer useOtherCar = new Integer(entries[columnNumbers.get(USE_OTHER_CAR)]);
 				Integer useHouseholdCarPool = new Integer(entries[columnNumbers.get(USE_HOUSEHOLD_CAR_POOL)]);
 				Integer useOtherCarPool = new Integer(entries[columnNumbers.get(USE_OTHER_CAR_POOL)]);
 				//Integer mode = new Integer(entries[columnNumbers.get(MODE)]);
 				//String mode = new String(entries[columnNumbers.get(MODE)]);
-				Double distanceBeeline = new Double(entries[columnNumbers.get(DISTANCE_BEELINE)]);
-				Double distanceRoutedFastest = new Double(entries[columnNumbers.get(DISTANCE_ROUTED_FASTEST)]);
-				Double distanceRoutedShortest = new Double(entries[columnNumbers.get(DISTANCE_ROUTED_SHORTEST)]);
-				Double speed= new Double(entries[columnNumbers.get(SPEED)]);
-				Double duration = new Double(entries[columnNumbers.get(DURATION)]);
+				Double distanceBeeline_km = new Double(entries[columnNumbers.get(DISTANCE_BEELINE_KM)]);
+				Double distanceRoutedFastest_km = new Double(entries[columnNumbers.get(DISTANCE_ROUTED_FASTEST_KM)]);
+				Double distanceRoutedShortest_km = new Double(entries[columnNumbers.get(DISTANCE_ROUTED_SHORTEST_KM)]);
+				Double speed_km_h= new Double(entries[columnNumbers.get(SPEED_KM_H)]);
+				Double duration_min = new Double(entries[columnNumbers.get(DURATION_MIN)]);
 				Id<Zone> arrivalZoneId = Id.create(entries[columnNumbers.get(ARRIVAL_ZONE_ID)], Zone.class);
-				Double arrivalTime = new Double(entries[columnNumbers.get(ARRIVAL_TIME)]);
+				Double arrivalTime_min = new Double(entries[columnNumbers.get(ARRIVAL_TIME_MIN)]);
 				// String activityStartActType = new String(entries[columnNumbers.get(ACTIVITY_START_ACT_TYPE)]);
 				String activityStartActType = transformActType(new Integer(entries[columnNumbers.get(ACTIVITY_START_ACT_TYPE)]));
 				
@@ -141,20 +141,20 @@ public class SrVTripParser {
 				trip.setTripId(tripId);
 				trip.setActivityEndActType(activityEndActType);
 				trip.setDepartureZoneId(departureZoneId);
-				trip.setDepartureTime(departureTime);
+				trip.setDepartureTime_s(departureTime_min * 60.);
 				//trip.setDepartureLegMode(departureLegMode);
 				trip.setUseHouseholdCar(useHouseholdCar);
 				trip.setUseOtherCar(useOtherCar);
 				trip.setUseHouseholdCarPool(useHouseholdCarPool);
 				trip.setUseOtherCarPool(useOtherCarPool);
 				//trip.setMode(mode);
-				trip.setDistanceBeeline(distanceBeeline);
-				trip.setDistanceRoutedFastest(distanceRoutedFastest);
-				trip.setDistanceRoutedShortest(distanceRoutedShortest);
-				trip.setSpeed(speed);
-				trip.setDuration(duration);
+				trip.setDistanceBeeline_m(distanceBeeline_km * 1000.);
+				trip.setDistanceRoutedFastest_m(distanceRoutedFastest_km * 1000.);
+				trip.setDistanceRoutedShortest_m(distanceRoutedShortest_km * 1000.);
+				trip.setSpeed_m_s(speed_km_h * 3.6);
+				trip.setDurationGivenBySurvey_s(duration_min * 60.);
 				trip.setArrivalZoneId(arrivalZoneId);
-				trip.setArrivalTime(arrivalTime);
+				trip.setArrivalTime_s(arrivalTime_min * 60.);
 				//trip.setArrivalLegMode(arrivalLegMode);
 				trip.setActivityStartActType(activityStartActType);
 				

@@ -29,22 +29,22 @@ public class TripAnalyzerExtended {
 
 	
 	/* Parameters */
-	private static final String runId = "run_199";
+	private static final String runId = "run_168a";
 	private static final String usedIteration = "300"; // most frequently used value: 150
 	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
 	
 	private static final Integer planningAreaId = 11000000; // 11000000 = Berlin
 
-	private static final boolean onlyCar = true; // "car"; new, should be used for runs with ChangeLegMode enabled
+	private static final boolean onlyCar = false; // "car"; new, should be used for runs with ChangeLegMode enabled
 	private static final boolean onlyInterior = false; // "int"
-	private static final boolean onlyBerlinBased = false; // "ber"; usually varied for analysis
-	private static final boolean distanceFilter = false; // "dist"; usually varied for analysis
+	private static final boolean onlyBerlinBased = true; // "ber"; usually varied for analysis
+	private static final boolean distanceFilter = true; // "dist"; usually varied for analysis
 	// private static final double double minDistance = 0;
 	private static final double maxDistance_km = 100; // most frequently used value: 150
 
 	private static final boolean onlyWorkTrips = false; // "work"
 
-	private static final boolean ageFilter = true; // "age"
+	private static final boolean ageFilter = false; // "age"
 	private static final Integer minAge = 80; // typically "x0"
 	private static final Integer maxAge = 119; // typically "x9"; higehst number ususally chosen is 119
 
@@ -74,16 +74,196 @@ public class TripAnalyzerExtended {
 	/* Variables to store objects */
 	private static Network network;
 	private static Geometry planningAreaGeometry;
-	private static CemdapPersonInputFileReader cemdapPersonInputFileReader;
+	private static ObjectAttributes cemdapPersonAttributes;
+	
+	
+	/* Variables to store information */
+	private static int tripCounter = 0;
+	private static int tripCounterSpeed = 0;
+	private static int tripCounterIncomplete = 0;
+	
+	private static Map <Integer, Double> tripDurationMap = new TreeMap <Integer, Double>();
+	private static double aggregateTripDuration = 0.;
+    
+	private static Map <Integer, Double> departureTimeMap = new TreeMap <Integer, Double>();
+    
+	private static Map <String, Double> activityTypeMap = new TreeMap <String, Double>();
+    
+	private static Map <Integer, Double> tripDistanceRoutedMap = new TreeMap <Integer, Double>();
+	private static double aggregateTripDistanceRouted = 0.;
+	
+	private static Map <Integer, Double> tripDistanceBeelineMap = new TreeMap <Integer, Double>();
+	private static double aggregateTripDistanceBeeline = 0.;
+    
+	private static Map <Integer, Double> averageTripSpeedRoutedMap = new TreeMap <Integer, Double>();
+	private static double aggregateOfAverageTripSpeedsRouted = 0.;
+    
+	private static Map <Integer, Double> averageTripSpeedBeelineMap = new TreeMap <Integer, Double>();
+	private static double aggregateOfAverageTripSpeedsBeeline = 0.;
+    
+	private static int numberOfTripsWithNoCalculableSpeed = 0;
+    
+	private static Map <Id<Trip>, Double> distanceRoutedMap = new TreeMap <Id<Trip>, Double>();
+	private static Map <Id<Trip>, Double> distanceBeelineMap = new TreeMap <Id<Trip>, Double>();
+    
+	private static Map <String, Integer> otherInformationMap = new TreeMap <String, Integer>();
+	
+	
+	private static double averageTripDuration;
+	private static double averageTripDistanceRouted;
+	private static double averageTripDistanceBeeline;
+	private static double averageOfAverageTripSpeedsRouted;
+	private static double averageOfAverageTripSpeedsBeeline;
 
 	
-	@SuppressWarnings("unused")
 	public static void main(String[] args) {
-		Map<Integer, Geometry> zoneGeometries = ShapeReader.read(planningAreaShapeFile, "NR");
-		planningAreaGeometry = zoneGeometries.get(planningAreaId);
+		adaptOutputDirectory();
+	    
+		// Create an EventsManager instance (MATSim infrastructure)
+	    EventsManager eventsManager = EventsUtils.createEventsManager();
+	    TripHandler handler = new TripHandler();
+	    eventsManager.addHandler(handler);
+	 
+	    // Connect a file reader to the EventsManager and read in the event file
+	    MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+	    reader.readFile(eventsFile);
+	    log.info("Events file read!");
+	    
+	       
+	    /* Get network, which is needed to calculate distances */
+	    network = NetworkUtils.createNetwork();
+	    MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
+	    networkReader.readFile(networkFile);
+	    
+	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(planningAreaShapeFile, "NR");
+		planningAreaGeometry = zoneGeometries.get(planningAreaId);	    
+	    
+	    if (ageFilter == true) {
+	    	// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
+	    	CemdapPersonInputFileReader cemdapPersonInputFileReader = new CemdapPersonInputFileReader();
+		 	cemdapPersonInputFileReader.parse(cemdapPersonsInputFile);
+		 	cemdapPersonAttributes = cemdapPersonInputFileReader.getPersonAttributes();
+	    }
 
-	    /* Systematic output naming */
-	    outputDirectory = outputDirectory + "_" + usedIteration;
+	    
+	    /* Do calculations */
+	    for (Trip trip : handler.getTrips().values()) {
+	    	if(!trip.getTripComplete()) {
+	    		System.err.println("Trip is not complete!");
+	    		tripCounterIncomplete++;
+	    		/* The only case where incomplete trips occur is when agents are removed according to "removeStuckVehicles = true"
+	    		 * Since a removed agent can at most have one incomplete trip (the one when he is removed), the number of
+	    		 * incomplete trips should be equal to the number of removed agents
+	    		 */
+	    		continue;
+	    	}	    	
+
+	    	if (decideIfConsiderTrip(trip) == true) {
+	    		analyzeTrip(trip);
+	    	}
+	    }
+	    calculateAverages();
+	    
+	    otherInformationMap.put("Number of trips that have no previous activity", handler.getNoPreviousEndOfActivityCounter());
+	    otherInformationMap.put("Number of trips that have no calculable speed", numberOfTripsWithNoCalculableSpeed);
+	    otherInformationMap.put("Number of incomplete trips (i.e. number of removed agents)", tripCounterIncomplete);
+	    otherInformationMap.put("Number of (complete) trips", tripCounter);
+	    
+	    writeResultFiles();
+	    
+	    log.info(tripCounterIncomplete + " trips are incomplete.");
+	}
+
+
+	private static void writeResultFiles() {
+	    new File(outputDirectory).mkdir();
+	    AnalysisFileWriter writer = new AnalysisFileWriter();
+	    writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, tripCounter, averageTripDuration);
+	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, tripCounter, averageTripDuration);
+	    writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", tripCounter);
+	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, tripCounter, averageTripDistanceRouted);
+	    writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance_km, tripCounter, averageTripDistanceBeeline);
+	    writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsRouted);
+	    writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
+	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, tripCounter, averageTripDuration);
+	    writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeelineCumulative.txt", binWidthDistance_km, tripCounter, averageTripDistanceBeeline);
+	    writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
+	    writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
+	    
+	    // write a routed distance vs. beeline distance comparison file
+	    writer.writeRoutedBeelineDistanceComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "/beeline.txt", tripCounter);
+	}
+
+
+	private static void calculateAverages() {
+		averageTripDuration = aggregateTripDuration / tripCounter;
+	    averageTripDistanceRouted = aggregateTripDistanceRouted / tripCounter;
+	    averageTripDistanceBeeline = aggregateTripDistanceBeeline / tripCounter;
+	    averageOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted / tripCounterSpeed;
+	    averageOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline / tripCounterSpeed;
+	}
+
+
+	private static void analyzeTrip(Trip trip) {
+		tripCounter++;
+
+		// calculate travel times and store them in a map
+		double tripDuration_min = trip.getCalculatedDuration_s() / 60.;
+		double tripDuration_h = tripDuration_min / 60.;
+		addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, 1.);
+		aggregateTripDuration = aggregateTripDuration + tripDuration_min;	 
+
+		// store departure times in a map
+		double departureTime_h = trip.getDepartureTime_s() / 3600.;
+		addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, 1.);
+
+		// store activities in a map
+		String activityType = trip.getActivityStartActType();
+		addToMapStringKey(activityTypeMap, activityType);
+
+		// calculate (routed) distances and and store them in a map
+		double tripDistance_m = 0.;
+		for (int i = 0; i < trip.getLinks().size(); i++) {
+			Id<Link> linkId = trip.getLinks().get(i);
+			Link link = network.getLinks().get(linkId);
+			double length_m = link.getLength();
+			tripDistance_m = tripDistance_m + length_m;
+		}
+		// TODO here, the distances from activity to link and link to activity are missing!
+		double tripDistanceRouted = tripDistance_m / 1000.;
+
+		// store (routed) distances  in a map
+		addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted, binWidthDistance_km, maxBinDistance_km, 1.);
+		aggregateTripDistanceRouted = aggregateTripDistanceRouted + tripDistanceRouted;
+		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted);
+
+		// store (beeline) distances in a map
+		double tripDistanceBeeline = trip.getBeelineDistance(network);
+		addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline, binWidthDistance_km, maxBinDistance_km, 1.);
+		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline;
+		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline);
+
+		// calculate speeds and and store them in a map
+		if (tripDuration_h > 0.) {
+			//System.out.println("trip distance is " + tripDistance + " and time is " + timeInHours);
+			double averageTripSpeedRouted = tripDistanceRouted / tripDuration_h;
+			addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted;
+
+			double averageTripSpeedBeeline = tripDistanceBeeline / tripDuration_h;
+			addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline;
+
+			tripCounterSpeed++;
+		} else {
+			numberOfTripsWithNoCalculableSpeed++;
+		}
+	}
+
+
+	@SuppressWarnings("all")
+	private static void adaptOutputDirectory() {
+		outputDirectory = outputDirectory + "_" + usedIteration;
 	    if (onlyCar == true) {
 			outputDirectory = outputDirectory + "_car";
 		}
@@ -103,185 +283,7 @@ public class TripAnalyzerExtended {
 			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
-//		outputDirectory = outputDirectory + "_2"; // in case used for double-check
-				
-		
-		// Create an EventsManager instance (MATSim infrastructure)
-	    EventsManager eventsManager = EventsUtils.createEventsManager();
-	    TripHandler handler = new TripHandler();
-	    eventsManager.addHandler(handler);
-	 
-	    // Connect a file reader to the EventsManager and read in the event file
-	    MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-	    reader.readFile(eventsFile);
-	    log.info("Events file read!");
-	    
-	    // check if all trips have been completed; if so, result will be zero
-	    int numberOfIncompleteTrips = 0;
-	    for (Trip trip : handler.getTrips().values()) {
-	    	if(!trip.getTripComplete()) { numberOfIncompleteTrips++; }
-	    }
-	    log.info(numberOfIncompleteTrips + " trips are incomplete.");
-	    
-	    
-	    // --------------------------------------------------------------------------------------------------
-	    cemdapPersonInputFileReader = new CemdapPersonInputFileReader();
-	    if (ageFilter == true) {
-	    	// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
-	    	// so far age is the only one
-		    // parse person file
-		 	
-		 	cemdapPersonInputFileReader.parse(cemdapPersonsInputFile);
-	    }
-	 	// --------------------------------------------------------------------------------------------------
-	    
-	    	    	    
-	    /* Get network, which is needed to calculate distances */
-	    network = NetworkUtils.createNetwork();
-	    MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
-	    networkReader.readFile(networkFile);
-    	
-    	// create objects
-    	int tripCounter = 0;
-    	int tripCounterSpeed = 0;
-    	int tripCounterIncomplete = 0;
-    	
-    	Map <Integer, Double> tripDurationMap = new TreeMap <Integer, Double>();
-	    double aggregateTripDuration = 0.;
-	    
-	    Map <Integer, Double> departureTimeMap = new TreeMap <Integer, Double>();
-	    
-	    Map <String, Double> activityTypeMap = new TreeMap <String, Double>();
-	    
-	    Map <Integer, Double> tripDistanceRoutedMap = new TreeMap <Integer, Double>();
-		double aggregateTripDistanceRouted = 0.;
-		
-		Map <Integer, Double> tripDistanceBeelineMap = new TreeMap <Integer, Double>();
-		double aggregateTripDistanceBeeline = 0.;
-	    
-		Map <Integer, Double> averageTripSpeedRoutedMap = new TreeMap <Integer, Double>();
-	    double aggregateOfAverageTripSpeedsRouted = 0.;
-	    
-	    Map <Integer, Double> averageTripSpeedBeelineMap = new TreeMap <Integer, Double>();
-	    double aggregateOfAverageTripSpeedsBeeline = 0.;
-	    
-
-	    int numberOfTripsWithNoCalculableSpeed = 0;
-	    
-	    Map <Id<Trip>, Double> distanceRoutedMap = new TreeMap <Id<Trip>, Double>();
-	    Map <Id<Trip>, Double> distanceBeelineMap = new TreeMap <Id<Trip>, Double>();
-	    
-	    Map <String, Integer> otherInformationMap = new TreeMap <String, Integer>();
-	    
-	    // --------------------------------------------------------------------------------------------------
-	    ObjectAttributes personActivityAttributes = new ObjectAttributes();
-	    // --------------------------------------------------------------------------------------------------
-	    
-	    
-	    // do calculations
-	    for (Trip trip : handler.getTrips().values()) {
-	    	if(!trip.getTripComplete()) {
-	    		System.err.println("Trip is not complete!");
-	    		tripCounterIncomplete++;
-	    		/* The only case where incomplete trips occur is when agents are removed according to "removeStuckVehicles = true"
-	    		 * Since a removed agent can at most have one incomplete trip (the one when he is removed), the number of
-	    		 * incomplete trips should be equal to the number of removed agents
-	    		 */
-	    		continue;
-	    	}
-	    	
-
-	    	if (decideIfConsiderTrip(trip) == true) {
-	    		tripCounter++;
-
-	    		// calculate travel times and store them in a map
-	    		// trip.getArrivalTime() / trip.getDepartureTime() yields values in seconds!
-	    		double departureTime_s = trip.getDepartureTime();
-	    		double arrivalTime_s = trip.getArrivalTime();
-	    		double tripDuration_s = arrivalTime_s - departureTime_s;
-	    		double tripDuration_min = tripDuration_s / 60.;
-	    		double tripDuration_h = tripDuration_min / 60.;
-	    		addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, 1.);
-	    		aggregateTripDuration = aggregateTripDuration + tripDuration_min;	 
-
-	    		// store departure times in a map
-	    		double departureTime_h = departureTime_s / 3600.;
-	    		addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, 1.);
-
-	    		// store activities in a map
-	    		String activityType = trip.getActivityStartActType();
-	    		addToMapStringKey(activityTypeMap, activityType);
-
-	    		// calculate (routed) distances and and store them in a map
-	    		double tripDistance_m = 0.;
-	    		for (int i = 0; i < trip.getLinks().size(); i++) {
-	    			Id<Link> linkId = trip.getLinks().get(i);
-	    			Link link = network.getLinks().get(linkId);
-	    			double length_m = link.getLength();
-	    			tripDistance_m = tripDistance_m + length_m;
-	    		}
-	    		// TODO here, the distances from activity to link and link to activity are missing!
-	    		double tripDistanceRouted = tripDistance_m / 1000.;
-
-	    		// store (routed) distances  in a map
-	    		addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted, binWidthDistance_km, maxBinDistance_km, 1.);
-	    		aggregateTripDistanceRouted = aggregateTripDistanceRouted + tripDistanceRouted;
-	    		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted);
-
-	    		// store (beeline) distances in a map
-	    		double tripDistanceBeeline = trip.getBeelineDistance(network);
-	    		addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline, binWidthDistance_km, maxBinDistance_km, 1.);
-	    		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline;
-	    		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline);
-
-	    		// calculate speeds and and store them in a map
-	    		if (tripDuration_h > 0.) {
-	    			//System.out.println("trip distance is " + tripDistance + " and time is " + timeInHours);
-	    			double averageTripSpeedRouted = tripDistanceRouted / tripDuration_h;
-	    			addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
-	    			aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted;
-
-	    			double averageTripSpeedBeeline = tripDistanceBeeline / tripDuration_h;
-	    			addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
-	    			aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline;
-
-	    			tripCounterSpeed++;
-	    		} else {
-	    			numberOfTripsWithNoCalculableSpeed++;
-	    		}
-	    	}
-	    }
-	    
-	    double averageTripDuration = aggregateTripDuration / tripCounter;
-	    double averageTripDistanceRouted = aggregateTripDistanceRouted / tripCounter;
-	    double averageTripDistanceBeeline = aggregateTripDistanceBeeline / tripCounter;
-	    double averageOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted / tripCounterSpeed;
-	    double averageOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline / tripCounterSpeed;
-	    
-	    
-	    otherInformationMap.put("Number of trips that have no previous activity", handler.getNoPreviousEndOfActivityCounter());
-	    otherInformationMap.put("Number of trips that have no calculable speed", numberOfTripsWithNoCalculableSpeed);
-	    otherInformationMap.put("Number of incomplete trips (i.e. number of removed agents)", tripCounterIncomplete);
-	    otherInformationMap.put("Number of (complete) trips", tripCounter);
-	 
-	    
-	    // write results to files
-	    new File(outputDirectory).mkdir();
-	    AnalysisFileWriter writer = new AnalysisFileWriter();
-	    writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, tripCounter, averageTripDuration);
-	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, tripCounter, averageTripDuration);
-	    writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", tripCounter);
-	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, tripCounter, averageTripDistanceRouted);
-	    writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance_km, tripCounter, averageTripDistanceBeeline);
-	    writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsRouted);
-	    writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
-	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, tripCounter, averageTripDuration);
-	    writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeelineCumulative.txt", binWidthDistance_km, tripCounter, averageTripDistanceBeeline);
-	    writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
-	    writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
-	    
-	    // write a routed distance vs. beeline distance comparison file
-	    writer.writeRoutedBeelineDistanceComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "/beeline.txt", tripCounter);
+		outputDirectory = outputDirectory + "_2"; // in case used for double-check
 	}
 	
 	
@@ -348,7 +350,7 @@ public class TripAnalyzerExtended {
     		// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
     		// so far age is the only one
     		String personId = trip.getPersonId().toString();
-    		int age = (int) cemdapPersonInputFileReader.getPersonAttributes().getAttribute(personId, "age");
+    		int age = (int) cemdapPersonAttributes.getAttribute(personId, "age");
 
     		if (age < minAge) {
     			considerTrip = false;

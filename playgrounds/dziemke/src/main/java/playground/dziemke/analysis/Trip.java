@@ -19,7 +19,7 @@ public class Trip {
 	private String activityEndActType;
 	private Id<Link> departureLinkId;
 	private Id<Zone> departureZoneId;
-	private double departureTime;
+	private double departureTime_s;
 	private String departureLegMode;
 	private List<Id<Link>> links = new LinkedList<Id<Link>>();
 	private int useHouseholdCar;
@@ -27,14 +27,14 @@ public class Trip {
 	private int useHouseholdCarPool;
 	private int useOtherCarPool;
 	private String mode;
-	private double distanceBeeline;
-	private double distanceRoutedFastest;
-	private double distanceRoutedShortest;
-	private double speed;
-	private double duration;
+	private double distanceBeeline_m; // TODO
+	private double distanceRoutedFastest_m;
+	private double distanceRoutedShortest_m;
+	private double speed_m_s;
+	private double duration_s;
 	private Id<Link> arrivalLinkId;
 	private Id<Zone> arrivalZoneId;
-	private double arrivalTime;
+	private double arrivalTime_s;
 	private String arrivalLegMode;
 	private String activityStartActType;
 	private boolean tripComplete = false;
@@ -101,12 +101,12 @@ public class Trip {
 		this.departureZoneId = departureZoneId;
 	}
 	
-	public double getDepartureTime() {
-		return this.departureTime;
+	public double getDepartureTime_s() {
+		return this.departureTime_s;
 	}
 
-	public void setDepartureTime(double departureTime) {
-		this.departureTime = departureTime;
+	public void setDepartureTime_s(double departureTime_s) {
+		this.departureTime_s = departureTime_s;
 	}
 		
 	public String getDepartureLegMode() {
@@ -165,44 +165,44 @@ public class Trip {
 		this.mode = mode;
 	}
 	
-	public double getDistanceBeeline() {
-		return this.distanceBeeline;
+	public double getDistanceBeeline_m() {
+		return this.distanceBeeline_m;
 	}
 
-	public void setDistanceBeeline(double distanceBeeline) {
-		this.distanceBeeline = distanceBeeline;
+	public void setDistanceBeeline_m(double distanceBeeline_m) {
+		this.distanceBeeline_m = distanceBeeline_m;
 	}
 	
-	public double getDistanceRoutedFastest() {
-		return this.distanceRoutedFastest;
+	public double getDistanceRoutedFastest_m() {
+		return this.distanceRoutedFastest_m;
 	}
 
-	public void setDistanceRoutedFastest(double distanceRoutedFastest) {
-		this.distanceRoutedFastest = distanceRoutedFastest;
+	public void setDistanceRoutedFastest_m(double distanceRoutedFastest_m) {
+		this.distanceRoutedFastest_m = distanceRoutedFastest_m;
 	}
 	
-	public double getDistanceRoutedShortest() {
-		return this.distanceRoutedShortest;
+	public double getDistanceRoutedShortest_m() {
+		return this.distanceRoutedShortest_m;
 	}
 
-	public void setDistanceRoutedShortest(double distanceRoutedShortest) {
-		this.distanceRoutedShortest = distanceRoutedShortest;
+	public void setDistanceRoutedShortest_m(double distanceRoutedShortest_m) {
+		this.distanceRoutedShortest_m = distanceRoutedShortest_m;
 	}
 	
-	public double getSpeed() {
-		return this.speed;
+	public double getSpeed_m_s() {
+		return this.speed_m_s;
 	}
 
-	public void setSpeed(double speed) {
-		this.speed = speed;
+	public void setSpeed_m_s(double speed_m_s) {
+		this.speed_m_s = speed_m_s;
 	}
 	
-	public double getDuration() {
-		return this.duration;
+	public double getDurationGivenBySurvey_s() {
+		return this.duration_s;
 	}
 
-	public void setDuration(double duration) {
-		this.duration = duration;
+	public void setDurationGivenBySurvey_s(double duration_s) {
+		this.duration_s = duration_s;
 	}
 	
 	public Id<Link> getArrivalLinkId() {
@@ -221,12 +221,12 @@ public class Trip {
 		this.arrivalZoneId = arrivalZoneId;
 	}
 		
-	public double getArrivalTime() {
-		return this.arrivalTime;
+	public double getArrivalTime_s() {
+		return this.arrivalTime_s;
 	}
 
-	public void setArrivalTime(double arrivalTime) {
-		this.arrivalTime = arrivalTime;
+	public void setArrivalTime_s(double arrivalTime) {
+		this.arrivalTime_s = arrivalTime;
 	}
 	
 	public String getArrivalLegMode() {
@@ -271,6 +271,10 @@ public class Trip {
 			calculateBeelineDistance(network);
 		}
 		return beelineDistance_m;
+	}
+	
+	public double getCalculatedDuration_s(){
+		return arrivalTime_s - departureTime_s;
 	}
 
 
