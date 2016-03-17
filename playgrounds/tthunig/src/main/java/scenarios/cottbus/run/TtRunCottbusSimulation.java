@@ -107,10 +107,14 @@ public class TtRunCottbusSimulation {
 	private static Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
 
-		config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n_woTagebau.xml");
+		config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n.xml");
+//		config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n_woTagebau.xml");
 		config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes.xml");
-		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/"
-				+ "commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
+//		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/"
+//				+ "commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
+		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_ohneTagebau/"
+		+ "commuter_population_wgs84_utm33n_car_only.xml.gz");
+//		config.plans().setInputFile(INPUT_BASE_DIR + "Cottbus-pt/INPUT_mod/public/input/plans_scale1.4false.xml");
 		
 		// set number of iterations
 		config.controler().setLastIteration(100);
@@ -191,8 +195,8 @@ public class TtRunCottbusSimulation {
 //		config.qsim().setStuckTime(3600 * 10.);
 		config.qsim().setRemoveStuckVehicles(false);
 		
-		config.qsim().setStorageCapFactor( 0.5 );
-		config.qsim().setFlowCapFactor( 0.5 );
+		config.qsim().setStorageCapFactor( 0.7 );
+		config.qsim().setFlowCapFactor( 0.7 );
 		
 		config.qsim().setStartTime(3600 * 6); 
 
@@ -205,7 +209,7 @@ public class TtRunCottbusSimulation {
 
 		config.planCalcScore().setMarginalUtilityOfMoney(1.0); // default is 1.0
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		// note: the output directory is defined in
 		// createRunNameAndOutputDir(...) after all adaptations are done
 
