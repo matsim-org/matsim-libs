@@ -20,7 +20,7 @@ public class LinkTravelTimeAnalysisTest {
 
 	@Before
 	public void prepareTest() {
-
+/*
 		// set small
 		eventsFile = "C:/Users/polettif/Desktop/output/small_02/ITERS/it.1/1.events.xml.gz";
 		outputCSV = "C:/Users/polettif/Desktop/output/analysis/small2.csv";
@@ -42,12 +42,12 @@ public class LinkTravelTimeAnalysisTest {
 		crossingIds.add(Id.createLinkId("2322-x"));
 		crossingIds.add(Id.createLinkId("2223-x"));
 
-
+*/
 	}
 
 	@Test
 	public void runAnalysis() throws FileNotFoundException, UnsupportedEncodingException {
-		LinkTravelTimeAnalysis.run(crossingIds, eventsFile, outputCSV, "06:00:00", "07:00:00");
+//		LinkTravelTimeAnalysis.run(crossingIds, eventsFile, outputCSV, "06:00:00", "07:00:00");
 	}
 
 }

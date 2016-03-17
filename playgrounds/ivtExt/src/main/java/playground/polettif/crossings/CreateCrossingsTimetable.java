@@ -55,17 +55,17 @@ public class CreateCrossingsTimetable {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//create an event object
-		EventsManager events = EventsUtils.createEventsManager();
+		EventsManager eventsManager = EventsUtils.createEventsManager();
         			
 		//create the handler and add it
 		CrossingsHandler handler = new CrossingsHandler();
 		handler.setNetwork(scenario.getNetwork());
 		handler.setBuffer(preBuffer, postBuffer);
 		handler.loadCrossings(inputCrossingsFile);
-		events.addHandler(handler);
+		eventsManager.addHandler(handler);
 
 		//create the reader and read the file
-		MatsimEventsReader reader = new MatsimEventsReader(events);
+		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 		reader.readFile(inputEventsFile);
 		
 		List<LinkChangeEvent> linkChangeEvents = handler.getLinkChangeEvents();

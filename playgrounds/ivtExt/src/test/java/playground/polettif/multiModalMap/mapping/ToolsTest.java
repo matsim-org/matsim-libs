@@ -4,25 +4,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import static org.junit.Assert.assertEquals;
-import static playground.polettif.multiModalMap.mapping.Tools.*;
 
 public class ToolsTest {
 

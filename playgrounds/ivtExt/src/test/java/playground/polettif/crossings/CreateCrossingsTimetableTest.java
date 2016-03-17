@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import static org.junit.Assert.*;
@@ -13,23 +14,30 @@ public class CreateCrossingsTimetableTest {
 
 	@Test
 	public void testRun() {
-
+/*
 		String inputNetworkFile, inputConfigFile, inputEventsFile, inputCrossingsFile, outputNetworkChangeEventsFile;
 
-		String base = "C:/Users/polettif/Desktop/";
+		String base = "C:/Users/polettif/Desktop/crossings/";
 		String scenarioName = "pt";
 		String configName = "config";
-		String networkName = "network_10mCrossingLength";
+		String networkName = "network";
 
-		inputConfigFile = base + "input/" + scenarioName + "/01_" + configName + ".xml";
-		inputNetworkFile = base + "input/" + scenarioName + "/" + networkName + ".xml";
+		String inputBase = base + "input/" + scenarioName+"/";
+		inputConfigFile = inputBase + configName + ".xml";
+		inputNetworkFile = inputBase + networkName + ".xml";
+		inputCrossingsFile = inputBase + "crossings.xml";
+		outputNetworkChangeEventsFile = inputBase + "/networkChangeEvents.xml";
 		inputEventsFile = base + "output/" + scenarioName + "_01/ITERS/it.0/0.events.xml.gz";
-		inputCrossingsFile = base + "input/" + scenarioName + "/crossings.xml";
-		outputNetworkChangeEventsFile = base + "input/" + scenarioName + "/networkChangeEvents.xml";
 
 		// run 1 iteration of scenario
-		Config config01 = ConfigUtils.loadConfig(inputConfigFile);
-		Scenario scenario01 = ScenarioUtils.loadScenario(config01);
+		Config config = ConfigUtils.loadConfig(inputConfigFile);
+		config.setParam("controler", "outputDirectory", base+"output/"+scenarioName+"_01/");
+		config.setParam("network", "inputNetworkFile", inputNetworkFile);
+		config.setParam("plans", "inputPlansFile", inputBase+"population.xml");
+		config.setParam("transit", "transitScheduleFile", inputBase+"transitschedule.xml");
+		config.setParam("transit", "vehiclesFile", inputBase+"transitVehicles.xml");
+
+		Scenario scenario01 = ScenarioUtils.loadScenario(config);
 		Controler controler01 = new Controler(scenario01);
 		controler01.run();
 
@@ -37,12 +45,15 @@ public class CreateCrossingsTimetableTest {
 		CreateCrossingsTimetable.run(inputNetworkFile, inputCrossingsFile, inputEventsFile, outputNetworkChangeEventsFile, 80.0, 40.0);
 
 		// run scenario again with crossings
-		String filename02 = base + "input/" + scenarioName + "/02_" + configName + ".xml";
-		Config config02 = ConfigUtils.loadConfig(filename02);
-		Scenario scenario02 = ScenarioUtils.loadScenario(config02);
+		config.controler().setLastIteration(20);
+		config.setParam("controler", "outputDirectory", base+"output/"+scenarioName+"_02/");
+		config.setParam("network", "timeVariantNetwork",  "true");
+		config.setParam("network", "inputChangeEventsFile",  outputNetworkChangeEventsFile);
+
+		Scenario scenario02 = ScenarioUtils.loadScenario(config);
 		Controler controler02 = new Controler(scenario02);
 		controler02.run();
-
+*/
 	}
 
 }
