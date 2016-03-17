@@ -199,7 +199,7 @@ public class IterativeAlgorithmDC {
                     rcms.getPersonsMaxEpsUnscaled();
 					Map<String, TravelTime> travelTimes = new HashMap<>();
 					travelTimes.put(TransportMode.car, travelTimeCalculator.getLinkTravelTimes());
-					BestReplyDestinationChoice module = new BestReplyDestinationChoice(TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory), dcContext, rcms.getPersonsMaxEpsUnscaled(), new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario), travelTimes, factories);
+					BestReplyDestinationChoice module = new BestReplyDestinationChoice(dcContext, rcms.getPersonsMaxEpsUnscaled());
 					module.prepareReplanning(context);
 					Collection<PlanImpl> copiedPlans = new ArrayList<PlanImpl>();
 					for(Person person:typePopulations.get(type)) {

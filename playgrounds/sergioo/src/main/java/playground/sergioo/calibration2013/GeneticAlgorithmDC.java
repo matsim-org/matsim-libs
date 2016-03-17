@@ -309,7 +309,7 @@ public class GeneticAlgorithmDC {
 		travelTimes.put(TransportMode.car, travelTimeCalculator.getLinkTravelTimes());
 		Map<String, TravelDisutilityFactory> factories = new HashMap<>();
 		factories.put(TransportMode.car, factory);
-		module = new BestReplyDestinationChoice(TripRouterFactoryBuilderWithDefaults.createTripRouterProvider(scenario, new DijkstraFactory(), transitRouterFactory), dcContext, rcms.getPersonsMaxEpsUnscaled(), new CharyparNagelOpenTimesScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario), travelTimes, factories);
+		module = new BestReplyDestinationChoice(dcContext, rcms.getPersonsMaxEpsUnscaled());
 		int numIterations = new Integer(args[4]);
 		avgDistance = new Double(args[5]);
 		int maxElements = new Integer(args[6]);
