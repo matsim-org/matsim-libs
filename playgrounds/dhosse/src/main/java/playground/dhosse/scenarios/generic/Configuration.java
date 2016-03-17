@@ -10,22 +10,36 @@ public class Configuration {
 	//TAGS
 	private static final String SEP = "\t";
 	private static final String COMMENT = "#";
+	
 	private static final String OSM_FILE = "osmFile";
-	private static final String SURVEY_AREA_IDS = "surveyAreaIdss";
-	private static final String VICINITY_IDS = "vicinityIds";
+	private static final String SURVEY_AREA_IDS = "surveyAreaIds";
 	private static final String CRS = "coordinateSystem";
 	private static final String WORKING_DIR = "workingDirectory";
 	private static final String INPUT_COMMUTER_FILE = "inputCommuterFile";
 	private static final String INPUT_REVERSE_COMMUTER_FILE = "inputReverseCommuterFile";
+	private static final String POPULATION_TYPE = "populationType";
+	private static final String PERSONS_IN_SURVEY_AREA = "personsInSurveyArea";
+	private static final String USE_HOUSEHOLDS = "useHouseholds";
 	
 	//MEMBERS
 	private String osmFile;
 	private String[] surveyAreaIds;
-	private String[] vicinityIds;
 	private String crs;
 	private String workingDirectory;
 	private String inputCommuterFile;
 	private String inputReverseCommuterFile;
+	private PopulationType popType;
+	private int personsInSurveyArea;
+	private boolean useHouseholds = false;
+	
+	private String databaseUrl = "";
+	private String midHouseholdUrlExtension = "";
+	private String midPersonUrlExtension = "";
+	private String midWayUrlExtension = "";
+	private String databaseUser = "";
+	private String userPassword = "";
+	
+	public enum PopulationType{dummy,commuter,complete};
 	
 	Configuration(String file){
 		
@@ -55,10 +69,6 @@ public class Configuration {
 						
 						this.surveyAreaIds = lineParts[1].split(",");
 						
-					} else if(VICINITY_IDS.equals(lineParts[0])){
-						
-						this.vicinityIds = lineParts[1].split(",");
-						
 					} else if(CRS.equals(lineParts[0])){
 						
 						this.crs = lineParts[1];
@@ -74,6 +84,18 @@ public class Configuration {
 					} else if(INPUT_REVERSE_COMMUTER_FILE.equals(lineParts[0])){
 						
 						this.inputReverseCommuterFile = lineParts[1];
+						
+					} else if(POPULATION_TYPE.equals(lineParts[0])){
+						
+						this.popType = PopulationType.valueOf(lineParts[1]);
+						
+					} else if(PERSONS_IN_SURVEY_AREA.equals(lineParts[0])){
+						
+						this.personsInSurveyArea = Integer.parseInt(lineParts[1]);
+						
+					} else if(USE_HOUSEHOLDS.equals(lineParts[0])){
+						
+						this.useHouseholds = Boolean.parseBoolean(lineParts[1]);
 						
 					}
 					
@@ -97,10 +119,6 @@ public class Configuration {
 		return this.surveyAreaIds;
 	}
 
-	public String[] getVicinityIds() {
-		return this.vicinityIds;
-	}
-
 	public String getCrs() {
 		return crs;
 	}
@@ -115,6 +133,38 @@ public class Configuration {
 	
 	public String getReverseCommuterFile() {
 		return this.inputReverseCommuterFile;
+	}
+	
+	public PopulationType getPopulationType() {
+		return this.popType;
+	}
+	
+	public int getNumberOfPersons(){
+		return this.personsInSurveyArea;
+	}
+	
+	public boolean isUsingHouseholds(){
+		return this.useHouseholds;
+	}
+	
+	public String getHouseholdDatabaseUrl(){
+		return (this.databaseUrl + this.midHouseholdUrlExtension);
+	}
+	
+	public String getPersonDatabaseUrl(){
+		return (this.databaseUrl + this.midPersonUrlExtension);
+	}
+	
+	public String getWayDatabaseUrl(){
+		return (this.databaseUrl + this.midWayUrlExtension);
+	}
+	
+	public String getDatabaseUsername(){
+		return this.databaseUser;
+	}
+	
+	public String getPassword(){
+		return this.userPassword;
 	}
 	
 }

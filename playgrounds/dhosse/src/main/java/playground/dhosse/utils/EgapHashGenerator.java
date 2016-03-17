@@ -1,10 +1,10 @@
 package playground.dhosse.utils;
 
-import playground.dhosse.scenarios.generic.population.io.mid.MiDSurveyPerson;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDPerson;
 
 public class EgapHashGenerator {
 	
-	public static String generateMiDPersonHash(MiDSurveyPerson person){
+	public static String generateMiDPersonHash(MiDPerson person){
 		
 		int lowerBound = (int)(person.getAge()/10) * 10;
 		int upperBound = lowerBound + 9;

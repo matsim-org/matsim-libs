@@ -20,13 +20,12 @@ public class MiDPerson {
 	public MiDPerson(String id, String sex, String age, String carAvailable, String hasLicense, String isEmployed){
 		
 		this.id = id;
-		this.sex = sex.equals("male") ? 0 : 1;
-		this.age = !age.equals("NULL") ? Integer.parseInt(age) : Integer.MIN_VALUE;
-		this.plans = new ArrayList<>();
+		this.sex = sex.equals(MiDConstants.SEX_MALE) ? 0 : 1;
+		this.age = !age.equals(MiDConstants.NAN) ? Integer.parseInt(age) : Integer.MIN_VALUE;
 		
-		if(carAvailable.equals("never")){
+		if(carAvailable.equals("1") || carAvailable.equals("2")){
 			
-			this.carAvailable = false;
+			this.carAvailable = true;
 			
 		} else{
 			
@@ -34,62 +33,13 @@ public class MiDPerson {
 			
 		}
 		
-		this.hasLicense = !hasLicense.equals("NULL") ? Boolean.parseBoolean(hasLicense) : false;
-		this.isEmployed = !isEmployed.equals("NULL") ? Boolean.parseBoolean(isEmployed) : false;
+		this.hasLicense = hasLicense.equals("1") ? true : false;
+		this.isEmployed = isEmployed.equals("1") ? true : false;
+		
+		this.plans = new ArrayList<>();
 		
 	}
 	
-//	public void addPlanElement(String mode, String activityType, String distance, String startTime, String endTime){
-//		
-//		if(this.plan == null){
-//			
-//			this.plan = new PlanImpl();
-//			
-//		}
-//		
-//		if(mode.equals("car (passenger)")){
-//			mode = TransportMode.ride;
-//		}
-//		
-//		Leg leg = new LegImpl(mode);
-//		
-//		if(!startTime.equals("NULL")){
-//			((LegImpl)leg).setDepartureTime(Time.parseTime(startTime));
-//		}
-//		if(!endTime.equals("NULL")){
-//			((LegImpl)leg).setArrivalTime(Time.parseTime(startTime));
-//		}
-//		
-//		leg.setRoute(new GenericRouteImpl(null, null));
-//		double d = !distance.equals("NULL") ? Double.parseDouble(distance.replace(",", ".")) * 1000 : Double.NaN;
-//		leg.getRoute().setDistance(d);
-//		
-//		plan.addLeg(leg);
-//		
-//		Activity act = new ActivityImpl(activityType, new Coord(0., 0.));
-//		
-//		if(plan.getPlanElements().size() > 1){
-//			
-//			Activity lastAct = (Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 2);
-//			
-//			if(!startTime.equals("NULL")){
-//				lastAct.setEndTime(Time.parseTime(startTime));
-//			} else{
-//				lastAct.setEndTime(Time.UNDEFINED_TIME);
-//			}
-//			
-//		}
-//		
-//		if(!endTime.equals("NULL")){
-//			act.setStartTime(Time.parseTime(endTime));
-//		} else{
-//			act.setStartTime(Time.UNDEFINED_TIME);
-//		}
-//		
-//		plan.addActivity(act);
-//		
-//	}
-
 	public String getId() {
 		return id;
 	}

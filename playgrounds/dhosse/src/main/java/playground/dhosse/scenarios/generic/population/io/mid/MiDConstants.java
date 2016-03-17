@@ -4,6 +4,10 @@ public class MiDConstants {
 	
 	private MiDConstants(){};
 
+	public static final String SEX_MALE = "1";
+	public static final String SEX_FEMALE = "2";
+	public static final String NAN = "NaN";
+	
 	//households
 	public static final String HOUSEHOLD_ID = "hhid";
 	public static final String SOURCE_ID = "sourceid";

@@ -2,13 +2,16 @@ package playground.dhosse.scenarios.generic;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.OutputDirectoryLogging;
 
 import playground.dhosse.scenarios.generic.facilities.FacilitiesCreator;
 import playground.dhosse.scenarios.generic.network.NetworkCreator;
-import playground.dhosse.scenarios.generic.population.io.commuters.CommuterFileReader;
+import playground.dhosse.scenarios.generic.population.PopulationCreator;
+import playground.dhosse.scenarios.generic.utils.Geoinformation;
 
 public class ScenarioBuilder {
 
@@ -63,14 +66,39 @@ public class ScenarioBuilder {
 		//TODO pt
 		
 		log.info("########## loading administrative borders");
-		//TODO load admin borders shapefiles
+		//TODO load admin borders
+		//TODO load adjacency matrix
+		Set<String> filterIds = new HashSet<>();
+		
+		//first, add the survey area id(s)
+		for(String id : configuration.getSurveyAreaIds()){
+			
+			filterIds.add(id);
+			
+		}
+		
+		try {
+			
+			Geoinformation.readGeodataFromDatabase(filterIds);
+			
+		} catch (Exception e) {
+			
+			e.printStackTrace();
+			
+		}
 		
 		log.info("########## demand generation");
-		//TODO demand generation
-		//read commuter data
-		CommuterFileReader cReader = new CommuterFileReader();
-		cReader.read(configuration.getReverseCommuterFile(), true);
-		cReader.read(configuration.getCommuterFile(), false);
+		
+		if(configuration.getPopulationType() != null){
+			
+			PopulationCreator.run(configuration);
+			
+		} else {
+			
+			log.warn("Population type was not defined.");
+			log.warn("No population will be created.");
+			
+		}
 		//read mid data
 		//read tracking data
 		

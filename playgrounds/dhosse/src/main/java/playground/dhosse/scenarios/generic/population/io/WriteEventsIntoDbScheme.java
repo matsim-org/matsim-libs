@@ -31,13 +31,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-
-import playground.dhosse.utils.GeometryUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -101,9 +97,6 @@ public class WriteEventsIntoDbScheme implements PersonDepartureEventHandler, Per
 		
 		log.info("Writing legs to " + args[4] + "...");
 		
-		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(
-				"EPSG:32632", TransformationFactory.WGS84);
-		
 		BufferedWriter writer = IOUtils.getBufferedWriter(args[4]);
 		
 		try {
@@ -133,7 +126,7 @@ public class WriteEventsIntoDbScheme implements PersonDepartureEventHandler, Per
 						
 						geometry = factory.createLineString(coordinates);
 						
-						String geoString = geometry != null ? GeometryUtils.geometryToWKB(geometry, transformation) : "";
+						String geoString = geometry != null ? geometry.toString() : "";
 						
 						writer.newLine();
 						writer.write(personId + "_" + info.id + SEPARATOR + personId + SEPARATOR +
@@ -197,7 +190,7 @@ public class WriteEventsIntoDbScheme implements PersonDepartureEventHandler, Per
 		
 		//add the new info to the list
 		personId2TrackInfos.get(personId).add(info);
-		
+			
 	}
 
 	@Override

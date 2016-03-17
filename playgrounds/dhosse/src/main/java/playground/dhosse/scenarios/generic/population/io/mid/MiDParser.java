@@ -66,6 +66,8 @@ public class MiDParser {
 					
 				}
 				
+				set.close();
+				statement.close();
 				connection.close();
 				
 			} else{
@@ -117,16 +119,19 @@ public class MiDParser {
 					String license = set.getString(MiDConstants.PERSON_LICENSE);
 					String sex = set.getString(MiDConstants.PERSON_SEX);
 					String age = set.getString(MiDConstants.PERSON_AGE);
+					String employed = set.getString(MiDConstants.PERSON_EMPLOYED);
 					
-					MiDPerson person = new MiDPerson(personId, sex, age, carAvail, license, "");
+					MiDPerson person = new MiDPerson(personId, sex, age, carAvail, license, employed);
 					person.setWeight(personWeight);
-					String hash = HashGenerator.generateMiDPersonHash(person);
 					
 					if(!this.midPersons.containsKey(personId)){
 					
 						this.midPersons.put(personId, person);
 						
 					}
+					
+					//generate person hash in order to classify the current person
+					String hash = HashGenerator.generateMiDPersonHash(person);
 					
 					if(!this.midPersonsClassified.containsKey(hash)){
 						
@@ -138,6 +143,8 @@ public class MiDParser {
 					
 				}
 				
+				set.close();
+				statement.close();
 				connection.close();
 				
 			} else{
@@ -282,6 +289,8 @@ public class MiDParser {
 					
 				}
 				
+				set.close();
+				statement.close();
 				connection.close();
 				
 			} else{
