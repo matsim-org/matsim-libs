@@ -95,12 +95,12 @@ public final class RunBraessSimulation {
 	private static final Double INIT_PLAN_SCORE = null;
 
 	/// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_ONE_SECOND_Z;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.NONE;
+	private static final PricingType PRICING_TYPE = PricingType.V3;
 	public enum PricingType{
 		NONE, V3, V4, V8, V9, FLOWBASED
 	}
@@ -111,7 +111,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/abmtrans/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/congestionPricing/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -146,7 +146,7 @@ public final class RunBraessSimulation {
 			config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 			
 			// set travelTimeBinSize (only has effect if reRoute is used)
-			config.travelTimeCalculator().setTraveltimeBinSize( 10 );
+			config.travelTimeCalculator().setTraveltimeBinSize( 900 );
 			
 			config.travelTimeCalculator().setTravelTimeCalculatorType(
 					TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
