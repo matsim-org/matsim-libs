@@ -9,7 +9,6 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import playground.mzilske.cdr.BerlinRunUncongested3;
 import roadclassification.RunRoadClassification;
 
 /**
@@ -23,7 +22,7 @@ public class MZRoadClassificationMain {
     public static void main(String[] args) {
         Config config = new Config();
         config.addCoreModules();
-        new ConfigReader(config).parse(BerlinRunUncongested3.class.getResourceAsStream("2kW.15.xml"));
+//        new ConfigReader(config).parse(BerlinRunUncongested3.class.getResourceAsStream("2kW.15.xml"));
         config.plans().setInputFile(BERLIN_PATH + "plans/baseplan_car_only.xml.gz");
         config.controler().setWritePlansInterval(0);
         config.controler().setDumpDataAtEnd(false);
