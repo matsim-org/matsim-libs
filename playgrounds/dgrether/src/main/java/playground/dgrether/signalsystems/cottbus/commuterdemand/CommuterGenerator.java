@@ -36,7 +36,6 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.gis.DgPopulation2ShapeWriter;
 
 /**
@@ -49,17 +48,16 @@ public class CommuterGenerator {
 	
 	public static void main(String[] args) throws Exception {
 		
-		String networkFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
+		String baseDir = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/";
+		String networkFile = baseDir + "network_wgs84_utm33n.xml.gz";
 		boolean useLanduse = true;
-				String populationOutputDirectory = DgPaths.REPOS + "shared-svn/studies/dgrether/" 
-				+ "cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage_landuse/";
-//		String populationOutputDirectory = DgPaths.REPOS + "shared-svn/studies/dgrether/" 
-//				+ "cottbus/cottbus_feb_fix/cb_spn_gemeinde_nachfrage/";
+		String populationOutputDirectory = baseDir + "cb_spn_gemeinde_nachfrage_landuse_ohneTagebau/";
 
-		String shapesOutputDirectory = populationOutputDirectory + "shapes_all_modes/";
+//		String shapesOutputDirectory = populationOutputDirectory + "shapes_all_modes/";
+		String shapesOutputDirectory = populationOutputDirectory + "shapes/";
 		
-		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n.xml.gz";
-//		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n_all_modes.xml.gz";
+//		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n.xml.gz";
+		String populationOutputFile = populationOutputDirectory + "commuter_population_wgs84_utm33n_car_only.xml.gz";
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(populationOutputDirectory);
 
 		File shapes = new File(shapesOutputDirectory);
@@ -74,10 +72,10 @@ public class CommuterGenerator {
 		CommuterDataReader cdr = new CommuterDataReader();
 		cdr.addFilterRange(12071000);
 		cdr.addFilter("12052000"); //12052000 == cottbus stadt
-		cdr.readFile(DgPaths.REPOS + "shared-svn/studies/countries/de/pendler_nach_gemeinden/brandenburg_einpendler.csv");
+		cdr.readFile("../../../shared-svn/studies/countries/de/pendler_nach_gemeinden/brandenburg_einpendler.csv");
 //		cdr.getCommuterRelations().add(new CommuterDataElement("12052000", "12052000", 1000));
 		
-		String gemeindenBrandenburgShapeFile = DgPaths.REPOS + "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/gemeinden/dlm_gemeinden.shp";
+		String gemeindenBrandenburgShapeFile = "../../../shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/gemeinden/dlm_gemeinden.shp";
 		ShapeFileReader gemeindenReader = new ShapeFileReader();
 		Collection<SimpleFeature> gemeindenFeatures = gemeindenReader.readFileAndInitialize(gemeindenBrandenburgShapeFile);
 		
@@ -94,8 +92,8 @@ public class CommuterGenerator {
 			cdw.addLanduse("work", workLanduse);
 		}
 //		
-		cdw.setScalefactor(1.0); // all modes
-//		cdw.setScalefactor(0.55); //car mode share
+//		cdw.setScalefactor(1.0); // all modes
+		cdw.setScalefactor(0.55); //car mode share
 //		cdw.setScalefactor(0.1); //testing
 		
 		cdw.computeDemand(sc);

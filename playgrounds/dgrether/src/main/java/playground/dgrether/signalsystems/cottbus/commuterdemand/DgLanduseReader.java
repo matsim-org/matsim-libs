@@ -34,7 +34,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class DgLanduseReader {
 	
-	public static String BASE_DIR = "/media/data/work/repos/shared-svn/studies/countries/de/berlin_brandenburg_corine_landcover/shapefiles/";
+	public static String BASE_DIR = "../../../shared-svn/studies/countries/de/berlin_brandenburg_corine_landcover/shapefiles/";
 	
 	private static final String STADTGEFUEGE_KONTINUIERLICH = BASE_DIR + "clc06_c111.shp";
 	private static final String STADTGEFUEGE_NICHT_KONTINUIERLICH = BASE_DIR + "clc06_c112.shp";
@@ -53,8 +53,8 @@ public class DgLanduseReader {
 	private static final String[] landuse_files_work = {STADTGEFUEGE_KONTINUIERLICH, 
 		STADTGEFUEGE_NICHT_KONTINUIERLICH, INDUSTRIE_GEWERBEGEBIETE,
 		STRASSEN_SCHIENENNETZE_GEBAUEDE, HAFENGEBIET,
-		FLUGHAEFEN, DEPONIEN, BAUSTELLEN,
-		MINERALE_ABBAUSTAETTEN
+		FLUGHAEFEN, DEPONIEN, BAUSTELLEN /*,
+		MINERALE_ABBAUSTAETTEN */
 		};
 //	private static final String[] landuse_files_work = {INDUSTRIE_GEWERBEGEBIETE};
 
