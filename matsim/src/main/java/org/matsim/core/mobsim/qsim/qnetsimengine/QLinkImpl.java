@@ -66,21 +66,11 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		private QNetwork network;
 		private VehicleQ<QVehicle> vehicleQueue = new FIFOVehicleQ() ;
 		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
-		private AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder;
+		private final QueueWithBufferContext context;
+		Builder(QueueWithBufferContext context) {
+			this.context = context ;
+		} 
 		QLinkImpl build( Link link, QNode toNode ) {
-			Gbl.assertNotNull( network );
-			
-			QSimConfigGroup qsimConfig = network.simEngine.getMobsim().getScenario().getConfig().qsim() ;
-			EventsManager events = network.simEngine.getMobsim().getEventsManager() ;
-			double effectiveCellSize = ((NetworkImpl) network.getNetwork()).getEffectiveCellSize() ;
-			AgentCounter agentCounter = network.simEngine.getMobsim().getAgentCounter() ;
-			if ( agentSnapshotInfoBuilder==null ) {
-				agentSnapshotInfoBuilder = network.simEngine.getAgentSnapshotInfoBuilder();
-			}
-			Gbl.assertNotNull(agentSnapshotInfoBuilder);
-			final QueueWithBufferContext context = new QueueWithBufferContext( events, effectiveCellSize,
-					agentCounter, agentSnapshotInfoBuilder, qsimConfig );
-
 			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( context ) ;
 			builder.setVehicleQueue(vehicleQueue);
 			builder.setLinkSpeedCalculator(linkSpeedCalculator);
@@ -95,9 +85,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		}
 		final void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
 			this.linkSpeedCalculator = linkSpeedCalculator;
-		}
-		final void setAgentSnapshotInfoBuilder(AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder) {
-			this.agentSnapshotInfoBuilder = agentSnapshotInfoBuilder;
 		}
 	}
 
