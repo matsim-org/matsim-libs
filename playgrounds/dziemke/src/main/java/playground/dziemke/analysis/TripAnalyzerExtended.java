@@ -282,16 +282,16 @@ public class TripAnalyzerExtended {
 		// calculate travel times and store them in a map
 		double tripDuration_min = trip.getDurationByCalculation_s() / 60.;
 		double tripDuration_h = tripDuration_min / 60.;
-		addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, 1.);
+		AnalysisUtils.addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, 1.);
 		aggregateTripDuration = aggregateTripDuration + tripDuration_min;	 
 
 		// store departure times in a map
 		double departureTime_h = trip.getDepartureTime_s() / 3600.;
-		addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, 1.);
+		AnalysisUtils.addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, 1.);
 
 		// store activities in a map
 		String activityType = trip.getActivityStartActType();
-		addToMapStringKey(activityTypeMap, activityType);
+		AnalysisUtils.addToMapStringKey(activityTypeMap, activityType, 1.);
 
 		// calculate (routed) distances and and store them in a map
 		double tripDistance_m = 0.;
@@ -305,13 +305,13 @@ public class TripAnalyzerExtended {
 		double tripDistanceRouted_km = tripDistance_m / 1000.;
 
 		// store (routed) distances  in a map
-		addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, maxBinDistance_km, 1.);
+		AnalysisUtils.addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, maxBinDistance_km, 1.);
 		aggregateTripDistanceRouted = aggregateTripDistanceRouted + tripDistanceRouted_km;
 		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted_km);
 
 		// store (beeline) distances in a map
 		double tripDistanceBeeline_km = trip.getDistanceBeelineByCalculation_m(network) / 1000.;
-		addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, 1.);
+		AnalysisUtils.addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, 1.);
 		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline_km;
 		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline_km);
 
@@ -319,11 +319,11 @@ public class TripAnalyzerExtended {
 		if (tripDuration_h > 0.) {
 			//System.out.println("trip distance is " + tripDistance + " and time is " + timeInHours);
 			double averageTripSpeedRouted_km_h = tripDistanceRouted_km / tripDuration_h;
-			addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			AnalysisUtils.addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
 			aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted_km_h;
 
 			double averageTripSpeedBeeline_km_h = tripDistanceBeeline_km / tripDuration_h;
-			addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			AnalysisUtils.addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
 			aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline_km_h;
 
 			tripCounterSpeed++;
@@ -360,38 +360,4 @@ public class TripAnalyzerExtended {
 	    // write a routed distance vs. beeline distance comparison file
 	    writer.writeRoutedBeelineDistanceComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "/beeline.txt", tripCounter);
 	}
-
-	
-	private static void addToMapIntegerKey(Map <Integer, Double> map, double inputValue, int binWidth, int limitOfLastBin, double weight) {
-		double inputValueBin = inputValue / binWidth;
-		int ceilOfLastBin = limitOfLastBin / binWidth;		
-		// Math.ceil returns the higher integer number (but as a double value)
-		int ceilOfValue = (int)Math.ceil(inputValueBin);
-		if (ceilOfValue < 0) {
-			throw new RuntimeException("Lower end of bin may not be smaller than zero!");
-		}
-				
-		if (ceilOfValue >= ceilOfLastBin) {
-			ceilOfValue = ceilOfLastBin;
-		}
-						
-		if (!map.containsKey(ceilOfValue)) {
-			map.put(ceilOfValue, weight);
-		} else {
-			double value = map.get(ceilOfValue);
-			value = value + weight;
-			map.put(ceilOfValue, value);
-		}			
-	}
-	
-	
-	private static void addToMapStringKey(Map <String, Double> map, String caption) {
-		if (!map.containsKey(caption)) {
-			map.put(caption, 1.);
-		} else {
-			double value = map.get(caption);
-			value++;
-			map.put(caption, value);
-		}
-	}	
 }

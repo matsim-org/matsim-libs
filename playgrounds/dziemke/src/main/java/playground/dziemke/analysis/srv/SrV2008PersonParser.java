@@ -42,8 +42,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * This class parses the SrV2008 person file and creates (Person) ObjectAttributes
  * contain the relevant information
  */
-public class SrVPersonParser {
-	private final static Logger log = Logger.getLogger(SrVPersonParser.class);
+public class SrV2008PersonParser {
+	private final static Logger log = Logger.getLogger(SrV2008PersonParser.class);
 	private ObjectAttributes personAttributes = new ObjectAttributes();
 	
 	private static final String HOUSEHOLD_ID = "HHNR";
@@ -57,7 +57,7 @@ public class SrVPersonParser {
 	// other possible variables: locationOfWork, locationOfSchool, parent
 	
 	
-	public SrVPersonParser() {
+	public SrV2008PersonParser() {
 	}
 	
 	

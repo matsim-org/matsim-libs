@@ -41,9 +41,9 @@ import playground.dziemke.cemdapMatsimCadyts.Zone;
  * This class parses the SrV2008 trip file and creates a map with Trip object that
  * contain the relevant information
  */
-public class SrVTripParser {
+public class SrV2008TripParser {
 
-	private final static Logger log = Logger.getLogger(SrVTripParser.class);
+	private final static Logger log = Logger.getLogger(SrV2008TripParser.class);
 	
 	private Map<Id<Trip>, Trip> trips = new HashMap<Id<Trip>, Trip>();
 	
@@ -72,7 +72,7 @@ public class SrVTripParser {
 	private static final String WEIGHT = "GEWICHT_W";
 	
 
-	public SrVTripParser() {
+	public SrV2008TripParser() {
 	}
 	
 	

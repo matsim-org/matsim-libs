@@ -53,6 +53,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.dziemke.analysis.AnalysisFileWriter;
+import playground.dziemke.analysis.AnalysisUtils;
 import playground.dziemke.analysis.Trip;
 
 /**
@@ -139,13 +140,13 @@ public class SrVTripAnalyzer {
 		
 		// parse trip file
 		log.info("Parsing " + inputFileTrips + ".");		
-		SrVTripParser tripParser = new SrVTripParser();
+		SrV2008TripParser tripParser = new SrV2008TripParser();
 		tripParser.parse(inputFileTrips);
 		log.info("Finished parsing trips.");
 		
 		// parse person file
 		log.info("Parsing " + inputFilePersons + ".");		
-		SrVPersonParser personParser = new SrVPersonParser();
+		SrV2008PersonParser personParser = new SrV2008PersonParser();
 		personParser.parse(inputFilePersons);
 		log.info("Finished parsing persons.");
 		
@@ -332,7 +333,7 @@ public class SrVTripAnalyzer {
 	    		double tripDuration_h = tripDuration_min / 60.;
 	    		// there are also three cases where time < 0; they need to be excluded
 	    		if (arrivalTime_min >= 0 && (departureTime_s * 60.) >= 0 && tripDuration_min >= 0) {
-	    			addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, weight);
+	    			AnalysisUtils.addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, weight);
 	    			//aggregateTripDuration = aggregateTripDuration + tripDurationInMinutes;
 	    			aggregateTripDuration = aggregateTripDuration + weightedTripDuration_min;
 	    			aggregateWeightTripDuration = aggregateWeightTripDuration + weight;
@@ -342,7 +343,7 @@ public class SrVTripAnalyzer {
 
 	    		// store departure times in a map
 	    		if (departureTime_h >= 0) {
-	    			addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, weight);
+	    			AnalysisUtils.addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, weight);
 	    			aggregateWeightDepartureTime = aggregateWeightDepartureTime + weight;
 	    		}
 
@@ -351,7 +352,7 @@ public class SrVTripAnalyzer {
 	    		// reliant on variable "V_ZWECK": -9 = no data
 	    		// "V_ZWECK" - end of trip = start of activity
 	    		String activityType = trip.getActivityStartActType();
-	    		addToMapStringKey(activityTypeMap, activityType, weight);
+	    		AnalysisUtils.addToMapStringKey(activityTypeMap, activityType, weight);
 	    		aggregateWeightActivityTypes = aggregateWeightActivityTypes + weight;
 
 
@@ -366,7 +367,7 @@ public class SrVTripAnalyzer {
 	    		double tripDistanceRouted_km = trip.getDistanceRoutedShortest_m() / 1000.;
 	    		double weightedTripDistanceRouted = weight * tripDistanceRouted_km;
 	    		if (tripDistanceRouted_km >= 0.) {
-	    			addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, maxBinDistance_km, weight);
+	    			AnalysisUtils.addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, maxBinDistance_km, weight);
 	    			aggregateTripDistanceRouted = aggregateTripDistanceRouted + weightedTripDistanceRouted;
 	    			distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted_km);
 	    			aggregateWeightTripDistanceRouted = aggregateWeightTripDistanceRouted + weight;
@@ -377,7 +378,7 @@ public class SrVTripAnalyzer {
 	    		//double tripDistanceBeeline = trip.getDistanceBeeline();
 	    		double weightedTripDistanceBeeline = weight * tripDistanceBeeline_km;
 	    		if (tripDistanceBeeline_km >= 0.) {				
-	    			addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, weight);
+	    			AnalysisUtils.addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, weight);
 	    			aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + weightedTripDistanceBeeline;
 	    			distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline_km);
 	    			aggregateWeightTripDistanceBeeline = aggregateWeightTripDistanceBeeline + weight;
@@ -389,7 +390,7 @@ public class SrVTripAnalyzer {
 	    			// reliant to SrV variable variable "E_LAENGE_KUERZEST"; -7 = calculation not possible
 	    			if (tripDistanceRouted_km >= 0.) {
 	    				double averageTripSpeedRouted_km_h = tripDistanceRouted_km / tripDuration_h;
-	    				addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, weight);
+	    				AnalysisUtils.addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, weight);
 	    				aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted_km_h;
 	    				aggregateWeightTripSpeedRouted = aggregateWeightTripSpeedRouted + weight;
 	    			}
@@ -397,7 +398,7 @@ public class SrVTripAnalyzer {
 	    			// reliant on variable "V_LAENGE": -9 = no data, -10 = implausible
 	    			if (tripDistanceBeeline_km >= 0.) {			
 	    				double averageTripSpeedBeeline_km_h = tripDistanceBeeline_km / tripDuration_h;
-	    				addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, weight);
+	    				AnalysisUtils.addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, weight);
 	    				aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline_km_h;
 	    				aggregateWeightTripSpeedBeeline = aggregateWeightTripSpeedBeeline + weight;
 	    			}
@@ -410,7 +411,7 @@ public class SrVTripAnalyzer {
 	    		// reliant on variable "E_GESCHW": -7 = Calculation not possible	    		
 	    		double averageTripSpeedProvided_km_h = trip.getSpeedFromSurvey_m_s() / 3.6;
 	    		if (averageTripSpeedProvided_km_h >= 0) {
-	    			addToMapIntegerKey(averageTripSpeedProvidedMap, averageTripSpeedProvided_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, weight);
+	    			AnalysisUtils.addToMapIntegerKey(averageTripSpeedProvidedMap, averageTripSpeedProvided_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, weight);
 	    			aggregateOfAverageTripSpeedsProvided = aggregateOfAverageTripSpeedsProvided + averageTripSpeedProvided_km_h;
 	    			aggregateWeightTripSpeedProvided = aggregateWeightTripSpeedProvided + weight;
 	    		}
@@ -554,39 +555,5 @@ public class SrVTripAnalyzer {
 	    // print counters
 	    System.out.println("tripMapEntryCounter = " + tripMapEntryCounter);
 	    System.out.println("events added: " + eventsCounter);
-	}
-
-
-	private static void addToMapIntegerKey(Map <Integer, Double> map, double inputValue, int binWidth, int limitOfLastBin, double weight) {
-		double inputValueBin = inputValue / binWidth;
-		int ceilOfLastBin = limitOfLastBin / binWidth;		
-		// Math.ceil returns the higher integer number (but as a double value)
-		int ceilOfValue = (int)Math.ceil(inputValueBin);
-		if (ceilOfValue < 0) {
-			System.err.println("Lower end of bin may not be smaller than zero!");
-		}
-				
-		if (ceilOfValue >= ceilOfLastBin) {
-			ceilOfValue = ceilOfLastBin;
-		}
-						
-		if (!map.containsKey(ceilOfValue)) {
-			map.put(ceilOfValue, weight);
-		} else {
-			double value = map.get(ceilOfValue);
-			value = value + weight;
-			map.put(ceilOfValue, value);
-		}			
-	}
-
-
-	private static void addToMapStringKey(Map <String, Double> map, String caption, double weight) {
-		if (!map.containsKey(caption)) {
-			map.put(caption, weight);
-		} else {
-			double value = map.get(caption);
-			value = value + weight;
-			map.put(caption, value);
-		}
 	}
 }
