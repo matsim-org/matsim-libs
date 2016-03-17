@@ -69,8 +69,23 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		private AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder;
 		QLinkImpl build( Link link, QNode toNode ) {
 			Gbl.assertNotNull( network );
-			Gbl.assertNotNull( agentSnapshotInfoBuilder );
-			return new QLinkImpl( link, network, toNode, linkSpeedCalculator, agentSnapshotInfoBuilder ) ;
+			
+			QSimConfigGroup qsimConfig = network.simEngine.getMobsim().getScenario().getConfig().qsim() ;
+			EventsManager events = network.simEngine.getMobsim().getEventsManager() ;
+			double effectiveCellSize = ((NetworkImpl) network.getNetwork()).getEffectiveCellSize() ;
+			AgentCounter agentCounter = network.simEngine.getMobsim().getAgentCounter() ;
+			if ( agentSnapshotInfoBuilder==null ) {
+				agentSnapshotInfoBuilder = network.simEngine.getAgentSnapshotInfoBuilder();
+			}
+			Gbl.assertNotNull(agentSnapshotInfoBuilder);
+			final QueueWithBufferContext context = new QueueWithBufferContext( events, effectiveCellSize,
+					agentCounter, agentSnapshotInfoBuilder, qsimConfig );
+
+			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( context ) ;
+			builder.setVehicleQueue(vehicleQueue);
+			builder.setLinkSpeedCalculator(linkSpeedCalculator);
+			
+			return new QLinkImpl( link, network, toNode, builder ) ;
 		}
 		final void setNetwork(QNetwork network) {
 			this.network = network;
@@ -99,52 +114,53 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	private final VisData visdata;
 
-	/* package, for some tests */ final QLaneI qlane;
+	private final QLaneI qlane;
 
 	private QNetwork qnetwork;
 	// memorizing the back pointer separately here because I don't want to make it package-available. kai, mar'16
 
-	/**
-	 * Initializes a QueueLink with one QueueLane.
-	 */
-	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode) {
-		this(link2, network, toNode, new DefaultLinkSpeedCalculator(), network.simEngine.getAgentSnapshotInfoBuilder() );
-	}
-
-	/** 
-	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
-	 * @param linkSpeedCalculator TODO
-	 * @param agentSnapshotInfoBuilder TODO
-	 * 
-	 */
-	QLinkImpl(final Link link2, QNetwork network, final QNode toNode, LinkSpeedCalculator linkSpeedCalculator, 
-			AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder) {
-		// yy get rid of this c'tor (since the one with queueWithBuffer is more flexible)?
-		super(link2, toNode, network) ;
-		this.qnetwork = network ;
-		//--
-		QSimConfigGroup qsimConfig = network.simEngine.getMobsim().getScenario().getConfig().qsim() ;
-		EventsManager events = network.simEngine.getMobsim().getEventsManager() ;
-		double effectiveCellSize = ((NetworkImpl) network.getNetwork()).getEffectiveCellSize() ;
-		AgentCounter agentCounter = network.simEngine.getMobsim().getAgentCounter() ;
-		Gbl.assertNotNull(agentSnapshotInfoBuilder);
-		//--
-		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( new QueueWithBufferContext( events, effectiveCellSize,
-				agentCounter, agentSnapshotInfoBuilder, qsimConfig ) ) ;
-		builder.setLinkSpeedCalculator(linkSpeedCalculator);
-		this.qlane = builder.createLane(this) ;
-		//--
-		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
-		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
-	}
-	
-	public QLinkImpl( final Link link2, QNetwork network, final QNode toNode, final QLaneI queueWithBuffer ) {
-		super(link2, toNode, network) ;
-		this.qnetwork = network ;
-		this.qlane = queueWithBuffer ;
-		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
-		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
-	}
+//	/**
+//	 * Initializes a QueueLink with one QueueLane.
+//	 */
+//	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode) {
+//		this(link2, network, toNode, new DefaultLinkSpeedCalculator(), network.simEngine.getAgentSnapshotInfoBuilder() );
+//	}
+//
+//	/** 
+//	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
+//	 * @param linkSpeedCalculator TODO
+//	 * @param agentSnapshotInfoBuilder TODO
+//	 * 
+//	 */
+//	QLinkImpl(final Link link2, QNetwork network, final QNode toNode, LinkSpeedCalculator linkSpeedCalculator, 
+//			AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder) {
+//		// yy get rid of this c'tor (since the one with queueWithBuffer is more flexible)?
+//		super(link2, toNode, network) ;
+//		this.qnetwork = network ;
+//		//--
+//		QSimConfigGroup qsimConfig = network.simEngine.getMobsim().getScenario().getConfig().qsim() ;
+//		EventsManager events = network.simEngine.getMobsim().getEventsManager() ;
+//		double effectiveCellSize = ((NetworkImpl) network.getNetwork()).getEffectiveCellSize() ;
+//		AgentCounter agentCounter = network.simEngine.getMobsim().getAgentCounter() ;
+//		Gbl.assertNotNull(agentSnapshotInfoBuilder);
+//		//--
+//		final QueueWithBufferContext context = new QueueWithBufferContext( events, effectiveCellSize,
+//				agentCounter, agentSnapshotInfoBuilder, qsimConfig );
+//		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( context ) ;
+//		builder.setLinkSpeedCalculator(linkSpeedCalculator);
+//		this.qlane = builder.createLane(this) ;
+//		//--
+//		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
+//		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
+//	}
+//	
+//	public QLinkImpl( final Link link2, QNetwork network, final QNode toNode, final QLaneI queueWithBuffer ) {
+//		super(link2, toNode, network) ;
+//		this.qnetwork = network ;
+//		this.qlane = queueWithBuffer ;
+//		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
+//		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
+//	}
 	
 	/** 
 	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
@@ -332,7 +348,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo( Collection<AgentSnapshotInfo> positions) {
 			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = qnetwork.simEngine.getAgentSnapshotInfoBuilder();
 
-			QLaneI.VisData roadVisData = qlane.getVisData() ;
+			QLaneI.VisData roadVisData = getAcceptingQLane().getVisData() ;
 			if (visLink != null) {
 				((QueueWithBuffer.VisDataImpl)roadVisData).setVisInfo(visLink.getLinkStartCoord(), visLink.getLinkEndCoord(), visLink.getEuklideanDistance()) ;
 				// yyyy not so great but an elegant solution needs more thinking about visualizer structure. kai, jun'13
