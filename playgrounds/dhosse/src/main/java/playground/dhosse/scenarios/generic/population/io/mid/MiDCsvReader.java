@@ -18,7 +18,7 @@ import playground.dhosse.scenarios.generic.utils.ActivityTypes;
 
 public class MiDCsvReader {
 
-	public Map<String, MiDSurveyPerson> persons;
+	public Map<String, MiDPerson> persons;
 	
 	public MiDCsvReader(){
 		this.persons = new HashMap<>();
@@ -413,7 +413,7 @@ public class MiDCsvReader {
 		
 	}
 	
-	public Map<String, MiDSurveyPerson> getPersons(){
+	public Map<String, MiDPerson> getPersons(){
 		return this.persons;
 	}
 	
