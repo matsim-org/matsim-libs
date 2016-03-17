@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.cottbus.commuterdemand;
+package playground.vsp.demandde.commuterDemandCottbus;
 
 import java.io.File;
 import java.util.Collection;
@@ -35,8 +35,6 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import playground.dgrether.analysis.gis.DgPopulation2ShapeWriter;
 
 /**
  * @author jbischoff

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.cottbus.commuterdemand;
+package playground.vsp.demandde.commuterDemandCottbus;
 
 import java.util.ArrayList;
 import java.util.Collection;

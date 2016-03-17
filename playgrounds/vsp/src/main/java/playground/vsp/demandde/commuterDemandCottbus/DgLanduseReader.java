@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.cottbus.commuterdemand;
+package playground.vsp.demandde.commuterDemandCottbus;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -42,7 +42,7 @@ public class DgLanduseReader {
 	private static final String STRASSEN_SCHIENENNETZE_GEBAUEDE = BASE_DIR + "clc06_c122.shp";
 	private static final String HAFENGEBIET = BASE_DIR + "clc06_c123.shp";
 	private static final String FLUGHAEFEN = BASE_DIR + "clc06_c124.shp";
-	private static final String MINERALE_ABBAUSTAETTEN = BASE_DIR + "clc06_c131.shp";
+//	private static final String MINERALE_ABBAUSTAETTEN = BASE_DIR + "clc06_c131.shp";
 	private static final String DEPONIEN = BASE_DIR + "clc06_c132.shp";
 	private static final String BAUSTELLEN = BASE_DIR + "clc06_c133.shp";
 	
@@ -53,8 +53,9 @@ public class DgLanduseReader {
 	private static final String[] landuse_files_work = {STADTGEFUEGE_KONTINUIERLICH, 
 		STADTGEFUEGE_NICHT_KONTINUIERLICH, INDUSTRIE_GEWERBEGEBIETE,
 		STRASSEN_SCHIENENNETZE_GEBAUEDE, HAFENGEBIET,
-		FLUGHAEFEN, DEPONIEN, BAUSTELLEN /*,
-		MINERALE_ABBAUSTAETTEN */
+		FLUGHAEFEN, DEPONIEN, BAUSTELLEN
+		/* skip mines because they cause disproportional many work places and, thus, to much traffic in their region */ 
+//		, MINERALE_ABBAUSTAETTEN
 		};
 //	private static final String[] landuse_files_work = {INDUSTRIE_GEWERBEGEBIETE};
 
