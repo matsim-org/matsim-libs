@@ -21,6 +21,7 @@ import com.vividsolutions.jts.geom.Point;
 
 import playground.dziemke.utils.ShapeReader;
 
+
 /**
  * @author dziemke
  */
@@ -119,17 +120,14 @@ public class TripAnalyzerExtended {
 	public static void main(String[] args) {
 		adaptOutputDirectory();
 	    
-		// Create an EventsManager instance (MATSim infrastructure)
+		/* Events infrastructure and reading the events file */
 	    EventsManager eventsManager = EventsUtils.createEventsManager();
 	    TripHandler handler = new TripHandler();
 	    eventsManager.addHandler(handler);
-	 
-	    // Connect a file reader to the EventsManager and read in the event file
-	    MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-	    reader.readFile(eventsFile);
+	    MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);
+	    eventsReader.readFile(eventsFile);
 	    log.info("Events file read!");
-	    
-	       
+	    	       
 	    /* Get network, which is needed to calculate distances */
 	    network = NetworkUtils.createNetwork();
 	    MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
@@ -208,7 +206,7 @@ public class TripAnalyzerExtended {
 		tripCounter++;
 
 		// calculate travel times and store them in a map
-		double tripDuration_min = trip.getCalculatedDuration_s() / 60.;
+		double tripDuration_min = trip.getDurationByCalculation_s() / 60.;
 		double tripDuration_h = tripDuration_min / 60.;
 		addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, 1.);
 		aggregateTripDuration = aggregateTripDuration + tripDuration_min;	 
@@ -230,29 +228,29 @@ public class TripAnalyzerExtended {
 			tripDistance_m = tripDistance_m + length_m;
 		}
 		// TODO here, the distances from activity to link and link to activity are missing!
-		double tripDistanceRouted = tripDistance_m / 1000.;
+		double tripDistanceRouted_km = tripDistance_m / 1000.;
 
 		// store (routed) distances  in a map
-		addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted, binWidthDistance_km, maxBinDistance_km, 1.);
-		aggregateTripDistanceRouted = aggregateTripDistanceRouted + tripDistanceRouted;
-		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted);
+		addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, maxBinDistance_km, 1.);
+		aggregateTripDistanceRouted = aggregateTripDistanceRouted + tripDistanceRouted_km;
+		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted_km);
 
 		// store (beeline) distances in a map
-		double tripDistanceBeeline = trip.getBeelineDistance(network);
-		addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline, binWidthDistance_km, maxBinDistance_km, 1.);
-		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline;
-		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline);
+		double tripDistanceBeeline_km = trip.getDistanceBeelineByCalculation_m(network) / 1000.;
+		addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, 1.);
+		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline_km;
+		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline_km);
 
 		// calculate speeds and and store them in a map
 		if (tripDuration_h > 0.) {
 			//System.out.println("trip distance is " + tripDistance + " and time is " + timeInHours);
-			double averageTripSpeedRouted = tripDistanceRouted / tripDuration_h;
-			addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
-			aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted;
+			double averageTripSpeedRouted_km_h = tripDistanceRouted_km / tripDuration_h;
+			addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted_km_h;
 
-			double averageTripSpeedBeeline = tripDistanceBeeline / tripDuration_h;
-			addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
-			aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline;
+			double averageTripSpeedBeeline_km_h = tripDistanceBeeline_km / tripDuration_h;
+			addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline_km_h;
 
 			tripCounterSpeed++;
 		} else {
@@ -327,10 +325,10 @@ public class TripAnalyzerExtended {
     			considerTrip = false;
     		}
     	}
-    	if (distanceFilter == true && trip.getBeelineDistance(network) >= maxDistance_km) {
+    	if (distanceFilter == true && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) >= maxDistance_km) {
     		considerTrip = false;
     	}
-//    	if (distanceFilter == true && trip.getBeelineDistance(network) <= minDistance) {
+//    	if (distanceFilter == true && (trip.getBeelineDistance(network) / 1000.) <= minDistance) {
 //    		considerTrip = false;
 //    	}
     	if (onlyWorkTrips == true) {

@@ -159,7 +159,7 @@ public class TripAnalyzerSimple {
 	    		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted);
 
 	    		// store (beeline) distances in a map
-	    		double tripDistanceBeeline = trip.getBeelineDistance(network);
+	    		double tripDistanceBeeline = trip.getDistanceBeelineByCalculation_m(network);
 	    		addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline, binWidthDistance, maxBinDistance, 1.);
 	    		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline;
 	    		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline);

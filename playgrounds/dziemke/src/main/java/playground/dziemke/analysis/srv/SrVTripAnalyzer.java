@@ -263,7 +263,7 @@ public class SrVTripAnalyzer {
 
 
 	    	// distance
-	    	double tripDistanceBeeline_km = trip.getDistanceBeeline_m() / 1000.;
+	    	double tripDistanceBeeline_km = trip.getDistanceBeelineFromSurvey_m() / 1000.;
 	    	if (distanceFilter == true) {
 	    		if (tripDistanceBeeline_km >= maxDistance_km) {
 	    			considerTrip = false;
@@ -408,7 +408,7 @@ public class SrVTripAnalyzer {
 
 	    		// get provided speeds and store them in a map
 	    		// reliant on variable "E_GESCHW": -7 = Calculation not possible	    		
-	    		double averageTripSpeedProvided_km_h = trip.getSpeed_m_s() / 3.6;
+	    		double averageTripSpeedProvided_km_h = trip.getSpeedFromSurvey_m_s() / 3.6;
 	    		if (averageTripSpeedProvided_km_h >= 0) {
 	    			addToMapIntegerKey(averageTripSpeedProvidedMap, averageTripSpeedProvided_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, weight);
 	    			aggregateOfAverageTripSpeedsProvided = aggregateOfAverageTripSpeedsProvided + averageTripSpeedProvided_km_h;

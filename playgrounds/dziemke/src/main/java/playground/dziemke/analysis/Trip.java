@@ -27,11 +27,11 @@ public class Trip {
 	private int useHouseholdCarPool;
 	private int useOtherCarPool;
 	private String mode;
-	private double distanceBeeline_m; // TODO
+	private double distanceBeelineFromSurvey_m; // TODO
 	private double distanceRoutedFastest_m;
-	private double distanceRoutedShortest_m;
-	private double speed_m_s;
-	private double duration_s;
+	private double distanceRoutedShortestFromSurvey_m;
+	private double speedFromSurvey_m_s;
+	private double durationFromSurvey_s;
 	private Id<Link> arrivalLinkId;
 	private Id<Zone> arrivalZoneId;
 	private double arrivalTime_s;
@@ -42,7 +42,7 @@ public class Trip {
 	private double weight;
 	
 	//
-	private Double beelineDistance_m = Double.NaN;
+	private Double distanceBeelineByCalculation_m = Double.NaN;
 	//
 	
 	
@@ -165,44 +165,44 @@ public class Trip {
 		this.mode = mode;
 	}
 	
-	public double getDistanceBeeline_m() {
-		return this.distanceBeeline_m;
+	public double getDistanceBeelineFromSurvey_m() {
+		return this.distanceBeelineFromSurvey_m;
 	}
 
-	public void setDistanceBeeline_m(double distanceBeeline_m) {
-		this.distanceBeeline_m = distanceBeeline_m;
+	public void setDistanceBeelineFromSurvey_m(double distanceBeelineFromSurvey_m) {
+		this.distanceBeelineFromSurvey_m = distanceBeelineFromSurvey_m;
 	}
 	
 	public double getDistanceRoutedFastest_m() {
 		return this.distanceRoutedFastest_m;
 	}
 
-	public void setDistanceRoutedFastest_m(double distanceRoutedFastest_m) {
-		this.distanceRoutedFastest_m = distanceRoutedFastest_m;
+	public void setDistanceRoutedFastestFromSurvey_m(double distanceRoutedFastestFromSurvey_m) {
+		this.distanceRoutedFastest_m = distanceRoutedFastestFromSurvey_m;
 	}
 	
 	public double getDistanceRoutedShortest_m() {
-		return this.distanceRoutedShortest_m;
+		return this.distanceRoutedShortestFromSurvey_m;
 	}
 
-	public void setDistanceRoutedShortest_m(double distanceRoutedShortest_m) {
-		this.distanceRoutedShortest_m = distanceRoutedShortest_m;
+	public void setDistanceRoutedShortestFromSurvey_m(double distanceRoutedShortestFromSurvey_m) {
+		this.distanceRoutedShortestFromSurvey_m = distanceRoutedShortestFromSurvey_m;
 	}
 	
-	public double getSpeed_m_s() {
-		return this.speed_m_s;
+	public double getSpeedFromSurvey_m_s() {
+		return this.speedFromSurvey_m_s;
 	}
 
-	public void setSpeed_m_s(double speed_m_s) {
-		this.speed_m_s = speed_m_s;
+	public void setSpeedFromSurvey_m_s(double speedFromSurvey_m_s) {
+		this.speedFromSurvey_m_s = speedFromSurvey_m_s;
 	}
 	
-	public double getDurationGivenBySurvey_s() {
-		return this.duration_s;
+	public double getDurationFromSurvey_s() {
+		return this.durationFromSurvey_s;
 	}
 
-	public void setDurationGivenBySurvey_s(double duration_s) {
-		this.duration_s = duration_s;
+	public void setDurationFromSurvey_s(double durationFromSurvey_s) {
+		this.durationFromSurvey_s = durationFromSurvey_s;
 	}
 	
 	public Id<Link> getArrivalLinkId() {
@@ -266,32 +266,32 @@ public class Trip {
 	 * @param network
 	 * @return beeline distance of this trip in meters
 	 */
-	public double getBeelineDistance(Network network) {
-		if (beelineDistance_m.isNaN()) {
-			calculateBeelineDistance(network);
+	public double getDistanceBeelineByCalculation_m(Network network) {
+		if (distanceBeelineByCalculation_m.isNaN()) {
+			calculateBeelineDistance_m(network);
 		}
-		return beelineDistance_m;
+		return distanceBeelineByCalculation_m;
 	}
 	
-	public double getCalculatedDuration_s(){
+	public double getDurationByCalculation_s(){
 		return arrivalTime_s - departureTime_s;
 	}
 
 
-	private void calculateBeelineDistance(Network network) {
+	private void calculateBeelineDistance_m(Network network) {
     	Link departureLink = network.getLinks().get(departureLinkId);
     	Link arrivalLink = network.getLinks().get(arrivalLinkId);
 
     	// TODO use coords of toNode instead of center coord of link
-    	double arrivalCoordX = arrivalLink.getCoord().getX();
-    	double arrivalCoordY = arrivalLink.getCoord().getY();
-    	double departureCoordX = departureLink.getCoord().getX();
-    	double departureCoordY = departureLink.getCoord().getY();
+    	double arrivalCoordX_m = arrivalLink.getCoord().getX();
+    	double arrivalCoordY_m = arrivalLink.getCoord().getY();
+    	double departureCoordX_m = departureLink.getCoord().getX();
+    	double departureCoordY_m = departureLink.getCoord().getY();
     	
-    	double horizontalDistance_m = (Math.abs(departureCoordX - arrivalCoordX)) / 1000;
-    	double verticalDistance_m = (Math.abs(departureCoordY - arrivalCoordY)) / 1000;
+    	double horizontalDistance_m = Math.abs(departureCoordX_m - arrivalCoordX_m);
+    	double verticalDistance_m = Math.abs(departureCoordY_m - arrivalCoordY_m);
 
-    	this.beelineDistance_m = Math.sqrt(horizontalDistance_m * horizontalDistance_m 
+    	this.distanceBeelineByCalculation_m = Math.sqrt(horizontalDistance_m * horizontalDistance_m 
     			+ verticalDistance_m * verticalDistance_m);
 	}
 }

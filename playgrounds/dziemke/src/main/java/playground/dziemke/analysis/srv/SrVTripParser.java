@@ -148,11 +148,11 @@ public class SrVTripParser {
 				trip.setUseHouseholdCarPool(useHouseholdCarPool);
 				trip.setUseOtherCarPool(useOtherCarPool);
 				//trip.setMode(mode);
-				trip.setDistanceBeeline_m(distanceBeeline_km * 1000.);
-				trip.setDistanceRoutedFastest_m(distanceRoutedFastest_km * 1000.);
-				trip.setDistanceRoutedShortest_m(distanceRoutedShortest_km * 1000.);
-				trip.setSpeed_m_s(speed_km_h * 3.6);
-				trip.setDurationGivenBySurvey_s(duration_min * 60.);
+				trip.setDistanceBeelineFromSurvey_m(distanceBeeline_km * 1000.);
+				trip.setDistanceRoutedFastestFromSurvey_m(distanceRoutedFastest_km * 1000.);
+				trip.setDistanceRoutedShortestFromSurvey_m(distanceRoutedShortest_km * 1000.);
+				trip.setSpeedFromSurvey_m_s(speed_km_h * 3.6);
+				trip.setDurationFromSurvey_s(duration_min * 60.);
 				trip.setArrivalZoneId(arrivalZoneId);
 				trip.setArrivalTime_s(arrivalTime_min * 60.);
 				//trip.setArrivalLegMode(arrivalLegMode);
