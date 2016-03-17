@@ -53,8 +53,8 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 		this.scenario = scenario;
 	}
 	@Override
-	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine ) {
-		this.netsimEngine = netsimEngine;
+	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine1 ) {
+		this.netsimEngine = netsimEngine1;
 		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
@@ -67,8 +67,8 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 	}
 	@Override
 	QLinkI createNetsimLink(final Link link, final QNode toQueueNode) {
-		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( context ) ;
-		return new QLinkImpl(link, toQueueNode, builder, context, netsimEngine );
+		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
+		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
 	QNode createNetsimNode(final Node node, QNetwork qnetwork) {

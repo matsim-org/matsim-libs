@@ -22,6 +22,9 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+
 import playground.gregor.TransportMode;
 import playground.gregor.casim.simulation.CANetsimEngine;
 
@@ -43,6 +46,12 @@ public final class HybridQSimCANetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
+	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
 	public QLinkI createNetsimLink(final Link link, final QNode toQueueNode) {
 		boolean sim2DQTransitionLink = false;
 		boolean qSim2DTransitionLink = link.getAllowedModes().contains(TransportMode.walkca);
@@ -53,7 +62,7 @@ public final class HybridQSimCANetworkFactory extends QNetworkFactory {
 		if (qSim2DTransitionLink) {
 			qLink = new CALink(link,1);
 		} else {
-			qLink = new QLinkImpl(link, network, toQueueNode);
+//			qLink = new QLinkImpl(link, network, toQueueNode);
 			throw new RuntimeException("Not yet implemented!");
 		}
 

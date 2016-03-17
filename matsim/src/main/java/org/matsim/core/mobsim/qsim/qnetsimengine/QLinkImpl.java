@@ -28,10 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
@@ -40,14 +36,12 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisData;
 
 /**
@@ -67,22 +61,31 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		private VehicleQ<QVehicle> vehicleQueue = new FIFOVehicleQ() ;
 		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 		private final NetsimEngineContext context;
+		private LaneFactory laneFactory;
 		Builder(NetsimEngineContext context, QNetsimEngine netsimEngine) {
 			this.context = context ;
 			this.netsimEngine = netsimEngine;
 		} 
 		QLinkImpl build( Link link, QNode toNode ) {
-			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( context ) ;
-			builder.setVehicleQueue(vehicleQueue);
-			builder.setLinkSpeedCalculator(linkSpeedCalculator);
-			
-			return new QLinkImpl( link, toNode, builder, context, netsimEngine ) ;
+			if ( laneFactory == null ) {
+				QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( context ) ;
+				builder.setVehicleQueue(vehicleQueue);
+				builder.setLinkSpeedCalculator(linkSpeedCalculator);
+				laneFactory = builder ;
+			}
+			return new QLinkImpl( link, toNode, laneFactory, context, netsimEngine ) ;
 		}
 		final void setVehicleQueue(VehicleQ<QVehicle> vehicleQueue) {
 			this.vehicleQueue = vehicleQueue;
 		}
 		final void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
 			this.linkSpeedCalculator = linkSpeedCalculator;
+		}
+		/**
+		 * Note that explicitly setting the LaneFactory here means that setVehicleQueue and setLinkSpeedCalculator will be ignored.
+		 */
+		final void setLaneFactory( LaneFactory laneFactory ) {
+			this.laneFactory = laneFactory ;
 		}
 	}
 
@@ -103,13 +106,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	private NetsimEngineContext context;
 	
-	/** 
-	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
-	 * @param context TODO
-	 * @param netsimEngine TODO
-	 * 
-	 */
-	public QLinkImpl(final Link link2, final QNode toNode, final LaneFactory roadFactory, NetsimEngineContext context, QNetsimEngine netsimEngine) {
+	private QLinkImpl(final Link link2, final QNode toNode, final LaneFactory roadFactory, NetsimEngineContext context, QNetsimEngine netsimEngine) {
 		super(link2, toNode, context, netsimEngine) ;
 		this.context = context ;
 		// The next line must must by contract stay within the constructor,

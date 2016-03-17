@@ -43,7 +43,9 @@ public final class AssignmentEmulatingQLaneNetworkFactory extends QNetworkFactor
 				return new AssignmentEmulatingQLane(qLinkImpl, vehicleQueue, qLinkImpl.getLink().getId(), context, netsimEngine, linkSpeedCalculator ) ;
 			}
 		} ;
-		return new QLinkImpl(link, queueNode, roadFactory, context, netsimEngine) ;
+		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
+		linkBuilder.setLaneFactory(roadFactory);
+		return linkBuilder.build(link, queueNode) ; 
 	}
 
 	@Override

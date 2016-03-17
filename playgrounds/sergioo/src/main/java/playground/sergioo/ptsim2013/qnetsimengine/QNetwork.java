@@ -53,7 +53,6 @@ public class QNetwork implements NetsimNetwork {
 
 	private final NetsimNetworkFactory<QNode, ? extends PTQLink> queueNetworkFactory;
 	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-	private final 	AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 	
 	private StopStopTime stopStopTime;
 	
@@ -124,11 +123,4 @@ public class QNetwork implements NetsimNetwork {
 	public NetsimNode getNetsimNode(final Id<Node> id) {
 		return this.nodes.get(id);
 	}
-
-	@Override
-	public  AgentSnapshotInfoFactory getAgentSnapshotInfoFactory(){
-		return this.snapshotInfoFactory;
-	}
-
-
 }

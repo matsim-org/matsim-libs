@@ -728,6 +728,8 @@ public class PTQLink2 implements NetsimLink, TimeVariantLink {
 
 	@Override
 	public void recalcTimeVariantAttributes() {
+		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+
 		this.freespeedTravelTime = this.length / this.getLink().getFreespeed(now);
 		calculateFlowCapacity(now);
 		calculateStorageCapacity(now);

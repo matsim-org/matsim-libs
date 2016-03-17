@@ -14,22 +14,23 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
 public class QCALink extends AbstractQLink {
 
-	private final QNetwork qNetwork;
+	private final NetsimEngineContext context;
 	//private QLinkInternalI qLink;
 	private final CAEnvironment environmentCA;
 	private final CAAgentFactory agentFactoryCA;
 	private final TransitionArea transitionArea;
 	private CALane qlane;
 
-	public QCALink(Link link, QNetwork network, QLinkI qLink, CAEnvironment environmentCA, CAAgentFactory agentFactoryCA, TransitionArea transitionArea) {
+	public QCALink(Link link, CAEnvironment environmentCA, CAAgentFactory agentFactoryCA, TransitionArea transitionArea, NetsimEngineContext context, 
+			QNetsimEngine netsimEngine) {
 		super(link, null, context, netsimEngine);
-		//this.qLink = qLink;
-		this.qNetwork = network;
+		this.context = context ;
 		this.environmentCA = environmentCA;
 		this.agentFactoryCA = agentFactoryCA;
 		this.transitionArea = transitionArea;
@@ -41,11 +42,6 @@ public class QCALink extends AbstractQLink {
 		return this.qlane ;
 	}
 	
-	@Override
-	public void recalcTimeVariantAttributes() {
-		this.qlane.recalcTimeVariantAttributes(time);
-	}
-
 	@Override
 	public Collection<MobsimVehicle> getAllNonParkedVehicles() {
 		// NOT NEEDED
@@ -65,10 +61,10 @@ public class QCALink extends AbstractQLink {
 	}
 
 	public void notifyMoveOverBorderNode(QVehicle vehicle, Id<Link> nextLinkId){
-		double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-		getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
+		double now = context.getSimTimer().getTimeOfDay();
+		context.getEventsManager().processEvent(new LinkLeaveEvent(
 				now, vehicle.getId(), getLink().getId()));
-		getQnetwork().simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
+		context.getEventsManager().processEvent(new LinkEnterEvent(
 				now, vehicle.getId(), nextLinkId));
 	}
 	
@@ -93,18 +89,15 @@ public class QCALink extends AbstractQLink {
 		}
 		@Override
 		void addFromUpstream(QVehicle veh) {
+			double now = context.getSimTimer().getTimeOfDay() ;
+			
 			Pedestrian pedestrian = agentFactoryCA.buildPedestrian(environmentCA.getId(),veh,transitionArea);		
 			
 //			qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
 //					now, veh.getId(), getLink().getId()));
 			// now done by QNode
-			qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new CAAgentConstructEvent(
+			context.getEventsManager().processEvent(new CAAgentConstructEvent(
 					now, pedestrian));
-		}
-
-		@Override
-		void updateRemainingFlowCapacity(double now) {
-			throw new RuntimeException("not implemented") ;
 		}
 
 		// === simulation logic (I am a bit surprised that it works completely without) ===
@@ -190,11 +183,28 @@ public class QCALink extends AbstractQLink {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
-		void recalcTimeVariantAttributes(double now) {
+		public Id<Lane> getId() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		void changeSpeedMetersPerSecond(double val) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		double getLoadIndicator() {
+			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 
+	}
+
+	@Override
+	public void recalcTimeVariantAttributes() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 }

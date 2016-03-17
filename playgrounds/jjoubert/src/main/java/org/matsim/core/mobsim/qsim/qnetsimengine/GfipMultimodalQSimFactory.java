@@ -34,17 +34,22 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -92,7 +97,7 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 
 	@Override
 	public Mobsim get() {
-		QSimConfigGroup configGroup = scenario.getConfig().qsim();
+		final QSimConfigGroup configGroup = scenario.getConfig().qsim();
 		if (configGroup == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
@@ -106,6 +111,24 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 		
 		/* This is the crucial part for changing the queue type. */ 
 		QNetworkFactory netsimNetworkFactory = new QNetworkFactory() {
+			private NetsimEngineContext context;
+			private QNetsimEngine netsimEngine;
+			@Override
+			void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine1) {
+				double effectiveCellSize = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize() ;
+				
+				SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+				linkWidthCalculator.setLinkWidthForVis( configGroup.getLinkWidthForVis() );
+				if (! Double.isNaN(scenario.getNetwork().getEffectiveLaneWidth())){
+					linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
+				}
+				AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+				AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
+				
+				this.context = new NetsimEngineContext(eventsManager, effectiveCellSize, agentCounter, snapshotInfoBuilder, configGroup, mobsimTimer, 
+						linkWidthCalculator ) ;
+				this.netsimEngine = netsimEngine1 ;
+			}
 			@Override
 			public QLinkImpl createNetsimLink(final Link link, final QNode toQueueNode) {
 				VehicleQ<QVehicle> vehicleQ = null;
@@ -121,7 +144,10 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 				default:
 					throw new RuntimeException("Do not know what VehicleQ to use with queue type " + queueType.toString());
 				}
-				return new QLinkImpl(link, toQueueNode, linkSpeedCalculator, agentSnapshotInfoBuilder, netsimEngine);
+//				return new QLinkImpl(link, toQueueNode, linkSpeedCalculator, agentSnapshotInfoBuilder, netsimEngine);
+				QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
+				linkBuilder.setVehicleQueue(vehicleQ);
+				return linkBuilder.build(link, toQueueNode) ;
 			}
 			@Override
 			public QNode createNetsimNode(final Node node, QNetwork network) {
