@@ -25,16 +25,15 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class SelectedPlansAnalyzer {
 	// Parameters
-	private static final  String runId = "run_190";
+	private static final  String runId = "run_199";
 	private static final  int numberOfIterations = 300;
 	//static int plansFileInterval = 50;
 	private static final  int plansFileInterval = 300;
 	private static final  boolean useInterimPlans = true;
 	private static final  boolean useOutputPlans = false;
 	
-	// Output file
+	// Input/output
 	private static final  String directoryRoot = "../../../runs-svn/cemdapMatsimCadyts/" + runId;
-	//static String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis/";
 
 	private static final  Map<Integer, Integer> stayHomePlansMap = new HashMap<Integer, Integer>();
 	private static final  Map<Integer, Integer> otherPlansMap = new HashMap<Integer, Integer>();

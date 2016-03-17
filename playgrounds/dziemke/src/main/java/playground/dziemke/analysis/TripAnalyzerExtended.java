@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -24,26 +25,28 @@ import playground.dziemke.utils.ShapeReader;
  * @author dziemke
  */
 public class TripAnalyzerExtended {
+	public static final Logger log = Logger.getLogger(TripAnalyzerExtended.class) ;
 
+	
 	/* Parameters */
-	private static final String runId = "run_190";
+	private static final String runId = "run_199";
 	private static final String usedIteration = "300"; // most frequently used value: 150
-	private static final String cemdapPersonsFileId = "21";
+	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
 	
 	private static final Integer planningAreaId = 11000000; // 11000000 = Berlin
 
-	private static final boolean onlyCar = false; // "car"; new, should be used for runs with ChangeLegMode enabled
-	private static final boolean onlyInterior = true; // "int"
+	private static final boolean onlyCar = true; // "car"; new, should be used for runs with ChangeLegMode enabled
+	private static final boolean onlyInterior = false; // "int"
 	private static final boolean onlyBerlinBased = false; // "ber"; usually varied for analysis
-	private static final boolean distanceFilter = true; // "dist"; usually varied for analysis
+	private static final boolean distanceFilter = false; // "dist"; usually varied for analysis
 	// private static final double double minDistance = 0;
 	private static final double maxDistance_km = 100; // most frequently used value: 150
 
 	private static final boolean onlyWorkTrips = false; // "work"
 
-	private static final boolean ageFilter = false; // "age"
-	private static final Integer minAge = 80;
-	private static final Integer maxAge = 119;	
+	private static final boolean ageFilter = true; // "age"
+	private static final Integer minAge = 80; // typically "x0"
+	private static final Integer maxAge = 119; // typically "x9"; higehst number ususally chosen is 119
 
 	private static final int maxBinDuration_min = 120;
 	private static final int binWidthDuration_min = 1;
@@ -54,16 +57,16 @@ public class TripAnalyzerExtended {
 	private static final int maxBinDistance_km = 60;
 	private static final int binWidthDistance_km = 1;
 
-	private static final int maxBinSpeed_kmh = 60;
-	private static final int binWidthSpeed_kmh = 1;
+	private static final int maxBinSpeed_km_h = 60;
+	private static final int binWidthSpeed_km_h = 1;
 
 
 	/* Input and output */
 	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + 
 			"/" + runId + "." + usedIteration + ".events.xml.gz";
-	private static final String cemdapPersonFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + 
-			cemdapPersonsFileId + "/persons1.dat";
+	private static final String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + 
+			cemdapPersonsInputFileId + "/persons1.dat";
 	private static final String planningAreaShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
 	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
 
@@ -71,7 +74,7 @@ public class TripAnalyzerExtended {
 	/* Variables to store objects */
 	private static Network network;
 	private static Geometry planningAreaGeometry;
-	private static CemdapPersonFileReader cemdapPersonFileReader;
+	private static CemdapPersonInputFileReader cemdapPersonInputFileReader;
 
 	
 	@SuppressWarnings("unused")
@@ -79,7 +82,7 @@ public class TripAnalyzerExtended {
 		Map<Integer, Geometry> zoneGeometries = ShapeReader.read(planningAreaShapeFile, "NR");
 		planningAreaGeometry = zoneGeometries.get(planningAreaId);
 
-	    // Systematic output naming
+	    /* Systematic output naming */
 	    outputDirectory = outputDirectory + "_" + usedIteration;
 	    if (onlyCar == true) {
 			outputDirectory = outputDirectory + "_car";
@@ -111,24 +114,24 @@ public class TripAnalyzerExtended {
 	    // Connect a file reader to the EventsManager and read in the event file
 	    MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 	    reader.readFile(eventsFile);
-	    System.out.println("Events file read!");
+	    log.info("Events file read!");
 	    
 	    // check if all trips have been completed; if so, result will be zero
 	    int numberOfIncompleteTrips = 0;
 	    for (Trip trip : handler.getTrips().values()) {
 	    	if(!trip.getTripComplete()) { numberOfIncompleteTrips++; }
 	    }
-	    System.out.println(numberOfIncompleteTrips + " trips are incomplete.");
+	    log.info(numberOfIncompleteTrips + " trips are incomplete.");
 	    
 	    
 	    // --------------------------------------------------------------------------------------------------
-	    cemdapPersonFileReader = new CemdapPersonFileReader();
+	    cemdapPersonInputFileReader = new CemdapPersonInputFileReader();
 	    if (ageFilter == true) {
 	    	// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
 	    	// so far age is the only one
 		    // parse person file
 		 	
-		 	cemdapPersonFileReader.parse(cemdapPersonFile);
+		 	cemdapPersonInputFileReader.parse(cemdapPersonsInputFile);
 	    }
 	 	// --------------------------------------------------------------------------------------------------
 	    
@@ -235,11 +238,11 @@ public class TripAnalyzerExtended {
 	    		if (tripDuration_h > 0.) {
 	    			//System.out.println("trip distance is " + tripDistance + " and time is " + timeInHours);
 	    			double averageTripSpeedRouted = tripDistanceRouted / tripDuration_h;
-	    			addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted, binWidthSpeed_kmh, maxBinSpeed_kmh, 1.);
+	    			addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
 	    			aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted;
 
 	    			double averageTripSpeedBeeline = tripDistanceBeeline / tripDuration_h;
-	    			addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline, binWidthSpeed_kmh, maxBinSpeed_kmh, 1.);
+	    			addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
 	    			aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline;
 
 	    			tripCounterSpeed++;
@@ -270,11 +273,11 @@ public class TripAnalyzerExtended {
 	    writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", tripCounter);
 	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, tripCounter, averageTripDistanceRouted);
 	    writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance_km, tripCounter, averageTripDistanceBeeline);
-	    writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_kmh, tripCounterSpeed, averageOfAverageTripSpeedsRouted);
-	    writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_kmh, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
+	    writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsRouted);
+	    writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
 	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, tripCounter, averageTripDuration);
 	    writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeelineCumulative.txt", binWidthDistance_km, tripCounter, averageTripDistanceBeeline);
-	    writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_kmh, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
+	    writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
 	    writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
 	    
 	    // write a routed distance vs. beeline distance comparison file
@@ -340,13 +343,12 @@ public class TripAnalyzerExtended {
 //    		personActivityAttributes.putAttribute(trip.getDriverId(), "hasWorkActivity", true);
 //    	}
 
-    	// --------------------------------------------------------------------------------------------------
-    	// PERSON-SPECIFIC ATTRIBUTES
+    	/* Person-specific attributes */
     	if (ageFilter == true) {
     		// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
     		// so far age is the only one
     		String personId = trip.getPersonId().toString();
-    		int age = (int) cemdapPersonFileReader.getPersonAttributes().getAttribute(personId, "age");
+    		int age = (int) cemdapPersonInputFileReader.getPersonAttributes().getAttribute(personId, "age");
 
     		if (age < minAge) {
     			considerTrip = false;
@@ -355,7 +357,6 @@ public class TripAnalyzerExtended {
     			considerTrip = false;
     		}
     	}
-    	// --------------------------------------------------------------------------------------------------
 
     	return considerTrip;
 	}
@@ -367,7 +368,7 @@ public class TripAnalyzerExtended {
 		// Math.ceil returns the higher integer number (but as a double value)
 		int ceilOfValue = (int)Math.ceil(inputValueBin);
 		if (ceilOfValue < 0) {
-			new RuntimeException("Lower end of bin may not be smaller than zero!");
+			throw new RuntimeException("Lower end of bin may not be smaller than zero!");
 		}
 				
 		if (ceilOfValue >= ceilOfLastBin) {

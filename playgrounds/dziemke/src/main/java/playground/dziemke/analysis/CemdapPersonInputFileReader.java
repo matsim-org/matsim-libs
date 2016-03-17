@@ -32,12 +32,12 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * This class parses a cemdap person file and creates (Person) ObjectAttributes
  * contain the relevant information
  */
-public class CemdapPersonFileReader {
-	private final static Logger log = Logger.getLogger(CemdapPersonFileReader.class);
+public class CemdapPersonInputFileReader {
+	private final static Logger log = Logger.getLogger(CemdapPersonInputFileReader.class);
 	private ObjectAttributes personAttributes = new ObjectAttributes();
 	
 	
-	public CemdapPersonFileReader() {
+	public CemdapPersonInputFileReader() {
 	}
 	
 	

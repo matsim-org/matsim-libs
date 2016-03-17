@@ -26,7 +26,6 @@ public class Trip {
 	private int useOtherCar;
 	private int useHouseholdCarPool;
 	private int useOtherCarPool;
-	//private int mode;
 	private String mode;
 	private double distanceBeeline;
 	private double distanceRoutedFastest;
@@ -47,12 +46,12 @@ public class Trip {
 	//
 	
 	
-	// constructor
+	/* Default constructor */
 	public Trip() {
 	}
 
 	
-	// get and set methods
+	/* Get and set methods */
 	public Id<Household> getHouseholdId() {
 		return this.householdId;
 	}
@@ -158,12 +157,10 @@ public class Trip {
 		this.useOtherCarPool = useOtherCarPool;
 	}
 	
-	//public int getMode() {
 	public String getMode() {
 		return this.mode;
 	}
 
-	//public void setMode(int mode) {
 	public void setMode(String mode) {
 		this.mode = mode;
 	}
@@ -263,6 +260,7 @@ public class Trip {
 	public void setWeight(double weight) {
 		this.weight = weight;
 	}
+	
 	
 	/**
 	 * @param network
