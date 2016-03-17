@@ -56,7 +56,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(QLinkImpl.class);
 	
-	static class Builder {
+	public static class Builder {
 		private QNetsimEngine netsimEngine ;
 		private VehicleQ<QVehicle> vehicleQueue = new FIFOVehicleQ() ;
 		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;

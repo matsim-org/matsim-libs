@@ -19,38 +19,39 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.hybridsim.simulation.ExternalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class QSimExternalTransitionLink extends AbstractQLink {
 
 	private final ExternalEngine e;
 	private final EventsManager em;
-	private final Network net;
 	private FakeLane fakeLane;
+	private final NetsimEngineContext context ;
+	private final QNode toQNode ;
 
-	QSimExternalTransitionLink(Link link, QNetwork network, ExternalEngine e) {
-		super(link, null, network);
+	QSimExternalTransitionLink(Link link, ExternalEngine e, NetsimEngineContext context, QNetsimEngine netsimEngine, QNode toQNode) {
+		super(link, null, context, netsimEngine );
 		this.e = e;
 		this.em = e.getEventsManager();
-		this.net = network.getNetwork();
+		this.context = context ;
+		this.toQNode = toQNode ;
 	}
 
 	@Override
-	boolean doSimStep(double now) {
-		// TODO Auto-generated method stub
+	boolean doSimStep() {
 		return false;
 	}
 
@@ -60,7 +61,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	}
 
 	@Override
-	public void recalcTimeVariantAttributes(double time) {
+	public void recalcTimeVariantAttributes() {
 		throw new RuntimeException("not yet implemented");
 	}
 
@@ -97,15 +98,27 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	
 	private final class FakeLane extends QLaneI {
 		@Override
-		void addFromUpstream(QVehicle veh, double now) {
+		void addFromUpstream(QVehicle veh) {
+			double now = context.getSimTimer().getTimeOfDay() ;
+			
 			Id<Link> nextL = veh.getDriver().chooseNextLinkId();
-			Id<Node> leaveId = net.getLinks().get(nextL).getToNode().getId();
+			Id<Node> leaveId = toQNode.getNode().getId() ;
 			e.addFromUpstream( getLink().getFromNode().getId(), leaveId, veh);
 			em.processEvent(new LinkEnterEvent(now, veh.getId(), getLink().getId()));
 		}
+		
+		@Override
+		double getLoadIndicator() {
+			return 0. ;
+		}
+		@Override
+		void changeSpeedMetersPerSecond( double spd ) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
 
 		@Override
-		void addFromWait(QVehicle arg0, double arg1) {
+		void addFromWait(QVehicle arg0) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
@@ -129,13 +142,13 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 
 		@Override
-		void clearVehicles(double now) {
+		void clearVehicles() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		boolean doSimStep(double arg0) {
+		boolean doSimStep() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
@@ -197,7 +210,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 
 		@Override
-		boolean isAcceptingFromWait(double now) {
+		boolean isAcceptingFromWait() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
@@ -215,22 +228,17 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 
 		@Override
-		QVehicle popFirstVehicle(double now) {
+		QVehicle popFirstVehicle() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		void recalcTimeVariantAttributes(double arg0) {
+		public Id<Lane> getId() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
-		@Override
-		void updateRemainingFlowCapacity(double now) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
 	}
 
 
