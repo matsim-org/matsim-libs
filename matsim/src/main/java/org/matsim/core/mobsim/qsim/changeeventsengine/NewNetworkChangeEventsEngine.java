@@ -42,7 +42,7 @@ class NewNetworkChangeEventsEngine implements MobsimEngine {
 						final NetsimLink netsimLink = internalInterface.getMobsim().getNetsimNetwork().getNetsimLink(link.getId());
 						if ( netsimLink instanceof TimeVariantLink ) {
 							final double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
-							((TimeVariantLink) netsimLink).recalcTimeVariantAttributes(now);
+							((TimeVariantLink) netsimLink).recalcTimeVariantAttributes();
 						} else {
 							throw new RuntimeException("link not time variant") ;
 						}

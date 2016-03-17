@@ -27,15 +27,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.ThreadFactory;
+
+import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
@@ -51,12 +59,9 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
-
-import javax.inject.Inject;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -76,8 +81,6 @@ public class QNetsimEngine implements MobsimEngine {
 	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
 
 	private final QSim qsim;
-
-	private final AbstractAgentSnapshotInfoBuilder positionInfoBuilder;
 
 	private final double stucktimeCache;
 	private final VehicularDepartureHandler dpHandler;
@@ -147,37 +150,15 @@ public class QNetsimEngine implements MobsimEngine {
 			}
 		}
 		
-		AgentSnapshotInfoFactory agentSnapshotInfoFactory = QNetwork.getAgentSnapshotInfoFactory() ;
-		this.positionInfoBuilder = createAgentSnapshotInfoBuilder( sim.getScenario(), agentSnapshotInfoFactory );
-
-		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
-		// first in ctors calling each other.  kai, feb'12
-//		if (config.qsim().isUseLanes()) {
-//			log.info("Lanes enabled...");
-//			if (netsimNetworkFactory != null) {
-//				throw new RuntimeException("both `lanes' and `netsimNetworkFactory' are defined; don't know what that means; aborting") ;
-//			}
-//			network = new QNetwork(
-//							sim.getScenario().getNetwork(),
-//							new QLanesNetworkFactory(new DefaultQNetworkFactory(), sim.getScenario().getLanes()));
-//		} else 
 		if (netsimNetworkFactory != null){
 			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
-//		} else if (qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ || qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ) {
-//			network = new QNetwork(sim.getScenario().getNetwork(), new QNetworkFactory() {
-//				@Override
-//				public QLinkImpl createNetsimLink(final Link link, final QNetwork network2, final QNode toQueueNode) {
-//					return new QLinkImpl(link, network2, toQueueNode, new PassingVehicleQ(), linkSpeedCalculator, positionInfoBuilder );
-//				}
-//				@Override
-//				public QNode createNetsimNode(final Node node, QNetwork network2) {
-//					return new QNode(node, network2);
-//				}
-//			});
 		} else {
-			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
+			Scenario scenario = sim.getScenario();
+			EventsManager events = sim.getEventsManager() ;
+			QSimConfigGroup qsimConfig = sim.getScenario().getConfig().qsim() ;
+			Network net = scenario.getNetwork() ;
+			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory( qsimConfig, events, net, scenario ) );
 		}
-		network.getLinkWidthCalculatorForVis().setLinkWidthForVis(qsimConfigGroup.getLinkWidthForVis());
 		network.initialize(this);
 
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
@@ -373,10 +354,6 @@ public class QNetsimEngine implements MobsimEngine {
 
 	QSim getMobsim() {
 		return this.qsim;
-	}
-
-	AbstractAgentSnapshotInfoBuilder getAgentSnapshotInfoBuilder(){
-		return this.positionInfoBuilder;
 	}
 
 	public NetsimNetwork getNetsimNetwork() {

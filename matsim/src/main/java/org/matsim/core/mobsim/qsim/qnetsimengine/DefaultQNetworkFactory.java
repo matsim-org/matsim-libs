@@ -22,44 +22,56 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import javax.inject.Inject;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 
 /**
- * @author dgrether
+ * @author dgrether, knagel
  */
 public final class DefaultQNetworkFactory extends QNetworkFactory {
-	@Inject QSimConfigGroup qsimConfig ;
-	@Inject EventsManager events ;
-	@Inject Network network ;
-	@Inject Mobsim mobsim ;
-
-	@Override
-	public QLinkI createNetsimLink(final Link link, final QNetwork qnetwork, final QNode toQueueNode) {
-		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
-		AgentCounter agentCounter = ((QSim)mobsim).getAgentCounter() ;
-		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = qnetwork.simEngine.getAgentSnapshotInfoBuilder();
-		Gbl.assertNotNull(agentSnapshotInfoBuilder);
-		final QueueWithBufferContext context = new QueueWithBufferContext( events, effectiveCellSize,
-				agentCounter, agentSnapshotInfoBuilder, qsimConfig );
-
-		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( context ) ;
-
-		return new QLinkImpl(link, qnetwork, toQueueNode, builder );
+	private QSimConfigGroup qsimConfig ;
+	private EventsManager events ;
+	private Network network ;
+	private Scenario scenario ;
+	private NetsimEngineContext context;
+	private QNetsimEngine netsimEngine ;
+	@Inject
+	DefaultQNetworkFactory( QSimConfigGroup qsimConfig, EventsManager events, Network network, Scenario scenario ) {
+		this.qsimConfig = qsimConfig;
+		this.events = events;
+		this.network = network;
+		this.scenario = scenario;
 	}
-
 	@Override
-	public QNode createNetsimNode(final Node node, QNetwork qnetwork) {
+	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine ) {
+		this.netsimEngine = netsimEngine;
+		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
+		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
+		if (! Double.isNaN(network.getEffectiveLaneWidth())){
+			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
+		}
+		AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
+		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
+	}
+	@Override
+	QLinkI createNetsimLink(final Link link, final QNode toQueueNode) {
+		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( context ) ;
+		return new QLinkImpl(link, toQueueNode, builder, context, netsimEngine );
+	}
+	@Override
+	QNode createNetsimNode(final Node node, QNetwork qnetwork) {
 		return new QNode(node, qnetwork);
 	}
-
 }

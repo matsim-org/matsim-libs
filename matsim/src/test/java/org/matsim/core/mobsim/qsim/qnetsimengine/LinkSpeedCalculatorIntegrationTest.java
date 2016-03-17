@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,6 +59,7 @@ import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -72,6 +75,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.EventsLogger;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 /**
  * @author mrieser / Senozon AG
@@ -123,22 +127,30 @@ public class LinkSpeedCalculatorIntegrationTest {
 			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(5.0) ;
 			@Override public void install() {
 				bind(QNetworkFactory.class).toInstance( new QNetworkFactory(){
-					@Override QNode createNetsimNode(Node node, QNetwork network) {
-						return new QNode( node, network) ;
+					@Inject QSimConfigGroup qsimConfig ;
+					@Inject EventsManager events ;
+					@Inject Network network ;
+					private AgentCounter agentCounter;
+					private QNetsimEngine netsimEngine;
+					private MobsimTimer mobsimTimer;
+					@Override void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, QNetsimEngine netsimEngine1) {
+						this.agentCounter = agentCounter1 ;
+						this.mobsimTimer = mobsimTimer1 ;
+						this.netsimEngine = netsimEngine1 ;
 					}
-					@Override QLinkI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
-						QSimConfigGroup qsimConfig = network.simEngine.getMobsim().getScenario().getConfig().qsim() ;
-						EventsManager events = network.simEngine.getMobsim().getEventsManager() ;
-						double effectiveCellSize = ((NetworkImpl) network.getNetwork()).getEffectiveCellSize() ;
-						AgentCounter agentCounter = network.simEngine.getMobsim().getAgentCounter() ;
-						AgentSnapshotInfoFactory agentSnapshotInfoFactory = QNetwork.getAgentSnapshotInfoFactory() ;
-						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, agentSnapshotInfoFactory );
-						final QueueWithBufferContext context = new QueueWithBufferContext( events, effectiveCellSize,
-								agentCounter, positionInfoBuilder, qsimConfig );
+					@Override QNode createNetsimNode(Node node, QNetwork qnetwork) {
+						return new QNode( node, qnetwork) ;
+					}
+					@Override QLinkI createNetsimLink(Link link, QNode queueNode) {
+						double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
+						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
+						final NetsimEngineContext context = new NetsimEngineContext( events, effectiveCellSize,
+								agentCounter, positionInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
 
-						Builder builder = new QLinkImpl.Builder(context) ;
+						Builder builder = new QLinkImpl.Builder(context, netsimEngine) ;
 						builder.setLinkSpeedCalculator(linkSpeedCalculator);
-						builder.setNetwork(network);
 
 						return builder.build(link, queueNode) ;
 					}
@@ -190,21 +202,29 @@ public class LinkSpeedCalculatorIntegrationTest {
 			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(20.0) ;
 			@Override public void install() {
 				bind(QNetworkFactory.class).toInstance( new QNetworkFactory(){
-					@Override QNode createNetsimNode(Node node, QNetwork network) {
-						return new QNode( node, network) ;
+					@Inject private QSimConfigGroup qsimConfig ;
+					@Inject private EventsManager events ;
+					@Inject private Network network ;
+					private AgentCounter agentCounter;
+					private MobsimTimer mobsimTimer;
+					private QNetsimEngine netsimEngine;
+					@Override void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, QNetsimEngine netsimEngine1) {
+						this.agentCounter = agentCounter1 ;
+						this.mobsimTimer = mobsimTimer1 ;
+						this.netsimEngine = netsimEngine1 ;
 					}
-					@Override QLinkI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
-						QSimConfigGroup qsimConfig = network.simEngine.getMobsim().getScenario().getConfig().qsim() ;
-						EventsManager events = network.simEngine.getMobsim().getEventsManager() ;
-						double effectiveCellSize = ((NetworkImpl) network.getNetwork()).getEffectiveCellSize() ;
-						AgentCounter agentCounter = network.simEngine.getMobsim().getAgentCounter() ;
-						AgentSnapshotInfoFactory agentSnapshotInfoFactory = QNetwork.getAgentSnapshotInfoFactory() ;
-						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, agentSnapshotInfoFactory );
-						final QueueWithBufferContext context = new QueueWithBufferContext( events, effectiveCellSize,
-								agentCounter, positionInfoBuilder, qsimConfig );
-						Builder builder = new QLinkImpl.Builder(context) ;
+					@Override QNode createNetsimNode(Node node, QNetwork qnetwork) {
+						return new QNode( node, qnetwork) ;
+					}
+					@Override QLinkI createNetsimLink(Link link, QNode queueNode) {
+						double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
+						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
+						final NetsimEngineContext context = new NetsimEngineContext( events, effectiveCellSize,
+								agentCounter, positionInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
+						Builder builder = new QLinkImpl.Builder(context, netsimEngine) ;
 
-						builder.setNetwork(network);
 						builder.setLinkSpeedCalculator(linkSpeedCalculator);
 						return builder.build(link, queueNode) ;
 					}

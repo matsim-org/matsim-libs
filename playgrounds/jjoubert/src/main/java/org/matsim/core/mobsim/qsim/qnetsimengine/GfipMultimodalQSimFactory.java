@@ -107,7 +107,7 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 		/* This is the crucial part for changing the queue type. */ 
 		QNetworkFactory netsimNetworkFactory = new QNetworkFactory() {
 			@Override
-			public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+			public QLinkImpl createNetsimLink(final Link link, final QNode toQueueNode) {
 				VehicleQ<QVehicle> vehicleQ = null;
 				switch (queueType) {
 				case FIFO:
@@ -121,7 +121,7 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 				default:
 					throw new RuntimeException("Do not know what VehicleQ to use with queue type " + queueType.toString());
 				}
-				return new QLinkImpl(link, network, toQueueNode, linkSpeedCalculator, agentSnapshotInfoBuilder);
+				return new QLinkImpl(link, toQueueNode, linkSpeedCalculator, agentSnapshotInfoBuilder, netsimEngine);
 			}
 			@Override
 			public QNode createNetsimNode(final Node node, QNetwork network) {

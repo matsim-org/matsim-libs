@@ -130,7 +130,7 @@ abstract class QLinkI implements NetsimLink, TimeVariantLink {
 	/**
 	 * Seems ok as public interface function. kai, aug'15
 	 */
-	abstract boolean doSimStep(final double now);
+	abstract boolean doSimStep();
 
 	/**
 	 * Seems ok as public interface function. kai, aug'15 

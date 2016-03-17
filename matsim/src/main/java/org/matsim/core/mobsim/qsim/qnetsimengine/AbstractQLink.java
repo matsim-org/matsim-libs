@@ -71,7 +71,7 @@ abstract class AbstractQLink extends QLinkI {
 
 	private final Link link;
 
-	private final QNetwork qnetwork ;
+//	private final QNetwork qnetwork ;
 	private NetElementActivationRegistry netElementActivationRegistry;
 	// (NOTE: via the qnetwork you reach the QNetsimEngine.  That is the "global" thing.  In contrast, via the netElementActivator,
 	// you reach the QNetsimEngineRunner.  That is the thread that runs the QLink.  Kai, mar'16
@@ -105,12 +105,16 @@ abstract class AbstractQLink extends QLinkI {
 	
 	private final QNode toQNode ;
 
-	AbstractQLink(Link link, QNode toQNode, QNetwork network) {
+	private final NetsimEngineContext context;
+
+	private final QNetsimEngine netsimEngine;
+
+	AbstractQLink(Link link, QNode toQNode, NetsimEngineContext context, QNetsimEngine netsimEngine) {
 		this.link = link ;
 		this.toQNode = toQNode ;
-		this.qnetwork = network;
-		this.insertingWaitingVehiclesBeforeDrivingVehicles =
-				network.simEngine.getMobsim().getScenario().getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
+		this.context = context;
+		this.netsimEngine = netsimEngine;
+		this.insertingWaitingVehiclesBeforeDrivingVehicles = context.qsimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
 	}
 	
 	@Override QNode getToNode() {
@@ -147,11 +151,11 @@ abstract class AbstractQLink extends QLinkI {
 	}
 	
 	/* package */ final void letVehicleArrive(QVehicle qveh) {
-		double now = this.qnetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();;
-		this.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(new VehicleLeavesTrafficEvent(now , qveh.getDriver().getId(), 
+		double now = context.getSimTimer().getTimeOfDay();;
+		context.getEventsManager().processEvent(new VehicleLeavesTrafficEvent(now , qveh.getDriver().getId(), 
 				this.link.getId(), qveh.getId(), qveh.getDriver().getMode(), 1.0 ) ) ;
 		
-		this.qnetwork.simEngine.letVehicleArrive(qveh);
+		this.netsimEngine.letVehicleArrive(qveh);
 	}
 
 	@Override
@@ -188,7 +192,7 @@ abstract class AbstractQLink extends QLinkI {
 
 	@Override
 	void clearVehicles() {
-		double now = this.qnetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = context.getSimTimer().getTimeOfDay();
 
 		/*
 		 * Some agents might be present in multiple lists/maps.
@@ -204,13 +208,13 @@ abstract class AbstractQLink extends QLinkI {
 				if (stuckAgents.contains(veh.getDriver().getId())) continue;
 				else stuckAgents.add(veh.getDriver().getId());
 
-				this.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+				context.getEventsManager().processEvent(
 						new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
 				
-				this.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+				context.getEventsManager().processEvent(
 						new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
-				this.qnetwork.simEngine.getMobsim().getAgentCounter().incLost();
-				this.qnetwork.simEngine.getMobsim().getAgentCounter().decLiving();
+				context.getAgentCounter().incLost();
+				context.getAgentCounter().decLiving();
 			}
 
 			for (PassengerAgent passenger : veh.getPassengers()) {
@@ -219,10 +223,10 @@ abstract class AbstractQLink extends QLinkI {
 
 				MobsimAgent mobsimAgent = (MobsimAgent) passenger;
 
-				this.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+				context.getEventsManager().processEvent(
 						new PersonStuckEvent(now, mobsimAgent.getId(), veh.getCurrentLink().getId(), mobsimAgent.getMode()));
-				this.qnetwork.simEngine.getMobsim().getAgentCounter().incLost();
-				this.qnetwork.simEngine.getMobsim().getAgentCounter().decLiving();
+				context.getAgentCounter().incLost();
+				context.getAgentCounter().decLiving();
 			}
 		}
 		this.parkedVehicles.clear();
@@ -230,10 +234,10 @@ abstract class AbstractQLink extends QLinkI {
 			if (stuckAgents.contains(driver.getId())) continue;
 			else stuckAgents.add(driver.getId());
 
-			this.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+			context.getEventsManager().processEvent(
 					new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
-			this.qnetwork.simEngine.getMobsim().getAgentCounter().incLost();
-			this.qnetwork.simEngine.getMobsim().getAgentCounter().decLiving();
+			context.getAgentCounter().incLost();
+			context.getAgentCounter().decLiving();
 		}
 		driversWaitingForPassengers.clear();
 
@@ -243,10 +247,10 @@ abstract class AbstractQLink extends QLinkI {
 				if (stuckAgents.contains(driver.getId())) continue;
 				stuckAgents.add(driver.getId());
 
-				this.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+				context.getEventsManager().processEvent(
 						new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
-				this.qnetwork.simEngine.getMobsim().getAgentCounter().incLost();
-				this.qnetwork.simEngine.getMobsim().getAgentCounter().decLiving();
+				context.getAgentCounter().incLost();
+				context.getAgentCounter().decLiving();
 			}
 		}
 		driversWaitingForCars.clear();
@@ -255,10 +259,10 @@ abstract class AbstractQLink extends QLinkI {
 				if (stuckAgents.contains(passenger.getId())) continue;
 				else stuckAgents.add(passenger.getId());
 
-				this.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+				context.getEventsManager().processEvent(
 						new PersonStuckEvent(now, passenger.getId(), passenger.getCurrentLinkId(), passenger.getMode()));
-				this.qnetwork.simEngine.getMobsim().getAgentCounter().incLost();
-				this.qnetwork.simEngine.getMobsim().getAgentCounter().decLiving();
+				this.context.getAgentCounter().incLost();
+				this.context.getAgentCounter().decLiving();
 			}
 		}
 		this.passengersWaitingForCars.clear();
@@ -267,13 +271,13 @@ abstract class AbstractQLink extends QLinkI {
 			if (stuckAgents.contains(veh.getDriver().getId())) continue;
 			else stuckAgents.add(veh.getDriver().getId());
 			
-			this.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+			this.context.getEventsManager().processEvent(
 					new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
 			
-			this.qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+			this.context.getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
-			this.qnetwork.simEngine.getMobsim().getAgentCounter().incLost();
-			this.qnetwork.simEngine.getMobsim().getAgentCounter().decLiving();
+			this.context.getAgentCounter().incLost();
+			this.context.getAgentCounter().decLiving();
 		}
 		this.waitingList.clear();
 	}
@@ -329,7 +333,7 @@ abstract class AbstractQLink extends QLinkI {
 		MobsimDriverAgent driver = vehicle.getDriver();
 		if (driver == null) throw new RuntimeException("Vehicle cannot depart without a driver!");
 
-		EventsManager eventsManager = qnetwork.simEngine.getMobsim().getEventsManager();
+		EventsManager eventsManager = context.getEventsManager();
 		eventsManager.processEvent(new PersonEntersVehicleEvent(now, driver.getId(), vehicle.getId()));
 		this.addDepartingVehicle(vehicle);
 	}
@@ -357,7 +361,7 @@ abstract class AbstractQLink extends QLinkI {
 			}
 
 			((PassengerAgent) passenger).setVehicle(vehicle);
-			EventsManager eventsManager = qnetwork.simEngine.getMobsim().getEventsManager();
+			EventsManager eventsManager = context.getEventsManager();
 			eventsManager.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), vehicle.getId()));
 			// TODO: allow setting passenger's currentLinkId to null
 

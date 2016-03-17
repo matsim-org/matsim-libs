@@ -27,7 +27,7 @@ public class QCALink extends AbstractQLink {
 	private CALane qlane;
 
 	public QCALink(Link link, QNetwork network, QLinkI qLink, CAEnvironment environmentCA, CAAgentFactory agentFactoryCA, TransitionArea transitionArea) {
-		super(link, null, network);
+		super(link, null, context, netsimEngine);
 		//this.qLink = qLink;
 		this.qNetwork = network;
 		this.environmentCA = environmentCA;
@@ -42,7 +42,7 @@ public class QCALink extends AbstractQLink {
 	}
 	
 	@Override
-	public void recalcTimeVariantAttributes(double time) {
+	public void recalcTimeVariantAttributes() {
 		this.qlane.recalcTimeVariantAttributes(time);
 	}
 
@@ -59,7 +59,7 @@ public class QCALink extends AbstractQLink {
 	}
 
 	@Override
-	boolean doSimStep(double now) {
+	boolean doSimStep() {
 		// NOT NEEDED
 		throw new RuntimeException("Method not needed for the moment");
 	}
@@ -92,7 +92,7 @@ public class QCALink extends AbstractQLink {
 			return transitionArea.acceptPedestrians();
 		}
 		@Override
-		void addFromUpstream(QVehicle veh, double now) {
+		void addFromUpstream(QVehicle veh) {
 			Pedestrian pedestrian = agentFactoryCA.buildPedestrian(environmentCA.getId(),veh,transitionArea);		
 			
 //			qNetwork.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
@@ -109,7 +109,7 @@ public class QCALink extends AbstractQLink {
 
 		// === simulation logic (I am a bit surprised that it works completely without) ===
 		@Override
-		boolean doSimStep(double now) {
+		boolean doSimStep() {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
@@ -117,7 +117,7 @@ public class QCALink extends AbstractQLink {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
-		void clearVehicles(double now) {
+		void clearVehicles() {
 			throw new RuntimeException("not implemented") ;
 		}
 
@@ -146,11 +146,11 @@ public class QCALink extends AbstractQLink {
 
 		// === functionality for arrival/departure area ===
 		@Override
-		void addFromWait(QVehicle veh, double now) {
+		void addFromWait(QVehicle veh) {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
-		boolean isAcceptingFromWait(double now) {
+		boolean isAcceptingFromWait() {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
@@ -164,7 +164,7 @@ public class QCALink extends AbstractQLink {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
-		QVehicle popFirstVehicle(double now) {
+		QVehicle popFirstVehicle() {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override

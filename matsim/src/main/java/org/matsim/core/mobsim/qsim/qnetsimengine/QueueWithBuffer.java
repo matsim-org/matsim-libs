@@ -69,11 +69,6 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
  * @author nagel
  */
 final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
-	// yy I think I would find it more honest to pass the MobsimTimer, rather than adding "double now" as an argument to the
-	// various methods when I suddenly find out that I need it there.  An alternative would be to _always_ pass it, just in case.   Or to 
-	// recognize the time step from doSimStep( double now ).  Hm.  kai, mar'16
-	
-	
 	private static final Logger log = Logger.getLogger( QueueWithBuffer.class ) ;
 	
 	static final class Builder implements LaneFactory {
@@ -83,8 +78,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		private Double effectiveNumberOfLanes = null ;
 		private Double flowCapacity_s = null ;
 		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
-		private final QueueWithBufferContext context;
-		Builder( final QueueWithBufferContext context ) {
+		private final NetsimEngineContext context;
+		Builder( final NetsimEngineContext context ) {
 			this.context = context ;
 			if (context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ || context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ) {
 				this.vehicleQueue = new PassingVehicleQ() ;
@@ -110,7 +105,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	/**
 	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
 	 * buffer. This value is updated each time step by a call to
-	 * {@link #updateRemainingFlowCapacity(double)} (double)}.
+	 * {@link #updateRemainingFlowCapacity()} (double)}.
 	 */
 	private double remainingflowCap = 0.0 ;
 	/**
@@ -190,10 +185,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	private final VisDataImpl visData = new VisDataImpl() ;
 	private final LinkSpeedCalculator linkSpeedCalculator;
-	private final QueueWithBufferContext context;
+	private final NetsimEngineContext context;
 
 	private QueueWithBuffer(AbstractQLink qlink,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> laneId, 
-			double length, double effectiveNumberOfLanes, double flowCapacity_s, final QueueWithBufferContext context, 
+			double length, double effectiveNumberOfLanes, double flowCapacity_s, final NetsimEngineContext context, 
 			LinkSpeedCalculator linkSpeedCalculator) {
 		// the general idea is to give this object no longer access to "everything".  So we give it each necessary item separately.
 		// Results in a larger memory footprint; if this becomes a problem, could think about a "QSimContext".  kai, mar'16
@@ -237,16 +232,18 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	 final void addFromWait(final QVehicle veh, final double now) {
-		addToBuffer(veh, now);
+	 final void addFromWait(final QVehicle veh) {
+		addToBuffer(veh);
 	}
 
-	private void addToBuffer(final QVehicle veh, final double now) {
+	private void addToBuffer(final QVehicle veh) {
 		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
 		// kai/mz/amit, mar'12
 		
+		double now = context.getSimTimer().getTimeOfDay() ;
+		
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
-			updateFlowAccumulation(now);
+			updateFlowAccumulation();
 			if (flowcap_accumulate.getValue() > 0.0  ) {
 				flowcap_accumulate.addValue(-veh.getSizeInEquivalents(), now);
 			} else {
@@ -279,13 +276,13 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	 final boolean isAcceptingFromWait(double now) {
-		return this.hasFlowCapacityLeftAndBufferSpace(now) ;
+	 final boolean isAcceptingFromWait() {
+		return this.hasFlowCapacityLeftAndBufferSpace() ;
 	}
 
-	private boolean hasFlowCapacityLeftAndBufferSpace(double now) {
+	private boolean hasFlowCapacityLeftAndBufferSpace() {
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
-			updateFlowAccumulation(now); 
+			updateFlowAccumulation(); 
 			return (
 					usedBufferStorageCapacity < bufferStorageCapacity
 					&&
@@ -300,8 +297,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	private void updateFlowAccumulation(final double now){
-		
+	private void updateFlowAccumulation(){
+		double now = context.getSimTimer().getTimeOfDay() ;
 		if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() <= 0. && isNotOfferingVehicle() ){
 			
 				double flowCapSoFar = flowcap_accumulate.getValue();
@@ -315,7 +312,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	private final void updateRemainingFlowCapacity(double now) {
+	private final void updateRemainingFlowCapacity() {
+		double now = context.getSimTimer().getTimeOfDay() ;
 		if(!context.qsimConfig.isUsingFastCapacityUpdate() ){
 			remainingflowCap = flowCapacityPerTimeStep;
 			if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {
@@ -365,14 +363,15 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final boolean doSimStep(final double now ) {
-		this.updateRemainingFlowCapacity(now);
-		if(context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles) this.processArrivalOfHoles( now ) ;
-		this.moveQueueToBuffer(now);
+	final boolean doSimStep( ) {
+		this.updateRemainingFlowCapacity();
+		if(context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles) this.processArrivalOfHoles( ) ;
+		this.moveQueueToBuffer();
 		return true ;
 	}
 
-	private void processArrivalOfHoles(double now) {
+	private void processArrivalOfHoles() {
+		double now = context.getSimTimer().getTimeOfDay() ;
 		while ( this.holes.size()>0 && this.holes.peek().getEarliestLinkExitTime() < now ) {
 			Hole hole = this.holes.poll() ; // ???
 			this.remainingHolesStorageCapacity += hole.getSizeInEquivalents() ;
@@ -384,13 +383,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 * Move vehicles from link to buffer, according to buffer capacity and
 	 * departure time of vehicle. Also removes vehicles from lane if the vehicle
 	 * arrived at its destination.
-	 * @param now
-	 *          The current time.
 	 */
-	private final void moveQueueToBuffer(final double now) {
+	private final void moveQueueToBuffer() {
+		double now = context.getSimTimer().getTimeOfDay() ;
+		
 		QVehicle veh;
-
-		while((veh = peekFromVehQueue(now)) !=null){
+		while((veh = peekFromVehQueue()) !=null){
 			//we have an original QueueLink behaviour
 			if (veh.getEarliestLinkExitTime() > now){
 				return;
@@ -402,7 +400,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				HandleTransitStopResult handleTransitStop = qLink.getTransitQLink().handleTransitStop(now, veh, (TransitDriverAgent) driver, this.qLink.getLink().getId());
 				if (handleTransitStop == HandleTransitStopResult.accepted) {
 					// vehicle has been accepted into the transit vehicle queue of the link.
-					removeVehicleFromQueue(now,veh) ;
+					removeVehicleFromQueue(veh) ;
 					continue;
 				} else if (handleTransitStop == HandleTransitStopResult.rehandle) {
 					continue; // yy why "continue", and not "break" or "return"?  Seems to me that this
@@ -416,24 +414,27 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 			// Check if veh has reached destination:
 			if ((driver.isWantingToArriveOnCurrentLink())) {
-				letVehicleArrive(now, veh);
+				letVehicleArrive(veh);
 				continue;
 			}
 			
 			/* is there still room left in the buffer? */
-			if (!hasFlowCapacityLeftAndBufferSpace(now) ) {
+			if (!hasFlowCapacityLeftAndBufferSpace() ) {
 				return;
 			}
 
-			addToBuffer(veh, now);
-			removeVehicleFromQueue(now,veh);
+			addToBuffer(veh);
+			removeVehicleFromQueue(veh);
 			if(context.qsimConfig.isRestrictingSeepage() && context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ && veh.getDriver().getMode().equals(context.qsimConfig.getSeepMode())) {
 				noOfSeepModeBringFwd++;
 			}
 		} // end while
 	}
 
-	private QVehicle removeVehicleFromQueue(final double now,final QVehicle veh2Remove) {
+	private QVehicle removeVehicleFromQueue(final QVehicle veh2Remove) {
+		double now = context.getSimTimer().getTimeOfDay() ;
+		
+		
 		//		QVehicle veh = vehQueue.poll();
 		//		usedStorageCapacity -= veh.getSizeInEquivalents();
 
@@ -457,16 +458,14 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		return veh ;
 	}
 
-	private void letVehicleArrive(final double now, QVehicle veh) {
-
+	private void letVehicleArrive(QVehicle veh) {
+		double now = context.getSimTimer().getTimeOfDay() ;
 		qLink.addParkedVehicle(veh);
-
 		qLink.letVehicleArrive(veh);
-		
 		qLink.makeVehicleAvailableToNextDriver(veh, now);
 		
 		// remove _after_ processing the arrival to keep link active:
-		removeVehicleFromQueue( now, veh ) ;
+		removeVehicleFromQueue( veh ) ;
 	}
 
 	@Override
@@ -557,17 +556,19 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	 final QVehicle popFirstVehicle(double now) {
-		QVehicle veh = removeFirstVehicle(now);
+	 final QVehicle popFirstVehicle() {
+		double now = context.getSimTimer().getTimeOfDay() ;
+		QVehicle veh = removeFirstVehicle();
 		if (this.context.qsimConfig.isUseLanes() ) {
-			this.context.events.processEvent(new LaneLeaveEvent(
+			this.context.getEventsManager().processEvent(new LaneLeaveEvent(
 					now, veh.getId(), this.qLink.getLink().getId(), this.getId()
 					));
 		}
 		return veh;
 	}
 
-	private final QVehicle removeFirstVehicle(double now){
+	private final QVehicle removeFirstVehicle(){
+		double now = context.getSimTimer().getTimeOfDay() ;
 		QVehicle veh = buffer.poll();
 		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
@@ -608,24 +609,26 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	 final void clearVehicles(double now) {
+	 final void clearVehicles() {
 		// yyyyyy right now it seems to me that one should rather just abort the agents and have the framework take care of the rest. kai, mar'16
+		
+		double now = context.getSimTimer().getTimeOfDay() ;
 
 		for (QVehicle veh : vehQueue) {
-			context.events.processEvent( new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
-			context.events.processEvent( new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+			context.getEventsManager().processEvent( new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
+			context.getEventsManager().processEvent( new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			
-			context.agentCounter.incLost();
-			context.agentCounter.decLiving();
+			context.getAgentCounter().incLost();
+			context.getAgentCounter().decLiving();
 		}
 		vehQueue.clear();
 
 		for (QVehicle veh : buffer) {
-			context.events.processEvent( new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
-			context.events.processEvent( new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+			context.getEventsManager().processEvent( new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
+			context.getEventsManager().processEvent( new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			
-			context.agentCounter.incLost();
-			context.agentCounter.decLiving();
+			context.getAgentCounter().incLost();
+			context.getAgentCounter().decLiving();
 		}
 		buffer.clear();
 		usedBufferStorageCapacity = 0;
@@ -635,7 +638,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	 final void addFromUpstream(final QVehicle veh, double now) {
+	 final void addFromUpstream(final QVehicle veh) {
+		double now = context.getSimTimer().getTimeOfDay() ;
 
 		// activate link since there is now action on it:
 		qLink.activateLink();
@@ -754,8 +758,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 					double freespeedTraveltime = length / (HOLE_SPEED*1000./3600.);
 					double lastDistanceFromFromNode = Double.NaN;
 					for (Hole hole : holes) {
-						lastDistanceFromFromNode = createHolePositionAndReturnDistance(now, lastDistanceFromFromNode, spacing,
-								freespeedTraveltime, hole);
+						lastDistanceFromFromNode = createHolePositionAndReturnDistance(lastDistanceFromFromNode, spacing, freespeedTraveltime,
+								hole);
 						if ( QSimConfigGroup.SnapshotStyle.withHoles==context.qsimConfig.getSnapshotStyle() ) {
 							addHolePosition( positions, lastDistanceFromFromNode, hole ) ;
 						}
@@ -788,17 +792,17 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			return positions ;
 		}
 
-		private double createHolePositionAndReturnDistance(double now,
-				double lastDistanceFromFromNode, double spacing, double freespeedTraveltime, Hole veh)
+		private double createHolePositionAndReturnDistance(double lastDistanceFromFromNode,
+				double spacing, double freespeedTraveltime, Hole veh)
 		{
+			double now = context.getSimTimer().getTimeOfDay() ;
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
 			double distanceFromFromNode = context.snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(QueueWithBuffer.this.length, spacing,
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
 			return distanceFromFromNode;
 		}
 		
-		private void addHolePosition(final Collection<AgentSnapshotInfo> positions,
-				double distanceFromFromNode, Hole veh)
+		private void addHolePosition(final Collection<AgentSnapshotInfo> positions, double distanceFromFromNode, Hole veh)
 		{
 			Integer lane = 10 ;
 			double speedValue = 1. ;
@@ -823,7 +827,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private int maxSeepModeAllowed = 4;
 	private int noOfSeepModeBringFwd = 0;
 	
-	private QVehicle peekFromVehQueue(double now){
+	private QVehicle peekFromVehQueue(){
+		double now = context.getSimTimer().getTimeOfDay() ;
+		
 		QVehicle returnVeh = vehQueue.peek();
 
 		if( context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ ) {

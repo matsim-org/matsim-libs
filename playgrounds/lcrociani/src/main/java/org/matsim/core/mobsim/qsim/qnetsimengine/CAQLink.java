@@ -26,7 +26,7 @@ public class CAQLink {
 	}
 
 	public void addFromUpstream(QVehicle veh) {
-		this.ql.getAcceptingQLane().addFromUpstream(veh, now);
+		this.ql.getAcceptingQLane().addFromUpstream(veh);
 	}
 	
 	public TransitionArea getTransitionArea(){

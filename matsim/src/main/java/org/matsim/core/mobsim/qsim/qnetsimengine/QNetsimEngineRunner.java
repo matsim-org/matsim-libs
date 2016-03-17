@@ -184,7 +184,7 @@ class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnab
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
 
-			remainsActive = link.doSimStep(time);
+			remainsActive = link.doSimStep();
 
 			if (!remainsActive) simLinks.remove();
 		}

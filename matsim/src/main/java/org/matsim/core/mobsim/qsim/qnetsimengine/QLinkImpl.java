@@ -63,22 +63,20 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	private final static Logger log = Logger.getLogger(QLinkImpl.class);
 	
 	static class Builder {
-		private QNetwork network;
+		private QNetsimEngine netsimEngine ;
 		private VehicleQ<QVehicle> vehicleQueue = new FIFOVehicleQ() ;
 		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
-		private final QueueWithBufferContext context;
-		Builder(QueueWithBufferContext context) {
+		private final NetsimEngineContext context;
+		Builder(NetsimEngineContext context, QNetsimEngine netsimEngine) {
 			this.context = context ;
+			this.netsimEngine = netsimEngine;
 		} 
 		QLinkImpl build( Link link, QNode toNode ) {
 			QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( context ) ;
 			builder.setVehicleQueue(vehicleQueue);
 			builder.setLinkSpeedCalculator(linkSpeedCalculator);
 			
-			return new QLinkImpl( link, network, toNode, builder ) ;
-		}
-		final void setNetwork(QNetwork network) {
-			this.network = network;
+			return new QLinkImpl( link, toNode, builder, context, netsimEngine ) ;
 		}
 		final void setVehicleQueue(VehicleQ<QVehicle> vehicleQueue) {
 			this.vehicleQueue = vehicleQueue;
@@ -103,59 +101,17 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	private final QLaneI qlane;
 
-	private QNetwork qnetwork;
-	// memorizing the back pointer separately here because I don't want to make it package-available. kai, mar'16
-
-//	/**
-//	 * Initializes a QueueLink with one QueueLane.
-//	 */
-//	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode) {
-//		this(link2, network, toNode, new DefaultLinkSpeedCalculator(), network.simEngine.getAgentSnapshotInfoBuilder() );
-//	}
-//
-//	/** 
-//	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
-//	 * @param linkSpeedCalculator TODO
-//	 * @param agentSnapshotInfoBuilder TODO
-//	 * 
-//	 */
-//	QLinkImpl(final Link link2, QNetwork network, final QNode toNode, LinkSpeedCalculator linkSpeedCalculator, 
-//			AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder) {
-//		// yy get rid of this c'tor (since the one with queueWithBuffer is more flexible)?
-//		super(link2, toNode, network) ;
-//		this.qnetwork = network ;
-//		//--
-//		QSimConfigGroup qsimConfig = network.simEngine.getMobsim().getScenario().getConfig().qsim() ;
-//		EventsManager events = network.simEngine.getMobsim().getEventsManager() ;
-//		double effectiveCellSize = ((NetworkImpl) network.getNetwork()).getEffectiveCellSize() ;
-//		AgentCounter agentCounter = network.simEngine.getMobsim().getAgentCounter() ;
-//		Gbl.assertNotNull(agentSnapshotInfoBuilder);
-//		//--
-//		final QueueWithBufferContext context = new QueueWithBufferContext( events, effectiveCellSize,
-//				agentCounter, agentSnapshotInfoBuilder, qsimConfig );
-//		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( context ) ;
-//		builder.setLinkSpeedCalculator(linkSpeedCalculator);
-//		this.qlane = builder.createLane(this) ;
-//		//--
-//		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
-//		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
-//	}
-//	
-//	public QLinkImpl( final Link link2, QNetwork network, final QNode toNode, final QLaneI queueWithBuffer ) {
-//		super(link2, toNode, network) ;
-//		this.qnetwork = network ;
-//		this.qlane = queueWithBuffer ;
-//		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
-//		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
-//	}
+	private NetsimEngineContext context;
 	
 	/** 
 	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
+	 * @param context TODO
+	 * @param netsimEngine TODO
 	 * 
 	 */
-	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final LaneFactory roadFactory) {
-		super(link2, toNode, network) ;
-		this.qnetwork = network ;
+	public QLinkImpl(final Link link2, final QNode toNode, final LaneFactory roadFactory, NetsimEngineContext context, QNetsimEngine netsimEngine) {
+		super(link2, toNode, context, netsimEngine) ;
+		this.context = context ;
 		// The next line must must by contract stay within the constructor,
 		// so that the caller can use references to the created roads to wire them together,
 		// if it must.
@@ -168,22 +124,21 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override
 	void clearVehicles() {
-		double now = qnetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
-		
 		super.clearVehicles();
-		qlane.clearVehicles(now);
+		qlane.clearVehicles();
 	}
 
 	@Override
-	boolean doSimStep(double now) {
+	boolean doSimStep() {
+		double now = context.getSimTimer().getTimeOfDay() ;
 		if ( this.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
-			this.moveWaitToRoad(now);
+			this.moveWaitToRoad();
 			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);
-			qlane.doSimStep(now);
+			qlane.doSimStep();
 		} else {
 			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);
-			qlane.doSimStep(now);
-			this.moveWaitToRoad(now);
+			qlane.doSimStep();
+			this.moveWaitToRoad();
 		}
 		this.setActive(this.checkForActivity());
 		return isActive();
@@ -197,18 +152,16 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	/**
 	 * Move as many waiting cars to the link as it is possible
-	 *
-	 * @param now
-	 *          the current time
 	 */
-	private void moveWaitToRoad(final double now) {
-		while (qlane.isAcceptingFromWait(now) ) {
+	private void moveWaitToRoad() {
+		double now = context.getSimTimer().getTimeOfDay() ;
+		while (qlane.isAcceptingFromWait() ) {
 			QVehicle veh = this.getWaitingList().poll();
 			if (veh == null) {
 				return;
 			}
 
-			qnetwork.simEngine.getMobsim().getEventsManager().processEvent(
+			context.getEventsManager().processEvent(
 					new VehicleEntersTrafficEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId(), veh.getDriver().getMode(), 1.0));
 
 			if ( this.getTransitQLink().addTransitToStopQueue(now, veh, this.getLink().getId()) ) {
@@ -222,7 +175,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 				continue;
 			}
 
-			qlane.addFromWait(veh, now);
+			qlane.addFromWait(veh);
 		}
 	}
 
@@ -232,7 +185,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	}
 
 	@Override
-	public void recalcTimeVariantAttributes(double now) {
+	public void recalcTimeVariantAttributes() {
+		double now = context.getSimTimer().getTimeOfDay() ;
 		qlane.changeUnscaledFlowCapacityPerSecond( ((LinkImpl) this.getLink()).getFlowCapacityPerSec(now) );
 		qlane.changeEffectiveNumberOfLanes(this.getLink().getNumberOfLanes(now));
 		qlane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
@@ -320,20 +274,19 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		private VisLinkWLanes visLink = null;
 
 		private VisDataImpl() {
-			double nodeOffset = qnetwork.simEngine.getMobsim().getScenario().getConfig().qsim().getNodeOffset(); 
+			double nodeOffset = context.qsimConfig.getNodeOffset(); 
 			if (nodeOffset != 0.0) {
 				nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 				visModelBuilder = new VisLaneModelBuilder();
 				CoordinateTransformation transformation = new IdentityTransformation();
 				visLink = visModelBuilder.createVisLinkLanes(transformation, QLinkImpl.this, nodeOffset, null);
-				SnapshotLinkWidthCalculator linkWidthCalculator = qnetwork.getLinkWidthCalculatorForVis();
-				visModelBuilder.recalculatePositions(visLink, linkWidthCalculator);
+				visModelBuilder.recalculatePositions(visLink, context.linkWidthCalculator);
 			}
 		}
 
 		@Override
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo( Collection<AgentSnapshotInfo> positions) {
-			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = qnetwork.simEngine.getAgentSnapshotInfoBuilder();
+//			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = qnetwork.simEngine.getAgentSnapshotInfoBuilder();
 
 			QLaneI.VisData roadVisData = getAcceptingQLane().getVisData() ;
 			if (visLink != null) {
@@ -341,20 +294,20 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 				// yyyy not so great but an elegant solution needs more thinking about visualizer structure. kai, jun'13
 			}
 
-			double now = qnetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+			double now = context.getSimTimer().getTimeOfDay() ;
 			positions = roadVisData.addAgentSnapshotInfo(positions,now) ;
 
 			int cnt2 = 10 ; // a counter according to which non-moving items can be "spread out" in the visualization
 			// initialize a bit away from the lane
 
 			// treat vehicles from transit stops
-			cnt2 = snapshotInfoBuilder.positionVehiclesFromTransitStop(positions, getLink(), getTransitQLink().getTransitVehicleStopQueue(), cnt2 );
+			cnt2 = context.snapshotInfoBuilder.positionVehiclesFromTransitStop(positions, getLink(), getTransitQLink().getTransitVehicleStopQueue(), cnt2 );
 
 			// treat vehicles from waiting list:
-			cnt2 = snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkImpl.this.getLink(), cnt2,
+			cnt2 = context.snapshotInfoBuilder.positionVehiclesFromWaitingList(positions, QLinkImpl.this.getLink(), cnt2,
 					QLinkImpl.this.getWaitingList());
 
-			cnt2 = snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.getLink(),
+			cnt2 = context.snapshotInfoBuilder.positionAgentsInActivities(positions, QLinkImpl.this.getLink(),
 					QLinkImpl.this.getAdditionalAgentsOnLink(), cnt2);
 
 			return positions;

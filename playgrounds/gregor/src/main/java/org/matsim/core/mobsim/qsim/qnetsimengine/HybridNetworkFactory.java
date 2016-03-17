@@ -37,12 +37,11 @@ public class HybridNetworkFactory extends
 	}
 
 	@Override
-	public QLinkI createNetsimLink(Link link, QNetwork network,
-			QNode queueNode) {
+	public QLinkI createNetsimLink(Link link, QNode queueNode) {
 		
 		for (Entry<String, QNetworkFactory> e : this.facs.entrySet()) {
 			if (link.getAllowedModes().contains(e.getKey())) {
-				return e.getValue().createNetsimLink(link, network, queueNode);
+				return e.getValue().createNetsimLink(link, queueNode);
 			}
 		}
 		//default QLink

@@ -53,7 +53,7 @@ public class CALink extends QLinkI {
 	}
 
 	@Override
-	public void recalcTimeVariantAttributes(double time) {
+	public void recalcTimeVariantAttributes() {
 		throw new RuntimeException("Not yet implemented!");
 
 	}
@@ -173,7 +173,7 @@ public class CALink extends QLinkI {
 	}
 
 	@Override
-	boolean doSimStep(double now) {
+	boolean doSimStep() {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -37,7 +37,7 @@ public class CAQNetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	public QLinkI createNetsimLink(Link link, QNetwork network,	QNode toQueueNode) {
+	public QLinkI createNetsimLink(Link link, QNode toQueueNode) {
 		QLinkI qLink = null;
 		qLink = new QLinkImpl(link, network, toQueueNode);
 

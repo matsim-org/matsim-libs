@@ -40,9 +40,9 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
  */
 abstract class QLaneI implements Identifiable<Lane> {
 	
-	abstract void addFromWait( final QVehicle veh, final double now);
+	abstract void addFromWait( final QVehicle veh);
 
-	abstract boolean isAcceptingFromWait(double now);
+	abstract boolean isAcceptingFromWait();
 
 	abstract boolean isActive();
 
@@ -71,17 +71,17 @@ abstract class QLaneI implements Identifiable<Lane> {
 
 	abstract void changeEffectiveNumberOfLanes( final double val ) ;
 
-	abstract boolean doSimStep(final double now);
+	abstract boolean doSimStep();
 
-	abstract void clearVehicles(double now);
+	abstract void clearVehicles();
 
 	abstract Collection<MobsimVehicle> getAllVehicles();
 
-	abstract void addFromUpstream(final QVehicle veh, double now);
+	abstract void addFromUpstream(final QVehicle veh);
 
 	abstract boolean isNotOfferingVehicle();
 
-	abstract QVehicle popFirstVehicle(double now);
+	abstract QVehicle popFirstVehicle();
 
 	abstract QVehicle getFirstVehicle();
 

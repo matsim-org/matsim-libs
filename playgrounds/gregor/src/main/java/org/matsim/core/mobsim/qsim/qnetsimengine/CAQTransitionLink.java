@@ -52,8 +52,8 @@ public class CAQTransitionLink extends QLinkI{
 	}
 
 	@Override
-	public void recalcTimeVariantAttributes(double time) {
-		this.ql.recalcTimeVariantAttributes(time);
+	public void recalcTimeVariantAttributes() {
+		this.ql.recalcTimeVariantAttributes();
 		
 	}
 
@@ -78,8 +78,8 @@ public class CAQTransitionLink extends QLinkI{
 	}
 
 	@Override
-	boolean doSimStep(double now) {
-		return this.ql.doSimStep(now);
+	boolean doSimStep() {
+		return this.ql.doSimStep();
 	}
 
 	@Override

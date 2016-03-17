@@ -303,7 +303,7 @@ public class QNode implements NetsimNode {
 
 	private static int wrnCnt = 0 ;
 	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final QLaneI fromLane, final double now, Id<Link> currentLinkId) {
-		fromLane.popFirstVehicle(now);
+		fromLane.popFirstVehicle();
 		// -->
 		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
 		// <--
@@ -329,14 +329,14 @@ public class QNode implements NetsimNode {
 	private void moveVehicleFromInlinkToOutlink(final QVehicle veh, Id<Link> currentLinkId, final QLaneI fromLane, Id<Link> nextLinkId, QLaneI nextQueueLane) {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 
-		fromLane.popFirstVehicle(now);
+		fromLane.popFirstVehicle();
 		// -->
 		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
 		// <--
 
 		veh.getDriver().notifyMoveOverNode( nextLinkId );
 
-		nextQueueLane.addFromUpstream(veh, now);
+		nextQueueLane.addFromUpstream(veh);
 		// -->
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId ));
 		// <--

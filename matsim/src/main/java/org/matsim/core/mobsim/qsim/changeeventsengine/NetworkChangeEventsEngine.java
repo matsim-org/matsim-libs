@@ -73,7 +73,7 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 			for (Link link : event.getLinks()) {
 				final NetsimLink netsimLink = this.mobsim.getNetsimNetwork().getNetsimLink(link.getId());
 				if ( netsimLink instanceof TimeVariantLink ) {
-					((TimeVariantLink) netsimLink).recalcTimeVariantAttributes(time);
+					((TimeVariantLink) netsimLink).recalcTimeVariantAttributes();
 				} else {
 					throw new RuntimeException("link not time variant") ;
 				}
