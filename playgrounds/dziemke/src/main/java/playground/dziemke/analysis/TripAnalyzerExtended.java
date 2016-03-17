@@ -171,94 +171,8 @@ public class TripAnalyzerExtended {
 	    
 	    log.info(tripCounterIncomplete + " trips are incomplete.");
 	}
-
-
-	private static void writeResultFiles() {
-	    new File(outputDirectory).mkdir();
-	    AnalysisFileWriter writer = new AnalysisFileWriter();
-	    writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, tripCounter, averageTripDuration);
-	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, tripCounter, averageTripDuration);
-	    writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", tripCounter);
-	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, tripCounter, averageTripDistanceRouted);
-	    writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance_km, tripCounter, averageTripDistanceBeeline);
-	    writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsRouted);
-	    writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
-	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, tripCounter, averageTripDuration);
-	    writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeelineCumulative.txt", binWidthDistance_km, tripCounter, averageTripDistanceBeeline);
-	    writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
-	    writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
-	    
-	    // write a routed distance vs. beeline distance comparison file
-	    writer.writeRoutedBeelineDistanceComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "/beeline.txt", tripCounter);
-	}
-
-
-	private static void calculateAverages() {
-		averageTripDuration = aggregateTripDuration / tripCounter;
-	    averageTripDistanceRouted = aggregateTripDistanceRouted / tripCounter;
-	    averageTripDistanceBeeline = aggregateTripDistanceBeeline / tripCounter;
-	    averageOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted / tripCounterSpeed;
-	    averageOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline / tripCounterSpeed;
-	}
-
-
-	private static void analyzeTrip(Trip trip) {
-		tripCounter++;
-
-		// calculate travel times and store them in a map
-		double tripDuration_min = trip.getDurationByCalculation_s() / 60.;
-		double tripDuration_h = tripDuration_min / 60.;
-		addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, 1.);
-		aggregateTripDuration = aggregateTripDuration + tripDuration_min;	 
-
-		// store departure times in a map
-		double departureTime_h = trip.getDepartureTime_s() / 3600.;
-		addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, 1.);
-
-		// store activities in a map
-		String activityType = trip.getActivityStartActType();
-		addToMapStringKey(activityTypeMap, activityType);
-
-		// calculate (routed) distances and and store them in a map
-		double tripDistance_m = 0.;
-		for (int i = 0; i < trip.getLinks().size(); i++) {
-			Id<Link> linkId = trip.getLinks().get(i);
-			Link link = network.getLinks().get(linkId);
-			double length_m = link.getLength();
-			tripDistance_m = tripDistance_m + length_m;
-		}
-		// TODO here, the distances from activity to link and link to activity are missing!
-		double tripDistanceRouted_km = tripDistance_m / 1000.;
-
-		// store (routed) distances  in a map
-		addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, maxBinDistance_km, 1.);
-		aggregateTripDistanceRouted = aggregateTripDistanceRouted + tripDistanceRouted_km;
-		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted_km);
-
-		// store (beeline) distances in a map
-		double tripDistanceBeeline_km = trip.getDistanceBeelineByCalculation_m(network) / 1000.;
-		addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, 1.);
-		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline_km;
-		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline_km);
-
-		// calculate speeds and and store them in a map
-		if (tripDuration_h > 0.) {
-			//System.out.println("trip distance is " + tripDistance + " and time is " + timeInHours);
-			double averageTripSpeedRouted_km_h = tripDistanceRouted_km / tripDuration_h;
-			addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
-			aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted_km_h;
-
-			double averageTripSpeedBeeline_km_h = tripDistanceBeeline_km / tripDuration_h;
-			addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
-			aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline_km_h;
-
-			tripCounterSpeed++;
-		} else {
-			numberOfTripsWithNoCalculableSpeed++;
-		}
-	}
-
-
+	
+	
 	@SuppressWarnings("all")
 	private static void adaptOutputDirectory() {
 		outputDirectory = outputDirectory + "_" + usedIteration;
@@ -281,7 +195,7 @@ public class TripAnalyzerExtended {
 			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
-		outputDirectory = outputDirectory + "_2"; // in case used for double-check
+		outputDirectory = outputDirectory + "_2"; // // TODO in case used for double-check
 	}
 	
 	
@@ -359,6 +273,92 @@ public class TripAnalyzerExtended {
     	}
 
     	return considerTrip;
+	}
+
+
+	private static void analyzeTrip(Trip trip) {
+		tripCounter++;
+
+		// calculate travel times and store them in a map
+		double tripDuration_min = trip.getDurationByCalculation_s() / 60.;
+		double tripDuration_h = tripDuration_min / 60.;
+		addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, 1.);
+		aggregateTripDuration = aggregateTripDuration + tripDuration_min;	 
+
+		// store departure times in a map
+		double departureTime_h = trip.getDepartureTime_s() / 3600.;
+		addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, 1.);
+
+		// store activities in a map
+		String activityType = trip.getActivityStartActType();
+		addToMapStringKey(activityTypeMap, activityType);
+
+		// calculate (routed) distances and and store them in a map
+		double tripDistance_m = 0.;
+		for (int i = 0; i < trip.getLinks().size(); i++) {
+			Id<Link> linkId = trip.getLinks().get(i);
+			Link link = network.getLinks().get(linkId);
+			double length_m = link.getLength();
+			tripDistance_m = tripDistance_m + length_m;
+		}
+		// TODO here, the distances from activity to link and link to activity are missing!
+		double tripDistanceRouted_km = tripDistance_m / 1000.;
+
+		// store (routed) distances  in a map
+		addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, maxBinDistance_km, 1.);
+		aggregateTripDistanceRouted = aggregateTripDistanceRouted + tripDistanceRouted_km;
+		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted_km);
+
+		// store (beeline) distances in a map
+		double tripDistanceBeeline_km = trip.getDistanceBeelineByCalculation_m(network) / 1000.;
+		addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, 1.);
+		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline_km;
+		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline_km);
+
+		// calculate speeds and and store them in a map
+		if (tripDuration_h > 0.) {
+			//System.out.println("trip distance is " + tripDistance + " and time is " + timeInHours);
+			double averageTripSpeedRouted_km_h = tripDistanceRouted_km / tripDuration_h;
+			addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted_km_h;
+
+			double averageTripSpeedBeeline_km_h = tripDistanceBeeline_km / tripDuration_h;
+			addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline_km_h;
+
+			tripCounterSpeed++;
+		} else {
+			numberOfTripsWithNoCalculableSpeed++;
+		}
+	}
+	
+	
+	private static void calculateAverages() {
+		averageTripDuration = aggregateTripDuration / tripCounter;
+	    averageTripDistanceRouted = aggregateTripDistanceRouted / tripCounter;
+	    averageTripDistanceBeeline = aggregateTripDistanceBeeline / tripCounter;
+	    averageOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted / tripCounterSpeed;
+	    averageOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline / tripCounterSpeed;
+	}
+	
+	
+	private static void writeResultFiles() {
+	    new File(outputDirectory).mkdir();
+	    AnalysisFileWriter writer = new AnalysisFileWriter();
+	    writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, tripCounter, averageTripDuration);
+	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, tripCounter, averageTripDuration);
+	    writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", tripCounter);
+	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, tripCounter, averageTripDistanceRouted);
+	    writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance_km, tripCounter, averageTripDistanceBeeline);
+	    writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsRouted);
+	    writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
+	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, tripCounter, averageTripDuration);
+	    writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeelineCumulative.txt", binWidthDistance_km, tripCounter, averageTripDistanceBeeline);
+	    writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, tripCounterSpeed, averageOfAverageTripSpeedsBeeline);
+	    writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
+	    
+	    // write a routed distance vs. beeline distance comparison file
+	    writer.writeRoutedBeelineDistanceComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "/beeline.txt", tripCounter);
 	}
 
 	
