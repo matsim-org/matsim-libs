@@ -38,7 +38,8 @@ public class ContinuousAgeArentzeTieUtilityModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		log.debug( "Configuring "+getClass().getSimpleName() );
-		bind(DeterministicPart.class);
+		// binding automatic if module has a @Provides method
+		// bind(DeterministicPart.class);
 		bind(ErrorTerm.class).to(GumbelErrorTerm.class);
 		log.debug( "Configuring "+getClass().getSimpleName()+": DONE" );
 	}

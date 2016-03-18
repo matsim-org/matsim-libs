@@ -24,7 +24,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author thibautd
  */
 public class EstimatedSamplingModelConfigGroup extends ReflectiveConfigGroup {
-	private static final String GROUP_NAME = "utility";
+	private static final String GROUP_NAME = "estimatedSamplingUtility";
 
 	private double b_logDist = -0.5271;
 	private double b_sameGender = 2.7568;
