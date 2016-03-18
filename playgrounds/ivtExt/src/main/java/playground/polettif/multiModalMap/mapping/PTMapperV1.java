@@ -36,8 +36,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.multiModalMap.mapping.router.PTLRFastAStarLandmarksSimpleRouting;
-import playground.polettif.multiModalMap.mapping.router.PTLRouter;
+import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmarksSimpleRouting;
+import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
 
 import java.util.*;
 import java.util.stream.Collectors;
