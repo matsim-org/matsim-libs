@@ -190,6 +190,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final LinkSpeedCalculator linkSpeedCalculator;
 	private final NetsimEngineContext context;
 
+	private double lastUpdate;
+
 	private QueueWithBuffer(AbstractQLink qlink,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> laneId, 
 			double length, double effectiveNumberOfLanes, double flowCapacity_s, final NetsimEngineContext context, 
 			LinkSpeedCalculator linkSpeedCalculator) {
@@ -315,8 +317,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	private final void updateRemainingFlowCapacity() {
+	 final void updateRemainingFlowCapacity() {
 		double now = context.getSimTimer().getTimeOfDay() ;
+		if ( this.lastUpdate==now ) {
+			return ;
+		}
+		this.lastUpdate = now ;
 		if(!context.qsimConfig.isUsingFastCapacityUpdate() ){
 			remainingflowCap = flowCapacityPerTimeStep;
 			if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {

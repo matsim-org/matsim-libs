@@ -266,6 +266,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		for (QLaneI lane : this.laneQueues.values()) {
 			// (go through all lanes)
 			
+			((QueueWithBuffer) lane).updateRemainingFlowCapacity();
+			
 			/* part A */
 			if (!this.toNodeLaneQueues.contains(lane)) {
 				// (so it HAS a link-internal next lane)

@@ -78,7 +78,7 @@ public class SignalSystemsIT {
 		config.qsim().setStartTime(1.5*3600);
 		config.qsim().setEndTime(5.5*3600);
 		
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(10);
 		
 		// ---
 		
@@ -92,16 +92,16 @@ public class SignalSystemsIT {
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		c.getConfig().controler().setDumpDataAtEnd(false);
 		
-		c.addOverridingModule( new AbstractModule(){
-			@Override public void install() {
-				this.addEventHandlerBinding().toInstance( new BasicEventHandler(){
-					@Override public void reset(int iteration) { }
-					@Override public void handleEvent(Event event) {
-						Logger.getLogger( SignalSystemsIT.class ).warn( event );
-					}
-				} ) ;
-			}
-		});
+//		c.addOverridingModule( new AbstractModule(){
+//			@Override public void install() {
+//				this.addEventHandlerBinding().toInstance( new BasicEventHandler(){
+//					@Override public void reset(int iteration) { }
+//					@Override public void handleEvent(Event event) {
+//						Logger.getLogger( SignalSystemsIT.class ).warn( event );
+//					}
+//				} ) ;
+//			}
+//		});
 		
 		c.run();
 
