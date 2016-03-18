@@ -342,7 +342,7 @@ public class PTMapperV1 extends PTMapper {
 					}
 
 //					LeastCostPathCalculator.Path path = getShortestPath(startNode, nextStop);
-					LeastCostPathCalculator.Path path = this.router.calcLeastCostPath(startNode, endNode);
+					LeastCostPathCalculator.Path path = this.router.calcLeastCostPath(startNode, endNode, null, null );
 
 					if (path != null) {
 						for (Link link : path.links) {

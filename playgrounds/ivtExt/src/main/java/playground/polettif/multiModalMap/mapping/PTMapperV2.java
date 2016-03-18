@@ -129,7 +129,7 @@ public class PTMapperV2 extends PTMapper {
 						for(Link linkCandidateActual : clostestLinksActual) {
 							for(Link linkCandidateNext : clostestLinksNext) {
 								// route
-								LeastCostPathCalculator.Path pathCandidate = this.router.calcLeastCostPath(linkCandidateActual.getFromNode(), linkCandidateNext.getToNode());
+								LeastCostPathCalculator.Path pathCandidate = this.router.calcLeastCostPath(linkCandidateActual.getFromNode(), linkCandidateNext.getToNode(), null, null);
 
 								if(pathCandidate.links.size() > 0)
 									routingScores.put(pathCandidate.travelCost, pathCandidate);
@@ -168,14 +168,14 @@ public class PTMapperV2 extends PTMapper {
 								// route from previous link to next link
 								LeastCostPathCalculator.Path pathReroute =
 										this.router.calcLeastCostPath(network.getLinks().get(previousStop.getStopFacility().getLinkId()).getFromNode(),
-												network.getLinks().get(nextStop.getStopFacility().getLinkId()).getToNode());
+												network.getLinks().get(nextStop.getStopFacility().getLinkId()).getToNode(), null, null);
 
 								if(pathReroute == null || pathReroute.links.contains(currentStopLinkBestCandidate)) {
 									this.schedule.getFacilities().get(currentStop.getStopFacility().getId()).setLinkId(currentStopLinkBestCandidateId);
 								}
 								else if(pathReroute.links.contains(LinkBase)) {
 									path = this.router.calcLeastCostPath(LinkBase.getFromNode(),
-											network.getLinks().get(nextStop.getStopFacility().getLinkId()).getToNode());
+											network.getLinks().get(nextStop.getStopFacility().getLinkId()).getToNode(), null, null);
 								}
 								else {
 									log.error("Routing between "+ currentStop +" and "+ nextStop +" not successful!");
@@ -377,7 +377,7 @@ public class PTMapperV2 extends PTMapper {
 					}
 
 //					LeastCostPathCalculator.Path path = getShortestPath(startNode, nextStop);
-					LeastCostPathCalculator.Path path = this.router.calcLeastCostPath(startNode, endNode);
+					LeastCostPathCalculator.Path path = this.router.calcLeastCostPath(startNode, endNode, null, null);
 
 					if (path != null) {
 						for (Link link : path.links) {
