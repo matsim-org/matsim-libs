@@ -148,9 +148,12 @@ public class LinkSpeedCalculatorIntegrationTest {
 						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
 						final NetsimEngineContext context = new NetsimEngineContext( events, effectiveCellSize,
 								agentCounter, positionInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
+						
+						QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
+						laneBuilder.setLinkSpeedCalculator(linkSpeedCalculator);
 
 						Builder builder = new QLinkImpl.Builder(context, netsimEngine) ;
-						builder.setLinkSpeedCalculator(linkSpeedCalculator);
+						builder.setLaneFactory(laneBuilder);
 
 						return builder.build(link, queueNode) ;
 					}
@@ -223,9 +226,13 @@ public class LinkSpeedCalculatorIntegrationTest {
 						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
 						final NetsimEngineContext context = new NetsimEngineContext( events, effectiveCellSize,
 								agentCounter, positionInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
-						Builder builder = new QLinkImpl.Builder(context, netsimEngine) ;
 
-						builder.setLinkSpeedCalculator(linkSpeedCalculator);
+						QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
+						laneBuilder.setLinkSpeedCalculator(linkSpeedCalculator);
+
+						Builder builder = new QLinkImpl.Builder(context, netsimEngine) ;
+						builder.setLaneFactory(laneBuilder);
+
 						return builder.build(link, queueNode) ;
 					}
 				} ) ;
@@ -268,7 +275,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 
         QNetsimEngine netsimEngine = new QNetsimEngine(qsim);
 		if (linkSpeedCalculator != null) {
-			netsimEngine.setLinkSpeedCalculator(linkSpeedCalculator);
+			throw new RuntimeException( "does not work like this any more") ;
 		}
 		qsim.addMobsimEngine(netsimEngine);
 		qsim.addDepartureHandler(netsimEngine.getDepartureHandler());

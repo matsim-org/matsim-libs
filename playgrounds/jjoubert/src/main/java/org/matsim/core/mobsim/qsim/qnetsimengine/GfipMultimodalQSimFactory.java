@@ -43,6 +43,7 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
@@ -109,6 +110,32 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
+		LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+		/* Add the custom GFIP link speed calculator, but only when required. */
+		if(queueType == QueueType.FIFO){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using basic FIFO link speed calculator. "); 
+			log.info("------------------------------------------------------------------------------");
+			linkSpeedCalculator = new DefaultLinkSpeedCalculator();
+		} else if(queueType == QueueType.BASIC_PASSING){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using basic passing link speed calculator. "); 
+			log.info("------------------------------------------------------------------------------");
+			linkSpeedCalculator = new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType) ;
+		} else if(queueType == QueueType.GFIP_PASSING){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using custom GFIP-link-density-based link speed calculator with passing. "); 
+			log.info("------------------------------------------------------------------------------");
+			linkSpeedCalculator = new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType) ;
+		} else if(queueType == QueueType.GFIP_FIFO){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using custom GFIP-link-density-based link speed calculator without passing."); 
+			log.info("------------------------------------------------------------------------------");
+			linkSpeedCalculator = new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType) ;
+		}
+		final LinkSpeedCalculator theLinkSpeedCalculator = linkSpeedCalculator ; // to get this final
+
+		
 		/* This is the crucial part for changing the queue type. */ 
 		QNetworkFactory netsimNetworkFactory = new QNetworkFactory() {
 			private NetsimEngineContext context;
@@ -144,9 +171,14 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 				default:
 					throw new RuntimeException("Do not know what VehicleQ to use with queue type " + queueType.toString());
 				}
-//				return new QLinkImpl(link, toQueueNode, linkSpeedCalculator, agentSnapshotInfoBuilder, netsimEngine);
+				// vehicleQueue and speedCalculator are at the level of the lane:
+				QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
+				laneBuilder.setVehicleQueue(vehicleQ);
+				laneBuilder.setLinkSpeedCalculator(theLinkSpeedCalculator);
+
+				// insert the lane into the link:
 				QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
-				linkBuilder.setVehicleQueue(vehicleQ);
+				linkBuilder.setLaneFactory(laneBuilder);
 				return linkBuilder.build(link, toQueueNode) ;
 			}
 			@Override
@@ -156,28 +188,6 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 		};
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, netsimNetworkFactory);
 		
-		/* Add the custom GFIP link speed calculator, but only when required. */
-		if(queueType == QueueType.FIFO){
-			log.info("------------------------------------------------------------------------------");
-			log.info("  Using basic FIFO link speed calculator. "); 
-			log.info("------------------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new DefaultLinkSpeedCalculator());
-		} else if(queueType == QueueType.BASIC_PASSING){
-			log.info("------------------------------------------------------------------------------");
-			log.info("  Using basic passing link speed calculator. "); 
-			log.info("------------------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType));
-		} else if(queueType == QueueType.GFIP_PASSING){
-			log.info("------------------------------------------------------------------------------");
-			log.info("  Using custom GFIP-link-density-based link speed calculator with passing. "); 
-			log.info("------------------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType));
-		} else if(queueType == QueueType.GFIP_FIFO){
-			log.info("------------------------------------------------------------------------------");
-			log.info("  Using custom GFIP-link-density-based link speed calculator without passing."); 
-			log.info("------------------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType));
-		}
 	
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());

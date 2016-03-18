@@ -91,8 +91,6 @@ public class QNetsimEngine implements MobsimEngine {
 
 	private final int numOfThreads;
 
-	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
-
 	private List<QNetsimEngineRunner> engines;
 
 	private Phaser startBarrier;
@@ -405,14 +403,6 @@ public class QNetsimEngine implements MobsimEngine {
 		veh.setDriver(null);
 		driver.endLegAndComputeNextState(now);
 		this.internalInterface.arrangeNextAgentState(driver);
-	}
-
-	public void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
-		this.linkSpeedCalculator = linkSpeedCalculator;
-	}
-
-	public LinkSpeedCalculator getLinkSpeedCalculator() {
-		return this.linkSpeedCalculator;
 	}
 
 	private void initQSimEngineThreads() {

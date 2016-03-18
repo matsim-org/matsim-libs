@@ -84,8 +84,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			this.context = context ;
 			if (context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ || context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ) {
 				this.vehicleQueue = new PassingVehicleQ() ;
-				// yyyyyy note that this is effectively overridden again by QLinkImpl.Builder.  Also points to the fact that maybe all
-				// QNetworkFactory instances should declare all components themselves and directly. kai, mar'16
 			}
 		}
 		@Override public QueueWithBuffer createLane( AbstractQLink qLink ) {
@@ -195,13 +193,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private QueueWithBuffer(AbstractQLink qlink,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> laneId, 
 			double length, double effectiveNumberOfLanes, double flowCapacity_s, final NetsimEngineContext context, 
 			LinkSpeedCalculator linkSpeedCalculator) {
-		// the general idea is to give this object no longer access to "everything".  So we give it each necessary item separately.
-		// Results in a larger memory footprint; if this becomes a problem, could think about a "QSimContext".  kai, mar'16
+		// the general idea is to give this object no longer access to "everything".  Objects get back pointers (here qlink), but they
+		// do not present the back pointer to the outside.  In consequence, this object can go up to qlink, but not any further. kai, mar'16
 		
 		this.qLink = qlink;
-		// this back pointer feels a bit heavy-weight ... but we need the functionality, and since AbstractQLink does not provide
-		// (any more) an accessible back pointer going further (e.g. to qnetwork), I think that this is ok.  kai, mar'16
-		
 		this.id = laneId ;
 		this.context = context ;
 		this.linkSpeedCalculator = linkSpeedCalculator;
@@ -321,7 +316,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	final void updateRemainingFlowCapacity() {
+	private final void updateRemainingFlowCapacity() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		if ( this.lastUpdate==now ) {
 			return ;

@@ -46,6 +46,5 @@ public abstract class QNetworkFactory implements MatsimFactory {
 	abstract QNode createNetsimNode(Node node, QNetwork network);
 
 	abstract QLinkI createNetsimLink(Link link, QNode queueNode);
-	
 
 }

@@ -60,35 +60,18 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	
 	public static class Builder {
 		private QNetsimEngine netsimEngine ;
-		private VehicleQ<QVehicle> vehicleQueue = new FIFOVehicleQ() ;
-		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 		private final NetsimEngineContext context;
 		private LaneFactory laneFactory;
 		Builder(NetsimEngineContext context, QNetsimEngine netsimEngine) {
 			this.context = context ;
 			this.netsimEngine = netsimEngine;
-			if (context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ || context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ) {
-				this.vehicleQueue = new PassingVehicleQ() ;
-			}
 		} 
 		QLinkImpl build( Link link, QNode toNode ) {
 			if ( laneFactory == null ) {
-				QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( context ) ;
-				builder.setVehicleQueue(vehicleQueue);
-				builder.setLinkSpeedCalculator(linkSpeedCalculator);
-				laneFactory = builder ;
+				laneFactory = new QueueWithBuffer.Builder( context ) ;
 			}
 			return new QLinkImpl( link, toNode, laneFactory, context, netsimEngine ) ;
 		}
-		final void setVehicleQueue(VehicleQ<QVehicle> vehicleQueue) {
-			this.vehicleQueue = vehicleQueue;
-		}
-		final void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
-			this.linkSpeedCalculator = linkSpeedCalculator;
-		}
-		/**
-		 * Note that explicitly setting the LaneFactory here means that setVehicleQueue and setLinkSpeedCalculator will be ignored.
-		 */
 		final void setLaneFactory( LaneFactory laneFactory ) {
 			this.laneFactory = laneFactory ;
 		}
@@ -122,8 +105,6 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
 	}
 
-
-
 	@Override
 	void clearVehicles() {
 		super.clearVehicles();
@@ -132,7 +113,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override
 	boolean doSimStep() {
-		((QueueWithBuffer)qlane).updateRemainingFlowCapacity(); 
+//		((QueueWithBuffer)qlane).updateRemainingFlowCapacity(); 
 		
 		double now = context.getSimTimer().getTimeOfDay() ;
 		if ( context.qsimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
@@ -158,17 +139,13 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 * Move as many waiting cars to the link as it is possible
 	 */
 	private void moveWaitToRoad() {
-		double now = context.getSimTimer().getTimeOfDay() ;
-		if ( now==0. ) log.warn( "here10" );
 		while (qlane.isAcceptingFromWait() ) {
-			if ( now==0. ) log.warn( "here20" );
 			QVehicle veh = this.getWaitingList().poll();
 			if (veh == null) {
 				return;
 			}
 			
-			log.warn(" at time=" + now + " moving vehicle with ID=" + veh.getId() + " to road" ) ;
-
+			double now = context.getSimTimer().getTimeOfDay() ;
 			context.getEventsManager().processEvent(
 					new VehicleEntersTrafficEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId(), veh.getDriver().getMode(), 1.0));
 
@@ -187,21 +164,18 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		}
 	}
 
-	@Override
-	boolean isNotOfferingVehicle() {
+	@Override boolean isNotOfferingVehicle() {
 		return qlane.isNotOfferingVehicle();
 	}
 
-	@Override
-	public void recalcTimeVariantAttributes() {
+	@Override public void recalcTimeVariantAttributes() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		qlane.changeUnscaledFlowCapacityPerSecond( ((LinkImpl) this.getLink()).getFlowCapacityPerSec(now) );
 		qlane.changeEffectiveNumberOfLanes(this.getLink().getNumberOfLanes(now));
 		qlane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
 	}
 
-	@Override
-	QVehicle getVehicle(Id<Vehicle> vehicleId) {
+	@Override QVehicle getVehicle(Id<Vehicle> vehicleId) {
 		QVehicle ret = super.getVehicle(vehicleId);
 		if (ret != null) {
 			return ret;
@@ -213,8 +187,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		return this.qlane.getVehicle( vehicleId ) ;
 	}
 
-	@Override
-	public Collection<MobsimVehicle> getAllNonParkedVehicles(){
+	@Override public Collection<MobsimVehicle> getAllNonParkedVehicles(){
 		Collection<MobsimVehicle> vehicles = new ArrayList<>();
 		vehicles.addAll(this.getTransitQLink().getTransitVehicleStopQueue());
 		vehicles.addAll(this.getWaitingList());
@@ -241,8 +214,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		return this.qlane.getSimulatedFlowCapacityPerTimeStep() ;
 	}
 
-	@Override
-	public VisData getVisData() {
+	@Override public VisData getVisData() {
 		return this.visdata;
 	}
 
@@ -256,18 +228,15 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		return qlane.isActive()  || !this.getWaitingList().isEmpty() || !this.getTransitQLink().getTransitVehicleStopQueue().isEmpty() ;
 	}
 
-	@Override
-	public void setSignalStateAllTurningMoves(SignalGroupState state) {
+	@Override public void setSignalStateAllTurningMoves(SignalGroupState state) {
 		((SignalizeableItem) qlane).setSignalStateAllTurningMoves(state);
 	}
 
-	@Override
-	public void setSignalStateForTurningMove(SignalGroupState state, Id<Link> toLinkId) {
+	@Override public void setSignalStateForTurningMove(SignalGroupState state, Id<Link> toLinkId) {
 		((SignalizeableItem) qlane).setSignalStateForTurningMove(state, toLinkId);
 	}
 
-	@Override
-	public void setSignalized(boolean isSignalized) {
+	@Override public void setSignalized(boolean isSignalized) {
 		((SignalizeableItem) qlane).setSignalized(isSignalized);
 	}
 

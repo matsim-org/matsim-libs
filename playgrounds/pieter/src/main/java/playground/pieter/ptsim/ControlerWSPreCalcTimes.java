@@ -20,10 +20,14 @@
 
 package playground.pieter.ptsim;
 
-import com.google.inject.Provider;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
@@ -51,6 +55,7 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -60,15 +65,13 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
+import com.google.inject.Provider;
+
 import playground.pieter.singapore.utils.events.RidershipTracking;
 import playground.sergioo.eventAnalysisTools2013.excessWaitingTime.ExcessWaitingTimeCalculator;
 import playground.sergioo.ptsim2013.TransitSheduleToNetwork;
 import playground.singapore.ptsim.pt.BoardAlightVehicleTransitStopHandlerFactory;
 import playground.singapore.ptsim.qnetsimengine.PTLinkSpeedCalculatorWithPreCalcTimes;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.NoSuchElementException;
 
 
 /**
@@ -161,8 +164,10 @@ public class ControlerWSPreCalcTimes {
                         qSim.addMobsimEngine(activityEngine);
                         qSim.addActivityHandler(activityEngine);
                         //
-                        QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
-                        netsimEngine.setLinkSpeedCalculator(linkSpeedCalculatorWithPreCalcTimes);
+                        ConfigurableQNetworkFactory netsimEngineFactory = new ConfigurableQNetworkFactory(controler.getEvents(), controler.getScenario() ) ;
+                        netsimEngineFactory.setLinkSpeedCalculator(linkSpeedCalculatorWithPreCalcTimes);
+				//
+                        QNetsimEngine netsimEngine = new QNetsimEngine(qSim, netsimEngineFactory );
                         qSim.addMobsimEngine(netsimEngine);
                         qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
                         //
