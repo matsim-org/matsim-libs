@@ -52,8 +52,10 @@ import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
@@ -157,7 +159,11 @@ public class QNetsimEngine implements MobsimEngine {
 			EventsManager events = sim.getEventsManager() ;
 			QSimConfigGroup qsimConfig = sim.getScenario().getConfig().qsim() ;
 			Network net = scenario.getNetwork() ;
-			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory( qsimConfig, events, net, scenario ) );
+			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( qsimConfig, events, net, scenario );
+			MobsimTimer mobsimTimer = this.getMobsim().getSimTimer() ;
+			AgentCounter agentCounter = this.getMobsim().getAgentCounter() ;
+			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, this );
+			network = new QNetwork(sim.getScenario().getNetwork(), netsimNetworkFactory2 );
 		}
 		network.initialize(this);
 
