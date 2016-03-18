@@ -25,28 +25,28 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class SelectedPlansAnalyzer {
 	// Parameters
-	static String runId = "run_190";
-	static int numberOfIterations = 300;
+	private static final  String runId = "run_199";
+	private static final  int numberOfIterations = 300;
 	//static int plansFileInterval = 50;
-	static int plansFileInterval = 300;
-	static boolean useInterimPlans = true;
-	static boolean useOutputPlans = false;
+	private static final  int plansFileInterval = 300;
+	private static final  boolean useInterimPlans = true;
+	private static final  boolean useOutputPlans = false;
 	
-	// Output file
-	static String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis/";
-	//static String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis/";
+	// Input/output
+	private static final  String directoryRoot = "../../../runs-svn/cemdapMatsimCadyts/" + runId;
 
-	static Map<Integer, Integer> stayHomePlansMap = new HashMap<Integer, Integer>();
-	static Map<Integer, Integer> otherPlansMap = new HashMap<Integer, Integer>();
-	static Map<Integer, Integer> carPlansMap = new HashMap<Integer, Integer>();
-	static Map<Integer, Integer> ptPlansMap = new HashMap<Integer, Integer>();
-	static Map<Integer, Integer> walkPlansMap = new HashMap<Integer, Integer>();
-		
+	private static final  Map<Integer, Integer> stayHomePlansMap = new HashMap<Integer, Integer>();
+	private static final  Map<Integer, Integer> otherPlansMap = new HashMap<Integer, Integer>();
+	private static final  Map<Integer, Integer> carPlansMap = new HashMap<Integer, Integer>();
+	private static final  Map<Integer, Integer> ptPlansMap = new HashMap<Integer, Integer>();
+	private static final  Map<Integer, Integer> walkPlansMap = new HashMap<Integer, Integer>();
+	
+	
 	public static void main(String[] args) {
 		if (useInterimPlans == true) {
 			for (int i = 1; i<= numberOfIterations/plansFileInterval; i++) {
 				//String plansFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + i * plansFileInterval
-				String plansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + i * plansFileInterval
+				String plansFile = directoryRoot + "/ITERS/it." + i * plansFileInterval
 						+ "/" + runId + "." + i * plansFileInterval + ".plans.xml.gz";
 				
 				Config config = ConfigUtils.createConfig();
@@ -134,11 +134,11 @@ public class SelectedPlansAnalyzer {
 
 	
 	static void writeFile() {
-		new File(outputDirectory).mkdir();
+		new File(directoryRoot + "/analysis").mkdir();
 		BufferedWriter bufferedWriter = null;
 			
 		try {
-			File output = new File(outputDirectory + "selectedPlans.txt");
+			File output = new File(directoryRoot + "/analysis/selectedPlans.txt");
 			FileWriter fileWriter = new FileWriter(output);
 			bufferedWriter = new BufferedWriter(fileWriter);
 			
@@ -161,6 +161,6 @@ public class SelectedPlansAnalyzer {
 	            ex.printStackTrace();
 	        }
 	    }
-		System.out.println("Analysis file " + outputDirectory + "selectedPlans.txt" + " written.");
+		System.out.println("Analysis file " + directoryRoot + "/analysis/selectedPlans.txt" + " written.");
 	}
 }

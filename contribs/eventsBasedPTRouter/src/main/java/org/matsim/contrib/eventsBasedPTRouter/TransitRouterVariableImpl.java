@@ -21,6 +21,7 @@
 package org.matsim.contrib.eventsBasedPTRouter;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -30,6 +31,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
@@ -46,6 +48,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 	private final TransitRouterNetworkWW transitNetwork;
 
 	private final MultiNodeDijkstra dijkstra;
+	private final MultiDestinationDijkstra mDijkstra;
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkTravelTimeAndDisutility ttCalculator;
 
@@ -54,6 +57,9 @@ public class TransitRouterVariableImpl implements TransitRouter {
 		this.transitNetwork = routerNetwork;
 		this.ttCalculator = ttCalculator;
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.ttCalculator, this.ttCalculator);
+		PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
+		preProcessDijkstra.run(routerNetwork);
+		mDijkstra = new MultiDestinationDijkstra(routerNetwork, this.ttCalculator, this.ttCalculator, preProcessDijkstra);
 	}
 	
 	private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime){
@@ -80,6 +86,18 @@ public class TransitRouterVariableImpl implements TransitRouter {
 	
 	private double getWalkDisutility(Person person, Coord coord, Coord toCoord) {
 		return this.ttCalculator.getTravelDisutility(person, coord, toCoord);
+	}
+	
+	public Map<Id<Node>, Path> calcPathRoutes(final Id<Node> fromNodeId, final Set<Id<Node>> toNodeIds, final double startTime, final Person person) {
+		Set<Node> toNodes = new HashSet<>();
+		for(Id<Node> toNode:toNodeIds)
+			if(transitNetwork.getNodes().get(toNode)!=null)
+				toNodes.add(transitNetwork.getNodes().get(toNode));
+		Node node = transitNetwork.getNodes().get(fromNodeId);
+		if(node!=null)
+			return mDijkstra.calcLeastCostPath(node, toNodes, startTime, person);
+		else
+			return new HashMap<>();
 	}
 	
 	@Override
@@ -119,7 +137,18 @@ public class TransitRouterVariableImpl implements TransitRouter {
 		// find possible end stops
 		Map<Node, InitialNode> wrappedToNodes  = this.locateWrappedNearestTransitNodes(person, toCoord, departureTime);
 		// find routes between start and end stops
-		return this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
+		Path path = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
+		if (path == null) {
+			return null;
+		}
+		double directWalkTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / this.config.getBeelineWalkSpeed();
+		double directWalkCost = directWalkTime * ( 0 - this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		double pathCost = path.travelCost + wrappedFromNodes.get(path.nodes.get(0)).initialCost + wrappedToNodes.get(path.nodes.get(path.nodes.size() - 1)).initialCost;
+		if (directWalkCost < pathCost) {
+			return new Path(new ArrayList<Node>(), new ArrayList<Link>(), directWalkTime, directWalkCost);
+		}
+		double pathTime = path.travelTime + wrappedFromNodes.get(path.nodes.get(0)).initialTime + wrappedToNodes.get(path.nodes.get(path.nodes.size() - 1)).initialTime - 2*departureTime;
+		return new Path(path.nodes, path.links, pathTime, pathCost);
 	}
 	
 	protected List<Leg> convertPathToLegList( double departureTime, Path p, Coord fromCoord, Coord toCoord, Person person) {

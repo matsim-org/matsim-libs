@@ -2,7 +2,6 @@ package org.matsim.contrib.carsharing.runExample;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
@@ -15,8 +14,6 @@ import org.matsim.contrib.carsharing.router.TwoWayCarsharingRoutingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.*;
-
-import javax.inject.Provider;
 
 public class CarsharingUtils {
 	public static Config addConfigModules(Config config) {

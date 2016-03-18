@@ -17,10 +17,9 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import playground.dhosse.gap.Global;
-import playground.dhosse.gap.scenario.GAPScenarioBuilder;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 public class NetworkCreator {
 
@@ -88,8 +87,8 @@ public class NetworkCreator {
 		Set<String> modes = new HashSet<>();
 		modes.add(TransportMode.car);
 		double laneCapacity = 1000;
-		double nLanes = 1;
-		double freespeed = 80/3.6;
+		double nLanes = 2;
+		double freespeed = 50/3.6;
 		double freespeedFactor = 0.5;
 		
 		Link tunnelGP01 = netFactory.createLink(Id.createLinkId("tGP01"), network.getNodes().get(Id.createNodeId("389886914")), network.getNodes().get(Id.createNodeId("2835402")));
@@ -147,7 +146,7 @@ public class NetworkCreator {
 	public static void createZone30InAllOfGarmisch(Network network, String outputNetworkFile){
 		
 		double minSpeedToIgnore = 60 / 3.6 * 0.5;
-		double maxSpeed = 30/3.6 * 0.8;
+		double maxSpeed = 30/3.6 * 0.6;
 		
 		//read in built area shapefile
 		Collection<SimpleFeature> builtAreas = new ShapeFileReader().readFileAndInitialize(Global.adminBordersDir + "Gebietsstand_2007/gemeinden_2007_bebaut.shp");

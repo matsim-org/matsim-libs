@@ -34,6 +34,9 @@ public class WalkDistances implements BasicEventHandler {
 
 	private Map<String, LinkedList<String>> mapa;
 	
+	double walkCS = 0.0;
+	int count = 0;
+	int counx = 0;
 	
 	@Override
 	public void reset(int iteration) {
@@ -61,22 +64,26 @@ public class WalkDistances implements BasicEventHandler {
 			Id<Person> personId=ParkingArrivalEvent.getPersonId(event.getAttributes());
 			if (!personId.toString().equals("null")) {
 				Id<PC2Parking> parkingId = ParkingArrivalEvent.getParkingId(event.getAttributes());
-
+				
 				Coord destCoord = ParkingArrivalEvent.getDestCoord(event.getAttributes());
 				
 				double walkDistance = GeneralLib.getDistance(parking.get(parkingId).getCoord(),
 						destCoord);
-				if (this.mapa.containsKey(personId.toString()) && 
-						this.mapa.get(personId.toString()).contains(Double.toString(event.getTime()))){
-						
-					if (!walkDistancesCarsharing.containsKey(getGroup(parkingId))){
-						walkDistancesCarsharing.put(getGroup(parkingId), new LinkedList<Double>());
-					}
+				if (this.mapa.containsKey(personId.toString())) {
 					
-					walkDistancesCarsharing.get(getGroup(parkingId)).add(walkDistance);						
+					if (isFFParking(event.getTime(), personId.toString())) {
 						
-						
+						if (!walkDistancesCarsharing.containsKey(getGroup(parkingId))){
+							walkDistancesCarsharing.put(getGroup(parkingId), new LinkedList<Double>());
+						}
+						this.walkCS += walkDistance;
+						count++;
+						walkDistancesCarsharing.get(getGroup(parkingId)).add(walkDistance);	
+					}
 				}
+						
+						
+				
 				
 				else {
 				
@@ -90,6 +97,19 @@ public class WalkDistances implements BasicEventHandler {
 			}
 		}		
 	}
+	
+	public boolean isFFParking(double t, String personId) {
+		
+		for (String s: this.mapa.get(personId)) {
+			
+			if (t <= Double.parseDouble(s)  && t > Double.parseDouble(s) - 420 )	
+				return true;
+			
+		}
+		
+		return false;
+	}
+	
 	
 	public void outp() {
 		int[] walkGroups = new int[150];
@@ -127,6 +147,9 @@ public class WalkDistances implements BasicEventHandler {
 			
 			System.out.println(i);
 		}
+		
+		System.out.println(count);
+		System.out.println(1.3*this.walkCS/this.count);
 	}
 	
 	public static String getGroup(Id parkingId){

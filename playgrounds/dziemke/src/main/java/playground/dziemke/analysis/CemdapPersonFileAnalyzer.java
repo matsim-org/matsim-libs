@@ -75,7 +75,7 @@ public class CemdapPersonFileAnalyzer {
 	    
 	    
 	    // parse person file
-	 	CemdapPersonFileReader cemdapPersonFileReader = new CemdapPersonFileReader();
+	 	CemdapPersonInputFileReader cemdapPersonFileReader = new CemdapPersonInputFileReader();
 	 	cemdapPersonFileReader.parse(cemdapPersonFile);
 	 	
 	    	    	    

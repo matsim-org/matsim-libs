@@ -12,7 +12,7 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 	
 	private String vehiclelocationsInputFile = null;
 	
-	private String searchDistance = null;
+	private Double searchDistance = null;
 	
 	private String rentalPriceTimeTwoWayCarsharing = null;
 	
@@ -67,13 +67,13 @@ public class TwoWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter( "searchDistanceTwoWayCarsharing" )
-	public String getsearchDistance() {
+	public Double getsearchDistance() {
 		return this.searchDistance;
 	}
 
 	@StringSetter( "searchDistanceTwoWayCarsharing" )
 	public void setsearchDistance(final String searchDistance) {
-		this.searchDistance = searchDistance;
+		this.searchDistance = Double.parseDouble(searchDistance);
 	}
 	
 	@StringGetter( "timeFeeTwoWayCarsharing" )

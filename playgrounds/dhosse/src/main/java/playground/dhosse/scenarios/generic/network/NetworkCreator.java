@@ -8,10 +8,9 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.core.utils.io.OsmNetworkReader;
 
 import playground.dhosse.utils.GeometryUtils;
-import playground.dhosse.utils.osm.reader.CustomizedOsmNetworkReader;
 
 public class NetworkCreator {
 
@@ -54,7 +53,7 @@ public class NetworkCreator {
 	 * @param osmFile input OpenStreetMap file
 	 * @param cleanNetwork Defines whether the resulting MATSim network should be cleaned up or not.
 	 */	
-	public static void generateNetwork(final Scenario scenario, String fromCrs, String toCrs,
+	static void generateNetwork(final Scenario scenario, String fromCrs, String toCrs,
 			String osmFile, boolean cleanNetwork){
 		
 		generateNetwork(scenario, fromCrs, toCrs, osmFile, cleanNetwork, null);
@@ -71,17 +70,17 @@ public class NetworkCreator {
 	 * @param cleanNetwork Defines whether the resulting MATSim network should be cleaned up or not.
 	 * @param outputShapefile
 	 */	
-	public static void generateNetwork(final Scenario scenario, String fromCrs, String toCrs,
+	static void generateNetwork(final Scenario scenario, String fromCrs, String toCrs,
 			String osmFile, boolean cleanNetwork,String outputShapefile){
 		
 		Network network = scenario.getNetwork();
-		scenario.getConfig().transit().setUseTransit(true);
-		TransitSchedule schedule = scenario.getTransitSchedule();
+//		scenario.getConfig().transit().setUseTransit(true);
+//		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		CoordinateTransformation transformation = 
 				TransformationFactory.getCoordinateTransformation(fromCrs, toCrs);
 
-		CustomizedOsmNetworkReader onr = new CustomizedOsmNetworkReader(network, schedule, transformation);
+		OsmNetworkReader onr = new OsmNetworkReader(network, transformation);
 		onr.parse(osmFile);
 		
 		if(cleanNetwork){

@@ -24,12 +24,7 @@
  */
 package floetteroed.opdyts.trajectorysampling;
 
-import static floetteroed.opdyts.trajectorysampling.SurrogateObjectiveFunction.Bound.LOWER;
-import static floetteroed.opdyts.trajectorysampling.SurrogateObjectiveFunction.Bound.UPPER;
-
 import java.util.List;
-
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Matrix;
@@ -41,14 +36,6 @@ import floetteroed.utilities.math.Vector;
  *
  */
 public class SurrogateObjectiveFunction<U extends DecisionVariable> {
-
-	// -------------------- CONSTANTS --------------------
-
-	public static enum Bound {
-		UPPER, LOWER
-	};
-
-	private Bound bound;
 
 	// -------------------- MEMBERS --------------------
 
@@ -62,13 +49,11 @@ public class SurrogateObjectiveFunction<U extends DecisionVariable> {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	SurrogateObjectiveFunction(final List<Transition<U>> transitions,
-			final double equilibriumGapWeight, final double uniformityWeight,
-			final Bound bound) {
+	public SurrogateObjectiveFunction(final List<Transition<U>> transitions,
+			final double equilibriumGapWeight, final double uniformityWeight) {
 		this.transitions = transitions;
 		this.equilibriumGapWeight = equilibriumGapWeight;
 		this.uniformityGapWeight = uniformityWeight;
-		this.bound = bound;
 
 		this.deltaCovariances = new Matrix(transitions.size(),
 				transitions.size());
@@ -83,25 +68,13 @@ public class SurrogateObjectiveFunction<U extends DecisionVariable> {
 	}
 
 	// -------------------- PARAMETERS --------------------
-	
+
 	double getEquilibriumGapWeight() {
 		return this.equilibriumGapWeight;
 	}
 
 	double getUniformityWeight() {
 		return this.uniformityGapWeight;
-	}
-
-	void setBound(Bound bound) {
-		this.bound = bound;
-	}
-	
-	Bound getBound() {
-		return this.bound;
-	}
-	
-	GoalType getGoalTypeFromBound() {
-		return (Bound.UPPER.equals(this.bound) ? GoalType.MINIMIZE : GoalType.MAXIMIZE);
 	}
 
 	// -------------------- VALUES --------------------
@@ -131,9 +104,8 @@ public class SurrogateObjectiveFunction<U extends DecisionVariable> {
 
 	double surrogateObjectiveFunctionValue(final Vector alphas) {
 		return this.interpolatedObjectiveFunctionValue(alphas)
-				+ (UPPER.equals(this.bound) ? 1.0 : -1.0)
-				* (this.equilibriumGapWeight * this.equilibriumGap(alphas) + this.uniformityGapWeight
-						* alphas.innerProd(alphas));
+				+ this.equilibriumGapWeight * this.equilibriumGap(alphas)
+				+ this.uniformityGapWeight * alphas.innerProd(alphas);
 	}
 
 	// -------------------- GRADIENTS --------------------
@@ -154,18 +126,12 @@ public class SurrogateObjectiveFunction<U extends DecisionVariable> {
 			result.set(i, alphas.innerProd(this.deltaCovariances.getRow(i))
 					/ (equilibriumGap + 1e-8));
 		}
-		if (LOWER.equals(this.bound)) {
-			result.mult(-1.0);
-		}
 		return result;
 	}
 
 	Vector dUniformityGap_dAlpha(final Vector alphas) {
 		final Vector result = alphas.copy();
 		result.mult(2.0);
-		if (LOWER.equals(this.bound)) {
-			result.mult(-1.0);
-		}
 		return result;
 	}
 
@@ -176,18 +142,4 @@ public class SurrogateObjectiveFunction<U extends DecisionVariable> {
 		result.add(this.dUniformityGap_dAlpha(alphas), this.uniformityGapWeight);
 		return result;
 	}
-
-	// -------------------- HESSIANS --------------------
-
-	// Matrix d2EquilibriumGapdAlpha2(final Vector alphas) {
-	// final Matrix result = this.deltaCovariances.copy();
-	// final Vector gradient = this.dEquilibriumGap_dAlpha(alphas);
-	// result.addOuterProduct(gradient, gradient, -1.0);
-	// result.mult(1.0 / this.equilibriumGap(alphas));
-	// return result;
-	// }
-	//
-	// Matrix d2UniformityGapdAlpha2(final Vector alphas) {
-	// return Matrix.newDiagonal(alphas.size(), 2.0);
-	// }
 }

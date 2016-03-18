@@ -79,14 +79,15 @@ public class LegStatsPerZone implements AnalyzerTask<Collection<? extends Person
                 pred = new ZonePredicate(personZoneMapping, zone);
             }
 
-            ioContext.append(zone.getAttribute(zones.getPrimaryKey()));
+            String zoneId = zone.getAttribute(zones.getPrimaryKey());
+            FileIOContext localContext = new FileIOContext(String.format("%s/%s", ioContext.getPath(), zoneId));
 
             DiscretizerBuilder builder1 = new StratifiedDiscretizerBuilder(50, 50);
             DiscretizerBuilder builder2 = new PassThroughDiscretizerBuilder(new LinearDiscretizer(10000), "linear10");
             DiscretizerBuilder builder3 = new PassThroughDiscretizerBuilder(new LinearDiscretizer(25000), "linear25");
             DiscretizerBuilder builder4 = new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear50");
 
-            HistogramWriter writer = new HistogramWriter(ioContext, builder1);
+            HistogramWriter writer = new HistogramWriter(localContext, builder1);
             writer.addBuilder(builder2);
             writer.addBuilder(builder3);
             writer.addBuilder(builder4);
@@ -95,7 +96,7 @@ public class LegStatsPerZone implements AnalyzerTask<Collection<? extends Person
                     CommonKeys.LEG_GEO_DISTANCE,
                     true,
                     pred,
-                    zone.getAttribute(zones.getPrimaryKey()),
+                    zoneId,
                     writer);
             tasks.addComponent(analyzer);
         }

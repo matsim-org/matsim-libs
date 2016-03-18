@@ -107,17 +107,12 @@ public class RunCapeTownTripChoiceSetConversion {
 								}
 							})
 					.withChoicesIdentifier(
-							new Provider<ChoicesIdentifier<TripChoiceSituation>>() {
-								@Override
-								public ChoicesIdentifier<TripChoiceSituation> get() {
-									return new TripChoicesIdentifier(
-											group.getActivityType(),
-											sc.getActivityFacilities(),
-											new StageActivityTypesImpl(
-													PtConstants.TRANSIT_ACTIVITY_TYPE),
-											new CapeTownMainModeIdentifier());
-								}
-							})
+							() -> new TripChoicesIdentifier(
+									group.getActivityType(),
+									sc.getActivityFacilities(),
+									new StageActivityTypesImpl(
+											PtConstants.TRANSIT_ACTIVITY_TYPE),
+									new CapeTownMainModeIdentifier()) )
 					.withNumberOfThreads(
 							group.getNumberOfThreads())
 					.create()

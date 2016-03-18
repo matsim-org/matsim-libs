@@ -214,6 +214,7 @@ public class AccessEgressDemoSimple {
 		busType.setCapacity(capacity);
 		busType.setAccessTime(2.0);
 		busType.setEgressTime(1.0);
+		vehicles.addVehicleType(busType);
 		
 		// train like
 		VehicleType trainType = vb.createVehicleType(Id.create("train", VehicleType.class));
@@ -223,6 +224,7 @@ public class AccessEgressDemoSimple {
 		trainType.setCapacity(capacity);
 		trainType.setAccessTime(0.2);
 		trainType.setEgressTime(0.1);
+		vehicles.addVehicleType(trainType);
 		
 		for (int i = 0; i < nOfBuses/2; i++) {
 			vehicles.addVehicle( vb.createVehicle(Id.create(i, Vehicle.class), busType));

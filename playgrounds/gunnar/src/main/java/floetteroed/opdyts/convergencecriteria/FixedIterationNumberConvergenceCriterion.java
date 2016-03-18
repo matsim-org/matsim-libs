@@ -69,36 +69,41 @@ public class FixedIterationNumberConvergenceCriterion implements
 
 	@Override
 	public <U extends DecisionVariable> ConvergenceCriterionResult evaluate(
-			final List<Transition<U>> transitionSequence) {
+			final List<Transition<U>> mostRecentTransitionSequence,
+			final int totalTransitionSequenceLength) {
 
-		if (transitionSequence.size() >= this.averagingIterations) {
+		if (mostRecentTransitionSequence.size() >= this.averagingIterations) {
 
 			// objective function statistics
 			final List<Double> objectiveFunctionValues = this
-					.objectiveFunctionValues(transitionSequence);
+					.objectiveFunctionValues(mostRecentTransitionSequence);
 			final BasicStatistics objectiveFunctionValueStats = new BasicStatistics();
-			for (int i = transitionSequence.size() - this.averagingIterations; i < transitionSequence
+			for (int i = mostRecentTransitionSequence.size()
+					- this.averagingIterations; i < mostRecentTransitionSequence
 					.size(); i++) {
 				objectiveFunctionValueStats.add(objectiveFunctionValues.get(i));
 			}
 
 			// gap statistics
-			final Vector totalDelta = transitionSequence
-					.get(transitionSequence.size() - this.averagingIterations)
-					.getDelta().copy();
-			for (int i = transitionSequence.size() - this.averagingIterations
-					+ 1; i < transitionSequence.size(); i++) {
-				totalDelta.add(transitionSequence.get(i).getDelta());
+			final Vector totalDelta = mostRecentTransitionSequence
+					.get(mostRecentTransitionSequence.size()
+							- this.averagingIterations).getDelta().copy();
+			for (int i = mostRecentTransitionSequence.size()
+					- this.averagingIterations + 1; i < mostRecentTransitionSequence
+					.size(); i++) {
+				totalDelta.add(mostRecentTransitionSequence.get(i).getDelta());
 			}
 
 			// package the results
-			final boolean converged = (transitionSequence.size() >= this.iterationsToConvergence);
+			final boolean converged = (totalTransitionSequenceLength >= this.iterationsToConvergence);
 			return new ConvergenceCriterionResult(converged,
 					objectiveFunctionValueStats.getAvg(),
-					objectiveFunctionValueStats.getStddev(),
+					objectiveFunctionValueStats.getStddev()
+							/ Math.sqrt(this.averagingIterations),
 					totalDelta.euclNorm() / this.averagingIterations,
-					1.0 / this.averagingIterations, transitionSequence.get(0)
-							.getDecisionVariable(), transitionSequence.size());
+					1.0 / this.averagingIterations,
+					mostRecentTransitionSequence.get(0).getDecisionVariable(),
+					mostRecentTransitionSequence.size());
 
 		} else {
 
@@ -106,43 +111,5 @@ public class FixedIterationNumberConvergenceCriterion implements
 					null, null, null);
 
 		}
-
-		// if ((transitionSequence.iterations() < this.iterationsToConvergence))
-		// {
-		//
-		// return null;
-		//
-		// } else {
-		//
-		// // objective function statistics
-		// final List<Double> objectiveFunctionValues = transitionSequence
-		// .getObjectiveFunctionValues();
-		// final BasicStatistics objectiveFunctionValueStats = new
-		// BasicStatistics();
-		// for (int i = transitionSequence.size() - this.averagingIterations; i
-		// < transitionSequence
-		// .size(); i++) {
-		// objectiveFunctionValueStats.add(objectiveFunctionValues.get(i));
-		// }
-		//
-		// // gap statistics
-		// final Vector totalDelta = transitionSequence.getTransitions()
-		// .get(transitionSequence.size() - this.averagingIterations)
-		// .getDelta().copy();
-		// for (int i = transitionSequence.size() - this.averagingIterations
-		// + 1; i < transitionSequence.size(); i++) {
-		// totalDelta.add(transitionSequence.getTransitions().get(i)
-		// .getDelta());
-		// }
-		//
-		// // package the results
-		// return new ConvergenceCriterionResult(
-		// objectiveFunctionValueStats.getAvg(),
-		// objectiveFunctionValueStats.getStddev(),
-		// totalDelta.euclNorm() / this.averagingIterations,
-		// 1.0 / this.averagingIterations,
-		// transitionSequence.getDecisionVariable(),
-		// transitionSequence.size());
-		// }
 	}
 }

@@ -83,11 +83,11 @@ public class StaticAVSim {
     private static SimBase setUpSim(String tripFile, double shareOfOriginalAgentsServedByAV,
                                     double shareOfOriginalFleetReplacedByAV, int randomSeed, boolean redistributionSwitch) {
         MatsimRandom.reset(randomSeed);
-        StaticDemand staticDemand = new StaticDemand(tripFile, Constants.MODES_REPLACED_BY_AV, shareOfOriginalAgentsServedByAV);
+        StaticDemand staticDemand = new StaticDemandAVImpl(tripFile, Constants.MODES_REPLACED_BY_AV, shareOfOriginalAgentsServedByAV);
         List<Trip> demand = staticDemand.getSortedDemand();
         List<AutonomousVehicle> fleet = InitialSupplyCreator.createInitialAVSupply(shareOfOriginalFleetReplacedByAV, staticDemand);
         StaticAVSim.redistributionSwitch = redistributionSwitch;
-        return new SimBase(demand, fleet);
+        return new SimBaseImpl(demand, fleet);
     }
 
     private static void resetSim(SimBase simBase) {
@@ -115,8 +115,8 @@ public class StaticAVSim {
         log.info("Simulation...");
 
         // Initialize Simulation
-        comingRequests.addAll(simBase.demand);
-        availableVehicles.addAll(simBase.fleet);
+        comingRequests.addAll(simBase.getDemand());
+        availableVehicles.addAll(simBase.getFleet());
 
         // Time-Step-Based Simulation
         for (time = 0; time < Constants.TOTAL_SIMULATION_TIME; time += Constants.SIMULATION_INTERVAL) {
@@ -327,13 +327,28 @@ public class StaticAVSim {
         }
     }
 
-    protected static class SimBase {
-        final List<Trip> demand;
-        final List<AutonomousVehicle> fleet;
+	public interface SimBase {
+		List<Trip> getDemand();
+		List<AutonomousVehicle> getFleet();
+	}
 
-        public SimBase(List<Trip> demand, List<AutonomousVehicle> fleet) {
+    protected static class SimBaseImpl implements SimBase{
+        private final List<Trip> demand;
+        private final List<AutonomousVehicle> fleet;
+
+        public SimBaseImpl(List<Trip> demand, List<AutonomousVehicle> fleet) {
             this.demand = demand;
             this.fleet = fleet;
         }
-    }
+
+		@Override
+		public List<Trip> getDemand() {
+			return demand;
+		}
+
+		@Override
+		public List<AutonomousVehicle> getFleet() {
+			return fleet;
+		}
+	}
 }

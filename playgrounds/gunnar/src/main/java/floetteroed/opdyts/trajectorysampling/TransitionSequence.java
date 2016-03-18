@@ -25,6 +25,7 @@
 package floetteroed.opdyts.trajectorysampling;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
@@ -36,7 +37,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  * 
  */
-public class TransitionSequence<U extends DecisionVariable> {
+class TransitionSequence<U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -44,7 +45,7 @@ public class TransitionSequence<U extends DecisionVariable> {
 
 	private SimulatorState lastState = null;
 
-	private int iterations = 0;
+	private int additionCnt = 0;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -87,21 +88,21 @@ public class TransitionSequence<U extends DecisionVariable> {
 		this.transitions.add(new Transition<>(decisionVariable, delta, toState
 				.getReferenceToVectorRepresentation(), objectiveFunctionValue));
 		this.lastState = toState;
-
-		this.iterations++;
+		this.additionCnt++;
 	}
 
-	void shrinkToMaximumLength(final int maximumLength) {
+	List<Transition<U>> shrinkToMaximumLength(final int maximumLength) {
+		final List<Transition<U>> removed = new LinkedList<>();
 		while (this.transitions.size() > maximumLength) {
 			// old transitions are removed from the front
-			this.transitions.removeFirst();
+			removed.add(this.transitions.removeFirst());
 		}
+		return removed;
 	}
 
 	// -------------------- GETTERS --------------------
 
-	// TODO is now public
-	public DecisionVariable getDecisionVariable() {
+	DecisionVariable getDecisionVariable() {
 		return this.transitions.getFirst().getDecisionVariable();
 	}
 
@@ -109,30 +110,20 @@ public class TransitionSequence<U extends DecisionVariable> {
 		return this.lastState;
 	}
 
-	// TODO is now public
-	public LinkedList<Transition<U>> getTransitions() {
+	LinkedList<Transition<U>> getTransitions() {
 		return this.transitions;
 	}
 
-	// TODO NEW
-	// remember: transitions are added at the end (and removed from the front)
 	Transition<U> getLastTransition() {
+		// transitions are added at the end (and removed from the front)
 		return this.transitions.getLast();
 	}
 
-	public int iterations() {
-		return this.iterations;
-	}
-
-	public int size() {
+	int size() {
 		return this.transitions.size();
 	}
 
-//	public List<Double> getObjectiveFunctionValues() {
-//		final List<Double> result = new ArrayList<Double>(this.size());
-//		for (Transition<U> transition : this.transitions) {
-//			result.add(transition.getToStateObjectiveFunctionValue());
-//		}
-//		return result;
-//	}
+	int additionCnt() {
+		return this.additionCnt;
+	}
 }

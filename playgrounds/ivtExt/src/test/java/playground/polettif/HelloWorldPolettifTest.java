@@ -29,21 +29,20 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
- * Created by polettif on 24.02.2016.
- */
 public class HelloWorldPolettifTest {
 	
 	@Test
 	public final void testMain() {
+		/*
 		try {
-			Config config = ConfigUtils.createConfig() ;
+			String inputConfigFile = "C:/Users/polettif/Desktop/input/small/config_02.xml";
+			Config config = ConfigUtils.loadConfig(inputConfigFile) ;
 			config.controler().setLastIteration(1);
 			config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 			Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
-			Controler controler = new Controler( scenario ) ;
+			Controler controler = new Controler(scenario) ;
 
 			controler.run();
 		} catch ( Exception ee ) {
@@ -52,5 +51,6 @@ public class HelloWorldPolettifTest {
 			// if one catches an exception, then one needs to explicitly fail the test:
 			Assert.fail();
 		}
+		*/
 	}
 }

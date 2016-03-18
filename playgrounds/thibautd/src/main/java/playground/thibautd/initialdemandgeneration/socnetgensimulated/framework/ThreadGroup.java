@@ -30,15 +30,10 @@ class ThreadGroup {
 	final List<Thread> threads = new ArrayList< >();
 	final List<Throwable> exceptions = new ArrayList< >();
 	final Thread.UncaughtExceptionHandler exceptionHandler =
-		 new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(
-					final Thread t ,
-					final Throwable e ) {
+			( t, e ) -> {
 				log.error( "exception in thread "+t.getName() , e );
 				exceptions.add( e );
-			}
-		};
+			};
 
 	public void add( final Runnable r ) {
 		final Thread t = new Thread( r );

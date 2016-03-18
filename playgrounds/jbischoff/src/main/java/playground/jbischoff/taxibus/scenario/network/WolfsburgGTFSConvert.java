@@ -1,7 +1,9 @@
 package playground.jbischoff.taxibus.scenario.network;
 
+import com.conveyal.gtfs.GTFSFeed;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.contrib.gtfs.GtfsConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -12,7 +14,8 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.andreas.mzilske.bvg09.MergeNetworks;
-import playground.mzilske.gtfs.GtfsConverter;
+
+import java.time.LocalDate;
 
 public class WolfsburgGTFSConvert {
 
@@ -26,8 +29,8 @@ public class WolfsburgGTFSConvert {
 		// ---
 		final String filepath0 = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/";
 		// ---
-		GtfsConverter converter = new GtfsConverter(filepath0, scenario0, ct );
-		converter.setDate(20151008);
+		GtfsConverter converter = new GtfsConverter(GTFSFeed.fromFile(filepath0), scenario0, ct );
+		converter.setDate(LocalDate.of(2015, 10, 8));
 		converter.convert();
 		// ---
 		new NetworkWriter(scenario0.getNetwork()).write( filepath0 + "/output_network.xml.gz");

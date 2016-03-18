@@ -50,7 +50,6 @@ public class PTDepartureFrequencyModification {
 		final int desiredFrequency = Integer.parseInt(args[1])*60;
 
 		scenario.getConfig().transit().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(scenario.getConfig().transit().getTransitScheduleFile());
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(scenario.getConfig().transit().getVehiclesFile());

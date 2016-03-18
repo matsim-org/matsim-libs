@@ -189,7 +189,8 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
             return Math.abs(simVal - refVal);
         } else {
             if (refVal > 0) {
-                return Math.abs(simVal - refVal) / refVal;
+//                return Math.abs(simVal - refVal) / refVal;
+                return Math.pow((simVal - refVal) / refVal, 2.0);
             } else {
                 if (simVal == 0) return 0;
                 else return simVal/scaleFactor; //TODO: this should be invariant from the sample size of sim values.

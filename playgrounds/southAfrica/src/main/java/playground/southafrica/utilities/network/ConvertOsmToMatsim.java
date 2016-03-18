@@ -107,10 +107,11 @@ public class ConvertOsmToMatsim {
 		LOG.info("Overwriting some highway defaults...");
 		onr.setHighwayDefaults(1, "trunk", 1, 120/3.6, 1, 2000);
 		onr.setHighwayDefaults(1, "primary", 2, 80/3.6, 1, 1500);
-		onr.setHighwayDefaults(1, "secondary", 1, 80/3.6, 1, 1000);
+		onr.setHighwayDefaults(1, "secondary", 2, 80/3.6, 1, 1000);
 		onr.setHighwayDefaults(1, "tertiary", 1, 60/3.6, 1, 1000);
 		onr.setHighwayDefaults(1, "unclassified", 1, 60/3.6, 1, 800);
 		onr.setHighwayDefaults(1, "residential", 1, 45/3.6, 1, 600);
+		onr.setHighwayDefaults(1, "service", 1, 60/3.6, 1, 600);
 		
 		LOG.info("Parsing the OSM file...");
 		onr.parse(inputFile);

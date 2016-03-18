@@ -46,6 +46,10 @@ public class JbUtils {
 	}
 	
 	public static Map<String,Geometry> readShapeFileAndExtractGeometry(String filename){
+		return readShapeFileAndExtractGeometry(filename, "SCHLUESSEL");
+	}
+
+	public static Map<String,Geometry> readShapeFileAndExtractGeometry(String filename, String key){
 		
 		Map<String,Geometry> geometry = new TreeMap<>();	
 		for (SimpleFeature ft : ShapeFileReader.getAllFeatures(filename)) {
@@ -55,7 +59,7 @@ public class JbUtils {
 
 				try {
 					Geometry geo = wktReader.read((ft.getAttribute("the_geom")).toString());
-					String lor = ft.getAttribute("SCHLUESSEL").toString();
+					String lor = ft.getAttribute(key).toString();
 					geometry.put(lor, geo);
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block

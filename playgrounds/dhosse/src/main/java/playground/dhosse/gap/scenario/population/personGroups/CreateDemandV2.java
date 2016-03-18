@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -22,24 +21,21 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.matrices.Matrix;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 import playground.dhosse.gap.GAPMatrices;
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.scenario.GAPScenarioBuilder;
-import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
-import playground.dhosse.gap.scenario.mid.MiDTravelChain;
-import playground.dhosse.gap.scenario.mid.MiDTravelChain.MiDTravelStage;
 import playground.dhosse.gap.scenario.population.PlansCreatorV2;
-import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
 import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
 import playground.dhosse.gap.scenario.population.utils.LegModeCreator;
 import playground.dhosse.gap.scenario.population.utils.PlanCreationUtils;
-import playground.dhosse.utils.EgapHashGenerator;
+import playground.dhosse.scenarios.generic.population.HashGenerator;
+import playground.dhosse.scenarios.generic.population.io.commuters.CommuterDataElement;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDPersonGroupTemplates;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDTravelChain;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDTravelChain.MiDTravelStage;
 
 public class CreateDemandV2 {
 	
@@ -393,7 +389,7 @@ public class CreateDemandV2 {
 			
 			double timeShift = PlansCreatorV2.createRandomTimeShift(1);
 			
-			Person person = factory.createPerson(Id.createPersonId(munId + "_" + EgapHashGenerator.generateAgeGroupHash(a0, aX) + "_" + i));
+			Person person = factory.createPerson(Id.createPersonId(munId + "_" + HashGenerator.generateAgeGroupHash(a0, aX) + "_" + i));
 			Plan plan = factory.createPlan();
 			
 			GAPScenarioBuilder.getDemographicAttributes().putAttribute(person.getId().toString(), Global.SEX, Integer.toString(sex));
@@ -413,7 +409,7 @@ public class CreateDemandV2 {
 				
 			}
 			
-			String pHash = EgapHashGenerator.generatePersonHash(age, sex, carAvail, hasLicense, isEmployed);
+			String pHash = HashGenerator.generatePersonHash(age, sex, carAvail, hasLicense, isEmployed);
 			
 			Map<String, List<MiDTravelChain>> patterns = templates.getTravelPatterns(pHash);
 			
@@ -1028,7 +1024,7 @@ public class CreateDemandV2 {
 			
 			double timeShift = PlansCreatorV2.createRandomTimeShift(1);
 			
-			Person person = factory.createPerson(Id.createPersonId(munId + "_" + workId + "_" + EgapHashGenerator.generateAgeGroupHash(a0, aX) + "_" + i));
+			Person person = factory.createPerson(Id.createPersonId(munId + "_" + workId + "_" + HashGenerator.generateAgeGroupHash(a0, aX) + "_" + i));
 			Plan plan = factory.createPlan();
 			
 			GAPScenarioBuilder.getDemographicAttributes().putAttribute(person.getId().toString(), Global.SEX, Integer.toString(sex));
@@ -1048,7 +1044,7 @@ public class CreateDemandV2 {
 				
 			}
 			
-			String pHash = EgapHashGenerator.generatePersonHash(age, sex, carAvail, hasLicense, isEmployed);
+			String pHash = HashGenerator.generatePersonHash(age, sex, carAvail, hasLicense, isEmployed);
 			
 			Map<String, List<MiDTravelChain>> patterns = templates.getTravelPatterns(pHash);
 			

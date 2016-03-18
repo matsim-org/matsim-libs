@@ -21,23 +21,24 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.arentzemo
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.IndexedPopulation;
+import playground.thibautd.utils.BooleanList;
 
 /**
  * @author thibautd
  */
 public class ArentzePopulation extends IndexedPopulation {
 	private final char[] ageCategory;
-	private final boolean[] isMale;
+	private final BooleanList isMale;
 	private final Coord[] coord;
 
-	protected ArentzePopulation(
+	public ArentzePopulation(
 			final Id[] ids,
 			final char[] ageCategory,
 			final boolean[] isMale,
-			final Coord[] coord) {
+			final Coord[] coord ) {
 		super(ids);
 		this.ageCategory = ageCategory;
-		this.isMale = isMale;
+		this.isMale = new BooleanList( isMale );
 		this.coord = coord;
 	}
 
@@ -46,7 +47,7 @@ public class ArentzePopulation extends IndexedPopulation {
 	}
 
 	public boolean isMale(final int agent) {
-		return isMale[agent];
+		return isMale.get( agent );
 	}
 
 	public Coord getCoord(final int agent) {

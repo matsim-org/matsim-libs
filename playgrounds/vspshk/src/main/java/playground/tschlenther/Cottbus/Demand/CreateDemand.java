@@ -1,7 +1,8 @@
 package playground.tschlenther.Cottbus.Demand;
 
-	import java.util.HashMap;
-import java.util.Iterator;
+	import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -19,11 +20,8 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 //import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.opengis.feature.simple.SimpleFeature;
@@ -38,7 +36,7 @@ import com.vividsolutions.jts.io.WKTReader;
 
 		//------FIELDS TO BE MODIFIED -----------------------------------------------------------------------------------------//		
 		//Modal-Split values representing the relative amount of car users
-		private final double MS_INNER_CITY = 0.5;
+		private final double MS_INNER_CITY = 0.55;
 		private final double MS_OUTSIDE = 1;
 		
 		/*
@@ -49,24 +47,35 @@ import com.vividsolutions.jts.io.WKTReader;
 		 * SCALEFACTOR 0.15 = 10%-Szenario
 		 * SCALEFACTOR 0.015 = 1%-Szenario
 		 */
-		private static double SCALEFACTOR = 1.5;
+		private static double SCALEFACTOR = 1.4;
+
+		/*
+		 * adds some additional activities
+		 */
+		private static final boolean ENRICHPLANS = false;
+
 //------ FIELDS NOT TO BE MODIFIED ------------------------------------------------------------------------------------//
 		private Scenario scenario;
 		private Map<String,Geometry> shapeMap;
-		private Map<String,Geometry> buildingsMap;
+		private Map<String,Geometry> homeLocations;
+		private Map<String,Geometry> workLocations;
 		private Map<String,Coord> kindergartens;
 		private Map<String,Coord> shops;
-		private static final Random rnd = MatsimRandom.getRandom();	
+		private enum LanduseType {HOME, WORK};
+		private static final Random rnd = MatsimRandom.getRandom();
+		private int personcount = 0;
 //----- FILE PATHS ----------------------------------------------------------------------------------------------------//
-		private static final String INPUTFOLDER = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/Cottbus-pt/INPUT_mod/";
+		private static final String INPUTFOLDER = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/Cottbus-pt/INPUT_mod/public/input/";
 
 		private static final String NETWORKFILE = INPUTFOLDER+"network.xml";
-		private static final String KREISE = INPUTFOLDER+"Landkreise/Kreise.shp";
-		private static final String BUILDINGS = INPUTFOLDER+"BuildingsCottbus/BuildingsCottbus.shp";
-		private static final String SHOPS = INPUTFOLDER+"shops.txt";
-		private static final String KINDERGARTEN = INPUTFOLDER+"kindergaerten.txt";
+		private static final String KREISE = INPUTFOLDER+"../../Landkreise/Kreise.shp";
+		private static final String RESIDENTIAL = INPUTFOLDER+ "../../landuse/residential.shp";
+		private static final String COMMERCIAL = INPUTFOLDER+ "../../landuse/residential.shp";
+		private static final String INDUSTRIAL = INPUTFOLDER+ "../../landuse/industrial.shp";
+		private static final String SHOPS = INPUTFOLDER+"../../shops.txt";
+		private static final String KINDERGARTEN = INPUTFOLDER+"../../kindergaerten.txt";
 		
-		private static final String PLANSFILEOUTPUT = INPUTFOLDER+"plans_scale" + SCALEFACTOR + ".xml";
+		private static final String PLANSFILEOUTPUT = INPUTFOLDER+"plans_scale" + SCALEFACTOR + Boolean.toString(ENRICHPLANS)+ ".xml.gz";
 //-------------------------------------------------------------------------------------------------------------------//
 		
 		
@@ -84,11 +93,14 @@ import com.vividsolutions.jts.io.WKTReader;
 			
 			// read all files
 			this.shapeMap = readShapeFile(KREISE, "Nr");
-			this.buildingsMap = readShapeFile(BUILDINGS, "osm_id");
+			this.homeLocations = readShapeFile(RESIDENTIAL, "osm_id");
+			this.workLocations = readShapeFile(INDUSTRIAL, "osm_id");
+			this.workLocations.putAll(readShapeFile(COMMERCIAL, "osm_id"));
 			this.shops = readFacilityLocations(SHOPS);
 			this.kindergartens = readFacilityLocations(KINDERGARTEN);
 			
 			
+			// the network covers only SPN & CB. Agents from LDS,LOS are put in
 			//create Persons for every home zone - work zone - relation 
 			//CB-CB
 			double commuters = 22709*SCALEFACTOR;								//amount of 'commuters' for this h-w-relation
@@ -96,11 +108,13 @@ import com.vividsolutions.jts.io.WKTReader;
 			
 			//CB-LDS
 			commuters = 399*SCALEFACTOR;
-			createPersons("12052000", "12061000", commuters, MS_OUTSIDE);
+//			createPersons("12052000", "12061000", commuters, MS_OUTSIDE);
+			createPersons("12052000", "12071000", commuters, MS_OUTSIDE);
 			
 			//CB-LOS
 			commuters = 139*SCALEFACTOR;
-			createPersons("12052000", "12067000", commuters, MS_OUTSIDE);
+//			createPersons("12052000", "12067000", commuters, MS_OUTSIDE);
+			createPersons("12052000", "12071000", commuters, MS_OUTSIDE);
 			
 			//CB-SPN
 			commuters = 4338*SCALEFACTOR;
@@ -108,19 +122,23 @@ import com.vividsolutions.jts.io.WKTReader;
 					
 			//LDS-CB
 			commuters = 1322*SCALEFACTOR;
-			createPersons("12061000", "12052000", commuters, MS_OUTSIDE);
+//			createPersons("12061000", "12052000", commuters, MS_OUTSIDE);
+			createPersons("12071000", "12052000", commuters, MS_OUTSIDE);
 					
 			//LDS-SPN
 			commuters = 522*SCALEFACTOR;
-			createPersons("12061000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12061000", "12071000", commuters, MS_OUTSIDE);
 			
 			//LOS-CB
 			commuters = 382*SCALEFACTOR;
-			createPersons("12067000", "12052000", commuters, MS_OUTSIDE);
+//			createPersons("12067000", "12052000", commuters, MS_OUTSIDE);
+			createPersons("12071000", "12052000", commuters, MS_OUTSIDE);
 			
 			//LOS-SPN
 			commuters = 449*SCALEFACTOR;
-			createPersons("12067000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12067000", "12071000", commuters, MS_OUTSIDE);
 			
 			//SPN-CB
 			commuters = 11869*SCALEFACTOR;
@@ -128,15 +146,17 @@ import com.vividsolutions.jts.io.WKTReader;
 			
 			//SPN-LDS
 			commuters = 408*SCALEFACTOR;
-			createPersons("12071000", "12061000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12061000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
 			
 			//SPN-LOS
 			commuters = 466*SCALEFACTOR;
-			createPersons("12071000", "12067000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12067000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
 			
 			//SPN-SPN
 			commuters = 22524*SCALEFACTOR;
-			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
+//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
 			
 			System.out.println(this.shapeMap.keySet());
 		
@@ -160,11 +180,11 @@ import com.vividsolutions.jts.io.WKTReader;
 				if (i>carcommuters) mode = "pt";
 				
 				// set coordinates of home and work activities to a randomly picked building
-				Coord homec = this.setBuildingFromZone(home);
-				Coord workc = this.setBuildingFromZone(work);
+				Coord homec = this.setBuildingFromZone(home,LanduseType.HOME);
+				Coord workc = this.setBuildingFromZone(work,LanduseType.WORK);
 				
 				double personalRandom = rnd.nextDouble();
-				createOnePerson(i, homec, workc, mode, homeZone+ "_"+workZone+ "_", personalRandom);
+				createOnePerson(homec, workc, mode, homeZone+ "_"+workZone+ "_", personalRandom);
 			}
 		}
 		
@@ -182,9 +202,9 @@ import com.vividsolutions.jts.io.WKTReader;
 		 * @param toFromPrefix
 		 * @param activityChain
 		 */
-		private void createOnePerson(int i, Coord coord, Coord coordWork, String mode, String toFromPrefix, double activityChain) {
-			Id<Person> personId = Id.createPersonId(toFromPrefix+i);
-			
+		private void createOnePerson(Coord coord, Coord coordWork, String mode, String toFromPrefix, double activityChain) {
+			Id<Person> personId = Id.createPersonId(toFromPrefix+this.personcount);
+			this.personcount++;
 			// create the Person and Plan instances
 			Person person = scenario.getPopulation().getFactory().createPerson(personId); 
 			Plan plan = scenario.getPopulation().getFactory().createPlan(); 
@@ -195,15 +215,17 @@ import com.vividsolutions.jts.io.WKTReader;
 			
 			//60% plan: home-work-home
 			Activity home = scenario.getPopulation().getFactory().createActivityFromCoord("home", coord);
-			double startTime = 7.5*60*60+(2*60*60*rnd.nextDouble()); //ZufallsStartZeit 7.30-9.30Uhr
+			double startTime = 6.5*60*60+(2*60*60*rnd.nextDouble()); //ZufallsStartZeit 7.30-9.30Uhr
 			home.setEndTime(startTime);
 			plan.addActivity(home); 
 
 			Leg hinweg1 = scenario.getPopulation().getFactory().createLeg(mode);
 			plan.addLeg(hinweg1); 
-
+			
 			//10% plan: home-KINDERGARTEN1-work-KINDERGARTEN2-home
 			//kindergarten AM
+			
+			if (ENRICHPLANS){
 			if ((activityChain>0.6)&&(activityChain<=0.7)){
 				
 				Activity kindergarten1 = scenario.getPopulation().getFactory().createActivityFromCoord("kindergarten1", this.findClosestCoordInMap(coord, kindergartens));
@@ -213,7 +235,7 @@ import com.vividsolutions.jts.io.WKTReader;
 				Leg hinweg2 = scenario.getPopulation().getFactory().createLeg(mode);
 				plan.addLeg(hinweg2); 			
 			}		
-			
+			}
 			Activity work = scenario.getPopulation().getFactory().createActivityFromCoord("work", coordWork);
 			double workEndTime = startTime+(7.5*60*60)+(1*60*60*rnd.nextDouble()); // working time 7.5-8.5 hours
 			work.setEndTime(workEndTime);
@@ -223,17 +245,21 @@ import com.vividsolutions.jts.io.WKTReader;
 			plan.addLeg(rueckweg1); 
 			
 			//kindergarten PM
+			if (ENRICHPLANS){
+
 			if ((activityChain>0.6)&&(activityChain<=0.7)){
 				
 				Activity kindergarten2 = scenario.getPopulation().getFactory().createActivityFromCoord("kindergarten2", this.findClosestCoordInMap(coord, kindergartens));
 				kindergarten2.setEndTime(workEndTime+(0.4*60*60)+(0.1*60*60*rnd.nextDouble())); //pickup-time 5-10min
 				plan.addActivity(kindergarten2); 
 
-				Leg rückweg2 = scenario.getPopulation().getFactory().createLeg(mode);
-				plan.addLeg(rückweg2);
+				Leg back2 = scenario.getPopulation().getFactory().createLeg(mode);
+				plan.addLeg(back2);
 			}		
-			
+			}
 			//30% plan: home-work-home-SHOPPEN-home
+			if (ENRICHPLANS){
+
 			if (activityChain >0.7){
 				
 				Activity home2 = scenario.getPopulation().getFactory().createActivityFromCoord("home", coord);
@@ -251,7 +277,7 @@ import com.vividsolutions.jts.io.WKTReader;
 				Leg vomShoppen = scenario.getPopulation().getFactory().createLeg(mode);
 				plan.addLeg(vomShoppen); 		
 			}
-			
+			}
 			Activity home3 = scenario.getPopulation().getFactory().createActivityFromCoord("home", coord);
 			plan.addActivity(home3);
 
@@ -259,20 +285,7 @@ import com.vividsolutions.jts.io.WKTReader;
 			scenario.getPopulation().addPerson(person);
 		}
 		
-		private  Coord drawRandomPointFromGeometry(Geometry g) {
-			   Random rnd = MatsimRandom.getLocalInstance();
-			   Point p;
-			   double x, y;
-			   do {
-			      x = g.getEnvelopeInternal().getMinX() +  rnd.nextDouble() * (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());
-			      y = g.getEnvelopeInternal().getMinY() + rnd.nextDouble() * (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
-			      p = MGC.xy2Point(x, y);
-			   } while (!g.contains(p));
-			   Coord coord = new Coord(p.getX(), p.getY());
-			   return coord;
-		}
-		
-
+	
 		/**
 		 * read in a shape file and convert it into a map of geometries where
 		 * keys are the values of the attribute defined by attrString
@@ -336,46 +349,31 @@ import com.vividsolutions.jts.io.WKTReader;
 			return closest;
 		}
 		
-		/**
-		 * evaluates if a building(its coordinate) is within a geometry
-		 * @param zone
-		 * @param building
-		 * @return
-		 */
-		private boolean isBuildingInZone (Geometry zone, Coord building){;
-			Point p = MGC.xy2Point(building.getX(), building.getY());
-		    return zone.contains(p);
-		}
-		
-				
-		private Coord findClosestBuildingFromCoord(Coord coord){
-			Coord closest = coord;
-			Coord ii = coord;
-			double closestDistance = Double.MAX_VALUE;
-			for(Geometry g  : this.buildingsMap.values()){
-				ii = MGC.point2Coord(g.getCentroid());
-				double distance = CoordUtils.calcEuclideanDistance(ii, coord);
-				if(distance<closestDistance){ 
-					closestDistance = distance;
-					closest = ii;
-				}
-			}
-			return closest;
-		}
+	
 			
 		/**
 		 * returns the coordinate of a randomly picked building in zone
 		 * @param zone
 		 * @return
 		 */
-		private Coord setBuildingFromZone (Geometry zone){
-			Coord coord ;
-			do {
-				Coord random = drawRandomPointFromGeometry(zone);
-				coord = this.findClosestBuildingFromCoord(random);
+		private Coord setBuildingFromZone (Geometry zone, LanduseType type){
+			Point p;
+			
+			Map<String,Geometry> landuseMap = null;
+			if (type.equals(LanduseType.WORK)) {
+				landuseMap = workLocations;
+			} else{
+				landuseMap = homeLocations;
 			}
-			while(!this.isBuildingInZone(zone, coord));
-			return coord;
+			do {
+				
+				List<String> keys      = new ArrayList<String>(landuseMap.keySet());
+				String       randomKey = keys.get( rnd.nextInt(keys.size()) );
+				Geometry     area = landuseMap.get(randomKey);			
+				p = area.getCentroid();
+			}
+			while(!zone.contains(p));
+			return MGC.point2Coord(p);
 		}
 				
 }

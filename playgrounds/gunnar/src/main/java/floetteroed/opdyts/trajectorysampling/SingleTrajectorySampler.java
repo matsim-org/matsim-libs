@@ -51,11 +51,15 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	private final ConvergenceCriterion convergenceCriterion;
 
+	private boolean initialized = false;
+
 	private ConvergenceCriterionResult convergenceResult = null;
 
 	private SimulatorState fromState = null;
 
 	private TransitionSequence<U> transitionSequence = null;
+
+	private int totalTransitionCnt = 0;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -76,7 +80,7 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	@Override
 	public boolean foundSolution() {
-		return this.convergenceResult != null;
+		return ((this.convergenceResult != null) && this.convergenceResult.converged);
 	}
 
 	@Override
@@ -93,11 +97,17 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	@Override
 	public void initialize() {
+		if (this.initialized) {
+			throw new RuntimeException(
+					"Create new instance instead of re-initializing.");
+		}
+		this.initialized = true;
 		this.decisionVariable.implementInSimulation();
 	}
 
 	@Override
 	public void afterIteration(SimulatorState newState) {
+		this.totalTransitionCnt++;
 		if (this.fromState != null) {
 			if (this.transitionSequence == null) {
 				this.transitionSequence = new TransitionSequence<U>(
@@ -108,19 +118,21 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 						this.decisionVariable, newState,
 						this.objectiveFunction.value(newState));
 			}
-			this.convergenceCriterion.evaluate(this.transitionSequence
-					.getTransitions());
+			this.convergenceResult = this.convergenceCriterion.evaluate(
+					this.transitionSequence.getTransitions(),
+					this.transitionSequence.additionCnt());
 		}
 		this.fromState = newState;
 	}
 
 	@Override
 	public int getTotalTransitionCnt() {
-		if (this.transitionSequence != null) {
-			return this.transitionSequence.size();
-		} else {
-			return 0;
-		}
+		return this.totalTransitionCnt;
+		// if (this.transitionSequence != null) {
+		// return this.transitionSequence.size();
+		// } else {
+		// return 0;
+		// }
 	}
 
 	@Override

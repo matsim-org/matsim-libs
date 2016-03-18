@@ -58,6 +58,5 @@ public class RoadpricingObjectiveFunction implements ObjectiveFunction {
 		}
 		result /= roadpricingState.getPersonIdView().size();
 		return result;
-
 	}
 }

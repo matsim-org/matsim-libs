@@ -43,6 +43,8 @@ public interface ConvergenceCriterion {
 	 *            convergence is evaluated for this sequence
 	 */
 	public <U extends DecisionVariable> ConvergenceCriterionResult evaluate(
-			final List<Transition<U>> transitionSequence);
+			final List<Transition<U>> mostRecentTransitionSequence,
+			final int totalTransitionSequenceLength);
 
+	// public double effectiveAveragingIterations();
 }

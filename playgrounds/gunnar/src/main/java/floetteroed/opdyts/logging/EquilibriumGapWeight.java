@@ -12,9 +12,11 @@ import floetteroed.utilities.statisticslogging.Statistic;
 public class EquilibriumGapWeight<U extends DecisionVariable> implements
 		Statistic<SamplingStage<U>> {
 
+	public static final String LABEL = "Equilibrium Gap Weight";
+
 	@Override
 	public String label() {
-		return "Equilibrium Gap Weight";
+		return LABEL;
 	}
 
 	@Override

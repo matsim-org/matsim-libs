@@ -1,0 +1,80 @@
+/****************************************************************************/
+// SUMO, Simulation of Urban MObility; see http://sumo.dlr.de/
+// Copyright (C) 2001-2016 DLR (http://www.dlr.de/) and contributors
+/****************************************************************************/
+//
+//   This file is part of SUMO.
+//   SUMO is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//
+/****************************************************************************/
+
+syntax = "proto3";
+
+package hybridsim;
+
+option java_multiple_files = false;
+option java_package = "org.matsim.contrib.hybridsim.proto";
+option java_outer_classname = "HybridSimProto";
+
+service HybridSimulation {
+    rpc simulatedTimeInerval(LeftClosedRightOpenTimeInterval) returns (Empty) {}
+    rpc transferAgent(Agent) returns (Boolean) {}
+    rpc receiveTrajectories(Empty) returns (Trajectories) {}
+    rpc retrieveAgents(Empty) returns (Agents) {}
+    rpc shutdown(Empty) returns (Empty) {}
+}
+
+
+message LeftClosedRightOpenTimeInterval {
+    double fromTimeIncluding = 1;
+    double toTimeExcluding = 2;
+}
+
+message Empty {}
+
+message Boolean {
+    bool val = 1;
+}
+
+message Agent {
+    string id = 1;
+    Coordinate enterLocation = 2;
+    Coordinate leaveLocation = 3;
+    double x = 4;
+    double y = 5;
+    Leg leg = 6;
+}
+
+message Leg {
+    repeated Link link = 15;
+}
+
+message Link {
+    Coordinate centroid = 1;
+    string id = 2;
+}
+
+message Coordinate {
+    double x = 1;
+    double y = 2;
+}
+
+message Agents {
+    repeated Agent agents = 1;
+}
+
+message Trajectory {
+    string id = 1;
+    double x = 2;
+    double y = 3;
+    double spd = 4;
+    double phi = 5; //TODO: report vx / vy instead of spd and phi
+    string linkId = 6;
+}
+
+message Trajectories {
+    repeated Trajectory trajectories = 1;
+}

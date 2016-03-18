@@ -43,7 +43,7 @@ public class ZoneCollection {
 	private String primaryKey;
 
 	public ZoneCollection() {
-		zones = new HashSet<>();
+		zones = new LinkedHashSet<>();
 	}
 
 	public void setPrimaryKey(String key) {

@@ -54,6 +54,9 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
+import analysis.TtAnalyzedGeneralResultsWriter;
+import analysis.TtGeneralAnalysis;
+import analysis.TtListenerToBindGeneralAnalysis;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
@@ -61,8 +64,6 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
-import analysis.TtGeneralAnalysis;
-import analysis.TtListenerToBindGeneralAnalysis;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
 /**
@@ -106,13 +107,17 @@ public class TtRunCottbusSimulation {
 	private static Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
 
-		config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n.xml.gz");
+		config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n.xml");
+//		config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n_woTagebau.xml");
 		config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes.xml");
-		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/"
-				+ "commuter_population_wgs84_utm33n_car_only.xml.gz");
+//		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/"
+//				+ "commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
+		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_ohneTagebau/"
+		+ "commuter_population_wgs84_utm33n_car_only.xml.gz");
+//		config.plans().setInputFile(INPUT_BASE_DIR + "Cottbus-pt/INPUT_mod/public/input/plans_scale1.4false.xml");
 		
 		// set number of iterations
-		config.controler().setLastIteration(200);
+		config.controler().setLastIteration(100);
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes( true );
@@ -157,7 +162,7 @@ public class TtRunCottbusSimulation {
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultStrategy.TimeAllocationMutator.toString());
-			strat.setWeight(0.1);
+			strat.setWeight(0.0);
 			strat.setDisableAfter(config.controler().getLastIteration() - 100);
 			config.strategy().addStrategySettings(strat);
 			config.timeAllocationMutator().setMutationRange(1800); // 1800 is default
@@ -165,7 +170,7 @@ public class TtRunCottbusSimulation {
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
-			strat.setWeight(0.8);
+			strat.setWeight(0.9);
 			strat.setDisableAfter(config.controler().getLastIteration());
 			config.strategy().addStrategySettings(strat);
 		}
@@ -204,7 +209,7 @@ public class TtRunCottbusSimulation {
 
 		config.planCalcScore().setMarginalUtilityOfMoney(1.0); // default is 1.0
 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		// note: the output directory is defined in
 		// createRunNameAndOutputDir(...) after all adaptations are done
 
@@ -238,7 +243,7 @@ public class TtRunCottbusSimulation {
 	}
 
 	private static Scenario prepareScenario(Config config) {
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);		
 		createRunNameAndOutputDir(scenario);
 	
 		// add missing scenario elements
@@ -345,8 +350,10 @@ public class TtRunCottbusSimulation {
 		controler.addOverridingModule(new AbstractModule() {			
 			@Override
 			public void install() {
+				this.bind(TtGeneralAnalysis.class).asEagerSingleton();
+				this.addEventHandlerBinding().to(TtGeneralAnalysis.class);
+				this.bind(TtAnalyzedGeneralResultsWriter.class);
 				this.addControlerListenerBinding().to(TtListenerToBindGeneralAnalysis.class);
-				this.bind(TtGeneralAnalysis.class);
 			}
 		});
 		

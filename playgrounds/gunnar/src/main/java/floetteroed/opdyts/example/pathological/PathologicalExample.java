@@ -1,15 +1,13 @@
 package floetteroed.opdyts.example.pathological;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Random;
 
 import floetteroed.opdyts.ObjectiveFunction;
-import floetteroed.opdyts.analysis.LogFileAnalyzer;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.utilities.latex.PSTricksDiagramWriter;
+import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import floetteroed.utilities.math.Matrix;
 import floetteroed.utilities.math.Vector;
 
@@ -26,43 +24,47 @@ public class PathologicalExample {
 
 	private final String convFileName;
 
+	private final String outerLogFileName;
+
 	private final int populationSize;
+
+	private final boolean naive;
 
 	public PathologicalExample(final int populationSize,
 			final String logFileName, final String convFileName,
-			final Random rnd) {
+			final String outerLogFileName, final Random rnd, final boolean naive) {
 		final Matrix _A = new Matrix(2, 2);
 		_A.getRow(0).set(0, 0.0);
 		_A.getRow(0).set(1, 0.9);
 		_A.getRow(1).set(0, 0.9);
 		_A.getRow(1).set(1, 0.0);
-		// _A.getRow(0).set(0, 0.9);
-		// _A.getRow(0).set(1, 0.0);
-		// _A.getRow(1).set(0, 0.0);
-		// _A.getRow(1).set(1, 0.9);
 		final Matrix _B = new Matrix(2, 2);
 		_B.getRow(0).set(0, 1.0);
 		_B.getRow(0).set(1, 0.0);
 		_B.getRow(1).set(0, -3.2);
 		_B.getRow(1).set(1, 1.0);
-		this.system = new LinearSystemSimulator(_A, _B, 0.1, rnd); // noise was
-																	// 0.1
+		final double sigmaNoise = 0.0;
+		this.system = new LinearSystemSimulator(_A, _B, sigmaNoise, rnd);
 		this.logFileName = logFileName;
 		this.convFileName = convFileName;
+		this.outerLogFileName = outerLogFileName;
 		this.populationSize = populationSize;
+		this.naive = naive;
 	}
 
 	public void run() {
 
 		final Random rnd = new Random();
 
+		final int maxIts = 100;
+		final int avgIts = 1;
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
-				200, 100);
-		final ObjectiveFunction objFct = new LinearSystemObjectiveFunction();
+				maxIts, avgIts);
+		final ObjectiveFunction objFct = new LinearSystemObjectiveFunction(1.0,
+				0.0);
 
-		final int maxMemorizedTrajectoryLength = Integer.MAX_VALUE;
 		final boolean interpolate = true;
-		final int maxRandomSearchIterations = 5;
+		final int maxRandomSearchIterations = 10;
 		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
 		final boolean includeCurrentBest = false;
 
@@ -77,50 +79,54 @@ public class PathologicalExample {
 						new Vector(2), this.system), convergenceCriterion,
 				maxRandomSearchIterations, maxRandomSearchTransitions,
 				this.populationSize, rnd, interpolate, objFct,
-				maxMemorizedTrajectoryLength, includeCurrentBest);
+				includeCurrentBest);
 		randomSearch.setLogFileName(this.logFileName);
 		randomSearch.setConvergenceTrackingFileName(this.convFileName);
+		randomSearch.setOuterIterationLogFileName(this.outerLogFileName);
 		
-		// randomSearch.run(1.0, 1.0, false);
-		randomSearch.run();
+		randomSearch.setMaintainAllTrajectories(true);
+		randomSearch.setMaxTotalMemory(Integer.MAX_VALUE);
+
+		if (this.naive) {
+			randomSearch.setMaxMemoryPerTrajectory(1);
+			randomSearch.run(0.0, 0.0);
+		} else {
+			randomSearch.setMaxMemoryPerTrajectory(1);
+			// randomSearch.setMaxMemoryPerTrajectory(Integer.MAX_VALUE);
+			final SelfTuner selfTuner = new SelfTuner(0.95);
+			selfTuner.setNoisySystem(false);
+			randomSearch.run(selfTuner);
+		}
 	}
 
 	public static void main(String[] args) throws IOException {
 
-		final Random rnd = new Random(4711);
+		// System.err.println("MAKE SURE THAT DATA IS SECURED");
+		// System.exit(-1);
 
-		for (int populationSize : new int[] { 16 }) {
-
-			final PSTricksDiagramWriter writer = new PSTricksDiagramWriter(8.0,
-					6.0);
-			writer.setEndLine("\n");
-			writer.setLabelX("transitions [$10^3$]");
-			writer.setLabelY("$Q_\\text{surr} - Q_\\text{final}$");
-			writer.setXMin(0.0);
-			writer.setXMax(10.0);
-			writer.setXDelta(1.0);
-			writer.setYMin(-1.0);
-			writer.setYMax(+1.0);
-			writer.setYDelta(0.1);
-			writer.setPlotAttrs("data", "plotstyle=dots");
-
-			final int maxRepl = 1;
-			for (int repl = 1; repl <= maxRepl; repl++) {
-				final String logFileName = "./small-system_pop-size-"
-						+ populationSize + "_repl-" + repl + ".log";
-				final String convFileName = "./small-system_pop-size-"
-						+ populationSize + "_repl-" + repl + ".conv";
+		final boolean naive = true;
+		final String path = "./output/pathological/" + "test/";
+		// + (naive ? "naive/" : "proposed/");
+//		for (int populationSize : new int[] { 2, 4, 8, 16, 32, 64, 128, 256 }) {
+//			for (int seed : new int[] { 1000, 2000, 3000, 4000, 5000, 6000,
+//					7000, 8000, 9000, 10000 }) {
+		for (int populationSize : new int[] { 2 }) {
+			for (int seed : new int[] { 2000 }) {
+				final Random rnd = new Random(seed);
+				final String logFileName = path + "popSize" + populationSize
+						+ "_seed" + seed + ".log";
+				final String convFileName = path + "popSize" + populationSize
+						+ "_seed" + seed + ".conv";
+				final String outerLogFileName = path + "popSize"
+						+ populationSize + "_seed" + seed + ".opt";
 				new PathologicalExample(populationSize, logFileName,
-						convFileName, rnd).run();
-				final LogFileAnalyzer lfa = new LogFileAnalyzer(logFileName);
-				final List<Integer> its = lfa.getTotalTransitions();
-				final List<Double> gaps = lfa.getObjectiveFunctionValueGaps();
-				for (int i = 0; i < its.size(); i++) {
-					writer.add("data", its.get(i) / 1000.0, gaps.get(i));
-				}
+						convFileName, outerLogFileName, rnd, naive).run();
 			}
-
-			writer.printAll(System.out);
 		}
+	}
+
+	public static final String logFileNameFromParams(final String path,
+			final int populationSize, final int seed) {
+		return (path + "popSize" + populationSize + "_seed" + seed + ".log");
 	}
 }

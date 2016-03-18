@@ -42,7 +42,7 @@ public class RunAVEvaluation {
 		String eventsFile = "../../../shared-svn/projects/audi_av/runs/mobiltum/24-11k/nullevents.24-11k.xml.gz";
 		String outputFolder = "../../../shared-svn/projects/audi_av/runs/mobiltum/24-11k/";
 		String shapeFile = "../../../shared-svn/projects/audi_av/shp/Planungsraum.shp";
-		Map<String,Geometry> geo = JbUtils.readShapeFileAndExtractGeometry(shapeFile);
+		Map<String,Geometry> geo = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "SCHLUESSEL");
 		Network network = NetworkUtils.createNetwork() ;
 		new MatsimNetworkReader(network).readFile(networkFile);
 		ZoneBasedTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandler = new ZoneBasedTaxiCustomerWaitHandler(network, geo);

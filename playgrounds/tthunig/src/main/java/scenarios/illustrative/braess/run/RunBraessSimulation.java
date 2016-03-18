@@ -88,6 +88,7 @@ public final class RunBraessSimulation {
 	
 	private static final int NUMBER_OF_PERSONS = 3600; // per hour
 	private static final int SIMULATION_PERIOD = 1; // in hours
+	private static final double SIMULATION_START_TIME = 0.0; // seconds from midnight
 	
 	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.NONE;
 	// initial score for all initial plans
@@ -193,9 +194,9 @@ public final class RunBraessSimulation {
 			
 			config.qsim().setStuckTime(3600 * 10.);
 			
-			config.qsim().setStartTime(3600 * 8);
+			config.qsim().setStartTime(3600 * SIMULATION_START_TIME);
 			// set end time to shorten simulation run time. (set it to 2 hours after the last agent departs)
-			config.qsim().setEndTime(3600 * (8 + SIMULATION_PERIOD + 2));
+			config.qsim().setEndTime(3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2));
 			
 			// adapt monetary distance cost rate (should be negative)
 			config.planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate( -0.0 );
@@ -352,6 +353,7 @@ public final class RunBraessSimulation {
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
 		popCreator.setSimulationPeriod(SIMULATION_PERIOD);
+		popCreator.setSimulationStartTime(SIMULATION_START_TIME);
 		
 		popCreator.createPersons(INIT_ROUTES_TYPE, INIT_PLAN_SCORE);
 	}
@@ -384,6 +386,7 @@ public final class RunBraessSimulation {
 		if (SIMULATION_PERIOD != 1){
 			runName += "_" + SIMULATION_PERIOD + "h";
 		}
+		runName += "_start" + (int)SIMULATION_START_TIME; 
 		
 		switch(INIT_ROUTES_TYPE){
 		case ALL:

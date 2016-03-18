@@ -218,8 +218,6 @@ public class Run {
 			Clip clip = AudioSystem.getClip();
 			clip.open(AudioSystem.getAudioInputStream(new File(
 					"./input/house/mario.wav")));
-//			clip.open(AudioSystem.getAudioInputStream(new File(
-//					"C:\\Nobackup\\Profilen\\git\\matsim\\playgrounds\\gunnar\\input\\house\\mario.wav")));
 			clip.loop(Clip.LOOP_CONTINUOUSLY);
 		} catch (Exception exc) {
 			exc.printStackTrace(System.out);

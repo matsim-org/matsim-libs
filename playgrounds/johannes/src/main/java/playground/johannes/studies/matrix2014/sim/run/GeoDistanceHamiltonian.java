@@ -19,6 +19,7 @@
 package playground.johannes.studies.matrix2014.sim.run;
 
 import gnu.trove.list.array.TDoubleArrayList;
+import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.core.config.Config;
@@ -43,6 +44,8 @@ import java.util.Set;
  */
 public class GeoDistanceHamiltonian {
 
+    private static final Logger logger = Logger.getLogger(GeoDistanceHamiltonian.class);
+
     public static final String MODULE_NAME = "geoDistanceHamiltonian";
 
     public static void build(Simulator engine, Config config) {
@@ -52,6 +55,8 @@ public class GeoDistanceHamiltonian {
          */
         Set<Attributable> refLegs = getCarLegs(engine.getRefPersons(), engine.getLegPredicate());
         Set<Attributable> simLegs = getCarLegs(engine.getSimPersons(), engine.getLegPredicate());
+        logger.info(String.format("Initializing hamiltonian with %s ref legs and %s sim legs.", refLegs.size(),
+                simLegs.size()));
         /*
         Create the geo distance discretizer.
          */

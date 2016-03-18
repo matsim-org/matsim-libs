@@ -43,7 +43,7 @@ import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
 public class CreateHubPassengers {
 	public static void main(String[] args) {
 	String dir = "../../../shared-svn/projects/vw_rufbus/scenario/input/";
-	String inputPlans = dir + "vw060TB.output_plans.xml.gz";
+	String inputPlans = dir + "VW083PC.output_plans.xml.gz";
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	Population newpop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 	new MatsimPopulationReader(scenario).readFile(inputPlans);
@@ -58,8 +58,8 @@ public class CreateHubPassengers {
 			if (pE instanceof Leg){
 				if (((Leg) pE).getMode().equals(TaxibusUtils.TAXIBUS_MODE)){
 					((Leg) pE).setRoute(null);
-					Activity hub = newpop.getFactory().createActivityFromLinkId("tb_hub", Id.createLinkId(57195));
-//					Activity hub = newpop.getFactory().createActivityFromLinkId("tb_hub", Id.createLinkId(15073));
+//					Activity hub = newpop.getFactory().createActivityFromLinkId("tb_hub", Id.createLinkId(57195));
+					Activity hub = newpop.getFactory().createActivityFromLinkId("tb_hub", Id.createLinkId(15073));
 					hub.setMaximumDuration(60);
 					Leg newleg = newpop.getFactory().createLeg(TaxibusUtils.TAXIBUS_MODE);
 					plan.getPlanElements().add(2, hub);
@@ -67,13 +67,16 @@ public class CreateHubPassengers {
 					
 				}
 			}
+		for (int i = plan.getPlanElements().size()-1; i>4;i--){
+			plan.getPlanElements().remove(i);
+		}
 		}
 		
 		
 		
 		
 	}
-	new PopulationWriter(newpop).write(dir+"hubPlansTB060.xml.gz");
+	new PopulationWriter(newpop).write(dir+"hubPlansVW083PC_l295.xml.gz");
 	
 	
 	

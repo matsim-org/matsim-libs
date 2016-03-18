@@ -51,39 +51,39 @@ import com.google.inject.Inject;
  * @author tthunig
  *
  */
-public class TtGeneralAnalysis implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public final class TtGeneralAnalysis implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
-	private int totalNumberOfTrips;
-	private double totalDistance;
-	private double totalTt;
-	private double sumOfSpeedsMessured;
+	private int totalNumberOfTrips = 0;
+	private double totalDistance = 0.0;
+	private double totalTt = 0.0;
+	private double sumOfSpeedsMessured = 0.0;
 	
-	private Map<Id<Vehicle>, List<Double>> ttPerVehiclePerTrip;
-	private Map<Id<Vehicle>, LinkedList<Double>> delayPerVehiclePerTrip;
-	private Map<Id<Vehicle>, LinkedList<Double>> distancePerVehiclePerTrip;
-	private Map<Id<Vehicle>, LinkedList<Double>> avgSpeedPerVehiclePerTrip;
+	private Map<Id<Vehicle>, List<Double>> ttPerVehiclePerTrip = new HashMap<>();
+	private Map<Id<Vehicle>, LinkedList<Double>> delayPerVehiclePerTrip = new HashMap<>();
+	private Map<Id<Vehicle>, LinkedList<Double>> distancePerVehiclePerTrip = new HashMap<>();
+	private Map<Id<Vehicle>, LinkedList<Double>> avgSpeedPerVehiclePerTrip = new HashMap<>();
 	
-	private Map<Id<Vehicle>, Double> veh2lastVehEntersTrafficTime;
-	private Map<Id<Vehicle>, Double> veh2earliestLinkExitTime;
+	private Map<Id<Vehicle>, Double> veh2lastVehEntersTrafficTime = new HashMap<>();
+	private Map<Id<Vehicle>, Double> veh2earliestLinkExitTime = new HashMap<>();
 	
-	private Map<Id<Link>, Double> totalDelayPerLink;
+	private Map<Id<Link>, Double> totalDelayPerLink = new HashMap<>();
 //	private Map<Id<Link>, Map<Double, Double>> delayPerLinkPerHour;
-	private Map<Id<Link>, Integer> numberOfVehPerLink;
+	private Map<Id<Link>, Integer> numberOfVehPerLink = new HashMap<>();
 //	private Map<Id<Link>, Map<Double, Integer>> numberOfVehPerLinkPerHour;
 //	private Map<Id<Link>, Double> avgSpeedPerLink;
 //	private Map<Id<Link>, Map<Double, Double>> avgSpeedPerLinkPerHour;
 	
 	/* in all these maps the key gives the start of the interval */
 	// in 100 m steps
-	private Map<Double, Integer> numberOfTripsPerTripDistanceInterval;
+	private Map<Double, Integer> numberOfTripsPerTripDistanceInterval = new TreeMap<>();
 	// in 100 s steps
-	private Map<Double, Integer> numberOfTripsPerTripDurationInterval;
+	private Map<Double, Integer> numberOfTripsPerTripDurationInterval = new TreeMap<>();
 	// in 1 m/s steps
-	private Map<Double, Integer> numberOfTripsPerTripSpeedInterval;
+	private Map<Double, Integer> numberOfTripsPerTripSpeedInterval = new TreeMap<>();
 	// in 100 s steps
-	private Map<Double, Integer> numberOfDeparturesPerTimeInterval;
+	private Map<Double, Integer> numberOfDeparturesPerTimeInterval = new TreeMap<>();
 	// in 100 s steps
-	private Map<Double, Integer> numberOfArrivalsPerTimeInterval;
+	private Map<Double, Integer> numberOfArrivalsPerTimeInterval = new TreeMap<>();
 	
 	@Inject
 	private Scenario scenario;
@@ -94,19 +94,19 @@ public class TtGeneralAnalysis implements PersonDepartureEventHandler, PersonArr
 		this.totalDistance = 0.0;
 		this.totalTt = 0.0;
 		this.sumOfSpeedsMessured = 0.0;
-		this.ttPerVehiclePerTrip = new HashMap<>();
-		this.delayPerVehiclePerTrip = new HashMap<>();
-		this.distancePerVehiclePerTrip = new HashMap<>();
-		this.avgSpeedPerVehiclePerTrip = new HashMap<>();
-		this.veh2lastVehEntersTrafficTime = new HashMap<>();
-		this.veh2earliestLinkExitTime = new HashMap<>();
-		this.totalDelayPerLink = new HashMap<>();
-		this.numberOfVehPerLink = new HashMap<>();
-		this.numberOfTripsPerTripDistanceInterval = new TreeMap<>();
-		this.numberOfTripsPerTripDurationInterval = new TreeMap<>();
-		this.numberOfTripsPerTripSpeedInterval = new TreeMap<>();
-		this.numberOfDeparturesPerTimeInterval = new TreeMap<>();
-		this.numberOfArrivalsPerTimeInterval = new TreeMap<>();
+		this.ttPerVehiclePerTrip.clear();
+		this.delayPerVehiclePerTrip.clear();
+		this.distancePerVehiclePerTrip.clear();
+		this.avgSpeedPerVehiclePerTrip.clear();
+		this.veh2lastVehEntersTrafficTime.clear();
+		this.veh2earliestLinkExitTime.clear();
+		this.totalDelayPerLink.clear();
+		this.numberOfVehPerLink.clear();
+		this.numberOfTripsPerTripDistanceInterval.clear();
+		this.numberOfTripsPerTripDurationInterval.clear();
+		this.numberOfTripsPerTripSpeedInterval.clear();
+		this.numberOfDeparturesPerTimeInterval.clear();
+		this.numberOfArrivalsPerTimeInterval.clear();
 	}
 
 	@Override
@@ -298,6 +298,10 @@ public class TtGeneralAnalysis implements PersonDepartureEventHandler, PersonArr
 	
 	public Map<Id<Vehicle>, LinkedList<Double>> getDistancePerVehiclePerTrip(){
 		return distancePerVehiclePerTrip;
+	}
+	
+	public Map<Id<Link>, Integer> getNumberOfVehPerLink(){
+		return numberOfVehPerLink;
 	}
 
 }

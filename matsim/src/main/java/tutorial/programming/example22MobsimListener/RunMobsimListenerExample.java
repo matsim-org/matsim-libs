@@ -10,13 +10,13 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 /**
- * This is an minor example for how to bind a MobsimListener in matsim.
+ * This is a minor example for how to bind a MobsimListener in matsim.
  * @author gthunig
  *
  */
 public class RunMobsimListenerExample {
 	
-	public static String outputDirectory = "mobsim-listener";
+	public static String outputDirectory = "output/mobsimListenerExample/";
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();

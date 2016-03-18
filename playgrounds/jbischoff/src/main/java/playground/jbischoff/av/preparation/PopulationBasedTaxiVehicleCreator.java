@@ -61,10 +61,10 @@ public class PopulationBasedTaxiVehicleCreator
 	{
 
 
-	private String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz";
-	private String shapeFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/Planungsraum.shp";
-	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/subscenarios/mobhubs/taxi_vehicles_";
-	private String populationData = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/bevoelkerungInnenring.txt";
+	private String networkFile = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/network_noptvw.xml";
+	private String shapeFile = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/zones_via.shp";
+	private String vehiclesFilePrefix = "../../../shared-svn/projects/vw_rufbus/av_simulation/vehicles/v";
+	private String populationData = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/pop.csv";
 	
 	private Scenario scenario ;
 	Map<String,Geometry> geometry;
@@ -74,7 +74,7 @@ public class PopulationBasedTaxiVehicleCreator
 
 	
 	public static void main(String[] args) {
-		for (int i = 4000; i<8001 ; i=i+500 ){
+		for (int i = 10000; i<30000 ; i=i+1000 ){
 			PopulationBasedTaxiVehicleCreator tvc = new PopulationBasedTaxiVehicleCreator();
 			System.out.println(i);
 			tvc.run(i);
@@ -85,7 +85,7 @@ public class PopulationBasedTaxiVehicleCreator
 				
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-		this.geometry = JbUtils.readShapeFileAndExtractGeometry(shapeFile);	
+		this.geometry = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "ID");	
 		this.wrs = new WeightedRandomSelection<>();
         readPopulationData();
 	}
@@ -93,7 +93,7 @@ public class PopulationBasedTaxiVehicleCreator
 	private void readPopulationData() {
 		
 		TabularFileParserConfig config = new TabularFileParserConfig();
-        config.setDelimiterTags(new String[] {"\t"});
+        config.setDelimiterTags(new String[] {","});
         config.setFileName(populationData);
         config.setCommentTags(new String[] { "#" });
         new TabularFileParser().parse(config, new TabularFileHandler() {
@@ -101,7 +101,7 @@ public class PopulationBasedTaxiVehicleCreator
 			@Override
 			public void startRow(String[] row) {
 
-				wrs.add(row[0], Double.parseDouble(row[2]));
+				wrs.add(row[0], Double.parseDouble(row[3]));
 			}
 		});
         
@@ -113,7 +113,7 @@ public class PopulationBasedTaxiVehicleCreator
 		for (int i = 0 ; i< amount; i++){
 		Point p = TaxiDemandWriter.getRandomPointInFeature(random, geometry.get(wrs.select()));
 		Link link = ((NetworkImpl) scenario.getNetwork()).getNearestLinkExactly(MGC.point2Coord(p));
-        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(25*3600));
+        Vehicle v = new VehicleImpl(Id.create("rt"+i, Vehicle.class), link, 5, Math.round(1), Math.round(27*3600));
         vehicles.add(v);
 
 		}
