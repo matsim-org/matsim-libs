@@ -99,8 +99,6 @@ public class ScenarioBuilder {
 			log.warn("No population will be created.");
 			
 		}
-		//read mid data
-		//read tracking data
 		
 		log.info("########## Scenario created!");
 		

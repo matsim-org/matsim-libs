@@ -89,7 +89,7 @@ public class Geoinformation {
 				while(set.next()){
 					
 					String key = set.getString("id");
-					String g = set.getString("geometry");
+					String g = set.getString("wkt");
 					
 					if(g != null){
 						

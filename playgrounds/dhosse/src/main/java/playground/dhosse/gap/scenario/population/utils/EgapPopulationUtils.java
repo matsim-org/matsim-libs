@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import playground.dhosse.gap.Global;
+import playground.dhosse.scenarios.generic.population.HashGenerator;
 import playground.dhosse.scenarios.generic.population.io.mid.MiDPersonGroupData;
-import playground.dhosse.utils.EgapHashGenerator;
 
 /**
  * Some utilities for creating the population of the eGAP scenario.
@@ -46,12 +46,12 @@ public class EgapPopulationUtils {
 			MiDPersonGroupData male = new MiDPersonGroupData(age, age + 9, 0);
 			male.setLegsPerPersonAndDay(setLegsPerPersonAndDay(age, 0));
 			setPercentages(male);
-			EgapPopulationUtils.personGroupData.put(EgapHashGenerator.generatePersonGroupHash(age, 0), male);
+			EgapPopulationUtils.personGroupData.put(HashGenerator.generatePersonGroupHash(age, 0), male);
 			
 			MiDPersonGroupData female = new MiDPersonGroupData(age, age + 9, 1);
 			female.setLegsPerPersonAndDay(setLegsPerPersonAndDay(age, 1));
 			setPercentages(female);
-			EgapPopulationUtils.personGroupData.put(EgapHashGenerator.generatePersonGroupHash(age, 1), female);
+			EgapPopulationUtils.personGroupData.put(HashGenerator.generatePersonGroupHash(age, 1), female);
 			
 		}
 

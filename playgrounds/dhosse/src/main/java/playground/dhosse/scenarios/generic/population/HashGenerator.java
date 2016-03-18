@@ -39,4 +39,28 @@ public class HashGenerator {
 	
 	}
 	
+	public static String generatePersonGroupHash(int age, int sex){
+		
+		int lowerBound = (int)(age/10) * 10;
+		int upperBound = lowerBound + 9;
+		String ageClass = lowerBound + "_" + upperBound;
+		
+		return ("ageClass=" + ageClass + "_sex=" + sex);
+		
+	}
+	
+	public static String generateAgeGroupHash(int age){
+		
+		int lowerBound = (int)(age/10) * 10;
+		int upperBound = lowerBound + 9;
+		return (lowerBound + "_" + upperBound);
+		
+	}
+	
+	public static String generateAgeGroupHash(int a0, int aX){
+		
+		return (a0 + "_" + aX);
+		
+	}
+	
 }

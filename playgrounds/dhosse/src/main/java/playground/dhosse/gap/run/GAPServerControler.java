@@ -28,7 +28,6 @@ import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
 import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactory;
-import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.router.OneWayCarsharingRoutingModule;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
@@ -56,6 +55,8 @@ import org.matsim.core.router.NetworkRouting;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.dhosse.carsharing.mutable.MutableCarSharingSupplyConfigGroup;
+import playground.dhosse.carsharing.mutable.MutableCarSharingSupplyModule;
 import playground.dhosse.gap.Global;
 
 import com.google.inject.Inject;
@@ -87,19 +88,20 @@ public class GAPServerControler {
 		// create a new config and a new scenario and load it
 		final Config config = ConfigUtils.loadConfig(configfile,
 				new CarsharingConfigGroup(), new OneWayCarsharingConfigGroup(),
-				new TwoWayCarsharingConfigGroup(), new FreeFloatingConfigGroup());
-		
-		config.parallelEventHandling().setNumberOfThreads(4);
-		
-		config.removeModule("JDEQSim");
+				new TwoWayCarsharingConfigGroup(), new FreeFloatingConfigGroup(),
+				new MutableCarSharingSupplyConfigGroup());
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		
 		for(ActivityParams pars : config.planCalcScore().getActivityParams()){
 			pars.setMinimalDuration(Time.UNDEFINED);
 		}
+		
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 
 		mapPersonsToCarLinks(scenario);
 		
@@ -123,10 +125,51 @@ public class GAPServerControler {
 		addModeChoice(controler, 0.1);
 
 		addCarsharing(controler, 0.1);
+		
+//		initMutableCs(controler);
 
 		// start of the simulation
 		controler.run();
 
+	}
+	
+	private static void initMutableCs(final Controler controler){
+		
+		MutableCarSharingSupplyConfigGroup config = (MutableCarSharingSupplyConfigGroup) controler.getConfig().getModule(MutableCarSharingSupplyConfigGroup.GROUP_NAME);
+		config.setIterationToStopCreatingNewStations(80);
+		config.setMergeStations(true);
+		config.setMinDistanceBetweenStations(1000);
+		config.setMutateOW(true);
+		config.setSpeedCutoff(50/3.6);
+
+		MutableCarSharingSupplyModule module = new MutableCarSharingSupplyModule(controler);
+		
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				
+				this.addEventHandlerBinding().toInstance(module.getNv());
+				this.addEventHandlerBinding().toInstance(module.getNp());
+				this.addEventHandlerBinding().toInstance(module.getRegister());
+				
+				if(config.isMutateOW()){
+					this.addEventHandlerBinding().toInstance(module.getOWEventsHandler());
+				}
+				
+				if(config.isMutateTW()){
+					this.addEventHandlerBinding().toInstance(module.getTWEventsHandler());
+				}
+				
+				if(config.isMutateFF()){
+					this.addEventHandlerBinding().toInstance(module.getFFEventsHandler());
+				}
+				
+			}
+			
+		});
+		
+		controler.addControlerListener(module);
 	}
 
 	private static void mapPersonsToCarLinks(final Scenario scenario) {
@@ -323,26 +366,26 @@ public class GAPServerControler {
 		StrategySettings rttcsCar = new StrategySettings();
 		rttcsCar.setStrategyName("RandomTripToCarsharingStrategy");
 		rttcsCar.setSubpopulation(Global.GP_CAR);
-		rttcsCar.setWeight(weightForCsStrategies / 2);
+		rttcsCar.setWeight(weightForCsStrategies);
 		controler.getConfig().strategy().addStrategySettings(rttcsCar);
 		
 		StrategySettings rttcsLicense = new StrategySettings();
 		rttcsLicense.setStrategyName("RandomTripToCarsharingStrategy");
 		rttcsLicense.setSubpopulation(Global.LICENSE_OWNER);
-		rttcsLicense.setWeight(weightForCsStrategies / 2);
+		rttcsLicense.setWeight(weightForCsStrategies);
 		controler.getConfig().strategy().addStrategySettings(rttcsLicense);
 		
-		StrategySettings csmcCar = new StrategySettings();
-		csmcCar.setStrategyName("CarsharingSubtourModeChoiceStrategy");
-		csmcCar.setSubpopulation(Global.GP_CAR);
-		csmcCar.setWeight(weightForCsStrategies / 2);
-		controler.getConfig().strategy().addStrategySettings(csmcCar);
-		
-		StrategySettings csmcLicense = new StrategySettings();
-		csmcLicense.setStrategyName("CarsharingSubtourModeChoiceStrategy");
-		csmcLicense.setSubpopulation(Global.LICENSE_OWNER);
-		csmcLicense.setWeight(weightForCsStrategies / 2);
-		controler.getConfig().strategy().addStrategySettings(csmcLicense);
+//		StrategySettings csmcCar = new StrategySettings();
+//		csmcCar.setStrategyName("CarsharingSubtourModeChoiceStrategy");
+//		csmcCar.setSubpopulation(Global.GP_CAR);
+//		csmcCar.setWeight(weightForCsStrategies / 2);
+//		controler.getConfig().strategy().addStrategySettings(csmcCar);
+//		
+//		StrategySettings csmcLicense = new StrategySettings();
+//		csmcLicense.setStrategyName("CarsharingSubtourModeChoiceStrategy");
+//		csmcLicense.setSubpopulation(Global.LICENSE_OWNER);
+//		csmcLicense.setWeight(weightForCsStrategies / 2);
+//		controler.getConfig().strategy().addStrategySettings(csmcLicense);
 		
 		controler.addOverridingModule(new AbstractModule() {
 			
@@ -354,20 +397,17 @@ public class GAPServerControler {
 				
 				this.addPlanStrategyBinding("RandomTripToCarsharingStrategy").to( 
 						RandomTripToCarsharingStrategy.class ) ;
-				this.addPlanStrategyBinding("CarsharingSubtourModeChoiceStrategy").to( 
-						CarsharingSubtourModeChoiceStrategy.class ) ;
+//				this.addPlanStrategyBinding("CarsharingSubtourModeChoiceStrategy").to( 
+//						CarsharingSubtourModeChoiceStrategy.class ) ;
 
 				addRoutingModuleBinding("onewaycarsharing").toInstance(new OneWayCarsharingRoutingModule());
-				
+
 				bind(MainModeIdentifier.class).toInstance(new MainModeIdentifier() {
                     final MainModeIdentifier defaultModeIdentifier = new MainModeIdentifierImpl();
 
                     @Override
                     public String identifyMainMode(
                             final List<? extends PlanElement> tripElements) {
-                        // we still need to provide a way to identify our trips
-                        // as being twowaycarsharing trips.
-                        // This is for instance used at re-routing.
                         for ( PlanElement pe : tripElements ) {
                             if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
                                 return "twowaycarsharing";
@@ -379,8 +419,6 @@ public class GAPServerControler {
                                 return "freefloating";
                             }
                         }
-                        // if the trip doesn't contain a carsharing leg,
-                        // fall back to the default identification method.
                         return defaultModeIdentifier.identifyMainMode( tripElements );
                     }
                     

@@ -29,7 +29,7 @@ public class MiDPerson {
 			
 		} else{
 			
-			this.carAvailable = true;
+			this.carAvailable = false;
 			
 		}
 		
