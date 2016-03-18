@@ -37,7 +37,6 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import playground.ikaddoura.incidents.DateTime;
@@ -67,9 +66,7 @@ public class Incident2NetworkChangeEventsWriter {
 	private TMCAlerts tmc = null;
 	
 	private final NetworkChangeEventFactory nceFactory = new NetworkChangeEventFactoryImpl();
-	
-	private Map<Id<Link>, List<NetworkIncident>> linkId2incidents = new HashMap<>();
-	
+		
 	public Incident2NetworkChangeEventsWriter(TMCAlerts tmc, Map<String, TrafficItem> trafficItems, Map<String, Path> trafficItemId2path) {
 		this.tmc = tmc;
 		this.trafficItems = trafficItems;
@@ -85,45 +82,43 @@ public class Incident2NetworkChangeEventsWriter {
 		while (dateInSec <= endDate) {
 			
 			log.info("Writing network change events for day " + DateTime.secToDateTimeString(dateInSec));
-			linkId2incidents.clear();
 			
-			collectDayLinkIncidents(dateInSec);
-			
-			List<NetworkIncident> processedNetworkIncidents = processLinkIncidents();
-			List<NetworkChangeEvent> allChangeEvents = getNetworkChangeEvents(processedNetworkIncidents);
+			Map<Id<Link>, List<NetworkIncident>> linkId2rawIncidentsCurrentDay = collectDayLinkIncidents(dateInSec);
+			Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay = processLinkIncidents(linkId2rawIncidentsCurrentDay);
+			List<NetworkChangeEvent> allChangeEvents = getNetworkChangeEvents(linkId2processedIncidentsCurrentDay);
 
 			new NetworkChangeEventsWriter().write(outputDirectory + "networkChangeEvents_" + DateTime.secToDateTimeString(dateInSec) + ".xml.gz", allChangeEvents);
-			Incident2CSVWriter.writeProcessedNetworkIncidents(processedNetworkIncidents, outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateTimeString(dateInSec) + ".csv");
-			Incident2SHPWriter.writeDailyIncidentLinksToShapeFile(processedNetworkIncidents, outputDirectory, dateInSec);
+			Incident2CSVWriter.writeProcessedNetworkIncidents(linkId2processedIncidentsCurrentDay, outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateTimeString(dateInSec) + ".csv");
+			Incident2SHPWriter.writeDailyIncidentLinksToShapeFile(linkId2processedIncidentsCurrentDay, outputDirectory, dateInSec);
 			dateInSec = dateInSec + 24 * 3600.;
 		}
 		
 		log.info("Writing network change events completed.");
 	}
 	
-	private List<NetworkIncident> processLinkIncidents() {
+	private Map<Id<Link>, List<NetworkIncident>> processLinkIncidents(Map<Id<Link>, List<NetworkIncident>> linkId2rawIncidentsCurrentDay) {
 		
 		log.info("Processing the network incidents...");
 		
 		Map<Id<Link>, List<NetworkIncident>> linkId2linkIncidentsProcessed = new HashMap<>();
 		
 		int counter = 0;
-		for (Id<Link> linkId : this.linkId2incidents.keySet()) {
+		for (Id<Link> linkId : linkId2rawIncidentsCurrentDay.keySet()) {
 			
 			counter++;
 			if (counter % 100 == 0) {
-				log.info("Link: #" + counter + " (" + (int) (( counter / (double) this.linkId2incidents.size()) * 100) + "%)"); 
+				log.info("Link: #" + counter + " (" + (int) (( counter / (double) linkId2rawIncidentsCurrentDay.size()) * 100) + "%)"); 
 			}
 			
 			if (debug) log.warn("#############################################");
-			if (debug) log.warn("Processing " + this.linkId2incidents.get(linkId).size() + " incidents on link " + linkId + "...");
+			if (debug) log.warn("Processing " + linkId2rawIncidentsCurrentDay.get(linkId).size() + " incidents on link " + linkId + "...");
 
 			if (debug) log.warn("##### Raw incidents:");
-			for (NetworkIncident ni : this.linkId2incidents.get(linkId)) {
+			for (NetworkIncident ni : linkId2rawIncidentsCurrentDay.get(linkId)) {
 				if (debug) log.warn("	" + ni.toString());
 			}
 					
-			List<NetworkIncident> processedIncidents = processIncidents(linkId2incidents.get(linkId));
+			List<NetworkIncident> processedIncidents = processIncidents(linkId2rawIncidentsCurrentDay.get(linkId));
 			linkId2linkIncidentsProcessed.put(linkId, processedIncidents);	
 					
 			if (debug) log.warn("##### Processed incidents:");
@@ -133,15 +128,8 @@ public class Incident2NetworkChangeEventsWriter {
 		}
 		
 		log.info("Processing the network incidents... Done.");
-		log.info("Adding all network incidents to one list...");
-
-		List<NetworkIncident> allNetworkIncidentsFromLinks = new ArrayList<>();
-		for (Id<Link> linkId : linkId2linkIncidentsProcessed.keySet()) {
-			allNetworkIncidentsFromLinks.addAll(linkId2linkIncidentsProcessed.get(linkId));
-		}
-		log.info("Adding all network incidents to one list... Done.");
-
-		return allNetworkIncidentsFromLinks;
+		
+		return linkId2linkIncidentsProcessed;
 	}
 	
 	private List<NetworkIncident> processIncidents(List<NetworkIncident> incidents) {
@@ -290,38 +278,66 @@ public class Incident2NetworkChangeEventsWriter {
         	}
         }
 	}
-
-	private List<NetworkChangeEvent> getNetworkChangeEvents(List<NetworkIncident> incidents) {
+	
+	private List<NetworkChangeEvent> getNetworkChangeEvents(Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay) {
 		
 		List<NetworkChangeEvent> networkChangeEvents = new ArrayList<>();
 		
-		for (NetworkIncident incident : incidents) {
+		for (Id<Link> linkId : linkId2processedIncidentsCurrentDay.keySet()) {
+
+			if (debug) log.warn("***" + linkId);
+
+			List<NetworkIncident> incidents = linkId2processedIncidentsCurrentDay.get(linkId);
+			incidents.sort(new IntervalComparatorStartTimeEndTime());
 			
-			// incident start: change values
-			NetworkChangeEvent nceStart = nceFactory.createNetworkChangeEvent(incident.getStartTime());
-			nceStart.addLink(incident.getLink());
-			
-			nceStart.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getCapacity()));
-			nceStart.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getFreespeed()));
-			nceStart.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getNumberOfLanes()));
-			
-			networkChangeEvents.add(nceStart);
-			
-			// incident end: set back to original values
-			NetworkChangeEvent nceEnd = nceFactory.createNetworkChangeEvent(incident.getEndTime());
-			nceEnd.addLink(incident.getLink());
-			
-			nceEnd.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getLink().getCapacity()));
-			nceEnd.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getLink().getFreespeed()));
-			nceEnd.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getLink().getNumberOfLanes()));
-			
-			networkChangeEvents.add(nceEnd);
+			for (int i = 0; i < incidents.size(); i++) {
+				
+				NetworkIncident incident = incidents.get(i);
+				
+				if (debug) log.warn(incident.parametersToString());
+				
+				// incident start: change values
+				NetworkChangeEvent nceStart = nceFactory.createNetworkChangeEvent(incident.getStartTime());
+				nceStart.addLink(incident.getLink());
+				
+				nceStart.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getCapacity()));
+				nceStart.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getFreespeed()));
+				nceStart.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getNumberOfLanes()));
+				
+				networkChangeEvents.add(nceStart);
+				
+				boolean setBackToOriginalValues = false;
+				if (i == incidents.size() - 1) {
+					// last incident during the day
+					setBackToOriginalValues = true;
+				} else {
+					if ((int) incidents.get(i+1).getStartTime() == (int) incident.getEndTime()) {
+						// the current incident will immediately be followed by another incident
+					} else {
+						setBackToOriginalValues = true;
+					}
+				}
+				
+				if (setBackToOriginalValues) {
+					// incident end: set back to original values
+					NetworkChangeEvent nceEnd = nceFactory.createNetworkChangeEvent(incident.getEndTime());
+					nceEnd.addLink(incident.getLink());
+					
+					nceEnd.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getLink().getCapacity()));
+					nceEnd.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getLink().getFreespeed()));
+					nceEnd.setLanesChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getLink().getNumberOfLanes()));
+					
+					networkChangeEvents.add(nceEnd);
+				}
+			}
 		}
 		return networkChangeEvents;
 	}
 	
-	private void collectDayLinkIncidents(double dateInSec) {
+	private Map<Id<Link>, List<NetworkIncident>> collectDayLinkIncidents(double dateInSec) {
 				
+		Map<Id<Link>, List<NetworkIncident>> linkId2rawIncidents = new HashMap<>();
+		
 		log.info("Collecting all incidents that are relevant for this day...");
 		int counter = 0;
 		
@@ -390,20 +406,21 @@ public class Incident2NetworkChangeEventsWriter {
 					
 					if (incident.getIncidentLink() != null) {
 												
-						if (linkId2incidents.containsKey(link.getId())) {
-							linkId2incidents.get(link.getId()).add(incident);
+						if (linkId2rawIncidents.containsKey(link.getId())) {
+							linkId2rawIncidents.get(link.getId()).add(incident);
 							
 						} else {
 														
 							List<NetworkIncident> dayNetworkIncidents = new ArrayList<>();
 							dayNetworkIncidents.add(incident);
-							linkId2incidents.put(link.getId(), dayNetworkIncidents);
+							linkId2rawIncidents.put(link.getId(), dayNetworkIncidents);
 						}
 					}
 				}
 			}
 		}
 		log.info("Collecting all incidents that are relevant for this day... Done.");
+		return linkId2rawIncidents;
 	}
 
 	private static Link getMoreRestrictiveIncidentLink(Link incidentLink1, Link incidentLink2) {

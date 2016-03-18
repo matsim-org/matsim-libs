@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -61,7 +62,7 @@ public class Incident2SHPWriter {
 		this.trafficItemId2path = trafficItemId2path;
 	}
 
-	public static void writeDailyIncidentLinksToShapeFile(List<NetworkIncident> incidents, String outputDirectory, double dateInSec) {
+	public static void writeDailyIncidentLinksToShapeFile(Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay, String outputDirectory, double dateInSec) {
 		
 		String outputShpFile = outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateTimeString(dateInSec) + ".shp";
 		
@@ -87,44 +88,47 @@ public class Incident2SHPWriter {
 		
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
-		for (NetworkIncident incident : incidents) {	
-			Link link = incident.getLink();
-			Link incidentLink = incident.getIncidentLink();
-			
-			double endTime = incident.getEndTime();
-			if ((int) endTime == 24 * 3600) {
-				endTime = endTime - 1.;
-				// in order to have the TimeManager QGIS Plugin running...
+		for (Id<Link> linkId : linkId2processedIncidentsCurrentDay.keySet()) {
+			for (NetworkIncident incident : linkId2processedIncidentsCurrentDay.get(linkId)) {
+
+				Link link = incident.getLink();
+				Link incidentLink = incident.getIncidentLink();
+				
+				double endTime = incident.getEndTime();
+				if ((int) endTime == 24 * 3600) {
+					endTime = endTime - 1.;
+					// in order to have the TimeManager QGIS Plugin running...
+				}
+				
+				Object[] incidentObject = new Object[] {
+						link.getId().toString(),
+						incident.getId(),
+						
+						// the parameters under normal conditions
+						link.getCapacity(),
+						link.getFreespeed(),
+						link.getNumberOfLanes(),
+						link.getAllowedModes(),
+	
+						// incident specific values
+						incidentLink.getCapacity(),
+						incidentLink.getFreespeed(),
+						incidentLink.getNumberOfLanes(),
+						incidentLink.getAllowedModes(),
+	
+						// start and end time
+						DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(incident.getStartTime()),
+						DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(endTime)
+				};
+				
+				SimpleFeature feature = factory.createPolyline(
+						new Coordinate[] {
+								new Coordinate(MGC.coord2Coordinate(incident.getLink().getFromNode().getCoord())),
+								new Coordinate(MGC.coord2Coordinate(incident.getLink().getToNode().getCoord())) }
+						, incidentObject
+						, null);
+				features.add(feature);
 			}
-			
-			Object[] incidentObject = new Object[] {
-					link.getId().toString(),
-					incident.getId(),
-					
-					// the parameters under normal conditions
-					link.getCapacity(),
-					link.getFreespeed(),
-					link.getNumberOfLanes(),
-					link.getAllowedModes(),
-
-					// incident specific values
-					incidentLink.getCapacity(),
-					incidentLink.getFreespeed(),
-					incidentLink.getNumberOfLanes(),
-					incidentLink.getAllowedModes(),
-
-					// start and end time
-					DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(incident.getStartTime()),
-					DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(endTime)
-			};
-			
-			SimpleFeature feature = factory.createPolyline(
-					new Coordinate[] {
-							new Coordinate(MGC.coord2Coordinate(incident.getLink().getFromNode().getCoord())),
-							new Coordinate(MGC.coord2Coordinate(incident.getLink().getToNode().getCoord())) }
-					, incidentObject
-					, null);
-			features.add(feature);
 		}
 		
 		if (features.isEmpty()) {

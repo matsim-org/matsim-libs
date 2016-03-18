@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -79,7 +80,7 @@ public class Incident2NetworkChangeEventsTest {
 		config.network().setChangeEventInputFile(outputDirectory + "networkChangeEvents_2016-03-15.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-//		new NetworkWriter(scenario.getNetwork()).write(testUtils.getOutputDirectory() + "output-network.xml");
+		new NetworkWriter(scenario.getNetwork()).write(testUtils.getOutputDirectory() + "output-network.xml");
 				
 		Network network = scenario.getNetwork();
 		LinkImpl link = (LinkImpl) network.getLinks().get(Id.createLinkId("36087"));

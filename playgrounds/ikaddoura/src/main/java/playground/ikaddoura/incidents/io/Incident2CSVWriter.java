@@ -24,8 +24,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 import playground.ikaddoura.incidents.data.NetworkIncident;
 import playground.ikaddoura.incidents.data.TrafficItem;
@@ -75,22 +78,25 @@ public class Incident2CSVWriter {
 		}
 	}
 
-	public static void writeProcessedNetworkIncidents(List<NetworkIncident> processedNetworkIncidents, String outputFile) throws IOException {
+	public static void writeProcessedNetworkIncidents(Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay, String outputFile) throws IOException {
 		try ( BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile)) ) {
 			
 			bw.write("Link Id;Incident Id;Original Capacity;"
 					+ "Original Freespeed;Original Number Of Lanes;Incident Capacity;Incident Freespeed; Incident Number Of Lanes");
 			bw.newLine();
-		
-			for (NetworkIncident incident : processedNetworkIncidents) {
-				bw.write(incident.getLink().getId().toString() + ";"
-						+ incident.getId() + ";"
-						+ incident.getLink().getCapacity()
-						+ ";" + incident.getLink().getFreespeed()
-						+ ";" + incident.getLink().getNumberOfLanes()
-						+ ";" + incident.getIncidentLink().getCapacity()
-						+ ";" + incident.getIncidentLink().getFreespeed()
-						+ ";" + incident.getIncidentLink().getNumberOfLanes());
+			
+			for (Id<Link> linkId : linkId2processedIncidentsCurrentDay.keySet()) {
+				for (NetworkIncident incident : linkId2processedIncidentsCurrentDay.get(linkId)) {
+					bw.write(incident.getLink().getId().toString() + ";"
+							+ incident.getId() + ";"
+							+ incident.getLink().getCapacity()
+							+ ";" + incident.getLink().getFreespeed()
+							+ ";" + incident.getLink().getNumberOfLanes()
+							+ ";" + incident.getIncidentLink().getCapacity()
+							+ ";" + incident.getIncidentLink().getFreespeed()
+							+ ";" + incident.getIncidentLink().getNumberOfLanes());
+					bw.newLine();
+				}
 			}
 		}
 		log.info("Traffic incidents written to " + outputFile);
