@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.Id;
 
 public class AnalysisFileWriter {
 	
-	
 	public void writeToFileIntegerKey(Map<Integer, Double> map, String outputFile, int binWidth, double aggregateWeight, double average) {
 		BufferedWriter bufferedWriter = null;
 		
@@ -56,8 +55,6 @@ public class AnalysisFileWriter {
 	}
 	
 	
-	// New: For cummulative Plots
-	//-----------------------------------------------------------------------------------------------------------------------
 	public void writeToFileIntegerKeyCumulative(Map<Integer, Double> map, String outputFile, int binWidth, double aggregateWeight, double average) {
 		BufferedWriter bufferedWriter = null;
 		
@@ -102,42 +99,38 @@ public class AnalysisFileWriter {
         }
 		System.out.println("Analysis file " + outputFile + " written.");
 	}
-	//-----------------------------------------------------------------------------------------------------------------------
 	
 	
-	// New: Other information
-	//-----------------------------------------------------------------------------------------------------------------------
 	public void writeToFileOther(Map<String, Integer> map, String outputFile) {
 		BufferedWriter bufferedWriter = null;
-			
+
 		try {
 			File output = new File(outputFile);
-	    	FileWriter fileWriter = new FileWriter(output);
-	    	bufferedWriter = new BufferedWriter(fileWriter);
-	    		
-	    	for (String key : map.keySet()) {
-    			int value = map.get(key);
-    			bufferedWriter.write(key + "\t" + value);
-    			bufferedWriter.newLine();
-	    	}
-    		
+			FileWriter fileWriter = new FileWriter(output);
+			bufferedWriter = new BufferedWriter(fileWriter);
+
+			for (String key : map.keySet()) {
+				int value = map.get(key);
+				bufferedWriter.write(key + "\t" + value);
+				bufferedWriter.newLine();
+			}
+
 		} catch (FileNotFoundException ex) {
 			ex.printStackTrace();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			try {
+				if (bufferedWriter != null) {
+					bufferedWriter.flush();
+					bufferedWriter.close();
+				}
 			} catch (IOException ex) {
 				ex.printStackTrace();
-			} finally {
-				try {
-	                if (bufferedWriter != null) {
-	                    bufferedWriter.flush();
-	                    bufferedWriter.close();
-	                }
-	            } catch (IOException ex) {
-	                ex.printStackTrace();
-	            }
-	        }
-			System.out.println("Analysis file " + outputFile + " written.");
+			}
 		}
-		//-----------------------------------------------------------------------------------------------------------------------
+		System.out.println("Analysis file " + outputFile + " written.");
+	}
 	
 	
 	// file writer for data that has a string (e.g. an activity name) as key
@@ -241,13 +234,6 @@ public class AnalysisFileWriter {
     		//
     		double averageRatioRoutedBeeline = aggregateRatioRoutedBeeline / counter;
     		
-//    		System.out.println("Minimum routed distance is = " + minDistanceRouted);
-//    		System.out.println("Maximum routed distance is = " + maxDistanceRouted);
-//    		System.out.println("Minimum beeline distance is = " + minDistanceBeeline);
-//    		System.out.println("Maximum beeline distance is = " + maxDistanceBeeline);
-//    		System.out.println("Minimum ratio routed/beeline distance is = " + minRatioBeeline);
-//    		System.out.println("Average ratio routed/beeline distance is = " + averageRatioRoutedBeeline);
-//    		System.out.println("Maximum ratio routed/beeline distance is = " + maxRatioBeeline);
     		bufferedWriter.write("Minimum routed distance is = " + minDistanceRouted);
     		bufferedWriter.newLine();
     		bufferedWriter.write("Maximum routed distance is = " + maxDistanceRouted);
