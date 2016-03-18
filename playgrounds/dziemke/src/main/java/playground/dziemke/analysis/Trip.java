@@ -43,6 +43,7 @@ public class Trip {
 	
 	//
 	private Double distanceBeelineByCalculation_m = Double.NaN;
+	private Double distanceRoutedByCalculation_m = Double.NaN;
 	//
 	
 	
@@ -262,10 +263,6 @@ public class Trip {
 	}
 	
 	
-	/**
-	 * @param network
-	 * @return beeline distance of this trip in meters
-	 */
 	public double getDistanceBeelineByCalculation_m(Network network) {
 		if (distanceBeelineByCalculation_m.isNaN()) {
 			calculateBeelineDistance_m(network);
@@ -275,6 +272,13 @@ public class Trip {
 	
 	public double getDurationByCalculation_s(){
 		return arrivalTime_s - departureTime_s;
+	}
+	
+	public double getDistanceRoutedByCalculation_m(Network network) {
+		if (distanceRoutedByCalculation_m.isNaN()) {
+			calculateRoutedDistance_m(network);
+		}
+		return distanceRoutedByCalculation_m;
 	}
 
 
@@ -293,5 +297,18 @@ public class Trip {
 
     	this.distanceBeelineByCalculation_m = Math.sqrt(horizontalDistance_m * horizontalDistance_m 
     			+ verticalDistance_m * verticalDistance_m);
+	}
+	
+	
+	private void calculateRoutedDistance_m(Network network) {
+		double tripDistance_m = 0.;
+		for (int i = 0; i < links.size(); i++) {
+			Id<Link> linkId = links.get(i);
+			Link link = network.getLinks().get(linkId);
+			double length_m = link.getLength();
+			tripDistance_m = tripDistance_m + length_m;
+		}
+		this.distanceRoutedByCalculation_m = tripDistance_m;
+		// TODO here, the distances from activity to link and link to activity are missing!
 	}
 }

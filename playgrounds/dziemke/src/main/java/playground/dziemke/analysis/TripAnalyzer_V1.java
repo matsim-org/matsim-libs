@@ -25,8 +25,8 @@ import playground.dziemke.utils.ShapeReader;
 /**
  * @author dziemke
  */
-public class TripAnalyzerExtended {
-	public static final Logger log = Logger.getLogger(TripAnalyzerExtended.class) ;
+public class TripAnalyzer_V1 {
+	public static final Logger log = Logger.getLogger(TripAnalyzer_V1.class) ;
 
 	
 	/* Parameters */
@@ -122,8 +122,8 @@ public class TripAnalyzerExtended {
 	    
 		/* Events infrastructure and reading the events file */
 	    EventsManager eventsManager = EventsUtils.createEventsManager();
-	    TripHandler handler = new TripHandler();
-	    eventsManager.addHandler(handler);
+	    TripHandler tripHandler = new TripHandler();
+	    eventsManager.addHandler(tripHandler);
 	    MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);
 	    eventsReader.readFile(eventsFile);
 	    log.info("Events file read!");
@@ -145,7 +145,7 @@ public class TripAnalyzerExtended {
 
 	    
 	    /* Do calculations */
-	    for (Trip trip : handler.getTrips().values()) {
+	    for (Trip trip : tripHandler.getTrips().values()) {
 	    	if(!trip.getTripComplete()) {
 	    		System.err.println("Trip is not complete!");
 	    		tripCounterIncomplete++;
@@ -162,7 +162,7 @@ public class TripAnalyzerExtended {
 	    }
 	    calculateAverages();
 	    
-	    otherInformationMap.put("Number of trips that have no previous activity", handler.getNoPreviousEndOfActivityCounter());
+	    otherInformationMap.put("Number of trips that have no previous activity", tripHandler.getNoPreviousEndOfActivityCounter());
 	    otherInformationMap.put("Number of trips that have no calculable speed", numberOfTripsWithNoCalculableSpeed);
 	    otherInformationMap.put("Number of incomplete trips (i.e. number of removed agents)", tripCounterIncomplete);
 	    otherInformationMap.put("Number of (complete) trips", tripCounter);
@@ -173,6 +173,63 @@ public class TripAnalyzerExtended {
 	}
 	
 	
+	private static void analyzeTrip(Trip trip) {
+		tripCounter++;
+	
+		// calculate travel times and store them in a map
+		double tripDuration_min = trip.getDurationByCalculation_s() / 60.;
+		double tripDuration_h = tripDuration_min / 60.;
+		AnalysisUtils.addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, 1.);
+		aggregateTripDuration = aggregateTripDuration + tripDuration_min;	 
+	
+		// store departure times in a map
+		double departureTime_h = trip.getDepartureTime_s() / 3600.;
+		AnalysisUtils.addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, 1.);
+	
+		// store activities in a map
+		String activityType = trip.getActivityStartActType();
+		AnalysisUtils.addToMapStringKey(activityTypeMap, activityType, 1.);
+	
+		// calculate (routed) distances and and store them in a map
+		double tripDistance_m = 0.;
+		for (int i = 0; i < trip.getLinks().size(); i++) {
+			Id<Link> linkId = trip.getLinks().get(i);
+			Link link = network.getLinks().get(linkId);
+			double length_m = link.getLength();
+			tripDistance_m = tripDistance_m + length_m;
+		}
+		// TODO here, the distances from activity to link and link to activity are missing!
+		double tripDistanceRouted_km = tripDistance_m / 1000.;
+	
+		// store (routed) distances  in a map
+		AnalysisUtils.addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, maxBinDistance_km, 1.);
+		aggregateTripDistanceRouted = aggregateTripDistanceRouted + tripDistanceRouted_km;
+		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted_km);
+	
+		// store (beeline) distances in a map
+		double tripDistanceBeeline_km = trip.getDistanceBeelineByCalculation_m(network) / 1000.;
+		AnalysisUtils.addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, 1.);
+		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline_km;
+		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline_km);
+	
+		// calculate speeds and and store them in a map
+		if (tripDuration_h > 0.) {
+			//System.out.println("trip distance is " + tripDistance + " and time is " + timeInHours);
+			double averageTripSpeedRouted_km_h = tripDistanceRouted_km / tripDuration_h;
+			AnalysisUtils.addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted_km_h;
+	
+			double averageTripSpeedBeeline_km_h = tripDistanceBeeline_km / tripDuration_h;
+			AnalysisUtils.addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline_km_h;
+	
+			tripCounterSpeed++;
+		} else {
+			numberOfTripsWithNoCalculableSpeed++;
+		}
+	}
+
+
 	@SuppressWarnings("all")
 	private static void adaptOutputDirectory() {
 		outputDirectory = outputDirectory + "_" + usedIteration;
@@ -195,7 +252,7 @@ public class TripAnalyzerExtended {
 			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
-		outputDirectory = outputDirectory + "_2"; // // TODO in case used for double-check
+		outputDirectory = outputDirectory + "_3"; // TODO in case used for double-check
 	}
 	
 	
@@ -276,63 +333,6 @@ public class TripAnalyzerExtended {
 	}
 
 
-	private static void analyzeTrip(Trip trip) {
-		tripCounter++;
-
-		// calculate travel times and store them in a map
-		double tripDuration_min = trip.getDurationByCalculation_s() / 60.;
-		double tripDuration_h = tripDuration_min / 60.;
-		AnalysisUtils.addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, 1.);
-		aggregateTripDuration = aggregateTripDuration + tripDuration_min;	 
-
-		// store departure times in a map
-		double departureTime_h = trip.getDepartureTime_s() / 3600.;
-		AnalysisUtils.addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, 1.);
-
-		// store activities in a map
-		String activityType = trip.getActivityStartActType();
-		AnalysisUtils.addToMapStringKey(activityTypeMap, activityType, 1.);
-
-		// calculate (routed) distances and and store them in a map
-		double tripDistance_m = 0.;
-		for (int i = 0; i < trip.getLinks().size(); i++) {
-			Id<Link> linkId = trip.getLinks().get(i);
-			Link link = network.getLinks().get(linkId);
-			double length_m = link.getLength();
-			tripDistance_m = tripDistance_m + length_m;
-		}
-		// TODO here, the distances from activity to link and link to activity are missing!
-		double tripDistanceRouted_km = tripDistance_m / 1000.;
-
-		// store (routed) distances  in a map
-		AnalysisUtils.addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, maxBinDistance_km, 1.);
-		aggregateTripDistanceRouted = aggregateTripDistanceRouted + tripDistanceRouted_km;
-		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted_km);
-
-		// store (beeline) distances in a map
-		double tripDistanceBeeline_km = trip.getDistanceBeelineByCalculation_m(network) / 1000.;
-		AnalysisUtils.addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, 1.);
-		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline_km;
-		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline_km);
-
-		// calculate speeds and and store them in a map
-		if (tripDuration_h > 0.) {
-			//System.out.println("trip distance is " + tripDistance + " and time is " + timeInHours);
-			double averageTripSpeedRouted_km_h = tripDistanceRouted_km / tripDuration_h;
-			AnalysisUtils.addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
-			aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted_km_h;
-
-			double averageTripSpeedBeeline_km_h = tripDistanceBeeline_km / tripDuration_h;
-			AnalysisUtils.addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
-			aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline_km_h;
-
-			tripCounterSpeed++;
-		} else {
-			numberOfTripsWithNoCalculableSpeed++;
-		}
-	}
-	
-	
 	private static void calculateAverages() {
 		averageTripDuration = aggregateTripDuration / tripCounter;
 	    averageTripDistanceRouted = aggregateTripDistanceRouted / tripCounter;
