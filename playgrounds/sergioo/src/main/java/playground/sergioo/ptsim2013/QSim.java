@@ -20,6 +20,13 @@
 
 package playground.sergioo.ptsim2013;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,8 +43,11 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.interfaces.*;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -49,8 +59,6 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 
 import playground.sergioo.ptsim2013.pt.TransitQSimEngine;
 import playground.sergioo.ptsim2013.qnetsimengine.PTQNetsimEngine;
-
-import java.util.*;
 
 /**
  * This has developed over the last couple of months/years towards an increasingly pluggable module.  The current (dec'2011)
@@ -397,8 +405,8 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public NetsimNetwork getNetsimNetwork() {
-		return this.netEngine.getNetsimNetwork();
+	public org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork getNetsimNetwork() {
+		throw new RuntimeException("not implemented") ;
 	}
 
 	@Override

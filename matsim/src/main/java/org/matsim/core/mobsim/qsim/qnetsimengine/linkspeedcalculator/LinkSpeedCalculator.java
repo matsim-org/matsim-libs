@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalizedItem
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +16,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.matsim.api.core.v01.Id;
+package org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator;
+
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
-
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 /**
- * A simulation element that leads to something with an Id. In usual traffic/network applications
- * this would be a link or lane that is leading to one to several links.
+ * Calculates the maximum speed a vehicle can travel with on a specific link 
+ * at a specific time in a specific vehicle. If the speed should be depending
+ * on the person driving it, use vehicle.getDriver(). But remember that not
+ * every vehicle must have a Person as a driver.
  * 
- * The SignalizeableItem must be notified by its property to be signalized by calling the setSignalized(..) method.
- * 
- * @author dgrether
- *
+ * @author mrieser / Senozon AG
  */
-public interface SignalizeableItem {
-	
-	void setSignalized(final boolean isSignalized);
-	
-	void setSignalStateAllTurningMoves(final SignalGroupState state);
-	
-	void setSignalStateForTurningMove(final SignalGroupState state, final Id<Link> toLinkId);
+public interface LinkSpeedCalculator {
+
+	/**
+	 * @param vehicle
+	 * @param link
+	 * @param time
+	 * @return the maximum speed the vehicle can travel on the given link.
+	 */
+	public double getMaximumVelocity(QVehicle vehicle, Link link, double time);
 
 }

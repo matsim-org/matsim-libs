@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalSystemState
+ * QueueLink
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,14 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.interfaces;
 
+import java.util.Collection;
 
-/**
- * 
- * @author dgrether
- *
- */
-public enum SignalGroupState {
-	REDYELLOW, GREEN, YELLOW, RED, OFF
+import org.matsim.api.core.v01.Customizable;
+import org.matsim.core.api.internal.MatsimNetworkObject;
+import org.matsim.vis.snapshotwriters.VisLink;
+
+public interface NetsimLink extends Customizable, VisLink, MatsimNetworkObject {
+	
+	@Override
+	Collection<MobsimVehicle> getAllVehicles();
+	// not terribly efficient, but a possible method also for general mobsims
+
+	Collection<MobsimVehicle> getAllNonParkedVehicles();
+	// not terribly efficient, but a possible method also for general mobsims
+
 }

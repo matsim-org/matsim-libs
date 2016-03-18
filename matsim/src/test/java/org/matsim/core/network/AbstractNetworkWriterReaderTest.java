@@ -57,7 +57,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 	/**
 	 * Reads a network from the specified file into the given network data structure.
 	 *
-	 * @param network
+	 * @param qnetwork
 	 * @param filename
 	 */
 	protected abstract void readNetwork(final Scenario scenario, final String filename);

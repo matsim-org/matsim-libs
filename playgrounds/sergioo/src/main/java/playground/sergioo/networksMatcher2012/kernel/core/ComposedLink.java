@@ -45,6 +45,9 @@ public abstract class ComposedLink extends LinkImpl {
 	}
 	
 	public double getAngle() {
+		Node to = this.getToNode() ;
+		Node from = this.getFromNode() ;
+
 		return Math.atan2(to.getCoord().getY()-from.getCoord().getY(), to.getCoord().getX()-from.getCoord().getX());
 	}
 

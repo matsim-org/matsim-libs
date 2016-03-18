@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
 
 /**

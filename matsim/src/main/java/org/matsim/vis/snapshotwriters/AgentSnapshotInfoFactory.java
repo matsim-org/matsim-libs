@@ -20,6 +20,8 @@
 
 package org.matsim.vis.snapshotwriters;
 
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -41,7 +43,7 @@ public class AgentSnapshotInfoFactory {
 	private static final double PI_HALF = Math.PI / 2.0;
 	private SnapshotLinkWidthCalculator linkWidthCalculator;
 
-
+	@Inject
 	public AgentSnapshotInfoFactory(SnapshotLinkWidthCalculator widthCalculator) {
 		this.linkWidthCalculator = widthCalculator;
 	}
@@ -78,7 +80,7 @@ public class AgentSnapshotInfoFactory {
 		info.setId(agentId) ;
 		double euklidean;
 		if (link instanceof LinkImpl){ //as for LinkImpl instances the Euklidean distance is already computed we can save computing time
-			euklidean = ((LinkImpl)link).getEuklideanDistance();
+			euklidean = ((LinkImpl)link).getEuklideanLength();
 		}
 		else {
 			euklidean = CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());

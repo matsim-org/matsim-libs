@@ -19,9 +19,6 @@ package org.matsim.contrib.hybridsim.run;
  *                                                                         *
  * *********************************************************************** */
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.hybridsim.simulation.HybridMobsimProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -33,6 +30,10 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Provider;
 
 /**
  * Created by laemmel on 18/02/16.
@@ -60,9 +61,10 @@ public class RunHybridSim {
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 
-		final HybridNetworkFactory netFac = new HybridNetworkFactory();
+		final HybridNetworkFactory netFac = null ;
 
-
+		// I don't think that this will work like this.  Check LinkSpeedCalculatorIntegrationTest.testIntegration_Slow for an example
+		// to generate an injector that works with this. kai, mar'16
 
 		Injector mobsimProviderInjector = Guice.createInjector(new com.google.inject.AbstractModule() {
 			@Override

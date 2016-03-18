@@ -7,11 +7,11 @@ import org.matsim.api.core.v01.network.Link;
 
 public class CALink {
 	private final QLinkI ql;
-	private final QNetwork network;
+	private NetsimEngineContext context;
 	
-	public CALink(QNetwork network, QLinkI qLinkImpl) {
-		this.network = network;
+	public CALink(QLinkI qLinkImpl, NetsimEngineContext context) {
 		this.ql = qLinkImpl;
+		this.context = context ;
 	}
 
 	public Link getLink() {
@@ -19,10 +19,10 @@ public class CALink {
 	}
 
 	public void notifyMoveOverBorderNode(QVehicle vehicle, Id<Link> leftLinkId){
-		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
+		double now = context.getSimTimer().getTimeOfDay();
+		context.getEventsManager().processEvent(new LinkLeaveEvent(
 				now, vehicle.getId(), leftLinkId));
-		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(
+		context.getEventsManager().processEvent(new LinkEnterEvent(
 				now, vehicle.getId(), getLink().getId()));
 	}
 }

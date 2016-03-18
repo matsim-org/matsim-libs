@@ -26,10 +26,10 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
 import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 
 
 /**

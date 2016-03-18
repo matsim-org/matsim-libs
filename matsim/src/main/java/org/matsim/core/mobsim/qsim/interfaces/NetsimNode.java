@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.interfaces;
 
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.network.Node;

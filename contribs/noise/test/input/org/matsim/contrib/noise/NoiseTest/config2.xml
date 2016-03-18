@@ -33,8 +33,6 @@
 		<param name="removeStuckVehicles" value="true" />
 		<param name="stuckTime" value="36000" />
 		
-		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
-				
 		<param name="flowCapacityFactor" value="1.00" />
 		<param name="storageCapacityFactor" value="1.00" />
 	</module>

@@ -85,9 +85,9 @@ public class Incident2NetworkChangeEventsTest {
 		Network network = scenario.getNetwork();
 		LinkImpl link = (LinkImpl) network.getLinks().get(Id.createLinkId("36087"));
 		
-		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getFlowCapacity(16 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getCapacity(16 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong freespeed during the afternoon.", 13.88888888888888, link.getFreespeed(16 * 3600.), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong capacity during the morning.", 1.,link.getFlowCapacity(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong capacity during the morning.", 1.,link.getCapacity(10 * 3600.), MatsimTestUtils.EPSILON);		
 		Assert.assertEquals("Wrong freespeed during the morning.", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
 	}
 	
@@ -103,9 +103,9 @@ public class Incident2NetworkChangeEventsTest {
 		Network network = scenario.getNetwork();
 		LinkImpl link = (LinkImpl) network.getLinks().get(Id.createLinkId("36087"));
 		
-		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getFlowCapacity(16 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getCapacity(16 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong freespeed during the afternoon.", 13.88888888888888, link.getFreespeed(16 * 3600.), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong capacity during the morning.", 1.,link.getFlowCapacity(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong capacity during the morning.", 1.,link.getCapacity(10 * 3600.), MatsimTestUtils.EPSILON);		
 		Assert.assertEquals("Wrong freespeed during the morning.", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
 	}
 		

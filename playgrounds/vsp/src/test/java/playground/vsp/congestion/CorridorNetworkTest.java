@@ -22,12 +22,14 @@ package playground.vsp.congestion;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,6 +41,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -63,7 +66,7 @@ public class CorridorNetworkTest {
 	public void v3Test(){
 		CorridorNetworkAndPlans inputs = new CorridorNetworkAndPlans();
 		Scenario sc = inputs.getDesiredScenario();
-
+		
 		List<CongestionEvent> v3_events = getCongestionEvents("v3", sc);
 
 		Assert.assertEquals("wrong number of congestion events", 6, v3_events.size(), MatsimTestUtils.EPSILON);
@@ -177,6 +180,13 @@ public class CorridorNetworkTest {
 			}
 		});
 
+		events.addHandler( new BasicEventHandler(){
+			@Override public void reset(int iteration) { }
+			@Override public void handleEvent(Event event) {
+				Logger.getLogger( CorridorNetworkTest.class ).warn( event );
+			}
+		});
+		
 		if(congestionPricingImpl.equalsIgnoreCase("v3")) {
 			events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario)sc));
 		}

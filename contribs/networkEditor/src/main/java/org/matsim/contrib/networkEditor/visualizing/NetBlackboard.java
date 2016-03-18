@@ -1205,7 +1205,7 @@ public class NetBlackboard extends javax.swing.JPanel {
 		}
 		Id<Link> id = getRandomLinkId();
 		LinkImpl newLink = (LinkImpl)net.getFactory().createLink(id, start, end);
-		newLink.setLength(newLink.getEuklideanDistance());
+		newLink.setLength(newLink.getEuklideanLength());
 		newLink.setCapacity(600.0);
 		newLink.setFreespeed(8.3333);
 		net.addLink(newLink);

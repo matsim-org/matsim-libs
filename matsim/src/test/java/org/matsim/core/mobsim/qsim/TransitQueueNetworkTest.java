@@ -48,13 +48,13 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandler;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
@@ -106,19 +106,23 @@ public class TransitQueueNetworkTest extends TestCase {
         assertEquals(1, allVehicles.size());
         assertEquals(f.normalVehicle, f.qlink2.getAllVehicles().toArray(new MobsimVehicle[1])[0]); // first the normal vehicle
 
+        f.qsim.getSimTimer().setTime(103);
         f.simEngine.doSimStep(103);
         assertEquals(1, f.qlink2.getAllVehicles().size());
 
+        f.qsim.getSimTimer().setTime(119);
         f.simEngine.doSimStep(119);
         assertEquals(1, f.qlink2.getAllVehicles().size());
 
+        f.qsim.getSimTimer().setTime(120);
         f.simEngine.doSimStep(120); // 100 (departure) + 19 (stop delay) + 1 (buffer2node)
         assertEquals(2, f.qlink2.getAllVehicles().size());
         MobsimVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new MobsimVehicle[2]);
         assertEquals(f.normalVehicle, vehicles[0]);
         assertEquals(f.transitVehicle, vehicles[1]); // second the transit vehicle
 
-        f.simEngine.doSimStep(117);
+        f.qsim.getSimTimer().setTime(117); // yy time going backwards??
+        f.simEngine.doSimStep(117); // yy time going backwards??
         assertEquals(2, f.qlink2.getAllVehicles().size());
     }
 
@@ -138,26 +142,32 @@ public class TransitQueueNetworkTest extends TestCase {
     public void testBlockingStop_FirstLink() throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         Fixture f = new Fixture(1, true, 0, false);
 
+        f.qsim.getSimTimer().setTime(100);
         f.simEngine.doSimStep(100);
         assertEquals(0, f.qlink2.getAllVehicles().size());
 
+        f.qsim.getSimTimer().setTime(101);
         f.simEngine.doSimStep(101);
         assertEquals(1, f.qlink2.getAllVehicles().size());
         assertEquals(f.normalVehicle, f.qlink2.getAllVehicles().toArray(new MobsimVehicle[1])[0]); // first the normal vehicle
 
+        f.qsim.getSimTimer().setTime(102);
         f.simEngine.doSimStep(102);
         assertEquals(1, f.qlink2.getAllVehicles().size());
 
+        f.qsim.getSimTimer().setTime(119);
         f.simEngine.doSimStep(119);
         assertEquals(1, f.qlink2.getAllVehicles().size());
 
+        f.qsim.getSimTimer().setTime(120);
         f.simEngine.doSimStep(120); // 100 (departure) + 19 (stop delay) + 1 (buffer2node)
         assertEquals(2, f.qlink2.getAllVehicles().size());
         MobsimVehicle[] vehicles = f.qlink2.getAllVehicles().toArray(new MobsimVehicle[2]);
         assertEquals(f.normalVehicle, vehicles[0]);
         assertEquals(f.transitVehicle, vehicles[1]); // second the transit vehicle
 
-        f.simEngine.doSimStep(117);
+        f.qsim.getSimTimer().setTime(117); // yy time going backwards??
+        f.simEngine.doSimStep(117); // yy time going backwards??
         assertEquals(2, f.qlink2.getAllVehicles().size());
     }
 

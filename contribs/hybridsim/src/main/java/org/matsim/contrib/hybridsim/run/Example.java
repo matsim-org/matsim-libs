@@ -34,6 +34,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -69,8 +70,9 @@ public class Example {
 		final Controler controller = new Controler(sc);
 		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
-		final HybridNetworkFactory netFac = new HybridNetworkFactory();
-
+		final HybridNetworkFactory netFac = null ; // new HybridNetworkFactory();
+		// see below
+		
 		final EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		Injector mobsimProviderInjector = Guice.createInjector(new com.google.inject.AbstractModule() {
@@ -79,6 +81,8 @@ public class Example {
 				bind(Scenario.class).toInstance(sc);
 				bind(EventsManager.class).toInstance(eventsManager);
 				bind(HybridNetworkFactory.class).toInstance(netFac);
+				bind(QNetworkFactory.class).to( HybridNetworkFactory.class ) ;
+				// ??? See QSimModule (I changed how this is plugged together over the last two weeks).  kai, mar'16
 			}
 
 		});

@@ -9,16 +9,16 @@ import org.matsim.api.core.v01.network.Link;
 public class CAQLink {
 	private final QLinkI ql;
 	private final TransitionArea transitionArea;
-	private final QNetwork network;
+	private final NetsimEngineContext context;
 	
-	CAQLink(QNetwork network, QLinkI qLinkImpl, TransitionArea transitionArea) {
-		this.network = network;
+	CAQLink(QLinkI qLinkImpl, TransitionArea transitionArea, NetsimEngineContext context) {
 		this.ql = qLinkImpl;
 		this.transitionArea = transitionArea;
+		this.context = context;
 	}
 
 	public boolean isAcceptingFromUpstream() {
-		return this.ql.isAcceptingFromUpstream();
+		return this.ql.getAcceptingQLane().isAcceptingFromUpstream();
 	}
 
 	public Link getLink() {
@@ -26,7 +26,7 @@ public class CAQLink {
 	}
 
 	public void addFromUpstream(QVehicle veh) {
-		this.ql.addFromUpstream(veh);
+		this.ql.getAcceptingQLane().addFromUpstream(veh);
 	}
 	
 	public TransitionArea getTransitionArea(){
@@ -34,8 +34,8 @@ public class CAQLink {
 	}
 
 	public void notifyMoveOverBorderNode(QVehicle vehicle, Id<Link> leftLinkId){
-		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
+		double now = context.getSimTimer().getTimeOfDay();
+		context.getEventsManager().processEvent(new LinkLeaveEvent(
 				now, vehicle.getId(), leftLinkId));
 	}
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
- * project: kai
- * KaiHybridEngine.java
+ * project: org.matsim.*
+ * NetElementActivator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,38 +20,15 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Map;
-import java.util.TreeMap;
+abstract class NetElementActivationRegistry {
+	// yy In my language intuition, a NetElementActivator (previous name) is something that activates something else.  
+	// Here, however, this something that is is activated _by_ something else.  What is a better name?  ActiveNetElementsRegister? 
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-
-public class KaiHybridEngine implements MobsimEngine {
-
-	private InternalInterface internalInterface;
-	private Map<Id,KaiHiResLink> hiResLinks = new TreeMap<Id,KaiHiResLink>() ;
-
-	@Override
-	public void afterSim() {
-	}
-
-	@Override
-	public void onPrepareSim() {
-	}
-
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface ;
-	}
-
-	@Override
-	public void doSimStep(double time) {
-		// this could now, for example, also go over the agents rather than over the links.
-	}
-
-	public void registerHiResLink(KaiHiResLink hiResLink) {
-		this.hiResLinks.put( hiResLink.getLink().getId(), hiResLink ) ;
-	}
+	abstract void registerNodeAsActive(final QNode node);
 	
-}
+	abstract int getNumberOfSimulatedNodes();
+	
+	abstract void registerLinkAsActive(final QLinkI link);
+
+	abstract int getNumberOfSimulatedLinks();
+} 

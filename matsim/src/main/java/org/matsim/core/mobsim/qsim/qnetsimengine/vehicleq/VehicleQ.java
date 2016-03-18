@@ -1,4 +1,4 @@
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq;
 
 import java.util.Queue;
 

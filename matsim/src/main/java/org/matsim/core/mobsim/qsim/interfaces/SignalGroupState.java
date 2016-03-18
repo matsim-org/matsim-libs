@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * SignalSystemState
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,27 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.mobsim.qsim.interfaces;
 
-package org.matsim.core.mobsim.qsim.qnetsimengine;
-
-import org.matsim.api.core.v01.network.Link;
 
 /**
- * Calculates the maximum speed a vehicle can travel with on a specific link 
- * at a specific time in a specific vehicle. If the speed should be depending
- * on the person driving it, use vehicle.getDriver(). But remember that not
- * every vehicle must have a Person as a driver.
  * 
- * @author mrieser / Senozon AG
+ * @author dgrether
+ *
  */
-public interface LinkSpeedCalculator {
-
-	/**
-	 * @param vehicle
-	 * @param link
-	 * @param time
-	 * @return the maximum speed the vehicle can travel on the given link.
-	 */
-	public double getMaximumVelocity(QVehicle vehicle, Link link, double time);
-
+public enum SignalGroupState {
+	REDYELLOW, GREEN, YELLOW, RED, OFF
 }

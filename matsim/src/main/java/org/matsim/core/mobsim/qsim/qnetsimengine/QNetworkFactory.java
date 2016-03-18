@@ -19,38 +19,44 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-
+import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.QSimModule;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 
 
 /**
- * Design thoughts:<ul>
- * <li> It would probably be much better to have this in a separate package.  But this means to move a lot of scopes from
- * "package" to protected.  Worse, the interfaces are not sorted out.  So I remain here for the time being.  kai, jan'11
+ * The current design idea of this is as follows:<ul>
+ * <li> It is now possible to inject this.  See {@link QSimModule} for how the default is set up.   It can also be overridden in the usual way.
+ * <li> For a specific example, see {@link DefaultQNetworkFactory}. 
+ * </ul>
+ * 
+ * <p/>
+ * 
+ * @author dgrether, nagel
+ * 
+ * @see DefaultQNetworkFactory
+ * @see ConfigurableQNetworkFactory
+ *
  */
-public final class KaiHybridNetworkFactory implements NetsimNetworkFactory {
+public abstract class QNetworkFactory implements MatsimFactory {
 
-	private final KaiHybridEngine hybridEngine;
+	/**
+	 * I need info from the mobsim.  However, as long as the factory is injected, it cannot get to "the" mobsim; at best, it
+	 * can get an instance of the mobsim which is, however, not the same mobsim it will be working with.  So "initializeFactory"
+	 * is called by the mobsim to provide some info about itself (e.g. agentCounter).
+	 * <p/>
+	 * This should make the "QNetwork" argument in the creational methods obsolete (which is serving a bit the same purpose).
+	 * @param mobsimTimer TODO
+	 * @param netsimEngine TODO
+	 */
+	abstract void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine ) ;
 
-	public KaiHybridNetworkFactory( KaiHybridEngine hybridEngine) {
-		this.hybridEngine = hybridEngine;
-	}
+	abstract QNode createNetsimNode(Node node, QNetwork network);
 
-	@Override
-	public QLinkI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
-		if ( link.getId().toString().equals("15") ) {
-			KaiHiResLink hiResLink = new KaiHiResLink(link, network, toQueueNode, hybridEngine ) ;
-			this.hybridEngine.registerHiResLink(hiResLink);
-			return hiResLink ;
-		} else {
-			return new QLinkImpl(link, network, toQueueNode);
-		}
-	}
-
-	@Override
-	public QNode createNetsimNode(final Node node, QNetwork network) {
-		return new QNode(node, network);
-	}
+	abstract QLinkI createNetsimLink(Link link, QNode queueNode);
 
 }

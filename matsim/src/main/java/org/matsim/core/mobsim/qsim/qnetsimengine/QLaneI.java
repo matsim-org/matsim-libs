@@ -22,10 +22,13 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vis.snapshotwriters.VisData;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+
 
 /**
  * Essentially an interface, but since I do not want the methods public for the time being, it is incarnated as an abstract class.
@@ -35,23 +38,23 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author nagel
  *
  */
-abstract class QLaneI {
+abstract class QLaneI implements Identifiable<Lane> {
 	
-	abstract void addFromWait( final QVehicle veh, final double now);
+	abstract void addFromWait( final QVehicle veh);
 
 	abstract boolean isAcceptingFromWait();
 
-	abstract void updateRemainingFlowCapacity();
-
 	abstract boolean isActive();
 
-	abstract double getSimulatedFlowCapacity();
-
-	abstract void recalcTimeVariantAttributes(final double now);
+	abstract double getSimulatedFlowCapacityPerTimeStep();
 
 	abstract QVehicle getVehicle( final Id<Vehicle> vehicleId);
 
 	abstract double getStorageCapacity();
+	
+	static interface VisData {
+		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions, double now ) ;
+	}
 
 	abstract VisData getVisData();
 
@@ -64,26 +67,16 @@ abstract class QLaneI {
 	 */
 	abstract void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
 	
-	abstract void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) ;
+	abstract void changeUnscaledFlowCapacityPerSecond( final double val ) ;
 
-	abstract void changeEffectiveNumberOfLanes( final double val, final double now ) ;
+	abstract void changeEffectiveNumberOfLanes( final double val ) ;
 
-	/**
-	 * Seems ok as public interface function. kai, aug'15
-	 */
-	abstract boolean doSimStep(final double now);
+	abstract boolean doSimStep();
 
-	/**
-	 * Seems ok as public interface function. kai, aug'15 
-	 */
 	abstract void clearVehicles();
 
 	abstract Collection<MobsimVehicle> getAllVehicles();
 
-	/**
-	 * <br>
-	 * seems ok as public interface function. kai, aug'15
-	 */
 	abstract void addFromUpstream(final QVehicle veh);
 
 	abstract boolean isNotOfferingVehicle();
@@ -97,5 +90,13 @@ abstract class QLaneI {
 	abstract boolean hasGreenForToLink(final Id<Link> toLinkId);
 
 	abstract boolean isAcceptingFromUpstream();
+
+	abstract void changeSpeedMetersPerSecond(double val) ;
+
+	/**
+	 * When multiple lanes lead to the same next link, the QLinkLanesImpl needs to decide which lane to use.  It uses
+	 * the one with the smallest load.
+	 */
+	abstract double getLoadIndicator() ;
 
 }

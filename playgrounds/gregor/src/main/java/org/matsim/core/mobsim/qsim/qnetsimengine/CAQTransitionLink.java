@@ -42,13 +42,18 @@ public class CAQTransitionLink extends QLinkI{
 	}
 
 	@Override
+	QLaneI getAcceptingQLane() {
+		return this.ql.getAcceptingQLane() ;
+	}
+	
+	@Override
 	public Link getLink() {
 		return this.ql.getLink();
 	}
 
 	@Override
-	public void recalcTimeVariantAttributes(double time) {
-		this.ql.recalcTimeVariantAttributes(time);
+	public void recalcTimeVariantAttributes() {
+		this.ql.recalcTimeVariantAttributes();
 		
 	}
 
@@ -73,8 +78,8 @@ public class CAQTransitionLink extends QLinkI{
 	}
 
 	@Override
-	boolean doSimStep(double now) {
-		return this.ql.doSimStep(now);
+	boolean doSimStep() {
+		return this.ql.doSimStep();
 	}
 
 	@Override
@@ -165,24 +170,13 @@ public class CAQTransitionLink extends QLinkI{
 	}
 
 	@Override
-	public void addFromUpstream(QVehicle veh) {
-
-		this.ql.addFromUpstream(veh);
-	}
-
-	@Override
 	boolean isNotOfferingVehicle() {
 		return this.ql.isNotOfferingVehicle();
 	}
 
 	@Override
-	public boolean isAcceptingFromUpstream() {
-		return this.ql.isAcceptingFromUpstream();
-	}
-
-	@Override
-	List<QLaneI> getToNodeQueueLanes() {
-		return this.ql.getToNodeQueueLanes() ;
+	List<QLaneI> getOfferingQLanes() {
+		return this.ql.getOfferingQLanes() ;
 	}
 
 }

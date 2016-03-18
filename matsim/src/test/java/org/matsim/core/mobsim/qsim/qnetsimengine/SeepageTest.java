@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,7 +70,8 @@ import org.matsim.vehicles.VehicleUtils;
  */
 @RunWith(Parameterized.class)
 public class SeepageTest {
-	
+	static private final Logger log = Logger.getLogger( SeepageTest.class);
+
 	private final boolean isUsingFastCapacityUpdate;
 	
 	public SeepageTest(boolean isUsingFastCapacityUpdate) {
@@ -185,7 +188,7 @@ public class SeepageTest {
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.walk));
 			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ.name());
 			
-			config.qsim().setSeepMode("walk");
+			config.qsim().setSeepMode(TransportMode.walk);
 			config.qsim().setSeepModeStorageFree(false);
 			config.qsim().setRestrictingSeepage(true);
 			
@@ -226,6 +229,9 @@ public class SeepageTest {
 				this.personLinkTravelTimes.put(Id.createPersonId(event.getVehicleId()), travelTimes);
 			}
 			travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
+			if ( event.getLinkId().equals( Id.createLinkId("2") ) ) {
+				log.info( event );
+			}
 		}
 
 		@Override
@@ -237,6 +243,9 @@ public class SeepageTest {
 					double time = event.getTime() - d.doubleValue();
 					travelTimes.put(event.getLinkId(), Double.valueOf(time));
 				}
+			}
+			if ( event.getLinkId().equals( Id.createLinkId("2") ) ) {
+				log.info( event );
 			}
 		}
 

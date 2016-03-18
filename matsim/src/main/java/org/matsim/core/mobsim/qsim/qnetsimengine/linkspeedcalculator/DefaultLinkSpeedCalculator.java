@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.qnetsimengine;
-
+package org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.internal.MatsimFactory;
-
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
 /**
- * @author dgrether
+ * A simple link speed calculator taking the vehicle's max speed and the link's
+ * free speed into account;
+ * 
+ * @author mrieser / Senozon AG
  */
-public interface NetsimNetworkFactory extends MatsimFactory {
+public final class DefaultLinkSpeedCalculator implements LinkSpeedCalculator {
 
-	QNode createNetsimNode(Node node, QNetwork network);
-
-	QLinkI createNetsimLink(Link link, QNetwork network, QNode queueNode);
-
+	@Override
+	public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
+		return Math.min(vehicle.getMaximumVelocity(), link.getFreespeed(time));
+	}
+	
 }

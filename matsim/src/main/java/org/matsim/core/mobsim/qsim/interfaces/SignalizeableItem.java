@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * SignalizedItem
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,22 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.mobsim.qsim.interfaces;
 
-package org.matsim.core.mobsim.qsim.qnetsimengine;
-
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-/**
- * A simple link speed calculator taking the vehicle's max speed and the link's
- * free speed into account;
- * 
- * @author mrieser / Senozon AG
- */
-/*package*/ class DefaultLinkSpeedCalculator implements LinkSpeedCalculator {
 
-	@Override
-	public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
-		return Math.min(vehicle.getMaximumVelocity(), link.getFreespeed(time));
-	}
+/**
+ * A simulation element that leads to something with an Id. In usual traffic/network applications
+ * this would be a link or lane that is leading to one to several links.
+ * 
+ * The SignalizeableItem must be notified by its property to be signalized by calling the setSignalized(..) method.
+ * 
+ * @author dgrether
+ *
+ */
+public interface SignalizeableItem {
 	
+	void setSignalized(final boolean isSignalized);
+	
+	void setSignalStateAllTurningMoves(final SignalGroupState state);
+	
+	void setSignalStateForTurningMove(final SignalGroupState state, final Id<Link> toLinkId);
+
 }
