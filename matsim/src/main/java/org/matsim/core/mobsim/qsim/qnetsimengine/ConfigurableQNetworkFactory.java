@@ -36,6 +36,10 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 /**
  * Device to avoid typing lots of lines in code that does not use this from injection.  
+ * 
+ * @author knagel
+ * 
+ * @see DefaultQNetworkFactory
  */
 public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 	private QSimConfigGroup qsimConfig ;

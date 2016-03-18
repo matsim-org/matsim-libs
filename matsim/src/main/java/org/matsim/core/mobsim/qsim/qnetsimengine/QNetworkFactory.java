@@ -24,11 +24,23 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.QSimModule;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 
 
 /**
- * @author dgrether
+ * The current design idea of this is as follows:<ul>
+ * <li> It is now possible to inject this.  See {@link QSimModule} for how the default is set up.   It can also be overridden in the usual way.
+ * <li> For a specific example, see {@link DefaultQNetworkFactory}. 
+ * </ul>
+ * 
+ * <p/>
+ * 
+ * @author dgrether, nagel
+ * 
+ * @see DefaultQNetworkFactory
+ * @see ConfigurableQNetworkFactory
+ *
  */
 public abstract class QNetworkFactory implements MatsimFactory {
 
