@@ -317,7 +317,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	 final void updateRemainingFlowCapacity() {
+	private final void updateRemainingFlowCapacity() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		if ( this.lastUpdate==now ) {
 			return ;
