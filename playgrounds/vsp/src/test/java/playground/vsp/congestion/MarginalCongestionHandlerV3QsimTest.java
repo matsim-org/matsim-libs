@@ -1305,7 +1305,7 @@ private void setPopulation6(Scenario scenario) {
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
-//		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
 		Scenario scenario = (ScenarioUtils.createScenario(config));
