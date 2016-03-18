@@ -333,14 +333,10 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				}
 			} else {
 				StringBuilder b = new StringBuilder();
-				b.append("Person Id: ");
-				b.append(veh.getDriver().getId());
-				b.append(" is on Lane Id ");
-				b.append(((QueueWithBuffer) qlane).getId());
-				b.append(" on Link Id ");
-				b.append(this.getLink().getId());
-				b.append(" and wants to drive to Link Id ");
-				b.append(toLinkId);
+				b.append("Person Id: ").append(veh.getDriver().getId());
+				b.append(" is on Lane Id ").append(((QueueWithBuffer) qlane).getId());
+				b.append(" on Link Id ").append(this.getLink().getId());
+				b.append(" and wants to drive to Link Id ").append(toLinkId);
 				b.append(" but there is no Lane leading to that Link!");
 				log.error(b.toString());
 				throw new IllegalStateException(b.toString());
