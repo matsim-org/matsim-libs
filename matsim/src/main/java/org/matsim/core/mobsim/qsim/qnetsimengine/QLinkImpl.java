@@ -28,12 +28,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -65,6 +67,9 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		Builder(NetsimEngineContext context, QNetsimEngine netsimEngine) {
 			this.context = context ;
 			this.netsimEngine = netsimEngine;
+			if (context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ || context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ) {
+				this.vehicleQueue = new PassingVehicleQ() ;
+			}
 		} 
 		QLinkImpl build( Link link, QNode toNode ) {
 			if ( laneFactory == null ) {

@@ -83,6 +83,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			this.context = context ;
 			if (context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ || context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ) {
 				this.vehicleQueue = new PassingVehicleQ() ;
+				// yyyyyy note that this is effectively overridden again by QLinkImpl.Builder.  Also points to the fact that maybe all
+				// QNetworkFactory instances should declare all components themselves and directly. kai, mar'16
 			}
 		}
 		@Override public QueueWithBuffer createLane( AbstractQLink qLink ) {

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -43,6 +44,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -73,6 +75,7 @@ import org.matsim.vehicles.VehicleTypeImpl;
 
 @RunWith(Parameterized.class)
 public final class QLinkTest extends MatsimTestCase {
+	private static final Logger logger = Logger.getLogger( QLinkTest.class );
 
 	private final boolean isUsingFastCapacityUpdate;
 	
@@ -486,6 +489,7 @@ public final class QLinkTest extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().qsim().setStuckTime(100);
 		scenario.getConfig().qsim().setRemoveStuckVehicles(true);
+		MatsimRandom.reset(4711); // yyyyyy !!!!!!
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new Coord(0, 0));
@@ -525,6 +529,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 		int stuckCnt = 0;
 		for (Event e : collector.getEvents()) {
+			logger.warn( e ) ;
 			if (e instanceof PersonStuckEvent) {
 				stuckCnt++;
 			}
