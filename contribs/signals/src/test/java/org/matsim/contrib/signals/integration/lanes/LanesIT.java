@@ -143,14 +143,24 @@ public class LanesIT {
 			 * to link 35 with 1200 veh/h (approx. 33.3 %)
 			 * to link 36 with 1800 veh/h to link 36 (approx. 50 %).
 			 */
+			
+			log.info( "link34:" + percent34 );
+			log.info( "link35:" + percent35 );
+			log.info( "link36:" + percent36 );
+			
 //			Assert.assertTrue("", (15.5 < percent34 && percent34 < 17.5));
 //			Assert.assertTrue("", (32.5 < percent35 && percent35 < 34.5));
 //			Assert.assertTrue("", (49.0 < percent36 && percent36 < 51.0));
 			
 			// shifting the error margins so that 50 iterations are enough. kai, feb'16
-			Assert.assertTrue("", (17.4 < percent34 && percent34 < 17.5));
-			Assert.assertTrue("", (34.5 < percent35 && percent35 < 34.6));
-			Assert.assertTrue("", (47.9 < percent36 && percent36 < 48.0));
+//			Assert.assertTrue("", (17.4 < percent34 && percent34 < 17.5));
+//			Assert.assertTrue("", (34.5 < percent35 && percent35 < 34.6));
+//			Assert.assertTrue("", (47.9 < percent36 && percent36 < 48.0));
+
+			// had a change in the dynamics that seems to lead to faster convergence.  kai, mar'16
+			Assert.assertTrue("", (17.1 < percent34 && percent34 < 17.2));
+			Assert.assertTrue("", (33.7 < percent35 && percent35 < 33.8));
+			Assert.assertTrue("", (49.1 < percent36 && percent36 < 49.2));
 		}
 	}
 

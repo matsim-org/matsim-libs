@@ -317,7 +317,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	private final void updateRemainingFlowCapacity() {
+	final void updateRemainingFlowCapacity() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		if ( this.lastUpdate==now ) {
 			return ;
@@ -571,7 +571,6 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		if (this.context.qsimConfig.isUseLanes() ) {
 			if (  this.qLink.getAcceptingQLane() != this.qLink.getOfferingQLanes().get(0) ) {
 				this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(), this.qLink.getLink().getId(), this.getId() ));
-				// yyyyyy the number of events now seems to be same as before.  but some of them come a time step earlier. kai, mar'16
 			}
 		}
 		return veh;
