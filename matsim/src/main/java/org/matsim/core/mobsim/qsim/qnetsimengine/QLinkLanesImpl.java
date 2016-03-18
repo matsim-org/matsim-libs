@@ -282,7 +282,10 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				// Tests run ok, but it may have capacity ramifications outside tests.  kai, mar'16
 			}
 			/* end of part A */
-			
+		}
+		for (QLaneI lane : this.laneQueues.values()) {
+			// (go through all lanes)
+		
 			/* part B */
 			// move vehicles to the lane buffer if they have reached their earliest lane exit time
 			lane.doSimStep();
