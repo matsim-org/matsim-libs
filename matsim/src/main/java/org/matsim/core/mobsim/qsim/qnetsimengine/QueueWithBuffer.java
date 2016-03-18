@@ -190,7 +190,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final LinkSpeedCalculator linkSpeedCalculator;
 	private final NetsimEngineContext context;
 
-	private double lastUpdate;
+	private double lastUpdate = Double.NEGATIVE_INFINITY ;
 
 	private QueueWithBuffer(AbstractQLink qlink,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> laneId, 
 			double length, double effectiveNumberOfLanes, double flowCapacity_s, final NetsimEngineContext context, 
@@ -286,6 +286,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	private boolean hasFlowCapacityLeftAndBufferSpace() {
+		// yyyyyy really not so pretty that we have updateFlowAccumulation in fastCapUp and updateRemainingFlowCap in normalCapUp.
+		// In particular since the last one was a bit confused in the code before.  Need to clean up.  kai, mar'16
+		
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
 			updateFlowAccumulation(); 
 			return (
@@ -294,6 +297,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 					((flowcap_accumulate.getValue() > 0.0) )
 					);
 		} else {
+			this.updateRemainingFlowCapacity();
 			return (
 					usedBufferStorageCapacity < bufferStorageCapacity
 					&&

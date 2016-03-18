@@ -169,6 +169,10 @@ abstract class AbstractQLink extends QLinkI {
 		this.waitingList.add(vehicle);
 		vehicle.setCurrentLink(this.getLink());
 		this.activateLink();
+		
+		double now = context.getSimTimer().getTimeOfDay() ;
+		log.warn( "at time=" + now + " added departing vehicle=" + vehicle.getId() );
+		
 	}
 
 	@Override

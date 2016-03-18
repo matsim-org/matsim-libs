@@ -132,6 +132,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override
 	boolean doSimStep() {
+		((QueueWithBuffer)qlane).updateRemainingFlowCapacity(); 
+		
 		double now = context.getSimTimer().getTimeOfDay() ;
 		if ( context.qsimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
 			this.moveWaitToRoad();
@@ -157,11 +159,15 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	private void moveWaitToRoad() {
 		double now = context.getSimTimer().getTimeOfDay() ;
+		if ( now==0. ) log.warn( "here10" );
 		while (qlane.isAcceptingFromWait() ) {
+			if ( now==0. ) log.warn( "here20" );
 			QVehicle veh = this.getWaitingList().poll();
 			if (veh == null) {
 				return;
 			}
+			
+			log.warn(" at time=" + now + " moving vehicle with ID=" + veh.getId() + " to road" ) ;
 
 			context.getEventsManager().processEvent(
 					new VehicleEntersTrafficEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId(), veh.getDriver().getMode(), 1.0));
