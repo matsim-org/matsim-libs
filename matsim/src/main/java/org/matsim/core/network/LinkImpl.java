@@ -243,21 +243,14 @@ public class LinkImpl implements Link {
 		return this.length / this.freespeed;
 	}
 
+	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
 	public double getFlowCapacityPerSec() {
 		return getFlowCapacityPerSec(Time.UNDEFINED_TIME);
 	}
 
+	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
 	public double getFlowCapacityPerSec(final double time) {
 		return this.capacity / network.getCapacityPeriod();
-	}
-	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
-	public double getFlowCapacity() {
-		return getFlowCapacity(Time.UNDEFINED_TIME);
-	}
-
-	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
-	public double getFlowCapacity(final double time) {
-		return this.flowCapacity;
 	}
 
 	public final String getOrigId() {
