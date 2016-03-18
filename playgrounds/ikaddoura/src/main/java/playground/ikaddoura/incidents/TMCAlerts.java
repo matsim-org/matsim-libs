@@ -119,8 +119,8 @@ public class TMCAlerts {
 					
 					incidentLink = nf.createLink(link.getId(), link.getFromNode(), link.getToNode());
 					incidentLink.setAllowedModes(link.getAllowedModes());
-					incidentLink.setCapacity(1.0);
-					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setCapacity(0.1);
+					incidentLink.setNumberOfLanes(0.1);
 					incidentLink.setFreespeed(0.22227);
 				
 				} else if (containsOrEndsWith(trafficItem, "C31")) { // closed for cars
@@ -132,8 +132,8 @@ public class TMCAlerts {
 					
 					incidentLink = nf.createLink(link.getId(), link.getFromNode(), link.getToNode());
 					incidentLink.setAllowedModes(allowedModes);
-					incidentLink.setCapacity(1.0);
-					incidentLink.setNumberOfLanes(1.0);
+					incidentLink.setCapacity(0.1);
+					incidentLink.setNumberOfLanes(0.1);
 					incidentLink.setFreespeed(0.22227);
 				
 				// one (or maybe more?) lane(s) closed
