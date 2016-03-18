@@ -34,8 +34,8 @@
 		<param name="removeStuckVehicles" value="false" />
 		<param name="stuckTime" value="36000" />
 		
-		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
-	</module>
+<!-- 		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
+ -->	</module>
 	
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
