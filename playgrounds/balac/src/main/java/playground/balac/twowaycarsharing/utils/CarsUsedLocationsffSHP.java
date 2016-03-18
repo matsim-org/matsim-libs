@@ -72,7 +72,7 @@ public class CarsUsedLocationsffSHP {
 				s = readLink2.readLine();
 			}
 	        
-	        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/used_ff_low_1x.shp");
+	        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/used_ff_medium_4x.shp");
 	     
 
 	}
