@@ -27,14 +27,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -46,7 +44,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -111,17 +108,16 @@ public class MarginalCongestionHandlerV3V7QsimTest {
 		final CongestionHandlerImplV3 congestionHandler = new CongestionHandlerImplV3(events, sc);
 		
 		events.addHandler( new CongestionEventHandler() {
-			@Override public void reset(int iteration) { }
-			@Override public void handleEvent(CongestionEvent event) {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}	
 		});
-//		events.addHandler( new BasicEventHandler(){
-//			@Override public void reset(int iteration) { }
-//			@Override public void handleEvent(Event event) {
-//				Logger.getLogger( MarginalCongestionHandlerV3V7QsimTest.class ).warn( event );
-//			}
-//		} ) ;
 		
 		events.addHandler(congestionHandler);
 				
@@ -291,7 +287,7 @@ public class MarginalCongestionHandlerV3V7QsimTest {
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
-//		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
 		Scenario scenario = (ScenarioUtils.createScenario(config));
