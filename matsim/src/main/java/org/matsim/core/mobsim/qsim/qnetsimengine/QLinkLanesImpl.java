@@ -247,7 +247,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		boolean lanesActive = false;
 		boolean movedWaitToRoad = false;
-		if (this.isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
+		if ( context.qsimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles() ) {
 			this.moveWaitToRoad(now);
 			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);
 			lanesActive = this.moveLanes();

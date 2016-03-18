@@ -96,9 +96,6 @@ abstract class AbstractQLink extends QLinkI {
 	 */
 	private final Queue<QVehicle> waitingList = new LinkedList<>();
 
-
-	private final boolean insertingWaitingVehiclesBeforeDrivingVehicles;
-
 	private boolean active = false;
 
 	private TransitQLink transitQLink;
@@ -114,7 +111,6 @@ abstract class AbstractQLink extends QLinkI {
 		this.toQNode = toQNode ;
 		this.context = context;
 		this.netsimEngine = netsimEngine;
-		this.insertingWaitingVehiclesBeforeDrivingVehicles = context.qsimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
 	}
 	
 	@Override QNode getToNode() {
@@ -443,10 +439,6 @@ abstract class AbstractQLink extends QLinkI {
 	@Override
 	public Link getLink() {
 		return link;
-	}
-
-	boolean isInsertingWaitingVehiclesBeforeDrivingVehicles() {
-		return insertingWaitingVehiclesBeforeDrivingVehicles;
 	}
 
 	boolean isActive() {
