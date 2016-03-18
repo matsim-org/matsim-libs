@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
@@ -386,7 +387,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 * departure time of vehicle. Also removes vehicles from lane if the vehicle
 	 * arrived at its destination.
 	 */
-	private final void moveQueueToBuffer() {
+	 private final void moveQueueToBuffer() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		
 		QVehicle veh;
@@ -562,9 +563,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		QVehicle veh = removeFirstVehicle();
 		if (this.context.qsimConfig.isUseLanes() ) {
-			this.context.getEventsManager().processEvent(new LaneLeaveEvent(
-					now, veh.getId(), this.qLink.getLink().getId(), this.getId()
-					));
+			if ( this.qLink.getOfferingQLanes().size()>1 || this != this.qLink.getAcceptingQLane() ) {
+				this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(), this.qLink.getLink().getId(), this.getId() ));
+				// yyyyyy the number of events now seems to be same as before.  but some of them come a time step earlier. kai, mar'16
+			}
 		}
 		return veh;
 	}
@@ -642,6 +644,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	@Override
 	 final void addFromUpstream(final QVehicle veh) {
 		double now = context.getSimTimer().getTimeOfDay() ;
+
+		if (this.context.qsimConfig.isUseLanes() ) {
+			if ( this.qLink.getOfferingQLanes().size()>1) {
+				this.context.getEventsManager().processEvent(new LaneEnterEvent( now, veh.getId(), this.qLink.getLink().getId(), this.getId() ));
+			}
+		}
 
 		// activate link since there is now action on it:
 		qLink.activateLink();

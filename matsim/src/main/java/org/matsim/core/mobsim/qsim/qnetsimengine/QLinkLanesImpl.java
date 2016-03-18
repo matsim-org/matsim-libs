@@ -250,10 +250,10 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		if (this.isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
 			this.moveWaitToRoad(now);
 			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);
-			lanesActive = this.moveLanes(now);
+			lanesActive = this.moveLanes();
 		} else {
 			this.getTransitQLink().handleTransitVehiclesInStopQueue(now);
-			lanesActive = this.moveLanes(now);
+			lanesActive = this.moveLanes();
 			movedWaitToRoad = this.moveWaitToRoad(now);
 		}
 		this.setActive(lanesActive || movedWaitToRoad || (!this.getWaitingList().isEmpty())
@@ -261,18 +261,21 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		return this.isActive();
 	}
 
-	private boolean moveLanes(double now) {
+	private boolean moveLanes() {
 		boolean activeLane = false;
-		for (QLaneI queue : this.laneQueues.values()) {
+		for (QLaneI lane : this.laneQueues.values()) {
+			// (go through all lanes)
 			
 			/* part A */
-			if (!this.toNodeLaneQueues.contains(queue)) {
+			if (!this.toNodeLaneQueues.contains(lane)) {
+				// (so it HAS a link-internal next lane)
+				
 				// move vehicles from the lane buffer to the next lane
-				this.moveBufferToNextLane(now, queue);
+				this.moveBufferToNextLane(lane);
 			} else {
 				// move vehicles from the lane buffer to the link buffer, i.e. prepare moving them
 				// to the next link
-//				((QueueWithBuffer) queue).moveQueueToBuffer(now);
+//				((QueueWithBuffer) queue).moveQueueToBuffer();
 				// yy just commented out the above line.  Can't say why it might needed; doSimStep also calls moveQueueToBuffer.
 				// Tests run ok, but it may have capacity ramifications outside tests.  kai, mar'16
 			}
@@ -280,10 +283,10 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			
 			/* part B */
 			// move vehicles to the lane buffer if they have reached their earliest lane exit time
-			queue.doSimStep();
+			lane.doSimStep();
 			/* end of part B */
 			
-			activeLane = activeLane || queue.isActive();
+			activeLane = activeLane || lane.isActive();
 			
 			/*
 			 * Remark: The order of part A and B influences the travel time on lanes.
@@ -304,7 +307,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		return activeLane;
 	}
 
-	private void moveBufferToNextLane(final double now, QLaneI qlane) {
+	private void moveBufferToNextLane(QLaneI qlane) {
 		QVehicle veh;
 		while (!qlane.isNotOfferingVehicle()) {
 			veh = qlane.getFirstVehicle();
@@ -313,13 +316,13 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			if (nextQueue != null) {
 				if (nextQueue.isAcceptingFromUpstream()) {
 					((QueueWithBuffer) qlane).popFirstVehicle();
-					context .getEventsManager() .processEvent(
-									new LaneLeaveEvent(now, veh.getId(), this.getLink()
-											.getId(), ((QueueWithBuffer) qlane).getId()));
+//					context .getEventsManager() .processEvent(
+//									new LaneLeaveEvent(now, veh.getId(), this.getLink()
+//											.getId(), ((QueueWithBuffer) qlane).getId()));
 					nextQueue.addFromUpstream(veh);
-					context .getEventsManager() .processEvent(
-									new LaneEnterEvent(now, veh.getId(), this.getLink()
-											.getId(), ((QueueWithBuffer) nextQueue).getId()));
+//					context .getEventsManager() .processEvent(
+//									new LaneEnterEvent(now, veh.getId(), this.getLink()
+//											.getId(), ((QueueWithBuffer) nextQueue).getId()));
 				} else {
 					break;
 				}

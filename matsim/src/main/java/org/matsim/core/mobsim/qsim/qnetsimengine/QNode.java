@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -305,6 +306,7 @@ public class QNode implements NetsimNode {
 	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final QLaneI fromLane, final double now, Id<Link> currentLinkId) {
 		fromLane.popFirstVehicle();
 		// -->
+//		network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(now, veh.getId(), currentLinkId, fromLane.getId()));
 		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
 		// <--
 		
@@ -331,6 +333,7 @@ public class QNode implements NetsimNode {
 
 		fromLane.popFirstVehicle();
 		// -->
+//		network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(now, veh.getId(), currentLinkId, fromLane.getId()));
 		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
 		// <--
 

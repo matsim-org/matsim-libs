@@ -140,7 +140,7 @@ public abstract class EventsFileComparator {
 			for (Entry<String, Counter> e : map2.entrySet()) {
 				Counter c = map1.get(e.getKey());
 				if (c == null) {
-					log.warn("Missing event:" + e.getKey() + "\nin events file:" + worker2.getEventsFile());
+					log.warn("Missing event:" + e.getKey() + "\nin events file:" + worker1.getEventsFile());
 					setExitCode(CODE_MISSING_EVENT);
 					return;
 				}
