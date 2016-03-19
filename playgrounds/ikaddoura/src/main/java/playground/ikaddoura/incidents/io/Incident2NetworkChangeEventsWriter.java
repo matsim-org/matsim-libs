@@ -59,7 +59,7 @@ public class Incident2NetworkChangeEventsWriter {
 	private static final Logger log = Logger.getLogger(Incident2NetworkChangeEventsWriter.class);
 	private final double dayEndTime = (24 * 3600.) - 1.;
 	
-	private boolean debug = true;
+	private boolean debug = false;
 	
 	private Map<String, TrafficItem> trafficItems = null;
 	private Map<String, Path> trafficItemId2path = null;

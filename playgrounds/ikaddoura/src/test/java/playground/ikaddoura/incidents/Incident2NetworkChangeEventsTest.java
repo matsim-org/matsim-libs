@@ -65,7 +65,7 @@ public class Incident2NetworkChangeEventsTest {
 		
 		// test traffic items
 		
-		Assert.assertEquals("Wrong number of traffic items.", 277, analysis.getTrafficItems().size());
+		Assert.assertEquals("Wrong number of traffic items.", 279, analysis.getTrafficItems().size());
 		
 		Assert.assertEquals("Wrong incident code.", "C1", analysis.getTrafficItems().get("936802552584210227").getTMCAlert().getPhraseCode());
 		Assert.assertEquals("Wrong incident start time.", DateTime.parseDateTimeToDateTimeSeconds("2016/03/15 07:15:33"), DateTime.parseDateTimeToDateTimeSeconds(analysis.getTrafficItems().get("936802552584210227").getStartDateTime()), MatsimTestUtils.EPSILON);
@@ -87,7 +87,7 @@ public class Incident2NetworkChangeEventsTest {
 		
 		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getCapacity(16 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong freespeed during the afternoon.", 13.88888888888888, link.getFreespeed(16 * 3600.), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong capacity during the morning.", 1.,link.getCapacity(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong capacity during the morning.", 0.1, link.getCapacity(10 * 3600.), MatsimTestUtils.EPSILON);		
 		Assert.assertEquals("Wrong freespeed during the morning.", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
 	}
 	
@@ -105,7 +105,7 @@ public class Incident2NetworkChangeEventsTest {
 		
 		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getCapacity(16 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong freespeed during the afternoon.", 13.88888888888888, link.getFreespeed(16 * 3600.), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong capacity during the morning.", 1.,link.getCapacity(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong capacity during the morning.", 1., link.getCapacity(10 * 3600.), MatsimTestUtils.EPSILON);		
 		Assert.assertEquals("Wrong freespeed during the morning.", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
 	}
 		

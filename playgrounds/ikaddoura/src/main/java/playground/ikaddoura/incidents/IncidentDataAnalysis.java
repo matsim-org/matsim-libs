@@ -52,11 +52,11 @@ public class IncidentDataAnalysis {
 
 	private String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
 	private String inputDirectory = "/Users/ihab/Desktop/testXmlFiles/";
-	private String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis/";
+	private String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis_2016-02-11/";
 	
 	private boolean writeCSVFileForEachXMLFile = false;
-	private String startDateTime = "2016/03/15";
-	private String endDateTime = "2016/03/15";
+	private String startDateTime = "2016/02/11";
+	private String endDateTime = "2016/02/11";
 		
 // ##################################################################
 	
@@ -99,7 +99,7 @@ public class IncidentDataAnalysis {
 		}
 		
 		collectTrafficItems(); // traffic items that have the same traffic item IDs are updated by the more recent information or by the update traffic item
-//		Incident2CSVWriter.writeTrafficItems(trafficItems.values(), outputDirectory + "incidentData_beforeConsideringUpdateMessages.csv");
+		Incident2CSVWriter.writeTrafficItems(trafficItems.values(), outputDirectory + "incidentData_beforeConsideringUpdateMessages.csv");
 	
 		updateTrafficItems(); // update all traffic items that are updated or canceled by another traffic item
 		
@@ -298,12 +298,17 @@ public class IncidentDataAnalysis {
 						// the update and original traffic items' locations are the same
 						
 					} else {
-						log.warn("An update message should only update the incident's endtime. The location should remain the same. Compare the following traffic items:");
-						log.warn("Normal traffic item: " + originalItem);
-						log.warn("Update traffic item: " + updateItem);
 						
-						log.warn("If the from and to locations' descriptions are the same: Ok, probably some minor location coordinate corrections. Proceed...");
-						log.warn("If the from and to locations' descriptions are not the same: Assuming that this is still the update for the previous traffic item. Proceed....");
+						if (originalItem.getOrigin() == null && originalItem.getTo() == null) {
+							// Ok, probably some minor location coordinate corrections. Proceed...
+							
+						} else {
+							log.warn("An update message should only update the incident's endtime. The location should remain the same. Compare the following traffic items:");
+							log.warn("Normal traffic item: " + originalItem);
+							log.warn("Update traffic item: " + updateItem);
+							
+							log.warn("If the from and to locations' descriptions are not the same: Assuming that this is still the update for the previous traffic item. Proceed....");
+						}						
 					}
 					originalItem.setEndDateTime(updateItem.getStartDateTime());
 					updateItemsToBeDeleted.add(updateItem.getId());
@@ -333,23 +338,31 @@ public class IncidentDataAnalysis {
 							// only update the end time
 							
 							originalItem.setEndDateTime(updateItem.getEndDateTime());
+							updateItemsToBeDeleted.add(updateItem.getId());
 							
 						} else {
 							
-							log.warn("An update item should only update the incident's endtime. The location and alert code should remain the same. Compare the following traffic items:");
-							log.warn("Original traffic item: " + originalItem);
-							log.warn("Update traffic item: " + updateItem);
+							if (updateItem.getTMCAlert().getPhraseCode().equals(originalItem.getTMCAlert().getPhraseCode()) ||  ( updateItem.getTMCAlert().getPhraseCode().startsWith("Q1(") && originalItem.getTMCAlert().getPhraseCode().startsWith("Q1("))) {
+								
+//								log.warn("An update item should only update the incident's endtime. The location and alert code should remain the same. Compare the following traffic items:");
+//								log.warn("Original traffic item: " + originalItem);
+//								log.warn("Update traffic item: " + updateItem);
+//								log.warn("The same alert code --> Updating the end time and the location information...");
+								
+								originalItem.setEndDateTime(updateItem.getEndDateTime());
+								originalItem.setOrigin(updateItem.getOrigin());
+								originalItem.setTo(updateItem.getTo());
+								
+								updateItemsToBeDeleted.add(updateItem.getId());
 							
-							log.warn("If the from and to locations' descriptions are the same: Ok, probably some minor location coordinate corrections. Proceed...");
-							log.warn("If the from and to locations' descriptions are not the same: Assuming that this is still the update for the previous traffic item. Proceed....");
-							
-							originalItem.setEndDateTime(updateItem.getEndDateTime());
-							originalItem.setOrigin(updateItem.getOrigin());
-							originalItem.setTo(updateItem.getTo());
-							originalItem.setTMCAlert(updateItem.getTMCAlert());
-						}
-						
-						updateItemsToBeDeleted.add(updateItem.getId());
+							} else {
+								
+								log.warn("An update item should only update the incident's endtime. The location and alert code should remain the same. Compare the following traffic items:");
+								log.warn("Original traffic item: " + originalItem);
+								log.warn("Update traffic item: " + updateItem);
+								log.warn("Different alert codes --> Considering the update traffic item as a new traffic item...");								
+							}
+						}						
 					}
 				}				
 			}
