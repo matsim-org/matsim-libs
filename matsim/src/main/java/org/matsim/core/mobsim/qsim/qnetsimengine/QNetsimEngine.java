@@ -84,7 +84,6 @@ public class QNetsimEngine implements MobsimEngine {
 
 	private final QSim qsim;
 
-	private final double stucktimeCache;
 	private final VehicularDepartureHandler dpHandler;
 
 	private double infoTime = 0;
@@ -125,7 +124,6 @@ public class QNetsimEngine implements MobsimEngine {
 
 		final Config config = sim.getScenario().getConfig();
 		final QSimConfigGroup qsimConfigGroup = config.qsim();
-		this.stucktimeCache = qsimConfigGroup.getStuckTime();
 		this.usingThreadpool = qsimConfigGroup.isUsingThreadpool();
 
 
@@ -362,13 +360,6 @@ public class QNetsimEngine implements MobsimEngine {
 
 	public NetsimNetwork getNetsimNetwork() {
 		return this.network;
-	}
-
-	/**
-	 * convenience method so that stuck time can be cached without caching it in every node separately.  kai, jun'10
-	 */
-	double getStuckTime() {
-		return this.stucktimeCache;
 	}
 
 	public VehicularDepartureHandler getDepartureHandler() {
