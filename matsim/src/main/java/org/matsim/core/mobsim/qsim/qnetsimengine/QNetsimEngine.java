@@ -97,7 +97,7 @@ public class QNetsimEngine implements MobsimEngine {
 
 	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 
-	/*package*/ InternalInterface internalInterface = null;
+	private InternalInterface internalInterface = null;
 
 	private int numOfRunners;
 
@@ -533,5 +533,9 @@ public class QNetsimEngine implements MobsimEngine {
 		public Thread newThread(Runnable r) {
 			return new Thread( r , "QNetsimEngine_PooledThread_" + count++);
 		}
+	}
+
+	final void arrangeNextAgentState(MobsimAgent pp) {
+		internalInterface.arrangeNextAgentState(pp);
 	}
 }

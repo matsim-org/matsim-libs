@@ -328,7 +328,7 @@ public class QNode implements NetsimNode {
 		for ( PassengerAgent pp : veh.getPassengers() ) {
 			if ( pp instanceof MobsimAgent ) {
 				((MobsimAgent)pp).setStateToAbort(now);
-				netsimEngine.internalInterface.arrangeNextAgentState((MobsimAgent)pp) ;
+				netsimEngine.arrangeNextAgentState((MobsimAgent)pp) ;
 			} else if ( wrnCnt < 1 ) {
 				wrnCnt++ ; 
 				log.warn("encountering PassengerAgent that cannot be cast into a MobsimAgent; cannot say if this is a problem" ) ;
@@ -338,7 +338,7 @@ public class QNode implements NetsimNode {
 
 		// now treat the driver:
 		veh.getDriver().setStateToAbort(now) ;
-		netsimEngine.internalInterface.arrangeNextAgentState(veh.getDriver()) ;
+		netsimEngine.arrangeNextAgentState(veh.getDriver()) ;
 	
 	}
 
