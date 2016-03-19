@@ -139,7 +139,7 @@ public class QNetsimEngine implements MobsimEngine {
 		default:
 			throw new RuntimeException("Unknown vehicle behavior option.");			
 		}
-		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior);
+		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior, qSimConfigGroup);
 		
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
 			log.info("Seepage is allowed. Seep mode is " + qSimConfigGroup.getSeepMode() + ".");
@@ -156,14 +156,14 @@ public class QNetsimEngine implements MobsimEngine {
 			QSimConfigGroup qsimConfig = sim.getScenario().getConfig().qsim() ;
 			Network net = scenario.getNetwork() ;
 			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( qsimConfig, events, net, scenario );
-			MobsimTimer mobsimTimer = this.getMobsim().getSimTimer() ;
-			AgentCounter agentCounter = this.getMobsim().getAgentCounter() ;
+			MobsimTimer mobsimTimer = sim.getSimTimer() ;
+			AgentCounter agentCounter = sim.getAgentCounter() ;
 			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, this );
 			network = new QNetwork(sim.getScenario().getNetwork(), netsimNetworkFactory2 );
 		}
-		network.initialize(this);
+		network.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
 
-		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
+		this.numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 
 	private static int wrnCnt = 0;
@@ -354,9 +354,10 @@ public class QNetsimEngine implements MobsimEngine {
 		return numNodes;
 	}
 
-	QSim getMobsim() {
-		return this.qsim;
-	}
+//	QSim getMobsim() {
+//		return this.qsim;
+//	}
+	// do not hand out back pointers! kai, mar'16
 
 	public NetsimNetwork getNetsimNetwork() {
 		return this.network;
