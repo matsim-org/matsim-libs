@@ -66,6 +66,7 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.Builder;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -131,10 +132,10 @@ public class LinkSpeedCalculatorIntegrationTest {
 					@Inject EventsManager events ;
 					@Inject Network network ;
 					private AgentCounter agentCounter;
-					private QNetsimEngine netsimEngine;
+					private NetsimInternalInterface netsimEngine;
 					private MobsimTimer mobsimTimer;
 					private NetsimEngineContext context;
-					@Override void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, QNetsimEngine netsimEngine1) {
+					@Override void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, NetsimInternalInterface netsimEngine1) {
 						this.agentCounter = agentCounter1 ;
 						this.mobsimTimer = mobsimTimer1 ;
 						this.netsimEngine = netsimEngine1 ;
@@ -215,9 +216,9 @@ public class LinkSpeedCalculatorIntegrationTest {
 					@Inject private Network network ;
 					private AgentCounter agentCounter;
 					private MobsimTimer mobsimTimer;
-					private QNetsimEngine netsimEngine;
+					private NetsimInternalInterface netsimEngine;
 					private NetsimEngineContext context;
-					@Override void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, QNetsimEngine netsimEngine1) {
+					@Override void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, NetsimInternalInterface netsimEngine1) {
 						this.agentCounter = agentCounter1 ;
 						this.mobsimTimer = mobsimTimer1 ;
 						this.netsimEngine = netsimEngine1 ;

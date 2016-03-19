@@ -26,6 +26,7 @@ import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSimModule;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 
 
 /**
@@ -51,9 +52,9 @@ public abstract class QNetworkFactory implements MatsimFactory {
 	 * <p/>
 	 * This should make the "QNetwork" argument in the creational methods obsolete (which is serving a bit the same purpose).
 	 * @param mobsimTimer TODO
-	 * @param netsimEngine TODO
+	 * @param simEngine1 TODO
 	 */
-	abstract void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine ) ;
+	abstract void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1 ) ;
 
 	abstract QNode createNetsimNode(Node node);
 

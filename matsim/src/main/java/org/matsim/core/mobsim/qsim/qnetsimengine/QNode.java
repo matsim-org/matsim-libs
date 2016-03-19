@@ -39,6 +39,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 
 /**
  * Represents a node in the QSimulation.
@@ -46,10 +47,10 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
 public class QNode implements NetsimNode {
 	private static final Logger log = Logger.getLogger(QNode.class);
 	public static class Builder {
-		private final QNetsimEngine netsimEngine;
+		private final NetsimInternalInterface netsimEngine;
 		private NetsimEngineContext context;
-		public Builder( QNetsimEngine netsimEngine, NetsimEngineContext context ) {
-			this.netsimEngine = netsimEngine;
+		public Builder( NetsimInternalInterface netsimEngine2, NetsimEngineContext context ) {
+			this.netsimEngine = netsimEngine2;
 			this.context = context;
 		}
 		public QNode build( Node n ) {
@@ -78,11 +79,11 @@ public class QNode implements NetsimNode {
 
 	private final Random random;
 	private final NetsimEngineContext context;
-	private final QNetsimEngine netsimEngine;
+	private final NetsimInternalInterface netsimEngine;
 
-	private QNode(final Node n, NetsimEngineContext context, QNetsimEngine netsimEngine) {
+	private QNode(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
 		this.node = n;
-		this.netsimEngine = netsimEngine ;
+		this.netsimEngine = netsimEngine2 ;
 		this.context = context ;
 		int nofInLinks = this.node.getInLinks().size();
 		this.inLinksArrayCache = new QLinkI[nofInLinks];
@@ -106,7 +107,7 @@ public class QNode implements NetsimNode {
 	/*package*/ void init() {
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
-			QNetwork network = (QNetwork) netsimEngine.getNetsimNetwork() ;
+			QNetwork network = netsimEngine.getNetsimNetwork() ;
 			this.inLinksArrayCache[i] = network.getNetsimLinks().get(l.getId());
 			i++;
 		}

@@ -42,6 +42,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
@@ -139,9 +140,9 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 		/* This is the crucial part for changing the queue type. */ 
 		QNetworkFactory netsimNetworkFactory = new QNetworkFactory() {
 			private NetsimEngineContext context;
-			private QNetsimEngine netsimEngine;
+			private NetsimInternalInterface netsimEngine;
 			@Override
-			void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine1) {
+			void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
 				double effectiveCellSize = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize() ;
 				
 				SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();

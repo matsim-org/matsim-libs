@@ -22,6 +22,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -39,7 +40,7 @@ public class CAQNetworkFactory extends QNetworkFactory {
 	private CAScenario scenarioCA;
 	private Map<Node, TransitionArea> nodeToTransitionArea = new HashMap<Node, TransitionArea>();
 	private NetsimEngineContext context;
-	private QNetsimEngine netsimEngine;
+	private NetsimInternalInterface netsimEngine;
 
 	public CAQNetworkFactory(CAEngine engineCA, Scenario scenario, CAAgentFactory agentFactoryCA) {
 		this.engineCA = engineCA;
@@ -48,7 +49,7 @@ public class CAQNetworkFactory extends QNetworkFactory {
 	}
 	
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine1) {
+	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
 		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();

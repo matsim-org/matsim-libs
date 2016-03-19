@@ -59,10 +59,9 @@ public class QNetwork implements NetsimNetwork {
 		this.nodes = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
 	}
 
-
 	public void initialize(QNetsimEngine simEngine1, AgentCounter agentCounter, MobsimTimer simTimer) {
 		this.simEngine = simEngine1;
-		this.queueNetworkFactory.initializeFactory( agentCounter, simTimer, simEngine1 );
+		this.queueNetworkFactory.initializeFactory( agentCounter, simTimer, simEngine1.ii );
 		for (Node n : network.getNodes().values()) {
 			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n));
 		}
