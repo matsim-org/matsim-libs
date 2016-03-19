@@ -95,8 +95,8 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
-	QNode createNetsimNode(final Node node, QNetwork qnetwork) {
-		QNode.Builder builder = new QNode.Builder( qnetwork ) ;
+	QNode createNetsimNode(final Node node) {
+		QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
 		return builder.build( node ) ;
 	}
 }

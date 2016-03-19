@@ -100,8 +100,8 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	public QNode createNetsimNode(Node node, QNetwork network) {
-		return this.delegate.createNetsimNode(node, network);
+	public QNode createNetsimNode(Node node) {
+		return this.delegate.createNetsimNode(node);
 	}
 
 }

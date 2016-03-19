@@ -62,10 +62,11 @@ public class QNetwork implements NetsimNetwork {
 		this.simEngine = simEngine1;
 		this.queueNetworkFactory.initializeFactory( simEngine1.getMobsim().getAgentCounter(), simEngine1.getMobsim().getSimTimer(), simEngine1 );
 		for (Node n : network.getNodes().values()) {
-			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n, this));
+			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n));
 		}
 		for (Link l : network.getLinks().values()) {
-			this.links.put(l.getId(), this.queueNetworkFactory.createNetsimLink(l, this.nodes.get(l.getToNode().getId())));
+			final QLinkI qlink = this.queueNetworkFactory.createNetsimLink(l, this.nodes.get(l.getToNode().getId()));
+			this.links.put(l.getId(), qlink);
 		}
 		for (QNode n : this.nodes.values()) {
 			n.init();

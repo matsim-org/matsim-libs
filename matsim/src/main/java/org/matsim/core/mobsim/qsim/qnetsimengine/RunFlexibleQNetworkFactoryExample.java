@@ -67,8 +67,8 @@ public class RunFlexibleQNetworkFactoryExample {
 			
 			this.netsimEngine = netsimEngine1 ;
 		}
-		@Override QNode createNetsimNode(Node node, QNetwork qnetwork) { // yyyyyy would like to get rid of network here. kai, mar'16
-			QNode.Builder builder = new QNode.Builder( qnetwork ) ;
+		@Override QNode createNetsimNode(Node node) { // yyyyyy would like to get rid of network here. kai, mar'16
+			QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
 			return builder.build( node ) ;
 			
 		}
