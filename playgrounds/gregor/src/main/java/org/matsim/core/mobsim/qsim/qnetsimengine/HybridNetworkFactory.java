@@ -66,7 +66,8 @@ public class HybridNetworkFactory extends QNetworkFactory {
 
 	@Override
 	public QNode createNetsimNode(Node node, QNetwork network) {
-		return new QNode(node, network);
+		QNode.Builder builder = new QNode.Builder( network ) ;
+		return builder.build( node ) ;
 	}
 
 	@Override

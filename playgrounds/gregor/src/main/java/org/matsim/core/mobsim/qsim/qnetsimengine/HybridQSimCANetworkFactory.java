@@ -106,9 +106,10 @@ public final class HybridQSimCANetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	public QNode createNetsimNode(final Node node, QNetwork network) {
+	public QNode createNetsimNode(final Node node, QNetwork qnetwork) {
 		//TODO CA Node;
-		return new QNode(node, network);
+		QNode.Builder builder = new QNode.Builder( qnetwork ) ;
+		return builder.build( node ) ;
 	}
 
 }

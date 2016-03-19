@@ -67,7 +67,8 @@ public class CAQNetworkFactory extends QNetworkFactory {
 	
 	@Override
 	public QNode createNetsimNode(Node node, QNetwork qnetwork) {
-		return new QNode(node, qnetwork);
+		QNode.Builder builder = new QNode.Builder( qnetwork ) ;
+		return builder.build( node ) ;
 	}
 
 	@Override

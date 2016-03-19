@@ -81,7 +81,8 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 	}
 	@Override
 	QNode createNetsimNode(final Node node, QNetwork qnetwork) {
-		return new QNode(node, qnetwork);
+		QNode.Builder builder = new QNode.Builder( qnetwork ) ;
+		return builder.build( node ) ;
 	}
 	public final void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
 		this.linkSpeedCalculator = linkSpeedCalculator;

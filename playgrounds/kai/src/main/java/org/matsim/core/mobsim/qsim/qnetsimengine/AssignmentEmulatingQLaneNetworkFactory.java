@@ -29,8 +29,9 @@ public final class AssignmentEmulatingQLaneNetworkFactory extends QNetworkFactor
 	private NetsimEngineContext context;
 
 	@Override
-	public QNode createNetsimNode(Node node, QNetwork network) {
-		return new QNode(node, network);
+	public QNode createNetsimNode(Node node, QNetwork qnetwork) {
+		QNode.Builder builder = new QNode.Builder( qnetwork ) ;
+		return builder.build( node ) ;
 	}
 
 	@Override

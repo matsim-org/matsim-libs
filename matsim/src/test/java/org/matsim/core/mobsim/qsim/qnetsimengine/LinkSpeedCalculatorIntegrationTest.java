@@ -139,7 +139,8 @@ public class LinkSpeedCalculatorIntegrationTest {
 						this.netsimEngine = netsimEngine1 ;
 					}
 					@Override QNode createNetsimNode(Node node, QNetwork qnetwork) {
-						return new QNode( node, qnetwork) ;
+						QNode.Builder builder = new QNode.Builder( qnetwork ) ;
+						return builder.build( node ) ;
 					}
 					@Override QLinkI createNetsimLink(Link link, QNode queueNode) {
 						double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
@@ -217,7 +218,8 @@ public class LinkSpeedCalculatorIntegrationTest {
 						this.netsimEngine = netsimEngine1 ;
 					}
 					@Override QNode createNetsimNode(Node node, QNetwork qnetwork) {
-						return new QNode( node, qnetwork) ;
+						QNode.Builder builder = new QNode.Builder( qnetwork ) ;
+						return builder.build( node ) ;
 					}
 					@Override QLinkI createNetsimLink(Link link, QNode queueNode) {
 						double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;

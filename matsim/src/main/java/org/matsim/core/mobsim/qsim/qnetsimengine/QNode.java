@@ -20,13 +20,19 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -34,15 +40,20 @@ import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * Represents a node in the QSimulation.
  */
 public class QNode implements NetsimNode {
-
 	private static final Logger log = Logger.getLogger(QNode.class);
+	public static class Builder {
+		private QNetwork qnetwork;
+		public Builder( QNetwork qnetwork ) {
+			this.qnetwork = qnetwork ;
+		}
+		public QNode build( Node n ) {
+			return new QNode( n, qnetwork ) ;
+		}
+	}
 
 	private final QLinkI[] inLinksArrayCache;
 	private final QLinkI[] tempLinks;
@@ -67,7 +78,7 @@ public class QNode implements NetsimNode {
 
 	private Random random;
 
-	public QNode(final Node n, final QNetwork network) {
+	private QNode(final Node n, final QNetwork network) {
 		this.node = n;
 		this.network = network;
 		int nofInLinks = this.node.getInLinks().size();
@@ -96,7 +107,7 @@ public class QNode implements NetsimNode {
 			this.inLinksArrayCache[i] = network.getNetsimLinks().get(l.getId());
 			i++;
 		}
-		/* As the order of nodes has an influence on the simulation results,
+		/* As the order of links has an influence on the simulation results,
 		 * the nodes are sorted to avoid indeterministic simulations. dg[april08]
 		 */
 		Arrays.sort(this.inLinksArrayCache, new Comparator<NetsimLink>() {

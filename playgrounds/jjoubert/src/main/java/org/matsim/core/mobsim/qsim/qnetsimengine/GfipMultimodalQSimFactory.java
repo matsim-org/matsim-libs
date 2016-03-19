@@ -182,8 +182,9 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 				return linkBuilder.build(link, toQueueNode) ;
 			}
 			@Override
-			public QNode createNetsimNode(final Node node, QNetwork network) {
-				return new QNode(node, network);
+			public QNode createNetsimNode(final Node node, QNetwork qnetwork) {
+				QNode.Builder builder = new QNode.Builder( qnetwork ) ;
+				return builder.build( node ) ;
 			}
 		};
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, netsimNetworkFactory);
