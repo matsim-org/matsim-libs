@@ -37,7 +37,7 @@ public class BooleanList {
 	}
 
 	public BooleanList( final boolean[] bs ) {
-		integer = new int[ (int) Math.ceil( bs.length / 31.0 ) ];
+		integer = new int[ (int) Math.ceil( bs.length / 32.0 ) ];
 		for ( boolean b : bs ) add( b );
 	}
 
@@ -48,11 +48,11 @@ public class BooleanList {
 	}
 
 	public boolean get( int i ) {
-		return ( integer[ i / 31 ] & ( 1 << ( i - ( i / 31 ) ) ) ) != 0;
+		return ( integer[ i / 32 ] & ( 1 << ( i - ( i / 32 ) ) ) ) != 0;
 	}
 
 	private void expand() {
-		final int nIntegers = size / 31;
+		final int nIntegers = size / 32;
 		if ( integer.length == nIntegers ) {
 			integer = Arrays.copyOf( integer , integer.length * 2 );
 		}
@@ -60,10 +60,10 @@ public class BooleanList {
 
 	private void set( final int i , boolean b ) {
 		if ( b ) {
-			integer[ i / 31 ] |= 1 << ( i - ( i / 31 ) );
+			integer[ i / 32 ] |= 1 << ( i - ( i / 32 ) );
 		}
 		else {
-			integer[ i / 31 ] &= ~(1 << (i - ( i / 31 ) ));
+			integer[ i / 32 ] &= ~(1 << (i - ( i / 32 ) ));
 		}
 	}
 

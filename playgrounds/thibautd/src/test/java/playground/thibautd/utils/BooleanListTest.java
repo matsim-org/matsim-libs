@@ -75,7 +75,7 @@ public class BooleanListTest {
 		Assert.assertEquals(
 				"unexpected storing array size",
 				testee.sizeStoringArray(),
-				(int) Math.ceil( reference.length / 31.0 ) );
+				(int) Math.ceil( reference.length / 32.0 ) );
 
 		for ( int i = 0; i < reference.length; i++ ) {
 			Assert.assertEquals(
