@@ -81,7 +81,7 @@ public class Incident2NetworkChangeEventsWriter {
 		double dateInSec = startDate;
 		while (dateInSec <= endDate) {
 			
-			log.info("Writing network change events for day " + DateTime.secToDateTimeString(dateInSec));
+			log.info("Writing network change events for day " + DateTime.secToDateTimeString(dateInSec) + " (date in seconds: " + dateInSec + ")");
 			
 			Map<Id<Link>, List<NetworkIncident>> linkId2rawIncidentsCurrentDay = collectDayLinkIncidents(dateInSec);
 			Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay = processLinkIncidents(linkId2rawIncidentsCurrentDay);
@@ -238,8 +238,12 @@ public class Incident2NetworkChangeEventsWriter {
 	    for (NetworkIncident processedIncidentTmp : incidentsProcessedTmp) {
 	    	Link incidentLink = null;
 	    	String id = "";
+
 	    	for (NetworkIncident incident : incidents) {
+	    		
 	    		if (incident.getStartTime() <= processedIncidentTmp.getStartTime() && incident.getEndTime() >= processedIncidentTmp.getEndTime()) {
+	    			// in relevant interval
+	    			
 	    			if (incidentLink == null) {
 	    				incidentLink = incident.getIncidentLink();
 	    				id = incident.getId();
@@ -247,12 +251,20 @@ public class Incident2NetworkChangeEventsWriter {
 	    				incidentLink = getMoreRestrictiveIncidentLink(incidentLink, incident.getIncidentLink());
 	    				id = id + "+" + incident.getId();
 	    			}
+	    			
+	    		} else {
+	    			// not in the relevant interval
 	    		}
 	    	}
-        	NetworkIncident incidentPart = new NetworkIncident(id, processedIncidentTmp.getStartTime(), processedIncidentTmp.getEndTime());
-        	incidentPart.setLink(incidents.get(0).getLink());
-        	incidentPart.setIncidentLink(incidentLink);
-        	incidentsProcessed.add(incidentPart);
+	    	
+	    	if (incidentLink != null) {
+	    		NetworkIncident incidentPart = new NetworkIncident(id, processedIncidentTmp.getStartTime(), processedIncidentTmp.getEndTime());
+	        	incidentPart.setLink(incidents.get(0).getLink());
+	        	incidentPart.setIncidentLink(incidentLink);
+	        	incidentsProcessed.add(incidentPart);
+	    	} else {
+	    		// This interval is a gap between two other incident intervals.
+	    	}
 	    }
 	    
 	    return incidentsProcessed;
@@ -299,6 +311,11 @@ public class Incident2NetworkChangeEventsWriter {
 				// incident start: change values
 				NetworkChangeEvent nceStart = nceFactory.createNetworkChangeEvent(incident.getStartTime());
 				nceStart.addLink(incident.getLink());
+				
+				if (incident.getIncidentLink() == null) {
+					log.warn("Incident link " +  incident.getId() + " for link " + linkId + " is null.");
+					log.warn("Incident link: " + incident.toString());
+				}
 				
 				nceStart.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getCapacity()));
 				nceStart.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE, incident.getIncidentLink().getFreespeed()));
@@ -352,7 +369,7 @@ public class Incident2NetworkChangeEventsWriter {
 			double startTime = Double.NEGATIVE_INFINITY;
 			double endTime = Double.NEGATIVE_INFINITY;
 			
-			if (DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) < dateInSec 
+			if (DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) <= dateInSec 
 					|| DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) > dateInSec + (24 * 3600.)) {
 				// traffic item ends on a previous day or starts on a later day --> the traffic item is not relevant for this day
 			

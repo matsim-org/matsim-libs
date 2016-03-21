@@ -51,12 +51,14 @@ public class IncidentDataAnalysis {
 	private final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
 
 	private String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-	private String inputDirectory = "/Users/ihab/Desktop/testXmlFiles/";
-	private String outputDirectory = "/Users/ihab/Desktop/output-berlin-analysis_2016-02-11/";
+	private String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-berlin/";
+	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin-analysis-2016-03-01-2016-03-19/";
 	
 	private boolean writeCSVFileForEachXMLFile = false;
-	private String startDateTime = "2016/02/11";
-	private String endDateTime = "2016/02/11";
+	
+	// start and end date should be in the same month... TODO: Account for the different months' lengths, only weekdays etc.
+	private String startDateTime = "2016/03/01";
+	private String endDateTime = "2016/03/19";
 		
 // ##################################################################
 	
@@ -110,12 +112,13 @@ public class IncidentDataAnalysis {
 		final Incident2Network networkMapper = new Incident2Network(loadScenario(), this.trafficItems);
 		networkMapper.computeIncidentPaths();
 		final Map<String, Path> trafficItemId2path = networkMapper.getTrafficItemId2path();
-		final Set<String> trafficItemsToCheck = networkMapper.getTrafficItemsToCheck();
 
-		// write shape file which contains relevant incidents mapped to network links
-		final Incident2SHPWriter shpWriter = new Incident2SHPWriter(this.tmc, this.trafficItems, trafficItemId2path);
-		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks.shp", this.trafficItems.keySet());
-		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks_WARNING.shp", trafficItemsToCheck);
+//		// write shape file which contains relevant incidents mapped to network links
+//		final Incident2SHPWriter shpWriter = new Incident2SHPWriter(this.tmc, this.trafficItems, trafficItemId2path);
+//		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks.shp", this.trafficItems.keySet());
+//		
+//		final Set<String> trafficItemsToCheck = networkMapper.getTrafficItemsToCheck();
+//		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks_WARNING.shp", trafficItemsToCheck);
 		
 		// write network change events
 		final Incident2NetworkChangeEventsWriter nceWriter = new Incident2NetworkChangeEventsWriter(this.tmc, this.trafficItems, trafficItemId2path);

@@ -105,7 +105,7 @@ public class DateTime {
 		int year = (int) ( dateTimeInSec / (12 * 30.436875 * 24 * 3600) );
 		int month = (int) ( (dateTimeInSec - (year * 12 * 30.436875 * 24 * 3600)) / (30.436875 * 24 * 3600) );
 		int day = (int) ( (dateTimeInSec - (year * 12 * 30.436875 * 24 * 3600) - (month * 30.436875 * 24 * 3600) ) / (24 * 3600) );
-		
+
 		double seconds = (dateTimeInSec - (year * 12 * 30.436875 * 24 * 3600.) - (month * 30.436875 * 24 * 3600.) - (day * 24 * 3600.)) / 3600.;
 		String time = Time.writeTime(seconds);
 
