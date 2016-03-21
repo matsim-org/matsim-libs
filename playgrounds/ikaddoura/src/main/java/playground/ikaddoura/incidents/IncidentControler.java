@@ -72,70 +72,72 @@ public class IncidentControler {
 		} else {
 			log.info("Using default parameters...");
 			
-			runId = "2a";
+			runId = "0";
+						
+			if (runId.equals("0")) {
+				
+				configFile = "../../../runs-svn/incidents/input/config.xml";
+				outputDirectory = "../../../runs-svn/incidents/output/baseCase/";
+				
+				networkChangeEventsFile = null;
+				networkChangeEventsFileDirectory = null;
+				run2_nrOfRuns = Integer.MIN_VALUE;
+				
+			} else if (runId.equals("1")) {
+				
+				configFile = "../../../runs-svn/incidents/input/config.xml";
+				outputDirectory = "../../../runs-svn/incidents/output/2016-03-15/";
+				networkChangeEventsFile = "../../../runs-svn/incidents/input/networkChangeEvents_2016-03-15.xml.gz";
+				
+				networkChangeEventsFileDirectory = null;
+				run2_nrOfRuns = Integer.MIN_VALUE;
+				
+			} else if (runId.equals("2a")) {
+				
+				configFile = "../../../runs-svn/incidents/input/config_2a_reroute0.5.xml";
+				outputDirectory = "../../../runs-svn/incidents/output/run_2a_reroute0.5/";
+				networkChangeEventsFileDirectory = "../../../runs-svn/incidents/input/nce/";
+				run2_nrOfRuns = 27;
+
+				networkChangeEventsFile = null;
+				
+			} else if (runId.equals("2b")) {
+				
+				configFile = "../../../runs-svn/incidents/input/config_2b_reroute1.0.xml";
+				outputDirectory = "../../../runs-svn/incidents/output/run_2b_reroute1.0/";
+				networkChangeEventsFileDirectory = "../../../runs-svn/incidents/input/nce/";
+				run2_nrOfRuns = 27;
+
+				networkChangeEventsFile = null;
+				
+			} else if (runId.equals("3")) {
+				
+				configFile = "../../../runs-svn/incidents/input/config_3.xml";
+				outputDirectory = "../../../runs-svn/incidents/output/run_3_nce/";
+				networkChangeEventsFileDirectory = "../../../runs-svn/incidents/input/nce/";
+
+				networkChangeEventsFile = null;
+				run2_nrOfRuns = Integer.MIN_VALUE;
+				
+			} else {
+				throw new RuntimeException("Unknown run Id. Aborting...");
+			}
 		}
 		
-		IncidentControler main = new IncidentControler();
-		
-		if (runId.equals("0")) {
-			
-			configFile = "../../../runs-svn/incidents/input/config.xml";
-			outputDirectory = "../../../runs-svn/incidents/output/baseCase/";
-			
-			networkChangeEventsFile = null;
-			networkChangeEventsFileDirectory = null;
-			run2_nrOfRuns = Integer.MIN_VALUE;
-			
+		IncidentControler main = new IncidentControler();	
+		if (runId.equals("0")) {		
 			main.run0();
-
 		} else if (runId.equals("1")) {
-			
-			configFile = "../../../runs-svn/incidents/input/config.xml";
-			outputDirectory = "../../../runs-svn/incidents/output/2016-03-15/";
-			networkChangeEventsFile = "../../../runs-svn/incidents/input/networkChangeEvents_2016-03-15.xml.gz";
-			
-			networkChangeEventsFileDirectory = null;
-			run2_nrOfRuns = Integer.MIN_VALUE;
-			
 			main.run1();
-			
 		} else if (runId.equals("2a")) {
-			
-			configFile = "../../../runs-svn/incidents/input/config_2a_reroute0.5.xml";
-			outputDirectory = "../../../runs-svn/incidents/output/run_2a_reroute0.5/";
-			networkChangeEventsFileDirectory = "../../../runs-svn/incidents/input/nce/";
-			run2_nrOfRuns = 27;
-
-			networkChangeEventsFile = null;
-
 			main.run2();
-			
 		} else if (runId.equals("2b")) {
-			
-			configFile = "../../../runs-svn/incidents/input/config_2b_reroute1.0.xml";
-			outputDirectory = "../../../runs-svn/incidents/output/run_2b_reroute1.0/";
-			networkChangeEventsFileDirectory = "../../../runs-svn/incidents/input/nce/";
-			run2_nrOfRuns = 27;
-
-			networkChangeEventsFile = null;
-
 			main.run2();
-			
 		} else if (runId.equals("3")) {
-			
-			configFile = "../../../runs-svn/incidents/input/config_3.xml";
-			outputDirectory = "../../../runs-svn/incidents/output/run_3_nce/";
-			networkChangeEventsFileDirectory = "../../../runs-svn/incidents/input/nce/";
-
-			networkChangeEventsFile = null;
-			run2_nrOfRuns = Integer.MIN_VALUE;
-
 			main.run3();
-			
 		} else {
 			throw new RuntimeException("Unknown run Id. Aborting...");
 		}
-
 	}
 	
 	/**
