@@ -38,12 +38,12 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 
 	private final ExternalEngine e;
 	private final EventsManager em;
-	private FakeLane fakeLane;
+	private FakeLane fakeLane = new FakeLane();
 	private final NetsimEngineContext context ;
 	private final QNode toQNode ;
 
 	QSimExternalTransitionLink(Link link, ExternalEngine e, NetsimEngineContext context, QNetsimEngine netsimEngine, QNode toQNode) {
-		super(link, null, context, netsimEngine );
+		super(link, toQNode, context, netsimEngine );
 		this.e = e;
 		this.em = e.getEventsManager();
 		this.context = context ;

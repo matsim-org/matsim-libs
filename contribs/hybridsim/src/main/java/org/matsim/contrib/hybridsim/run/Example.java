@@ -16,6 +16,7 @@ package org.matsim.contrib.hybridsim.run;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
+import com.google.inject.util.Providers;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -28,9 +29,11 @@ import org.matsim.contrib.hybridsim.simulation.HybridMobsimProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
@@ -55,24 +58,22 @@ public class Example {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 
-		ExternalRunner r = new ExternalRunner();
-		Thread t1 = new Thread(r);
-		t1.start();
 
 		Config c = ConfigUtils.createConfig();
 		c.controler().setLastIteration(0);
 		c.controler().setWriteEventsInterval(1);
 
+
+
+
 		final Scenario sc = ScenarioUtils.createScenario(c);
+		enrichConfig(c);
 		createNetwork(sc);
 		createPopulation(sc);
 
 		final Controler controller = new Controler(sc);
 		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
-		final HybridNetworkFactory netFac = null ; // new HybridNetworkFactory();
-		// see below
-		
 		final EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		Injector mobsimProviderInjector = Guice.createInjector(new com.google.inject.AbstractModule() {
@@ -80,9 +81,8 @@ public class Example {
 			protected void configure() {
 				bind(Scenario.class).toInstance(sc);
 				bind(EventsManager.class).toInstance(eventsManager);
-				bind(HybridNetworkFactory.class).toInstance(netFac);
-				bind(QNetworkFactory.class).to( HybridNetworkFactory.class ) ;
-				// ??? See QSimModule (I changed how this is plugged together over the last two weeks).  kai, mar'16
+				bind(HybridNetworkFactory.class).toInstance(new HybridNetworkFactory());
+				bind(QNetworkFactory.class).to(HybridNetworkFactory.class); ;
 			}
 
 		});
@@ -90,13 +90,40 @@ public class Example {
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(Mobsim.class).toProvider(mobsimProvider);
-
+				bindMobsim().toProvider(mobsimProvider);
+				bindEventsManager().toInstance(eventsManager);
 			}
 		});
 		controller.run();
 
 
+	}
+
+	private static void enrichConfig(Config c) {
+		PlanCalcScoreConfigGroup.ActivityParams pre = new PlanCalcScoreConfigGroup.ActivityParams("origin");
+		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when
+		// running a simulation one gets
+		// "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
+		// the reason is the double precision. see also comment in
+		// ActivityUtilityParameters.java (gl)
+		pre.setMinimalDuration(49);
+		pre.setClosingTime(49);
+		pre.setEarliestEndTime(49);
+		pre.setLatestStartTime(49);
+		pre.setOpeningTime(49);
+
+		PlanCalcScoreConfigGroup.ActivityParams post = new PlanCalcScoreConfigGroup.ActivityParams("destination");
+		post.setTypicalDuration(49); // dito
+		post.setMinimalDuration(49);
+		post.setClosingTime(49);
+		post.setEarliestEndTime(49);
+		post.setLatestStartTime(49);
+		post.setOpeningTime(49);
+		c.planCalcScore().addActivityParams(pre);
+		c.planCalcScore().addActivityParams(post);
+
+		c.planCalcScore().setLateArrival_utils_hr(0.);
+		c.planCalcScore().setPerforming_utils_hr(0.);
 	}
 
 	private static void createPopulation(Scenario sc) {
@@ -107,12 +134,12 @@ public class Example {
 			pop.addPerson(pers);
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
-			Activity a0 = fac.createActivityFromLinkId("h",Id.createLinkId(0));
+			Activity a0 = fac.createActivityFromLinkId("origin",Id.createLinkId(0));
 			a0.setEndTime(i);
 			plan.addActivity(a0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity a1 = fac.createActivityFromLinkId("h",Id.createLinkId(3));
+			Activity a1 = fac.createActivityFromLinkId("destination",Id.createLinkId(3));
 			plan.addActivity(a1);
 		}
 		for (int i = 20; i < 40; i++) {
@@ -120,12 +147,12 @@ public class Example {
 			pop.addPerson(pers);
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
-			Activity a0 = fac.createActivityFromLinkId("h",Id.createLinkId("3r"));
+			Activity a0 = fac.createActivityFromLinkId("origin",Id.createLinkId("3r"));
 			a0.setEndTime(i-20);
 			plan.addActivity(a0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity a1 = fac.createActivityFromLinkId("h",Id.createLinkId("0r"));
+			Activity a1 = fac.createActivityFromLinkId("destination",Id.createLinkId("0r"));
 			plan.addActivity(a1);
 		}
 	}
@@ -185,53 +212,5 @@ public class Example {
 
 
 
-	}
-
-	private static final class ExternalRunner implements Runnable {
-
-
-		private Process process;
-
-		public ExternalRunner() {
-		}
-
-		@Override
-		public void run() {
-			try {
-				//TODO: this requires jpscore from the sumo_grpc branch to be installed
-				//probably it would be good to have jpscore as a maven dependency [gl Mar'16]
-				this.process = new ProcessBuilder("/usr/local/bin/jpscore", "./src/main/resources/corridor_ini.xml").start();
-				logToLog(process);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		public void destroy() {
-			this.process.destroy();
-		}
-	}
-
-	private static void logToLog(Process p1) throws IOException {
-		{
-			InputStream is = p1.getInputStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String l = br.readLine();
-			while (l != null) {
-				log.info("FROM EXTERN:" + l);
-				l = br.readLine();
-			}
-		}
-		{
-			InputStream is = p1.getErrorStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String l = br.readLine();
-			while (l != null) {
-				log.error("FROM EXTERN:" + l);
-				l = br.readLine();
-			}
-		}
 	}
 }
