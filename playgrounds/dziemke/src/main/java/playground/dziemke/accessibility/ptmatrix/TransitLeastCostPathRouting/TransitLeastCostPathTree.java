@@ -127,15 +127,15 @@ public class TransitLeastCostPathTree {
         augmentIterationId();
 
         //find the best node
-        double minTime = Double.POSITIVE_INFINITY;
+        double minCost = Double.POSITIVE_INFINITY;
         Node minCostNode = null;
         for (Node currentNode: toNodes.keySet()) {
             DijkstraNodeData data = getData(currentNode);
             InitialData initData = toNodes.get(currentNode);
-            double time = data.getTime() + initData.initialTime;
-            if (time != 0.0 || fromNodes.containsKey(currentNode)) {
-                if (time < minTime) {
-                    minTime = time;
+            double cost = data.getCost() + initData.initialCost;
+            if (cost != 0.0 || fromNodes.containsKey(currentNode)) {
+                if (cost < minCost) {
+                    minCost = cost;
                     minCostNode = currentNode;
                 }
             }
