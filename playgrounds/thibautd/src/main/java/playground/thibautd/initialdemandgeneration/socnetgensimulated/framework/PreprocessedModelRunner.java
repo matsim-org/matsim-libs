@@ -103,6 +103,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 		// This part would be nicer externalized in a "preprocessed network provider" or smth
 		if ( config.getInputPreprocessedNetwork() == null ) {
 			this.updatePrimaryPreprocess( distr );
+			this.updateSecondaryPreprocess( lowestStoredPrimary );
 			// needed at least in tests (but one could imagine other usecases where this might happen as well)
 			if ( globalConfig.getOutputDirectory() != null ) {
 				new WeightedSocialNetworkWriter().write(preprocess, globalConfig.getOutputDirectory() + "/preprocess-network.xml.gz");
@@ -111,6 +112,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 		}
 		else {
 			this.preprocess = new WeightedSocialNetworkReader().read( config.getInputPreprocessedNetwork() );
+			this.updateSecondaryPreprocess( lowestStoredPrimary );
 		}
 	}
 
