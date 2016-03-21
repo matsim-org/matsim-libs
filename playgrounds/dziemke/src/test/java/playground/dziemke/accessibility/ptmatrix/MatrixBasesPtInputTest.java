@@ -21,7 +21,6 @@ package playground.dziemke.accessibility.ptmatrix;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -36,7 +35,10 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -52,7 +54,6 @@ public class MatrixBasesPtInputTest {
 	
 	private static final Logger log = Logger.getLogger(MatrixBasesPtInputTest.class);
 
-    @Ignore
 	@Test
 	public final void testLeastCostPathTree() {
         final long timeStart = System.currentTimeMillis();
@@ -219,7 +220,7 @@ public class MatrixBasesPtInputTest {
         System.out.println("Verlaufszeit der Schleife: " + (timeEnd - timeStart) + " Millisek.");
     }
 
-	public static ArrayList<String[]> readCSVLine(String filePath, String splitString) {
+	private static ArrayList<String[]> readCSVLine(String filePath, String splitString) {
 		BufferedReader CSVFile = null;
 		try {
 			CSVFile = new BufferedReader(new FileReader(filePath));
