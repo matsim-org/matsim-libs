@@ -143,7 +143,7 @@ public final class TtGeneralAnalysis implements PersonDepartureEventHandler, Per
 	public void handleEvent(LinkLeaveEvent event) {
 		Link currentLink = scenario.getNetwork().getLinks().get(event.getLinkId());
 		
-		// remove the distance of the last trip temporary from the list
+		// remove the distance of the last trip temporarily from the list
 		double previousDistance = distancePerVehiclePerTrip.get(event.getVehicleId()).pollLast();
 		// if the last distance is 0.0, it is the departure link
 		if (previousDistance == 0.0){
@@ -162,7 +162,7 @@ public final class TtGeneralAnalysis implements PersonDepartureEventHandler, Per
 		// calculate delay
 		double currentDelay = event.getTime() - veh2earliestLinkExitTime.get(event.getVehicleId());
 		totalDelayPerLink.put(event.getLinkId(), totalDelayPerLink.get(event.getLinkId()) + currentDelay);
-		// remove the delay of the last trip temporary from the list
+		// remove the delay of the last trip temporarily from the list
 		double previousDelay = delayPerVehiclePerTrip.get(event.getVehicleId()).pollLast();
 		// add it again as updated delay
 		delayPerVehiclePerTrip.get(event.getVehicleId()).add(previousDelay + currentDelay);
@@ -183,7 +183,7 @@ public final class TtGeneralAnalysis implements PersonDepartureEventHandler, Per
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		// trip is finished ... handle it's distance
+		// trip is finished ... handle its distance
 		double tripDistance = distancePerVehiclePerTrip.get(event.getVehicleId()).peekLast();
 		totalDistance += tripDistance;
 		double distInterval = Math.floor(tripDistance / 100) * 100;
@@ -193,7 +193,7 @@ public final class TtGeneralAnalysis implements PersonDepartureEventHandler, Per
 		}
 		numberOfTripsPerTripDistanceInterval.put(distInterval, ++distEntry);
 		
-		// ... handle it's duration
+		// ... handle its duration
 		double tripDuration = event.getTime() - veh2lastVehEntersTrafficTime.get(event.getVehicleId());
 		totalTt += tripDuration;
 		ttPerVehiclePerTrip.get(event.getVehicleId()).add(tripDuration);
@@ -204,7 +204,7 @@ public final class TtGeneralAnalysis implements PersonDepartureEventHandler, Per
 		}
 		numberOfTripsPerTripDurationInterval.put(durationInterval, ++durEntry);
 		
-		// ... calculate it's average speed
+		// ... calculate its average speed
 		double avgTripSpeed = tripDistance / tripDuration;
 		sumOfSpeedsMessured += avgTripSpeed;
 		avgSpeedPerVehiclePerTrip.get(event.getVehicleId()).add(avgTripSpeed);
