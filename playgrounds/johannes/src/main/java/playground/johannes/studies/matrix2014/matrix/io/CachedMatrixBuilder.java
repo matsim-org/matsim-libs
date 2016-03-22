@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,       *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,44 +16,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.johannes.studies.matrix2014.analysis;
+
+package playground.johannes.studies.matrix2014.matrix.io;
 
 import org.matsim.facilities.ActivityFacilities;
+import playground.johannes.studies.matrix2014.analysis.MatrixBuilder;
 import playground.johannes.studies.matrix2014.matrix.DefaultMatrixBuilder;
-import playground.johannes.synpop.analysis.AnalyzerTask;
-import playground.johannes.synpop.analysis.FileIOContext;
 import playground.johannes.synpop.analysis.Predicate;
-import playground.johannes.synpop.analysis.StatsContainer;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.matrix.NumericMatrix;
-import playground.johannes.synpop.matrix.NumericMatrixIO;
+import playground.johannes.synpop.sim.MarkovEngineListener;
+import playground.johannes.synpop.sim.data.CachedPerson;
 
-import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 /**
- * @author jillenberger
+ * @author johannes
  */
-public class MatrixWriter implements AnalyzerTask<Collection<? extends Person>> {
+public class CachedMatrixBuilder implements MatrixBuilder, MarkovEngineListener {
+
+    private long iteration = 0;
+
+    private long lastBuilt = -1;
+
+    private NumericMatrix matrix;
 
     private final DefaultMatrixBuilder matrixBuilder;
 
-    private final FileIOContext ioContext;
+    private final Collection<? extends Person> population;
 
-    private boolean useWeights;
+    private Predicate<Segment> legPredicate;
 
-    private Predicate<Segment> predicate;
+    private boolean useWeights = true;
 
-    public MatrixWriter(ActivityFacilities facilities, ZoneCollection zones, FileIOContext ioContext) {
+    public CachedMatrixBuilder(Collection<? extends Person> population, ActivityFacilities facilities, ZoneCollection zones) {
+        this.population = population;
         matrixBuilder = new DefaultMatrixBuilder(facilities, zones);
-        this.ioContext = ioContext;
     }
 
-    public void setPredicate(Predicate<Segment> predicate) {
-        this.predicate = predicate;
+    public void setLegPredicate(Predicate<Segment> predicate) {
+        this.legPredicate = predicate;
     }
 
     public void setUseWeights(boolean useWeights) {
@@ -61,13 +66,19 @@ public class MatrixWriter implements AnalyzerTask<Collection<? extends Person>> 
     }
 
     @Override
-    public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        NumericMatrix matrix = matrixBuilder.build(persons, predicate, useWeights);
+    public void afterStep(Collection<CachedPerson> population, Collection<? extends Attributable> mutations, boolean accepted) {
+        iteration++;
+    }
 
-        try {
-            NumericMatrixIO.write(matrix, String.format("%s/matrix.txt.gz", ioContext.getPath()));
-        } catch (IOException e) {
-            e.printStackTrace();
+    @Override
+    public NumericMatrix build(Collection<? extends Person> population) {
+        if(this.population != population) throw new RuntimeException("Trying to build a matrix from different population!");
+
+        if(lastBuilt < iteration) {
+            matrix = matrixBuilder.build(this.population, legPredicate, useWeights);
+            lastBuilt = iteration;
         }
+
+        return matrix;
     }
 }

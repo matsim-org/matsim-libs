@@ -22,10 +22,7 @@ package playground.johannes.studies.matrix2014.config;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.ConfigGroup;
-import playground.johannes.studies.matrix2014.analysis.MatrixComparator;
-import playground.johannes.studies.matrix2014.analysis.MatrixDistanceCompare;
-import playground.johannes.studies.matrix2014.analysis.MatrixMarginalsCompare;
-import playground.johannes.studies.matrix2014.analysis.MatrixVolumeCompare;
+import playground.johannes.studies.matrix2014.analysis.*;
 import playground.johannes.synpop.analysis.AnalyzerTaskComposite;
 import playground.johannes.synpop.analysis.FileIOContext;
 import playground.johannes.synpop.analysis.HistogramWriter;
@@ -55,10 +52,13 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
 
     private final FileIOContext ioContext;
 
-    public MatrixAnalyzerConfigurator(ConfigGroup config, DataPool dataPool, FileIOContext ioContext) {
+    private final MatrixBuilder builder;
+
+    public MatrixAnalyzerConfigurator(ConfigGroup config, DataPool dataPool, FileIOContext ioContext, MatrixBuilder builder) {
         this.config = config;
         this.dataPool = dataPool;
         this.ioContext = ioContext;
+        this.builder = builder;
     }
 
     @Override
@@ -101,7 +101,7 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
         composite.addComponent(distTask);
         composite.addComponent(marTask);
 
-        MatrixComparator analyzer = new MatrixComparator(m, facilityData.getAll(), zones, composite);
+        MatrixComparator analyzer = new MatrixComparator(m, builder, composite);
         analyzer.setVolumeThreshold(threshold);
 
         return analyzer;

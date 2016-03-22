@@ -41,9 +41,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author johannes
  */
-public class MatrixBuilder {
+public class DefaultMatrixBuilder {
 
-    private static final Logger logger = Logger.getLogger(MatrixBuilder.class);
+    private static final Logger logger = Logger.getLogger(DefaultMatrixBuilder.class);
 
     private final ActivityFacilities facilities;
 
@@ -51,7 +51,7 @@ public class MatrixBuilder {
 
     private final Map<String, String> zoneIds;
 
-    public MatrixBuilder(ActivityFacilities facilities, ZoneCollection zones) {
+    public DefaultMatrixBuilder(ActivityFacilities facilities, ZoneCollection zones) {
         this.facilities = facilities;
         this.zones = zones;
         zoneIds = new ConcurrentHashMap<>();

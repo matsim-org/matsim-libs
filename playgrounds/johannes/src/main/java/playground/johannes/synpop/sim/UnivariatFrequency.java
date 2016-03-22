@@ -64,7 +64,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
 
     private final Object PREDICATE_RESULT_KEY = new Object();
 
-    private double errerExponent = 1.0;
+    private double errorExponent = 1.0;
 
     public UnivariatFrequency(Set<? extends Attributable> refElements, Set<? extends Attributable> simElements,
                               String attrKey, Discretizer discretizer) {
@@ -114,7 +114,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
     }
 
     public void setErrorExponent(double exponent) {
-        this.errerExponent = exponent;
+        this.errorExponent = exponent;
     }
 
     private DynamicDoubleArray initHistogram(Set<? extends Attributable> elements, String key, boolean useWeights) {
@@ -196,7 +196,7 @@ public class UnivariatFrequency implements Hamiltonian, AttributeChangeListener 
         } else {
             if (refVal > 0) {
 //                return Math.abs(simVal - refVal) / refVal;
-                return Math.pow(Math.abs(simVal - refVal) / refVal, errerExponent);
+                return Math.pow(Math.abs(simVal - refVal) / refVal, errorExponent);
             } else {
                 if (simVal == 0) return 0;
                 else return simVal/scaleFactor; //TODO: this should be invariant from the sample size of sim values.

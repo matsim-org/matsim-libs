@@ -26,6 +26,7 @@ import playground.johannes.studies.matrix2014.analysis.MatrixWriter;
 import playground.johannes.studies.matrix2014.config.MatrixAnalyzerConfigurator;
 import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 import playground.johannes.studies.matrix2014.matrix.ZoneDistancePredicate;
+import playground.johannes.studies.matrix2014.matrix.io.CachedMatrixBuilder;
 import playground.johannes.synpop.analysis.AnalyzerTaskComposite;
 import playground.johannes.synpop.analysis.ConcurrentAnalyzerTask;
 import playground.johannes.synpop.data.Person;
@@ -41,6 +42,14 @@ public class ExtendedAnalyzerBuilder {
 
     public static void build(Simulator engine, Config config) {
         AnalyzerTaskComposite<Collection<? extends Person>> task = engine.getAnalyzerTasks();
+
+        FacilityData facilityData = (FacilityData) engine.getDataPool().get(FacilityDataLoader.KEY);
+        ZoneData zoneData = (ZoneData) engine.getDataPool().get(ZoneDataLoader.KEY);
+
+        // FIXME: requires consolidation!
+        CachedMatrixBuilder builder = new CachedMatrixBuilder(engine.getSimPersons(), facilityData.getAll(), zoneData.getLayer("nuts3"));
+        builder.setLegPredicate(engine.getLegPredicate());
+        builder.setUseWeights(engine.getUseWeights());
         /*
         matrix comparators
          */
@@ -48,24 +57,26 @@ public class ExtendedAnalyzerBuilder {
         MatrixComparator mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(
                 config.getModule("matrixAnalyzerITP"),
                 engine.getDataPool(),
-                engine.getIOContext()).load();
-        mAnalyzer.setLegPredicate(engine.getLegPredicate());
-        mAnalyzer.setUseWeights(engine.getUseWeights());
+                engine.getIOContext(),
+                builder).load();
+//        mAnalyzer.setLegPredicate(engine.getLegPredicate());
+//        mAnalyzer.setUseWeights(engine.getUseWeights());
         matrixTasks.addComponent(mAnalyzer);
 
 
         mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(
                 config.getModule("matrixAnalyzerTomTom"),
                 engine.getDataPool(),
-                engine.getIOContext()).load();
-        mAnalyzer.setLegPredicate(engine.getLegPredicate());
+                engine.getIOContext(),
+                builder).load();
+//        mAnalyzer.setLegPredicate(engine.getLegPredicate());
 
-        ZoneData zoneData = (ZoneData) engine.getDataPool().get(ZoneDataLoader.KEY);
+//        ZoneData zoneData = (ZoneData) engine.getDataPool().get(ZoneDataLoader.KEY);
         ZoneCollection zones = zoneData.getLayer("tomtom");
         ODPredicate distPredicate = new ZoneDistancePredicate(zones, 100000);
 
         mAnalyzer.setNormPredicate(distPredicate);
-        mAnalyzer.setUseWeights(engine.getUseWeights());
+//        mAnalyzer.setUseWeights(engine.getUseWeights());
         matrixTasks.addComponent(mAnalyzer);
         /*
         matrix writer

@@ -24,7 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
 import org.matsim.facilities.ActivityFacilities;
-import playground.johannes.studies.matrix2014.matrix.MatrixBuilder;
+import playground.johannes.studies.matrix2014.matrix.DefaultMatrixBuilder;
 import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 import playground.johannes.studies.matrix2014.matrix.VolumePredicate;
 import playground.johannes.synpop.analysis.*;
@@ -52,7 +52,7 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
     private final String matrixName;
 
-    private final MatrixBuilder matrixBuilder;
+    private final DefaultMatrixBuilder matrixBuilder;
 
     private Predicate<Segment> predicate;
 
@@ -71,7 +71,7 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
     public MatrixAnalyzer(ActivityFacilities facilities, ZoneCollection zones, NumericMatrix refMatrix, String name) {
         this.refMatrix = refMatrix;
         this.matrixName = name;
-        matrixBuilder = new MatrixBuilder(facilities, zones);
+        matrixBuilder = new DefaultMatrixBuilder(facilities, zones);
     }
 
     public void setPredicate(Predicate<Segment> predicate) {
