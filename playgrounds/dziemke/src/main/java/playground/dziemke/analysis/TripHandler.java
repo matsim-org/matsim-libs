@@ -64,6 +64,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		trip.setDepartureTime_s(time_s);
 		//trip.setDepartureLegMode(legMode);
 		trip.setActivityEndActType(actType);
+		trip.setWeight(1.);
 		trips.put(tripId, trip);
 		
 		

@@ -7,9 +7,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 
 public class AnalysisFileWriter {
+	public static final Logger log = Logger.getLogger(AnalysisFileWriter.class);
 	
 	public void writeToFileIntegerKey(Map<Integer, Double> map, String outputFile, int binWidth, double aggregateWeight, double average) {
 		BufferedWriter bufferedWriter = null;
@@ -34,8 +37,8 @@ public class AnalysisFileWriter {
     		
 			double countDifference = Math.abs(writeCounter - aggregateWeight);
     		if (countDifference >1.) {
-    			System.err.println("Weighted number of trips in " + outputFile + " is not equal to aggregate weight!");
-    			System.err.println("writeCounter: " + writeCounter + "; aggregateWeight: " + aggregateWeight);
+    			log.error("Weighted number of trips in " + outputFile + " is not equal to aggregate weight!");
+    			log.error("writeCounter: " + writeCounter + "; aggregateWeight: " + aggregateWeight);
     		}
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
@@ -51,7 +54,7 @@ public class AnalysisFileWriter {
                 ex.printStackTrace();
             }
         }
-		System.out.println("Analysis file " + outputFile + " written.");
+		log.info("Analysis file " + outputFile + " written.");
 	}
 	
 	
@@ -80,8 +83,8 @@ public class AnalysisFileWriter {
     		
 			double countDifference = Math.abs(writeCounter - aggregateWeight);
     		if (countDifference >1.) {
-    			System.err.println("Weighted number of trips in " + outputFile + " is not equal to aggregate weight!");
-    			System.err.println("writeCounter: " + writeCounter + "; aggregateWeight: " + aggregateWeight);
+    			log.error("Weighted number of trips in " + outputFile + " is not equal to aggregate weight!");
+    			log.error("writeCounter: " + writeCounter + "; aggregateWeight: " + aggregateWeight);
     		}
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
@@ -97,7 +100,7 @@ public class AnalysisFileWriter {
                 ex.printStackTrace();
             }
         }
-		System.out.println("Analysis file " + outputFile + " written.");
+		log.info("Analysis file " + outputFile + " written.");
 	}
 	
 	
@@ -129,7 +132,7 @@ public class AnalysisFileWriter {
 				ex.printStackTrace();
 			}
 		}
-		System.out.println("Analysis file " + outputFile + " written.");
+		log.info("Analysis file " + outputFile + " written.");
 	}
 	
 	
@@ -156,8 +159,8 @@ public class AnalysisFileWriter {
     		
     		double countDifference = Math.abs(writeCounter - aggregateWeight);
     		if (countDifference >1.) {
-    			System.err.println("Weighted number of trips in " + outputFile + " is not equal to aggregate weight!");
-    			System.err.println("writeCounter: " + writeCounter + "; aggregateWeight: " + aggregateWeight);
+    			log.error("Weighted number of trips in " + outputFile + " is not equal to aggregate weight!");
+    			log.error("writeCounter: " + writeCounter + "; aggregateWeight: " + aggregateWeight);
     		}
 	    } catch (FileNotFoundException ex) {
 	        ex.printStackTrace();
@@ -173,7 +176,7 @@ public class AnalysisFileWriter {
 	            ex.printStackTrace();
 	        }
 	    }
-		System.out.println("Analysis file " + outputFile + " written.");
+		log.info("Analysis file " + outputFile + " written.");
 	}
 	
 	
@@ -228,7 +231,7 @@ public class AnalysisFileWriter {
     		bufferedWriter.newLine();
     		    		
     		if (mapEntryCounter != tripCounter) {
-    			System.err.println("Number of map entries in " + outputFile + " is not equal to number of trips!");
+    			Log.error("Number of map entries in " + outputFile + " is not equal to number of trips!");
     		}
     		
     		//
@@ -262,6 +265,6 @@ public class AnalysisFileWriter {
 	            ex.printStackTrace();
 	        }
 	    }
-		System.out.println("Analysis file " + outputFile + " written.");
+		log.info("Analysis file " + outputFile + " written.");
 	}
 }
