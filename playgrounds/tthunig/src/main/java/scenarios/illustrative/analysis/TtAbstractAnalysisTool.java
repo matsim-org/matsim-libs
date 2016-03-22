@@ -102,6 +102,7 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 	@Inject
 	public TtAbstractAnalysisTool() {
 		defineNumberOfRoutes();
+		reset(0);
 	}
 	
 	/**
