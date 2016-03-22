@@ -53,9 +53,9 @@ public class TDDistributions {
 		this.analyzePlans();
 		log.info("Analyses finished ###################################");
 	}
-	
+		
 	private void init() {
-		//String [] activities = {"home", "work", "leisure", "pudo", "personal", "primaryschool", "secondaryschool", "tertiaryschool", "foreignschool"};
+		String [] hitsActivities = {"home", "work", "leisure", "pudo", "personal", "primaryschool", "secondaryschool", "tertiaryschool", "foreignschool"};
 		
 		
 		for (String mode : allmodes) {
@@ -63,12 +63,9 @@ public class TDDistributions {
 			counter.totalDistance.put(mode, 0.0);
 			counter.totalTime.put(mode, 0.0);
 		}
-		
-		String [] activities = {"home", "work", "leisure"};
-		String [] modes = {"car", "pt", "walk"};
-		
-		for (String activity: activities) {
-			for (String mode : modes) {
+				
+		for (String activity: hitsActivities) {
+			for (String mode : allmodes) {
 				DistributionClass distributionClass = this.createAndAddDistributionClass(mode + "-" + activity, "distance");
 				this.addToActivityType(distributionClass, activity);
 				this.addMainMode(distributionClass, mode);
@@ -76,8 +73,8 @@ public class TDDistributions {
 			}
 		}
 		
-		for (String activity: activities) {
-			for (String mode : modes) {
+		for (String activity: hitsActivities) {
+			for (String mode : allmodes) {
 				DistributionClass distributionClass = this.createAndAddDistributionClass(mode + "-" + activity, "time");
 				this.addToActivityType(distributionClass, activity);
 				this.addMainMode(distributionClass, mode);
@@ -85,20 +82,20 @@ public class TDDistributions {
 			}
 		}
 		
-		for (String activity: activities) {
+		for (String activity: hitsActivities) {
 			DistributionClass distributionClass = this.createAndAddDistributionClass("all modes" + "-" + activity, "distance");
 			this.defineDistanceBinsForDistributionClass(distributionClass);
 			this.addToActivityType(distributionClass, activity);
-			for (String mode : modes) {				
+			for (String mode : allmodes) {				
 				this.addMainMode(distributionClass, mode);			
 			}
 		}
 		
-		for (String activity: activities) {
+		for (String activity: hitsActivities) {
 			DistributionClass distributionClass = this.createAndAddDistributionClass("all modes" + "-" + activity, "time");
 			this.defineTimeBinsForDistributionClass(distributionClass);
 			this.addToActivityType(distributionClass, activity);
-			for (String mode : modes) {				
+			for (String mode : allmodes) {				
 				this.addMainMode(distributionClass, mode);			
 			}
 		}

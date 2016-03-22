@@ -1,5 +1,6 @@
 package playground.singapore.springcalibration.run;
 
+import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -27,7 +28,7 @@ import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 
-import javax.inject.Inject;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -41,6 +42,7 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
 	/*
 	 * String used to identify the operation in the IterationStopWatch.
 	 */
+	private final static Logger log = Logger.getLogger(CountsControlerListenerSingapore.class);
 	public static final String OPERATION_COMPARECOUNTS = "compare with counts";
 
     private GlobalConfigGroup globalConfigGroup;
@@ -52,18 +54,14 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
     private IterationStopWatch iterationStopwatch;
     private OutputDirectoryHierarchy controlerIO;
 
-    @com.google.inject.Inject(optional=true)
     private Counts<Link> counts = null;
 
     private final Map<Id<Link>, double[]> linkStats = new HashMap<>();
     private int iterationsUsed = 0;
 
-    @Inject
-    CountsControlerListenerSingapore() {
-	}
-
 	@Override
 	public void notifyStartup(final StartupEvent controlerStartupEvent) {
+		log.info("Starting up");
 		Scenario scenario = controlerStartupEvent.getServices().getScenario();
 		Config config = controlerStartupEvent.getServices().getConfig();
 		
@@ -75,8 +73,9 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
 		this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());
         this.iterationStopwatch = controlerStartupEvent.getServices().getStopwatch();
         this.controlerIO = controlerStartupEvent.getServices().getControlerIO();
-		
-		
+        
+        this.counts = (Counts<Link>) scenario.getScenarioElement(Counts.ELEMENT_NAME);
+				
         if (counts != null) {
             for (Id<Link> linkId : counts.getCounts().keySet()) {
                 this.linkStats.put(linkId, new double[24]);
@@ -86,12 +85,12 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
 
     @Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		if (counts != null && this.config.getWriteCountsInterval() > 0) {
+    	log.info("Iteration ends call");
+		if (counts != null && this.config.getWriteCountsInterval() > 0) {			
             if (useVolumesOfIteration(event.getIteration(), controlerConfigGroup.getFirstIteration())) {
                 addVolumes(volumesAnalyzer);
             }
-
-            if (createCountsInIteration(event.getIteration())) {
+            if (createCountsInIteration(event.getIteration())) {          	
                 iterationStopwatch.beginOperation(OPERATION_COMPARECOUNTS);
                 Map<Id<Link>, double[]> averages;
                 if (this.iterationsUsed > 1) {
@@ -114,10 +113,13 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
                 }
                 cca.setCountsScaleFactor(this.config.getCountsScaleFactor());
                 cca.run();
-
+                
                 if (this.config.getOutputFormat().contains("html") ||
-                        this.config.getOutputFormat().contains("all")) {
-                    CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(controlerIO.getIterationPath(event.getIteration()) + "/screenline/", cca.getComparison(), event.getIteration());
+                        this.config.getOutputFormat().contains("all")) {                	
+                	String path = controlerIO.getIterationPath(event.getIteration()) + "/screenline/";
+                	new File(path).mkdir();
+                	log.info("Writing counts to: " + path);
+                    CountsHtmlAndGraphsWriter cgw = new CountsHtmlAndGraphsWriter(path, cca.getComparison(), event.getIteration());
                     cgw.addGraphsCreator(new CountsSimRealPerHourGraphCreator("sim and real volumes"));
                     cgw.addGraphsCreator(new CountsErrorGraphCreator("errors"));
                     cgw.addGraphsCreator(new CountsLoadCurveGraphCreator("link volumes"));
@@ -126,7 +128,7 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
                 }
                 if (this.config.getOutputFormat().contains("kml") ||
                         this.config.getOutputFormat().contains("all")) {
-                    String filename = controlerIO.getIterationFilename(event.getIteration(), "/screenline/countscompare.kmz");
+                    String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare_screenline.kmz");
                     CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
                             cca.getComparison(), network, TransformationFactory.getCoordinateTransformation(globalConfigGroup.getCoordinateSystem(), TransformationFactory.WGS84));
                     kmlWriter.setIterationNumber(event.getIteration());
@@ -134,7 +136,7 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
                 }
                 if (this.config.getOutputFormat().contains("txt") ||
                         this.config.getOutputFormat().contains("all")) {
-                    String filename = controlerIO.getIterationFilename(event.getIteration(), "/screenline/countscompare.txt");
+                    String filename = controlerIO.getIterationFilename(event.getIteration(), "countscompare_screenline.txt");
                     CountSimComparisonTableWriter ctw = new CountSimComparisonTableWriter(cca.getComparison(), Locale.ENGLISH);
                     ctw.writeFile(filename);
                 }
