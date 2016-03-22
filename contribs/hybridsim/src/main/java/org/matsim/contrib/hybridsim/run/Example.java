@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.hybridsim.proto.HybridSimProto;
 import org.matsim.contrib.hybridsim.simulation.HybridMobsimProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -70,6 +71,7 @@ public class Example {
 		enrichConfig(c);
 		createNetwork(sc);
 		createPopulation(sc);
+//		createHybridsimScenario(sc); //enable for grpc_jps_as_a_service branch
 
 		final Controler controller = new Controler(sc);
 		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -97,6 +99,209 @@ public class Example {
 		controller.run();
 
 
+	}
+
+	private static void createHybridsimScenario(Scenario sc) {
+		HybridSimProto.Scenario.Builder scb = HybridSimProto.Scenario.newBuilder();
+		HybridSimProto.Environment.Builder eb = scb.getEnvironmentBuilder();
+		HybridSimProto.Room.Builder rb = eb.addRoomBuilder();
+		rb.setId(0);
+		rb.setCaption("hall");
+		HybridSimProto.Subroom.Builder srb = rb.addSubroomBuilder();
+		srb.setId(0);
+		srb.setClosed(0);
+		{
+			HybridSimProto.Polygon.Builder srpb = srb.addPolygonBuilder();
+			srpb.setCaption("wall");
+			HybridSimProto.Coordinate.Builder c1 = srpb.addCoordinateBuilder();
+			c1.setX(200.0);
+			c1.setY(109.35);
+			HybridSimProto.Coordinate.Builder c2 = srpb.addCoordinateBuilder();
+			c2.setX(113.85);
+			c2.setY(109.35);
+		}
+		{
+			HybridSimProto.Polygon.Builder srpb = srb.addPolygonBuilder();
+			srpb.setCaption("wall");
+			HybridSimProto.Coordinate.Builder c1 = srpb.addCoordinateBuilder();
+			c1.setX(113.85);
+			c1.setY(110.85);
+			HybridSimProto.Coordinate.Builder c2 = srpb.addCoordinateBuilder();
+			c2.setX(200.0);
+			c2.setY(110.85);
+		}
+		{
+			HybridSimProto.Transition.Builder tb = eb.addTransitionBuilder();
+			tb.setId(0);
+			tb.setCaption("exit");
+			tb.setType("emergency");
+			tb.setRoom1Id(0);
+			tb.setSubroom1Id(0);
+			tb.setRoom2Id(-1);
+			tb.setSubroom2Id(-1);
+			HybridSimProto.Coordinate.Builder c1 = tb.getVert1Builder();
+			c1.setX(200.0);
+			c1.setY(109.35);
+			HybridSimProto.Coordinate.Builder c2 = tb.getVert2Builder();
+			c2.setX(200.0);
+			c2.setY(110.85);
+		}
+		{
+			HybridSimProto.Transition.Builder tb = eb.addTransitionBuilder();
+			tb.setId(1);
+			tb.setCaption("entrance");
+			tb.setType("emergency");
+			tb.setRoom1Id(0);
+			tb.setSubroom1Id(0);
+			tb.setRoom2Id(-1);
+			tb.setSubroom2Id(-1);
+			HybridSimProto.Coordinate.Builder c1 = tb.getVert1Builder();
+			c1.setX(113.85);
+			c1.setY(110.85);
+			HybridSimProto.Coordinate.Builder c2 = tb.getVert2Builder();
+			c2.setX(113.85);
+			c2.setY(109.35);
+		}
+
+		{
+			HybridSimProto.Goal.Builder gb = scb.addGoalBuilder();
+			gb.setId(0);
+			gb.setFinal(true);
+			gb.setCaption("goal0");
+			HybridSimProto.Polygon.Builder pb = gb.getPBuilder();
+			HybridSimProto.Coordinate.Builder cb1 = pb.addCoordinateBuilder();
+			cb1.setX(198);
+			cb1.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb2 = pb.addCoordinateBuilder();
+			cb2.setX(198);
+			cb2.setY(110.85);
+			HybridSimProto.Coordinate.Builder cb3 = pb.addCoordinateBuilder();
+			cb3.setX(200.5);
+			cb3.setY(110.85);
+			HybridSimProto.Coordinate.Builder cb4 = pb.addCoordinateBuilder();
+			cb4.setX(200.5);
+			cb4.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb5 = pb.addCoordinateBuilder();
+			cb5.setX(198);
+			cb5.setY(109.35);
+		}
+		{
+			HybridSimProto.Goal.Builder gb = scb.addGoalBuilder();
+			gb.setId(1);
+			gb.setFinal(true);
+			gb.setCaption("goal1");
+			HybridSimProto.Polygon.Builder pb = gb.getPBuilder();
+			HybridSimProto.Coordinate.Builder cb1 = pb.addCoordinateBuilder();
+			cb1.setX(115.85);
+			cb1.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb2 = pb.addCoordinateBuilder();
+			cb2.setX(115.85);
+			cb2.setY(110.85);
+			HybridSimProto.Coordinate.Builder cb3 = pb.addCoordinateBuilder();
+			cb3.setX(113.35);
+			cb3.setY(110.85);
+			HybridSimProto.Coordinate.Builder cb4 = pb.addCoordinateBuilder();
+			cb4.setX(113.35);
+			cb4.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb5 = pb.addCoordinateBuilder();
+			cb5.setX(115.35);
+			cb5.setY(109.35);
+		}
+
+		{
+			HybridSimProto.Group.Builder gb = scb.addGroupBuilder();
+			gb.setGroupId(0);
+			gb.setRoomId(0);
+			gb.setSubroomId(0);
+			gb.setNumber(0);
+			gb.setRouterId(1);
+			HybridSimProto.Coordinate.Builder cb1 = gb.getMinXYBuilder();
+			cb1.setX(198.5);
+			cb1.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb2 = gb.getMaxXYBuilder();
+			cb2.setX(201);
+			cb2.setY(110.85);
+		}
+		{
+			HybridSimProto.Group.Builder gb = scb.addGroupBuilder();
+			gb.setGroupId(1);
+			gb.setRoomId(0);
+			gb.setSubroomId(0);
+			gb.setNumber(0);
+			gb.setRouterId(1);
+			HybridSimProto.Coordinate.Builder cb1 = gb.getMinXYBuilder();
+			cb1.setX(112.85);
+			cb1.setY(109.35);
+			HybridSimProto.Coordinate.Builder cb2 = gb.getMaxXYBuilder();
+			cb2.setX(115.35);
+			cb2.setY(110.85);
+		}
+		{
+			HybridSimProto.Source.Builder srcb = scb.addSourceBuilder();
+			srcb.setId(0);
+			srcb.setFrequency(5);
+			srcb.setMaxAgents(5);
+			srcb.setGroupId(0);
+			srcb.setCaption("source1");
+		}
+		{
+			HybridSimProto.Source.Builder srcb = scb.addSourceBuilder();
+			srcb.setId(1);
+			srcb.setFrequency(5);
+			srcb.setMaxAgents(5);
+			srcb.setGroupId(0);
+			srcb.setCaption("source2");
+		}
+
+		HybridSimProto.Model.Builder mb = scb.getModelBuilder();
+		mb.setType(HybridSimProto.Model.Type.Gompertz);
+		HybridSimProto.Gompertz.Builder gb = mb.getGompertzBuilder();
+		gb.setSolver("eueler");
+		gb.setStepsize(0.01);
+		gb.setExitCrossingStrategy(3);
+		gb.setLinkedCellsEnabled(true);
+		gb.setCellSize(2.2);
+		HybridSimProto.Force.Builder pfb = gb.getForcePedBuilder();
+		pfb.setNu(3);
+		pfb.setB(0.25);
+		pfb.setC(3.0);
+		HybridSimProto.Force.Builder wfb = gb.getForcePedBuilder();
+		wfb.setNu(10);
+		wfb.setB(0.7);
+		wfb.setC(3.0);
+		HybridSimProto.Distribution.Builder v0b = gb.getV0Builder();
+		v0b.setMu(0.5);
+		v0b.setSigma(0.0);
+		HybridSimProto.Distribution.Builder bmaxb = gb.getBMaxBuilder();
+		bmaxb.setMu(0.25);
+		bmaxb.setSigma(0.001);
+		HybridSimProto.Distribution.Builder bminb = gb.getBMinBuilder();
+		bminb.setMu(0.2);
+		bminb.setSigma(0.001);
+		HybridSimProto.Distribution.Builder aminb = gb.getAMinBuilder();
+		aminb.setMu(0.18);
+		aminb.setSigma(0.001);
+		HybridSimProto.Distribution.Builder taub = gb.getTauBuilder();
+		taub.setMu(0.5);
+		taub.setSigma(0.001);
+		HybridSimProto.Distribution.Builder ataub = gb.getAtauBuilder();
+		ataub.setMu(0.5);
+		ataub.setSigma(0.001);
+
+
+		HybridSimProto.Router.Builder roub = scb.addRouterBuilder();
+		roub.setRouterId(1);
+		roub.setDescription("global_shortest");
+
+
+		sc.addScenarioElement("hybrid_scenario",scb.build());
+
+//		Object gb = scb
+
+
+//		HybridSimProto.roo
+//		room = e.add
+//		e.add
 	}
 
 	private static void enrichConfig(Config c) {
