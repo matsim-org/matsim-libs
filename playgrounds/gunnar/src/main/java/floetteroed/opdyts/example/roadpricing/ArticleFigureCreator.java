@@ -1,5 +1,6 @@
 package floetteroed.opdyts.example.roadpricing;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
@@ -33,15 +34,14 @@ class ArticleFigureCreator {
 	};
 
 	String asPSTricksSnippet(final double xFact, final double yFact,
-			final String text, final String style, final String marker,
-			final WhatToWrite whatToWrite) {
+			final String text, final String style, final WhatToWrite whatToWrite) {
 
 		final DecimalFormatSymbols dfs = new DecimalFormatSymbols();
 		dfs.setDecimalSeparator('.');
 		final DecimalFormat df = new DecimalFormat("#");
 		df.setMaximumFractionDigits(4);
 		df.setDecimalFormatSymbols(dfs);
-		
+
 		final StringBuffer result = new StringBuffer();
 
 		boolean dataAvail = true;
@@ -77,10 +77,14 @@ class ArticleFigureCreator {
 			}
 			if (transitions.getN() > 0) {
 
-				result.append("\\rput("
+				// result.append("\\rput("
+				// + df.format(xFact * transitions.getPercentile(50))
+				// + "," + df.format(values.getPercentile(50)) + "){"
+				// + marker + "}\n");
+
+				result.append("\\psdot[dotstyle=x]("
 						+ df.format(xFact * transitions.getPercentile(50))
-						+ "," + df.format(values.getPercentile(50)) + "){"
-						+ marker + "}\n");
+						+ "," + df.format(values.getPercentile(50)) + ")\n");
 
 				final double x1 = xFact * transitions.getPercentile(25);
 				final double x2 = xFact * transitions.getPercentile(75);
@@ -111,7 +115,7 @@ class ArticleFigureCreator {
 
 		System.out.println("STARTED ...");
 
-		final int[] populationSizes = new int[] { 2 };
+		final int[] populationSizes = new int[] { 2, 4, 8, 16, 32, 64, 128, 256 };
 		final String[] runIdentifiers = new String[] { "a", "b", "c", "d", "e",
 				"f", "g", "h", "i", "j" };
 
@@ -120,15 +124,21 @@ class ArticleFigureCreator {
 			final ArticleFigureCreator afcProposed = new ArticleFigureCreator();
 			for (String run : runIdentifiers) {
 				// read naive
-				OptFileReader reader = new OptFileReader(
-						"./output/roadpricing/logfiles/naive_" + populationSize
-								+ run + ".opt");
-				afcNaive.add(reader.getOptFileSummary());
+				final String naiveFileName = "./output/roadpricing/logfiles/naive_"
+						+ populationSize + run + ".opt";
+				if (new File(naiveFileName).exists()) {
+					final OptFileReader reader = new OptFileReader(
+							naiveFileName);
+					afcNaive.add(reader.getOptFileSummary());
+				}
 				// read proposed
-				reader = new OptFileReader(
-						"./output/roadpricing/logfiles/search_"
-								+ populationSize + run + ".opt");
-				afcProposed.add(reader.getOptFileSummary());
+				final String proposedFileName = "./output/roadpricing/logfiles/search_"
+						+ populationSize + run + ".opt";
+				if (new File(proposedFileName).exists()) {
+					final OptFileReader reader = new OptFileReader(
+							proposedFileName);
+					afcProposed.add(reader.getOptFileSummary());
+				}
 			}
 
 			final double xFact = 1.0 / 1000.0; // simulation equivalent
@@ -140,23 +150,23 @@ class ArticleFigureCreator {
 								+ populationSize + ".tex");
 				writer.println(afcNaive.asPSTricksSnippet(xFact, 1.0, "\\tiny{"
 						+ populationSize + "}", "[linestyle=solid]",
-						"$\\times$", WhatToWrite.ObjFctVals));
+						WhatToWrite.ObjFctVals));
 				writer.println(afcProposed.asPSTricksSnippet(xFact, 1.0,
 						"\\tiny{" + populationSize + "}", "[linestyle=solid]",
-						"$\\times$", WhatToWrite.ObjFctVals));
+						WhatToWrite.ObjFctVals));
 				writer.flush();
 				writer.close();
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}
 			// write equilibrium gaps
-			try {
+			try { 
 				final PrintWriter writer = new PrintWriter(
 						"./output/roadpricing/latex/EquilGaps_popSize"
 								+ populationSize + ".tex");
 				writer.println(afcProposed.asPSTricksSnippet(xFact, 1.0,
 						"\\tiny{" + populationSize + "}", "[linestyle=solid]",
-						"$\\times$", WhatToWrite.EquilGaps));
+						WhatToWrite.EquilGaps));
 				writer.flush();
 				writer.close();
 			} catch (FileNotFoundException e) {
@@ -169,7 +179,7 @@ class ArticleFigureCreator {
 								+ populationSize + ".tex");
 				writer.println(afcProposed.asPSTricksSnippet(xFact, 1.0,
 						"\\tiny{" + populationSize + "}", "[linestyle=solid]",
-						"$\\times$", WhatToWrite.UnifGaps));
+						WhatToWrite.UnifGaps));
 				writer.flush();
 				writer.close();
 			} catch (FileNotFoundException e) {
