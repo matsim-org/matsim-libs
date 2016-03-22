@@ -67,6 +67,7 @@ public class GTFSReader {
 	private Map<String, Shape> shapes;
 	private boolean usesShapes;
 	private boolean usesFrequencies;
+	private boolean usesFrequenciesWarn = true;
 	private String[] serviceIds;    //	The types of dates that will be represented by the new file
 
 	// TODO serviceId which algorithm param
@@ -83,6 +84,7 @@ public class GTFSReader {
 
 	private SimpleDateFormat timeFormat;
 	private Map<String, Integer> serviceIdsCount;
+	private boolean useDummyLinks = false;
 
 	public static void main(final String[] args) {
 		convertGTFS2MATSimTransitSchedule(args[0], args[1]);
@@ -159,10 +161,13 @@ public class GTFSReader {
 		for(Entry<String, Stop> stop: stops.entrySet()) {
 			Coord result = stop.getValue().getPoint(); // TODO coordinateTransformation.transform(stop.getValue().getPoint());
 			TransitStopFacility transitStopFacility = transitScheduleFactory.createTransitStopFacility(Id.create(stop.getKey(), TransitStopFacility.class), result, stop.getValue().isBlocks());
-			transitStopFacility.setLinkId(DUMMY_LINK);
 			transitStopFacility.setName(stop.getValue().getName());
 			transitSchedule.addStopFacility(transitStopFacility);
+			if(useDummyLinks) {transitStopFacility.setLinkId(DUMMY_LINK); }
 		}
+
+		// use unique departure ids (safer than generating one for each transitRoue as long as Departures are stored in a Map
+		int departureId = 0;
 
 		for(Map.Entry<String,Route> route:routes.entrySet()) {
 			// creating new transit line
@@ -180,37 +185,57 @@ public class GTFSReader {
 					}
 				}
 
-				if (isService) {
-					NetworkRoute networkRoute = new LinkNetworkRouteImpl(DUMMY_LINK, DUMMY_LINK_END);
-
+				if(isService) {
 					// get stop sequence
-					List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
+					List<TransitRouteStop> transitRouteStops = new ArrayList<>();
 					Date startTime = trip.getValue().getStopTimes().get(trip.getValue().getStopTimes().firstKey()).getArrivalTime();
-					for(Integer stopTimeKey:trip.getValue().getStopTimes().keySet()) {
+					for (Integer stopTimeKey : trip.getValue().getStopTimes().keySet()) {
 						StopTime stopTime = trip.getValue().getStopTimes().get(stopTimeKey);
 						double arrival = Time.UNDEFINED_TIME, departure = Time.UNDEFINED_TIME;
-						if(!stopTimeKey.equals(trip.getValue().getStopTimes().firstKey())) {
-							long difference = stopTime.getArrivalTime().getTime()-startTime.getTime();
+						if (!stopTimeKey.equals(trip.getValue().getStopTimes().firstKey())) {
+							long difference = stopTime.getArrivalTime().getTime() - startTime.getTime();
 							try {
-								arrival = Time.parseTime(timeFormat.format(new Date(timeFormat.parse("00:00:00").getTime()+difference)));
+								arrival = Time.parseTime(timeFormat.format(new Date(timeFormat.parse("00:00:00").getTime() + difference)));
 							} catch (ParseException e) {
 								e.printStackTrace();
 							}
 						}
-						if(!stopTimeKey.equals(trip.getValue().getStopTimes().lastKey())) {
-							long difference = stopTime.getDepartureTime().getTime()-startTime.getTime();
+						if (!stopTimeKey.equals(trip.getValue().getStopTimes().lastKey())) {
+							long difference = stopTime.getDepartureTime().getTime() - startTime.getTime();
 							try {
-								departure = Time.parseTime(timeFormat.format(new Date(timeFormat.parse("00:00:00").getTime()+difference)));
+								departure = Time.parseTime(timeFormat.format(new Date(timeFormat.parse("00:00:00").getTime() + difference)));
 							} catch (ParseException e) {
 								e.printStackTrace();
 							}
 						}
-						transitRouteStops.add(transitScheduleFactory.createTransitRouteStop(transitSchedule.getFacilities().get(Id.create(stopTime.getStopId(), TransitStopFacility.class)),arrival,departure));
+						transitRouteStops.add(transitScheduleFactory.createTransitRouteStop(transitSchedule.getFacilities().get(Id.create(stopTime.getStopId(), TransitStopFacility.class)), arrival, departure));
 					}
 
-					// add transitRoute to transitLine
-					TransitRoute transitRoute = transitScheduleFactory.createTransitRoute(Id.create(trip.getKey(), TransitRoute.class), networkRoute, transitRouteStops, route.getValue().getRouteType().name);
-					transitLine.addRoute(transitRoute);
+					if(usesFrequencies && usesFrequenciesWarn) {
+						log.warn("Algorithm does not yet support frequencies instead of stop_times to create departure times!");
+						usesFrequenciesWarn = false;
+					}
+
+					// if route sequence is already used by the same transitLine: just add new departure for transitRoute
+					boolean routeExistsInTransitLine = false;
+					for (Entry<Id<TransitRoute>, TransitRoute> routeEntry : transitLine.getRoutes().entrySet()) {
+						if (routeEntry.getValue().getStops().equals(transitRouteStops)) {
+							routeEntry.getValue().addDeparture(transitScheduleFactory.createDeparture(
+									Id.create(departureId++, Departure.class), Time.parseTime(timeFormat.format(startTime))));
+							routeExistsInTransitLine = true;
+							break;
+						}
+					}
+
+					if (!routeExistsInTransitLine) {
+						TransitRoute newTransitRoute = transitScheduleFactory.createTransitRoute(Id.create(trip.getKey(), TransitRoute.class), null, transitRouteStops, route.getValue().getRouteType().name);
+
+						newTransitRoute.addDeparture(transitScheduleFactory.createDeparture(
+								Id.create(departureId++, Departure.class), Time.parseTime(timeFormat.format(startTime))));
+						transitLine.addRoute(newTransitRoute);
+					}
+
+
 				}
 			} // foreach trip
 		} // foreach route
@@ -400,13 +425,9 @@ public class GTFSReader {
 		int i=1;
 		int c=1;
 		while (line != null) {
-			if(i == Math.pow(2, c)) {
-				log.info("        line #"+i);
-				c++;
-			}
-			i++;
+			if(i == Math.pow(2, c)) { log.info("        line #"+i);	c++; } i++;
 
-			for(Route actualRoute:routes.values()) {
+			for(Route actualRoute : routes.values()) {
 				Trip trip = actualRoute.getTrips().get(line[col.get("trip_id")]);
 				if(trip!=null) {
 					try {
@@ -480,7 +501,7 @@ public class GTFSReader {
 		}
 
 		if(columnNames.length != indices.size())
-			log.warn("Column name not found in csv. Is the file encoded in UTF-8?");
+			log.warn("Column name not found in csv. Might be some additional characters in the header or the encoding not being UTF-8.");
 
 		return indices;
 	}
@@ -526,6 +547,10 @@ public class GTFSReader {
 				i++;
 			}
 		}
+	}
+
+	public void useDummyLinks(boolean b) {
+		this.useDummyLinks = b;
 	}
 
 	/**
