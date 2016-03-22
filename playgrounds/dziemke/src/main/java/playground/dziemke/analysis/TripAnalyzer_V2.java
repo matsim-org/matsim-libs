@@ -118,33 +118,33 @@ public class TripAnalyzer_V2 {
 	    List<Trip> trips = createListOfValidTrip(tripHandler.getTrips());
 	    
 	    /* Do calculations and write-out*/
-	    Map <Integer, Double> tripDurationMap = createTripDurationMap(trips, binWidthDuration_min, maxBinDuration_min);
-	    double averageTripDuration = calculateAverageTripDuration_min(trips);
+	    Map <Integer, Double> tripDurationMap = TripAnalyzerBasic.createTripDurationMap(trips, binWidthDuration_min, maxBinDuration_min);
+	    double averageTripDuration = TripAnalyzerBasic.calculateAverageTripDuration_min(trips);
 	    writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, numberOfConsideredTrips, averageTripDuration);
 	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, numberOfConsideredTrips, averageTripDuration);
 	    
-	    Map <Integer, Double> departureTimeMap = createDepartureTimeMap(trips, binWidthTime_h, maxBinTime_h);
+	    Map <Integer, Double> departureTimeMap = TripAnalyzerBasic.createDepartureTimeMap(trips, binWidthTime_h, maxBinTime_h);
 	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, numberOfConsideredTrips, averageTripDuration);
 	    	    
-	    Map<String, Double> activityTypeMap = createActivityTypeMap(trips, binWidthTime_h, maxBinTime_h);
+	    Map<String, Double> activityTypeMap = TripAnalyzerBasic.createActivityTypeMap(trips, binWidthTime_h, maxBinTime_h);
 	    writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", numberOfConsideredTrips);
 	    
-	    Map<Integer, Double> tripDistanceBeelineMap = createTripDistanceBeelineMap(trips, binWidthDistance_km, maxBinDistance_km);
-		double averageTripDistanceBeeline_km = calculateAverageTripDistanceBeeline_km(trips);
+	    Map<Integer, Double> tripDistanceBeelineMap = TripAnalyzerBasic.createTripDistanceBeelineMap(trips, binWidthDistance_km, maxBinDistance_km);
+		double averageTripDistanceBeeline_km = TripAnalyzerBasic.calculateAverageTripDistanceBeeline_km(trips);
 		writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance_km, numberOfConsideredTrips, averageTripDistanceBeeline_km);
 		writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeelineCumulative.txt", binWidthDistance_km, numberOfConsideredTrips, averageTripDistanceBeeline_km);
 	    
-	    Map<Integer, Double> tripDistanceRoutedMap = createTripDistanceRoutedMap(trips, binWidthDistance_km, maxBinDistance_km);
-	    double averageTripDistanceRouted_km = calculateAverageTripDistanceRouted_km(trips);
+	    Map<Integer, Double> tripDistanceRoutedMap = TripAnalyzerBasic.createTripDistanceRoutedMap(trips, binWidthDistance_km, maxBinDistance_km);
+	    double averageTripDistanceRouted_km = TripAnalyzerBasic.calculateAverageTripDistanceRouted_km(trips);
 	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, numberOfConsideredTrips, averageTripDistanceRouted_km);
 	    
-	    Map<Integer, Double> averageTripSpeedBeelineMap = createAverageTripSpeedBeelineMap(trips, binWidthSpeed_km_h, maxBinSpeed_km_h);
-		double averageOfAverageTripSpeedsBeeline_km_h = calculateAverageOfAverageTripSpeedsBeeline_km_h(trips);
+	    Map<Integer, Double> averageTripSpeedBeelineMap = TripAnalyzerBasic.createAverageTripSpeedBeelineMap(trips, binWidthSpeed_km_h, maxBinSpeed_km_h);
+		double averageOfAverageTripSpeedsBeeline_km_h = TripAnalyzerBasic.calculateAverageOfAverageTripSpeedsBeeline_km_h(trips);
 		writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, numberOfTripsWithCalculabeSpeed, averageOfAverageTripSpeedsBeeline_km_h);
 		writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, numberOfTripsWithCalculabeSpeed, averageOfAverageTripSpeedsBeeline_km_h);
 		
-		Map<Integer, Double> averageTripSpeedRoutedMap = createAverageTripSpeedRoutedMap(trips, binWidthSpeed_km_h, maxBinSpeed_km_h);
-		double averageOfAverageTripSpeedsRouted_km_h = calculateAverageOfAverageTripSpeedsRouted_km_h(trips);
+		Map<Integer, Double> averageTripSpeedRoutedMap = TripAnalyzerBasic.createAverageTripSpeedRoutedMap(trips, binWidthSpeed_km_h, maxBinSpeed_km_h);
+		double averageOfAverageTripSpeedsRouted_km_h = TripAnalyzerBasic.calculateAverageOfAverageTripSpeedsRouted_km_h(trips);
 		writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_km_h, numberOfTripsWithCalculabeSpeed, averageOfAverageTripSpeedsRouted_km_h);
 
 		/* Other information */
@@ -160,146 +160,6 @@ public class TripAnalyzer_V2 {
 	    log.info(numberOfInIncompleteTrips + " trips are incomplete.");
 	}
 	
-	private static Map<Integer, Double> createTripDurationMap(List<Trip> trips, int binWidthDuration_min, int maxBinDuration_min) {
-    	Map<Integer, Double> tripDurationMap = new TreeMap<>();
-    	for (Trip trip : trips) {
-    		double tripDuration_min = trip.getDurationByCalculation_s() / 60.;
-    		double tripWeight = trip.getWeight();
-    		AnalysisUtils.addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, tripWeight);
-    	}
-    	return tripDurationMap;
-    }
-	
-	private static double calculateAverageTripDuration_min(List<Trip> trips) {
-		double sumOfAllDurations_min = 0.;
-		double sumOfAllWeights = 0.;
-		for (Trip trip : trips) {
-    		sumOfAllDurations_min += trip.getDurationByCalculation_s() / 60.;
-    		sumOfAllWeights += trip.getWeight();
-    	}
-		return sumOfAllDurations_min / sumOfAllWeights;
-	}
-	
-	private static Map<Integer, Double> createDepartureTimeMap(List<Trip> trips, int binWidthTime_h, int maxBinTime_h) {
-    	Map<Integer, Double> departureTimeMap = new TreeMap<>();
-    	for (Trip trip : trips) {
-    		double departureTime_h = trip.getDepartureTime_s() / 3600.;
-    		double tripWeight = trip.getWeight();
-    		AnalysisUtils.addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, tripWeight);
-    	}
-    	return departureTimeMap;
-    }
-	
-	private static Map<String, Double> createActivityTypeMap(List<Trip> trips, int binWidthTime_h, int maxBinTime_h) {
-    	Map<String, Double> activityTypeMap = new TreeMap<>();
-    	for (Trip trip : trips) {
-    		String activityType = trip.getActivityStartActType();
-    		double tripWeight = trip.getWeight();
-    		AnalysisUtils.addToMapStringKey(activityTypeMap, activityType, tripWeight);
-    	}
-    	return activityTypeMap;
-    }
-	
-	private static Map<Integer, Double> createTripDistanceBeelineMap(List<Trip> trips, int binWidthDistance_km, int maxBinDistance_km) {
-		Map<Integer, Double> tripDistanceBeelineMap = new TreeMap<>();
-		for (Trip trip : trips) {
-			double tripDistanceBeeline_km = trip.getDistanceBeelineByCalculation_m(network) / 1000.;
-			double tripWeight = trip.getWeight();
-			AnalysisUtils.addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, tripWeight);
-			
-			distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline_km); // TODO eventually remove this
-		}
-		return tripDistanceBeelineMap;
-	}
-
-	private static double calculateAverageTripDistanceBeeline_km(List<Trip> trips) {
-		double sumOfAllDistancesBeeline_km = 0.;
-		double sumOfAllWeights = 0.;
-		for (Trip trip : trips) {
-			sumOfAllDistancesBeeline_km += (trip.getDistanceBeelineByCalculation_m(network) / 1000.);
-			sumOfAllWeights += trip.getWeight();
-		}
-		return sumOfAllDistancesBeeline_km / sumOfAllWeights;
-	}
-
-	private static Map<Integer, Double> createTripDistanceRoutedMap(List<Trip> trips, int binWidthDistance_km, int maxBinDistance_km) {
-    	Map<Integer, Double> tripDistanceRoutedMap = new TreeMap<>();
-    	for (Trip trip : trips) {
-    		double tripDistanceRouted_km = trip.getDistanceRoutedByCalculation_m(network) / 1000.;
-    		double tripWeight = trip.getWeight();
-    		AnalysisUtils.addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, maxBinDistance_km, tripWeight);
-    		
-    		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted_km); // TODO eventually remove this
-    	}
-    	return tripDistanceRoutedMap;
-    }
-	
-	private static double calculateAverageTripDistanceRouted_km(List<Trip> trips) {
-		double sumOfAllDistancesRouted_km = 0.;
-		double sumOfAllWeights = 0.;
-		for (Trip trip : trips) {
-    		sumOfAllDistancesRouted_km += (trip.getDistanceRoutedByCalculation_m(network) / 1000.);
-    		sumOfAllWeights += trip.getWeight();
-    	}
-		return sumOfAllDistancesRouted_km / sumOfAllWeights;
-	}
-	
-	private static Map<Integer, Double> createAverageTripSpeedBeelineMap(List<Trip> trips, int binWidthSpeed_km_h, int maxBinSpeed_km_h) {
-		Map<Integer, Double> averageTripSpeedBeelineMap = new TreeMap<>();
-		for (Trip trip : trips) {
-			double tripDuration_h = trip.getDurationByCalculation_s() / 3600.;
-			if (tripDuration_h > 0.) {
-	    		double tripDistanceBeeline_km = trip.getDistanceBeelineByCalculation_m(network) / 1000.;
-	    		double tripWeight = trip.getWeight();
-	    		AnalysisUtils.addToMapIntegerKey(averageTripSpeedBeelineMap, (tripDistanceBeeline_km / tripDuration_h), binWidthSpeed_km_h, maxBinSpeed_km_h, tripWeight);
-	    		numberOfTripsWithCalculabeSpeed++;
-			} else {
-				numberOfTripsWithNoCalculableSpeed++;
-			}
-		}
-		return averageTripSpeedBeelineMap;
-	}
-
-	private static double calculateAverageOfAverageTripSpeedsBeeline_km_h(List<Trip> trips) {
-		double sumOfAllAverageSpeedsBeeline_km_h = 0.;
-		double sumOfAllWeights = 0.;
-		for (Trip trip : trips) {
-			double tripDuration_h = trip.getDurationByCalculation_s() / 3600.;
-			if (tripDuration_h > 0.) {
-				double tripDistanceBeeline_km = (trip.getDistanceBeelineByCalculation_m(network) / 1000.);
-				sumOfAllAverageSpeedsBeeline_km_h += (tripDistanceBeeline_km / tripDuration_h);
-				sumOfAllWeights += trip.getWeight();
-			}
-		}
-		return sumOfAllAverageSpeedsBeeline_km_h / sumOfAllWeights;
-	}
-
-	private static Map<Integer, Double> createAverageTripSpeedRoutedMap(List<Trip> trips, int binWidthSpeed_km_h, int maxBinSpeed_km_h) {
-    	Map<Integer, Double> averageTripSpeedRoutedMap = new TreeMap<>();
-    	for (Trip trip : trips) {
-    		double tripDuration_h = trip.getDurationByCalculation_s() / 3600.;
-    		if (tripDuration_h > 0.) {
-	    		double tripDistanceRouted_km = trip.getDistanceRoutedByCalculation_m(network) / 1000.;
-	    		double tripWeight = trip.getWeight();
-	    		AnalysisUtils.addToMapIntegerKey(averageTripSpeedRoutedMap, (tripDistanceRouted_km / tripDuration_h), binWidthSpeed_km_h, maxBinSpeed_km_h, tripWeight);
-    		}
-    	}
-    	return averageTripSpeedRoutedMap;
-    }
-	
-	private static double calculateAverageOfAverageTripSpeedsRouted_km_h(List<Trip> trips) {
-		double sumOfAllAverageSpeedsRouted_km_h = 0.;
-		double sumOfAllWeights = 0.;
-		for (Trip trip : trips) {
-			double tripDuration_h = trip.getDurationByCalculation_s() / 3600.;
-			if (tripDuration_h > 0.) {
-				double tripDistanceRouted_km = (trip.getDistanceRoutedByCalculation_m(network) / 1000.);
-				sumOfAllAverageSpeedsRouted_km_h += (tripDistanceRouted_km / tripDuration_h);
-				sumOfAllWeights += trip.getWeight();
-			}
-    	}
-		return sumOfAllAverageSpeedsRouted_km_h / sumOfAllWeights;
-	}
 	
 	@SuppressWarnings("all")
 	private static void adaptOutputDirectory() {
