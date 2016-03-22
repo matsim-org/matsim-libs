@@ -36,6 +36,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.taxi.TaxiUtils;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -58,6 +61,8 @@ public static void main(String[] args) throws IOException {
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw079.output_plansNoPTRoutes.xml.gz");
 	Geometry geometry = ScenarioPreparator.readShapeFileAndExtractGeometry("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/onezone.shp");
+	new MatsimNetworkReader(scenario.getNetwork()).readFile("../../../shared-svn/projects/vw_rufbus/av_simulation/scenario/networkpt-feb.xml.gz");
+	NetworkImpl net = (NetworkImpl) scenario.getNetwork();
 	Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 	List<String> starts = new ArrayList<>();
 	List<String> ends = new ArrayList<>();
@@ -88,11 +93,21 @@ public static void main(String[] args) throws IOException {
 				Coord currentCoord = currentAct.getCoord();
 				if (previousActInArea && currentActInArea){
 					Leg leg = (Leg) plan.getPlanElements().get(i-1);
-					if (leg.getMode().equals(TransportMode.car)){
+					if (leg.getMode().equals(TransportMode.car)||leg.getMode().equals(TransportMode.pt))
+{
 						
 						leg.setMode(TaxiUtils.TAXI_MODE);
-						Id<Link> start = leg.getRoute().getStartLinkId();
-						Id<Link> end = leg.getRoute().getEndLinkId();
+						Id<Link> start = null;
+						Id<Link> end = null;
+						if (leg.getRoute()!=null){
+						start = leg.getRoute().getStartLinkId();
+						end = leg.getRoute().getEndLinkId();
+						}
+						else {
+							start = net.getNearestLinkExactly(previousCoord).getId();
+							end = net.getNearestLinkExactly(currentCoord).getId();
+						}
+						
 						starts.add(previousCoord.getX()+";"+previousCoord.getY()+";"+Time.writeTime(leg.getDepartureTime()));
 						ends.add(currentCoord.getX()+";"+currentCoord.getY()+";"+Time.writeTime(currentAct.getStartTime()));
 						leg.setRoute(new GenericRouteImpl(start, end));
@@ -108,11 +123,11 @@ public static void main(String[] args) throws IOException {
 			pop2.addPerson(p2);	
 		}
 	}
-	new PopulationWriter(pop2).write("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw079.taxiplans.xml.gz");
+	new PopulationWriter(pop2).write("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/nopt/vw079.taxiplans.xml.gz");
 	WobPlansFilter.replaceCarLegsByTeleport(pop2);
-	new PopulationWriter(pop2).write("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/vw079.taxiplans_noCars.xml.gz");
-	BufferedWriter bw = IOUtils.getBufferedWriter("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/taxiDepartures.csv");
-	BufferedWriter bw2 = IOUtils.getBufferedWriter("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/taxiDestinations.csv");
+	new PopulationWriter(pop2).write("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/nopt/vw079.taxiplans_noCars.xml.gz");
+	BufferedWriter bw = IOUtils.getBufferedWriter("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/nopt/taxiDepartures.csv");
+	BufferedWriter bw2 = IOUtils.getBufferedWriter("../../../shared-svn/projects/vw_rufbus/av_simulation/demand/plans/nopt/taxiDestinations.csv");
 	for (String c : starts){
 		bw.write(c);
 		bw.newLine();

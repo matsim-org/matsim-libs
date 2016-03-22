@@ -75,9 +75,9 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 	    public void handleEvent(PersonDepartureEvent event){
 	        if (!event.getLegMode().equals(TaxiUtils.TAXI_MODE))
 	            return;
-	        this.personsTaxiCallTime.put(event.getPersonId(), event.getTime());
 	        String zoneId = getZoneForLinkId(event.getLinkId());
 	        if (zoneId!=null){
+	        	this.personsTaxiCallTime.put(event.getPersonId(), event.getTime());
 	        	this.personZone.put(event.getPersonId(), zoneId);
 	        }
 	        
@@ -90,7 +90,7 @@ public class ZoneBasedTaxiCustomerWaitHandler implements PersonDepartureEventHan
 	        double callTime = this.personsTaxiCallTime.get(event.getPersonId());
 	        double waitingTime = event.getTime() - callTime;
 	        if (this.personZone.containsKey(event.getPersonId())){
-	        	String zoneId = this.personZone.get(event.getPersonId());
+	        	String zoneId = this.personZone.remove(event.getPersonId());
 	        	int hour = JbUtils.getHour(callTime);
 	        	this.zoneDepartures.get(zoneId)[hour]++;
 	        	

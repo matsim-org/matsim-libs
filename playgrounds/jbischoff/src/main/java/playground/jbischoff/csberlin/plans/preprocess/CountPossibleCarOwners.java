@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CottbusMain
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,59 +16,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.matsimha2;
 
+package playground.jbischoff.csberlin.plans.preprocess;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author dgrether
+ * @author  jbischoff
  *
  */
-public class HAMain {
-	
-	
-	
-	private static final Logger log = Logger.getLogger(HAMain.class);
-	
-	
-	
-	public void runCottbus(String c){
-		log.info("Running HAMain with config: " + c);
-		Controler controler = new Controler(c);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler.run();
+public class CountPossibleCarOwners {
+public static void main(String[] args) {
+	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	new MatsimPopulationReader(scenario).readFile("../../../shared-svn/projects/bmw_carsharing/data/scenario/mierendorff-plans.xml.gz");
+	int i = 0;
+	for (Person p : scenario.getPopulation().getPersons().values()){
+		Plan plan = p.getSelectedPlan();
+		for (PlanElement pe : plan.getPlanElements()){
+			if (pe instanceof Leg){
+				Leg leg = (Leg) pe;
+				if (leg.getMode().equals("car")){
+				i++;
+				break;
+				}
+			}
+		}
 	}
-	
-	
-
-	
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args)
-
-	{
-		 String config = "C:\\Users\\Joschka Bischoff\\workspace_new\\matsim\\examples\\two-routes\\config.xml";
-
-		if (args == null || args.length == 0){
-			new HAMain().runCottbus(config);
-		}
-		else if (args.length == 1){
-			new HAMain().runCottbus(args[0]);
-		}
-		else {
-			log.error("too many arguments!");
-		}
-		
-	}
-
-
+	System.out.println(i);
+}
 }

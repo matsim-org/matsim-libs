@@ -28,6 +28,7 @@ import org.matsim.core.network.*;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import playground.jbischoff.taxi.evaluation.TravelDistanceTimeEvaluator;
 import playground.jbischoff.utils.JbUtils;
 
 /**
@@ -38,25 +39,31 @@ public class RunAVEvaluation {
 
 	public static void main(String[] args) {
 
-		String networkFile = "../../../shared-svn/projects/audi_av/scenario/networkc.xml.gz";
-		String eventsFile = "../../../shared-svn/projects/audi_av/runs/mobiltum/24-11k/nullevents.24-11k.xml.gz";
-		String outputFolder = "../../../shared-svn/projects/audi_av/runs/mobiltum/24-11k/";
-		String shapeFile = "../../../shared-svn/projects/audi_av/shp/Planungsraum.shp";
-		Map<String,Geometry> geo = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "SCHLUESSEL");
+		String networkFile = "../../../shared-svn/projects/vw_rufbus/av_simulation/scenario/networkpt-feb.xml.gz";
+		String shapeFile = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/zones.shp";
+		Map<String,Geometry> geo = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "plz");
 		Network network = NetworkUtils.createNetwork() ;
 		new MatsimNetworkReader(network).readFile(networkFile);
-		ZoneBasedTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandler = new ZoneBasedTaxiCustomerWaitHandler(network, geo);
-//		TravelDistanceTimeEvaluator travelDistanceTimeEvaluator = new TravelDistanceTimeEvaluator(network, 0);
-		ZoneBasedTaxiStatusAnalysis zoneBasedTaxiStatusAnalysis = new ZoneBasedTaxiStatusAnalysis(network, geo);
 		
+		for (int i = 21; i<27; i++){
+		
+		ZoneBasedTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandler = new ZoneBasedTaxiCustomerWaitHandler(network, geo);
+		ZoneBasedTaxiStatusAnalysis zoneBasedTaxiStatusAnalysis = new ZoneBasedTaxiStatusAnalysis(network, geo);
+		TravelDistanceTimeEvaluator travelDistanceTimeEvaluator = new TravelDistanceTimeEvaluator(network, 0);
 		EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler(zoneBasedTaxiCustomerWaitHandler);
-//		events.addHandler(travelDistanceTimeEvaluator);
-		events.addHandler(zoneBasedTaxiStatusAnalysis);
-		new MatsimEventsReader(events).readFile(eventsFile);
-		zoneBasedTaxiCustomerWaitHandler.writeCustomerStats(outputFolder);
-//		travelDistanceTimeEvaluator.writeTravelDistanceStatsToFiles(outputFolder+"distanceStats.txt");
-		zoneBasedTaxiStatusAnalysis.evaluateAndWriteOutput(outputFolder);
+//		events.addHandler(zoneBasedTaxiCustomerWaitHandler);
+//		events.addHandler(zoneBasedTaxiStatusAnalysis);
+		events.addHandler(travelDistanceTimeEvaluator);
+			String eventsFile = "../../../shared-svn/projects/vw_rufbus/av_simulation/"+i+"000/"+i+"k_events.out.xml.gz";
+			String outputFolder = "../../../shared-svn/projects/vw_rufbus/av_simulation/"+i+"000/";
+			
+			new MatsimEventsReader(events).readFile(eventsFile);
+//			zoneBasedTaxiCustomerWaitHandler.writeCustomerStats(outputFolder);
+//			zoneBasedTaxiStatusAnalysis.evaluateAndWriteOutput(outputFolder);
+			travelDistanceTimeEvaluator.writeTravelDistanceStatsToFiles(outputFolder);
+		}
+		
+
 		
 	}
 
