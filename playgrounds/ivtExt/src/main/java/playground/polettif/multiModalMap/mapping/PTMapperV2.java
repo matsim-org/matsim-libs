@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -37,6 +38,8 @@ import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmarksSimpleRouting;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
+import playground.polettif.multiModalMap.mapping.router.SolvedSubRoutes;
+import playground.polettif.multiModalMap.mapping.router.InterStopRoute;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -53,21 +56,25 @@ public class PTMapperV2 extends PTMapper {
 	// TODO ensure coordinate system is not WGS84 since this is not suitable for coordinate calculations
 
 	// params TODO move to a config?
-	private final static double SEARCH_RADIUS = 500; //[m] 150
+	private final static double SEARCH_RADIUS = 300; //[m] 150
+	private final static int MAX_N_CLOSEST_LINKS = 4; // number of link candidates considered for all stops
+
+	// not used
 	private final static double MAX_FACILITY_NODE_DISTANCE = 100;
-	private final static double MAX_FACILITY_LINK_DISTANCE = 1000;
+	private final static double MAX_FACILITY_LINK_DISTANCE = 50;
+
+	private final static double WEIGHT_TRAVELTIME_COMPARED_TO_STOPFACILITY_DISTANCE = 1.0;
 	private final static boolean CONNECTION_TO_ALL_LINKS_WITHIN_SEARCH_AREA = false;
 
 	private final static String PREFIX_SPLIT_LINKS = "split_";
 	private final static String PREFIX_ARTIFICIAL_LINKS = "pt_";
 
-	private final Map<Id<TransitStopFacility>, List<Id<TransitStopFacility>>> linkedStopFacilitiesTree = new HashMap<>();
-	private final Set<Id<TransitStopFacility>> linkedStopFacilities = new HashSet<>();
-	private final Map<Id<TransitStopFacility>, ArtificiallyConnectedStopFacility> artificiallyConnectedStopFacilities = new HashMap<>();
-	private final Map<Tuple<Node, Node>, Link> artificiallyAddedLinks = new HashMap<>();
+	// TODO use transit modes
 	private final Set<String> transitModes = Collections.singleton(TransportMode.pt);
+
+	int artificialId = 0;
 	private PTLRouter router = null;
-	private static int linkIdCounter = 0;
+	private Map<TransitStopFacility, List<Link>> allClosestLinks = new HashMap<>();
 
 	public PTMapperV2(TransitSchedule schedule) {
 		super(schedule);
@@ -78,18 +85,52 @@ public class PTMapperV2 extends PTMapper {
 	}
 
 	@Override
-	public void routePTLines(Network network) {
-		setNetwork(network);
+	public void routePTLines(Network networkParam) {
+		setNetwork(networkParam);
 
 		// TODO add DUMMY_LINK to avoid null pointer stuff
 		// TODO remove after routing
-		network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1), new Coord(0.0, 0.0)));
-		network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2), new Coord(0.0, 0.0)));
-		network.addLink(networkFactory.createLink(Id.createLinkId(GTFSReader.DUMMY_LINK), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_1)), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_2))));
+		this.network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1), new Coord(0.0, 0.0)));
+		this.network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2), new Coord(0.0, 0.0)));
+		this.network.addLink(networkFactory.createLink(Id.createLinkId(GTFSReader.DUMMY_LINK), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_1)), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_2))));
 
 		log.info("Creating PT lines...");
 
-		Counter counter = new Counter("route # ");
+		Counter counterLine = new Counter("route # ");
+
+
+
+
+		/*
+		* preload closest links
+		* stopfacilities with no links within search radius need artificial links and nodes before routing starts
+		*/
+		NetworkImpl networkImpl = ((NetworkImpl) network); // used by search for nearest node
+		for(TransitStopFacility stopFacility : this.schedule.getFacilities().values()) {
+			// limits number of links, for all links within search radius use Tools.findClosestLinks()
+			List<Link> closestLinks = Tools.findOnlyNClosestLinks(networkImpl, stopFacility.getCoord(), SEARCH_RADIUS, MAX_N_CLOSEST_LINKS);
+
+			if (closestLinks == null) {
+				Node newNode = networkFactory.createNode(Id.create(PREFIX_ARTIFICIAL_LINKS + artificialId++, Node.class), stopFacility.getCoord());
+				Node nearestNode = networkImpl.getNearestNode(stopFacility.getCoord());
+				Link newLink = networkFactory.createLink(Id.createLinkId(PREFIX_ARTIFICIAL_LINKS + artificialId++), newNode, nearestNode);
+				Link newLink2 = networkFactory.createLink(Id.createLinkId(PREFIX_ARTIFICIAL_LINKS + artificialId++), nearestNode, newNode);
+
+				network.addNode(newNode);
+				network.addLink(newLink);
+				network.addLink(newLink2);
+
+				List<Link> newList = new ArrayList<>();
+				newList.add(newLink);
+				allClosestLinks.put(stopFacility, newList);
+			} else {
+				allClosestLinks.put(stopFacility, closestLinks);
+			}
+		}
+
+		/*
+		* initiate router
+		*/
 		this.router = new PTLRFastAStarLandmarksSimpleRouting(this.network); // TODO param for routing algorithm
 
 		/*
@@ -98,427 +139,101 @@ public class PTMapperV2 extends PTMapper {
 		*   - routes
 		* 	   - stops
 		* 	     look at pairs of stops
-		*        - route between different links
-		*          assign score value to routes
-		*          use route (between two stops) with the best score
-		*        combine subroutes to route (linkSequence)
-		*
-		*        maybe look at previous pair as well
-		*
-		 */
-
+		* 	     - get set of close links (linkCandidates) for each stop
+		*          - route between all linkCandidates
+		*            assign score value to routes (using traveltime and facility-link distance
+		*            use route (between two stops) with the best score
+		*      combine best subroutes to route (linkSequence)
+		*/
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			log.info("Line "+ line.getId());
 			for (TransitRoute route : line.getRoutes().values()) {
-				counter.incCounter();
+				log.info("Route: " + route.getId());
+				counterLine.incCounter();
 
-				List<Id<Link>> linkSequence = new ArrayList<>();
+				SolvedSubRoutes solvedSubRoutes = new SolvedSubRoutes();
 
-				int i = 0;
+
+				int i = 0; // iterate through all stops of the route
 				while (i < (route.getStops().size())) {
-
-					SortedMap<Double, LeastCostPathCalculator.Path> routingScores = new TreeMap<>();
-
 					// look to next stop
 					TransitRouteStop currentStop = route.getStops().get(i);
 					TransitRouteStop nextStop = (i < route.getStops().size() - 1) ? route.getStops().get(i + 1) : null;
 
-					if(nextStop != null) {
-						List<Link> clostestLinksActual = Tools.findClosestLinks(network, currentStop.getStopFacility().getCoord(), SEARCH_RADIUS, MAX_FACILITY_LINK_DISTANCE);
-						List<Link> clostestLinksNext = Tools.findClosestLinks(network, nextStop.getStopFacility().getCoord(), SEARCH_RADIUS, MAX_FACILITY_LINK_DISTANCE);
+					// check if pari of current and next stop was already routed
+					if(nextStop != null && !solvedSubRoutes.contains(currentStop, nextStop)) {
 
-						for(Link linkCandidateActual : clostestLinksActual) {
-							for(Link linkCandidateNext : clostestLinksNext) {
-								// route
-								LeastCostPathCalculator.Path pathCandidate = this.router.calcLeastCostPath(linkCandidateActual.getFromNode(), linkCandidateNext.getToNode(), null, null);
+						SortedMap<Double, InterStopRoute> routeScores = new TreeMap<>();
+						List<InterStopRoute> interStopRoutes = new ArrayList<>();
 
-								if(pathCandidate.links.size() > 0)
-									routingScores.put(pathCandidate.travelCost, pathCandidate);
-							}
+						List<Link> closestLinksCurrent = allClosestLinks.get(currentStop.getStopFacility());
+						List<Link> closestLinksNext = allClosestLinks.get(nextStop.getStopFacility());
+
+						// look at all routes for all linkCandidate combinations
+						for (Link linkCandidateCurrent : closestLinksCurrent) {
+							for (Link linkCandidateNext : closestLinksNext) {
+								LeastCostPathCalculator.Path pathCandidate = this.router.calcLeastCostPath(linkCandidateCurrent.getToNode(), linkCandidateNext.getFromNode(), null, null);
+								interStopRoutes.add(new InterStopRoute(currentStop, nextStop, linkCandidateCurrent, linkCandidateNext, pathCandidate));
+								}
 						}
 
-						LeastCostPathCalculator.Path path = null;
-						try {
-							path = routingScores.get(routingScores.firstKey());
-						} catch(Exception e) {
-								e.printStackTrace();
-							}
-						Link nextStopLinkBestCandidate = path.links.get(0);
-						Collections.reverse(path.links);
-						Link currentStopLinkBestCandidate = path.links.get(0);
+						// calculate score for all possible interStopRoutes
+						for (InterStopRoute interStopRoute : interStopRoutes) {
+							routeScores.put(interStopRoute.getScore(10, 1, 1), interStopRoute);
+						}
 
+						// assign best scoring interStopRoute to the set of solved stop pairs
+						InterStopRoute bestInterStopRoute = routeScores.get(routeScores.firstKey());
+						solvedSubRoutes.put(bestInterStopRoute);
 
-						// reference links to stopFacilities
-						this.schedule.getFacilities().get(nextStop.getStopFacility().getId()).setLinkId(nextStopLinkBestCandidate.getId());
-
-						// TODO check whether refLink is different from previous routing pair
 						/*
+						* check whether the linkCandidate for the current stop is different from previous routing pair
+						* reroute subroute previousStop-currentStop to bestLinkCandidate for current stop
+						*
+						* TODO other approaches:
 						* two candidates for current link: previous routing and current routing
 						* if not: route from previous to next, use the link in this path.
 						* if both candidates are not in optimal path? use next worse path
 						 */
-						if(i > 0) {
-							Id<Link> linkIdTest = this.schedule.getFacilities().get(currentStop.getStopFacility().getId()).getLinkId();
-							Id<Link> currentStopLinkBestCandidateId = currentStopLinkBestCandidate.getId();
-							Link LinkBase = network.getLinks().get(currentStopLinkBestCandidateId);
+						if (i > 0) {
+							TransitRouteStop previousStop = route.getStops().get(i - 1);
+							InterStopRoute previousRoute = solvedSubRoutes.getInterStopRoute(previousStop, currentStop);
 
+							if (!previousRoute.getToLink().equals(bestInterStopRoute.getFromLink())) {
+								LeastCostPathCalculator.Path pathReroute = this.router.calcLeastCostPath(
+										previousRoute.getFromLink().getFromNode(),
+										bestInterStopRoute.getFromLink().getFromNode(), null, null);
 
-							if(!linkIdTest.equals(currentStopLinkBestCandidateId)) {
-								TransitRouteStop previousStop = route.getStops().get(i-1);
-
-								// route from previous link to next link
-								LeastCostPathCalculator.Path pathReroute =
-										this.router.calcLeastCostPath(network.getLinks().get(previousStop.getStopFacility().getLinkId()).getFromNode(),
-												network.getLinks().get(nextStop.getStopFacility().getLinkId()).getToNode(), null, null);
-
-								if(pathReroute == null || pathReroute.links.contains(currentStopLinkBestCandidate)) {
-									this.schedule.getFacilities().get(currentStop.getStopFacility().getId()).setLinkId(currentStopLinkBestCandidateId);
-								}
-								else if(pathReroute.links.contains(LinkBase)) {
-									path = this.router.calcLeastCostPath(LinkBase.getFromNode(),
-											network.getLinks().get(nextStop.getStopFacility().getLinkId()).getToNode(), null, null);
-								}
-								else {
-									log.error("Routing between "+ currentStop +" and "+ nextStop +" not successful!");
-								}
+									log.warn("link reassigned");
+									solvedSubRoutes.put(new InterStopRoute(previousStop, currentStop, previousRoute.getFromLink(), bestInterStopRoute.getFromLink(), pathReroute));
 							}
 						}
-
-						// add path to link sequence
-//						linkSequence.addAll(path.links);
-
-//						tranfsorm linkSequence into IDs
-
-
-					//	linkSequence.add(currentStop.getStopFacility().getLinkId());
-
-						/*
-						Node startNode =null;
-						Node endNode=null;
-
-						if(currentStop.getStopFacility() != null && currentStop.getStopFacility().getLinkId() != null && network.getLinks().get(currentStop.getStopFacility().getLinkId()) != null) {
-							startNode = this.network.getLinks().get(currentStop.getStopFacility().getLinkId()).getToNode();
-						}
-
-						if(nextStop.getStopFacility() != null && nextStop.getStopFacility().getLinkId() != null && network.getLinks().get(nextStop.getStopFacility().getLinkId()) != null) {
-							endNode = this.network.getLinks().get(nextStop.getStopFacility().getLinkId()).getFromNode();
-						}
-						else {
-							Id<Link> stopLinkId = nextStop.getStopFacility().getLinkId();
-							Map<Id<Link>, ? extends Link> nlinks = network.getLinks();
-						}
-
-						LeastCostPathCalculator.Path path = this.router.calcLeastCostPath(startNode, endNode);
-
-						if (path != null) {
-							for (Link link : path.links) {
-								linkSequence.add(link.getId());
-							}
-						} else {
-							Node fromNode = network.getLinks().get(currentStop.getStopFacility().getLinkId()).getToNode();
-							Node toNode = network.getLinks().get(nextStop.getStopFacility().getLinkId()).getFromNode();
-							Link artificialLink = (artificiallyAddedLinks.containsKey(new Tuple<>(fromNode, toNode))) ?
-									artificiallyAddedLinks.get(new Tuple<>(fromNode, toNode)) :
-									createNewLink(fromNode, toNode);
-							linkSequence.add(artificialLink.getId());
-							artificiallyAddedLinks.put(new Tuple<>(fromNode, toNode), artificialLink);
-						}
-						*/
+						this.schedule.getFacilities().get(currentStop.getStopFacility().getId()).setLinkId(bestInterStopRoute.getFromLink().getId());
 					}
-						i++;
+					i++;
 				}
+
+				// combine all subroutes to one route (as a sequence of links)
+				List<Id<Link>> linkSequence = new ArrayList<>();
+				linkSequence.addAll(solvedSubRoutes.getLinkIdList(route.getStops()));
+
 				if (linkSequence.size() > 0) {
 					route.setRoute(RouteUtils.createNetworkRoute(linkSequence, this.network));
 				} else {
 					log.warn("No route found for transit route " + route.toString() + ". No route assigned.");
 				}
+
+				// reference links to stopFacilities
+				for(Map.Entry<TransitStopFacility, Id<Link>> entry : solvedSubRoutes.getStopFacilityRefLinkIds().entrySet()) {
+					this.schedule.getFacilities().get(entry.getKey().getId()).setLinkId(entry.getValue());
+				}
 			}
 		}
-
 
 		cleanStationsAndNetwork();
 		log.info("Creating PT lines... done.");
 	}
 
-
-
-
-	/**
-	 * Link the pt-stations in the schedule to the closest network links.
-	 * Thereby modifies this.schedule.
-	 *
-	 * V2: works with a list of possible closest links and uses them for routing
-	 */
-	@Deprecated
-	protected void linkStationsToNetwork() {
-		StopFacilityLinker stopFacilityLinker = new StopFacilityLinker(network, PREFIX_SPLIT_LINKS);
-
-		log.info("Linking pt stations to network...");
-
-		Counter counter = new Counter("route # ");
-		Set<TransitStopFacility> newFacilities = new HashSet<>();
-		for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
-
-			final Link closestLink = Tools.findClosestLink(network, facility.getCoord(), SEARCH_RADIUS);
-			if (closestLink != null) {
-				Id<Link> refLinkId = closestLink.getId();
-
-				// check first if closest link nodes are too far from stopFacility, if true split link
-				// TODO include MAX_FACILITY_LINK_DISTANCE
-				if(CoordUtils.calcEuclideanDistance(facility.getCoord(), closestLink.getFromNode().getCoord()) > MAX_FACILITY_NODE_DISTANCE) {
-					stopFacilityLinker.split(closestLink, facility.getCoord());
-					this.network = stopFacilityLinker.getNetwork();
-					log.debug("link " + refLinkId + " split up for stopFacility \"" + facility.getName()+"\"");
-
-					refLinkId = stopFacilityLinker.getNewLinkId();
-				}
-
-				//	reference current stopfacilitiy to link
-				facility.setLinkId(refLinkId);
-
-				List<Id<TransitStopFacility>> localLinkedFacilities = new ArrayList<>();
-				localLinkedFacilities.add(facility.getId());
-
-				linkedStopFacilitiesTree.put(facility.getId(), localLinkedFacilities);
-			}
-
-			counter.incCounter();
-		}
-
-		// relinking facilities if newly created links are closer then the previous link
-		for(TransitStopFacility facility : this.schedule.getFacilities().values()) {
-			final Link closestLink = Tools.findClosestLink(network, facility.getCoord(), SEARCH_RADIUS);
-			if(closestLink != null && !facility.getLinkId().equals(closestLink.getId())) {
-				log.debug(facility.getName()+" refLink changed from "+facility.getLinkId()+" to "+closestLink.getId());
-				facility.setLinkId(closestLink.getId());
-			}
-		}
-
-
-		// add newly created stop facilities to schedule TODO use newFacilities?
-		newFacilities.forEach(this.schedule::addStopFacility);
-
-		counter.printCounter();
-
-		log.info("Linking pt stations to network... done.");
-
-		for (List<Id<TransitStopFacility>> facilityList : linkedStopFacilitiesTree.values()) {
-			linkedStopFacilities.addAll(facilityList.stream().collect(Collectors.toList()));
-		}
-	}
-
-	/**
-	 * By applying a routing algorithm (e.g. shortest path or OSM-extraction) route from station to
-	 * station for each pt-line.
-	 *
-	 * Writes the resulting schedule into this.schedule.
-	 */
-	// TODO
-	@Deprecated
-	protected void createPTRoutes() {
-		log.info("Creating pt routes...");
-
-		Counter counter = new Counter("route # ");
-		this.router = new PTLRFastAStarLandmarksSimpleRouting(this.network); // TODO param for routing algorithm
-		for (TransitLine line : this.schedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				counter.incCounter();
-				assignRoute(route);
-			}
-		}
-		counter.printCounter();
-
-		log.info("  Add artificial links and nodes...");
-		for (ArtificiallyConnectedStopFacility newFacility : artificiallyConnectedStopFacilities.values()) {
-			this.network.addNode(newFacility.myNode);
-		}
-		for (ArtificiallyConnectedStopFacility newFacility : artificiallyConnectedStopFacilities.values()) {
-			this.network.addLink(newFacility.myLink);
-			for (Link newLink : newFacility.getLinks()) {
-				this.network.addLink(newLink);
-			}
-		}
-		for (Link newLink : artificiallyAddedLinks.values()) {
-			this.network.addLink(newLink);
-		}
-		log.info("  Add artificial links and nodes... done.");
-
-		log.info("Creating pt routes... done.");
-	}
-
-	@Deprecated
-	private void assignRoute(TransitRoute route) {
-
-		List<Id<Link>> linkSequence = new ArrayList<>();
-		int i = 0;
-		while (i < (route.getStops().size())) {
-			TransitRouteStop presentStop = route.getStops().get(i);
-			TransitRouteStop nextStop = (i < route.getStops().size()-1) ? route.getStops().get(i + 1) : null;
-
-			if (nextStop != null) {
-
-				// 	Case 1: For both stops a link assigned, then just route between the two.
-				if (linkedStopFacilities.contains(presentStop.getStopFacility().getId())
-						&& linkedStopFacilities.contains(nextStop.getStopFacility().getId())) {
-					linkSequence.add(presentStop.getStopFacility().getLinkId());
-
-					Node startNode =null;
-					Node endNode=null;
-
-					if(presentStop.getStopFacility() != null && presentStop.getStopFacility().getLinkId() != null && network.getLinks().get(presentStop.getStopFacility().getLinkId()) != null) {
-						startNode = this.network.getLinks().get(presentStop.getStopFacility().getLinkId()).getToNode();
-					}
-
-					if(nextStop.getStopFacility() != null && nextStop.getStopFacility().getLinkId() != null && network.getLinks().get(nextStop.getStopFacility().getLinkId()) != null) {
-						endNode = this.network.getLinks().get(nextStop.getStopFacility().getLinkId()).getFromNode();
-					}
-					else {
-						Id<Link> stopLinkId = nextStop.getStopFacility().getLinkId();
-						Map<Id<Link>, ? extends Link> nlinks = network.getLinks();
-					}
-
-//					LeastCostPathCalculator.Path path = getShortestPath(startNode, nextStop);
-					LeastCostPathCalculator.Path path = this.router.calcLeastCostPath(startNode, endNode, null, null);
-
-					if (path != null) {
-						for (Link link : path.links) {
-							linkSequence.add(link.getId());
-						}
-					} else {
-						Node fromNode = network.getLinks().get(presentStop.getStopFacility().getLinkId()).getToNode();
-						Node toNode = network.getLinks().get(nextStop.getStopFacility().getLinkId()).getFromNode();
-						Link artificialLink = (artificiallyAddedLinks.containsKey(new Tuple<>(fromNode, toNode))) ?
-								artificiallyAddedLinks.get(new Tuple<>(fromNode, toNode)) :
-								createNewLink(fromNode, toNode);
-						linkSequence.add(artificialLink.getId());
-						artificiallyAddedLinks.put(new Tuple<>(fromNode, toNode), artificialLink);
-					}
-
-				// Case 2: PresentStop has no link, but NextStop has link then create link to closest network node and route between that node and link of follow-stop.
-				} else if (!linkedStopFacilities.contains(presentStop.getStopFacility().getId())
-						&& linkedStopFacilities.contains(nextStop.getStopFacility().getId())) {
-
-					ArtificiallyConnectedStopFacility thisStopFacility = getArtificiallyConnectedStopFacility(presentStop.getStopFacility());
-					Node toNode = network.getLinks().get(nextStop.getStopFacility().getLinkId()).getFromNode();
-
-					linkSequence.add(thisStopFacility.myLink.getId());
-					linkSequence.add(thisStopFacility.getLinkToNode(toNode).getId());
-
-				// Case 3: PresentStop has link, but NextStop has no link then create link to closest network node for follow stop and then route between the two.
-				} else if (linkedStopFacilities.contains(presentStop.getStopFacility().getId())
-						&& !linkedStopFacilities.contains(nextStop.getStopFacility().getId())) {
-
-					ArtificiallyConnectedStopFacility nextStopFacility = getArtificiallyConnectedStopFacility(nextStop.getStopFacility());
-					Node fromNode = network.getLinks().get(presentStop.getStopFacility().getLinkId()).getToNode();
-
-					linkSequence.add(presentStop.getStopFacility().getLinkId());
-					linkSequence.add(nextStopFacility.getLinkFromNode(fromNode).getId());
-
-				// Case 4: Neither PresentStop nor NextStop has link then standard link creation as with Marcel's network creator.
-				} else {
-					ArtificiallyConnectedStopFacility thisStopFacility = getArtificiallyConnectedStopFacility(presentStop.getStopFacility());
-					ArtificiallyConnectedStopFacility nextStopFacility = getArtificiallyConnectedStopFacility(nextStop.getStopFacility());
-
-					linkSequence.add(thisStopFacility.myLink.getId());
-					linkSequence.add(nextStopFacility.getLinkFromNode(thisStopFacility.myNode).getId());
-				}
-
-			// If nextStop was null, this means we have reached the end of the route and just add the final link.
-			} else {
-				if (linkedStopFacilities.contains(presentStop.getStopFacility().getId())) {
-					linkSequence.add(presentStop.getStopFacility().getLinkId());
-				} else {
-					ArtificiallyConnectedStopFacility thisStopFacility = getArtificiallyConnectedStopFacility(presentStop.getStopFacility());
-					linkSequence.add(thisStopFacility.myLink.getId());
-				}
-			}
-
-			i++;
-		}
-		if (linkSequence.size() > 0) {
-			route.setRoute(RouteUtils.createNetworkRoute(linkSequence, this.network));
-		} else {
-			log.warn("No route found for transit route " + route.toString() + ". No route assigned.");
-		}
-	}
-
-	private ArtificiallyConnectedStopFacility getArtificiallyConnectedStopFacility(TransitStopFacility facility) {
-		if (!artificiallyConnectedStopFacilities.containsKey(facility.getId())) {
-			artificiallyConnectedStopFacilities.put(facility.getId(),
-					new ArtificiallyConnectedStopFacility(facility));
-		}
-		return artificiallyConnectedStopFacilities.get(facility.getId());
-	}
-
-	/**
-	 * FromNodes -> thisNode -> ToNodes
-	 */
-	private class ArtificiallyConnectedStopFacility {
-
-		final Link myLink;
-		final Node myNode;
-		private final Map<Node, Link> fromNodes = new HashMap<>();
-		private final Map<Node, Link> toNodes = new HashMap<>();
-
-		ArtificiallyConnectedStopFacility(TransitStopFacility facility) {
-			myNode = networkFactory.createNode(Id.create(PREFIX_ARTIFICIAL_LINKS + facility.getId(), Node.class), facility.getCoord());
-			myLink = createNewLink(myNode, myNode);
-			facility.setLinkId(myLink.getId());
-		}
-
-		List<Link> getLinks() {
-			List<Link> links = new ArrayList<>();
-			links.addAll(fromNodes.values());
-			links.addAll(toNodes.values());
-			return links;
-		}
-
-		Link getLinkFromNode(Node fromNode) {
-			if (!fromNodes.containsKey(fromNode)) {
-				fromNodes.put(fromNode, createNewLink(fromNode, myNode));
-			}
-			return fromNodes.get(fromNode);
-		}
-
-		Link getLinkToNode (Node toNode) {
-			if (!toNodes.containsKey(toNode)) {
-				toNodes.put(toNode, createNewLink(myNode, toNode));
-			}
-			return toNodes.get(toNode);
-		}
-	}
-
-	private Link createNewLink(Node fromNode, Node toNode) {
-		Link link = networkFactory.createLink(Id.create(PREFIX_ARTIFICIAL_LINKS + linkIdCounter++, Link.class), fromNode, toNode);
-		if (fromNode == toNode) {
-			link.setLength(50);
-		} else {
-			link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
-		}
-		link.setFreespeed(80.0 / 3.6);
-		link.setCapacity(10000);
-		link.setNumberOfLanes(1);
-		link.setAllowedModes(this.transitModes);
-		return link;
-	}
-
-
-	private LeastCostPathCalculator.Path getShortestPath(Node startNode, TransitRouteStop toStop) {
-		LeastCostPathCalculator.Path shortestPath = null;
-
-		for (Id<TransitStopFacility> toStopFacilityId : linkedStopFacilitiesTree.get(toStop.getStopFacility().getId())) {
-			TransitStopFacility facility = this.schedule.getFacilities().get(toStopFacilityId);
-			Id<Link> linkId = facility.getLinkId();
-			Link link = this.network.getLinks().get(linkId);
-			Node endNode = link.getFromNode();
-			LeastCostPathCalculator.Path tempShortestPath = this.router.calcLeastCostPath(startNode, endNode, "", "");
-			if (tempShortestPath != null && (shortestPath == null || (tempShortestPath.travelCost < shortestPath.travelCost))) {
-				shortestPath = tempShortestPath;
-				toStop.setStopFacility(this.schedule.getFacilities().get(toStopFacilityId));
-			}
-		}
-
-		return shortestPath;
-	}
 
 	/**
 	 * After all lines created, clean all non-linked stations, all pt-exclusive links (check allowed modes)
@@ -527,10 +242,14 @@ public class PTMapperV2 extends PTMapper {
 	 */
 	protected void cleanStationsAndNetwork() {
 		log.info("Clean Stations and Network...");
+		// TODO get rid of dummy links which are implemented via gtfsreader (not independent)
+		network.removeLink(Id.createLinkId(GTFSReader.DUMMY_LINK));
+		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1));
+		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2));
 		cleanSchedule();
 		prepareNetwork();
 		removeNonUsedStopFacilities();
-		setConnectedStopFacilitiesToIsBlocking();
+// TODO		setConnectedStopFacilitiesToIsBlocking();
 		log.info("Clean Stations and Network... done.");
 	}
 

@@ -246,19 +246,15 @@ public class Tools {
 	}
 
 	/**
-	 * Within search radius look for nodes and then search for the closest link.
-	 *
-	 * @param coord Coordinate to search the closest link.
-	 * @return Null if no such link could be found.
+	 * Looks for nodes within search radius of coord, then searches the closest links. Returns links wich are closer
+	 * than maxLinkDistance (calculated via distancePointLineSegment() in {@link org.matsim.core.utils.geometry.CoordUtils}).
 	 */
-	public static List<Link> findClosestLinks(Network network, Coord coord, double searchRadius, double maxLinkDistance) {
-		Collection<Node> nearestNodes = ((NetworkImpl) network).getNearestNodes(coord, searchRadius);
+	public static List<Link> findClosestLinks(NetworkImpl networkImpl, Coord coord, double searchRadius, double maxLinkDistance) {
+		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, searchRadius);
 		List<Link> closestLinks = new ArrayList<>();
-
 		for (Node node : nearestNodes) {
 			Map<Id<Link>, ? extends Link> outLinks = node.getOutLinks();
-			Map<Id<Link>, ? extends Link> inLinks = node.getInLinks();
-			double lineSegmentDistance = 0;
+			double lineSegmentDistance;
 
 			for (Link linkCandidate : outLinks.values()) {
 				lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
@@ -266,23 +262,58 @@ public class Tools {
 					closestLinks.add(linkCandidate);
 				}
 			}
-
 		}
-
 		return closestLinks;
 	}
 
+	/**
+	 * Looks for nodes within search radius of coord, then searches the closest links (calculated via distancePointLineSegment()
+	 * in {@link org.matsim.core.utils.geometry.CoordUtils}).
+	 *
+	 * @return the closest n links to coord
+	 */
+	public static List<Link> findOnlyNClosestLinks(NetworkImpl networkImpl, Coord coord, double searchRadius, int n) {
+		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, searchRadius);
+		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
 
-		/**
-		 * Finds the nearest link to a node.
-		 * Looks for all nodes within a search Radius from the  and calculates distancePointLineSegment for all links for these nodes.
-		 * If the distance is < the
-		 *
-		 * Aborts searching after a maxSearchRadius (default 500m)
-		 *
-		 * TODO nodes and stopfacilities
-		 * TODO minimal threshold, abort loops if distance < threshold
-		 */
+		if(nearestNodes.size() == 0) {
+			return null;
+		} else {
+			for (Node node : nearestNodes) {
+				Map<Id<Link>, ? extends Link> outLinks = node.getOutLinks();
+				double lineSegmentDistance;
+
+				for (Link linkCandidate : outLinks.values()) {
+					lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
+					closestLinksMap.put(lineSegmentDistance, linkCandidate);
+				}
+			}
+
+			List<Link> closestLinks = new ArrayList<>();
+			Object[] closestLinksArray = closestLinksMap.values().toArray();
+
+			int i = 0;
+			while (i < n && i < closestLinksArray.length) {
+				closestLinks.add((Link) closestLinksArray[i]);
+				i++;
+			}
+
+			return closestLinks;
+		}
+	}
+
+
+
+	/**
+	 * Finds the nearest link to a node.
+	 * Looks for all nodes within a search Radius from the  and calculates distancePointLineSegment for all links for these nodes.
+	 * If the distance is < the
+	 *
+	 * Aborts searching after a maxSearchRadius (default 500m)
+	 *
+	 * TODO nodes and stopfacilities
+	 * TODO minimal threshold, abort loops if distance < threshold
+	 */
 /*
 	public static Id<Link> findNearestLink1(Network network, Coord point, double maxSearchRadius) throws Exception {
 		return Id.createLinkId("");

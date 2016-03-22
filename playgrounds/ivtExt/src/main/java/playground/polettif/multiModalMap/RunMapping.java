@@ -19,6 +19,7 @@
 
 package playground.polettif.multiModalMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
@@ -30,12 +31,16 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.boescpa.converters.osm.Osm2Network;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
 import playground.polettif.multiModalMap.mapping.PTMapperV1;
 import playground.polettif.multiModalMap.mapping.PTMapperV2;
 
 public class RunMapping {
+
+	protected static Logger log = Logger.getLogger(RunMapping.class);
+
 
 	public static void main(final String[] args) {
 
@@ -44,9 +49,9 @@ public class RunMapping {
 
 		// input
 		final String gtfsPath = "C:/Users/polettif/Desktop/data/gtfs/zvv/";
-		final String mtsFile = "C:/Users/polettif/Desktop/data/mts/zvv_unmappedSchedule.xml";
+		final String mtsFile = "C:/Users/polettif/Desktop/data/mts/zvv_unmappedSchedule_WGS84.xml";
 
-		final String osmFile = "C:/Users/polettif/Desktop/data/osm/zurich-plus.osm";
+		final String osmFile = "C:/Users/polettif/Desktop/data/osm/zurich-city.osm";
 		final String networkFile = "C:/Users/polettif/Desktop/data/network/zurich-city.xml.gz";
 
 		final String outbase = "C:/Users/polettif/Desktop/output/mtsMapping/";
@@ -86,8 +91,20 @@ public class RunMapping {
 	//	new PTMapperV1(schedule).routePTLines(network);
 		new PTMapperV2(schedule).routePTLines(network);
 
-//		new TransitScheduleWriter(schedule).writeFile(path_MixedSchedule);
-//		new NetworkWriter(network).write(path_MixedNetwork);
+		log.info("Writing schedule and network to file...");
+		new TransitScheduleWriter(schedule).writeFile(path_MixedSchedule);
+		new NetworkWriter(network).write(path_MixedNetwork);
+		log.info("Writing schedule and network to file... done");
+
+		log.info("Validating transit schedule...");
+		try {
+			TransitScheduleValidator.main(new String[]{path_MixedSchedule, path_MixedNetwork});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		log.info("Validating transit schedule... done");
+
+		log.info("Schedule mapped!");
 	}
 
 }
