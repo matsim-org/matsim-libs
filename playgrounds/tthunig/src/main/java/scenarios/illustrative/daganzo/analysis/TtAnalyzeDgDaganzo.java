@@ -19,45 +19,46 @@
  *  *                                                                         *
  *  * ***********************************************************************
  */
-package scenarios.illustrative.daganzo.run;
+package scenarios.illustrative.daganzo.analysis;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+
+import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
 
 /**
- * Run a simulation of the daganzo scenario of DG
+ * This class extends the abstract analysis tool for the specific scenario of
+ * Daganzos example.
+ * 
+ * @see scenarios.illustrative.analysis.TtAbstractAnalysisTool
  * 
  * @author tthunig
  *
  */
-public class RunDGDaganzoSimulation {
+public class TtAnalyzeDgDaganzo extends TtAbstractAnalysisTool {
 
-	private static final String BASE_DIR = "../../matsim/examples/daganzo/";
-	
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(BASE_DIR + "config.xml");
-		config.controler().setOutputDirectory("../../../runs-svn/daganzo/DGScenario/");
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
-		
-//		config.plans().setInputFile(BASE_DIR + "plans_long_route_selected.xml.gz");
-		config.plans().setInputFile(BASE_DIR + "plans_short_route_selected.xml.gz");
-		
-		config.network().setInputFile(BASE_DIR + "network21.xml");
-//		config.network().setInputFile(BASE_DIR + "network22.xml");
-		
-		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
-		config.vspExperimental().setWritingOutputEvents(true);
-		
-		// remove unmaterialized module
-		config.removeModule("otfvis");
-		
-		config.controler().setLastIteration(100);
-		
-		final Controler controler = new Controler(config);
-		
-		controler.run();
+	@Override
+	protected int determineRoute(LinkEnterEvent linkEnterEvent) {
+		// in the daganzo scenario the route is unique if one gets a link enter
+		// event of link 3 or 4
+		int route = -1;
+		switch (linkEnterEvent.getLinkId().toString()) {
+		case "3":
+			// the person uses the longer route
+			route = 1;
+			break;
+		case "4": 
+			// the person uses the shorter route
+			route = 0;
+			break;
+		default:
+			break;
+		}
+		return route;
 	}
 
+	@Override
+	protected void defineNumberOfRoutes() {
+		setNumberOfRoutes(2);
+	}
+	
 }

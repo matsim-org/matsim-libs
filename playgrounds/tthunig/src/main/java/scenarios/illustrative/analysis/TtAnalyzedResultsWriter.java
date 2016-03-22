@@ -27,6 +27,9 @@ import java.io.PrintStream;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+
+import com.google.inject.Inject;
 
 /**
  * Class to write all calculated results of the analyze tool that is given in the constructor.
@@ -44,10 +47,11 @@ public class TtAnalyzedResultsWriter {
 	private int numberOfRoutes;
 	private int lastIteration;
 	
-	public TtAnalyzedResultsWriter(TtAbstractAnalysisTool handler, String outputDirBase, int lastIteration) {
+	@Inject
+	public TtAnalyzedResultsWriter(Scenario scenario, TtAbstractAnalysisTool handler) {
 		this.handler = handler;
-		this.outputDirBase = outputDirBase;
-		this.lastIteration = lastIteration;
+		this.outputDirBase = scenario.getConfig().controler().getOutputDirectory();
+		this.lastIteration = scenario.getConfig().controler().getLastIteration();
 		
 		this.numberOfRoutes = handler.getNumberOfRoutes();
 		

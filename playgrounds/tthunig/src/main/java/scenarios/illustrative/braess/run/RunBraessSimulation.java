@@ -63,13 +63,15 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
+import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
+import scenarios.illustrative.analysis.TtAnalyzedResultsWriter;
 import scenarios.illustrative.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes;
-import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
-import scenarios.illustrative.braess.createInput.TtCreateBraessSignals;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
+import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
+import scenarios.illustrative.braess.createInput.TtCreateBraessSignals;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
 /**
@@ -329,8 +331,17 @@ public final class RunBraessSimulation {
 			});
 		}
 		
-		// add a controller listener to analyze results
-		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, new TtAnalyzeBraess(), true));
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+//				this.bind(TtAnalyzeBraess.class).asEagerSingleton();
+//				this.addEventHandlerBinding().to(TtAnalyzeBraess.class);
+				this.bind(TtAbstractAnalysisTool.class).to(TtAnalyzeBraess.class).asEagerSingleton();
+				this.addEventHandlerBinding().to(TtAbstractAnalysisTool.class);
+				this.bind(TtAnalyzedResultsWriter.class);
+				this.addControlerListenerBinding().to(TtListenerToBindAndWriteAnalysis.class);
+			}
+		});
 		
 		return controler;
 	}

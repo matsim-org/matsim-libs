@@ -31,6 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.EventHandler;
@@ -46,7 +47,6 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
-import scenarios.illustrative.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
@@ -150,9 +150,13 @@ public final class FixBraessBehaviorTest{
 			controler.addControlerListener(initializer);
 		}
 					
-		// add a controller listener to analyze results
 		TtAbstractAnalysisTool handler = new TtAnalyzeBraess();
-		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, handler, false));
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().toInstance(handler);
+			}
+		});
 			
 		controler.run();		
 		
