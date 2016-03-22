@@ -1,6 +1,5 @@
 package playground.dziemke.analysis;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -8,46 +7,22 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-
-import playground.dziemke.utils.ShapeReader;
 
 /**
  * @author dziemke
  */
-public class TripAnalyzer_V2 {
-	public static final Logger log = Logger.getLogger(TripAnalyzer_V2.class);
+public class TripAnalyzerBasic {
+	public static final Logger log = Logger.getLogger(TripAnalyzerBasic.class);
 	
 	/* Parameters */
 	private static final String runId = "run_168a";
 	private static final String usedIteration = "300"; // most frequently used value: 150
-	private static final String cemdapPersonsInputFileId = "21"; // check if this number corresponds correctly to the runId
-	
-	private static final Integer planningAreaId = 11000000; // 11000000 = Berlin
-
-	private static final boolean onlyCar = false; // "car"; new, should be used for runs with ChangeLegMode enabled
-	private static final boolean onlyInterior = false; // "int"
-	private static final boolean onlyBerlinBased = true; // "ber"; usually varied for analysis
-	private static final boolean distanceFilter = true; // "dist"; usually varied for analysis
-	// private static final double double minDistance = 0;
-	private static final double maxDistance_km = 100; // most frequently used value: 150
-
-	private static final boolean onlyWorkTrips = false; // "work"
-
-	private static final boolean ageFilter = false; // "age"
-	private static final Integer minAge = 80; // typically "x0"
-	private static final Integer maxAge = 119; // typically "x9"; higehst number ususally chosen is 119
 
 	private static final int maxBinDuration_min = 120;
 	private static final int binWidthDuration_min = 1;
@@ -65,15 +40,10 @@ public class TripAnalyzer_V2 {
 	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + 
 			"/" + runId + "." + usedIteration + ".events.xml.gz";
-	private static final String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + 
-			cemdapPersonsInputFileId + "/persons1.dat";
-	private static final String planningAreaShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
 	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
 
 	/* Variables to store objects */
 	private static Network network;
-	private static Geometry planningAreaGeometry;
-	private static ObjectAttributes cemdapPersonAttributes;
 
 	/* Variables to store information */
 	private static int numberOfConsideredTrips = 0;
@@ -87,9 +57,7 @@ public class TripAnalyzer_V2 {
 	private static Map<String, Integer> otherInformationMap = new TreeMap<>();
 
 	
-	public static void main(String[] args) {
-		adaptOutputDirectory();
-	    
+	public static void main(String[] args) {	    
 		/* Events infrastructure and reading the events file */
 	    EventsManager eventsManager = EventsUtils.createEventsManager();
 	    TripHandler tripHandler = new TripHandler();
@@ -101,21 +69,11 @@ public class TripAnalyzer_V2 {
 	    /* Get network, which is needed to calculate distances */
 	    network = NetworkUtils.createNetwork();
 	    MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
-	    networkReader.readFile(networkFile);
-	    
-	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(planningAreaShapeFile, "NR");
-		planningAreaGeometry = zoneGeometries.get(planningAreaId);	    
+	    networkReader.readFile(networkFile);    
 	    
 		AnalysisFileWriter writer = new AnalysisFileWriter();
-
-		if (ageFilter == true) {
-	    	// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
-	    	CemdapPersonInputFileReader cemdapPersonInputFileReader = new CemdapPersonInputFileReader();
-		 	cemdapPersonInputFileReader.parse(cemdapPersonsInputFile);
-		 	cemdapPersonAttributes = cemdapPersonInputFileReader.getPersonAttributes();
-	    }
-	    
-	    List<Trip> trips = createListOfValidTrip(tripHandler.getTrips());
+		
+		List<Trip> trips = createListOfValidTrip(tripHandler.getTrips());
 	    
 	    /* Do calculations and write-out*/
 	    Map <Integer, Double> tripDurationMap = createTripDurationMap(trips, binWidthDuration_min, maxBinDuration_min);
@@ -301,124 +259,13 @@ public class TripAnalyzer_V2 {
 		return sumOfAllAverageSpeedsRouted_km_h / sumOfAllWeights;
 	}
 	
-	@SuppressWarnings("all")
-	private static void adaptOutputDirectory() {
-		outputDirectory = outputDirectory + "_" + usedIteration;
-	    if (onlyCar == true) {
-			outputDirectory = outputDirectory + "_car";
-		}
-	    if (onlyInterior == true) {
-			outputDirectory = outputDirectory + "_int";
-	    }
-		if (onlyBerlinBased == true) {
-			outputDirectory = outputDirectory + "_ber";
-		}
-		if (distanceFilter == true) {
-			outputDirectory = outputDirectory + "_dist";
-		}
-		if (onlyWorkTrips == true) {
-			outputDirectory = outputDirectory + "_work";
-		}
-		if (ageFilter == true) {
-			outputDirectory = outputDirectory + "_age_" + minAge.toString();
-			outputDirectory = outputDirectory + "_" + maxAge.toString();
-		}
-		outputDirectory = outputDirectory + "_4"; // TODO in case used for double-check
-		
-		/* Create directory */
-		new File(outputDirectory).mkdir();
-	}
 	
-	
-	@SuppressWarnings("all")
 	private static List<Trip> createListOfValidTrip(Map<Id<Trip>, Trip> tripMap) {
 		List<Trip> trips = new LinkedList<>();
-		
 		for (Trip trip : tripMap.values()) {
-
-			// get coordinates of links
-			Id<Link> departureLinkId = trip.getDepartureLinkId();
-			Id<Link> arrivalLinkId = trip.getArrivalLinkId();
-			//
-			Link departureLink = network.getLinks().get(departureLinkId);
-			Link arrivalLink = network.getLinks().get(arrivalLinkId);
-
-			// TODO use coords of toNode instead of center coord of link
-			double arrivalCoordX = arrivalLink.getCoord().getX();
-			double arrivalCoordY = arrivalLink.getCoord().getY();
-			double departureCoordX = departureLink.getCoord().getX();
-			double departureCoordY = departureLink.getCoord().getY();
-
-			// create points
-			Point arrivalLocation = MGC.xy2Point(arrivalCoordX, arrivalCoordY);
-			Point departureLocation = MGC.xy2Point(departureCoordX, departureCoordY);
-
-			// choose if trip will be considered
-			if (onlyBerlinBased == true) {
-				if (!planningAreaGeometry.contains(arrivalLocation) && !planningAreaGeometry.contains(departureLocation)) {
-					continue;
-				}
-			}
-			if (onlyInterior == true) {
-				if (!planningAreaGeometry.contains(arrivalLocation) || !planningAreaGeometry.contains(departureLocation)) {
-					continue;
-				}
-			}
-//			if (!trip.getMode().equals("car") && !trip.getMode().equals("pt")) {
-//				throw new RuntimeException("In current implementation leg mode must either be car or pt");
-//			}
-			if (onlyCar == true) {
-				if (!trip.getMode().equals("car")) {
-					continue;
-				}
-			}
-			if (distanceFilter == true && (trip.getDistanceBeelineByCalculation_m(network) / 1000.) >= maxDistance_km) {
-				continue;
-			}
-//			if (distanceFilter == true && (trip.getBeelineDistance(network) / 1000.) <= minDistance) {
-//    			continue;
-//    		}
-			if (onlyWorkTrips == true) {
-				if (trip.getActivityEndActType().equals("work")) {
-					continue;
-				}
-			}
-
-			// TODO The plan was to calculate activity-chain frequencies here. Needs to be done somewhere else
-			// write person activity attributes
-//   	 	if (trip.getActivityEndActType().equals("work")) {
-//   	 		personActivityAttributes.putAttribute(trip.getDriverId(), "hasWorkActivity", true);
-//    		}
-
-			/* Person-specific attributes */
-			if (ageFilter == true) {
-				// TODO needs to be adapted for other analyses that are based on person-specific attributes as well
-				// so far age is the only one
-				String personId = trip.getPersonId().toString();
-				int age = (int) cemdapPersonAttributes.getAttribute(personId, "age");
-
-				if (age < minAge) {
-					continue;
-				}
-				if (age > maxAge) {
-					continue;
-				}
-			}
-
-			/* The only case where incomplete trips occur is when agents are removed according to "removeStuckVehicles = true"
-			 * Since a removed agent can at most have one incomplete trip (the one when he is removed), the number of
-			 * incomplete trips should be equal to the number of removed agents */
-			if(!trip.getTripComplete()) {
-				System.err.println("Trip is not complete!");
-				numberOfInIncompleteTrips++;
-				continue;
-			}	    	
-
-			/* Only trips that fullfill all checked criteria are added; otherwise that loop would have been "continued" already */
 			trips.add(trip);
 			numberOfConsideredTrips++;
 		}
-		
 		return trips;
 	}
 }
