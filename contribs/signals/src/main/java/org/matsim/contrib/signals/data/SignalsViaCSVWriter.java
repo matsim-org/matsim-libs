@@ -105,8 +105,10 @@ public class SignalsViaCSVWriter {
 							Double time = signalPlan.getStartTime();
 							if (time == null) {
 								// use start time of the simulation
-								time = scenario.getConfig().qsim().getStartTime() + signalPlan.getOffset();
+								time = scenario.getConfig().qsim().getStartTime();
 							}
+							// add the signal plan offset to the start time
+							time += signalPlan.getOffset();
 //							log.info("Writing signal states for signal " + signal.getId() + " for the whole simulation time ...");
 							Double endTime = signalPlan.getEndTime();
 							if (endTime == null) {
