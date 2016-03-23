@@ -39,7 +39,7 @@ public class TryExecutingBashCommand {
 
 	    printWriter.println("cd ../../../runs-svn/cemdapMatsimCadyts/run_168a/analysis_300_ber_dist_5/");
 	    printWriter.println("pwd");
-	    printWriter.println("/usr/local/bin/gnuplot plot.gnu");
+	    printWriter.println("/usr/local/bin/gnuplot ../../../../shared-svn/projects/cemdapMatsimCadyts/analysis/plot_local.gnu");
 
 	    printWriter.close();
 
