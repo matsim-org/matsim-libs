@@ -1,9 +1,9 @@
-package playground.dziemke.other;
+package playground.dziemke.examples;
 
 import org.junit.Assert;
 
 
-public class TestStuff2 {
+public class TestOther {
 
 	/**
 	 * @param args

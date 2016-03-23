@@ -1,8 +1,8 @@
-package playground.dziemke.other;
+package playground.dziemke.examples;
 
 import java.util.Random;
 
-public class TestStuff {
+public class TestWithRandomNumbers {
 
 	/**
 	 * @param args

@@ -1,9 +1,9 @@
-package playground.dziemke.other;
+package playground.dziemke.examples;
 
 import org.apache.log4j.Logger;
 
-public class TestCharacterStuff {
-	private final static Logger log = Logger.getLogger(TestCharacterStuff.class);
+public class TestCharacterHandling {
+	private final static Logger log = Logger.getLogger(TestCharacterHandling.class);
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub

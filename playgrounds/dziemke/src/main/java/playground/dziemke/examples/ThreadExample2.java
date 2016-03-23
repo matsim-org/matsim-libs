@@ -1,11 +1,7 @@
-package playground.dziemke.other;
+package playground.dziemke.examples;
 
 /**
- * 
  * example taken from http://www.tutorialspoint.com/java/java_multithreading.htm
- * 
- * @author Dominik
- *
  */
 public class ThreadExample2 {
 	public static void main(String args[]) {
