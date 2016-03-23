@@ -21,6 +21,8 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.arentzemo
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import gnu.trove.list.TCharList;
 import gnu.trove.list.array.TCharArrayList;
 import org.apache.log4j.Logger;
@@ -43,29 +45,19 @@ import java.util.Stack;
  * @author thibautd
  */
 public class ArentzePopulationModule extends AbstractModule {
-	private static final Logger log = Logger.getLogger(ArentzePopulationModule.class);
+	private static final Logger log = Logger.getLogger( ArentzePopulationModule.class );
 
 	@Override
 	protected void configure() {
-		log.debug( "Configuring "+getClass().getSimpleName() );
-		bind(IndexedPopulation.class).to(ArentzePopulation.class);
+		log.debug( "Configuring " + getClass().getSimpleName() );
+		bind( IndexedPopulation.class ).to( ArentzePopulation.class );
 
-		bind(ArentzePopulation.class).toProvider(
-				new Provider<ArentzePopulation>() {
-					@Inject
-					SocialNetworkGenerationConfigGroup group;
-					@Inject
-					Config config;
-
-					@Override
-					public ArentzePopulation get() {
-						return parsePopulation(group.getInputPopulationFile());
-					}
-				});
-		log.debug("Configuring " + getClass().getSimpleName() + ": DONE");
+		log.debug( "Configuring " + getClass().getSimpleName() + ": DONE" );
 	}
 
-	public static ArentzePopulation parsePopulation(final String populationFile) {
+	@Provides
+	@Singleton
+	private ArentzePopulation createArentzePopulation( SocialNetworkGenerationConfigGroup group, Config config ) {
 		final Counter counter = new Counter( "convert person to agent # " );
 		final ObjectPool<Coord> coordPool = new ObjectPool<>();
 
@@ -81,7 +73,7 @@ public class ArentzePopulationModule extends AbstractModule {
 			public void startTag(
 					final String name,
 					final Attributes atts,
-					final Stack<String> context) {
+					final Stack<String> context ) {
 				if ( name.equals( "person" ) ) {
 					try {
 						if ( Integer.parseInt( atts.getValue( "id" ) ) > 1000000000 ) return;
@@ -93,40 +85,41 @@ public class ArentzePopulationModule extends AbstractModule {
 
 					try {
 						final int age = Integer.parseInt( atts.getValue( "age" ) );
-						if ( age < 0 ) throw new IllegalArgumentException( ""+age );
+						if ( age < 0 ) throw new IllegalArgumentException( "" + age );
 						final char ageCategory = age <= 23 ? (char) 1 : age <= 37 ? (char) 2 : age <= 50 ? (char) 3 : age <= 65 ? (char) 4 : (char) 5;
 						final boolean male = atts.getValue( "sex" ).equals( "m" );
 
-						ids.add( Id.create(atts.getValue("id"), Person.class) );
+						ids.add( Id.create( atts.getValue( "id" ), Person.class ) );
 						ageCategories.add( ageCategory );
 						isMales.add( male );
 
 						missCoord = true;
 					}
-					catch (Exception e) {
-						throw new RuntimeException( "exception when processing person "+atts , e );
+					catch ( Exception e ) {
+						throw new RuntimeException( "exception when processing person " + atts, e );
 					}
 				}
 
 				if ( name.equals( "act" ) && missCoord ) {
 					final double x = Double.parseDouble( atts.getValue( "x" ) );
 					final double y = Double.parseDouble( atts.getValue( "y" ) );
-					coords.add( coordPool.getPooledInstance(new Coord(x, y)) );
+					coords.add( coordPool.getPooledInstance( new Coord( x, y ) ) );
 					missCoord = false;
 				}
 
 			}
 
 			@Override
-			public void endTag(String name, String content,
-					Stack<String> context) {}
-		}.parse( populationFile );
+			public void endTag( String name, String content,
+					Stack<String> context ) {
+			}
+		}.parse( group.getInputPopulationFile() );
 
 		counter.printCounter();
 		coordPool.printStats( "Coord pool" );
 
 		final boolean[] malesArray = new boolean[ isMales.size() ];
-		for ( int i = 0; i < malesArray.length; i++ )  {
+		for ( int i = 0; i < malesArray.length; i++ ) {
 			malesArray[ i ] = isMales.get( i ).booleanValue();
 		}
 
@@ -136,5 +129,4 @@ public class ArentzePopulationModule extends AbstractModule {
 				malesArray,
 				coords.toArray( new Coord[ ids.size() ] ) );
 	}
-
 }

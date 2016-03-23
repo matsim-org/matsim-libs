@@ -20,6 +20,7 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.estimated
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import gnu.trove.list.TCharList;
 import gnu.trove.list.array.TCharArrayList;
 import org.apache.log4j.Logger;
@@ -52,7 +53,7 @@ public class ContinuousAgeArentzePopulationModule extends AbstractModule {
 		log.debug("Configuring " + getClass().getSimpleName() + ": DONE");
 	}
 
-	@Provides
+	@Provides @Singleton
 	private ArentzePopulation createArentzePopulation( SocialNetworkGenerationConfigGroup group , Config config ) {
 		final String populationFile = group.getInputPopulationFile();
 		final Counter counter = new Counter( "convert person to agent # " );
