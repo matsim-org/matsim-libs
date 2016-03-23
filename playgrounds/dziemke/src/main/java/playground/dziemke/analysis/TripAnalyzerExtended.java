@@ -26,8 +26,8 @@ import playground.dziemke.utils.ShapeReader;
 /**
  * @author dziemke
  */
-public class TripAnalyzer_V2 {
-	public static final Logger log = Logger.getLogger(TripAnalyzer_V2.class);
+public class TripAnalyzerExtended {
+	public static final Logger log = Logger.getLogger(TripAnalyzerExtended.class);
 	
 	/* Parameters */
 	private static final String runId = "run_168a";
@@ -160,6 +160,14 @@ public class TripAnalyzer_V2 {
 	    writer.writeRoutedBeelineDistanceComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "/beeline.txt", numberOfConsideredTrips);
 	    	    
 	    log.info(numberOfInIncompleteTrips + " trips are incomplete.");
+	    
+	    
+	    /* Create gnuplot graphics */
+	    String gnuplotScriptName = "plot_rel_path_run.gnu";
+	    String pathToSpecificAnalysisDir = outputDirectory;
+		String relativePathToGnuplotScript = "../../../../shared-svn/projects/cemdapMatsimCadyts/analysis/" + gnuplotScriptName;
+
+		GnuplotUtils.runGnuplotScript(pathToSpecificAnalysisDir, relativePathToGnuplotScript);
 	}
 	
 	
