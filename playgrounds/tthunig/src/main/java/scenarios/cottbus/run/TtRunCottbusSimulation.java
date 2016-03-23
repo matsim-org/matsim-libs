@@ -421,9 +421,9 @@ public class TtRunCottbusSimulation {
 			runName += "_lanes";
 			// link 2 link vs node 2 node routing. this only has an effect if lanes are used
 			if (config.controler().isLinkToLinkRoutingEnabled())
-				runName += "_link";
+				runName += "_2link";
 			else
-				runName += "_node";
+				runName += "_2node";
 		}			
 
 		if (ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME,
@@ -443,7 +443,7 @@ public class TtRunCottbusSimulation {
 		}
 		
 		if (config.strategy().getMaxAgentPlanMemorySize() != 0)
-			runName += "_max" + config.strategy().getMaxAgentPlanMemorySize() + "plans";
+			runName += "_" + config.strategy().getMaxAgentPlanMemorySize() + "plans";
 
 		String outputDir = OUTPUT_BASE_DIR + runName + "/"; 
 		// create directory
