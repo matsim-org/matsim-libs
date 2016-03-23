@@ -112,7 +112,7 @@ public class TtRunCottbusSimulation {
 		config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes.xml");
 //		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/"
 //				+ "commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
-		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_ohneTagebau/"
+		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/"
 		+ "commuter_population_wgs84_utm33n_car_only.xml.gz");
 //		config.plans().setInputFile(INPUT_BASE_DIR + "Cottbus-pt/INPUT_mod/public/input/plans_scale1.4false.xml");
 		

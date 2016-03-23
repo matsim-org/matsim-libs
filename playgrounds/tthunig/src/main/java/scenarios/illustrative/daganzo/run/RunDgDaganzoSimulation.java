@@ -49,14 +49,15 @@ public class RunDgDaganzoSimulation {
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(BASE_DIR + "config.xml");
-		config.controler().setOutputDirectory("../../../runs-svn/daganzo/DGScenario/" + createDateString() + "_network21Length100_shortRouteSelected/");
+//		config.controler().setOutputDirectory("../../../runs-svn/daganzo/DGScenario/" + createDateString() + "_network21Length100_longRouteSelected/");
+		config.controler().setOutputDirectory("../../../runs-svn/daganzo/DGScenario/" + createDateString() + "_network22_shortRouteSelected/");
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists ) ;
 		
 //		config.plans().setInputFile(BASE_DIR + "plans_long_route_selected.xml.gz");
 		config.plans().setInputFile(BASE_DIR + "plans_short_route_selected.xml.gz");
 		
-		config.network().setInputFile(BASE_DIR + "network21.xml");
-//		config.network().setInputFile(BASE_DIR + "network22.xml");
+//		config.network().setInputFile(BASE_DIR + "network21.xml");
+		config.network().setInputFile(BASE_DIR + "network22.xml");
 		
 		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
 		config.vspExperimental().setWritingOutputEvents(true);
@@ -68,7 +69,7 @@ public class RunDgDaganzoSimulation {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		scenario.getNetwork().getLinks().get(Id.createLinkId(4)).setLength(100);
+//		scenario.getNetwork().getLinks().get(Id.createLinkId(4)).setLength(100);
 		
 		Controler controler = new Controler(scenario);
 		
