@@ -157,20 +157,11 @@ public class PreprocessedModelRunner implements ModelRunner {
 								null;
 
 						final Random random = new Random( randomSeed + threadNumber );
-						// initialize out loop to reduce stress on GC
-						final TIntList potentialAlters = new TIntArrayList( population.size() - startThreadAgents );
 
 						for ( int ego = startThreadAgents; ego < endThreadAgents; ego++ ) {
-							potentialAlters.clear();
-							for ( int pa=ego + 1; pa < population.size(); pa++ ) {
-								potentialAlters.add( pa );
-							}
-
-							int nAltersToConsider = (int) Math.ceil( primarySampleRate * potentialAlters.size() );
-
-							while ( nAltersToConsider-- > 0 && !potentialAlters.isEmpty() ) {
+							for ( int alter=ego + 1; alter < population.size(); alter++ ) {
+								if ( random.nextDouble() > primarySampleRate ) continue;
 								counter.incCounter();
-								final int alter = potentialAlters.removeAt( random.nextInt( potentialAlters.size() ) );
 
 								final double score = utility.getTieUtility( ego , alter );
 
