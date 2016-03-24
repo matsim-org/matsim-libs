@@ -179,12 +179,12 @@ public class TripAnalyzerOld {
 		// calculate travel times and store them in a map
 		double tripDuration_min = trip.getDurationByCalculation_s() / 60.;
 		double tripDuration_h = tripDuration_min / 60.;
-		AnalysisUtils.addToMapIntegerKey(tripDurationMap, tripDuration_min, binWidthDuration_min, maxBinDuration_min, 1.);
+		AnalysisUtils.addToMapIntegerKeyCeiling(tripDurationMap, tripDuration_min, binWidthDuration_min, 1.);
 		aggregateTripDuration = aggregateTripDuration + tripDuration_min;	 
 	
 		// store departure times in a map
 		double departureTime_h = trip.getDepartureTime_s() / 3600.;
-		AnalysisUtils.addToMapIntegerKey(departureTimeMap, departureTime_h, binWidthTime_h, maxBinTime_h, 1.);
+		AnalysisUtils.addToMapIntegerKeyCeiling(departureTimeMap, departureTime_h, binWidthTime_h, 1.);
 	
 		// store activities in a map
 		String activityType = trip.getActivityStartActType();
@@ -202,13 +202,13 @@ public class TripAnalyzerOld {
 		double tripDistanceRouted_km = tripDistance_m / 1000.;
 	
 		// store (routed) distances  in a map
-		AnalysisUtils.addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, maxBinDistance_km, 1.);
+		AnalysisUtils.addToMapIntegerKeyCeiling(tripDistanceRoutedMap, tripDistanceRouted_km, binWidthDistance_km, 1.);
 		aggregateTripDistanceRouted = aggregateTripDistanceRouted + tripDistanceRouted_km;
 		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted_km);
 	
 		// store (beeline) distances in a map
 		double tripDistanceBeeline_km = trip.getDistanceBeelineByCalculation_m(network) / 1000.;
-		AnalysisUtils.addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, 1.);
+		AnalysisUtils.addToMapIntegerKeyCeiling(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, 1.);
 		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline_km;
 		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline_km);
 	
@@ -216,11 +216,11 @@ public class TripAnalyzerOld {
 		if (tripDuration_h > 0.) {
 			//System.out.println("trip distance is " + tripDistance + " and time is " + timeInHours);
 			double averageTripSpeedRouted_km_h = tripDistanceRouted_km / tripDuration_h;
-			AnalysisUtils.addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			AnalysisUtils.addToMapIntegerKeyCeiling(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, 1.);
 			aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted_km_h;
 	
 			double averageTripSpeedBeeline_km_h = tripDistanceBeeline_km / tripDuration_h;
-			AnalysisUtils.addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, maxBinSpeed_km_h, 1.);
+			AnalysisUtils.addToMapIntegerKeyCeiling(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, 1.);
 			aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline_km_h;
 	
 			tripCounterSpeed++;

@@ -28,7 +28,7 @@ public class Trip {
 	private int useOtherCarPool;
 	private String mode;
 	private double distanceBeelineFromSurvey_m; // TODO
-	private double distanceRoutedFastest_m;
+	private double distanceRoutedFastestFromSurvey_m;
 	private double distanceRoutedShortestFromSurvey_m;
 	private double speedFromSurvey_m_s;
 	private double durationFromSurvey_s;
@@ -174,15 +174,15 @@ public class Trip {
 		this.distanceBeelineFromSurvey_m = distanceBeelineFromSurvey_m;
 	}
 	
-	public double getDistanceRoutedFastest_m() {
-		return this.distanceRoutedFastest_m;
+	public double getDistanceRoutedFastestFromSurvey_m() {
+		return this.distanceRoutedFastestFromSurvey_m;
 	}
 
 	public void setDistanceRoutedFastestFromSurvey_m(double distanceRoutedFastestFromSurvey_m) {
-		this.distanceRoutedFastest_m = distanceRoutedFastestFromSurvey_m;
+		this.distanceRoutedFastestFromSurvey_m = distanceRoutedFastestFromSurvey_m;
 	}
 	
-	public double getDistanceRoutedShortest_m() {
+	public double getDistanceRoutedShortestFromSurvey_m() {
 		return this.distanceRoutedShortestFromSurvey_m;
 	}
 
@@ -280,6 +280,37 @@ public class Trip {
 		}
 		return distanceRoutedByCalculation_m;
 	}
+	
+	 public String toString() {
+		return "householdId = " + householdId
+				+ " -- personId = " + personId
+				+ " -- tripId = "+ tripId
+				+ " -- activityEndActType = " + activityEndActType
+				+ " -- departureLinkId = " + departureLinkId
+//	private Id<Zone> departureZoneId;
+//	private double departureTime_s;
+//	private String departureLegMode;
+//	private List<Id<Link>> links = new LinkedList<Id<Link>>();
+//	private int useHouseholdCar;
+//	private int useOtherCar;
+//	private int useHouseholdCarPool;
+//	private int useOtherCarPool;
+//	private String mode;
+//	private double distanceBeelineFromSurvey_m; // TODO
+//	private double distanceRoutedFastest_m;
+//	private double distanceRoutedShortestFromSurvey_m;
+//	private double speedFromSurvey_m_s;
+//	private double durationFromSurvey_s;
+//	private Id<Link> arrivalLinkId;
+//	private Id<Zone> arrivalZoneId;
+//	private double arrivalTime_s;
+//	private String arrivalLegMode;
+//	private String activityStartActType;
+//	private boolean tripComplete = false;
+	+ " -- weight = " + weight;
+//	private Double distanceBeelineByCalculation_m = Double.NaN;
+//	private Double distanceRoutedByCalculation_m = Double.NaN;activityEndActType;	 
+	 }
 
 
 	private void calculateBeelineDistance_m(Network network) {
@@ -292,6 +323,7 @@ public class Trip {
     	double departureCoordX_m = departureLink.getCoord().getX();
     	double departureCoordY_m = departureLink.getCoord().getY();
     	
+    	// TODO use CoordUtils.calcEuclideanDistance instead
     	double horizontalDistance_m = Math.abs(departureCoordX_m - arrivalCoordX_m);
     	double verticalDistance_m = Math.abs(departureCoordY_m - arrivalCoordY_m);
 
@@ -302,6 +334,9 @@ public class Trip {
 	
 	private void calculateRoutedDistance_m(Network network) {
 		double tripDistance_m = 0.;
+		if (links.isEmpty()) {
+			throw new RuntimeException("List of links is empty. This computation is most likely not suitable for the present case.");
+		}
 		for (int i = 0; i < links.size(); i++) {
 			Id<Link> linkId = links.get(i);
 			Link link = network.getLinks().get(linkId);

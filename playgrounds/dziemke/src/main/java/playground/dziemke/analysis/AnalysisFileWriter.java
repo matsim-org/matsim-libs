@@ -27,7 +27,7 @@ public class AnalysisFileWriter {
     		for (int key : map.keySet()) {
     			int binCaption = key * binWidth;
     			double value = map.get(key);
-    			bufferedWriter.write(binCaption + "+" + "\t" + value + "\t" + value/aggregateWeight);
+    			bufferedWriter.write(binCaption + "\t" + value + "\t" + value/aggregateWeight);
     			writeCounter = writeCounter + value;
     			bufferedWriter.newLine();
     		}
@@ -158,7 +158,7 @@ public class AnalysisFileWriter {
     		//bufferedWriter.write("Sum = " + writeCounter);
     		
     		double countDifference = Math.abs(writeCounter - aggregateWeight);
-    		if (countDifference >1.) {
+    		if (countDifference > 1.) {
     			log.error("Weighted number of trips in " + outputFile + " is not equal to aggregate weight!");
     			log.error("writeCounter: " + writeCounter + "; aggregateWeight: " + aggregateWeight);
     		}

@@ -36,7 +36,7 @@ public class TripAnalyzerExtended {
 	
 	private static final Integer planningAreaId = 11000000; // 11000000 = Berlin
 
-	private static final boolean onlyCar = false; // "car"; new, should be used for runs with ChangeLegMode enabled
+	private static final boolean onlyCar = false; // "car"; should be used for runs with ChangeLegMode enabled
 	private static final boolean onlyInterior = false; // "int"
 	private static final boolean onlyBerlinBased = true; // "ber"; usually varied for analysis
 	private static final boolean distanceFilter = true; // "dist"; usually varied for analysis
@@ -47,7 +47,7 @@ public class TripAnalyzerExtended {
 
 	private static final boolean ageFilter = false; // "age"
 	private static final Integer minAge = 80; // typically "x0"
-	private static final Integer maxAge = 119; // typically "x9"; higehst number ususally chosen is 119
+	private static final Integer maxAge = 119; // typically "x9"; highest number ususally chosen is 119
 
 	private static final int maxBinDuration_min = 120;
 	private static final int binWidthDuration_min = 1;
@@ -69,6 +69,8 @@ public class TripAnalyzerExtended {
 			cemdapPersonsInputFileId + "/persons1.dat";
 	private static final String planningAreaShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
 	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+	
+	private static String gnuplotScriptName = "plot_rel_path_run.gnu";
 
 	/* Variables to store objects */
 	private static Geometry planningAreaGeometry;
@@ -85,6 +87,7 @@ public class TripAnalyzerExtended {
 
 	
 	public static void main(String[] args) {
+		int numberOfTripsWithNonNegativeTimesAndDurations = 0;
 		int numberOfTripsWithCalculableSpeed = 0;
 		
 		adaptOutputDirectory();
@@ -122,10 +125,12 @@ public class TripAnalyzerExtended {
 	    writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, numberOfConsideredTrips, averageTripDuration);
 	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, numberOfConsideredTrips, averageTripDuration);
 	    
+	    numberOfTripsWithNonNegativeTimesAndDurations = TripAnalyzerBasic.countTripsWithNonNegativeTimesAndDurations(trips);
+	    
 	    Map <Integer, Double> departureTimeMap = TripAnalyzerBasic.createDepartureTimeMap(trips, binWidthTime_h, maxBinTime_h);
-	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, numberOfConsideredTrips, averageTripDuration);
+	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, numberOfConsideredTrips, -99);
 	    	    
-	    Map<String, Double> activityTypeMap = TripAnalyzerBasic.createActivityTypeMap(trips, binWidthTime_h, maxBinTime_h);
+	    Map<String, Double> activityTypeMap = TripAnalyzerBasic.createActivityTypeMap(trips);
 	    writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", numberOfConsideredTrips);
 	    
 	    Map<Integer, Double> tripDistanceBeelineMap = TripAnalyzerBasic.createTripDistanceBeelineMap(trips, binWidthDistance_km, maxBinDistance_km, network);
@@ -133,13 +138,13 @@ public class TripAnalyzerExtended {
 		writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance_km, numberOfConsideredTrips, averageTripDistanceBeeline_km);
 		writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeelineCumulative.txt", binWidthDistance_km, numberOfConsideredTrips, averageTripDistanceBeeline_km);
 	    
-	    Map<Integer, Double> tripDistanceRoutedMap = TripAnalyzerBasic.createTripDistanceRoutedMap(trips, binWidthDistance_km, maxBinDistance_km, network);
+	    Map<Integer, Double> tripDistanceRoutedMap = TripAnalyzerBasic.createTripDistanceRoutedMap(trips, binWidthDistance_km, network);
 	    double averageTripDistanceRouted_km = TripAnalyzerBasic.calculateAverageTripDistanceRouted_km(trips, network);
 	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, numberOfConsideredTrips, averageTripDistanceRouted_km);
 	    
 	    numberOfTripsWithCalculableSpeed = TripAnalyzerBasic.countTripsWithCalculableSpeed(trips);
 	    
-	    Map<Integer, Double> averageTripSpeedBeelineMap = TripAnalyzerBasic.createAverageTripSpeedBeelineMap(trips, binWidthSpeed_km_h, maxBinSpeed_km_h, network);
+	    Map<Integer, Double> averageTripSpeedBeelineMap = TripAnalyzerBasic.createAverageTripSpeedBeelineMap(trips, binWidthSpeed_km_h, network);
 		double averageOfAverageTripSpeedsBeeline_km_h = TripAnalyzerBasic.calculateAverageOfAverageTripSpeedsBeeline_km_h(trips, network);
 		writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, numberOfTripsWithCalculableSpeed, averageOfAverageTripSpeedsBeeline_km_h);
 		writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, numberOfTripsWithCalculableSpeed, averageOfAverageTripSpeedsBeeline_km_h);
@@ -150,6 +155,7 @@ public class TripAnalyzerExtended {
 
 		/* Other information */
 	    otherInformationMap.put("Number of trips that have no previous activity", tripHandler.getNoPreviousEndOfActivityCounter());
+	    otherInformationMap.put("Number of trips that have no negative times or durations", numberOfConsideredTrips - numberOfTripsWithNonNegativeTimesAndDurations);		
 	    otherInformationMap.put("Number of trips that have no calculable speed", numberOfConsideredTrips - numberOfTripsWithCalculableSpeed);
 	    otherInformationMap.put("Number of incomplete trips (i.e. number of removed agents)", numberOfInIncompleteTrips);
 	    otherInformationMap.put("Number of (complete) trips", numberOfConsideredTrips);
@@ -163,11 +169,12 @@ public class TripAnalyzerExtended {
 	    
 	    
 	    /* Create gnuplot graphics */
-	    String gnuplotScriptName = "plot_rel_path_run.gnu";
+//	    String gnuplotScriptName = "plot_rel_path_run.gnu";
 	    String pathToSpecificAnalysisDir = outputDirectory;
-		String relativePathToGnuplotScript = "../../../../shared-svn/projects/cemdapMatsimCadyts/analysis/" + gnuplotScriptName;
+		String relativePathToGnuplotScript = "../../../../shared-svn/projects/cemdapMatsimCadyts/analysis/gnuplot/" + gnuplotScriptName;
+		String argument1= "wd_wt_carp_dist";
 
-		GnuplotUtils.runGnuplotScript(pathToSpecificAnalysisDir, relativePathToGnuplotScript);
+		GnuplotUtils.runGnuplotScript(pathToSpecificAnalysisDir, relativePathToGnuplotScript, argument1);
 	}
 	
 	
@@ -177,7 +184,8 @@ public class TripAnalyzerExtended {
 			double tripDistanceRouted_km = trip.getDistanceRoutedByCalculation_m(network) / 1000.;
 			double tripDistanceBeeline_km = trip.getDistanceBeelineByCalculation_m(network) / 1000.;
 			double tripWeight = trip.getWeight();
-			AnalysisUtils.addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, maxBinDistance_km, tripWeight);
+			AnalysisUtils.addToMapIntegerKeyCeiling(tripDistanceBeelineMap, tripDistanceBeeline_km, binWidthDistance_km, //maxBinDistance_km, 
+					tripWeight);
 			
 			distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline_km); // TODO eventually remove this
 			distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted_km); // TODO eventually remove this
@@ -207,7 +215,7 @@ public class TripAnalyzerExtended {
 			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
-		outputDirectory = outputDirectory + "_5"; // TODO in case used for double-check
+		outputDirectory = outputDirectory + "_8"; // TODO in case used for double-check
 		
 		/* Create directory */
 		new File(outputDirectory).mkdir();
