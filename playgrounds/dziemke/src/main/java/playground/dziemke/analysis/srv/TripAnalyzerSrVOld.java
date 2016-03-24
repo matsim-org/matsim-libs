@@ -306,12 +306,14 @@ public class TripAnalyzerSrVOld {
 	    		double arrivalTime_min = trip.getArrivalTime_s() / 60.;
 	    		//double departureTimeInMinutes = trip.getDepartureTime();
 	    		double departureTime_h = departureTime_s / 3600.;
-	    		double tripDuration_min = arrivalTime_min - (departureTime_s * 60.);
+	    		double tripDuration_min = arrivalTime_min - (departureTime_s / 60.);
 	    		//double tripDurationInMinutes = trip.getDuration();
 	    		double weightedTripDuration_min = tripDuration_min * weight;
 	    		double tripDuration_h = tripDuration_min / 60.;
 	    		// there are also three cases where time < 0; they need to be excluded
-	    		if (arrivalTime_min >= 0 && (departureTime_s * 60.) >= 0 && tripDuration_min >= 0) {
+	    		System.out.println("departureTime_min = " + departureTime_s / 60. + " -- arrivalTime_min = " + arrivalTime_min + " -- tripDuration_min = " + tripDuration_min);
+	    		if (arrivalTime_min >= 0 && (departureTime_s / 60.) >= 0 && tripDuration_min >= 0) {
+	    			System.out.println("departureTime_s = " + departureTime_s + " -- arrivalTime_min = " + arrivalTime_min);
 	    			AnalysisUtils.addToMapIntegerKeyCeiling(tripDurationMap, tripDuration_min, binWidthDuration_min, weight);
 	    			//aggregateTripDuration = aggregateTripDuration + tripDurationInMinutes;
 	    			aggregateTripDuration = aggregateTripDuration + weightedTripDuration_min;
@@ -321,7 +323,7 @@ public class TripAnalyzerSrVOld {
 
 	    		// store departure times in a map
 	    		if (departureTime_h >= 0) {
-	    			AnalysisUtils.addToMapIntegerKeyCeiling(departureTimeMap, departureTime_h, binWidthTime_h, weight);
+	    			AnalysisUtils.addToMapIntegerKeyFloor(departureTimeMap, departureTime_h, binWidthTime_h, weight);
 	    			aggregateWeightDepartureTime = aggregateWeightDepartureTime + weight;
 	    		}
 

@@ -114,13 +114,13 @@ public class TripAnalyzerExtended {
 	    List<Trip> trips = createListOfValidTrip(tripHandler.getTrips(), network);
 	    
 	    /* Do calculations and write-out*/
+	    numberOfTripsWithNonNegativeTimesAndDurations = TripAnalyzerBasic.countTripsWithNonNegativeTimesAndDurations(trips);
+	    
 	    Map <Integer, Double> tripDurationMap = TripAnalyzerBasic.createTripDurationMap(trips, binWidthDuration_min);
 	    double averageTripDuration = TripAnalyzerBasic.calculateAverageTripDuration_min(trips);
 	    writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, numberOfConsideredTrips, averageTripDuration);
 	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, numberOfConsideredTrips, averageTripDuration);
-	    
-	    numberOfTripsWithNonNegativeTimesAndDurations = TripAnalyzerBasic.countTripsWithNonNegativeTimesAndDurations(trips);
-	    
+
 	    Map <Integer, Double> departureTimeMap = TripAnalyzerBasic.createDepartureTimeMap(trips, binWidthTime_h);
 	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, numberOfConsideredTrips, -99);
 	    	    
