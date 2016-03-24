@@ -36,6 +36,7 @@ import playground.polettif.boescpa.converters.osm.Osm2Network;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
 import playground.polettif.multiModalMap.mapping.PTMapperV1;
 import playground.polettif.multiModalMap.mapping.PTMapperV2;
+import playground.polettif.multiModalMap.mapping.PTMapperV3;
 
 public class RunMapping {
 
@@ -51,8 +52,8 @@ public class RunMapping {
 		final String gtfsPath = "C:/Users/polettif/Desktop/data/gtfs/zvv/";
 		final String mtsFile = "C:/Users/polettif/Desktop/data/mts/zvv_unmappedSchedule_WGS84.xml";
 
-		final String osmFile = "C:/Users/polettif/Desktop/data/osm/zurich-city.osm";
-		final String networkFile = "C:/Users/polettif/Desktop/data/network/zurich-city.xml.gz";
+		final String osmFile = "C:/Users/polettif/Desktop/data/osm/zurich-plus.osm";
+		final String networkFile = "C:/Users/polettif/Desktop/data/network/zurich-plus.xml.gz";
 
 		final String outbase = "C:/Users/polettif/Desktop/output/mtsMapping/";
 
@@ -89,7 +90,8 @@ public class RunMapping {
 		// MAPPING
 		// vgl. OSM2MixedIVT createMixed
 	//	new PTMapperV1(schedule).routePTLines(network);
-		new PTMapperV2(schedule).routePTLines(network);
+//		new PTMapperV2(schedule).routePTLines(network);
+		new PTMapperV3(schedule).routePTLines(network);
 
 		log.info("Writing schedule and network to file...");
 		new TransitScheduleWriter(schedule).writeFile(path_MixedSchedule);

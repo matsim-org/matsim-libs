@@ -31,23 +31,21 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmarksSimpleRouting;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
-import playground.polettif.multiModalMap.mapping.router.SolvedSubRoutes;
-import playground.polettif.multiModalMap.mapping.router.InterStopRoute;
+import playground.polettif.multiModalMap.mapping.containter.SolvedSubRoutes;
+import playground.polettif.multiModalMap.mapping.containter.InterStopRoute;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Default implementation of PTLinesCreator.
  *
  * V2: combined linking stopFacilities to links and routing
+ * looks at pairs of stops and link candidates and uses best route
  *
  * @author polettif
  */
@@ -154,13 +152,14 @@ public class PTMapperV2 extends PTMapper {
 				SolvedSubRoutes solvedSubRoutes = new SolvedSubRoutes();
 
 
-				int i = 0; // iterate through all stops of the route
+				int i = 0; // iterate through all stops of the route and calculate best scores
 				while (i < (route.getStops().size())) {
 					// look to next stop
 					TransitRouteStop currentStop = route.getStops().get(i);
 					TransitRouteStop nextStop = (i < route.getStops().size() - 1) ? route.getStops().get(i + 1) : null;
+					TransitRouteStop previousStop = (i > 0 ? route.getStops().get(i - 1) : null);
 
-					// check if pari of current and next stop was already routed
+					// check if part of current and next stop was already routed
 					if(nextStop != null && !solvedSubRoutes.contains(currentStop, nextStop)) {
 
 						SortedMap<Double, InterStopRoute> routeScores = new TreeMap<>();
@@ -169,17 +168,19 @@ public class PTMapperV2 extends PTMapper {
 						List<Link> closestLinksCurrent = allClosestLinks.get(currentStop.getStopFacility());
 						List<Link> closestLinksNext = allClosestLinks.get(nextStop.getStopFacility());
 
+						// TODO prevent u-turns
+
 						// look at all routes for all linkCandidate combinations
 						for (Link linkCandidateCurrent : closestLinksCurrent) {
 							for (Link linkCandidateNext : closestLinksNext) {
 								LeastCostPathCalculator.Path pathCandidate = this.router.calcLeastCostPath(linkCandidateCurrent.getToNode(), linkCandidateNext.getFromNode(), null, null);
 								interStopRoutes.add(new InterStopRoute(currentStop, nextStop, linkCandidateCurrent, linkCandidateNext, pathCandidate));
-								}
+							}
 						}
 
 						// calculate score for all possible interStopRoutes
 						for (InterStopRoute interStopRoute : interStopRoutes) {
-							routeScores.put(interStopRoute.getScore(10, 1, 1), interStopRoute);
+							routeScores.put(interStopRoute.getScore(1,1,1), interStopRoute);
 						}
 
 						// assign best scoring interStopRoute to the set of solved stop pairs
@@ -196,19 +197,15 @@ public class PTMapperV2 extends PTMapper {
 						* if both candidates are not in optimal path? use next worse path
 						 */
 						if (i > 0) {
-							TransitRouteStop previousStop = route.getStops().get(i - 1);
 							InterStopRoute previousRoute = solvedSubRoutes.getInterStopRoute(previousStop, currentStop);
-
 							if (!previousRoute.getToLink().equals(bestInterStopRoute.getFromLink())) {
 								LeastCostPathCalculator.Path pathReroute = this.router.calcLeastCostPath(
 										previousRoute.getFromLink().getFromNode(),
 										bestInterStopRoute.getFromLink().getFromNode(), null, null);
 
-									log.warn("link reassigned");
-									solvedSubRoutes.put(new InterStopRoute(previousStop, currentStop, previousRoute.getFromLink(), bestInterStopRoute.getFromLink(), pathReroute));
+								solvedSubRoutes.put(new InterStopRoute(previousStop, currentStop, previousRoute.getFromLink(), bestInterStopRoute.getFromLink(), pathReroute));
 							}
 						}
-						this.schedule.getFacilities().get(currentStop.getStopFacility().getId()).setLinkId(bestInterStopRoute.getFromLink().getId());
 					}
 					i++;
 				}

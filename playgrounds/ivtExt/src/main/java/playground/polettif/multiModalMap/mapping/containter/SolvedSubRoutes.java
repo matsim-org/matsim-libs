@@ -17,7 +17,7 @@
  * *********************************************************************** */
 
 
-package playground.polettif.multiModalMap.mapping.router;
+package playground.polettif.multiModalMap.mapping.containter;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -27,7 +27,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.*;
 
-public class SolvedSubRoutes {
+public class SolvedSubRoutes implements SubRoutes {
 
 	Map<Tuple, InterStopRoute> subroutes = new HashMap<>();
 	Map<TransitStopFacility, Id<Link>> getStopFacilityRefLinkIds = new HashMap<>();
@@ -59,8 +59,9 @@ public class SolvedSubRoutes {
 		return list;
 	}
 
-	public boolean contains(TransitRouteStop stop1, TransitRouteStop stop2) {
-		return subroutes.containsKey(new Tuple<>(stop1, stop2));
+	@Override
+	public boolean contains(TransitRouteStop fromStop, TransitRouteStop toStop) {
+		return subroutes.containsKey(new Tuple<>(fromStop, toStop));
 	}
 
 	public Map<TransitStopFacility, Id<Link>> getStopFacilityRefLinkIds() {
