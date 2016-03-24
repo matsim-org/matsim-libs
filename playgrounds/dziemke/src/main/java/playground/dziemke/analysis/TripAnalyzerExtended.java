@@ -39,9 +39,10 @@ public class TripAnalyzerExtended {
 	private static final boolean onlyCar = false; // "car"; should be used for runs with ChangeLegMode enabled
 	private static final boolean onlyInterior = false; // "int"
 	private static final boolean onlyBerlinBased = true; // "ber"; usually varied for analysis
+	
 	private static final boolean distanceFilter = true; // "dist"; usually varied for analysis
 	// private static final double double minDistance = 0;
-	private static final double maxDistance_km = 100; // most frequently used value: 150
+	private static final double maxDistance_km = 100;
 
 	private static final boolean onlyWorkTrips = false; // "work"
 
@@ -49,16 +50,9 @@ public class TripAnalyzerExtended {
 	private static final Integer minAge = 80; // typically "x0"
 	private static final Integer maxAge = 119; // typically "x9"; highest number ususally chosen is 119
 
-	private static final int maxBinDuration_min = 120;
 	private static final int binWidthDuration_min = 1;
-
-	private static final int maxBinTime_h = 23;
 	private static final int binWidthTime_h = 1;
-
-	private static final int maxBinDistance_km = 60;
 	private static final int binWidthDistance_km = 1;
-
-	private static final int maxBinSpeed_km_h = 60;
 	private static final int binWidthSpeed_km_h = 1;
 
 	/* Input and output */
@@ -120,20 +114,20 @@ public class TripAnalyzerExtended {
 	    List<Trip> trips = createListOfValidTrip(tripHandler.getTrips(), network);
 	    
 	    /* Do calculations and write-out*/
-	    Map <Integer, Double> tripDurationMap = TripAnalyzerBasic.createTripDurationMap(trips, binWidthDuration_min, maxBinDuration_min);
+	    Map <Integer, Double> tripDurationMap = TripAnalyzerBasic.createTripDurationMap(trips, binWidthDuration_min);
 	    double averageTripDuration = TripAnalyzerBasic.calculateAverageTripDuration_min(trips);
 	    writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, numberOfConsideredTrips, averageTripDuration);
 	    writer.writeToFileIntegerKeyCumulative(tripDurationMap, outputDirectory + "/tripDurationCumulative.txt", binWidthDuration_min, numberOfConsideredTrips, averageTripDuration);
 	    
 	    numberOfTripsWithNonNegativeTimesAndDurations = TripAnalyzerBasic.countTripsWithNonNegativeTimesAndDurations(trips);
 	    
-	    Map <Integer, Double> departureTimeMap = TripAnalyzerBasic.createDepartureTimeMap(trips, binWidthTime_h, maxBinTime_h);
+	    Map <Integer, Double> departureTimeMap = TripAnalyzerBasic.createDepartureTimeMap(trips, binWidthTime_h);
 	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, numberOfConsideredTrips, -99);
 	    	    
 	    Map<String, Double> activityTypeMap = TripAnalyzerBasic.createActivityTypeMap(trips);
 	    writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", numberOfConsideredTrips);
 	    
-	    Map<Integer, Double> tripDistanceBeelineMap = TripAnalyzerBasic.createTripDistanceBeelineMap(trips, binWidthDistance_km, maxBinDistance_km, network);
+	    Map<Integer, Double> tripDistanceBeelineMap = TripAnalyzerBasic.createTripDistanceBeelineMap(trips, binWidthDistance_km, network);
 		double averageTripDistanceBeeline_km = TripAnalyzerBasic.calculateAverageTripDistanceBeeline_km(trips, network);
 		writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance_km, numberOfConsideredTrips, averageTripDistanceBeeline_km);
 		writer.writeToFileIntegerKeyCumulative(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeelineCumulative.txt", binWidthDistance_km, numberOfConsideredTrips, averageTripDistanceBeeline_km);
@@ -149,7 +143,7 @@ public class TripAnalyzerExtended {
 		writer.writeToFileIntegerKey(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeeline.txt", binWidthSpeed_km_h, numberOfTripsWithCalculableSpeed, averageOfAverageTripSpeedsBeeline_km_h);
 		writer.writeToFileIntegerKeyCumulative(averageTripSpeedBeelineMap, outputDirectory + "/averageTripSpeedBeelineCumulative.txt", binWidthSpeed_km_h, numberOfTripsWithCalculableSpeed, averageOfAverageTripSpeedsBeeline_km_h);
 		
-		Map<Integer, Double> averageTripSpeedRoutedMap = TripAnalyzerBasic.createAverageTripSpeedRoutedMap(trips, binWidthSpeed_km_h, maxBinSpeed_km_h, network);
+		Map<Integer, Double> averageTripSpeedRoutedMap = TripAnalyzerBasic.createAverageTripSpeedRoutedMap(trips, binWidthSpeed_km_h, network);
 		double averageOfAverageTripSpeedsRouted_km_h = TripAnalyzerBasic.calculateAverageOfAverageTripSpeedsRouted_km_h(trips, network);
 		writer.writeToFileIntegerKey(averageTripSpeedRoutedMap, outputDirectory + "/averageTripSpeedRouted.txt", binWidthSpeed_km_h, numberOfTripsWithCalculableSpeed, averageOfAverageTripSpeedsRouted_km_h);
 
@@ -162,7 +156,7 @@ public class TripAnalyzerExtended {
 	    writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
 	    
 	    // write a routed distance vs. beeline distance comparison file
-	    doBeelineCaluclations(trips, binWidthDistance_km, maxBinDistance_km, network);
+	    doBeelineCaluclations(trips, binWidthDistance_km, network);
 	    writer.writeRoutedBeelineDistanceComparisonFile(distanceRoutedMap, distanceBeelineMap, outputDirectory + "/beeline.txt", numberOfConsideredTrips);
 	    	    
 	    log.info(numberOfInIncompleteTrips + " trips are incomplete.");
@@ -178,7 +172,7 @@ public class TripAnalyzerExtended {
 	}
 	
 	
-	static void doBeelineCaluclations(List<Trip> trips, int binWidthDistance_km, int maxBinDistance_km, Network network) {
+	static void doBeelineCaluclations(List<Trip> trips, int binWidthDistance_km, Network network) {
 		Map<Integer, Double> tripDistanceBeelineMap = new TreeMap<>();
 		for (Trip trip : trips) {
 			double tripDistanceRouted_km = trip.getDistanceRoutedByCalculation_m(network) / 1000.;

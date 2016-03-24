@@ -58,17 +58,10 @@ import playground.dziemke.analysis.Trip;
 
 /**
  * @author dziemke
- * adapted from TripAnalyzer04
- *
  */
 public class TripAnalyzerSrVOld {
-
 	private final static Logger log = Logger.getLogger(TripAnalyzerSrVOld.class);
 
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
 	public static void main(String[] args) throws IOException {
 		// Parameters
 		boolean useWeights = true;			//wt
@@ -84,18 +77,10 @@ public class TripAnalyzerSrVOld {
 		Integer minAge = 80;
 		Integer maxAge = 119;	
 		
-		int maxBinDuration_min = 120;
-	    int binWidthDuration_min = 1;
-	    
-	    int maxBinTime_h = 23;
+		int binWidthDuration_min = 1;
 	    int binWidthTime_h = 1;
-	    
-	    int maxBinDistance_km = 60;
 	    int binWidthDistance_km = 1;
-	    	    
-	    int maxBinSpeed_km_h = 60;
 	    int binWidthSpeed_km_h = 1;
-	    
 	    
 		// Input and output files
 	    String inputFileTrips = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/input/W2008_Berlin_Weekday.dat";
@@ -104,7 +89,7 @@ public class TripAnalyzerSrVOld {
 		String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 //		String shapeFile = "/Users/dominik/Workspace/data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
 				
-		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/output/wd_neu_2016";
+		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/output/wd_neu_2016_1a";
 		
 		
 		if (useWeights == true) {
@@ -153,7 +138,6 @@ public class TripAnalyzerSrVOld {
 		
 		
 		// create objects
-		
 		// for writing plans files (newer ones...)
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -167,7 +151,6 @@ public class TripAnalyzerSrVOld {
 		networkReader.parse(networkFile);
 		
 		List<Event> events = new ArrayList<Event>();
-//		TreeMap<Double, Event> eventsMap = new TreeMap<Double, Event>();
 		
 		String fromCRS = "EPSG:31468"; // GK4
 		String toCRS = "EPSG:31468"; // GK4
@@ -263,7 +246,6 @@ public class TripAnalyzerSrVOld {
 	    		}
 	    	}
 
-
 	    	// distance
 	    	double tripDistanceBeeline_km = trip.getDistanceBeelineFromSurvey_m() / 1000.;
 	    	if (distanceFilter == true) {
@@ -275,7 +257,6 @@ public class TripAnalyzerSrVOld {
 	    		}
 	    	}
 
-	    	
 	    	// age
 	    	String personId = trip.getPersonId().toString();
 	    	
@@ -289,10 +270,8 @@ public class TripAnalyzerSrVOld {
 	    		}
 	    	}
 
-
 	    	// use all filtered trips to construct plans and do calculations 
 	    	if (considerTrip == true) {
-	    		
 	    		
 	    		// collect and store information to create plans later
 	    		Id<Person> id = Id.create(personId, Person.class);
@@ -309,7 +288,6 @@ public class TripAnalyzerSrVOld {
 	    			personTripsMap.get(id).put(departureTime_s, trip);
 	    		}
 	    		
-
 	    		// do calculations
 	    		tripCounter++;
 
@@ -341,13 +319,11 @@ public class TripAnalyzerSrVOld {
 	    			//tripDurationCounter++;
 	    		}
 
-
 	    		// store departure times in a map
 	    		if (departureTime_h >= 0) {
 	    			AnalysisUtils.addToMapIntegerKeyCeiling(departureTimeMap, departureTime_h, binWidthTime_h, weight);
 	    			aggregateWeightDepartureTime = aggregateWeightDepartureTime + weight;
 	    		}
-
 
 	    		// store activities in a map
 	    		// reliant on variable "V_ZWECK": -9 = no data
@@ -356,14 +332,10 @@ public class TripAnalyzerSrVOld {
 	    		AnalysisUtils.addToMapStringKey(activityTypeMap, activityType, weight);
 	    		aggregateWeightActivityTypes = aggregateWeightActivityTypes + weight;
 	    		
-	    		
-
-
 	    		// reliant on variable "V_START_ZWECK": -9 = no data
 	    		// "V_START_ZWECK" - start of trip = end of activity
 	    		// String activityTypePrevious = trip.getActivityEndActType();
 	    		// addToMapStringKey(activityTypePreviousMap, activityTypePrevious, weight);
-
 
 	    		// In SrV, a routed distance (according to some software) is already given
 	    		// reliant on SrV variable "E_LAENGE_KUERZEST"; -7 = calculation not possible
@@ -376,7 +348,6 @@ public class TripAnalyzerSrVOld {
 	    			aggregateWeightTripDistanceRouted = aggregateWeightTripDistanceRouted + weight;
 	    		}
 
-
 	    		// reliant on variable "V_LAENGE": -9 = no data, -10 = implausible
 	    		//double tripDistanceBeeline = trip.getDistanceBeeline();
 	    		double weightedTripDistanceBeeline = weight * tripDistanceBeeline_km;
@@ -386,7 +357,6 @@ public class TripAnalyzerSrVOld {
 	    			distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline_km);
 	    			aggregateWeightTripDistanceBeeline = aggregateWeightTripDistanceBeeline + weight;
 	    		}
-
 
 	    		// calculate speeds and and store them in a map
 	    		if (tripDuration_h > 0.) {
@@ -408,7 +378,6 @@ public class TripAnalyzerSrVOld {
 	    		} else {
 	    			numberOfTripsWithNoCalculableSpeed++;
 	    		}
-
 
 	    		// get provided speeds and store them in a map
 	    		// reliant on variable "E_GESCHW": -7 = Calculation not possible	    		
