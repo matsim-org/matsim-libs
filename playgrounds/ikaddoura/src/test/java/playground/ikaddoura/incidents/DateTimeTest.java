@@ -41,10 +41,10 @@ public class DateTimeTest {
 	public final void test1() {
 
 		double dateInSec = 2016 * 12 * 30.436875 * 24 * 3600 + 3 * 30.436875 * 24 * 3600 + 1 * 24 * 3600;
-		Assert.assertEquals("Wrong date / time", dateInSec, DateTime.parseDateTimeToDateTimeSeconds("2016/03/01"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong date / time", dateInSec, DateTime.parseDateTimeToDateTimeSeconds("2016-03-01"), MatsimTestUtils.EPSILON);
 		
 		Assert.assertEquals("Wrong date / time", "2016-03-01", DateTime.secToDateTimeString(dateInSec));
-		Assert.assertEquals("Wrong date / time", "2016-03-01", DateTime.secToDateTimeString(DateTime.parseDateTimeToDateTimeSeconds("2016/03/01")));		
+		Assert.assertEquals("Wrong date / time", "2016-03-01", DateTime.secToDateTimeString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-01")));		
 	}
 		
 }

@@ -24,8 +24,8 @@ import org.matsim.core.utils.misc.Time;
 
 
 /**
-* Expected Input date+time format: YYYY/MM/DD HH:MM:SS, other formats are not accepted.
-* Only YYYY/MM/DD or HH:MM:SS should also work.  
+* Expected Input date+time format: YYYY-MM-DD HH:MM:SS, other formats are not accepted.
+* Only YYYY-MM-DD or HH:MM:SS should also work.  
 * 
 * @author ikaddoura
 */
@@ -42,9 +42,11 @@ public class DateTime {
 			if (datetime[0].contains(":")) {
 				// only time
 				timeSec = Time.parseTime(datetime[0]);
-			} else if (datetime[0].contains("/")) {
+			} else if (datetime[0].contains("-")) {
 				// only date
 				dateSec = computeDateSec(datetime[0]);
+			} else {
+				throw new RuntimeException("Expecting the following date/time/date+time formats: YYYY-MM-DD HH:MM:SS OR YYYY-MM-DD OR HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
 			}
 			
 		} else if (datetime.length == 2) {
@@ -52,7 +54,7 @@ public class DateTime {
 			dateSec = computeDateSec(datetime[0]);
 			timeSec = Time.parseTime(datetime[1]);
 		} else {
-			throw new RuntimeException("Expecting the traffic incidents to have the date+time format YYYY/MM/DD HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
+			throw new RuntimeException("Expecting the following date+time format: YYYY-MM-DD HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
 		}
 		
 		double seconds = dateSec + timeSec;
@@ -61,11 +63,11 @@ public class DateTime {
 
 	private static double computeDateSec(String dateString) {
 		
-		String dateDelimiter = "/";
+		String dateDelimiter = "-";
 		String[] date = StringUtils.explode(dateString, dateDelimiter.charAt(0));
 				
 		if (date.length != 3 || date[0].length() != 4 || date[1].length() != 2 || date[2].length() != 2) {
-			throw new RuntimeException("Expecting the traffic incidents to have the date format YYYY/MM/DD.  Cannot interpret the following text: " + dateString + " Aborting...");
+			throw new RuntimeException("Expecting the following date format: YYYY-MM-DD.  Cannot interpret the following text: " + dateString + " Aborting...");
 		}
 		
 		double year = Double.valueOf(date[0]);
@@ -85,16 +87,16 @@ public class DateTime {
 			if (datetime[0].contains(":")) {
 				// only time
 				timeSec = Time.parseTime(datetime[0]);
-			} else if (datetime[0].contains("/")) {
+			} else if (datetime[0].contains("-")) {
 				// only date
-				throw new RuntimeException("Expecting the time format HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
+				throw new RuntimeException("Expecting the following time format: HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
 			}
 			
 		} else if (datetime.length == 2) {
 			// date + time
 			timeSec = Time.parseTime(datetime[1]);
 		} else {
-			throw new RuntimeException("Expecting the date+time format YYYY/MM/DD HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
+			throw new RuntimeException("Expecting the following date+time format: YYYY-MM-DD HH:MM:SS. Cannot interpret the following text: " + dateTimeString + " Aborting...");
 		}
 		
 		return timeSec;

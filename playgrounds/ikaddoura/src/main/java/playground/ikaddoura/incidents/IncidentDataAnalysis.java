@@ -52,19 +52,19 @@ public class IncidentDataAnalysis {
 
 	private String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
 	private String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-berlin/";
-	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin-analysis-filtered/";
+	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin-analysis-withDelays/";
 	
 	private boolean writeCSVFileForEachXMLFile = false;
 	
 	private boolean writeAllTrafficItems2ShapeFile = false;
 	private boolean writeDaySpecificTrafficItems2ShapeFile = true;
-	private String shpFileStartDateTime = "2016/02/11";
-	private String shpFileEndDateTime = "2016/02/11";
+	private String shpFileStartDateTime = "2016-02-11";
+	private String shpFileEndDateTime = "2016-02-11";
 	
 	// start and end date should be in the same month... TODO: Account for the different months' lengths, only weekdays etc.
 	private boolean writeNetworkChangeEventFiles = false;
-	private String networkChangeEventStartDateTime = "2016/02/11";
-	private String networkChangeEventEndDateTime = "2016/02/29";
+	private String networkChangeEventStartDateTime = "2016-02-11";
+	private String networkChangeEventEndDateTime = "2016-02-29";
 		
 // ##################################################################
 	
