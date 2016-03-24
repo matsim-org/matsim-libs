@@ -37,8 +37,9 @@ class PTScheduleRandomiser implements DecisionVariableRandomizer<PTSchedule> {
 		str = str + vehicles.getVehicles().size() + "		" +
 				result.get(0).vehicles.getVehicles().size() + "		" + 
 				result.get(1).vehicles.getVehicles().size() + "		" + "\n";
-		writeToTextFile(str, scenario.getConfig().controler()
-				.getOutputDirectory()+"vehicles.txt");//Write the number of vehicles statistics to a file
+		writeToTextFile(str, "vehicles.txt");//Write the number of vehicles statistics to a file
+		System.out.println("Vehicles Written to: " + scenario.getConfig().controler()
+				.getOutputDirectory());
 		return result;
 	}
 	

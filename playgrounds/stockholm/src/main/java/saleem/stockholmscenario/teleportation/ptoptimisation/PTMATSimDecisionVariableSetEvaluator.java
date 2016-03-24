@@ -80,8 +80,6 @@ public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	private LinkedList<Vector> stateList = null;
 
 	private MATSimState finalState = null;
-	
-	private String outputdirectory="";
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -93,12 +91,11 @@ public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 			final MATSimStateFactory<U> stateFactory,
 			final TimeDiscretization timeDiscretization,
 			final Collection<Id<TransitStopFacility>> relevantStopIds, 
-			TransitSchedule schedule, String outputdirectory) {
+			TransitSchedule schedule) {
 		this.trajectorySampler = trajectorySampler;
 		this.stateFactory = stateFactory;
 		this.schedule=schedule;
 		this.timeDiscretization = timeDiscretization;
-		this.outputdirectory = outputdirectory;
 		if (relevantStopIds == null) {
 			this.relevantStopIds = null;
 		} else {
@@ -247,7 +244,7 @@ public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 			
 		}
 		PlotInfo pinfo = new PlotInfo();
-		pinfo.PlotWaitingPassengers(outputdirectory + "waitingPassengers.png", times, waitingpassengers);
+		pinfo.PlotWaitingPassengers("waitingPassengers.png", times, waitingpassengers);
 		System.out.println("Stuck Agents: " + this.occupancyAnalyser.getTotalStuckOutsideStops());
 		System.out.println("Stuck Agents Left on Stops: " + this.occupancyAnalyser.getTotalLeftOnStopsAtEnd());
 		

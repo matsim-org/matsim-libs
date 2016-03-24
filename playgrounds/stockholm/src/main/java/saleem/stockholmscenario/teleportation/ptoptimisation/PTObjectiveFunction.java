@@ -36,7 +36,7 @@ public class PTObjectiveFunction implements ObjectiveFunction {
 		}
 		result /= ptstate.getPersonIdView().size();
 		str = str + result	+ "\n";
-//		writeToTextFile(str, "C:\\Results Matsim\\Optimisation\\scores.txt");//Write the number of vehicles statistics to a file
+		writeToTextFile(str, "scores.txt");//Write the number of vehicles statistics to a file
 		return result;	
 	}
 	public void writeToTextFile(String str, String path){
