@@ -19,18 +19,22 @@
 package playground.johannes.studies.matrix2014.sim.run;
 
 import org.matsim.core.config.Config;
-import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.studies.matrix2014.analysis.AnalyzerTaskGroup;
 import playground.johannes.studies.matrix2014.analysis.MatrixComparator;
 import playground.johannes.studies.matrix2014.analysis.MatrixWriter;
 import playground.johannes.studies.matrix2014.config.MatrixAnalyzerConfigurator;
+import playground.johannes.studies.matrix2014.gis.ActivityLocationLayer;
+import playground.johannes.studies.matrix2014.gis.ActivityLocationLayerLoader;
+import playground.johannes.studies.matrix2014.matrix.DefaultMatrixBuilder;
 import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 import playground.johannes.studies.matrix2014.matrix.ZoneDistancePredicate;
-import playground.johannes.studies.matrix2014.matrix.io.CachedMatrixBuilder;
+import playground.johannes.studies.matrix2014.sim.MatrixSampler;
 import playground.johannes.synpop.analysis.AnalyzerTaskComposite;
 import playground.johannes.synpop.analysis.ConcurrentAnalyzerTask;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.gis.*;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneData;
+import playground.johannes.synpop.gis.ZoneDataLoader;
 import playground.johannes.synpop.sim.PopulationWriter;
 
 import java.util.Collection;
@@ -43,13 +47,15 @@ public class ExtendedAnalyzerBuilder {
     public static void build(Simulator engine, Config config) {
         AnalyzerTaskComposite<Collection<? extends Person>> task = engine.getAnalyzerTasks();
 
-        FacilityData facilityData = (FacilityData) engine.getDataPool().get(FacilityDataLoader.KEY);
+//        FacilityData facilityData = (FacilityData) engine.getDataPool().get(FacilityDataLoader.KEY);
         ZoneData zoneData = (ZoneData) engine.getDataPool().get(ZoneDataLoader.KEY);
+        ActivityLocationLayer locations = (ActivityLocationLayer) engine.getDataPool().get(ActivityLocationLayerLoader.KEY);
 
         // FIXME: requires consolidation!
-        CachedMatrixBuilder builder = new CachedMatrixBuilder(engine.getSimPersons(), facilityData.getAll(), zoneData.getLayer("nuts3"));
-        builder.setLegPredicate(engine.getLegPredicate());
-        builder.setUseWeights(engine.getUseWeights());
+//        CachedMatrixBuilder builder = new CachedMatrixBuilder(engine.getSimPersons(), facilityData.getAll(), zoneData.getLayer("nuts3"));
+        DefaultMatrixBuilder nuts3Builder = new DefaultMatrixBuilder(locations, zoneData.getLayer("nuts3"), "nuts3");
+        nuts3Builder.setLegPredicate(engine.getLegPredicate());
+        nuts3Builder.setUseWeights(engine.getUseWeights());
         /*
         matrix comparators
          */
@@ -58,22 +64,26 @@ public class ExtendedAnalyzerBuilder {
                 config.getModule("matrixAnalyzerITP"),
                 engine.getDataPool(),
                 engine.getIOContext(),
-                builder).load();
+                nuts3Builder).load();
 //        mAnalyzer.setLegPredicate(engine.getLegPredicate());
 //        mAnalyzer.setUseWeights(engine.getUseWeights());
         matrixTasks.addComponent(mAnalyzer);
 
 
+        ZoneCollection tomtomZones = zoneData.getLayer("tomtom");
+        DefaultMatrixBuilder tomtomBuilder = new DefaultMatrixBuilder(locations, tomtomZones, "tomtom");
+        tomtomBuilder.setLegPredicate(engine.getLegPredicate());
+        tomtomBuilder.setUseWeights(engine.getUseWeights());
         mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(
                 config.getModule("matrixAnalyzerTomTom"),
                 engine.getDataPool(),
                 engine.getIOContext(),
-                builder).load();
+                tomtomBuilder).load();
 //        mAnalyzer.setLegPredicate(engine.getLegPredicate());
 
 //        ZoneData zoneData = (ZoneData) engine.getDataPool().get(ZoneDataLoader.KEY);
-        ZoneCollection zones = zoneData.getLayer("tomtom");
-        ODPredicate distPredicate = new ZoneDistancePredicate(zones, 100000);
+
+        ODPredicate distPredicate = new ZoneDistancePredicate(tomtomZones, 100000);
 
         mAnalyzer.setNormPredicate(distPredicate);
 //        mAnalyzer.setUseWeights(engine.getUseWeights());
@@ -81,10 +91,10 @@ public class ExtendedAnalyzerBuilder {
         /*
         matrix writer
          */
-        ActivityFacilities facilities = ((FacilityData) engine.getDataPool().get(FacilityDataLoader.KEY)).getAll();
-        MatrixWriter matrixWriter = new MatrixWriter(facilities, zones, engine.getIOContext());
-        matrixWriter.setPredicate(engine.getLegPredicate());
-        matrixWriter.setUseWeights(engine.getUseWeights());
+//        ActivityFacilities facilities = ((FacilityData) engine.getDataPool().get(FacilityDataLoader.KEY)).getAll();
+        MatrixWriter matrixWriter = new MatrixWriter(tomtomBuilder, engine.getIOContext());
+//        matrixWriter.setPredicate(engine.getLegPredicate());
+//        matrixWriter.setUseWeights(engine.getUseWeights());
         matrixTasks.addComponent(matrixWriter);
 
         task.addComponent(new AnalyzerTaskGroup<>(matrixTasks, engine.getIOContext(), "matrix"));
@@ -107,5 +117,38 @@ public class ExtendedAnalyzerBuilder {
 //                .setUseWeights(engine.getUseWeights())
 //                .build(fData.getAll());
 //        task.addComponent(actDist);
+
+        long start = (long) Double.parseDouble(config.findParam(Simulator.MODULE_NAME, "matrixSamplingStart"));
+        long step = (long) Double.parseDouble(config.findParam(Simulator.MODULE_NAME, "matrixSamplingStep"));
+
+        MatrixSampler nuts3Sampler = new MatrixSampler(nuts3Builder, start, step);
+        engine.getEngineListeners().addComponent(nuts3Sampler);
+
+        ConcurrentAnalyzerTask<Collection<? extends Person>> samplerTasks = new ConcurrentAnalyzerTask<>();
+        mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(
+                config.getModule("matrixAnalyzerITP"),
+                engine.getDataPool(),
+                engine.getIOContext(),
+                nuts3Sampler).load();
+        samplerTasks.addComponent(mAnalyzer);
+
+        MatrixSampler tomtomSampler = new MatrixSampler(tomtomBuilder, start, step);
+        engine.getEngineListeners().addComponent(tomtomSampler);
+
+        mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(
+                config.getModule("matrixAnalyzerTomTom"),
+                engine.getDataPool(),
+                engine.getIOContext(),
+                tomtomSampler).load();
+
+        mAnalyzer.setNormPredicate(distPredicate);
+        samplerTasks.addComponent(mAnalyzer);
+        /*
+        matrix writer
+         */
+        matrixWriter = new MatrixWriter(nuts3Sampler, engine.getIOContext());
+        samplerTasks.addComponent(matrixWriter);
+
+        task.addComponent(new AnalyzerTaskGroup<>(samplerTasks, engine.getIOContext(), "matrixAvr"));
     }
 }

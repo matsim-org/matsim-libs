@@ -19,8 +19,8 @@
 
 package playground.johannes.studies.matrix2014.matrix.io;
 
-import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.studies.matrix2014.analysis.MatrixBuilder;
+import playground.johannes.studies.matrix2014.gis.ActivityLocationLayer;
 import playground.johannes.studies.matrix2014.matrix.DefaultMatrixBuilder;
 import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.Attributable;
@@ -46,15 +46,15 @@ public class CachedMatrixBuilder implements MatrixBuilder, MarkovEngineListener 
 
     private final DefaultMatrixBuilder matrixBuilder;
 
-    private final Collection<? extends Person> population;
+//    private final Collection<? extends Person> population;
 
     private Predicate<Segment> legPredicate;
 
     private boolean useWeights = true;
 
-    public CachedMatrixBuilder(Collection<? extends Person> population, ActivityFacilities facilities, ZoneCollection zones) {
-        this.population = population;
-        matrixBuilder = new DefaultMatrixBuilder(facilities, zones);
+    public CachedMatrixBuilder(Collection<? extends Person> population, ActivityLocationLayer facilities, ZoneCollection zones, String layerName) {
+//        this.population = population;
+        matrixBuilder = new DefaultMatrixBuilder(facilities, zones, layerName);
     }
 
     public void setLegPredicate(Predicate<Segment> predicate) {
@@ -72,10 +72,12 @@ public class CachedMatrixBuilder implements MatrixBuilder, MarkovEngineListener 
 
     @Override
     public NumericMatrix build(Collection<? extends Person> population) {
-        if(this.population != population) throw new RuntimeException("Trying to build a matrix from different population!");
+//        if(this.population != population) throw new RuntimeException("Trying to build a matrix from different population!");
 
         if(lastBuilt < iteration) {
-            matrix = matrixBuilder.build(this.population, legPredicate, useWeights);
+            matrixBuilder.setLegPredicate(legPredicate);
+            matrixBuilder.setUseWeights(useWeights);
+            matrix = matrixBuilder.build(population);
             lastBuilt = iteration;
         }
 

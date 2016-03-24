@@ -18,15 +18,10 @@
  * *********************************************************************** */
 package playground.johannes.studies.matrix2014.analysis;
 
-import org.matsim.facilities.ActivityFacilities;
-import playground.johannes.studies.matrix2014.matrix.DefaultMatrixBuilder;
 import playground.johannes.synpop.analysis.AnalyzerTask;
 import playground.johannes.synpop.analysis.FileIOContext;
-import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.analysis.StatsContainer;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.matrix.NumericMatrixIO;
 
@@ -39,30 +34,32 @@ import java.util.List;
  */
 public class MatrixWriter implements AnalyzerTask<Collection<? extends Person>> {
 
-    private final DefaultMatrixBuilder matrixBuilder;
+    private final MatrixBuilder matrixBuilder;
 
     private final FileIOContext ioContext;
 
-    private boolean useWeights;
+//    private boolean useWeights;
 
-    private Predicate<Segment> predicate;
+//    private Predicate<Segment> predicate;
 
-    public MatrixWriter(ActivityFacilities facilities, ZoneCollection zones, FileIOContext ioContext) {
-        matrixBuilder = new DefaultMatrixBuilder(facilities, zones);
+    public MatrixWriter(MatrixBuilder builder, FileIOContext ioContext) {
+        matrixBuilder = builder;
         this.ioContext = ioContext;
     }
 
-    public void setPredicate(Predicate<Segment> predicate) {
-        this.predicate = predicate;
-    }
+//    public void setPredicate(Predicate<Segment> predicate) {
+//        this.predicate = predicate;
+//    }
 
-    public void setUseWeights(boolean useWeights) {
-        this.useWeights = useWeights;
-    }
+//    public void setUseWeights(boolean useWeights) {
+//        this.useWeights = useWeights;
+//    }
 
     @Override
     public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        NumericMatrix matrix = matrixBuilder.build(persons, predicate, useWeights);
+//        matrixBuilder.setLegPredicate(predicate);
+//        matrixBuilder.setUseWeights(useWeights);
+        NumericMatrix matrix = matrixBuilder.build(persons);
 
         try {
             NumericMatrixIO.write(matrix, String.format("%s/matrix.txt.gz", ioContext.getPath()));

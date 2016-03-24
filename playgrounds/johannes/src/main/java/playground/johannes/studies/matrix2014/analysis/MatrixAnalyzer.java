@@ -23,7 +23,7 @@ import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.stats.StatsWriter;
-import org.matsim.facilities.ActivityFacilities;
+import playground.johannes.studies.matrix2014.gis.ActivityLocationLayer;
 import playground.johannes.studies.matrix2014.matrix.DefaultMatrixBuilder;
 import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 import playground.johannes.studies.matrix2014.matrix.VolumePredicate;
@@ -68,10 +68,10 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
 //    private
 
-    public MatrixAnalyzer(ActivityFacilities facilities, ZoneCollection zones, NumericMatrix refMatrix, String name) {
+    public MatrixAnalyzer(ActivityLocationLayer facilities, ZoneCollection zones, NumericMatrix refMatrix, String name, String layerName) {
         this.refMatrix = refMatrix;
         this.matrixName = name;
-        matrixBuilder = new DefaultMatrixBuilder(facilities, zones);
+        matrixBuilder = new DefaultMatrixBuilder(facilities, zones, layerName);
     }
 
     public void setPredicate(Predicate<Segment> predicate) {
@@ -100,7 +100,9 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
 
     @Override
     public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        NumericMatrix simMatrix = matrixBuilder.build(persons, predicate, useWeights);
+        matrixBuilder.setUseWeights(useWeights);
+        matrixBuilder.setLegPredicate(predicate);
+        NumericMatrix simMatrix = matrixBuilder.build(persons);
 
         if (odPredicate != null) {
             NumericMatrix tmpMatrix = new NumericMatrix();

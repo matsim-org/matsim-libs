@@ -19,11 +19,10 @@
 
 package playground.johannes.studies.matrix2014.matrix;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
+import playground.johannes.studies.matrix2014.analysis.MatrixBuilder;
+import playground.johannes.studies.matrix2014.gis.ActivityLocationLayer;
+import playground.johannes.studies.matrix2014.gis.Feature;
 import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Episode;
@@ -41,24 +40,70 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author johannes
  */
-public class DefaultMatrixBuilder {
+public class DefaultMatrixBuilder implements MatrixBuilder {
 
     private static final Logger logger = Logger.getLogger(DefaultMatrixBuilder.class);
 
-    private final ActivityFacilities facilities;
+    private final ActivityLocationLayer locationLayer;
+
+    private final String zoneIdKey;
 
     private final ZoneCollection zones;
 
     private final Map<String, String> zoneIds;
 
-    public DefaultMatrixBuilder(ActivityFacilities facilities, ZoneCollection zones) {
-        this.facilities = facilities;
+    private Predicate<Segment> legPredicate;
+
+    private boolean useWeights;
+
+    public DefaultMatrixBuilder(ActivityLocationLayer locations, ZoneCollection zones, String layerName) {
+//        this.facilities = facilities;
+        this.locationLayer = locations;
         this.zones = zones;
+        zoneIdKey = layerName + "_zone_id";
         zoneIds = new ConcurrentHashMap<>();
     }
 
-    public NumericMatrix build(Collection<? extends Person> persons, Predicate<Segment> predicate, boolean useWeights) {
-//        int n = 1;
+    public void setLegPredicate(Predicate<Segment> predicate) {
+        this.legPredicate = predicate;
+    }
+
+    public void setUseWeights(boolean useWeights) {
+        this.useWeights = useWeights;
+    }
+
+    private String getZoneId(String facilityId) {
+        String zoneId = zoneIds.get(facilityId);
+
+        if(zoneId == null) {
+            Feature location = locationLayer.get(facilityId);
+            zoneId = location.getAttribute(zoneIdKey);
+
+            if(zoneId == null) {
+                Zone zone = zones.get(location.getGeometry().getCoordinate());
+                if(zone != null) {
+                    zoneId = zone.getAttribute(zones.getPrimaryKey());
+                }
+            }
+            zoneIds.put(facilityId, zoneId);
+
+//            Id<ActivityFacility> facilityObjId = Id.create(facilityId, ActivityFacility.class);
+//            ActivityFacility facility = facilities.getFacilities().get(facilityObjId);
+//            Coordinate c = new Coordinate(facility.getCoord().getX(), facility.getCoord().getY());
+//
+//            Zone zone = zones.get(c);
+//            if(zone != null) {
+//                zoneId = zone.getAttribute(zones.getPrimaryKey());
+//                zoneIds.put(facilityId, zoneId);
+//            }
+        }
+
+        return zoneId;
+    }
+
+    @Override
+    public NumericMatrix build(Collection<? extends Person> persons) {
+        logger.debug("Start building matrix...");
         int n = persons.size() / 10000;
         n = Math.min(n, Executor.getFreePoolSize());
         n = Math.max(2, n);
@@ -66,7 +111,7 @@ public class DefaultMatrixBuilder {
 
         List<RunThread> runnables = new ArrayList<>(n);
         for(List<? extends Person> segment : segments) {
-            runnables.add(new RunThread(segment, predicate, useWeights));
+            runnables.add(new RunThread(segment, legPredicate, useWeights));
         }
 
         Executor.submitAndWait(runnables);
@@ -83,25 +128,8 @@ public class DefaultMatrixBuilder {
         if(errors > 0) {
             logger.warn(String.format("%s facilities cannot be located in a zone.", errors));
         }
+        logger.debug("Done building matrix.");
         return m;
-    }
-
-    private String getZoneId(String facilityId) {
-        String zoneId = zoneIds.get(facilityId);
-
-        if(zoneId == null) {
-            Id<ActivityFacility> facilityObjId = Id.create(facilityId, ActivityFacility.class);
-            ActivityFacility facility = facilities.getFacilities().get(facilityObjId);
-            Coordinate c = new Coordinate(facility.getCoord().getX(), facility.getCoord().getY());
-
-            Zone zone = zones.get(c);
-            if(zone != null) {
-                zoneId = zone.getAttribute(zones.getPrimaryKey());
-                zoneIds.put(facilityId, zoneId);
-            }
-        }
-
-        return zoneId;
     }
 
     public class RunThread implements Runnable {

@@ -19,8 +19,8 @@
 
 package playground.johannes.studies.matrix2014.sim;
 
+import org.apache.log4j.Logger;
 import playground.johannes.studies.matrix2014.analysis.MatrixBuilder;
-import playground.johannes.synpop.analysis.AnalyzerTask;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.matrix.NumericMatrix;
@@ -35,9 +35,11 @@ import java.util.Set;
  */
 public class MatrixSampler implements playground.johannes.studies.matrix2014.analysis.MatrixBuilder, MarkovEngineListener {
 
-    private final long start = 0;
+    private static final Logger logger = Logger.getLogger(MatrixSampler.class);
 
-    private final long step = 0;
+    private final long start;
+
+    private final long step;
 
     private long iteration;
 
@@ -49,7 +51,12 @@ public class MatrixSampler implements playground.johannes.studies.matrix2014.ana
 
     private MatrixBuilder builder;
 
-    private AnalyzerTask<NumericMatrix> analyzer;
+    public MatrixSampler(MatrixBuilder builder, long start, long step) {
+        this.builder = builder;
+        this.start = start;
+        this.step = step;
+        avrMatrix = new NumericMatrix();
+    }
 
     public void drawSample(Collection<? extends Person> persons) {
         NumericMatrix sample = builder.build(persons);
@@ -83,7 +90,9 @@ public class MatrixSampler implements playground.johannes.studies.matrix2014.ana
         iteration++;
 
         if(iteration >= start && iteration % step == 0) {
+            logger.debug(String.format("Drawing matrix sample. Current sample size = %s.", sampleSize));
             drawSample(population);
+            logger.debug("Done drawing matrix sample.");
         }
     }
 

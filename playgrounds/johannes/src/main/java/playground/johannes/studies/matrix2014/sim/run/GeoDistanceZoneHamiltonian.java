@@ -123,7 +123,7 @@ public class GeoDistanceZoneHamiltonian {
                         discretizer,
                         engine.getUseWeights());
 
-                hamiltonian.setErrorExponent(2.0);
+                hamiltonian.setErrorExponent(1.0);
 
                 hamiltonians.add(hamiltonian);
 //                hamiltonian.setPredicate(pred);

@@ -23,6 +23,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.ConfigGroup;
 import playground.johannes.studies.matrix2014.analysis.*;
+import playground.johannes.studies.matrix2014.gis.ActivityLocationLayer;
+import playground.johannes.studies.matrix2014.gis.ActivityLocationLayerLoader;
 import playground.johannes.synpop.analysis.AnalyzerTaskComposite;
 import playground.johannes.synpop.analysis.FileIOContext;
 import playground.johannes.synpop.analysis.HistogramWriter;
@@ -65,7 +67,8 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
     public Object load() {
         String zoneLayerName = config.getValue(ZONE_LAYER_NAME);
 
-        FacilityData facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
+//        FacilityData facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
+        ActivityLocationLayer locationLayer = (ActivityLocationLayer) dataPool.get(ActivityLocationLayerLoader.KEY);
         ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
         ZoneCollection zones = zoneData.getLayer(zoneLayerName);
 
@@ -101,6 +104,7 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
         composite.addComponent(distTask);
         composite.addComponent(marTask);
 
+//        DefaultMatrixBuilder builder = new DefaultMatrixBuilder(locationLayer, zones, zoneLayerName);
         MatrixComparator analyzer = new MatrixComparator(m, builder, composite);
         analyzer.setVolumeThreshold(threshold);
 
