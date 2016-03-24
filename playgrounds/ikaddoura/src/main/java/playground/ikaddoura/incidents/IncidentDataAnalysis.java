@@ -52,13 +52,19 @@ public class IncidentDataAnalysis {
 
 	private String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
 	private String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-berlin/";
-	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin-analysis-2016-03-01-2016-03-19/";
+	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin-analysis-filtered/";
 	
 	private boolean writeCSVFileForEachXMLFile = false;
 	
+	private boolean writeAllTrafficItems2ShapeFile = false;
+	private boolean writeDaySpecificTrafficItems2ShapeFile = true;
+	private String shpFileStartDateTime = "2016/02/11";
+	private String shpFileEndDateTime = "2016/02/11";
+	
 	// start and end date should be in the same month... TODO: Account for the different months' lengths, only weekdays etc.
-	private String startDateTime = "2016/03/01";
-	private String endDateTime = "2016/03/19";
+	private boolean writeNetworkChangeEventFiles = false;
+	private String networkChangeEventStartDateTime = "2016/02/11";
+	private String networkChangeEventEndDateTime = "2016/02/29";
 		
 // ##################################################################
 	
@@ -87,8 +93,8 @@ public class IncidentDataAnalysis {
 		this.inputDirectory = inputDirectory;
 		this.outputDirectory = outputDirectory;
 		this.writeCSVFileForEachXMLFile = writeCSVFileForEachXMLFile;
-		this.startDateTime = startDateTime;
-		this.endDateTime = endDateTime;
+		this.networkChangeEventStartDateTime = startDateTime;
+		this.networkChangeEventEndDateTime = endDateTime;
 	}
 
 	public void run() throws XMLStreamException, IOException {
@@ -113,16 +119,37 @@ public class IncidentDataAnalysis {
 		networkMapper.computeIncidentPaths();
 		final Map<String, Path> trafficItemId2path = networkMapper.getTrafficItemId2path();
 
-//		// write shape file which contains relevant incidents mapped to network links
-//		final Incident2SHPWriter shpWriter = new Incident2SHPWriter(this.tmc, this.trafficItems, trafficItemId2path);
-//		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks.shp", this.trafficItems.keySet());
-//		
-//		final Set<String> trafficItemsToCheck = networkMapper.getTrafficItemsToCheck();
-//		shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItemsLinks_WARNING.shp", trafficItemsToCheck);
+		final Incident2SHPWriter shpWriter = new Incident2SHPWriter(this.tmc, this.trafficItems, trafficItemId2path);
+
+		if (writeAllTrafficItems2ShapeFile) {
+			log.info("Writing all traffic items to shape file...");
+			
+			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_all.shp", this.trafficItems.keySet());
+			
+			final Set<String> trafficItemsToCheck = networkMapper.getTrafficItemsToCheck();
+			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_WARNING.shp", trafficItemsToCheck);
+		}
 		
-		// write network change events
-		final Incident2NetworkChangeEventsWriter nceWriter = new Incident2NetworkChangeEventsWriter(this.tmc, this.trafficItems, trafficItemId2path);
-		nceWriter.writeIncidentLinksToNetworkChangeEventFile(this.startDateTime, this.endDateTime, this.outputDirectory); 
+		if (writeDaySpecificTrafficItems2ShapeFile) {
+			log.info("Writing filtered traffic items to shape file(s)...");
+
+			final Set<String> filteredTrafficItems = new HashSet<>();
+			for (TrafficItem item : this.trafficItems.values()) {
+				if (DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) < DateTime.parseDateTimeToDateTimeSeconds(shpFileStartDateTime)
+						|| DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) > DateTime.parseDateTimeToDateTimeSeconds(shpFileEndDateTime) + (24 * 3600.)) {
+				} else {
+					filteredTrafficItems.add(item.getId());
+				}
+			}
+			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_" + shpFileStartDateTime + "_" + shpFileEndDateTime + ".shp", filteredTrafficItems);
+			shpWriter.writeCongestionInfo2ShapeFile(outputDirectory + "delays_" + shpFileStartDateTime + "_" + shpFileEndDateTime + ".shp", filteredTrafficItems);
+		}
+		
+		if (writeNetworkChangeEventFiles) {
+			// write network change events file and network incident shape file for each day
+			final Incident2NetworkChangeEventsWriter nceWriter = new Incident2NetworkChangeEventsWriter(this.tmc, this.trafficItems, trafficItemId2path);
+			nceWriter.writeIncidentLinksToNetworkChangeEventFile(this.networkChangeEventStartDateTime, this.networkChangeEventEndDateTime, this.outputDirectory);
+		}
 		
 		OutputDirectoryLogging.closeOutputDirLogging();
 	}

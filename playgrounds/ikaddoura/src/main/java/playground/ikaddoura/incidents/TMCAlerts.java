@@ -343,5 +343,15 @@ public class TMCAlerts {
 		return changedFreeSpeed;
 	}
 
+	public double getAdditionalTravelTime(TrafficItem trafficItem) {
+		
+		// Q: 
+		if (trafficItem.getTMCAlert().getPhraseCode().contains("Q1(5)")) {
+			return 5 * 60.;
+		} else {
+			return 0.;
+		}
+	}
+
 }
 

@@ -234,6 +234,99 @@ public class Incident2SHPWriter {
 		};
 		return incidentObject;
 	}
+
+	public void writeCongestionInfo2ShapeFile(String outputShpFile, Set<String> itemIdsToPrint) {
+		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
+				.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
+				.setName("Link")
+				.addAttribute("LinkId", String.class)
+				.addAttribute("IncidentId", String.class)
+				.addAttribute("Street", String.class)
+				.addAttribute("Alert", String.class)
+				.addAttribute("Message", String.class)
+				.addAttribute("Length", Double.class)
+				.addAttribute("Modes", String.class)
+				.addAttribute("Capacity", Double.class)
+				.addAttribute("Lanes", Double.class)
+				.addAttribute("Freespeed", Double.class)
+				.addAttribute("IncAddTime", Double.class)
+				.addAttribute("IncStart", String.class)
+				.addAttribute("IncEnd", String.class)
+				.create();
+		
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		for (String id : itemIdsToPrint) {		
+			if (trafficItemId2path.get(id) == null) {
+				// no path identified
+				log.warn("Skipping traffic item " + id + " because there is no path.");
+				
+			} else {
+				
+				double additionalTravelTimePath = tmc.getAdditionalTravelTime(trafficItems.get(id));
+				if ((int) additionalTravelTimePath == 0) {
+					// no congestion info
+				} else {					
+					double pathTravelTime = trafficItemId2path.get(id).travelTime;
+					
+					log.info("Path travel time: " + pathTravelTime);
+					log.info("Additional path travel time: " + additionalTravelTimePath);
+					
+					for (Link link : trafficItemId2path.get(id).links) {
+						double freespeedTravelTime = (link.getLength() / link.getFreespeed());
+						double additionalTravelTimeThisLink = ( freespeedTravelTime / pathTravelTime ) * additionalTravelTimePath;
+						
+						log.info("	-> Link: " + link.getId());				
+						log.info("		-> freespeed travel time: " + freespeedTravelTime);
+						log.info("		-> travel time share: " + freespeedTravelTime / pathTravelTime);
+						log.info("		-> additional travel time link: " + additionalTravelTimeThisLink);
+						
+						SimpleFeature feature = factory.createPolyline(
+								new Coordinate[] {
+										new Coordinate(MGC.coord2Coordinate(link.getFromNode().getCoord())),
+										new Coordinate(MGC.coord2Coordinate(link.getToNode().getCoord())) }
+								, createCongestionInfoObject(trafficItems.get(id), link, additionalTravelTimeThisLink)
+								, null);
+						features.add(feature);
+					}
+				}
+			}
+		}
+		
+		if (features.isEmpty()) {
+			log.warn("No traffic incidents. Nothing to write into a shape file.");
+		} else {
+			log.info("Writing out incident shapefile... ");
+			ShapeFileWriter.writeGeometries(features, outputShpFile);
+			log.info("Writing out incident shapefile... Done.");
+		}
+	}
+	
+	private Object[] createCongestionInfoObject(TrafficItem trafficItem, Link link, double additionalTravelTime) {
+		
+		Object[] incidentObject = new Object[] {
+				link.getId(),
+				trafficItem.getId(),
+				trafficItem.getOrigin().getDescription() + " --> " + trafficItem.getTo().getDescription(),
+				trafficItem.getTMCAlert().getPhraseCode(),
+				trafficItem.getTMCAlert().getDescription(),
+				link.getLength(),
+				
+				// the parameters under normal conditions
+				link.getAllowedModes(),
+				link.getCapacity(),
+				link.getNumberOfLanes(),
+				link.getFreespeed(),
+				
+				// incident additional travel time
+				additionalTravelTime,
+					
+				// start and end time
+				trafficItem.getStartDateTime(),
+				trafficItem.getEndDateTime()
+		};
+		return incidentObject;
+	}
 	
 }
 
