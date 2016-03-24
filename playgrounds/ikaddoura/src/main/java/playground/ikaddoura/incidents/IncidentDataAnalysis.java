@@ -86,15 +86,25 @@ public class IncidentDataAnalysis {
 			String inputDirectory,
 			String outputDirectory,
 			boolean writeCSVFileForEachXMLFile,
-			String startDateTime,
-			String endDateTime) {
+			boolean writeAllTrafficItems2ShapeFile,
+			boolean writeDaySpecificTrafficItems2ShapeFile,
+			String shpStartDateTime,
+			String shpEndDateTime,
+			boolean writeNetworkChangeEventFiles,
+			String nceStartDateTime,
+			String nceEndDateTime) {
 		
 		this.networkFile = networkFile;
 		this.inputDirectory = inputDirectory;
 		this.outputDirectory = outputDirectory;
 		this.writeCSVFileForEachXMLFile = writeCSVFileForEachXMLFile;
-		this.networkChangeEventStartDateTime = startDateTime;
-		this.networkChangeEventEndDateTime = endDateTime;
+		this.writeAllTrafficItems2ShapeFile = writeAllTrafficItems2ShapeFile;
+		this.writeDaySpecificTrafficItems2ShapeFile = writeDaySpecificTrafficItems2ShapeFile;
+		this.shpFileStartDateTime = shpStartDateTime;
+		this.shpFileEndDateTime = shpEndDateTime;
+		this.writeNetworkChangeEventFiles = writeNetworkChangeEventFiles;
+		this.networkChangeEventStartDateTime = nceStartDateTime;
+		this.networkChangeEventEndDateTime = nceEndDateTime;
 	}
 
 	public void run() throws XMLStreamException, IOException {
