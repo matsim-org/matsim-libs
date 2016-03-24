@@ -1,4 +1,4 @@
-package playground.polettif.crossings;
+package playground.polettif.crossings.run;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -7,14 +7,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.polettif.crossings.CreateCrossingsTimetable;
 
 import static org.junit.Assert.*;
 
-public class CreateCrossingsTimetableTest {
+public class RunCreateCrossingsTimetable {
 
 	@Test
 	public void testRun() {
-/*
+
 		String inputNetworkFile, inputConfigFile, inputEventsFile, inputCrossingsFile, outputNetworkChangeEventsFile;
 
 		String base = "C:/Users/polettif/Desktop/crossings/";
@@ -53,7 +54,7 @@ public class CreateCrossingsTimetableTest {
 		Scenario scenario02 = ScenarioUtils.loadScenario(config);
 		Controler controler02 = new Controler(scenario02);
 		controler02.run();
-*/
+
 	}
 
 }
