@@ -26,6 +26,7 @@ import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.opdyts.searchalgorithms.SelfTuner;
 
 public class OptimisePT {
 	@SuppressWarnings({ "rawtypes", "unused" })
@@ -33,6 +34,7 @@ public class OptimisePT {
 		System.out.println("STARTED ...");
 		
 		String path = "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\config.xml";
+//		String path = "/home/saleem/input/config.xml";
         Config config = ConfigUtils.loadConfig(path);
         MatsimServices controler = new Controler(config);
         final Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -60,8 +62,9 @@ public class OptimisePT {
 		Network network = scenario.getNetwork();
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		new CreatePseudoNetwork(schedule, network, "tr_").createNetwork();
-		NetworkWriter networkWriter =  new NetworkWriter(network);
-		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
+//		NetworkWriter networkWriter =  new NetworkWriter(network);
+//		networkWriter.write("/home/saleem/input/PseudoNetwork.xml");
+//		networkWriter.write("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\PseudoNetwork.xml");
 		final PTSchedule ptschedule = new PTSchedule(scenario, scenario.getTransitSchedule(),scenario.getTransitVehicles());//Decision Variable
 		
 			
@@ -85,9 +88,14 @@ public class OptimisePT {
 				MatsimRandom.getRandom(), interpolate, objectiveFunction,
 				includeCurrentBest);
 		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
-		randomSearch.run(0.0, 0.0); // TODO change this to adaptive gap weights
-
-		
+		randomSearch.setConvergenceTrackingFileName(originalOutputDirectory
+				+ "opdyts.con");
+		randomSearch.setOuterIterationLogFileName(originalOutputDirectory
+				+ "opdyts.opt");
+		// randomSearch.run(0.0, 0.0); // TODO change this to adaptive gap weights
+		final SelfTuner tuner = new SelfTuner(0.95);
+		tuner.setNoisySystem(true);
+		randomSearch.run(tuner);
 		System.out.println("... DONE.");
 	}
 }

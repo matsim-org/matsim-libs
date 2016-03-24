@@ -157,15 +157,15 @@ public class P0ControlHandler implements BasicEventHandler{
 			if(event.getTime()-bintime>500){
 				updateDelays((LinkEnterEvent)event);
 				bintime = event.getTime() - event.getTime()%500;
-				if(averagedelaylink2!=0)delaysLink2.put(bintime, averagedelaylink2);
-				if(averagedelaylink4!=0)delaysLink4.put(bintime, averagedelaylink4);
-				adjustCapacityP0(1, 1,bintime-500);
+				delaysLink2.put(bintime, averagedelaylink2);
+				delaysLink4.put(bintime, averagedelaylink4);
+				adjustCapacityP0(satcapacity2, satcapacity4,bintime-500);
 				double abspreslink2 = averagedelaylink2*satcapacity2;
 				double abspres1ink4 = averagedelaylink4*satcapacity4;	
 				double abspresdiff = Math.abs(abspreslink2 - abspres1ink4);
-				if(abspresdiff!=0)absolutepressuredifference.add(abspresdiff);
-				if(abspreslink2!=0)absolutepressurelink2.add(abspreslink2);
-				if(abspres1ink4!=0)absolutepressurelink4.add(abspres1ink4);
+				absolutepressuredifference.add(abspresdiff);
+				absolutepressurelink2.add(abspreslink2);
+				absolutepressurelink4.add(abspres1ink4);
 				capacitiesLink2.put(bintime-500, capacity2);
 				capacitiesLink4.put(bintime-500, capacity4);
 				//Capacities on day one
@@ -207,6 +207,7 @@ public class P0ControlHandler implements BasicEventHandler{
 		   if(iter==0){
 			   return;
 		   }
+		   System.out.println("Average Delays: "  + time + "..." + averagedelaylink2 + "..." + averagedelaylink4);
 		   double m = 0.1/iter;//To make the capacity change dependent on number of day/iteration
 		   if(lastcapacitiesLink2.get(time)!=null){
 			  capacity2=lastcapacitiesLink2.get(time);

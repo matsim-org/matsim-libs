@@ -96,7 +96,8 @@ public class PTMATSimSimulator<U extends DecisionVariable> implements
 		 */
 		final PTMATSimDecisionVariableSetEvaluator<U> matsimDecisionVariableEvaluator = new PTMATSimDecisionVariableSetEvaluator<>(
 				trajectorySampler, this.stateFactory, this.timeDiscretization,
-				this.relevantStopIds, this.scenario.getTransitSchedule());
+				this.relevantStopIds, this.scenario.getTransitSchedule(), scenario.getConfig().controler()
+				.getOutputDirectory());
 		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
 		// matsimDecisionVariableEvaluator.setStandardLogFileName("./opdyts.log");
 

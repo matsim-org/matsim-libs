@@ -41,7 +41,7 @@ public class P0Controller {
 		Controler controler = new Controler(scenario);
 		NetworkFactoryImpl nf = (NetworkFactoryImpl) scenario.getNetwork().getFactory();
 		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
-		controler.addControlerListener(new P0ControlListener((NetworkImpl) scenario.getNetwork()));
+		controler.addControlerListener(new GenericP0ControlListener((NetworkImpl) scenario.getNetwork()));
 		controler.run();
 	}
 
