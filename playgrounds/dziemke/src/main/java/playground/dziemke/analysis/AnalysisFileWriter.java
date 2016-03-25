@@ -104,7 +104,7 @@ public class AnalysisFileWriter {
 	}
 	
 	
-	public void writeToFileOther(Map<String, Integer> map, String outputFile) {
+	public void writeToFileOther(Map<String, Double> map, String outputFile) {
 		BufferedWriter bufferedWriter = null;
 
 		try {
@@ -113,7 +113,7 @@ public class AnalysisFileWriter {
 			bufferedWriter = new BufferedWriter(fileWriter);
 
 			for (String key : map.keySet()) {
-				int value = map.get(key);
+				double value = map.get(key);
 				bufferedWriter.write(key + "\t" + value);
 				bufferedWriter.newLine();
 			}
@@ -181,7 +181,7 @@ public class AnalysisFileWriter {
 	
 	
 	// file writer for comparison file routed distance vs. beeline distance
-	public void writeRoutedBeelineDistanceComparisonFile(Map<Id<Trip>, Double> mapRouted, Map<Id<Trip>, Double> mapBeeline, String outputFile, int tripCounter) {
+	public void writeRoutedBeelineDistanceComparisonFile(Map<Id<Trip>, Double> mapRouted, Map<Id<Trip>, Double> mapBeeline, String outputFile, double tripCounter) {
 		BufferedWriter bufferedWriter = null;
 		
 		try {

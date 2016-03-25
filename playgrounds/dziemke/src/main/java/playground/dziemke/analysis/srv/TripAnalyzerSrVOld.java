@@ -64,14 +64,14 @@ public class TripAnalyzerSrVOld {
 
 	public static void main(String[] args) throws IOException {
 		// Parameters
-		boolean useWeights = true;			//wt
+		boolean useWeights = false;			//wt
 		boolean onlyCar = false;			//car
 		boolean onlyCarAndCarPool = true;	//carp
 		boolean onlyHomeAndWork = false;	//hw
 		boolean distanceFilter = true;		//dist
 		boolean ageFilter = false;
 		
-		double minDistance_km = 0;
+		// double minDistance_km = 0;
 		double maxDistance_km = 100;
 		
 		Integer minAge = 80;
@@ -252,9 +252,9 @@ public class TripAnalyzerSrVOld {
 	    		if (tripDistanceBeeline_km >= maxDistance_km) {
 	    			considerTrip = false;
 	    		}
-	    		if (tripDistanceBeeline_km <= minDistance_km) {
-	    			considerTrip = false;
-	    		}
+//	    		if (tripDistanceBeeline_km <= minDistance_km) {
+//	    			considerTrip = false;
+//	    		}
 	    	}
 
 	    	// age
@@ -365,16 +365,18 @@ public class TripAnalyzerSrVOld {
 	    			// reliant to SrV variable variable "E_LAENGE_KUERZEST"; -7 = calculation not possible
 	    			if (tripDistanceRouted_km >= 0.) {
 	    				double averageTripSpeedRouted_km_h = tripDistanceRouted_km / tripDuration_h;
+	    				double weightedAverageTripSpeedRouted = weight * averageTripSpeedRouted_km_h;
 	    				AnalysisUtils.addToMapIntegerKeyCeiling(averageTripSpeedRoutedMap, averageTripSpeedRouted_km_h, binWidthSpeed_km_h, weight);
-	    				aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted_km_h;
+	    				aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + weightedAverageTripSpeedRouted;
 	    				aggregateWeightTripSpeedRouted = aggregateWeightTripSpeedRouted + weight;
 	    			}
 
 	    			// reliant on variable "V_LAENGE": -9 = no data, -10 = implausible
 	    			if (tripDistanceBeeline_km >= 0.) {			
 	    				double averageTripSpeedBeeline_km_h = tripDistanceBeeline_km / tripDuration_h;
+	    				double weightedAaverageTripSpeedBeeline = weight * averageTripSpeedBeeline_km_h;
 	    				AnalysisUtils.addToMapIntegerKeyCeiling(averageTripSpeedBeelineMap, averageTripSpeedBeeline_km_h, binWidthSpeed_km_h, weight);
-	    				aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline_km_h;
+	    				aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + weightedAaverageTripSpeedBeeline;
 	    				aggregateWeightTripSpeedBeeline = aggregateWeightTripSpeedBeeline + weight;
 	    			}
 	    		} else {
@@ -392,7 +394,6 @@ public class TripAnalyzerSrVOld {
 	    	}
 	    }
 	    
-	    
 	    // calculate averages (taking into account weights if applicable)
 	    double averageTime = aggregateTripDuration / aggregateWeightTripDuration;
 	    double averageTripDistanceRouted = aggregateTripDistanceRouted / aggregateWeightTripDistanceRouted;
@@ -400,7 +401,6 @@ public class TripAnalyzerSrVOld {
 	    double averageOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted / aggregateWeightTripSpeedRouted;
 	    double averageOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline / aggregateWeightTripSpeedBeeline;
 	    double averageOfAverageTripSpeedsProvided = aggregateOfAverageTripSpeedsProvided / aggregateWeightTripSpeedProvided;
-	    
 	    
 	    // write results to files
 	    new File(outputDirectory).mkdir();

@@ -49,16 +49,9 @@ public class TripAnalyzerOld {
 	private static final Integer minAge = 80; // typically "x0"
 	private static final Integer maxAge = 119; // typically "x9"; higehst number ususally chosen is 119
 
-	private static final int maxBinDuration_min = 120;
 	private static final int binWidthDuration_min = 1;
-
-	private static final int maxBinTime_h = 23;
 	private static final int binWidthTime_h = 1;
-
-	private static final int maxBinDistance_km = 60;
 	private static final int binWidthDistance_km = 1;
-
-	private static final int maxBinSpeed_km_h = 60;
 	private static final int binWidthSpeed_km_h = 1;
 
 
@@ -83,31 +76,31 @@ public class TripAnalyzerOld {
 	private static int tripCounterSpeed = 0;
 	private static int tripCounterIncomplete = 0;
 	
-	private static Map <Integer, Double> tripDurationMap = new TreeMap <Integer, Double>();
+	private static Map <Integer, Double> tripDurationMap = new TreeMap <>();
 	private static double aggregateTripDuration = 0.;
     
-	private static Map <Integer, Double> departureTimeMap = new TreeMap <Integer, Double>();
+	private static Map <Integer, Double> departureTimeMap = new TreeMap <>();
     
-	private static Map <String, Double> activityTypeMap = new TreeMap <String, Double>();
+	private static Map <String, Double> activityTypeMap = new TreeMap <>();
     
-	private static Map <Integer, Double> tripDistanceRoutedMap = new TreeMap <Integer, Double>();
+	private static Map <Integer, Double> tripDistanceRoutedMap = new TreeMap <>();
 	private static double aggregateTripDistanceRouted = 0.;
 	
-	private static Map <Integer, Double> tripDistanceBeelineMap = new TreeMap <Integer, Double>();
+	private static Map <Integer, Double> tripDistanceBeelineMap = new TreeMap <>();
 	private static double aggregateTripDistanceBeeline = 0.;
     
-	private static Map <Integer, Double> averageTripSpeedRoutedMap = new TreeMap <Integer, Double>();
+	private static Map <Integer, Double> averageTripSpeedRoutedMap = new TreeMap <>();
 	private static double aggregateOfAverageTripSpeedsRouted = 0.;
     
-	private static Map <Integer, Double> averageTripSpeedBeelineMap = new TreeMap <Integer, Double>();
+	private static Map <Integer, Double> averageTripSpeedBeelineMap = new TreeMap <>();
 	private static double aggregateOfAverageTripSpeedsBeeline = 0.;
     
 	private static int numberOfTripsWithNoCalculableSpeed = 0;
     
-	private static Map <Id<Trip>, Double> distanceRoutedMap = new TreeMap <Id<Trip>, Double>();
-	private static Map <Id<Trip>, Double> distanceBeelineMap = new TreeMap <Id<Trip>, Double>();
+	private static Map <Id<Trip>, Double> distanceRoutedMap = new TreeMap <>();
+	private static Map <Id<Trip>, Double> distanceBeelineMap = new TreeMap <>();
     
-	private static Map <String, Integer> otherInformationMap = new TreeMap <String, Integer>();
+	private static Map <String, Double> otherInformationMap = new TreeMap <>();
 	
 	
 	private static double averageTripDuration;
@@ -162,10 +155,10 @@ public class TripAnalyzerOld {
 	    }
 	    calculateAverages();
 	    
-	    otherInformationMap.put("Number of trips that have no previous activity", tripHandler.getNoPreviousEndOfActivityCounter());
-	    otherInformationMap.put("Number of trips that have no calculable speed", numberOfTripsWithNoCalculableSpeed);
-	    otherInformationMap.put("Number of incomplete trips (i.e. number of removed agents)", tripCounterIncomplete);
-	    otherInformationMap.put("Number of (complete) trips", tripCounter);
+	    otherInformationMap.put("Number of trips that have no previous activity", (double) tripHandler.getNoPreviousEndOfActivityCounter());
+	    otherInformationMap.put("Number of trips that have no calculable speed", (double) numberOfTripsWithNoCalculableSpeed);
+	    otherInformationMap.put("Number of incomplete trips (i.e. number of removed agents)", (double) tripCounterIncomplete);
+	    otherInformationMap.put("Number of (complete) trips", (double) tripCounter);
 	    
 	    writeResultFiles();
 	    
@@ -252,7 +245,7 @@ public class TripAnalyzerOld {
 			outputDirectory = outputDirectory + "_age_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
 		}
-		outputDirectory = outputDirectory + "_3"; // TODO in case used for double-check
+		outputDirectory = outputDirectory + "_10"; // TODO in case used for double-check
 	}
 	
 	
@@ -346,7 +339,7 @@ public class TripAnalyzerOld {
 	    new File(outputDirectory).mkdir();
 	    AnalysisFileWriter writer = new AnalysisFileWriter();
 	    writer.writeToFileIntegerKey(tripDurationMap, outputDirectory + "/tripDuration.txt", binWidthDuration_min, tripCounter, averageTripDuration);
-	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, tripCounter, averageTripDuration);
+	    writer.writeToFileIntegerKey(departureTimeMap, outputDirectory + "/departureTime.txt", binWidthTime_h, tripCounter, Double.NaN);
 	    writer.writeToFileStringKey(activityTypeMap, outputDirectory + "/activityTypes.txt", tripCounter);
 	    writer.writeToFileIntegerKey(tripDistanceRoutedMap, outputDirectory + "/tripDistanceRouted.txt", binWidthDistance_km, tripCounter, averageTripDistanceRouted);
 	    writer.writeToFileIntegerKey(tripDistanceBeelineMap, outputDirectory + "/tripDistanceBeeline.txt", binWidthDistance_km, tripCounter, averageTripDistanceBeeline);

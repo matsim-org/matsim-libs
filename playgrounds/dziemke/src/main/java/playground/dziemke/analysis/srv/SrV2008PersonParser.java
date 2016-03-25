@@ -106,14 +106,14 @@ public class SrV2008PersonParser {
 					personAttributes.putAttribute(person.getId().toString(), "age", age);
 				} else {
 					personAttributes.putAttribute(person.getId().toString(), "age", -1);
-					System.err.println("Age is not a positive number.");
+					log.warn("Age is not a positive number.");
 				}
 				
 				if (sex == 1 || sex == 2) {
 					personAttributes.putAttribute(person.getId().toString(), "sex", sex);
 				} else {
 					personAttributes.putAttribute(person.getId().toString(), "sex", -1);
-					System.err.println("Sex is neither male nor female.");
+					log.warn("Sex is neither male nor female.");
 				}
 				
 				if (employed == 8 || employed == 9 || employed == 10 || employed == 11 ) {
@@ -123,14 +123,14 @@ public class SrV2008PersonParser {
 					personAttributes.putAttribute(person.getId().toString(), "employed", 0);
 				} else {
 					personAttributes.putAttribute(person.getId().toString(), "employed", -1);
-					System.err.println("No information on employment.");
+					log.warn("No information on employment.");
 				}
 				
 				if (employed == 7) {
 					personAttributes.putAttribute(person.getId().toString(), "student", 1);
 				} else if (employed == -9 || employed == -10) {
 					personAttributes.putAttribute(person.getId().toString(), "student", -1);
-					System.err.println("No information on being student.");
+					log.warn("No information on being student.");
 				} else {
 					personAttributes.putAttribute(person.getId().toString(), "student", 0);
 				}
@@ -141,7 +141,7 @@ public class SrV2008PersonParser {
 					personAttributes.putAttribute(person.getId().toString(), "driversLicence", 0);
 				} else {
 					personAttributes.putAttribute(person.getId().toString(), "driversLicence", 0);
-					System.err.println("No information on driver's licence.");
+					log.warn("No information on driver's licence.");
 				}
 			}
 		} catch (IOException e) {
