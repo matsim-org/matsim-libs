@@ -27,12 +27,12 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -45,7 +45,7 @@ import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import playground.dziemke.analysis.Trip;
@@ -53,23 +53,15 @@ import playground.dziemke.analysis.Trip;
 /**
  * @author dziemke
  */
-public class SrVConverter {
-	private final static Logger log = Logger.getLogger(SrVConverter.class);
+public class SrV2PlansAndEventsConverter {
+	private final static Logger log = Logger.getLogger(SrV2PlansAndEventsConverter.class);
 
 	public static void convert(TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap, Network network, CoordinateTransformation ct, String outputDirectory) {
 		
-		
-		// create objects
-		// for writing plans files (newer ones...)
 		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		
-		
-		
-		Population population = scenario.getPopulation();
+		Population population = PopulationUtils.createPopulation(config);
 		PopulationFactory populationFactory = population.getFactory();
-		
-		
+				
 		List<Event> events = new ArrayList<Event>();
 	
 	    // add activities from map to plans
@@ -90,6 +82,7 @@ public class SrVConverter {
 	    	
 	    	// TODO exclude trip if first activity is not "home"
 	    	
+	    	// since this is a tree map the trips should be returned in ascending order
 	    	for (double departureTime : tripsMap.keySet()) {
 	    		tripMapEntryCounter++;
 	    		
@@ -113,8 +106,8 @@ public class SrVConverter {
 				}
 				
 				Activity endingActivity = populationFactory.createActivityFromCoord(activityTypeEndingActivity, ct.transform(departureCoordinates));
-	    		double departureTimeInSeconds = trip.getDepartureTime_s();
-				endingActivity.setEndTime(departureTimeInSeconds);
+	    		double departureTime_s = trip.getDepartureTime_s();
+				endingActivity.setEndTime(departureTime_s);
 				
 				plan.addActivity(endingActivity);
 	    		
@@ -132,30 +125,30 @@ public class SrVConverter {
 		    		Activity startingActivity = populationFactory.createActivityFromCoord(activityTypeStartingActivity, ct.transform(arrivalCoordinates));
 		    		plan.addActivity(startingActivity);
 	    		}
-				
 	    		
 				// events
-				ActivityEndEvent activityEndEvent = new ActivityEndEvent(departureTimeInSeconds, personId, null, null, activityTypeEndingActivity);
+	    		// TODO maybe add link here
+	    		Id<Link> departureLinkId = null;
+	    		
+				ActivityEndEvent activityEndEvent = new ActivityEndEvent(departureTime_s, personId, departureLinkId, null, activityTypeEndingActivity);
 				events.add(activityEndEvent);
-//				eventsMap.put(departureTimeInSeconds, activityEndEvent);
 				// TODO make mode adjustable
-				PersonDepartureEvent personDepartureEvent = new PersonDepartureEvent(departureTimeInSeconds, personId, null, "car");
+				PersonDepartureEvent personDepartureEvent = new PersonDepartureEvent(departureTime_s, personId, departureLinkId, "car");
 				events.add(personDepartureEvent);
-//				eventsMap.put(departureTimeInSeconds, personDepartureEvent);
 				
-				double arrivalTimeInSeconds = trip.getArrivalTime_s();
+				double arrivalTime_s = trip.getArrivalTime_s();
+				// TODO maybe add link here
+	    		Id<Link> arrivalLinkId = null;
 				// TODO make mode adjustable
-				PersonArrivalEvent personArrivalEvent = new PersonArrivalEvent(arrivalTimeInSeconds, personId, null, "car");
+				PersonArrivalEvent personArrivalEvent = new PersonArrivalEvent(arrivalTime_s, personId, arrivalLinkId, "car");
 				events.add(personArrivalEvent);
-//				eventsMap.put(arrivalTimeInSeconds, personArrivalEvent);
-				ActivityStartEvent activityStartEvent = new ActivityStartEvent(arrivalTimeInSeconds, personId, null, null, activityTypeStartingActivity);
+				ActivityStartEvent activityStartEvent = new ActivityStartEvent(arrivalTime_s, personId, arrivalLinkId, null, activityTypeStartingActivity);
 				events.add(activityStartEvent);	
-//				eventsMap.put(arrivalTimeInSeconds, activityStartEvent);
 	    	}  	
 	    }	    
 	    
 	    // write population
-	    MatsimWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
+	    MatsimWriter popWriter = new PopulationWriter(population, network);
 	    popWriter.write(outputDirectory + "plans.xml");
 	    
 	    //  write events

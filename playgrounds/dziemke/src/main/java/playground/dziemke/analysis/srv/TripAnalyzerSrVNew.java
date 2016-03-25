@@ -9,8 +9,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.dziemke.analysis.AnalysisFileWriter;
 import playground.dziemke.analysis.AnalysisUtils;
@@ -30,7 +33,7 @@ public class TripAnalyzerSrVNew {
 	private static final boolean onlyHomeAndWork = false;	//hw
 	
 	private static final boolean distanceFilter = true;		//dist
-	// private static final double double minDistance = 0;
+	private static final double minDistance_km = 0; // TODO switch back off
 	private static final double maxDistance_km = 100;
 	
 	private static final boolean ageFilter = false;
@@ -49,7 +52,7 @@ public class TripAnalyzerSrVNew {
 	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 //	private static finalString shapeFile = "/Users/dominik/Workspace/data/srv/input/RBS_OD_STG_1412/RBS_OD_STG_1412.shp";
 			
-	private static String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/output/wd";
+	private static String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/analysis/srv/output/wd_new";
 
 	/* Variables to store information */
 	private static double aggregatedWeightOfConsideredTrips = 0;
@@ -64,6 +67,12 @@ public class TripAnalyzerSrVNew {
 		double aggregatedWeightOfTripsWithNonNegativeDistanceRoutedSurvey = 0.;
 		double aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey = 0;
 		double aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey = 0;
+		
+		//
+		String fromCRS = "EPSG:31468"; // GK4
+		String toCRS = "EPSG:31468"; // GK4
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(fromCRS, toCRS);
+		//
 		
 		adaptOutputDirectory();
 	    
@@ -141,6 +150,10 @@ public class TripAnalyzerSrVNew {
 	    writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
 	    
 	    log.info(numberOfInIncompleteTrips + " trips are incomplete.");
+	    
+	    /* Create plans and events */
+	    TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = createPersonTripsMap(trips);
+	    SrV2PlansAndEventsConverter.convert(personTripsMap, network, ct, outputDirectory + "/");
 	}
 	
 	
@@ -285,6 +298,28 @@ public class TripAnalyzerSrVNew {
     	}
 		return sumOfAllAverageSpeedsRouted_km_h / sumOfAllWeights;
 	}
+	
+	static TreeMap<Id<Person>, TreeMap<Double, Trip>> createPersonTripsMap(List<Trip> trips) {
+		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = new TreeMap<Id<Person>, TreeMap<Double, Trip>>();
+		
+		for (Trip trip : trips) {
+			String personId = trip.getPersonId().toString();
+			Id<Person> idPerson = Id.create(personId, Person.class);
+			
+			if (!personTripsMap.containsKey(idPerson)) {
+				TreeMap<Double, Trip> tripsMap = new TreeMap<Double, Trip>();
+				personTripsMap.put(idPerson, tripsMap);
+			}
+		
+			double departureTime_s = trip.getDepartureTime_s();
+			if (personTripsMap.get(idPerson).containsKey(departureTime_s)) {
+				new RuntimeException("Person may not have two activites ending at the exact same time.");
+			} else {
+				personTripsMap.get(idPerson).put(departureTime_s, trip);
+			}
+		}
+		return personTripsMap;
+	}
 	/* SrV-specific calculations -- End */
 	
 	
@@ -362,9 +397,9 @@ public class TripAnalyzerSrVNew {
 	    	if (distanceFilter == true && tripDistanceBeeline_km >= maxDistance_km) {
 	    		continue;
 	    	}
-//	    	if (distanceFilter == true && tripDistanceBeeline_km <= minDistance_km) {
-//	    		continue;
-//	    	}
+	    	if (distanceFilter == true && tripDistanceBeeline_km <= minDistance_km) { // TODO switch back off
+	    		continue;
+	    	}
 
 	    	// age
 	    	String personId = trip.getPersonId().toString();

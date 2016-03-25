@@ -112,24 +112,12 @@ public class TripAnalyzerSrVOld {
 		log.info("Finished parsing persons.");
 		
 		
-		// create objects
-		// for writing plans files (newer ones...)
-//		Config config = ConfigUtils.createConfig();
-//		Scenario scenario = ScenarioUtils.createScenario(config);
-		
+		// create objects		
 		TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap = new TreeMap<Id<Person>, TreeMap<Double, Trip>>();
-		
-//		Population population = scenario.getPopulation();
-//		PopulationFactory populationFactory = population.getFactory();
-		
-//		NetworkReaderMatsimV1 networkReader = new NetworkReaderMatsimV1(scenario.getNetwork());
-//		networkReader.parse(networkFile);
 		
 		Network network = NetworkUtils.createNetwork();
 	    MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
 	    networkReader.readFile(networkFile);
-		
-//		List<Event> events = new ArrayList<Event>();
 		
 		String fromCRS = "EPSG:31468"; // GK4
 		String toCRS = "EPSG:31468"; // GK4
@@ -401,110 +389,6 @@ public class TripAnalyzerSrVOld {
 	    // return number of trips that have no calculable speed
 	    log.warn("Number of trips that have no calculable speed is: " + numberOfTripsWithNoCalculableSpeed);
 	    
-	    SrVConverter.convert(personTripsMap, network, ct, outputDirectory);
-	    
-//	    
-//	    // add activities from map to plans
-//	    int tripMapEntryCounter = 0;
-//	    
-//	    for (Id<Person> personId : personTripsMap.keySet()) {
-//	    	
-//	    	// add person to population
-//	    	if (!population.getPersons().containsKey(personId)) {
-//	    		Person person = populationFactory.createPerson(personId);
-//	    		Plan plan = populationFactory.createPlan();
-//    			person.addPlan(plan);
-//    			population.addPerson(person);
-//    		}
-//	    	
-//	    	TreeMap<Double, Trip> tripsMap = personTripsMap.get(personId);
-//	    	Person person = population.getPersons().get(personId);
-//	    	
-//	    	// TODO exclude trip if first activity is not "home"
-//	    	
-//	    	for (double departureTime : tripsMap.keySet()) {
-//	    		tripMapEntryCounter++;
-//	    		
-//	    		// plans
-//	    		Plan plan = person.getPlans().get(0);
-//	    		
-//	    		Trip trip = tripsMap.get(departureTime);
-//
-//	    		// TODO substitute zone by something better; or use alternative (new... as discussed earlier...) data structure that can handle zones
-//	    		double x = Double.parseDouble(trip.getDepartureZoneId().toString());
-//	    		double y = x;
-//	    		// TODO add appropriate coordinate transformation
-//				Coord departureCoordinates = new Coord(x, y);
-//	    		
-//
-//				Id<Person> idToBeChecked = Id.create("1363_1", Person.class);
-//				
-//				String activityTypeEndingActivity = trip.getActivityEndActType();	
-//				if (personId == idToBeChecked) {
-//					System.err.println("personId = " + personId + " -- trip.getActivityEndActType() = "	+ activityTypeEndingActivity);
-//				}
-//				
-//				Activity endingActivity = populationFactory.createActivityFromCoord(activityTypeEndingActivity, ct.transform(departureCoordinates));
-//	    		double departureTimeInMinutes = trip.getDepartureTime_s();
-//	    		double departureTimeInSeconds = departureTimeInMinutes * 60;
-//				endingActivity.setEndTime(departureTimeInSeconds);
-//				
-//				plan.addActivity(endingActivity);
-//	    		
-//	    		// TODO make mode adjustable; right now its okay since non-car trips are excluded anyways
-//	    		Leg leg = populationFactory.createLeg("car");
-//	    		plan.addLeg(leg);
-//	    		
-//	    		// last activity
-//	    		String activityTypeStartingActivity = trip.getActivityStartActType();
-//	    		
-//	    		if (departureTime == tripsMap.lastKey()) {
-//		    		double x2 = Double.parseDouble(trip.getArrivalZoneId().toString());
-//		    		double y2 = x2;
-//		    		Coord arrivalCoordinates = new Coord(x2, y2);
-//		    		Activity startingActivity = populationFactory.createActivityFromCoord(activityTypeStartingActivity, ct.transform(arrivalCoordinates));
-//		    		plan.addActivity(startingActivity);
-//	    		}
-//				
-//	    		
-//				// events
-//				ActivityEndEvent activityEndEvent = new ActivityEndEvent(departureTimeInSeconds, personId, null, null, activityTypeEndingActivity);
-//				events.add(activityEndEvent);
-////				eventsMap.put(departureTimeInSeconds, activityEndEvent);
-//				// TODO make mode adjustable
-//				PersonDepartureEvent personDepartureEvent = new PersonDepartureEvent(departureTimeInSeconds, personId, null, "car");
-//				events.add(personDepartureEvent);
-////				eventsMap.put(departureTimeInSeconds, personDepartureEvent);
-//				
-//				double arrivalTimeInMinutes = trip.getArrivalTime_s();
-//				double arrivalTimeInSeconds = arrivalTimeInMinutes * 60;
-//				// TODO make mode adjustable
-//				PersonArrivalEvent personArrivalEvent = new PersonArrivalEvent(arrivalTimeInSeconds, personId, null, "car");
-//				events.add(personArrivalEvent);
-////				eventsMap.put(arrivalTimeInSeconds, personArrivalEvent);
-//				ActivityStartEvent activityStartEvent = new ActivityStartEvent(arrivalTimeInSeconds, personId, null, null, activityTypeStartingActivity);
-//				events.add(activityStartEvent);	
-////				eventsMap.put(arrivalTimeInSeconds, activityStartEvent);
-//	    	}  	
-//	    }	    
-//	    
-//	    // write population
-//	    MatsimWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
-//	    popWriter.write(outputDirectory + "plans.xml");
-//	    
-//	    //  write events
-//	    // TODO have events sorted by time
-//	    int eventsCounter = 0;
-//	    EventWriterXML eventWriter = new EventWriterXML(outputDirectory + "events.xml");
-////	    for (Event event : eventsMap.values()) {
-//	    for (Event event : events) {
-//	    	eventWriter.handleEvent(event);
-//	    	eventsCounter++;
-//	    }
-//	    eventWriter.closeFile();
-//	    
-//	    // print counters
-//	    System.out.println("tripMapEntryCounter = " + tripMapEntryCounter);
-//	    System.out.println("events added: " + eventsCounter);
+	    SrV2PlansAndEventsConverter.convert(personTripsMap, network, ct, outputDirectory);
 	}
 }
