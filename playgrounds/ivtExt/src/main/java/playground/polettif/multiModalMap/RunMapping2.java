@@ -26,19 +26,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.TransitScheduleValidator;
-import playground.polettif.boescpa.converters.osm.Osm2Network;
-import playground.polettif.multiModalMap.gtfs.GTFSReader;
 import playground.polettif.multiModalMap.mapping.PTMapperLinkScoring;
 
-public class RunMapping {
+public class RunMapping2 {
 
-	protected static Logger log = Logger.getLogger(RunMapping.class);
+	protected static Logger log = Logger.getLogger(RunMapping2.class);
 
 
 	public static void main(final String[] args) {
@@ -46,45 +42,31 @@ public class RunMapping {
 		boolean reloadGTFS = false;
 		boolean reloadNetwork = false;
 
-		String base = "C:/Users/Flavio/Desktop/";
+		String base = "C:/Users/Flavio/Desktop/data/ptMappingTest/";
 
 		// input
-		final String gtfsPath = base + "data/gtfs/zvv/";
-		final String osmFile = base + "data/osm/zurich-plus.osm";
+		final String mtsFile = base + "testSchedule_full.xml";
 
-		final String mtsFile = base + "data/mts/zvv_unmappedSchedule_WGS84.xml";
-//		final String mtsFile = base + "data/mts/zvv_69er.xml";
+		final String networkFile = base + "network_berlin.xml.gz";
 
-		final String networkFile = base + "data/network/zurich-plus.xml.gz";
+		final String outbase = base + "output/";
 
-		final String outbase = base + "output/mtsMapping/";
-
-		final String outCoordinateSystem = "CH1903_LV03_Plus";
+		final String outCoordinateSystem = "GK4"; //"CH1903_LV03_Plus";
 
 		// fields
 		TransitSchedule schedule;
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, outCoordinateSystem);
+	//	CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, outCoordinateSystem);
 
 		final String path_MixedSchedule = outbase + "schedule.xml";
 		final String path_MixedNetwork = outbase + "network.xml";
 
 		// Load Schedule
-		if (reloadGTFS) {
-			GTFSReader gtfsReader = new GTFSReader(gtfsPath);
-			gtfsReader.writeTransitSchedule(mtsFile);
-			//schedule = gtfsReader.getTransitSchedule();
-		}
-		new TransitScheduleReader(coordinateTransformation, scenario).readFile(mtsFile);
+		new TransitScheduleReader(scenario).readFile(mtsFile);
 		schedule = scenario.getTransitSchedule();
 
 
 		// Load Network
-		if (reloadNetwork) {
-			// TODO coordinate transformation in Osm2Network
-			Osm2Network.main(new String[]{osmFile, networkFile});
-		}
-
 		(new MatsimNetworkReader(scenario.getNetwork())).readFile(networkFile);
 		Network network = scenario.getNetwork();
 

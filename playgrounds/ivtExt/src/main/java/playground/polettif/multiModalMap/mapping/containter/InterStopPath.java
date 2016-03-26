@@ -26,27 +26,22 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class InterStopRoute {
+public class InterStopPath {
 
-	private static Map<Tuple, Double> minTT = new HashMap<>();
-	private static Map<Tuple, Double> minDist1 = new HashMap<>();
-	private static Map<Tuple, Double> minDist2 = new HashMap<>();
+	private final Tuple<Link, Link> id;
+	private final TransitRouteStop fromStop;
+	private final TransitRouteStop toStop;
+	private final Link fromLink;
+	private final Link toLink;
+	private final List<Link> pathLinks;
 
 	private double travelTime;
-	private Link fromLink;
-	private Link toLink;
 	private LeastCostPathCalculator.Path path;
-	private TransitRouteStop fromStop;
-	private TransitRouteStop toStop;
 	private double distanceStartFacilityToLink;
 	private double distanceEndFacilityToLink;
-	private List<Link> links;
 
 	/**
 	 *
@@ -56,22 +51,19 @@ public class InterStopRoute {
 	 * @param toLink the corresponding end Link
 	 * @param path between fromLink.toNode and toLink.fromNode (note: does not include start and end link, they are added on construction)
 	 */
-	public InterStopRoute(TransitRouteStop fromStop, TransitRouteStop toStop, Link fromLink, Link toLink, LeastCostPathCalculator.Path path) {
+	public InterStopPath(TransitRouteStop fromStop, TransitRouteStop toStop, Link fromLink, Link toLink, LeastCostPathCalculator.Path path) {
 		this.fromStop = fromStop;
 		this.toStop = toStop;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
+		this.id = new Tuple<>(fromLink, toLink);
 
 		if(path.links.size() == 0) {
-			List<Link> linksConstr = new ArrayList<>();
-			linksConstr.add(fromLink);
-			linksConstr.add(toLink);
-			this.links = linksConstr;
+			// links are immediately next to each other
+			this.pathLinks = null;
 			this.travelTime = 0;
 		} else {
-			this.links = path.links;
-			this.links.add(0, fromLink);
-			this.links.add(toLink);
+			this.pathLinks = path.links;
 			this.travelTime = path.travelTime;
 		}
 
@@ -80,20 +72,27 @@ public class InterStopRoute {
 	}
 
 	/**
-	 * @return a list of link ids between the two stops, the end link is included!
+	 * @return all pathLinks part of the path, including the first and last link
 	 */
-	public List<Id<Link>> getIntermediateLinkIds() {
-		List<Id<Link>> list = getLinkIds();
-		list.remove(0);
+	public List<Id<Link>> getAllLinkIds() {
+		List<Id<Link>> list = new ArrayList<>();
+		list.add(fromLink.getId());
+		if(pathLinks != null) {
+			list.addAll(getIntermediateLinkIds());
+		}
+		list.add(toLink.getId());
 
 		return list;
 	}
 
 	/**
-	 * @return all links part of the path, including the first and last link
+	 * @return a list of link ids between the two stops
 	 */
-	public List<Id<Link>> getLinkIds() {
-		return links.stream().map(Link::getId).collect(Collectors.toList());
+	public List<Id<Link>> getIntermediateLinkIds() {
+		if(pathLinks != null)
+			return pathLinks.stream().map(Link::getId).collect(Collectors.toList());
+		else
+			return null;
 	}
 
 	/**
@@ -122,6 +121,24 @@ public class InterStopRoute {
 		return travelTime;
 	}
 
+	public Double getDistanceStartFacilityToLink() {
+		return distanceStartFacilityToLink;
+	}
+
+	public Double getdistanceEndFacilityToLink() {
+		return distanceEndFacilityToLink;
+	}
+
+	public Tuple<Link, Link> getId() {
+		return id;
+	}
+
+	public static List<Id<Link>> getLinkIdsFromPath(LeastCostPathCalculator.Path path) {
+		return path.links.stream().map(Link::getId).collect(Collectors.toList());
+
+	}
+
+	@Deprecated
 	public Double getScore(int i, int i1, int i2) {
 		return 1.0;
 	}

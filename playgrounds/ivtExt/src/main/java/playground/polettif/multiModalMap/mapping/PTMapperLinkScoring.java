@@ -38,55 +38,52 @@ import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmarksSimpleRouting;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
-import playground.polettif.multiModalMap.mapping.containter.AllInterStopRoutes;
-import playground.polettif.multiModalMap.mapping.containter.InterStopRoute;
-import playground.polettif.multiModalMap.mapping.containter.InterStopRoutes;
+import playground.polettif.multiModalMap.mapping.containter.SubRoutes;
+import playground.polettif.multiModalMap.mapping.containter.InterStopPath;
+import playground.polettif.multiModalMap.mapping.containter.InterStopPathSet;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
- * Default implementation of PTLinesCreator.
- *
- * V3:
- * combined linking stopFacilities to links and routing
- * calculates routes for all stops and adds weigh for used links in route
- *
+ * Combines routing and referencing of stopFacilities. What happens for each route:
+ * <ol>
+ * <li>getting linkCandidates for each routeStop</li>
+ * <li>routes between linkCandidates for several/all pairs of stops</li>
+ * <li>calculate linkWeights for links used by the routes (basically the more a link is used by different paths, the better its weight)</li>
+ * <li>reference the most plausible link to a stopFacilities. The plausibilityScore is calculated with the link weight and the distance between link and stopfacility</li>
+ * <li>routing between the now fixed stoplinks of the route</li>
+ * </ol>
+ * 
+ * Already calculated path, route pairs and weights are stored.
+ * 
  * @author polettif
  */
-public class PTMapperV3 extends PTMapper {
+public class PTMapperLinkScoring extends PTMapper {
 
 	// TODO ensure coordinate system is not WGS84 since this is not suitable for coordinate calculations
 
 	// params TODO move to a config?
-	private final static double NODE_SEARCH_RADIUS = 200; //[m] 150
+	private final static double NODE_SEARCH_RADIUS = 300; //[m] 150
 	private final static int MAX_N_CLOSEST_LINKS = 6; // number of link candidates considered for all stops
-	private final static int LOOKAHEAD_STOPS = 5; // number of next stops that should be included in calculations
+	private final static int LOOKAHEAD_STOPS = 10; // number of next stops that should be included in calculations
 	private final static int MAX_INITIAL_ARTIFICIAL_LINK_LENGTH = 1000; // maximal length of artificial links
-	private final static double AZIMUTH_TOLERANCE = Math.PI*50/200; // maximal length of artificial links
 
-	// not used
-	private final static double MAX_FACILITY_NODE_DISTANCE = 100;
-	private final static double MAX_FACILITY_LINK_DISTANCE = 50;
-
-	private final static double WEIGHT_TRAVELTIME_COMPARED_TO_STOPFACILITY_DISTANCE = 1.0;
-
-	private final static String PREFIX_SPLIT_LINKS = "split_";
 	private final static String PREFIX_ARTIFICIAL_LINKS = "pt_";
 
 	// TODO use transit modes
 	private final Set<String> transitModes = Collections.singleton(TransportMode.pt);
 
-	int artificialId = 0;
+	private int artificialId = 0;
 	private Map<TransitStopFacility, List<Link>> allClosestLinks = new HashMap<>();
-	private Map<List<TransitRouteStop>, Map<Id<Link>, Double>> linkWeights = new HashMap<>(); // todo store all linkweights to save time for recurring calculations
 
-
-	public PTMapperV3(TransitSchedule schedule) {
+	/**
+	 * Constructor
+	 */
+	public PTMapperLinkScoring(TransitSchedule schedule) {
 		super(schedule);
 	}
 
-	public PTMapperV3(TransitSchedule schedule, Network network) {
+	public PTMapperLinkScoring(TransitSchedule schedule, Network network) {
 		super(schedule, network);
 	}
 
@@ -104,13 +101,14 @@ public class PTMapperV3 extends PTMapper {
 
 		Counter counterLine = new Counter("route # ");
 
-		/*
+		/** [1]
 		* preload closest links
 		* stopfacilities with no links within search radius need artificial links and nodes before routing starts
 		*/
 		List<TransitStopFacility> facilitiesTooFar = new ArrayList<>();
 		NetworkImpl networkImpl = ((NetworkImpl) network); // used by search for nearest node
 		for(TransitStopFacility stopFacility : this.schedule.getFacilities().values()) {
+			
 			// limits number of links, for all links within search radius use Tools.findClosestLinks()
 			List<Link> closestLinks = Tools.findOnlyNClosestLinks(networkImpl, stopFacility.getCoord(), NODE_SEARCH_RADIUS, MAX_N_CLOSEST_LINKS);
 
@@ -138,7 +136,7 @@ public class PTMapperV3 extends PTMapper {
 			}
 		}
 
-		/*
+		/**
 		* create artificial links for facilities initially too far from a network node. Can now use artificial links.
 		* Still not perfect, but acceptable since stopfacilities outside the map area are normally not that relevant
 		 */
@@ -158,56 +156,48 @@ public class PTMapperV3 extends PTMapper {
 			allClosestLinks.put(stopFacility, newList);
 		}
 
-		new NetworkWriter(network).write("C:/Users/polettif/Desktop/output/test/artificailnet.xml");
-
-
-		/*
+		/**
 		* initiate router
 		*/
 		PTLRouter router = new PTLRFastAStarLandmarksSimpleRouting(this.network);
 
-		/*
-		* loop throgh
+		/**
+		*
 		* - lines
 		*   - routes
 		* 	   - stops
-		* 	     look at pairs of stops
-		* 	     - get set of close links (linkCandidates) for each stop
-		*          - route between all linkCandidates
-		*            assign score value to routes (using traveltime and facility-link distance
-		*            use route (between two stops) with the best score
-		*      combine best subroutes to route (linkSequence)
+		* 	   - calculate link weights
+		* 	   - assign best scoring links to stopFacilities
+		* 	   - route between assigned links
+		* 	   - add link sequence to schedule
+		* 	     
 		*/
-		AllInterStopRoutes allInterStopRoutes = new AllInterStopRoutes();
+		SubRoutes subRoutes = new SubRoutes();
 
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			log.info("Line "+ line.getId());
 			for(TransitRoute route : line.getRoutes().values()) {
 
 				List<TransitRouteStop> routeStops = route.getStops();
-				TransitRouteStop firstStop = routeStops.get(0);
-				TransitRouteStop endStop = routeStops.get(routeStops.size() - 1);
-				Double firstEndStopDistance = CoordUtils.calcEuclideanDistance(firstStop.getStopFacility().getCoord(), endStop.getStopFacility().getCoord());
 
-				// TODO ! circular lines and so on cannot be routed from first stop to last stop (are excluded now)
-				// TODO maybe include some maximal angular difference or so...
-
-				// TODO currently only busses
-				if(route.getTransportMode().equals("bus") && firstEndStopDistance > NODE_SEARCH_RADIUS*3) {
+				if(route.getTransportMode().equals("bus")) {
 					log.info("     Route " + route.getId());
 					counterLine.incCounter();
 
-					HashMap<Id<Link>, Double> routeLinkWeights = new HashMap<>();
-
-					// iterate through all stops of the route and calculate best scores
+					/** [2]
+					 * iterate through all stops of the route and get paths
+					 */
 					for (int i = 0; i < routeStops.size(); i++) {
 						TransitRouteStop currentStop = routeStops.get(i);
-						for (int j = i; j <= i + LOOKAHEAD_STOPS && j < routeStops.size(); j++) {
+						
+						// calculate linkWeight for between the current stop and some stops ahead (defined in LOOKAHEAD_STOPS)
+						for (int j = i+1; j <= i + LOOKAHEAD_STOPS && j < routeStops.size(); j++) {
 							TransitRouteStop nextStop = routeStops.get(j);
-							InterStopRoutes interStopRoutes = new InterStopRoutes(currentStop, nextStop);
+
+							InterStopPathSet currentInterStopPaths = new InterStopPathSet(currentStop, nextStop);
 
 							// check if part of current and next stop was already routed
-							if (!allInterStopRoutes.contains(currentStop, nextStop)) {
+							if (!subRoutes.contains(currentStop, nextStop)) {
 								List<Link> closestLinksCurrent = allClosestLinks.get(currentStop.getStopFacility());
 								List<Link> closestLinksNext = allClosestLinks.get(nextStop.getStopFacility());
 
@@ -216,140 +206,76 @@ public class PTMapperV3 extends PTMapper {
 									for (Link linkCandidateNext : closestLinksNext) {
 										if (!linkCandidateCurrent.equals(linkCandidateNext)) {
 											LeastCostPathCalculator.Path pathCandidate = router.calcLeastCostPath(linkCandidateCurrent.getToNode(), linkCandidateNext.getFromNode(), null, null);
-											interStopRoutes.add(new InterStopRoute(currentStop, nextStop, linkCandidateCurrent, linkCandidateNext, pathCandidate));
+											InterStopPath isp = new InterStopPath(currentStop, nextStop, linkCandidateCurrent, linkCandidateNext, pathCandidate);
+											currentInterStopPaths.add(isp);
 										}
 									}
 								}
-								allInterStopRoutes.add(interStopRoutes);
-							}
 
-							Map<Id<Link>, Double> tmpLinkWeights = allInterStopRoutes.get(currentStop, nextStop).getLinkWeights();
-
-							for (Map.Entry<Id<Link>, Double> entry : tmpLinkWeights.entrySet()) {
-								if (routeLinkWeights.containsKey(entry.getKey())) {
-									routeLinkWeights.put(entry.getKey(), routeLinkWeights.get(entry.getKey()) + tmpLinkWeights.get(entry.getKey()));
-								} else {
-									routeLinkWeights.put(entry.getKey(), tmpLinkWeights.get(entry.getKey()));
-								}
+								// store interStopRoutes
+								subRoutes.add(currentInterStopPaths);
 							}
 						}
 					}
 
+					/** [3]
+					 * get the linkWeights for all links relevant for the current sequence of route stops
+					 * 
+					 * Each possible route between two possible linkCandidates that passes a link adds 
+					 * weight to the link. Higher weight means more paths have passed a link.
+					  */
+					Map<Id<Link>, Double> routeLinkWeights = subRoutes.getTransitRouteLinkWeights(routeStops);
 
-					PTLRouter subrouter = new PTLRTransitRouter(network, routeLinkWeights);
 
-					/*
-					* create subroutes depending on maximal difference of azimut
-					* fix the linkcandidate for breaking stops
+					/** [4]
+					* Assign the best scoring link* to each stop, then route between the two links.
+					* 
+					* score is calucated with the linkweight and the distance from the link and the stop facility
 					 */
-					List<Id<Link>> linkSequence = new LinkedList<>();
-					List<InterStopRoutes> subRoutes = new ArrayList<>();
-					int i = 0;
-					while (i < routeStops.size()-1) {
-						int j = i + 1;
-						TransitRouteStop stopA = routeStops.get(i);
-						double az1 = Tools.getAzimuth(stopA.getStopFacility().getCoord(), routeStops.get(j++).getStopFacility().getCoord());
+					this.schedule.getFacilities().get(routeStops.get(0).getStopFacility().getId())
+							.setLinkId(getMostPlausibleLink(routeStops.get(0).getStopFacility(), routeLinkWeights).getId());
+					
+					List<Id<Link>> linkSequence = new ArrayList<>();
+					for(int i = 0; i<routeStops.size()-1; i++) {
+						TransitRouteStop currentStop = routeStops.get(i);
+						TransitRouteStop nextStop = routeStops.get(i+1);
 
-						while (j < routeStops.size()) {
-							double az2 = Tools.getAzimuth(stopA.getStopFacility().getCoord(), routeStops.get(j).getStopFacility().getCoord());
+						// TODO if link reference is already set, do not calculcate it anymore 
+						
+						//get the most plausible links for this and the next stop 
+						Link currentLink = getMostPlausibleLink(currentStop.getStopFacility(), routeLinkWeights);
+						Link nextLink = getMostPlausibleLink(nextStop.getStopFacility(), routeLinkWeights);
+						
+						this.schedule.getFacilities().get(nextStop.getStopFacility().getId())
+								.setLinkId(nextLink.getId());
 
-							if (Math.abs(az2 - az1) > AZIMUTH_TOLERANCE) {
-								TransitRouteStop stopB = routeStops.get(j - 1);
-								List<Link> stopALinks = allClosestLinks.get(stopA.getStopFacility());
-								List<Link> stopBLinks = allClosestLinks.get(stopB.getStopFacility());
+						// add very first link
+						if(i==0) { linkSequence.add(currentLink.getId()); }
 
-								Link fromLink = null;
-								Link toLink = null;
+						this.schedule.getFacilities().get(currentStop.getStopFacility().getId())
+								.setLinkId(currentLink.getId());
 
-								// get best scoring link for stop 2
-								double maxWeight = 0;
-								for (Link check : stopALinks) {
-									double checkLinkWeight = routeLinkWeights.get(check.getId());
-									if (checkLinkWeight > maxWeight) {
-										maxWeight = checkLinkWeight;
-										fromLink = check;
-									}
-								}
 
-								maxWeight = 0;
-								for (Link check : stopBLinks) {
-									double checkLinkWeight = routeLinkWeights.get(check.getId());
-									if (checkLinkWeight > maxWeight) {
-										maxWeight = checkLinkWeight;
-										toLink = check;
-									}
-								}
-
-								LeastCostPathCalculator.Path path = subrouter.calcLeastCostPath(fromLink.getToNode(), toLink.getToNode(), null, null);
-
-								linkSequence.addAll(new InterStopRoute(stopA, stopB, fromLink, toLink, path).getLinkIds());
-
-								i = j;
-								break;
-							} else {
-								j++;
-							}
+						/** [5]
+						 * route between the now referenced links
+						 */
+						// if stop pair was already routed, use stored path
+						List<Id<Link>> path = null;
+						if(subRoutes.get(currentStop, nextStop).contains(currentLink, nextLink)) {
+							path = subRoutes.get(currentStop, nextStop).getPath(currentLink, nextLink).getIntermediateLinkIds();
 						}
-						i++;
-					}
-
-					// find best path from firstStop to lastStop considering linkWeights
-					/*
-					List<Link> closestLinksStart = allClosestLinks.get(firstStop.getStopFacility());
-					List<Link> closestLinksEnd = allClosestLinks.get(endStop.getStopFacility());
-
-					Double maxTravelCost = Double.MAX_VALUE;
-					InterStopRoute bestRoute = null;
-					for (Link linkStart : closestLinksStart) {
-						for (Link linkEnd : closestLinksEnd) {
-							LeastCostPathCalculator.Path path = subrouter.calcLeastCostPath(linkStart.getFromNode(), linkEnd.getToNode(), null, null);
-
-							if (path.travelCost < maxTravelCost) {
-								maxTravelCost = path.travelCost;
-								bestRoute = new InterStopRoute(firstStop, endStop, linkStart, linkEnd, path);
-							}
+						else {
+							path = InterStopPath.getLinkIdsFromPath(router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode(), null, null));
 						}
+
+						if(path != null)
+							linkSequence.addAll(path);
+
+						linkSequence.add(nextLink.getId());
 					}
 
-
-					// assing best path as link sequence to route
-					if(bestRoute != null) {
-						//	List<Id<Link>> linkSequence = bestPath.links.stream().map(Link::getId).collect(Collectors.toList());
-						route.setRoute(RouteUtils.createNetworkRoute(bestRoute.getLinkIds(), this.network));
-
-						// reference links to stopFacilities
-						for (TransitRouteStop entry : routeStops) {
-							List<Link> closestLinks = allClosestLinks.get(entry.getStopFacility());
-
-							for (Link ll : closestLinks) {
-								if (bestRoute.getLinkIds().contains(ll.getId())) {
-									this.schedule.getFacilities().get(entry.getStopFacility().getId()).setLinkId(ll.getId());
-									break;
-								}
-							}
-						}
-					} else {
-						log.warn("No route (link sequence) assigned for route " + route.getId());
-					}
-					*/
-
-					if(linkSequence.size() > 0) {
-						route.setRoute(RouteUtils.createNetworkRoute(linkSequence, this.network));
-					} else {
-						log.warn("No route (link sequence) assigned for route " + route.getId());
-					}
-
-					// reference links to stopFacilities
-					for (TransitRouteStop entry : routeStops) {
-						List<Link> closestLinks = allClosestLinks.get(entry.getStopFacility());
-
-						for (Link ll : closestLinks) {
-							if (linkSequence.contains(ll.getId())) {
-								this.schedule.getFacilities().get(entry.getStopFacility().getId()).setLinkId(ll.getId());
-								break;
-							}
-						}
-					}
+					// add link sequence to schedule
+					route.setRoute(RouteUtils.createNetworkRoute(linkSequence, this.network));
 				}
 			} // - route loop
 
@@ -365,18 +291,19 @@ public class PTMapperV3 extends PTMapper {
 	 * and all nodes which are non-linked to any link after the above cleaning...
 	 * Clean also the allowed modes for only the modes, no line-number any more...
 	 */
-	protected void cleanStationsAndNetwork() {
+	private void cleanStationsAndNetwork() {
 		log.info("Clean Stations and Network...");
 		// TODO get rid of dummy links which are implemented via gtfsreader (not independent)
 		network.removeLink(Id.createLinkId(GTFSReader.DUMMY_LINK));
 		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1));
 		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2));
+
+// TODO clean network
 		cleanSchedule();
-/* TODO clean network
-		prepareNetwork();
+//		prepareNetwork();
 		removeNonUsedStopFacilities();
- 		setConnectedStopFacilitiesToIsBlocking();
-*/
+//		setConnectedStopFacilitiesToIsBlocking();
+
 		log.info("Clean Stations and Network... done.");
 	}
 
@@ -474,6 +401,96 @@ public class PTMapperV3 extends PTMapper {
 		for (TransitStopFacility facility : unusedStopFacilites) {
 			this.schedule.removeStopFacility(facility);
 		}
+	}
+
+	/**
+	 * calculates the plausibility score for all closest links of a stopFacility
+	 *
+	 * score = d + w
+	 *
+	 * d = distance stopFacility-Link (scaled 0..1)
+	 * w = link weight (scaled 0..1, only weights of linkCandidates are used to normalize)
+	 *
+	 * @param stopFacility used to calculate the distance to the links
+	 * @return map with plausibilityScores
+	 */
+	private SortedMap<Double, Link> getLinkPlausibilityScores(TransitStopFacility stopFacility, Map<Id<Link>, Double> routeLinkWeights) {
+		Map<Id<Link>, Double> distances = new HashMap<>();
+		SortedMap<Double, Link> rankedLinks = new TreeMap<>();
+		List<Link> links = allClosestLinks.get(stopFacility);
+		Map<Id<Link>, Double> routeLinkWeightsSubset = new HashMap<>();
+
+		double minDist = Double.MAX_VALUE;
+
+		// calculate all distances stopFacility-Link (get linkweight subset on the way)
+		for(Link ll : links) {
+			double distance = CoordUtils.distancePointLinesegment(ll.getFromNode().getCoord(), ll.getToNode().getCoord(), stopFacility.getCoord());
+			if(distance < minDist)
+				minDist = distance;
+
+			distances.put(ll.getId(), distance);
+
+			routeLinkWeightsSubset.put(ll.getId(), routeLinkWeights.get(ll.getId()));
+		}
+
+		// scale linkweights
+		routeLinkWeightsSubset = normalize(routeLinkWeightsSubset);
+
+		// scale distances
+		distances = normalizeInvert(distances); // .put(ll.getId(), 2-distances.get(ll.getId())/minDist);
+
+		for(Link ll : links) {
+			double plausibilityScore = distances.get(ll.getId()) + (routeLinkWeightsSubset.get(ll.getId()));
+			rankedLinks.put(plausibilityScore, ll);
+		}
+
+		return rankedLinks;
+	}
+
+	/**
+	 * @return the most plausible linkId calculated by {@link #getLinkPlausibilityScores}
+	 */
+	public Link getMostPlausibleLink(TransitStopFacility stopFacility, Map<Id<Link>, Double> routeLinkWeights) {
+		SortedMap<Double, Link> rankedLinks = getLinkPlausibilityScores(stopFacility, routeLinkWeights);
+
+		return rankedLinks.get(rankedLinks.lastKey());
+	}
+
+	/**
+	 * normalizes the values of a map via value/maxValue
+	 * @return the normalized map
+	 */
+	public static Map<Id<Link>, Double> normalize(Map<Id<Link>, Double> map) {
+		// get maximal weight
+		double maxValue = 0;
+		for(Double v : map.values()) {
+			if(v > maxValue)
+				maxValue = v;
+		}
+
+		// scale weights
+		for(Map.Entry<Id<Link>, Double> e : map.entrySet()) {
+			map.put(e.getKey(), map.get(e.getKey())/maxValue);
+		}
+	return map;
+	}
+
+	/**
+	 * normalizes the values of a map via 1-value/maxValue
+	 * @return the normalized map
+	 */
+	public static Map<Id<Link>, Double> normalizeInvert(Map<Id<Link>, Double> map) {
+		double maxValue = 0;
+		for(Double v : map.values()) {
+			if(v > maxValue)
+				maxValue = v;
+		}
+
+		for(Map.Entry<Id<Link>, Double> e : map.entrySet()) {
+			map.put(e.getKey(), 1-map.get(e.getKey())/maxValue);
+		}
+
+		return map;
 	}
 
 

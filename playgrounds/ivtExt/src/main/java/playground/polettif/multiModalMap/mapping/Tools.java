@@ -270,31 +270,50 @@ public class Tools {
 	 * Looks for nodes within search radius of coord, then searches the closest links (calculated via distancePointLineSegment()
 	 * in {@link org.matsim.core.utils.geometry.CoordUtils}).
 	 *
+	 * TODO Can return more than n links if links have the same distance from the facility (diff <1m).
+	 *
 	 * @return the closest n links to coord
 	 */
 	public static List<Link> findOnlyNClosestLinks(NetworkImpl networkImpl, Coord coord, double searchRadius, int n) {
 		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, searchRadius);
 		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
+		double incr = 0.1; double tol=2.0;
+
+
 
 		if(nearestNodes.size() == 0) {
 			return null;
 		} else {
 			for (Node node : nearestNodes) {
 				Map<Id<Link>, ? extends Link> outLinks = node.getOutLinks();
+				Map<Id<Link>, ? extends Link> inLinks = node.getInLinks();
 				double lineSegmentDistance;
 
 				for (Link linkCandidate : outLinks.values()) {
 					lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
+
+					// since distance is used as key, we need to ensure the exact distance is not used already TODO maybe check for side of the road?
+					while(closestLinksMap.containsKey(lineSegmentDistance))
+						lineSegmentDistance+=incr;
+
+					closestLinksMap.put(lineSegmentDistance, linkCandidate);
+				}
+				for (Link linkCandidate : inLinks.values()) {
+					lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
+					while(closestLinksMap.containsKey(lineSegmentDistance)) {
+						lineSegmentDistance+=incr;
+					}
 					closestLinksMap.put(lineSegmentDistance, linkCandidate);
 				}
 			}
 
 			List<Link> closestLinks = new ArrayList<>();
-			Object[] closestLinksArray = closestLinksMap.values().toArray();
 
-			int i = 0;
-			while (i < n && i < closestLinksArray.length) {
-				closestLinks.add((Link) closestLinksArray[i]);
+			int i = 1; double d=0;
+			for(Map.Entry<Double, Link> e : closestLinksMap.entrySet()) { //int i=0; i < n && i < closestLinksArray.length; i++) {
+				if(i > n && (e.getKey()-d > tol))
+					break;
+				closestLinks.add(e.getValue());
 				i++;
 			}
 

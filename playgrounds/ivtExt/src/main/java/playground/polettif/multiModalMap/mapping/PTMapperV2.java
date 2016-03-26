@@ -36,8 +36,8 @@ import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmarksSimpleRouting;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
-import playground.polettif.multiModalMap.mapping.containter.SolvedSubRoutes;
-import playground.polettif.multiModalMap.mapping.containter.InterStopRoute;
+import playground.polettif.multiModalMap.mapping.containter.V2SolvedSubRoutes;
+import playground.polettif.multiModalMap.mapping.containter.InterStopPath;
 
 import java.util.*;
 
@@ -132,6 +132,13 @@ public class PTMapperV2 extends PTMapper {
 		this.router = new PTLRFastAStarLandmarksSimpleRouting(this.network); // TODO param for routing algorithm
 
 		/*
+		assigning proxy lane# values to visualize
+		for(Map.Entry<Id<Link>, Double> e : routeLinkWeights.entrySet()) {
+			network.getLinks().get(e.getKey()).setNumberOfLanes(e.getValue()*100+10);
+		}
+		*/
+
+		/*
 		* loop throgh
 		* - lines
 		*   - routes
@@ -149,11 +156,11 @@ public class PTMapperV2 extends PTMapper {
 				log.info("Route: " + route.getId());
 				counterLine.incCounter();
 
-				SolvedSubRoutes solvedSubRoutes = new SolvedSubRoutes();
+				V2SolvedSubRoutes solvedSubRoutes = new V2SolvedSubRoutes();
 
 
-				int i = 0; // iterate through all stops of the route and calculate best scores
-				while (i < (route.getStops().size())) {
+				// iterate through all stops of the route and calculate best scores
+				for(int i = 0; i < (route.getStops().size()); i++) {
 					// look to next stop
 					TransitRouteStop currentStop = route.getStops().get(i);
 					TransitRouteStop nextStop = (i < route.getStops().size() - 1) ? route.getStops().get(i + 1) : null;
@@ -162,8 +169,8 @@ public class PTMapperV2 extends PTMapper {
 					// check if part of current and next stop was already routed
 					if(nextStop != null && !solvedSubRoutes.contains(currentStop, nextStop)) {
 
-						SortedMap<Double, InterStopRoute> routeScores = new TreeMap<>();
-						List<InterStopRoute> interStopRoutes = new ArrayList<>();
+						SortedMap<Double, InterStopPath> routeScores = new TreeMap<>();
+						List<InterStopPath> interStopPaths = new ArrayList<>();
 
 						List<Link> closestLinksCurrent = allClosestLinks.get(currentStop.getStopFacility());
 						List<Link> closestLinksNext = allClosestLinks.get(nextStop.getStopFacility());
@@ -174,18 +181,18 @@ public class PTMapperV2 extends PTMapper {
 						for (Link linkCandidateCurrent : closestLinksCurrent) {
 							for (Link linkCandidateNext : closestLinksNext) {
 								LeastCostPathCalculator.Path pathCandidate = this.router.calcLeastCostPath(linkCandidateCurrent.getToNode(), linkCandidateNext.getFromNode(), null, null);
-								interStopRoutes.add(new InterStopRoute(currentStop, nextStop, linkCandidateCurrent, linkCandidateNext, pathCandidate));
+								interStopPaths.add(new InterStopPath(currentStop, nextStop, linkCandidateCurrent, linkCandidateNext, pathCandidate));
 							}
 						}
 
 						// calculate score for all possible interStopRoutes
-						for (InterStopRoute interStopRoute : interStopRoutes) {
-							routeScores.put(interStopRoute.getScore(1,1,1), interStopRoute);
+						for (InterStopPath interStopPath : interStopPaths) {
+							routeScores.put(interStopPath.getScore(1,1,1), interStopPath);
 						}
 
 						// assign best scoring interStopRoute to the set of solved stop pairs
-						InterStopRoute bestInterStopRoute = routeScores.get(routeScores.firstKey());
-						solvedSubRoutes.put(bestInterStopRoute);
+						InterStopPath bestInterStopPath = routeScores.get(routeScores.firstKey());
+						solvedSubRoutes.put(bestInterStopPath);
 
 						/*
 						* check whether the linkCandidate for the current stop is different from previous routing pair
@@ -197,17 +204,16 @@ public class PTMapperV2 extends PTMapper {
 						* if both candidates are not in optimal path? use next worse path
 						 */
 						if (i > 0) {
-							InterStopRoute previousRoute = solvedSubRoutes.getInterStopRoute(previousStop, currentStop);
-							if (!previousRoute.getToLink().equals(bestInterStopRoute.getFromLink())) {
+							InterStopPath previousRoute = solvedSubRoutes.getInterStopRoute(previousStop, currentStop);
+							if (!previousRoute.getToLink().equals(bestInterStopPath.getFromLink())) {
 								LeastCostPathCalculator.Path pathReroute = this.router.calcLeastCostPath(
 										previousRoute.getFromLink().getFromNode(),
-										bestInterStopRoute.getFromLink().getFromNode(), null, null);
+										bestInterStopPath.getFromLink().getFromNode(), null, null);
 
-								solvedSubRoutes.put(new InterStopRoute(previousStop, currentStop, previousRoute.getFromLink(), bestInterStopRoute.getFromLink(), pathReroute));
+								solvedSubRoutes.put(new InterStopPath(previousStop, currentStop, previousRoute.getFromLink(), bestInterStopPath.getFromLink(), pathReroute));
 							}
 						}
 					}
-					i++;
 				}
 
 				// combine all subroutes to one route (as a sequence of links)

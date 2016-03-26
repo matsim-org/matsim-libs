@@ -30,41 +30,30 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * contains a set of interstop routes between fromStop and toStop
- * methods:
- * getlinkweights
- * ...
+ * contains a set of interstop paths between fromStop and toStop
  */
-public class InterStopRoutes {
+public class InterStopPathSet {
 
-	private final Tuple<TransitRouteStop, TransitRouteStop> tuple;
+	private final Tuple<TransitRouteStop, TransitRouteStop> id;
 	private final TransitRouteStop fromStop;
 	private final TransitRouteStop toStop;
-	private List<InterStopRoute> list = new ArrayList<>();
-	private Map<Id<Link>, Double> weights = new HashMap<>();
 
-	public InterStopRoutes(TransitRouteStop fromStop, TransitRouteStop toStop) {
+	private Map<Tuple<Link, Link>, InterStopPath> interStopPaths = new HashMap<>();
+	private Map<Id<Link>, Double> weights = null;
+	private double minDist1 = Double.MAX_VALUE;
+	private double minDist2 = Double.MAX_VALUE;
+	private double minTT = Double.MAX_VALUE;
+
+	public InterStopPathSet(TransitRouteStop fromStop, TransitRouteStop toStop) {
 		this.fromStop = fromStop;
 		this.toStop = toStop;
-		this.tuple = new Tuple<>(fromStop, toStop);
+		this.id = new Tuple<>(fromStop, toStop);
 	}
 
-	public void add(InterStopRoute interStopRoute) {
-		list.add(interStopRoute);
+	public void add(InterStopPath interStopPath) {
+		interStopPaths.put(new Tuple<>(interStopPath.getFromLink(), interStopPath.getToLink()), interStopPath);
 	}
 
-	public Map<Id<Link>, Double> getLinkWeights() {
-		for(InterStopRoute interStopRoute : list) {
-			for(Id<Link> linkId : interStopRoute.getLinkIds()) {
-				if(!weights.containsKey(linkId)) {
-					weights.put(linkId, getScore(interStopRoute));
-				} else {
-					weights.put(linkId, weights.get(linkId) + getScore(interStopRoute));
-				}
-			}
-		}
-		return weights;
-	}
 
 	/**
 	 * Calculates the score of a route based on the travel time on the links and the distance of the stop facilities
@@ -79,6 +68,7 @@ public class InterStopRoutes {
 	 *
 	 * @return the score
 	 */
+	@Deprecated
 	public double getScore(double weightTT, double weightDistance1, double weightDistance2) {
 		return 0.0; /*weightTT*(travelTime/minTT.get(key)) +
 				weightDistance1*(distanceStartFacilityToLink/minDist1.get(key)) +
@@ -86,40 +76,35 @@ public class InterStopRoutes {
 				*/
 	}
 
-	/**
-	 * TODO
-	 * @param interStopRoute
-	 * @return 1
-	 */
-	public double getScore(InterStopRoute interStopRoute) {
-		return 1.0;
+
+	public Tuple<TransitRouteStop,TransitRouteStop> getId() {
+		return id;
 	}
 
-	public Tuple<TransitRouteStop,TransitRouteStop> getStopsTuple() {
-		return tuple;
+	private void calculateMinimalValues() {
+		if (minTT == Double.MAX_VALUE) {
+			for (InterStopPath isr : interStopPaths.values()) {
+				if (isr.getDistanceStartFacilityToLink() < minDist1)
+					minDist1 = isr.getDistanceStartFacilityToLink();
+
+				if (isr.getdistanceEndFacilityToLink() < minDist2)
+					minDist2 = isr.getDistanceStartFacilityToLink();
+
+				if (isr.getTravelTime() < minTT)
+					minTT = isr.getDistanceStartFacilityToLink();
+			}
+		}
 	}
 
-	/*
-	if(minDist1.containsKey(key)) {
-			if (distanceStartFacilityToLink < minDist1.get(key))
-				minDist1.put(key, distanceStartFacilityToLink);
-		} else {
-			minDist1.put(key, Double.MAX_VALUE);
-		}
+	public List<InterStopPath> getPaths() {
+		return new ArrayList<>(interStopPaths.values());
+	}
 
-		if(minDist2.containsKey(key)) {
-			if(distanceEndFacilityToLink < minDist2.get(key))
-				minDist2.put(key, distanceEndFacilityToLink);
-		} else {
-			minDist2.put(key, Double.MAX_VALUE);
-		}
+	public InterStopPath getPath(Link currentLink, Link nextLink) {
+		return interStopPaths.get(new Tuple<>(currentLink, nextLink));
+	}
 
-		if(minTT.containsKey(key)) {
-			if(travelTime < minTT.get(key))
-				minTT.put(key, travelTime);
-		} else {
-			minTT.put(key, Double.MAX_VALUE);
-		}
-	 */
-
+	public boolean contains(Link fromLink, Link toLink) {
+		return interStopPaths.containsKey(new Tuple<>(fromLink, toLink));
+	}
 }

@@ -27,20 +27,20 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.*;
 
-public class SolvedSubRoutes implements SubRoutes {
+public class V2SolvedSubRoutes {
 
-	Map<Tuple, InterStopRoute> subroutes = new HashMap<>();
+	Map<Tuple, InterStopPath> subroutes = new HashMap<>();
 	Map<TransitStopFacility, Id<Link>> getStopFacilityRefLinkIds = new HashMap<>();
 
-	public SolvedSubRoutes() {
+	public V2SolvedSubRoutes() {
 	}
 
-	public InterStopRoute getInterStopRoute(TransitRouteStop previousStop, TransitRouteStop currentStop) {
+	public InterStopPath getInterStopRoute(TransitRouteStop previousStop, TransitRouteStop currentStop) {
 		return subroutes.get(new Tuple<>(previousStop, currentStop));
 	}
 
-	public void put(InterStopRoute interStopRoute) {
-		subroutes.put(new Tuple<>(interStopRoute.getFromStop(), interStopRoute.getToStop()), interStopRoute);
+	public void put(InterStopPath interStopPath) {
+		subroutes.put(new Tuple<>(interStopPath.getFromStop(), interStopPath.getToStop()), interStopPath);
 	}
 
 	public List<Id<Link>> getLinkIdList(List<TransitRouteStop> stopSequence) {
@@ -48,8 +48,8 @@ public class SolvedSubRoutes implements SubRoutes {
 
 		int i = 0;
 		while(i < stopSequence.size()-1) {
-			InterStopRoute interStopRoute = subroutes.get(new Tuple<>(stopSequence.get(i), stopSequence.get(i+1)));
-			list.addAll(interStopRoute.getIntermediateLinkIds());
+			InterStopPath interStopPath = subroutes.get(new Tuple<>(stopSequence.get(i), stopSequence.get(i+1)));
+			list.addAll(interStopPath.getIntermediateLinkIds());
 			i++;
 		}
 
@@ -59,7 +59,6 @@ public class SolvedSubRoutes implements SubRoutes {
 		return list;
 	}
 
-	@Override
 	public boolean contains(TransitRouteStop fromStop, TransitRouteStop toStop) {
 		return subroutes.containsKey(new Tuple<>(fromStop, toStop));
 	}
