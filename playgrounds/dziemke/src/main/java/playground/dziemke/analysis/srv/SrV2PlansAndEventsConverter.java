@@ -21,6 +21,7 @@
 package playground.dziemke.analysis.srv;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -91,19 +92,22 @@ public class SrV2PlansAndEventsConverter {
 	    		
 	    		Trip trip = tripsMap.get(departureTime);
 
-	    		// TODO substitute zone by something better; or use alternative (new... as discussed earlier...) data structure that can handle zones
-	    		double x = Double.parseDouble(trip.getDepartureZoneId().toString());
-	    		double y = x;
-	    		// TODO add appropriate coordinate transformation
-				Coord departureCoordinates = new Coord(x, y);
 	    		
-
+	    		//
 				Id<Person> idToBeChecked = Id.create("1363_1", Person.class);
 				
 				String activityTypeEndingActivity = trip.getActivityEndActType();	
 				if (personId == idToBeChecked) {
 					System.err.println("personId = " + personId + " -- trip.getActivityEndActType() = "	+ activityTypeEndingActivity);
 				}
+				//
+				
+				
+				// TODO substitute zone by something better; or use alternative (new... as discussed earlier...) data structure that can handle zones
+	    		double x = Double.parseDouble(trip.getDepartureZoneId().toString());
+	    		double y = x;
+	    		// TODO add appropriate coordinate transformation
+				Coord departureCoordinates = new Coord(x, y);
 				
 				Activity endingActivity = populationFactory.createActivityFromCoord(activityTypeEndingActivity, ct.transform(departureCoordinates));
 	    		double departureTime_s = trip.getDepartureTime_s();
@@ -143,26 +147,44 @@ public class SrV2PlansAndEventsConverter {
 				PersonArrivalEvent personArrivalEvent = new PersonArrivalEvent(arrivalTime_s, personId, arrivalLinkId, "car");
 				events.add(personArrivalEvent);
 				ActivityStartEvent activityStartEvent = new ActivityStartEvent(arrivalTime_s, personId, arrivalLinkId, null, activityTypeStartingActivity);
-				events.add(activityStartEvent);	
+				events.add(activityStartEvent);
 	    	}  	
 	    }	    
+	    System.out.println("tripMapEntryCounter = " + tripMapEntryCounter);
 	    
-	    // write population
+	    writePlansFile(outputDirectory, network, population);
+
+	    events.sort(new EventsComparatorByTime());
+	    writeEventsFile(outputDirectory, events);
+	}
+
+	private static void writePlansFile(String outputDirectory, Network network, Population population) {
 	    MatsimWriter popWriter = new PopulationWriter(population, network);
 	    popWriter.write(outputDirectory + "plans.xml");
-	    
-	    //  write events
-	    // TODO have events sorted by time
-	    int eventsCounter = 0;
+	}
+
+	private static void writeEventsFile(String outputDirectory, List<Event> events) {
+		int eventsCounter = 0;
 	    EventWriterXML eventWriter = new EventWriterXML(outputDirectory + "events.xml");
 	    for (Event event : events) {
 	    	eventWriter.handleEvent(event);
 	    	eventsCounter++;
 	    }
 	    eventWriter.closeFile();
-	    
-	    // print counters
-	    System.out.println("tripMapEntryCounter = " + tripMapEntryCounter);
 	    System.out.println("events added: " + eventsCounter);
 	}
+	
+	private static class EventsComparatorByTime implements Comparator<Event> {
+
+    	public int compare(Event event1, Event event2) {
+
+    		if ( event1.getTime() < event2.getTime() ) {
+    			return -1 ;
+    		} else if ( event1.getTime() == event2.getTime() ) {
+    			return 0 ;
+    		} else {
+    			return +1 ;
+    		}
+    	}
+    }
 }
