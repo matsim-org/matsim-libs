@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -55,7 +56,7 @@ import playground.dziemke.analysis.Trip;
  * @author dziemke
  */
 public class SrV2PlansAndEventsConverter {
-	private final static Logger log = Logger.getLogger(SrV2PlansAndEventsConverter.class);
+//	private final static Logger log = Logger.getLogger(SrV2PlansAndEventsConverter.class);
 
 	public static void convert(TreeMap<Id<Person>, TreeMap<Double, Trip>> personTripsMap, Network network, CoordinateTransformation ct, String outputDirectory) {
 		
@@ -89,50 +90,38 @@ public class SrV2PlansAndEventsConverter {
 	    		
 	    		// plans
 	    		Plan plan = person.getPlans().get(0);
-	    		
 	    		Trip trip = tripsMap.get(departureTime);
 
+	    		String activityTypeEndingActivity = trip.getActivityEndActType();	
+	    		// TODO substitute zone by something better; or use alternative (new... as discussed earlier...) data structure that can handle zones
+	    		double x = Double.parseDouble(trip.getDepartureZoneId().toString());
+	    		Coord departureCoordinates = new Coord(x, x);
+				Activity endingActivity = populationFactory.createActivityFromCoord(activityTypeEndingActivity, ct.transform(departureCoordinates));
+				double departureTime_s = trip.getDepartureTime_s();
+				endingActivity.setEndTime(departureTime_s);
+				plan.addActivity(endingActivity);
 	    		
-	    		//
+				//
 				Id<Person> idToBeChecked = Id.create("1363_1", Person.class);
-				
-				String activityTypeEndingActivity = trip.getActivityEndActType();	
 				if (personId == idToBeChecked) {
 					System.err.println("personId = " + personId + " -- trip.getActivityEndActType() = "	+ activityTypeEndingActivity);
 				}
 				//
 				
-				
-				// TODO substitute zone by something better; or use alternative (new... as discussed earlier...) data structure that can handle zones
-	    		double x = Double.parseDouble(trip.getDepartureZoneId().toString());
-	    		double y = x;
-	    		// TODO add appropriate coordinate transformation
-				Coord departureCoordinates = new Coord(x, y);
-				
-				Activity endingActivity = populationFactory.createActivityFromCoord(activityTypeEndingActivity, ct.transform(departureCoordinates));
-	    		double departureTime_s = trip.getDepartureTime_s();
-				endingActivity.setEndTime(departureTime_s);
-				
-				plan.addActivity(endingActivity);
-	    		
 	    		// TODO make mode adjustable; right now its okay since non-car trips are excluded anyways
-	    		Leg leg = populationFactory.createLeg("car");
-	    		plan.addLeg(leg);
+	    		plan.addLeg(populationFactory.createLeg(TransportMode.car));
 	    		
 	    		// last activity
 	    		String activityTypeStartingActivity = trip.getActivityStartActType();
-	    		
 	    		if (departureTime == tripsMap.lastKey()) {
 		    		double x2 = Double.parseDouble(trip.getArrivalZoneId().toString());
-		    		double y2 = x2;
-		    		Coord arrivalCoordinates = new Coord(x2, y2);
+		    		Coord arrivalCoordinates = new Coord(x2, x2);
 		    		Activity startingActivity = populationFactory.createActivityFromCoord(activityTypeStartingActivity, ct.transform(arrivalCoordinates));
 		    		plan.addActivity(startingActivity);
 	    		}
 	    		
 				// events
-	    		// TODO maybe add link here
-	    		Id<Link> departureLinkId = null;
+	    		Id<Link> departureLinkId = null; // TODO maybe add link here
 	    		
 				ActivityEndEvent activityEndEvent = new ActivityEndEvent(departureTime_s, personId, departureLinkId, null, activityTypeEndingActivity);
 				events.add(activityEndEvent);

@@ -143,8 +143,11 @@ public class TripAnalyzerSrVNew {
 
 		/* Other information */
 //	    otherInformationMap.put("Number of trips that have no previous activity", tripHandler.getNoPreviousEndOfActivityCounter()); // TODO reactivate
-		otherInformationMap.put("Aggregated weight of trips that have no negative times or durations", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithNonNegativeTimesAndDurations);		
-	    otherInformationMap.put("Aggregated weight of trips that have no calculable speed", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey);
+		otherInformationMap.put("Aggregated weight of trips that have negative times or durations", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithNonNegativeTimesAndDurations);		
+		otherInformationMap.put("Aggregated weight of trips that have negative distance (beeline, from survey)", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithNonNegativeDistanceBeelineSurvey);
+		otherInformationMap.put("Aggregated weight of trips that have negative distance (routed, from survey)", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithNonNegativeDistanceRoutedSurvey);
+		otherInformationMap.put("Aggregated weight of trips that have no calculable speed (beeline)", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithCalculableSpeedBeelineSurvey);
+		otherInformationMap.put("Aggregated weight of trips that have no calculable speed (routed)", aggregatedWeightOfConsideredTrips - aggregatedWeightOfTripsWithCalculableSpeedRoutedSurvey);
 	    otherInformationMap.put("Number of incomplete trips (i.e. number of removed agents)", (double) numberOfInIncompleteTrips);
 	    otherInformationMap.put("Aggregated weight of (complete) trips", aggregatedWeightOfConsideredTrips);
 	    writer.writeToFileOther(otherInformationMap, outputDirectory + "/otherInformation.txt");
@@ -273,6 +276,7 @@ public class TripAnalyzerSrVNew {
 		}
 		return counter;
 	}
+	
 	static Map<Integer, Double> createAverageTripSpeedRoutedMap(List<Trip> trips, int binWidthSpeed_km_h, Network network) {
     	Map<Integer, Double> averageTripSpeedRoutedMap = new TreeMap<>();
     	for (Trip trip : trips) {
@@ -322,33 +326,26 @@ public class TripAnalyzerSrVNew {
 	}
 	/* SrV-specific calculations -- End */
 	
-	
 	@SuppressWarnings("all")
 	private static void adaptOutputDirectory() {
 		if (useWeights == true) {
 			outputDirectory = outputDirectory + "_wt";
 		}
-		
 		if (onlyCar == true) {
 			outputDirectory = outputDirectory + "_car";
 		}
-		
 		if (onlyCarAndCarPool == true) {
 			outputDirectory = outputDirectory + "_carp";
 		}
-		
 		if (onlyCar == false && onlyCarAndCarPool == false) {
 			outputDirectory = outputDirectory + "_all";
 		}
-				
 		if (distanceFilter == true) {
 			outputDirectory = outputDirectory + "_dist";
 		}
-		
 		if (onlyHomeAndWork == true) {
 			outputDirectory = outputDirectory + "_hw";
-		}		
-				
+		}
 		if (ageFilter == true) {
 			outputDirectory = outputDirectory + "_" + minAge.toString();
 			outputDirectory = outputDirectory + "_" + maxAge.toString();
@@ -357,7 +354,6 @@ public class TripAnalyzerSrVNew {
 		/* Create directory */
 		new File(outputDirectory).mkdir();
 	}
-	
 	
 	@SuppressWarnings("all")
 	private static List<Trip> createListOfValidTrip(Map<Id<Trip>, Trip> tripMap, Network network, SrV2008PersonParser personParser) {
@@ -414,6 +410,12 @@ public class TripAnalyzerSrVNew {
 	    		}
 	    	}
 	    	
+	    	// activity times and durations
+	    	if ((trip.getArrivalTime_s() < 0) || (trip.getDepartureTime_s() < 0) //|| (trip.getDurationByCalculation_s() < 0)
+	    			) {
+	    		continue;
+	    	}	    	
+
 	    	// make weighting correct
 	    	double weight;
     		if (useWeights == true) {
