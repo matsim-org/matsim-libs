@@ -20,11 +20,6 @@
 
 package playground.dziemke.cemdapMatsimCadyts.controller;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +29,6 @@ import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -47,80 +41,51 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 
+/**
+ * @author dziemke
+ */
 public class CemdapMatsimCadytsController {
-	//private final static Logger log = Logger.getLogger(CemdapMatsimCadytsController.class);
 	
 	public static void main(String[] args) {
 		final Config config = ConfigUtils.createConfig();
 		
-		// global
-		//config.global().setRandomSeed(4711);
 		config.global().setCoordinateSystem("GK4");
 		
-		// network
-		String inputNetworkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-		config.network().setInputFile(inputNetworkFile);
+		config.network().setInputFile("../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml");
 		
-		// plans
-		String inputPlansFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/24/plans.xml.gz";
-		config.plans().setInputFile(inputPlansFile);
+		config.plans().setInputFile("../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/24/plans.xml.gz");
 		
-		// simulation
+		config.counts().setCountsFileName("../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml");
+		config.counts().setCountsScaleFactor(100);
+		config.counts().setOutputFormat("all"); // default is "txt"
+		
+		String runId = "run_146a";
+		config.controler().setRunId(runId);
+		config.controler().setOutputDirectory("../../../runs-svn/cemdapMatsimCadyts/" + runId + "/");
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(150);
+		config.controler().setWritePlansInterval(50);
+		config.controler().setWriteEventsInterval(50);
+				
 		config.qsim().setFlowCapFactor(0.02);
 		config.qsim().setStorageCapFactor(0.02);
 		config.qsim().setRemoveStuckVehicles(false);
-
-		// counts
-		String countsFileName = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/vmz_di-do.xml";
-		config.counts().setCountsFileName(countsFileName);
-		config.counts().setCountsScaleFactor(100);
-		config.counts().setOutputFormat("all");
 		
-		// vsp experimental
-		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "ignore");
-				
-		// controller
-		String runId = "run_146a";
-		String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/";
-		config.controler().setRunId(runId);
-		config.controler().setOutputDirectory(outputDirectory);
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(150);
-		Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.xml));
-		config.controler().setEventsFileFormats(eventsFileFormats);
-		config.controler().setMobsim("qsim");
-		config.controler().setWritePlansInterval(50);
-		config.controler().setWriteEventsInterval(50);
-		Set<String> snapshotFormat = new HashSet<String>();
-		//snapshotFormat.add("otfvis");
-		config.controler().setSnapshotFormat(snapshotFormat);
-				
-		// strategy
 		{
-		StrategySettings strategySettings = new StrategySettings();
-		strategySettings.setStrategyName("ChangeExpBeta");
-		strategySettings.setWeight(1.0);
-		config.strategy().addStrategySettings(strategySettings);
+			StrategySettings strategySettings = new StrategySettings();
+			strategySettings.setStrategyName("ChangeExpBeta");
+			strategySettings.setWeight(1.0);
+			config.strategy().addStrategySettings(strategySettings);
+		}{
+			StrategySettings strategySettings = new StrategySettings();
+			strategySettings.setStrategyName("ReRoute");
+			strategySettings.setWeight(0.5);
+			strategySettings.setDisableAfter(90);
+			config.strategy().addStrategySettings(strategySettings);
 		}
-		{
-		StrategySettings strategySettings = new StrategySettings();
-		strategySettings.setStrategyName("ReRoute");
-		strategySettings.setWeight(0.5);
-		strategySettings.setDisableAfter(90);
-		config.strategy().addStrategySettings(strategySettings);
-		}
-		// not necessary when cadyts as scoring is used
-//		{
-//		StrategySettings strategySetinngs = new StrategySettings();
-//		strategySetinngs.setStrategyName("cadytsCar");
-//		strategySetinngs.setWeight(1.0);
-//		config.strategy().addStrategySettings(strategySetinngs);
-//		}
-		
 		config.strategy().setMaxAgentPlanMemorySize(10);
 		//config.strategy().setMaxAgentPlanMemorySize(5);
 		
-		// planCalcScore
 		ActivityParams homeActivity = new ActivityParams("home");
 		homeActivity.setTypicalDuration(12*60*60);
 		config.planCalcScore().addActivityParams(homeActivity);
@@ -144,50 +109,35 @@ public class CemdapMatsimCadytsController {
 		// ActivityParams educActivity = new ActivityParams("educ");
 		// educActivity.setTypicalDuration(9*60*60);
 		// config.planCalcScore().addActivityParams(educActivity);
+
+		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "ignore");
 		
-		// start controller
-		final Controler controler = new Controler(config);
-		
-		// cadytsContext (and cadytsCarConfigGroup)
-		// CadytsContext generates new CadytsCarConfigGroup with name "cadytsCar"
+		final Controler controler = new Controler(config);	
 		controler.addOverridingModule(new CadytsCarModule());
-		
 //		controler.getConfig().getModule("cadytsCar").addParam("startTime", "00:00:00"); // TODO reactivate
 //		controler.getConfig().getModule("cadytsCar").addParam("endTime", "24:00:00");
-		
-        // not necessary anymore, just use normal ChangeExpBeta
-//		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
-//			@Override
-//			public PlanStrategy get() {
-//				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(
-//						controler.getConfig().planCalcScore().getBrainExpBeta(), cContext));
-//			}
-//		});
-		
-		// scoring function
+
+		/* Add Cadyts component to scoring function */
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-//			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-			@Inject private CadytsContext cContext;
+			@Inject private CadytsContext cadytsContext;
 			@Inject CharyparNagelScoringParametersForPerson parameters;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-				// outcommenting following lines until return statement -> set scoring to zero
-				// outcommenting following three lines -> cadyts-only scoring
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cContext);
+				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cadytsContext);
 				final double cadytsScoringWeight = 15.0 * config.planCalcScore().getBrainExpBeta();
-				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
-				sumScoringFunction.addScoringFunction(scoringFunction );
+				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
+				sumScoringFunction.addScoringFunction(scoringFunction);
 
 				return sumScoringFunction;
 			}
-		}) ;
+		});
 
 		controler.run();
 	}
