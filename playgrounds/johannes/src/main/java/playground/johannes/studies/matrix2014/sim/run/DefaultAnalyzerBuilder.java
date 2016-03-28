@@ -97,7 +97,7 @@ public class DefaultAnalyzerBuilder {
                 histogramWriter));
 
 //        LegCollector<String> purposeCollector = new LegCollector<>(new AttributeProvider<Segment>(CommonKeys.LEG_PURPOSE));
-//        purposeCollector.setPredicate(engine.getLegPredicate());
+//        purposeCollector.setLegPredicate(engine.getLegPredicate());
 //        Set<String> purposes = new HashSet<>(purposeCollector.collect(engine.getRefPersons()));
 //        purposes.remove(null);
 //        for (String purpose : purposes) {

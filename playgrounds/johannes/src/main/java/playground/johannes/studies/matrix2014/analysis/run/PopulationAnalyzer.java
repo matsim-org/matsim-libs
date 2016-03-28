@@ -101,7 +101,7 @@ public class PopulationAnalyzer {
 
         ActivityFacilities facilities = ((FacilityData)dataPool.get(FacilityDataLoader.KEY)).getAll();
 //        LegStatsPerZone legStatsPerZone = new LegStatsPerZone(zoneData.getLayer("nuts3"), facilities, ioContext);
-//        legStatsPerZone.setPredicate(carPredicate);
+//        legStatsPerZone.setLegPredicate(carPredicate);
 //        tasks.addComponent(legStatsPerZone);
 //
 //        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(

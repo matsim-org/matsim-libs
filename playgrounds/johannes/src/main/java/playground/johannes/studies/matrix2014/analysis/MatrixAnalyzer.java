@@ -71,10 +71,10 @@ public class MatrixAnalyzer implements AnalyzerTask<Collection<? extends Person>
     public MatrixAnalyzer(ActivityLocationLayer facilities, ZoneCollection zones, NumericMatrix refMatrix, String name, String layerName) {
         this.refMatrix = refMatrix;
         this.matrixName = name;
-        matrixBuilder = new DefaultMatrixBuilder(facilities, zones, layerName);
+        matrixBuilder = new DefaultMatrixBuilder(facilities, zones);
     }
 
-    public void setPredicate(Predicate<Segment> predicate) {
+    public void setLegPredicate(Predicate<Segment> predicate) {
         this.predicate = predicate;
     }
 

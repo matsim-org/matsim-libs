@@ -112,7 +112,7 @@ public class NetLoad {
 		/*
 		 * load zones
 		 */
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "NO");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "NO", null);
 		/*
 		 * setup router
 		 */

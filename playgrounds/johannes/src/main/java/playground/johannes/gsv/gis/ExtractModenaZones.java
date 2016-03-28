@@ -41,7 +41,7 @@ public class ExtractModenaZones {
 	 */
 	public static void main(String[] args) throws IOException {
 		ZoneCollection world = ZoneEsriShapeIO.read("");
-		ZoneCollection ger = new ZoneCollection();
+		ZoneCollection ger = new ZoneCollection(null);
 		
 		for(Zone zone : world.getZones()) {
 			if("DE".equalsIgnoreCase(zone.getAttribute("NUTS0_CODE"))) {

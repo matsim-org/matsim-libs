@@ -20,6 +20,7 @@ package playground.johannes.studies.matrix2014.sim.run;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.TDoubleDoubleMap;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.log4j.Logger;
@@ -35,26 +36,21 @@ import org.matsim.facilities.Facility;
 import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
 import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonian;
 import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonianConfigurator;
-import playground.johannes.synpop.analysis.AnalyzerTask;
-import playground.johannes.synpop.analysis.HistogramWriter;
-import playground.johannes.synpop.analysis.PassThroughDiscretizerBuilder;
-import playground.johannes.synpop.analysis.Predicate;
+import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.gis.*;
-import playground.johannes.synpop.sim.AttributeChangeListener;
-import playground.johannes.synpop.sim.Hamiltonian;
-import playground.johannes.synpop.sim.HamiltonianLogger;
-import playground.johannes.synpop.sim.UnivariatFrequency;
+import playground.johannes.synpop.sim.*;
 import playground.johannes.synpop.sim.data.*;
+import playground.johannes.synpop.util.Executor;
 
 import java.util.*;
 
 /**
  * @author jillenberger
  */
-public class GeoDistanceZoneHamiltonian {
+public class GeoDistanceZoneHamiltonian2 {
 
-    private static final Logger logger = Logger.getLogger(GeoDistanceZoneHamiltonian.class);
+    private static final Logger logger = Logger.getLogger(GeoDistanceZoneHamiltonian2.class);
 
 
     public static final String MODULE_NAME = "geoDistanceHamiltonian";
@@ -63,11 +59,6 @@ public class GeoDistanceZoneHamiltonian {
 
     public static void build(Simulator engine, Config config) {
         ConfigGroup configGroup = config.getModule(MODULE_NAME);
-        /*
-        Get the elements the hamiltonian runs on.
-         */
-        Set<Attributable> refLegs = getCarLegs(engine.getRefPersons(), engine.getLegPredicate());
-        //Set<Attributable> simLegs = getCarLegs(engine.getSimPersons(), engine.getLegPredicate());
         /*
         Create the geo distance discretizer.
          */
@@ -79,6 +70,10 @@ public class GeoDistanceZoneHamiltonian {
         for (int d = 500000; d < 1000000; d += 100000) borders.add(d);
         borders.add(Double.MAX_VALUE);
         Discretizer discretizer = new FixedBordersDiscretizer(borders.toArray());
+
+        LegAttributeHistogramBuilder builder = new LegAttributeHistogramBuilder(CommonKeys.LEG_GEO_DISTANCE, discretizer);
+        builder.setPredicate(engine.getLegPredicate());
+        TDoubleDoubleMap refHist = builder.build(engine.getRefPersons());
         /*
         Index zones
          */
@@ -86,12 +81,12 @@ public class GeoDistanceZoneHamiltonian {
         ZoneCollection zones = ((ZoneData) engine.getDataPool().get(ZoneDataLoader.KEY)).getLayer("nuts3");
         TObjectIntMap<Zone> indices = indexZones(engine.getSimPersons(), facilities, zones);
 
-        Map<String, Set<Attributable>> simLegsMap = getSimLegs(engine.getSimPersons(), engine.getLegPredicate());
+        Map<String, Set<Person>> simPersonsMap = getSimPersons(engine.getSimPersons());
 
         int emptyZones = 0;
 
         logger.debug("Creating zone hamiltonians...");
-        List<UnivariatFrequency> hamiltonians = new ArrayList<>(indices.size());
+        List<UnivariatFrequency2> hamiltonians = new ArrayList<>(indices.size());
         ProgressLogger.init(indices.size(), 2, 10);
 
         int[] indexArray = indices.values();
@@ -100,20 +95,25 @@ public class GeoDistanceZoneHamiltonian {
 
         for (int i = 0; i <= maxKey; i++) {
 
-            Set<Attributable> simLegs = simLegsMap.get(String.valueOf(i));
+            Set<Person> simPersons = simPersonsMap.get(String.valueOf(i));
 
-            if(simLegs.size() > 0) {
+            if(simPersons.size() > 0) {
             /*
             Create and add the hamiltonian.
             */
-                UnivariatFrequency hamiltonian = new UnivariatFrequency(
-                        refLegs,
-                        simLegs,
+                builder = new LegAttributeHistogramBuilder(CommonKeys.LEG_GEO_DISTANCE, discretizer);
+                builder.setPredicate(PredicateAndComposite.create(
+                        engine.getLegPredicate(),
+                        new LegPersonAttributePredicate(PERSON_ZONE_IDX, String.valueOf(i))));
+                UnivariatFrequency2 hamiltonian = new UnivariatFrequency2(
+                        refHist,
+                        builder,
                         CommonKeys.LEG_GEO_DISTANCE,
                         discretizer,
-                        engine.getUseWeights());
+                        engine.getUseWeights(),
+                        false);
 
-                hamiltonian.setErrorExponent(1.0);
+                hamiltonian.setErrorExponent(2.0);
 
                 hamiltonians.add(hamiltonian);
             } else {
@@ -155,7 +155,8 @@ public class GeoDistanceZoneHamiltonian {
         engine.getEngineListeners().addComponent(new HamiltonianLogger(hamiltonian,
                 engine.getLoggingInterval(),
                 CommonKeys.LEG_GEO_DISTANCE,
-                engine.getIOContext().getRoot()));
+                engine.getIOContext().getRoot(),
+                annealingHamiltonian.getStartIteration()));
 
         logger.debug("Done setting up hamiltonian.");
     }
@@ -172,27 +173,22 @@ public class GeoDistanceZoneHamiltonian {
         return legs;
     }
 
-    private static Map<String, Set<Attributable>> getSimLegs(Set<? extends Person> persons, Predicate<Segment> predicate) {
-        Map<String, Set<Attributable>> legsMap = new LinkedHashMap<>();
+    private static Map<String, Set<Person>> getSimPersons(Set<? extends Person> persons) {
+        Map<String, Set<Person>> personsMap = new LinkedHashMap<>();
         for (Person p : persons) {
             String zoneIndex = p.getAttribute(PERSON_ZONE_IDX);
 
-            if(zoneIndex == null) throw new NullPointerException();
+            if (zoneIndex == null) throw new NullPointerException();
 
-            Episode e = p.getEpisodes().get(0);
-            for (Segment leg : e.getLegs()) {
-                if (predicate.test(leg)) {
-                    Set<Attributable> legs = legsMap.get(zoneIndex);
-                    if(legs == null) {
-                        legs = new HashSet<>();
-                        legsMap.put(zoneIndex, legs);
-                    }
-                    legs.add(leg);
-                }
+            Set<Person> zonePersons = personsMap.get(zoneIndex);
+            if (zonePersons == null) {
+                zonePersons = new HashSet<>();
+                personsMap.put(zoneIndex, zonePersons);
             }
+            zonePersons.add(p);
         }
 
-        return legsMap;
+        return personsMap;
     }
 
     private static TObjectIntMap indexZones(Set<? extends Person> simPersons, ActivityFacilities facilities,
@@ -240,39 +236,62 @@ public class GeoDistanceZoneHamiltonian {
 
     private static class HamiltonianWrapper implements Hamiltonian, AttributeChangeListener {
 
-        private final List<UnivariatFrequency> hamiltonians;
+        private final List<UnivariatFrequency2> hamiltonians;
 
         private Object dataKey;
 
         private final Object indexDataKey = new Object();
 
-        public HamiltonianWrapper(List<UnivariatFrequency> hamiltonians) {
+        private boolean isInitialized = false;
+
+        private double sum;
+
+        public HamiltonianWrapper(List<UnivariatFrequency2> hamiltonians) {
             this.hamiltonians = hamiltonians;
         }
 
         @Override
         public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement element) {
-            if(this.dataKey == null) this.dataKey = Converters.register(
-                    CommonKeys.LEG_GEO_DISTANCE,
-                    new DoubleConverter());
+            if(isInitialized) {
+                if (this.dataKey == null) this.dataKey = Converters.register(
+                        CommonKeys.LEG_GEO_DISTANCE,
+                        new DoubleConverter());
 
-            if(this.dataKey.equals(dataKey)) {
-                getHamiltonian(element).onChange(dataKey, oldValue, newValue, element);
+                if (this.dataKey.equals(dataKey)) {
+                    UnivariatFrequency2 uf = getHamiltonian(element);
+                    double h = uf.evaluate(null);
+                    uf.onChange(dataKey, oldValue, newValue, element);
+                    double h2 = uf.evaluate(null);
+
+                    sum += (h2 - h);
+                }
             }
-
         }
 
         @Override
         public double evaluate(Collection<CachedPerson> population) {
-            double sum = 0;
-            for(int i = 0; i < hamiltonians.size(); i++) {
-                sum += hamiltonians.get(i).evaluate(population);
+            if(!isInitialized) {
+                logger.info("Initializing hamiltonians...");
+                ProgressLogger.init(hamiltonians.size(), 2, 10);
+                sum = 0;
+
+                List<RunThread> threads = new ArrayList<>(hamiltonians.size());
+                for (int i = 0; i < hamiltonians.size(); i++) {
+                    threads.add(new RunThread(population, hamiltonians.get(i)));
+                }
+
+                Executor.submitAndWait(threads);
+
+                for(RunThread thread : threads) sum += thread.getResult();
+
+                ProgressLogger.terminate();
+                isInitialized = true;
             }
 
-            return sum/(double)hamiltonians.size();
+            return sum / (double) hamiltonians.size();
         }
 
-        private UnivariatFrequency getHamiltonian(CachedElement element) {
+        private UnivariatFrequency2 getHamiltonian(CachedElement element) {
             CachedSegment leg = (CachedSegment)element;
             CachedPerson person = (CachedPerson) leg.getEpisode().getPerson();
 
@@ -283,6 +302,30 @@ public class GeoDistanceZoneHamiltonian {
             }
 
             return hamiltonians.get(index);
+        }
+
+        private class RunThread implements Runnable {
+
+            private final Collection<CachedPerson> persons;
+
+            private final Hamiltonian h;
+
+            double val;
+
+            public RunThread(Collection<CachedPerson> persons, Hamiltonian h) {
+                this.persons = persons;
+                this.h = h;
+            }
+
+            @Override
+            public void run() {
+                val = h.evaluate(persons);
+                ProgressLogger.step();
+            }
+
+            public double getResult() {
+                return val;
+            }
         }
     }
 }

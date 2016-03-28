@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,24 +16,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.sim.util;
 
-package playground.johannes.studies.matrix2014.analysis;
+import gnu.trove.map.TDoubleDoubleMap;
+import org.matsim.contrib.common.stats.Discretizer;
 
-import playground.johannes.synpop.analysis.Predicate;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.matrix.NumericMatrix;
-
-import java.util.Collection;
+import java.util.Arrays;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public interface MatrixBuilder {
+public class DynamicArrayBuilder {
 
-    void setLegPredicate(Predicate<Segment> predicate);
+    public static DynamicDoubleArray build(TDoubleDoubleMap hist, Discretizer discretizer) {
+        double[] keys = hist.keys();
+        Arrays.sort(keys);
 
-    void setUseWeights(boolean useWeights);
+        DynamicDoubleArray arr = new DynamicDoubleArray(keys.length, 0);
+        for(double key : keys) {
+            int idx = discretizer.index(key);
+            double val = hist.get(key);
+            arr.set(idx, val);
+        }
 
-    NumericMatrix build(Collection<? extends Person> population);
+        return arr;
+    }
 }

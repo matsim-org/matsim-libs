@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,24 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.sim;
 
-package playground.johannes.studies.matrix2014.analysis;
-
-import playground.johannes.synpop.analysis.Predicate;
+import gnu.trove.map.TDoubleDoubleMap;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.util.Collection;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public interface MatrixBuilder {
+public interface HistogramBuilder {
 
-    void setLegPredicate(Predicate<Segment> predicate);
+    TDoubleDoubleMap build(Collection<? extends Person> persons);
 
-    void setUseWeights(boolean useWeights);
-
-    NumericMatrix build(Collection<? extends Person> population);
 }

@@ -34,6 +34,8 @@ import java.util.*;
  */
 public class ZoneCollection {
 
+	private final String id;
+
 	private final Set<Zone> zones;
 
 	private SpatialIndex spatialIndex;
@@ -42,8 +44,13 @@ public class ZoneCollection {
 
 	private String primaryKey;
 
-	public ZoneCollection() {
+	public ZoneCollection(String id) {
+		this.id = id;
 		zones = new LinkedHashSet<>();
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public void setPrimaryKey(String key) {

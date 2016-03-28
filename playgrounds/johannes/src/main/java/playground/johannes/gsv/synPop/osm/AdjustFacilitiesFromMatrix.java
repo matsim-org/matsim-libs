@@ -71,7 +71,7 @@ public class AdjustFacilitiesFromMatrix {
 		logger.info("Loading zones...");
 		String data = new String(Files.readAllBytes(Paths.get(zonesFile)));
 		Set<Zone> tmp = ZoneGeoJsonIO.parseFeatureCollection(data);
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		zones.addAll(tmp);
 		/*
 		 * load facilities

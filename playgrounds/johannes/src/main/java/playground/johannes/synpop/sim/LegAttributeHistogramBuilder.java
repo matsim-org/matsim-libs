@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,24 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.synpop.sim;
 
-package playground.johannes.studies.matrix2014.analysis;
-
-import playground.johannes.synpop.analysis.Predicate;
-import playground.johannes.synpop.data.Person;
+import org.matsim.contrib.common.stats.Discretizer;
+import playground.johannes.synpop.analysis.NumericAttributeProvider;
 import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.matrix.NumericMatrix;
-
-import java.util.Collection;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public interface MatrixBuilder {
+public class LegAttributeHistogramBuilder extends LegHistogramBuilder {
 
-    void setLegPredicate(Predicate<Segment> predicate);
-
-    void setUseWeights(boolean useWeights);
-
-    NumericMatrix build(Collection<? extends Person> population);
+    public LegAttributeHistogramBuilder(String key, Discretizer discretizer) {
+        super(new NumericAttributeProvider<Segment>(key), discretizer);
+    }
 }

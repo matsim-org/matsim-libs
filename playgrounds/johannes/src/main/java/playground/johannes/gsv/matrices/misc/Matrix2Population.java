@@ -187,7 +187,7 @@ public class Matrix2Population {
 
 		String outFile = args[3];
 
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "NO");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "NO", null);
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,       *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,24 +16,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.johannes.studies.matrix2014.analysis;
 
-import playground.johannes.synpop.analysis.Predicate;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.matrix.NumericMatrix;
-
-import java.util.Collection;
+import playground.johannes.studies.matrix2014.gis.ActivityLocationLayer;
+import playground.johannes.synpop.gis.ZoneCollection;
 
 /**
- * @author johannes
+ * @author jillenberger
  */
-public interface MatrixBuilder {
+public interface MatrixBuilderFactory {
 
-    void setLegPredicate(Predicate<Segment> predicate);
+    MatrixBuilder create(ActivityLocationLayer locations, ZoneCollection zones);
 
-    void setUseWeights(boolean useWeights);
-
-    NumericMatrix build(Collection<? extends Person> population);
 }

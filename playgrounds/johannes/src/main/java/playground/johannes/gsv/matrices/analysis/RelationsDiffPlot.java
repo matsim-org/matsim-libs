@@ -83,7 +83,7 @@ public class RelationsDiffPlot {
 		/*
 		 * load zones
 		 */
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.json")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");

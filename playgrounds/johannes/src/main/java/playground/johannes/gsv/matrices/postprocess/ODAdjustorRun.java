@@ -96,7 +96,7 @@ public class ODAdjustorRun {
 //		MatrixOperations.multiply(refMatrix, 1 / 16.0);
 //		MatrixOperations.multiply(refMatrix, 1 / (4 * 11.8));
 
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 //		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
 		String data = new String(Files.readAllBytes(Paths.get(args[4])));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
