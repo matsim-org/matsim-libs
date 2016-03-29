@@ -67,18 +67,31 @@ public class PlanCorrector {
 		new ObjectAttributesXmlReader(population.getPersonAttributes()).parse(populationAttributesFile);
 		
 		int hasCar = 0;
-		for (Person p : population.getPersons().values()) {		
+		int hasLicense = 0;
+		int hasBoth = 0;
+		for (Person person : population.getPersons().values()) {		
 			// TODO: adapt the replannning module -> PITA
-			String carAvail = (String)  population.getPersonAttributes().getAttribute(p.getId().toString(), "car");	
-			if (carAvail.equals("0")) PersonUtils.setCarAvail(p, "never");
+			String carAvail = (String)  population.getPersonAttributes().getAttribute(person.getId().toString(), "car");	
+			if (carAvail.equals("0")) PersonUtils.setCarAvail(person, "never");
 			else {
-				PersonUtils.setCarAvail(p, "always");	
+				PersonUtils.setCarAvail(person, "always");	
 				hasCar++;
 			}
+			String license = (String)  population.getPersonAttributes().getAttribute(person.getId().toString(), "license");	
+			if (license.equals("0")) PersonUtils.setLicence(person, "no");
+			else {
+				PersonUtils.setLicence(person, "yes");	
+				hasLicense++;
+			}
+			
+			if (!carAvail.equals("0") && license.equals("1")) hasBoth++;
+			
 		}
 		double size = population.getPersons().size();
-		double share = hasCar / size;
-		log.info("Share of persons with car: " + df.format(share));
+		double shareCar = hasCar / size;
+		double shareLicense = hasLicense / size;
+		double shareBoth = hasBoth / size;
+		log.info("Share of persons with car: " + df.format(shareCar) + " with license: " + df.format(shareLicense) + " both: " + df.format(shareBoth));
 	}
 	
 	private void writePlans(Population population, Network network, String outFile) {
