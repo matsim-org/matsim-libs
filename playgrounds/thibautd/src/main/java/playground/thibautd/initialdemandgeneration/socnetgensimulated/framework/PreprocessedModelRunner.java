@@ -295,7 +295,6 @@ public class PreprocessedModelRunner implements ModelRunner {
 			final Random random = new Random( randomSeed + 20140107 + i );
 			threads.add(
 					() -> {
-						final TIntList potentialAlters = new TIntArrayList();
 						// TODO: modify doublyweighted preprocess to avoid having to do that externally
 						final TIntDoubleMap highestPrimary = new TIntDoubleHashMap();
 
@@ -317,19 +316,11 @@ public class PreprocessedModelRunner implements ModelRunner {
 								altersOfAltersSet.clear();
 								preprocess.fillWithAltersOverWeight( altersOfAltersSet , alter , primaryThreshold );
 
-								potentialAlters.clear();
-								altersOfAltersSet.forEach( fof -> {
-									if ( fof <= ego ) return true; // only consider upper half of matrix
-									if ( altersSet.contains( fof ) ) return true;
-									potentialAlters.add( fof );
-									return true;
-								} );
-
-								for ( int remainingChecks = (int) Math.ceil( secondarySampleRate * potentialAlters.size() );
-										remainingChecks > 0 && !potentialAlters.isEmpty();
-										remainingChecks--) {
+								altersOfAltersSet.forEach( alterOfAlter -> {
+									if ( alterOfAlter <= ego ) return true; // only consider upper half of matrix
+									if ( altersSet.contains( alterOfAlter ) ) return true;
+									if ( random.nextDouble() > secondarySampleRate ) return true;
 									counter.incCounter();
-									final int alterOfAlter = potentialAlters.removeAt( random.nextInt( potentialAlters.size() ) );
 
 									// "utility" of an alter of alter is the min of the
 									// two linked ties, as below this utility it is not an
@@ -345,7 +336,8 @@ public class PreprocessedModelRunner implements ModelRunner {
 											highestPrimary.get( alterOfAlter ) < aoaWeight ) {
 										highestPrimary.put( alterOfAlter , aoaWeight );
 									}
-								}
+									return true;
+								} );
 
 								return true;
 							} );
