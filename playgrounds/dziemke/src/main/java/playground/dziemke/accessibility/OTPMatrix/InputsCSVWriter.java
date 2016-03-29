@@ -1,4 +1,4 @@
-package playground.dziemke.accessibility.routeMatrix;
+package playground.dziemke.accessibility.OTPMatrix;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;

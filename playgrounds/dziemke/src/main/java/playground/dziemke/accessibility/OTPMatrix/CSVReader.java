@@ -1,4 +1,4 @@
-package playground.dziemke.accessibility.routeMatrix;
+package playground.dziemke.accessibility.OTPMatrix;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class CSVReader {
 
     private String zeile;
-    private ArrayList<String> list = new ArrayList<String>();
+    private ArrayList<String> list = new ArrayList<>();
     private String[] split = null;
     private BufferedReader data;
 	private boolean isReady = false; 
@@ -46,13 +46,13 @@ public class CSVReader {
 		try {
 			while ((zeile = data.readLine()) != null) {
 			    split = zeile.split(this.seperator);
-			    for(int i=0; i<split.length; i++) {
-			        //leere Zeilen ignorieren
-			        if( !(split[i].equals("")) )
-			        //eventuelle Leerzeichen zwischen zwei ',' entfernen
-			        //und Wert in Liste schreiben
-			        list.add(split[i].trim());
-			    }
+				for (String aSplit : split) {
+					//leere Zeilen ignorieren
+					if (!(aSplit.equals("")))
+						//eventuelle Leerzeichen zwischen zwei ',' entfernen
+						//und Wert in Liste schreiben
+						list.add(aSplit.trim());
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
