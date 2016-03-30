@@ -87,9 +87,9 @@ public class FacilityData {
         return quadTrees.get(type);
     }
 
-    public String getAttribute(ActivityFacility facility, String key) {
-        return null;
-    }
+//    public String getAttribute(ActivityFacility facility, String key) {
+//        return null;
+//    }
 
     private synchronized void initMap() {
         if (facilitiesMap == null) {
@@ -119,7 +119,7 @@ public class FacilityData {
         if (quadtree == null) {
             logger.debug(String.format("Initializing quad tree for facilities of type %s.", type));
 
-            List<ActivityFacility> facilities = facilitiesMap.get(type);
+            List<ActivityFacility> facilities = getFacilities(type);
             double minx = Double.MAX_VALUE;
             double miny = Double.MAX_VALUE;
             double maxx = 0;
