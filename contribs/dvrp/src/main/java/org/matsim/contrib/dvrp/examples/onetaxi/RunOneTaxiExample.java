@@ -35,6 +35,8 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 public class RunOneTaxiExample
 {
     public static final String MODE = "taxi";
+    private static final String ONE_TAXI_GROUP_NAME = "one_taxi";
+    private static final String TAXIS_FILE = "taxisFile";
 
 
     public static void run(boolean otfvis)
@@ -46,15 +48,15 @@ public class RunOneTaxiExample
 
     public static void run(String configFile, boolean otfvis)
     {
-        Config config = ConfigUtils.loadConfig(configFile, new OTFVisConfigGroup());
+        ConfigGroup oneTaxiCfg = new ConfigGroup(ONE_TAXI_GROUP_NAME) {};
+        Config config = ConfigUtils.loadConfig(configFile, new OTFVisConfigGroup(), oneTaxiCfg);
         config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
         config.checkConsistency();
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
         final VrpData vrpData = new VrpDataImpl();
-        String taxisFile = config.getModule("one_taxi").getValue("taxisFile");
-        new VehicleReader(scenario.getNetwork(), vrpData).parse(taxisFile);
+        new VehicleReader(scenario.getNetwork(), vrpData).parse(oneTaxiCfg.getValue(TAXIS_FILE));
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new AbstractModule() {

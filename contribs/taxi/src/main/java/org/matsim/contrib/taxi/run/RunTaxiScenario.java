@@ -40,8 +40,15 @@ public class RunTaxiScenario
 {
     public static void run(String configFile, boolean otfvis)
     {
-        final TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-        Config config = ConfigUtils.loadConfig(configFile, taxiCfg, new OTFVisConfigGroup());
+        Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
+                new OTFVisConfigGroup());
+        run(config, otfvis);
+    }
+
+
+    public static void run(Config config, boolean otfvis)
+    {
+        TaxiConfigGroup taxiCfg = (TaxiConfigGroup)config.getModule(TaxiConfigGroup.GROUP_NAME);
         config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
         config.checkConsistency();
 
@@ -97,7 +104,8 @@ public class RunTaxiScenario
 
     public static void main(String[] args)
     {
-        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
+        //        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
+        String configFile = "./src/main/resources/mielec_2014_02/config.xml";
         RunTaxiScenario.run(configFile, true);
     }
 }
