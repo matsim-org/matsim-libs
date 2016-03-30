@@ -45,7 +45,7 @@ public class FifoSchedulingProblem
             TaxiRequest req = unplannedRequests.peek();
 
             BestDispatchFinder.Dispatch best = dispatchFinder.findBestVehicleForRequest(req,
-                    optimContext.context.getVrpData().getVehicles().values());
+                    optimContext.taxiData.getVehicles().values());
             
             //TODO search only through available vehicles
             //TODO what about k-nearstvehicle filtering?

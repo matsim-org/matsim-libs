@@ -23,11 +23,11 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.scheduler.*;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
+import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
 import org.matsim.contrib.util.distance.DistanceUtils;
 
 import com.google.common.collect.Iterables;
@@ -42,8 +42,7 @@ import playground.jbischoff.taxi.vehicles.ElectricTaxi;
 
 public class IdleRankVehicleFinder
 {
-    private final MatsimVrpContext context;
-    private final TaxiScheduler scheduler;
+    private final TaxiOptimizerContext optimContext;
     private ElectricTaxiChargingHandler ecabHandler;
     private boolean IsElectric;
     private boolean useChargeOverTime;
@@ -52,10 +51,9 @@ public class IdleRankVehicleFinder
     private static double MINIMUM_SOC_FOR_DISPATCH = 0.25;
 
 
-    public IdleRankVehicleFinder(MatsimVrpContext context, TaxiScheduler scheduler)
+    public IdleRankVehicleFinder(TaxiOptimizerContext optimContext)
     {
-        this.context = context;
-        this.scheduler = scheduler;
+        this.optimContext = optimContext;
         this.IsElectric = false;
         this.useChargeOverTime = false;
         this.rnd = new Random(7);
@@ -102,19 +100,19 @@ public class IdleRankVehicleFinder
     }
 
 
-//    public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
-//            TaxiRequest request)
-//    {
-//        return Lists.newArrayList(findVehicleForRequest(vehicles, request));
-//    }
-
+    //    public Iterable<Vehicle> filterVehiclesForRequest(Iterable<Vehicle> vehicles,
+    //            TaxiRequest request)
+    //    {
+    //        return Lists.newArrayList(findVehicleForRequest(vehicles, request));
+    //    }
 
     private Vehicle findBestChargedVehicle(TaxiRequest req)
     {
         Vehicle bestVeh = null;
         double bestDistance = 1e9;
 
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(
+                optimContext.taxiData.getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         for (Vehicle veh : vehicles) {
@@ -152,10 +150,12 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         double bestSoc = 0;
 
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(
+                optimContext.taxiData.getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
-        for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
+        for (Vehicle veh : Iterables.filter(vehicles,
+                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -176,10 +176,12 @@ public class IdleRankVehicleFinder
         Vehicle bestVeh = null;
         double bestSoc = 0;
 
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(
+                optimContext.taxiData.getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
-        for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
+        for (Vehicle veh : Iterables.filter(vehicles,
+                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -207,13 +209,15 @@ public class IdleRankVehicleFinder
 
     private Vehicle findClosestFIFOVehicle(TaxiRequest req)
     {
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(
+                optimContext.taxiData.getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         Vehicle bestVeh = null;
         //          double bestDistance = Double.MAX_VALUE;
         double bestDistance = Double.MAX_VALUE / 2;
-        for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
+        for (Vehicle veh : Iterables.filter(vehicles,
+                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -242,13 +246,15 @@ public class IdleRankVehicleFinder
 
     private Vehicle findClosestWillingVehicle(TaxiRequest req)
     {
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles().values());
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(
+                optimContext.taxiData.getVehicles().values());
         Collections.shuffle(vehicles, rnd);
 
         Vehicle bestVeh = null;
         //          double bestDistance = Double.MAX_VALUE;
         double bestDistance = Double.MAX_VALUE / 2;
-        for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
+        for (Vehicle veh : Iterables.filter(vehicles,
+                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler))) {
             if (this.IsElectric)
                 if (!this.hasEnoughCapacityForTask(veh))
                     continue;
@@ -292,7 +298,7 @@ public class IdleRankVehicleFinder
 
     private double calculateSquaredDistance(TaxiRequest req, Vehicle veh)
     {
-        LinkTimePair departure = scheduler.getEarliestIdleness(veh);
+        LinkTimePair departure = optimContext.scheduler.getEarliestIdleness(veh);
         Link fromLink;
         if (departure == null) {
             return Double.MAX_VALUE;

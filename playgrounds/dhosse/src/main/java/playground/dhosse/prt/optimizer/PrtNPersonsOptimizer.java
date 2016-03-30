@@ -10,9 +10,9 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
 	
-	public PrtNPersonsOptimizer(TaxiOptimizerContext optimConfig) {
+	public PrtNPersonsOptimizer(TaxiOptimizerContext optimContext) {
 		
-		super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), false);
+		super(optimContext, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), false);
 		
 	}
 	

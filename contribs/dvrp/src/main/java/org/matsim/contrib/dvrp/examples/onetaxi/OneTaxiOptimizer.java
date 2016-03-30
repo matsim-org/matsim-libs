@@ -21,14 +21,15 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -40,7 +41,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 public class OneTaxiOptimizer
     implements VrpOptimizer
 {
-    private final MatsimVrpContext context;
+    private final MobsimTimer timer;
 
     private final TravelTime travelTime;
     private final LeastCostPathCalculator router;
@@ -49,18 +50,20 @@ public class OneTaxiOptimizer
     private final Schedule<AbstractTask> schedule;// the vehicle's schedule
 
     public static final double PICKUP_DURATION = 120;
+    public static final double DROPOFF_DURATION = 60;
 
 
     @SuppressWarnings("unchecked")
-    public OneTaxiOptimizer(MatsimVrpContext context)
+    public OneTaxiOptimizer(Scenario scenario, VrpData vrpData, MobsimTimer timer)
     {
-        this.context = context;
+        this.timer = timer;
 
         travelTime = new FreeSpeedTravelTime();
-        router = new Dijkstra(context.getScenario().getNetwork(),
-                new TimeAsTravelDisutility(travelTime), travelTime);
+        router = new Dijkstra(scenario.getNetwork(), new TimeAsTravelDisutility(travelTime),
+                travelTime);
 
-        vehicle = context.getVrpData().getVehicles().values().iterator().next();
+        vehicle = vrpData.getVehicles().values().iterator().next();
+        vehicle.resetSchedule();//necessary if we run more than 1 iteration
         schedule = (Schedule<AbstractTask>)vehicle.getSchedule();
         schedule.addTask(
                 new StayTaskImpl(vehicle.getT0(), vehicle.getT1(), vehicle.getStartLink(), "wait"));
@@ -71,7 +74,7 @@ public class OneTaxiOptimizer
     public void requestSubmitted(Request request)
     {
         StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only WaitTask possible here
-        double currentTime = context.getTime();
+        double currentTime = timer.getTimeOfDay();
 
         switch (lastTask.getStatus()) {
             case PLANNED:
@@ -107,7 +110,7 @@ public class OneTaxiOptimizer
         schedule.addTask(new DriveTaskImpl(p2));
 
         double t3 = p2.getArrivalTime();
-        double t4 = t3 + 60;// 1 minute for dropping off the passenger
+        double t4 = t3 + DROPOFF_DURATION;// 1 minute for dropping off the passenger
         schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, false, req));
 
         //just wait (and be ready) till the end of the vehicle's time window (T1)
@@ -124,15 +127,18 @@ public class OneTaxiOptimizer
     }
 
 
-    //Simplified version. For something more advanced, see:
-    //playground.michalm.taxi.scheduler.TaxiScheduler.updateCurrentAndPlannedTasks(...)
+    /**
+     * Simplified version. For something more advanced, see
+     * {@link org.matsim.contrib.taxi.scheduler.TaxiScheduler#updateBeforeNextTask(Schedule)} in the
+     * taxi contrib
+     */
     private void shiftTimings()
     {
         if (schedule.getStatus() != ScheduleStatus.STARTED) {
             return;
         }
 
-        double now = context.getTime();
+        double now = timer.getTimeOfDay();
         Task currentTask = schedule.getCurrentTask();
         double diff = now - currentTask.getEndTime();
 

@@ -6,9 +6,9 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
-import org.matsim.contrib.taxi.TaxiActionCreator;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.scheduler.*;
+import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.*;
@@ -27,18 +27,15 @@ import playground.dhosse.prt.scheduler.PrtScheduler;
 public class PrtQSimFactory implements MobsimFactory{
 	
 	private final PrtConfigGroup prtConfig;
-	private final MatsimVrpContextImpl context;
     public final TravelTime travelTime;
     public final TravelDisutility travelDisutility;
 	private AlgorithmConfig algorithmConfig;
 	
 
-    public PrtQSimFactory(PrtConfigGroup prtConfig, MatsimVrpContextImpl context,
-            TravelTime travelTime, TravelDisutility travelDisutility, AlgorithmConfig config)
+    public PrtQSimFactory(PrtConfigGroup prtConfig, TravelTime travelTime, TravelDisutility travelDisutility, AlgorithmConfig config)
     {
 		
 		this.prtConfig = prtConfig;
-		this.context = context;
 		this.algorithmConfig = config;
 		
         this.travelTime = travelTime;
@@ -48,7 +45,7 @@ public class PrtQSimFactory implements MobsimFactory{
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		
-		TaxiOptimizerContext taxiConfig = initOptimizerConfiguration(prtConfig, context, travelTime, travelDisutility, algorithmConfig);
+		TaxiOptimizerContext taxiConfig = initOptimizerConfiguration(prtConfig, travelTime, travelDisutility, algorithmConfig);
 		TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(taxiConfig);
 
 		QSimConfigGroup conf = sc.getConfig().qsim();

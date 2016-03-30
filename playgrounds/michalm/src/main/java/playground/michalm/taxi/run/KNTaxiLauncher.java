@@ -24,13 +24,12 @@ import java.util.*;
 import org.apache.commons.configuration.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.run.VrpPopulationUtils;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams.TravelTimeSource;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
+import org.matsim.contrib.util.PopulationUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 
@@ -48,7 +47,7 @@ class KNTaxiLauncher
         SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(config);
 
         if (removeNonPassengers) {
-            VrpPopulationUtils.removePersonsNotUsingMode(TaxiModule.TAXI_MODE, launcher.scenario);
+            PopulationUtils.removePersonsNotUsingMode(TaxiModule.TAXI_MODE, launcher.scenario);
 
             if (endActivitiesAtTimeZero) {
                 setEndTimeForFirstActivities(launcher.scenario, 0);
@@ -63,41 +62,6 @@ class KNTaxiLauncher
 
         launcher.initTravelTimeAndDisutility();
         launcher.simulateIteration("");
-    }
-
-
-    private static Configuration createConfig()
-    {
-        String inputDir = "../../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/";
-        Map<String, Object> map = new HashMap<>();
-        map.put(TaxiLauncherParams.NET_FILE, inputDir + "network.xml");
-
-        //demand: 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0
-        map.put(TaxiLauncherParams.PLANS_FILE, inputDir + "plans_taxi/plans_taxi_4.0.xml.gz");
-        //supply: 25, 50
-        map.put(TaxiLauncherParams.TAXIS_FILE, inputDir + "taxis-25.xml");
-
-        map.put(TaxiLauncherParams.ONLINE_VEHICLE_TRACKER, Boolean.FALSE);
-        map.put(TaxiLauncherParams.OTF_VIS, "true");
-
-        String sPrefix = TaxiLauncherConfigUtils.SCHEDULER + TaxiLauncherConfigUtils.DELIMITER;
-        map.put(sPrefix + TaxiSchedulerParams.DESTINATION_KNOWN, Boolean.FALSE);
-        map.put(sPrefix + TaxiSchedulerParams.VEHICLE_DIVERSION, Boolean.FALSE);
-        map.put(sPrefix + TaxiSchedulerParams.PICKUP_DURATION, 1.);
-        map.put(sPrefix + TaxiSchedulerParams.DROPOFF_DURATION, 1.);
-
-        String oPrefix = TaxiLauncherConfigUtils.OPTIMIZER + TaxiLauncherConfigUtils.DELIMITER;
-        map.put(oPrefix + AbstractTaxiOptimizerParams.PARAMS_CLASS,
-                RuleBasedTaxiOptimizerParams.class.getName());
-        map.put(oPrefix + AbstractTaxiOptimizerParams.ID, "KN");
-        map.put(oPrefix + AbstractTaxiOptimizerParams.TRAVEL_TIME_SOURCE,
-                TravelTimeSource.FREE_FLOW_SPEED.name());
-        map.put(oPrefix + RuleBasedTaxiOptimizerParams.GOAL, Goal.DEMAND_SUPPLY_EQUIL.name());
-        map.put(oPrefix + RuleBasedTaxiOptimizerParams.NEAREST_REQUESTS_LIMIT, 99999);
-        map.put(oPrefix + RuleBasedTaxiOptimizerParams.NEAREST_VEHICLES_LIMIT, 99999);
-        map.put(oPrefix + RuleBasedTaxiOptimizerParams.CELL_SIZE, 1000);
-
-        return new MapConfiguration(map);
     }
 
 

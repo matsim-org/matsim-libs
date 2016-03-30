@@ -31,13 +31,15 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.*;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 
 
 /**
  * It might be nicer to have ActivityEngine as a delegate, not as the superclass. But there is a
  * hardcoded "instanceof ActivityEngine" check in QSim :-( TODO introduce an ActivityEngine
  * interface?
+ * 
+ * DynActivityEngine and ActivityEngine could be decoupled
+ * (if we can ensure DynActivityEngine's handleActivity() is called before that of ActivityEngine)
  */
 public class DynActivityEngine
     extends ActivityEngine

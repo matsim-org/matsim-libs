@@ -21,8 +21,9 @@ package playground.jbischoff.taxibus.run.configuration;
 
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.taxi.multirun.VrpLauncherUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
@@ -58,7 +59,11 @@ public class ConfigBasedTaxibusLaunchUtils {
 		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) controler.getScenario().getConfig().getModule("taxibusConfig");
       	context = new MatsimVrpContextImpl();
 		context.setScenario(controler.getScenario());
-		VrpData vrpData = VrpLauncherUtils.initVrpData(context, tbcg.getVehiclesFile());
+        VrpData vrpData = new VrpDataImpl();
+        new VehicleReader(context.getScenario().getNetwork(), vrpData).parse(tbcg.getVehiclesFile());
+
+		
+		
 		final PermissibleModesCalculator taxibusPermissibleModesCalculator;
 		
 		final LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context,tbcg);	

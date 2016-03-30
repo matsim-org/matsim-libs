@@ -61,7 +61,7 @@ public class StatsCalculators
             public Integer calculateStat()
             {
                 return Iterables.size(
-                        Iterables.filter(optimContext.context.getVrpData().getVehicles().values(),
+                        Iterables.filter(optimContext.taxiData.getVehicles().values(),
                                 TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
             }
         };

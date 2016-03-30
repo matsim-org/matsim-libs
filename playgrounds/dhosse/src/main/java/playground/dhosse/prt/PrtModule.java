@@ -3,9 +3,9 @@ package playground.dhosse.prt;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.*;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.taxi.multirun.VrpLauncherUtils;
+import org.matsim.contrib.taxi.multirun.VrpLauncherUtils.*;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizers;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams.*;
 import org.matsim.core.config.ConfigUtils;
@@ -68,7 +68,7 @@ public class PrtModule {
 		ETaxiData data = new ETaxiData();
 		context.setVrpData(data);
 		new TaxiRankReader(context.getScenario(), (ETaxiData) context.getVrpData()).parse(prtConfig.getRanksFile());
-		new ETaxiReader(scenario, data).parse(prtConfig.getVehiclesFile());
+		new ETaxiReader(scenario.getNetwork(), data).parse(prtConfig.getVehiclesFile());
 		
 		PrtData prtData = new PrtData(scenario.getNetwork(), data);
 		

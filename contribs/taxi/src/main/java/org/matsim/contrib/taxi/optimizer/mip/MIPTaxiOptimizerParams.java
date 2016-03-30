@@ -19,29 +19,22 @@
 
 package org.matsim.contrib.taxi.optimizer.mip;
 
+import org.apache.commons.configuration.Configuration;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+
+
 public class MIPTaxiOptimizerParams
-//    extends TaxiOptimizerParams
+    extends AbstractTaxiOptimizerParams
 {
-//    public static final String FIND_START_SOLUTION = "findStartSolution";
-//    public static final String OPTIMIZE = "optimize";
-//    public static final String LOAD = "load";
-//    public static final String REQ_PER_VEH_PLANNING_HORIZON = "reqPerVehPlanningHorizon";
-//
-//    public final int nearestRequestsLimit;
-//    public final int nearestVehiclesLimit;
-//
-//    public final double cellSize;
-//
-//
-//    public MIPTaxiOptimizerParams(Configuration optimizerConfig)
-//    {
-//        super(optimizerConfig);
-//
-//        goal = Goal.valueOf(optimizerConfig.getString(GOAL));
-//
-//        nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
-//        nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
-//
-//        cellSize = optimizerConfig.getDouble(CELL_SIZE);//1000 m tested for Berlin
-//    }
+    public static final String FIND_START_SOLUTION = "findStartSolution";
+    public static final String OPTIMIZE = "optimize";
+    public static final String LOAD = "load";
+    public static final String REQ_PER_VEH_PLANNING_HORIZON = "reqPerVehPlanningHorizon";
+
+
+    public MIPTaxiOptimizerParams(Configuration optimizerConfig)
+    {
+        super(optimizerConfig);
+        throw new UnsupportedOperationException("Unused temporarily");
+    }
 }

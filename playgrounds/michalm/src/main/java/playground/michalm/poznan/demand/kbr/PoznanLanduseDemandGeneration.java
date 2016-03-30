@@ -26,10 +26,10 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.contrib.util.random.*;
 import org.matsim.contrib.zone.*;
 import org.matsim.contrib.zone.util.SubzoneUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -178,7 +178,7 @@ public class PoznanLanduseDemandGeneration
         int randomSeed = RandomUtils.DEFAULT_SEED;
         RandomUtils.reset(randomSeed);
 
-        scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
         zones = Zones.readZones(zonesXmlFile, zonesShpFile);
 

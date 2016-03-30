@@ -24,9 +24,9 @@ import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.contrib.util.distance.*;
 import org.matsim.contrib.zone.Zone;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -121,7 +121,7 @@ public class RunChargerLocationOptimization
         String potentialFile = dir + "taxi_berlin/2014/status/idleVehiclesPerZoneAndHour.txt";
         //String taxiRanksFile = dir + "scenarios/2015_02_basic_scenario_v6/berlin_ranks.xml";
 
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
         //        DistanceCalculator calculator = DistanceCalculators
@@ -132,8 +132,8 @@ public class RunChargerLocationOptimization
         readPotentials(zones, potentialFile, HORIZON);
 
         double totalEnergyConsumed = //
-        Math.max(eScenario.energyPerVehicle - (includeDeltaSoc ? DELTA_SOC : 0), 0)
-                * HORIZON.vehicleCount;
+                Math.max(eScenario.energyPerVehicle - (includeDeltaSoc ? DELTA_SOC : 0), 0)
+                        * HORIZON.vehicleCount;
         ZoneData zoneData = new ZoneData(zones, zonePotentials,
                 totalEnergyConsumed / totalPotential);
 

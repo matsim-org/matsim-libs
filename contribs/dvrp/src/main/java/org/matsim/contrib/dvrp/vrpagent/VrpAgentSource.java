@@ -21,8 +21,8 @@ package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
@@ -31,22 +31,25 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.*;
 
+import com.google.inject.Inject;
+
 
 public class VrpAgentSource
     implements AgentSource
 {
     private final DynActionCreator nextActionCreator;
 
-    private final MatsimVrpContext context;
+    private final VrpData vrpData;
     private final VrpOptimizer optimizer;
     private final QSim qSim;
 
 
-    public VrpAgentSource(DynActionCreator nextActionCreator, MatsimVrpContext context,
+    @Inject
+    public VrpAgentSource(DynActionCreator nextActionCreator, VrpData vrpData,
             VrpOptimizer optimizer, QSim qSim)
     {
         this.nextActionCreator = nextActionCreator;
-        this.context = context;
+        this.vrpData = vrpData;
         this.optimizer = optimizer;
         this.qSim = qSim;
     }
@@ -56,7 +59,7 @@ public class VrpAgentSource
     public void insertAgentsIntoMobsim()
     {
         VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
-        for (Vehicle vrpVeh : context.getVrpData().getVehicles().values()) {
+        for (Vehicle vrpVeh : vrpData.getVehicles().values()) {
             Id<Vehicle> id = vrpVeh.getId();
             Id<Link> startLinkId = vrpVeh.getStartLink().getId();
 

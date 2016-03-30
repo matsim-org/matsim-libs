@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.data.file;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.*;
 import org.xml.sax.Attributes;
@@ -31,9 +31,9 @@ import playground.michalm.taxi.data.ETaxi;
 public class ETaxiReader
     extends VehicleReader
 {
-    public ETaxiReader(Scenario scenario, VrpData data)
+    public ETaxiReader(Network network, VrpData data)
     {
-        super(scenario, data);
+        super(network, data);
     }
 
 

@@ -102,7 +102,7 @@ public class NOSRankTaxiOptimizer
         super(optimConfig);
         this.optimConfig = optimConfig;
         this.idleVehicleFinder = vehicleFinder;
-        this.rankModeTaxiScheduler = (RankModeTaxiScheduler)optimConfig.scheduler;
+        this.rankModeTaxiScheduler = (RankModeTaxiScheduler)optimConfig.scheduleInquiry;
         rankModeTaxiScheduler.optimizer = this;
     }
 
@@ -115,7 +115,7 @@ public class NOSRankTaxiOptimizer
 
     public void setRankMode(boolean rankMode)
     {
-        ((RankModeTaxiScheduler)optimConfig.scheduler).rankmode = rankMode;
+        ((RankModeTaxiScheduler)optimConfig.scheduleInquiry).rankmode = rankMode;
     }
 
 
@@ -225,7 +225,7 @@ public class NOSRankTaxiOptimizer
 
         for (Vehicle veh : optimConfig.context.getVrpData().getVehicles().values()) {
 
-            if (!optimConfig.scheduler.isIdle(veh))
+            if (!optimConfig.scheduleInquiry.isIdle(veh))
                 continue;
             if (veh.getSchedule().getStatus() != ScheduleStatus.STARTED)
                 continue;
@@ -360,7 +360,7 @@ public class NOSRankTaxiOptimizer
     public void sendIdlingTaxisBackToRank(double time)
     {
         for (Vehicle veh : optimConfig.context.getVrpData().getVehicles().values()) {
-            if (!optimConfig.scheduler.isIdle(veh))
+            if (!optimConfig.scheduleInquiry.isIdle(veh))
                 continue;
             if (veh.getSchedule().getStatus() != ScheduleStatus.STARTED)
                 continue;
@@ -391,7 +391,7 @@ public class NOSRankTaxiOptimizer
         for (Vehicle veh : optimConfig.context.getVrpData().getVehicles().values()) {
             if (time + 3600 < veh.getT1())
                 continue;
-            if (!optimConfig.scheduler.isIdle(veh))
+            if (!optimConfig.scheduleInquiry.isIdle(veh))
                 continue;
             if (veh.getSchedule().getStatus() != ScheduleStatus.STARTED)
                 continue;

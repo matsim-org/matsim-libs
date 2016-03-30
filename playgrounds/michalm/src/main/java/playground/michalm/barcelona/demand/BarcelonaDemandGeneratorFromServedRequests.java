@@ -22,8 +22,8 @@ package playground.michalm.barcelona.demand;
 import java.util.Date;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.contrib.util.random.*;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -92,7 +92,7 @@ public class BarcelonaDemandGeneratorFromServedRequests
         System.out.println("#within BCN: " + Iterables.size(requests));
 
         for (int i = 2; i <= 10; i++) {
-            Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+            Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
             new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
             BarcelonaDemandGeneratorFromServedRequests dg = new BarcelonaDemandGeneratorFromServedRequests(

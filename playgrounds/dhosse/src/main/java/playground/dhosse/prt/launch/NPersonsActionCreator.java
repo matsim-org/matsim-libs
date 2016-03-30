@@ -6,8 +6,8 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.DynAction;
-import org.matsim.contrib.taxi.TaxiActionCreator;
 import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 
 import playground.dhosse.prt.passenger.NPersonsDropoffActivity;
 import playground.dhosse.prt.passenger.NPersonsPickupActivity;

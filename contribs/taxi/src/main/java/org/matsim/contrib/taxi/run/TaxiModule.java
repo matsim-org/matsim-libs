@@ -19,14 +19,10 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.router.DynRoutingModule;
 import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
-import org.matsim.contrib.taxi.router.TaxiRoutingModule;
-import org.matsim.contrib.taxi.scheduler.*;
+import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.core.controler.AbstractModule;
-
-import com.google.inject.Singleton;
 
 
 public class TaxiModule
@@ -34,18 +30,20 @@ public class TaxiModule
 {
     public static final String TAXI_MODE = "taxi";
 
+    private final TaxiData taxiData;
+
+
+    public TaxiModule(TaxiData taxiData)
+    {
+        this.taxiData = taxiData;
+    }
+
 
     @Override
     public void install()
     {
-        bindMobsim().toProvider(TaxiQSimProvider.class);//TODO ??????
-        addRoutingModuleBinding(TaxiModule.TAXI_MODE).to(TaxiRoutingModule.class);
-
-        bind(VrpData.class).to(TaxiData.class).in(Singleton.class);
-
-        //??????????????TODO
-        //bind(TravelTime)
-        //bind(TaxiSchedulerParams.class)
-        //bind(AbstractTaxiOptimizerParams)
+        addRoutingModuleBinding(TAXI_MODE).toInstance(new DynRoutingModule(TAXI_MODE));
+        bind(TaxiData.class).toInstance(taxiData);
+        bind(TaxiOptimizerFactory.class).to(DefaultTaxiOptimizerFactory.class);
     }
 }

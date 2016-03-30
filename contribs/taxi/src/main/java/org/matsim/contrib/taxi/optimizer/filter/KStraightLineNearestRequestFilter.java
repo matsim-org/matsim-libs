@@ -24,20 +24,20 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.contrib.util.PartialSort;
 import org.matsim.contrib.util.distance.DistanceUtils;
 
 
 public class KStraightLineNearestRequestFilter
 {
-    private final TaxiScheduler scheduler;
+    private final TaxiScheduleInquiry scheduleInquiry;
     private final int k;
 
 
-    public KStraightLineNearestRequestFilter(TaxiScheduler scheduler, int k)
+    public KStraightLineNearestRequestFilter(TaxiScheduleInquiry scheduleInquiry, int k)
     {
-        this.scheduler = scheduler;
+        this.scheduleInquiry = scheduleInquiry;
         this.k = k;
     }
 
@@ -45,7 +45,7 @@ public class KStraightLineNearestRequestFilter
     public List<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests,
             Vehicle vehicle)
     {
-        Link fromLink = scheduler.getImmediateDiversionOrEarliestIdleness(vehicle).link;
+        Link fromLink = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(vehicle).link;
         PartialSort<TaxiRequest> nearestRequestSort = new PartialSort<TaxiRequest>(k);
 
         for (TaxiRequest req : requests) {

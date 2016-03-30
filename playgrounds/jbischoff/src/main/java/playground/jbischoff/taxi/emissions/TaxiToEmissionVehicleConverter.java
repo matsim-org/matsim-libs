@@ -42,7 +42,7 @@ public class TaxiToEmissionVehicleConverter {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(dir+"scenarios/2014_10_basic_scenario_v4/berlin_brb.xml");
 		VrpData vrpData = new VrpDataImpl();
-        new VehicleReader(scenario, vrpData).parse(dir+"/scenarios/2014_10_basic_scenario_v4/taxis4to4_EV0.0.xml");
+        new VehicleReader(scenario.getNetwork(), vrpData).parse(dir+"/scenarios/2014_10_basic_scenario_v4/taxis4to4_EV0.0.xml");
         new TaxiToEmissionVehicleConverter().convert(vrpData,dir+"/scenarios/2014_10_basic_scenario_v4/+emissionVehicles.xml"); 
 
 }

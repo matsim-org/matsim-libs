@@ -46,7 +46,7 @@ public class PrtAnalyzer {
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
 		popReader.readFile("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/population_prt_final2.xml");
 		VrpData data = new VrpDataImpl();
-		ETaxiReader vehReader = new ETaxiReader(scenario, data);
+		ETaxiReader vehReader = new ETaxiReader(scenario.getNetwork(), data);
 		vehReader.parse("C:/Users/Daniel/Desktop/dvrp/cottbus_scenario/vehicles/" + nVeh + "_vehicles.xml");
 		
 		EventsManager events = EventsUtils.createEventsManager();

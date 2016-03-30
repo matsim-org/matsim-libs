@@ -38,7 +38,7 @@ public class PrtControllerListener implements StartupListener, IterationStartsLi
 	private PrtRankAndPassengerStatsHandler rsh;
 	private PrtStatsWriter statsWriter;
 
-	public PrtControllerListener(PrtConfigGroup config, MatsimServices controler, MatsimVrpContextImpl context,
+	public PrtControllerListener(PrtConfigGroup config, MatsimServices controler,
 			PrtData data) {
 		
 		this.cch = new CostContainerHandler(controler.getScenario().getNetwork(),
