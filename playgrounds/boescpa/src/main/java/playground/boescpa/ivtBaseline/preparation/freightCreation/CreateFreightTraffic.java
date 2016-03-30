@@ -40,6 +40,7 @@ import org.matsim.core.utils.geometry.transformations.CH1903LV03toCH1903LV03Plus
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.*;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.boescpa.lib.tools.PopulationUtils;
 
 import java.io.BufferedReader;
@@ -57,13 +58,12 @@ public class CreateFreightTraffic {
 	private final static CoordinateTransformation transformation = new CH1903LV03toCH1903LV03Plus();
 
 	private final static String DELIMITER = ";";
-	private final static String FREIGHT_TAG = "Freight";
+	private final static String FREIGHT_TAG = "freight";
 	private final static int VICINITY_RADIUS = 10000; // radius [m] around zone centroid which is considered vicinity
 
 	private final Random random;
 	private int roundDowns = 0;
 	private int roundUps = 0;
-	private static int facilityIndex = 0;
 	private final double[] cummulativeDepartureProbability = new double[24];
 	private final Map<Integer, List<ActivityFacility>> zones = new HashMap<>();
 	private final Population freightPopulation;
@@ -204,7 +204,7 @@ public class CreateFreightTraffic {
 	private ActivityFacility getFacility(int zoneId) {
 		List<ActivityFacility> facilityList = zones.get(zoneId);
 		ActivityFacility origFacility = facilityList.get(random.nextInt(facilityList.size()));
-		Id<ActivityFacility> facilityId = Id.create(FREIGHT_TAG + "_" + ++facilityIndex, ActivityFacility.class);
+		Id<ActivityFacility> facilityId = Id.create(FREIGHT_TAG + "_" + (int)origFacility.getCoord().getX() + "_" + (int)origFacility.getCoord().getY(), ActivityFacility.class);
 		ActivityFacility freightFacility;
 		if (freightFacilities.getFacilities().containsKey(facilityId)) {
 			freightFacility = freightFacilities.getFacilities().get(facilityId);
@@ -280,6 +280,8 @@ public class CreateFreightTraffic {
 	private void writeFreightPopulation(String outputPopulation) {
 		PopulationWriter writer = new PopulationWriter(freightPopulation);
 		writer.write(outputPopulation);
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(freightPopulation.getPersonAttributes());
+		attributesWriter.writeFile(outputPopulation.substring(0, outputPopulation.indexOf(".xml")) + "_Attributes.xml.gz");
 	}
 
 	private void writeFreightFacilities(String outputFacilities) {
