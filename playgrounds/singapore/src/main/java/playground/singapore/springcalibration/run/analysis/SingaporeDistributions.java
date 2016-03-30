@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.singapore.springcalibration.run;
+package playground.singapore.springcalibration.run.analysis;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -53,6 +53,8 @@ import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
+
+import playground.singapore.springcalibration.run.SingaporeControlerListener;
 
 /**
  * @author anhorni

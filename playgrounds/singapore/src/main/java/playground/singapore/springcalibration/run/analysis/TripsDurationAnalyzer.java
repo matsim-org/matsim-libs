@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.singapore.springcalibration.run;
+package playground.singapore.springcalibration.run.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

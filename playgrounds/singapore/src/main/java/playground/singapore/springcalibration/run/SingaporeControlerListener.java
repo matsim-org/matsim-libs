@@ -17,7 +17,8 @@ import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.pt.PtConstants;
 
-import playground.singapore.springcalibration.run.SingaporeDistributions.DistributionClass;
+import playground.singapore.springcalibration.run.analysis.SingaporeDistributions;
+import playground.singapore.springcalibration.run.analysis.SingaporeDistributions.DistributionClass;
 
 public class SingaporeControlerListener implements StartupListener {
 	
