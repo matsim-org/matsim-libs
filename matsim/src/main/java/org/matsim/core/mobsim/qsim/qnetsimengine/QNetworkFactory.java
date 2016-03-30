@@ -50,9 +50,8 @@ public abstract class QNetworkFactory implements MatsimFactory {
 	 * can get an instance of the mobsim which is, however, not the same mobsim it will be working with.  So "initializeFactory"
 	 * is called by the mobsim to provide some info about itself (e.g. agentCounter).
 	 * <p/>
-	 * This should make the "QNetwork" argument in the creational methods obsolete (which is serving a bit the same purpose).
-	 * @param mobsimTimer TODO
-	 * @param simEngine1 TODO
+	 * This could be solved using custom scopes.  They do, however, for the time being only exist in the guice inject framework, not
+	 * in javax.inject, and thus we do not want to use them (yet?).
 	 */
 	abstract void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1 ) ;
 
