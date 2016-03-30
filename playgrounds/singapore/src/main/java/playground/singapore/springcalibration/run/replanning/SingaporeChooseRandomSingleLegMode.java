@@ -23,14 +23,15 @@ package playground.singapore.springcalibration.run.replanning;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -46,6 +47,8 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 	private final String[] possibleModes;
 	private boolean ignoreCarAvailability = true;
 	private double walkThreshold = 5000.0;
+	private Population population;
+	private static final Logger log = Logger.getLogger(SingaporeChooseRandomSingleLegMode.class);
 
 	private final Random rng;
 
@@ -55,9 +58,11 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 	 * @see TransportMode
 	 * @see MatsimRandom
 	 */
-	public SingaporeChooseRandomSingleLegMode(final String[] possibleModes, final Random rng) {
+	public SingaporeChooseRandomSingleLegMode(final String[] possibleModes, final Random rng, Population population) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
+		this.population = population;
+		log.info("Replanning for population of size: " + population.getPersons().size());
 	}
 
 	public void setIgnoreCarAvailability(final boolean ignoreCarAvailability) {
@@ -69,8 +74,8 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 		boolean forbidCar = false;
 		boolean forbidPassenger = false;
 		if (!this.ignoreCarAvailability) {
-			String carAvail = PersonUtils.getCarAvail(plan.getPerson());
-			String license = PersonUtils.getLicense(plan.getPerson());
+			String carAvail = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "car");
+			String license = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "license");						
 			// as defined only people with license and car are allowed to use car
 			if ("never".equals(carAvail) || "no".equals(license)) {
 				forbidCar = true;

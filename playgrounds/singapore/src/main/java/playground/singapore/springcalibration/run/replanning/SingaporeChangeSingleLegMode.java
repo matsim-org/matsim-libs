@@ -21,6 +21,7 @@
 package playground.singapore.springcalibration.run.replanning;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
@@ -34,22 +35,18 @@ public class SingaporeChangeSingleLegMode extends AbstractMultithreadedModule {
 
 	private String[] availableModes = new String[] { TransportMode.car, TransportMode.pt };
 	private boolean ignoreCarAvailability = true;
+	private Population population;
 
-	public SingaporeChangeSingleLegMode(final GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup) {
+	public SingaporeChangeSingleLegMode(final GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup, Population population) {
 		super(globalConfigGroup.getNumberOfThreads());
 		this.availableModes = changeLegModeConfigGroup.getModes();
 		this.ignoreCarAvailability = changeLegModeConfigGroup.getIgnoreCarAvailability();
+		this.population = population;
 	}
 	
-	public SingaporeChangeSingleLegMode(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty) {
-		super(nOfThreads);
-		this.availableModes = modes.clone();
-		this.ignoreCarAvailability = ignoreCarAvailabilty;
-	}
-
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		SingaporeChooseRandomSingleLegMode algo = new SingaporeChooseRandomSingleLegMode(this.availableModes, MatsimRandom.getLocalInstance());
+		SingaporeChooseRandomSingleLegMode algo = new SingaporeChooseRandomSingleLegMode(this.availableModes, MatsimRandom.getLocalInstance(), population);
 		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
 		return algo;
 	}
