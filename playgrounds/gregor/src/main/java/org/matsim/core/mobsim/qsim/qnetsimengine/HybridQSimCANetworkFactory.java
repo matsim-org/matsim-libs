@@ -22,8 +22,14 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import playground.gregor.TransportMode;
 import playground.gregor.casim.simulation.CANetsimEngine;
@@ -40,15 +46,34 @@ public final class HybridQSimCANetworkFactory extends QNetworkFactory {
 
 
 	private final CANetsimEngine hybridEngine;
+	private NetsimInternalInterface netsimEngine;
+	private final Scenario sc;
+	private NetsimEngineContext context;
+	private final EventsManager events;
 
-	public HybridQSimCANetworkFactory(CANetsimEngine e, Scenario sc) {
+	public HybridQSimCANetworkFactory(CANetsimEngine e, Scenario sc, EventsManager events) {
 		this.hybridEngine = e;
+		this.sc = sc ;
+		this.events = events ;
 	}
 
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
+	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
+		QSimConfigGroup qsimConfig = sc.getConfig().qsim() ;
+		
+		this.netsimEngine = netsimEngine1 ;
+		
+		double effectiveCellSize = ((NetworkImpl) sc.getNetwork()).getEffectiveCellSize() ;
+
+		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
+		if (! Double.isNaN(sc.getNetwork().getEffectiveLaneWidth())){
+			linkWidthCalculator.setLaneWidth( sc.getNetwork().getEffectiveLaneWidth() );
+		}
+		AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+		AbstractAgentSnapshotInfoBuilder snapshotBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( sc, snapshotInfoFactory );
+		
+		this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, snapshotBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
 	}
 
 	@Override
@@ -106,9 +131,10 @@ public final class HybridQSimCANetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	public QNode createNetsimNode(final Node node, QNetwork network) {
+	public QNode createNetsimNode(final Node node) {
 		//TODO CA Node;
-		return new QNode(node, network);
+		QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+		return builder.build( node ) ;
 	}
 
 }

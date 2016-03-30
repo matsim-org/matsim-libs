@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -28,7 +29,7 @@ public class QCALink extends AbstractQLink {
 	private CALane qlane;
 
 	public QCALink(Link link, CAEnvironment environmentCA, CAAgentFactory agentFactoryCA, TransitionArea transitionArea, NetsimEngineContext context, 
-			QNetsimEngine netsimEngine) {
+			NetsimInternalInterface netsimEngine) {
 		super(link, null, context, netsimEngine);
 		this.context = context ;
 		this.environmentCA = environmentCA;

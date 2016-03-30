@@ -20,29 +20,43 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 
 /**
  * Represents a node in the QSimulation.
  */
 public class QNode implements NetsimNode {
-
 	private static final Logger log = Logger.getLogger(QNode.class);
+	public static class Builder {
+		private final NetsimInternalInterface netsimEngine;
+		private NetsimEngineContext context;
+		public Builder( NetsimInternalInterface netsimEngine2, NetsimEngineContext context ) {
+			this.netsimEngine = netsimEngine2;
+			this.context = context;
+		}
+		public QNode build( Node n ) {
+			return new QNode( n, context, netsimEngine ) ;
+		}
+	}
 
 	private final QLinkI[] inLinksArrayCache;
 	private final QLinkI[] tempLinks;
@@ -63,18 +77,18 @@ public class QNode implements NetsimNode {
 	// for Customizable
 	private final Map<String, Object> customAttributes = new HashMap<>();
 
-	private final QNetwork network;
+	private final Random random;
+	private final NetsimEngineContext context;
+	private final NetsimInternalInterface netsimEngine;
 
-	private Random random;
-
-	public QNode(final Node n, final QNetwork network) {
+	private QNode(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
 		this.node = n;
-		this.network = network;
+		this.netsimEngine = netsimEngine2 ;
+		this.context = context ;
 		int nofInLinks = this.node.getInLinks().size();
 		this.inLinksArrayCache = new QLinkI[nofInLinks];
 		this.tempLinks = new QLinkI[nofInLinks];
-		this.random = MatsimRandom.getRandom();
-		if (network.simEngine.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads() > 1) {
+		if (this.context.qsimConfig.getNumberOfThreads() > 1) { 
 			// This could just as well be the "normal" case. The second alternative
 			// is just there so some scenarios / test cases stay
 			// "event-file-compatible". Consider removing the second alternative.
@@ -93,10 +107,11 @@ public class QNode implements NetsimNode {
 	/*package*/ void init() {
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
+			QNetwork network = netsimEngine.getNetsimNetwork() ;
 			this.inLinksArrayCache[i] = network.getNetsimLinks().get(l.getId());
 			i++;
 		}
-		/* As the order of nodes has an influence on the simulation results,
+		/* As the order of links has an influence on the simulation results,
 		 * the nodes are sorted to avoid indeterministic simulations. dg[april08]
 		 */
 		Arrays.sort(this.inLinksArrayCache, new Comparator<NetsimLink>() {
@@ -268,7 +283,8 @@ public class QNode implements NetsimNode {
 			moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now, currentLink.getId());
 			return true;
 		}
-
+		
+		QNetwork network = (QNetwork) this.netsimEngine.getNetsimNetwork() ;
 		QLinkI nextQueueLink = network.getNetsimLinks().get(nextLinkId);
 		if ( !checkNextLinkSemantics(currentLink, nextLinkId, nextQueueLink, veh) ) {
 			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now, currentLink.getId() ) ;
@@ -287,7 +303,7 @@ public class QNode implements NetsimNode {
 			 * of if there is space on the next link or not.. optionally we let them
 			 * die here, we have a config setting for that!
 			 */
-			if (network.simEngine.getMobsim().getScenario().getConfig().qsim().isRemoveStuckVehicles()) {
+			if (this.context.qsimConfig.isRemoveStuckVehicles()) {
 				moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now, currentLink.getId());
 				return false ;
 			} else {
@@ -306,15 +322,14 @@ public class QNode implements NetsimNode {
 	private void moveVehicleFromInlinkToAbort(final QVehicle veh, final QLaneI fromLane, final double now, Id<Link> currentLinkId) {
 		fromLane.popFirstVehicle();
 		// -->
-//		network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(now, veh.getId(), currentLinkId, fromLane.getId()));
-		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
+		this.context.getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
 		// <--
 		
 		// first treat the passengers:
 		for ( PassengerAgent pp : veh.getPassengers() ) {
 			if ( pp instanceof MobsimAgent ) {
 				((MobsimAgent)pp).setStateToAbort(now);
-				network.simEngine.internalInterface.arrangeNextAgentState((MobsimAgent)pp) ;
+				netsimEngine.arrangeNextAgentState((MobsimAgent)pp) ;
 			} else if ( wrnCnt < 1 ) {
 				wrnCnt++ ; 
 				log.warn("encountering PassengerAgent that cannot be cast into a MobsimAgent; cannot say if this is a problem" ) ;
@@ -324,29 +339,31 @@ public class QNode implements NetsimNode {
 
 		// now treat the driver:
 		veh.getDriver().setStateToAbort(now) ;
-		network.simEngine.internalInterface.arrangeNextAgentState(veh.getDriver()) ;
+		netsimEngine.arrangeNextAgentState(veh.getDriver()) ;
 	
 	}
 
 	private void moveVehicleFromInlinkToOutlink(final QVehicle veh, Id<Link> currentLinkId, final QLaneI fromLane, Id<Link> nextLinkId, QLaneI nextQueueLane) {
-		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+		double now = this.context.getSimTimer().getTimeOfDay() ;
 
 		fromLane.popFirstVehicle();
 		// -->
 //		network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(now, veh.getId(), currentLinkId, fromLane.getId()));
-		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
+		this.context.getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
 		// <--
 
 		veh.getDriver().notifyMoveOverNode( nextLinkId );
 
 		nextQueueLane.addFromUpstream(veh);
 		// -->
-		this.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId ));
+		this.context.getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId ));
 		// <--
 	}
 
 	private boolean vehicleIsStuck(final QLaneI fromLaneBuffer, final double now) {
-		return (now - fromLaneBuffer.getLastMovementTimeOfFirstVehicle()) > network.simEngine.getStuckTime();
+//		final double stuckTime = network.simEngine.getStuckTime();
+		final double stuckTime = this.context.qsimConfig.getStuckTime() ;
+		return (now - fromLaneBuffer.getLastMovementTimeOfFirstVehicle()) > stuckTime;
 	}
 
 	@Override

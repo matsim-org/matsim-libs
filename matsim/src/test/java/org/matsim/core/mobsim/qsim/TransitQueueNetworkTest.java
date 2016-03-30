@@ -1064,7 +1064,10 @@ public class TransitQueueNetworkTest extends TestCase {
 			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
-            QNetsimEngineModule.configure(qSim);
+            QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
+		  qSim.addMobsimEngine(netsimEngine);
+		  qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		  this.simEngine = netsimEngine ;
 			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 			qSim.addMobsimEngine(teleportationEngine);
 
@@ -1083,7 +1086,7 @@ public class TransitQueueNetworkTest extends TestCase {
             this.qlink1 = (QLinkImpl) qnet.getNetsimLink(linkId1);
             this.qlink2 = (QLinkImpl) qnet.getNetsimLink(linkId2);
             this.qlink3 = (QLinkImpl) qnet.getNetsimLink(linkId3);
-            this.simEngine = qsim.getNetsimEngine();
+//            this.simEngine = qsim.getNetsimEngine();
             this.simEngine.onPrepareSim();
             TransitStopAgentTracker tracker = transitEngine.getAgentTracker();
             tracker.addAgentToStop(90, new FakeAgent(null, null), stop1.getId()); // just add some agent so the transit vehicle has to stop
