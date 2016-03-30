@@ -209,13 +209,13 @@ public class ExtractTripModeSharesAroundBellevue {
 		for ( Leg l : trip.getLegsOnly() ) {
 			final Route r = l.getRoute();
 			if ( USE_NET_DIST && r instanceof NetworkRoute )  {
-				dist += RouteUtils.calcDistance( (NetworkRoute) r , network );
+				dist += RouteUtils.calcDistanceExcludingStartEndLink( (NetworkRoute) r , network );
 			}
 			else {
 				// TODO: make configurable?
 				dist += CROW_FLY_FACTOR *
 					// TODO: use coord of activities
-					CoordUtils.calcDistance(
+					CoordUtils.calcEuclideanDistance(
 							network.getLinks().get( r.getStartLinkId() ).getFromNode().getCoord(),
 							network.getLinks().get( r.getEndLinkId() ).getToNode().getCoord() );
 			}
@@ -239,7 +239,7 @@ public class ExtractTripModeSharesAroundBellevue {
 		@Override
 		public boolean acceptPlan(final Plan plan) {
 			final Activity act = getHomeActivity( plan );
-			return CoordUtils.calcDistance( act.getCoord() , BELLEVUE_COORD ) <= radius;
+			return CoordUtils.calcEuclideanDistance( act.getCoord() , BELLEVUE_COORD ) <= radius;
 		}
 
 		@Override
@@ -268,8 +268,8 @@ public class ExtractTripModeSharesAroundBellevue {
 
 		@Override
 		public boolean acceptTrip(final Trip trip) {
-			return CoordUtils.calcDistance( trip.getOriginActivity().getCoord() , BELLEVUE_COORD ) <= radius &&
-				 CoordUtils.calcDistance( trip.getDestinationActivity().getCoord() , BELLEVUE_COORD ) <= radius;
+			return CoordUtils.calcEuclideanDistance( trip.getOriginActivity().getCoord() , BELLEVUE_COORD ) <= radius &&
+				 CoordUtils.calcEuclideanDistance( trip.getDestinationActivity().getCoord() , BELLEVUE_COORD ) <= radius;
 		}
 	}
 }

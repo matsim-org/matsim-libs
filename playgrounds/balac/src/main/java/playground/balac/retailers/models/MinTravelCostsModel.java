@@ -85,7 +85,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
       {
           Network network = this.controler.getScenario().getNetwork();
         TravelTime travelTime = this.controler.getLinkTravelTimes();
-        TravelDisutility travelCost = this.controler.getTravelDisutilityFactory().createTravelDisutility(travelTime, this.controler.getConfig().planCalcScore());
+        TravelDisutility travelCost = this.controler.getTravelDisutilityFactory().createTravelDisutility(travelTime);
 
         LeastCostPathCalculator routeAlgo = this.controler.getLeastCostPathCalculatorFactory().createPathCalculator(network, travelCost, travelTime);
 
@@ -148,7 +148,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
       route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
       route.setTravelTime((int)path.travelTime);
       route.setTravelCost(path.travelCost);
-      route.setDistance(RouteUtils.calcDistance(route, network));
+      route.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route, network));
       leg.setRoute(route);
       travTime = (int)path.travelTime;
     }

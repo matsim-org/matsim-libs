@@ -45,12 +45,7 @@ import org.matsim.pt.router.MultiNodeDijkstra;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 import playground.ivt.maxess.prepareforbiogeme.framework.Converter;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicConversionConfigGroup;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicDestinationSampler;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.RoutingChoiceSetSampler;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.TripChoiceSituation;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.TripChoicesIdentifier;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.*;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus.CodebookUtils;
 import playground.ivt.router.CachingRoutingModuleWrapper;
 import playground.ivt.router.TripSoftCache;
@@ -112,17 +107,12 @@ public class RunCapeTownTripChoiceSetConversion {
 								}
 							})
 					.withChoicesIdentifier(
-							new Provider<ChoicesIdentifier<TripChoiceSituation>>() {
-								@Override
-								public ChoicesIdentifier<TripChoiceSituation> get() {
-									return new TripChoicesIdentifier(
-											group.getActivityType(),
-											sc.getActivityFacilities(),
-											new StageActivityTypesImpl(
-													PtConstants.TRANSIT_ACTIVITY_TYPE),
-											new CapeTownMainModeIdentifier());
-								}
-							})
+							() -> new TripChoicesIdentifier(
+									group.getActivityType(),
+									sc.getActivityFacilities(),
+									new StageActivityTypesImpl(
+											PtConstants.TRANSIT_ACTIVITY_TYPE),
+									new CapeTownMainModeIdentifier()) )
 					.withNumberOfThreads(
 							group.getNumberOfThreads())
 					.create()

@@ -66,8 +66,8 @@ public class DistanceStandardDeviationLocationChooser implements LocationChooser
 
 		double avg = 0;
 		for ( Subchain s : subchains ) {
-			final double distance = CoordUtils.calcDistance( s.getStart().getCoord() , f.getCoord() ) +
-							CoordUtils.calcDistance( s.getEnd().getCoord() , f.getCoord() );
+			final double distance = CoordUtils.calcEuclideanDistance( s.getStart().getCoord() , f.getCoord() ) +
+							CoordUtils.calcEuclideanDistance( s.getEnd().getCoord() , f.getCoord() );
 			distances.add( distance );
 			avg += distance;
 		}

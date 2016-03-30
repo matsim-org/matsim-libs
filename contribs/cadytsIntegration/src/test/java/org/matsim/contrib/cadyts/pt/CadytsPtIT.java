@@ -150,8 +150,8 @@ public class CadytsPtIT {
 
 		config.planCalcScore().setBrainExpBeta(beta) ;
 
-		StrategySettings stratSets = new StrategySettings(Id.create("1", StrategySettings.class)) ;
-		//		stratSets.setModuleName("ChangeExpBeta") ;
+		StrategySettings stratSets = new StrategySettings() ;
+//				stratSets.setStrategyName("ChangeExpBeta") ;
 		stratSets.setStrategyName("ccc") ;
 		stratSets.setWeight(1.0) ;
 		config.strategy().addStrategySettings(stratSets) ;

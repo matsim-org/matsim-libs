@@ -50,7 +50,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
-import playground.jbischoff.taxibus.scenario.analysis.quick.TraveltimeAndDistanceEventHandler;
 import playground.jbischoff.taxibus.scenario.analysis.quick.TaxiBusTravelTimesAnalyzer;
 
 /**
@@ -61,7 +60,8 @@ public class RunTaxibusPolicyCase {
 
 	public static void main(String[] args) {
 
-		String configFileName = "../../../shared-svn/projects/vw_rufbus/scenario/input/configs/configSingleRunM.xml";
+		String configFileName = "../../../shared-svn/projects/vw_rufbus/scenario/input/configs/ConfigPC85.xml";
+//		String configFileName = "D:/runs-svn/vw_rufbus/VW60ML50/VW60ML50.output_config.xml.gz";
 		if (args.length>0){
 			configFileName = args[0];
 		}
@@ -72,7 +72,7 @@ public class RunTaxibusPolicyCase {
 
 		Controler controler = new Controler(scenario);
 
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses(false);
+		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
 			@Override
@@ -82,9 +82,7 @@ public class RunTaxibusPolicyCase {
 				// Score activities, legs, payments and being stuck
 				// with the default MATSim scoring based on utility parameters in the config file.
 				final CharyparNagelScoringParameters params =
-						CharyparNagelScoringParameters.getBuilder(
-								scenario,
-								person.getId() ).create();
+						new CharyparNagelScoringParameters.Builder(scenario, person.getId()).build();
 				sum.addScoringFunction(new CharyparNagelActivityScoring(params));
 				sum.addScoringFunction(new MyLegScoring(params, scenario.getNetwork()));
 				sum.addScoringFunction(new CharyparNagelMoneyScoring(params));

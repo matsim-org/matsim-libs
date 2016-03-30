@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -219,7 +218,7 @@ public class RoutingTest  {
 						addTravelTimeBinding("car").toInstance(calculator);
 						addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
 							@Override
-							public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+							public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 								return calculator;
 							}
 						});

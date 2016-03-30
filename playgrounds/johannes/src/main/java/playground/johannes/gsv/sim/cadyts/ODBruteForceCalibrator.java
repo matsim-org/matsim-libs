@@ -457,7 +457,7 @@ public class ODBruteForceCalibrator {
 		MatrixOperations.applyFactor(refMatrix, 1 / 16.0);
 		MatrixOperations.applyFactor(refMatrix, 1 / (4 * 11.8));
 
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");

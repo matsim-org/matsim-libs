@@ -104,19 +104,12 @@ public class ActivityOptionImpl implements ActivityOption {
 		return this.type;
 	}
 
-	public final void setFacility(ActivityFacility facility) {
-		this.facility = facility;
-	}
-
-	public final ActivityFacility getFacility() {
-		return this.facility;
-	}
-
 	@Override
 	public final double getCapacity() {
 		return this.capacity;
 	}
 
+	@Override
 	public final SortedSet<OpeningTime> getOpeningTimes() {
 		return this.openingTimes;
 	}

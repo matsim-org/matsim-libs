@@ -36,7 +36,8 @@ public class LinkLeaveEvent extends Event {
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 
-	final static String missingDriverIdMessage = "driver (or person) id does no longer exist in LinkEnter/LeaveEvent; use vehicle ID instead.  See Vehicle2DriverEventHandler for an approach to reconstruct the driver id.";
+	final static String missingDriverIdMessage = "driver (or person) ID does no longer exist in LinkEnter/LeaveEvent; use vehicle ID instead. "
+			+ "See Vehicle2DriverEventHandler for an approach to reconstruct the driver ID and/or EventsConverterXML to convert your old event file.";
 
 	public LinkLeaveEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
 		super(time);

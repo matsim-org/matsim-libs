@@ -1,6 +1,5 @@
 package playground.kai.run;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,7 +8,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.contrib.noise.NoiseConfigGroup;
+import org.matsim.contrib.noise.NoiseOfflineCalculation;
+import org.matsim.contrib.noise.utils.MergeNoiseCSVFile;
+import org.matsim.contrib.noise.utils.MergeNoiseCSVFile.OutputFormat;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
@@ -25,20 +27,8 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.ikaddoura.noise2.NoiseParameters;
-import playground.ikaddoura.noise2.NoiseWriter;
-import playground.ikaddoura.noise2.data.GridParameters;
-import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
-import playground.ikaddoura.noise2.handler.PersonActivityTracker;
-import playground.ikaddoura.noise2.utils.MergeNoiseCSVFile;
-import playground.ikaddoura.noise2.utils.MergeNoiseCSVFile.OutputFormat;
 
 class KNBerlinControler {
 	private static final Logger log = Logger.getLogger("blabla");
@@ -47,7 +37,9 @@ class KNBerlinControler {
 		log.warn("here") ;
 
 		// ### prepare the config:
-		Config config = ConfigUtils.loadConfig( "/Users/nagel/kairuns/a100/config.xml" ) ;
+		Config config = ConfigUtils.loadConfig( "/Users/nagel/kairuns/a100/config.xml", new NoiseConfigGroup() ) ;
+		
+		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 
 		// paths:
 		//		config.network().setInputFile("/Users/nagel/");
@@ -76,10 +68,10 @@ class KNBerlinControler {
 		config.qsim().setUsingFastCapacityUpdate(true);
 
 		//		config.controler().setMobsim(MobsimType.JDEQSim.toString());
-		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.END_TIME, "36:00:00") ;
-		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.FLOW_CAPACITY_FACTOR, Double.toString(sampleFactor) ) ;
-		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.SQUEEZE_TIME, "5" ) ;
-		//		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.STORAGE_CAPACITY_FACTOR, Double.toString( Math.pow(sampleFactor, -0.25)) ) ;
+		//		config.setParam(JDEQSimulation.NAME, JDEQSimulation.END_TIME, "36:00:00") ;
+		//		config.setParam(JDEQSimulation.NAME, JDEQSimulation.FLOW_CAPACITY_FACTOR, Double.toString(sampleFactor) ) ;
+		//		config.setParam(JDEQSimulation.NAME, JDEQSimulation.SQUEEZE_TIME, "5" ) ;
+		//		config.setParam(JDEQSimulation.NAME, JDEQSimulation.STORAGE_CAPACITY_FACTOR, Double.toString( Math.pow(sampleFactor, -0.25)) ) ;
 
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
@@ -149,21 +141,18 @@ class KNBerlinControler {
 		// ===
 		// post-processing:
 
-		// grid parameters
-		GridParameters gridParameters = new GridParameters();
-
+		// noise parameters
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModule("noise");
+				
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+		noiseParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 
-		gridParameters.setReceiverPointGap(200.);
+		noiseParameters.setReceiverPointGap(200.);
 
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
+		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivitiesForDamages);
 
-		// noise parameters
-		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(1./sampleFactor); // yyyyyy sample size!!!!
-
 
 		// yyyyyy Same link ids?  Otherwise ask student
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
@@ -209,46 +198,19 @@ class KNBerlinControler {
 		tunnelLinkIDs.add(Id.create("4989", Link.class));
 		tunnelLinkIDs.add(Id.create("73496", Link.class));
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
-		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
+		noiseParameters.setTunnelLinkIDsSet(tunnelLinkIDs);
 
 		// ---
 
 		String outputDirectory = config.controler().getOutputDirectory() ;
-		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
-		File file = new File(outputFilePath);
-		file.mkdirs();
-
-		EventsManager events = EventsUtils.createEventsManager();
-
-		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		events.addHandler(eventWriter);
-
-		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
-		noiseContext.initialize();
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", true);
-
-		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
-		timeTracker.setUseCompression(true);
-		events.addHandler(timeTracker);
-
-		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
-		events.addHandler(actTracker);
-
-		log.info("Reading events file...");
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(outputDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
-		log.info("Reading events file... Done.");
-
-		timeTracker.computeFinalTimeIntervals();
-
-		eventWriter.closeFile();
-		log.info("Noise calculation completed.");
-
+		
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
+		noiseCalculation.run();		
+		
 		// ---
 
+		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		mergeNoiseFiles(outputFilePath);
-
-
 
 	}
 

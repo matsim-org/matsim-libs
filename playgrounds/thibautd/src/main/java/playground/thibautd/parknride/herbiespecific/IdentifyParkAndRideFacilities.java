@@ -66,7 +66,7 @@ public class IdentifyParkAndRideFacilities {
 		final String networkFile = args[ 1 ];
 		final String outputFile = args[ 2 ];
 
-		final double minDist = CoordUtils.calcDistance( CENTER , BOUNDARY_POINT ) * factor;
+		final double minDist = CoordUtils.calcEuclideanDistance( CENTER , BOUNDARY_POINT ) * factor;
 		final PnrIds ids = new PnrIds();
 
 		NetworkImpl network = readNetwork( networkFile );
@@ -133,7 +133,7 @@ public class IdentifyParkAndRideFacilities {
 	}
 
 	private static boolean acceptStop(final Coord coord , final double dist) {
-		return CoordUtils.calcDistance( coord , CENTER ) > dist;
+		return CoordUtils.calcEuclideanDistance( coord , CENTER ) > dist;
 	}
 
 	private static TransitSchedule readSchedule( final String fileName ) {

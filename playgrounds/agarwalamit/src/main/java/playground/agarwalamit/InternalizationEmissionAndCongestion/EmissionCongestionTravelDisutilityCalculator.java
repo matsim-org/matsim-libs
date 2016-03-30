@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -35,6 +36,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -78,9 +80,22 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle v) {
+		Vehicle emissionVehicle = v;
+		if (v == null){
+			// the link travel disutility is asked without information about the vehicle
+			if (person == null){
+				// additionally, no person is given -> a default vehicle type is used
+				Log.warn("No person and no vehicle is given to calculate the link travel disutility. The default vehicle type is used to estimate emission disutility.");
+				emissionVehicle = VehicleUtils.getFactory().createVehicle(Id.createVehicleId("defaultVehicle"), VehicleUtils.getDefaultVehicleType());
+			} else {
+				// a person is given -> use the vehicle for that person given in emissionModule
+				emissionVehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
+			}
+		}
+		
 		double linkTravelDisutility;
 
-		double linkTravelTime = this.timeCalculator.getLinkTravelTime(link, time, person, v);
+		double linkTravelTime = this.timeCalculator.getLinkTravelTime(link, time, person, emissionVehicle);
 		double linkTravelTimeDisutility = this.marginalUtlOfTravelTime * linkTravelTime ;
 
 		double distance = link.getLength();
@@ -91,10 +106,10 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 
 		if(this.hotspotLinks == null){
 			// pricing applies for all links
-			linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(person, link, distance, linkTravelTime);
+			linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, distance, linkTravelTime);
 		} else {
 			// pricing applies for the current link
-			if(this.hotspotLinks.contains(link.getId())) linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(person, link, distance, linkTravelTime);
+			if(this.hotspotLinks.contains(link.getId())) linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, distance, linkTravelTime);
 			// pricing applies not for the current link
 			else linkExpectedEmissionDisutility = 0.0;
 		}
@@ -108,7 +123,7 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 			return linkTravelDisutility;
 	}
 
-	private double calculateExpectedEmissionDisutility(Person person, Link link, double distance, double linkTravelTime) {
+	private double calculateExpectedEmissionDisutility(Vehicle vehicle, Link link, double distance, double linkTravelTime) {
 		double linkExpectedEmissionDisutility;
 
 		/* The following is an estimate of the warm emission costs that an agent (depending on her vehicle type and
@@ -116,17 +131,13 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 		iteration. Cold emission costs are assumed not to change routing; they might change mode choice or
 		location choice (not implemented)! */
 
-		Vehicle vehicle = this.emissionModule.getEmissionVehicles().getVehicles().get(person.getId());
-		VehicleType vehicleType = vehicle.getType();
-		String vehicleInformation = vehicleType.getId().toString();
 		WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionHandler().getWarmEmissionAnalysisModule();
 		Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
-				person.getId(),
+				vehicle,
 				Integer.parseInt(((LinkImpl) link).getType()),
 				link.getFreespeed(),
 				distance,
-				linkTravelTime,
-				vehicleInformation
+				linkTravelTime
 				);
 		double expectedEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(expectedWarmEmissions);
 		linkExpectedEmissionDisutility = this.marginalUtlOfMoney * expectedEmissionCosts ;

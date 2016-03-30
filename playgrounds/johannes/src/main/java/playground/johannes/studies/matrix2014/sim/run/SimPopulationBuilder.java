@@ -36,7 +36,7 @@ import playground.johannes.synpop.sim.SetHomeFacilities;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -52,7 +52,7 @@ public class SimPopulationBuilder {
         DataPool dataPool = engine.getDataPool();
 
         Set<Person> simPersons;
-        if(simPopFile == null) {
+        if (simPopFile == null) {
 
             int size = (int) Double.parseDouble(config.getParam(Simulator.MODULE_NAME, "populationSize"));
             simPersons = (Set<Person>) clonePersons(engine.getRefPersons(),
@@ -65,19 +65,28 @@ public class SimPopulationBuilder {
             Initializing simulation population...
             */
             logger.info("Assigning home locations...");
-            ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
-            ZoneCollection modenaZones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
-
-            ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(
-                    MiDKeys.PERSON_LAU2_CLASS,
-                    lau2Zones,
-                    engine.getLegPredicate());
-            zoneMobilityRate.analyze(engine.getRefPersons(), null);
-
-            new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
+            boolean useZoneWeights = true;
+            String val = config.findParam(Simulator.MODULE_NAME, "useZoneWeights");
+            if (val != null) {
+                useZoneWeights = Boolean.parseBoolean(val);
+            }
 
             SetHomeFacilities setHomeFacilities = new SetHomeFacilities(dataPool, "modena", engine.getRandom());
-            setHomeFacilities.setZoneWeights(zoneMobilityRate.getMobilityRatePerZone(modenaZones));
+
+            if (useZoneWeights) {
+                ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+                ZoneCollection modenaZones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("modena");
+
+                ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(
+                        MiDKeys.PERSON_LAU2_CLASS,
+                        lau2Zones,
+                        engine.getLegPredicate());
+                zoneMobilityRate.analyze(engine.getRefPersons(), null);
+
+                new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
+                setHomeFacilities.setZoneWeights(zoneMobilityRate.getMobilityRatePerZone(modenaZones));
+            }
+
             setHomeFacilities.apply(simPersons);
 
             logger.info("Assigning random activity locations...");
@@ -108,8 +117,8 @@ public class SimPopulationBuilder {
         double wsum1 = 0;
         double wsum2 = 0;
 
-        Set<Person> persons1 = new HashSet<>();
-        Set<Person> persons2 = new HashSet<>();
+        Set<Person> persons1 = new LinkedHashSet<>();
+        Set<Person> persons2 = new LinkedHashSet<>();
 
         TripsCounter counter = new TripsCounter(legPredicate);
         for (Person p : refPersons) {
@@ -137,7 +146,7 @@ public class SimPopulationBuilder {
         for (Person p : simPersons1) p.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w1));
         for (Person p : simPersons2) p.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w2));
 
-        Set<Person> all = new HashSet<>();
+        Set<Person> all = new LinkedHashSet<>();
         all.addAll(simPersons1);
         all.addAll(simPersons2);
 

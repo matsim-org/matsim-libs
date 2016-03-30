@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
-import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
 import org.matsim.vis.snapshotwriters.VisLink;
 
 /**
@@ -41,55 +41,44 @@ import org.matsim.vis.snapshotwriters.VisLink;
 
 public class QNetwork implements NetsimNetwork {
 
-	private final Map<Id<Link>, QLinkInternalI> links;
+	private final Map<Id<Link>, QLinkI> links;
 
 	private final Map<Id<Node>, QNode> nodes;
 
 	private final Network network;
 
-	private final NetsimNetworkFactory queueNetworkFactory;
-	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-	private final 	AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-
-	
+	private final QNetworkFactory queueNetworkFactory;
 	QNetsimEngine simEngine;
 
-	QNetwork(final Network network, final NetsimNetworkFactory netsimNetworkFactory ) {
+	QNetwork(final Network network, final QNetworkFactory netsimNetworkFactory ) {
 		this.network = network;
 		this.queueNetworkFactory = netsimNetworkFactory;
 		this.links = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
 		this.nodes = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
-		if (! Double.isNaN(network.getEffectiveLaneWidth())){
-			this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
-		}
-
 	}
 
 
-	public void initialize(QNetsimEngine simEngine) {
-		this.simEngine = simEngine;
+	public void initialize(QNetsimEngine simEngine1) {
+		this.simEngine = simEngine1;
+		this.queueNetworkFactory.initializeFactory( simEngine1.getMobsim().getAgentCounter(), simEngine1.getMobsim().getSimTimer(), simEngine1 );
 		for (Node n : network.getNodes().values()) {
 			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n, this));
 		}
 		for (Link l : network.getLinks().values()) {
-			this.links.put(l.getId(), this.queueNetworkFactory.createNetsimLink(l, this, this.nodes.get(l.getToNode().getId())));
+			this.links.put(l.getId(), this.queueNetworkFactory.createNetsimLink(l, this.nodes.get(l.getToNode().getId())));
 		}
 		for (QNode n : this.nodes.values()) {
 			n.init();
 		}
 	}
 	
-	/*package*/ SnapshotLinkWidthCalculator getLinkWidthCalculatorForVis(){
-		return this.linkWidthCalculator;
-	}
-
 	@Override
 	public Network getNetwork() {
 		return this.network;
 	}
 
 	@Override
-	public Map<Id<Link>, QLinkInternalI> getNetsimLinks() {
+	public Map<Id<Link>, QLinkI> getNetsimLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
@@ -104,18 +93,13 @@ public class QNetwork implements NetsimNetwork {
 	}
 
 	@Override
-	public QLinkInternalI getNetsimLink(final Id<Link> id) {
+	public QLinkI getNetsimLink(final Id<Link> id) {
 		return this.links.get(id);
 	}
 
 	@Override
 	public NetsimNode getNetsimNode(final Id<Node> id) {
 		return this.nodes.get(id);
-	}
-
-	@Override
-	public  AgentSnapshotInfoFactory getAgentSnapshotInfoFactory(){
-		return this.snapshotInfoFactory;
 	}
 
 

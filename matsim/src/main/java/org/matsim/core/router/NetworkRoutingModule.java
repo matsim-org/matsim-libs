@@ -39,9 +39,14 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
 
 /**
- * @thibautd
+ * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
+ * routes from a {@link Facility} to another {@link Facility}, as we need in MATSim.
+ * 
+ * @author thibautd
  */
-public class NetworkRoutingModule implements RoutingModule {
+public final class NetworkRoutingModule implements RoutingModule {
+	// I think it makes sense to NOT add the bushwhacking mode directly into here ...
+	// ... since it makes sense be able to to route from facility.getLinkId() to facility.getLinkId(). kai, dec'15
 
 	private final String mode;
 	private final PopulationFactory populationFactory;
@@ -113,18 +118,18 @@ public class NetworkRoutingModule implements RoutingModule {
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
 //		CarRoute route = null;
-		Path path = null;
+//		Path path = null;
 		if (toLink != fromLink) {
 			// (a "true" route)
-			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
+			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			NetworkRoute route = this.routeFactory.createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
-			route.setTravelTime((int) path.travelTime);
+			route.setTravelTime((int) path.travelTime); // yyyy why int?  kai, dec'15
 			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistance(route, this.network));
+			route.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route, this.network));
 			leg.setRoute(route);
-			travTime = (int) path.travelTime;
+			travTime = (int) path.travelTime; // yyyy why int?  kai, dec'15
 		} else {
 			// create an empty route == staying on place if toLink == endLink
 			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15

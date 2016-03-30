@@ -24,8 +24,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.signals.model.SignalGroup;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
 
 /**

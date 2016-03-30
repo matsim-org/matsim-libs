@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 
 public interface Netsim extends ObservableMobsim {
 

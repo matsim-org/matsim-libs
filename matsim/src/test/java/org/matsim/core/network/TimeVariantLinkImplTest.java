@@ -272,7 +272,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     
     		// test base values
     		assertEquals(3600.0, link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(1.0, link.getFlowCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+    		assertEquals(1.0, link.getFlowCapacityPerSec(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
     
     		// add an absolute change
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
@@ -282,8 +282,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     
     		// do the tests
     		assertEquals(3600.0, link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(1.0, link.getFlowCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(2.0, link.getFlowCapacity(7*3600), EPSILON);
+    		assertEquals(1.0, link.getFlowCapacityPerSec(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+    		assertEquals(2.0, link.getFlowCapacityPerSec(7*3600), EPSILON);
     
     		// test derived values
     		// TODO test flowcap by sending vehicles through the link, this requires to create a queuenetwork from this time-variant network

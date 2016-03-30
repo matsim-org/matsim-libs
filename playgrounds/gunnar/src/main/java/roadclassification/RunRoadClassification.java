@@ -44,12 +44,12 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.opdyts.searchalgorithms.SelfTuner;
 
 public class RunRoadClassification {
 
@@ -61,8 +61,7 @@ public class RunRoadClassification {
 		final String configFileName = path + "run_145f.output_config.xml";
 
 		final Config config = ConfigUtils.loadConfig(configFileName);
-		final File out = new File(config.findParam("controler",
-				"outputDirectory"));
+		final File out = new File(config.controler().getOutputDirectory());
 		if (out.exists()) {
 			IOUtils.deleteDirectory(out);
 		}
@@ -88,7 +87,6 @@ public class RunRoadClassification {
 		almostRealLinkSettings.add(addNoise(new LinkSettings(16.0, 3000.0, 2.0)));
 		almostRealLinkSettings.add(addNoise(new LinkSettings(25.0, 4000.0, 2.5)));
 
-		int maxMemoryLength = 100;
 		boolean interpolate = false;
 		int maxIterations = 100;
 		int maxTransitions = 1000;
@@ -141,16 +139,17 @@ public class RunRoadClassification {
 				convergenceCriterion, 
 				// selfTuner, 
 				maxIterations, maxTransitions, populationSize,
-				MatsimRandom.getRandom(), interpolate, objectiveFunction, maxMemoryLength, false);
+				MatsimRandom.getRandom(), interpolate, objectiveFunction, false);
 		randomSearch.setLogFileName(scenario.getConfig().controler().getOutputDirectory() + "optimization.log");
-		randomSearch.run();
-		for (DecisionVariable decisionVariable : randomSearch.getBestDecisionVariablesView()) {
-			log.info("--DecisionVariable follows--");
-			RoadClassificationDecisionVariable rcdv = (RoadClassificationDecisionVariable) decisionVariable;
-			for (LinkSettings linkSettings : rcdv.getLinkSettingses()) {
-				log.info(String.format("%d %d %d\n", (int) linkSettings.getCapacity(), (int) linkSettings.getFreespeed(), (int) linkSettings.getNofLanes()));
-			}
-		}
+		randomSearch.run(new SelfTuner(0.95));
+		
+//		for (DecisionVariable decisionVariable : randomSearch.getBestDecisionVariablesView()) {
+//			log.info("--DecisionVariable follows--");
+//			RoadClassificationDecisionVariable rcdv = (RoadClassificationDecisionVariable) decisionVariable;
+//			for (LinkSettings linkSettings : rcdv.getLinkSettingses()) {
+//				log.info(String.format("%d %d %d\n", (int) linkSettings.getCapacity(), (int) linkSettings.getFreespeed(), (int) linkSettings.getNofLanes()));
+//			}
+//		}
 
 		// AND RUN THE ENTIRE THING
 

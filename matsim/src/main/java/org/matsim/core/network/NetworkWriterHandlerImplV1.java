@@ -24,12 +24,24 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
 
 /*package*/ class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
+	private final CoordinateTransformation transformation;
+
+	NetworkWriterHandlerImplV1() {
+			this( new IdentityTransformation() );
+	}
+
+	NetworkWriterHandlerImplV1(CoordinateTransformation transformation) {
+		this.transformation = transformation;
+	}
 
 	//////////////////////////////////////////////////////////////////////
 	//
@@ -101,8 +113,9 @@ import org.matsim.core.utils.misc.Time;
 	public void startNode(final Node node, final BufferedWriter out) throws IOException {
 		out.write("\t\t<node");
 		out.write(" id=\"" + node.getId() + "\"");
-		out.write(" x=\"" + node.getCoord().getX() + "\"");
-		out.write(" y=\"" + node.getCoord().getY() + "\"");
+		final Coord coord = transformation.transform( node.getCoord() );
+		out.write(" x=\"" + coord.getX() + "\"");
+		out.write(" y=\"" + coord.getY() + "\"");
 		if (node instanceof NodeImpl) {
 			NodeImpl node2 = (NodeImpl) node;
 			if (node2.getType() != null) {

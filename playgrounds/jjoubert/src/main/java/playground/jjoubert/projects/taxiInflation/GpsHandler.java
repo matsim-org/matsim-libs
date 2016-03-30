@@ -265,7 +265,7 @@ public class GpsHandler {
 				Coord thisCoordinate = ct.transform(c);
 				
 				/* Convert distance (m) to distance (km). */
-				double distance = CoordUtils.calcDistance(lastCoordinate, thisCoordinate) / 1000;
+				double distance = CoordUtils.calcEuclideanDistance(lastCoordinate, thisCoordinate) / 1000;
 				
 				/* Add crow-fly-factor. */
 				accumulatedDistance += distance * DISTANCE_FACTOR;

@@ -22,9 +22,11 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 
+import playground.gregor.TransportMode;
 import playground.gregor.casim.simulation.CANetsimEngine;
-import playground.gregor.sim2d_v4.scenario.TransportMode;
 
 
 
@@ -34,7 +36,7 @@ import playground.gregor.sim2d_v4.scenario.TransportMode;
  * <li> It would probably be much better to have this in a separate package.  But this means to move a lot of scopes from
  * "package" to protected.  Worse, the interfaces are not sorted out.  So I remain here for the time being.  kai, jan'11
  */
-public final class HybridQSimCANetworkFactory implements NetsimNetworkFactory {
+public final class HybridQSimCANetworkFactory extends QNetworkFactory {
 
 
 	private final CANetsimEngine hybridEngine;
@@ -44,17 +46,23 @@ public final class HybridQSimCANetworkFactory implements NetsimNetworkFactory {
 	}
 
 	@Override
-	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public QLinkI createNetsimLink(final Link link, final QNode toQueueNode) {
 		boolean sim2DQTransitionLink = false;
 		boolean qSim2DTransitionLink = link.getAllowedModes().contains(TransportMode.walkca);
 
 		
 		
-		QLinkInternalI qLink = null;
+		QLinkI qLink = null;
 		if (qSim2DTransitionLink) {
 			qLink = new CALink(link,1);
 		} else {
-			qLink = new QLinkImpl(link, network, toQueueNode);
+//			qLink = new QLinkImpl(link, network, toQueueNode);
 			throw new RuntimeException("Not yet implemented!");
 		}
 

@@ -74,6 +74,7 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.GfipMultimodalQSimFactory.QueueType;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -202,9 +203,6 @@ public class GfipQueuePassingControler {
 		default:
 			break;
 		}
-
-		/* Random seed!! */
-		config.global().setRandomSeed(2014092401);
 
 		String[] modes ={
 				GfipMode.GFIP_A1.toString(), 

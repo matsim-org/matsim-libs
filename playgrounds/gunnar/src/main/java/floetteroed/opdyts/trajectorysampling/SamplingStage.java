@@ -24,6 +24,8 @@
  */
 package floetteroed.opdyts.trajectorysampling;
 
+import static java.util.Collections.unmodifiableMap;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
@@ -64,12 +66,15 @@ public class SamplingStage<U extends DecisionVariable> {
 
 	private final Double convergedObjectiveFunctionValue;
 
+	private final Map<Transition<?>, Double> transition2lastSolutionView;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	SamplingStage(final Vector alphas,
 			final TransitionSequencesAnalyzer<U> evaluator,
 			final Transition<U> lastTransition,
-			final Double convergedObjectiveFunctionValue) {
+			final Double convergedObjectiveFunctionValue,
+			final Map<Transition<?>, Double> transition2lastSolution) {
 
 		this.alphas = alphas.copy();
 		this.equilibriumGapWeight = evaluator.getEquilibriumGapWeight();
@@ -89,6 +94,8 @@ public class SamplingStage<U extends DecisionVariable> {
 		this.lastEquilibriumGap = lastTransition.getDelta().euclNorm();
 
 		this.convergedObjectiveFunctionValue = convergedObjectiveFunctionValue;
+
+		this.transition2lastSolutionView = unmodifiableMap(transition2lastSolution);
 	}
 
 	// -------------------- PACKAGE PRIVATE FUNCTIONALITY --------------------
@@ -146,5 +153,9 @@ public class SamplingStage<U extends DecisionVariable> {
 
 	public Double getConvergedObjectiveFunctionValue() {
 		return this.convergedObjectiveFunctionValue;
+	}
+
+	Map<Transition<?>, Double> transition2lastSolutionView() {
+		return this.transition2lastSolutionView;
 	}
 }

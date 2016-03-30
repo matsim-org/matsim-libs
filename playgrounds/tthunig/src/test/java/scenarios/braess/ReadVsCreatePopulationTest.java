@@ -34,16 +34,17 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 
 import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
-import scenarios.illustrative.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
@@ -55,9 +56,10 @@ import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRo
  * The first run creates the population in code. The second run reads a
  * population file, that corresponds to the one that is written by the first.
  * 
- * Differences may occur by activity end times that are non integer values
- * (because they are written as integer values in the plans file). With 3600
- * agents all activity end times are integer.
+ * If one do not specify the time format via
+ * Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMMSSDOTSS);
+ * differences may occur by activity end times that are non integer values
+ * (because they are written as integer values in the plans file). 
  * 
  * Further differences may occur by different person order: In code the persons
  * are created with increasing id's. The PopulationWriter sorts them
@@ -77,6 +79,9 @@ public class ReadVsCreatePopulationTest {
 	
 	@Test
 	public void testReadVsCreatePopulation() {
+		// specify global time format
+		Time.setDefaultTimeFormat(Time.TIMEFORMAT_HHMMSSDOTSS);
+		
 		Tuple<TtAbstractAnalysisTool,Population> createResults = run(true);
 		Tuple<TtAbstractAnalysisTool,Population> readResults = run(false);
 		
@@ -124,9 +129,13 @@ public class ReadVsCreatePopulationTest {
 		
 		Controler controler = new Controler(scenario);
 					
-		// add a controller listener to analyze results
 		TtAbstractAnalysisTool handler = new TtAnalyzeBraess();
-		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, handler, false));
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().toInstance(handler);
+			}
+		});
 		
 		controler.run();
 		
@@ -137,9 +146,9 @@ public class ReadVsCreatePopulationTest {
 		Config config = ConfigUtils.createConfig();
 
 		// set network and population
-		config.network().setInputFile(testUtils.getClassInputDirectory() + "network_cap3600-1800.xml");
+		config.network().setInputFile(testUtils.getClassInputDirectory() + "network_cap2000.xml");
 		if (!createPopulation){ // read population
-			config.plans().setInputFile(testUtils.getClassInputDirectory() + "plans3600_initRoutes.xml");
+			config.plans().setInputFile(testUtils.getClassInputDirectory() + "plans2000_initRoutes_exactTime.xml");
 		}
 
 		// set number of iterations
@@ -173,7 +182,8 @@ public class ReadVsCreatePopulationTest {
 		
 		TtCreateBraessPopulation popCreator = 
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
-		popCreator.setNumberOfPersons(3600);
+		popCreator.setNumberOfPersons(2000);
+		popCreator.setSimulationStartTime(8*3600);
 		popCreator.createPersons(InitRoutes.ALL, 110.);
 	}
 	

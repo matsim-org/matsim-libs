@@ -6,7 +6,6 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 /**

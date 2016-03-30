@@ -13,9 +13,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.jdeqsim.Road;
-import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.population.routes.NetworkRoute;
 
@@ -67,7 +68,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 	private int numOfThreads;
 
 	public PJDEQSimulation(Scenario scenario, EventsManager events, int numOfThreads) {
-		super(scenario, events);
+		super(ConfigUtils.addOrGetModule(scenario.getConfig(), JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class), scenario, events);
 		this.numOfThreads = numOfThreads; // TODO: use this number really...
 	}
 
@@ -84,17 +85,18 @@ public class PJDEQSimulation extends JDEQSimulation {
 		PMessageQueue queue=new PMessageQueue();
 
 		// set the maxTimeDelta
-		String JDEQ_SIM="JDEQSim";
-		String MAX_TIME_DELTA="maxTimeDelta";
-		String maxTimeDelta=this.scenario.getConfig().findParam(JDEQ_SIM, MAX_TIME_DELTA);
-
-		if (maxTimeDelta!=null){
-			queue.setMaxTimeDelta(Integer.parseInt(maxTimeDelta));
-		}
+		// commented this out, as the jdeqsim config group does not contain any parameter remotely named like time delta.
+//		String JDEQ_SIM="JDEQSim";
+//		String MAX_TIME_DELTA="maxTimeDelta";
+//		String maxTimeDelta=this.scenario.getConfig().findParam(JDEQ_SIM, MAX_TIME_DELTA);
+//
+//		if (maxTimeDelta!=null){
+//			queue.setMaxTimeDelta(Integer.parseInt(maxTimeDelta));
+//		}
 
 		PScheduler scheduler = new PScheduler(queue);
 		scheduler.getQueue().idOfMainThread = Thread.currentThread().getId();
-		SimulationParameters.setAllRoads(new HashMap<Id<Link>, Road>());
+		Road.setAllRoads(new HashMap<Id<Link>, Road>());
 
 		// find out networkXMedian
 		int numberOfLinks = 0;
@@ -166,7 +168,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 				road.setThreadZoneId(1);
 			}
 
-			SimulationParameters.getAllRoads().put(link.getId(), road);
+			Road.getAllRoads().put(link.getId(), road);
 		}
 
 		// define border roads

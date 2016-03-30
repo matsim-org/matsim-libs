@@ -29,9 +29,10 @@ public class RunManyAnalyses {
 
 	public static void main(String[] args) {
 
-		String[] runs = {"vw058","vw071","vw067FF","vw059TB","vw060TBTW15","vw061TB","vw065TB","vw066TB","vw067TB","VW60ML50"};
+		String[] runs = {"vw079	"};
 		for (int i = 0; i<runs.length;i++){
-			String[] file = {"D:/runs-svn/vw_rufbus/delievery/20160121/runs/"+runs[i]+"/"+runs[i]+".output_events.xml.gz"};
+			String[] file = {"D:/runs-svn/vw_rufbus/"+runs[i]+"/"+runs[i]+".output_events.xml.gz"};
+//			String[] file = {"D:/runs-svn/vw_rufbus/delievery/20160121/runs/"+runs[i]+"/"+runs[i]+".output_events.xml.gz"};
 			TravelTimeStatistics.main(file);
 		}
 		

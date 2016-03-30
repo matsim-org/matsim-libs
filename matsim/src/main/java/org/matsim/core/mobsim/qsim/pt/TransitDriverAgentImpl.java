@@ -20,6 +20,7 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
@@ -29,6 +30,9 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.ActivityWrapperFacility;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufStueckI;
@@ -84,6 +88,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	private TransitLine transitLine;
 	private TransitRoute transitRoute;
 	private Departure departure;
+	private Scenario scenario;
 	
 	public TransitDriverAgentImpl(Umlauf umlauf,
 			String transportMode,
@@ -91,6 +96,8 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		super(internalInterface, thisAgentTracker);
 		this.umlauf = umlauf;
 		this.eventsManager = ((QSim) internalInterface.getMobsim()).getEventsManager();
+		this.scenario = ((QSim) internalInterface.getMobsim()).getScenario() ;
+		// (yy AbstractTransitDriverAgent already keeps both of them. kai, dec'15)
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
 		Person driverPerson = PopulationUtils.createPerson(Id.create("pt_" + umlauf.getId(), Person.class)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		PlanBuilder planBuilder = new PlanBuilder();
@@ -216,6 +223,16 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 			return null ;
 		}
 	}
+	@Override
+	public PlanElement getPreviousPlanElement() {
+		if (iPlanElement.hasPrevious()) {
+			PlanElement prev = iPlanElement.previous(); // peek at the element, but...
+			iPlanElement.next(); // ...rewind iterator by one step
+			return prev;
+		} else {
+			return null ;
+		}
+	}
 
 	@Override
 	public Id<Link> getDestinationLinkId() {
@@ -262,6 +279,46 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 			return false ;
 		}
 	}
+
+	@Override
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		PlanElement pe = this.getCurrentPlanElement() ;
+		Activity activity ;
+		if ( pe instanceof Activity ) {
+			activity = (Activity) pe;
+		} else if ( pe instanceof Leg ) {
+			activity = (Activity) this.getPreviousPlanElement() ;
+		} else {
+			throw new RuntimeException("unexpected type of PlanElement") ;
+		}
+		ActivityFacility fac = this.scenario.getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
+		if ( fac != null ) {
+			return fac ;
+		} else {
+			return new ActivityWrapperFacility( activity ) ; 
+		}
+		// the above assumes alternating acts/legs.  I start having the suspicion that we should revoke our decision to give that up.
+		// If not, one will have to use TripUtils to find the preceeding activity ... but things get more difficult.  Preferably, the
+		// facility should then sit in the leg (since there it is used for routing).  kai, dec'15
+	}
+
+	@Override
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		PlanElement pe = this.getCurrentPlanElement() ;
+		if ( pe instanceof Leg ) {
+			Activity activity = (Activity)this.getNextPlanElement() ;
+			ActivityFacility fac = this.scenario.getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
+			if ( fac != null ) {
+				return fac ;
+			} else {
+				return new ActivityWrapperFacility( activity ) ; 
+			}
+		} else if ( pe instanceof Activity ) {
+			return null ;
+		}
+		throw new RuntimeException("unexpected type of PlanElement") ;
+	}
+
 	
 	
 

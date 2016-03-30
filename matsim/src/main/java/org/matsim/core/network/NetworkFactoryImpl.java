@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * @author dgrether
@@ -56,7 +57,8 @@ public class NetworkFactoryImpl implements NetworkFactory {
 
 	@Override
 	public Link createLink(Id<Link> id, Node fromNode, Node toNode) {
-		return this.linkFactory.createLink(id, fromNode, toNode, this.network, 1.0, 1.0, 1.0, 1.0);
+		return this.linkFactory.createLink(id, fromNode, toNode, 
+				this.network, CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()), 1.0, 1.0, 1.0);
 	}
 
 	public Link createLink(final Id<Link> id, final Node from, final Node to,

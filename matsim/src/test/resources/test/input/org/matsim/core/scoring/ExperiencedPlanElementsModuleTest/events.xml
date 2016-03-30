@@ -2,11 +2,5 @@
 
 <events>
 	<event time="21610" person="2" link="2" actType="" type="actend"  />
-	<event time="21620" person="2" link="3" type="departure"  />
-	<event time="21630" person="2" vehicle="2" link="4" type="wait2link"  />
-	<event time="21640" vehicle="2" link="5" type="left link"  />
-	<event time="21650" vehicle="2" link="6" type="entered link"  />
-	<event time="21660" person="2" link="7" type="arrival"  />
 	<event time="21670" person="2" link="8" actType="" type="actstart"  />
-	<event time="21680" person="1" link="9" type="stuckAndAbort"  />
 </events>

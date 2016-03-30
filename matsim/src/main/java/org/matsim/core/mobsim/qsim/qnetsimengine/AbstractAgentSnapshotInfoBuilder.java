@@ -24,11 +24,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NavigableMap;
 import java.util.Queue;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -38,6 +35,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
@@ -71,7 +70,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	public final int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
-			Collection<Identifiable> peopleInVehicle = getPeopleInVehicle(veh);
+			Collection<Identifiable<?>> peopleInVehicle = getPeopleInVehicle(veh);
 			boolean first = true;
 			for (Identifiable passenger : peopleInVehicle) {
 				cnt2++ ;
@@ -110,10 +109,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	public final int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
 		if (transitVehicleStopQueue.size() > 0) {
 			for (QVehicle veh : transitVehicleStopQueue) {
-				List<Identifiable> peopleInVehicle = getPeopleInVehicle(veh);
+				List<Identifiable<?>> peopleInVehicle = getPeopleInVehicle(veh);
 				boolean last = false ;
 				cnt2 += peopleInVehicle.size() ;
-				for ( ListIterator<Identifiable> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
+				for ( ListIterator<Identifiable<?>> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
 					Identifiable passenger = it.previous();
 					if ( !it.hasPrevious() ) {
 						last = true ;
@@ -172,7 +171,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		double lastDistanceFromFromNode = Double.NaN;
 
-//		Iterator<Entry<Double, Hole>> iterator = holePositions.descendingMap().entrySet().iterator() ;
 		Iterator<Entry<Double, Hole>> iterator = holePositions.entrySet().iterator() ;
 
 
@@ -191,7 +189,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					distanceFromFromNode, lane, speedValue);
 			lastDistanceFromFromNode = distanceFromFromNode;
 
-			if ( QueueWithBuffer.HOLES ) {
+			if ( this.scenario.getConfig().qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
 				while ( iterator.hasNext() ) {
 					Entry<Double, Hole> entry = iterator.next();
 					double size = entry.getValue().getSizeInEquivalents() ;
@@ -269,8 +267,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	 * @param vehicle
 	 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
 	 */
-	final List<Identifiable> getPeopleInVehicle(QVehicle vehicle) {
-		ArrayList<Identifiable> people = new ArrayList<>();
+	final static List<Identifiable<?>> getPeopleInVehicle(QVehicle vehicle) {
+		ArrayList<Identifiable<?>> people = new ArrayList<>();
 		people.add(vehicle.getDriver());
 		//		if (vehicle instanceof TransitVehicle) {
 		//			for (PassengerAgent passenger : ((TransitVehicle) vehicle).getPassengers()) {

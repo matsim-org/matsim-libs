@@ -52,8 +52,8 @@ public class ExtractFacilities {
 				String[] arr = s.split("\t");
 				ActivityFacility f = scenario.getActivityFacilities().getFacilities().get(Id.create(arr[1], ActivityFacility.class));
 				
-				landPrice += CoordUtils.calcDistance(f.getCoord(), coord) * (-0.00001) + 1.0;
-				if (CoordUtils.calcDistance(coord, f.getCoord()) < 5000) {
+				landPrice += CoordUtils.calcEuclideanDistance(f.getCoord(), coord) * (-0.00001) + 1.0;
+				if (CoordUtils.calcEuclideanDistance(coord, f.getCoord()) < 5000) {
 					
 					insideCust +=  Integer.parseInt(arr[5]);
 					
@@ -74,9 +74,9 @@ public class ExtractFacilities {
 				String s = readLink.readLine();
 				String[] arr = s.split("\t");
 				ActivityFacility f = scenario.getActivityFacilities().getFacilities().get(Id.create(arr[1], ActivityFacility.class));
-				landPrice += CoordUtils.calcDistance(f.getCoord(), coord) * (-0.00001) + 1.0;
+				landPrice += CoordUtils.calcEuclideanDistance(f.getCoord(), coord) * (-0.00001) + 1.0;
 				//scenario_new.getActivityFacilities().getFacilities().put(Id.create(arr[1]), f);
-				if (CoordUtils.calcDistance(coord, f.getCoord()) < 5000) {
+				if (CoordUtils.calcEuclideanDistance(coord, f.getCoord()) < 5000) {
 					
 					insideCust +=  Integer.parseInt(arr[5]);
 					inside++;

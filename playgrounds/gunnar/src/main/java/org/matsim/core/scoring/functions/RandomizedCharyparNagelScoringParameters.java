@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Builder;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import floetteroed.utilities.Units;
@@ -71,22 +71,19 @@ public class RandomizedCharyparNagelScoringParameters implements
 
 		if (!this.params.containsKey(person)) {
 			// if (!this.params.containsKey(subpopulation)) {
-			CharyparNagelScoringParametersBuilder builder = CharyparNagelScoringParameters
-					.getBuilder(this.config,
-							this.config.getScoringParameters(subpopulation),
-							scConfig);
+			Builder builder = new Builder(this.config, this.config.getScoringParameters(subpopulation), scConfig);
 			if (this.defaultParameters == null) {
-				this.defaultParameters = builder.create();
+				this.defaultParameters = builder.build();
 			}
-			builder = builder.withMarginalUtilityOfPerforming_s(this
+			builder = builder.setMarginalUtilityOfPerforming_s(this
 					.marginalUtilityOfPerforming_s(person));
-			builder = builder.withMarginalUtilityOfMoney(this
+			builder = builder.setMarginalUtilityOfMoney(this
 					.marginalUtilityOfMoney(person));
-			builder = builder.withActivityParameters("home",
+			builder = builder.setActivityParameters("home",
 					this.actParams(person, "home"));
-			builder = builder.withActivityParameters("work",
+			builder = builder.setActivityParameters("work",
 					this.actParams(person, "work"));
-			this.params.put(person, builder.create());
+			this.params.put(person, builder.build());
 		}
 
 		// return this.params.get(subpopulation);
@@ -107,7 +104,7 @@ public class RandomizedCharyparNagelScoringParameters implements
 		return Units.S_PER_D - this.getTypicalWorkDuration_s(person);
 	}
 
-	protected ActivityUtilityParameters actParams(final Person person,
+	protected ActivityUtilityParameters.Builder actParams(final Person person,
 			final String type) {
 		final ActivityUtilityParameters defaultActParams = this.defaultParameters.utilParams
 				.get(type);
@@ -129,7 +126,7 @@ public class RandomizedCharyparNagelScoringParameters implements
 		builder.setScoreAtAll(true); // TODO no getter
 		builder.setZeroUtilityComputation(new ActivityUtilityParameters.SameAbsoluteScore());
 		// TODO no getter
-		return builder.create();
+		return builder;
 	}
 
 	protected double marginalUtilityOfPerforming_s(final Person person) {

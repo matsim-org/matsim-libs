@@ -296,13 +296,13 @@ public class SantiagoPopulationCreator {
 		Activity candidatePersonFromActivity = (Activity) candidatePerson.getSelectedPlan().getPlanElements().get(0);
 		Activity candidatePersonToActivity = (Activity) candidatePerson.getSelectedPlan().getPlanElements().get(2);
 		
-		double distanceA = CoordUtils.calcDistance(personToActivity.getCoord(), candidatePersonFromActivity.getCoord());
+		double distanceA = CoordUtils.calcEuclideanDistance(personToActivity.getCoord(), candidatePersonFromActivity.getCoord());
 		if (distanceA > DISTANCE_THRESHOLD) {
 			// those two are too fare away - abort
 			return false;
 		}
 		
-		double distanceB = CoordUtils.calcDistance(personFromActivity.getCoord(), candidatePersonToActivity.getCoord());
+		double distanceB = CoordUtils.calcEuclideanDistance(personFromActivity.getCoord(), candidatePersonToActivity.getCoord());
 		if (distanceB > DISTANCE_THRESHOLD) {
 			// those two are too fare away - abort
 			return false;

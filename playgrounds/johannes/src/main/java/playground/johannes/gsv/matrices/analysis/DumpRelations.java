@@ -83,7 +83,7 @@ public class DumpRelations {
 		// MatrixOperations.multiply(simulation, 11.8);
 		// MatrixOperations.applyDiagonalFactor(simulation, 1.3);
 
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.gk3.geojson")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		data = null;

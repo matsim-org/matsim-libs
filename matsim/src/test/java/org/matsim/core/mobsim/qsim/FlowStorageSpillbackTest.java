@@ -23,6 +23,8 @@
 package org.matsim.core.mobsim.qsim;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +34,9 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -69,11 +74,24 @@ import org.matsim.vehicles.Vehicle;
  * @author ikaddoura
  *
  */
+@RunWith(Parameterized.class)
 public class FlowStorageSpillbackTest {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
+	private final boolean isUsingFastCapacityUpdate;
+	
+	public FlowStorageSpillbackTest(boolean isUsingFastCapacityUpdate) {
+		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
+	}
+	
+	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
+	public static Collection<Object> parameterObjects () {
+		Object [] capacityUpdates = new Object [] { false, true };
+		return Arrays.asList(capacityUpdates);
+	}
+	
 	private EventsManager events;
 	
 	private Id<Person> testAgent1 = Id.create("testAgent1", Person.class);
@@ -92,6 +110,7 @@ public class FlowStorageSpillbackTest {
 		Scenario sc = loadScenario();
 		setPopulation(sc);
 		
+		sc.getConfig().qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
 		
 		final List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<LinkLeaveEvent>();
 							
@@ -130,7 +149,11 @@ public class FlowStorageSpillbackTest {
 			System.out.println(event.toString());
 
 			if (event.getVehicleId().equals(vehicleOfPerson.get(this.testAgent4)) && event.getLinkId().equals(this.linkId2)) {
-				Assert.assertEquals("wrong link leave time.", 170., event.getTime(), MatsimTestCase.EPSILON);
+				if(this.isUsingFastCapacityUpdate) {
+					Assert.assertEquals("wrong link leave time.", 169., event.getTime(), MatsimTestCase.EPSILON);
+				} else {
+					Assert.assertEquals("wrong link leave time.", 170., event.getTime(), MatsimTestCase.EPSILON);
+				}
 			}
 		}
 		

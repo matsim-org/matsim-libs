@@ -52,6 +52,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
+import scenarios.illustrative.analysis.TtAnalyzedResultsWriter;
 import scenarios.illustrative.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.illustrative.parallel.analysis.TtAnalyzeParallel;
 import scenarios.illustrative.parallel.createInput.TtCreateParallelNetworkAndLanes;
@@ -200,7 +201,7 @@ public final class RunParallelSimulation {
 			
 			// adapt sigma for randomized routing
 			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
-					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car );
+					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() );
 			builder.setSigma(SIGMA);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
@@ -210,8 +211,15 @@ public final class RunParallelSimulation {
 			});
 //		}
 		
-		// add a controller listener to analyze results
-		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, new TtAnalyzeParallel(), true));
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				this.bind(TtAnalyzeParallel.class).asEagerSingleton();
+				this.addEventHandlerBinding().to(TtAnalyzeParallel.class);
+				this.bind(TtAnalyzedResultsWriter.class);
+				this.addControlerListenerBinding().to(TtListenerToBindAndWriteAnalysis.class);
+			}
+		});
 		
 		return controler;
 	}

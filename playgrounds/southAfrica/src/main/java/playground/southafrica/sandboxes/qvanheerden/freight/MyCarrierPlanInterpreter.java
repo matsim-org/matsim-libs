@@ -123,7 +123,7 @@ public class MyCarrierPlanInterpreter {
 				if(te instanceof Leg){
 					Leg leg = (Leg) te;
 
-					double distance = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), network);
+					double distance = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) leg.getRoute(), network);
 
 					if(distance>0){
 						interActDistance.add(distance);

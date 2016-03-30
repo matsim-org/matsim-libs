@@ -3,10 +3,12 @@ package floetteroed.opdyts.example.roadpricing;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 import org.matsim.core.gbl.MatsimRandom;
 
 import floetteroed.opdyts.DecisionVariableRandomizer;
+import floetteroed.utilities.math.MathHelpers;
 
 /**
  * 
@@ -48,7 +50,7 @@ class TollLevelsRandomizer implements DecisionVariableRandomizer<TollLevels> {
 
 					@Override
 					public double constrain(double originalValue) {
-						// TODO Could also re-center this at the value grid.
+						originalValue = round(originalValue, deltaTime_s);
 						return Math.max(0, Math.min(24 * 3600, originalValue));
 					}
 				});
@@ -71,9 +73,15 @@ class TollLevelsRandomizer implements DecisionVariableRandomizer<TollLevels> {
 
 					@Override
 					public double constrain(double originalValue) {
-						return Math.max(0, originalValue);
+						originalValue = round(originalValue, deltaCost_money);
+						return Math.max(0.0, originalValue);
 					}
 				});
+	}
+
+	private static double round(final double val, final double discr) {
+		return MathHelpers.round(val / discr) * discr;
+
 	}
 
 	// ---------- IMPLEMENTATION OF DecisionVariableRandomizer ----------
@@ -98,4 +106,17 @@ class TollLevelsRandomizer implements DecisionVariableRandomizer<TollLevels> {
 				newCostStructurePair.get(1), this.initialTollLevels.scenario));
 		return result;
 	}
+
+	// -------------------- MAIN-FUNCTION, ONLY FOR TESTING --------------------
+
+	public static void main(String[] args) {
+
+		final Random rnd = new Random();
+		for (int i = 0; i < 25; i++) {
+			final double x = rnd.nextGaussian();
+			System.out.println(x + "\t" + round(x, 0.25));
+		}
+
+	}
+
 }

@@ -6,6 +6,8 @@ import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
+import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 
@@ -37,8 +39,13 @@ class NewNetworkChangeEventsEngine implements MobsimEngine {
 				@Override
 				public void handleMessage() {
 					for (Link link : changeEvent.getLinks()) {
-						internalInterface.getMobsim().getNetsimNetwork().getNetsimLink(link.getId())
-								.recalcTimeVariantAttributes(internalInterface.getMobsim().getSimTimer().getTimeOfDay());
+						final NetsimLink netsimLink = internalInterface.getMobsim().getNetsimNetwork().getNetsimLink(link.getId());
+						if ( netsimLink instanceof TimeVariantLink ) {
+							final double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+							((TimeVariantLink) netsimLink).recalcTimeVariantAttributes();
+						} else {
+							throw new RuntimeException("link not time variant") ;
+						}
 					}
 				}
 			};

@@ -78,7 +78,7 @@ public class Shape {
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		int nearestPointPos = -1;
 		for(int p=1; p<=points.size(); p++) {
-			double distance = CoordUtils.calcDistance(point, points.get(p));
+			double distance = CoordUtils.calcEuclideanDistance(point, points.get(p));
 			if(distance<nearestDistance) {
 				nearestDistance = distance;
 				nearestPointPos = p;

@@ -406,7 +406,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 					for (int i = 1, n = way.nodes.size(); i < n; i++) {
 						OsmNode toNode = this.nodes.get(way.nodes.get(i));
 						if (toNode != lastToNode) {
-							length += CoordUtils.calcDistance(lastToNode.coord, toNode.coord);
+							length += CoordUtils.calcEuclideanDistance(lastToNode.coord, toNode.coord);
 							if (toNode.used) {
 
 								if(this.hierarchyLayers.isEmpty()) {
@@ -439,7 +439,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		this.ways.clear();
 	}
 
-	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
+	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, 
+			final double length) {
 		String highway = way.tags.get(TAG_HIGHWAY);
 
         if ("no".equals(way.tags.get(TAG_ACCESS))) {
@@ -551,6 +552,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setNumberOfLanes(nofLanes);
 				if (l instanceof LinkImpl) {
 					((LinkImpl) l).setOrigId(origId);
+					((LinkImpl) l).setType( highway );
 				}
 				network.addLink(l);
 				this.id++;
@@ -563,6 +565,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setNumberOfLanes(nofLanes);
 				if (l instanceof LinkImpl) {
 					((LinkImpl) l).setOrigId(origId);
+					((LinkImpl) l).setType( highway );
 				}
 				network.addLink(l);
 				this.id++;

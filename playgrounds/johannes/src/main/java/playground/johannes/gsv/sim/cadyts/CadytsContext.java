@@ -150,7 +150,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 //				ZoneCollection zones = new ZoneCollection();
 //				zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 				ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(config.getParam(GsvConfigGroup
-						.GSV_CONFIG_MODULE_NAME, "zonesFile"), "NO");
+						.GSV_CONFIG_MODULE_NAME, "zonesFile"), "NO", null);
 
 				odCalibrator = new ODCalibrator(event.getServices().getScenario(), this, m, zones, distThreshold, countThreshold, aggKey);
 				event.getServices().getEvents().addHandler(odCalibrator);

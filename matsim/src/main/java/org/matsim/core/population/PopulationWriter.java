@@ -21,11 +21,14 @@
 package org.matsim.core.population;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.AbstractMatsimWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
@@ -39,6 +42,7 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 
 	private final double write_person_fraction;
 
+	private final CoordinateTransformation coordinateTransformation;
 	private PopulationWriterHandler handler = null;
 	private final Population population;
 	private final Network network;
@@ -50,7 +54,13 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 	public PopulationWriter(final Population population) {
 		this(population, null, 1.0);
 	}
-	
+
+	public PopulationWriter(
+			final CoordinateTransformation coordinateTransformation,
+			final Population population) {
+		this(coordinateTransformation , population, null, 1.0);
+	}
+
 	/**
 	 * Creates a new PlansWriter to write out the specified plans to the file and with version
 	 * as specified in the {@linkplain org.matsim.core.config.groups.PlansConfigGroup configuration}.
@@ -63,6 +73,35 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 		this(population, network, 1.0);
 	}
 
+	public PopulationWriter(
+			final CoordinateTransformation coordinateTransformation,
+			final Population population,
+			final Network network) {
+		this(coordinateTransformation , population, network, 1.0);
+	}
+
+	/**
+	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
+	 * the specified version.
+	 * If plans-streaming is on, the file will already be opened and the file-header be written.
+	 * If plans-streaming is off, the file will not be created until {@link #write(java.lang.String)} is called.
+	 *
+	 * @param coordinateTransformation transformation from the internal CRS to the CRS in which the file should be written
+	 * @param population the population to write to file
+	 * @param fraction of persons to write to the plans file
+	 */
+	public PopulationWriter(
+			final CoordinateTransformation coordinateTransformation,
+			final Population population,
+			final Network network,
+			final double fraction) {
+		this.coordinateTransformation = coordinateTransformation;
+		this.population = population;
+		this.network = network;
+		this.write_person_fraction = fraction;
+		this.handler = new PopulationWriterHandlerImplV5(coordinateTransformation);
+	}
+
 	/**
 	 * Creates a new PlansWriter to write out the specified plans to the specified file and with
 	 * the specified version.
@@ -72,12 +111,11 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 	 * @param population the population to write to file
 	 * @param fraction of persons to write to the plans file
 	 */
-	public PopulationWriter(final Population population, final Network network, final double fraction) {
-		super();
-		this.population = population;
-		this.network = network;
-		this.write_person_fraction = fraction;
-		this.handler = new PopulationWriterHandlerImplV5();
+	public PopulationWriter(
+			final Population population,
+			final Network network,
+			final double fraction) {
+		this( new IdentityTransformation() , population , network , fraction );
 	}
 
 	/**
@@ -191,17 +229,17 @@ public class PopulationWriter extends AbstractMatsimWriter implements MatsimWrit
 	}
 
 	public void writeFileV0(final String filename) {
-		this.handler = new PopulationWriterHandlerImplV0(this.network);
+		this.handler = new PopulationWriterHandlerImplV0( coordinateTransformation , this.network);
 		write(filename);
 	}
 
 	public void writeFileV4(final String filename) {
-		this.handler = new PopulationWriterHandlerImplV4(this.network);
+		this.handler = new PopulationWriterHandlerImplV4( coordinateTransformation , this.network );
 		write(filename);
 	}
 
 	public void writeFileV5(final String filename) {
-		this.handler = new PopulationWriterHandlerImplV5();
+		this.handler = new PopulationWriterHandlerImplV5(coordinateTransformation);
 		write(filename);
 	}
 

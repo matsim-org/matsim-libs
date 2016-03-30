@@ -201,7 +201,7 @@ class CreateTestScenario {
 		}else{
 			l.setFreespeed(50/3.6);
 		}
-		l.setLength(CoordUtils.calcDistance(from.getCoord(), to.getCoord()));
+		l.setLength(CoordUtils.calcEuclideanDistance(from.getCoord(), to.getCoord()));
 		return l;
 	}
 

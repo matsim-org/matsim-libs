@@ -34,6 +34,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -242,6 +243,18 @@ class WagonSimAgent implements MobsimDriverAgent, MobsimPassengerAgent, PTPassen
 	@Override
 	public boolean isWantingToArriveOnCurrentLink() {
 		return this.delegate.isWantingToArriveOnCurrentLink() ;
+	}
+
+	public final PlanElement getPreviousPlanElement() {
+		return this.delegate.getPreviousPlanElement();
+	}
+
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		return this.delegate.getCurrentFacility();
+	}
+
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		return this.delegate.getDestinationFacility();
 	}
 
 }

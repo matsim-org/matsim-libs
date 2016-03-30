@@ -62,7 +62,7 @@ public class XMLHandler extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equalsIgnoreCase(Constants.PERSONS_TAG)) {
-			persons = new HashSet<>();
+			persons = new LinkedHashSet<>();
 
 		} else if (name.equalsIgnoreCase(Constants.PERSON_TAG)) {
 			person = factory.newPerson(getAttribute(Constants.ID_KEY, atts));

@@ -101,7 +101,7 @@ public final class NetworkUtil {
 		
 		
 		Distances d = new Distances();
-		double distance = NetworkUtils.getEuclidianDistance(pointx, pointy, destinationNode.getCoord().getX(), destinationNode.getCoord().getY()) ;
+		double distance = NetworkUtils.getEuclideanDistance(pointx, pointy, destinationNode.getCoord().getX(), destinationNode.getCoord().getY()) ;
 		d.setDisatancePoint2Road(distance);
 		// yyyy I have no idea what it is doing here. kai, mar'14
 

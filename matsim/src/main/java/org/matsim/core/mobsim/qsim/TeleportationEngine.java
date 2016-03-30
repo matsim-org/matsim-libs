@@ -12,8 +12,10 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -21,12 +23,14 @@ import org.matsim.vis.snapshotwriters.VisData;
 import javax.inject.Inject;
 import java.util.*;
 
+/**
+ * Includes all agents that have transportation modes unknown to the
+ * NetsimEngine (often all != "car") or have two activities on the same link
+ */
 public final class TeleportationEngine implements DepartureHandler, MobsimEngine,
 VisData {
-	/**
-	 * Includes all agents that have transportation modes unknown to the
-	 * QueueSimulation (i.e. != "car") or have two activities on the same link
-	 */
+	private static final Logger log = Logger.getLogger( TeleportationEngine.class ) ;
+	
 	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<>(
 			30, new Comparator<Tuple<Double, MobsimAgent>>() {
 
@@ -43,34 +47,45 @@ VisData {
 	private InternalInterface internalInterface;
 	private Scenario scenario;
 	private EventsManager eventsManager;
+	
+	private final boolean withTravelTimeCheck ;
 
 	@Inject
 	public TeleportationEngine(Scenario scenario, EventsManager eventsManager) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
+		
+		withTravelTimeCheck = scenario.getConfig().qsim().isUsingTravelTimeCheckInTeleportation() ;
 	}
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-    	if ( agent.getExpectedTravelTime()==null || agent.getExpectedTravelTime()==Time.UNDEFINED_TIME ) {
-    		Logger.getLogger( this.getClass() ).info( "mode: " + agent.getMode() );
-    		throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
-    				+ " since otherwise mode choice optimization will eventually lead to all legs teleported.  kai/mz, apr'15") ;
-    	}
-		double arrivalTime = now + agent.getExpectedTravelTime();
-		this.teleportationList.add(new Tuple<>(arrivalTime,
-				agent));
+		if ( agent.getExpectedTravelTime()==null || agent.getExpectedTravelTime()==Time.UNDEFINED_TIME ) {
+			Logger.getLogger( this.getClass() ).info( "mode: " + agent.getMode() );
+			throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
+					+ " since we cannot guess travel times for arbitrary modes and arbitrary landscapes.  kai/mz, apr'15 & feb'16") ;
+		}
+
+		Double travelTime = agent.getExpectedTravelTime() ;
+		if ( withTravelTimeCheck ) {
+			Double speed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( agent.getMode() ) ;
+			Facility<?> dpfac = agent.getCurrentFacility() ;
+			Facility<?> arfac = agent.getDestinationFacility() ;
+			travelTime = TeleportationEngine.travelTimeCheck(travelTime, speed, dpfac, arfac);
+		}
+    	
+		double arrivalTime = now + travelTime ;
+		this.teleportationList.add(new Tuple<>(arrivalTime, agent));
+		
+		// === below here is only visualization, no dynamics ===
 		Id<Person> agentId = agent.getId();
-		Link currLink = this.scenario
-				.getNetwork().getLinks().get(linkId);
-		Link destLink = this.scenario
-				.getNetwork().getLinks().get(agent.getDestinationLinkId());
-		double travTime = agent.getExpectedTravelTime();
+		Link currLink = this.scenario .getNetwork().getLinks().get(linkId);
+		Link destLink = this.scenario .getNetwork().getLinks().get(agent.getDestinationLinkId());
 		Coord fromCoord = currLink.getToNode().getCoord();
 		Coord toCoord = destLink.getToNode().getCoord();
-		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId,
-				fromCoord, toCoord, travTime);
+		TeleportationVisData agentInfo = new TeleportationVisData(now, agentId, fromCoord, toCoord, travelTime);
 		this.teleportationData.put(agentId, agentInfo);
+		
 		return true;
 	}
 
@@ -127,6 +142,39 @@ VisData {
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
+	}
+
+	private static Double travelTimeCheck(Double travelTime, Double speed, Facility<?> dpfac, Facility<?> arfac) {
+		if ( speed==null ) {
+			// if we don't have a bushwhacking speed, the only thing we can do is trust the router
+			return travelTime ;
+		} 
+		
+		if ( dpfac == null || arfac == null ) {
+			log.warn( "dpfac = " + dpfac ) ;
+			log.warn( "arfac = " + arfac ) ;
+			throw new RuntimeException("have bushwhacking mode but nothing that leads to coordinates; don't know what to do ...") ;
+			// (means that the agent is not correctly implemented)
+		}
+		
+		if ( dpfac.getCoord()==null || arfac.getCoord()==null ) {
+			// yy this is for example the case if activities are initialized at links, without coordinates.  Could use the link coordinate
+			// instead, but somehow this does not feel any better. kai, feb'16
+			
+			return travelTime ;
+		}
+			
+		final Coord dpCoord = dpfac.getCoord();
+		final Coord arCoord = arfac.getCoord();
+				
+		double dist = NetworkUtils.getEuclideanDistance( dpCoord, arCoord ) ;
+		double travelTimeTmp = dist / speed ;
+		
+		if ( travelTimeTmp < travelTime ) {
+			return travelTime ;
+		}
+			
+		return travelTimeTmp ;
 	}
 
 }

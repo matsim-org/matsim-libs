@@ -19,9 +19,16 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vis.snapshotwriters.VisData;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+
 
 /**
  * Essentially an interface, but since I do not want the methods public for the time being, it is incarnated as an abstract class.
@@ -31,47 +38,25 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author nagel
  *
  */
-abstract class QLaneI extends QInternalI {
+abstract class QLaneI implements Identifiable<Lane> {
 	
-//	boolean doSimStep( final double now ) ;
-	
-	abstract void addFromWait( final QVehicle veh, final double now);
+	abstract void addFromWait( final QVehicle veh);
 
 	abstract boolean isAcceptingFromWait();
 
-	abstract void updateRemainingFlowCapacity();
-
-//	int vehInQueueCount();
-
 	abstract boolean isActive();
 
-	abstract double getSimulatedFlowCapacity();
-
-//	boolean isAcceptingFromUpstream();
-
-	abstract void recalcTimeVariantAttributes(final double now);
+	abstract double getSimulatedFlowCapacityPerTimeStep();
 
 	abstract QVehicle getVehicle( final Id<Vehicle> vehicleId);
 
-//	Collection<MobsimVehicle> getAllVehicles();
-
-//	QVehicle popFirstVehicle();
-
-//	boolean hasGreenForToLink( final Id<Link> toLinkId);
-
 	abstract double getStorageCapacity();
-
-//	boolean isNotOfferingVehicle();
-
-//	void clearVehicles();
-
-//	void addFromUpstream(final QVehicle veh);
+	
+	static interface VisData {
+		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions, double now ) ;
+	}
 
 	abstract VisData getVisData();
-
-//	QVehicle getFirstVehicle();
-
-//	double getLastMovementTimeOfFirstVehicle();
 
 	/**
 	 * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the link can also be served.
@@ -82,8 +67,36 @@ abstract class QLaneI extends QInternalI {
 	 */
 	abstract void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
 	
-	abstract void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) ;
+	abstract void changeUnscaledFlowCapacityPerSecond( final double val ) ;
 
-	abstract void changeEffectiveNumberOfLanes( final double val, final double now ) ;
+	abstract void changeEffectiveNumberOfLanes( final double val ) ;
+
+	abstract boolean doSimStep();
+
+	abstract void clearVehicles();
+
+	abstract Collection<MobsimVehicle> getAllVehicles();
+
+	abstract void addFromUpstream(final QVehicle veh);
+
+	abstract boolean isNotOfferingVehicle();
+
+	abstract QVehicle popFirstVehicle();
+
+	abstract QVehicle getFirstVehicle();
+
+	abstract double getLastMovementTimeOfFirstVehicle();
+
+	abstract boolean hasGreenForToLink(final Id<Link> toLinkId);
+
+	abstract boolean isAcceptingFromUpstream();
+
+	abstract void changeSpeedMetersPerSecond(double val) ;
+
+	/**
+	 * When multiple lanes lead to the same next link, the QLinkLanesImpl needs to decide which lane to use.  It uses
+	 * the one with the smallest load.
+	 */
+	abstract double getLoadIndicator() ;
 
 }

@@ -410,7 +410,8 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		ttc.handleEvent(new LinkEnterEvent(200, vehId, link2.getId()));
 		ttc.handleEvent(new LinkLeaveEvent(300, vehId, link2.getId()));
 
-		Assert.assertEquals("No transport mode has been registered to be analyzed, therefore no vehicle/agent should be counted", 1.0, ttc.getLinkTravelTimes().getLinkTravelTime(link2, 300, null, null), 1e-8);
+		Assert.assertEquals("No transport mode has been registered to be analyzed, therefore no vehicle/agent should be counted", 1000.0, ttc.getLinkTravelTimes().getLinkTravelTime(link2, 300, null, null), 1e-8);
+		// 1000.0s is the freespeed travel time (euclidean link length: 1000m, default freespeed: 1m/s)
 	}
 	
 	/**

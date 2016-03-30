@@ -21,10 +21,12 @@ package org.matsim.contrib.signals.integration;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -34,7 +36,9 @@ import org.matsim.contrib.signals.router.InvertedNetworkRoutingModuleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
@@ -74,6 +78,8 @@ public class SignalSystemsIT {
 		config.qsim().setStartTime(1.5*3600);
 		config.qsim().setEndTime(5.5*3600);
 		
+		config.controler().setLastIteration(10);
+		
 		// ---
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
@@ -85,6 +91,18 @@ public class SignalSystemsIT {
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		c.getConfig().controler().setDumpDataAtEnd(false);
+		
+//		c.addOverridingModule( new AbstractModule(){
+//			@Override public void install() {
+//				this.addEventHandlerBinding().toInstance( new BasicEventHandler(){
+//					@Override public void reset(int iteration) { }
+//					@Override public void handleEvent(Event event) {
+//						Logger.getLogger( SignalSystemsIT.class ).warn( event );
+//					}
+//				} ) ;
+//			}
+//		});
+		
 		c.run();
 
 		String inputDirectory = testUtils.getInputDirectory();

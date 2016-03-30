@@ -135,7 +135,7 @@ public class Person2ActivityPerformingWriter {
 
 	private void storeUtilOfPerforming(final Scenario sc, final Person p, final Activity activity) {
 		ScoringFunctionFactory sfFactory = new ScoringFunctionFactory() {
-			CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(sc, p.getId() ).create();
+			CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(sc, p.getId()).build();
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {

@@ -118,7 +118,7 @@ public class Compare {
 		writer.close();
 		scatterWriter.close();
 
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.gk3.geojson", "gsvId");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.gk3.geojson", "gsvId", null);
 		TDoubleDoubleHashMap hist = calcDistDistribution(zones, iais, iais, threshold);
 		StatsWriter.writeHistogram(hist, "d", "p", String.format("/home/johannes/gsv/fpd/telefonica/analysis%s/fpd" +
 				".dist.txt", suffix));

@@ -45,7 +45,7 @@ public class TaxibusVehicleCreator
 
 
 	private String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/network_nopt.xml";
-	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/taxibus_vehicles_woblines";
+	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/taxibus_vehicles_hubs";
 	
 	private Scenario scenario ;
 	private int ii = 0;
@@ -64,6 +64,18 @@ public class TaxibusVehicleCreator
 		tvc.run(i, Id.createLinkId("6422"));
 		tvc.run(i, Id.createLinkId("41185"));
 		tvc.run(i, Id.createLinkId("41181"));
+		tvc.run(i, Id.createLinkId("57196"));
+		tvc.run(i, Id.createLinkId("10104"));
+		tvc.run(i, Id.createLinkId("57195"));
+		tvc.run(i, Id.createLinkId("5082"));
+		tvc.run(i, Id.createLinkId("42749"));
+		tvc.run(i, Id.createLinkId("10346"));
+		tvc.run(i, Id.createLinkId("42748"));
+		tvc.run(i, Id.createLinkId("10345"));
+		tvc.run(i, Id.createLinkId("40589"));
+		tvc.run(i, Id.createLinkId("55237"));
+		
+		
 		
 		
 

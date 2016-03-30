@@ -100,7 +100,7 @@ public abstract class AbstractController {
                 controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected);
             }
         };
-        MatsimRuntimeModifications.run(runnable, dirtyShutdown);
+        MatsimRuntimeModifications.run(runnable);
         OutputDirectoryLogging.closeOutputDirLogging();
     }
 
@@ -127,7 +127,7 @@ public abstract class AbstractController {
     }
 
 
-    final String DIVIDER = "###################################################";
+    public static final String DIVIDER = "###################################################";
     final String MARKER = "### ";
 
     private void iteration(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {

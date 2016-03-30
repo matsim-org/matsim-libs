@@ -75,7 +75,7 @@ public class SetHomeFacilities implements PersonsTask {
         logger.info("Assigning facilities to persons...");
         List<Person> shuffledPersons = new ArrayList<>(persons);
         Collections.shuffle(shuffledPersons, random);
-        assignToPersons(shuffledPersons, facilityMapping, probabilities);
+        assignToPersons2(shuffledPersons, facilityMapping, probabilities);
 
         // this is only necessary if there are zones with a population but no facilities
         logger.info("Checking for homeless persons...");
@@ -180,7 +180,80 @@ public class SetHomeFacilities implements PersonsTask {
         ProgressLogger.terminate();
 
         if (total < persons.size()) {
-            logger.warn("Not all persons precessed. Check facilities and zones!");
+            logger.warn("Not all persons processed. Check facilities and zones!");
+        }
+
+    }
+
+    private void assignToPersons2(List<Person> persons, Map<Zone, List<ActivityFacility>> facilityMapping, TObjectDoubleHashMap<Zone> probabilities) {
+        ProgressLogger.init(persons.size(), 2, 10);
+
+        double globalWSum = 0;
+        for(Person p : persons) {
+            globalWSum += Double.parseDouble(p.getAttribute(CommonKeys.PERSON_WEIGHT));
+        }
+
+        TObjectDoubleIterator<Zone> it = probabilities.iterator();
+        double accumulatedWSum = 0;
+
+        int personIdx = 0;
+        // go through all zones
+        for (int zoneIdx = 0; zoneIdx < probabilities.size(); zoneIdx++) {
+            it.advance();
+
+            //FIXME: Adapt this with weights!
+            // round number of inhabitants up to ensure that all persons are assigned
+//            int n = (int) Math.ceil(persons.size() * it.value());
+            double targetWSum = globalWSum * it.value();
+
+            List<ActivityFacility> facilities = facilityMapping.get(it.key());
+            if (facilities != null) {
+
+                // check for out of bounds
+                if (targetWSum + accumulatedWSum > globalWSum) {
+                    logger.debug(String.format("Correcting target weight sum: %s -> %s", targetWSum, globalWSum - accumulatedWSum));
+                    targetWSum = globalWSum - accumulatedWSum;
+                }
+
+//                for (int idx = wsum; idx < (wsum + localWSum); idx++) {
+//                    ActivityFacility f = facilities.get(random.nextInt(facilities.size()));
+//                    setHomeFacility(persons.get(idx), f);
+//
+//                    ProgressLogger.step();
+//                }
+
+                double wsum = 0;
+                while(wsum < targetWSum) {
+                    if(persons.size() > personIdx) {
+                        Person p = persons.get(personIdx);
+                        ActivityFacility f = facilities.get(random.nextInt(facilities.size()));
+                        setHomeFacility(p, f);
+                        personIdx++;
+                        wsum += Double.parseDouble(p.getAttribute(CommonKeys.PERSON_WEIGHT));
+
+                        ProgressLogger.step();
+                    } else {
+                        logger.debug(String.format(
+                                "All persons processed before target weight sum reached (targetSum = %s, wsum = %s",
+                                targetWSum, wsum));
+                        break;
+
+                    }
+                }
+
+                accumulatedWSum += wsum;
+            }
+
+            if(personIdx >= persons.size()) {
+                logger.debug(String.format("%s zones unprocessed.", probabilities.size() - (zoneIdx + 1)));
+                break;
+            }
+        }
+
+        ProgressLogger.terminate();
+
+        if (personIdx < persons.size()) {
+            logger.warn("Not all persons processed. Check facilities and zones!");
         }
 
     }

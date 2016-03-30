@@ -27,6 +27,10 @@ import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.router.DistanceAsTravelDisutility;
+<<<<<<< HEAD
+=======
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+>>>>>>> refs/remotes/origin/master
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;

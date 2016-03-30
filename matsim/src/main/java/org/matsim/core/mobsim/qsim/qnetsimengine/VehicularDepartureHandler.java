@@ -68,7 +68,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 		// Thus, such trips are now simulated normally.
 		// See MATSIM-233 for details. td apr'14
 		Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
-		QLinkInternalI qlink = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
+		QLinkI qlink = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
 			if (vehicleBehavior == VehicleBehavior.teleport) {
@@ -111,7 +111,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 					log.info("No more occurrences of teleported vehicles will be reported.");
 				}
 			}
-			QLinkInternalI qlinkOld = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
+			QLinkI qlinkOld = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
 			QVehicle result = qlinkOld.removeParkedVehicle(vehicle.getId());
 			if ( result==null ) {
 				throw new RuntimeException( "Could not remove parked vehicle with id " + vehicle.getId() +" on the link id " 

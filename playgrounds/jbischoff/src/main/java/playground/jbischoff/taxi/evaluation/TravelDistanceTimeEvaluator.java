@@ -138,11 +138,11 @@ public class TravelDistanceTimeEvaluator
     }
 
 
-    public String writeTravelDistanceStatsToFiles(String distanceFile)
+    public String writeTravelDistanceStatsToFiles(String outputFolder)
     {
 
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(distanceFile)));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputFolder+"/taxiDistanceStats.txt")));
             double tkm = 0.;
             double tpkm = 0.;
             double s = 0.;
@@ -200,7 +200,7 @@ public class TravelDistanceTimeEvaluator
             return avs;
         }
         catch (IOException e) {
-            System.err.println("Could not create File" + distanceFile);
+            System.err.println("Could not create File in " + outputFolder);
             e.printStackTrace();
         }
         return null;

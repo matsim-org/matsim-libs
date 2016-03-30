@@ -27,6 +27,7 @@ import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import floetteroed.utilities.Units;
 import floetteroed.utilities.config.ConfigReader;
 import floetteroed.utilities.math.MathHelpers;
@@ -121,6 +122,11 @@ class OptimizeRoadpricing {
 		final boolean adjustWeights = Boolean.parseBoolean(myConfig.get(
 				"opdyts", "adjustweights"));
 
+		final int maxRandomSearchIterations = Integer.parseInt(myConfig.get(
+				"opdyts", "maxiterations"));
+		final int maxRandomSearchTransitions = Integer.parseInt(myConfig.get(
+				"opdyts", "maxtransitions"));
+
 		/*
 		 * Create the MATSim scenario.
 		 */
@@ -180,22 +186,29 @@ class OptimizeRoadpricing {
 		/*
 		 * RandomSearch specification.
 		 */
-		final int maxMemorizedTrajectoryLength = Integer.MAX_VALUE;
-		final int maxRandomSearchIterations = 1000;
-		final int maxRandomSearchTransitions = Integer.MAX_VALUE;
 		final RandomSearch<TollLevels> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer, initialTollLevels,
 				convergenceCriterion, maxRandomSearchIterations,
 				maxRandomSearchTransitions, randomSearchPopulationSize,
 				MatsimRandom.getRandom(), parallelSampling, objectiveFunction,
-				maxMemorizedTrajectoryLength, includeCurrentBest);
+				includeCurrentBest);
 		randomSearch.setLogFileName(originalOutputDirectory + "opdyts.log");
+		randomSearch.setConvergenceTrackingFileName(originalOutputDirectory
+				+ "opdyts.con");
+		randomSearch.setOuterIterationLogFileName(originalOutputDirectory
+				+ "opdyts.opt");
+		randomSearch.setMaxTotalMemory(averageIterations);
 
 		/*
 		 * Run it.
 		 */
-		randomSearch.run(initialEquilibriumWeight, initialUniformityWeight,
-				adjustWeights);
+		if (adjustWeights) {
+			final SelfTuner selfTuner = new SelfTuner(0.95);
+			selfTuner.setNoisySystem(true);
+			randomSearch.run(selfTuner);
+		} else {
+			randomSearch.run(initialEquilibriumWeight, initialUniformityWeight);
+		}
 
 		System.out.println("... DONE.");
 	}

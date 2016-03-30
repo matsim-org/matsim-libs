@@ -19,7 +19,6 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.OpeningTimeImpl;
-import org.matsim.facilities.OpeningTime.DayType;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
@@ -87,8 +86,8 @@ public class EducationalFacilitiesGenerator {
 						option = ((ActivityFacilityImpl) facility).createAndAddActivityOption(EDUCATION_ACTIVITY_TYPES[eduType]);
 					else
 						capacity = option.getCapacity();
-					option.setCapacity((double)((int)(capacity+educationalFacilitiesResult.getDouble(2))));
-					option.addOpeningTime(new OpeningTimeImpl(DayType.wkday, EDUCATION_START_TIMES[eduType], EDUCATION_START_TIMES[eduType]+EDUCATION_DURATIONS[eduType]));
+					option.setCapacity(((int)(capacity+educationalFacilitiesResult.getDouble(2))));
+					option.addOpeningTime(new OpeningTimeImpl(EDUCATION_START_TIMES[eduType], EDUCATION_START_TIMES[eduType]+EDUCATION_DURATIONS[eduType]));
 				}	
 			}
 		}
@@ -98,7 +97,7 @@ public class EducationalFacilitiesGenerator {
 		int zip=-1;
 		double nearest = Double.MAX_VALUE;
 		for(Entry<Integer, Coord> postalCode: allPostalCodes.entrySet()) {
-			double distance = CoordUtils.calcDistance(postalCode.getValue(), coord);
+			double distance = CoordUtils.calcEuclideanDistance(postalCode.getValue(), coord);
 			if(distance<nearest) {
 				zip = postalCode.getKey();
 				nearest = distance;

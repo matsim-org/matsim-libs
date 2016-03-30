@@ -64,15 +64,16 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 	public static class Builder implements TravelDisutilityFactory{
 		private final String mode;
 		private double sigma = 0. ;
+		private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-		public Builder( final String mode ) {
+		public Builder( final String mode, PlanCalcScoreConfigGroup cnScoringGroup ) {
 			this.mode = mode;
+			this.cnScoringGroup = cnScoringGroup;
 		}
 
 		@Override
 		public RandomizingTimeDistanceTravelDisutility createTravelDisutility(
-				final TravelTime timeCalculator,
-				final PlanCalcScoreConfigGroup cnScoringGroup) {
+				final TravelTime timeCalculator) {
 			logWarningsIfNecessary( cnScoringGroup );
 
 			/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/

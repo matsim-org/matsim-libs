@@ -8,39 +8,18 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.matrices.Matrix;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
 
 import playground.dhosse.gap.Global;
-import playground.dhosse.gap.scenario.GAPScenarioBuilder;
-import playground.dhosse.gap.scenario.mid.MiDCSVReader;
-import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
-import playground.dhosse.gap.scenario.mid.MiDPersonGroupTemplates;
-import playground.dhosse.gap.scenario.mid.MiDSurveyPerson;
-import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
-import playground.dhosse.gap.scenario.population.io.CommuterFileReader;
-import playground.dhosse.gap.scenario.population.personGroups.CreateCommutersFromElsewhere;
-import playground.dhosse.gap.scenario.population.personGroups.CreateDemand;
 import playground.dhosse.gap.scenario.population.personGroups.CreateDemandV2;
-import playground.dhosse.utils.EgapHashGenerator;
+import playground.dhosse.scenarios.generic.population.io.commuters.CommuterDataElement;
+import playground.dhosse.scenarios.generic.population.io.commuters.CommuterFileReader;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDCsvReader;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDPersonGroupTemplates;
 
 public class PlansCreatorV2 {
 	
@@ -52,7 +31,7 @@ public class PlansCreatorV2 {
 		//that start or end in these municipalities
 		CommuterFileReader cdr = new CommuterFileReader();
 		
-		cdr.addFilter("09180"); //GaPa (Kreis)
+//		cdr.addFilter("09180"); //GaPa (Kreis)
 		cdr.addFilter("09180113"); //Bad Bayersoien
 		cdr.addFilter("09180112"); //Bad Kohlgrub
 		cdr.addFilter("09180114"); //Eschenlohe
@@ -74,6 +53,7 @@ public class PlansCreatorV2 {
 		cdr.addFilter("09180134"); //Uffind a Staffelsee
 		cdr.addFilter("09180135"); //Unterammergau
 		cdr.addFilter("09180136"); //Wallgau
+//		cdr.setSpatialFilder("091");
 		
 		cdr.read(reverseCommuterFilename, true);
 		cdr.read(commuterFilename, false);
@@ -108,8 +88,8 @@ public class PlansCreatorV2 {
 		
 		MiDPersonGroupTemplates templates = new MiDPersonGroupTemplates();
 		
-		MiDCSVReader reader = new MiDCSVReader();
-		reader.readV2(Global.matsimInputDir + "MID_Daten_mit_Wegeketten/travelsurvey_m.csv", templates);
+		MiDCsvReader reader = new MiDCsvReader();
+		reader.readV2("/home/dhosse/bayern_laendl_Wege.csv", templates);
 		templates.setWeights();
 
 		CreateDemandV2.getNinetyPctDistances().put(TransportMode.car, new Double(14560));
@@ -120,7 +100,7 @@ public class PlansCreatorV2 {
 		
 		for(Entry<String, Municipality> entry : Municipalities.getMunicipalities().entrySet()){
 			
-			CreateDemandV2.runTryout(entry.getKey(), 6, 17, entry.getValue().getnStudents(), scenario, templates, matrices);
+//			CreateDemandV2.runTryout(entry.getKey(), 6, 17, entry.getValue().getnStudents(), scenario, templates, matrices);
 			
 			int nCommuters = 0;
 			List<String> keysToRemove = new ArrayList<>();
@@ -135,8 +115,9 @@ public class PlansCreatorV2 {
 					
 					if(relationParts[1].startsWith("09180")){
 						
-						CreateDemandV2.createCommuters(relationParts[0], relationParts[1], 18, 65, relations.get(relation), scenario, templates, matrices);
-						keysToRemove.add(relation);
+//						CreateDemandV3.createCommuters(scenario, relationParts[0], relationParts[1], relations.get(relation).getCommuters());
+//						CreateDemandV2.createCommuters(relationParts[0], relationParts[1], 18, 65, relations.get(relation), scenario, templates, matrices);
+//						keysToRemove.add(relation);
 						
 					}
 					
@@ -150,12 +131,12 @@ public class PlansCreatorV2 {
 				
 			}
 			
-			CreateDemandV2.runTryout(entry.getKey(), 18, 65, entry.getValue().getnAdults() - nCommuters, scenario, templates, matrices);
-			CreateDemandV2.runTryout(entry.getKey(), 66, 100, entry.getValue().getnPensioners(), scenario, templates, matrices);
+//			CreateDemandV2.runTryout(entry.getKey(), 18, 65, entry.getValue().getnAdults() - nCommuters, scenario, templates, matrices);
+//			CreateDemandV2.runTryout(entry.getKey(), 66, 100, entry.getValue().getnPensioners(), scenario, templates, matrices);
 			
 		}
 		
-		CreateCommutersFromElsewhere.run(scenario, relations.values());
+//		CreateCommutersFromElsewhere.run(scenario, relations.values());
 		
 	}
 	

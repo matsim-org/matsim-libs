@@ -24,26 +24,13 @@ import com.google.inject.Inject;
 import gnu.trove.TDoubleCollection;
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.array.TDoubleArrayList;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -51,9 +38,14 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.rx.ObservableUtils;
-import rx.Observable;
-import rx.functions.Action1;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This class helps EventsToScore by keeping ScoringFunctions for the entire Population - one per Person -, and dispatching Activities
@@ -63,7 +55,7 @@ import rx.functions.Action1;
  * @author michaz
  *
  */
-class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPlansService {
+class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler, ExperiencedPlansService {
 
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
 	private final PlansConfigGroup plansConfigGroup;
@@ -74,99 +66,81 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 	/*
 	 * Replaced TreeMaps with (Linked)HashMaps since they should perform much better. For 'partialScores'
 	 * a LinkedHashMap is used to ensure that agents are written in a deterministic order to the output files.
-	 * 
+	 *
 	 * Replaced List with TDoubleCollection (TDoubleArrayList) in the partialScores map. This collection allows
 	 * storing primitive objects, i.e. its double entries don't have to be wrapped into Double objects which
 	 * should be faster and reduce the memory overhead.
-	 * 
-	 * cdobler, nov'15  
+	 *
+	 * cdobler, nov'15
 	 */
 	private final Map<Id<Person>, ScoringFunction> agentScorers = new HashMap<>();
 	private final Map<Id<Person>, Plan> agentRecords = new HashMap<>();
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
+	private final AtomicReference<Throwable> exception = new AtomicReference<>();
 
 	@Inject
 	ScoringFunctionsForPopulation(EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
-			PlansConfigGroup plansConfigGroup, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
+								  PlansConfigGroup plansConfigGroup, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
 		this.plansConfigGroup = plansConfigGroup;
 		this.network = network;
 		this.population = population;
 		this.scoringFunctionFactory = scoringFunctionFactory;
-		reset();
-
-		// Merge three streams of different type into one and react on it.
-		// Otherwise, I would have to synchronize on the three scoreXX methods,
-		// because the three upstream producers can run on different threads.
-		// And I want to start to stop using low-level concurrency constructs
-		// and explore more high-level ones.
-		Observable<Event> events = ObservableUtils.fromEventsManager(eventsManager);
-		Observable<PersonExperiencedActivity> activities = ObservableUtils.fromEventsToActivities(eventsToActivities);
-		Observable<PersonExperiencedLeg> legs = ObservableUtils.fromEventsToLegs(eventsToLegs);
-		Observable<Object> allEvents = Observable.merge(events, activities, legs);
-		allEvents.subscribe(new Action1<Object>() {
-			@Override
-			public void call(Object o) {
-				if (o instanceof HasPersonId) {
-					scorePersonEvent((HasPersonId) o);
-				} else if (o instanceof PersonExperiencedActivity) {
-					scoreExperiencedActivity((PersonExperiencedActivity) o);
-				} else if (o instanceof PersonExperiencedLeg) {
-					scoreExperiencedLeg((PersonExperiencedLeg) o);
-				}
-			}
-		});
-		eventsManager.addHandler(this); // only so that I receive the reset() call!
+		eventsManager.addHandler(this);
+		eventsToActivities.addActivityHandler(this);
+		eventsToLegs.addLegHandler(this);
+		log.info("Using old scoring.");
 	}
 
-	private void scorePersonEvent(HasPersonId o) {
+	public void onIterationStarts() {
+		for (Person person : population.getPersons().values()) {
+			ScoringFunction data = scoringFunctionFactory.createNewScoringFunction(person);
+			this.agentScorers.put(person.getId(), data);
+			this.agentRecords.put(person.getId(), new PlanImpl());
+			this.partialScores.put(person.getId(), new TDoubleArrayList());
+		}
+	}
+
+	synchronized public void handleEvent(Event o) {
 		// this is for the stuff that is directly based on events.
 		// note that this passes on _all_ person events, even those which are aggregated into legs and activities.
 		// for the time being, not all PersonEvents may "implement HasPersonId".
 		// link enter/leave events are NOT passed on, for performance reasons.
 		// kai/dominik, dec'12
-
-		ScoringFunction scoringFunction = getScoringFunctionForAgent(o.getPersonId());
-		if (scoringFunction != null) {
-			if ( o instanceof PersonStuckEvent) {
-				scoringFunction.agentStuck(((Event) o).getTime()) ;
-			} else if ( o instanceof PersonMoneyEvent) {
-				scoringFunction.addMoney(((PersonMoneyEvent) o).getAmount()) ;
-			} else {
-				scoringFunction.handleEvent((Event) o) ;
+		if (o instanceof HasPersonId) {
+			ScoringFunction scoringFunction = getScoringFunctionForAgent(((HasPersonId) o).getPersonId());
+			if (scoringFunction != null) {
+				if (o instanceof PersonStuckEvent) {
+					scoringFunction.agentStuck(o.getTime());
+				} else if (o instanceof PersonMoneyEvent) {
+					scoringFunction.addMoney(((PersonMoneyEvent) o).getAmount());
+				} else {
+					scoringFunction.handleEvent(o);
+				}
 			}
 		}
 	}
 
-	private void scoreExperiencedLeg(PersonExperiencedLeg o) {
+	synchronized public void handleLeg(PersonExperiencedLeg o) {
 		Id<Person> agentId = o.getAgentId();
 		Leg leg = o.getLeg();
 		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
 		if (scoringFunction != null) {
 			scoringFunction.handleLeg(leg);
 			agentRecords.get(agentId).addLeg(leg);
-			TDoubleCollection partialScoresForAgent = ScoringFunctionsForPopulation.this.partialScores.get(agentId);
+			TDoubleCollection partialScoresForAgent = partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
 		}
 	}
 
-	private void scoreExperiencedActivity(PersonExperiencedActivity o) {
+	synchronized public void handleActivity(PersonExperiencedActivity o) {
 		Id<Person> agentId = o.getAgentId();
 		Activity activity = o.getActivity();
 		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
 		if (scoringFunction != null) {
 			scoringFunction.handleActivity(activity);
-			ScoringFunctionsForPopulation.this.agentRecords.get(agentId).addActivity(activity);
-			TDoubleCollection partialScoresForAgent = ScoringFunctionsForPopulation.this.partialScores.get(agentId);
+			agentRecords.get(agentId).addActivity(activity);
+			TDoubleCollection partialScoresForAgent = partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
-		}
-	}
-
-	private void reset() {
-		for (Person person : population.getPersons().values()) {
-			ScoringFunction data = scoringFunctionFactory.createNewScoringFunction(person);
-			this.agentScorers.put(person.getId(), data);
-			this.agentRecords.put(person.getId(), new PlanImpl());
-			this.partialScores.put(person.getId(), new TDoubleArrayList());
 		}
 	}
 
@@ -190,6 +164,15 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 	}
 
 	public void finishScoringFunctions() {
+		// Rethrow an exception in a scoring function (user code) if there was one.
+		Throwable throwable = exception.get();
+		if (throwable != null) {
+			if (throwable instanceof RuntimeException) {
+				throw ((RuntimeException) throwable);
+			} else {
+				throw new RuntimeException(throwable);
+			}
+		}
 		for (ScoringFunction sf : this.agentScorers.values()) {
 			sf.finish();
 		}
@@ -231,11 +214,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, ExperiencedPla
 	}
 
 	@Override
-	public void handleEvent(Event event) {
-	}
-
-	@Override
 	public void reset(int iteration) {
-		reset();
+
 	}
 }

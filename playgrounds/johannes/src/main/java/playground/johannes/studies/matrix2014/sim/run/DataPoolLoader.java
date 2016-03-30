@@ -20,6 +20,7 @@ package playground.johannes.studies.matrix2014.sim.run;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import playground.johannes.studies.matrix2014.gis.ActivityLocationLayerLoader;
 import playground.johannes.studies.matrix2014.gis.ValidateFacilities;
 import playground.johannes.studies.matrix2014.gis.ZoneSetLAU2Class;
 import playground.johannes.synpop.gis.*;
@@ -35,6 +36,7 @@ public class DataPoolLoader {
 
         dataPool.register(new FacilityDataLoader(configGroup.getValue("facilities"), engine.getRandom()), FacilityDataLoader.KEY);
         dataPool.register(new ZoneDataLoader(configGroup), ZoneDataLoader.KEY);
+        dataPool.register(new ActivityLocationLayerLoader(dataPool), ActivityLocationLayerLoader.KEY);
 
         ValidateFacilities.validate(dataPool, "modena");
         ValidateFacilities.validate(dataPool, "lau2");

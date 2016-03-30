@@ -56,11 +56,15 @@ public class ConfigBasedTaxibusLaunchUtils {
 		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) controler.getScenario().getConfig().getModule("taxibusConfig");
       	context = new MatsimVrpContextImpl();
 		context.setScenario(controler.getScenario());
+<<<<<<< HEAD
         VrpData vrpData = new VrpDataImpl();
         new VehicleReader(context.getScenario().getNetwork(), vrpData).parse(tbcg.getVehiclesFile());
 
 		
 		
+=======
+		VrpData vrpData = VrpLauncherUtils.initVrpData(context, tbcg.getVehiclesFile());
+>>>>>>> refs/remotes/origin/master
 		
 		final LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context,tbcg);	
 		final TaxibusPassengerOrderManager orderManager = new TaxibusPassengerOrderManager();

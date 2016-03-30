@@ -104,7 +104,7 @@ public class TreesBuilder {
 			Map<String, ? extends ActivityOption> facilityActOpts = f.getActivityOptions();
 
 			// do not add facility if it is not in region of interest ------------------------
-			if (regionalScenario && (CoordUtils.calcDistance(f.getCoord(), centerNode.getCoord()) > radius)) {
+			if (regionalScenario && (CoordUtils.calcEuclideanDistance(f.getCoord(), centerNode.getCoord()) > radius)) {
 				continue;
 			}
 			// -------------------------------------------------------------------------------

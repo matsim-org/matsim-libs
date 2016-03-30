@@ -16,7 +16,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package floetteroed.utilities.math;
 
 import java.util.ArrayList;
@@ -51,6 +51,8 @@ public class LeastAbsoluteDeviations {
 
 	private final List<Double> yList = new ArrayList<Double>();
 
+	private final List<Double> deltaList = new ArrayList<Double>();
+
 	private Vector lowerBounds = null;
 
 	private Vector upperBounds = null;
@@ -64,9 +66,14 @@ public class LeastAbsoluteDeviations {
 	public LeastAbsoluteDeviations() {
 	}
 
-	public void add(final Vector x, final double y) {
+	public void add(final Vector x, final double y, final double delta) {
 		this.xList.add(x);
 		this.yList.add(y);
+		this.deltaList.add(delta);
+	}
+
+	public void add(final Vector x, final double y) {
+		this.add(x, y, 0.0);
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -118,11 +125,11 @@ public class LeastAbsoluteDeviations {
 		 * Create constraints.
 		 */
 		final List<LinearConstraint> constraints = new ArrayList<LinearConstraint>(
-				2 * this.size() + (this.lowerBounds == null ? 0 : this.xDim())
+				3 * this.size() + (this.lowerBounds == null ? 0 : this.xDim())
 						+ (this.upperBounds == null ? 0 : this.xDim()));
 		{
 			/*
-			 * Two constraints per measurement that couple the dummy decision
+			 * Three constraints per measurement that couple the dummy decision
 			 * variables to regression residuals.
 			 */
 			for (int i = 0; i < this.size(); i++) {
@@ -130,16 +137,23 @@ public class LeastAbsoluteDeviations {
 						+ this.xDim()];
 				final double[] constrCoeffs2 = new double[this.size()
 						+ this.xDim()];
+				final double[] constrCoeffs3 = new double[this.size()
+						+ this.xDim()];
 				constrCoeffs1[i] = 1.0;
 				constrCoeffs2[i] = 1.0;
+				constrCoeffs3[i] = 1.0;
 				for (int j = 0; j < this.xDim(); j++) {
 					constrCoeffs1[this.size() + j] = +this.xList.get(i).get(j);
 					constrCoeffs2[this.size() + j] = -this.xList.get(i).get(j);
 				}
 				constraints.add(new LinearConstraint(constrCoeffs1,
-						Relationship.GEQ, +this.yList.get(i)));
+						Relationship.GEQ, +this.yList.get(i)
+								- this.deltaList.get(i)));
 				constraints.add(new LinearConstraint(constrCoeffs2,
-						Relationship.GEQ, -this.yList.get(i)));
+						Relationship.GEQ, -this.yList.get(i)
+								- this.deltaList.get(i)));
+				constraints.add(new LinearConstraint(constrCoeffs3,
+						Relationship.GEQ, 0.0));
 			}
 
 			/*

@@ -31,7 +31,7 @@ public class CircuitNetworkCreator {
 	private static Id<Link> LINK_ID4 = Id.create("Link4", Link.class);
 	private static Id<Link> LINK_ID5 = Id.create("Link5", Link.class);
 
-	private Scenario scenario;
+	protected Scenario scenario;
 	
 	public CircuitNetworkCreator(Scenario scenario){
 		this.scenario = scenario;

@@ -11,6 +11,10 @@ import org.matsim.core.network.NetworkImpl;
 
 import com.vividsolutions.jts.geom.Point;
 
+/**
+ * @deprecated this class is nowhere used because it is a former version of NetworkUtil in contrib accessibility. 
+ * just delete it? tt feb'16
+ */
 public class NetworkUtil {
 	
 	// logger

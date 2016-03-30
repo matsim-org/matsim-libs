@@ -77,10 +77,10 @@ public class MergePopulations {
 //        writer.write(outDir + "pop.car.xml", persons);
 
 
-        logger.info("Removing legs with less than 3 KM...");
-        TaskRunner.run(new DeleteShortLongTrips(3000, true), persons);
-        TaskRunner.validatePersons(new DeleteNoLegs(), persons);
-        logger.info(String.format("Persons after filter: %s", persons.size()));
+//        logger.info("Removing legs with less than 3 KM...");
+//        TaskRunner.run(new DeleteShortLongTrips(3000, true), persons);
+//        TaskRunner.validatePersons(new DeleteNoLegs(), persons);
+//        logger.info(String.format("Persons after filter: %s", persons.size()));
 
         logger.info("Removing legs with more than 1000 KM...");
         TaskRunner.run(new DeleteShortLongTrips(1000000, false), persons);

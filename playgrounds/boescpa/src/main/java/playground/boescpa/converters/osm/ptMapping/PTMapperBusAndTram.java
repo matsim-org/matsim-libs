@@ -201,7 +201,7 @@ public class PTMapperBusAndTram extends PTMapper {
 	private Id<Link> findClosestLink(TransitStopFacility stopFacility) {
 		Link nearestLink = NetworkUtils.getNearestLink(this.network, stopFacility.getCoord());
 		if (nearestLink.getAllowedModes().contains(this.networkMode)
-				&& NetworkUtils.getEuclidianDistance(stopFacility.getCoord(), nearestLink.getCoord()) <= this.searchRadius) {
+				&& NetworkUtils.getEuclideanDistance(stopFacility.getCoord(), nearestLink.getCoord()) <= this.searchRadius) {
 			// If nearest link has right mode and is within search radius, return it.
 			return nearestLink.getId();
 		} else {
@@ -210,8 +210,8 @@ public class PTMapperBusAndTram extends PTMapper {
 			double currentRadius = this.searchRadius;
 			for (Link potentialLink : this.network.getLinks().values()) {
 				if (potentialLink.getAllowedModes().contains(this.networkMode)
-						&& NetworkUtils.getEuclidianDistance(stopFacility.getCoord(), potentialLink.getCoord()) < currentRadius) {
-					currentRadius = NetworkUtils.getEuclidianDistance(stopFacility.getCoord(), potentialLink.getCoord());
+						&& NetworkUtils.getEuclideanDistance(stopFacility.getCoord(), potentialLink.getCoord()) < currentRadius) {
+					currentRadius = NetworkUtils.getEuclideanDistance(stopFacility.getCoord(), potentialLink.getCoord());
 					nearestLink = potentialLink;
 				}
 			}
@@ -276,7 +276,7 @@ public class PTMapperBusAndTram extends PTMapper {
 		Set<Link> linksWithinRadius = new HashSet<>();
 		for (Link link : this.network.getLinks().values()) {
 			if (link.getAllowedModes().contains(this.networkMode)
-					&& NetworkUtils.getEuclidianDistance(centralCoords, link.getCoord()) < this.searchRadius) {
+					&& NetworkUtils.getEuclideanDistance(centralCoords, link.getCoord()) < this.searchRadius) {
 				linksWithinRadius.add(link);
 			}
 		}

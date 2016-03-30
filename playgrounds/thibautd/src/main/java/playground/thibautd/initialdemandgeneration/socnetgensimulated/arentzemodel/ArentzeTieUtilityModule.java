@@ -56,7 +56,7 @@ public class ArentzeTieUtilityModule extends AbstractModule {
 										// increase distance by 1 (normally meter) to avoid linking with all agents
 										// living in the same place.
 										// TODO: test sensitivity of the results to this
-										return pars.getB_logDist() * Math.log( CoordUtils.calcDistance(population.getCoord(ego), population.getCoord(alter)) + 1 )
+										return pars.getB_logDist() * Math.log( CoordUtils.calcEuclideanDistance(population.getCoord(ego), population.getCoord(alter)) + 1 )
 												+ pars.getB_sameGender() * dummy( population.isMale( ego ) == population.isMale( alter ) )
 												+ pars.getB_ageDiff0() * dummy( ageClassDifference == 0 )
 												+ pars.getB_ageDiff2() * dummy( ageClassDifference == 2 )

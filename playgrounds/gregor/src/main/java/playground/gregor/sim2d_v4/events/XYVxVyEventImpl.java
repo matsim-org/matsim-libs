@@ -19,14 +19,12 @@
  * *********************************************************************** */
 package playground.gregor.sim2d_v4.events;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
-
 import playground.gregor.sim2d_v4.cgal.TwoDObject;
-import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+
+import java.util.Map;
 
 public class XYVxVyEventImpl extends Event implements TwoDObject {
 
@@ -43,7 +41,6 @@ public class XYVxVyEventImpl extends Event implements TwoDObject {
 	private final double vx;
 	private final double vy;
 	private final Id<Person> personId;
-	private Sim2DAgent agent;
 
 	public XYVxVyEventImpl(Id<Person> id, double x, double y, double vx, double vy, double time) {
 		super(time);
@@ -54,19 +51,7 @@ public class XYVxVyEventImpl extends Event implements TwoDObject {
 		this.vy = vy;
 	}
 	
-	public XYVxVyEventImpl(Id<Person> id, double x, double y, double vx, double vy, double time,Sim2DAgent agent) {
-		super(time);
-		this.personId = id;
-		this.x = x;
-		this.y = y;
-		this.vx = vx;
-		this.vy = vy;
-		this.agent = agent;
-	}
-	public Sim2DAgent getAgent() {
-		return this.agent;
-	}
-	
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();

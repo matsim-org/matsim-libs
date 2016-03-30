@@ -85,7 +85,7 @@ class PricingControler {
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		
 		TollHandler tollHandler = new TollHandler(sc);
-		final TollDisutilityCalculatorFactory fact = new TollDisutilityCalculatorFactory(tollHandler);
+		final TollDisutilityCalculatorFactory fact = new TollDisutilityCalculatorFactory(tollHandler, controler.getConfig().planCalcScore());
 		
 		switch (congestionPricing) {
 		case "implV3":

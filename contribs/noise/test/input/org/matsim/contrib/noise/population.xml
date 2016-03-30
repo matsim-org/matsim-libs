@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v5.dtd">
+
+<population>
+
+<!-- ====================================================================== -->
+
+	<person id="person_car_test1" employed="no">
+		<plan selected="yes">
+			<act type="home" x="500.0" y="5.0" end_time="10:10:53" />
+			<leg mode="car">
+			</leg>
+			<act type="work" x="4500" y="5.0" end_time="16:12:22" />
+			<leg mode="car">
+			</leg>
+			<act type="home" x="500.0" y="5.0" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="person_car_test2" employed="no">
+		<plan selected="yes">
+			<act type="home" x="500.0" y="5.0" end_time="10:17:54" />
+			<leg mode="car">
+			</leg>
+			<act type="work" x="4500" y="5.0" end_time="16:08:15" />
+			<leg mode="car">
+			</leg>
+			<act type="home" x="500.0" y="5.0" />
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="person_car_test3" employed="no">
+			<plan selected="yes">
+				<act type="home" x="4500.0" y="5.0" end_time="22:00:00" />
+				<leg mode="car">
+				</leg>
+				<act type="work" x="4500" y="5.0" end_time="23:00:00" />
+				<leg mode="car">
+				</leg>
+				<act type="home" x="4500.0" y="5.0" />
+			</plan>
+	
+		</person>
+	
+	<!-- ====================================================================== -->
+
+</population>

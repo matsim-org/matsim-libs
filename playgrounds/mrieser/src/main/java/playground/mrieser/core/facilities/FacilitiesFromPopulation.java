@@ -41,7 +41,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTimeImpl;
 
@@ -149,18 +148,14 @@ public class FacilitiesFromPopulation {
 						if (this.oneFacilityPerLink && linkId != null) {
 							facility = facilitiesPerLinkId.get(linkId);
 							if (facility == null) {
-								facility = factory.createActivityFacility(Id.create(this.idPrefix + linkId.toString(), ActivityFacility.class), c);
-								((ActivityFacilityImpl) facility).setLinkId(linkId);
+								facility = factory.createActivityFacility(Id.create(this.idPrefix + linkId.toString(), ActivityFacility.class), c, linkId);
 								this.facilities.addActivityFacility(facility);
 								facilitiesPerLinkId.put(linkId, facility);
 							}
 						} else {
 							facility = facilitiesPerCoordinate.get(c);
 							if (facility == null) {
-								facility = factory.createActivityFacility(Id.create(this.idPrefix + idxCounter++, ActivityFacility.class), c);
-								if (linkId != null) {
-									((ActivityFacilityImpl) facility).setLinkId(linkId);
-								}
+								facility = factory.createActivityFacility(Id.create(this.idPrefix + idxCounter++, ActivityFacility.class), c, linkId);
 								this.facilities.addActivityFacility(facility);
 								facilitiesPerCoordinate.put(c, facility);
 							}

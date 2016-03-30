@@ -39,7 +39,7 @@ public class RunVTTSRouter {
 		Controler controler = new Controler(config);
 
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
-		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler);
+		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, config.planCalcScore());
 		factory.setSigma(0.);
 		
 		controler.addOverridingModule(new AbstractModule(){

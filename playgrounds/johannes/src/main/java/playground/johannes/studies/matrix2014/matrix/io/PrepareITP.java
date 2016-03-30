@@ -47,7 +47,7 @@ public class PrepareITP {
         VisumOMatrixReader.read(m, inFile);
 
         logger.info("Loading zones...");
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "NO", null);
 
         logger.info("Checking zones...");
         Set<String> keys = m.keys();

@@ -34,6 +34,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -313,5 +314,17 @@ public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAg
 	@Override
 	public Person getPerson() {
 		return ((HasPerson) delegate).getPerson();
+	}
+
+	public PlanElement getPreviousPlanElement() {
+		return this.planDelegate.getPreviousPlanElement();
+	}
+
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		return this.delegate.getCurrentFacility();
+	}
+
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		return this.delegate.getDestinationFacility();
 	}
 }

@@ -23,6 +23,7 @@ import org.matsim.contrib.carsharing.vehicles.OneWayCarsharingVehicleLocation;
 import org.matsim.contrib.carsharing.vehicles.TwoWayCarsharingVehicleLocation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -95,7 +96,7 @@ public class CarSharingVehicles {
 			    		
 			    		FreeFloatingStation oldStation = stationToLinkMap.get(l);
 			    		
-			    		log.warn("Merging freefloating carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+			    		log.warn("Merging freefloating carsharing stations that are mapped to the same link with id: " + oldStation.getLinkId().toString() + " .");
 
 			    		ArrayList<String> oldVehIDs = oldStation.getIDs();
 			    		ArrayList<String> newvehIDs = new ArrayList<String>();
@@ -153,7 +154,7 @@ public class CarSharingVehicles {
 			    		
 			    		OneWayCarsharingStation oldStation = stationToLinkMap.get(l);
 			    		
-			    		log.warn("Merging oneway carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+			    		log.warn("Merging oneway carsharing stations that are mapped to the same link with id: " + oldStation.getLinkId().toString() + " .");
 
 			    		ArrayList<String> oldVehIDs = oldStation.getIDs();
 			    		ArrayList<String> newvehIDs = new ArrayList<String>();
@@ -208,7 +209,7 @@ public class CarSharingVehicles {
 			    		
 			    		TwoWayCarsharingStation oldStation = stationToLinkMap.get(l);
 			    		
-			    		log.warn("Merging twoway carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+			    		log.warn("Merging twoway carsharing stations that are mapped to the same link with id: " + oldStation.getLinkId().toString() + " .");
 
 			    		ArrayList<String> oldVehIDs = oldStation.getIDs();
 			    		ArrayList<String> newvehIDs = new ArrayList<String>();
@@ -249,7 +250,7 @@ public class CarSharingVehicles {
 		
 		public LinkUtils(Network network) {
 			
-			this.network = NetworkImpl.createNetwork();
+			this.network = (NetworkImpl) NetworkUtils.createNetwork();
 			Set<String> restrictions = new HashSet<>();
 			restrictions = new HashSet<>();
 			restrictions.add("car");

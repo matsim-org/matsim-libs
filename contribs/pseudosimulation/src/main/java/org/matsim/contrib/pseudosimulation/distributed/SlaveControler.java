@@ -231,7 +231,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                     install(new TravelDisutilityModule());
                 else{
                     final Builder disutilityFactory =
-                            new Builder( TransportMode.car );
+                            new Builder( TransportMode.car, config.planCalcScore() );
                     matsimControler.addOverridingModule(new AbstractModule() {
                         @Override
                         public void install() {
@@ -273,7 +273,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             });
         } else {
             final Builder disutilityFactory =
-                    new Builder( TransportMode.car );
+                    new Builder( TransportMode.car, config.planCalcScore() );
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {

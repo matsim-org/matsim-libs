@@ -25,6 +25,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.inject.Inject;
+
 import playground.vsp.congestion.handlers.TollHandler;
 
 
@@ -37,19 +39,22 @@ public final class CongestionTollTimeDistanceTravelDisutilityFactory implements 
 	private double sigma = 0. ;
 	private Builder timeDistanceTravelDisutilityFactory;
 	private final TollHandler tollHandler;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public CongestionTollTimeDistanceTravelDisutilityFactory(Builder timeDistanceTravelDisutilityFactory, TollHandler tollHandler) {
+	public CongestionTollTimeDistanceTravelDisutilityFactory(Builder timeDistanceTravelDisutilityFactory, 
+			TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.tollHandler = tollHandler;
 		this.timeDistanceTravelDisutilityFactory = timeDistanceTravelDisutilityFactory;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		
 		timeDistanceTravelDisutilityFactory.setSigma(sigma);
 		
 		return new CongestionTollTimeDistanceTravelDisutility(
-				timeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
+				timeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
 				this.tollHandler,
 				cnScoringGroup.getMarginalUtilityOfMoney(),
 				this.sigma

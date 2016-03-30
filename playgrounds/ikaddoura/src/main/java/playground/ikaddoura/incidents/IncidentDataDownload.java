@@ -50,6 +50,8 @@ public class IncidentDataDownload extends TimerTask {
 	private static Area area;
 	private static String outputDirectory;
 	private static long timeIntervalSec;
+	private static String appId;
+	private static String appCode;
 
 	private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss"); 
 	private final boolean downloadZipFile = true;
@@ -76,6 +78,9 @@ public class IncidentDataDownload extends TimerTask {
 			timeIntervalSec = Long.valueOf(args[2]);
 			log.info("Time interval: " + timeIntervalSec);
 			
+			appId = args[3];
+			appCode = args[4];
+			
 		} else {
 			
 //			outputDirectory = "../../../shared-svn/studies/ihab/incidents/germany-test/";
@@ -83,8 +88,9 @@ public class IncidentDataDownload extends TimerTask {
 			
 			outputDirectory = "../../../shared-svn/studies/ihab/incidents/berlinXXX/";
 			area = Area.berlin;
-
 			timeIntervalSec = 0;
+			appId = null;
+			appCode = null;
 
 		}
 				
@@ -104,13 +110,13 @@ public class IncidentDataDownload extends TimerTask {
 				
 		String urlString;
 		if (area == Area.berlin) {
-			urlString = "http://traffic.cit.api.here.com/traffic/6.0/incidents.xml?app_id=iMCM7KBVFey9uI5uNEi4"
-					+ "&app_code=xxx"
+			urlString = "http://traffic.cit.api.here.com/traffic/6.0/incidents.xml?app_id=" + appId
+					+ "&app_code=" + appCode
 					+ "&bbox=52.1571,12.5903;52.7928,13.9856" // Greater Berlin Area
 					+ "&status=active";
 		} else if (area == Area.germany) {
-			urlString = "http://traffic.cit.api.here.com/traffic/6.0/incidents.xml?app_id=iMCM7KBVFey9uI5uNEi4"
-					+ "&app_code=xxx"
+			urlString = "http://traffic.cit.api.here.com/traffic/6.0/incidents.xml?app_id=" + appId
+					+ "&app_code=" + appCode
 					+ "&bbox=47.06,5.32;55.19,15.47" // Germany
 					+ "&status=active";
 		} else {

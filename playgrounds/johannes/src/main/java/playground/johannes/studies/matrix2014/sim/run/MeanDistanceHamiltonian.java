@@ -72,6 +72,7 @@ public class MeanDistanceHamiltonian {
                 hamiltonian,
                 configGroup);
         engine.getHamiltonian().addComponent(annealingHamiltonian);
+        engine.getEngineListeners().addComponent(annealingHamiltonian);
         engine.getAttributeListeners().get(CommonKeys.LEG_GEO_DISTANCE).addComponent(hamiltonian);
         /*
         Add a hamiltonian logger.

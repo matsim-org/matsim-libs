@@ -112,7 +112,7 @@ public class IterativeTransitTimeAndDisutility implements TravelTime, TransitTra
 	
 	@Override
 	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
-		double distance = CoordUtils.calcDistance(coord, toCoord);
+		double distance = CoordUtils.calcEuclideanDistance(coord, toCoord);
 		double initialTime = distance / config.getBeelineWalkSpeed();
 		return initialTime;
 	}

@@ -35,7 +35,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-class SurrogateObjectiveFunction<U extends DecisionVariable> {
+public class SurrogateObjectiveFunction<U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -49,7 +49,7 @@ class SurrogateObjectiveFunction<U extends DecisionVariable> {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	SurrogateObjectiveFunction(final List<Transition<U>> transitions,
+	public SurrogateObjectiveFunction(final List<Transition<U>> transitions,
 			final double equilibriumGapWeight, final double uniformityWeight) {
 		this.transitions = transitions;
 		this.equilibriumGapWeight = equilibriumGapWeight;
@@ -142,18 +142,4 @@ class SurrogateObjectiveFunction<U extends DecisionVariable> {
 		result.add(this.dUniformityGap_dAlpha(alphas), this.uniformityGapWeight);
 		return result;
 	}
-
-	// -------------------- HESSIANS --------------------
-
-	// Matrix d2EquilibriumGapdAlpha2(final Vector alphas) {
-	// final Matrix result = this.deltaCovariances.copy();
-	// final Vector gradient = this.dEquilibriumGap_dAlpha(alphas);
-	// result.addOuterProduct(gradient, gradient, -1.0);
-	// result.mult(1.0 / this.equilibriumGap(alphas));
-	// return result;
-	// }
-	//
-	// Matrix d2UniformityGapdAlpha2(final Vector alphas) {
-	// return Matrix.newDiagonal(alphas.size(), 2.0);
-	// }
 }

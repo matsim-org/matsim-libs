@@ -12,9 +12,11 @@ import floetteroed.utilities.statisticslogging.Statistic;
 public class UniformityGapWeight<U extends DecisionVariable> implements
 		Statistic<SamplingStage<U>> {
 
+	public static final String LABEL = "Uniformity Gap Weight";
+	
 	@Override
 	public String label() {
-		return "Uniformity Gap Weight";
+		return LABEL;
 	}
 
 	@Override

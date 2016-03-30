@@ -34,6 +34,7 @@ import playground.johannes.synpop.processing.PersonsTask;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -53,12 +54,12 @@ public class ReweightJourneys implements PersonsTask {
 
     public ReweightJourneys() {
         discretizer = new LinearDiscretizer(50000);
-        threshold = 350000;
+        threshold = 300000;
 
         referenceHist = new TDoubleDoubleHashMap();
         try {
             BufferedReader reader = new BufferedReader(new FileReader
-                    ("/home/johannes/gsv/matrix2014/popgen/mid-fusion/tomtom.dist.txt"));
+                    ("/Users/johannes/gsv/matrix2014/popgen/mid-fusion/tomtom.dist.txt"));
             String line = reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] tokens = line.split("\t");
@@ -139,13 +140,18 @@ public class ReweightJourneys implements PersonsTask {
         });
 
         TDoubleDoubleHashMap weigths = new TDoubleDoubleHashMap();
-        it2 = hist.iterator();
+//        it2 = hist.iterator();
+        double[] keys = hist.keys();
+        Arrays.sort(keys);
         for (int i = 0; i < hist.size(); i++) {
-            it2.advance();
+//            it2.advance();
 //            if (it2.key() >= threshold) {
-                double f = referenceHist.get(it2.key()) / it2.value();
-                weigths.put(it2.key(), f);
-                logger.info(String.format("Weight for distance %s: %s.", it2.key(), f));
+            double d = keys[i];
+            double vol = hist.get(d);
+//                double f = referenceHist.get(it2.key()) / it2.value();
+            double f = referenceHist.get(d) / vol;
+                weigths.put(d, f);
+                logger.info(String.format("Weight for distance %s: %s.", d, f));
 //            }
         }
 

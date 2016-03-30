@@ -136,12 +136,12 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		
 		// get the free-speed car travel times (in seconds)
 		TravelTime ttf = new FreeSpeedTravelTime() ;
-		TravelDisutility tdFree = controler.getTravelDisutilityFactory().createTravelDisutility(ttf, controler.getConfig().planCalcScore() ) ;
+		TravelDisutility tdFree = controler.getTravelDisutilityFactory().createTravelDisutility(ttf ) ;
 		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttf, tdFree, (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
 		
 		// get the congested car travel time (in seconds)
 		TravelTime ttc = controler.getLinkTravelTimes(); // congested
-		TravelDisutility tdCongested = controler.getTravelDisutilityFactory().createTravelDisutility(ttc, controler.getConfig().planCalcScore() ) ;
+		TravelDisutility tdCongested = controler.getTravelDisutilityFactory().createTravelDisutility(ttc ) ;
 		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
 
 		// get travel distance (in meter)

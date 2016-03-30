@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.noise.events.NoiseEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -43,10 +44,9 @@ import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPer
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.CongestionAnalysisHandler;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
-import playground.ikaddoura.noise2.events.NoiseEventsReader;
 import playground.vsp.congestion.events.CongestionEventsReader;
 
-/*
+/**
  * 
  * Provides the following analysis: 
  * 
@@ -81,8 +81,8 @@ public class PersonTripAnalysisMain {
 			
 		} else {
 			
-			String id = "cn4";
-			String baiscDirectoryPath = "../../../runs-svn/cn2/500iterations/output/";
+			String id = "baseCase";
+			String baiscDirectoryPath = "/Users/ihab/Desktop/ils4/kaddoura/incidents/output/";
 						
 			runDirectory = baiscDirectoryPath + id + "/";
 			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
@@ -108,6 +108,7 @@ public class PersonTripAnalysisMain {
 		Config config = ConfigUtils.loadConfig(configFile);	
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
+		config.network().setChangeEventInputFile(null);
 		
 		int finalIteration = config.controler().getLastIteration();
 		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";

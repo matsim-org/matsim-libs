@@ -138,6 +138,9 @@
 		<module>map2mapmatching</module>
 		<module>travelsummary</module>
 		<module>deprecated</module>
+		<module>protobuf</module>
+		<module>hybridsim</module>
+		<module>noise</module>
 	</modules>
 	<repositories>
 		<repository>

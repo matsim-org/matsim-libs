@@ -25,6 +25,8 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
+import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 
@@ -69,7 +71,12 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)) {
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
 			for (Link link : event.getLinks()) {
-				this.mobsim.getNetsimNetwork().getNetsimLink(link.getId()).recalcTimeVariantAttributes(time);
+				final NetsimLink netsimLink = this.mobsim.getNetsimNetwork().getNetsimLink(link.getId());
+				if ( netsimLink instanceof TimeVariantLink ) {
+					((TimeVariantLink) netsimLink).recalcTimeVariantAttributes();
+				} else {
+					throw new RuntimeException("link not time variant") ;
+				}
 			}
 		}
 	}

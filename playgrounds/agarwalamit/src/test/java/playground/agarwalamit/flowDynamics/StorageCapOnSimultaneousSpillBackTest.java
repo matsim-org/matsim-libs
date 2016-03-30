@@ -19,12 +19,17 @@
 package playground.agarwalamit.flowDynamics;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,8 +69,20 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author amit
  */
 
+@RunWith(Parameterized.class)
 public class StorageCapOnSimultaneousSpillBackTest {
-	
+	private final boolean isUsingFastCapacityUpdate;
+
+	public StorageCapOnSimultaneousSpillBackTest(boolean isUsingFastCapacityUpdate) {
+		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
+	}
+
+	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
+	public static Collection<Object> parameterObjects () {
+		Object [] capacityUpdates = new Object [] { false, true };
+		return Arrays.asList(capacityUpdates);
+	}
+
 	@Test
 	public void storageCapTest4BottleneckLink (){
 		/*
@@ -76,16 +93,25 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		 * second will also be forced to move on next link. 
 		 * 
 		 */
-		
+
 		Tuple<Id<Link>, Id<Link>> startLinkIds = new Tuple<Id<Link>, Id<Link>>(Id.createLinkId(1), Id.createLinkId(4)); // agent 2,4 depart on link 1
 		Map<Id<Person>, Tuple<Double,Double>> person2EnterTime = getPerson2LinkEnterTime(startLinkIds);
 
-		Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 14.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 34.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
-		
+		if (this.isUsingFastCapacityUpdate ) {
+			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 13.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 23.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
+
+			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 23.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 33.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
+
+		} else { // here are some rounding errors --> person 1 leave, link blocked for 10 sec, person 2 leave after 11 sec, link blocked again for 10 sec, person 2 leave after 10 sec.
+			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 14.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
+
+			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 34.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
+		}
+
 
 		for(Id<Person> personId : person2EnterTime.keySet()){
 			System.out.println("Person "+personId+ " is entering link 2 at time "+person2EnterTime.get(personId).getFirst() +" and leaving at time "+person2EnterTime.get(personId).getSecond());
@@ -95,18 +121,27 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		startLinkIds = new Tuple<Id<Link>, Id<Link>>(Id.createLinkId(4), Id.createLinkId(1));
 		person2EnterTime = getPerson2LinkEnterTime(startLinkIds);
 
-		Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 34.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 14.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
+		if(this.isUsingFastCapacityUpdate) { 
+			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 23.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 33.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
+
+			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 13.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 23.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
+		} else {
+			Assert.assertEquals("Person 3 is entering on link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(3)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 3 is leaving from link 2 at wrong time.", 34.0, person2EnterTime.get(Id.createPersonId(3)).getSecond(),MatsimTestUtils.EPSILON);
+
+			Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 14.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
+		}
+
 	}
 
 	private Map<Id<Person>, Tuple<Double,Double>> getPerson2LinkEnterTime(final Tuple<Id<Link>, Id<Link>> startLinkIds){
-		
+
 		MatsimRandom.reset(); // resetting the random nos with default seed.
-		
-		MergingNetworkAndPlans pseudoInputs = new MergingNetworkAndPlans();
+
+		MergingNetworkAndPlans pseudoInputs = new MergingNetworkAndPlans(this.isUsingFastCapacityUpdate);
 		pseudoInputs.createNetwork();
 		pseudoInputs.createPopulation(startLinkIds );
 		Scenario sc = pseudoInputs.scenario;
@@ -170,10 +205,11 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		Link link3;
 		Link link4;
 
-		private MergingNetworkAndPlans(){
+		private MergingNetworkAndPlans(boolean isUsingFastCapacityUpdate){
 			config=ConfigUtils.createConfig();
 			config.qsim().setStuckTime(3600.);
 			config.global().setRandomSeed(2546);
+			config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 			this.scenario = ScenarioUtils.loadScenario(config);
 			network =  (NetworkImpl) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();

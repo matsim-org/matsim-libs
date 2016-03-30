@@ -76,8 +76,8 @@ public class TransitRouteData {
 			TransitStopFacility currentViaStop = null;
 			double currentViaDistance = Double.NEGATIVE_INFINITY;
 			for (TransitRouteStop stop : transitRoute.getStops()) {
-				double distanceFirstPotentialVia = CoordUtils.calcDistance(this.firstStop.getCoord(), stop.getStopFacility().getCoord());
-				double distanceLastProtenialVia = CoordUtils.calcDistance(this.lastStop.getCoord(), stop.getStopFacility().getCoord());
+				double distanceFirstPotentialVia = CoordUtils.calcEuclideanDistance(this.firstStop.getCoord(), stop.getStopFacility().getCoord());
+				double distanceLastProtenialVia = CoordUtils.calcEuclideanDistance(this.lastStop.getCoord(), stop.getStopFacility().getCoord());
 				double newDistance = Math.sqrt(Math.pow(distanceFirstPotentialVia, 2) + Math.pow(distanceLastProtenialVia, 2));
 
 				if (newDistance > currentViaDistance) {

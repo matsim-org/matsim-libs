@@ -100,11 +100,6 @@
 		<param name="parkingPriceScoreScalingFactor" value="1.0" />
 		<param name="parkingActivityDurationPenaltyScalingFactor" value="1.0" />
 	</module>
-	
-	<module name="locationchoice"><!--
-		<param name="constrained" value="true"/>
-		--><param name="maxRecursions" value="20"/>
-	</module>
 
 	<module name="parallelEventHandling">
     <param name="numberOfThreads" value="1" />

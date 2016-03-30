@@ -45,7 +45,7 @@ public class UtilsAvignon {
 				if (pe instanceof Leg) {
 					if (((Leg) pe).getMode().equals( "car" )) {
 						car = true;
-					previousDistance = RouteUtils.calcDistance((NetworkRoute) ((Leg) pe).getRoute(), scenario.getNetwork());
+					previousDistance = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) ((Leg) pe).getRoute(), scenario.getNetwork());
 					if (shop == true) {
 						distanceFrom +=previousDistance;
 					}
@@ -92,7 +92,7 @@ public class UtilsAvignon {
 				if (pe instanceof Leg) {
 					if (((Leg) pe).getMode().equals("car")) {
 						car = true;
-					previousTravelTime = RouteUtils.calcDistance((NetworkRoute) ((Leg) pe).getRoute(), scenario.getNetwork());
+					previousTravelTime = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) ((Leg) pe).getRoute(), scenario.getNetwork());
 					if (shop == true) {
 						travelTimeFrom +=previousTravelTime;
 					}
@@ -145,7 +145,7 @@ public class UtilsAvignon {
 				if (pe instanceof Leg) {
 					if (((Leg) pe).getMode().equals("car")) {
 						car = true;
-						previousDistance = RouteUtils.calcDistance((NetworkRoute) ((Leg) pe).getRoute(), scenario.getNetwork());
+						previousDistance = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) ((Leg) pe).getRoute(), scenario.getNetwork());
 						if (shopInside == true) {
 							distanceFromInside +=previousDistance;
 							numberFromInside++;
@@ -222,7 +222,7 @@ public class UtilsAvignon {
 				if (pe instanceof Leg) {
 					if (((Leg) pe).getMode().equals("car")) {
 						car = true;
-						previousDistance = RouteUtils.calcDistance((NetworkRoute) ((Leg) pe).getRoute(), scenario.getNetwork());
+						previousDistance = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) ((Leg) pe).getRoute(), scenario.getNetwork());
 						if (shopInside == true) {
 							travelTimeFromInside += previousDistance;
 							numberFromInside++;

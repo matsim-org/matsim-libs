@@ -117,43 +117,53 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 			// (re)set the 
 		}
 
-		public void setType(String type) {
+
+		public Builder setType(String type) {
 			this.type = type;
+			return this;
 		}
 
-		public void setPriority(double priority) {
+		public Builder setPriority(double priority) {
 			this.priority = priority;
+			return this;
 		}
 
-		public void setTypicalDuration_s(double typicalDurationS) {
+		public Builder setTypicalDuration_s(double typicalDurationS) {
 			typicalDuration_s = typicalDurationS;
+			return this;
 		}
 
-		public void setClosingTime(double closingTime) {
+		public Builder setClosingTime(double closingTime) {
 			this.closingTime = closingTime;
+			return this;
 		}
 
-		public void setEarliestEndTime(double earliestEndTime) {
+		public Builder setEarliestEndTime(double earliestEndTime) {
 			this.earliestEndTime = earliestEndTime;
+			return this;
 		}
 
-		public void setLatestStartTime(double latestStartTime) {
+		public Builder setLatestStartTime(double latestStartTime) {
 			this.latestStartTime = latestStartTime;
+			return this;
 		}
 
-		public void setMinimalDuration(double minimalDuration) {
+		public Builder setMinimalDuration(double minimalDuration) {
 			this.minimalDuration = minimalDuration;
+			return this;
 		}
 
-		public void setOpeningTime(double openingTime) {
+		public Builder setOpeningTime(double openingTime) {
 			this.openingTime = openingTime;
+			return this;
 		}
 
-		public void setScoreAtAll(boolean scoreAtAll) {
+		public Builder setScoreAtAll(boolean scoreAtAll) {
 			this.scoreAtAll = scoreAtAll;
+			return this;
 		}
 
-		public ActivityUtilityParameters create() {
+		public ActivityUtilityParameters build() {
 			ActivityUtilityParameters params = new ActivityUtilityParameters(this.type) ;
 			params.setScoreAtAll(this.scoreAtAll) ;
 			params.setTypicalDuration( this.typicalDuration_s) ;
@@ -167,8 +177,9 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 			return params ;
 		}
 
-		public final void setZeroUtilityComputation(ZeroUtilityComputation zeroUtilityComputation) {
+		public final Builder setZeroUtilityComputation(ZeroUtilityComputation zeroUtilityComputation) {
 			this.zeroUtilityComputation = zeroUtilityComputation;
+			return this;
 		}
 	}
 

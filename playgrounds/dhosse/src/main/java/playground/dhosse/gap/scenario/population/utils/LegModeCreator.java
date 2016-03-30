@@ -1,5 +1,6 @@
 package playground.dhosse.gap.scenario.population.utils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,10 +12,15 @@ import playground.dhosse.gap.Global;
 
 public class LegModeCreator {
 
-	private static final double meanDistanceBike = 3786.879756;
-	private static final double meanDistanceCar = 14560.53314;
-	private static final double meanDistancePt = 21515.61622;
-	private static final double meanDistanceWalk = 1276.443998;
+//	private static final double meanDistanceBike = 3786.879756;
+//	private static final double meanDistanceCar = 14560.53314;
+//	private static final double meanDistancePt = 10000;
+//	private static final double meanDistanceWalk = 1276.443998;
+
+	private static final double meanDistanceBike = 3768;
+	private static final double meanDistanceCar = 14560;
+	private static final double meanDistancePt = 8000;
+	private static final double meanDistanceWalk = 1276;
 	
 	public static String getLegModeForDistance(double distance, int age, int sex){
 		
@@ -63,17 +69,23 @@ public class LegModeCreator {
 		double random = Global.random.nextDouble() * accumulatedWeight;
 		
 		double weight = 0.;
+		double max = 0.;
+		String selectedMode = "";
 		
 		for(Entry<String, Double> entry : weightsMap.entrySet()){
 			
-			weight += entry.getValue();
-			if(random <= weight){
-				return entry.getKey();
+			if(entry.getValue() > max){
+				max = entry.getValue();
+				selectedMode = entry.getKey();
 			}
+//			weight += entry.getValue();
+//			if(random <= weight){
+//				return entry.getKey();
+//			}
 			
 		}
 		
-		return null;
+		return selectedMode;
 		
 	}
 	
@@ -100,6 +112,26 @@ public class LegModeCreator {
 		}
 		
 		return Math.exp(-distance/mean)/mean;
+		
+	}
+	
+	public static String getMode(int age, int sex){
+		
+		Map<String, Double> shares = getModeShare(age, sex);
+		
+		double p = Global.random.nextDouble();
+		
+		
+		double weight = 0.;
+		for(Entry<String, Double> mode : shares.entrySet()){
+			
+			weight += mode.getValue();
+			
+			if(p <= weight) return mode.getKey();
+			
+		}
+		
+		return "";
 		
 	}
 	

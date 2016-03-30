@@ -20,8 +20,7 @@
 
 package playground.sergioo.ptsim2013.qnetsimengine;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
-
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 
 public abstract class NetElementActivator {
 

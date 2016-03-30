@@ -38,7 +38,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		Id<Link> linkId = event.getLinkId();
 		//String linkShortened = linkId.toString().substring(0, 10) + "...";
 		Id<Person> personId = event.getPersonId();
-		double time = event.getTime();
+		double time_s = event.getTime();
 		String actType = event.getActType();
 		//Id facilityId =	event.getFacilityId();
 		//System.out.println("Type: " + eventType + " - LinkId: " + linkShortened + " - PersonId: " + personId.toString()
@@ -61,9 +61,10 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		trip.setTripId(tripId);
 		trip.setPersonId(personId);
 		trip.setDepartureLinkId(linkId);
-		trip.setDepartureTime(time);
+		trip.setDepartureTime_s(time_s);
 		//trip.setDepartureLegMode(legMode);
 		trip.setActivityEndActType(actType);
+		trip.setWeight(1.);
 		trips.put(tripId, trip);
 		
 		
@@ -97,7 +98,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		Id<Link> linkId = event.getLinkId();
 		//String linkShortened = linkId.toString().substring(0, 10) + "...";
 		Id<Person> personId = event.getPersonId();
-		double time = event.getTime();
+		double time_s = event.getTime();
 		String actType = event.getActType();
 		//Id facilityId =	event.getFacilityId();
 		//System.out.println("Type: " + eventType + " - LinkId: " + linkShortened + " - PersonId: " + personId.toString()
@@ -118,7 +119,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		Id<Trip> tripId = Id.create(personId + "_" + activityStartCount.get(personId), Trip.class);
 		if (trips.get(tripId) != null) {
 			trips.get(tripId).setArrivalLinkId(linkId);
-			trips.get(tripId).setArrivalTime(time);
+			trips.get(tripId).setArrivalTime_s(time_s);
 			//trips.get(tripId).setArrivalLegMode(legMode);
 			trips.get(tripId).setActivityStartActType(actType);
 			trips.get(tripId).setTripComplete(true);

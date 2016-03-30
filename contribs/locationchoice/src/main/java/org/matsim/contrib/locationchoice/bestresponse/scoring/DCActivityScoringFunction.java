@@ -225,7 +225,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
 		boolean foundAct = false;
 		
-		if (act.getType().equals("pt interaction") || 
+		if (act.getType().contains("interaction") || // yyyy might be too loose. kai, feb'16 
 				(this.converter.convertType(act.getType()).startsWith("h") && this.converter.isV1()) || 
 				act.getType().equals("home")) {
 			return openInterval;

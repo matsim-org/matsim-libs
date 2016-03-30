@@ -45,11 +45,11 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import playground.gregor.TransportMode;
 import playground.gregor.casim.run.CARoutingModule;
 import playground.gregor.casim.simulation.CAMobsimFactory;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.casim.simulation.physics.CASingleLaneNetworkFactory;
-import playground.gregor.sim2d_v4.scenario.TransportMode;
 
 import java.util.HashSet;
 import java.util.Set;

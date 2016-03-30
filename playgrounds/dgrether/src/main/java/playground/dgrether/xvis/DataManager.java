@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether.xvis;
 
-import org.matsim.core.scenario.MutableScenario;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.data.SignalsData;
 
 import playground.dgrether.xvis.vismodel.VisScenario;
@@ -33,11 +33,11 @@ public class DataManager {
 
 	private VisScenario visScenario = null;
 
-	private MutableScenario scenario = null;
+	private Scenario scenario = null;
 
 	private SignalsData signalsData;
 
-	public DataManager(MutableScenario sc){
+	public DataManager(Scenario sc){
 		this.scenario = sc;
 		this.signalsData = (SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
