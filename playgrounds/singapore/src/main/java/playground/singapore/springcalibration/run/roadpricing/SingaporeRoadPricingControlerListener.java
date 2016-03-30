@@ -55,10 +55,10 @@ import javax.inject.Inject;
  *
  * @author mrieser
  */
-class RoadPricingControlerListener implements StartupListener, AfterMobsimListener,
+class SingaporeRoadPricingControlerListener implements StartupListener, AfterMobsimListener,
 IterationEndsListener, ShutdownListener {
 
-	final static private Logger log = Logger.getLogger(RoadPricingControlerListener.class);
+	final static private Logger log = Logger.getLogger(SingaporeRoadPricingControlerListener.class);
 
 	private final RoadPricingScheme scheme;
     private final CalcPaidToll calcPaidToll;
@@ -67,7 +67,7 @@ IterationEndsListener, ShutdownListener {
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-    RoadPricingControlerListener(RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
+    SingaporeRoadPricingControlerListener(RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl, EventsManager eventsManager, OutputDirectoryHierarchy controlerIO) {
 		this.scheme = scheme;
         this.calcPaidToll = calcPaidToll;
         this.cattl = cattl;

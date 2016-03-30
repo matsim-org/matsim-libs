@@ -32,26 +32,16 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-
 import com.google.inject.Singleton;
-
-import playground.singapore.springcalibration.run.SubpopTravelDisutility;
-
 import org.matsim.roadpricing.CalcAverageTolledTripLength;
 import org.matsim.roadpricing.CalcPaidToll;
-import org.matsim.roadpricing.PlansCalcRouteWithTollOrNot;
-import org.matsim.roadpricing.ReRouteAreaToll;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
-import org.matsim.roadpricing.RoadPricingNetworkRouting;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.roadpricing.RoadPricingTravelDisutilityFactory;
 
 public class SubpopRoadPricingModule extends AbstractModule {
 
@@ -82,13 +72,9 @@ public class SubpopRoadPricingModule extends AbstractModule {
         }
         bind(RoadPricingInitializer.class).asEagerSingleton();
         
-        // ???????????????
-        // bind(PlansCalcRouteWithTollOrNot.class);
-        // addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
-        // ??????????????????????????????????
-
         // use ControlerDefaults configuration, replacing the TravelDisutility with a toll-dependent one
         install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
+        //install(new AbstractModule() {
             @Override
             public void install() {
                 addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(
@@ -98,12 +84,7 @@ public class SubpopRoadPricingModule extends AbstractModule {
             }
         }));
 
-        // ??????????????????????????????????
-        // addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.car, getConfig().planCalcScore()));
-        // addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
-        // ??????????????????????????????????
-
-        addControlerListenerBinding().to(RoadPricingControlerListener.class);
+        addControlerListenerBinding().to(SingaporeRoadPricingControlerListener.class);
 
         // add the events handler to calculate the tolls paid by agents
         bind(CalcPaidToll.class).in(Singleton.class);
