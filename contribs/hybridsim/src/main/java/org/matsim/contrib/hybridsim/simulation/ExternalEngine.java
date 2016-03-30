@@ -245,7 +245,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 
 //		HybridSimProto.Scenario hsc = (HybridSimProto.Scenario) sc.getScenarioElement("hybrid_scenario");
 
-//		this.client.getBlockingStub().initScenario(HybridSimProto.Scenario.getDefaultInstance());
+		this.client.getBlockingStub().initScenario(HybridSimProto.Scenario.getDefaultInstance());
 
 	}
 

@@ -56,13 +56,23 @@ message Gompertz {
     double cell_size = 5;
     Force force_ped = 6;
     Force force_wall = 7;
-    Distribution v0 = 8;
-    Distribution b_max = 9;
-    Distribution b_min = 10;
-    Distribution a_min = 11;
-    Distribution tau = 12;
-    Distribution atau = 13;
+    AgentParams agent_params = 8;
+}
 
+message AgentParams {
+    Distribution v0 = 1;
+    Distribution b_max = 2;
+    Distribution b_min = 3;
+    Distribution a_min = 4;
+    Distribution tau = 5;
+    Distribution atau = 6;
+    Distribution v0_upstairs = 7;
+    Distribution v0_downstairs = 8;
+    Distribution v0_escalator_up = 9;
+    Distribution v0_escalator_down = 10;
+    Distribution v0_idle_escalator_up = 11;
+    Distribution v0_idle_escalator_down = 12;
+    Distribution T = 13;
 }
 
 message Distribution {
@@ -72,8 +82,9 @@ message Distribution {
 
 message Force {
     double nu = 1;
-    double b = 2;
-    double c = 3;
+    double a = 2;
+    double b = 3;
+    double c = 4;
 }
 
 message Group {

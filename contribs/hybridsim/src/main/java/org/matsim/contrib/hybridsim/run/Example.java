@@ -256,7 +256,7 @@ public class Example {
 		HybridSimProto.Model.Builder mb = scb.getModelBuilder();
 		mb.setType(HybridSimProto.Model.Type.Gompertz);
 		HybridSimProto.Gompertz.Builder gb = mb.getGompertzBuilder();
-		gb.setSolver("eueler");
+		gb.setSolver("euler");
 		gb.setStepsize(0.01);
 		gb.setExitCrossingStrategy(3);
 		gb.setLinkedCellsEnabled(true);
@@ -269,22 +269,24 @@ public class Example {
 		wfb.setNu(10);
 		wfb.setB(0.7);
 		wfb.setC(3.0);
-		HybridSimProto.Distribution.Builder v0b = gb.getV0Builder();
+
+		HybridSimProto.AgentParams.Builder ab = gb.getAgentParamsBuilder();
+		HybridSimProto.Distribution.Builder v0b = ab.getV0Builder();
 		v0b.setMu(0.5);
 		v0b.setSigma(0.0);
-		HybridSimProto.Distribution.Builder bmaxb = gb.getBMaxBuilder();
+		HybridSimProto.Distribution.Builder bmaxb = ab.getBMaxBuilder();
 		bmaxb.setMu(0.25);
 		bmaxb.setSigma(0.001);
-		HybridSimProto.Distribution.Builder bminb = gb.getBMinBuilder();
+		HybridSimProto.Distribution.Builder bminb = ab.getBMinBuilder();
 		bminb.setMu(0.2);
 		bminb.setSigma(0.001);
-		HybridSimProto.Distribution.Builder aminb = gb.getAMinBuilder();
+		HybridSimProto.Distribution.Builder aminb = ab.getAMinBuilder();
 		aminb.setMu(0.18);
 		aminb.setSigma(0.001);
-		HybridSimProto.Distribution.Builder taub = gb.getTauBuilder();
+		HybridSimProto.Distribution.Builder taub = ab.getTauBuilder();
 		taub.setMu(0.5);
 		taub.setSigma(0.001);
-		HybridSimProto.Distribution.Builder ataub = gb.getAtauBuilder();
+		HybridSimProto.Distribution.Builder ataub = ab.getAtauBuilder();
 		ataub.setMu(0.5);
 		ataub.setSigma(0.001);
 
