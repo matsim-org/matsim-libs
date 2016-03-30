@@ -27,6 +27,7 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -49,6 +50,7 @@ public class SubpopRoadPricingModule extends AbstractModule {
     private CharyparNagelScoringParametersForPerson parameters;
     private Scenario scenario;
     private TravelDisutilityFactory originalTravelDisutilityFactory;
+    private static final Logger log = Logger.getLogger( SubpopRoadPricingModule.class ) ;
 
     public SubpopRoadPricingModule(CharyparNagelScoringParametersForPerson parameters, Scenario scenario, TravelDisutilityFactory originalTravelDisutilityFactory) {
         this.roadPricingScheme = null;
@@ -62,6 +64,7 @@ public class SubpopRoadPricingModule extends AbstractModule {
 
     @Override
     public void install() {
+    	log.info("installing SubpopRoadPricingModule");
         ConfigUtils.addOrGetModule(getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
         // This is not optimal yet. Modules should not need to have parameters.
         // But I am not quite sure yet how to best handle custom scenario elements. mz
@@ -84,6 +87,7 @@ public class SubpopRoadPricingModule extends AbstractModule {
             }
         }));
 
+        log.info("Adding SingaporeRoadPricingControlerListener");
         addControlerListenerBinding().to(SingaporeRoadPricingControlerListener.class);
 
         // add the events handler to calculate the tolls paid by agents
