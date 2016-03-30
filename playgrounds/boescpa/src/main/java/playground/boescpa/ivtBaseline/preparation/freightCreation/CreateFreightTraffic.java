@@ -62,6 +62,8 @@ public class CreateFreightTraffic {
 	private final static int VICINITY_RADIUS = 10000; // radius [m] around zone centroid which is considered vicinity
 
 	private final Random random;
+	private final double percentage;
+	private int totalPopulationSize = 0;
 	private int roundDowns = 0;
 	private int roundUps = 0;
 	private final double[] cummulativeDepartureProbability = new double[24];
@@ -69,8 +71,9 @@ public class CreateFreightTraffic {
 	private final Population freightPopulation;
 	private final ActivityFacilities freightFacilities;
 
-	private CreateFreightTraffic(String coordFile, String facilitiesFile, int randomSeed) {
+	private CreateFreightTraffic(String coordFile, String facilitiesFile, double percentagePopulation, int randomSeed) {
 		readZones(coordFile, facilitiesFile);
+		this.percentage = percentagePopulation;
 		this.random = new Random(randomSeed);
 		this.freightPopulation = PopulationUtils.getEmptyPopulation();
 		this.freightFacilities = FacilitiesUtils.createActivityFacilities();
@@ -83,12 +86,13 @@ public class CreateFreightTraffic {
 		final String trucksFile = args[3];
 		final String heavyDutyVehiclesFile = args[4];
 		final String cumulativeProbabilityFreightDeparturesFile = args[5];
-		final int randomSeed = Integer.parseInt(args[6]);
-		final String outputFacilities = args[7];
-		final String outputPopulation = args[8];
+		final double percentagePopulation = Double.parseDouble(args[6]); // for example for a 1% population enter "0.01"
+		final int randomSeed = Integer.parseInt(args[7]);
+		final String outputFacilities = args[8];
+		final String outputPopulation = args[9];
 
 		log.info("Freight creation...");
-		CreateFreightTraffic creator = new CreateFreightTraffic(coordFile, facilitiesFile, randomSeed);
+		CreateFreightTraffic creator = new CreateFreightTraffic(coordFile, facilitiesFile, percentagePopulation, randomSeed);
 		creator.readDepartures(cumulativeProbabilityFreightDeparturesFile);
 
 		creator.createFreightTraffic("UTV_", utilityVehiclesFile);
@@ -114,6 +118,7 @@ public class CreateFreightTraffic {
 	}
 
 	private void printStats() {
+		log.info("Found " + totalPopulationSize + " freight agents");
 		log.info("Created " + freightPopulation.getPersons().size() + " freight agents");
 		log.info("Created " + freightFacilities.getFacilities().size() + " freight facilities");
 		log.info("Round ups: " + roundUps);
@@ -130,9 +135,12 @@ public class CreateFreightTraffic {
 				String[] line = nextLine.split(DELIMITER);
 				int numberOfTrips = getNumberOfTrips(line[4]);
 				for (int i = 0; i < numberOfTrips; i++) {
-					ActivityFacility startFacility = getFacility(Integer.parseInt(line[0]));
-					ActivityFacility endFacility = getFacility(Integer.parseInt(line[2]));
-					createSingleTripAgent(prefix + ++personIndex, startFacility, endFacility);
+					totalPopulationSize++;
+					if (random.nextDouble() <= percentage) {
+						ActivityFacility startFacility = getFacility(Integer.parseInt(line[0]));
+						ActivityFacility endFacility = getFacility(Integer.parseInt(line[2]));
+						createSingleTripAgent(prefix + ++personIndex, startFacility, endFacility);
+					}
 				}
 				nextLine = reader.readLine();
 				counter.incCounter();
