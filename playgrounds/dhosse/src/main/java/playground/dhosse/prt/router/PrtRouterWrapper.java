@@ -1,24 +1,14 @@
 package playground.dhosse.prt.router;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.*;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -35,7 +25,7 @@ public class PrtRouterWrapper implements RoutingModule {
 	private PrtData data;
 	
 	public PrtRouterWrapper(final String mode, Network network, final PopulationFactory populationFactory, 
-			MatsimVrpContextImpl context, PrtData data, final RoutingModule routingModule){
+			PrtData data, final RoutingModule routingModule){
 		this.walkRouter = routingModule;
 		this.network = (NetworkImpl) network;
 		this.data = data;

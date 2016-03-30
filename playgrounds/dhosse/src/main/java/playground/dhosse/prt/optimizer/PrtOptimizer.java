@@ -2,14 +2,13 @@ package playground.dhosse.prt.optimizer;
 
 import java.util.*;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.schedule.*;
-import org.matsim.contrib.taxi.scheduler.*;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
@@ -25,7 +24,7 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 	
 	private Set<Vehicle> idleVehicles;
 	
-	private final VrpData data;
+	//private final VrpData data;
 	private final TaxiScheduler scheduler;
 	private TaxiOptimizerContext optimizerContext;
 	
@@ -33,7 +32,7 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 	
 	public PrtOptimizer(TaxiOptimizerContext optimizerContext){
 		
-		this(optimizerContext, optimizerContext.scheduler, new IdleRankVehicleFinder(optimizerContext.scheduler));
+		this(optimizerContext, optimizerContext.scheduler, new IdleRankVehicleFinder(optimizerContext));
 		
 	}
 	
@@ -43,7 +42,7 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 		this.idleVehicleFinder = vehicleFinder;
 		this.unplannedRequests = new ArrayList<TaxiRequest>();
 		
-		int vehicleCapacity = ((PrtOptimizerConfiguration)optimizerContext).prtConfigGroup.getVehicleCapacity();
+		int vehicleCapacity = ((PrtOptimizerContext)optimizerContext).prtConfigGroup.getVehicleCapacity();
 		vrpFinder =  new NPersonsVehicleRequestPathFinder(optimizerContext, vehicleCapacity);
 		
 	}

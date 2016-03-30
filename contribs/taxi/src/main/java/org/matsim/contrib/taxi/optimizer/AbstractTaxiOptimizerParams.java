@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.optimizer;
 import org.apache.commons.configuration.Configuration;
 
 
-public abstract class AbstractTaxiOptimizerParams
+public class AbstractTaxiOptimizerParams
     implements TaxiOptimizerParams
 {
     public static final String ID = "id";

@@ -186,6 +186,6 @@ public class TaxiConfigGroup
 
     public ConfigGroup getOptimizerConfigGroup()
     {
-        return getParameterSets().get(OPTIMIZER_PARAMETER_SET).iterator().next();
+        return getParameterSets(OPTIMIZER_PARAMETER_SET).iterator().next();
     }
 }
