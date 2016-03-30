@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -14,18 +15,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
-import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 import playground.singapore.scoring.CharyparNagelOpenTimesActivityScoring;
-
+import playground.singapore.springcalibration.run.roadpricing.SubpopRoadPricingModule;
 
 public class RunSingapore {	
 	private final static Logger log = Logger.getLogger(RunSingapore.class);
@@ -39,11 +38,11 @@ public class RunSingapore {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
-		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
-		
+		CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+								
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
+			
 			@Inject Network network;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
@@ -61,17 +60,30 @@ public class RunSingapore {
 
 				return sumScoringFunction;
 			}
-		}) ;
+		}) ;		
+	
 		
+		
+		final SubpopTravelDisutilityFactory subPopDisutilityCalculatorFactory = new SubpopTravelDisutilityFactory(parameters, TransportMode.car);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindCarTravelDisutilityFactory().toInstance(subPopDisutilityCalculatorFactory);
+			}
+		});
+						
+		final SubpopTravelDisutility.Builder builder_taxi =  new SubpopTravelDisutility.Builder("taxi", parameters);	
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addTravelTimeBinding("taxi").to(networkTravelTime());
-				addTravelDisutilityFactoryBinding("taxi").to(carTravelDisutilityFactoryKey());
+				addTravelDisutilityFactoryBinding("taxi").toInstance(builder_taxi);
 			}
 		});
 		
-			
+		// TODO: make car and taxi also consider road pricing
+		//controler.setModules(new SubpopRoadPricingModule());
+						
 		controler.addControlerListener(new SingaporeControlerListener());
 		
 		controler.run();
