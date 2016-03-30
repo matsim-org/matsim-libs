@@ -42,11 +42,11 @@ public class RunTaxiScenario
     {
         Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(),
                 new OTFVisConfigGroup());
-        run(config, otfvis);
+        createControler(config, otfvis).run();
     }
 
 
-    public static void run(Config config, boolean otfvis)
+    public static Controler createControler(Config config, boolean otfvis)
     {
         TaxiConfigGroup taxiCfg = (TaxiConfigGroup)config.getModule(TaxiConfigGroup.GROUP_NAME);
         config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
@@ -73,7 +73,7 @@ public class RunTaxiScenario
         //        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values())
         //                .getStats();
 
-        controler.run();
+        return controler;
     }
 
 

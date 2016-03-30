@@ -19,19 +19,17 @@
 
 package playground.michalm.taxi.run;
 
-import org.apache.commons.configuration.Configuration;
 import org.junit.Test;
 
 
-public class KNTaxiLauncherTest
+public class KNTaxiTest
 {
     @Test
-    public void test()
+    public void testRun()
     {
-        String paramFile = "./src/main/resources/mielec_2014_02/params.in";
-        Configuration config = TaxiLauncherConfigUtils.loadConfig(paramFile);
-        KNTaxiLauncher.run(config, false, false, false);//equivalent to (file, false, true)        
-        KNTaxiLauncher.run(config, true, false, false);
-        KNTaxiLauncher.run(config, true, true, false);
+        String configFile = "src/main/resources/mielec_2014_02/KN_config.xml";
+        KNTaxi.run(configFile, false, false, false);        
+        KNTaxi.run(configFile, true, false, false);
+        KNTaxi.run(configFile, true, true, false);
     }
 }

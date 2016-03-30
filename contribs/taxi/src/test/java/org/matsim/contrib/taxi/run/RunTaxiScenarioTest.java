@@ -35,11 +35,29 @@ public class RunTaxiScenarioTest
 
 
     @Test
-    public void testRunMielec()
+    public void testRunMielecLowDemandLowSupply()
     {
         runMielec("plans_taxi_1.0.xml.gz", "taxis-25.xml");
+    }
+
+
+    @Test
+    public void testRunMielecLowDemandHighSupply()
+    {
         runMielec("plans_taxi_1.0.xml.gz", "taxis-50.xml");
+    }
+
+
+    @Test
+    public void testRunMielecHighDemandLowSupply()
+    {
         runMielec("plans_taxi_4.0.xml.gz", "taxis-25.xml");
+    }
+
+
+    @Test
+    public void testRunMielecHighDemandHighSupply()
+    {
         runMielec("plans_taxi_4.0.xml.gz", "taxis-50.xml");
     }
 
@@ -53,6 +71,6 @@ public class RunTaxiScenarioTest
         Config config = ConfigUtils.loadConfig(configFile, taxiCfg, new OTFVisConfigGroup());
         config.plans().setInputFile(dir + plansFile);
         taxiCfg.setTaxisFile(dir + taxisFile);
-        RunTaxiScenario.run(config, false);
+        RunTaxiScenario.createControler(config, false).run();
     }
 }
