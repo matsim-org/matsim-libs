@@ -46,8 +46,10 @@ public class SubpopTravelDisutility implements TravelDisutility {
 		double marginalUtilityOfMoney = params.getScoringParameters(person).marginalUtilityOfMoney;		
 		final double marginalUtilityOfDistanceFromMoney_util_m = monetaryDistanceRate * marginalUtilityOfMoney; // [money/m]*[util/money]
 		
-		// TODO: check if this needs to be negative!
-		return marginalUtilityOfTime_util_m * travelTime + (marginalUtilityOfDistance_util_m + marginalUtilityOfDistanceFromMoney_util_m) * link.getLength();
+		// Needs to be positive: 
+		return -1.0 *
+				(marginalUtilityOfTime_util_m * travelTime 
+					+ (marginalUtilityOfDistance_util_m + marginalUtilityOfDistanceFromMoney_util_m) * link.getLength());
 	}
 
 	@Override
@@ -58,9 +60,10 @@ public class SubpopTravelDisutility implements TravelDisutility {
 		double marginalUtilityOfMoney = params.getScoringParameters(null).marginalUtilityOfMoney;		
 		final double marginalUtilityOfDistanceFromMoney_util_m = monetaryDistanceRate * marginalUtilityOfMoney; // [money/m]*[util/money]
 		
-		// TODO: check if this needs to be negative!
-		return marginalUtilityOfTime_util_m * (link.getLength() / link.getFreespeed()) 
-				+ (marginalUtilityOfDistance_util_m + marginalUtilityOfDistanceFromMoney_util_m) * link.getLength();
+		// Needs to be positive: 
+		return -1.0 * 
+				(marginalUtilityOfTime_util_m * (link.getLength() / link.getFreespeed()) 
+				+ (marginalUtilityOfDistance_util_m + marginalUtilityOfDistanceFromMoney_util_m) * link.getLength());
 	}
 
 }

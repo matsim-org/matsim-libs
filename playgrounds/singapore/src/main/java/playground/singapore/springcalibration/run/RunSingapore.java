@@ -82,7 +82,7 @@ public class RunSingapore {
 		});
 		
 		// TODO: make car and taxi also consider road pricing
-		//controler.setModules(new SubpopRoadPricingModule());
+		controler.setModules(new SubpopRoadPricingModule());
 						
 		controler.addControlerListener(new SingaporeControlerListener());
 		
