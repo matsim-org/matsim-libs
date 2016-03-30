@@ -36,8 +36,9 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toCH1903LV03Plus;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.*;
 import playground.boescpa.lib.tools.PopulationUtils;
 
@@ -53,15 +54,16 @@ import java.util.*;
  */
 public class CreateFreightTraffic {
 	private final static Logger log = Logger.getLogger(CreateFreightTraffic.class);
-	private final static CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("CH1903_LV03", "CH1903_LV03_Plus");
+	private final static CoordinateTransformation transformation = new CH1903LV03toCH1903LV03Plus();
 
 	private final static String DELIMITER = ";";
-	private final static String FREIGHT_TAG = "freight";
-	private final static int VICINITY_RADIUS = 5000; // radius [m] around zone centroid which is considered vicinity
+	private final static String FREIGHT_TAG = "Freight";
+	private final static int VICINITY_RADIUS = 10000; // radius [m] around zone centroid which is considered vicinity
 
 	private final Random random;
 	private int roundDowns = 0;
 	private int roundUps = 0;
+	private static int facilityIndex = 0;
 	private final double[] cummulativeDepartureProbability = new double[24];
 	private final Map<Integer, List<ActivityFacility>> zones = new HashMap<>();
 	private final Population freightPopulation;
@@ -81,21 +83,21 @@ public class CreateFreightTraffic {
 		final String trucksFile = args[3];
 		final String heavyDutyVehiclesFile = args[4];
 		final String cumulativeProbabilityFreightDeparturesFile = args[5];
-		final int randomSeed = Integer.parseInt(args[5]);
-		final String outputFacilities = args[6];
-		final String outputPopulation = args[7];
+		final int randomSeed = Integer.parseInt(args[6]);
+		final String outputFacilities = args[7];
+		final String outputPopulation = args[8];
 
 		log.info("Freight creation...");
 		CreateFreightTraffic creator = new CreateFreightTraffic(coordFile, facilitiesFile, randomSeed);
 		creator.readDepartures(cumulativeProbabilityFreightDeparturesFile);
 
-		creator.createFreightTraffic(utilityVehiclesFile);
-		creator.createFreightTraffic(trucksFile);
-		creator.createFreightTraffic(heavyDutyVehiclesFile);
+		creator.createFreightTraffic("UTV_", utilityVehiclesFile);
+		creator.createFreightTraffic("TRU_", trucksFile);
+		creator.createFreightTraffic("HDV_", heavyDutyVehiclesFile);
 
 		creator.writeFreightFacilities(outputFacilities);
 		creator.writeFreightPopulation(outputPopulation);
-		log.info("Freight creation finished.");
+		log.info("Freight creation... done.");
 		creator.printStats();
 	}
 
@@ -103,7 +105,7 @@ public class CreateFreightTraffic {
 		BufferedReader reader = IOUtils.getBufferedReader(cumulativeProbabilityFreightDeparturesFile);
 		try {
 			for (int i = 0; i < 24; i++) {
-				String[] line = reader.readLine().split("\t");
+				String[] line = reader.readLine().split(DELIMITER);
 				cummulativeDepartureProbability[i] = Double.parseDouble(line[1]);
 			}
 		} catch (IOException e) {
@@ -118,26 +120,30 @@ public class CreateFreightTraffic {
 		log.info("Round downs: " + roundDowns);
 	}
 
-	private void createFreightTraffic(String vehiclesFile) {
+	private void createFreightTraffic(String prefix, String vehiclesFile) {
+		Counter counter = new Counter(" OD-relationship # ");
+		int personIndex = 0;
 		BufferedReader reader = IOUtils.getBufferedReader(vehiclesFile);
 		try {
 			String nextLine = reader.readLine();
 			while (nextLine != null) {
 				String[] line = nextLine.split(DELIMITER);
-				int numberOfTrips = getNumberOfTrips(line[3]);
+				int numberOfTrips = getNumberOfTrips(line[4]);
 				for (int i = 0; i < numberOfTrips; i++) {
 					ActivityFacility startFacility = getFacility(Integer.parseInt(line[0]));
 					ActivityFacility endFacility = getFacility(Integer.parseInt(line[2]));
-					createSingleTripAgent(i, startFacility, endFacility);
+					createSingleTripAgent(prefix + ++personIndex, startFacility, endFacility);
 				}
 				nextLine = reader.readLine();
+				counter.incCounter();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		counter.printCounter();
 	}
 
-	private void createSingleTripAgent(int index, ActivityFacility startFacility, ActivityFacility endFacility) {
+	private void createSingleTripAgent(String index, ActivityFacility startFacility, ActivityFacility endFacility) {
 		// create and add new agent
 		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(FREIGHT_TAG + "_" + index, Person.class));
 		freightPopulation.addPerson(p);
@@ -182,7 +188,7 @@ public class CreateFreightTraffic {
 
 	private int getNumberOfTrips(String floatingNumberOfTripsForThisODRelationship) {
 		// first all full trips for this OD-relationship
-		int numberOfTrips = Integer.parseInt(floatingNumberOfTripsForThisODRelationship.split(".")[0]);
+		int numberOfTrips = (int)Math.floor(Double.parseDouble(floatingNumberOfTripsForThisODRelationship));
 		// then - if chance allows - another trip
 		double residualTrips = Double.parseDouble(floatingNumberOfTripsForThisODRelationship) - numberOfTrips;
 		if (random.nextDouble() <= residualTrips) {
@@ -198,7 +204,7 @@ public class CreateFreightTraffic {
 	private ActivityFacility getFacility(int zoneId) {
 		List<ActivityFacility> facilityList = zones.get(zoneId);
 		ActivityFacility origFacility = facilityList.get(random.nextInt(facilityList.size()));
-		Id<ActivityFacility> facilityId = Id.create(FREIGHT_TAG + "_" + origFacility.getCoord().toString(), ActivityFacility.class);
+		Id<ActivityFacility> facilityId = Id.create(FREIGHT_TAG + "_" + ++facilityIndex, ActivityFacility.class);
 		ActivityFacility freightFacility;
 		if (freightFacilities.getFacilities().containsKey(facilityId)) {
 			freightFacility = freightFacilities.getFacilities().get(facilityId);
@@ -220,6 +226,7 @@ public class CreateFreightTraffic {
 	private void readZones(String coordFile, String facilitiesFile) {
 		ActivityFacilities origFacilities = readFacilities(facilitiesFile);
 		// read zone centroids and assign all facilities close to centroid
+		Counter counter = new Counter(" zone # ");
 		BufferedReader reader = IOUtils.getBufferedReader(coordFile);
 		try {
 			String nextLine = reader.readLine();
@@ -239,10 +246,12 @@ public class CreateFreightTraffic {
 					zones.put(zoneId, borderFacility);
 				}
 				nextLine = reader.readLine();
+				counter.incCounter();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		counter.printCounter();
 	}
 
 	private List<ActivityFacility> getFacilities(ActivityFacilities origFacilities, Coord zoneCentroidCoord) {
@@ -255,8 +264,8 @@ public class CreateFreightTraffic {
 		}
 		if (facilityList.isEmpty()) {
 			Id<ActivityFacility> facilityId = Id.create("temp_" + zoneCentroidCoord.toString(), ActivityFacility.class);
-			origFacilities.getFactory().createActivityFacility(facilityId, zoneCentroidCoord);
-			facilityList.add(origFacilities.getFacilities().get(facilityId));
+			ActivityFacility newFacility = origFacilities.getFactory().createActivityFacility(facilityId, zoneCentroidCoord);
+			facilityList.add(newFacility);
 		}
 		return facilityList;
 	}
