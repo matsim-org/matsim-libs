@@ -28,6 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -47,7 +48,7 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 	private Network network ;
 	private Scenario scenario ;
 	private NetsimEngineContext context;
-	private QNetsimEngine netsimEngine ;
+	private NetsimInternalInterface netsimEngine ;
 	private LinkSpeedCalculator linkSpeedCalculator;
 
 	public ConfigurableQNetworkFactory( EventsManager events, Scenario scenario ) {
@@ -57,7 +58,7 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 		this.qsimConfig = scenario.getConfig().qsim() ;
 	}
 	@Override
-	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine1 ) {
+	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 		this.netsimEngine = netsimEngine1;
 		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -80,8 +81,9 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
-	QNode createNetsimNode(final Node node, QNetwork qnetwork) {
-		return new QNode(node, qnetwork);
+	QNode createNetsimNode(final Node node) {
+		QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+		return builder.build( node ) ;
 	}
 	public final void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
 		this.linkSpeedCalculator = linkSpeedCalculator;

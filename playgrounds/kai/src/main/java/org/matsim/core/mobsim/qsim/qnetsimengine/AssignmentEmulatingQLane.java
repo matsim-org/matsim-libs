@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.core.network.LinkImpl;
@@ -95,19 +96,19 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 	private final NetsimEngineContext context;
 
-	private final QNetsimEngine netsimEngine;
+	private final NetsimInternalInterface netsimEngine;
 
 	private final LinkSpeedCalculator linkSpeedCalculator;
 
 
 	
 	AssignmentEmulatingQLane(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id id, 
-			NetsimEngineContext context, QNetsimEngine netsimEngine, LinkSpeedCalculator linkSpeedCalculator ) {
+			NetsimEngineContext context, NetsimInternalInterface netsimEngine2, LinkSpeedCalculator linkSpeedCalculator ) {
 		this.id = id ;
 		this.qLink = qLinkImpl;
 		this.vehQueue = vehicleQueue ;
 		this.context = context;
-		this.netsimEngine = netsimEngine;
+		this.netsimEngine = netsimEngine2;
 		this.linkSpeedCalculator = linkSpeedCalculator;
 
 	}
