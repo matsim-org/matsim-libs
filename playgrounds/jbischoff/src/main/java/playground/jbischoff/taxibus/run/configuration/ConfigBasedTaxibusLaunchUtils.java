@@ -26,15 +26,12 @@ import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.taxi.multirun.VrpLauncherUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.population.algorithms.PermissibleModesCalculator;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LinesUtils;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
-import playground.jbischoff.taxibus.run.sim.TaxibusPermissibleModesCalculatorImpl;
 import playground.jbischoff.taxibus.run.sim.TaxibusQSimProvider;
 import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
-import playground.jbischoff.taxibus.scenario.strategies.TaxibusAndWOBScenarioPermissibleModesCalculator;
 
 /**
  * @author jbischoff
@@ -52,7 +49,7 @@ public class ConfigBasedTaxibusLaunchUtils {
 		}
 		
 	 
-	public  void initiateTaxibusses(boolean wobCase){
+	public  void initiateTaxibusses(){
 		//this is done exactly once per simulation
 		
 		
@@ -64,20 +61,11 @@ public class ConfigBasedTaxibusLaunchUtils {
 
 		
 		
-		final PermissibleModesCalculator taxibusPermissibleModesCalculator;
 		
 		final LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context,tbcg);	
 		final TaxibusPassengerOrderManager orderManager = new TaxibusPassengerOrderManager();
 		
-		final String[] availableModes = controler.getScenario().getConfig().subtourModeChoice().getModes();
-		final String[] chainBasedModes = controler.getScenario().getConfig().subtourModeChoice().getChainBasedModes();
 		
-		if (wobCase){
-			taxibusPermissibleModesCalculator = new TaxibusAndWOBScenarioPermissibleModesCalculator(availableModes, dispatcher, controler.getScenario());
-		}
-		else {
-			taxibusPermissibleModesCalculator = new TaxibusPermissibleModesCalculatorImpl(availableModes, dispatcher);
-		}
 		
 		context.setVrpData(vrpData);	 
            
@@ -86,17 +74,6 @@ public class ConfigBasedTaxibusLaunchUtils {
 			@Override
 			public void install() {
 				
-//				addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice.name()+"_new").toProvider(new javax.inject.Provider<PlanStrategy>(){
-//					@Override
-//					public PlanStrategy get() {
-//						SubtourModeChoice choice  = new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false);
-//						choice.setPermissibleModesCalculator(taxibusPermissibleModesCalculator);
-//						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-//						builder.addStrategyModule(new ReRoute(controler.getScenario()));
-//						builder.addStrategyModule(choice);
-//						return builder.build();
-//					}
-//				});
 				addEventHandlerBinding().toInstance(dispatcher);
 				addEventHandlerBinding().toInstance(orderManager);
 				bindMobsim().toProvider(TaxibusQSimProvider.class);
@@ -114,7 +91,4 @@ public class ConfigBasedTaxibusLaunchUtils {
 	}
 
 
-	public void initiateTaxibusses() {
-		initiateTaxibusses(false);	
-	} 
 }
