@@ -13,11 +13,9 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 import playground.dhosse.prt.request.NPersonsVehicleRequestPathFinder;
-import playground.jbischoff.taxi.optimizer.rank.IdleRankVehicleFinder;
 
 public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBeforeSimStepListener {
 
-	protected final IdleRankVehicleFinder idleVehicleFinder;
 	protected final Collection<TaxiRequest> unplannedRequests;
 	
 	protected boolean requiresReoptimization = false;
@@ -32,14 +30,8 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 	
 	public PrtOptimizer(TaxiOptimizerContext optimizerContext){
 		
-		this(optimizerContext, optimizerContext.scheduler, new IdleRankVehicleFinder(optimizerContext));
-		
-	}
-	
-	protected PrtOptimizer(TaxiOptimizerContext optimizerContext, TaxiScheduler scheduler, IdleRankVehicleFinder vehicleFinder){
 		this.optimizerContext = optimizerContext;
-		this.scheduler = scheduler;
-		this.idleVehicleFinder = vehicleFinder;
+		this.scheduler = optimizerContext.scheduler;
 		this.unplannedRequests = new ArrayList<TaxiRequest>();
 		
 		int vehicleCapacity = ((PrtOptimizerContext)optimizerContext).prtConfigGroup.getVehicleCapacity();
