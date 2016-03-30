@@ -56,6 +56,7 @@ public class RunSingapore {
 				//sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+				
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
 
 				return sumScoringFunction;
@@ -81,8 +82,9 @@ public class RunSingapore {
 			}
 		});
 		
-		// TODO: make car and taxi also consider road pricing
-		controler.setModules(new SubpopRoadPricingModule(parameters, scenario, subPopDisutilityCalculatorFactory));
+		// TODO: make taxi also consider road pricing
+		SubpopRoadPricingModule rpModule = new SubpopRoadPricingModule(parameters, scenario, subPopDisutilityCalculatorFactory);
+		controler.setModules(rpModule);
 						
 		controler.addControlerListener(new SingaporeControlerListener());
 		
