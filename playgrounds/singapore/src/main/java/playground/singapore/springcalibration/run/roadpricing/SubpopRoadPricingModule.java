@@ -36,8 +36,12 @@ import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 
 import com.google.inject.Singleton;
+
+import playground.singapore.springcalibration.run.SubpopTravelDisutility;
+
 import org.matsim.roadpricing.CalcAverageTolledTripLength;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.PlansCalcRouteWithTollOrNot;
@@ -52,13 +56,18 @@ import org.matsim.roadpricing.RoadPricingTravelDisutilityFactory;
 public class SubpopRoadPricingModule extends AbstractModule {
 
     private final RoadPricingScheme roadPricingScheme;
+    private CharyparNagelScoringParametersForPerson parameters;
+    private Scenario scenario;
+    private TravelDisutilityFactory originalTravelDisutilityFactory;
 
-    public SubpopRoadPricingModule() {
+    public SubpopRoadPricingModule(CharyparNagelScoringParametersForPerson parameters, Scenario scenario, TravelDisutilityFactory originalTravelDisutilityFactory) {
         this.roadPricingScheme = null;
+        this.parameters = parameters;
+        this.originalTravelDisutilityFactory = originalTravelDisutilityFactory;
     }
 
     public SubpopRoadPricingModule(RoadPricingScheme roadPricingScheme) {
-        this.roadPricingScheme = roadPricingScheme;
+        this.roadPricingScheme = roadPricingScheme;      
     }
 
     @Override
@@ -72,19 +81,27 @@ public class SubpopRoadPricingModule extends AbstractModule {
             bind(RoadPricingScheme.class).toProvider(RoadPricingSchemeProvider.class).in(Singleton.class);
         }
         bind(RoadPricingInitializer.class).asEagerSingleton();
-        bind(PlansCalcRouteWithTollOrNot.class);
-        addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
+        
+        // ???????????????
+        // bind(PlansCalcRouteWithTollOrNot.class);
+        // addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
+        // ??????????????????????????????????
 
         // use ControlerDefaults configuration, replacing the TravelDisutility with a toll-dependent one
         install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
             @Override
             public void install() {
-                addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(TravelDisutilityIncludingTollFactoryProvider.class).asEagerSingleton();
+                addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(
+                		new SubpopTravelDisutilityIncludingTollFactoryProvider(scenario, roadPricingScheme, originalTravelDisutilityFactory, parameters)).asEagerSingleton();
+                addTravelDisutilityFactoryBinding("taxi").toProvider(
+                		new SubpopTravelDisutilityIncludingTollFactoryProvider(scenario, roadPricingScheme, originalTravelDisutilityFactory, parameters)).asEagerSingleton();
             }
         }));
 
-        addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.car, getConfig().planCalcScore()));
-        addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
+        // ??????????????????????????????????
+        // addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutility.Builder(TransportMode.car, getConfig().planCalcScore()));
+        // addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
+        // ??????????????????????????????????
 
         addControlerListenerBinding().to(RoadPricingControlerListener.class);
 
@@ -140,34 +157,6 @@ public class SubpopRoadPricingModule extends AbstractModule {
                 return rpsImpl;
             }
         }
-    }
-
-    private static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
-
-        private final Scenario scenario;
-        private final RoadPricingScheme scheme;
-
-        @Inject
-        TravelDisutilityIncludingTollFactoryProvider(Scenario scenario, RoadPricingScheme scheme) {
-            this.scenario = scenario;
-            this.scheme = scheme;
-        }
-
-        @Override
-        public TravelDisutilityFactory get() {
-            RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-            final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
-//			if (!scheme.getType().equals(RoadPricingScheme.TOLL_TYPE_AREA)) {
-                RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
-                        originalTravelDisutilityFactory, scheme, scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney()
-                );
-                travelDisutilityFactory.setSigma(rpConfig.getRoutingRandomness());
-                return travelDisutilityFactory;
-//            } else {
-//                return originalTravelDisutilityFactory;
-//            }
-        }
-
-    }
+    }       
 
 }
