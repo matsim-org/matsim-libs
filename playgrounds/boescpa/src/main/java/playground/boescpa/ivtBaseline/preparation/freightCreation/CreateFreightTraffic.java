@@ -226,11 +226,18 @@ public class CreateFreightTraffic {
 			while (nextLine != null) {
 				String[] line = nextLine.split(DELIMITER);
 				int zoneId = Integer.parseInt(line[0]);
-				double xCoord = Double.parseDouble(line[2]);
-				double yCoord = Double.parseDouble(line[3]);
-				Coord coord = transformation.transform(new Coord(xCoord, yCoord));
-				List<ActivityFacility> facilitiesInVicinity = getFacilities(origFacilities,coord);
-				zones.put(zoneId, facilitiesInVicinity);
+				if (zoneId < 2000000) { // these are the Swiss zones
+					double xCoord = Double.parseDouble(line[2]);
+					double yCoord = Double.parseDouble(line[3]);
+					Coord coord = transformation.transform(new Coord(xCoord, yCoord));
+					List<ActivityFacility> facilitiesInVicinity = getFacilities(origFacilities, coord);
+					zones.put(zoneId, facilitiesInVicinity);
+				} else { // these are the international zones without centroids;
+					// here - instead of the coords of the centroid - the id of the appropriate border facility is specified.
+					List<ActivityFacility> borderFacility = new ArrayList<>();
+					borderFacility.add(origFacilities.getFacilities().get(Id.create(line[2], ActivityFacility.class)));
+					zones.put(zoneId, borderFacility);
+				}
 				nextLine = reader.readLine();
 			}
 		} catch (IOException e) {
