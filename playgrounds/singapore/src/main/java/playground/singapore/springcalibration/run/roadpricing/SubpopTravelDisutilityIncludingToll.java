@@ -42,10 +42,14 @@ class SubpopTravelDisutilityIncludingToll implements TravelDisutility {
 	private final TollRouterBehaviour tollCostHandler;
 	private final TravelDisutility normalTravelDisutility;
 	private CharyparNagelScoringParametersForPerson parameters;
-	private final double sigma ;
+	// no sigma required, we wanna go for the subpops' marginal utility of money!
+	//private final double sigma ;
 
-	public SubpopTravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, CharyparNagelScoringParametersForPerson parameters, double sigma) {
+	public SubpopTravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, 
+			final RoadPricingScheme scheme, CharyparNagelScoringParametersForPerson parameters, double sigma) {
 		this.scheme = scheme;
+		//this.sigma = sigma;
+		this.parameters = parameters;
 		this.normalTravelDisutility = normalTravelDisutility;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
 			this.tollCostHandler = new DistanceTollCostBehaviour();
@@ -60,34 +64,26 @@ class SubpopTravelDisutilityIncludingToll implements TravelDisutility {
 		} else {
 			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme.getType() + "\" is not supported.");
 		}
-		this.sigma = sigma ;
 		log.info("Initialized SubpopTravelDisutilityIncludingToll");
 	}
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) 
 	{
-		log.info("getLinkTravelDisutility for person: " + person.getId().toString());
+		//log.info("getLinkTravelDisutility for person: " + person.getId().toString());
 		double normalTravelDisutilityForLink = this.normalTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
-
-		double logNormalRnd = 1. ;
-		// randomize if applicable:
-		if ( sigma != 0. ) {
-			logNormalRnd = (double) person.getCustomAttributes().get("logNormalRnd") ;
-		}
-		// end randomize
 
 		double tollCost = this.tollCostHandler.getTypicalTollCost(link, time );
 		
 		double marginalUtilityOfMoney = parameters.getScoringParameters(person).marginalUtilityOfMoney;
-		log.info("mom: " + marginalUtilityOfMoney);
-		return normalTravelDisutilityForLink + tollCost * marginalUtilityOfMoney * logNormalRnd;
+		//log.info("mom: " + marginalUtilityOfMoney);
+		return normalTravelDisutilityForLink + tollCost * marginalUtilityOfMoney;
 		// sign convention: these are all costs (= disutilities), so they are all normally positive.  tollCost is positive, marginalUtilityOfMoney as well.
 	}
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		log.info("getLinkTravelDisutility for link: " + link.getId().toString());
+		//log.info("getLinkTravelDisutility for link: " + link.getId().toString());
 		return this.normalTravelDisutility.getLinkMinimumTravelDisutility(link);
 	}
 

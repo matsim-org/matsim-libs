@@ -21,6 +21,7 @@ import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 import playground.singapore.scoring.CharyparNagelOpenTimesActivityScoring;
@@ -32,8 +33,8 @@ public class RunSingapore {
 	
 
 	public static void main(String[] args) {
-		log.info("Running SingaporeControlerRunner");
-						
+		log.info("Running SingaporeControlerRunner"); 
+     
 		Config config = ConfigUtils.loadConfig( args[0], new RoadPricingConfigGroup() ) ;
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
@@ -62,16 +63,14 @@ public class RunSingapore {
 				return sumScoringFunction;
 			}
 		}) ;		
-	
-		
 		
 		final SubpopTravelDisutilityFactory subPopDisutilityCalculatorFactory = new SubpopTravelDisutilityFactory(parameters, TransportMode.car);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindCarTravelDisutilityFactory().toInstance(subPopDisutilityCalculatorFactory);
-			}
-		});
+//		controler.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindCarTravelDisutilityFactory().toInstance(subPopDisutilityCalculatorFactory);
+//			}
+//		});
 						
 		final SubpopTravelDisutility.Builder builder_taxi =  new SubpopTravelDisutility.Builder("taxi", parameters);	
 		controler.addOverridingModule(new AbstractModule() {
@@ -81,11 +80,10 @@ public class RunSingapore {
 				addTravelDisutilityFactoryBinding("taxi").toInstance(builder_taxi);
 			}
 		});
-		
-		// TODO: make taxi also consider road pricing
-		SubpopRoadPricingModule rpModule = new SubpopRoadPricingModule(parameters, scenario, subPopDisutilityCalculatorFactory);
+	
+		SubpopRoadPricingModule rpModule = new SubpopRoadPricingModule(parameters, scenario, subPopDisutilityCalculatorFactory, config);
 		controler.setModules(rpModule);
-						
+										
 		controler.addControlerListener(new SingaporeControlerListener());
 		
 		controler.run();

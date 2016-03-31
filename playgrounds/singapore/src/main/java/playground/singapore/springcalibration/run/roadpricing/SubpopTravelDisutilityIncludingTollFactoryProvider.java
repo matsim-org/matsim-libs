@@ -35,7 +35,7 @@ public class SubpopTravelDisutilityIncludingTollFactoryProvider implements Provi
         
         SubpopRoadPricingTravelDisutilityFactory travelDisutilityFactory = new SubpopRoadPricingTravelDisutilityFactory(
                 originalTravelDisutilityFactory, scheme, parameters);
-        travelDisutilityFactory.setSigma(rpConfig.getRoutingRandomness());
+        //travelDisutilityFactory.setSigma(rpConfig.getRoutingRandomness());
         return travelDisutilityFactory;
     }
 
