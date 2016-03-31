@@ -86,17 +86,12 @@ public class TaxiQSimProvider
         TaxiOptimizer optimizer = createTaxiOptimizer(qSim);
         qSim.addQueueSimulationListeners(optimizer);
 
-        PassengerEngine passengerEngine = new PassengerEngine(TaxiModule.TAXI_MODE, events,
-                new TaxiRequestCreator(), optimizer, taxiData, scenario.getNetwork());
+        PassengerEngine passengerEngine = createPassengerEngine(optimizer);
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);
 
-        LegCreator legCreator = taxiCfg.isOnlineVehicleTracker() ? //
-                VrpLegs.createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer()) : //
-                VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
-        TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,
-                taxiCfg.getPickupDuration());
-        qSim.addAgentSource(new VrpAgentSource(actionCreator, taxiData, optimizer, qSim));
+        VrpAgentSource agentSource = createVrpAgentSource(optimizer, qSim, passengerEngine);
+        qSim.addAgentSource(agentSource);
 
         addTaxiOverTimeCounters(qSim);
         return qSim;
@@ -114,6 +109,25 @@ public class TaxiQSimProvider
                 qSim.getSimTimer(), travelTime, travelDisutility, scheduler);
         return optimizerFactory.createTaxiOptimizer(optimContext,
                 taxiCfg.getOptimizerConfigGroup());
+    }
+
+
+    private PassengerEngine createPassengerEngine(TaxiOptimizer optimizer)
+    {
+        return new PassengerEngine(TaxiModule.TAXI_MODE, events, new TaxiRequestCreator(),
+                optimizer, taxiData, scenario.getNetwork());
+    }
+
+
+    private VrpAgentSource createVrpAgentSource(TaxiOptimizer optimizer, QSim qSim,
+            PassengerEngine passengerEngine)
+    {
+        LegCreator legCreator = taxiCfg.isOnlineVehicleTracker() ? //
+                VrpLegs.createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer()) : //
+                VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
+        TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,
+                taxiCfg.getPickupDuration());
+        return new VrpAgentSource(actionCreator, taxiData, optimizer, qSim);
     }
 
 

@@ -64,8 +64,8 @@ public class VrpAgentSource
             Id<Link> startLinkId = vrpVeh.getStartLink().getId();
 
             VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, vrpVeh);
-            DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, qSim,
-                    vrpAgentLogic);
+            DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId,
+                    qSim.getEventsManager(), vrpAgentLogic);
             QVehicle mobsimVehicle = new QVehicle(qSimVehicleFactory.createVehicle(
                     Id.create(id, org.matsim.vehicles.Vehicle.class),
                     VehicleUtils.getDefaultVehicleType()));
