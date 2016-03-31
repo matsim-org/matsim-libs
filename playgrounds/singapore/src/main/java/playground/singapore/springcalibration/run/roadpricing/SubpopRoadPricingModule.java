@@ -50,16 +50,11 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 public class SubpopRoadPricingModule extends AbstractModule {
 
     private final RoadPricingScheme roadPricingScheme;
-    private CharyparNagelScoringParametersForPerson parameters;
-    private Scenario scenario;
-    private TravelDisutilityFactory originalTravelDisutilityFactory;
     private static final Logger log = Logger.getLogger( SubpopRoadPricingModule.class ) ;
     private Config config;
 
-    public SubpopRoadPricingModule(CharyparNagelScoringParametersForPerson parameters, Scenario scenario, TravelDisutilityFactory originalTravelDisutilityFactory, Config config) {
+    public SubpopRoadPricingModule(Scenario scenario, Config config) {
         this.roadPricingScheme = null;
-        this.parameters = parameters;
-        this.originalTravelDisutilityFactory = originalTravelDisutilityFactory;
         this.config = config ;
     }
 
@@ -153,14 +148,12 @@ public class SubpopRoadPricingModule extends AbstractModule {
     
     private static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
 
-        private final Scenario scenario;
         private final RoadPricingScheme scheme;
         private final CharyparNagelScoringParametersForPerson parameters;
         private final Config config;
         
         @Inject
-        TravelDisutilityIncludingTollFactoryProvider(Scenario scenario, RoadPricingScheme scheme, CharyparNagelScoringParametersForPerson parameters, Config config) {
-            this.scenario = scenario;
+        TravelDisutilityIncludingTollFactoryProvider(RoadPricingScheme scheme, CharyparNagelScoringParametersForPerson parameters, Config config) {
             this.scheme = scheme;
             this.parameters = parameters;
             this.config = config;
@@ -168,7 +161,7 @@ public class SubpopRoadPricingModule extends AbstractModule {
 
         @Override
         public TravelDisutilityFactory get() {
-        		
+        	
             RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, 
             		RoadPricingConfigGroup.GROUP_NAME, 
             		RoadPricingConfigGroup.class);
@@ -180,11 +173,6 @@ public class SubpopRoadPricingModule extends AbstractModule {
                     originalTravelDisutilityFactory, scheme, parameters);
             travelDisutilityFactory.setSigma(rpConfig.getRoutingRandomness());
             return travelDisutilityFactory;
-            
-            
-            //return originalTravelDisutilityFactory;
         }
-
     }
-
 }

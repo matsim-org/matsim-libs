@@ -4,7 +4,6 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -21,7 +20,6 @@ import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
-import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 import playground.singapore.scoring.CharyparNagelOpenTimesActivityScoring;
@@ -40,7 +38,7 @@ public class RunSingapore {
 		Controler controler = new Controler(scenario);
 		
 		CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-								
+										
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			
@@ -50,21 +48,19 @@ public class RunSingapore {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));
-				
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));			
 				// this is the Singaporean scorer with Open times:
 				sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(params, scenario.getActivityFacilities()));
-				//sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+				//sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;	
 				
-				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-				
+				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));				
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
 
 				return sumScoringFunction;
 			}
 		}) ;		
 		
-		final SubpopTravelDisutilityFactory subPopDisutilityCalculatorFactory = new SubpopTravelDisutilityFactory(parameters, TransportMode.car);
+//		final SubpopTravelDisutilityFactory subPopDisutilityCalculatorFactory = new SubpopTravelDisutilityFactory(parameters, TransportMode.car);
 //		controler.addOverridingModule(new AbstractModule() {
 //			@Override
 //			public void install() {
@@ -81,7 +77,7 @@ public class RunSingapore {
 			}
 		});
 	
-		SubpopRoadPricingModule rpModule = new SubpopRoadPricingModule(parameters, scenario, subPopDisutilityCalculatorFactory, config);
+		SubpopRoadPricingModule rpModule = new SubpopRoadPricingModule(scenario, config);
 		controler.setModules(rpModule);
 										
 		controler.addControlerListener(new SingaporeControlerListener());
