@@ -20,7 +20,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 public class CAMobsimFactory implements MobsimFactory{
 
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario sc, EventsManager events) {
 
 		if (!sc.getConfig().controler().getMobsim().equals(Constants.CA_MOBSIM_MODE)) {
 			throw new RuntimeException("This factory does not make sense for " + sc.getConfig().controler().getMobsim()  );
@@ -31,18 +31,18 @@ public class CAMobsimFactory implements MobsimFactory{
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
-		QSim qSim = new QSim(sc, eventsManager);
+		QSim qSim = new QSim(sc, events);
 		
 		CAAgentFactory agentFactoryCA = new CAAgentFactory();
 		CAEngine engineCA = new CAEngine(qSim,agentFactoryCA);
 		
 		qSim.addMobsimEngine(engineCA);
 		
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager);
+		ActivityEngine activityEngine = new ActivityEngine(events);
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 	
-		CAQNetworkFactory networkFactoryCA = new CAQNetworkFactory(engineCA,sc, agentFactoryCA);
+		CAQNetworkFactory networkFactoryCA = new CAQNetworkFactory(engineCA,sc, agentFactoryCA, events);
 		
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, networkFactoryCA);
 		qSim.addMobsimEngine(netsimEngine);
