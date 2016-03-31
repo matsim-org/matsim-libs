@@ -61,9 +61,9 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author dgrether
  * @author tthunig
  */
-public class TravelTimeOneWayTest {
+public class TravelTimeOneWayTestIT {
 
-	private static final Logger log = Logger.getLogger(TravelTimeOneWayTest.class);
+	private static final Logger log = Logger.getLogger(TravelTimeOneWayTestIT.class);
 
 	private static final boolean WRITE_EVENTS = false;
 	

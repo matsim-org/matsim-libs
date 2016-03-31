@@ -11,6 +11,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.LaneFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
@@ -25,12 +26,13 @@ public final class AssignmentEmulatingQLaneNetworkFactory extends QNetworkFactor
 	@Inject Network network ;
 	@Inject Scenario scenario ;
 	
-	private QNetsimEngine netsimEngine;
+	private NetsimInternalInterface netsimEngine;
 	private NetsimEngineContext context;
 
 	@Override
-	public QNode createNetsimNode(Node node, QNetwork network) {
-		return new QNode(node, network);
+	public QNode createNetsimNode(Node node) {
+		QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+		return builder.build( node ) ;
 	}
 
 	@Override
@@ -49,7 +51,7 @@ public final class AssignmentEmulatingQLaneNetworkFactory extends QNetworkFactor
 	}
 
 	@Override
-	void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, QNetsimEngine netsimEngine1) {
+	void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, NetsimInternalInterface netsimEngine1) {
 		this.netsimEngine = netsimEngine1 ;
 		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();

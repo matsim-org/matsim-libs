@@ -47,6 +47,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -104,15 +105,15 @@ abstract class AbstractQLink extends QLinkI {
 
 	private final NetsimEngineContext context;
 
-	private final QNetsimEngine netsimEngine;
+	private final NetsimInternalInterface netsimEngine;
 
-	AbstractQLink(Link link, QNode toQNode, NetsimEngineContext context, QNetsimEngine netsimEngine) {
+	AbstractQLink(Link link, QNode toQNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
 		this.link = link ;
 		this.toQNode = toQNode ;
 		this.context = context;
-		this.netsimEngine = netsimEngine;
+		this.netsimEngine = netsimEngine2;
 	}
-	
+
 	@Override QNode getToNode() {
 		return toQNode ;
 	}

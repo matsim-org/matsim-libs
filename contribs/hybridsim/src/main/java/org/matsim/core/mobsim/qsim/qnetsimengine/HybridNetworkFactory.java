@@ -34,6 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -45,13 +46,13 @@ public class HybridNetworkFactory extends QNetworkFactory {
 
 	private Network network ;
 	private NetsimEngineContext context;
-	private QNetsimEngine netsimEngine ;
+	private NetsimInternalInterface netsimEngine ;
 
 
 	private ExternalEngine externalEngine;
 
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine arg2) {
+	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface arg2) {
 		network = arg2.getNetsimNetwork().getNetwork();
 		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
 
@@ -70,8 +71,9 @@ public class HybridNetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	public QNode createNetsimNode(Node node, QNetwork network) {
-		return new QNode(node, network);
+	public QNode createNetsimNode(Node node) {
+		QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+		return builder.build( node ) ;
 	}
 
 

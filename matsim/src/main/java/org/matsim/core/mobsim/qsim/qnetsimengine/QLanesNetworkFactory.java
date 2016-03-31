@@ -29,6 +29,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.lanes.ModelLane;
 import org.matsim.lanes.data.v20.Lanes;
@@ -58,7 +59,7 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 
 	private Scenario scenario;
 
-	private QNetsimEngine netsimEngine;
+	private NetsimInternalInterface netsimEngine;
 	
 	@Inject 
 	public QLanesNetworkFactory( QSimConfigGroup qsimConfig, EventsManager events, Network network, Scenario scenario, Lanes lanesDefinitions ) {
@@ -71,7 +72,7 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine1) {
+	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
 		this.netsimEngine = netsimEngine1 ;
 		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -100,8 +101,8 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	public QNode createNetsimNode(Node node, QNetwork network) {
-		return this.delegate.createNetsimNode(node, network);
+	public QNode createNetsimNode(Node node) {
+		return this.delegate.createNetsimNode(node);
 	}
 
 }

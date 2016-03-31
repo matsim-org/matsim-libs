@@ -4,9 +4,11 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSModule;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -32,14 +34,14 @@ public class RunSingapore {
 	
 
 	public static void main(String[] args) {
-		log.info("Running SingaporeControlerRunner");
-						
+		log.info("Running SingaporeControlerRunner"); 
+     
 		Config config = ConfigUtils.loadConfig( args[0], new RoadPricingConfigGroup() ) ;
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
 		CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-								
+										
 		// scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			
@@ -49,28 +51,25 @@ public class RunSingapore {
 				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));
-				
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, network));			
 				// this is the Singaporean scorer with Open times:
 				sumScoringFunction.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(params, scenario.getActivityFacilities()));
-				//sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+				//sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;	
 				
-				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));				
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
 
 				return sumScoringFunction;
 			}
 		}) ;		
-	
 		
-		
-		final SubpopTravelDisutilityFactory subPopDisutilityCalculatorFactory = new SubpopTravelDisutilityFactory(parameters, TransportMode.car);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindCarTravelDisutilityFactory().toInstance(subPopDisutilityCalculatorFactory);
-			}
-		});
+//		final SubpopTravelDisutilityFactory subPopDisutilityCalculatorFactory = new SubpopTravelDisutilityFactory(parameters, TransportMode.car);
+//		controler.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindCarTravelDisutilityFactory().toInstance(subPopDisutilityCalculatorFactory);
+//			}
+//		});
 						
 		final SubpopTravelDisutility.Builder builder_taxi =  new SubpopTravelDisutility.Builder("taxi", parameters);	
 		controler.addOverridingModule(new AbstractModule() {
@@ -80,11 +79,33 @@ public class RunSingapore {
 				addTravelDisutilityFactoryBinding("taxi").toInstance(builder_taxi);
 			}
 		});
-		
-		// TODO: make car and taxi also consider road pricing
-		controler.setModules(new SubpopRoadPricingModule(parameters, scenario, subPopDisutilityCalculatorFactory));
-						
+	
+		SubpopRoadPricingModule rpModule = new SubpopRoadPricingModule(scenario, config);
+		controler.setModules(rpModule);
+										
 		controler.addControlerListener(new SingaporeControlerListener());
+		
+		// Singapore transit router: --------------------------------------------------
+		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(
+				controler.getScenario().getPopulation(), 
+				controler.getScenario().getTransitSchedule(), 
+				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), 
+				(int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
+		controler.getEvents().addHandler(waitTimeCalculator);
+        
+		log.info("About to init StopStopTimeCalculator...");
+		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(
+				controler.getScenario().getTransitSchedule(), 
+				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), 
+				(int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
+		controler.getEvents().addHandler(stopStopTimeCalculator);
+        log.info("About to init TransitRouterWSImplFactory...");
+        
+        controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+        
+        // TODO: also take into account waiting times and stop times in scoring?!
+		// -----------------------------------------------------------------------------
+		
 		
 		controler.run();
 		log.info("finished SingaporeControlerRunner");

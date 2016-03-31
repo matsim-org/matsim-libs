@@ -41,6 +41,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -154,7 +155,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * @param context TODO
 	 * @param netsimEngine TODO
 	 */
-	QLinkLanesImpl(final Link link2, final QNode toNode, List<ModelLane> lanes, NetsimEngineContext context, QNetsimEngine netsimEngine) {
+	QLinkLanesImpl(final Link link2, final QNode toNode, List<ModelLane> lanes, NetsimEngineContext context, NetsimInternalInterface netsimEngine) {
 		super(link2, toNode, context, netsimEngine);
 		this.context = context ;
 		this.toQueueNode = toNode;

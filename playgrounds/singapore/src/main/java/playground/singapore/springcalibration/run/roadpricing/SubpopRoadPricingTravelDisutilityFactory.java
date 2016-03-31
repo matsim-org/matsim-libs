@@ -22,7 +22,6 @@
 
 package playground.singapore.springcalibration.run.roadpricing;
 
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -33,10 +32,11 @@ public class SubpopRoadPricingTravelDisutilityFactory implements TravelDisutilit
 	private final RoadPricingScheme scheme;
 	private CharyparNagelScoringParametersForPerson parameters;
 	private TravelDisutilityFactory previousTravelDisutilityFactory;
-	private double sigma = 3. ;
+	private double sigma ;
 
 
-	public SubpopRoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, CharyparNagelScoringParametersForPerson parameters) {
+	public SubpopRoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, 
+			RoadPricingScheme scheme, CharyparNagelScoringParametersForPerson parameters) {
 		this.scheme = scheme ;
 		this.parameters = parameters ;
 		this.previousTravelDisutilityFactory = previousTravelDisutilityFactory ;
@@ -44,13 +44,14 @@ public class SubpopRoadPricingTravelDisutilityFactory implements TravelDisutilit
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		if ( this.sigma != 0. ) {
-			if ( previousTravelDisutilityFactory instanceof Builder) {
-				((Builder) previousTravelDisutilityFactory).setSigma( this.sigma );
-			} else {
-				throw new RuntimeException("cannot use sigma!=null together with provided travel disutility factory");
-			}
-		}
+//		if ( this.sigma != 0. ) {
+//			if ( previousTravelDisutilityFactory instanceof Builder) {
+//				((Builder) previousTravelDisutilityFactory).setSigma( this.sigma );
+//			} 
+////			else {
+////				throw new RuntimeException("cannot use sigma!=null together with provided travel disutility factory");
+////			}
+//		}
 		return new SubpopTravelDisutilityIncludingToll(
 				previousTravelDisutilityFactory.createTravelDisutility(timeCalculator),
 				this.scheme,

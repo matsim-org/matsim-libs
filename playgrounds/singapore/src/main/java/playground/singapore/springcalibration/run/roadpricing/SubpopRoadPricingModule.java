@@ -27,6 +27,7 @@ import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -36,6 +37,9 @@ import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import com.google.inject.Singleton;
+
+import playground.singapore.springcalibration.run.SubpopTravelDisutilityFactory;
+
 import org.matsim.roadpricing.CalcAverageTolledTripLength;
 import org.matsim.roadpricing.CalcPaidToll;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
@@ -46,14 +50,12 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 public class SubpopRoadPricingModule extends AbstractModule {
 
     private final RoadPricingScheme roadPricingScheme;
-    private CharyparNagelScoringParametersForPerson parameters;
-    private Scenario scenario;
-    private TravelDisutilityFactory originalTravelDisutilityFactory;
+    private static final Logger log = Logger.getLogger( SubpopRoadPricingModule.class ) ;
+    private Config config;
 
-    public SubpopRoadPricingModule(CharyparNagelScoringParametersForPerson parameters, Scenario scenario, TravelDisutilityFactory originalTravelDisutilityFactory) {
+    public SubpopRoadPricingModule(Scenario scenario, Config config) {
         this.roadPricingScheme = null;
-        this.parameters = parameters;
-        this.originalTravelDisutilityFactory = originalTravelDisutilityFactory;
+        this.config = config ;
     }
 
     public SubpopRoadPricingModule(RoadPricingScheme roadPricingScheme) {
@@ -62,7 +64,8 @@ public class SubpopRoadPricingModule extends AbstractModule {
 
     @Override
     public void install() {
-        ConfigUtils.addOrGetModule(getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+    	log.info("installing SubpopRoadPricingModule");
+        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
         // This is not optimal yet. Modules should not need to have parameters.
         // But I am not quite sure yet how to best handle custom scenario elements. mz
         if (this.roadPricingScheme != null) {
@@ -71,19 +74,22 @@ public class SubpopRoadPricingModule extends AbstractModule {
             bind(RoadPricingScheme.class).toProvider(RoadPricingSchemeProvider.class).in(Singleton.class);
         }
         bind(RoadPricingInitializer.class).asEagerSingleton();
-        
+                                        
         // use ControlerDefaults configuration, replacing the TravelDisutility with a toll-dependent one
         install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
         //install(new AbstractModule() {
             @Override
             public void install() {
-                addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(
-                		new SubpopTravelDisutilityIncludingTollFactoryProvider(scenario, roadPricingScheme, originalTravelDisutilityFactory, parameters)).asEagerSingleton();
-                addTravelDisutilityFactoryBinding("taxi").toProvider(
-                		new SubpopTravelDisutilityIncludingTollFactoryProvider(scenario, roadPricingScheme, originalTravelDisutilityFactory, parameters)).asEagerSingleton();
+            //	addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(
+            //			new TravelDisutilityIncludingTollFactoryProvider(scenario, roadPricingScheme, parameters, config));
+            	
+            	addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(TravelDisutilityIncludingTollFactoryProvider.class);
+            	
+            	// we do not need taxi here as the customer does pay a fare not a toll!
             }
         }));
 
+        log.info("Adding SingaporeRoadPricingControlerListener");
         addControlerListenerBinding().to(SingaporeRoadPricingControlerListener.class);
 
         // add the events handler to calculate the tolls paid by agents
@@ -138,6 +144,35 @@ public class SubpopRoadPricingModule extends AbstractModule {
                 return rpsImpl;
             }
         }
-    }       
+    } 
+    
+    private static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
 
+        private final RoadPricingScheme scheme;
+        private final CharyparNagelScoringParametersForPerson parameters;
+        private final Config config;
+        
+        @Inject
+        TravelDisutilityIncludingTollFactoryProvider(RoadPricingScheme scheme, CharyparNagelScoringParametersForPerson parameters, Config config) {
+            this.scheme = scheme;
+            this.parameters = parameters;
+            this.config = config;
+        }
+
+        @Override
+        public TravelDisutilityFactory get() {
+        	
+            RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, 
+            		RoadPricingConfigGroup.GROUP_NAME, 
+            		RoadPricingConfigGroup.class);
+            
+            final TravelDisutilityFactory originalTravelDisutilityFactory = new SubpopTravelDisutilityFactory(parameters, TransportMode.car);
+            log.info("getting TravelDisutilityFactory");
+            
+            SubpopRoadPricingTravelDisutilityFactory travelDisutilityFactory = new SubpopRoadPricingTravelDisutilityFactory(
+                    originalTravelDisutilityFactory, scheme, parameters);
+            travelDisutilityFactory.setSigma(rpConfig.getRoutingRandomness());
+            return travelDisutilityFactory;
+        }
+    }
 }

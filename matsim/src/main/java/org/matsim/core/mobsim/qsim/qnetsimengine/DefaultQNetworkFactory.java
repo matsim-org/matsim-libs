@@ -31,6 +31,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -68,7 +69,7 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 	private Network network ;
 	private Scenario scenario ;
 	private NetsimEngineContext context;
-	private QNetsimEngine netsimEngine ;
+	private NetsimInternalInterface netsimEngine ;
 	@Inject
 	DefaultQNetworkFactory( QSimConfigGroup qsimConfig, EventsManager events, Network network, Scenario scenario ) {
 		this.qsimConfig = qsimConfig;
@@ -77,7 +78,7 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 		this.scenario = scenario;
 	}
 	@Override
-	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine1 ) {
+	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
 		this.netsimEngine = netsimEngine1;
 		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -95,7 +96,8 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
-	QNode createNetsimNode(final Node node, QNetwork qnetwork) {
-		return new QNode(node, qnetwork);
+	QNode createNetsimNode(final Node node) {
+		QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+		return builder.build( node ) ;
 	}
 }
