@@ -6,6 +6,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSModule;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -81,6 +84,28 @@ public class RunSingapore {
 		controler.setModules(rpModule);
 										
 		controler.addControlerListener(new SingaporeControlerListener());
+		
+		// Singapore transit router: --------------------------------------------------
+		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(
+				controler.getScenario().getPopulation(), 
+				controler.getScenario().getTransitSchedule(), 
+				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), 
+				(int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
+		controler.getEvents().addHandler(waitTimeCalculator);
+        
+		log.info("About to init StopStopTimeCalculator...");
+		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(
+				controler.getScenario().getTransitSchedule(), 
+				controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), 
+				(int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
+		controler.getEvents().addHandler(stopStopTimeCalculator);
+        log.info("About to init TransitRouterWSImplFactory...");
+        
+        controler.addOverridingModule(new TransitRouterEventsWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+        
+        // TODO: also take into account waiting times and stop times in scoring?!
+		// -----------------------------------------------------------------------------
+		
 		
 		controler.run();
 		log.info("finished SingaporeControlerRunner");
