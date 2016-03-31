@@ -25,7 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -47,7 +47,8 @@ public class RunRandomizingRouterExample {
 
 		Controler controler = new Controler( scenario ) ;
 
-		final Builder factory = new Builder( TransportMode.car, config.planCalcScore() );
+		final RandomizingTimeDistanceTravelDisutility.Builder factory = 
+				new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() );
 		factory.setSigma(3.) ; 	// this sets the routing randomness (currently between time and money only, so be careful
 								// that you have a monetary term in the standard disutility, e.g. a distance cost)
 		
