@@ -56,14 +56,21 @@ public class TripAnalyzerExtended {
 	private static final int binWidthSpeed_km_h = 1;
 
 	/* Input and output */
-	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + 
+//	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	private static final String networkFile = "../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+//	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration +
+//			"/" + runId + "." + usedIteration + ".events.xml.gz";
+	private static final String eventsFile = "../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration +
 			"/" + runId + "." + usedIteration + ".events.xml.gz";
-	private static final String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + 
+//	private static final String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" +
+//			cemdapPersonsInputFileId + "/persons1.dat";
+	private static final String cemdapPersonsInputFile = "../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" +
 			cemdapPersonsInputFileId + "/persons1.dat";
-	private static final String planningAreaShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
-	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
-	
+//	private static final String planningAreaShapeFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
+	private static final String planningAreaShapeFile = "../shared-svn/projects/cemdapMatsimCadyts/scenario/shapefiles/Berlin_DHDN_GK4.shp";
+//	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+	private static String outputDirectory = "../runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+
 	private static String gnuplotScriptName = "plot_rel_path_run.gnu";
 
 	/* Variables to store objects */
