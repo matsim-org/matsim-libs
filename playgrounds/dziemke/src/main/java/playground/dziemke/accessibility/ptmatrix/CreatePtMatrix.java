@@ -2,9 +2,7 @@ package playground.dziemke.accessibility.ptmatrix;
 
 
 import com.conveyal.gtfs.GTFSFeed;
-import com.conveyal.gtfs.model.Calendar;
 import com.conveyal.gtfs.model.Route;
-import com.conveyal.gtfs.model.Trip;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -25,8 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Class is deprecated in favor of the GTFS2MATsim "RunGTFS2MATSim" run-script in combination with
+ * the ThreadedMatrixCreator from dziemke's playground. These two in combination grant the same functionality.
  * @author gthunig on 25.02.16.
  */
+@Deprecated
 public class CreatePtMatrix {
 
     private static final Logger log = Logger.getLogger(CreatePtMatrix.class);
@@ -82,21 +83,6 @@ public class CreatePtMatrix {
                     log.warn("Unknown 'wrong' route_type. Value: " + route.route_type + "\nPlease add exception.");
                     break;
             }
-        }
-
-        for (Trip trip : feed.trips.values()) {
-            Calendar c = new Calendar();
-            c.service = trip.service;
-            c.monday = 1;
-            c.tuesday = 1;
-            c.wednesday = 1;
-            c.thursday = 1;
-            c.friday = 1;
-            c.saturday = 1;
-            c.sunday = 1;
-            c.start_date = 20160211;
-            c.end_date = 20161210;
-            trip.service.calendar = c;
         }
 
         GtfsConverter converter = new GtfsConverter(feed, scenario, ct );
