@@ -93,6 +93,7 @@ message Group {
     int32 subroom_id = 3;
     int32 number = 4;
     int32 router_id = 5;
+    int32 agent_parameter_id = 6;
     Coordinate min_x_y = 7;
     Coordinate max_x_y = 8;
 }
