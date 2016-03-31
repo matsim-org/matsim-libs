@@ -961,7 +961,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@StringSetter( "subpopulation" )
 		public void setSubpopulation(String subpopulation) {
 			//TODO: handle case of default subpopulation
-			if ( subpopulation != null ) {
+			if ( this.subpopulation != null ) {
 				throw new IllegalStateException( "cannot change subpopulation in a scoring parameter set, as it is used for indexing." );
 			}
 

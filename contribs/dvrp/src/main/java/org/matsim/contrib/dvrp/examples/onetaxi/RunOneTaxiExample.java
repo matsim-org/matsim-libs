@@ -20,70 +20,64 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.router.DynRoutingModule;
+import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
+import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.core.config.*;
+import org.matsim.core.controler.*;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 
 public class RunOneTaxiExample
 {
-    private final String dir;
-    private final String netFile;
-    private final String plansFile;
-    private final String vehiclesFile;
-    private final boolean otfVis;
+    public static final String MODE = "taxi";
+    private static final String ONE_TAXI_GROUP_NAME = "one_taxi";
+    private static final String TAXIS_FILE = "taxisFile";
 
 
-    public RunOneTaxiExample(boolean otfVis)
+    public static void run(boolean otfvis)
     {
-        this.otfVis = otfVis;
-
-        dir = "./src/main/resources/";
-        netFile = dir + "grid_network.xml";
-        plansFile = dir + "one_taxi/one_taxi_population.xml";
-        vehiclesFile = dir + "one_taxi/one_taxi_vehicles.xml";
+        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
+        run(configFile, otfvis);
     }
 
 
-    public void go()
+    public static void run(String configFile, boolean otfvis)
     {
-        MatsimVrpContextImpl context = new MatsimVrpContextImpl();
+        ConfigGroup oneTaxiCfg = new ConfigGroup(ONE_TAXI_GROUP_NAME) {};
+        Config config = ConfigUtils.loadConfig(configFile, new OTFVisConfigGroup(), oneTaxiCfg);
+        config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
+        config.checkConsistency();
 
-        Scenario scenario = VrpLauncherUtils.initScenario(netFile, plansFile);
-        context.setScenario(scenario);
+        Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        VrpData vrpData = VrpLauncherUtils.initVrpData(context, vehiclesFile);
-        context.setVrpData(vrpData);
+        final VrpData vrpData = new VrpDataImpl();
+        new VehicleReader(scenario.getNetwork(), vrpData).parse(oneTaxiCfg.getValue(TAXIS_FILE));
 
-        OneTaxiOptimizer optimizer = new OneTaxiOptimizer(context);
+        Controler controler = new Controler(scenario);
+        controler.addOverridingModule(new AbstractModule() {
+            public void install()
+            {
+                addRoutingModuleBinding(MODE).toInstance(new DynRoutingModule(MODE));
+                bind(VrpData.class).toInstance(vrpData);
+            }
+        });
+        controler.addOverridingModule(new DynQSimModule<>(OneTaxiQSimProvider.class));
 
-        QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
-        context.setMobsimTimer(qSim.getSimTimer());
-
-        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine("taxi",
-                new OneTaxiRequestCreator(), optimizer, context, qSim);
-
-        VrpLauncherUtils.initAgentSources(qSim, context, optimizer,
-                new OneTaxiActionCreator(passengerEngine, qSim.getSimTimer()));
-
-        EventsManager events = qSim.getEventsManager();
-
-        if (otfVis) { // OFTVis visualization
-            DynAgentLauncherUtils.runOTFVis(qSim, true, ColoringScheme.taxicab);
+        if (otfvis) {
+            controler.addOverridingModule(new OTFVisLiveModule());
         }
 
-        qSim.run();
-        events.finishProcessing();
+        controler.run();
     }
 
 
     public static void main(String... args)
     {
-        new RunOneTaxiExample(true).go();
+        run(true);
     }
 }

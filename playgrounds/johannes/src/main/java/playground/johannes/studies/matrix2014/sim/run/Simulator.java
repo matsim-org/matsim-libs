@@ -187,6 +187,7 @@ public class Simulator {
 
 //        GeoDistanceZoneDensityHamiltonian.build(this, config);
         GeoDistanceZoneHamiltonian2.build(this, config);
+        GeoDistanceTypeHamiltonian.build(this, config);
 //        GeoDistanceHamiltonian.build(this, config);
 //        GeoDistanceLAU2Hamiltonian.build(this, config);
 //        MeanDistanceHamiltonian.build(this, config);

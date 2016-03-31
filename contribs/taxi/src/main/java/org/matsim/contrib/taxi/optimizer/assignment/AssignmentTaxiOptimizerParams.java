@@ -62,11 +62,4 @@ public class AssignmentTaxiOptimizerParams
         nearestRequestsLimit = optimizerConfig.getInt(NEAREST_REQUESTS_LIMIT);
         nearestVehiclesLimit = optimizerConfig.getInt(NEAREST_VEHICLES_LIMIT);
     }
-
-
-    @Override
-    public AssignmentTaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext)
-    {
-        return new AssignmentTaxiOptimizer(optimContext);
-    }
 }

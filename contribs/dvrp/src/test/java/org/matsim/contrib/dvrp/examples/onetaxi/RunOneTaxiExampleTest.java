@@ -25,8 +25,8 @@ import org.junit.Test;
 public class RunOneTaxiExampleTest
 {
     @Test
-    public void testGo()
+    public void testRun()
     {
-        new RunOneTaxiExample(false).go();
+        RunOneTaxiExample.run(false);
     }
 }

@@ -12,17 +12,18 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.replanning.strategies.SelectBestPlanStrategyProvider;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.pt.PtConstants;
 
-import playground.singapore.springcalibration.run.SingaporeDistributions.DistributionClass;
+import playground.singapore.springcalibration.run.analysis.SingaporeDistributions;
+import playground.singapore.springcalibration.run.analysis.SingaporeDistributions.DistributionClass;
 
 public class SingaporeControlerListener implements StartupListener {
 	
 	private final static Logger log = Logger.getLogger(SingaporeControlerListener.class);
 	private String path = "/cluster/scratch/fouriep/calibration/input/20160225_0/validation/";
+	//private String path = "D:/Senozon/Models/FCL/inputdata/20160225_0/validation/";
 	private Population population;
 	public static String [] activities = {"home", "work", "leisure", "pudo", "personal", "primaryschool", "secondaryschool", "tertiaryschool", "foreignschool"};
 	public static String [] modes = {"car", "pt", "walk", "passenger", "taxi"}; // "other" removed
@@ -45,6 +46,7 @@ public class SingaporeControlerListener implements StartupListener {
 		
 		this.addDurationAnalyzers(controler);
 		this.addDistanceAnalyzers(controler);
+		log.info("Initialized SingaporeControlerListener");
 	}
 	
 	private void addDurationAnalyzers(MatsimServices controler) {

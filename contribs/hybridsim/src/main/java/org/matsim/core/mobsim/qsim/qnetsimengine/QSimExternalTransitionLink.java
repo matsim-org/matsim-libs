@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.hybridsim.simulation.ExternalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -42,8 +43,8 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	private final NetsimEngineContext context ;
 	private final QNode toQNode ;
 
-	QSimExternalTransitionLink(Link link, ExternalEngine e, NetsimEngineContext context, QNetsimEngine netsimEngine, QNode toQNode) {
-		super(link, toQNode, context, netsimEngine );
+	QSimExternalTransitionLink(Link link, ExternalEngine e, NetsimEngineContext context, NetsimInternalInterface netsimEngine, QNode toQNode) {
+		super(link, toQNode, context, netsimEngine);
 		this.e = e;
 		this.em = e.getEventsManager();
 		this.context = context ;

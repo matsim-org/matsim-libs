@@ -2,14 +2,19 @@ package playground.boescpa.ivtBaseline.preparation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
 
 import java.io.BufferedReader;
@@ -38,6 +43,9 @@ public class PreparationScript {
     protected static final String HOUSEHOLDS = File.separator + IVTConfigCreator.HOUSEHOLDS;
     protected static final String POPULATION = File.separator + IVTConfigCreator.POPULATION;
     protected static final String POPULATION_ATTRIBUTES = File.separator + IVTConfigCreator.POPULATION_ATTRIBUTES;
+	protected static final String FREIGHT_FACILITIES = File.separator + "freightFacilities.xml.gz";
+	protected static final String FREIGHT_POPULATION = File.separator + "freightPopulation.xml.gz";
+	protected static final String FREIGHT_POPULATION_ATTRIBUTES = File.separator + "freightPopulationAttributes.xml.gz";
     // RESOURCES
     protected static final String NETWORK = File.separator + IVTConfigCreator.NETWORK;
     protected static final String SCHEDULE = File.separator + IVTConfigCreator.SCHEDULE;
@@ -61,6 +69,9 @@ public class PreparationScript {
     private static String pathHouseholdAttributes;
     private static String pathPopulationAttributes;
     private static String pathHouseholds;
+	private static String pathFreightFacilities;
+	private static String pathFreightPopulation;
+	private static String pathFreightPopulationAttributes;
     private static String pathConfig;
     private static String pathLCConfig;
 
@@ -80,6 +91,7 @@ public class PreparationScript {
                 repairActivityChains();
                 setInitialFacilitiesForAllActivities();
                 createPrefsForPopulation();
+				mergeInSubpopulations();
                 createDefaultIVTConfig(prctScenario);
 				createIVTLCConfig(prctScenario);
                 // to finish the process copy all files together to the final scenario
@@ -89,7 +101,10 @@ public class PreparationScript {
             e.printStackTrace();
         } finally {
             try {
-                Files.deleteIfExists(Paths.get(tempFolder));
+				Files.delete(Paths.get(pathFreightFacilities));
+				Files.delete(Paths.get(pathFreightPopulation));
+				Files.delete(Paths.get(pathFreightPopulationAttributes));
+				Files.deleteIfExists(Paths.get(tempFolder));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -107,7 +122,7 @@ public class PreparationScript {
         Files.move(Paths.get(pathPopulation), Paths.get(pathScenario + POPULATION));
         Files.move(Paths.get(pathPopulationAttributes), Paths.get(pathScenario + POPULATION_ATTRIBUTES));
 
-        Files.copy(Paths.get(pathResources + NETWORK), Paths.get(pathScenario + NETWORK));
+		Files.copy(Paths.get(pathResources + NETWORK), Paths.get(pathScenario + NETWORK));
         Files.copy(Paths.get(pathResources + SCHEDULE), Paths.get(pathScenario + SCHEDULE));
         Files.copy(Paths.get(pathResources + VEHICLES), Paths.get(pathScenario + VEHICLES));
     }
@@ -131,6 +146,26 @@ public class PreparationScript {
         };
         IVTConfigCreator.main(args);
     }
+
+
+	private static void mergeInSubpopulations() {
+		log.info(" ------- Merge in the Freight Population ------- ");
+		// read the scenario population
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
+		plansReader.readFile(pathPopulation);
+		Population scenarioPopulation = scenario.getPopulation();
+		ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(scenarioPopulation.getPersonAttributes());
+		attributesReader.parse(pathPopulationAttributes);
+		// add the freight population to the scenario population
+		plansReader.readFile(pathFreightPopulation);
+		attributesReader.parse(pathFreightPopulationAttributes);
+		// write the new, merged population and its attributes:
+		PopulationWriter writer = new PopulationWriter(scenarioPopulation);
+		writer.write(pathPopulation);
+		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(scenarioPopulation.getPersonAttributes());
+		attributesWriter.writeFile(pathPopulationAttributes);
+	}
 
     private static void createPrefsForPopulation() {
         log.info(" ------- Create Prefs for Population ------- ");
@@ -226,10 +261,17 @@ public class PreparationScript {
         facilitiesReader = new MatsimFacilitiesReader(scenario);
         facilitiesReader.readFile(pathResources + SECONDARY_FACILITIES);
         ActivityFacilities secondaryFacilities = scenario.getActivityFacilities();
+		// load freight facilities:
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		facilitiesReader = new MatsimFacilitiesReader(scenario);
+		facilitiesReader.readFile(pathFreightFacilities);
+		ActivityFacilities freightFacilities = scenario.getActivityFacilities();
         // unify facilities:
-        ActivityFacilities mergedFacilities =
+        ActivityFacilities partiallyMergedFacilities =
                 new FacilityUnifier().uniteFacilitiesByMergingBintoA(scenarioFacilities, secondaryFacilities, null);
-        FacilitiesWriter facilitiesWriter = new FacilitiesWriter(mergedFacilities);
+		ActivityFacilities fullyMergedFacilities =
+				new FacilityUnifier().uniteFacilitiesByMergingBintoA(partiallyMergedFacilities, freightFacilities, null);
+		FacilitiesWriter facilitiesWriter = new FacilitiesWriter(fullyMergedFacilities);
         facilitiesWriter.write(pathFacilities);
     }
 
@@ -258,6 +300,9 @@ public class PreparationScript {
             Files.move(Paths.get(pathScenario + HOUSEHOLD_ATTRIBUTES), Paths.get(backupFolder + HOUSEHOLD_ATTRIBUTES));
             Files.move(Paths.get(pathScenario + POPULATION), Paths.get(backupFolder + POPULATION));
             Files.move(Paths.get(pathScenario + POPULATION_ATTRIBUTES), Paths.get(backupFolder + POPULATION_ATTRIBUTES));
+			Files.move(Paths.get(pathScenario + FREIGHT_FACILITIES), Paths.get(backupFolder + FREIGHT_FACILITIES));
+			Files.move(Paths.get(pathScenario + FREIGHT_POPULATION), Paths.get(backupFolder + FREIGHT_POPULATION));
+			Files.move(Paths.get(pathScenario + FREIGHT_POPULATION_ATTRIBUTES), Paths.get(backupFolder + FREIGHT_POPULATION_ATTRIBUTES));
 
             Files.createDirectory(Paths.get(tempFolder));
             pathFacilities = tempFolder + FACILITIES;
@@ -270,6 +315,12 @@ public class PreparationScript {
             Files.copy(Paths.get(backupFolder + POPULATION), Paths.get(pathPopulation));
             pathPopulationAttributes = tempFolder + POPULATION_ATTRIBUTES;
             Files.copy(Paths.get(backupFolder + POPULATION_ATTRIBUTES), Paths.get(pathPopulationAttributes));
+			pathFreightFacilities = tempFolder + FREIGHT_FACILITIES;
+			Files.copy(Paths.get(backupFolder + FREIGHT_FACILITIES), Paths.get(pathFreightFacilities));
+			pathFreightPopulation = tempFolder + FREIGHT_POPULATION;
+			Files.copy(Paths.get(backupFolder + FREIGHT_POPULATION), Paths.get(pathFreightPopulation));
+			pathFreightPopulationAttributes = tempFolder + FREIGHT_POPULATION_ATTRIBUTES;
+			Files.copy(Paths.get(backupFolder + FREIGHT_POPULATION_ATTRIBUTES), Paths.get(pathFreightPopulationAttributes));
 
             return true;
         } catch (NoSuchFileException e) {

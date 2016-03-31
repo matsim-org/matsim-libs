@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
+import playground.johannes.studies.matrix2014.analysis.HistogramComparator;
 import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
 import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonian;
 import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonianConfigurator;
@@ -52,7 +53,6 @@ public class GeoDistanceZoneHamiltonian2 {
 
     private static final Logger logger = Logger.getLogger(GeoDistanceZoneHamiltonian2.class);
 
-
     public static final String MODULE_NAME = "geoDistanceHamiltonian";
 
     public static final String PERSON_ZONE_IDX = "zoneIndex";
@@ -71,9 +71,9 @@ public class GeoDistanceZoneHamiltonian2 {
         borders.add(Double.MAX_VALUE);
         Discretizer discretizer = new FixedBordersDiscretizer(borders.toArray());
 
-        LegAttributeHistogramBuilder builder = new LegAttributeHistogramBuilder(CommonKeys.LEG_GEO_DISTANCE, discretizer);
-        builder.setPredicate(engine.getLegPredicate());
-        TDoubleDoubleMap refHist = builder.build(engine.getRefPersons());
+        LegAttributeHistogramBuilder refHistBuilder = new LegAttributeHistogramBuilder(CommonKeys.LEG_GEO_DISTANCE, discretizer);
+        refHistBuilder.setPredicate(engine.getLegPredicate());
+        TDoubleDoubleMap refHist = refHistBuilder.build(engine.getRefPersons());
         /*
         Index zones
          */
@@ -101,13 +101,13 @@ public class GeoDistanceZoneHamiltonian2 {
             /*
             Create and add the hamiltonian.
             */
-                builder = new LegAttributeHistogramBuilder(CommonKeys.LEG_GEO_DISTANCE, discretizer);
-                builder.setPredicate(PredicateAndComposite.create(
+                LegAttributeHistogramBuilder simHistBuilder = new LegAttributeHistogramBuilder(CommonKeys.LEG_GEO_DISTANCE, discretizer);
+                simHistBuilder.setPredicate(PredicateAndComposite.create(
                         engine.getLegPredicate(),
                         new LegPersonAttributePredicate(PERSON_ZONE_IDX, String.valueOf(i))));
                 UnivariatFrequency2 hamiltonian = new UnivariatFrequency2(
                         refHist,
-                        builder,
+                        simHistBuilder,
                         CommonKeys.LEG_GEO_DISTANCE,
                         discretizer,
                         engine.getUseWeights(),
@@ -149,6 +149,16 @@ public class GeoDistanceZoneHamiltonian2 {
                 engine.getLegPredicateName(),
                 writer);
         engine.getHamiltonianAnalyzers().addComponent(analyzer);
+
+//        refHistBuilder = new LegAttributeHistogramBuilder(CommonKeys.LEG_GEO_DISTANCE, discretizer);
+//        refHistBuilder.setPredicate(engine.getLegPredicate());
+
+        HistogramComparator comparator = new HistogramComparator(
+                refHist,
+                refHistBuilder,
+                String.format("%s.%s", CommonKeys.LEG_GEO_DISTANCE, engine.getLegPredicateName()));
+        comparator.setFileIoContext(engine.getIOContext());
+        engine.getHamiltonianAnalyzers().addComponent(comparator);
         /*
         Add a hamiltonian logger.
          */
@@ -246,6 +256,8 @@ public class GeoDistanceZoneHamiltonian2 {
 
         private double sum;
 
+        private Collection<CachedPerson> simPersons;
+
         public HamiltonianWrapper(List<UnivariatFrequency2> hamiltonians) {
             this.hamiltonians = hamiltonians;
         }
@@ -259,9 +271,9 @@ public class GeoDistanceZoneHamiltonian2 {
 
                 if (this.dataKey.equals(dataKey)) {
                     UnivariatFrequency2 uf = getHamiltonian(element);
-                    double h = uf.evaluate(null);
+                    double h = uf.evaluate(simPersons);
                     uf.onChange(dataKey, oldValue, newValue, element);
-                    double h2 = uf.evaluate(null);
+                    double h2 = uf.evaluate(simPersons);
 
                     sum += (h2 - h);
                 }
@@ -271,6 +283,7 @@ public class GeoDistanceZoneHamiltonian2 {
         @Override
         public double evaluate(Collection<CachedPerson> population) {
             if(!isInitialized) {
+                simPersons = population;
                 logger.info("Initializing hamiltonians...");
                 ProgressLogger.init(hamiltonians.size(), 2, 10);
                 sum = 0;

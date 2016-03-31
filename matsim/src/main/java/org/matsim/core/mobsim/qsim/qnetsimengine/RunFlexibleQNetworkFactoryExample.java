@@ -32,6 +32,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -50,9 +51,9 @@ public class RunFlexibleQNetworkFactoryExample {
 		@Inject private QSimConfigGroup qsimConfig ;
 
 		private NetsimEngineContext context;
-		private QNetsimEngine netsimEngine;
+		private NetsimInternalInterface netsimEngine;
 
-		@Override void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine1) {
+		@Override void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
 			double effectiveCellSize = ((NetworkImpl)network).getEffectiveCellSize() ;
 			
 			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -67,8 +68,9 @@ public class RunFlexibleQNetworkFactoryExample {
 			
 			this.netsimEngine = netsimEngine1 ;
 		}
-		@Override QNode createNetsimNode(Node node, QNetwork qnetwork) {
-			return new QNode( node, qnetwork ) ; // yyyyyy I would like to get rid of network here.  kai, mar'16
+		@Override QNode createNetsimNode(Node node) { // yyyyyy would like to get rid of network here. kai, mar'16
+			QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+			return builder.build( node ) ;
 			
 		}
 		@Override QLinkI createNetsimLink(Link link, QNode queueNode) {

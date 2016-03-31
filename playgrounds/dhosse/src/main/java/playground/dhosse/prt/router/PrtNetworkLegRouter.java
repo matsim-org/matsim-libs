@@ -3,8 +3,7 @@ package playground.dhosse.prt.router;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.pt.router.TransitRouter;
 
 public class PrtNetworkLegRouter implements TransitRouter{

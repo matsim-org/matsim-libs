@@ -30,12 +30,4 @@ public class FifoTaxiOptimizerParams
     {
         super(optimizerConfig);
     }
-
-
-    @Override
-    public FifoTaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext)
-    {
-        return new FifoTaxiOptimizer(optimContext);
-    }
-
 }

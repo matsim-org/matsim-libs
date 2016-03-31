@@ -23,12 +23,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.zone.*;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.utils.io.tabularFileParser.*;
 
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
@@ -38,8 +35,8 @@ import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
  */
 public class LinesUtils {
 
-	public static LineDispatcher createLineDispatcher(String linesFile, String zonesXml, String zonesShp, MatsimVrpContext context, final TaxibusConfigGroup tbcg){
-		final LineDispatcher dispatcher = new LineDispatcher(context,tbcg);
+	public static LineDispatcher createLineDispatcher(String linesFile, String zonesXml, String zonesShp, VrpData vrpData, final TaxibusConfigGroup tbcg){
+		final LineDispatcher dispatcher = new LineDispatcher(vrpData,tbcg);
 		final Map<Id<Zone>,Zone> zones = Zones.readZones(zonesXml, zonesShp);
 		
 		TabularFileParserConfig config = new TabularFileParserConfig();

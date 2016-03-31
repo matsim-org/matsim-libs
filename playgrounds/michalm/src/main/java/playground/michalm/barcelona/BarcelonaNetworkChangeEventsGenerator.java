@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkChangeEvent.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -75,7 +75,7 @@ public class BarcelonaNetworkChangeEventsGenerator
         String networkFile = dir + "network/barcelona_network.xml";
         String changeEventsFile = dir + "network/barcelona_change_events.xml";
 
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
         BarcelonaNetworkChangeEventsGenerator gen = new BarcelonaNetworkChangeEventsGenerator(
                 scenario.getNetwork());

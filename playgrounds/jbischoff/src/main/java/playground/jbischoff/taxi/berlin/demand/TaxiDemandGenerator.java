@@ -22,7 +22,7 @@ package playground.jbischoff.taxi.berlin.demand;
 import java.util.Map;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.taxi.TaxiUtils;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -77,7 +77,7 @@ public class TaxiDemandGenerator
             Matrix matrix = this.matrices.getMatrix(currentHr);
             int currentHour = getHour(currentHr);
             double startTime = dayOffset*24*3600 + currentHour*3600; 
-            odd.generateSinglePeriod(matrix, "departure", "arrival", TaxiUtils.TAXI_MODE, startTime, 3600, i);
+            odd.generateSinglePeriod(matrix, "departure", "arrival", TaxiModule.TAXI_MODE, startTime, 3600, i);
             if (currentHour == 23) dayOffset = 1; 
             currentHr = getNextTimeString(currentHr);
         }

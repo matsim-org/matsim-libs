@@ -26,12 +26,12 @@ import com.google.common.base.Predicate;
 
 public class TaxiSchedulerUtils
 {
-    public static Predicate<Vehicle> createIsIdle(final TaxiScheduler scheduler)
+    public static Predicate<Vehicle> createIsIdle(final TaxiScheduleInquiry scheduleInquiry)
     {
         return new Predicate<Vehicle>() {
             public boolean apply(Vehicle vehicle)
             {
-                return scheduler.isIdle(vehicle);
+                return scheduleInquiry.isIdle(vehicle);
             }
         };
     }

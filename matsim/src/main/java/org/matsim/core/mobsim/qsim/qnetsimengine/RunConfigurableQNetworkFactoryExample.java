@@ -19,7 +19,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -35,15 +34,6 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RunConfigurableQNetworkFactoryExample {
 
-	public static class MyFactoryProvider implements Provider<QNetworkFactory> {
-		@Inject private EventsManager events ;
-		@Inject private Scenario scenario ;
-		@Override public QNetworkFactory get() {
-			ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
-			factory.setLinkSpeedCalculator(null); // fill with something reasonable
-			return factory ;
-		}
-	}
 
 	/**
 	 * @param args
@@ -52,13 +42,18 @@ public class RunConfigurableQNetworkFactoryExample {
 
 		Config config = ConfigUtils.createConfig() ;
 		
-		Scenario scenario = ScenarioUtils.createScenario( config ) ;
+		final Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		
 		Controler controler = new Controler( scenario ) ;
 		
 		controler.addOverridingModule( new AbstractModule(){
+			@Inject private EventsManager events ;
 			@Override public void install() {
-				bind( QNetworkFactory.class ).toProvider( MyFactoryProvider.class ) ;
+				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
+				factory.setLinkSpeedCalculator(null); // fill with something reasonable
+				bind( QNetworkFactory.class ).toInstance( factory ) ;
+				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring 
+				// it in every iteration via the initializeFactory(...) method. kai, mar'16 
 			}
 		});
 		

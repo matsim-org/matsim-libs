@@ -25,7 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -34,9 +34,9 @@ public class RunVehicleCount
     public static void main(String[] args)
         throws IOException
     {
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         VrpData data = new VrpDataImpl();
-        VehicleReader reader = new VehicleReader(scenario, data);
+        VehicleReader reader = new VehicleReader(scenario.getNetwork(), data);
         reader.parse(
                 "d:/svn-vsp/sustainability-w-michal-and-dlr/data/scenarios/2015_02_strike/taxis.xml0.0.xml");
 

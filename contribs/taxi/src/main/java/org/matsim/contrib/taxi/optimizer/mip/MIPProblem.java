@@ -142,7 +142,7 @@ public class MIPProblem
     {
         initialSolution = new MIPSolutionFinder(optimContext, rData, vData).findInitialSolution();
 
-        stats = new MIPTaxiStats(optimContext.context.getVrpData());
+        stats = new MIPTaxiStats(optimContext.taxiData);
         stats.calcInitial();
 
         optimContext.scheduler.removeAwaitingRequestsFromAllSchedules();

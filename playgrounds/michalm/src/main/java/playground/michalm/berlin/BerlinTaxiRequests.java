@@ -24,9 +24,10 @@ import java.util.Map;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dvrp.run.*;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -39,10 +40,11 @@ public class BerlinTaxiRequests
 
     public static void filterRequestsWithinBerlin(String allPlansFile, String berlinPlansFile)
     {
-        Scenario berlinBrbScenario = VrpLauncherUtils.initScenario(BERLIN_BRB_NET_FILE,
-                DIR + allPlansFile);
+        Scenario berlinBrbScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        new MatsimNetworkReader(berlinBrbScenario.getNetwork()).readFile(BERLIN_BRB_NET_FILE);
+        new MatsimPopulationReader(berlinBrbScenario).readFile(DIR + allPlansFile);
 
-        Scenario onlyBerlinScenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario onlyBerlinScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(onlyBerlinScenario.getNetwork()).readFile(ONLY_BERLIN_NET_FILE);
         Population onlyBerlinPop = PopulationUtils.createPopulation(onlyBerlinScenario.getConfig(),
                 onlyBerlinScenario.getNetwork());

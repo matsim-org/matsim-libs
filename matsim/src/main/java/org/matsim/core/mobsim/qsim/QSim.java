@@ -528,11 +528,6 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return this.simTimer;
 	}
 
-	/*package*/ MobsimEngine getNetsimEngine() {
-		// For a test
-		return this.netEngine;
-	}
-
 	public void addMobsimEngine(MobsimEngine mobsimEngine) {
 		if (mobsimEngine instanceof TransitQSimEngine) {
 			if (this.transitEngine != null) {
