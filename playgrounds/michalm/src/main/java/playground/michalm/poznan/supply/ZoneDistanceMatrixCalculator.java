@@ -22,9 +22,9 @@ package playground.michalm.poznan.supply;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.contrib.util.distance.*;
 import org.matsim.contrib.zone.*;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrix;
@@ -61,7 +61,7 @@ public class ZoneDistanceMatrixCalculator
                 ChargerLocations.createLocation(12, 630740.137462418, 5806467.83836639, 0) //
         };
 
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
         DistanceCalculator calculator = DistanceCalculators.//
@@ -71,7 +71,7 @@ public class ZoneDistanceMatrixCalculator
         //        crateFreespeedDistanceCalculator(scenario.getNetwork());
         //        matrixFile += "shortest_";
 
-        crateFreespeedTimeCalculator(scenario.getNetwork());
+                crateFreespeedTimeCalculator(scenario.getNetwork());
         matrixFile += "fastest_";
 
         Map<Id<Zone>, Zone> zones = Zones.readZones(zonesXmlFile, zonesShpFile);

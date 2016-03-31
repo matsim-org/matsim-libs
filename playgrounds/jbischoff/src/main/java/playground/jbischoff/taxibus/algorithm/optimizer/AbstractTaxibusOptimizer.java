@@ -39,7 +39,7 @@ import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTask.TaxibusTaskT
 public abstract class AbstractTaxibusOptimizer
     implements TaxibusOptimizer
 {
-    protected final TaxibusOptimizerConfiguration optimConfig;
+    protected final TaxibusOptimizerContext optimContext;
     protected final Collection<TaxibusRequest> unplannedRequests;
 
     private final boolean doUnscheduleAwaitingRequests;//PLANNED or TAXI_DISPATCHED
@@ -49,15 +49,15 @@ public abstract class AbstractTaxibusOptimizer
     protected boolean requiresReoptimization = false;
 
 
-    public AbstractTaxibusOptimizer(TaxibusOptimizerConfiguration optimConfig,
+    public AbstractTaxibusOptimizer(TaxibusOptimizerContext optimContext,
              boolean doUnscheduleAwaitingRequests)
     {
-        this.optimConfig = optimConfig;
+        this.optimContext = optimContext;
         this.unplannedRequests = new TreeSet<TaxibusRequest>(Requests.ABSOLUTE_COMPARATOR);
        	this.doUnscheduleAwaitingRequests=doUnscheduleAwaitingRequests;
 
-        destinationKnown = optimConfig.scheduler.getParams().destinationKnown;
-        vehicleDiversion = optimConfig.scheduler.getParams().vehicleDiversion;
+        destinationKnown = optimContext.scheduler.getParams().destinationKnown;
+        vehicleDiversion = optimContext.scheduler.getParams().vehicleDiversion;
     }
 
 
@@ -72,8 +72,8 @@ public abstract class AbstractTaxibusOptimizer
                 unscheduleAwaitingRequests();
             }
 
-            for (Vehicle v : optimConfig.context.getVrpData().getVehicles().values()) {
-                optimConfig.scheduler.updateTimeline((Schedule<TaxibusTask>) v.getSchedule());
+            for (Vehicle v : optimContext.vrpData.getVehicles().values()) {
+                optimContext.scheduler.updateTimeline((Schedule<TaxibusTask>) v.getSchedule());
             }
             if (e.getSimulationTime() % 60 == 0){
             scheduleUnplannedRequests();
@@ -89,7 +89,7 @@ public abstract class AbstractTaxibusOptimizer
 
     protected void unscheduleAwaitingRequests()
     {
-        List<TaxibusRequest> removedRequests = optimConfig.scheduler
+        List<TaxibusRequest> removedRequests = optimContext.scheduler
                 .removeAwaitingRequestsFromAllSchedules();
         unplannedRequests.addAll(removedRequests);
     }
@@ -100,7 +100,7 @@ public abstract class AbstractTaxibusOptimizer
     
     protected void handleAimlessDriveTasks()
     {
-        optimConfig.scheduler.stopAllAimlessDriveTasks();
+        optimContext.scheduler.stopAllAimlessDriveTasks();
     }
     
 
@@ -116,7 +116,7 @@ public abstract class AbstractTaxibusOptimizer
     public void nextTask(Schedule<? extends Task> schedule)
     {
         Schedule<TaxibusTask> taxiSchedule = (Schedule<TaxibusTask>) schedule;
-        optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
+        optimContext.scheduler.updateBeforeNextTask(taxiSchedule);
 
         TaxibusTask newCurrentTask = taxiSchedule.nextTask();
 
@@ -136,7 +136,7 @@ public abstract class AbstractTaxibusOptimizer
     @Override
     public void nextLinkEntered(DriveTask driveTask)
     {
-        optimConfig.scheduler.updateTimeline((Schedule<TaxibusTask>) driveTask.getSchedule());
+        optimContext.scheduler.updateTimeline((Schedule<TaxibusTask>) driveTask.getSchedule());
 
         //TODO we may here possibly decide whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}

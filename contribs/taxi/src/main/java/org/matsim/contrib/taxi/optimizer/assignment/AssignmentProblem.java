@@ -29,7 +29,7 @@ import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.filter.*;
-import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
+import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -51,18 +51,19 @@ public class AssignmentProblem
     private AssignmentRequestData rData;
 
 
-    public AssignmentProblem(TaxiOptimizerContext optimContext, MultiNodeDijkstra router,
+    public AssignmentProblem(TaxiOptimizerContext optimContext,
+            AssignmentTaxiOptimizerParams params, MultiNodeDijkstra router,
             BackwardFastMultiNodeDijkstra backwardRouter)
     {
         this.optimContext = optimContext;
-        this.params = (AssignmentTaxiOptimizerParams)optimContext.optimizerParams;
+        this.params = params;
         this.router = router;
+        this.backwardRouter = backwardRouter;
+
         this.requestFilter = new KStraightLineNearestRequestFilter(optimContext.scheduler,
                 params.nearestRequestsLimit);
         this.vehicleFilter = new KStraightLineNearestVehicleDepartureFilter(
                 params.nearestVehiclesLimit);
-
-        this.backwardRouter = backwardRouter;
     }
 
 
@@ -84,9 +85,8 @@ public class AssignmentProblem
             return false;
         }
 
-        int idleVehs = Iterables
-                .size(Iterables.filter(optimContext.context.getVrpData().getVehicles().values(),
-                        TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
+        int idleVehs = Iterables.size(Iterables.filter(optimContext.taxiData.getVehicles().values(),
+                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
 
         if (idleVehs < rData.urgentReqCount) {
             vData = new VehicleData(optimContext, params.vehPlanningHorizonUndersupply);
@@ -196,7 +196,7 @@ public class AssignmentProblem
     //TODO does not support adv reqs
     private void calcPathsForRequests(RequestPathData[][] pathDataMatrix)
     {
-        double currTime = optimContext.context.getTime();
+        double currTime = optimContext.timer.getTimeOfDay();
 
         for (int r = 0; r < rData.dimension; r++) {
             TaxiRequest req = rData.requests.get(r);

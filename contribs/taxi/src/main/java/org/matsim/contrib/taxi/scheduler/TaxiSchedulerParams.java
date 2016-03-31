@@ -19,16 +19,11 @@
 
 package org.matsim.contrib.taxi.scheduler;
 
-import org.apache.commons.configuration.Configuration;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+
 
 public class TaxiSchedulerParams
 {
-    public static final String DESTINATION_KNOWN = "destinationKnown";
-    public static final String VEHICLE_DIVERSION = "vehicleDiversion";
-    public static final String PICKUP_DURATION = "pickupDuration";
-    public static final String DROPOFF_DURATION = "dropoffDuration";
-    public static final String A_STAR_EUCLIDEAN_OVERDO_FACTOR = "AStarEuclideanOverdoFactor";
-
     public final boolean destinationKnown;
     public final boolean vehicleDiversion;
     public final double pickupDuration;
@@ -36,13 +31,13 @@ public class TaxiSchedulerParams
     public final double AStarEuclideanOverdoFactor;
 
 
-    public TaxiSchedulerParams(Configuration config)
+    public TaxiSchedulerParams(TaxiConfigGroup taxiCfg)
     {
-        this.destinationKnown = config.getBoolean(DESTINATION_KNOWN);
-        this.vehicleDiversion = config.getBoolean(VEHICLE_DIVERSION);
-        this.pickupDuration = config.getDouble(PICKUP_DURATION);
-        this.dropoffDuration = config.getDouble(DROPOFF_DURATION);
-        this.AStarEuclideanOverdoFactor = config.getDouble(A_STAR_EUCLIDEAN_OVERDO_FACTOR, 1.);
+        this.destinationKnown = taxiCfg.isDestinationKnown();
+        this.vehicleDiversion = taxiCfg.isVehicleDiversion();
+        this.pickupDuration = taxiCfg.getPickupDuration();
+        this.dropoffDuration = taxiCfg.getDropoffDuration();
+        this.AStarEuclideanOverdoFactor = taxiCfg.getAStarEuclideanOverdoFactor();
     }
 
 

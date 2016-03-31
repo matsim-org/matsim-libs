@@ -44,7 +44,8 @@ public abstract class AbstractTaxiOptimizer
 
 
     public AbstractTaxiOptimizer(TaxiOptimizerContext optimContext,
-            Collection<TaxiRequest> unplannedRequests, boolean doUnscheduleAwaitingRequests)
+            AbstractTaxiOptimizerParams params, Collection<TaxiRequest> unplannedRequests,
+            boolean doUnscheduleAwaitingRequests)
     {
         this.optimContext = optimContext;
         this.unplannedRequests = unplannedRequests;
@@ -52,7 +53,7 @@ public abstract class AbstractTaxiOptimizer
 
         destinationKnown = optimContext.scheduler.getParams().destinationKnown;
         vehicleDiversion = optimContext.scheduler.getParams().vehicleDiversion;
-        reoptimizationTimeStep = optimContext.optimizerParams.reoptimizationTimeStep;
+        reoptimizationTimeStep = params.reoptimizationTimeStep;
     }
 
 
@@ -68,7 +69,7 @@ public abstract class AbstractTaxiOptimizer
             //TODO (2) update timeline only if the algo really wants to reschedule in this time step,
             //perhaps by checking if there are any unplanned requests??
             if (doUnscheduleAwaitingRequests) {
-                for (Vehicle v : optimContext.context.getVrpData().getVehicles().values()) {
+                for (Vehicle v : optimContext.taxiData.getVehicles().values()) {
                     optimContext.scheduler
                             .updateTimeline(TaxiSchedules.asTaxiSchedule(v.getSchedule()));
                 }
@@ -138,12 +139,5 @@ public abstract class AbstractTaxiOptimizer
 
         //TODO we may here possibly decide whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}
-    }
-
-
-    @Override
-    public TaxiOptimizerContext getOptimizerContext()
-    {
-        return optimContext;
     }
 }

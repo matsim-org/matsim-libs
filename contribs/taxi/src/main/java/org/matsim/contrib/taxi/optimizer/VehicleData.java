@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 
 
 public class VehicleData
@@ -63,18 +63,18 @@ public class VehicleData
     //skipping vehicles with departure.time > curr_time + maxDepartureDelay
     public VehicleData(TaxiOptimizerContext optimContext, double planningHorizon)
     {
-        double currTime = optimContext.context.getTime();
+        double currTime = optimContext.timer.getTimeOfDay();
         double maxDepartureTime = currTime + planningHorizon;
-        TaxiScheduler scheduler = optimContext.scheduler;
+        TaxiScheduleInquiry scheduleInquiry = optimContext.scheduler;
 
         int idx = 0;
         int idleCounter = 0;
-        for (Vehicle v : optimContext.context.getVrpData().getVehicles().values()) {
-            LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(v);
+        for (Vehicle v : optimContext.taxiData.getVehicles().values()) {
+            LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(v);
 
             if (departure != null && departure.time <= maxDepartureTime) {
                 boolean idle = departure.time == currTime //(small optimization to avoid unnecessary calls to Scheduler.isIdle())
-                        && scheduler.isIdle(v);
+                        && scheduleInquiry.isIdle(v);
 
                 entries.add(new Entry(idx++, v, departure, idle));
 

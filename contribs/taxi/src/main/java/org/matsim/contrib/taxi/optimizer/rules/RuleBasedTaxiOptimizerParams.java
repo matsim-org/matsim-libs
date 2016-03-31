@@ -53,12 +53,4 @@ public class RuleBasedTaxiOptimizerParams
 
         cellSize = optimizerConfig.getDouble(CELL_SIZE);//1000 m tested for Berlin
     }
-
-
-    @Override
-    public RuleBasedTaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext)
-    {
-        return new RuleBasedTaxiOptimizer(optimContext);
-    }
-
 }

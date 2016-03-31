@@ -23,10 +23,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
@@ -38,29 +37,31 @@ import org.matsim.core.mobsim.qsim.interfaces.*;
 public class PassengerEngine
     implements MobsimEngine, DepartureHandler
 {
-    protected final String mode;
+    private final String mode;
 
     private EventsManager eventsManager;
-    protected InternalInterface internalInterface;
-    protected final MatsimVrpContext context;
-    protected final PassengerRequestCreator requestCreator;
-    protected final VrpOptimizer optimizer;
+    private InternalInterface internalInterface;
+    private final PassengerRequestCreator requestCreator;
+    private final VrpOptimizer optimizer;
+    private final VrpData vrpData;
+    private final Network network;
 
-    protected final AdvanceRequestStorage advanceRequestStorage;
-    protected final AwaitingPickupStorage awaitingPickupStorage;
+    private final AdvanceRequestStorage advanceRequestStorage;
+    private final AwaitingPickupStorage awaitingPickupStorage;
 
 
     public PassengerEngine(String mode, EventsManager eventsManager,
-            PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
-            MatsimVrpContext context)
+            PassengerRequestCreator requestCreator, VrpOptimizer optimizer, VrpData vrpData,
+            Network network)
     {
         this.mode = mode;
         this.eventsManager = eventsManager;
         this.requestCreator = requestCreator;
         this.optimizer = optimizer;
-        this.context = context;
+        this.vrpData = vrpData;
+        this.network = network;
 
-        advanceRequestStorage = new AdvanceRequestStorage(context);
+        advanceRequestStorage = new AdvanceRequestStorage();
         awaitingPickupStorage = new AwaitingPickupStorage();
     }
 
@@ -96,28 +97,13 @@ public class PassengerEngine
     /**
      * This is to register an advance booking. The method is called when, in reality, the request is
      * made.
-     * 
-     * @param now -- time when trip is booked
-     * @param passenger
-     * @param leg -- contains information about the departure time. yyyy Michal, Joschka, note that
-     *        in MATSim leg departure times may be meaningless; the only thing that truly matters is
-     *        the activity end time. Is your code defensive against that? kai, jul'14 I (jb) only
-     *        use this functionality after I explicitly set the Leg departure time (aug '15)
-     * @return
      */
-    public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Leg leg)
+    public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId,
+            Id<Link> toLinkId, double departureTime)
     {
-        if (!leg.getMode().equals(mode)) {
-            return false;
-        }
-
-        if (leg.getDepartureTime() <= now) {
+        if (departureTime <= now) {
             throw new IllegalStateException("This is not a call ahead");
         }
-
-        Id<Link> fromLinkId = leg.getRoute().getStartLinkId();
-        Id<Link> toLinkId = leg.getRoute().getEndLinkId();
-        double departureTime = leg.getDepartureTime();
 
         PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime,
                 now);
@@ -146,7 +132,7 @@ public class PassengerEngine
         internalInterface.registerAdditionalAgentOnLink(passenger);
 
         PassengerRequest request = advanceRequestStorage.retrieveAdvanceRequest(passenger,
-                fromLinkId, toLinkId);
+                fromLinkId, toLinkId, now);
 
         if (request == null) {//this is an immediate request
             request = createRequest(passenger, fromLinkId, toLinkId, departureTime, now);
@@ -170,17 +156,17 @@ public class PassengerEngine
     private int nextId = 0;
 
 
-    protected PassengerRequest createRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,
+    private PassengerRequest createRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,
             Id<Link> toLinkId, double departureTime, double now)
     {
-        Map<Id<Link>, ? extends Link> links = context.getScenario().getNetwork().getLinks();
+        Map<Id<Link>, ? extends Link> links = network.getLinks();
         Link fromLink = links.get(fromLinkId);
         Link toLink = links.get(toLinkId);
         Id<Request> id = Id.create(mode + "_" + nextId++, Request.class);
 
         PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink,
                 departureTime, departureTime, now);
-        context.getVrpData().addRequest(request);
+        vrpData.addRequest(request);
         return request;
     }
 

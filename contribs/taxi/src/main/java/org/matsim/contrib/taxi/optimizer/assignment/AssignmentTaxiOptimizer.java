@@ -32,20 +32,24 @@ import org.matsim.core.router.util.RoutingNetwork;
 public class AssignmentTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
+    private final AssignmentTaxiOptimizerParams params;
     private final MultiNodeDijkstra router;
     private final BackwardFastMultiNodeDijkstra backwardRouter;
 
 
-    public AssignmentTaxiOptimizer(TaxiOptimizerContext optimContext)
+    public AssignmentTaxiOptimizer(TaxiOptimizerContext optimContext,
+            AssignmentTaxiOptimizerParams params)
     {
-        super(optimContext, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
+        super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
 
-        router = new MultiNodeDijkstra(optimContext.context.getScenario().getNetwork(),
+        this.params = params;
+
+        router = new MultiNodeDijkstra(optimContext.scenario.getNetwork(),
                 optimContext.travelDisutility, optimContext.travelTime, true);
 
         FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
         RoutingNetwork routingNetwork = new InverseArrayRoutingNetworkFactory(null)
-                .createRoutingNetwork(optimContext.context.getScenario().getNetwork());
+                .createRoutingNetwork(optimContext.scenario.getNetwork());
         backwardRouter = new BackwardFastMultiNodeDijkstra(routingNetwork,
                 optimContext.travelDisutility, optimContext.travelTime, null, fastRouterFactory,
                 true);
@@ -54,7 +58,7 @@ public class AssignmentTaxiOptimizer
 
     protected void scheduleUnplannedRequests()
     {
-        new AssignmentProblem(optimContext, router, backwardRouter)
+        new AssignmentProblem(optimContext, params, router, backwardRouter)
                 .scheduleUnplannedRequests((SortedSet<TaxiRequest>)unplannedRequests);
     }
 }

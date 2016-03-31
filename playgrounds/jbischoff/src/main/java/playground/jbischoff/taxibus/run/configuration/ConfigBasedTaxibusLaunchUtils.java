@@ -19,25 +19,20 @@
  * *********************************************************************** */
 package playground.jbischoff.taxibus.run.configuration;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.core.controler.*;
 
-import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
-import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LinesUtils;
+import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.*;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
-import playground.jbischoff.taxibus.run.sim.TaxibusQSimProvider;
-import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
+import playground.jbischoff.taxibus.run.sim.*;
 
 /**
  * @author jbischoff
  *
  */
 public class ConfigBasedTaxibusLaunchUtils {
-		private MatsimVrpContextImpl context;
 		private Controler controler;
 		
 		
@@ -51,19 +46,14 @@ public class ConfigBasedTaxibusLaunchUtils {
 	public  void initiateTaxibusses(){
 		//this is done exactly once per simulation
 		
-		
-		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) controler.getScenario().getConfig().getModule("taxibusConfig");
-      	context = new MatsimVrpContextImpl();
-		context.setScenario(controler.getScenario());
-		VrpData vrpData = VrpLauncherUtils.initVrpData(context, tbcg.getVehiclesFile());
-		
-		final LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context,tbcg);	
+		Scenario scenario = controler.getScenario();
+		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) scenario.getConfig().getModule("taxibusConfig");
+        VrpData vrpData = new VrpDataImpl();
+        new VehicleReader(scenario.getNetwork(), vrpData).parse(tbcg.getVehiclesFile());
+
+		final LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),vrpData,tbcg);	
 		final TaxibusPassengerOrderManager orderManager = new TaxibusPassengerOrderManager();
 		
-		
-		
-		context.setVrpData(vrpData);	 
-           
 		controler.addOverridingModule(new AbstractModule() {
 			
 			@Override
@@ -74,7 +64,6 @@ public class ConfigBasedTaxibusLaunchUtils {
 				bindMobsim().toProvider(TaxibusQSimProvider.class);
 				addRoutingModuleBinding("taxibus").toInstance(new TaxibusServiceRoutingModule(controler));
 				bind(TaxibusPassengerOrderManager.class).toInstance(orderManager);
-				bind(MatsimVrpContext.class).toInstance(context);
 				bind(LineDispatcher.class).toInstance(dispatcher);
 
 			}
