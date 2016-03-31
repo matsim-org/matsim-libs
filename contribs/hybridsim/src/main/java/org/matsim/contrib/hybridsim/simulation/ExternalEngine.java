@@ -61,7 +61,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 		this.em = eventsManager;
 		this.sim = sim;
 		this.net = sim.getScenario().getNetwork();
-		this.client = new GRPCExternalClient("localhost", 8989);
+		this.client = new GRPCExternalClient("localhost", 9000);
 		this.sc = sim.getScenario();
 	}
 
@@ -211,6 +211,9 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 		HybridSimProto.Trajectories trs = this.client.getBlockingStub().receiveTrajectories(reqTr);
 		for (HybridSimProto.Trajectory tr : trs.getTrajectoriesList()) {
 			QVehicle veh = this.vehicles.get(tr.getId());
+			if (veh == null) {
+				System.out.println("Gotcha!");
+			}
 			Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 			if (veh.getDriver().chooseNextLinkId().toString().equals(tr.getLinkId())) {
 
@@ -243,9 +246,9 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 	@Override
 	public void onPrepareSim() {
 
-//		HybridSimProto.Scenario hsc = (HybridSimProto.Scenario) sc.getScenarioElement("hybrid_scenario");
+		HybridSimProto.Scenario hsc = (HybridSimProto.Scenario) sc.getScenarioElement("hybrid_scenario");
 
-//		this.client.getBlockingStub().initScenario(HybridSimProto.Scenario.getDefaultInstance());
+		this.client.getBlockingStub().initScenario(hsc);
 
 	}
 

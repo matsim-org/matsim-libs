@@ -17,6 +17,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.util.Providers;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -71,7 +72,7 @@ public class Example {
 		enrichConfig(c);
 		createNetwork(sc);
 		createPopulation(sc);
-//		createHybridsimScenario(sc); //enable for grpc_jps_as_a_service branch
+		createHybridsimScenario(sc); //enable for grpc_jps_as_a_service branch
 
 		final Controler controller = new Controler(sc);
 		controller.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -103,8 +104,11 @@ public class Example {
 
 	private static void createHybridsimScenario(Scenario sc) {
 		HybridSimProto.Scenario.Builder scb = HybridSimProto.Scenario.newBuilder();
+		scb.setSeed(42);
 		HybridSimProto.Environment.Builder eb = scb.getEnvironmentBuilder();
 		HybridSimProto.Room.Builder rb = eb.addRoomBuilder();
+
+
 		rb.setId(0);
 		rb.setCaption("hall");
 		HybridSimProto.Subroom.Builder srb = rb.addSubroomBuilder();
@@ -204,7 +208,7 @@ public class Example {
 			cb4.setX(113.35);
 			cb4.setY(109.35);
 			HybridSimProto.Coordinate.Builder cb5 = pb.addCoordinateBuilder();
-			cb5.setX(115.35);
+			cb5.setX(115.85);
 			cb5.setY(109.35);
 		}
 
@@ -256,7 +260,7 @@ public class Example {
 		HybridSimProto.Model.Builder mb = scb.getModelBuilder();
 		mb.setType(HybridSimProto.Model.Type.Gompertz);
 		HybridSimProto.Gompertz.Builder gb = mb.getGompertzBuilder();
-		gb.setSolver("eueler");
+		gb.setSolver("euler");
 		gb.setStepsize(0.01);
 		gb.setExitCrossingStrategy(3);
 		gb.setLinkedCellsEnabled(true);
@@ -265,34 +269,34 @@ public class Example {
 		pfb.setNu(3);
 		pfb.setB(0.25);
 		pfb.setC(3.0);
-		HybridSimProto.Force.Builder wfb = gb.getForcePedBuilder();
+		HybridSimProto.Force.Builder wfb = gb.getForceWallBuilder();
 		wfb.setNu(10);
 		wfb.setB(0.7);
 		wfb.setC(3.0);
-		HybridSimProto.Distribution.Builder v0b = gb.getV0Builder();
+
+		HybridSimProto.AgentParams.Builder ab = gb.getAgentParamsBuilder();
+		HybridSimProto.Distribution.Builder v0b = ab.getV0Builder();
 		v0b.setMu(0.5);
 		v0b.setSigma(0.0);
-		HybridSimProto.Distribution.Builder bmaxb = gb.getBMaxBuilder();
+		HybridSimProto.Distribution.Builder bmaxb = ab.getBMaxBuilder();
 		bmaxb.setMu(0.25);
 		bmaxb.setSigma(0.001);
-		HybridSimProto.Distribution.Builder bminb = gb.getBMinBuilder();
+		HybridSimProto.Distribution.Builder bminb = ab.getBMinBuilder();
 		bminb.setMu(0.2);
 		bminb.setSigma(0.001);
-		HybridSimProto.Distribution.Builder aminb = gb.getAMinBuilder();
+		HybridSimProto.Distribution.Builder aminb = ab.getAMinBuilder();
 		aminb.setMu(0.18);
 		aminb.setSigma(0.001);
-		HybridSimProto.Distribution.Builder taub = gb.getTauBuilder();
+		HybridSimProto.Distribution.Builder taub = ab.getTauBuilder();
 		taub.setMu(0.5);
 		taub.setSigma(0.001);
-		HybridSimProto.Distribution.Builder ataub = gb.getAtauBuilder();
+		HybridSimProto.Distribution.Builder ataub = ab.getAtauBuilder();
 		ataub.setMu(0.5);
 		ataub.setSigma(0.001);
-
 
 		HybridSimProto.Router.Builder roub = scb.addRouterBuilder();
 		roub.setRouterId(1);
 		roub.setDescription("global_shortest");
-
 
 		sc.addScenarioElement("hybrid_scenario",scb.build());
 
