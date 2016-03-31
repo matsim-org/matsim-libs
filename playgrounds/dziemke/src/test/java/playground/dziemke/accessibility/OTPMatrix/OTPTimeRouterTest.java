@@ -5,8 +5,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
-import org.opentripplanner.analyst.batch.Individual;
-import org.opentripplanner.analyst.batch.SyntheticRasterPopulation;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class OTPTimeRouterTest {
 
@@ -22,7 +21,7 @@ public class OTPTimeRouterTest {
     public MatsimTestUtils utils = new MatsimTestUtils();
 
     private static final Logger log = LoggerFactory.getLogger(OTPTimeRouterTest.class);
-    private static final double EPSILON = 1e-10;
+//    private static final double EPSILON = 1e-10;
 
     @Test
     public void testMatrixRouting() throws Exception {
