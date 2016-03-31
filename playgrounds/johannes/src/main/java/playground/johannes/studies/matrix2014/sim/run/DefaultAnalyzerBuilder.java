@@ -18,10 +18,13 @@
  * *********************************************************************** */
 package playground.johannes.studies.matrix2014.sim.run;
 
+import gnu.trove.list.array.TDoubleArrayList;
+import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.Config;
 import playground.johannes.studies.matrix2014.analysis.AnalyzerTaskGroup;
+import playground.johannes.studies.matrix2014.analysis.LegPurposeDistanceTask;
 import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
 import playground.johannes.studies.matrix2014.analysis.ZoneMobilityRate;
 import playground.johannes.synpop.analysis.*;
@@ -140,6 +143,26 @@ public class DefaultAnalyzerBuilder {
         trips per person
          */
         task.addComponent(new TripsPerPersonTask().build(engine.getIOContext()));
+        /*
+        leg purposes over distance
+         */
+        /*
+        Create the geo distance discretizer.
+         */
+        TDoubleArrayList borders = new TDoubleArrayList();
+        borders.add(-1);
+        for (int d = 2000; d < 10000; d += 2000) borders.add(d);
+        for (int d = 10000; d < 50000; d += 10000) borders.add(d);
+        for (int d = 50000; d < 500000; d += 50000) borders.add(d);
+        for (int d = 500000; d < 1000000; d += 100000) borders.add(d);
+        borders.add(Double.MAX_VALUE);
+        Discretizer discretizer = new FixedBordersDiscretizer(borders.toArray());
+
+        LegPurposeDistanceTask lpdTask = new LegPurposeDistanceTask();
+        lpdTask.setPredicate(engine.getLegPredicate());
+        lpdTask.setIoContext(engine.getIOContext());
+        lpdTask.setDiscretizer(discretizer);
+        task.addComponent(lpdTask);
 
     }
 }
