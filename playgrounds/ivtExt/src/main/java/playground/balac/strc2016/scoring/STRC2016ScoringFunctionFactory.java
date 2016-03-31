@@ -98,7 +98,7 @@ public class STRC2016ScoringFunctionFactory implements ScoringFunctionFactory{
 			
 			final Double travelingCarUtility = (-1.0) * 
 					(Double) personAttributes
-					.getAttribute(person.getId().toString(), "traveling_car" );
+					.getAttribute(person.getId().toString(), "traveling_car" ) / 3600.0;
 			
 			builder.setModeParameters("car",
 					new ModeUtilityParameters.Builder()
