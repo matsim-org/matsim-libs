@@ -85,7 +85,7 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 					if (nextPlanElement instanceof Leg) {
 						Leg leg = (Leg) nextPlanElement;
 						if (leg.getMode().equals(TaxibusUtils.TAXIBUS_MODE)) {
-							Double departureTime = mobsimAgent.getActivityEndTime();
+							double departureTime = mobsimAgent.getActivityEndTime();
 							if (departureTime < event.getTime())  {
 								departureTime = event.getTime() + 60;}
 //							System.out.println(Time.writeTime(event.getTime()));
@@ -109,17 +109,14 @@ public class TaxibusPassengerOrderManager implements ActivityStartEventHandler, 
 				Leg leg = (Leg) agent.getNextPlanElement();
 				if (leg.getMode().equals(TaxibusUtils.TAXIBUS_MODE)) {
 					// if (leg.getMode().equals("car")){
-					Double departureTime = mobsimAgent.getActivityEndTime();
+					double departureTime = mobsimAgent.getActivityEndTime();
 					prebookTaxiBusTrip(mobsimAgent, leg, departureTime);
 				}
 			}
 		}
 	}
 
-	private void prebookTaxiBusTrip(MobsimAgent mobsimAgent, Leg leg, Double departureTime) {
-		if (departureTime == null) {
-			throw new IllegalStateException("There is no Activity before the leg or the activity has no end time.");
-		}
+	private void prebookTaxiBusTrip(MobsimAgent mobsimAgent, Leg leg, double departureTime) {
 //		System.out.println("taxi trip booked for " + mobsimAgent.getId() +" at "+Time.writeTime(departureTime));
 		this.passengerEngine.prebookTrip(qSim.getSimTimer().getTimeOfDay(), (MobsimPassengerAgent) mobsimAgent,
 				leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), departureTime);

@@ -52,8 +52,7 @@ import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 import playground.jbischoff.taxibus.algorithm.TaxibusActionCreator;
-import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizer;
-import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerConfiguration;
+import playground.jbischoff.taxibus.algorithm.optimizer.*;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.FifoOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.MultipleFifoOptimizer;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
@@ -80,16 +79,15 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 	private TaxibusPassengerEngine passengerEngine;
 	private TaxibusPassengerOrderManager orderManager;
 	private TaxibusScheduler scheduler;
-	private TaxibusOptimizerConfiguration optimConfig;
+	private TaxibusOptimizerContext optimizerContext;
 	private TaxibusSchedulerParams params;
 	private TravelDisutility travelDisutility;
 
 	@Inject
-	TaxibusQSimProvider(Config config, MatsimVrpContext context, EventsManager events,
+	TaxibusQSimProvider(Config config, EventsManager events,
 			Map<String, TravelTime> travelTimes, LineDispatcher dispatcher, TaxibusPassengerOrderManager orderManager) {
 		this.dispatcher = dispatcher;
 		this.tbcg = (TaxibusConfigGroup) config.getModule("taxibusConfig");
-		this.context = (MatsimVrpContextImpl) context;
 		this.events = events;
 		this.travelTime = travelTimes.get("car");
 		this.orderManager = orderManager;
@@ -112,7 +110,6 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 		
 		qSim.addQueueSimulationListeners(optimizer);
 
-		context.setMobsimTimer(qSim.getSimTimer());
 
 		qSim.addMobsimEngine(passengerEngine);
 		qSim.addDepartureHandler(passengerEngine);
@@ -142,15 +139,15 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 
 		scheduler = new TaxibusScheduler(context, params);
 
-		optimConfig = new TaxibusOptimizerConfiguration(context, travelTime, travelDisutility, scheduler,
+		optimizerContext = new TaxibusOptimizerConfiguration(context, travelTime, travelDisutility, scheduler,
 				tbcg.getOutputDir(),tbcg);
 
 		if (tbcg.getAlgorithmConfig().equals("line")) {
 
-			optimizer = new FifoOptimizer(optimConfig, dispatcher, false);
+			optimizer = new FifoOptimizer(optimizerContext, dispatcher, false);
 
 		} else if (tbcg.getAlgorithmConfig().equals("multipleLine")) {
-			optimizer = new MultipleFifoOptimizer(optimConfig, dispatcher, false);
+			optimizer = new MultipleFifoOptimizer(optimizerContext, dispatcher, false);
 
 		} else
 			throw new RuntimeException("No config parameter set for algorithm, please check and assign in config");

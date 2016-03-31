@@ -19,17 +19,14 @@
 
 package playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
@@ -44,13 +41,13 @@ public class LineDispatcher implements ActivityStartEventHandler {
 	private static final Logger log = Logger.getLogger(LineDispatcher.class);
 	private Map<Id<TaxibusLine>, TaxibusLine> lines = new HashMap<>();
 	private Map<Id<Link>, Id<TaxibusLine>> holdingPositions = new HashMap<>();
-	private final MatsimVrpContext context;
 	private final TaxibusConfigGroup tbcg;
 	private final LineBalanceMethod balanceMethod;
 	enum LineBalanceMethod {SAME, RETURN, BALANCED};
+	private final VrpData vrpData;
 	
-	public LineDispatcher(MatsimVrpContext context, TaxibusConfigGroup tbcg) {
-		this.context = context;
+	public LineDispatcher(VrpData vrpData, TaxibusConfigGroup tbcg) {
+		this.vrpData = vrpData;
 		this.tbcg = tbcg;
 		switch (this.tbcg.getBalancingMethod()){
 		case "same":
@@ -109,8 +106,8 @@ public class LineDispatcher implements ActivityStartEventHandler {
 			if (this.holdingPositions.containsKey(event.getLinkId())) {
 				Id<TaxibusLine> lineId = this.holdingPositions.get(event.getLinkId());
 				Id<Vehicle> busId = Id.create(event.getPersonId(), Vehicle.class);
-				if (context.getVrpData().getVehicles().containsKey(busId)) {
-					Vehicle veh = context.getVrpData().getVehicles().get(busId);
+				if (vrpData.getVehicles().containsKey(busId)) {
+					Vehicle veh = vrpData.getVehicles().get(busId);
 					this.lines.get(lineId).addVehicleToHold(veh);
 //					log.info(veh.getId() + " on hold for line "+lineId);
 				} else {

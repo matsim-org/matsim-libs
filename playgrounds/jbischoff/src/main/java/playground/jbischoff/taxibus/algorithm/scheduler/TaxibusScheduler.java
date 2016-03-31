@@ -23,14 +23,14 @@ import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusTask.TaxibusTaskType;
@@ -42,15 +42,17 @@ public class TaxibusScheduler
 
 	private static final Logger log = Logger.getLogger(TaxibusScheduler.class);
     private TaxibusSchedulerParams params;
-    protected final MatsimVrpContext context;
+    private final VrpData vrpData;
+    private final MobsimTimer timer;
 
 
-    public TaxibusScheduler(MatsimVrpContext context, TaxibusSchedulerParams params)
+    public TaxibusScheduler(VrpData vrpData, MobsimTimer timer, TaxibusSchedulerParams params)
     {
-        this.context = context;
+        this.vrpData = vrpData;
+        this.timer = timer;
         this.params = params;
 
-        for (Vehicle veh : context.getVrpData().getVehicles().values()) {
+        for (Vehicle veh : vrpData.getVehicles().values()) {
             Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>)veh.getSchedule();
             schedule.addTask(new TaxibusStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
         }
@@ -66,7 +68,7 @@ public class TaxibusScheduler
     public boolean isIdle(Vehicle vehicle)
     {
         Schedule<TaxibusTask> schedule = (Schedule<TaxibusTask>)vehicle.getSchedule();
-        if (context.getTime() >= vehicle.getT1()
+        if (timer.getTimeOfDay() >= vehicle.getT1()
                 || schedule.getStatus() != ScheduleStatus.STARTED) {
             return false;
         }
@@ -115,7 +117,7 @@ public class TaxibusScheduler
 
             if (task instanceof TaxibusDriveWithPassengerTask) {
                 if ( ((TaxibusDriveWithPassengerTask)task).getRequests().size() < capacity) {
-                    double time = Math.max(task.getBeginTime(), context.getTime());
+                    double time = Math.max(task.getBeginTime(), timer.getTimeOfDay());
                     LinkTimePair ltp = new LinkTimePair(
                             ((TaxibusDriveWithPassengerTask)task).getPath().getFromLink(), time);
                     linkTimeSet.add(ltp);
@@ -131,7 +133,7 @@ public class TaxibusScheduler
 
     public LinkTimePair getEarliestIdleness(Vehicle veh)
     {
-        if (context.getTime() >= veh.getT1()) {// time window T1 exceeded
+        if (timer.getTimeOfDay() >= veh.getT1()) {// time window T1 exceeded
             return null;
         }
 
@@ -147,7 +149,7 @@ public class TaxibusScheduler
                 switch (lastTask.getTaxibusTaskType()) {
                     case STAY:
                         link = ((StayTask)lastTask).getLink();
-                        time = Math.max(lastTask.getBeginTime(), context.getTime());//TODO very optimistic!!!
+                        time = Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());//TODO very optimistic!!!
                         return createValidLinkTimePair(link, time, veh);
 
                     case PICKUP:
@@ -394,7 +396,7 @@ public class TaxibusScheduler
             return;
         }
 
-        double endTime = context.getTime();
+        double endTime = timer.getTimeOfDay();
         TaxibusTask currentTask = schedule.getCurrentTask();
 
         updateTimelineImpl(schedule, endTime);
@@ -424,7 +426,7 @@ public class TaxibusScheduler
         }
 
         double predictedEndTime = TaskTrackers.predictEndTime(schedule.getCurrentTask(),
-                context.getTime());
+                timer.getTimeOfDay());
         updateTimelineImpl(schedule, predictedEndTime);
     }
 
@@ -516,7 +518,7 @@ public class TaxibusScheduler
     public List<TaxibusRequest> removeAwaitingRequestsFromAllSchedules()
     {
         removedRequests = new ArrayList<>();
-        for (Vehicle veh : context.getVrpData().getVehicles().values()) {
+        for (Vehicle veh : vrpData.getVehicles().values()) {
             removeAwaitingRequestsImpl((Schedule<TaxibusTask>)veh.getSchedule());
         }
 
