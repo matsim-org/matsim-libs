@@ -56,9 +56,18 @@ import java.util.Set;
  */
 public class Example {
 
+
+	public static String REMOTE_HOST = "localhost";
+	public static int REMOTE_PORT = 9000;
+
 	private static final Logger log = Logger.getLogger(Example.class);
 
 	public static void main(String[] args) throws IOException, InterruptedException {
+
+		if (args.length == 2) {
+			REMOTE_HOST = args[0];
+			REMOTE_PORT = Integer.parseInt(args[1]);
+		}
 
 
 		Config c = ConfigUtils.createConfig();
