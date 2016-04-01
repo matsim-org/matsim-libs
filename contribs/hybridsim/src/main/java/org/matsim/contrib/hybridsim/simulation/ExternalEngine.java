@@ -212,9 +212,6 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 		HybridSimProto.Trajectories trs = this.client.getBlockingStub().receiveTrajectories(reqTr);
 		for (HybridSimProto.Trajectory tr : trs.getTrajectoriesList()) {
 			QVehicle veh = this.vehicles.get(tr.getId());
-			if (veh == null) {
-				System.out.println("Gotcha!");
-			}
 			Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 			if (veh.getDriver().chooseNextLinkId().toString().equals(tr.getLinkId())) {
 
