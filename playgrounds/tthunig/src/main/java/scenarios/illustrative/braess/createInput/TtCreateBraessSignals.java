@@ -46,11 +46,13 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
+import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
 import playground.dgrether.signalsystems.sylvia.model.DgSylviaController;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
 
@@ -167,15 +169,12 @@ public final class TtCreateBraessSignals {
 	}
 
 	private void createSignalSystemAtNode(Node node) {
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
-		
 		SignalSystemsDataFactory fac = new SignalSystemsDataFactoryImpl();
 		
 		// create signal system
-		SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem"
-				+ node.getId(), SignalSystem.class));
+		SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem" + node.getId(), SignalSystem.class));
 		signalSystems.addSignalSystemData(signalSystem);
 		
 		// create a signal for every inLink outLink pair
@@ -183,16 +182,14 @@ public final class TtCreateBraessSignals {
 			int outLinkCounter = 0;
 			for (Id<Link> outLinkId : node.getOutLinks().keySet()){
 				outLinkCounter++;
-				SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId
-				+ "." + outLinkCounter, Signal.class));
+				SignalData signal = fac.createSignalData(Id.create("signal" + inLinkId + "." + outLinkCounter, Signal.class));
 				signalSystem.addSignalData(signal);
 				signal.setLinkId(inLinkId);
 				
 				// add turning move restrictions and lanes if necessary
 				switch (this.laneType) {
 				case TRIVIAL:
-					LanesToLinkAssignment20 linkLanes = this.scenario.getLanes()
-							.getLanesToLinkAssignments().get(inLinkId);
+					LanesToLinkAssignment20 linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
 					// the link only contains one lane (the trivial lane)
 					signal.addLaneId(linkLanes.getLanes().firstKey());
 				case NONE:
@@ -201,12 +198,10 @@ public final class TtCreateBraessSignals {
 					break;
 				case REALISTIC:
 					// find and add the correct lane if it exists
-					linkLanes = this.scenario.getLanes().getLanesToLinkAssignments()
-							.get(inLinkId);
+					linkLanes = this.scenario.getLanes().getLanesToLinkAssignments().get(inLinkId);
 					if (linkLanes != null) {
 						for (Lane lane : linkLanes.getLanes().values()) {
-							if (lane.getToLinkIds() != null && !lane.getToLinkIds().isEmpty() 
-									&& lane.getToLinkIds().contains(outLinkId))
+							if (lane.getToLinkIds() != null && !lane.getToLinkIds().isEmpty() && lane.getToLinkIds().contains(outLinkId))
 								// correct lane found
 								signal.addLaneId(lane.getId());
 						}
@@ -219,48 +214,38 @@ public final class TtCreateBraessSignals {
 
 	private void createSignalGroups() {
 
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 
 		// create signal groups for each signal system
-		for (SignalSystemData system : signalSystems.getSignalSystemData()
-				.values()) {
+		for (SignalSystemData system : signalSystems.getSignalSystemData().values()) {
 			SignalUtils.createAndAddSignalGroups4Signals(signalGroups, system);
 		}
 	}
 
 	private void createSignalControl() {
 
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalControlData signalControl = signalsData.getSignalControlData();
 		SignalControlDataFactory fac = new SignalControlDataFactoryImpl();
 
-		// creates a signal control for all signal systems
-		for (SignalSystemData signalSystem : signalSystems
-				.getSignalSystemData().values()) {
+		// create a signal control for all signal systems
+		for (SignalSystemData signalSystem : signalSystems.getSignalSystemData().values()) {
 
-			SignalSystemControllerData signalSystemControl = fac
-					.createSignalSystemControllerData(signalSystem.getId());
+			SignalSystemControllerData signalSystemControl = fac.createSignalSystemControllerData(signalSystem.getId());
 
-			// creates a default plan for the signal system (with defined cycle
-			// time and offset 0)
-			SignalPlanData signalPlan = SignalUtils.createSignalPlan(fac, CYCLE_TIME, 0);
+			// create a default plan for the signal system (with defined cycle time and offset 0)
+			SignalPlanData signalPlan = SignalUtils.createSignalPlan(fac, CYCLE_TIME, 0, Id.create("fixed_time_plan_1", SignalPlan.class));
 			
 			signalSystemControl.addSignalPlanData(signalPlan);
-			signalSystemControl
-					.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
 			signalControl.addSignalSystemControllerData(signalSystemControl);
 			
-			// specifies signal group settings for all signal groups of this
-			// signal system
-			for (SignalGroupData signalGroup : signalGroups
-					.getSignalGroupDataBySystemId(signalSystem.getId())
-					.values()) {
+			// specify signal group settings for all signal groups of this signal system
+			for (SignalGroupData signalGroup : signalGroups.getSignalGroupDataBySystemId(signalSystem.getId()).values()) {
 				
 				switch (this.signalType){
 				case GREEN_WAVE_Z:
@@ -279,18 +264,24 @@ public final class TtCreateBraessSignals {
 					signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
 							fac, signalGroup.getId(), 0, CYCLE_TIME));
 					break;
-				case SIGNAL4_SYLVIA:
-					signalSystemControl.setControllerIdentifier(DgSylviaController.CONTROLLER_IDENTIFIER);
-					// no "break" because signal setting of SIGNAL4_ONE_SECOND_SO should be used as basis
 				case SIGNAL4_ONE_SECOND_SO:
-					createSignal4Setting(fac, signalPlan, signalGroup.getId(), false);
+					createSignal4Setting(fac, signalPlan, signalGroup.getId(), 59);
 					break;
 				case SIGNAL4_ONE_SECOND_Z:
-					createSignal4Setting(fac, signalPlan, signalGroup.getId(), true);
+					createSignal4Setting(fac, signalPlan, signalGroup.getId(), 1);
+					break;
+				case SIGNAL4_SYLVIA:
+					// create a basis signal plan
+					createSignal4Setting(fac, signalPlan, signalGroup.getId(), 5);
 					break;
 				default:
 					break;
 				}
+			}
+			
+			// convert basis fixed time plan to sylvia plan if necessary
+			if (this.signalType.equals(SignalControlType.SIGNAL4_SYLVIA)){
+				signalControl = DgSylviaPreprocessData.convertSignalControlData(signalControl);
 			}
 		}
 		
@@ -311,8 +302,7 @@ public final class TtCreateBraessSignals {
 		}
 	}
 
-	private void createGreenWaveZSignalControl(SignalControlDataFactory fac, SignalPlanData signalPlan,
-			Id<SignalGroup> signalGroupId) {
+	private void createGreenWaveZSignalControl(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId) {
 		int onset = 0;
 		int dropping = 0;
 		int signalSystemOffset = 0;
@@ -370,8 +360,7 @@ public final class TtCreateBraessSignals {
 		signalPlan.setOffset(signalSystemOffset);
 	}
 
-	private void createGreenWaveSOSignalControl(SignalControlDataFactory fac, SignalPlanData signalPlan,
-			Id<SignalGroup> signalGroupId) {
+	private void createGreenWaveSOSignalControl(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId) {
 		int onset = 0;
 		int dropping = 0;
 		int signalSystemOffset = 0;
@@ -429,33 +418,21 @@ public final class TtCreateBraessSignals {
 		signalPlan.setOffset(signalSystemOffset);
 	}
 
-	private void createSignal4Setting(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId, boolean forceSO) {
+	private void createSignal4Setting(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId, int second2SwitchFromZtoV) {
 		int onset = 0;
 		int dropping = 0;
 		// set onset and dropping depending on the signal group and signal control type
 		switch (signalGroupId.toString()){
 		case "signal3_4.1": // signal at node 4 for the middle route
-			if (forceSO){
-				// set 1 second green for the middle route
-				onset = 0;
-				dropping = 1;
-			} else { // force Z
-				// set 59 seconds green for the middle route
-				onset = 1;
-				dropping = 60;
-			}
+			// set second2SwitchFromZtoV1 seconds green for the middle route
+			onset = 0;
+			dropping = second2SwitchFromZtoV;
 			break;
 		case "signal24_4.1":
 		case "signal2_4.1": // signal at node 4 for the lower route
-			if (forceSO){
-				// set 59 seconds green for the lower route
-				onset = 1;
-				dropping = 60;
-			} else { // force Z
-				// set 1 second green for the lower route
-				onset = 0;
-				dropping = 1;
-			}
+			// set 60 - second2SwitchFromZtoV seconds green for the lower route
+			onset = second2SwitchFromZtoV;
+			dropping = 60;
 			break;
 		default:
 			log.error("This method was called for signal group ID " + signalGroupId 
@@ -473,22 +450,15 @@ public final class TtCreateBraessSignals {
 	 */
 	private void changeAllGreenSignalControlTo1Z() {
 
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) this.scenario	.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalControlData signalControl = signalsData.getSignalControlData();
 
-		SignalSystemControllerData signalSystem4Control = signalControl
-				.getSignalSystemControllerDataBySystemId().get(
-						Id.create("signalSystem4", SignalSystem.class));
-		for (SignalPlanData signalPlan : signalSystem4Control
-				.getSignalPlanData().values()) {
+		SignalSystemControllerData signalSystem4Control = signalControl.getSignalSystemControllerDataBySystemId().get(Id.create("signalSystem4", SignalSystem.class));
+		for (SignalPlanData signalPlan : signalSystem4Control.getSignalPlanData().values()) {
 			// note: every signal system has only one signal plan here
 
-			// pick the signal at link 3_4 (which is the middle link) from the
-			// signal plan
-			SignalGroupSettingsData signalGroupZSetting = signalPlan
-						.getSignalGroupSettingsDataByGroupId().get(
-								Id.create("signal3_4.1", SignalGroup.class));
+			// pick the signal at link 3_4 (which is the middle link) from the signal plan
+			SignalGroupSettingsData signalGroupZSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(			Id.create("signal3_4.1", SignalGroup.class));
 
 			// set the signal green for only one second
 			signalGroupZSetting.setOnset(0);
@@ -515,24 +485,17 @@ public final class TtCreateBraessSignals {
 	 */
 	private void changeAllGreenSignalControlTo1SO() {
 		
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalControlData signalControl = signalsData.getSignalControlData();
 
 		// adapt signal system 2
-		SignalSystemControllerData signalSystem2Control = signalControl
-				.getSignalSystemControllerDataBySystemId().get(
-						Id.create("signalSystem2", SignalSystem.class));
-		for (SignalPlanData signalPlan : signalSystem2Control
-				.getSignalPlanData().values()) {
+		SignalSystemControllerData signalSystem2Control = signalControl.getSignalSystemControllerDataBySystemId().get(Id.create("signalSystem2", SignalSystem.class));
+		for (SignalPlanData signalPlan : signalSystem2Control.getSignalPlanData().values()) {
 			// note: every signal system has only one signal plan here
 
-			// pick the second signal at link 1_2 (turning right) from the
-			// signal plan
+			// pick the second signal at link 1_2 (turning right) from the signal plan
 			SignalGroupSettingsData signalGroupSOSetting;
-			signalGroupSOSetting = signalPlan
-						.getSignalGroupSettingsDataByGroupId().get(
-								Id.create("signal1_2.2", SignalGroup.class));
+			signalGroupSOSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create("signal1_2.2", SignalGroup.class));
 
 			// set the signal green for only one second
 			signalGroupSOSetting.setOnset(0);
@@ -540,15 +503,11 @@ public final class TtCreateBraessSignals {
 		}
 		
 		// adapt signal system 3
-		SignalSystemControllerData signalSystem3Control = signalControl
-				.getSignalSystemControllerDataBySystemId().get(
-						Id.create("signalSystem3", SignalSystem.class));
-		for (SignalPlanData signalPlan : signalSystem3Control
-				.getSignalPlanData().values()) {
+		SignalSystemControllerData signalSystem3Control = signalControl.getSignalSystemControllerDataBySystemId().get(	Id.create("signalSystem3", SignalSystem.class));
+		for (SignalPlanData signalPlan : signalSystem3Control.getSignalPlanData().values()) {
 			// note: every signal system has only one signal plan here
 
-			// pick the second signal at link 2_3 (or 23_3 respectively) (going straight on) 
-			// from the signal plan
+			// pick the second signal at link 2_3 (or 23_3 respectively) (going straight on) from the signal plan
 			SignalGroupSettingsData signalGroupSOSetting;
 			if (signalPlan.getSignalGroupSettingsDataByGroupId().containsKey(Id.create("signal2_3.2", SignalGroup.class))){
 				signalGroupSOSetting = signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create("signal2_3.2", SignalGroup.class));
@@ -571,9 +530,7 @@ public final class TtCreateBraessSignals {
 	}
 
 	public void writeSignalFiles(String directory) {
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
-		
+		SignalsData signalsData = (SignalsData) this.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		new SignalSystemsWriter20(signalsData.getSignalSystemsData()).write(directory + "signalSystems.xml");
 		new SignalControlWriter20(signalsData.getSignalControlData()).write(directory + "signalControl.xml");
 		new SignalGroupsWriter20(signalsData.getSignalGroupsData()).write(directory + "signalGroups.xml");
