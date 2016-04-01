@@ -51,6 +51,7 @@ import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
+import playground.dgrether.signalsystems.sylvia.model.DgSylviaController;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
 
 /**
@@ -66,7 +67,7 @@ public final class TtCreateBraessSignals {
 			.getLogger(TtCreateBraessSignals.class);
 	
 	public enum SignalControlType{
-		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_ONE_SECOND_Z, SIGNAL4_ONE_SECOND_SO
+		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_ONE_SECOND_Z, SIGNAL4_ONE_SECOND_SO, SIGNAL4_SYLVIA
 	}
 	
 	private static final int CYCLE_TIME = 60;
@@ -143,7 +144,9 @@ public final class TtCreateBraessSignals {
 	 */
 	private void createSignalSystems() {
 
-		if (signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_SO) || signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_Z)) {
+		if (signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_SO) || 
+				signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_Z) || 
+				signalType.equals(SignalControlType.SIGNAL4_SYLVIA)) {
 			// create only one signal system at node 4
 			createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(4)));
 		} else {
@@ -160,189 +163,7 @@ public final class TtCreateBraessSignals {
 					break;
 				}
 			}
-		}		
-		
-//		for (Link link : this.scenario.getNetwork().getLinks().values()) {
-//			// create toNode signal system for all nodes that have outgoing links
-//			Node toNode = link.getToNode();
-//			if (toNode.getOutLinks() != null && !toNode.getOutLinks().isEmpty()) {
-//				SignalSystemData signalSystem = fac.createSignalSystemData(Id.create("signalSystem"
-//						+ toNode.getId(), SignalSystem.class));
-//				signalSystems.addSignalSystemData(signalSystem);
-//
-//				int toLinkCounter = 0;
-//				// create one signal for every direction
-//				for (Link toLink : toNode.getOutLinks().values()) {
-//					toLinkCounter++;
-//					SignalData signal = fac.createSignalData(Id.create("signal" + link.getId()
-//							+ "." + toLinkCounter, Signal.class));
-//					signalSystem.addSignalData(signal);
-//					signal.setLinkId(link.getId());
-//
-//					// add turning move restrictions and lanes if necessary
-//					switch (this.laneType) {
-//					case TRIVIAL:
-//						LanesToLinkAssignment20 linkLanes = this.scenario.getLanes()
-//								.getLanesToLinkAssignments().get(link.getId());
-//						// the link only contains one lane (the trivial lane)
-//						signal.addLaneId(linkLanes.getLanes().firstKey());
-//					case NONE:
-//						// turning move restrictions are necessary for TRIVIAL and NONE
-//						signal.addTurningMoveRestriction(toLink.getId());
-//						break;
-//					case REALISTIC:
-//						// find and add the correct lane if it exists
-//						linkLanes = this.scenario.getLanes().getLanesToLinkAssignments()
-//								.get(link.getId());
-//						if (linkLanes != null) {
-//							for (Lane lane : linkLanes.getLanes().values()) {
-//								if (lane.getToLinkIds() != null && !lane.getToLinkIds().isEmpty() 
-//										&& lane.getToLinkIds().contains(toLink.getId()))
-//									// correct lane found
-//									signal.addLaneId(lane.getId());
-//							}
-//						}
-//						break;
-//					}
-//				}
-//			}
-//		}
-		
-//		// create signal system at node 2
-//		SignalSystemData signalSystem = fac.createSignalSystemData(Id.create(
-//				"signalSystem2", SignalSystem.class));
-//
-//		SignalData signal = fac.createSignalData(Id.create("signal1_2.1",
-//				Signal.class));
-//		signal.setLinkId(Id.createLinkId("1_2"));
-//		
-//		if (this.laneType.equals(LaneType.REALISTIC)) {
-//			signal.addLaneId(Id.create("1_2.1", Lane.class));
-//		} else { 
-//			// no realistic lanes used. turning move restrictions necessary
-//			if (this.simulateInflowCap23) {
-//				signal.addTurningMoveRestriction(Id.createLinkId("2_23"));
-//			} else {
-//				signal.addTurningMoveRestriction(Id.createLinkId("2_3"));
-//			}
-//			
-//			if (this.laneType.equals(LaneType.TRIVIAL)){
-//				// add trivial lane
-//				signal.addLaneId(Id.create("1_2.ol", Lane.class));
-//			}
-//		}
-//		signalSystem.addSignalData(signal);
-//
-//		signal = fac.createSignalData(Id.create("signal1_2.2", Signal.class));
-//		signal.setLinkId(Id.createLinkId("1_2"));
-//		if (this.laneType.equals(LaneType.REALISTIC)) {
-//			signal.addLaneId(Id.create("1_2.2", Lane.class));
-//		} else { 
-//			// no realistic lanes used. turning move restrictions necessary
-//			if (this.simulateInflowCap24) {
-//				signal.addTurningMoveRestriction(Id.createLinkId("2_24"));
-//			} else {
-//				signal.addTurningMoveRestriction(Id.createLinkId("2_4"));
-//			}
-//		}
-//		signalSystem.addSignalData(signal);
-//
-//		signalSystems.addSignalSystemData(signalSystem);
-//
-//		// create signal system at node 3
-//		signalSystem = fac.createSignalSystemData(Id.create("signalSystem3",
-//				SignalSystem.class));
-//
-//		if (simulateInflowCap23) {
-//			signal = fac.createSignalData(Id
-//					.create("signal23_3.1", Signal.class));
-//			signal.setLinkId(Id.createLinkId("23_3"));
-//			if (this.laneType.equals(LaneType.REALISTIC)) {
-//				signal.addLaneId(Id.create("23_3.1", Lane.class));
-//			} else { 
-//				// no realistic lanes used. turning move restrictions necessary
-//				signal.addTurningMoveRestriction(Id.createLinkId("3_5"));
-//			}
-//			signalSystem.addSignalData(signal);
-//
-//			if (this.middleLinkExists) {
-//				signal = fac.createSignalData(Id.create("signal23_3.2",
-//						Signal.class));
-//				signal.setLinkId(Id.createLinkId("23_3"));
-//				if (this.laneType.equals(LaneType.REALISTIC)) {
-//					signal.addLaneId(Id.create("23_3.2", Lane.class));
-//				} else { // no realistic lanes used. turning move restrictions necessary
-//					signal.addTurningMoveRestriction(Id.createLinkId("3_4"));
-//				}
-//				signalSystem.addSignalData(signal);
-//			}
-//		} else { // no inflow capacity simulated at link 2_3
-//			signal = fac.createSignalData(Id
-//					.create("signal2_3.1", Signal.class));
-//			signal.setLinkId(Id.createLinkId("2_3"));
-//			if (this.laneType.equals(LaneType.REALISTIC)) {
-//				signal.addLaneId(Id.create("2_3.1", Lane.class));
-//			} else { // no realistic lanes used. turning move restrictions necessary
-//				signal.addTurningMoveRestriction(Id.createLinkId("3_5"));
-//			}
-//			signalSystem.addSignalData(signal);
-//
-//			if (this.middleLinkExists) {
-//				signal = fac.createSignalData(Id.create("signal2_3.2",
-//						Signal.class));
-//				signal.setLinkId(Id.createLinkId("2_3"));
-//				if (this.laneType.equals(LaneType.REALISTIC)) {
-//					signal.addLaneId(Id.create("2_3.2", Lane.class));
-//				} else { // no realistic lanes used. turning move restrictions necessary
-//					signal.addTurningMoveRestriction(Id.createLinkId("3_4"));
-//				}
-//				signalSystem.addSignalData(signal);
-//			}
-//		}
-//
-//		signalSystems.addSignalSystemData(signalSystem);
-//
-//		// create signal system at node 4
-//		signalSystem = fac.createSignalSystemData(Id.create("signalSystem4",
-//				SignalSystem.class));
-//
-//		if (simulateInflowCap24){
-//			SignalUtils.createAndAddSignal(signalSystem, fac,
-//					Id.create("signal24_4", Signal.class),
-//					Id.createLinkId("24_4"), null);
-//		} else {
-//			SignalUtils.createAndAddSignal(signalSystem, fac,
-//					Id.create("signal2_4", Signal.class),
-//					Id.createLinkId("2_4"), null);
-//		}
-//
-//		if (this.middleLinkExists) {
-//			SignalUtils.createAndAddSignal(signalSystem, fac,
-//					Id.create("signal3_4", Signal.class),
-//					Id.createLinkId("3_4"), null);
-//
-//			signalSystems.addSignalSystemData(signalSystem);
-//		}
-//
-//		// create signal system at node 5
-//		signalSystem = fac.createSignalSystemData(Id.create("signalSystem5",
-//				SignalSystem.class));
-//
-//		SignalUtils.createAndAddSignal(signalSystem, fac,
-//				Id.create("signal3_5", Signal.class), Id.createLinkId("3_5"),
-//				null);
-//
-//		if (this.simulateInflowCap45) {
-//			SignalUtils.createAndAddSignal(signalSystem, fac,
-//					Id.create("signal45_5", Signal.class),
-//					Id.createLinkId("45_5"), null);
-//		} else {
-//			SignalUtils.createAndAddSignal(signalSystem, fac,
-//					Id.create("signal4_5", Signal.class),
-//					Id.createLinkId("4_5"), null);
-//		}
-//
-//		signalSystems.addSignalSystemData(signalSystem);
+		}
 	}
 
 	private void createSignalSystemAtNode(Node node) {
@@ -458,6 +279,9 @@ public final class TtCreateBraessSignals {
 					signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
 							fac, signalGroup.getId(), 0, CYCLE_TIME));
 					break;
+				case SIGNAL4_SYLVIA:
+					signalSystemControl.setControllerIdentifier(DgSylviaController.CONTROLLER_IDENTIFIER);
+					// no "break" because signal setting of SIGNAL4_ONE_SECOND_SO should be used as basis
 				case SIGNAL4_ONE_SECOND_SO:
 					createSignal4Setting(fac, signalPlan, signalGroup.getId(), false);
 					break;

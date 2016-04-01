@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
@@ -56,6 +55,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
+import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
@@ -97,12 +97,12 @@ public final class RunBraessSimulation {
 	private static final Double INIT_PLAN_SCORE = null;
 
 	/// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_SYLVIA;
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.V3;
+	private static final PricingType PRICING_TYPE = PricingType.NONE;
 	public enum PricingType{
 		NONE, V3, V4, V8, V9, FLOWBASED
 	}
@@ -113,7 +113,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/congestionPricing/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/sylvia/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -148,7 +148,7 @@ public final class RunBraessSimulation {
 			config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 			
 			// set travelTimeBinSize (only has effect if reRoute is used)
-			config.travelTimeCalculator().setTraveltimeBinSize( 900 );
+			config.travelTimeCalculator().setTraveltimeBinSize( 10 );
 			
 			config.travelTimeCalculator().setTravelTimeCalculatorType(
 					TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
@@ -248,12 +248,11 @@ public final class RunBraessSimulation {
 		Config config = scenario.getConfig();
 		Controler controler = new Controler(scenario);
 
-		// add the signals module if signal systems are used
-		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
-				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		if (signalsConfigGroup.isUseSignalSystems()) {
-			controler.addOverridingModule(new SignalsModule());
-		}
+		// add the signals module
+		boolean alwaysSameMobsimSeed = false;
+		SylviaSignalsModule sylviaSignalsModule = new SylviaSignalsModule();
+		sylviaSignalsModule.setAlwaysSameMobsimSeed(alwaysSameMobsimSeed);
+		controler.addOverridingModule(sylviaSignalsModule);
 		
 		// add the module for link to link routing if enabled
 		if (config.controler().isLinkToLinkRoutingEnabled()){
@@ -508,6 +507,10 @@ public final class RunBraessSimulation {
 				break;
 			case SIGNAL4_ONE_SECOND_Z:
 				runName += "_S4_1sZ";
+				break;
+			case SIGNAL4_SYLVIA:
+				runName += "_S4_Sylvia";
+				break;
 			default:
 				runName += "_" + SIGNAL_TYPE;
 				break;
