@@ -85,9 +85,10 @@ public class DgSylviaPreprocessData {
 
 		convertSignalGroupsData(signalGroupsData, signalControl);
 
-		SignalControlData newSignalControl = convertSignalControlData(signalControl);
+		SignalControlData sylviaSignalControl = new SignalControlDataImpl();
+		convertSignalControlData(signalControl, sylviaSignalControl);
 
-		SignalControlWriter20 writer = new SignalControlWriter20(newSignalControl);
+		SignalControlWriter20 writer = new SignalControlWriter20(sylviaSignalControl);
 		writer.write(singalControlOutputFile);
 
 		SignalGroupsWriter20 groupsWriter = new SignalGroupsWriter20(signalGroupsData);
@@ -123,27 +124,33 @@ public class DgSylviaPreprocessData {
 		SignalControlReader20 reader = new SignalControlReader20(signalControl);
 		reader.readFile(signalControlInputFile);
 
-		SignalControlData sylviaSignalControl = convertSignalControlData(signalControl);
+		SignalControlDataImpl sylviaSignalControl = new SignalControlDataImpl();
+		convertSignalControlData(signalControl, sylviaSignalControl);
 
 		SignalControlWriter20 writer = new SignalControlWriter20(sylviaSignalControl);
 		writer.write(signalControlOutputFile);
 	}
 
-	public static SignalControlData convertSignalControlData(final SignalControlData controlData){
-		SignalControlData cd = new SignalControlDataImpl();
+	/**
+	 * convert old controlData into new sylviaSignalControlData
+	 * @param controlData
+	 * @param sylviaSignalControlData
+	 * @return
+	 */
+	public static void convertSignalControlData(final SignalControlData controlData, SignalControlData sylviaSignalControlData){
 		for (SignalSystemControllerData  controllerData: controlData.getSignalSystemControllerDataBySystemId().values()){
-			SignalSystemControllerData newControllerData = cd.getFactory().createSignalSystemControllerData(controllerData.getSignalSystemId());
-			cd.addSignalSystemControllerData(newControllerData);
+			SignalSystemControllerData newControllerData = sylviaSignalControlData.getFactory().createSignalSystemControllerData(controllerData.getSignalSystemId());
+			sylviaSignalControlData.addSignalSystemControllerData(newControllerData);
 			newControllerData.setControllerIdentifier(DgSylviaController.CONTROLLER_IDENTIFIER);
 //			log.debug("");
 //			log.debug("system: " + controllerData.getSignalSystemId());
 			for (SignalPlanData signalPlan : controllerData.getSignalPlanData().values()) {
 				// add a copy of the old plan
-				newControllerData.addSignalPlanData(DgSignalsUtils.copySignalPlanData(signalPlan, Id.create(FIXED_TIME_PREFIX + signalPlan.getId().toString(), SignalPlan.class), cd.getFactory()));
-				newControllerData.addSignalPlanData(convertSignalPlanData(signalPlan, cd.getFactory()));
+				newControllerData.addSignalPlanData(DgSignalsUtils.copySignalPlanData(signalPlan, 
+						Id.create(FIXED_TIME_PREFIX + signalPlan.getId().toString(), SignalPlan.class), sylviaSignalControlData.getFactory()));
+				newControllerData.addSignalPlanData(convertSignalPlanData(signalPlan, sylviaSignalControlData.getFactory()));
 			}
 		}
-		return cd;
 	}
 	
 	

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
@@ -46,14 +47,12 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
-import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
-import playground.dgrether.signalsystems.sylvia.model.DgSylviaController;
 import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.LaneType;
 
 /**
@@ -231,18 +230,26 @@ public final class TtCreateBraessSignals {
 		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalControlData signalControl = signalsData.getSignalControlData();
 		SignalControlDataFactory fac = new SignalControlDataFactoryImpl();
-
+		
+		// create a temporary, empty signal control object needed in case sylvia is used
+		SignalControlData tmpSignalControl = new SignalControlDataImpl();		
+		
 		// create a signal control for all signal systems
 		for (SignalSystemData signalSystem : signalSystems.getSignalSystemData().values()) {
 
 			SignalSystemControllerData signalSystemControl = fac.createSignalSystemControllerData(signalSystem.getId());
 
 			// create a default plan for the signal system (with defined cycle time and offset 0)
-			SignalPlanData signalPlan = SignalUtils.createSignalPlan(fac, CYCLE_TIME, 0, Id.create("fixed_time_plan_1", SignalPlan.class));
+			SignalPlanData signalPlan = SignalUtils.createSignalPlan(fac, CYCLE_TIME, 0);
 			
 			signalSystemControl.addSignalPlanData(signalPlan);
 			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			signalControl.addSignalSystemControllerData(signalSystemControl);
+			// add the signalSystemControl to the final or temporary, respectively, signalControl 
+			if (this.signalType.equals(SignalControlType.SIGNAL4_SYLVIA)){
+				tmpSignalControl.addSignalSystemControllerData(signalSystemControl);
+			} else {
+				signalControl.addSignalSystemControllerData(signalSystemControl);
+			}
 			
 			// specify signal group settings for all signal groups of this signal system
 			for (SignalGroupData signalGroup : signalGroups.getSignalGroupDataBySystemId(signalSystem.getId()).values()) {
@@ -278,15 +285,12 @@ public final class TtCreateBraessSignals {
 					break;
 				}
 			}
-			
-			// convert basis fixed time plan to sylvia plan if necessary
-			if (this.signalType.equals(SignalControlType.SIGNAL4_SYLVIA)){
-				signalControl = DgSylviaPreprocessData.convertSignalControlData(signalControl);
-			}
 		}
 		
-		// change the overall signal control to ONE_SECOND_Z or ONE_SECOND_SO respectively if necessary
+		// overall adoptions
 		switch (this.signalType){
+		
+		// change the overall signal control to ONE_SECOND_Z or ONE_SECOND_SO respectively if necessary
 		case ONE_SECOND_Z:
 			// change all day green signal control such that
 			// the middle route gets only green for one second a cycle
@@ -297,6 +301,13 @@ public final class TtCreateBraessSignals {
 			// the outer routes get only green for one second a cycle
 			changeAllGreenSignalControlTo1SO();
 			break;
+		
+		// convert basis fixed time plan to sylvia plan
+		case SIGNAL4_SYLVIA:
+			// create the final sylvia signal control with information of the temporary signal control
+			DgSylviaPreprocessData.convertSignalControlData(tmpSignalControl, signalControl);
+			break;
+		
 		default:
 			break;
 		}
