@@ -37,19 +37,28 @@ public class CreateMatrixBasedPtInputs {
 		
 		// ... for local use
 		// Input and Output
-		String networkFile = "../../../../Workspace/data/accessibility/nmb/scenario/NMBM_PT_V1.xml.gz";
+//		String networkFile = "../../../../Workspace/data/accessibility/nmb/scenario/NMBM_PT_V1.xml.gz";
+//		String networkFile = "../../../shared-svn/projects/maxess/data/nmb/transit/NMBM_PT_V1.xml.gz";
+		
 //		String networkFile = "../../../../Workspace/shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz";
 //		String networkFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/jtlu14i.output_network.xml.gz";
 //		String networkFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14d/jtlu14d.output_network.xml.gz";
+		String networkFile = "../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/jtlu14b.output_network.xml.gz";
 //		String networkFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/network/2015-05-26/network.xml";
 		
-		String transitScheduleFile = "../../../../Workspace/data/accessibility/nmb/scenario/Transitschedule_PT_V1_WithVehicles.xml.gz";
+//		String transitScheduleFile = "../../../../Workspace/data/accessibility/nmb/scenario/Transitschedule_PT_V1_WithVehicles.xml.gz";
+//		String transitScheduleFile = "../../../shared-svn/projects/maxess/data/nmb/transit/Transitschedule_PT_V1_WithVehicles.xml.gz";
+		
 //		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/transitSchedule.xml.gz";
 //		String transitScheduleFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/ITERS/it.300/jtlu14i.300.transitScheduleScored.xml.gz";
 //		String transitScheduleFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14d/ITERS/it.300/jtlu14d.300.transitScheduleScored.xml.gz";
+		String transitScheduleFile = "../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/ITERS/it.300/jtlu14b.300.transitScheduleScored.xml.gz";
 //		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/gtfs/2015-07-03/transitschedule.xml";
 		
-		String outputRoot = "../../../../Workspace/data/accessibility/nmb/matrix/06/";
+//		String outputRoot = "../../../../Workspace/data/accessibility/nmb/matrix/06/";
+//		String outputRoot = "../../../shared-svn/projects/maxess/data/nmb/transit/matrix/07/";
+		String outputRoot = "../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/matrix";
+		
 //		String outputRoot = "../../../../Workspace/shared-svn/projects/accessibility_berlin/travel_matrix/2016-01-05/";
 		
 //		String outputFileRoot = "../../data/accessibility/be_002/";
