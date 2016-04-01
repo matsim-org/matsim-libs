@@ -48,7 +48,11 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
 
     private DynamicDoubleArray simFreq;
 
-    private double scaleFactor;
+//    private double scaleFactor;
+
+    private double refSum;
+
+    private double simSum;
 
     private double binCount;
 
@@ -103,8 +107,10 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
         TDoubleDoubleMap simHist = histBuilder.build(simPersons);
         simFreq = DynamicArrayBuilder.build(simHist, discretizer);
 
-        double refSum = 0;
-        double simSum = 0;
+//        double refSum = 0;
+//        double simSum = 0;
+        refSum = 0;
+        simSum = 0;
 
         binCount = Math.max(simFreq.size(), refFreq.size());
         for (int i = 0; i < binCount; i++) {
@@ -112,14 +118,17 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
             refSum += refFreq.get(i);
         }
 
-        scaleFactor = simSum/refSum;
+//        scaleFactor = simSum/refSum;
     }
 
     private void initHamiltonian() {
         hamiltonianValue = 0;
+        double scaleFactor = simSum/refSum;
+
         for (int i = 0; i < binCount; i++) {
             double simVal = simFreq.get(i);
             double refVal = refFreq.get(i) * scaleFactor;
+
 
             hamiltonianValue += calculateError(simVal, refVal);
         }
@@ -134,11 +143,20 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
             double delta = 1.0;
             if(useWeights) delta = (Double)element.getData(weightKey);
 
-            int bucket = discretizer.index((Double) oldValue);
-            double diff1 = changeBucketContent(bucket, -delta);
+            if(oldValue == null) simSum += delta;
+            if(newValue == null) simSum -= delta;
 
-            bucket = discretizer.index((Double) newValue);
-            double diff2 = changeBucketContent(bucket, delta);
+            double diff1 = 0;
+            if(oldValue != null) {
+                int bucket = discretizer.index((Double) oldValue);
+                diff1 = changeBucketContent(bucket, -delta);
+            }
+
+            double diff2 = 0;
+            if(newValue != null) {
+                int bucket = discretizer.index((Double) newValue);
+                diff2 = changeBucketContent(bucket, delta);
+            }
 
             hamiltonianValue += (diff1 + diff2);
         }
@@ -158,6 +176,8 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
     }
 
     private double changeBucketContent(int bucketIndex, double value) {
+        double scaleFactor = simSum/refSum;
+
         double simVal = simFreq.get(bucketIndex);
         double refVal = refFreq.get(bucketIndex) * scaleFactor;
         double oldDiff = calculateError(simVal, refVal);
