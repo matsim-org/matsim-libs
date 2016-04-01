@@ -61,7 +61,7 @@ public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 	}
 
 	@Override
-	public SignalSystem createSignalSystem(Id id) {
+	public SignalSystem createSignalSystem(Id<SignalSystem> id) {
 		return this.delegate.createSignalSystem(id);
 	}
 
