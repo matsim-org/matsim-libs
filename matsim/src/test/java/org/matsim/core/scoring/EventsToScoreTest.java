@@ -52,6 +52,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore e2s = EventsToScore.createWithoutScoreUpdating(scenario, sfFactory, events);
+		e2s.beginIteration(0);
 		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4));
 		e2s.finish();
 		assertEquals(3.4, e2s.getAgentScore(person.getId()));
