@@ -77,9 +77,10 @@ public class PurposeHamiltonian {
         Make indices.
          */
         logger.info("Indexing leg purposes...");
+        makePurposeIndex(engine.getRefPersons());
         makePurposeIndex(engine.getSimPersons());
         logger.info("Indexing distance categories....");
-//        int[] indices = makeDistanceIndex(engine.getSimPersons(), discretizer);
+        int[] indices = makeDistanceIndex(engine.getRefPersons(), discretizer);
 
         Object key = Converters.register(PURPOSE_IDX_KEY, new DoubleConverter());
         GeoDistanceMediator mediator = new GeoDistanceMediator(discretizer, key);
@@ -87,6 +88,7 @@ public class PurposeHamiltonian {
 
         logger.info("Initializing purpose hamiltonians...");
         for(int distanceIndex = 0; distanceIndex < borders.size(); distanceIndex++) {
+//            Predicate<Segment> distIdxPredicate = new LegAttributePredicate(GEO_DISTANCE_IDX_KEY, String.valueOf(distanceIndex));
             Predicate<Segment> distIdxPredicate = new LegAttributePredicate(GEO_DISTANCE_IDX_KEY, String.valueOf(distanceIndex));
 
             LegAttributeHistogramBuilder builder = new LegAttributeHistogramBuilder(PURPOSE_IDX_KEY, new LinearDiscretizer(1));
@@ -168,7 +170,7 @@ public class PurposeHamiltonian {
     }
 
     private static Map<String, Integer> makePurposeIndex(Collection<? extends Person> persons) {
-        Collector<String> collector = new LegCollector<>(new AttributeProvider<>(CommonKeys.LEG_PURPOSE));
+        Collector<String> collector = new LegCollector<>(new AttributeProvider<Segment>(CommonKeys.LEG_PURPOSE));
         Set<String> purposes = new HashSet<>(collector.collect(persons));
         purposes.remove(null);
 
@@ -193,17 +195,20 @@ public class PurposeHamiltonian {
         return purpose2Idx;
     }
 
-    private static int[] makeDistanceIndex(Collection<? extends Person> persons, Discretizer discretizer) {
+    private static int[] makeDistanceIndex(Collection<? extends Person> persons, final Discretizer discretizer) {
         final Set<Integer> indices = new HashSet<>();
 
         TaskRunner.run(new EpisodeTask() {
             @Override
             public void apply(Episode episode) {
                 for(Segment leg : episode.getLegs()) {
-                    double dist = Double.parseDouble(leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE));
-                    int idx = discretizer.index(dist);
-                    leg.setAttribute(GEO_DISTANCE_IDX_KEY, String.valueOf(idx));
-                    indices.add(idx);
+                    String val = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
+                    if(val != null) {
+                        double dist = Double.parseDouble(val);
+                        int idx = discretizer.index(dist);
+                        leg.setAttribute(GEO_DISTANCE_IDX_KEY, String.valueOf(idx));
+                        indices.add(idx);
+                    }
                 }
             }
         }, persons);
