@@ -68,7 +68,7 @@ public class GeoDistanceTypeHamiltonian {
 //        Discretizer discretizer = new LinearDiscretizer(50000);
 
 //        Collector<String> collector = new LegCollector<>(new AttributeProvider<>(ReplaceActTypes.ORIGINAL_TYPE));
-        Collector<String> collector = new LegCollector<>(new AttributeProvider<>(CommonKeys.LEG_PURPOSE));
+        Collector<String> collector = new LegCollector<>(new AttributeProvider<Segment>(CommonKeys.LEG_PURPOSE));
         Set<String> types = new HashSet<>(collector.collect(engine.getRefPersons()));
         types.remove(null);
 
@@ -82,7 +82,7 @@ public class GeoDistanceTypeHamiltonian {
                     engine.getLegPredicate(),
                     typePredicate);
 
-            LegCollector<Double> distCollector = new LegCollector<>(new NumericAttributeProvider<>(CommonKeys.LEG_GEO_DISTANCE));
+            LegCollector<Double> distCollector = new LegCollector<>(new NumericAttributeProvider<Segment>(CommonKeys.LEG_GEO_DISTANCE));
             distCollector.setPredicate(predicate);
             List<Double> dists = distCollector.collect(engine.getRefPersons());
             dists.add(1000000.0);

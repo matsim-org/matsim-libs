@@ -167,7 +167,7 @@ public class RefPopulationBuilder {
         private Predicate<Segment> distancePredicate;
 
         public GuessMissingPurposes(Collection<? extends Person> refPersons, Predicate<Segment> predicate, Random random) {
-            LabeledLegHistogramBuilder builder = new LabeledLegHistogramBuilder(new AttributeProvider<>(CommonKeys.LEG_PURPOSE));
+            LabeledLegHistogramBuilder builder = new LabeledLegHistogramBuilder(new AttributeProvider<Segment>(CommonKeys.LEG_PURPOSE));
             /*
             short distances
              */
