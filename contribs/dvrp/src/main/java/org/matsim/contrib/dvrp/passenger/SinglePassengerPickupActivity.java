@@ -52,8 +52,8 @@ public class SinglePassengerPickupActivity
             endTime = now + pickupDuration;
         }
         else {
-            //try to predict the end time
-            endTime = Math.max(now, request.getT0()) + pickupDuration;
+            //try to predict the end time and stay alive
+            endTime = Math.max(now, request.getT0()) + pickupDuration + 1.0;
         }
     }
 
@@ -81,8 +81,8 @@ public class SinglePassengerPickupActivity
     public void doSimStep(double now)
     {
         if (!passengerAboard) {
-            //try to predict the end time
-            endTime = Math.max(now, request.getT0()) + pickupDuration;
+            //try to predict the end time and stay alive
+            endTime = Math.max(now, request.getT0()) + pickupDuration + 1.0;
         }
     }
 
@@ -90,7 +90,7 @@ public class SinglePassengerPickupActivity
     @Override
     public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now)
     {
-        if (passenger != request.getPassenger()) {
+        if (passenger.getId().equals(request.getPassenger().getId())) {
             throw new IllegalArgumentException("I am waiting for a different passenger!");
         }
 
