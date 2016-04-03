@@ -52,8 +52,7 @@ public class SinglePassengerPickupActivity
             endTime = now + pickupDuration;
         }
         else {
-            //try to predict the end time
-            endTime = Math.max(now, request.getT0()) + pickupDuration;
+            setEndTimeIfWaitingForPassenger(now);
         }
     }
 
@@ -81,8 +80,18 @@ public class SinglePassengerPickupActivity
     public void doSimStep(double now)
     {
         if (!passengerAboard) {
-            //try to predict the end time
-            endTime = Math.max(now, request.getT0()) + pickupDuration;
+            setEndTimeIfWaitingForPassenger(now);
+        }
+    }
+
+
+    private void setEndTimeIfWaitingForPassenger(double now)
+    {
+        //try to predict the passenger's arrival time
+        endTime = Math.max(now, request.getT0()) + pickupDuration;
+
+        if (endTime == now) {//happens only if pickupDuration == 0
+            endTime += 1; //to prevent the driver departing now (before picking up the passenger)
         }
     }
 
@@ -98,7 +107,8 @@ public class SinglePassengerPickupActivity
         passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
 
         if (!passengerAboard) {
-            throw new IllegalStateException("The passenger is not on the link or not available for departure!");
+            throw new IllegalStateException(
+                    "The passenger is not on the link or not available for departure!");
         }
 
         endTime = now + pickupDuration;
