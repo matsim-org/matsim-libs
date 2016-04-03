@@ -39,6 +39,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.router.util.*;
+import org.matsim.vehicles.VehicleType;
 
 import com.google.inject.*;
 import com.google.inject.name.Named;
@@ -55,6 +56,7 @@ public class TaxiQSimProvider
     private final TravelTime travelTime;
 
     private final TaxiConfigGroup taxiCfg;
+    private final VehicleType vehicleType;
     private final TaxiOptimizerFactory optimizerFactory;
 
 
@@ -62,6 +64,7 @@ public class TaxiQSimProvider
     public TaxiQSimProvider(Scenario scenario, EventsManager events,
             Collection<AbstractQSimPlugin> plugins, TaxiData taxiData,
             @Named(VrpTravelTimeModules.DVRP) TravelTime travelTime, TaxiConfigGroup taxiCfg,
+            @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
             TaxiOptimizerFactory optimizerFactory)
     {
         this.scenario = scenario;
@@ -70,6 +73,7 @@ public class TaxiQSimProvider
         this.taxiData = taxiData;
         this.travelTime = travelTime;
         this.taxiCfg = taxiCfg;
+        this.vehicleType = vehicleType;
         this.optimizerFactory = optimizerFactory;
     }
 
@@ -90,7 +94,8 @@ public class TaxiQSimProvider
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);
 
-        VrpAgentSource agentSource = createVrpAgentSource(optimizer, qSim, passengerEngine);
+        VrpAgentSource agentSource = createVrpAgentSource(optimizer, qSim, passengerEngine,
+                vehicleType);
         qSim.addAgentSource(agentSource);
 
         addTaxiOverTimeCounters(qSim);
@@ -120,14 +125,14 @@ public class TaxiQSimProvider
 
 
     private VrpAgentSource createVrpAgentSource(TaxiOptimizer optimizer, QSim qSim,
-            PassengerEngine passengerEngine)
+            PassengerEngine passengerEngine, VehicleType vehicleType)
     {
         LegCreator legCreator = taxiCfg.isOnlineVehicleTracker() ? //
                 VrpLegs.createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer()) : //
                 VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
         TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,
                 taxiCfg.getPickupDuration());
-        return new VrpAgentSource(actionCreator, taxiData, optimizer, qSim);
+        return new VrpAgentSource(actionCreator, taxiData, optimizer, qSim, vehicleType);
     }
 
 

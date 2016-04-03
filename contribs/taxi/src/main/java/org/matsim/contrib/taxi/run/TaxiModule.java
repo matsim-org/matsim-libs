@@ -23,6 +23,9 @@ import org.matsim.contrib.dvrp.router.DynRoutingModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.vehicles.*;
+
+import com.google.inject.name.Names;
 
 
 public class TaxiModule
@@ -31,11 +34,19 @@ public class TaxiModule
     public static final String TAXI_MODE = "taxi";
 
     private final TaxiData taxiData;
+    private final VehicleType vehicleType;
 
 
     public TaxiModule(TaxiData taxiData)
     {
+        this(taxiData, VehicleUtils.getDefaultVehicleType());
+    }
+
+
+    public TaxiModule(TaxiData taxiData, VehicleType vehicleType)
+    {
         this.taxiData = taxiData;
+        this.vehicleType = vehicleType;
     }
 
 
@@ -44,6 +55,7 @@ public class TaxiModule
     {
         addRoutingModuleBinding(TAXI_MODE).toInstance(new DynRoutingModule(TAXI_MODE));
         bind(TaxiData.class).toInstance(taxiData);
+        bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
         bind(TaxiOptimizerFactory.class).to(DefaultTaxiOptimizerFactory.class);
     }
 }
