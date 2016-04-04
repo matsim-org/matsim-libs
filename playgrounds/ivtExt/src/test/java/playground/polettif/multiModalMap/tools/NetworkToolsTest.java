@@ -1,4 +1,4 @@
-package playground.polettif.multiModalMap.mapping;
+package playground.polettif.multiModalMap.tools;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,7 +13,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import static org.junit.Assert.assertEquals;
 
-public class ToolsTest {
+public class NetworkToolsTest {
 
 	double testDelta = 1/1000.;
 	Network network;
@@ -81,14 +81,14 @@ public class ToolsTest {
 
 	@Test
 	public void testGetAzimuth() {
-		assertEquals(0, 200*Tools.getAzimuth(A,D)/Math.PI, testDelta);
-		assertEquals(50, 200*Tools.getAzimuth(A,C)/Math.PI, testDelta);
-		assertEquals(100, 200*Tools.getAzimuth(A,B)/Math.PI, testDelta);
-		assertEquals(150, 200*Tools.getAzimuth(A,I)/Math.PI, testDelta);
-		assertEquals(200, 200*Tools.getAzimuth(A,H)/Math.PI, testDelta);
-		assertEquals(250, 200*Tools.getAzimuth(A,G)/Math.PI, testDelta);
-		assertEquals(300, 200*Tools.getAzimuth(A,F)/Math.PI, testDelta);
-		assertEquals(350, 200*Tools.getAzimuth(A,E)/Math.PI, testDelta);
+		assertEquals(0, 200* NetworkTools.getAzimuth(A,D)/Math.PI, testDelta);
+		assertEquals(50, 200* NetworkTools.getAzimuth(A,C)/Math.PI, testDelta);
+		assertEquals(100, 200* NetworkTools.getAzimuth(A,B)/Math.PI, testDelta);
+		assertEquals(150, 200* NetworkTools.getAzimuth(A,I)/Math.PI, testDelta);
+		assertEquals(200, 200* NetworkTools.getAzimuth(A,H)/Math.PI, testDelta);
+		assertEquals(250, 200* NetworkTools.getAzimuth(A,G)/Math.PI, testDelta);
+		assertEquals(300, 200* NetworkTools.getAzimuth(A,F)/Math.PI, testDelta);
+		assertEquals(350, 200* NetworkTools.getAzimuth(A,E)/Math.PI, testDelta);
 	}
 
 	@Test
@@ -107,7 +107,7 @@ public class ToolsTest {
 
 	@Test
 	public void testGetClosestPointOnLine() {
-		Coord splitPoint = Tools.getClosestPointOnLine(D, B, X);
+		Coord splitPoint = NetworkTools.getClosestPointOnLine(D, B, X);
 
 		System.out.println(splitPoint);
 	}

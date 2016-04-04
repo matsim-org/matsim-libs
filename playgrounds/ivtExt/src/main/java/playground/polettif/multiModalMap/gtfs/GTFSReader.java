@@ -91,7 +91,7 @@ public class GTFSReader {
 	}
 
 	/**
-	 * Reads gtfs files in and converts them to an unmapped MATSim Transit Schedule.
+	 * Reads gtfs files in and converts them to an unmapped MATSim Transit Schedule (mts).
 	 * "Unmapped" means stopFacilities are not referenced to links and transit lines do not have routes. The schedule is
 	 * valid however since dummy link ids are used.
 	 *

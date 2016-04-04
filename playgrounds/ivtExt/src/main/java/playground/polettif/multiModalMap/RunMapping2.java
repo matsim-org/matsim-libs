@@ -39,9 +39,6 @@ public class RunMapping2 {
 
 	public static void main(final String[] args) {
 
-		boolean reloadGTFS = false;
-		boolean reloadNetwork = false;
-
 		String base = "C:/Users/Flavio/Desktop/data/ptMappingTest/";
 
 		// input

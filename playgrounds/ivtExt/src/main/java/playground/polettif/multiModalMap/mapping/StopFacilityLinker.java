@@ -29,6 +29,7 @@ import org.matsim.core.network.LinkIdComparator;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
 
@@ -73,13 +74,13 @@ public class StopFacilityLinker {
 	 */
 	public void split(Link link, Coord splitPointCoordinates) {
 		Id<Link> linkId = link.getId();
-		Link oppositeLink = Tools.getOppositeLink(link);
+		Link oppositeLink = NetworkTools.getOppositeLink(link);
 
 		Node nodeA = link.getFromNode();
 		Node nodeB = link.getToNode();
 
 		// get coordinates on the link
-		Coord coordinatesOnLink = Tools.getClosestPointOnLine(link, splitPointCoordinates);
+		Coord coordinatesOnLink = NetworkTools.getClosestPointOnLine(link, splitPointCoordinates);
 
 		// new names
 		Id<Node> newNodeId = Id.createNodeId(prefix + "node_" + nodeIdIter++);

@@ -38,6 +38,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmarksSimpleRouting;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
+import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -112,7 +113,7 @@ public class PTMapperV1 extends PTMapper {
 		Set<TransitStopFacility> newFacilities = new HashSet<>();
 		for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
 
-			final Link closestLink = Tools.findClosestLink(network, facility.getCoord(), SEARCH_RADIUS);
+			final Link closestLink = NetworkTools.findClosestLink(network, facility.getCoord(), SEARCH_RADIUS);
 			if (closestLink != null) {
 				Id<Link> refLinkId = closestLink.getId();
 
@@ -152,7 +153,7 @@ public class PTMapperV1 extends PTMapper {
 
 		// relinking facilities if newly created links are closer then the previous link
 		for(TransitStopFacility facility : this.schedule.getFacilities().values()) {
-			final Link closestLink = Tools.findClosestLink(network, facility.getCoord(), SEARCH_RADIUS);
+			final Link closestLink = NetworkTools.findClosestLink(network, facility.getCoord(), SEARCH_RADIUS);
 			if(closestLink != null && !facility.getLinkId().equals(closestLink.getId())) {
 				log.debug(facility.getName()+" refLink changed from "+facility.getLinkId()+" to "+closestLink.getId());
 				facility.setLinkId(closestLink.getId());

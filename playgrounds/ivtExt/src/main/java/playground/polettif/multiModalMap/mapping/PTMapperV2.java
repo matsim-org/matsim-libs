@@ -38,6 +38,7 @@ import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmar
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
 import playground.polettif.multiModalMap.mapping.containter.V2SolvedSubRoutes;
 import playground.polettif.multiModalMap.mapping.containter.InterStopPath;
+import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
 
@@ -106,7 +107,7 @@ public class PTMapperV2 extends PTMapper {
 		NetworkImpl networkImpl = ((NetworkImpl) network); // used by search for nearest node
 		for(TransitStopFacility stopFacility : this.schedule.getFacilities().values()) {
 			// limits number of links, for all links within search radius use Tools.findClosestLinks()
-			List<Link> closestLinks = Tools.findOnlyNClosestLinks(networkImpl, stopFacility.getCoord(), SEARCH_RADIUS, MAX_N_CLOSEST_LINKS);
+			List<Link> closestLinks = NetworkTools.findOnlyNClosestLinks(networkImpl, stopFacility.getCoord(), SEARCH_RADIUS, MAX_N_CLOSEST_LINKS);
 
 			if (closestLinks == null) {
 				Node newNode = networkFactory.createNode(Id.create(PREFIX_ARTIFICIAL_LINKS + artificialId++, Node.class), stopFacility.getCoord());

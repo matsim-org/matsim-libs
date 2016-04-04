@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -41,6 +40,7 @@ import playground.polettif.multiModalMap.gtfs.GTFSReader;
 import playground.polettif.multiModalMap.mapping.containter.SubRoutes;
 import playground.polettif.multiModalMap.mapping.containter.InterStopPath;
 import playground.polettif.multiModalMap.mapping.containter.InterStopPathSet;
+import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
 
@@ -66,15 +66,15 @@ public class PTMapperLinkScoring extends PTMapper {
 	private final static double NODE_SEARCH_RADIUS = 300; //[m] 150
 	private final static int MAX_N_CLOSEST_LINKS = 6; // number of link candidates considered for all stops
 	private final static int LOOKAHEAD_STOPS = 10; // number of next stops that should be included in calculations
-	private final static int MAX_INITIAL_ARTIFICIAL_LINK_LENGTH = 1000; // maximal length of artificial links
-
 	private final static String PREFIX_ARTIFICIAL_LINKS = "pt_";
+
+	private final static int MAX_INITIAL_ARTIFICIAL_LINK_LENGTH = 1000; // maximal length of artificial links
 
 	// TODO use transit modes
 	private final Set<String> transitModes = Collections.singleton(TransportMode.pt);
-
 	private int artificialId = 0;
 	private Map<TransitStopFacility, List<Link>> allClosestLinks = new HashMap<>();
+	private int multipleBestScoringLinks = 0;
 
 	/**
 	 * Constructor
@@ -85,6 +85,14 @@ public class PTMapperLinkScoring extends PTMapper {
 
 	public PTMapperLinkScoring(TransitSchedule schedule, Network network) {
 		super(schedule, network);
+	}
+
+	/**
+	 * TODO: create main() for a static access using network file, unmapped schedule file and an output path
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
 	}
 
 	@Override
@@ -110,7 +118,7 @@ public class PTMapperLinkScoring extends PTMapper {
 		for(TransitStopFacility stopFacility : this.schedule.getFacilities().values()) {
 			
 			// limits number of links, for all links within search radius use Tools.findClosestLinks()
-			List<Link> closestLinks = Tools.findOnlyNClosestLinks(networkImpl, stopFacility.getCoord(), NODE_SEARCH_RADIUS, MAX_N_CLOSEST_LINKS);
+			List<Link> closestLinks = NetworkTools.findOnlyNClosestLinks(networkImpl, stopFacility.getCoord(), NODE_SEARCH_RADIUS, MAX_N_CLOSEST_LINKS);
 
 			if (closestLinks == null) {
 				// if there are links outside the map area, the very first links are routed weird (i.e. directly to the covered area)
@@ -228,9 +236,12 @@ public class PTMapperLinkScoring extends PTMapper {
 
 
 					/** [4]
-					* Assign the best scoring link* to each stop, then route between the two links.
-					* 
-					* score is calucated with the linkweight and the distance from the link and the stop facility
+					 * Assign the best scoring link to each stop, then route between the two links.
+					 *  score is calucated with the linkweight and the distance from the link and the stop facility
+					 *
+					 *  if a the stopfacilitiy already has a link assigned which is different from the current best scoring
+					 *  link, the stopFacility schold be duplicated. Now it just logs a warning and overwrites the existing
+					 *  reference.
 					 */
 					this.schedule.getFacilities().get(routeStops.get(0).getStopFacility().getId())
 							.setLinkId(getMostPlausibleLink(routeStops.get(0).getStopFacility(), routeLinkWeights).getId());
@@ -240,12 +251,18 @@ public class PTMapperLinkScoring extends PTMapper {
 						TransitRouteStop currentStop = routeStops.get(i);
 						TransitRouteStop nextStop = routeStops.get(i+1);
 
-						// TODO if link reference is already set, do not calculcate it anymore 
-						
+						// todo if link reference is already set, do not calculcate it anymore? Or do and compare scores
+
 						//get the most plausible links for this and the next stop 
 						Link currentLink = getMostPlausibleLink(currentStop.getStopFacility(), routeLinkWeights);
 						Link nextLink = getMostPlausibleLink(nextStop.getStopFacility(), routeLinkWeights);
-						
+
+						if(nextStop.getStopFacility().getLinkId() != null && nextStop.getStopFacility().getLinkId() != nextLink.getId()) {
+							// TODO duplicate stopFacility and change stopSequence for route
+							log.warn("     Multiple best scoring links for stopFacility \"" + nextStop.getStopFacility().getName() + "\" (id " + nextStop.getStopFacility().getId() + ")");
+							multipleBestScoringLinks++;
+						}
+
 						this.schedule.getFacilities().get(nextStop.getStopFacility().getId())
 								.setLinkId(nextLink.getId());
 

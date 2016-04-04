@@ -35,6 +35,7 @@ import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.boescpa.converters.osm.Osm2Network;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
 import playground.polettif.multiModalMap.mapping.PTMapperLinkScoring;
+import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 public class RunMapping {
 
@@ -52,7 +53,7 @@ public class RunMapping {
 		final String gtfsPath = base + "data/gtfs/zvv/";
 		final String osmFile = base + "data/osm/zurich-plus.osm";
 
-		final String mtsFile = base + "data/mts/zvv_unmappedSchedule_WGS84.xml";
+		final String mtsFile = base + "data/mts/zvv/zvv_unmappedSchedule_WGS84.xml";
 //		final String mtsFile = base + "data/mts/zvv_69er.xml";
 
 		final String networkFile = base + "data/network/zurich-plus.xml.gz";
@@ -77,7 +78,6 @@ public class RunMapping {
 		}
 		new TransitScheduleReader(coordinateTransformation, scenario).readFile(mtsFile);
 		schedule = scenario.getTransitSchedule();
-
 
 		// Load Network
 		if (reloadNetwork) {

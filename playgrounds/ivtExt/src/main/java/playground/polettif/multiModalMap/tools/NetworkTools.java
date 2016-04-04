@@ -17,27 +17,23 @@
  * *********************************************************************** */
 
 
-package playground.polettif.multiModalMap.mapping;
+package playground.polettif.multiModalMap.tools;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.*;
 
-public class Tools {
+public class NetworkTools {
 
-	protected static Logger log = Logger.getLogger(Tools.class);
+	protected static Logger log = Logger.getLogger(NetworkTools.class);
 
 	// default params in [m]
 	private static final double DEFAULT_SEARCH_RADIUS = 50;
