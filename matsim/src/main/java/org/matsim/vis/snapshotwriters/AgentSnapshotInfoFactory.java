@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 
 /**
  * translation of physical position (e.g. odometer distance on link, lane) into visualization position

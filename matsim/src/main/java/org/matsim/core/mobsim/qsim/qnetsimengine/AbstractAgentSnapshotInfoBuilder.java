@@ -246,7 +246,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 
 
-	public final void positionQItem(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, 
+	 final void positionHole(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, 
 			double lengthOfCurve, QItem veh, double distanceFromFromNode, 
 			Integer lane,	double speedValueBetweenZeroAndOne){
 		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class), endCoord, startCoord, 
@@ -279,6 +279,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 				double spacing, double freespeedTraveltime, Hole veh, double now, double curvedLength)
 		{
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
+			spacing = 0 ;
 			double distanceFromFromNode = this.calculateDistanceOnVectorFromFromNode2(curvedLength, spacing,
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
 			return distanceFromFromNode;
@@ -289,7 +290,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	{
 		Integer lane = 10 ;
 		double speedValue = 1. ;
-		this.positionQItem(positions, upstreamCoord, downstreamCoord,
+		this.positionHole(positions, upstreamCoord, downstreamCoord,
 					curvedLength, veh, distanceFromFromNode,
 					lane, speedValue);
 	}

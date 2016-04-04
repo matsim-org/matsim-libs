@@ -774,7 +774,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	class VisDataImpl implements QLaneI.VisData {
 		private Coord upstreamCoord;
-		private Coord downsteamCoord;
+		private Coord downstreamCoord;
 
 		@Override
 		public final Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions, double now) {
@@ -784,8 +784,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				if ( this.upstreamCoord==null ) {
 					this.upstreamCoord = qLink.getLink().getFromNode().getCoord() ;
 				}
-				if ( this.downsteamCoord==null ) {
-					this.downsteamCoord = qLink.getLink().getToNode().getCoord() ;
+				if ( this.downstreamCoord==null ) {
+					this.downstreamCoord = qLink.getLink().getToNode().getCoord() ;
 				}
 				// vehicle positions are computed in snapshotInfoBuilder as a service:
 				positions = context.snapshotInfoBuilder.positionVehiclesAlongLine(
@@ -794,8 +794,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 						getAllVehicles(), 
 						length, 
 						storageCapacity + bufferStorageCapacity, 
-						this.downsteamCoord,
 						this.upstreamCoord,
+						this.downstreamCoord,
 						inverseFlowCapacityPerTimeStep, 
 						qLink.getLink().getFreespeed(now), 
 						NetworkUtils.getNumberOfLanesAsInt(now, qLink.getLink()), 
@@ -807,7 +807,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		void setVisInfo(Coord upstreamCoord, Coord downstreamCoord) {
 			this.upstreamCoord = upstreamCoord;
-			this.downsteamCoord = downstreamCoord;
+			this.downstreamCoord = downstreamCoord;
 		}
 	}
 
