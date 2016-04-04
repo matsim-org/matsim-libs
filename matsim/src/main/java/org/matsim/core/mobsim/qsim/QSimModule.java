@@ -34,6 +34,7 @@ public class QSimModule extends AbstractModule {
 		}
 	}
 
+	@SuppressWarnings("static-method")
 	@Provides
 	Collection<AbstractQSimPlugin> provideQSimPlugins(TransitConfigGroup transitConfigGroup, NetworkConfigGroup networkConfigGroup, Config config) {
 		final Collection<AbstractQSimPlugin> plugins = new ArrayList<>();

@@ -68,7 +68,7 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 		this.network = network ;
 		this.scenario = scenario ;
 		this.laneDefinitions = lanesDefinitions;
-		delegate = new DefaultQNetworkFactory( qsimConfig, events, network, scenario ) ;
+		delegate = new DefaultQNetworkFactory( events, scenario ) ;
 	}
 
 	@Override
@@ -80,7 +80,6 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 		}
-		AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
 		delegate.initializeFactory(agentCounter, mobsimTimer, netsimEngine1);

@@ -179,7 +179,7 @@ public class QNetsimEngine implements MobsimEngine {
 			EventsManager events = sim.getEventsManager() ;
 			QSimConfigGroup qsimConfig = sim.getScenario().getConfig().qsim() ;
 			Network net = scenario.getNetwork() ;
-			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( qsimConfig, events, net, scenario );
+			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
 			MobsimTimer mobsimTimer = sim.getSimTimer() ;
 			AgentCounter agentCounter = sim.getAgentCounter() ;
 			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, ii );
