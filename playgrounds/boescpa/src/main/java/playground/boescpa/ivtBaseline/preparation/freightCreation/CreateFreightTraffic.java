@@ -41,6 +41,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import playground.boescpa.lib.tools.FacilityUtils;
 import playground.boescpa.lib.tools.PopulationUtils;
 
 import java.io.BufferedReader;
@@ -232,7 +233,7 @@ public class CreateFreightTraffic {
 	}
 
 	private void readZones(String coordFile, String facilitiesFile) {
-		ActivityFacilities origFacilities = readFacilities(facilitiesFile);
+		ActivityFacilities origFacilities = FacilityUtils.readFacilities(facilitiesFile);
 		// read zone centroids and assign all facilities close to centroid
 		Counter counter = new Counter(" zone # ");
 		BufferedReader reader = IOUtils.getBufferedReader(coordFile);
@@ -276,13 +277,6 @@ public class CreateFreightTraffic {
 			facilityList.add(newFacility);
 		}
 		return facilityList;
-	}
-
-	private ActivityFacilities readFacilities(String facilitiesFile) {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		FacilitiesReaderMatsimV1 reader = new FacilitiesReaderMatsimV1(scenario);
-		reader.readFile(facilitiesFile);
-		return scenario.getActivityFacilities();
 	}
 
 	private void writeFreightPopulation(String outputPopulation) {
