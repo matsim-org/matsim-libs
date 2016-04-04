@@ -183,8 +183,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 				double freespeedTraveltimeOfHole = curvedLength / (QueueWithBuffer.HOLE_SPEED*1000./3600.);
 				double lastDistanceOfHoleFromFromNode = Double.NaN;
 				for (Hole hole : holes) {
-					lastDistanceOfHoleFromFromNode = createHolePositionAndReturnDistance(lastDistanceOfHoleFromFromNode, spacing, freespeedTraveltimeOfHole,
-							hole, now, curvedLength);
+					lastDistanceOfHoleFromFromNode = createHolePositionAndReturnDistance(lastDistanceOfHoleFromFromNode, 
+							spacing, freespeedTraveltimeOfHole, hole, now, curvedLength);
 					addHolePosition( positions, lastDistanceOfHoleFromFromNode, hole, curvedLength, upstreamCoord, downstreamCoord ) ;
 					consumableHoles.put( lastDistanceOfHoleFromFromNode, hole ) ;
 				}
