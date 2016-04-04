@@ -178,7 +178,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final AbstractQLink qLink;
 	private final Id<Lane> id;
 	private static int spaceCapWarningCount = 0;
-	private final double HOLE_SPEED = 15.0;
+	final static double HOLE_SPEED = 15.0;
 
 	private final double length ;
 	private double unscaledFlowCapacity_s = Double.NaN ;
@@ -778,73 +778,33 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		@Override
 		public final Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions, double now) {
-			TreeMap<Double, Hole> holePositions = new TreeMap<>() ;
-			if ( QSimConfigGroup.SnapshotStyle.withHoles==context.qsimConfig.getSnapshotStyle() ) {
-				// holes:
-				if ( !holes.isEmpty() ) {
-					double spacing = context.snapshotInfoBuilder.calculateVehicleSpacing(length, getStorageCapacity(), holes );
-					double freespeedTraveltime = length / (HOLE_SPEED*1000./3600.);
-					double lastDistanceFromFromNode = Double.NaN;
-					for (Hole hole : holes) {
-						lastDistanceFromFromNode = createHolePositionAndReturnDistance(lastDistanceFromFromNode, spacing, freespeedTraveltime,
-								hole);
-						if ( QSimConfigGroup.SnapshotStyle.withHoles==context.qsimConfig.getSnapshotStyle() ) {
-							addHolePosition( positions, lastDistanceFromFromNode, hole ) ;
-						}
-						holePositions.put( lastDistanceFromFromNode, hole ) ;
-					}
-				}
-			}
-
-			// vehicles:
-			if ( !buffer.isEmpty() || !vehQueue.isEmpty() ) {
-				// vehicle positions are computed in snapshotInfoBuilder as a service:
+			if ( !buffer.isEmpty() || !vehQueue.isEmpty() || !holes.isEmpty() ) {
 				Gbl.assertNotNull(positions);
-				Gbl.assertNotNull(holePositions);
-				Gbl.assertNotNull(qLink.getLink());
 				Gbl.assertNotNull( context.snapshotInfoBuilder );
-				context.snapshotInfoBuilder.positionVehiclesAlongLine(
+				if ( this.upstreamCoord==null ) {
+					this.upstreamCoord = qLink.getLink().getFromNode().getCoord() ;
+				}
+				if ( this.downsteamCoord==null ) {
+					this.downsteamCoord = qLink.getLink().getToNode().getCoord() ;
+				}
+				// vehicle positions are computed in snapshotInfoBuilder as a service:
+				positions = context.snapshotInfoBuilder.positionVehiclesAlongLine(
 						positions, 
 						now, 
 						getAllVehicles(), 
-						holePositions, 
 						length, 
 						storageCapacity + bufferStorageCapacity, 
-						qLink.getLink().getFromNode().getCoord(), 
-						qLink.getLink().getToNode().getCoord(), 
+						this.downsteamCoord,
+						this.upstreamCoord,
 						inverseFlowCapacityPerTimeStep, 
 						qLink.getLink().getFreespeed(now), 
-						NetworkUtils.getNumberOfLanesAsInt(now, qLink.getLink())
+						NetworkUtils.getNumberOfLanesAsInt(now, qLink.getLink()), 
+						holes
 						);
 			}
 			return positions ;
 		}
 
-		private double createHolePositionAndReturnDistance(double lastDistanceFromFromNode,
-				double spacing, double freespeedTraveltime, Hole veh)
-		{
-			double now = context.getSimTimer().getTimeOfDay() ;
-			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
-			double distanceFromFromNode = context.snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(QueueWithBuffer.this.length, spacing,
-					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
-			return distanceFromFromNode;
-		}
-		
-		private void addHolePosition(final Collection<AgentSnapshotInfo> positions, double distanceFromFromNode, Hole veh)
-		{
-			Integer lane = 10 ;
-			double speedValue = 1. ;
-			if (this.upstreamCoord != null){
-				context.snapshotInfoBuilder.positionQItem(positions, this.upstreamCoord, this.downsteamCoord,
-						QueueWithBuffer.this.length, veh, distanceFromFromNode,
-						lane, speedValue);
-			} else {
-				context.snapshotInfoBuilder.positionQItem(positions, qLink.getLink().getFromNode().getCoord(), qLink.getLink().getToNode().getCoord(),
-						QueueWithBuffer.this.length, veh , distanceFromFromNode, 
-						lane, speedValue);
-			}
-		}
-		
 		void setVisInfo(Coord upstreamCoord, Coord downstreamCoord) {
 			this.upstreamCoord = upstreamCoord;
 			this.downsteamCoord = downstreamCoord;

@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * translation of physical position (e.g. odometer distance on link, lane) into visualization position
@@ -81,6 +82,8 @@ public class AgentSnapshotInfoFactory {
 		PositionInfo info = new PositionInfo() ;
 		info.setId(agentId) ;
 		double lanePosition = this.linkWidthCalculator.calculateLanePosition(lane);
+		Gbl.assertNotNull( startCoord );
+		Gbl.assertNotNull( endCoord );
 		calculateAndSetPosition(info, startCoord, endCoord, distanceOnLink, curveLength, lanePosition) ;
 		return info;
 	}
