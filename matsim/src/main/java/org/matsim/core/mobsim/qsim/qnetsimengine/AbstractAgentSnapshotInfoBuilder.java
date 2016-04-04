@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +44,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QueueWithBuffer.Hole;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 
 /**
@@ -57,8 +57,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	private final AgentSnapshotInfoFactory snapshotInfoFactory;
 	private Scenario scenario;
 
-	AbstractAgentSnapshotInfoBuilder( Scenario sc, final AgentSnapshotInfoFactory agentSnapshotInfoFactory ){
-		this.snapshotInfoFactory = agentSnapshotInfoFactory;
+	AbstractAgentSnapshotInfoBuilder( Scenario sc, SnapshotLinkWidthCalculator linkWidthCalculator ){
+		this.snapshotInfoFactory = new AgentSnapshotInfoFactory( linkWidthCalculator );
 		this.scenario = sc ;
 	}
 
@@ -69,7 +69,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	public final int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
-			Collection<Identifiable<?>> peopleInVehicle = getPeopleInVehicle(veh);
+			Collection<Identifiable<?>> peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
 			boolean first = true;
 			for (Identifiable passenger : peopleInVehicle) {
 				cnt2++ ;
@@ -108,7 +108,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	public final int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
 		if (transitVehicleStopQueue.size() > 0) {
 			for (QVehicle veh : transitVehicleStopQueue) {
-				List<Identifiable<?>> peopleInVehicle = getPeopleInVehicle(veh);
+				List<Identifiable<?>> peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
 				boolean last = false ;
 				cnt2 += peopleInVehicle.size() ;
 				for ( ListIterator<Identifiable<?>> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
@@ -136,8 +136,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	}
 
 	public final void positionAgentOnLink(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord,
-			double lengthOfCurve, double euclideanLength, QVehicle veh, 
-			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne){
+			double lengthOfCurve, QVehicle veh, double distanceFromFromNode, 
+			Integer lane,	double speedValueBetweenZeroAndOne){
 		MobsimDriverAgent driverAgent = veh.getDriver();
 		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), startCoord, endCoord, 
 				distanceFromFromNode, lane, lengthOfCurve);
@@ -162,8 +162,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	public final void positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
 			double now, Collection<MobsimVehicle> vehs, TreeMap<Double,Hole> holePositions, double curvedLength, 
-			double storageCapacity, double euklideanLength, Coord upstreamCoord, Coord downstreamCoord, 
-			double inverseFlowCapPerTS, double freeSpeed, int numberOfLanesAsInt)
+			double storageCapacity, Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, 
+			double freeSpeed, int numberOfLanesAsInt)
 	{
 		double spacing = this.calculateVehicleSpacing( curvedLength, vehs.size(), storageCapacity );
 //		double spacing = this.calculateVehicleSpacing( euklideanLength, vehs.size(), storageCapacity );
@@ -181,12 +181,12 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			double distanceFromFromNode = this.calculateDistanceOnVectorFromFromNode2(curvedLength, spacing,
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
 
-			Integer lane = AbstractAgentSnapshotInfoBuilder.guessLane(veh, numberOfLanesAsInt );
-			double speedValue = AbstractAgentSnapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh,
+			Integer lane = VisUtils.guessLane(veh, numberOfLanesAsInt );
+			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh,
 					inverseFlowCapPerTS, now, freeSpeed);
 			this.positionAgentOnLink(positions, upstreamCoord, downstreamCoord,
-					curvedLength, euklideanLength, veh,
-					distanceFromFromNode, lane, speedValue);
+					curvedLength, veh, distanceFromFromNode,
+					lane, speedValue);
 			lastDistanceFromFromNode = distanceFromFromNode;
 
 			if ( this.scenario.getConfig().qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
@@ -218,29 +218,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		positions.add(pos);
 	}
 
-	public final static double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed){
-		int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
-		// "inverseSimulatedFlowCapacity" is there to keep vehicles green that only wait for capacity (i.e. have no vehicle
-		// ahead). Especially important with small samples sizes.  This is debatable :-).  kai, jan'11
-
-		double speed = (now > cmp ? 0.0 : 1.0);
-		return speed;
-	}
-
-	public final static Integer guessLane(QVehicle veh, int numberOfLanes){
-		Integer tmpLane;
-		try {
-			tmpLane = Integer.parseInt(veh.getId().toString()) ;
-		} catch ( NumberFormatException ee ) {
-			tmpLane = veh.getId().hashCode() ;
-			if (tmpLane < 0 ){
-				tmpLane = -tmpLane;
-			}
-		}
-		int lane = 1 + (tmpLane % numberOfLanes);
-		return lane;
-	}
-
 	final void positionPassengers(Collection<AgentSnapshotInfo> positions,
 			Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
 			double lengthOfCurve, Integer lane, double speedValueBetweenZeroAndOne) {
@@ -260,26 +237,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		}
 	}
 
-
-	/**
-	 * Returns all the people sitting in this vehicle.
-	 *
-	 * @param vehicle
-	 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
-	 */
-	final static List<Identifiable<?>> getPeopleInVehicle(QVehicle vehicle) {
-		ArrayList<Identifiable<?>> people = new ArrayList<>();
-		people.add(vehicle.getDriver());
-		//		if (vehicle instanceof TransitVehicle) {
-		//			for (PassengerAgent passenger : ((TransitVehicle) vehicle).getPassengers()) {
-		//				people.add((MobsimAgent) passenger);
-		//			}
-		//		}
-		for ( PassengerAgent passenger : vehicle.getPassengers() ) {
-			people.add(passenger) ;
-		}
-		return people;
-	}
 
 	public abstract double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double overallStorageCapacity);
 

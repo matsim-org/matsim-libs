@@ -20,7 +20,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 /**
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
@@ -28,8 +28,8 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
  */
 final class EquiDistAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 
-	EquiDistAgentSnapshotInfoBuilder( Scenario sc, AgentSnapshotInfoFactory agentSnapshotInfoFactory ){
-		super(sc, agentSnapshotInfoFactory);
+	EquiDistAgentSnapshotInfoBuilder( Scenario sc, SnapshotLinkWidthCalculator linkWidthCalculator ){
+		super(sc, linkWidthCalculator);
 	}
 
 	

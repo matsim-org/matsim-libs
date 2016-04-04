@@ -796,11 +796,11 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 						holePositions, 
 						length, 
 						storageCapacity + bufferStorageCapacity, 
-						((LinkImpl) qLink.getLink()).getEuklideanLength(), 
 						qLink.getLink().getFromNode().getCoord(), 
 						qLink.getLink().getToNode().getCoord(), 
 						inverseFlowCapacityPerTimeStep, 
-						qLink.getLink().getFreespeed(now), NetworkUtils.getNumberOfLanesAsInt(now, qLink.getLink())
+						qLink.getLink().getFreespeed(now), 
+						NetworkUtils.getNumberOfLanesAsInt(now, qLink.getLink())
 						);
 			}
 			return positions ;

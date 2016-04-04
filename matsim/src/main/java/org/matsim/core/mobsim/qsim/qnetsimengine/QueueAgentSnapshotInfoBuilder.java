@@ -22,7 +22,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 
 /**
@@ -37,8 +37,8 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 
 	@Inject
-	QueueAgentSnapshotInfoBuilder(Scenario scenario, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
-		super(scenario, agentSnapshotInfoFactory);
+	QueueAgentSnapshotInfoBuilder(Scenario scenario, SnapshotLinkWidthCalculator linkWidthCalculator) {
+		super(scenario, linkWidthCalculator);
 	}
 
 	@Override

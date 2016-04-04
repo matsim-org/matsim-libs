@@ -62,7 +62,7 @@ public class RunFlexibleQNetworkFactoryExample {
 				linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 			}
 			AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-			AbstractAgentSnapshotInfoBuilder snapshotBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
+			AbstractAgentSnapshotInfoBuilder snapshotBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 			
 			this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, snapshotBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
 			

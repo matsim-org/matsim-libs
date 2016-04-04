@@ -60,7 +60,7 @@ public final class AssignmentEmulatingQLaneNetworkFactory extends QNetworkFactor
 			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 		}
 		AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
+		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 		this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter1, snapshotInfoBuilder, qsimConfig, mobsimTimer1, linkWidthCalculator ) ;
 	}
 }

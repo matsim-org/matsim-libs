@@ -151,7 +151,7 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 					linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
 				}
 				AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-				AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
+				AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 				
 				this.context = new NetsimEngineContext(eventsManager, effectiveCellSize, agentCounter, snapshotInfoBuilder, configGroup, mobsimTimer, 
 						linkWidthCalculator ) ;

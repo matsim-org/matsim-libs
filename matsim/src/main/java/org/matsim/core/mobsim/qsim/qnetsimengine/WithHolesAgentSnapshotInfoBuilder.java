@@ -20,7 +20,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 
 /**
@@ -34,8 +34,8 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
  */
 class WithHolesAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 
-	WithHolesAgentSnapshotInfoBuilder(Scenario scenario, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
-		super(scenario, agentSnapshotInfoFactory);
+	WithHolesAgentSnapshotInfoBuilder(Scenario scenario, SnapshotLinkWidthCalculator linkWidthCalculator) {
+		super(scenario, linkWidthCalculator);
 	}
 
 	@Override

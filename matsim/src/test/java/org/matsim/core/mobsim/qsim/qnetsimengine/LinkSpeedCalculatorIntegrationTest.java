@@ -144,7 +144,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 
 						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
+						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
 						this.context = new NetsimEngineContext( events, effectiveCellSize,
 								agentCounter, positionInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
@@ -227,7 +227,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 
 						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
+						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
 						this.context = new NetsimEngineContext( events, effectiveCellSize,
 								agentCounter, positionInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
