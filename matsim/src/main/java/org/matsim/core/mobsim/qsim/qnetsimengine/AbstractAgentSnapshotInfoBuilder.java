@@ -167,18 +167,13 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			double freeSpeed, int numberOfLanesAsInt)
 	{
 		double spacingOfOnePCE = this.calculateVehicleSpacing( curvedLength, storageCapacity, vehs );
-		// yyyy this whole logic does not make sense any more with vehicles of different sizes.  At best, we could sum
-		// up all PCEs over all vehicles, and then divide link length by this sum to get spacing of one PCE.  Not sure ...  kai, apr'16
-		// yy Could also argue that equilDist is not really needed any more since in those cases where this is important
-		// (large scale overview over system), there is now VIA.  ???? kai, apr'16
 
 		double freespeedTraveltime = curvedLength / freeSpeed ;
 
 		double lastDistanceFromFromNode = Double.NaN;
 
 		Iterator<Entry<Double, Hole>> iterator = holePositions.entrySet().iterator() ;
-
-
+		
 		for ( MobsimVehicle mveh : vehs ) {
 			QVehicle veh = (QVehicle) mveh ;
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
@@ -188,12 +183,11 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
 			
 			Integer lane = VisUtils.guessLane(veh, numberOfLanesAsInt );
-			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh,
-					inverseFlowCapPerTS, now, freeSpeed);
-			this.positionAgentOnLink(positions, upstreamCoord, downstreamCoord,
-					curvedLength, veh, distanceFromFromNode,
-					lane, speedValue);
+			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh, inverseFlowCapPerTS, now, freeSpeed);
+			this.positionAgentOnLink(positions, upstreamCoord, downstreamCoord, curvedLength, veh, distanceFromFromNode, lane, speedValue);
 			lastDistanceFromFromNode = distanceFromFromNode;
+			
+			
 
 			if ( this.scenario.getConfig().qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
 				while ( iterator.hasNext() ) {
@@ -201,9 +195,19 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					double size = entry.getValue().getSizeInEquivalents() ;
 					double holePositionFromFromNode = entry.getKey() ;
 					// since hole position here is from fromNode, subtracting it from (curved) length to get the position from toNode. amit Nov'15
-					if ( curvedLength -  holePositionFromFromNode > lastDistanceFromFromNode ) {  // +7.5?  -7.5?  +7.5*size?  -7.5*size?
-//						lastDistanceFromFromNode +=  7.5 * size ; // why dependent on size when a vehicle take 7.5 m? amit Nov 15
-						lastDistanceFromFromNode +=  7.5  ; // where is the magic number coming from?  cellSize??
+
+					if ( curvedLength -  holePositionFromFromNode > lastDistanceFromFromNode ) {  
+
+						lastDistanceFromFromNode +=  7.5 * size ; 
+						// why dependent on size when a vehicle take 7.5 m? amit Nov 15
+						// because the hole also has different size, depending on size of vehicle that created it.  kai, apr'16
+						
+						// yyyy +7.5?  -7.5?  +7.5*size?  -7.5*size?
+						// there should actually be a "hole" spacing, similar to spacingOfOnePCE computed above.  I think it is in fact
+						// already computed in QueueWithBuffer, although that feels like the wrong place.  kai, apr'16
+						
+						// yyyyyy Isn't this "losing" holes?  I.e. if the above if condition is wrong, that hole is lost?  
+						
 					} else {
 						break ;
 					}
