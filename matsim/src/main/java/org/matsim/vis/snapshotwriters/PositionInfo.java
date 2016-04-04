@@ -42,7 +42,6 @@ public class PositionInfo implements AgentSnapshotInfo {
 	private double colorValue = 0;
 	private AgentState agentState = null;
 	private Id<Link> linkId = null;
-	private int type = 0;
 	private int user = 0;
 
 	/* package-private */ PositionInfo() { }
@@ -102,18 +101,6 @@ public class PositionInfo implements AgentSnapshotInfo {
 	}
 	public final void setLinkId( Id<Link> tmp ) {
 		this.linkId = tmp ;
-	}
-
-	@Override
-	@Deprecated // yyyy I don't know what this is.  kai, jan'10
-	public int getType() {
-		return this.type;
-	}
-
-	@Override
-	@Deprecated // yyyy I don't know what this is.  kai, jan'10
-	public void setType( int tmp ) {
-		this.type = tmp ;
 	}
 
 	@Override

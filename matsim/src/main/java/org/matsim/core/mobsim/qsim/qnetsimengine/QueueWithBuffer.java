@@ -822,12 +822,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			double speedValue = 1. ;
 			if (this.upstreamCoord != null){
 				context.snapshotInfoBuilder.positionQItem(positions, this.upstreamCoord, this.downsteamCoord,
-						QueueWithBuffer.this.length, this.euklideanDistance, veh,
-						distanceFromFromNode, lane, speedValue);
+						QueueWithBuffer.this.length, veh, distanceFromFromNode,
+						lane, speedValue);
 			} else {
 				context.snapshotInfoBuilder.positionQItem(positions, qLink.getLink().getFromNode().getCoord(), qLink.getLink().getToNode().getCoord(),
-						QueueWithBuffer.this.length, ((LinkImpl)qLink.getLink()).getEuklideanLength() , veh, 
-						distanceFromFromNode, lane, speedValue);
+						QueueWithBuffer.this.length, veh , distanceFromFromNode, 
+						lane, speedValue);
 			}
 		}
 		

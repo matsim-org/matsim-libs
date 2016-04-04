@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -141,7 +140,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne){
 		MobsimDriverAgent driverAgent = veh.getDriver();
 		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), startCoord, endCoord, 
-				distanceFromFromNode, lane, lengthOfCurve, euclideanLength);
+				distanceFromFromNode, lane, lengthOfCurve);
 		pos.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 		if (driverAgent instanceof TransitDriverAgent){
 			pos.setAgentState(AgentState.TRANSIT_DRIVER);
@@ -155,7 +154,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		}
 
 		this.positionPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord, 
-				endCoord, lengthOfCurve, euclideanLength, lane+5, speedValueBetweenZeroAndOne);
+				endCoord, lengthOfCurve, lane+5, speedValueBetweenZeroAndOne);
 		// (this is deliberately first memorizing "pos" but then filling in the passengers first)
 
 		positions.add(pos);
@@ -163,10 +162,11 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	public final void positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
 			double now, Collection<MobsimVehicle> vehs, TreeMap<Double,Hole> holePositions, double curvedLength, 
-			double storageCapacity, double euklideanDistance, Coord upstreamCoord, Coord downstreamCoord, 
+			double storageCapacity, double euklideanLength, Coord upstreamCoord, Coord downstreamCoord, 
 			double inverseFlowCapPerTS, double freeSpeed, int numberOfLanesAsInt)
 	{
 		double spacing = this.calculateVehicleSpacing( curvedLength, vehs.size(), storageCapacity );
+//		double spacing = this.calculateVehicleSpacing( euklideanLength, vehs.size(), storageCapacity );
 		double freespeedTraveltime = curvedLength / freeSpeed ;
 
 		double lastDistanceFromFromNode = Double.NaN;
@@ -185,7 +185,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			double speedValue = AbstractAgentSnapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh,
 					inverseFlowCapPerTS, now, freeSpeed);
 			this.positionAgentOnLink(positions, upstreamCoord, downstreamCoord,
-					curvedLength, euklideanDistance, veh,
+					curvedLength, euklideanLength, veh,
 					distanceFromFromNode, lane, speedValue);
 			lastDistanceFromFromNode = distanceFromFromNode;
 
@@ -209,10 +209,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 
 	public final void positionQItem(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, 
-			double lengthOfCurve, double euclideanLength, QItem veh, 
-			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne){
+			double lengthOfCurve, QItem veh, double distanceFromFromNode, 
+			Integer lane,	double speedValueBetweenZeroAndOne){
 		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class), endCoord, startCoord, 
-				distanceFromFromNode, lane, lengthOfCurve, euclideanLength);
+				distanceFromFromNode, lane, lengthOfCurve);
 		pos.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 		pos.setAgentState(AgentState.PERSON_OTHER_MODE );
 		positions.add(pos);
@@ -243,7 +243,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	final void positionPassengers(Collection<AgentSnapshotInfo> positions,
 			Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
-			double lengthOfCurve, double euclideanLength, Integer lane, double speedValueBetweenZeroAndOne) {
+			double lengthOfCurve, Integer lane, double speedValueBetweenZeroAndOne) {
 		int cnt = passengers.size();
 		int laneInt = 2*(cnt+1);
 		if (lane != null){
@@ -252,7 +252,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		for (PassengerAgent passenger : passengers) {
 			int lanePos = laneInt - 2*cnt ;
 			AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), startCoord, endCoord, 
-					distanceOnLink, lanePos, lengthOfCurve, euclideanLength);
+					distanceOnLink, lanePos, lengthOfCurve);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 			passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger
 			positions.add(passengerPosition);
@@ -290,7 +290,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	 * @param now
 	 * @param freespeedTraveltime
 	 * @param remainingTravelTime
-	 * @return
 	 */
 	public abstract double calculateDistanceOnVectorFromFromNode2(double length, double spacing, double lastDistanceFromFromNode, double now,
 			double freespeedTraveltime, double remainingTravelTime);

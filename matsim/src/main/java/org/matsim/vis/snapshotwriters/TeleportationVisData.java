@@ -39,7 +39,6 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	private final double starttime;
 	private final Id<Person> agentId;
 	private int userDefined;
-	private int type;
 	private double colorval;
 	private AgentState state = AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE;
 	private int intX;
@@ -59,6 +58,9 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 		this.endY = toCoord.getY();
 		this.currentX = startX;
 		this.currentY = startY;
+		
+		// the following is there to somewhat shift teleported agents.  So that they are not exactly on top of each other when they have
+		// exactly the same dp time and destination ... as may happen e.g. for teleported transit walk and illustrative examples. kai, apr'16
 		String idstr = personId.toString();
 		int hashCode = idstr.hashCode();
 		intX = hashCode%offset;
@@ -82,7 +84,7 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 		return this.agentId;
 	}
 
-	public void calculatePosition(double time) {
+	public final void updatePosition(double time) {
 		double frac = (time - starttime) / travelTime ;
 		this.currentX = (1.-frac) * this.startX + frac * this.endX + 0.1*(intX-offset/2) ;
 		this.currentY = (1.-frac) * this.startY + frac * this.endY + 0.1*(intY-offset/2) ;
@@ -104,11 +106,6 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	}
 
 	@Override
-	public int getType() {
-		return this.type;
-	}
-
-	@Override
 	public int getUserDefined() {
 		return this.userDefined;
 	}
@@ -122,12 +119,6 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	public void setColorValueBetweenZeroAndOne(double tmp) {
 		this.colorval = tmp;
 	}
-
-	@Override
-	public void setType(int tmp) {
-		this.type = tmp;
-	}
-
 	@Override
 	public void setUserDefined(int tmp) {
 		this.userDefined = tmp;
