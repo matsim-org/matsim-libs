@@ -19,8 +19,11 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 
 /**
@@ -39,13 +42,20 @@ class WithHolesAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder
 	}
 
 	@Override
-	public double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink,
-			double overallStorageCapacity) {
-	// the length of a vehicle in visualization
+	public double calculateVehicleSpacing(double curvedLength, double overallStorageCapacity,
+			Collection<? extends VisVehicle> vehs) {
+		// the length of a vehicle in visualization
+
+		double sum = 0. ;
+		for ( VisVehicle veh : vehs ) {
+			sum += veh.getSizeInEquivalents() ;
+		}
+
 
 		double vehLen = Math.min( 
-		linkLength / (overallStorageCapacity), // number of ``cells''
-		linkLength / (numberOfVehiclesOnLink) ); // the link may be more than ``full'' because of forward squeezing of stuck vehicles
+				curvedLength / overallStorageCapacity , // number of ``cells''
+				curvedLength / sum  // the link may be more than ``full'' because of forward squeezing of stuck vehicles 
+				);
 		
 		return vehLen;
 	}

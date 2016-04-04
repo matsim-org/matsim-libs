@@ -527,8 +527,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 					VisLane otfLane = visLink.getLaneData().get(
 							((QueueWithBuffer) ql).getId().toString());
 					((QueueWithBuffer.VisDataImpl) ql.getVisData()).setVisInfo(
-							otfLane.getStartCoord(), otfLane.getEndCoord(),
-							otfLane.getEuklideanDistance());
+							otfLane.getStartCoord(), otfLane.getEndCoord());
 				}
 			}
 

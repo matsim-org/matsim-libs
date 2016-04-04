@@ -748,19 +748,33 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 
 		@Override
-		final double getSizeInEquivalents() {
+		public final double getSizeInEquivalents() {
 			return this.pcu;
 		}
 
 		final void setSizeInEquivalents(double pcuFactorOfHole) {
 			this.pcu = pcuFactorOfHole;
 		}
+
+		@Override
+		public Vehicle getVehicle() {
+			return null ;
+		}
+
+		@Override
+		public MobsimDriverAgent getDriver() {
+			return null ;
+		}
+
+		@Override
+		public Id<Vehicle> getId() {
+			return null ;
+		}
 	}
 
 	class VisDataImpl implements QLaneI.VisData {
 		private Coord upstreamCoord;
 		private Coord downsteamCoord;
-		private double euklideanDistance;
 
 		@Override
 		public final Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions, double now) {
@@ -768,7 +782,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			if ( QSimConfigGroup.SnapshotStyle.withHoles==context.qsimConfig.getSnapshotStyle() ) {
 				// holes:
 				if ( !holes.isEmpty() ) {
-					double spacing = context.snapshotInfoBuilder.calculateVehicleSpacing(length, holes.size(), getStorageCapacity() );
+					double spacing = context.snapshotInfoBuilder.calculateVehicleSpacing(length, getStorageCapacity(), holes );
 					double freespeedTraveltime = length / (HOLE_SPEED*1000./3600.);
 					double lastDistanceFromFromNode = Double.NaN;
 					for (Hole hole : holes) {
@@ -831,10 +845,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			}
 		}
 		
-		void setVisInfo(Coord upstreamCoord, Coord downstreamCoord, double euklideanDistance) {
+		void setVisInfo(Coord upstreamCoord, Coord downstreamCoord) {
 			this.upstreamCoord = upstreamCoord;
 			this.downsteamCoord = downstreamCoord;
-			this.euklideanDistance = euklideanDistance;
 		}
 	}
 

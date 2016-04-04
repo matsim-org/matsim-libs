@@ -45,6 +45,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 
 /**
@@ -73,14 +74,13 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			boolean first = true;
 			for (Identifiable passenger : peopleInVehicle) {
 				cnt2++ ;
-				AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 0.9*link.getLength(), cnt2); // for the time being, same position as facilities
+				AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 
+						0.9*link.getLength(), cnt2); // for the time being, same position as facilities
 				if (passenger.getId().toString().startsWith("pt")) {
 					passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
-				}
-				else if (first) {
+				} else if (first) {
 					passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);
-				}
-				else {
+				} else {
 					passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE);
 				}
 				positions.add(passengerPosition);
@@ -105,7 +105,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	 * Put the transit vehicles from the transit stop list in positions.
 	 * @param transitVehicleStopQueue 
 	 */
-	public final int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
+	public final int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, 
+			Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
 		if (transitVehicleStopQueue.size() > 0) {
 			for (QVehicle veh : transitVehicleStopQueue) {
 				List<Identifiable<?>> peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
@@ -165,8 +166,12 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			double storageCapacity, Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, 
 			double freeSpeed, int numberOfLanesAsInt)
 	{
-		double spacing = this.calculateVehicleSpacing( curvedLength, vehs.size(), storageCapacity );
-//		double spacing = this.calculateVehicleSpacing( euklideanLength, vehs.size(), storageCapacity );
+		double spacingOfOnePCE = this.calculateVehicleSpacing( curvedLength, storageCapacity, vehs );
+		// yyyy this whole logic does not make sense any more with vehicles of different sizes.  At best, we could sum
+		// up all PCEs over all vehicles, and then divide link length by this sum to get spacing of one PCE.  Not sure ...  kai, apr'16
+		// yy Could also argue that equilDist is not really needed any more since in those cases where this is important
+		// (large scale overview over system), there is now VIA.  ???? kai, apr'16
+
 		double freespeedTraveltime = curvedLength / freeSpeed ;
 
 		double lastDistanceFromFromNode = Double.NaN;
@@ -178,9 +183,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			QVehicle veh = (QVehicle) mveh ;
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
 
-			double distanceFromFromNode = this.calculateDistanceOnVectorFromFromNode2(curvedLength, spacing,
+			double distanceFromFromNode = this.calculateDistanceOnVectorFromFromNode2(curvedLength, 
+					mveh.getSizeInEquivalents()*spacingOfOnePCE ,
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
-
+			
 			Integer lane = VisUtils.guessLane(veh, numberOfLanesAsInt );
 			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh,
 					inverseFlowCapPerTS, now, freeSpeed);
@@ -238,7 +244,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	}
 
 
-	public abstract double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double overallStorageCapacity);
+	public abstract double calculateVehicleSpacing(double linkLength, double overallStorageCapacity, Collection<? extends VisVehicle> vehs);
 
 	/**
 	 * @param length

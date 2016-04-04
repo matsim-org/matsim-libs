@@ -19,8 +19,11 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 /**
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
@@ -34,9 +37,13 @@ final class EquiDistAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBu
 
 	
 	@Override
-	public double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink,
-			double overallStorageCapacity) {
-		return linkLength / numberOfVehiclesOnLink;
+	public double calculateVehicleSpacing(double linkLength, double overallStorageCapacity,
+			Collection<? extends VisVehicle> vehs) {
+		double sum = 0. ;
+		for ( VisVehicle veh : vehs ) {
+			sum += veh.getSizeInEquivalents() ;
+		}
+		return linkLength / sum ;
 	}
 
 	@Override
