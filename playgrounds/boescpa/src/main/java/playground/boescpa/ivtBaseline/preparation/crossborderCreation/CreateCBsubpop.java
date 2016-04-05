@@ -37,6 +37,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Random;
 
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
+
 /**
  * Trunk class for the creation of cross-border (cb) sub-populations.
  *
@@ -48,7 +50,7 @@ abstract class CreateCBsubpop {
 	final static String DELIMITER = ";";
 	final static String CB_TAG = "cb";
 
-	private final Population cbTransitPopulation;
+	private final Population newCBPopulation;
 	private final ActivityFacilities origFacilities;
 	private final double[] cummulativeDepartureProbability;
 	final double samplePercentage;
@@ -56,7 +58,7 @@ abstract class CreateCBsubpop {
 	private int index = 0;
 
 	final Population getPopulation() {
-		return cbTransitPopulation;
+		return newCBPopulation;
 	}
 
 	final ActivityFacilities getOrigFacilities() {
@@ -64,7 +66,7 @@ abstract class CreateCBsubpop {
 	}
 
 	CreateCBsubpop(String pathToFacilities, String pathToCumulativeDepartureProbabilities, double samplePercentage, long randomSeed) {
-		this.cbTransitPopulation = PopulationUtils.getEmptyPopulation();
+		this.newCBPopulation = PopulationUtils.getEmptyPopulation();
 		this.origFacilities = FacilityUtils.readFacilities(pathToFacilities);
 		addHomeActivityIfNotInFacilityYet(this.origFacilities);
 		this.cummulativeDepartureProbability = readDepartures(pathToCumulativeDepartureProbabilities);
@@ -90,10 +92,10 @@ abstract class CreateCBsubpop {
 	private void addHomeActivityIfNotInFacilityYet(ActivityFacilities facilities) {
 		for (ActivityFacility facility : facilities.getFacilities().values()) {
 			if (facility.getId().toString().contains("cb_")) {
-				if (!facility.getActivityOptions().keySet().contains("home")) {
-					((ActivityFacilityImpl)facility).createAndAddActivityOption("home");
+				if (!facility.getActivityOptions().keySet().contains(HOME)) {
+					((ActivityFacilityImpl)facility).createAndAddActivityOption(HOME);
 					OpeningTime ot = new OpeningTimeImpl(0.0 * 3600.0, 24.0 * 3600.0);
-					facility.getActivityOptions().get("home").addOpeningTime(ot);
+					facility.getActivityOptions().get(HOME).addOpeningTime(ot);
 				}
 			}
 		}
@@ -110,22 +112,22 @@ abstract class CreateCBsubpop {
 		}
 		// create and add new agent
 		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(CB_TAG + "_" + subTag + "_" + index++, Person.class));
-		cbTransitPopulation.addPerson(p);
-		cbTransitPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", CB_TAG);
+		newCBPopulation.addPerson(p);
+		newCBPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", CB_TAG);
 		// create and add new plan
 		p.addPlan(createSingleTripPlan(origFacility, destFacility));
 	}
 
 	abstract Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility);
 
-	final int getDepartureTime() {
+	final double getDepartureTime() {
 		double randDep = random.nextDouble();
 		// identify selected hour of day
 		int hour = 0;
 		while (hour < 23 && cummulativeDepartureProbability[hour + 1] < randDep) {
 			hour++;
 		}
-		int time = hour*60*60;
+		double time = hour*60*60;
 		// random assignment within that hour of the day
 		time += random.nextInt(3600);
 		return time;

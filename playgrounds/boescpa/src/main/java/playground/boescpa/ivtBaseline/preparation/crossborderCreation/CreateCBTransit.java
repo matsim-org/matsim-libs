@@ -21,7 +21,6 @@
 
 package playground.boescpa.ivtBaseline.preparation.crossborderCreation;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
@@ -38,6 +37,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.HOME;
 
 /**
  * Implementation of the trunk class CreateCBsubpop for the creation of transit single-trip cb-agents.
@@ -138,7 +139,7 @@ public class CreateCBTransit extends CreateCBsubpop {
 		Plan plan = new PlanImpl();
 		int departureTime = getDepartureTime();
 
-		ActivityImpl actStart = new ActivityImpl("home", origFacility.getCoord(), origFacility.getLinkId());
+		ActivityImpl actStart = new ActivityImpl(HOME, origFacility.getCoord(), origFacility.getLinkId());
 		actStart.setFacilityId(origFacility.getId());
 		actStart.setStartTime(0.0);
 		actStart.setMaximumDuration(departureTime);
@@ -147,7 +148,7 @@ public class CreateCBTransit extends CreateCBsubpop {
 
 		plan.addLeg(new LegImpl("car"));
 
-		ActivityImpl actEnd = new ActivityImpl("home", destFacility.getCoord(), destFacility.getLinkId());
+		ActivityImpl actEnd = new ActivityImpl(HOME, destFacility.getCoord(), destFacility.getLinkId());
 		actEnd.setFacilityId(destFacility.getId());
 		actEnd.setStartTime(departureTime);
 		actEnd.setMaximumDuration(24.0 * 3600.0 - departureTime);
