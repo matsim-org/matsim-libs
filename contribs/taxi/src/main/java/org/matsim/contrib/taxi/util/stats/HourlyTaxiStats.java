@@ -47,7 +47,7 @@ public class HourlyTaxiStats
 
 
     public static final String MAIN_HEADER = // 
-    "\tPassenger_Wait_Time [min]\t\t\t\t\t\t\t\t\t\t" + //
+    "\tPassenger_Wait_Time [s]\t\t\t\t\t\t\t\t\t\t" + //
             "\tEmpty_Drive_Ratio [%]\t\t\t\t\t\t\t\t\t\t" + //
             "\tVehicle_Wait_Ratio [%]\t\t\t\t\t\t\t\t\t\t" + //
             "\tNum_Vehicle_Wait_Ratio [%]\t\t\t\t\t";
