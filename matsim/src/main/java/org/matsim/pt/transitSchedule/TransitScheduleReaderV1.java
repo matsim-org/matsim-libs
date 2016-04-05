@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -64,6 +65,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 	private TempRoute currentRouteProfile = null;
 
 	private final CoordinateTransformation coordinateTransformation;
+	private final StringCache cache = new StringCache(); 
 
 	/**
 	 * @param schedule
@@ -124,7 +126,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 				stop.setLinkId(linkId);
 			}
 			if (atts.getValue(Constants.NAME) != null) {
-				stop.setName(atts.getValue(Constants.NAME));
+				stop.setName(this.cache.get(atts.getValue(Constants.NAME)));
 			}
 			this.schedule.addStopFacility(stop);
 		} else if (Constants.TRANSIT_LINE.equals(name)) {
@@ -250,6 +252,29 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 			}
 		}
 
+	}
+
+	private static class StringCache {
+
+		private ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<String, String>(10000);
+
+		/**
+		 * Returns the cached version of the given String. If the strings was
+		 * not yet in the cache, it is added and returned as well.
+		 *
+		 * @param string
+		 * @return cached version of string
+		 */
+		public String get(final String string) {
+			if (string == null) {
+				return null;
+			}
+			String s = cache.putIfAbsent(string, string);
+			if (s == null) {
+				return string;
+			}
+			return s;
+		}
 	}
 
 }
