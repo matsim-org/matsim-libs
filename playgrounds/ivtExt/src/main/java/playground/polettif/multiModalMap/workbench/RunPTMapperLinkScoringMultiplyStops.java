@@ -20,28 +20,26 @@
 package playground.polettif.multiModalMap.workbench;
 
 import GTFS2PTSchedule.GTFS2MATSimTransitSchedule;
+import playground.polettif.multiModalMap.mapping.PTMapperLinkScoringMultiplyStops;
 
-public class Run {
+public class RunPTMapperLinkScoringMultiplyStops {
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
+
 		String base = "C:/Users/polettif/Desktop/";
-		String osm = "input/osm/zh_plus.osm";
-		String osmNetwork1 = "output/osm/network_LV03plus.xml";
-		String osmNetwork2 = "output/osm/network_WGS84.xml";
+		String outbase = base+"output/mtsMapping/";
 
-		String gtfs = "output/gtfs2MATSimTransitSchedule/transitSchedule.xml";
-		String outputNetwork = "output/osm/network_gtfs.xml";
+		// input
+//		final String mtsFile = base + "data/mts/zvv/zvv_unmappedSchedule_LV1903+.xml";
+		final String mtsFile = base + "data/mts/uri/schedule_unmapped_cut.xml";
+//		final String mtsFile = base + "data/mts/uri/debug.xml";
+//		final String mtsFile = base + "data/mts/zvv_69er.xml";
 
-		// generate network from osm
-//		String[] inputOSM = {base+osm, base+osmNetwork1};
-//		Osm2Network.main(inputOSM);
+		final String networkFile = base + "data/network/uri.xml.gz";
+//		final String networkFile = base + "data/network/zurich-city.xml.gz";
+//		final String networkFile = base + "data/network/zurich-plus.xml.gz";
 
-		// Transform network "CH1903_LV03_Plus", "WGS84"
-//		TransformNetworkFile.run(base+osmNetwork1, base+osmNetwork2, "CH1903_LV03_Plus", "WGS84");
-
-		String[] inputGTFS = {base + gtfs, base + osmNetwork2, base + outputNetwork, "Test"};
-		GTFS2MATSimTransitSchedule.main(inputGTFS);
-
+		PTMapperLinkScoringMultiplyStops.main(new String[]{mtsFile, networkFile, outbase+"schedule.xml", outbase+"network.xml"});
 	}
 
 }

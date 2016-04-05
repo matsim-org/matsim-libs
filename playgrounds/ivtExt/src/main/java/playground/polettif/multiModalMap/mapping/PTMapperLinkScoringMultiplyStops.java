@@ -22,68 +22,86 @@
 package playground.polettif.multiModalMap.mapping;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmarksSimpleRouting;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
-import playground.polettif.multiModalMap.mapping.container.SubRoutes;
 import playground.polettif.multiModalMap.mapping.container.InterStopPath;
 import playground.polettif.multiModalMap.mapping.container.InterStopPathSet;
+import playground.polettif.multiModalMap.mapping.container.SubRoutes;
 import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
 
 /**
- * Combines routing and referencing of stopFacilities. What happens for each route:
- * <ol>
- * <li>getting linkCandidates for each routeStop</li>
- * <li>create a ChildStopFacility for each linkCandidate and reference that link</li>
- * <li>routes between linkCandidates for several/all pairs of stops</li>
- * <li>calculate linkWeights for links used by the routes (basically the more a link is used by different paths, the better its weight)</li>
- * <li>get the most plausible link for each parent stop. The plausibilityScore is calculated with the link weight and the distance between link and stopfacility</li>
- * <li>exchange the parent stop in the StopSequence with the ChildStopFacility which refers to the best scoring link</li>
- * <li>routing between the now fixed stoplinks of the route</li>
- * </ol>
- * <p/>
- * Already calculated path, route pairs and weights are stored.
+ * References an unmapped transit schedule to a network. Combines routing and referencing of stopFacilities. Creates additional
+ * stop facilities if a stopFacility has more than one plausible link. @see main()
  *
  * @author polettif
  */
 public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 
-	// TODO ensure coordinate system is not WGS84 since this is not suitable for coordinate calculations
+	// TODO ensure coordinate system is not WGS84 since this is not suitable for coordinate calculations (or warn accordingly)
+	// TODO move params to a config?
 
-	// params TODO move to a config?
-	private final static double NODE_SEARCH_RADIUS = 300; //[m] 150
-	private final static int MAX_N_CLOSEST_LINKS = 8; // number of link candidates considered for all stops, depends on accuracy of stops
-	private final static boolean CONSIDER_LINK_FACILITY_DISTANCE = false; // should the distance from the facility to a link be included in the link scoring? (default true)
-	private final static int LOOKAHEAD_STOPS = 10; // number of next stops that should be included in calculations
+	/**
+	 * Defines the radius [meter] from a stop facility within nodes are searched.
+	 * Mainly a maximum value for performance.
+	 */
+	private final static double NODE_SEARCH_RADIUS = 300;
+
+	/**
+	 * Number of link candidates considered for all stops, depends on accuracy of
+	 * stops and desired performance. Somewhere between 4 and 8 seems reasonable.
+	 */
+	private final static int MAX_N_CLOSEST_LINKS = 8;
+
+	/**
+	 * Should the distance from the facility to a link be included in the
+	 * link scoring? Set to false if StopFacility coordinates are severely inaccurate.
+	 */
+	private final static boolean CONSIDER_LINK_FACILITY_DISTANCE = true;
+
+	/**
+	 * Number of next stops that should be included in calculations for link weights.
+	 * Paths are calculated for stop[i] -> stop[i+1] up to stop[i] -> stop[i+LOOKAHEAD_STOPS]
+	 */
+	private final static int LOOKAHEAD_STOPS = 10;
+
+	/**
+	 * ID prefix used for artificial link created if no nodes are found within {@link #NODE_SEARCH_RADIUS}
+	 */
 	private final static String PREFIX_ARTIFICIAL_LINKS = "pt_";
-	private final static String SUFFIX_ARTIFICIAL_STOPFACILITIES = "_fac:";
 
-	private final static int MAX_INITIAL_ARTIFICIAL_LINK_LENGTH = 100000; // maximal length of artificial links
+	/**
+	 * Suffix used for child stop facilities. A number for each child of a parent stop facility is appended (i.e. stop0123_fac:2)
+	 */
+	private final static String SUFFIX_CHILD_STOPFACILITIES = "_fac:";
 
-	// TODO use transit modes
-	private final Set<String> transitModes = Collections.singleton(TransportMode.pt);
-
+	/**
+	 * fields
+	 */
 	private int artificialId = 0;
 	private Map<TransitStopFacility, List<Link>> allClosestLinks = new HashMap<>();
-
-	//	private Map<Tuple<TransitLine, TransitRoute>, Map<TransitRouteStop, TransitStopFacility>> stopFacilitiesToReplace = new HashMap<>();
 	private ReplacementStorageLines stopFacilitiesToReplace = new ReplacementStorageLines();
-	private List<Tuple<TransitLine, TransitRoute>> newTransitLines = new ArrayList<>();
 	private HashMap<Tuple<TransitStopFacility, Id<Link>>, TransitStopFacility> refStopFacility = new HashMap<>();
-	private HashMap<TransitStopFacility, Integer> childCounter = new HashMap<>();
+	private HashMap<TransitStopFacility, Integer> childFacilityCounter = new HashMap<>();
+	private List<Tuple<TransitLine, TransitRoute>> newTransitLines = new ArrayList<>();
 
 
 	/**
@@ -98,23 +116,83 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 	}
 
 	/**
-	 * TODO: create main() for a static access using network file, unmapped schedule file and an output path
+	 * Routes the unmapped MATSim Transit Schedule file to the network given by file. Writes the resulting
+	 * schedule and network to xml files.<p/>
 	 *
-	 * @param args
+	 * The mapper combines routing and referencing of stopFacilities. Additional stop facilities are created if a
+	 * stopFacility has more than one plausible link. What happens for each route:
+	 * <ol>
+	 * <li>getting linkCandidates for each routeStop</li>
+	 * <li>create a ChildStopFacility for each linkCandidate and reference that link</li>
+	 * <li>routes between linkCandidates for several/all pairs of stops</li>
+	 * <li>calculate linkWeights for links used by the routes (basically the more a link is used by different paths, the better its weight)</li>
+	 * <li>get the most plausible link for each parent stop. The plausibilityScore is calculated with the link weight and the distance between link and stopfacility</li>
+	 * <li>exchange the parent stop in the StopSequence with the ChildStopFacility which refers to the best scoring link</li>
+	 * <li>routing between the now fixed stoplinks of the route</li>
+	 * <li>not used facilities are removed</li>
+	 * </ol>
+	 * <p/>
+	 *
+	 * @param args <br/>[0] unmapped MATSim Transit Schedule file<br/>
+	 * 			   [1] MATSim network file<br/>
+	 *             [2] output schedule file path<br/>
+	 *             [3] output network file path
+	 *
 	 */
 	public static void main(String[] args) {
+		if (args.length != 4) {
+			System.out.println("Incorrect number of arguments.\n[0] unmapped schedule file\n[1] network file\n[2] output schedule path\n[3]output network path");
+		}
 
+		mapFromFiles(args[0], args[1], args[2], args[3]);
 	}
+
+	/**
+	 * Routes the unmapped MATSim Transit Schedule file to the network given by file. Writes the resulting
+	 * schedule and network to xml files.<p/>
+	 *
+	 * The mapper combines routing and referencing of stopFacilities. Additional stop facilities are created if a
+	 * stopFacility has more than one plausible link. What happens for each route:
+	 * <ol>
+	 * <li>getting linkCandidates for each routeStop</li>
+	 * <li>create a ChildStopFacility for each linkCandidate and reference that link</li>
+	 * <li>routes between linkCandidates for several/all pairs of stops</li>
+	 * <li>calculate linkWeights for links used by the routes (basically the more a link is used by different paths, the better its weight)</li>
+	 * <li>get the most plausible link for each parent stop. The plausibilityScore is calculated with the link weight and the distance between link and stopfacility</li>
+	 * <li>exchange the parent stop in the StopSequence with the ChildStopFacility which refers to the best scoring link</li>
+	 * <li>routing between the now fixed stoplinks of the route</li>
+	 * <li>not used facilities are removed</li>
+	 * </ol>
+	 * <p/>
+	 *
+	 * @param matsimTransitScheduleFile unmapped MATSim Transit Schedule (unmapped: stopFacilities are not referenced to links and routes do not have a network route (linkSequence) yet.
+ 	 * @param networkFile MATSim network file
+	 * @param outputScheduleFile the resulting MATSim Transit Schedule
+	 * @param outputNetworkFile the resulting MATSim network (might have some additional links added)
+	 *
+	 */
+	public static void mapFromFiles(String matsimTransitScheduleFile, String networkFile, String outputScheduleFile, String outputNetworkFile) {
+		log.info("Reading schedule and network file...");
+		Scenario mainScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Network mainNetwork = mainScenario.getNetwork();
+		new TransitScheduleReader(mainScenario).readFile(matsimTransitScheduleFile);
+		new MatsimNetworkReader(mainNetwork).readFile(networkFile);
+		TransitSchedule mainSchedule = mainScenario.getTransitSchedule();
+
+		log.info("Mapping transit schedule to network...");
+		new PTMapperLinkScoringMultiplyStops(mainSchedule).routePTLines(mainNetwork);
+
+		log.info("Writing schedule and network to file...");
+		new TransitScheduleWriter(mainSchedule).writeFile(outputScheduleFile);
+		new NetworkWriter(mainNetwork).write(outputNetworkFile);
+
+		log.info("Mapping public transit to network successful!");
+	}
+
 
 	@Override
 	public void routePTLines(Network networkParam) {
 		setNetwork(networkParam);
-
-		// TODO add DUMMY_LINK to avoid null pointer stuff
-		// TODO remove after routing
-//		this.network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1), new Coord(0.0, 0.0)));
-//		this.network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2), new Coord(0.0, 0.0)));
-//		this.network.addLink(networkFactory.createLink(Id.createLinkId(GTFSReader.DUMMY_LINK), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_1)), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_2))));
 
 		log.info("Creating PT lines...");
 
@@ -153,10 +231,10 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 			 * generate child stop facilities and reference them
 			 */
 			for (Link l : closestLinks) {
-				Integer counter = (childCounter.containsKey(stopFacility) ? childCounter.put(stopFacility, childCounter.get(stopFacility) + 1) + 1 : childCounter.put(stopFacility, 1));
+				Integer counter = (childFacilityCounter.containsKey(stopFacility) ? childFacilityCounter.put(stopFacility, childFacilityCounter.get(stopFacility) + 1) + 1 : childFacilityCounter.put(stopFacility, 1));
 				counter = (counter == null ? 1 : counter);
 				TransitStopFacility newFacility = scheduleFactory.createTransitStopFacility(
-						Id.create(stopFacility.getId() + SUFFIX_ARTIFICIAL_STOPFACILITIES + counter, TransitStopFacility.class),
+						Id.create(stopFacility.getId() + SUFFIX_CHILD_STOPFACILITIES + counter, TransitStopFacility.class),
 						stopFacility.getCoord(),
 						stopFacility.getIsBlockingLane()
 				);
@@ -171,23 +249,18 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 		}
 
 		// assign new facilities to schedule
-		for (TransitStopFacility f : newFacilities) {
-			this.schedule.addStopFacility(f);
-		}
+		newFacilities.forEach(this.schedule::addStopFacility);
 
-		/**
-		 * initiate router
-		 */
+		// initiate router
 		PTLRouter router = new PTLRFastAStarLandmarksSimpleRouting(this.network);
 
-		/**
-		 *
+		/** [3]-[5]
+		 * iterate through
 		 * - lines
 		 *   - routes
 		 * 	   - stops
-		 * 	   - calculate link weights
-		 * 	   - get best scoring link and assign child stop facility
-		 *
+		 * 	   > calculate link weights
+		 * 	   > get best scoring link and assign child stop facility
 		 */
 		SubRoutes subRoutes = new SubRoutes();
 
@@ -199,8 +272,9 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 				if (route.getTransportMode().equals("bus")) {
 					counterLine.incCounter();
 
-					/** [.]
-					 * iterate through all stops of the route and get possible paths for linkCandidate pairs
+					/** [3]
+					 * iterate through all stops of the route and get possible paths for linkCandidate pairs. Store the
+					 * possible paths to calculate linkWeights later.
 					 */
 					for (int i = 0; i < routeStops.size(); i++) {
 						TransitRouteStop currentStop = routeStops.get(i);
@@ -232,7 +306,7 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 						}
 					}
 
-					/** [.]
+					/** [4]
 					 * get the linkWeights for all links relevant for the current sequence of route stops
 					 *
 					 * Each possible route between two possible linkCandidates that passes a link adds 
@@ -244,11 +318,11 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 					if (route.getId().toString().equals("line1_01037_001"))
 						log.debug("");
 
-					/** [.]
+					/** [5]
 					 * Get the best scoring link and exchange the parent stop in the routeProfile (stopSequence) with
 					 * the child stop (which has the best scoring link already referenced). The score is calucated with
-					 * the linkweight and the distance from the link and the stop facility.
-					 * Cannot modify the schedule within this loop, replacements are stored.
+					 * the linkweight and the distance from the link and the stop facility {@link
+					 * (Cannot modify the schedule within this loop, replacements are stored).
 					 */
 					for (TransitRouteStop currentStop : routeStops) {
 						Link mostPlausibleLink = getMostPlausibleLink(currentStop.getStopFacility(), routeLinkWeights);
@@ -259,8 +333,8 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 
 		} // - line loop
 
-		/** [.]
-		 * Replace the parent stopFacilities in the schedule
+		/** [6]
+		 * Actually replace the parent stopFacilities in the schedule
 		 */
 		log.info("Replacing StopFacilities with ChildStopFacilities...");
 		for (Id<TransitLine> lineId : stopFacilitiesToReplace.getLineIds()) {
@@ -281,9 +355,8 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 
 				TransitRoute newRoute = scheduleFactory.createTransitRoute(oldRouteId, null, newStopSequence, oldTransportMode);
 
-				for(Departure departure : route.getDepartures().values()) {
-					newRoute.addDeparture(departure);
-				}
+				// add departures
+				route.getDepartures().values().forEach(newRoute::addDeparture);
 
 				this.schedule.getTransitLines().get(line.getId()).removeRoute(route);
 
@@ -296,11 +369,7 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 			this.schedule.getTransitLines().get(entry.getFirst().getId()).addRoute(entry.getSecond());
 		}
 
-// TODO remove writer
-		new TransitScheduleWriter(schedule).writeFile("C:/Users/polettif/Desktop/output/test_replacementschedule.xml");
-
-
-		/** [5]
+		/** [7]
 		 * route all routes with the new referenced links
 		 */
 		// todo maybe put it back into the previous loop?
@@ -311,13 +380,12 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 				if (route.getTransportMode().equals("bus")) {
 
 					List<TransitRouteStop> routeStops = route.getStops();
-
 					List<Id<Link>> linkSequence = new ArrayList<>();
 
 					// add very first link
 					linkSequence.add(routeStops.get(0).getStopFacility().getLinkId());
 
-					// route backwards
+					// route backwards (from stop to previous stop)
 					for (int i = 1; i < routeStops.size(); i++) {
 						TransitRouteStop previousStop = routeStops.get(i-1);
 						Link previousLink = network.getLinks().get(previousStop.getStopFacility().getLinkId());
@@ -336,170 +404,35 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 				}
 			}
 		}
-		cleanStationsAndNetwork();
+
+		/** [8]
+		 * After all lines created, clean all non-linked stations, all pt-exclusive links (check allowed modes)
+		 * and all nodes which are non-linked to any link after the above cleaning...
+		 * Clean also the allowed modes for only the modes, no line-number any more...
+		 */
+		log.info("Clean Stations and Network...");
+		cleanSchedule();
+		addPTModeToNetwork();
+		removeNonUsedStopFacilities();
+		setConnectedStopFacilitiesToIsBlocking();
+		log.info("Clean Stations and Network... done.");
+
 		log.info("Creating PT lines... done.");
 	}
 
-
 	/**
-	 * Replaces the stop sequence on the route by creating a total new route, removing the old and adding the new one.
-	 *
-	 * @param line         the line the route is on
-	 * @param route        the route which stops should be replaced
-	 * @param replacements a map with the original TransitRouteStop and the replacing facility. Arrivals and Departures
-	 *                     are copied from the existing route.
-	 */
-	@Deprecated
-	private void replaceStop(TransitLine line, TransitRoute route, Map<TransitRouteStop, TransitStopFacility> replacements) {
-		Id<TransitRoute> oldRouteId = route.getId();
-		String oldTransportMode = route.getTransportMode();
-		List<TransitRouteStop> oldStopSequence = this.schedule.getTransitLines().get(line.getId()).getRoutes().get(route.getId()).getStops();
-		List<TransitRouteStop> newStopSequence = new ArrayList<>();
-
-		for (TransitRouteStop stop : oldStopSequence) {
-			newStopSequence.add(scheduleFactory.createTransitRouteStop(replacements.get(stop), stop.getArrivalOffset(), stop.getDepartureOffset()));
-		}
-
-		//	newRoute = scheduleFactory.createTransitRoute(oldRouteId, null, newStopSequence, oldTransportMode);
-
-		//	newTransitLines.put(line, newTransitLines.get(line).add());
-
-//		this.schedule.getTransitLines().get(line.getId()).getRoutes().containsValue(route);
-// 		this.schedule.getTransitLines().get(line.getId()).removeRoute(route);
-//		this.schedule.getTransitLines().get(line.getId()).addRoute(scheduleFactory.createTransitRoute(oldRouteId, null, newStopSequence, oldTransportMode));
-	}
-
-
-	/**
-	 * After all lines created, clean all non-linked stations, all pt-exclusive links (check allowed modes)
-	 * and all nodes which are non-linked to any link after the above cleaning...
-	 * Clean also the allowed modes for only the modes, no line-number any more...
-	 */
-	private void cleanStationsAndNetwork() {
-		log.info("Clean Stations and Network...");
-		// TODO get rid of dummy links which are implemented via gtfsreader (not independent)
-//		network.removeLink(Id.createLinkId(GTFSReader.DUMMY_LINK));
-//		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1));
-//		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2));
-
-// TODO clean network
-		cleanSchedule();
-//		prepareNetwork();
-		removeNonUsedStopFacilities();
-//		setConnectedStopFacilitiesToIsBlocking();
-
-		log.info("Clean Stations and Network... done.");
-	}
-
-	private void setConnectedStopFacilitiesToIsBlocking() {
-		Set<TransitStopFacility> facilitiesToExchange = new HashSet<>();
-		for (TransitStopFacility oldFacility : this.schedule.getFacilities().values()) {
-			if (this.network.getLinks().get(oldFacility.getLinkId()).getAllowedModes().contains(TransportMode.car)) {
-				TransitStopFacility newFacility = this.scheduleFactory.createTransitStopFacility(
-						oldFacility.getId(), oldFacility.getCoord(), true);
-				newFacility.setName(oldFacility.getName());
-				newFacility.setLinkId(oldFacility.getLinkId());
-				newFacility.setStopPostAreaId(oldFacility.getStopPostAreaId());
-				facilitiesToExchange.add(newFacility);
-			}
-		}
-		for (TransitStopFacility facility : facilitiesToExchange) {
-			TransitStopFacility facilityToRemove = this.schedule.getFacilities().get(facility.getId());
-			this.schedule.removeStopFacility(facilityToRemove);
-			this.schedule.addStopFacility(facility);
-		}
-	}
-
-	private void cleanSchedule() {
-		for (TransitLine line : this.schedule.getTransitLines().values()) {
-			Set<TransitRoute> toRemove = new HashSet<>();
-			for (TransitRoute transitRoute : line.getRoutes().values()) {
-				boolean removeRoute = false;
-				NetworkRoute networkRoute = transitRoute.getRoute();
-				if (networkRoute.getStartLinkId() == null || networkRoute.getEndLinkId() == null) {
-					removeRoute = true;
-				}
-				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
-					if (linkId == null) {
-						removeRoute = true;
-					}
-				}
-				if (removeRoute) {
-					log.error("NetworkRoute for " + transitRoute.getId().toString() + " incomplete. Remove route.");
-					toRemove.add(transitRoute);
-				}
-			}
-			if (!toRemove.isEmpty()) {
-				for (TransitRoute transitRoute : toRemove) {
-					line.removeRoute(transitRoute);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Add to any link that is passed by any route a "pt" in the modes, if it hasn't already one...
-	 */
-	private void prepareNetwork() {
-		Map<Id<Link>, ? extends Link> networkLinks = network.getLinks();
-		Set<Id<Link>> transitLinks = new HashSet<>();
-		for (TransitLine line : this.schedule.getTransitLines().values()) {
-			for (TransitRoute transitRoute : line.getRoutes().values()) {
-				NetworkRoute networkRoute = transitRoute.getRoute();
-				transitLinks.add(networkRoute.getStartLinkId());
-				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
-					transitLinks.add(linkId);
-				}
-				transitLinks.add(networkRoute.getEndLinkId());
-			}
-		}
-		for (Id<Link> transitLinkId : transitLinks) {
-			Link transitLink = networkLinks.get(transitLinkId);
-			if (!transitLink.getAllowedModes().contains(TransportMode.pt)) {
-				Set<String> modes = new HashSet<>();
-				modes.addAll(transitLink.getAllowedModes());
-				modes.add(TransportMode.pt);
-				transitLink.setAllowedModes(modes);
-			}
-		}
-	}
-
-	private void removeNonUsedStopFacilities() {
-		// Collect all used stop facilities:
-		Set<Id<TransitStopFacility>> usedStopFacilities = new HashSet<>();
-		for (TransitLine line : this.schedule.getTransitLines().values()) {
-			for (TransitRoute route : line.getRoutes().values()) {
-				for (TransitRouteStop stop : route.getStops()) {
-					usedStopFacilities.add(stop.getStopFacility().getId());
-				}
-			}
-		}
-		// Check all stop facilities if not used:
-		Set<TransitStopFacility> unusedStopFacilites = new HashSet<>();
-		for (Id<TransitStopFacility> facilityId : this.schedule.getFacilities().keySet()) {
-			if (!usedStopFacilities.contains(facilityId)) {
-				unusedStopFacilites.add(this.schedule.getFacilities().get(facilityId));
-			}
-		}
-		// Remove all stop facilities not used:
-		for (TransitStopFacility facility : unusedStopFacilites) {
-			this.schedule.removeStopFacility(facility);
-		}
-	}
-
-	/**
-	 * calculates the plausibility score for all closest links of a stopFacility
+	 * Calculates the plausibility score for all closest links of a stopFacility
 	 * <br/>
 	 * score = d + w
 	 * <br/>
 	 * d = distance stopFacility-Link (scaled 0..1)<br/>
-	 * w = link weight (scaled 0..1, only weights of linkCandidates are used to normalize)
+	 * w = link weight (scaled 0..1)
 	 *
 	 * <p/>In case <i>CONSIDER_LINK_FACILITY_DISTANCE</i> is set to false, the score is just the link weight
 	 *
 	 * @param stopFacility used to calculate the distance to the links
 	 * @param routeLinkWeights the link weights for the current route
-	 * @return map with plausibilityScores
+	 * @return Map with plausibilityScores
 	 */
 	private SortedMap<Double, Link> getLinkPlausibilityScores(TransitStopFacility stopFacility, Map<Id<Link>, Double> routeLinkWeights) {
 		Map<Id<Link>, Double> distances = new HashMap<>();
@@ -564,7 +497,7 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 	}
 
 	/**
-	 * normalizes the values of a map via 1-value/maxValue
+	 * Normalizes the values of a map via 1-value/maxValue
 	 *
 	 * @return the normalized map
 	 */
@@ -582,7 +515,121 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 		return map;
 	}
 
+	/**
+	 * cleanStationsAndNetwork
+	 * boescpa
+	 */
+	private void setConnectedStopFacilitiesToIsBlocking() {
+		Set<TransitStopFacility> facilitiesToExchange = new HashSet<>();
+		for (TransitStopFacility oldFacility : this.schedule.getFacilities().values()) {
+			if (this.network.getLinks().get(oldFacility.getLinkId()).getAllowedModes().contains(TransportMode.car)) {
+				TransitStopFacility newFacility = this.scheduleFactory.createTransitStopFacility(
+						oldFacility.getId(), oldFacility.getCoord(), true);
+				newFacility.setName(oldFacility.getName());
+				newFacility.setLinkId(oldFacility.getLinkId());
+				newFacility.setStopPostAreaId(oldFacility.getStopPostAreaId());
+				facilitiesToExchange.add(newFacility);
+			}
+		}
+		for (TransitStopFacility facility : facilitiesToExchange) {
+			TransitStopFacility facilityToRemove = this.schedule.getFacilities().get(facility.getId());
+			this.schedule.removeStopFacility(facilityToRemove);
+			this.schedule.addStopFacility(facility);
+		}
+	}
 
+	/**
+	 * cleanStationsAndNetwork
+	 * boescpa
+	 */
+	private void cleanSchedule() {
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			Set<TransitRoute> toRemove = new HashSet<>();
+			for (TransitRoute transitRoute : line.getRoutes().values()) {
+				boolean removeRoute = false;
+				NetworkRoute networkRoute = transitRoute.getRoute();
+				if (networkRoute.getStartLinkId() == null || networkRoute.getEndLinkId() == null) {
+					removeRoute = true;
+				}
+				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
+					if (linkId == null) {
+						removeRoute = true;
+					}
+				}
+				if (removeRoute) {
+					log.error("NetworkRoute for " + transitRoute.getId().toString() + " incomplete. Remove route.");
+					toRemove.add(transitRoute);
+				}
+			}
+			if (!toRemove.isEmpty()) {
+				for (TransitRoute transitRoute : toRemove) {
+					line.removeRoute(transitRoute);
+				}
+			}
+		}
+	}
+
+	/**
+	 * cleanStationsAndNetwork
+	 * Add to any link that is passed by any route a "pt" in the modes, if it hasn't already one...
+	 * boescpa
+	 */
+	private void addPTModeToNetwork() {
+		Map<Id<Link>, ? extends Link> networkLinks = network.getLinks();
+		Set<Id<Link>> transitLinks = new HashSet<>();
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			for (TransitRoute transitRoute : line.getRoutes().values()) {
+				NetworkRoute networkRoute = transitRoute.getRoute();
+				transitLinks.add(networkRoute.getStartLinkId());
+				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
+					transitLinks.add(linkId);
+				}
+				transitLinks.add(networkRoute.getEndLinkId());
+			}
+		}
+		for (Id<Link> transitLinkId : transitLinks) {
+			Link transitLink = networkLinks.get(transitLinkId);
+			if (!transitLink.getAllowedModes().contains(TransportMode.pt)) {
+				Set<String> modes = new HashSet<>();
+				modes.addAll(transitLink.getAllowedModes());
+				modes.add(TransportMode.pt);
+				transitLink.setAllowedModes(modes);
+			}
+		}
+	}
+
+	/**
+	 * cleanStationsAndNetwork
+	 * Add to any link that is passed by any route a "pt" in the modes, if it hasn't already one...
+	 * boescpa
+	 */
+	private void removeNonUsedStopFacilities() {
+		// Collect all used stop facilities:
+		Set<Id<TransitStopFacility>> usedStopFacilities = new HashSet<>();
+		for (TransitLine line : this.schedule.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				for (TransitRouteStop stop : route.getStops()) {
+					usedStopFacilities.add(stop.getStopFacility().getId());
+				}
+			}
+		}
+		// Check all stop facilities if not used:
+		Set<TransitStopFacility> unusedStopFacilites = new HashSet<>();
+		for (Id<TransitStopFacility> facilityId : this.schedule.getFacilities().keySet()) {
+			if (!usedStopFacilities.contains(facilityId)) {
+				unusedStopFacilites.add(this.schedule.getFacilities().get(facilityId));
+			}
+		}
+		// Remove all stop facilities not used:
+		for (TransitStopFacility facility : unusedStopFacilites) {
+			this.schedule.removeStopFacility(facility);
+		}
+	}
+
+	/**
+	 * Container class to store the lines in with routes which have parent stop facilities needing to be replaced
+	 * with child stop facilities.
+	 */
 	private class ReplacementStorageLines {
 
 		private Map<Id<TransitLine>, ReplacementStorageRoutes> lines = new HashMap<>();
@@ -611,6 +658,9 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 		}
 	}
 
+	/**
+	 * Container class to store routes with parent stop facilities that need to be replaced with child stop facilities.
+	 */
 	private class ReplacementStorageRoutes {
 
 		private Map<Id<TransitRoute>, Map<TransitStopFacility, TransitStopFacility>> routes = new HashMap<>();
