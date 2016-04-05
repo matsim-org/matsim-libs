@@ -28,7 +28,8 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.facilities.*;
 import playground.boescpa.ivtBaseline.preparation.PrefsCreator;
 import playground.boescpa.lib.obj.CSVReader;
 
@@ -44,6 +45,7 @@ import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
  */
 public class CreateCBWork extends CreateCBsubpop {
 
+	private static final double VICINITY_RADIUS = 10000; // radius [m] around zone centroid which is considered vicinity
 	private final List<Tuple<Double, Coord>> cumProbWorkFromA = new ArrayList<>();
 	private final List<Tuple<Double, Coord>> cumProbWorkFromD = new ArrayList<>();
 	private final List<Tuple<Double, Coord>> cumProbWorkFromF = new ArrayList<>();
@@ -111,7 +113,36 @@ public class CreateCBWork extends CreateCBsubpop {
 	}
 
 	private ActivityFacility getWorkFacility(List<Tuple<Double, Coord>> cumProbWorkFromX) {
-		return null;
+		double randCommunity = random.nextDouble();
+		// identify selected community
+		Coord coord = null;
+		int i = 0;
+		while (i < cumProbWorkFromX.size() && cumProbWorkFromX.get(i).getFirst() < randCommunity) {
+			coord = cumProbWorkFromX.get(i).getSecond();
+		}
+		// get a work facility in the perimeter of the center of this community.
+		return getWorkFacilityAround(coord);
+	}
+
+	private ActivityFacility getWorkFacilityAround(Coord coord) {
+		ActivityFacility workFacility = null;
+		int randFacility = random.nextInt(50);
+		int countFacility = 0;
+		for (ActivityFacility facility : getOrigFacilities().getFacilitiesForActivityType(WORK).values()) {
+			if (CoordUtils.calcEuclideanDistance(facility.getCoord(), coord) <= VICINITY_RADIUS) {
+				workFacility = facility;
+				if (++countFacility > randFacility) break;
+			}
+		}
+		if (workFacility == null) {
+			Id<ActivityFacility> facilityId = Id.create("temp_" + coord.toString(), ActivityFacility.class);
+			workFacility = getOrigFacilities().getFactory().createActivityFacility(facilityId, coord);
+			getOrigFacilities().addActivityFacility(workFacility);
+			ActivityOption activityOption = new ActivityOptionImpl(WORK);
+			activityOption.addOpeningTime(new OpeningTimeImpl(0.0, 24.0*3600.0));
+			workFacility.addActivityOption(activityOption);
+		}
+		return workFacility;
 	}
 
 	@Override
