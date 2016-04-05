@@ -67,15 +67,18 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 
 	/**
 	 * Number of link candidates considered for all stops, depends on accuracy of
-	 * stops and desired performance. Somewhere between 4 and 8 seems reasonable.
+	 * stops and desired performance. Somewhere between 4 and 10 seems reasonable,
+	 * depending on the accuracy of the stop facility coordinates.
 	 */
-	private final static int MAX_N_CLOSEST_LINKS = 6;
+	private final static int MAX_N_CLOSEST_LINKS = 8;
 
 	/**
-	 * Should the distance from the facility to a link be included in the
-	 * link scoring? Set to false if StopFacility coordinates are severely inaccurate.
+	 * For the link score, link weights (given by routing) and the distance link-stopFacility is considered. The
+	 * influence of the distance can be adjusted, 1.0 means the distance is as important as the link weight (both
+	 * values are scaled 0...1). Value depends again on the accuracy of stop facility coordinates. Set lower (not
+	 * less than zero however) if StopFacility coordinates are inaccurate.
 	 */
-	private final static boolean CONSIDER_LINK_FACILITY_DISTANCE = true;
+	private final static double LINK_FACILITY_DISTANCE_WEIGHT = 0.3;
 
 	/**
 	 * Number of next stops that should be included in calculations for link weights.
@@ -140,11 +143,11 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 	 *
 	 */
 	public static void main(String[] args) {
-		if (args == null || args.length != 4) {
-			System.out.println("Incorrect number of arguments (" + args.length + " given)\n[0] unmapped schedule file\n[1] network file\n[2] output schedule path\n[3]output network path");
+		if (args.length != 4) {
+			System.out.println("Incorrect number of arguments\n[0] unmapped schedule file\n[1] network file\n[2] output schedule path\n[3]output network path");
+		} else {
+			mapFromFiles(args[0], args[1], args[2], args[3]);
 		}
-
-		mapFromFiles(args[0], args[1], args[2], args[3]);
 	}
 
 	/**
@@ -443,8 +446,6 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 		// calculate all distances stopFacility-Link (get linkweight subset on the way)
 		for (Link ll : links) {
 			double distance = CoordUtils.distancePointLinesegment(ll.getFromNode().getCoord(), ll.getToNode().getCoord(), stopFacility.getCoord());
-			if (distance < minDist)
-				minDist = distance;
 
 			distances.put(ll.getId(), distance);
 
@@ -458,7 +459,9 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 		distances = normalizeInvert(distances);
 
 		for (Link ll : links) {
-			double plausibilityScore = (CONSIDER_LINK_FACILITY_DISTANCE ? (distances.get(ll.getId()) + (routeLinkWeightsSubset.get(ll.getId()))) : routeLinkWeightsSubset.get(ll.getId()));
+			double plausibilityScore = LINK_FACILITY_DISTANCE_WEIGHT*distances.get(ll.getId()) + (routeLinkWeightsSubset.get(ll.getId()));
+
+
 			rankedLinks.put(plausibilityScore, ll);
 		}
 
@@ -468,7 +471,7 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 	/**
 	 * @return the most plausible linkId calculated by {@link #getLinkPlausibilityScores}
 	 */
-	public Link getMostPlausibleLink(TransitStopFacility stopFacility, Map<Id<Link>, Double> routeLinkWeights) {
+	private Link getMostPlausibleLink(TransitStopFacility stopFacility, Map<Id<Link>, Double> routeLinkWeights) {
 		SortedMap<Double, Link> rankedLinks = getLinkPlausibilityScores(stopFacility, routeLinkWeights);
 
 		return rankedLinks.get(rankedLinks.lastKey());
@@ -479,7 +482,7 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 	 *
 	 * @return the normalized map
 	 */
-	public static Map<Id<Link>, Double> normalize(Map<Id<Link>, Double> map) {
+	private static Map<Id<Link>, Double> normalize(Map<Id<Link>, Double> map) {
 		// get maximal weight
 		double maxValue = 0;
 		for (Double v : map.values()) {
@@ -499,7 +502,7 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 	 *
 	 * @return the normalized map
 	 */
-	public static Map<Id<Link>, Double> normalizeInvert(Map<Id<Link>, Double> map) {
+	private static Map<Id<Link>, Double> normalizeInvert(Map<Id<Link>, Double> map) {
 		double maxValue = 0;
 		for (Double v : map.values()) {
 			if (v > maxValue)
