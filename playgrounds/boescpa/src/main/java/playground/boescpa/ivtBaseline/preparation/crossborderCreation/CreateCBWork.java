@@ -186,6 +186,8 @@ public class CreateCBWork extends CreateCBsubpop {
 		plan.addLeg(new LegImpl("car"));
 
 		ActivityImpl actSA = new ActivityImpl(WORK, destFacility.getCoord(), destFacility.getLinkId());
+		destFacility.getActivityOptions().get(WORK).setCapacity(
+				destFacility.getActivityOptions().get(WORK).getCapacity() + 1);
 		actSA.setFacilityId(destFacility.getId());
 		actSA.setStartTime(departureTime);
 		actSA.setMaximumDuration(returnTime - departureTime);

@@ -48,12 +48,13 @@ abstract class CreateCBsubpop {
 	final static Logger log = Logger.getLogger(CreateCBsubpop.class);
 
 	final static String DELIMITER = ";";
-	final static String CB_TAG = "cb";
+	private final static String CB_TAG = "cb";
 
 	private final Population newCBPopulation;
 	private final ActivityFacilities origFacilities;
+	private final ActivityFacilities bcFacilities = FacilitiesUtils.createActivityFacilities();
 	private final double[] cummulativeDepartureProbability;
-	final double samplePercentage;
+	private final double samplePercentage;
 	final Random random;
 	private int index = 0;
 
@@ -117,6 +118,13 @@ abstract class CreateCBsubpop {
 		newCBPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", CB_TAG);
 		// create and add new plan
 		p.addPlan(createSingleTripPlan(origFacility, destFacility));
+		// store facilities (if not already stored)
+		if (!bcFacilities.getFacilities().containsKey(origFacility.getId())) {
+			bcFacilities.addActivityFacility(origFacility);
+		}
+		if (!bcFacilities.getFacilities().containsKey(destFacility.getId())) {
+			bcFacilities.addActivityFacility(destFacility);
+		}
 	}
 
 	abstract Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility);
@@ -138,7 +146,7 @@ abstract class CreateCBsubpop {
 		new PopulationWriter(getPopulation()).write(pathToOutput_CBTransitPopulation);
 		new ObjectAttributesXmlWriter(getPopulation().getPersonAttributes())
 				.writeFile(pathToOutput_CBTransitPopulation.substring(0, pathToOutput_CBTransitPopulation.indexOf(".xml")) + "_Attributes.xml.gz");
-		new FacilitiesWriter(getOrigFacilities())
+		new FacilitiesWriter(bcFacilities)
 				.write(pathToOutput_CBTransitPopulation.substring(0, pathToOutput_CBTransitPopulation.indexOf(".xml")) + "_Facilities.xml.gz");
 	}
 }
