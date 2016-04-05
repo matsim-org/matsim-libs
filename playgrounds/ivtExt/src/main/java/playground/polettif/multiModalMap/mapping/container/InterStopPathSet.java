@@ -17,7 +17,7 @@
  * *********************************************************************** */
 
 
-package playground.polettif.multiModalMap.mapping.containter;
+package playground.polettif.multiModalMap.mapping.container;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;

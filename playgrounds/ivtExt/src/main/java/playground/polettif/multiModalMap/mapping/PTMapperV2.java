@@ -36,8 +36,8 @@ import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmarksSimpleRouting;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
-import playground.polettif.multiModalMap.mapping.containter.V2SolvedSubRoutes;
-import playground.polettif.multiModalMap.mapping.containter.InterStopPath;
+import playground.polettif.multiModalMap.mapping.container.V2SolvedSubRoutes;
+import playground.polettif.multiModalMap.mapping.container.InterStopPath;
 import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;

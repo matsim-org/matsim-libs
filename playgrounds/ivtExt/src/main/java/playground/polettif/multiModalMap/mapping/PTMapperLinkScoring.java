@@ -37,9 +37,9 @@ import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmarksSimpleRouting;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
-import playground.polettif.multiModalMap.mapping.containter.SubRoutes;
-import playground.polettif.multiModalMap.mapping.containter.InterStopPath;
-import playground.polettif.multiModalMap.mapping.containter.InterStopPathSet;
+import playground.polettif.multiModalMap.mapping.container.InterStopPath;
+import playground.polettif.multiModalMap.mapping.container.InterStopPathSet;
+import playground.polettif.multiModalMap.mapping.container.SubRoutes;
 import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
@@ -72,9 +72,13 @@ public class PTMapperLinkScoring extends PTMapper {
 
 	// TODO use transit modes
 	private final Set<String> transitModes = Collections.singleton(TransportMode.pt);
+
 	private int artificialId = 0;
 	private Map<TransitStopFacility, List<Link>> allClosestLinks = new HashMap<>();
+
+	//debug
 	private int multipleBestScoringLinks = 0;
+	private Map<Id<TransitStopFacility>, Integer> multipleStops = new HashMap<>();
 
 	/**
 	 * Constructor
@@ -261,6 +265,7 @@ public class PTMapperLinkScoring extends PTMapper {
 							// TODO duplicate stopFacility and change stopSequence for route
 							log.warn("     Multiple best scoring links for stopFacility \"" + nextStop.getStopFacility().getName() + "\" (id " + nextStop.getStopFacility().getId() + ")");
 							multipleBestScoringLinks++;
+							multipleStops.put(nextStop.getStopFacility().getId(), 1);
 						}
 
 						this.schedule.getFacilities().get(nextStop.getStopFacility().getId())
@@ -297,6 +302,8 @@ public class PTMapperLinkScoring extends PTMapper {
 			} // - route loop
 
 		} // - line loop
+
+		log.info(multipleStops.size() + " stops might have a different reference link (" + schedule.getFacilities().size() + " stops total)");
 
 		cleanStationsAndNetwork();
 		log.info("Creating PT lines... done.");

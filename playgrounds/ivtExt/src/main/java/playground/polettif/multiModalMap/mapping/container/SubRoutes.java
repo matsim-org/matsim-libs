@@ -17,7 +17,7 @@
  * *********************************************************************** */
 
 
-package playground.polettif.multiModalMap.mapping.containter;
+package playground.polettif.multiModalMap.mapping.container;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -67,6 +67,7 @@ public class SubRoutes {
 
 		Map<Id<Link>, Double> weights = new HashMap<>();
 
+		// get a list of all links used
 		List<InterStopPath> list = new ArrayList<>();
 		for(int i = 1; i<routeStops.size(); i++) {
 			TransitRouteStop currentStop = routeStops.get(i);
@@ -76,6 +77,7 @@ public class SubRoutes {
 			list.addAll(interStopPathSet.getPaths());
 		}
 
+		// calculate and store the weight
 		for (InterStopPath interStopPath : list) {
 			for (Id<Link> linkId : interStopPath.getAllLinkIds()) {
 				if (!weights.containsKey(linkId)) {
@@ -90,14 +92,13 @@ public class SubRoutes {
 
 	/**
 	 * returns the score assigned to all links of a route.<br/>
-	 * score = 3*3600-travelTime<br/>
+	 * score = 2*3600-travelTime<br/>
 	 *
 	 * @param interStopPath
 	 * @return 1
 	 */
-	public double getWeight(InterStopPath interStopPath) {
+	private double getWeight(InterStopPath interStopPath) {
 		return 2*3600-interStopPath.getTravelTime();
 	}
-
 
 }
