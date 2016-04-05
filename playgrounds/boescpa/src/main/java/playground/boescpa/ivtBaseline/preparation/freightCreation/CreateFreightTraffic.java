@@ -41,6 +41,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import playground.boescpa.ivtBaseline.preparation.IVTConfigCreator;
 import playground.boescpa.lib.tools.FacilityUtils;
 import playground.boescpa.lib.tools.PopulationUtils;
 
@@ -266,7 +267,7 @@ public class CreateFreightTraffic {
 	private List<ActivityFacility> getFacilities(ActivityFacilities origFacilities, Coord zoneCentroidCoord) {
 		List<ActivityFacility> facilityList = new ArrayList<>();
 		for (ActivityFacility facility : origFacilities.getFacilities().values()) {
-			if (facility.getActivityOptions().keySet().contains("work")
+			if (facility.getActivityOptions().keySet().contains(IVTConfigCreator.WORK)
 					&& CoordUtils.calcEuclideanDistance(facility.getCoord(), zoneCentroidCoord) <= VICINITY_RADIUS) {
 				facilityList.add(facility);
 			}

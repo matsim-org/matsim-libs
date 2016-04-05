@@ -30,6 +30,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
+import playground.boescpa.ivtBaseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -82,7 +83,7 @@ public class CreateCBTransit extends CreateCBsubpop {
 					this.destFacilities.put(country, countryFacilities);
 				}
 				ActivityFacility destFacility =
-						getOrigFacilities().getFacilities().get(Id.create("BC_" + lineElements[0], ActivityFacility.class));
+						getOrigFacilities().getFacilities().get(Id.create(CreationOfCrossBorderFacilities.BC_TAG + lineElements[0], ActivityFacility.class));
 				double cumulativeProbability = Double.parseDouble(lineElements[4]);
 				countryFacilities.add(new Tuple<>(cumulativeProbability, destFacility));
 				line = reader.readLine();
@@ -103,9 +104,9 @@ public class CreateCBTransit extends CreateCBsubpop {
 			while (line != null) {
 				String[] lineElements = line.split(DELIMITER);
 				ActivityFacility origFacility =
-						getOrigFacilities().getFacilities().get(Id.create("BC_" + lineElements[0], ActivityFacility.class));
+						getOrigFacilities().getFacilities().get(Id.create(CreationOfCrossBorderFacilities.BC_TAG + lineElements[0], ActivityFacility.class));
 				if (origFacility == null) {
-					log.error("BC-Facility BC_" + lineElements[0] + " not found.");
+					log.error("BC-Facility " + CreationOfCrossBorderFacilities.BC_TAG + lineElements[0] + " not found.");
 				}
 				counter.incCounter();
 				createCBTransitPopulation(origFacility, Integer.parseInt(lineElements[5]), 'A');

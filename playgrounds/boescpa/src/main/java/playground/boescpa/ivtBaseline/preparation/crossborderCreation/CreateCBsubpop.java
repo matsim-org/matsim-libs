@@ -30,6 +30,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import playground.boescpa.ivtBaseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities;
 import playground.boescpa.lib.tools.FacilityUtils;
 import playground.boescpa.lib.tools.PopulationUtils;
 
@@ -92,7 +93,7 @@ abstract class CreateCBsubpop {
 
 	private void addHomeActivityIfNotInFacilityYet(ActivityFacilities facilities) {
 		for (ActivityFacility facility : facilities.getFacilities().values()) {
-			if (facility.getId().toString().contains("BC_")) {
+			if (facility.getId().toString().contains(CreationOfCrossBorderFacilities.BC_TAG)) {
 				if (!facility.getActivityOptions().keySet().contains(HOME)) {
 					((ActivityFacilityImpl)facility).createAndAddActivityOption(HOME);
 					OpeningTime ot = new OpeningTimeImpl(0.0, 24.0 * 3600.0);

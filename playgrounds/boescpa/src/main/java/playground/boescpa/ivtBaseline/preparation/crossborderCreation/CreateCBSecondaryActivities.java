@@ -30,6 +30,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import playground.boescpa.ivtBaseline.preparation.PrefsCreator;
+import playground.boescpa.ivtBaseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -76,9 +77,9 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 				counter.incCounter();
 				String[] lineElements = line.split(DELIMITER);
 				ActivityFacility homeFacility =
-						getOrigFacilities().getFacilities().get(Id.create("BC_" + lineElements[0], ActivityFacility.class));
+						getOrigFacilities().getFacilities().get(Id.create(CreationOfCrossBorderFacilities.BC_TAG + lineElements[0], ActivityFacility.class));
 				if (homeFacility == null) {
-					log.error("BC-Facility BC_" + lineElements[0] + " not found.");
+					log.error("BC-Facility " + CreationOfCrossBorderFacilities.BC_TAG + lineElements[0] + " not found.");
 				}
 				this.actTag = SHOP;
 				for (int i = 0; i < Integer.parseInt(lineElements[1]); i++) {

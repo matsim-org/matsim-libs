@@ -62,11 +62,11 @@ public class ActivityAdder {
     }
 
 	private void correctFacility(ActivityFacility facility) {
-		if (facility.getActivityOptions().containsKey("home")) {
-			facility.getActivityOptions().get("home").getOpeningTimes().clear();
+		if (facility.getActivityOptions().containsKey(IVTConfigCreator.HOME)) {
+			facility.getActivityOptions().get(IVTConfigCreator.HOME).getOpeningTimes().clear();
 		}
-		if (facility.getActivityOptions().containsKey("remote_home")) {
-			facility.getActivityOptions().get("remote_home").getOpeningTimes().clear();
+		if (facility.getActivityOptions().containsKey(IVTConfigCreator.REMOTE_HOME)) {
+			facility.getActivityOptions().get(IVTConfigCreator.REMOTE_HOME).getOpeningTimes().clear();
 		}
 	}
 
