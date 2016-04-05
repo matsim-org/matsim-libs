@@ -64,7 +64,7 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 	}
 
 	@Override
-	void createCBPopulation(String path2CBFile) {
+	final void createCBPopulation(String path2CBFile) {
 		BufferedReader reader = IOUtils.getBufferedReader(path2CBFile);
 		try {
 			reader.readLine(); // read header
@@ -89,12 +89,16 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 	}
 
 	@Override
-	Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility) {
+	final Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility) {
 		Plan plan = new PlanImpl();
 
 		double departureTime = getDepartureTime();
-		double actDuration = PrefsCreator.actCharacteristics.valueOf(this.actTag.toUpperCase()).getMinDur()
-				+ (random.nextDouble()*PrefsCreator.actCharacteristics.valueOf(this.actTag.toUpperCase()).getMinDur());
+		double actDuration = (4 + random.nextInt(24) + random.nextDouble())
+				* PrefsCreator.actCharacteristics.valueOf(this.actTag.toUpperCase()).getMinDur();
+		if (this.actTag.equals(SHOP)) {
+			actDuration *= 3; // shop has a very small min-time (representing kiosk-shopping)
+		}
+		actDuration *= 60; // the above comes in minutes, we need seconds.
 		double returnTime = departureTime + actDuration;
 		if (returnTime > 24.0 * 3600.0) {
 			returnTime = 24.0 * 3600.0;

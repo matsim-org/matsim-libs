@@ -93,7 +93,7 @@ public class CreateCBTransit extends CreateCBsubpop {
 	}
 
 	@Override
-	protected void createCBPopulation(String pathToCB_transit) {
+	final void createCBPopulation(String pathToCB_transit) {
 		BufferedReader reader = IOUtils.getBufferedReader(pathToCB_transit);
 		try {
 			log.info("CB-Pop creation...");
@@ -135,9 +135,9 @@ public class CreateCBTransit extends CreateCBsubpop {
 	}
 
 	@Override
-	Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility) {
+	final Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility) {
 		Plan plan = new PlanImpl();
-		int departureTime = getDepartureTime();
+		double departureTime = getDepartureTime();
 
 		ActivityImpl actStart = new ActivityImpl(HOME, origFacility.getCoord(), origFacility.getLinkId());
 		actStart.setFacilityId(origFacility.getId());
