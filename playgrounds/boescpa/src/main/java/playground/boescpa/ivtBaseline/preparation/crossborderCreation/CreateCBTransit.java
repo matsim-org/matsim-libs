@@ -82,7 +82,7 @@ public class CreateCBTransit extends CreateCBsubpop {
 					this.destFacilities.put(country, countryFacilities);
 				}
 				ActivityFacility destFacility =
-						getOrigFacilities().getFacilities().get(Id.create(CB_TAG + "_" + lineElements[0], ActivityFacility.class));
+						getOrigFacilities().getFacilities().get(Id.create("BC_" + lineElements[0], ActivityFacility.class));
 				double cumulativeProbability = Double.parseDouble(lineElements[4]);
 				countryFacilities.add(new Tuple<>(cumulativeProbability, destFacility));
 				line = reader.readLine();
@@ -103,7 +103,10 @@ public class CreateCBTransit extends CreateCBsubpop {
 			while (line != null) {
 				String[] lineElements = line.split(DELIMITER);
 				ActivityFacility origFacility =
-						getOrigFacilities().getFacilities().get(Id.create(CB_TAG + "_" + lineElements[0], ActivityFacility.class));
+						getOrigFacilities().getFacilities().get(Id.create("BC_" + lineElements[0], ActivityFacility.class));
+				if (origFacility == null) {
+					log.error("BC-Facility BC_" + lineElements[0] + " not found.");
+				}
 				counter.incCounter();
 				createCBTransitPopulation(origFacility, Integer.parseInt(lineElements[5]), 'A');
 				createCBTransitPopulation(origFacility, Integer.parseInt(lineElements[6]), 'D');
@@ -120,17 +123,15 @@ public class CreateCBTransit extends CreateCBsubpop {
 
 	private void createCBTransitPopulation(ActivityFacility origFacility, int numberOfAgents, char origCountry) {
 		for (int i = 0; i < numberOfAgents; i++) {
-			if (random.nextDouble() < samplePercentage) {
-				List<Tuple<Double, ActivityFacility>> destFacilitiesOfCountry = this.destFacilities.get(origCountry);
-				ActivityFacility destFacility = null;
-				double facilityChoice = random.nextDouble();
-				int j = 0;
-				while (j < destFacilitiesOfCountry.size() && destFacilitiesOfCountry.get(j).getFirst() <= facilityChoice) {
-					destFacility = destFacilitiesOfCountry.get(j).getSecond();
-					j++;
-				}
-				createSingleTripAgent(origFacility, destFacility, "transit");
+			List<Tuple<Double, ActivityFacility>> destFacilitiesOfCountry = this.destFacilities.get(origCountry);
+			ActivityFacility destFacility = null;
+			double facilityChoice = random.nextDouble();
+			int j = 0;
+			while (j < destFacilitiesOfCountry.size() && destFacilitiesOfCountry.get(j).getFirst() <= facilityChoice) {
+				destFacility = destFacilitiesOfCountry.get(j).getSecond();
+				j++;
 			}
+			createSingleTripAgent(origFacility, destFacility, "transit");
 		}
 	}
 

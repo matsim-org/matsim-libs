@@ -81,7 +81,7 @@ abstract class CreateCBsubpop {
 			cumulativeDepartureProbabilities = new double[24];
 			for (int i = 0; i < 24; i++) {
 				String[] line = reader.readLine().split(DELIMITER);
-				cummulativeDepartureProbability[i] = Double.parseDouble(line[1]);
+				cumulativeDepartureProbabilities[i] = Double.parseDouble(line[1]);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -91,10 +91,10 @@ abstract class CreateCBsubpop {
 
 	private void addHomeActivityIfNotInFacilityYet(ActivityFacilities facilities) {
 		for (ActivityFacility facility : facilities.getFacilities().values()) {
-			if (facility.getId().toString().contains("cb_")) {
+			if (facility.getId().toString().contains("BC_")) {
 				if (!facility.getActivityOptions().keySet().contains(HOME)) {
 					((ActivityFacilityImpl)facility).createAndAddActivityOption(HOME);
-					OpeningTime ot = new OpeningTimeImpl(0.0 * 3600.0, 24.0 * 3600.0);
+					OpeningTime ot = new OpeningTimeImpl(0.0, 24.0 * 3600.0);
 					facility.getActivityOptions().get(HOME).addOpeningTime(ot);
 				}
 			}
@@ -110,6 +110,7 @@ abstract class CreateCBsubpop {
 		if (origFacility == null || destFacility == null) {
 			throw new RuntimeException("Expected CB-Facility not found.");
 		}
+		if (random.nextDouble() > samplePercentage) return;
 		// create and add new agent
 		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(CB_TAG + "_" + subTag + "_" + index++, Person.class));
 		newCBPopulation.addPerson(p);

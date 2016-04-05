@@ -29,12 +29,15 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.*;
 import playground.boescpa.ivtBaseline.preparation.PrefsCreator;
 import playground.boescpa.lib.obj.CSVReader;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
 
@@ -50,6 +53,7 @@ public class CreateCBWork extends CreateCBsubpop {
 	private final List<Tuple<Double, Coord>> cumProbWorkFromD = new ArrayList<>();
 	private final List<Tuple<Double, Coord>> cumProbWorkFromF = new ArrayList<>();
 	private final List<Tuple<Double, Coord>> cumProbWorkFromI = new ArrayList<>();
+	private final Map<String, List<ActivityFacility>> communities = new HashMap<>();
 
 	private CreateCBWork(String pathToFacilities, String pathToCumulativeDepartureProbabilities, double samplePercentage, long randomSeed) {
 		super(pathToFacilities, pathToCumulativeDepartureProbabilities, samplePercentage, randomSeed);
@@ -75,25 +79,56 @@ public class CreateCBWork extends CreateCBsubpop {
 	private void createDestinations(String pathToCB_workDestination) {
 		CSVReader reader = new CSVReader(pathToCB_workDestination, DELIMITER);
 		reader.skipLine(); // header
+		log.info("CB-Dest creation...");
+		Counter counter = new Counter(" CB-Destination # ");
 		String[] lineElements = reader.readLine();
 		while (lineElements != null) {
+			counter.incCounter();
 			Coord coord = new Coord(Double.parseDouble(lineElements[1]), Double.parseDouble(lineElements[2]));
 			cumProbWorkFromA.add(new Tuple<>(Double.parseDouble(lineElements[3]), coord));
 			cumProbWorkFromD.add(new Tuple<>(Double.parseDouble(lineElements[4]), coord));
 			cumProbWorkFromF.add(new Tuple<>(Double.parseDouble(lineElements[5]), coord));
 			cumProbWorkFromI.add(new Tuple<>(Double.parseDouble(lineElements[6]), coord));
+			addFacilitiesToCommunity(coord);
 			lineElements = reader.readLine();
 		}
+		counter.printCounter();
+		log.info("CB-Dest creation... done.");
+	}
+
+	private void addFacilitiesToCommunity(Coord coord) {
+		List<ActivityFacility> communalList = new ArrayList<>();
+		for (ActivityFacility facility : getOrigFacilities().getFacilitiesForActivityType(WORK).values()) {
+			if (CoordUtils.calcEuclideanDistance(facility.getCoord(), coord) <= VICINITY_RADIUS) {
+				communalList.add(facility);
+			}
+		}
+		if (communalList.isEmpty()) {
+			Id<ActivityFacility> facilityId = Id.create("temp_" + coord.toString(), ActivityFacility.class);
+			ActivityFacility tempFacility = getOrigFacilities().getFactory().createActivityFacility(facilityId, coord);
+			getOrigFacilities().addActivityFacility(tempFacility);
+			ActivityOption activityOption = new ActivityOptionImpl(WORK);
+			activityOption.addOpeningTime(new OpeningTimeImpl(0.0, 24.0*3600.0));
+			tempFacility.addActivityOption(activityOption);
+			communalList.add(tempFacility);
+		}
+		communities.put(coord.toString(), communalList);
 	}
 
 	@Override
 	final void createCBPopulation(String pathToCB_workOrigin) {
 		CSVReader reader = new CSVReader(pathToCB_workOrigin, DELIMITER);
 		reader.skipLine(); // header
+		log.info("CB-Pop creation...");
+		Counter counter = new Counter(" CB-Work-Pop - Zollst # ");
 		String[] lineElements = reader.readLine();
 		while (lineElements != null) {
+			counter.incCounter();
 			ActivityFacility homeFacility = getOrigFacilities().getFacilities().get(
-					Id.create(CB_TAG + "_" + lineElements[0], ActivityFacility.class));
+					Id.create("BC_" + lineElements[0], ActivityFacility.class));
+			if (homeFacility == null) {
+				log.error("BC-Facility BC_" + lineElements[0] + " not found.");
+			}
 			switch (lineElements[1].charAt(0)) {
 				case 'A': createWorkPopulation(homeFacility, Integer.parseInt(lineElements[2]), cumProbWorkFromA); break;
 				case 'D': createWorkPopulation(homeFacility, Integer.parseInt(lineElements[2]), cumProbWorkFromD); break;
@@ -103,6 +138,8 @@ public class CreateCBWork extends CreateCBsubpop {
 			}
 			lineElements = reader.readLine();
 		}
+		counter.printCounter();
+		log.info("CB-Pop creation... done.");
 	}
 
 	private void createWorkPopulation(ActivityFacility homeFacility, int numberOfAgents, List<Tuple<Double, Coord>> cumProbWorkFromX) {
@@ -119,30 +156,11 @@ public class CreateCBWork extends CreateCBsubpop {
 		int i = 0;
 		while (i < cumProbWorkFromX.size() && cumProbWorkFromX.get(i).getFirst() < randCommunity) {
 			coord = cumProbWorkFromX.get(i).getSecond();
+			i++;
 		}
 		// get a work facility in the perimeter of the center of this community.
-		return getWorkFacilityAround(coord);
-	}
-
-	private ActivityFacility getWorkFacilityAround(Coord coord) {
-		ActivityFacility workFacility = null;
-		int randFacility = random.nextInt(50);
-		int countFacility = 0;
-		for (ActivityFacility facility : getOrigFacilities().getFacilitiesForActivityType(WORK).values()) {
-			if (CoordUtils.calcEuclideanDistance(facility.getCoord(), coord) <= VICINITY_RADIUS) {
-				workFacility = facility;
-				if (++countFacility > randFacility) break;
-			}
-		}
-		if (workFacility == null) {
-			Id<ActivityFacility> facilityId = Id.create("temp_" + coord.toString(), ActivityFacility.class);
-			workFacility = getOrigFacilities().getFactory().createActivityFacility(facilityId, coord);
-			getOrigFacilities().addActivityFacility(workFacility);
-			ActivityOption activityOption = new ActivityOptionImpl(WORK);
-			activityOption.addOpeningTime(new OpeningTimeImpl(0.0, 24.0*3600.0));
-			workFacility.addActivityOption(activityOption);
-		}
-		return workFacility;
+		int randFacility = random.nextInt(communities.get(coord.toString()).size());
+		return communities.get(coord.toString()).get(randFacility);
 	}
 
 	@Override
@@ -152,7 +170,6 @@ public class CreateCBWork extends CreateCBsubpop {
 		double departureTime = getDepartureTime();
 		double actDuration = (8 + random.nextInt(12) + random.nextDouble())
 			* PrefsCreator.actCharacteristics.valueOf(WORK.toUpperCase()).getMinDur();
-		actDuration *= 60; // the above comes in minutes, we need seconds.
 		double returnTime = departureTime + actDuration;
 		if (returnTime > 24.0 * 3600.0) {
 			returnTime = 24.0 * 3600.0;

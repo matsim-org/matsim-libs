@@ -27,6 +27,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import playground.boescpa.ivtBaseline.preparation.PrefsCreator;
 
@@ -68,11 +69,17 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 		BufferedReader reader = IOUtils.getBufferedReader(path2CBFile);
 		try {
 			reader.readLine(); // read header
+			log.info("CB-Pop creation...");
+			Counter counter = new Counter(" CB-SA-Pop - Zollst # ");
 			String line = reader.readLine();
 			while (line != null) {
+				counter.incCounter();
 				String[] lineElements = line.split(DELIMITER);
 				ActivityFacility homeFacility =
-						getOrigFacilities().getFacilities().get(Id.create(CB_TAG + "_" + lineElements[0], ActivityFacility.class));
+						getOrigFacilities().getFacilities().get(Id.create("BC_" + lineElements[0], ActivityFacility.class));
+				if (homeFacility == null) {
+					log.error("BC-Facility BC_" + lineElements[0] + " not found.");
+				}
 				this.actTag = SHOP;
 				for (int i = 0; i < Integer.parseInt(lineElements[1]); i++) {
 					createSingleTripAgent(homeFacility, homeFacility, "saShop");
@@ -83,6 +90,8 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 				}
 				line = reader.readLine();
 			}
+			counter.printCounter();
+			log.info("CB-Pop creation... done.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -96,9 +105,8 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 		double actDuration = (4 + random.nextInt(24) + random.nextDouble())
 				* PrefsCreator.actCharacteristics.valueOf(this.actTag.toUpperCase()).getMinDur();
 		if (this.actTag.equals(SHOP)) {
-			actDuration *= 3; // shop has a very small min-time (representing kiosk-shopping)
+			actDuration *= 1.5; // shop has a very small min-time (representing kiosk-shopping)
 		}
-		actDuration *= 60; // the above comes in minutes, we need seconds.
 		double returnTime = departureTime + actDuration;
 		if (returnTime > 24.0 * 3600.0) {
 			returnTime = 24.0 * 3600.0;
