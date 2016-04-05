@@ -383,7 +383,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 				double spacing, double freespeedTraveltime, QVehicle veh)
 		{
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
-			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(AssignmentEmulatingQLane.this.length, spacing, 
+			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode(AssignmentEmulatingQLane.this.length, spacing, 
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
 			Integer lane = VisUtils.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 //			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, 

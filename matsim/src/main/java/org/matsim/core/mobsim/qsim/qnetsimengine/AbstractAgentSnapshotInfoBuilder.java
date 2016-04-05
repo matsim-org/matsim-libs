@@ -27,6 +27,8 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -172,90 +174,84 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		double freespeedTraveltime = curvedLength / freeSpeed ;
 
-		double lastDistanceFromFromNode = Double.NaN;
 		
 		TreeMap<Double,Hole> consumableHoles = new TreeMap<>() ;
 		
+		// holes, if applicable:
 		if ( QSimConfigGroup.SnapshotStyle.withHoles==scenario.getConfig().qsim().getSnapshotStyle() ) {
-			// holes:
 			if ( !holes.isEmpty() ) {
-				double spacing = this.calculateVehicleSpacing(curvedLength, storageCapacity, holes );
 				double freespeedTraveltimeOfHole = curvedLength / (QueueWithBuffer.HOLE_SPEED*1000./3600.);
-				double lastDistanceOfHoleFromFromNode = Double.NaN;
 				for (Hole hole : holes) {
-					lastDistanceOfHoleFromFromNode = createHolePositionAndReturnDistance(lastDistanceOfHoleFromFromNode, 
-							spacing, freespeedTraveltimeOfHole, hole, now, curvedLength);
-					addHolePosition( positions, lastDistanceOfHoleFromFromNode, hole, curvedLength, upstreamCoord, downstreamCoord ) ;
-					consumableHoles.put( lastDistanceOfHoleFromFromNode, hole ) ;
+					double distanceOfHoleFromFromNode = computeHolePositionAndReturnDistance( freespeedTraveltimeOfHole, hole, now, curvedLength);
+					addHolePosition( positions, distanceOfHoleFromFromNode, hole, curvedLength, upstreamCoord, downstreamCoord ) ;
+					consumableHoles.put( distanceOfHoleFromFromNode, hole ) ;
 				}
 			}
 		}
+		
+		// might be faster by sorting holes into a regular array list ...
 
 
 //		Iterator<Entry<Double, Hole>> iterator = holePositions.entrySet().iterator() ;
 //		TreeMap<Double,Hole> consumableHoles = new TreeMap<>( holePositions ) ;
 		
-		for ( MobsimVehicle mveh : vehs ) {
-			QVehicle veh = (QVehicle) mveh ;
-			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
+		double distanceFromFromNode = Double.NaN;
 
-			double distanceFromFromNode = this.calculateDistanceOnVectorFromFromNode2(curvedLength, 
-					mveh.getSizeInEquivalents()*spacingOfOnePCE ,
-					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
+		for ( MobsimVehicle mveh : vehs ) {
+			final QVehicle veh = (QVehicle) mveh ;
+
+			final double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
+			// (starts off relatively small (rightmost vehicle))
 			
+			final double spacing = mveh.getSizeInEquivalents()*spacingOfOnePCE;
+			distanceFromFromNode = this.calculateDistanceOnVectorFromFromNode(curvedLength, 
+					spacing , distanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
+			// (starts off relatively large (rightmost vehicle))
+			
+			if ( this.scenario.getConfig().qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
+				while ( !consumableHoles.isEmpty() && consumableHoles.lastKey() > distanceFromFromNode ) {
+					// (i.e. if hole is to right of vehicle)
+					
+					Logger.getLogger( this.getClass() ).warn( "distanceFromFNode=" + distanceFromFromNode + "; lastKey=" + consumableHoles.lastKey() + "; firstKey=" + consumableHoles.firstKey() ) ;
+
+					Entry<Double, Hole> entry = consumableHoles.pollLastEntry() ;
+//					distanceFromFromNode +=  7.5 * entry.getValue().getSizeInEquivalents() ;
+					distanceFromFromNode -=  spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
+				}
+			}
+
 			Integer lane = VisUtils.guessLane(veh, numberOfLanesAsInt );
 			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh, inverseFlowCapPerTS, now, freeSpeed);
 			Gbl.assertNotNull( upstreamCoord ) ;
 			Gbl.assertNotNull( downstreamCoord ) ;
 			this.positionAgentOnLink(positions, upstreamCoord, downstreamCoord, curvedLength, veh, distanceFromFromNode, lane, speedValue);
-			lastDistanceFromFromNode = distanceFromFromNode;
-			
-			
 
-			if ( this.scenario.getConfig().qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
-//				while ( iterator.hasNext() ) {
-				while ( !consumableHoles.isEmpty() && curvedLength - consumableHoles.firstKey() > lastDistanceFromFromNode ) {
-
-//					Entry<Double, Hole> entry = iterator.next();
-//					double size = entry.getValue().getSizeInEquivalents() ;
-//					double holePositionFromFromNode = entry.getKey() ;
-					// since hole position here is from fromNode, subtracting it from (curved) length to get the position from toNode. amit Nov'15
-
-//					if ( curvedLength - holePositionFromFromNode > lastDistanceFromFromNode ) {  
-
-						Entry<Double, Hole> entry = consumableHoles.pollFirstEntry() ;
-						lastDistanceFromFromNode +=  7.5 * entry.getValue().getSizeInEquivalents() ;  
-						
-						// why dependent on size when a vehicle take 7.5 m? amit Nov 15
-						// because the hole also has different size, depending on size of vehicle that created it.  kai, apr'16
-						
-						// yyyy +7.5?  -7.5?  +7.5*size?  -7.5*size?
-						// there should actually be a "hole" spacing, similar to spacingOfOnePCE computed above.  I think it is in fact
-						// already computed in QueueWithBuffer, although that feels like the wrong place.  kai, apr'16
-						
-						// yyyyyy Isn't this "losing" holes?  I.e. if the above if condition is wrong, that hole is lost?  
-						
-//					} else {
-//						break ;
-//					}
-				}
-			}
 		}
+		
 		return positions;
 	}
 
 
 
-	 final void positionHole(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, 
-			double lengthOfCurve, QItem veh, double distanceFromFromNode, 
-			Integer lane,	double speedValueBetweenZeroAndOne){
-		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class), endCoord, startCoord, 
-				distanceFromFromNode, lane, lengthOfCurve);
-		pos.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
+	 private static double computeHolePositionAndReturnDistance(double freespeedTraveltime, Hole hole, double now, double curvedLength) 
+	{
+		double remainingTravelTime = hole.getEarliestLinkExitTime() - now ;
+		double distanceFromFromNode = remainingTravelTime/freespeedTraveltime * curvedLength ;
+		return distanceFromFromNode;
+	}
+		
+	private void addHolePosition(final Collection<AgentSnapshotInfo> positions, double distanceFromFromNode, Hole veh, 
+			double curvedLength, Coord upstreamCoord, Coord downstreamCoord)
+	{
+		Integer lane = 10 ;
+		double speedValue = 1. ;
+		AgentSnapshotInfo pos = this.snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class), upstreamCoord, downstreamCoord, 
+				distanceFromFromNode, lane, curvedLength);
+		pos.setColorValueBetweenZeroAndOne(speedValue);
 		pos.setAgentState(AgentState.PERSON_OTHER_MODE );
 		positions.add(pos);
 	}
-
+	
 	final void positionPassengers(Collection<AgentSnapshotInfo> positions,
 			Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
 			double lengthOfCurve, Integer lane, double speedValueBetweenZeroAndOne) {
@@ -275,38 +271,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		}
 	}
 
-	private double createHolePositionAndReturnDistance(double lastDistanceFromFromNode,
-				double spacing, double freespeedTraveltime, Hole veh, double now, double curvedLength)
-		{
-			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
-			spacing = 0 ;
-			double distanceFromFromNode = this.calculateDistanceOnVectorFromFromNode2(curvedLength, spacing,
-					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
-			return distanceFromFromNode;
-		}
-		
-	private void addHolePosition(final Collection<AgentSnapshotInfo> positions, double distanceFromFromNode, Hole veh, 
-			double curvedLength, Coord upstreamCoord, Coord downstreamCoord)
-	{
-		Integer lane = 10 ;
-		double speedValue = 1. ;
-		this.positionHole(positions, upstreamCoord, downstreamCoord,
-					curvedLength, veh, distanceFromFromNode,
-					lane, speedValue);
-	}
-	
-
-
 	public abstract double calculateVehicleSpacing(double linkLength, double overallStorageCapacity, Collection<? extends VisVehicle> vehs);
 
-	/**
-	 * @param length
-	 * @param spacing
-	 * @param lastDistanceFromFromNode
-	 * @param now
-	 * @param freespeedTraveltime
-	 * @param remainingTravelTime
-	 */
-	public abstract double calculateDistanceOnVectorFromFromNode2(double length, double spacing, double lastDistanceFromFromNode, double now,
-			double freespeedTraveltime, double remainingTravelTime);
+	public abstract double calculateDistanceOnVectorFromFromNode(double length, double spacing, double lastDistanceFromFromNode, 
+			double now, double freespeedTraveltime, double remainingTravelTime);
 }
