@@ -30,7 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.TransitScheduleValidator;
-import playground.polettif.multiModalMap.mapping.PTMapperLinkScoring;
+import playground.polettif.multiModalMap.mapping.PTMapperLinkScoringMultiplyStops;
 
 public class RunMapping2 {
 
@@ -72,7 +72,7 @@ public class RunMapping2 {
 		// vgl. OSM2MixedIVT createMixed
 	//	new PTMapperV1(schedule).routePTLines(network);
 //		new PTMapperV2(schedule).routePTLines(network);
-		new PTMapperLinkScoring(schedule).routePTLines(network);
+		new PTMapperLinkScoringMultiplyStops(schedule).routePTLines(network);
 
 		log.info("Writing schedule and network to file...");
 		new TransitScheduleWriter(schedule).writeFile(path_MixedSchedule);

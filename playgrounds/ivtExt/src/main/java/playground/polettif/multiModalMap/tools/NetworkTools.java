@@ -35,12 +35,62 @@ public class NetworkTools {
 
 	protected static Logger log = Logger.getLogger(NetworkTools.class);
 
-	// default params in [m]
-	private static final double DEFAULT_SEARCH_RADIUS = 50;
-	private static final double DEFAULT_RADIUS_INCREMENT = 50;
-	private static final double DEFAULT_MAX_SEARCH_RADIUS = 500;
-	private static final double DEFAULT_DISTANCE_THRESHOLD = 10;
+	/**
+	 * Looks for nodes within search radius of coord, then searches the closest n links
+	 * (calculated via distancePointLineSegment() in {@link org.matsim.core.utils.geometry.CoordUtils}).
+	 * Can return more than n links if links have the same distance from the facility (difference &lt; 2m).
+	 *
+	 * @return the closest n links to coord
+	 */
+	public static List<Link> findOnlyNClosestLinks(NetworkImpl networkImpl, Coord coord, double searchRadius, int n) {
+		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, searchRadius);
+		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
+		double incr = 0.1; double tol=2.0;
 
+		if(nearestNodes.size() == 0) {
+			return null;
+		} else {
+			for (Node node : nearestNodes) {
+				Map<Id<Link>, ? extends Link> outLinks = node.getOutLinks();
+				Map<Id<Link>, ? extends Link> inLinks = node.getInLinks();
+				double lineSegmentDistance;
+
+				for (Link linkCandidate : outLinks.values()) {
+					// check if link is already in the closestLinks set
+					if (!closestLinksMap.containsValue(linkCandidate)) {
+						lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
+
+						// since distance is used as key, we need to ensure the exact distance is not used already TODO maybe check for side of the road?
+						while (closestLinksMap.containsKey(lineSegmentDistance))
+							lineSegmentDistance += incr;
+
+						closestLinksMap.put(lineSegmentDistance, linkCandidate);
+					}
+				}
+				for (Link linkCandidate : inLinks.values()) {
+					if (!closestLinksMap.containsValue(linkCandidate)) {
+						lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
+						while (closestLinksMap.containsKey(lineSegmentDistance)) {
+							lineSegmentDistance += incr;
+						}
+						closestLinksMap.put(lineSegmentDistance, linkCandidate);
+					}
+				}
+			}
+
+			List<Link> closestLinks = new ArrayList<>();
+
+			int i = 1; double d=0;
+			for(Map.Entry<Double, Link> e : closestLinksMap.entrySet()) {
+				if(i > n && (e.getKey()-d > tol))
+					break;
+				closestLinks.add(e.getValue());
+				i++;
+			}
+
+			return closestLinks;
+		}
+	}
 
 	/**
 	 * Adds a node on the splitPointCoordinates and splits the link into two new links
@@ -219,7 +269,6 @@ public class NetworkTools {
 				}
 			}
 
-			/*
 			for (Link linkCandidate : inLinks.values()) {
 				lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
 				if (lineSegmentDistance < minDist) {
@@ -227,17 +276,8 @@ public class NetworkTools {
 					selected = linkCandidate;
 				}
 			}
-			*/
-		}
 
-		// get opposite link if stopFacility is on the left side of the link TODO change for countries driving on the left
-/*
-		if(selected != null) {
-			if(Tools.getAzimuth(selected.getFromNode().getCoord(), coord) < Tools.getAzimuth(selected.getFromNode().getCoord(), selected.getToNode().getCoord())) {
-				selected = Tools.getOppositeLink(selected);
-			}
 		}
-*/
 		return selected;
 	}
 
@@ -262,125 +302,4 @@ public class NetworkTools {
 		return closestLinks;
 	}
 
-	/**
-	 * Looks for nodes within search radius of coord, then searches the closest links (calculated via distancePointLineSegment()
-	 * in {@link org.matsim.core.utils.geometry.CoordUtils}).
-	 *
-	 * TODO Can return more than n links if links have the same distance from the facility (diff <1m).
-	 *
-	 * @return the closest n links to coord
-	 */
-	public static List<Link> findOnlyNClosestLinks(NetworkImpl networkImpl, Coord coord, double searchRadius, int n) {
-		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, searchRadius);
-		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
-		double incr = 0.1; double tol=2.0;
-
-
-
-		if(nearestNodes.size() == 0) {
-			return null;
-		} else {
-			for (Node node : nearestNodes) {
-				Map<Id<Link>, ? extends Link> outLinks = node.getOutLinks();
-				Map<Id<Link>, ? extends Link> inLinks = node.getInLinks();
-				double lineSegmentDistance;
-
-				for (Link linkCandidate : outLinks.values()) {
-					lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
-
-					// since distance is used as key, we need to ensure the exact distance is not used already TODO maybe check for side of the road?
-					while(closestLinksMap.containsKey(lineSegmentDistance))
-						lineSegmentDistance+=incr;
-
-					closestLinksMap.put(lineSegmentDistance, linkCandidate);
-				}
-				for (Link linkCandidate : inLinks.values()) {
-					lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
-					while(closestLinksMap.containsKey(lineSegmentDistance)) {
-						lineSegmentDistance+=incr;
-					}
-					closestLinksMap.put(lineSegmentDistance, linkCandidate);
-				}
-			}
-
-			List<Link> closestLinks = new ArrayList<>();
-
-			int i = 1; double d=0;
-			for(Map.Entry<Double, Link> e : closestLinksMap.entrySet()) { //int i=0; i < n && i < closestLinksArray.length; i++) {
-				if(i > n && (e.getKey()-d > tol))
-					break;
-				closestLinks.add(e.getValue());
-				i++;
-			}
-
-			return closestLinks;
-		}
-	}
-
-
-
-	/**
-	 * Finds the nearest link to a node.
-	 * Looks for all nodes within a search Radius from the  and calculates distancePointLineSegment for all links for these nodes.
-	 * If the distance is < the
-	 *
-	 * Aborts searching after a maxSearchRadius (default 500m)
-	 *
-	 * TODO nodes and stopfacilities
-	 * TODO minimal threshold, abort loops if distance < threshold
-	 */
-/*
-	public static Id<Link> findNearestLink1(Network network, Coord point, double maxSearchRadius) throws Exception {
-		return Id.createLinkId("");
-
-		// NetworkUtils.getSortedNodes
-		Map<Id<Node>, ? extends Node> allNodes = network.getNodes();
-		Map<Double, Node> distanceNodes = new HashMap<>();
-		Map<Id<Link>, Link> links = new HashMap<>();
-
-		double shortestDistance = Double.MAX_VALUE;
-
-		// get all nodes with distance from point < maxSearch
-		for (Node n : allNodes.values()) {
-			double distance = NetworkUtils.getEuclideanDistance(n.getCoord(), point);
-			if (distance < maxSearchRadius) {
-				n.getOutLinks();
-				n.getInLinks();
-
-		}
-		// sort nodes by distance (proably not needed)
-		Map<Double, Node> sortedNodesByDistance = new TreeMap<>(distanceNodes);
-
-		Link closestLink = null;
-
-		for(Node node : sortedNodesByDistance.values()) {
-			// look at all links from or to nodeCandidates and calculate shortest distance from point to the link
-
-			Map<Id<Link>, ? extends Link> outLinks = node.getOutLinks();
-			Map<Id<Link>, ? extends Link> inLinks = node.getInLinks();
-			double lineSegmentDistance = 0;
-
-			for (Link linkCandidate : outLinks.values()) {
-				lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), point);
-				if (lineSegmentDistance < shortestDistance) {
-					shortestDistance = distance;
-					closestLink = linkCandidate;
-				}
-			}
-
-			for (Link linkCandidate : inLinks.values()) {
-				lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), point);
-				if (lineSegmentDistance < shortestDistance) {
-					shortestDistance = distance;
-					closestLink = linkCandidate;
-				}
-			}
-		}
-
-		if(closestLink != null) {
-			return closestLink.getId();
-		} else {
-			throw new Exception("No links found!");
-		}
-	} */
 }
