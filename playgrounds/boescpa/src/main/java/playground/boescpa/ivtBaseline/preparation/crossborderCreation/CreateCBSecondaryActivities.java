@@ -78,7 +78,7 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 					createSingleTripAgent(homeFacility, homeFacility, "saShop");
 				}
 				this.actTag = LEISURE;
-				for (int i = 0; i < Integer.parseInt(lineElements[1]); i++) {
+				for (int i = 0; i < Integer.parseInt(lineElements[2]); i++) {
 					createSingleTripAgent(homeFacility, homeFacility, "saLeisure");
 				}
 				line = reader.readLine();
@@ -91,10 +91,15 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 	@Override
 	Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility) {
 		Plan plan = new PlanImpl();
+
 		double departureTime = getDepartureTime();
-		double returnTime = departureTime
-				+ PrefsCreator.actCharacteristics.valueOf(this.actTag.toUpperCase()).getMinDur()
+		double actDuration = PrefsCreator.actCharacteristics.valueOf(this.actTag.toUpperCase()).getMinDur()
 				+ (random.nextDouble()*PrefsCreator.actCharacteristics.valueOf(this.actTag.toUpperCase()).getMinDur());
+		double returnTime = departureTime + actDuration;
+		if (returnTime > 24.0 * 3600.0) {
+			returnTime = 24.0 * 3600.0;
+			departureTime = returnTime - actDuration;
+		}
 
 		ActivityImpl actStart = new ActivityImpl(HOME, origFacility.getCoord(), origFacility.getLinkId());
 		actStart.setFacilityId(origFacility.getId());

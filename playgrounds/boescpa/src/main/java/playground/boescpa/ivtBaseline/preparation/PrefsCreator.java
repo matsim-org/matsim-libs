@@ -228,9 +228,7 @@ public class PrefsCreator {
 
     private static void setTimeBudgetAsHomeDuration(ObjectAttributes prefs, double timeBudget, Person p) {
         // assign remaining timeBudget to home activities
-        double typicalHomeDuration = timeBudget;
-
-        prefs.putAttribute(p.getId().toString(), "typicalDuration_home", typicalHomeDuration);
+        prefs.putAttribute(p.getId().toString(), "typicalDuration_home", timeBudget);
         prefs.putAttribute(p.getId().toString(), "minimalDuration_home", 0.5 * 3600.0);
         prefs.putAttribute(p.getId().toString(), "earliestEndTime_home", 0.0 * 3600.0);
         prefs.putAttribute(p.getId().toString(), "latestStartTime_home", 24.0 * 3600.0);
@@ -355,7 +353,7 @@ public class PrefsCreator {
         return timeBudget;
     }
 
-    protected static ObjectAttributes getObjectAttributes(String pathToInputPrefs) {
+    private static ObjectAttributes getObjectAttributes(String pathToInputPrefs) {
         ObjectAttributes prefs = new ObjectAttributes();
         ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(prefs);
         reader.parse(pathToInputPrefs);
