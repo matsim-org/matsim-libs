@@ -69,7 +69,7 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 	 * Number of link candidates considered for all stops, depends on accuracy of
 	 * stops and desired performance. Somewhere between 4 and 8 seems reasonable.
 	 */
-	private final static int MAX_N_CLOSEST_LINKS = 8;
+	private final static int MAX_N_CLOSEST_LINKS = 6;
 
 	/**
 	 * Should the distance from the facility to a link be included in the
@@ -140,8 +140,8 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 	 *
 	 */
 	public static void main(String[] args) {
-		if (args.length != 4) {
-			System.out.println("Incorrect number of arguments.\n[0] unmapped schedule file\n[1] network file\n[2] output schedule path\n[3]output network path");
+		if (args == null || args.length != 4) {
+			System.out.println("Incorrect number of arguments (" + args.length + " given)\n[0] unmapped schedule file\n[1] network file\n[2] output schedule path\n[3]output network path");
 		}
 
 		mapFromFiles(args[0], args[1], args[2], args[3]);
@@ -203,7 +203,6 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 		 * stopfacilities with no links within search radius need artificial links and nodes before routing starts
 		 */
 		List<TransitStopFacility> newFacilities = new ArrayList<>();
-		List<TransitStopFacility> facilitiesTooFar = new ArrayList<>();
 		NetworkImpl networkImpl = ((NetworkImpl) network); // used by search for nearest node
 		for (TransitStopFacility stopFacility : this.schedule.getFacilities().values()) {
 
@@ -222,7 +221,6 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 
 				closestLinks = new ArrayList<>();
 				closestLinks.add(newLink);
-
 			}
 			// store closest links in database
 			allClosestLinks.put(stopFacility, closestLinks);
