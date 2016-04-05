@@ -29,17 +29,11 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
  */
 public abstract class AbstractHybridElectricVehicle extends AbstractVehicleWithBattery {
 
-	// TODO: both depletion mode and sustaining mode and other modes of use
-	// e.g. one mode which just switches to hybrid mode (soc not changing), when battery empty
-	// => in this case battery only chargable when connected to grid.
-	// => perhaps, this is also the only mode, we want to support here, because the other mode
-	// is just a normal hybrid, which d
-	
-	//TODO: irgendwo erwaehnen, dass wir annehmen, dass die network link length in meters angegeben sind!
-	// else provide tool to update network.
+	// TODO: implement both serial and hybrid versions
+
 	
 	
-	EnergyConsumptionModel combustionEngineECM;
+	EnergyConsumptionModel engineECM;
 	
 	public double updateEnergyUse(Link link, double averageSpeedDriven){
 		double energyConsumptionForLinkInJoule;
@@ -52,19 +46,18 @@ public abstract class AbstractHybridElectricVehicle extends AbstractVehicleWithB
 				double fractionOfLinkTravelWithBattery=socInJoules/energyConsumptionForLinkInJoule;
 				useBattery(socInJoules);
 				
-				energyConsumptionForLinkInJoule=combustionEngineECM.getEnergyConsumptionForLinkInJoule(link.getLength()*(1-fractionOfLinkTravelWithBattery), link.getFreespeed(), averageSpeedDriven);
+				energyConsumptionForLinkInJoule=engineECM.getEnergyConsumptionForLinkInJoule(link.getLength()*(1-fractionOfLinkTravelWithBattery), link.getFreespeed(), averageSpeedDriven);
 				useCombustionEngine(energyConsumptionForLinkInJoule);
 			}
 		} else {
-			energyConsumptionForLinkInJoule=combustionEngineECM.getEnergyConsumptionForLinkInJoule(link, averageSpeedDriven);
+			energyConsumptionForLinkInJoule=engineECM.getEnergyConsumptionForLinkInJoule(link, averageSpeedDriven);
 			useCombustionEngine(energyConsumptionForLinkInJoule);
 		}
 		
 		return energyConsumptionForLinkInJoule;
 	}
 	
-	private void useCombustionEngine(double energyConsumptionInJoule){
-		// TODO: log this...
-	}
+	// e.g. use this method to log fuel consumption
+	abstract void useCombustionEngine(double energyConsumptionInJoule);
 	
 }

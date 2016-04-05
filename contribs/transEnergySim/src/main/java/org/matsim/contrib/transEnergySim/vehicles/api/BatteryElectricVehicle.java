@@ -47,11 +47,8 @@ public abstract class BatteryElectricVehicle extends AbstractVehicleWithBattery 
 	@Override
 	public void useBattery(double energyConsumptionInJoule) {
 		super.useBattery(energyConsumptionInJoule);
-//		System.out.println("battery: "+this.socInJoules/3600./1000.);
 		if (socInJoules < 0) {
 			didRunOutOfBattery = true;
-//			System.out.println("Vehicle out of battery");
-
 		}
 	}
 
