@@ -63,7 +63,6 @@ public class GTFSReader {
 	private Map<String, Shape> shapes = new HashMap<>();
 	private boolean usesShapes = false;
 	private boolean usesFrequencies = false;
-	private boolean usesFrequenciesWarn = true;
 	private String[] serviceIds;    //	The types of dates that will be represented by the new file
 
 	private TransitScheduleFactory scheduleFactory = new TransitScheduleFactoryImpl();
@@ -130,6 +129,8 @@ public class GTFSReader {
 	 */
 	private void convert() {
 
+		log.info("Converting to MATSim transit schedule ...");
+
 		// TODO set service IDs with input param or define algorithm
 		setServiceIds(SERVICE_ID_MOST_USED);
 
@@ -141,6 +142,12 @@ public class GTFSReader {
 			TransitStopFacility stopFacility = scheduleFactory.createTransitStopFacility(Id.create(stop.getKey(), TransitStopFacility.class), result, stop.getValue().isBlocks());
 			stopFacility.setName(stop.getValue().getName());
 			schedule.addStopFacility(stopFacility);
+		}
+
+		if(usesFrequencies) {
+			log.info("        Using frequencies.txt to generate departures");
+		} else {
+			log.info("        Using stop_times.txt to generate departures");
 		}
 
 		DepartureIds departureIds = new DepartureIds();
@@ -201,12 +208,17 @@ public class GTFSReader {
 					 * Calculate departures from frequencies (if available)
 					 */
 					if(usesFrequencies) {
+
 						TransitRoute newTransitRoute = scheduleFactory.createTransitRoute(Id.create(trip.getId(), TransitRoute.class), null, transitRouteStops, gtfsRoute.getRouteType().name);
 
-						for(Frequency frequency : trip.getFrequencies())
+						for(Frequency frequency : trip.getFrequencies()) {
 							for(Date actualTime = (Date) frequency.getStartTime().clone(); actualTime.before(frequency.getEndTime()); actualTime.setTime(actualTime.getTime() + frequency.getSecondsPerDeparture() * 1000)) {
-								newTransitRoute.addDeparture(scheduleFactory.createDeparture(Id.create(departureIds.getNext(newTransitRoute.getId()), Departure.class), Time.parseTime(timeFormat.format(actualTime))));
+								newTransitRoute.addDeparture(scheduleFactory.createDeparture(
+										Id.create(departureIds.getNext(newTransitRoute.getId()), Departure.class),
+										Time.parseTime(timeFormat.format(actualTime))));
 							}
+						}
+						transitLine.addRoute(newTransitRoute);
 					} else {
 						/** [5.2]
 						 * Calculate departures from stopTimes
@@ -239,8 +251,8 @@ public class GTFSReader {
 			} // foreach trip
 		} // foreach route
 
-		log.info("GTFS successfully converted to an unmapped MATSIM Transit Schedule!");
-		log.info("###################################################################");
+		log.info("...     GTFS converted to an unmapped MATSIM Transit Schedule");
+		log.info("#############################################################");
 	}
 
 	/**
@@ -248,7 +260,7 @@ public class GTFSReader {
 	 */
 	private void loadFiles() {
 		try {
-			log.info("Loading gtfs files from " + root);
+			log.info("Loading GTFS files from " + root);
 			loadStops();
 			loadCalendar();
 			loadCalendarDates();
@@ -264,16 +276,16 @@ public class GTFSReader {
 	}
 
 	/**
-	 * Reads all gtfsStops and puts them in {@link #gtfsStops}
+	 * Reads all stops and puts them in {@link #gtfsStops}
 	 * <p/>
 	 * <br/><br/>
-	 * gtfsStops.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
+	 * stops.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
 	 * Individual locations where vehicles pick up or drop off passengers.
 	 *
 	 * @throws IOException
 	 */
 	private void loadStops() throws IOException {
-		log.info("Loading gtfsStops.txt");
+		log.info("Loading stops.txt");
 		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.STOPS.fileName));
 		String[] header = reader.readNext(); // read header
 		Map<String, Integer> col = getIndices(header, GTFSDefinitions.STOPS.columns); // get column numbers for required fields
@@ -288,7 +300,7 @@ public class GTFSReader {
 		}
 
 		reader.close();
-		log.info("...     gtfsStops.txt loaded");
+		log.info("...     stops.txt loaded");
 	}
 
 	/**
@@ -584,12 +596,10 @@ public class GTFSReader {
 	private void setServiceIds(String serviceIdAlgorithm) {
 
 		if(serviceIdAlgorithm.equals(SERVICE_ID_MOST_USED)) {
-			log.info("Getting most used service ID");
-
 			serviceIds = new String[1];
 			serviceIds[0] = getKeyOfMaxValue(serviceIdsCount);
 
-			log.info("... serviceId: " + serviceIds[0] + " (" + serviceIdsCount.get(serviceIds[0]) + " occurences)");
+			log.info("        Getting most used service ID: " + serviceIds[0] + " (" + serviceIdsCount.get(serviceIds[0]) + " occurences)");
 		} else {
 			log.warn("Using all service IDs (probably way too much data)");
 
@@ -621,9 +631,10 @@ public class GTFSReader {
 		public String getNext(Id<TransitRoute> transitRouteId) {
 			if(!ids.containsKey(transitRouteId)) {
 				ids.put(transitRouteId, 1);
-				return transitRouteId + "_1";
+				return transitRouteId + "_01";
 			} else {
-				return transitRouteId + "_" + Integer.toString(ids.put(transitRouteId, ids.get(transitRouteId) + 1) + 1);
+				int i = ids.put(transitRouteId, ids.get(transitRouteId) + 1) + 1;
+				return transitRouteId + "_" + ( i < 10 ? "0"+Integer.toString(i) : Integer.toString(i));
 			}
 
 		}
