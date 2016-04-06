@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TripAux.java
+ * Route.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,56 +20,70 @@
 
 package playground.polettif.multiModalMap.gtfs.containers;
 
-import java.util.HashMap;
-import java.util.Map;
+import playground.polettif.multiModalMap.gtfs.containers.GTFSDefinitions.RouteTypes;
 
-public class TripAux {
-	private Map<String,Integer> firsts;
-	private Map<String,Integer> lasts;
-	private String line;
+
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+
+public class GTFSRoute {
+	                           
+	//Attributes
+	private String routeId;
+	private String shortName;
+	private RouteTypes routeType;
+	private SortedMap<String, Trip> trips;
+
+	//Methods
 	/**
-	 * 
+	 * @param shortName
+	 * @param routeType
 	 */
-	public TripAux() {
+	public GTFSRoute(String routeId, String shortName, RouteTypes routeType) {
 		super();
-		firsts=new HashMap<String,Integer>();
-		lasts=new HashMap<String,Integer>();
+		this.routeId = routeId;
+		this.shortName = shortName;
+		this.routeType = routeType;
+		trips = new TreeMap<>();
 	}
-	public void addFirst(String first) {
-		if(firsts.get(first)==null)
-			firsts.put(first, 1);
-		else
-			firsts.put(first, firsts.get(first)+1);
-	}
-	public void addLast(String last) {
-		if(lasts.get(last)==null)
-			lasts.put(last, 1);
-		else
-			lasts.put(last, lasts.get(last)+1);
-	}
+
 	/**
-	 * @return the firsts
+	 * @return the routeId
 	 */
-	public Map<String, Integer> getFirsts() {
-		return firsts;
+	public String getRouteId() {
+		return routeId;
 	}
+
 	/**
-	 * @return the lasts
+	 * @return the shortName
 	 */
-	public Map<String, Integer> getLasts() {
-		return lasts;
+	public String getShortName() {
+		return shortName;
 	}
+
 	/**
-	 * @return the line
+	 * @return the routeType
 	 */
-	public String getLine() {
-		return line;
+	public RouteTypes getRouteType() {
+		return routeType;
 	}
+
 	/**
-	 * @param line the line to set
+	 * @return the trips
 	 */
-	public void setLine(String line) {
-		this.line = line;
+	public SortedMap<String, Trip> getTrips() {
+		return trips;
+	}
+
+	/**
+	 * Puts a new trip
+	 * @param key
+	 * @param trip
+	 */
+	public void putTrip(String key, Trip trip) {
+		trips.put(key, trip);
 	}
 	
+
 }

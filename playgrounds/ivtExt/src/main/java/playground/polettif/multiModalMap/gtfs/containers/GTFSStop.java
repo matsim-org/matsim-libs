@@ -22,7 +22,7 @@ package playground.polettif.multiModalMap.gtfs.containers;
 
 import org.matsim.api.core.v01.Coord;
 
-public class Stop {
+public class GTFSStop {
 	
 	//Attributes
 	/**
@@ -56,7 +56,7 @@ public class Stop {
 	 * @param name
 	 * @param blocks
 	 */
-	public Stop(Coord point, String name, boolean blocks) {
+	public GTFSStop(Coord point, String name, boolean blocks) {
 		super();
 		this.point = point;
 		this.name = name;
