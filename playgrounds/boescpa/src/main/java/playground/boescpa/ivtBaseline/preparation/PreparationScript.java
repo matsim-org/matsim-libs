@@ -13,6 +13,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBsubpop;
 import playground.boescpa.ivtBaseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities;
 import playground.boescpa.lib.tools.FacilityUtils;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
@@ -288,8 +289,7 @@ public class PreparationScript {
 				homeOption.getOpeningTimes().clear();
 				fullyMergedFacilities.getFacilities().get(facility.getId()).addActivityOption(homeOption);
 			} else {
-				fullyMergedFacilities.getFacilities().get(facility.getId()).getActivityOptions().get(IVTConfigCreator.WORK).setCapacity(
-						facility.getActivityOptions().get(IVTConfigCreator.WORK).getCapacity());
+				fullyMergedFacilities.addActivityFacility(facility);
 			}
 		}
 

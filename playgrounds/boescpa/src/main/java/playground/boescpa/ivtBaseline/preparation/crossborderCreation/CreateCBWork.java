@@ -185,7 +185,7 @@ public class CreateCBWork extends CreateCBsubpop {
 
 		plan.addLeg(new LegImpl("car"));
 
-		ActivityImpl actSA = new ActivityImpl(WORK, destFacility.getCoord(), destFacility.getLinkId());
+		ActivityImpl actSA = new ActivityImpl(WORK, destFacility.getCoord());
 		destFacility.getActivityOptions().get(WORK).setCapacity(
 				destFacility.getActivityOptions().get(WORK).getCapacity() + 1);
 		actSA.setFacilityId(destFacility.getId());

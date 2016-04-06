@@ -117,15 +117,31 @@ public abstract class CreateCBsubpop {
 		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(CB_TAG + "_" + subTag + "_" + index++, Person.class));
 		newCBPopulation.addPerson(p);
 		newCBPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", CB_TAG);
+		// store facilities (if not already stored)
+		origFacility = addCBFacility(origFacility);
+		destFacility = addCBFacility(destFacility);
 		// create and add new plan
 		p.addPlan(createSingleTripPlan(origFacility, destFacility));
-		// store facilities (if not already stored)
-		if (!bcFacilities.getFacilities().containsKey(origFacility.getId())) {
-			bcFacilities.addActivityFacility(origFacility);
+	}
+
+	private ActivityFacility addCBFacility(ActivityFacility facility) {
+		ActivityFacility finalFacility;
+		if (facility.getId().toString().contains(CreationOfCrossBorderFacilities.BC_TAG)) {
+			if (!bcFacilities.getFacilities().containsKey(facility.getId())) {
+				bcFacilities.addActivityFacility(facility);
+			}
+			finalFacility = facility;
+		} else {
+			Id<ActivityFacility> facilityId =
+					Id.create(CB_TAG + "_work_" + facility.getCoord().getX() + "_" + facility.getCoord().getY(), ActivityFacility.class);
+			if (!bcFacilities.getFacilities().containsKey(facilityId)) {
+				ActivityFacility newWorkFacility = bcFacilities.getFactory().createActivityFacility(facilityId, facility.getCoord());
+				((ActivityFacilityImpl) newWorkFacility).createAndAddActivityOption(WORK);
+				bcFacilities.addActivityFacility(newWorkFacility);
+			}
+			finalFacility = bcFacilities.getFacilities().get(facilityId);
 		}
-		if (!bcFacilities.getFacilities().containsKey(destFacility.getId())) {
-			bcFacilities.addActivityFacility(destFacility);
-		}
+		return finalFacility;
 	}
 
 	abstract Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility);
