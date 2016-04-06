@@ -27,12 +27,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBsubpop;
-import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
+import playground.boescpa.ivtBaseline.preparation.freightCreation.CreateFreightTraffic;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Creates an ivt config with location choice.
@@ -72,6 +70,11 @@ public class ChooseSecondaryFacilitiesConfigCreator extends IVTConfigCreator {
 		StrategyConfigGroup.StrategySettings strategySetting =
 				getStrategySetting("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy", 1.0);
 		strategySetting.setSubpopulation(CreateCBsubpop.CB_TAG);
+		strategySettings.add(strategySetting);
+		// freight pop
+		strategySetting =
+				getStrategySetting("ChangeExpBeta", 1.0);
+		strategySetting.setSubpopulation(CreateFreightTraffic.FREIGHT_TAG);
 		strategySettings.add(strategySetting);
 		return strategySettings;
 	}

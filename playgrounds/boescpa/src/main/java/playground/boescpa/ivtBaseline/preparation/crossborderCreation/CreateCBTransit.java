@@ -55,7 +55,7 @@ public class CreateCBTransit extends CreateCBsubpop {
 	}
 
 	public static void main(final String[] args) {
-		final String pathToFacilities = args[0];
+		final String pathToFacilities = args[0]; // all scenario facilities incl secondary facilities and bc facilities.
 		final String pathToCumulativeDepartureProbabilities = args[1];
 		final double samplePercentage = Double.parseDouble(args[2]);
 		final long randomSeed = Long.parseLong(args[3]);

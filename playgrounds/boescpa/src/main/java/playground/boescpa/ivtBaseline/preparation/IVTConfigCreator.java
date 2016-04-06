@@ -8,6 +8,8 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBsubpop;
+import playground.boescpa.ivtBaseline.preparation.freightCreation.CreateFreightTraffic;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
 import java.util.*;
@@ -136,6 +138,16 @@ public class IVTConfigCreator {
 		strategySettings.add(getStrategySetting("ReRoute", 0.2));
 		strategySettings.add(getStrategySetting("BlackListedTimeAllocationMutator", 0.1));
 		strategySettings.add(getStrategySetting("SubtourModeChoice", 0.1));
+		// cb pop
+		StrategyConfigGroup.StrategySettings strategySetting =
+				getStrategySetting("ChangeExpBeta", 0.01);
+		strategySetting.setSubpopulation(CreateCBsubpop.CB_TAG);
+		strategySettings.add(strategySetting);
+		// freight pop
+		strategySetting =
+				getStrategySetting("ChangeExpBeta", 0.01);
+		strategySetting.setSubpopulation(CreateFreightTraffic.FREIGHT_TAG);
+		strategySettings.add(strategySetting);
         return strategySettings;
     }
 

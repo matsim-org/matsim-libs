@@ -24,16 +24,13 @@ package playground.boescpa.ivtBaseline.preparation.freightCreation;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toCH1903LV03Plus;
@@ -60,7 +57,7 @@ public class CreateFreightTraffic {
 	private final static CoordinateTransformation transformation = new CH1903LV03toCH1903LV03Plus();
 
 	private final static String DELIMITER = ";";
-	private final static String FREIGHT_TAG = "freight";
+	public final static String FREIGHT_TAG = "freight";
 	private final static int VICINITY_RADIUS = 10000; // radius [m] around zone centroid which is considered vicinity
 
 	private final Random random;
@@ -83,7 +80,7 @@ public class CreateFreightTraffic {
 
 	public static void main(final String[] args) {
 		final String coordFile = args[0];
-		final String facilitiesFile = args[1];
+		final String facilitiesFile = args[1]; // all scenario facilities incl secondary facilities and bc facilities.
 		final String utilityVehiclesFile = args[2];
 		final String trucksFile = args[3];
 		final String heavyDutyVehiclesFile = args[4];

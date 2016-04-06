@@ -2,7 +2,6 @@ package playground.boescpa.ivtBaseline.preparation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -13,7 +12,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBsubpop;
 import playground.boescpa.ivtBaseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities;
 import playground.boescpa.lib.tools.FacilityUtils;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;

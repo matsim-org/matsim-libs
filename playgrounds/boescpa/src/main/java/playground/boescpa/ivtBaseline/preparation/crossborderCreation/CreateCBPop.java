@@ -43,7 +43,7 @@ import playground.boescpa.lib.tools.FacilityUtils;
 public class CreateCBPop {
 
 	public static void main(final String[] args) {
-		final String pathToFacilities = args[0];
+		final String pathToFacilities = args[0]; // all scenario facilities incl secondary facilities and bc facilities.
 		final String pathToCumulativeDepartureProbabilities = args[1];
 		final String samplePercentage = args[2];
 		final String randomSeed = args[3];
