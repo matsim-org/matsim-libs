@@ -191,10 +191,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		
 		// might be faster by sorting holes into a regular array list ...
 
-
-//		Iterator<Entry<Double, Hole>> iterator = holePositions.entrySet().iterator() ;
-//		TreeMap<Double,Hole> consumableHoles = new TreeMap<>( holePositions ) ;
-		
 		double distanceFromFromNode = Double.NaN;
 
 		for ( MobsimVehicle mveh : vehs ) {
@@ -204,7 +200,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			// (starts off relatively small (rightmost vehicle))
 			
 			final double spacing = mveh.getSizeInEquivalents()*spacingOfOnePCE;
-			distanceFromFromNode = this.calculateDistanceOnVectorFromFromNode(curvedLength, 
+			distanceFromFromNode = this.calculateOdometerDistanceFromFromNode(curvedLength, 
 					spacing , distanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
 			// (starts off relatively large (rightmost vehicle))
 			
@@ -273,6 +269,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	public abstract double calculateVehicleSpacing(double linkLength, double overallStorageCapacity, Collection<? extends VisVehicle> vehs);
 
-	public abstract double calculateDistanceOnVectorFromFromNode(double length, double spacing, double lastDistanceFromFromNode, 
+	public abstract double calculateOdometerDistanceFromFromNode(double length, double spacing, double lastDistanceFromFromNode, 
 			double now, double freespeedTraveltime, double remainingTravelTime);
 }

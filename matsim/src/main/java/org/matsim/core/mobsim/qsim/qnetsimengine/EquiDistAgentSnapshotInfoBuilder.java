@@ -47,7 +47,7 @@ final class EquiDistAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBu
 	}
 
 	@Override
-	public double calculateDistanceOnVectorFromFromNode(double length, double spacing,
+	public double calculateOdometerDistanceFromFromNode(double length, double spacing,
 			 double lastDistanceFromFromNode, double now, double freespeedTraveltime, double remainingTravelTime) {
 		double distanceOnVector = 0.;
 		if (Double.isNaN(lastDistanceFromFromNode)){

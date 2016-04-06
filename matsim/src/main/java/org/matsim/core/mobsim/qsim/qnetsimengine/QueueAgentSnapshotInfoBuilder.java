@@ -65,7 +65,7 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 	
 
 	@Override
-	public double calculateDistanceOnVectorFromFromNode(double curvedLength, double spacing,
+	public double calculateOdometerDistanceFromFromNode(double curvedLength, double spacing,
 			 double lastDistanceFromFNode, double now, double freespeedTraveltime, double remainingTravelTime) {
 		double distanceFromFNode ;
 		
