@@ -1,4 +1,4 @@
-package playground.tschlenther.Cottbus.Demand;
+package playground.jbischoff.teach.demand;
 
 	import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 	 
-	public class CreateDemand {
+	public class OSMLanduseBasedDemancGenerator {
 
 		//------FIELDS TO BE MODIFIED -----------------------------------------------------------------------------------------//		
 		//Modal-Split values representing the relative amount of car users
@@ -80,11 +80,11 @@ import com.vividsolutions.jts.io.WKTReader;
 		
 		
 		public static void main(String[] args) {
-			CreateDemand cd = new CreateDemand();
+			OSMLanduseBasedDemancGenerator cd = new OSMLanduseBasedDemancGenerator();
 			cd.run();
 		}
 		
-		CreateDemand (){
+		OSMLanduseBasedDemancGenerator (){
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);	
 		}
@@ -106,57 +106,16 @@ import com.vividsolutions.jts.io.WKTReader;
 			double commuters = 22709*SCALEFACTOR;								//amount of 'commuters' for this h-w-relation
 			createPersons("12052000", "12052000", commuters, MS_INNER_CITY);	
 			
-			//CB-LDS
-			commuters = 399*SCALEFACTOR;
-//			createPersons("12052000", "12061000", commuters, MS_OUTSIDE);
-			createPersons("12052000", "12071000", commuters, MS_OUTSIDE);
-			
-			//CB-LOS
-			commuters = 139*SCALEFACTOR;
-//			createPersons("12052000", "12067000", commuters, MS_OUTSIDE);
-			createPersons("12052000", "12071000", commuters, MS_OUTSIDE);
 			
 			//CB-SPN
 			commuters = 4338*SCALEFACTOR;
 			createPersons("12052000", "12071000", commuters, MS_OUTSIDE);
 					
-			//LDS-CB
-			commuters = 1322*SCALEFACTOR;
-//			createPersons("12061000", "12052000", commuters, MS_OUTSIDE);
-			createPersons("12071000", "12052000", commuters, MS_OUTSIDE);
-					
-			//LDS-SPN
-			commuters = 522*SCALEFACTOR;
-//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
-//			createPersons("12061000", "12071000", commuters, MS_OUTSIDE);
-			
-			//LOS-CB
-			commuters = 382*SCALEFACTOR;
-//			createPersons("12067000", "12052000", commuters, MS_OUTSIDE);
-			createPersons("12071000", "12052000", commuters, MS_OUTSIDE);
-			
-			//LOS-SPN
-			commuters = 449*SCALEFACTOR;
-//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
-//			createPersons("12067000", "12071000", commuters, MS_OUTSIDE);
 			
 			//SPN-CB
 			commuters = 11869*SCALEFACTOR;
 			createPersons("12071000", "12052000", commuters, MS_OUTSIDE);
 			
-			//SPN-LDS
-			commuters = 408*SCALEFACTOR;
-//			createPersons("12071000", "12061000", commuters, MS_OUTSIDE);
-//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
-			
-			//SPN-LOS
-			commuters = 466*SCALEFACTOR;
-//			createPersons("12071000", "12067000", commuters, MS_OUTSIDE);
-//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
-			
-			//SPN-SPN
-			commuters = 22524*SCALEFACTOR;
-//			createPersons("12071000", "12071000", commuters, MS_OUTSIDE);
 			
 			System.out.println(this.shapeMap.keySet());
 		
@@ -180,8 +139,8 @@ import com.vividsolutions.jts.io.WKTReader;
 				if (i>carcommuters) mode = "pt";
 				
 				// set coordinates of home and work activities to a randomly picked building
-				Coord homec = this.setBuildingFromZone(home,LanduseType.HOME);
-				Coord workc = this.setBuildingFromZone(work,LanduseType.WORK);
+				Coord homec = this.getLanduseFromZone(home,LanduseType.HOME);
+				Coord workc = this.getLanduseFromZone(work,LanduseType.WORK);
 				
 				double personalRandom = rnd.nextDouble();
 				createOnePerson(homec, workc, mode, homeZone+ "_"+workZone+ "_", personalRandom);
@@ -229,7 +188,7 @@ import com.vividsolutions.jts.io.WKTReader;
 			if ((activityChain>0.6)&&(activityChain<=0.7)){
 				
 				Activity kindergarten1 = scenario.getPopulation().getFactory().createActivityFromCoord("kindergarten1", this.findClosestCoordInMap(coord, kindergartens));
-				kindergarten1.setEndTime(startTime+(0.4*60*60)+(0.1*60*60*rnd.nextDouble())); //dropOff-time 5-10min
+				kindergarten1.setMaximumDuration(300+rnd.nextInt(300)); //5-10 minutes
 				plan.addActivity(kindergarten1); 
 
 				Leg hinweg2 = scenario.getPopulation().getFactory().createLeg(mode);
@@ -250,14 +209,14 @@ import com.vividsolutions.jts.io.WKTReader;
 			if ((activityChain>0.6)&&(activityChain<=0.7)){
 				
 				Activity kindergarten2 = scenario.getPopulation().getFactory().createActivityFromCoord("kindergarten2", this.findClosestCoordInMap(coord, kindergartens));
-				kindergarten2.setEndTime(workEndTime+(0.4*60*60)+(0.1*60*60*rnd.nextDouble())); //pickup-time 5-10min
+				kindergarten2.setMaximumDuration(300+rnd.nextInt(300)); //5-10 minutes
 				plan.addActivity(kindergarten2); 
 
 				Leg back2 = scenario.getPopulation().getFactory().createLeg(mode);
 				plan.addLeg(back2);
 			}		
 			}
-			//30% plan: home-work-home-SHOPPEN-home
+			//30% plan: home-work-home-shopping-home
 			if (ENRICHPLANS){
 
 			if (activityChain >0.7){
@@ -271,7 +230,7 @@ import com.vividsolutions.jts.io.WKTReader;
 				plan.addLeg(zumShoppen); 		
 				
 				Activity shopping = scenario.getPopulation().getFactory().createActivityFromCoord("shopping", this.findClosestCoordInMap(coord, shops));
-				shopping.setEndTime(startShoppingTime+(1*60*60)+(1*60*60*rnd.nextDouble())); //shopping 1-2 hours
+				shopping.setEndTime(startShoppingTime+(0.5*60*60)+(1*60*60*rnd.nextDouble())); //shopping 0.5-1.5 hours
 				plan.addActivity(shopping);
 				
 				Leg vomShoppen = scenario.getPopulation().getFactory().createLeg(mode);
@@ -356,7 +315,7 @@ import com.vividsolutions.jts.io.WKTReader;
 		 * @param zone
 		 * @return
 		 */
-		private Coord setBuildingFromZone (Geometry zone, LanduseType type){
+		private Coord getLanduseFromZone (Geometry zone, LanduseType type){
 			Point p;
 			
 			Map<String,Geometry> landuseMap = null;
