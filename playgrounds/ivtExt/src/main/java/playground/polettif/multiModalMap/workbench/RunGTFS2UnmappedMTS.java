@@ -31,9 +31,9 @@ public class RunGTFS2UnmappedMTS {
 	
 	public static void main(final String[] args) {
 		final String gtfsPath = "C:/Users/polettif/Desktop/data/gtfs/zvv/";
-		final String gtfsPath_sample = "C:/Users/polettif/Desktop/data/gtfs/google_sample/";
-		final String mtsFile = "C:/Users/polettif/Desktop/output/test/zvv_unmappedSchedule.xml";
-		final String mtsFile_sample = "C:/Users/polettif/Desktop/output/test/google_sample.xml";
+//		final String gtfsPath = "C:/Users/polettif/Desktop/data/gtfs/google_sample/";
+		final String mtsFile = "C:/Users/polettif/Desktop/output/gtfs2mts/zvv_unmappedSchedule.xml";
+//		final String mtsFile = "C:/Users/polettif/Desktop/output/gtfs2mts/google_sample.xml";
 
 		// Load Schedule
 		GTFSReader gtfsReader = new GTFSReader(gtfsPath);

@@ -23,20 +23,12 @@ import com.opencsv.CSVReader;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.multiModalMap.gtfs.containers.*;
 
 import java.io.FileNotFoundException;
@@ -57,7 +49,6 @@ public class GTFSReader {
 
 	private static final Logger log = Logger.getLogger(GTFSReader.class);
 
-
 	private final String root;
 	private final CoordinateTransformation coordinateTransformation;
 	private final String serviceIdsAlgorithm;
@@ -75,16 +66,10 @@ public class GTFSReader {
 	TransitScheduleFactory transitScheduleFactory;
 	TransitSchedule transitSchedule;
 
-	public static final Id<Link> DUMMY_LINK = Id.createLinkId("DUMMY_LINK");
-	public static final Id<Link> DUMMY_LINK_END = Id.createLinkId("DUMMY_LINK_END");
-	public static final Id<Node> DUMMY_NODE_1 = Id.createNodeId("DUMMY_NODE_1");
-	public static final Id<Node> DUMMY_NODE_2 = Id.createNodeId("DUMMY_NODE_2");
-	public static final Id<Node> DUMMY_NODE_3 = Id.createNodeId("DUMMY_NODE_3");
 	public static final String SERVICE_ID_MOST_USED = "mostused";
 
 	private SimpleDateFormat timeFormat;
 	private Map<String, Integer> serviceIdsCount;
-	private boolean useDummyLinks = false;
 
 	public static void main(final String[] args) {
 		convertGTFS2MATSimTransitSchedule(args[0], args[1]);
@@ -163,7 +148,6 @@ public class GTFSReader {
 			TransitStopFacility transitStopFacility = transitScheduleFactory.createTransitStopFacility(Id.create(stop.getKey(), TransitStopFacility.class), result, stop.getValue().isBlocks());
 			transitStopFacility.setName(stop.getValue().getName());
 			transitSchedule.addStopFacility(transitStopFacility);
-			if(useDummyLinks) {transitStopFacility.setLinkId(DUMMY_LINK); }
 		}
 
 		// use unique departure ids (safer than generating one for each transitRoue as long as Departures are stored in a Map
@@ -212,7 +196,7 @@ public class GTFSReader {
 					}
 
 					if(usesFrequencies && usesFrequenciesWarn) {
-						log.warn("Algorithm does not yet support frequencies instead of stop_times to create departure times!");
+						log.warn("Algorithm does not yet support frequencies instead of stop_times to create departure times. Only times in stop_times.txt are used.");
 						usesFrequenciesWarn = false;
 					}
 
@@ -240,14 +224,8 @@ public class GTFSReader {
 			} // foreach trip
 		} // foreach route
 
-		// Validate TransitSchedule with dummy network
-		if(TransitScheduleValidator.validateAll(transitSchedule, createDummyNetwork()).isValid()) {
-			log.info("Basic transit schedule is valid. However, stopFacilities are not yet referenced to links and transitLines do not include routes (link sequences).");
-			log.info("############################################");
-			log.info("GTFS successfully converted to basic MATSIM transit schedule");
-		} else {
-			log.error("Transit schedule not valid!");
-		}
+		log.info("GTFS successfully converted to an unmapped MATSIM Transit Schedule!");
+		log.info("############################################");
 
 	}
 
@@ -506,27 +484,6 @@ public class GTFSReader {
 		return indices;
 	}
 
-	/**
-	 * Generate a network with dummy links so the schedule can be validated.
-	 *
-	 * @author polettif
-	 */
-	private static Network createDummyNetwork() {
-
-		Network network = NetworkUtils.createNetwork();
-
-		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(network);
-
-		network.addNode(networkFactory.createNode(DUMMY_NODE_1, new Coord(0, 1)));
-		network.addNode(networkFactory.createNode(DUMMY_NODE_2, new Coord(0, 2)));
-		network.addNode(networkFactory.createNode(DUMMY_NODE_3, new Coord(0, 3)));
-
-		network.addLink(networkFactory.createLink(DUMMY_LINK, network.getNodes().get(DUMMY_NODE_1), network.getNodes().get(DUMMY_NODE_2)));
-		network.addLink(networkFactory.createLink(DUMMY_LINK_END, network.getNodes().get(DUMMY_NODE_2), network.getNodes().get(DUMMY_NODE_3)));
-
-		return network;
-	}
-
 	private void setServiceIds(String mode) {
 
 		if(mode.equals(SERVICE_ID_MOST_USED)) {
@@ -547,10 +504,6 @@ public class GTFSReader {
 				i++;
 			}
 		}
-	}
-
-	public void useDummyLinks(boolean b) {
-		this.useDummyLinks = b;
 	}
 
 	/**

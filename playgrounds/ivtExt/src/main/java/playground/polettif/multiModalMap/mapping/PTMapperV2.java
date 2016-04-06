@@ -89,9 +89,9 @@ public class PTMapperV2 extends PTMapper {
 
 		// TODO add DUMMY_LINK to avoid null pointer stuff
 		// TODO remove after routing
-		this.network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1), new Coord(0.0, 0.0)));
-		this.network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2), new Coord(0.0, 0.0)));
-		this.network.addLink(networkFactory.createLink(Id.createLinkId(GTFSReader.DUMMY_LINK), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_1)), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_2))));
+//		this.network.addNode(networkFactory.createNode(Id.createNodeId(DUMMY_NODE_1), new Coord(0.0, 0.0)));
+//		this.network.addNode(networkFactory.createNode(Id.createNodeId(DUMMY_NODE_2), new Coord(0.0, 0.0)));
+//		this.network.addLink(networkFactory.createLink(Id.createLinkId(DUMMY_LINK), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_1)), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_2))));
 
 		log.info("Creating PT lines...");
 
@@ -247,9 +247,9 @@ public class PTMapperV2 extends PTMapper {
 	protected void cleanStationsAndNetwork() {
 		log.info("Clean Stations and Network...");
 		// TODO get rid of dummy links which are implemented via gtfsreader (not independent)
-		network.removeLink(Id.createLinkId(GTFSReader.DUMMY_LINK));
-		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1));
-		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2));
+//		network.removeLink(Id.createLinkId(GTFSReader.DUMMY_LINK));
+//		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1));
+//		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2));
 		cleanSchedule();
 		prepareNetwork();
 		removeNonUsedStopFacilities();

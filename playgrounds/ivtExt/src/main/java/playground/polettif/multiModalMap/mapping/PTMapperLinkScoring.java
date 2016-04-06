@@ -55,6 +55,11 @@ import java.util.*;
  * </ol>
  * 
  * Already calculated path, route pairs and weights are stored.
+ *
+ * PROBLEM: there is no sulotion for multiple best scoring links for a stop, now refIds are just overwritten. Maybe check
+ * again for the whole network and set one link and THEN route from stop to stop. There is still the problem, however,
+ * that there might be multiple correct links for a stop (unless there are perfectly located multiple stop facilities in the schedule)
+ *
  * 
  * @author polettif
  */
@@ -105,9 +110,9 @@ public class PTMapperLinkScoring extends PTMapper {
 
 		// TODO add DUMMY_LINK to avoid null pointer stuff
 		// TODO remove after routing
-		this.network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1), new Coord(0.0, 0.0)));
-		this.network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2), new Coord(0.0, 0.0)));
-		this.network.addLink(networkFactory.createLink(Id.createLinkId(GTFSReader.DUMMY_LINK), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_1)), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_2))));
+//		this.network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1), new Coord(0.0, 0.0)));
+//		this.network.addNode(networkFactory.createNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2), new Coord(0.0, 0.0)));
+//		this.network.addLink(networkFactory.createLink(Id.createLinkId(GTFSReader.DUMMY_LINK), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_1)), network.getNodes().get(Id.createNodeId(GTFSReader.DUMMY_NODE_2))));
 
 		log.info("Creating PT lines...");
 
@@ -318,9 +323,9 @@ public class PTMapperLinkScoring extends PTMapper {
 	private void cleanStationsAndNetwork() {
 		log.info("Clean Stations and Network...");
 		// TODO get rid of dummy links which are implemented via gtfsreader (not independent)
-		network.removeLink(Id.createLinkId(GTFSReader.DUMMY_LINK));
-		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1));
-		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2));
+//		network.removeLink(Id.createLinkId(GTFSReader.DUMMY_LINK));
+//		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_1));
+//		network.removeNode(Id.createNodeId(GTFSReader.DUMMY_NODE_2));
 
 // TODO clean network
 		cleanSchedule();
