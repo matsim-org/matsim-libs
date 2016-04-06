@@ -84,7 +84,7 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 	 * Number of next stops that should be included in calculations for link weights.
 	 * Paths are calculated for stop[i] -> stop[i+1] up to stop[i] -> stop[i+LOOKAHEAD_STOPS]
 	 */
-	private final static int LOOKAHEAD_STOPS = 10;
+	private final static int LOOKAHEAD_STOPS = 5;
 
 	/**
 	 * ID prefix used for artificial link created if no nodes are found within {@link #NODE_SEARCH_RADIUS}
@@ -424,7 +424,7 @@ public class PTMapperLinkScoringMultiplyStops extends PTMapper {
 	/**
 	 * Calculates the plausibility score for all closest links of a stopFacility
 	 * <br/>
-	 * score = d + w
+	 * score = LINK_FACILITY_DISTANCE_WEIGHT * d + w
 	 * <br/>
 	 * d = distance stopFacility-Link (scaled 0..1)<br/>
 	 * w = link weight (scaled 0..1)

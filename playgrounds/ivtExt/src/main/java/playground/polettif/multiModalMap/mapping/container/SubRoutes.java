@@ -61,6 +61,7 @@ public class SubRoutes {
 	 * Each interStopRoute that passes a link adds weight to the link. Higher weight means more paths have
 	 * passed a link. The weight is calculated in {@link #getWeight(InterStopPath)} and based on the travelTime of the path.
 	 *
+	 * @param routeStops the stop sequence for which the link weights should be calculated
 	 * @return the weights
 	 */
 	public Map<Id<Link>, Double> getTransitRouteLinkWeights(List<TransitRouteStop> routeStops) {
@@ -92,13 +93,13 @@ public class SubRoutes {
 
 	/**
 	 * returns the score assigned to all links of a route.<br/>
-	 * score = 2*3600-travelTime<br/>
+	 * score = 3600-travelTime<br/>
 	 *
 	 * @param interStopPath
 	 * @return 1
 	 */
 	private double getWeight(InterStopPath interStopPath) {
-		return 2*3600-interStopPath.getTravelTime();
+		return 3600-interStopPath.getTravelTime();
 	}
 
 }
