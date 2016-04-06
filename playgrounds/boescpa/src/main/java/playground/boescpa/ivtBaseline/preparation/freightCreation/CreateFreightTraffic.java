@@ -24,16 +24,13 @@ package playground.boescpa.ivtBaseline.preparation.freightCreation;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toCH1903LV03Plus;
@@ -41,6 +38,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import playground.boescpa.ivtBaseline.preparation.IVTConfigCreator;
+import playground.boescpa.lib.tools.FacilityUtils;
 import playground.boescpa.lib.tools.PopulationUtils;
 
 import java.io.BufferedReader;
@@ -58,7 +57,7 @@ public class CreateFreightTraffic {
 	private final static CoordinateTransformation transformation = new CH1903LV03toCH1903LV03Plus();
 
 	private final static String DELIMITER = ";";
-	private final static String FREIGHT_TAG = "freight";
+	public final static String FREIGHT_TAG = "freight";
 	private final static int VICINITY_RADIUS = 10000; // radius [m] around zone centroid which is considered vicinity
 
 	private final Random random;
@@ -81,7 +80,7 @@ public class CreateFreightTraffic {
 
 	public static void main(final String[] args) {
 		final String coordFile = args[0];
-		final String facilitiesFile = args[1];
+		final String facilitiesFile = args[1]; // all scenario facilities incl secondary facilities and bc facilities.
 		final String utilityVehiclesFile = args[2];
 		final String trucksFile = args[3];
 		final String heavyDutyVehiclesFile = args[4];
@@ -232,7 +231,7 @@ public class CreateFreightTraffic {
 	}
 
 	private void readZones(String coordFile, String facilitiesFile) {
-		ActivityFacilities origFacilities = readFacilities(facilitiesFile);
+		ActivityFacilities origFacilities = FacilityUtils.readFacilities(facilitiesFile);
 		// read zone centroids and assign all facilities close to centroid
 		Counter counter = new Counter(" zone # ");
 		BufferedReader reader = IOUtils.getBufferedReader(coordFile);
@@ -265,7 +264,7 @@ public class CreateFreightTraffic {
 	private List<ActivityFacility> getFacilities(ActivityFacilities origFacilities, Coord zoneCentroidCoord) {
 		List<ActivityFacility> facilityList = new ArrayList<>();
 		for (ActivityFacility facility : origFacilities.getFacilities().values()) {
-			if (facility.getActivityOptions().keySet().contains("work")
+			if (facility.getActivityOptions().keySet().contains(IVTConfigCreator.WORK)
 					&& CoordUtils.calcEuclideanDistance(facility.getCoord(), zoneCentroidCoord) <= VICINITY_RADIUS) {
 				facilityList.add(facility);
 			}
@@ -276,13 +275,6 @@ public class CreateFreightTraffic {
 			facilityList.add(newFacility);
 		}
 		return facilityList;
-	}
-
-	private ActivityFacilities readFacilities(String facilitiesFile) {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		FacilitiesReaderMatsimV1 reader = new FacilitiesReaderMatsimV1(scenario);
-		reader.readFile(facilitiesFile);
-		return scenario.getActivityFacilities();
 	}
 
 	private void writeFreightPopulation(String outputPopulation) {
