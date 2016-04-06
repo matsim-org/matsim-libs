@@ -1,21 +1,16 @@
 package playground.boescpa.ivtBaseline.preparation;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Creates a default config for the ivt baseline scenarios.
@@ -85,12 +80,9 @@ public class IVTConfigCreator {
         // Set end time
 		config.qsim().setEndTime(108000); // 30:00:00
         // Add strategies
-        Map<String, Double> strategyDescr = getStrategyDescr();
-        for (String strategy : strategyDescr.keySet()) {
-            StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings();
-            strategySettings.setStrategyName(strategy);
-            strategySettings.setWeight(strategyDescr.get(strategy));
-            config.getModule(StrategyConfigGroup.GROUP_NAME).addParameterSet(strategySettings);
+        List<StrategyConfigGroup.StrategySettings> strategyDescrs = getStrategyDescr();
+        for (StrategyConfigGroup.StrategySettings strategy : strategyDescrs) {
+            config.getModule(StrategyConfigGroup.GROUP_NAME).addParameterSet(strategy);
         }
 		// Add black listed time mutation and the black listed modes:
 		// (black listed are all modes which are not free for the agent to decide the start and end times)
@@ -123,8 +115,8 @@ public class IVTConfigCreator {
 		config.households().setInputFile(INBASE_FILES + HOUSEHOLDS);
 		config.households().setInputHouseholdAttributesFile(INBASE_FILES + HOUSEHOLD_ATTRIBUTES);
 		config.network().setInputFile(INBASE_FILES + NETWORK);
-		config.plans().setInputFile(INBASE_FILES + POPULATION_ATTRIBUTES);
-		config.plans().setInputPersonAttributeFile(INBASE_FILES + POPULATION);
+		config.plans().setInputFile(INBASE_FILES + POPULATION);
+		config.plans().setInputPersonAttributeFile(INBASE_FILES + POPULATION_ATTRIBUTES);
 		config.transit().setTransitScheduleFile(INBASE_FILES + SCHEDULE);
 		config.transit().setVehiclesFile(INBASE_FILES + VEHICLES);
     }
@@ -138,16 +130,23 @@ public class IVTConfigCreator {
 		return transitWalkSet;
 	}
 
-	protected Map<String, Double> getStrategyDescr() {
-        Map<String, Double> strategyDescr = new HashMap<>();
-        strategyDescr.put("ChangeExpBeta", 0.5);
-        strategyDescr.put("ReRoute", 0.2);
-		strategyDescr.put("BlackListedTimeAllocationMutator", 0.1);
-        strategyDescr.put("SubtourModeChoice", 0.1);
-        return strategyDescr;
+	protected List<StrategyConfigGroup.StrategySettings> getStrategyDescr() {
+		List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
+		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.5));
+		strategySettings.add(getStrategySetting("ReRoute", 0.2));
+		strategySettings.add(getStrategySetting("BlackListedTimeAllocationMutator", 0.1));
+		strategySettings.add(getStrategySetting("SubtourModeChoice", 0.1));
+        return strategySettings;
     }
 
-    protected Map<String, Double> getActivityDescr() {
+	protected StrategyConfigGroup.StrategySettings getStrategySetting(String strategyName, double strategyWeight) {
+		StrategyConfigGroup.StrategySettings strategySetting = new StrategyConfigGroup.StrategySettings();
+		strategySetting.setStrategyName(strategyName);
+		strategySetting.setWeight(strategyWeight);
+		return strategySetting;
+	}
+
+	protected Map<String, Double> getActivityDescr() {
         Map<String, Double> activityDescr = new HashMap<>();
         activityDescr.put("home", 43200.);
         activityDescr.put("shop", 7200.);

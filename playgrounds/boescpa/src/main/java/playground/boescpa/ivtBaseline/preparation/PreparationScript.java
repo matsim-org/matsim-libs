@@ -167,9 +167,9 @@ public class PreparationScript {
 		ObjectAttributesXmlReader attributesReader = new ObjectAttributesXmlReader(scenarioPopulation.getPersonAttributes());
 		attributesReader.parse(pathPopulationAttributes);
 		// add tag for main population
-		for (Person p : scenarioPopulation.getPersons().values()) {
+		/*for (Person p : scenarioPopulation.getPersons().values()) {
 			scenarioPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "main_pop");
-		}
+		}*/
 		// add the freight population to the scenario population
 		plansReader.readFile(pathFreightPopulation);
 		attributesReader.parse(pathFreightPopulationAttributes);

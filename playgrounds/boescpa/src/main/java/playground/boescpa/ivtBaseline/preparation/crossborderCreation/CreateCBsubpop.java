@@ -45,11 +45,11 @@ import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
  *
  * @author boescpa
  */
-abstract class CreateCBsubpop {
+public abstract class CreateCBsubpop {
 	final static Logger log = Logger.getLogger(CreateCBsubpop.class);
 
 	final static String DELIMITER = ";";
-	private final static String CB_TAG = "cb";
+	public final static String CB_TAG = "cb";
 
 	private final Population newCBPopulation;
 	private final ActivityFacilities origFacilities;
