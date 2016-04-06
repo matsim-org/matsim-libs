@@ -30,15 +30,14 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
 public abstract class AbstractHybridElectricVehicle extends AbstractVehicleWithBattery {
 
 	// TODO: implement both serial and hybrid versions
-
 	
+	protected EnergyConsumptionModel engineECM;
 	
-	EnergyConsumptionModel engineECM;
-	
-	public double updateEnergyUse(Link link, double averageSpeedDriven){
+	@Override
+	public double updateEnergyUse(double drivenDistanceInMeters, double maxSpeedOnLink, double averageSpeedDriven) {
 		double energyConsumptionForLinkInJoule;
 		if (socInJoules>0){
-			energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(link, averageSpeedDriven);
+			energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(drivenDistanceInMeters,maxSpeedOnLink,averageSpeedDriven);
 		
 			if (energyConsumptionForLinkInJoule<=socInJoules){
 				useBattery(energyConsumptionForLinkInJoule);
@@ -46,18 +45,17 @@ public abstract class AbstractHybridElectricVehicle extends AbstractVehicleWithB
 				double fractionOfLinkTravelWithBattery=socInJoules/energyConsumptionForLinkInJoule;
 				useBattery(socInJoules);
 				
-				energyConsumptionForLinkInJoule=engineECM.getEnergyConsumptionForLinkInJoule(link.getLength()*(1-fractionOfLinkTravelWithBattery), link.getFreespeed(), averageSpeedDriven);
-				useCombustionEngine(energyConsumptionForLinkInJoule);
+				energyConsumptionForLinkInJoule=engineECM.getEnergyConsumptionForLinkInJoule(drivenDistanceInMeters*(1-fractionOfLinkTravelWithBattery), maxSpeedOnLink, averageSpeedDriven);
+				logEngineEnergyConsumption(energyConsumptionForLinkInJoule);
 			}
 		} else {
-			energyConsumptionForLinkInJoule=engineECM.getEnergyConsumptionForLinkInJoule(link, averageSpeedDriven);
-			useCombustionEngine(energyConsumptionForLinkInJoule);
+			energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(drivenDistanceInMeters,maxSpeedOnLink,averageSpeedDriven);
+			logEngineEnergyConsumption(energyConsumptionForLinkInJoule);
 		}
 		
 		return energyConsumptionForLinkInJoule;
 	}
 	
-	// e.g. use this method to log fuel consumption
-	abstract void useCombustionEngine(double energyConsumptionInJoule);
+	abstract protected void logEngineEnergyConsumption(double energyConsumptionInJoule);
 	
 }
