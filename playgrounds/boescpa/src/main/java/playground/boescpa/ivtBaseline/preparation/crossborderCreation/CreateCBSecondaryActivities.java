@@ -26,16 +26,22 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import playground.boescpa.ivtBaseline.preparation.PrefsCreator;
-import playground.boescpa.ivtBaseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
+import static playground.boescpa.ivtBaseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities.*;
 
 /**
  * Implementation of the trunk class CreateCBsubpop for the creation of secondary activity single-trip cb-agents.
@@ -44,11 +50,23 @@ import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
  */
 public class CreateCBSecondaryActivities extends CreateCBsubpop {
 
-	private String actTag = null;
+	private static final double MAX_BEELINE_DISTANCE = 20000;
 
 	private CreateCBSecondaryActivities(String pathToFacilities, String pathToCumulativeDepartureProbabilities, double samplePercentage, long randomSeed) {
 		super(pathToFacilities, pathToCumulativeDepartureProbabilities, samplePercentage, randomSeed);
+		//createFacilityCandidates();
 	}
+
+	/*private void createFacilityCandidates() {
+		leisureFacilityCandidatesPerBC = new HashMap<>();
+		shopFacilityCandidatesPerBC = new HashMap<>();
+		for (ActivityFacility facility : getOrigFacilities().getFacilities().values()) {
+			if (facility.getId().toString().contains(BC_TAG)) {
+				shopFacilityCandidatesPerBC.put(facility.getId().toString(), getFacilityCandidates(facility, SHOP));
+				leisureFacilityCandidatesPerBC.put(facility.getId().toString(), getFacilityCandidates(facility, LEISURE));
+			}
+		}
+	}*/
 
 	public static void main(final String[] args) {
 		final String pathToFacilities = args[0]; // all scenario facilities incl secondary facilities and bc facilities.
@@ -77,17 +95,20 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 				counter.incCounter();
 				String[] lineElements = line.split(DELIMITER);
 				ActivityFacility homeFacility =
-						getOrigFacilities().getFacilities().get(Id.create(CreationOfCrossBorderFacilities.BC_TAG + lineElements[0], ActivityFacility.class));
+						getOrigFacilities().getFacilities().get(Id.create(BC_TAG + lineElements[0], ActivityFacility.class));
 				if (homeFacility == null) {
-					log.error("BC-Facility " + CreationOfCrossBorderFacilities.BC_TAG + lineElements[0] + " not found.");
+					log.error("Expected BC-Facility " + BC_TAG + lineElements[0] + " not found. Will continue but population contain this demand.");
+					continue;
 				}
-				this.actTag = SHOP;
+				this.actTag = CB_TAG + "Shop";
+				List<Tuple<Integer, ActivityFacility>> shopCandidates = getFacilityCandidates(homeFacility, SHOP);
 				for (int i = 0; i < Integer.parseInt(lineElements[1]); i++) {
-					createSingleTripAgent(homeFacility, homeFacility, "saShop");
+					createSingleTripAgent(homeFacility, getSAFacility(shopCandidates, SHOP), SHOP);
 				}
-				this.actTag = LEISURE;
+				this.actTag = CB_TAG + "Leisure";
+				List<Tuple<Integer, ActivityFacility>> leisureCandidates = getFacilityCandidates(homeFacility, LEISURE);
 				for (int i = 0; i < Integer.parseInt(lineElements[2]); i++) {
-					createSingleTripAgent(homeFacility, homeFacility, "saLeisure");
+					createSingleTripAgent(homeFacility, getSAFacility(leisureCandidates, LEISURE), LEISURE);
 				}
 				line = reader.readLine();
 			}
@@ -98,14 +119,44 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 		}
 	}
 
+	private List<Tuple<Integer, ActivityFacility>> getFacilityCandidates(ActivityFacility facility, String seondaryActivityType) {
+		List<Tuple<Integer, ActivityFacility>> shopFacilitiesForBC = new ArrayList<>();
+		for (ActivityFacility facilityCandidate : getOrigFacilities().getFacilitiesForActivityType(seondaryActivityType).values()) {
+			if (!facilityCandidate.getId().toString().contains(BC_TAG) && // we don't want the BC-facilities themselves to be candidates here.
+					CoordUtils.calcEuclideanDistance(facility.getCoord(), facilityCandidate.getCoord()) < MAX_BEELINE_DISTANCE) {
+				if (shopFacilitiesForBC.isEmpty()) {
+					shopFacilitiesForBC.add(new Tuple<>(0, facilityCandidate));
+				} else {
+					int cummulativeProbFacility = shopFacilitiesForBC.get(shopFacilitiesForBC.size()-1).getFirst()
+							+ (int) Math.round(shopFacilitiesForBC.get(shopFacilitiesForBC.size() - 1).getSecond()
+							.getActivityOptions().get(seondaryActivityType).getCapacity());
+					shopFacilitiesForBC.add(new Tuple<>(cummulativeProbFacility, facilityCandidate));
+				}
+			}
+		}
+		return shopFacilitiesForBC;
+	}
+
+	private ActivityFacility getSAFacility(List<Tuple<Integer, ActivityFacility>> candidates, String saType) {
+		int maxCapSum = candidates.get(candidates.size()-1).getFirst()
+				+ (int) Math.round(candidates.get(candidates.size()-1).getSecond().getActivityOptions().get(saType).getCapacity());
+		int randFacility = random.nextInt(maxCapSum);
+		// identify selected facility
+		int currentCandidate = 0;
+		while (currentCandidate < (candidates.size() - 1) && candidates.get(currentCandidate + 1).getFirst() < randFacility) {
+			currentCandidate++;
+		}
+		return candidates.get(currentCandidate).getSecond();
+	}
+
 	@Override
 	final Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility) {
 		Plan plan = new PlanImpl();
 
 		double departureTime = getDepartureTime();
 		double actDuration = (4 + random.nextInt(24) + random.nextDouble())
-				* PrefsCreator.actCharacteristics.valueOf(this.actTag.toUpperCase()).getMinDur();
-		if (this.actTag.equals(SHOP)) {
+				* PrefsCreator.actCharacteristics.valueOf(this.actTag.substring(2).toUpperCase()).getMinDur();
+		if (this.actTag.substring(2).equals(SHOP)) {
 			actDuration *= 1.5; // shop has a very small min-time (representing kiosk-shopping)
 		}
 		double returnTime = departureTime + actDuration;

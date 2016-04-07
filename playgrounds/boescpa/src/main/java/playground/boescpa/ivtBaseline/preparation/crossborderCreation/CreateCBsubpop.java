@@ -51,6 +51,8 @@ public abstract class CreateCBsubpop {
 	final static String DELIMITER = ";";
 	public final static String CB_TAG = "cb";
 
+	String actTag = null;
+
 	private final Population newCBPopulation;
 	private final ActivityFacilities origFacilities;
 	private final ActivityFacilities bcFacilities = FacilitiesUtils.createActivityFacilities();
@@ -133,13 +135,16 @@ public abstract class CreateCBsubpop {
 			finalFacility = facility;
 		} else {
 			Id<ActivityFacility> facilityId =
-					Id.create(CB_TAG + "_work_" + facility.getCoord().getX() + "_" + facility.getCoord().getY(), ActivityFacility.class);
+					Id.create(CB_TAG + "_act_" + facility.getCoord().getX() + "_" + facility.getCoord().getY(), ActivityFacility.class);
 			if (!bcFacilities.getFacilities().containsKey(facilityId)) {
-				ActivityFacility newWorkFacility = bcFacilities.getFactory().createActivityFacility(facilityId, facility.getCoord());
-				((ActivityFacilityImpl) newWorkFacility).createAndAddActivityOption(WORK);
-				bcFacilities.addActivityFacility(newWorkFacility);
+				ActivityFacility newActFacility = bcFacilities.getFactory().createActivityFacility(facilityId, facility.getCoord());
+				((ActivityFacilityImpl) newActFacility).createAndAddActivityOption(this.actTag);
+				bcFacilities.addActivityFacility(newActFacility);
 			}
 			finalFacility = bcFacilities.getFacilities().get(facilityId);
+			if (!finalFacility.getActivityOptions().containsKey(this.actTag)) {
+				((ActivityFacilityImpl) finalFacility).createAndAddActivityOption(this.actTag);
+			}
 		}
 		return finalFacility;
 	}

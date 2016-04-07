@@ -143,9 +143,10 @@ public class CreateCBWork extends CreateCBsubpop {
 	}
 
 	private void createWorkPopulation(ActivityFacility homeFacility, int numberOfAgents, List<Tuple<Double, Coord>> cumProbWorkFromX) {
+		this.actTag = CB_TAG + "Work";
 		for (int i = 0; i < numberOfAgents; i++) {
 			ActivityFacility workFacility = getWorkFacility(cumProbWorkFromX);
-			createSingleTripAgent(homeFacility, workFacility, "work");
+			createSingleTripAgent(homeFacility, workFacility, WORK);
 		}
 	}
 
@@ -185,9 +186,9 @@ public class CreateCBWork extends CreateCBsubpop {
 
 		plan.addLeg(new LegImpl("car"));
 
-		ActivityImpl actSA = new ActivityImpl(WORK, destFacility.getCoord());
-		destFacility.getActivityOptions().get(WORK).setCapacity(
-				destFacility.getActivityOptions().get(WORK).getCapacity() + 1);
+		ActivityImpl actSA = new ActivityImpl(this.actTag, destFacility.getCoord());
+		//destFacility.getActivityOptions().get(this.actTag).setCapacity(
+		//		destFacility.getActivityOptions().get(this.actTag).getCapacity() + 1);
 		actSA.setFacilityId(destFacility.getId());
 		actSA.setStartTime(departureTime);
 		actSA.setMaximumDuration(returnTime - departureTime);
