@@ -39,7 +39,6 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 public class TransformTransitScheduleFile {
 
 	private static final Logger log = Logger.getLogger(TransformTransitScheduleFile.class);
-	private static TransitSchedule schedule;
 
 	/**
 	 * Transforms a MATSim Transit Schedule file.
@@ -49,7 +48,6 @@ public class TransformTransitScheduleFile {
 	 *             args[1] outputScheduleFile<br/>
 	 *             args[2] fromCoordinateSystem<br/>
 	 *             args[3] toCoordinateSystem
-	 * @author polettif
 	 */
 	public static void main(String[] args) {
 		run(args[0], args[1], args[1], args[3]);
@@ -66,7 +64,7 @@ public class TransformTransitScheduleFile {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		new TransitScheduleReader(coordinateTransformation, scenario).readFile(inputSchedule);
-		schedule = scenario.getTransitSchedule();
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		new TransitScheduleWriter(schedule).writeFile(outputSchedule);
 
 		log.info("Schedule transformed.");

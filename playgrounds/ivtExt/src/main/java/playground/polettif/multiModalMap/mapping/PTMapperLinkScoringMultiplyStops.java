@@ -49,8 +49,10 @@ import playground.polettif.multiModalMap.tools.NetworkTools;
 import java.util.*;
 
 /**
- * References an unmapped transit schedule to a network. Combines routing and referencing of stopFacilities. Creates additional
+ * References an unmapped transit schedule to a  b network. Combines routing and referencing of stopFacilities. Creates additional
  * stop facilities if a stopFacility has more than one plausible link. @see main()
+ *
+ * TODO doc input is modified
  *
  * @author polettif
  */

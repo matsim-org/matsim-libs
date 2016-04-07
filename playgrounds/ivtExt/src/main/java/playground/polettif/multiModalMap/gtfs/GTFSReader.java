@@ -54,25 +54,53 @@ public class GTFSReader {
 
 	private static final Logger log = Logger.getLogger(GTFSReader.class);
 
-	// fields
-	private final String root;
+	/**
+	 * which algorithm should be used to get serviceIds
+	 */
 	private final String serviceIdsAlgorithm;
+	public static final String SERVICE_ID_MOST_USED = "mostused";
+
+	/**
+	 * Path to the folder where the gtfs files are located
+	 */
+	private final String root;
+
+	/**
+	 * The types of dates that will be represented by the new file
+	 */
+	private String[] serviceIds;
+
+	/**
+	 * whether the gtfs feed uses frequencies.txt or not
+	 */
+	private boolean usesFrequencies = false;
+
+	/**
+	 * whether the gtfs feed uses shapes or not
+	 */
+	private boolean usesShapes = false;
+
+	/**
+	 * The time format used in the output MATSim transit schedule
+	 */
+	private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+
+	/**
+	 * map for counting how many trips use each serviceId
+	 */
+	private Map<String, Integer> serviceIdsCount = new HashMap<>();
+
+	// containers for storing gtfs data
 	private Map<String, GTFSStop> gtfsStops = new HashMap<>();
 	private SortedMap<String, GTFSRoute> gtfsRoutes = new TreeMap<>();
-	private Map<String, Service> services = new HashMap<>();    //	The calendar services
+	private Map<String, Service> services = new HashMap<>();
 	private Map<String, Shape> shapes = new HashMap<>();
-	private boolean usesShapes = false;
-	private boolean usesFrequencies = false;
-	private String[] serviceIds;    //	The types of dates that will be represented by the new file
-
 	private TransitScheduleFactory scheduleFactory = new TransitScheduleFactoryImpl();
 	private TransitSchedule schedule = scheduleFactory.createTransitSchedule();
 
-	private SimpleDateFormat timeFormat;
-	private Map<String, Integer> serviceIdsCount = new HashMap<>();
-
-	public static final String SERVICE_ID_MOST_USED = "mostused";
-
+	/**
+	 * Calls {@link #convertGTFS2MATSimTransitSchedule(String gtfsInputPath, String mtsOutputFile)}.
+	 */
 	public static void main(final String[] args) {
 		convertGTFS2MATSimTransitSchedule(args[0], args[1]);
 	}
@@ -93,11 +121,7 @@ public class GTFSReader {
 	}
 
 	public GTFSReader(String inputPath) {
-		if(!(inputPath.substring(inputPath.length() - 1).equals("/")))
-			inputPath += "/";
-
 		this.root = inputPath;
-		this.timeFormat = new SimpleDateFormat("HH:mm:ss");
 
 		// TODO there is only one algorithm to date
 		this.serviceIdsAlgorithm = SERVICE_ID_MOST_USED;
@@ -562,7 +586,6 @@ public class GTFSReader {
 	/**
 	 * In case optional columns in a csv file are missing or are out of order, adressing array
 	 * values directly via integer (i.e. where the column should be) does not work.
-	 * TODO check with GTFSDefinitions.getIndices
 	 *
 	 * @param header      the header (first line) of the csv file
 	 * @param columnNames array of attributes you need the indices of
