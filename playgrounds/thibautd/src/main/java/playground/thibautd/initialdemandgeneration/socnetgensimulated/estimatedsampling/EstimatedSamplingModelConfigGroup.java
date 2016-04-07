@@ -30,7 +30,7 @@ public class EstimatedSamplingModelConfigGroup extends ReflectiveConfigGroup {
 	private double b_sameGender = 2.7568;
 	private double b_ageDiff = -0.0955;
 
-	private Transformation distanceTransformation = Transformation.linear;
+	private Transformation distanceTransformation = Transformation.log;
 	private Transformation ageTransformation = Transformation.linear;
 
 	private double primarySample = 15682.0677;
