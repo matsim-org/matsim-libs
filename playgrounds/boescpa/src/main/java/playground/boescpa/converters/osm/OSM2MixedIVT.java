@@ -57,6 +57,7 @@ import playground.boescpa.lib.tools.fileMerging.VehicleMerger;
  *
  * @author boescpa
  */
+@Deprecated
 public class OSM2MixedIVT {
 
 	private static final CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
