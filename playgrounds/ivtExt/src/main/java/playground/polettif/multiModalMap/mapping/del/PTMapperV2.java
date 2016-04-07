@@ -19,9 +19,8 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.multiModalMap.mapping;
+package playground.polettif.multiModalMap.mapping.del;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -33,9 +32,9 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.multiModalMap.gtfs.GTFSReader;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmarksSimpleRouting;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
+import playground.polettif.multiModalMap.mapping.PTMapper;
 import playground.polettif.multiModalMap.mapping.container.V2SolvedSubRoutes;
 import playground.polettif.multiModalMap.mapping.container.InterStopPath;
 import playground.polettif.multiModalMap.tools.NetworkTools;

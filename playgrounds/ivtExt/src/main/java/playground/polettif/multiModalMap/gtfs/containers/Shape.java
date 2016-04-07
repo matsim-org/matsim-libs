@@ -24,11 +24,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
-import playground.polettif.multiModalMap.gtfs.geometry.Point2D;
-import playground.polettif.multiModalMap.gtfs.geometry.Vector2D;
 
 public class Shape {
 	

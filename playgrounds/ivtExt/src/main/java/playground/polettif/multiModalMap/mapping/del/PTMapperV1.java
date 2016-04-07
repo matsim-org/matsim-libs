@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.multiModalMap.mapping;
+package playground.polettif.multiModalMap.mapping.del;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,6 +38,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRFastAStarLandmarksSimpleRouting;
 import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
+import playground.polettif.multiModalMap.mapping.PTMapper;
 import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
