@@ -17,7 +17,7 @@
  * *********************************************************************** */
 
 
-package playground.polettif.multiModalMap.workbench;
+package playground.polettif.multiModalMap.tools;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -29,47 +29,49 @@ import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 
 
 /**
  * Transforms a network file .
  *
- * @params 	args[0] inputScheduleFile
- * 			args[1] outpuScheduleFile
- * 			args[2] fromSystem
- * 			args[3] toSystem
- *
  * @author polettif
  */
-public class TransformTransitScheduleFile {
+public class TransformNetworkFile {
 
-	private static final Logger log = Logger.getLogger(TransformTransitScheduleFile.class);
-	private static TransitSchedule schedule;
+	private static final Logger log = Logger.getLogger(TransformNetworkFile.class);
 
+	/**
+	 * 	Transforms a network file.
+	 *
+	 * @param 	args <br/>
+	 *          args[0] inputNetworkFile<br/>
+	 * 			args[1] outputNetworkFile<br/>
+	 * 			args[2] fromSystem<br/>
+	 * 			args[3] toSystem
+	 */
 	public static void main(String[] args) {
+			run(args[0], args[1], args[1], args[3]);
+		}
 
-		final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(args[2], args[3]);
-
-		// generate basic Config
-		Config config = ConfigUtils.createConfig();
-
-		// load scenario
-		final Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		new TransitScheduleReader(coordinateTransformation, scenario).readFile(args[0]);
-		schedule = scenario.getTransitSchedule();
-
-		new TransitScheduleWriter(schedule).writeFile(args[1]);
-
-		log.info("Schedule transformed.");
-	}
-
+	/**
+	 * 	Transforms a network file.
+	 */
 	public static void run(String inputNetwork, String outputNetwork, String fromSystem, String toSystem) {
-		String[] args = {inputNetwork, outputNetwork, fromSystem, toSystem};
-		main(args);
+
+		final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(fromSystem, toSystem);
+
+		Config config = ConfigUtils.createConfig();
+		config.setParam("network", "inputNetworkFile", inputNetwork);
+
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		Network network = scenario.getNetwork();
+
+		NetworkTransform networkTransform = new NetworkTransform(coordinateTransformation);
+		networkTransform.run(network);
+
+		new NetworkWriter(network).write(outputNetwork);
+
+		log.info("Network transformed.");
 	}
-	
+
 }

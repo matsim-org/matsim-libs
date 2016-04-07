@@ -17,60 +17,59 @@
  * *********************************************************************** */
 
 
-package playground.polettif.multiModalMap.workbench;
+package playground.polettif.multiModalMap.tools;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 
 
 /**
- * Transforms a network file .
- *
- * @params 	args[0] inputNetworkFile
- * 			args[1] outputNetworkFile
- * 			args[2] fromSystem
- * 			args[3] toSystem
+ * Transforms a MATSim Transit Schedule file.
  *
  * @author polettif
  */
-public class TransformNetworkFile {
+public class TransformTransitScheduleFile {
 
-	private static final Logger log = Logger.getLogger(TransformNetworkFile.class);
+	private static final Logger log = Logger.getLogger(TransformTransitScheduleFile.class);
+	private static TransitSchedule schedule;
 
+	/**
+	 * Transforms a MATSim Transit Schedule file.
+	 *
+	 * @param args <br/>
+	 *             args[0] inputScheduleFile<br/>
+	 *             args[1] outputScheduleFile<br/>
+	 *             args[2] fromCoordinateSystem<br/>
+	 *             args[3] toCoordinateSystem
+	 * @author polettif
+	 */
 	public static void main(String[] args) {
+		run(args[0], args[1], args[1], args[3]);
+	}
 
-		final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(args[2], args[3]);
-
-		// generate basic Config
+	/**
+	 * Transforms a MATSim Transit Schedule file.
+	 */
+	public static void run(String inputSchedule, String outputSchedule, String fromCoordinateSystem, String toCoordinateSystem) {
+		final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(fromCoordinateSystem, toCoordinateSystem);
 		Config config = ConfigUtils.createConfig();
-		config.setParam("network", "inputNetworkFile", args[0]);
 
 		// load scenario
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Network network = scenario.getNetwork();
+		new TransitScheduleReader(coordinateTransformation, scenario).readFile(inputSchedule);
+		schedule = scenario.getTransitSchedule();
+		new TransitScheduleWriter(schedule).writeFile(outputSchedule);
 
-		NetworkTransform networkTransform = new NetworkTransform(coordinateTransformation);
-
-		networkTransform.run(network);
-
-		NetworkWriter writer = new NetworkWriter(network);
-		writer.write(args[1]);
-
-		log.info("Network transformed.");
-	}
-
-	public static void run(String inputNetwork, String outputNetwork, String fromSystem, String toSystem) {
-		String[] args = {inputNetwork, outputNetwork, fromSystem, toSystem};
-		main(args);
+		log.info("Schedule transformed.");
 	}
 	
 }
