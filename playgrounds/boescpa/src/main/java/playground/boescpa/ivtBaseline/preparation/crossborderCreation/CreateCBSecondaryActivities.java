@@ -54,19 +54,7 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 
 	private CreateCBSecondaryActivities(String pathToFacilities, String pathToCumulativeDepartureProbabilities, double samplePercentage, long randomSeed) {
 		super(pathToFacilities, pathToCumulativeDepartureProbabilities, samplePercentage, randomSeed);
-		//createFacilityCandidates();
 	}
-
-	/*private void createFacilityCandidates() {
-		leisureFacilityCandidatesPerBC = new HashMap<>();
-		shopFacilityCandidatesPerBC = new HashMap<>();
-		for (ActivityFacility facility : getOrigFacilities().getFacilities().values()) {
-			if (facility.getId().toString().contains(BC_TAG)) {
-				shopFacilityCandidatesPerBC.put(facility.getId().toString(), getFacilityCandidates(facility, SHOP));
-				leisureFacilityCandidatesPerBC.put(facility.getId().toString(), getFacilityCandidates(facility, LEISURE));
-			}
-		}
-	}*/
 
 	public static void main(final String[] args) {
 		final String pathToFacilities = args[0]; // all scenario facilities incl secondary facilities and bc facilities.
@@ -186,7 +174,7 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 		ActivityImpl actEnd = new ActivityImpl(HOME, origFacility.getCoord(), origFacility.getLinkId());
 		actEnd.setFacilityId(origFacility.getId());
 		actEnd.setStartTime(returnTime);
-		actEnd.setMaximumDuration(24.0 * 3600.0 - returnTime);
+		//actEnd.setMaximumDuration(24.0 * 3600.0 - returnTime);
 		plan.addActivity(actEnd);
 		return plan;
 	}

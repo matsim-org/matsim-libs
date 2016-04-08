@@ -68,7 +68,7 @@ public class ChooseSecondaryFacilitiesConfigCreator extends IVTConfigCreator {
 		strategySettings.add(getStrategySetting("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy", 1.0));
 		// cb pop
 		StrategyConfigGroup.StrategySettings strategySetting =
-				getStrategySetting("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy", 1.0);
+				getStrategySetting("ChangeExpBeta", 1.0);
 		strategySetting.setSubpopulation(CreateCBsubpop.CB_TAG);
 		strategySettings.add(strategySetting);
 		// freight pop

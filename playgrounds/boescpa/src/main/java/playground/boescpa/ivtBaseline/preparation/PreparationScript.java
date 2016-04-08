@@ -2,9 +2,12 @@ package playground.boescpa.ivtBaseline.preparation;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -83,13 +86,13 @@ public class PreparationScript {
     public static void main(final String[] args) {
         pathScenario = args[0];
         pathResources = args[1];
-        int prctScenario = Integer.parseInt(args[2]);
+        int prctScenario = Integer.parseInt(args[2]); // for example for a 1%-scenario enter here '1'
 
         backupFolder = pathScenario + BACKUP_FOLDER;
         tempFolder = pathScenario + TEMP_FOLDER;
 
         try {
-            if (saveOriginalFiles() && testScenario()) {
+            if (saveOriginalFiles() && testScenario(false)) {
                 mergeFacilities();
                 addRemainingLocationChoiceActivities();
                 createF2L();
@@ -99,6 +102,7 @@ public class PreparationScript {
 				mergeInSubpopulations();
                 createDefaultIVTConfig(prctScenario);
 				createIVTLCConfig(prctScenario);
+				testScenario(true);
                 // to finish the process copy all files together to the final scenario
                 createNewScenario();
             }
@@ -296,7 +300,7 @@ public class PreparationScript {
         facilitiesWriter.write(pathFacilities);
     }
 
-    private static boolean testScenario() {
+    private static boolean testScenario(boolean executeFinalScenarioTests) {
         log.info(" ------- Test Scenario Files ------- ");
         try {
             Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -304,6 +308,9 @@ public class PreparationScript {
             facilitiesReader.readFile(pathFacilities);
             MatsimPopulationReader plansReader = new MatsimPopulationReader(scenario);
             plansReader.readFile(pathPopulation);
+			if (executeFinalScenarioTests) {
+				testFacilityAssignment(scenario);
+			}
             return true;
         } catch (Exception e) {
             log.fatal("Test of scenario input files failed.");
@@ -312,7 +319,31 @@ public class PreparationScript {
         }
     }
 
-    private static boolean saveOriginalFiles() throws IOException {
+	private static void testFacilityAssignment(Scenario scenario) {
+		boolean continueTest = true;
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
+				if (planElement instanceof ActivityImpl) {
+					ActivityImpl act = (ActivityImpl) planElement;
+					if (act.getFacilityId() != null) {
+						ActivityFacility activityFacility = scenario.getActivityFacilities().getFacilities().get(act.getFacilityId());
+						if (!activityFacility.getActivityOptions().keySet().contains(act.getType())) {
+							log.error("Assigned facility without appropriate activity type found. \n Agent Id: " + p.getId().toString()
+									+ ", act: " + act.toString());
+							continueTest = false;
+						}
+					} else {
+						log.error("Activity without assigned facility found. Agent Id: " + p.getId().toString());
+						continueTest = false;
+					}
+				}
+				if (!continueTest) break;
+			}
+			if (!continueTest) break;
+		}
+	}
+
+	private static boolean saveOriginalFiles() throws IOException {
         log.info(" ------- Save Original Files ------- ");
         try {
             Files.createDirectory(Paths.get(backupFolder));

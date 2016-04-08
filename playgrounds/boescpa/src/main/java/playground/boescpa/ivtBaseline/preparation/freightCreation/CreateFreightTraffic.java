@@ -175,7 +175,7 @@ public class CreateFreightTraffic {
 		ActivityImpl actEnd = new ActivityImpl(FREIGHT_TAG, endFacility.getCoord(), endFacility.getLinkId());
 		actEnd.setFacilityId(endFacility.getId());
 		actEnd.setStartTime(departureTime);
-		actEnd.setMaximumDuration(24.0 * 3600.0 - departureTime);
+		//actEnd.setMaximumDuration(24.0 * 3600.0 - departureTime);
 		plan.addActivity(actEnd);
 		return plan;
 	}

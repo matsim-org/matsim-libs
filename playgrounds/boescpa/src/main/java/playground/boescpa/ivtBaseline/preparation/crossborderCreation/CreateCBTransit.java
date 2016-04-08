@@ -153,7 +153,7 @@ public class CreateCBTransit extends CreateCBsubpop {
 		ActivityImpl actEnd = new ActivityImpl(HOME, destFacility.getCoord(), destFacility.getLinkId());
 		actEnd.setFacilityId(destFacility.getId());
 		actEnd.setStartTime(departureTime);
-		actEnd.setMaximumDuration(24.0 * 3600.0 - departureTime);
+		//actEnd.setMaximumDuration(24.0 * 3600.0 - departureTime);
 		plan.addActivity(actEnd);
 		return plan;
 	}

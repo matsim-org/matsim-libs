@@ -27,10 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.*;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.boescpa.lib.tools.FacilityUtils;
@@ -97,15 +94,28 @@ public class CreateCBPop {
 		ActivityFacilities saFacilities = FacilityUtils.readFacilities(
 				pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_SA_Facilities.xml.gz");
 		for (ActivityFacility facility : saFacilities.getFacilities().values()) {
-			if (!cbFacilities.getFacilities().containsKey(facility.getId())) cbFacilities.addActivityFacility(facility);
+			addFacility(cbFacilities, facility);
 		}
 		ActivityFacilities workFacilities = FacilityUtils.readFacilities(
 				pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_Work_Facilities.xml.gz");
 		for (ActivityFacility facility : workFacilities.getFacilities().values()) {
-			if (!cbFacilities.getFacilities().containsKey(facility.getId())) cbFacilities.addActivityFacility(facility);
+			addFacility(cbFacilities, facility);
 		}
 
 		new FacilitiesWriter(cbFacilities).writeV1(pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_Facilities.xml.gz");
+	}
+
+	private static void addFacility(ActivityFacilities cbFacilities, ActivityFacility facility) {
+		if (!cbFacilities.getFacilities().containsKey(facility.getId())) {
+			cbFacilities.addActivityFacility(facility);
+		} else {
+			for (String activityType : facility.getActivityOptions().keySet()) {
+				ActivityFacility cbFacility = cbFacilities.getFacilities().get(facility.getId());
+				if (!cbFacility.getActivityOptions().containsKey(activityType)) {
+					cbFacility.addActivityOption(facility.getActivityOptions().get(activityType));
+				}
+			}
+		}
 	}
 
 	private static void mergeSubpopulations(String pathToMainPop, String pathToAdditionalPop, String pathToOutputPop) {

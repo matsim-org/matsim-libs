@@ -200,7 +200,7 @@ public class CreateCBWork extends CreateCBsubpop {
 		ActivityImpl actEnd = new ActivityImpl(HOME, origFacility.getCoord(), origFacility.getLinkId());
 		actEnd.setFacilityId(origFacility.getId());
 		actEnd.setStartTime(returnTime);
-		actEnd.setMaximumDuration(24.0 * 3600.0 - returnTime);
+		//actEnd.setMaximumDuration(24.0 * 3600.0 - returnTime);
 		plan.addActivity(actEnd);
 		return plan;
 	}
