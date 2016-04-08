@@ -50,7 +50,7 @@ public class TransformTransitScheduleFile {
 	 *             args[3] toCoordinateSystem
 	 */
 	public static void main(String[] args) {
-		run(args[0], args[1], args[1], args[3]);
+		run(args[0], args[1], args[2], args[3]);
 	}
 
 	/**

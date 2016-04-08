@@ -78,7 +78,7 @@ public class PTMapperV1 extends PTMapper {
 	}
 
 	@Override
-	public void routePTLines(Network network) {
+	public void mapScheduleToNetwork(Network network) {
 		setNetwork(network);
 
 		// TODO

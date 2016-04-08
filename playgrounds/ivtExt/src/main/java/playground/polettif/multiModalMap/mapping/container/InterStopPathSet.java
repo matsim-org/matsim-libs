@@ -39,9 +39,18 @@ public class InterStopPathSet {
 	private final TransitRouteStop toStop;
 
 	private Map<Tuple<Link, Link>, InterStopPath> interStopPaths = new HashMap<>();
-	private Map<Id<Link>, Double> weights = null;
-	private double minDist1 = Double.MAX_VALUE;
-	private double minDist2 = Double.MAX_VALUE;
+
+	/**
+	 * minimal distance between the stop facility and the link for the fromStop
+	 */
+	private double minDistFrom = Double.MAX_VALUE;
+	/**
+	 * minimal distance between the stop facility and the link for the toStop
+	 */
+	private double minDistTo = Double.MAX_VALUE;
+	/**
+	 * minimal travel time betweent the two stops
+	 */
 	private double minTT = Double.MAX_VALUE;
 
 	public InterStopPathSet(TransitRouteStop fromStop, TransitRouteStop toStop) {
@@ -50,50 +59,22 @@ public class InterStopPathSet {
 		this.id = new Tuple<>(fromStop, toStop);
 	}
 
-	public void add(InterStopPath interStopPath) {
+	public void put(InterStopPath interStopPath) {
 		interStopPaths.put(new Tuple<>(interStopPath.getFromLink(), interStopPath.getToLink()), interStopPath);
-	}
 
+		if(interStopPath.getTravelTime() < minTT)
+			minTT = interStopPath.getTravelTime();
 
-	/**
-	 * Calculates the score of a route based on the travel time on the links and the distance of the stop facilities
-	 * from the link. Should be called after all route
-	 * <br/>
-	 *  score = 1.0+ weightTT*(travelTime/minTT)
-	 *  + weightDistance1*(distanceStartFacilityToLink/minDist1) +
-	 *  weightDistance2*(distanceEndFacilityToLink/minDist2))
-	 *
-	 *
-	 *  <br/>Other approaches should also be tested!
-	 *
-	 * @return the score
-	 */
-	@Deprecated
-	public double getScore(double weightTT, double weightDistance1, double weightDistance2) {
-		return 0.0; /*weightTT*(travelTime/minTT.get(key)) +
-				weightDistance1*(distanceStartFacilityToLink/minDist1.get(key)) +
-				weightDistance2*(distanceEndFacilityToLink/minDist2.get(key));
-				*/
+		if(interStopPath.getdistanceEndFacilityToLink() < minDistFrom)
+			minDistFrom = interStopPath.getDistanceStartFacilityToLink();
+
+		if(interStopPath.getdistanceEndFacilityToLink() < minDistTo)
+			minDistTo = interStopPath.getDistanceStartFacilityToLink();
 	}
 
 
 	public Tuple<TransitRouteStop,TransitRouteStop> getId() {
 		return id;
-	}
-
-	private void calculateMinimalValues() {
-		if (minTT == Double.MAX_VALUE) {
-			for (InterStopPath isr : interStopPaths.values()) {
-				if (isr.getDistanceStartFacilityToLink() < minDist1)
-					minDist1 = isr.getDistanceStartFacilityToLink();
-
-				if (isr.getdistanceEndFacilityToLink() < minDist2)
-					minDist2 = isr.getDistanceStartFacilityToLink();
-
-				if (isr.getTravelTime() < minTT)
-					minTT = isr.getDistanceStartFacilityToLink();
-			}
-		}
 	}
 
 	public List<InterStopPath> getPaths() {
@@ -106,5 +87,15 @@ public class InterStopPathSet {
 
 	public boolean contains(Link fromLink, Link toLink) {
 		return interStopPaths.containsKey(new Tuple<>(fromLink, toLink));
+	}
+
+	public List<Id<Link>> getAllIntermediateLinkIds() {
+		List<Id<Link>> allIntermediateLinkIds = new ArrayList<>();
+
+		for(InterStopPath isp : interStopPaths.values()) {
+			allIntermediateLinkIds.addAll(isp.getIntermediateLinkIds());
+		}
+
+		return allIntermediateLinkIds;
 	}
 }

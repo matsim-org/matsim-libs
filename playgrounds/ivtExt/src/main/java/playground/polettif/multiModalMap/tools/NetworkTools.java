@@ -42,7 +42,7 @@ public class NetworkTools {
 	 *
 	 * @return the closest n links to coord
 	 */
-	public static List<Link> findOnlyNClosestLinks(NetworkImpl networkImpl, Coord coord, double searchRadius, int n) {
+	public static List<Link> findOnlyNClosestLinks(NetworkImpl networkImpl, Coord coord, double searchRadius, int n, double maxLinkDistance) {
 		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, searchRadius);
 		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
 		double incr = 0.1; double tol=2.0;
@@ -84,12 +84,18 @@ public class NetworkTools {
 			for(Map.Entry<Double, Link> e : closestLinksMap.entrySet()) {
 				if(i > n && (e.getKey()-d > tol))
 					break;
+				if(e.getKey() > maxLinkDistance)
+					break;
 				closestLinks.add(e.getValue());
 				i++;
 			}
 
 			return closestLinks;
 		}
+	}
+
+	public static List<Link> findOnlyNClosestLinks(NetworkImpl networkImpl, Coord coord, double nodeSearchRadius, int maxNClosestLinks) {
+		return findOnlyNClosestLinks(networkImpl, coord, nodeSearchRadius, maxNClosestLinks, Double.MAX_VALUE);
 	}
 
 	/**
@@ -146,22 +152,6 @@ public class NetworkTools {
 		double az = 0;
 
 		double az2 = Math.atan2(deltaE, deltaN);
-
-		/* done via atan2
-		if(deltaE >= 0) {
-			if(deltaN >= 0) {
-				az = Math.atan(deltaE/deltaN);
-			} else {
-				az = Math.atan(deltaE / deltaN) + Math.PI;
-			}
-		} else {
-			if (deltaN >= 0) {
-				az = Math.atan(deltaE/deltaN) + 2*Math.PI;
-			} else {
-				az = Math.atan(deltaE/deltaN) + Math.PI;
-			}
-		}
-		*/
 
 		if(az2 < 0)
 			az2 = az2+2*Math.PI;
@@ -301,5 +291,6 @@ public class NetworkTools {
 		}
 		return closestLinks;
 	}
+
 
 }

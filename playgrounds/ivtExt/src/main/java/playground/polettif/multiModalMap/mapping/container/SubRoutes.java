@@ -21,6 +21,7 @@ package playground.polettif.multiModalMap.mapping.container;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
@@ -31,25 +32,21 @@ import java.util.Map;
 
 /**
  * Container to store all interStopRoutes of a schedule/network
- *
- * 	AllInterStopRoutes [1-n] InterStopPathSet [1-n] InterStopPath
- *
- * 	access interStopPathSet via [fromStop, toStop]
- * 	access interStopPath via [fromLink, toLink]
- *
+ * <p>
+ * AllInterStopRoutes [1-n] InterStopPathSet [1-n] InterStopPath
+ * <p>
+ * access interStopPathSet via [fromStop, toStop]
+ * access interStopPath via [fromLink, toLink]
  */
 public class SubRoutes {
 
 	private Map<Tuple<TransitRouteStop, TransitRouteStop>, InterStopPathSet> subRoutes = new HashMap<>();
 
-	public SubRoutes() {
-	}
-
 	public boolean contains(TransitRouteStop fromStop, TransitRouteStop toStop) {
 		return subRoutes.containsKey(new Tuple<>(fromStop, toStop));
 	}
 
-	public void add(InterStopPathSet interStopPaths) {
+	public void put(InterStopPathSet interStopPaths) {
 		subRoutes.put(interStopPaths.getId(), interStopPaths);
 	}
 
@@ -59,7 +56,9 @@ public class SubRoutes {
 
 	/**
 	 * Each interStopRoute that passes a link adds weight to the link. Higher weight means more paths have
-	 * passed a link. The weight is calculated in {@link #getWeight(InterStopPath)} and based on the travelTime of the path.
+	 * passed a link. The weight is calculated in {@link #getWeight(InterStopPath)} and based on the travelTime
+	 * of the path. Links that have been fixed on calculating paths are excluded from link weight calculations, except
+	 * for the link candidates of the first and last stop.
 	 *
 	 * @param routeStops the stop sequence for which the link weights should be calculated
 	 * @return the weights
@@ -69,27 +68,95 @@ public class SubRoutes {
 		Map<Id<Link>, Double> weights = new HashMap<>();
 
 		// get a list of all links used
-		List<InterStopPath> list = new ArrayList<>();
-		for(int i = 1; i<routeStops.size(); i++) {
+		for(int i = 1; i < routeStops.size(); i++) {
 			TransitRouteStop currentStop = routeStops.get(i);
-			TransitRouteStop previousStop = routeStops.get(i-1);
+			TransitRouteStop previousStop = routeStops.get(i - 1);
 
 			InterStopPathSet interStopPathSet = this.get(previousStop, currentStop);
-			list.addAll(interStopPathSet.getPaths());
-		}
 
-		// calculate and store the weight
-		for (InterStopPath interStopPath : list) {
-			for (Id<Link> linkId : interStopPath.getAllLinkIds()) {
-				if (!weights.containsKey(linkId)) {
-					weights.put(linkId, getWeight(interStopPath));
-				} else {
-					weights.put(linkId, weights.get(linkId) + getWeight(interStopPath));
+			if(i == 1) {
+				for(InterStopPath isp : interStopPathSet.getPaths()) {
+					for(Id<Link> linkId : isp.getIntermediateLinkIdsIncludingFromLink()) {
+						if(!weights.containsKey(linkId)) {
+							weights.put(linkId, getWeight(isp));
+						} else {
+							weights.put(linkId, weights.get(linkId) + getWeight(isp));
+						}
+					}
+				}
+			} else if(i == routeStops.size()-1) {
+				for(InterStopPath isp : interStopPathSet.getPaths()) {
+					for(Id<Link> linkId : isp.getIntermediateLinkIdsIncludingToLink()) {
+						if(!weights.containsKey(linkId)) {
+							weights.put(linkId, getWeight(isp));
+						} else {
+							weights.put(linkId, weights.get(linkId) + getWeight(isp));
+						}
+					}
+				}
+			} else {
+				for(InterStopPath isp : interStopPathSet.getPaths()) {
+					for(Id<Link> linkId : isp.getIntermediateLinkIds()) {
+						if(!weights.containsKey(linkId)) {
+							weights.put(linkId, getWeight(isp));
+						} else {
+							weights.put(linkId, weights.get(linkId) + getWeight(isp));
+						}
+					}
 				}
 			}
 		}
+
 		return weights;
 	}
+
+	public Map<Id<Link>, Double> getTransitRouteLinkWeightsV2(List<TransitRouteStop> routeStops) {
+
+		Map<Id<Link>, Double> weights = new HashMap<>();
+
+		// get a list of all links used
+		for(int i = 1; i < routeStops.size(); i++) {
+			TransitRouteStop currentStop = routeStops.get(i);
+			TransitRouteStop previousStop = routeStops.get(i - 1);
+
+			InterStopPathSet interStopPathSet = this.get(previousStop, currentStop);
+
+			if(i == 1) {
+				for(InterStopPath isp : interStopPathSet.getPaths()) {
+					for(Id<Link> linkId : isp.getIntermediateLinkIdsIncludingFromLink()) {
+						if(!weights.containsKey(linkId)) {
+							weights.put(linkId, getWeight(isp));
+						} else {
+							weights.put(linkId, weights.get(linkId) + getWeight(isp));
+						}
+					}
+				}
+			} else if(i == routeStops.size()-1) {
+				for(InterStopPath isp : interStopPathSet.getPaths()) {
+					for(Id<Link> linkId : isp.getIntermediateLinkIdsIncludingToLink()) {
+						if(!weights.containsKey(linkId)) {
+							weights.put(linkId, getWeight(isp));
+						} else {
+							weights.put(linkId, weights.get(linkId) + getWeight(isp));
+						}
+					}
+				}
+			} else {
+				for(InterStopPath isp : interStopPathSet.getPaths()) {
+					for(Id<Link> linkId : isp.getIntermediateLinkIds()) {
+						if(!weights.containsKey(linkId)) {
+							weights.put(linkId, getWeight(isp));
+						} else {
+							weights.put(linkId, weights.get(linkId) + getWeight(isp));
+						}
+					}
+				}
+			}
+		}
+
+		return weights;
+	}
+
 
 	/**
 	 * returns the score assigned to all links of a route.<br/>
@@ -98,8 +165,8 @@ public class SubRoutes {
 	 * @param interStopPath
 	 * @return 1
 	 */
-	private double getWeight(InterStopPath interStopPath) {
-		return 3600-interStopPath.getTravelTime();
+	private static double getWeight(InterStopPath interStopPath) {
+		return 3600 - interStopPath.getTravelTime();
 	}
 
 }

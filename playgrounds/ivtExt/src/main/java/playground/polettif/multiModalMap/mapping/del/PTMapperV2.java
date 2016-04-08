@@ -83,7 +83,7 @@ public class PTMapperV2 extends PTMapper {
 	}
 
 	@Override
-	public void routePTLines(Network networkParam) {
+	public void mapScheduleToNetwork(Network networkParam) {
 		setNetwork(networkParam);
 
 		// TODO add DUMMY_LINK to avoid null pointer stuff
@@ -106,7 +106,7 @@ public class PTMapperV2 extends PTMapper {
 		NetworkImpl networkImpl = ((NetworkImpl) network); // used by search for nearest node
 		for(TransitStopFacility stopFacility : this.schedule.getFacilities().values()) {
 			// limits number of links, for all links within search radius use Tools.findClosestLinks()
-			List<Link> closestLinks = NetworkTools.findOnlyNClosestLinks(networkImpl, stopFacility.getCoord(), SEARCH_RADIUS, MAX_N_CLOSEST_LINKS);
+			List<Link> closestLinks = NetworkTools.findOnlyNClosestLinks(networkImpl, stopFacility.getCoord(), SEARCH_RADIUS, MAX_N_CLOSEST_LINKS, 1000);
 
 			if (closestLinks == null) {
 				Node newNode = networkFactory.createNode(Id.create(PREFIX_ARTIFICIAL_LINKS + artificialId++, Node.class), stopFacility.getCoord());

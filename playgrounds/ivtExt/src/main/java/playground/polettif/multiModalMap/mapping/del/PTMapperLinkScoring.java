@@ -104,7 +104,7 @@ public class PTMapperLinkScoring extends PTMapper {
 	}
 
 	@Override
-	public void routePTLines(Network networkParam) {
+	public void mapScheduleToNetwork(Network networkParam) {
 		setNetwork(networkParam);
 
 		// TODO add DUMMY_LINK to avoid null pointer stuff
@@ -223,13 +223,13 @@ public class PTMapperLinkScoring extends PTMapper {
 										if (!linkCandidateCurrent.equals(linkCandidateNext)) {
 											LeastCostPathCalculator.Path pathCandidate = router.calcLeastCostPath(linkCandidateCurrent.getToNode(), linkCandidateNext.getFromNode(), null, null);
 											InterStopPath isp = new InterStopPath(currentStop, nextStop, linkCandidateCurrent, linkCandidateNext, pathCandidate);
-											currentInterStopPaths.add(isp);
+											currentInterStopPaths.put(isp);
 										}
 									}
 								}
 
 								// store interStopRoutes
-								subRoutes.add(currentInterStopPaths);
+								subRoutes.put(currentInterStopPaths);
 							}
 						}
 					}

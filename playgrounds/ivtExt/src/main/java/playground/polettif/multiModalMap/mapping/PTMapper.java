@@ -65,7 +65,7 @@ public abstract class PTMapper {
 	 *
 	 * @param network is a multimodal network (see MultimodalNetworkCreator)
 	 */
-	public abstract void routePTLines(Network network);
+	public abstract void mapScheduleToNetwork(Network network);
 
 	protected void setNetwork(Network network) {
 		this.network = network;

@@ -39,7 +39,6 @@ public class InterStopPath {
 	private final List<Link> pathLinks;
 
 	private double travelTime;
-	private LeastCostPathCalculator.Path path;
 	private double distanceStartFacilityToLink;
 	private double distanceEndFacilityToLink;
 
@@ -86,13 +85,29 @@ public class InterStopPath {
 	}
 
 	/**
-	 * @return a list of link ids between the two stops
+	 * @return a list of link ids between the two stops (excluding the links referenced to the first and last stop)
 	 */
 	public List<Id<Link>> getIntermediateLinkIds() {
 		if(pathLinks != null)
 			return pathLinks.stream().map(Link::getId).collect(Collectors.toList());
 		else
-			return null;
+			return new ArrayList<>();
+	}
+
+	public List<Id<Link>> getIntermediateLinkIdsIncludingFromLink() {
+		List<Id<Link>> list = new ArrayList<>();
+		list.add(fromLink.getId());
+		list.addAll(getIntermediateLinkIds());
+
+		return list;
+	}
+
+	public List<Id<Link>> getIntermediateLinkIdsIncludingToLink() {
+		List<Id<Link>> list = new ArrayList<>();
+		list.addAll(getIntermediateLinkIds());
+		list.add(toLink.getId());
+
+		return list;
 	}
 
 	/**
@@ -142,4 +157,6 @@ public class InterStopPath {
 	public Double getScore(int i, int i1, int i2) {
 		return 1.0;
 	}
+
+
 }
