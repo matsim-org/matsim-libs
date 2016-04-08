@@ -46,15 +46,15 @@ import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.HOME;
  *
  * @author boescpa
  */
-public class CreateCBTransit extends CreateCBsubpop {
+public class CreateCBTransit extends CreateSingleTripPopulation {
 
 	private Map<Character, List<Tuple<Double, ActivityFacility>>> destFacilities;
 
-	private CreateCBTransit(String pathToFacilities, String pathToCumulativeDepartureProbabilities, double samplePercentage, long randomSeed) {
-		super(pathToFacilities, pathToCumulativeDepartureProbabilities, samplePercentage, randomSeed);
+	public CreateCBTransit(CreateSingleTripPopulationConfigGroup configGroup) {
+		super(configGroup);
 	}
 
-	public static void main(final String[] args) {
+	/*public static void main(final String[] args) {
 		final String pathToFacilities = args[0]; // all scenario facilities incl secondary facilities and bc facilities.
 		final String pathToCumulativeDepartureProbabilities = args[1];
 		final double samplePercentage = Double.parseDouble(args[2]);
@@ -66,16 +66,17 @@ public class CreateCBTransit extends CreateCBsubpop {
 		cbTransit.readDestinations(pathToCB_transit);
 		cbTransit.createCBPopulation(pathToCB_transit);
 		cbTransit.writeOutput(pathToOutput_CBPopulation);
-	}
+	}*/
 
-	private void readDestinations(String pathToCB_transit) {
+	@Override
+	void readDestinations() {
 		this.destFacilities = new HashMap<>();
-		BufferedReader reader = IOUtils.getBufferedReader(pathToCB_transit);
+		BufferedReader reader = IOUtils.getBufferedReader(this.configGroup.getPathToOriginsFile());
 		try {
 			reader.readLine(); // read header
 			String line = reader.readLine();
 			while (line != null) {
-				String[] lineElements = line.split(DELIMITER);
+				String[] lineElements = line.split(this.configGroup.getDelimiter());
 				char country = lineElements[2].toCharArray()[0];
 				List<Tuple<Double, ActivityFacility>> countryFacilities = this.destFacilities.get(country);
 				if (countryFacilities == null) {
@@ -94,15 +95,15 @@ public class CreateCBTransit extends CreateCBsubpop {
 	}
 
 	@Override
-	final void createCBPopulation(String pathToCB_transit) {
-		BufferedReader reader = IOUtils.getBufferedReader(pathToCB_transit);
+	final void createCBPopulation() {
+		BufferedReader reader = IOUtils.getBufferedReader(this.configGroup.getPathToOriginsFile());
 		try {
 			log.info("CB-Pop creation...");
 			Counter counter = new Counter(" CB-Facility # ");
 			reader.readLine(); // read header
 			String line = reader.readLine();
 			while (line != null) {
-				String[] lineElements = line.split(DELIMITER);
+				String[] lineElements = line.split(this.configGroup.getDelimiter());
 				ActivityFacility origFacility =
 						getOrigFacilities().getFacilities().get(Id.create(CreationOfCrossBorderFacilities.BC_TAG + lineElements[0], ActivityFacility.class));
 				if (origFacility == null) {

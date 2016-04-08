@@ -45,38 +45,101 @@ import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
  *
  * @author boescpa
  */
-public abstract class CreateCBsubpop {
-	final static Logger log = Logger.getLogger(CreateCBsubpop.class);
-
-	final static String DELIMITER = ";";
-	public final static String CB_TAG = "cb";
+public abstract class CreateSingleTripPopulation {
+	final static Logger log = Logger.getLogger(CreateSingleTripPopulation.class);
 
 	String actTag = null;
 
 	private final Population newCBPopulation;
+	protected final CreateSingleTripPopulationConfigGroup configGroup;
 	private final ActivityFacilities origFacilities;
 	private final ActivityFacilities bcFacilities = FacilitiesUtils.createActivityFacilities();
 	private final double[] cummulativeDepartureProbability;
 	private final double samplePercentage;
-	final Random random;
+	protected final Random random;
 	private int index = 0;
 
-	final Population getPopulation() {
+	protected final Population getPopulation() {
 		return newCBPopulation;
 	}
 
-	final ActivityFacilities getOrigFacilities() {
+	protected final ActivityFacilities getOrigFacilities() {
 		return origFacilities;
 	}
 
-	CreateCBsubpop(String pathToFacilities, String pathToCumulativeDepartureProbabilities, double samplePercentage, long randomSeed) {
+	public CreateSingleTripPopulation(CreateSingleTripPopulationConfigGroup configGroup) {
+		this.configGroup = configGroup;
 		this.newCBPopulation = PopulationUtils.getEmptyPopulation();
-		this.origFacilities = FacilityUtils.readFacilities(pathToFacilities);
+		this.origFacilities = FacilityUtils.readFacilities(this.configGroup.getPathToFacilities());
 		addHomeActivityIfNotInFacilityYet(this.origFacilities);
-		this.cummulativeDepartureProbability = readDepartures(pathToCumulativeDepartureProbabilities);
-		this.samplePercentage = samplePercentage;
-		this.random = new Random(randomSeed);
+		this.cummulativeDepartureProbability = readDepartures(this.configGroup.getPathToCumulativeDepartureProbabilities());
+		this.samplePercentage = this.configGroup.getSamplePercentage();
+		this.random = new Random(this.configGroup.getRandomSeed());
 	}
+
+
+	// ******************************* Public Methods ***********************************
+
+	public final void runPopulationCreation() {
+		readDestinations();
+		createCBPopulation();
+	}
+
+	public final void writeOutput() {
+		String pathToOutput_CBTransitPopulation = this.configGroup.getPathToOutput();
+		new PopulationWriter(getPopulation()).write(pathToOutput_CBTransitPopulation);
+		new ObjectAttributesXmlWriter(getPopulation().getPersonAttributes())
+				.writeFile(pathToOutput_CBTransitPopulation.substring(0, pathToOutput_CBTransitPopulation.indexOf(".xml")) + "_Attributes.xml.gz");
+		new FacilitiesWriter(bcFacilities)
+				.write(pathToOutput_CBTransitPopulation.substring(0, pathToOutput_CBTransitPopulation.indexOf(".xml")) + "_Facilities.xml.gz");
+	}
+
+
+	// ******************************* Abstract Methods ***********************************
+
+	abstract void readDestinations();
+
+	/**
+	 * The method createSingleTripAgent (which calls the method createSingleTripPlan) is available to create the population.
+	 */
+	abstract void createCBPopulation();
+
+	abstract Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility);
+
+
+	// ******************************* Children Service Methods ***********************************
+
+	protected final void createSingleTripAgent(ActivityFacility origFacility, ActivityFacility destFacility, String subTag) {
+		if (origFacility == null || destFacility == null) {
+			throw new RuntimeException("Expected CB-Facility not found.");
+		}
+		if (random.nextDouble() > samplePercentage) return;
+		// create and add new agent
+		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(this.configGroup.getTag() + "_" + subTag + "_" + index++, Person.class));
+		newCBPopulation.addPerson(p);
+		newCBPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", this.configGroup.getTag());
+		// store facilities (if not already stored)
+		origFacility = addCBFacility(origFacility);
+		destFacility = addCBFacility(destFacility);
+		// create and add new plan
+		p.addPlan(createSingleTripPlan(origFacility, destFacility));
+	}
+
+	protected final double getDepartureTime() {
+		double randDep = random.nextDouble();
+		// identify selected hour of day
+		int hour = 0;
+		while (hour < 23 && cummulativeDepartureProbability[hour + 1] < randDep) {
+			hour++;
+		}
+		double time = hour*60*60;
+		// random assignment within that hour of the day
+		time += random.nextInt(3600);
+		return time;
+	}
+
+
+	// ******************************* Private Methods ***********************************
 
 	private double[] readDepartures(String pathToCumulativeDepartureProbabilities) {
 		BufferedReader reader = IOUtils.getBufferedReader(pathToCumulativeDepartureProbabilities);
@@ -84,7 +147,7 @@ public abstract class CreateCBsubpop {
 		try {
 			cumulativeDepartureProbabilities = new double[24];
 			for (int i = 0; i < 24; i++) {
-				String[] line = reader.readLine().split(DELIMITER);
+				String[] line = reader.readLine().split(this.configGroup.getDelimiter());
 				cumulativeDepartureProbabilities[i] = Double.parseDouble(line[1]);
 			}
 		} catch (IOException e) {
@@ -105,27 +168,6 @@ public abstract class CreateCBsubpop {
 		}
 	}
 
-	/**
-	 * The method createSingleTripAgent (which calls the method createSingleTripPlan) is available to create the population.
-	 */
-	abstract void createCBPopulation(String path2CBFile);
-
-	final void createSingleTripAgent(ActivityFacility origFacility, ActivityFacility destFacility, String subTag) {
-		if (origFacility == null || destFacility == null) {
-			throw new RuntimeException("Expected CB-Facility not found.");
-		}
-		if (random.nextDouble() > samplePercentage) return;
-		// create and add new agent
-		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(CB_TAG + "_" + subTag + "_" + index++, Person.class));
-		newCBPopulation.addPerson(p);
-		newCBPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", CB_TAG);
-		// store facilities (if not already stored)
-		origFacility = addCBFacility(origFacility);
-		destFacility = addCBFacility(destFacility);
-		// create and add new plan
-		p.addPlan(createSingleTripPlan(origFacility, destFacility));
-	}
-
 	private ActivityFacility addCBFacility(ActivityFacility facility) {
 		ActivityFacility finalFacility;
 		if (facility.getId().toString().contains(CreationOfCrossBorderFacilities.BC_TAG)) {
@@ -135,7 +177,7 @@ public abstract class CreateCBsubpop {
 			finalFacility = facility;
 		} else {
 			Id<ActivityFacility> facilityId =
-					Id.create(CB_TAG + "_act_" + facility.getCoord().getX() + "_" + facility.getCoord().getY(), ActivityFacility.class);
+					Id.create(this.configGroup.getTag() + "_act_" + facility.getCoord().getX() + "_" + facility.getCoord().getY(), ActivityFacility.class);
 			if (!bcFacilities.getFacilities().containsKey(facilityId)) {
 				ActivityFacility newActFacility = bcFacilities.getFactory().createActivityFacility(facilityId, facility.getCoord());
 				((ActivityFacilityImpl) newActFacility).createAndAddActivityOption(this.actTag);
@@ -147,28 +189,5 @@ public abstract class CreateCBsubpop {
 			}
 		}
 		return finalFacility;
-	}
-
-	abstract Plan createSingleTripPlan(ActivityFacility origFacility, ActivityFacility destFacility);
-
-	final double getDepartureTime() {
-		double randDep = random.nextDouble();
-		// identify selected hour of day
-		int hour = 0;
-		while (hour < 23 && cummulativeDepartureProbability[hour + 1] < randDep) {
-			hour++;
-		}
-		double time = hour*60*60;
-		// random assignment within that hour of the day
-		time += random.nextInt(3600);
-		return time;
-	}
-
-	final void writeOutput(String pathToOutput_CBTransitPopulation) {
-		new PopulationWriter(getPopulation()).write(pathToOutput_CBTransitPopulation);
-		new ObjectAttributesXmlWriter(getPopulation().getPersonAttributes())
-				.writeFile(pathToOutput_CBTransitPopulation.substring(0, pathToOutput_CBTransitPopulation.indexOf(".xml")) + "_Attributes.xml.gz");
-		new FacilitiesWriter(bcFacilities)
-				.write(pathToOutput_CBTransitPopulation.substring(0, pathToOutput_CBTransitPopulation.indexOf(".xml")) + "_Facilities.xml.gz");
 	}
 }

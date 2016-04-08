@@ -8,7 +8,8 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBsubpop;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBPop;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateSingleTripPopulation;
 import playground.boescpa.ivtBaseline.preparation.freightCreation.CreateFreightTraffic;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
@@ -141,7 +142,7 @@ public class IVTConfigCreator {
 		// cb pop
 		StrategyConfigGroup.StrategySettings strategySetting =
 				getStrategySetting("ChangeExpBeta", 0.01);
-		strategySetting.setSubpopulation(CreateCBsubpop.CB_TAG);
+		strategySetting.setSubpopulation(CreateCBPop.CB_TAG);
 		strategySettings.add(strategySetting);
 		// freight pop
 		strategySetting =

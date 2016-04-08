@@ -36,9 +36,7 @@ import playground.boescpa.ivtBaseline.preparation.PrefsCreator;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
 import static playground.boescpa.ivtBaseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities.*;
@@ -48,15 +46,15 @@ import static playground.boescpa.ivtBaseline.preparation.secondaryFacilityCreati
  *
  * @author boescpa
  */
-public class CreateCBSecondaryActivities extends CreateCBsubpop {
+public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 
 	private static final double MAX_BEELINE_DISTANCE = 20000;
 
-	private CreateCBSecondaryActivities(String pathToFacilities, String pathToCumulativeDepartureProbabilities, double samplePercentage, long randomSeed) {
-		super(pathToFacilities, pathToCumulativeDepartureProbabilities, samplePercentage, randomSeed);
+	public CreateCBSecondaryActivities(CreateSingleTripPopulationConfigGroup configGroup) {
+		super(configGroup);
 	}
 
-	public static void main(final String[] args) {
+	/*public static void main(final String[] args) {
 		final String pathToFacilities = args[0]; // all scenario facilities incl secondary facilities and bc facilities.
 		final String pathToCumulativeDepartureProbabilities = args[1];
 		final double samplePercentage = Double.parseDouble(args[2]);
@@ -69,11 +67,16 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 
 		cbSecondaryActivities.createCBPopulation(pathToCB_SA);
 		cbSecondaryActivities.writeOutput(pathToOutput_CBPopulation);
+	}*/
+
+	@Override
+	void readDestinations() {
+		// Here the destinations are given by the provided facilities. Ergo they don't need to be explicitly read.
 	}
 
 	@Override
-	final void createCBPopulation(String path2CBFile) {
-		BufferedReader reader = IOUtils.getBufferedReader(path2CBFile);
+	final void createCBPopulation() {
+		BufferedReader reader = IOUtils.getBufferedReader(this.configGroup.getPathToOriginsFile());
 		try {
 			reader.readLine(); // read header
 			log.info("CB-Pop creation...");
@@ -81,19 +84,19 @@ public class CreateCBSecondaryActivities extends CreateCBsubpop {
 			String line = reader.readLine();
 			while (line != null) {
 				counter.incCounter();
-				String[] lineElements = line.split(DELIMITER);
+				String[] lineElements = line.split(this.configGroup.getDelimiter());
 				ActivityFacility homeFacility =
 						getOrigFacilities().getFacilities().get(Id.create(BC_TAG + lineElements[0], ActivityFacility.class));
 				if (homeFacility == null) {
 					log.error("Expected BC-Facility " + BC_TAG + lineElements[0] + " not found. Will continue but population contain this demand.");
 					continue;
 				}
-				this.actTag = CB_TAG + "Shop";
+				this.actTag = this.configGroup.getTag() + "Shop";
 				List<Tuple<Integer, ActivityFacility>> shopCandidates = getFacilityCandidates(homeFacility, SHOP);
 				for (int i = 0; i < Integer.parseInt(lineElements[1]); i++) {
 					createSingleTripAgent(homeFacility, getSAFacility(shopCandidates, SHOP), SHOP);
 				}
-				this.actTag = CB_TAG + "Leisure";
+				this.actTag = this.configGroup.getTag() + "Leisure";
 				List<Tuple<Integer, ActivityFacility>> leisureCandidates = getFacilityCandidates(homeFacility, LEISURE);
 				for (int i = 0; i < Integer.parseInt(lineElements[2]); i++) {
 					createSingleTripAgent(homeFacility, getSAFacility(leisureCandidates, LEISURE), LEISURE);

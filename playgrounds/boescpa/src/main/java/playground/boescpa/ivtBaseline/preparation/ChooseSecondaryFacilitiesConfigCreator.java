@@ -26,7 +26,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBsubpop;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBPop;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateSingleTripPopulation;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateSingleTripPopulationConfigGroup;
 import playground.boescpa.ivtBaseline.preparation.freightCreation.CreateFreightTraffic;
 
 import java.util.ArrayList;
@@ -69,7 +71,7 @@ public class ChooseSecondaryFacilitiesConfigCreator extends IVTConfigCreator {
 		// cb pop
 		StrategyConfigGroup.StrategySettings strategySetting =
 				getStrategySetting("ChangeExpBeta", 1.0);
-		strategySetting.setSubpopulation(CreateCBsubpop.CB_TAG);
+		strategySetting.setSubpopulation(CreateCBPop.CB_TAG);
 		strategySettings.add(strategySetting);
 		// freight pop
 		strategySetting =

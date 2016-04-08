@@ -46,7 +46,7 @@ import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
  *
  * @author boescpa
  */
-public class CreateCBWork extends CreateCBsubpop {
+public class CreateCBWork extends CreateSingleTripPopulation {
 
 	private static final double VICINITY_RADIUS = 10000; // radius [m] around zone centroid which is considered vicinity
 	private final List<Tuple<Double, Coord>> cumProbWorkFromA = new ArrayList<>();
@@ -55,11 +55,12 @@ public class CreateCBWork extends CreateCBsubpop {
 	private final List<Tuple<Double, Coord>> cumProbWorkFromI = new ArrayList<>();
 	private final Map<String, List<ActivityFacility>> communities = new HashMap<>();
 
-	private CreateCBWork(String pathToFacilities, String pathToCumulativeDepartureProbabilities, double samplePercentage, long randomSeed) {
-		super(pathToFacilities, pathToCumulativeDepartureProbabilities, samplePercentage, randomSeed);
+	public CreateCBWork(CreateSingleTripPopulationConfigGroup configGroup) {
+		super(configGroup);
 	}
 
-	public static void main(final String[] args) {
+
+	/*public static void main(final String[] args) {
 		final String pathToFacilities = args[0]; // all scenario facilities incl secondary facilities and bc facilities.
 		final String pathToCumulativeDepartureProbabilities = args[1];
 		final double samplePercentage = Double.parseDouble(args[2]);
@@ -71,13 +72,14 @@ public class CreateCBWork extends CreateCBsubpop {
 		CreateCBWork cbSecondaryActivities =
 				new CreateCBWork(pathToFacilities, pathToCumulativeDepartureProbabilities, samplePercentage, randomSeed);
 
-		cbSecondaryActivities.createDestinations(pathToCB_workDestination);
+		cbSecondaryActivities.readDestinations(pathToCB_workDestination);
 		cbSecondaryActivities.createCBPopulation(pathToCB_workOrigin);
 		cbSecondaryActivities.writeOutput(pathToOutput_CBPopulation);
-	}
+	}*/
 
-	private void createDestinations(String pathToCB_workDestination) {
-		CSVReader reader = new CSVReader(pathToCB_workDestination, DELIMITER);
+	@Override
+	void readDestinations() {
+		CSVReader reader = new CSVReader(this.configGroup.getPathToDestinationsFile(), this.configGroup.getDelimiter());
 		reader.skipLine(); // header
 		log.info("CB-Dest creation...");
 		Counter counter = new Counter(" CB-Destination # ");
@@ -116,8 +118,8 @@ public class CreateCBWork extends CreateCBsubpop {
 	}
 
 	@Override
-	final void createCBPopulation(String pathToCB_workOrigin) {
-		CSVReader reader = new CSVReader(pathToCB_workOrigin, DELIMITER);
+	final void createCBPopulation() {//(String pathToCB_workOrigin) {
+		CSVReader reader = new CSVReader(this.configGroup.getPathToOriginsFile(), this.configGroup.getDelimiter());
 		reader.skipLine(); // header
 		log.info("CB-Pop creation...");
 		Counter counter = new Counter(" CB-Work-Pop - Zollst # ");
@@ -143,7 +145,7 @@ public class CreateCBWork extends CreateCBsubpop {
 	}
 
 	private void createWorkPopulation(ActivityFacility homeFacility, int numberOfAgents, List<Tuple<Double, Coord>> cumProbWorkFromX) {
-		this.actTag = CB_TAG + "Work";
+		this.actTag = this.configGroup.getTag() + "Work";
 		for (int i = 0; i < numberOfAgents; i++) {
 			ActivityFacility workFacility = getWorkFacility(cumProbWorkFromX);
 			createSingleTripAgent(homeFacility, workFacility, WORK);

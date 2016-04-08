@@ -23,6 +23,7 @@ package playground.boescpa.ivtBaseline.preparation.crossborderCreation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -39,49 +40,63 @@ import playground.boescpa.lib.tools.FacilityUtils;
  */
 public class CreateCBPop {
 
+	public static final String CB_TAG = "cb";
+
 	public static void main(final String[] args) {
-		final String pathToFacilities = args[0]; // all scenario facilities incl secondary facilities and bc facilities.
-		final String pathToCumulativeDepartureProbabilities = args[1];
-		final String samplePercentage = args[2];
-		final String randomSeed = args[3];
-		final String pathToInput_CBFiles = args[4];
-		final String pathToOutput_CBPopulation = args[5].substring(0, args[5].indexOf(".xml"))
-				+ "_" + randomSeed + "_" + samplePercentage + ".xml.gz";
+		final Config fullConfig = ConfigUtils.loadConfig(args[0], new CreateSingleTripPopulationConfigGroup());
+		CreateSingleTripPopulationConfigGroup configGroup =
+				(CreateSingleTripPopulationConfigGroup) fullConfig.getModule(CreateSingleTripPopulationConfigGroup.GROUP_NAME) ;
+
+		final String pathToOutput_CBPopulation = configGroup.getPathToOutput().substring(0, configGroup.getPathToOutput().indexOf(".xml"))
+				+ "_" + configGroup.getRandomSeed() + "_" + configGroup.getSamplePercentage() + ".xml.gz";
+		configGroup.setPathToOutput(pathToOutput_CBPopulation);
+		configGroup.setTag(CB_TAG);
+
 
 		// CB-Transit
-		String[] transitArgs = new String[]{
-				pathToFacilities,
-				pathToCumulativeDepartureProbabilities + "/CumulativeProbabilityTransitDeparture.txt",
-				samplePercentage,
-				randomSeed,
-				pathToInput_CBFiles + "/OD_CB-Agents_Transit.txt",
-				pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_Transit.xml.gz"};
-		CreateCBTransit.main(transitArgs);
+		//	config creation
+		CreateSingleTripPopulationConfigGroup transitConfig = configGroup.copy();
+		transitConfig.setPathToCumulativeDepartureProbabilities(
+				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilityTransitDeparture.txt");
+		transitConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "OD_CB-Agents_Transit.txt");
+		transitConfig.setPathToOutput(
+				configGroup.getPathToOutput().substring(0,configGroup.getPathToOutput().indexOf(".xml")) + "_Transit.xml.gz");
+		//	population creation
+		CreateCBTransit cbTransit = new CreateCBTransit(transitConfig);
+		cbTransit.runPopulationCreation();
+		cbTransit.writeOutput();
 
 		// CB-SecondaryActivities
-		String[] saArgs = new String[]{
-				pathToFacilities,
-				pathToCumulativeDepartureProbabilities + "/CumulativeProbabilitySecondaryActivityDeparture.txt",
-				samplePercentage,
-				randomSeed,
-				pathToInput_CBFiles + "/OD_CB-Agents_SecondaryActivities.txt",
-				pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_SA.xml.gz"};
-		CreateCBSecondaryActivities.main(saArgs);
+		//	config creation
+		CreateSingleTripPopulationConfigGroup saConfig = configGroup.copy();
+		saConfig.setPathToCumulativeDepartureProbabilities(
+				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilitySecondaryActivityDeparture.txt");
+		saConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "OD_CB-Agents_SecondaryActivities.txt");
+		saConfig.setPathToOutput(
+				configGroup.getPathToOutput().substring(0,configGroup.getPathToOutput().indexOf(".xml")) + "_SA.xml.gz");
+		//	population creation
+		CreateCBSecondaryActivities cbSecondaryActivities = new CreateCBSecondaryActivities(saConfig);
+		cbSecondaryActivities.runPopulationCreation();
+		cbSecondaryActivities.writeOutput();
 
 		// CB-Work
-		String[] workArgs = new String[]{
-				pathToFacilities,
-				pathToCumulativeDepartureProbabilities + "/CumulativeProbabilityWorkDeparture.txt",
-				samplePercentage,
-				randomSeed,
-				pathToInput_CBFiles + "/D_CB-Agents_Work.txt",
-				pathToInput_CBFiles + "/O_CB-Agents_Work.txt",
-				pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_Work.xml.gz"};
-		CreateCBWork.main(workArgs);
+		//	config creation
+		CreateSingleTripPopulationConfigGroup workConfig = configGroup.copy();
+		workConfig.setPathToCumulativeDepartureProbabilities(
+				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilityWorkDeparture.txt");
+		workConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "O_CB-Agents_Work.txt");
+		workConfig.setPathToDestinationsFile(configGroup.getPathToDestinationsFile() + "D_CB-Agents_Work.txt");
+		workConfig.setPathToOutput(
+				configGroup.getPathToOutput().substring(0,configGroup.getPathToOutput().indexOf(".xml")) + "_Work.xml.gz");
+		//	population creation
+		CreateCBWork cbWork = new CreateCBWork(workConfig);
+		cbWork.runPopulationCreation();
+		cbWork.writeOutput();
+
 
 		mergeFacilities(pathToOutput_CBPopulation);
-		mergeSubpopulations(transitArgs[5], saArgs[5], pathToOutput_CBPopulation);
-		mergeSubpopulations(pathToOutput_CBPopulation, workArgs[6], pathToOutput_CBPopulation);
+		mergeSubpopulations(transitConfig.getPathToOutput(), saConfig.getPathToOutput(), pathToOutput_CBPopulation);
+		mergeSubpopulations(pathToOutput_CBPopulation, workConfig.getPathToOutput(), pathToOutput_CBPopulation);
 	}
 
 	private static void mergeFacilities(String pathToOutput_CBPopulation) {
