@@ -27,28 +27,28 @@ public class TimeDiscretizer
     }
 
 
-    public static final TimeDiscretizer ACYCLIC_1_SEC = new TimeDiscretizer(30, 1, Type.ACYCLIC);
-    public static final TimeDiscretizer ACYCLIC_15_MIN = new TimeDiscretizer(30, 900, Type.ACYCLIC);
-    public static final TimeDiscretizer ACYCLIC_1_HOUR = new TimeDiscretizer(30, 3600,
+    public static final TimeDiscretizer ACYCLIC_1_SEC = new TimeDiscretizer(30 * 3600, 1, Type.ACYCLIC);
+    public static final TimeDiscretizer ACYCLIC_15_MIN = new TimeDiscretizer(30 * 3600, 900, Type.ACYCLIC);
+    public static final TimeDiscretizer ACYCLIC_1_HOUR = new TimeDiscretizer(30 * 3600, 3600,
             Type.ACYCLIC);
-    public static final TimeDiscretizer ACYCLIC_30_HOURS = new TimeDiscretizer(30, 30 * 3600,
+    public static final TimeDiscretizer ACYCLIC_30_HOURS = new TimeDiscretizer(30 * 3600, 30 * 3600,
             Type.ACYCLIC);
 
     //useful for routing when running over-night scenarios, such as a 5am-5am taxi simulation
-    public static final TimeDiscretizer CYCLIC_1_SEC = new TimeDiscretizer(24, 1, Type.CYCLIC);
-    public static final TimeDiscretizer CYCLIC_15_MIN = new TimeDiscretizer(24, 900, Type.CYCLIC);
-    public static final TimeDiscretizer CYCLIC_1_HOUR = new TimeDiscretizer(24, 3600, Type.CYCLIC);
-    public static final TimeDiscretizer CYCLIC_24_HOURS = new TimeDiscretizer(24, 24 * 3600,
+    public static final TimeDiscretizer CYCLIC_1_SEC = new TimeDiscretizer(24 * 3600, 1, Type.CYCLIC);
+    public static final TimeDiscretizer CYCLIC_15_MIN = new TimeDiscretizer(24 * 3600, 900, Type.CYCLIC);
+    public static final TimeDiscretizer CYCLIC_1_HOUR = new TimeDiscretizer(24 * 3600, 3600, Type.CYCLIC);
+    public static final TimeDiscretizer CYCLIC_24_HOURS = new TimeDiscretizer(24 * 3600, 24 * 3600,
             Type.CYCLIC);
 
-    //approach used in TravelTimeCalculator, an additional open-ended time bin
-    public static final TimeDiscretizer OPEN_ENDED_1_SEC = new TimeDiscretizer(30, 1,
+    //approach used in TravelTimeCalculator, the last time bin is open ended
+    public static final TimeDiscretizer OPEN_ENDED_1_SEC = new TimeDiscretizer(30 * 3600, 1,
             Type.OPEN_ENDED);
-    public static final TimeDiscretizer OPEN_ENDED_15_MIN = new TimeDiscretizer(30, 900,
+    public static final TimeDiscretizer OPEN_ENDED_15_MIN = new TimeDiscretizer(30 * 3600, 900,
             Type.OPEN_ENDED);
-    public static final TimeDiscretizer OPEN_ENDED_1_HOUR = new TimeDiscretizer(30, 3600,
+    public static final TimeDiscretizer OPEN_ENDED_1_HOUR = new TimeDiscretizer(30 * 3600, 3600,
             Type.OPEN_ENDED);
-    public static final TimeDiscretizer OPEN_ENDED_30_HOURS = new TimeDiscretizer(30, 30 * 3600,
+    public static final TimeDiscretizer OPEN_ENDED_30_HOURS = new TimeDiscretizer(30 * 3600, 30 * 3600,
             Type.OPEN_ENDED);
 
     private final int intervalCount;
@@ -56,17 +56,17 @@ public class TimeDiscretizer
     private final Type type;
 
 
-    public TimeDiscretizer(int hours, int timeInterval, Type type)
+    public TimeDiscretizer(int maxTime, int timeInterval, Type type)
     {
         this.timeInterval = timeInterval;
         this.type = type;
 
-        if (hours * 3600 % timeInterval != 0) {
+        if (maxTime % timeInterval != 0) {
             throw new IllegalArgumentException();
         }
 
         //option: additional open-end bin
-        intervalCount = hours * 3600 / timeInterval + (type == Type.OPEN_ENDED ? 1 : 0);
+        intervalCount = maxTime / timeInterval + (type == Type.OPEN_ENDED ? 1 : 0);
     }
 
 
