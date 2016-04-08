@@ -35,6 +35,7 @@ import org.matsim.pt.utils.TransitScheduleValidator;
 
 import playground.polettif.boescpa.converters.osm.Osm2Network;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
+import playground.polettif.multiModalMap.mapping.PTMapperLinkScoringMultiplyStops;
 
 public class RunMapping {
 
@@ -92,9 +93,7 @@ public class RunMapping {
 		// vgl. OSM2MixedIVT createMixed
 	//	new PTMapperV1(schedule).routePTLines(network);
 //		new PTMapperV2(schedule).routePTLines(network);
-//		new PTMapperLinkScoring(schedule).routePTLines(network);
-		log.fatal("above line of code commented out since it did not compile.  kai, apr'16");
-		System.exit(-1);
+		new PTMapperLinkScoringMultiplyStops(schedule).routePTLines(network);
 
 		log.info("Writing schedule and network to file...");
 		new TransitScheduleWriter(schedule).writeFile(path_MixedSchedule);
