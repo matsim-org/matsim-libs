@@ -64,6 +64,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
@@ -75,11 +76,17 @@ import javax.inject.Provider;
 import java.util.*;
 
 /**
+ * 
+ * Simple scenario:
+ * - The bottleneck on link 3 (1 car every 10 seconds) is activated by the first agent.
+ * - Then, the storage capacity on link 3 is reached.
+ * - Finally, the last agent is delayed.
+ * 
  * @author ikaddoura , lkroeger
  *
  */
 
-public class MarginalCongestionHandlerV3QsimTest {
+public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -109,9 +116,10 @@ public class MarginalCongestionHandlerV3QsimTest {
 	
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	
-	// the flow capacity on link 3 (1car / 10 seconds) is activated by the first agent,
-	// then the storage capacity on link 3 (only one car) is reached, too
-	// finally, one car on the link before is delayed
+	/**
+	 * V3
+	 * 
+	 */
 	@Test
 	public final void testFlowAndStorageCongestion_3agents(){
 		
@@ -153,9 +161,10 @@ public class MarginalCongestionHandlerV3QsimTest {
 		
 	}
 	
-	// the flow capacity on link 3 (1car / 10 seconds) is activated by the first agent,
-	// then the storage capacity on link 3 (only one car) is reached, too
-	// finally, one car on the link before is delayed
+	/**
+	 * V9
+	 * 
+	 */
 	@Test
 	public final void testFlowAndStorageCongestion_3agents_V9() {
 
@@ -193,11 +202,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 	}
 	
 	/**
-	 * the flow capacity on link 3 (1car / 10 seconds) is activated by the first agent,
-	 * then the storage capacity on link 3 (only one car) is reached, too
-	 * finally, one car on the link before is delayed
-	 * 
-	 * V8 is the same as V9 but without charging for spill-back delays
+	 * V8 (the same as V9 but without charging for spill-back delays)
 	 * 
 	 */
 	@Test
@@ -236,8 +241,47 @@ public class MarginalCongestionHandlerV3QsimTest {
 
 	}
 	
+	/**
+	 * V10
+	 * 
+	 */
+	@Test
+	public final void testFlowAndStorageCongestion_3agents_V10() {
+
+		Scenario sc = loadScenario1();
+		setPopulation1(sc);
+
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+
+		events.addHandler(new CongestionEventHandler() {
+
+			@Override
+			public void reset(int iteration) {
+			}
+
+			@Override
+			public void handleEvent(CongestionEvent event) {
+				congestionEvents.add(event);
+			}
+		});
+
+		events.addHandler(new CongestionHandlerImplV10(events, (MutableScenario) sc));
+
+		QSim sim = createQSim(sc, events);
+		sim.run();
+
+		double totalDelay = 0.;
+		
+		for (CongestionEvent event : congestionEvents) {
+
+			System.out.println(event.toString());
+			totalDelay += event.getDelay();
+		}
+		Assert.assertEquals("wrong total delay.", 32.0, totalDelay, MatsimTestUtils.EPSILON);
+
+	}
+	
 	// three agents moving along the links (unlimited storage capacity)
-	@Ignore
 	@Test
 	public final void testFlowCongestion_3agents(){
 		
@@ -270,7 +314,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}	
 		});
 		
-		events.addHandler(new CongestionHandlerImplV3(events, (MutableScenario) sc));
+		events.addHandler(new CongestionHandlerImplV10(events, (MutableScenario) sc));
 				
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -278,7 +322,6 @@ public class MarginalCongestionHandlerV3QsimTest {
 		for (CongestionEvent event : congestionEvents) {
 			System.out.println(event.toString());
 		}
-		
 	}
 	
 	// testing the routing
@@ -726,10 +769,10 @@ public class MarginalCongestionHandlerV3QsimTest {
 
 	}
 	
-private void setPopulation2(Scenario scenario) {
+	private void setPopulation2(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-    PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);
@@ -893,10 +936,10 @@ private void setPopulation2(Scenario scenario) {
 	
 	}
 	
-private void setPopulation6(Scenario scenario) {
+	private void setPopulation6(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
-    PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
+		PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 
 		Activity workActLink5 = popFactory.createActivityFromLinkId("work", linkId5);

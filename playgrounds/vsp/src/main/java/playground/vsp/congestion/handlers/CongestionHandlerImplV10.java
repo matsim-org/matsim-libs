@@ -174,13 +174,13 @@ public final class CongestionHandlerImplV10 implements CongestionHandler {
 				flowQueueAhead.add(causingAgentDelayInfo);
 			}
 			
-			for (int i = 0; i <= flowQueueAhead.size() ; i++ ) {
+			for (int i = 0; i < flowQueueAhead.size() ; i++ ) {
 				
 				DelayInfo causingAgentDelayInfo = flowQueueAhead.get(i);
 
 				double time1 = causingAgentDelayInfo.linkLeaveTime;
 				double time2 = Double.MIN_VALUE;
-				if (i == flowQueueAhead.size()) {
+				if (i == flowQueueAhead.size() - 1) {
 					// last causing agent delay info
 					time2 = event.getTime();
 				} else {

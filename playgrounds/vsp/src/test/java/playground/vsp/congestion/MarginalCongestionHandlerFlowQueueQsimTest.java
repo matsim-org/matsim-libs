@@ -65,11 +65,14 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV7;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 
 /**
+ * Simple scenario setup:
+ * Three agents moving along a corridor with unlimited storage capacity; arriving simultaneously at the bottleneck.
+ * 
  * @author ikaddoura , lkroeger
  *
  */
 
-public class MarginalCongestionHandlerV3V7QsimTest {
+public class MarginalCongestionHandlerFlowQueueQsimTest {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -97,7 +100,9 @@ public class MarginalCongestionHandlerV3V7QsimTest {
 	
 	//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	
-	// three agents moving along the corridor (unlimited storage capacity)
+	/**
+	 * V3
+	 */
 	@Test
 	public final void testFlowCongestion_3agents_V3(){
 		
@@ -133,55 +138,59 @@ public class MarginalCongestionHandlerV3V7QsimTest {
 
 	}
 	
-	// three agents moving along the corridor (unlimited storage capacity)
-		@Test
-		public final void testFlowCongestion_3agents_V7(){
-			
-			Scenario sc = loadScenario1();
-			setPopulation1(sc);
-			
-			final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
-			final CongestionHandlerImplV7 congestionHandler = new CongestionHandlerImplV7(events, sc);
-			
-			events.addHandler( new CongestionEventHandler() {
+	/**
+	 * V7
+	 */
+	@Test
+	public final void testFlowCongestion_3agents_V7(){
+		
+		Scenario sc = loadScenario1();
+		setPopulation1(sc);
+		
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+		final CongestionHandlerImplV7 congestionHandler = new CongestionHandlerImplV7(events, sc);
+		
+		events.addHandler( new CongestionEventHandler() {
 
-				@Override
-				public void reset(int iteration) {				
-				}
+			@Override
+			public void reset(int iteration) {				
+			}
 
-				@Override
-				public void handleEvent(CongestionEvent event) {
-					congestionEvents.add(event);
-				}	
-			});
+			@Override
+			public void handleEvent(CongestionEvent event) {
+				congestionEvents.add(event);
+			}	
+		});
+		
+		events.addHandler(congestionHandler);
+				
+		QSim sim = createQSim(sc, events);
+		sim.run();
 			
-			events.addHandler(congestionHandler);
-					
-			QSim sim = createQSim(sc, events);
-			sim.run();
-				
-			for (CongestionEvent event : congestionEvents) {
-				if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentB")) {
-					Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);					
-				}
-				
-				if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentA")) {
-					Assert.assertEquals("wrong delay", 6., event.getDelay(), MatsimTestUtils.EPSILON);					
-				}
-				
-				if (event.getCausingAgentId().toString().equals("agentB") && event.getAffectedAgentId().toString().equals("agentA")) {
-					Assert.assertEquals("wrong delay", 6., event.getDelay(), MatsimTestUtils.EPSILON);					
-				}
+		for (CongestionEvent event : congestionEvents) {
+			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentB")) {
+				Assert.assertEquals("wrong delay", 3., event.getDelay(), MatsimTestUtils.EPSILON);					
 			}
 			
-			Assert.assertEquals("wrong total delay", 9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON);
-		
-			// the second agent is 3 sec delayed and charges the first agent with these 3 sec
-			// the third agent is 6 sec delayed and charges the first and the second agent with each 6 sec
-			Assert.assertEquals("wrong total internalized delay", 15., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON);
+			if (event.getCausingAgentId().toString().equals("agentC") && event.getAffectedAgentId().toString().equals("agentA")) {
+				Assert.assertEquals("wrong delay", 6., event.getDelay(), MatsimTestUtils.EPSILON);					
+			}
+			
+			if (event.getCausingAgentId().toString().equals("agentB") && event.getAffectedAgentId().toString().equals("agentA")) {
+				Assert.assertEquals("wrong delay", 6., event.getDelay(), MatsimTestUtils.EPSILON);					
+			}
 		}
+		
+		Assert.assertEquals("wrong total delay", 9., congestionHandler.getTotalDelay(), MatsimTestUtils.EPSILON);
 	
-	// three agents moving along the corridor (unlimited storage capacity), arriving at the bottleneck at the same time (special case)
+		// the second agent is 3 sec delayed and charges the first agent with these 3 sec
+		// the third agent is 6 sec delayed and charges the first and the second agent with each 6 sec
+		Assert.assertEquals("wrong total internalized delay", 15., congestionHandler.getTotalInternalizedDelay(), MatsimTestUtils.EPSILON);
+	}
+	
+	/**
+	 * V8
+	 */
 	@Test
 	public final void testFlowCongestion_3agents_V8(){
 		
