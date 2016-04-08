@@ -72,19 +72,19 @@ public class PTScheduleCreatorHAFAS extends PTScheduleCreator implements RoutePr
 
 		// 1. Read all operators from BETRIEB_DE
 		log.info("  Read operators...");
-		Map<String, String> operators = OperatorReader.readOperators(pathToInputFiles + "/HAFAS/BETRIEB_DE");
+		Map<String, String> operators = OperatorReader.readOperators(pathToInputFiles + "BETRIEB_DE");
 		log.info("  Read operators... done.");
 
 		// 2. Read all ids for work-day-routes from HAFAS-BITFELD
 		log.info("  Read bitfeld numbers...");
 		Set<Integer> bitfeldNummern =
-				BitfeldAnalyzer.findBitfeldnumbersOfBusiestDay(pathToInputFiles + "HAFAS/FPLAN", pathToInputFiles + "HAFAS/BITFELD");
+				BitfeldAnalyzer.findBitfeldnumbersOfBusiestDay(pathToInputFiles + "FPLAN", pathToInputFiles + "BITFELD");
 		log.info("  Read bitfeld numbers... done.");
 
 		// 3. Create all lines from HAFAS-Schedule
 		log.info("  Read transit lines...");
 		Map<String, Integer> vehiclesUndefined =
-				FPLANReader.readLines(schedule, vehicles, bitfeldNummern, operators, pathToInputFiles + "HAFAS/FPLAN");
+				FPLANReader.readLines(schedule, vehicles, bitfeldNummern, operators, pathToInputFiles + "FPLAN");
 		log.info("  Read transit lines... done.");
 
 		// 4. Clean schedule

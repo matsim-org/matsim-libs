@@ -55,7 +55,7 @@ public class StopReader implements TransitStopCreator {
 	public void createTransitStops(TransitSchedule schedule, String pathToInputFiles) {
 		this.schedule = schedule;
 		this.scheduleBuilder = this.schedule.getFactory();
-		readStops(pathToInputFiles + "/HAFAS/BFKOORD_GEO");
+		readStops(pathToInputFiles + "/BFKOORD_GEO");
 	}
 
 	private void readStops(String pathToBFKOORD_GEOFile) {

@@ -20,25 +20,40 @@
 package playground.polettif.multiModalMap.workbench;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import playground.polettif.multiModalMap.gtfs.GTFSReader;
+import org.matsim.core.utils.io.OsmNetworkReader;
+import playground.polettif.boescpa.converters.osm.Osm2Network;
 
-public class RunGTFS2UnmappedMTS {
-	
-	public static void main(final String[] args) {
+public class RunOSM2Network {
+
+    public static void main(String[] args) {
 //		final String gtfsPath = "C:/Users/polettif/Desktop/data/gtfs/zvv/";
-		final String gtfsPath = "E:/data/gtfs/zvv/";
-		final String mtsFile = "E:/data/mts/unmapped/fromGtfs/zvv.xml";
-//		final String mtsFile = "C:/Users/polettif/Desktop/output/gtfs2mts/zvv_unmappedSchedule.xml";
-//		final String mtsFile = "C:/Users/polettif/Desktop/output/gtfs2mts/google_sample.xml";
+        final String osmPath = "E:/data/osm/zurich-plus.osm";
 
-		// Load Schedule
-		GTFSReader gtfsReader = new GTFSReader(gtfsPath);
-		gtfsReader.writeTransitSchedule(mtsFile);
-	}
-	
+        final String outputPath = "E:/data/network/zurich-plus.xml.gz";
+//        final String mtsFile = "C:/Users/polettif/Desktop/output/gtfs2mts/google_sample.xml";
+
+        Config config = ConfigUtils.createConfig();
+        Scenario sc = ScenarioUtils.createScenario(config);
+        Network net = sc.getNetwork();
+        CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
+                TransformationFactory.WGS84, TransformationFactory.CH1903_LV03_Plus);
+
+        OsmNetworkReader onr = new OsmNetworkReader(net, ct);
+        onr.parse(osmPath);
+
+        new NetworkCleaner().run(net);
+        new NetworkWriter(net).write(outputPath);
+
+//        Osm2Network.main(new String[]{osmPath, outputPath});
+
+    }
+
 }

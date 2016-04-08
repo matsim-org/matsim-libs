@@ -65,10 +65,10 @@ public class RunHAFAS2UnmappedMTS {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		Vehicles vehicles = scenario.getVehicles();
 
-		new PTScheduleCreatorHAFAS(schedule, vehicles, null).createSchedule("C:/Users/polettif/Desktop/data/hafas/");
+		new PTScheduleCreatorHAFAS(schedule, vehicles, null).createSchedule(args[0]);
 
-		new TransitScheduleWriter(schedule).writeFile("C:/Users/polettif/Desktop/output/hafas2mts/schedule.xml");
-		new VehicleWriterV1(vehicles).writeFile("C:/Users/polettif/Desktop/output/hafas2mts/vehicles.xml");
+		new TransitScheduleWriter(schedule).writeFile(args[1]+"schedule.xml");
+		new VehicleWriterV1(vehicles).writeFile(args[1]+"vehicles.xml");
 	}
 
 }

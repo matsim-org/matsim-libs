@@ -19,25 +19,26 @@
 
 package playground.polettif.multiModalMap.workbench;
 
-import GTFS2PTSchedule.GTFS2MATSimTransitSchedule;
 import playground.polettif.multiModalMap.mapping.PTMapperLinkScoringMultiplyStops;
 
 public class RunPTMapperLinkScoringMultiplyStops {
 
 	public static void main(String[] args) {
 
-		String base = "C:/Users/polettif/Desktop/";
+		String base = "E:/";
 		String outbase = base+"output/mtsMapping/";
 
 		// input
 //		final String mtsFile = base + "data/mts/zvv/zvv_unmappedSchedule_LV1903+.xml";
-		final String mtsFile = base + "data/mts/uri/schedule_unmapped_cut.xml";
+//		final String mtsFile = base + "data/mts/uri/schedule_unmapped_cut.xml";
 //		final String mtsFile = base + "data/mts/uri/debug.xml";
 //		final String mtsFile = base + "data/mts/zvv_69er.xml";
+//		final String mtsFile = base + "data/mts/unmapped/fromHafas/zurich.xml";
+		final String mtsFile = base + "data/mts/unmapped/fromGtfs/zvv.xml";
 
-		final String networkFile = base + "data/network/uri.xml.gz";
+//		final String networkFile = base + "data/network/uri.xml.gz";
 //		final String networkFile = base + "data/network/zurich-city.xml.gz";
-//		final String networkFile = base + "data/network/zurich-plus.xml.gz";
+		final String networkFile = base + "data/network/zurich-plus.xml.gz";
 
 		PTMapperLinkScoringMultiplyStops.main(new String[]{mtsFile, networkFile, outbase+"schedule.xml", outbase+"network.xml"});
 	}
