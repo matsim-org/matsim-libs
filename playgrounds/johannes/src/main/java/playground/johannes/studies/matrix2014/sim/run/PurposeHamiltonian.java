@@ -77,19 +77,19 @@ public class PurposeHamiltonian {
         Make indices.
          */
         logger.info("Indexing leg purposes...");
-        makePurposeIndex(engine.getRefPersons());
-        makePurposeIndex(engine.getSimPersons());
+        Map<String, Integer> purpose2Index = makePurposeIndex(engine.getRefPersons());
+        applyPurposeIndex(purpose2Index, engine.getRefPersons());
+        applyPurposeIndex(purpose2Index, engine.getSimPersons());
         logger.info("Indexing distance categories....");
-        int[] indices = makeDistanceIndex(engine.getRefPersons(), discretizer);
+//        int[] indices = makeDistanceIndex(engine.getRefPersons(), discretizer);
 
         Object key = Converters.register(PURPOSE_IDX_KEY, new DoubleConverter());
-        GeoDistanceMediator mediator = new GeoDistanceMediator(discretizer, key);
+        GeoDistanceMediator mediator = new GeoDistanceMediator(discretizer, key, borders.size()-1);
         engine.getAttributeListeners().get(CommonKeys.LEG_GEO_DISTANCE).addComponent(mediator);
 
         logger.info("Initializing purpose hamiltonians...");
-        for(int distanceIndex = 0; distanceIndex < borders.size(); distanceIndex++) {
-//            Predicate<Segment> distIdxPredicate = new LegAttributePredicate(GEO_DISTANCE_IDX_KEY, String.valueOf(distanceIndex));
-            Predicate<Segment> distIdxPredicate = new LegAttributePredicate(GEO_DISTANCE_IDX_KEY, String.valueOf(distanceIndex));
+        for(int dIdx = 1; dIdx < borders.size() - 1; dIdx++) {
+            Predicate<Segment> distIdxPredicate = new DistancePredicate(discretizer, dIdx);
 
             LegAttributeHistogramBuilder builder = new LegAttributeHistogramBuilder(PURPOSE_IDX_KEY, new LinearDiscretizer(1));
             builder.setPredicate(PredicateAndComposite.create(engine.getLegPredicate(), distIdxPredicate));
@@ -106,7 +106,7 @@ public class PurposeHamiltonian {
             /*
             Add the hamiltonian to the attribute change listener.
             */
-            mediator.addListener(h);
+            mediator.addListener(h, dIdx);
             /*
             Create annealing hamiltonian wrapper.
              */
@@ -116,7 +116,7 @@ public class PurposeHamiltonian {
             /*
             Add histogram comparator.
              */
-            String predicateName = String.format("%s.%s", CommonKeys.LEG_PURPOSE, distanceIndex);
+            String predicateName = String.format("%s.%s", CommonKeys.LEG_PURPOSE, borders.get(dIdx));
             HistogramComparator comparator = new HistogramComparator(
                     refHist,
                     builder,
@@ -132,7 +132,7 @@ public class PurposeHamiltonian {
                     engine.getIOContext().getRoot(),
                     ah.getStartIteration()));
 
-            logger.info(String.format("Initialized hamiltonian %s.", distanceIndex));
+            logger.info(String.format("Initialized hamiltonian %s.", borders.get(dIdx)));
         }
     }
 
@@ -140,18 +140,19 @@ public class PurposeHamiltonian {
 
         private Discretizer discretizer;
 
-        private List<AttributeChangeListener> listeners;
+        private AttributeChangeListener[] listeners;
 
         private Object purposeIdxObjectKey;
 
-        public GeoDistanceMediator(Discretizer discretizer, Object purposeIdxObjectKey) {
+        public GeoDistanceMediator(Discretizer discretizer, Object purposeIdxObjectKey, int maxIdx) {
             this.discretizer = discretizer;
             this.purposeIdxObjectKey = purposeIdxObjectKey;
-            listeners = new ArrayList<>();
+//            listeners = new ArrayList<>();
+            listeners = new AttributeChangeListener[maxIdx+1];
         }
 
-        public void addListener(AttributeChangeListener listener) {
-            listeners.add(listener);
+        public void addListener(AttributeChangeListener listener, int idx) {
+            listeners[idx] = listener;
         }
 
         @Override
@@ -159,8 +160,10 @@ public class PurposeHamiltonian {
             int oldIdx = discretizer.index((Double)oldValue);
             int newIdx = discretizer.index((Double)newValue);
 
-            AttributeChangeListener old = listeners.get(oldIdx);
-            AttributeChangeListener newListener = listeners.get(newIdx);
+//            AttributeChangeListener old = listeners.get(oldIdx);
+//            AttributeChangeListener newListener = listeners.get(newIdx);
+            AttributeChangeListener old = listeners[oldIdx];
+            AttributeChangeListener newListener = listeners[newIdx];
 
             Double purpose = (Double) element.getData(purposeIdxObjectKey);
 
@@ -179,20 +182,23 @@ public class PurposeHamiltonian {
         for(String purpose : purposes) {
             purpose2Idx.put(purpose, idx);
             idx++;
+            logger.info(String.format("Purpose %s -> index %s.", purpose, idx));
         }
 
+        return purpose2Idx;
+    }
+
+    private static void applyPurposeIndex(Map<String, Integer> purpose2Index, Collection<? extends Person> persons) {
         TaskRunner.run(new EpisodeTask() {
             @Override
             public void apply(Episode episode) {
                 for(Segment leg : episode.getLegs()) {
                     String purpose = leg.getAttribute(CommonKeys.LEG_PURPOSE);
-                    Integer idx = purpose2Idx.get(purpose);
+                    Integer idx = purpose2Index.get(purpose);
                     if(idx != null) leg.setAttribute(PURPOSE_IDX_KEY, idx.toString());
                 }
             }
         }, persons);
-
-        return purpose2Idx;
     }
 
     private static int[] makeDistanceIndex(Collection<? extends Person> persons, final Discretizer discretizer) {
@@ -221,5 +227,29 @@ public class PurposeHamiltonian {
         }
         Arrays.sort(nativeIndices);
         return nativeIndices;
+    }
+
+    private static class DistancePredicate implements Predicate<Segment> {
+
+        private final int index;
+
+        private final Discretizer discretizer;
+
+        public DistancePredicate(Discretizer discretizer, int index) {
+            this.discretizer = discretizer;
+            this.index = index;
+        }
+
+        @Override
+        public boolean test(Segment segment) {
+            String val = segment.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
+            if(val != null) {
+                double d = Double.parseDouble(val);
+                int idx = discretizer.index(d);
+                return idx == index;
+            }
+
+            return false;
+        }
     }
 }

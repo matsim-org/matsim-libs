@@ -23,10 +23,7 @@ import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.Config;
-import playground.johannes.studies.matrix2014.analysis.AnalyzerTaskGroup;
-import playground.johannes.studies.matrix2014.analysis.LegPurposeDistanceTask;
-import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
-import playground.johannes.studies.matrix2014.analysis.ZoneMobilityRate;
+import playground.johannes.studies.matrix2014.analysis.*;
 import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
@@ -163,6 +160,10 @@ public class DefaultAnalyzerBuilder {
         lpdTask.setIoContext(engine.getIOContext());
         lpdTask.setDiscretizer(discretizer);
         task.addComponent(lpdTask);
+        /*
+
+         */
+        task.addComponent(new DaySeasonTask());
 
     }
 }

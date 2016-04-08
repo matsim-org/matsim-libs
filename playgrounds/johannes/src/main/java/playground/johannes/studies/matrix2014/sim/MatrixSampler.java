@@ -53,8 +53,8 @@ public class MatrixSampler implements MatrixBuilder, MarkovEngineListener {
 
     private MatrixBuilder builder;
 
-    public MatrixSampler(MatrixBuilder builer, long start, long step) {
-        this.builder = builer;
+    public MatrixSampler(MatrixBuilder builder, long start, long step) {
+        this.builder = builder;
         this.start = start;
         this.step = step;
         avrMatrix = new NumericMatrix();

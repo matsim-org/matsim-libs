@@ -186,7 +186,7 @@ public class Simulator {
         analyzerTasks.addComponent(new AnalyzerTaskGroup<>(hamiltonianAnalyzers, ioContext, "hamiltonian"));
 
 //        GeoDistanceZoneDensityHamiltonian.build(this, config);
-//        GeoDistanceZoneHamiltonian2.build(this, config);
+        GeoDistanceZoneHamiltonian2.build(this, config);
         PurposeHamiltonian.build(this, config);
 //        GeoDistanceTypeHamiltonian.build(this, config);
 //        GeoDistanceHamiltonian.build(this, config);
