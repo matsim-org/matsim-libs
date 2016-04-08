@@ -28,13 +28,13 @@ public class FixedIntervalTimeVariantLinkFactory
     implements LinkFactory
 {
     private final int interval;
-    private final int intervalCount;
+    private final int maxTime;
 
 
-    public FixedIntervalTimeVariantLinkFactory(int interval, int intervalCount)
+    public FixedIntervalTimeVariantLinkFactory(int interval, int maxTime)
     {
         this.interval = interval;
-        this.intervalCount = intervalCount;
+        this.maxTime = maxTime;
     }
 
 
@@ -43,6 +43,6 @@ public class FixedIntervalTimeVariantLinkFactory
             double freespeed, double capacity, double nOfLanes)
     {
         return TimeVariantLinkImpl.createLinkWithFixedIntervalAttributes(id, from, to, network,
-                length, freespeed, capacity, nOfLanes, interval, intervalCount);
+                length, freespeed, capacity, nOfLanes, interval, maxTime);
     }
 }
