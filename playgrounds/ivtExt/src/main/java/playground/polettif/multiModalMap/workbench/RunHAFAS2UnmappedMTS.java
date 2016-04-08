@@ -27,10 +27,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+
 import playground.polettif.boescpa.converters.osm.OSM2MixedIVT;
 import playground.polettif.multiModalMap.hafas.hafasCreator.PTScheduleCreatorHAFAS;
-import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 /**
  * based on boescpa.converters.scheduleCreator.PTScheduleCreatorDefaultV2
