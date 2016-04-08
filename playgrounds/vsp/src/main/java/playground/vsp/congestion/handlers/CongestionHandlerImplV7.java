@@ -44,7 +44,13 @@ import playground.vsp.congestion.DelayInfo;
 import playground.vsp.congestion.events.CongestionEvent;
 
 /** 
- * In this implementation, the delay is allocated to all agents ahead that are in the queue.
+ * 
+ * For each agent leaving a link: Compute a delay as the difference between free speed travel time and actual travel time.
+ * 
+ * In this implementation, the delay is allocated to ALL agents ahead in the flow queue.
+ * EACH agent has to pay for the affected agent's total delay.
+ * 
+ * Spill-back effects are not taken into account.
  * 
  * @author ikaddoura
  *
@@ -154,7 +160,7 @@ public final class CongestionHandlerImplV7 implements CongestionHandler {
 		} else {
 			// The agent was leaving the link with a delay.
 
-			// go throw the flow queue and charge all causing agents with the delay on this link
+			// go through the flow queue and charge all causing agents with the delay on this link
 			LinkCongestionInfo linkInfo = this.delegate.getLinkId2congestionInfo().get(event.getLinkId());
 
 			for (Iterator<DelayInfo> it = linkInfo.getFlowQueue().descendingIterator() ; it.hasNext() ; ) {

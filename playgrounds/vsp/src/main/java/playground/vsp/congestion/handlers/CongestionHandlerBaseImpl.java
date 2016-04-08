@@ -53,7 +53,6 @@ import playground.vsp.congestion.events.CongestionEvent;
 /**
  * This class provides the basic functionality to calculate congestion effects which may be used for internalization.
  * One of the main tasks is to keep track of the queues on each link.
- *
  * 
  * @author ikaddoura
  *
