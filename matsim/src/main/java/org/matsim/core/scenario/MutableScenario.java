@@ -27,8 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.network.*;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -69,7 +68,7 @@ public final class MutableScenario implements Scenario {
 
 	MutableScenario(Config config) {
 		this.config = config;
-		this.network = NetworkImpl.createNetwork();
+		this.network = NetworkUtils.createNetwork(this.config);
 		this.population = PopulationUtils.createPopulation(this.config, this.network);
 		this.facilities = new ActivityFacilitiesImpl();
 		this.households = new HouseholdsImpl();
