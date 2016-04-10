@@ -17,17 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.run;
+package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
+import org.matsim.contrib.dvrp.run.VrpQSimConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 
 
-public class VrpQSimConfigConsistencyChecker
-    extends DynQSimConfigConsistencyChecker
+public class TaxiBenchmarkConfigConsistencyChecker
+    extends VrpQSimConfigConsistencyChecker
 {
-    private static final Logger log = Logger.getLogger(VrpQSimConfigConsistencyChecker.class);
+    private static final Logger log = Logger.getLogger(TaxiBenchmarkConfigConsistencyChecker.class);
 
 
     @Override
@@ -35,19 +35,14 @@ public class VrpQSimConfigConsistencyChecker
     {
         super.checkConsistency(config);
 
-        if (!config.qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
-            log.warn("Typically, vrp paths are calculated from startLink to endLink"
-                    + "(not from startNode to endNode). That requires making some assumptions"
-                    + "on how much time travelling on the first and last links takes. "
-                    + "The current implementation assumes freeflow travelling on the last link, "
-                    + "which is actually the case in QSim, and a 1-second stay on the first link. "
-                    + "The latter expectation is optimistic, and to make it more likely,"
-                    + "departing vehicles must be inserted befor driving ones "
-                    + "(though that still does not guarantee 1-second stay");
+        if (!config.network().isTimeVariantNetwork()
+                && config.network().getChangeEventsInputFile() == null) {
+            throw new IllegalStateException("Only timevariant network for benchmarking");
         }
 
-        if (config.qsim().isRemoveStuckVehicles()) {
-            throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
+        if (config.qsim().getFlowCapFactor() < 100) {
+            log.warn(
+                    "FlowCapFactor should be large enough (e.g. 100) to obtain deterministic travel times");
         }
     }
 }
