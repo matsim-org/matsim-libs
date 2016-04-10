@@ -19,7 +19,9 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.io.*;
+import java.io.PrintWriter;
+
+import org.matsim.core.utils.io.IOUtils;
 
 
 public class DailyHistograms
@@ -28,8 +30,8 @@ public class DailyHistograms
     public final Histogram stayRatio = new Histogram(0.05, 20);
 
     public static final String MAIN_HEADER = // 
-    "Empty_Drive_Ratio [%]" + HourlyHistograms.tabs(20) + //
-            "Vehicle_Wait_Ratio [%]" + HourlyHistograms.tabs(20); //
+            "Empty_Drive_Ratio [%]" + HourlyHistograms.tabs(20) + //
+                    "Vehicle_Wait_Ratio [%]" + HourlyHistograms.tabs(20); //
 
 
     public void printSubHeaders(PrintWriter pw)
@@ -50,13 +52,10 @@ public class DailyHistograms
 
     public void printHistograms(String file)
     {
-        try (PrintWriter dailyHistogramsWriter = new PrintWriter(file)) {
-            dailyHistogramsWriter.println(DailyHistograms.MAIN_HEADER);
-            printSubHeaders(dailyHistogramsWriter);
-            printHistograms(dailyHistogramsWriter);
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        PrintWriter dailyHistogramsWriter = new PrintWriter(IOUtils.getBufferedWriter(file));
+        dailyHistogramsWriter.println(DailyHistograms.MAIN_HEADER);
+        printSubHeaders(dailyHistogramsWriter);
+        printHistograms(dailyHistogramsWriter);
+        dailyHistogramsWriter.close();
     }
 }

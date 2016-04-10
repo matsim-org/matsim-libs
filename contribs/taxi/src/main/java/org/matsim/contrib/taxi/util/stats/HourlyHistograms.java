@@ -19,7 +19,9 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.io.*;
+import java.io.PrintWriter;
+
+import org.matsim.core.utils.io.IOUtils;
 
 
 public class HourlyHistograms
@@ -43,13 +45,13 @@ public class HourlyHistograms
 
 
     public static final String MAIN_HEADER = //
-    "\tPassenger_Wait_Time [min]" + tabs(25) + //
-    //
-    "\tEmpty_Drive_Time [min]" + tabs(21) + //
-            "\tOccupied_Drive_Time [min]" + tabs(21) + //
-    //
-    "\tEmpty_Drive_Ratio [%]" + tabs(20) + //
-            "\tVehicle_Wait_Ratio [%]" + tabs(20); //
+            "\tPassenger_Wait_Time [min]" + tabs(25) + //
+            //
+                    "\tEmpty_Drive_Time [min]" + tabs(21) + //
+                    "\tOccupied_Drive_Time [min]" + tabs(21) + //
+                    //
+                    "\tEmpty_Drive_Ratio [%]" + tabs(20) + //
+                    "\tVehicle_Wait_Ratio [%]" + tabs(20); //
 
 
     public static String tabs(int binCount)
@@ -101,16 +103,14 @@ public class HourlyHistograms
 
     public static void printAllHistograms(HourlyHistograms[] hourlyHistograms, String file)
     {
-        try (PrintWriter hourlyHistogramsWriter = new PrintWriter(file)) {
-            hourlyHistogramsWriter.println(HourlyHistograms.MAIN_HEADER);
-            hourlyHistograms[0].printSubHeaders(hourlyHistogramsWriter);
+        PrintWriter hourlyHistogramsWriter = new PrintWriter(IOUtils.getBufferedWriter(file));
+        hourlyHistogramsWriter.println(HourlyHistograms.MAIN_HEADER);
+        hourlyHistograms[0].printSubHeaders(hourlyHistogramsWriter);
 
-            for (HourlyHistograms hh : hourlyHistograms) {
-                hh.printHistograms(hourlyHistogramsWriter);
-            }
+        for (HourlyHistograms hh : hourlyHistograms) {
+            hh.printHistograms(hourlyHistogramsWriter);
         }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        
+         hourlyHistogramsWriter.close();
     }
 }

@@ -24,6 +24,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
+import org.matsim.core.utils.io.IOUtils;
 
 
 public class ResultsPostProcessor
@@ -137,63 +138,60 @@ public class ResultsPostProcessor
     private void writeValues(String file, int column)
     {
         String field = statsColumns[column];
-        try (PrintWriter pw = new PrintWriter(file + "_" + field)) {
-            StringBuffer lineId = new StringBuffer(StringUtils.leftPad(field, 20));
-            StringBuffer lineN = new StringBuffer(StringUtils.leftPad("n", 20));
-            StringBuffer lineM = new StringBuffer(StringUtils.leftPad("m", 20));
-            StringBuffer lineRatio = new StringBuffer(StringUtils.leftPad("ratio", 20));
+        PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(file + "_" + field));
+        StringBuffer lineId = new StringBuffer(StringUtils.leftPad(field, 20));
+        StringBuffer lineN = new StringBuffer(StringUtils.leftPad("n", 20));
+        StringBuffer lineM = new StringBuffer(StringUtils.leftPad("m", 20));
+        StringBuffer lineRatio = new StringBuffer(StringUtils.leftPad("ratio", 20));
+
+        for (Experiment e : experiments) {
+            if (e == EMPTY_COLUMN) {
+                lineId.append('\t');
+                lineN.append('\t');
+                lineM.append('\t');
+                lineRatio.append('\t');
+            }
+            else {
+                Stats s = e.stats.get(0);
+                double ratio = (double)s.n / s.m;
+                lineId.append('\t').append(e.id);
+                lineN.append('\t').append(s.n);
+                lineM.append('\t').append(s.m);
+                lineRatio.append('\t').append(String.format("%.2f", ratio));
+            }
+        }
+
+        pw.println(lineId.toString());
+        pw.println(lineN.toString());
+        pw.println(lineM.toString());
+        pw.println(lineRatio.toString());
+
+        int statsCount = experiments[0].stats.size();
+        DecimalFormat format = new DecimalFormat("#.##");
+
+        for (int i = 0; i < statsCount; i++) {
+            String cfg0 = experiments[0].stats.get(i).cfg;
+            pw.printf("%20s", cfg0);
 
             for (Experiment e : experiments) {
                 if (e == EMPTY_COLUMN) {
-                    lineId.append('\t');
-                    lineN.append('\t');
-                    lineM.append('\t');
-                    lineRatio.append('\t');
+                    pw.print('\t');//insert one empty column
                 }
                 else {
-                    Stats s = e.stats.get(0);
-                    double ratio = (double)s.n / s.m;
-                    lineId.append('\t').append(e.id);
-                    lineN.append('\t').append(s.n);
-                    lineM.append('\t').append(s.m);
-                    lineRatio.append('\t').append(String.format("%.2f", ratio));
+                    Stats s = e.stats.get(i);
+
+                    if (!cfg0.equals(s.cfg)) {
+                        throw new RuntimeException();
+                    }
+
+                    pw.print("\t" + format.format(s.values[column]));
                 }
             }
 
-            pw.println(lineId.toString());
-            pw.println(lineN.toString());
-            pw.println(lineM.toString());
-            pw.println(lineRatio.toString());
-
-            int statsCount = experiments[0].stats.size();
-            DecimalFormat format = new DecimalFormat("#.##");
-
-            for (int i = 0; i < statsCount; i++) {
-                String cfg0 = experiments[0].stats.get(i).cfg;
-                pw.printf("%20s", cfg0);
-
-                for (Experiment e : experiments) {
-                    if (e == EMPTY_COLUMN) {
-                        pw.print('\t');//insert one empty column
-                    }
-                    else {
-                        Stats s = e.stats.get(i);
-
-                        if (!cfg0.equals(s.cfg)) {
-                            throw new RuntimeException();
-                        }
-
-                        pw.print("\t" + format.format(s.values[column]));
-                    }
-                }
-
-                pw.println();
-            }
+            pw.println();
         }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
+        
+        pw.close();
     }
 
 
@@ -233,9 +231,9 @@ public class ResultsPostProcessor
                 "2.0", //
                 "2.5", //
                 "3.0", //
-//                "3.1", //
-//                "3.2", //
-//                "3.3" //
+                //                "3.1", //
+                //                "3.2", //
+                //                "3.3" //
                 "3.5", //
                 "4.0", //
                 "4.5", //
@@ -258,7 +256,7 @@ public class ResultsPostProcessor
                 "0.7", //
                 "0.8", //
                 "0.9" //
-                //"1.0"//
+        //"1.0"//
         ).process(dir, subDirPrefix, "stats");
     }
 
@@ -271,14 +269,14 @@ public class ResultsPostProcessor
         new ResultsPostProcessor(//
                 //"0.2", //
                 //"0.4", //
-//                "0.6", //
-//                "0.8", //
-//                "1.0", //
-//                "1.2", //
-//                "1.4", //
-//                "1.6", //
-//                "1.8", //
-//                "2.0"//
+                //                "0.6", //
+                //                "0.8", //
+                //                "1.0", //
+                //                "1.2", //
+                //                "1.4", //
+                //                "1.6", //
+                //                "1.8", //
+                //                "2.0"//
                 "0.45_DSE"//
         ).process(dir, subDirPrefix, "stats");
     }
@@ -290,32 +288,32 @@ public class ResultsPostProcessor
         String subDirPrefix = "taxi_vehicles_";
 
         new ResultsPostProcessor(//
-//                "04000", //
-//                "04500", //
-//                "05000", //
-//                "05500", //
-//                "06000", //
-//                "06500", //
-//                "07000", //
-//                "07500", //
-//                "08000" //
+                //                "04000", //
+                //                "04500", //
+                //                "05000", //
+                //                "05500", //
+                //                "06000", //
+                //                "06500", //
+                //                "07000", //
+                //                "07500", //
+                //                "08000" //
                 "09000", //
                 "10000", //
                 "11000", //
                 "12000", //
                 "13000" //
-//                "14000", //
-//                "15000", //
-//                "16000", //
-//                "17000", //
-//                "18000", //
-//                "19000", //
-//                "20000", //
-//                "21000", //
-//                "22000", //
-//                "23000", //
-//                "24000", //
-//                "25000" //
+        //                "14000", //
+        //                "15000", //
+        //                "16000", //
+        //                "17000", //
+        //                "18000", //
+        //                "19000", //
+        //                "20000", //
+        //                "21000", //
+        //                "22000", //
+        //                "23000", //
+        //                "24000", //
+        //                "25000" //
         ).process(dir, subDirPrefix, "stats");
     }
 
@@ -326,27 +324,27 @@ public class ResultsPostProcessor
         String subDirPrefix = "taxi_vehicles_";
 
         new ResultsPostProcessor(//
-//                "050000", //
-//                "060000", //
-//                "070000", //
+                //                "050000", //
+                //                "060000", //
+                //                "070000", //
                 "080000", //
                 "090000", //
                 "100000", //
                 "110000", //
                 "120000" //
-//                "130000", //
-//                "140000", //
-//                "150000", //
-//                "160000", //
-//                "170000", //
-//                "180000", //
-//                "190000", //
-//                "200000", //
-//                "210000", //
-//                "220000", //
-//                "230000", //
-//                "240000", //
-//                "250000" //
+        //                "130000", //
+        //                "140000", //
+        //                "150000", //
+        //                "160000", //
+        //                "170000", //
+        //                "180000", //
+        //                "190000", //
+        //                "200000", //
+        //                "210000", //
+        //                "220000", //
+        //                "230000", //
+        //                "240000", //
+        //                "250000" //
         ).process(dir, subDirPrefix, "stats");
     }
 

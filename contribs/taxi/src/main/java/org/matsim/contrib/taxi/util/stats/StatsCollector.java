@@ -19,11 +19,12 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.io.*;
+import java.io.PrintWriter;
 import java.util.*;
 
 import org.matsim.core.mobsim.framework.events.*;
 import org.matsim.core.mobsim.framework.listeners.*;
+import org.matsim.core.utils.io.IOUtils;
 
 
 public class StatsCollector<T>
@@ -75,27 +76,15 @@ public class StatsCollector<T>
     @Override
     public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
     {
-        try (PrintWriter pw = createPrintWriter()) {
-            pw.println("time\t" + name);
+        PrintWriter pw = file != null ? new PrintWriter(IOUtils.getBufferedWriter(file))
+                : new PrintWriter(System.out);
 
-            for (int i = 0; i < stats.size(); i++) {
-                pw.println(i * step + "\t" + stats.get(i));
-            }
-        }
-        catch (FileNotFoundException e1) {
-            throw new RuntimeException(e1);
-        }
-    }
+        pw.println("time\t" + name);
 
-
-    private PrintWriter createPrintWriter()
-        throws FileNotFoundException
-    {
-        if (file != null) {
-            return new PrintWriter(file);
+        for (int i = 0; i < stats.size(); i++) {
+            pw.println(i * step + "\t" + stats.get(i));
         }
-        else {
-            return new PrintWriter(System.out);
-        }
+        
+        pw.close();
     }
 }

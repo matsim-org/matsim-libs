@@ -1,12 +1,13 @@
 package org.matsim.contrib.taxi.benchmark;
 
-import java.io.*;
+import java.io.PrintWriter;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
+import org.matsim.core.utils.io.IOUtils;
 
 
 public class MultiRunStats
@@ -58,26 +59,24 @@ public class MultiRunStats
     @Override
     public void notifyShutdown(ShutdownEvent event)
     {
-        try (PrintWriter pw = new PrintWriter(
-                new FileWriter(outputDir + "/multiStats_" + id + ".txt"))) {
-            pw.println(HEADER);
-            pw.printf(
-                    "%20s\t%d\t%d\t"//
-                            + "%.0f\t%.0f\t%.0f\t"//
-                            + "%.0f\t%.2f\t", //
-                    id, //
-                    taxiData.getRequests().size(), //
-                    taxiData.getVehicles().size(), //
-                    //
-                    passengerWaitTime.getMean(), //
-                    pc95PassengerWaitTime.getMean(), //
-                    maxPassengerWaitTime.getMean(), //
-                    //
-                    driveOccupiedTime.getMean(), //
-                    driveEmptyRatio.getMean() * 100); //in [%]
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        PrintWriter pw = new PrintWriter(
+                IOUtils.getBufferedWriter(outputDir + "/multiStats_" + id + ".txt"));
+        pw.println(HEADER);
+        pw.printf(
+                "%20s\t%d\t%d\t"//
+                        + "%.0f\t%.0f\t%.0f\t"//
+                        + "%.0f\t%.2f\t", //
+                id, //
+                taxiData.getRequests().size(), //
+                taxiData.getVehicles().size(), //
+                //
+                passengerWaitTime.getMean(), //
+                pc95PassengerWaitTime.getMean(), //
+                maxPassengerWaitTime.getMean(), //
+                //
+                driveOccupiedTime.getMean(), //
+                driveEmptyRatio.getMean() * 100); //in [%]
+        
+        pw.close();
     }
 }

@@ -19,44 +19,45 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.io.*;
+import java.io.PrintWriter;
+import java.util.*;
 
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
+import org.matsim.core.utils.io.IOUtils;
 
 
 public class TaxiStatsDumper
     implements AfterMobsimListener, ShutdownListener
 {
     private final TaxiData taxiData;
-    private final PrintWriter pw;
+    private final String outputDir;
+    private final List<TaxiStats> stats = new ArrayList<>();
 
 
     public TaxiStatsDumper(TaxiData taxiData, String outputDir)
     {
         this.taxiData = taxiData;
-
-        try {
-            pw = new PrintWriter(outputDir + "/taxi_stats.txt");
-            pw.println(TaxiStats.HEADER);
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        this.outputDir = outputDir;
     }
 
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event)
     {
-        pw.println(new TaxiStatsCalculator(taxiData.getVehicles().values()).getStats());
+        stats.add(new TaxiStatsCalculator(taxiData.getVehicles().values()).getStats());
     }
 
 
     @Override
     public void notifyShutdown(ShutdownEvent event)
     {
+        PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(outputDir + "/taxi_stats.txt"));
+        pw.println(TaxiStats.HEADER);
+        for (TaxiStats s : stats) {
+            pw.println(s);
+        }
         pw.close();
     }
 }
