@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
@@ -70,19 +69,23 @@ public class MSACongestionHandler implements LinkEnterEventHandler,
 		LinkInfo li = this.lis.get(event.getLinkId());
 		if (li == null) {
 			return;
+			// nothing is done for the first link of the route (for which no link enter event exists). tt,Apr'14
 		}
 		li.agentsOnLink--;
 		AgentInfo ai = li.ais.remove(event.getVehicleId());
 		ai.leftTime = event.getTime();
 		double att = event.getTime() - ai.enterTime;
-		if (li.agentsOnLink == 0 || att <= li.freespeedTT) {
+		if (li.agentsOnLink == 0 || att <= li.freespeedTT) { // queue (no matter if spill back or flow queue) is interrupted. tt, Apr'14
+			// calculate link leave time difference to all agents ahead in the queue. tt, Apr'14
+			// don't you forget the first agent of the queue i.e. the last one who is traveling without delay but causes delay to the next agents? tt, Apr'14
 			for (AgentInfo c : li.congested) {
 				double delay = event.getTime() - c.leftTime;
-				CongestionEvent e = new CongestionEvent(event.getTime(), "null", c.p, Id.createPersonId("null"), delay, event.getLinkId(), c.enterTime);
+				CongestionEvent e = new CongestionEvent(event.getTime(), "null", Id.createPersonId(c.p), Id.createPersonId("null"), delay, event.getLinkId(), c.enterTime);
 				this.events.processEvent(e);
 			}
+			
 			li.congested.clear();
-		} else {
+		} else { // att > freespeedTT && there are agents on the link. tt, Arp'14
 			li.congested.add(ai);
 		}
 		
@@ -102,20 +105,20 @@ public class MSACongestionHandler implements LinkEnterEventHandler,
 		li.agentsOnLink++;
 		AgentInfo ai = new AgentInfo();
 		ai.enterTime = event.getTime();
-		ai.p = Id.createPersonId(event.getVehicleId());
+		ai.p = event.getVehicleId();
 		li.ais.put(ai.p, ai);
 	}
 	
 	private static final class AgentInfo {
 		public double enterTime;
 		public double leftTime;
-		Id<Person> p;
+		Id<Vehicle> p;
 	}
 	
 	private static final class LinkInfo {
 		double freespeedTT;
 		int agentsOnLink = 0;
-		Map<Id<Person>,AgentInfo> ais = new HashMap<>();
+		Map<Id<Vehicle>,AgentInfo> ais = new HashMap<>();
 		List<AgentInfo> congested = new ArrayList<>();
 	}
 	
