@@ -55,10 +55,16 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
+import matsimConnector.congestionpricing.MSACongestionHandler;
+import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
+import matsimConnector.congestionpricing.MSATollDisutilityCalculatorFactory;
+import matsimConnector.congestionpricing.MSATollHandler;
 import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV7;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
@@ -97,14 +103,14 @@ public final class RunBraessSimulation {
 	private static final Double INIT_PLAN_SCORE = null;
 
 	/// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_SYLVIA;
+	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.NONE;
+	private static final PricingType PRICING_TYPE = PricingType.GREGOR;
 	public enum PricingType{
-		NONE, V3, V4, V8, V9, FLOWBASED
+		NONE, V3, V4, V7, V8, V9, V10, FLOWBASED, GREGOR
 	}
 
 	// choose a sigma for the randomized router
@@ -113,7 +119,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/sylvia/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/congestionPricing/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -137,7 +143,7 @@ public final class RunBraessSimulation {
 			signalConfigGroup.setUseSignalSystems( SIGNAL_TYPE.equals(SignalControlType.NONE)? false : true );
 	
 			// set brain exp beta
-			config.planCalcScore().setBrainExpBeta( 20 );
+			config.planCalcScore().setBrainExpBeta( 1 );
 	
 			// choose between link to link and node to node routing
 			// (only has effect if lanes are used)
@@ -148,7 +154,7 @@ public final class RunBraessSimulation {
 			config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 			
 			// set travelTimeBinSize (only has effect if reRoute is used)
-			config.travelTimeCalculator().setTraveltimeBinSize( 10 );
+			config.travelTimeCalculator().setTraveltimeBinSize( 900 );
 			
 			config.travelTimeCalculator().setTravelTimeCalculatorType(
 					TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
@@ -192,7 +198,7 @@ public final class RunBraessSimulation {
 				config.strategy().addStrategySettings(strat);
 			}
 	
-			config.strategy().setMaxAgentPlanMemorySize( 5 );			
+			config.strategy().setMaxAgentPlanMemorySize( 3 );			
 			
 			config.qsim().setStuckTime(3600 * 10.);
 			
@@ -259,7 +265,7 @@ public final class RunBraessSimulation {
 			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
 
-		if (!PRICING_TYPE.equals(PricingType.NONE) && !PRICING_TYPE.equals(PricingType.FLOWBASED)){
+		if (!PRICING_TYPE.equals(PricingType.NONE) && !PRICING_TYPE.equals(PricingType.FLOWBASED) && !PRICING_TYPE.equals(PricingType.GREGOR)){
 			// add tolling
 			TollHandler tollHandler = new TollHandler(scenario);
 			
@@ -296,6 +302,10 @@ public final class RunBraessSimulation {
 				congestionHandler = new CongestionHandlerImplV4(controler.getEvents(), 
 						controler.getScenario());
 				break;
+			case V7:
+				congestionHandler = new CongestionHandlerImplV7(controler.getEvents(), 
+						controler.getScenario());
+				break;
 			case V8:
 				congestionHandler = new CongestionHandlerImplV8(controler.getEvents(), 
 						controler.getScenario());
@@ -304,13 +314,28 @@ public final class RunBraessSimulation {
 				congestionHandler = new CongestionHandlerImplV9(controler.getEvents(), 
 						controler.getScenario());
 				break;
+			case V10:
+				congestionHandler = new CongestionHandlerImplV10(controler.getEvents(), 
+						controler.getScenario());
+				break;
 			default:
 				break;
 			}
 			controler.addControlerListener(
-					new MarginalCongestionPricingContolerListener(controler.getScenario(), 
-							tollHandler, congestionHandler));
+					new MarginalCongestionPricingContolerListener(scenario, tollHandler, congestionHandler));
 		
+		} else if (PRICING_TYPE.equals(PricingType.GREGOR)){
+			final MSATollHandler tollHandler = new MSATollHandler(scenario);
+			final MSATollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new MSATollDisutilityCalculatorFactory(tollHandler, config.planCalcScore());
+
+			controler.addOverridingModule(new AbstractModule(){
+				@Override
+				public void install() {
+					this.bindCarTravelDisutilityFactory().toInstance( tollDisutilityCalculatorFactory );
+				}
+			}); 
+				
+			controler.addControlerListener(new MSAMarginalCongestionPricingContolerListener(scenario, tollHandler, new MSACongestionHandler(controler.getEvents(), scenario)));
 		} else if (PRICING_TYPE.equals(PricingType.FLOWBASED)) {
 			
 			throw new UnsupportedOperationException("Not yet implemented!");
@@ -508,8 +533,11 @@ public final class RunBraessSimulation {
 			case SIGNAL4_ONE_SECOND_Z:
 				runName += "_S4_1sZ";
 				break;
-			case SIGNAL4_SYLVIA:
-				runName += "_S4_Sylvia";
+			case SIGNAL4_SYLVIA_V2Z:
+				runName += "_S4_Sylvia_V2Z";
+				break;
+			case SIGNAL4_SYLVIA_Z2V:
+				runName += "_S4_Sylvia_Z2V";
 				break;
 			default:
 				runName += "_" + SIGNAL_TYPE;

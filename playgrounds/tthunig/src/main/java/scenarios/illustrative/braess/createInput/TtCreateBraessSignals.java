@@ -68,7 +68,7 @@ public final class TtCreateBraessSignals {
 			.getLogger(TtCreateBraessSignals.class);
 	
 	public enum SignalControlType{
-		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_ONE_SECOND_Z, SIGNAL4_ONE_SECOND_SO, SIGNAL4_SYLVIA
+		NONE, ALL_GREEN, ONE_SECOND_Z, ONE_SECOND_SO, GREEN_WAVE_Z, GREEN_WAVE_SO, SIGNAL4_ONE_SECOND_Z, SIGNAL4_ONE_SECOND_SO, SIGNAL4_SYLVIA_V2Z, SIGNAL4_SYLVIA_Z2V
 	}
 	
 	private static final int CYCLE_TIME = 60;
@@ -147,7 +147,8 @@ public final class TtCreateBraessSignals {
 
 		if (signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_SO) || 
 				signalType.equals(SignalControlType.SIGNAL4_ONE_SECOND_Z) || 
-				signalType.equals(SignalControlType.SIGNAL4_SYLVIA)) {
+				signalType.equals(SignalControlType.SIGNAL4_SYLVIA_V2Z) ||
+				signalType.equals(SignalControlType.SIGNAL4_SYLVIA_Z2V)) {
 			// create only one signal system at node 4
 			createSignalSystemAtNode(this.scenario.getNetwork().getNodes().get(Id.createNodeId(4)));
 		} else {
@@ -245,7 +246,7 @@ public final class TtCreateBraessSignals {
 			signalSystemControl.addSignalPlanData(signalPlan);
 			signalSystemControl.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
 			// add the signalSystemControl to the final or temporary, respectively, signalControl 
-			if (this.signalType.equals(SignalControlType.SIGNAL4_SYLVIA)){
+			if (this.signalType.equals(SignalControlType.SIGNAL4_SYLVIA_Z2V) || this.signalType.equals(SignalControlType.SIGNAL4_SYLVIA_V2Z)){
 				tmpSignalControl.addSignalSystemControllerData(signalSystemControl);
 			} else {
 				signalControl.addSignalSystemControllerData(signalSystemControl);
@@ -272,14 +273,18 @@ public final class TtCreateBraessSignals {
 							fac, signalGroup.getId(), 0, CYCLE_TIME));
 					break;
 				case SIGNAL4_ONE_SECOND_SO:
-					createSignal4Setting(fac, signalPlan, signalGroup.getId(), 59);
+					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), 59);
 					break;
 				case SIGNAL4_ONE_SECOND_Z:
-					createSignal4Setting(fac, signalPlan, signalGroup.getId(), 1);
+					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), 1);
 					break;
-				case SIGNAL4_SYLVIA:
+				case SIGNAL4_SYLVIA_V2Z:
 					// create a basis signal plan
-					createSignal4Setting(fac, signalPlan, signalGroup.getId(), 5);
+					createSignal4SettingFirstV(fac, signalPlan, signalGroup.getId(), 55);
+					break;
+				case SIGNAL4_SYLVIA_Z2V:
+					// create a basis signal plan
+					createSignal4SettingFirstZ(fac, signalPlan, signalGroup.getId(), 55);
 					break;
 				default:
 					break;
@@ -303,7 +308,8 @@ public final class TtCreateBraessSignals {
 			break;
 		
 		// convert basis fixed time plan to sylvia plan
-		case SIGNAL4_SYLVIA:
+		case SIGNAL4_SYLVIA_V2Z:
+		case SIGNAL4_SYLVIA_Z2V:
 			// create the final sylvia signal control with information of the temporary signal control
 			DgSylviaPreprocessData.convertSignalControlData(tmpSignalControl, signalControl);
 			break;
@@ -429,7 +435,7 @@ public final class TtCreateBraessSignals {
 		signalPlan.setOffset(signalSystemOffset);
 	}
 
-	private void createSignal4Setting(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId, int second2SwitchFromZtoV) {
+	private void createSignal4SettingFirstZ(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId, int second2SwitchFromZtoV) {
 		int onset = 0;
 		int dropping = 0;
 		// set onset and dropping depending on the signal group and signal control type
@@ -444,6 +450,30 @@ public final class TtCreateBraessSignals {
 			// set 60 - second2SwitchFromZtoV seconds green for the lower route
 			onset = second2SwitchFromZtoV;
 			dropping = 60;
+			break;
+		default:
+			log.error("This method was called for signal group ID " + signalGroupId 
+					+ " but should not be called for other signal groups than the ones of signal system 4.");
+			break;
+		}
+		signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac, signalGroupId, onset, dropping));
+	}
+	
+	private void createSignal4SettingFirstV(SignalControlDataFactory fac, SignalPlanData signalPlan, Id<SignalGroup> signalGroupId, int second2SwitchFromVtoZ) {
+		int onset = 0;
+		int dropping = 0;
+		// set onset and dropping depending on the signal group and signal control type
+		switch (signalGroupId.toString()){
+		case "signal3_4.1": // signal at node 4 for the middle route
+			// set 60 - second2SwitchFromVtoZ seconds green for the middle route
+			onset = second2SwitchFromVtoZ;
+			dropping = 60;
+			break;
+		case "signal24_4.1":
+		case "signal2_4.1": // signal at node 4 for the lower route
+			// set second2SwitchFromVtoZ seconds green for the lower route
+			onset = 0;
+			dropping = second2SwitchFromVtoZ;
 			break;
 		default:
 			log.error("This method was called for signal group ID " + signalGroupId 
