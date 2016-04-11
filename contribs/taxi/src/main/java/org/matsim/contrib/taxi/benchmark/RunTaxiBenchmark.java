@@ -35,12 +35,16 @@ import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 
 
 /**
- * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that we use
- * time-variant network with variable speeds on links in each time interval (usually 15 minutes).
- * There is no other traffic and the flow capacity factor is increased at least by 100 (to prevent
- * time delays at nodes if many taxis are moving over one)
+ * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel
+ * times are deterministic. To simulate this property, we remove (1) all other traffic, and (2) link
+ * capacity constraints (e.g. by increasing the capacities by 100+ times), as a result all vehicles
+ * move with the free-flow speed (which is the effective speed).
+ * <p/>
+ * To model the impact of traffic, we can use a time-variant network, where we specify different
+ * free-flow speeds for each link over time. The default approach is to specify free-flow speeds in
+ * each time interval (usually 15 minutes).
  */
-public class RunTaxiBenchmarkScenario
+public class RunTaxiBenchmark
 {
     public static void run(String configFile, int runs)
     {
@@ -51,33 +55,34 @@ public class RunTaxiBenchmarkScenario
 
         config.controler().setLastIteration(runs);
 
-        Scenario scenario = loadScenarioWithFixedIntervalTimeVariantLinks(config, 15 * 60,
-                30 * 3600);
+        Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
         final TaxiData taxiData = new TaxiData();
         new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new TaxiModule(taxiData));
-        controler.addOverridingModule(VrpTravelTimeModules.createFreespeedTravelTimeModule());
+        controler.addOverridingModule(VrpTravelTimeModules.createFreespeedTravelTimeModule(false));
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
         controler.addControlerListener(new TaxiSimulationConsistencyChecker(taxiData));
 
         String id = taxiCfg.getOptimizerConfigGroup().getValue(AbstractTaxiOptimizerParams.ID);
         controler.addControlerListener(
-                new MultiRunStats(taxiData, config.controler().getOutputDirectory(), id));
+                new TaxiBenchmarkStats(taxiData, config.controler().getOutputDirectory(), id));
 
         controler.run();
-
     }
 
 
-    private static Scenario loadScenarioWithFixedIntervalTimeVariantLinks(Config config,
-            int interval, int maxTime)
+    private static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime)
     {
         Scenario scenario = new ScenarioBuilder(config).build();
-        ((NetworkImpl)scenario.getNetwork()).getFactory()
-                .setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
+
+        if (config.network().isTimeVariantNetwork()) {
+            ((NetworkImpl)scenario.getNetwork()).getFactory()
+                    .setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
+        }
+
         ScenarioUtils.loadScenario(scenario);
         return scenario;
     }
@@ -85,7 +90,6 @@ public class RunTaxiBenchmarkScenario
 
     public static void main(String[] args)
     {
-        run("d:/eclipse/matsim-all/contribs/taxi/src/main/resources/one_taxi/one_taxi_config.xml",
-                20);
+        run("./src/main/resources/one_taxi_benchmark/one_taxi_benchmark_config.xml", 20);
     }
 }

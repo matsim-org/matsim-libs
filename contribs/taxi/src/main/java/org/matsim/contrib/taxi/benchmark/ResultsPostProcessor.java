@@ -83,7 +83,7 @@ public class ResultsPostProcessor
             experiments[i] = id == null ? EMPTY_COLUMN : new Experiment(ids[i]);
         }
 
-        String[] cols = MultiRunStats.HEADER.split("\\s+");
+        String[] cols = TaxiBenchmarkStats.HEADER.split("\\s+");
         Arrays.equals(Arrays.copyOf(cols, 3), new String[] { "cfg", "n", "m" });
         statsColumns = Arrays.copyOfRange(cols, 3, cols.length);
     }
@@ -107,7 +107,7 @@ public class ResultsPostProcessor
     {
         try (Scanner sc = new Scanner(new File(file))) {
             String header = sc.nextLine();
-            if (!header.equals(MultiRunStats.HEADER)) {
+            if (!header.equals(TaxiBenchmarkStats.HEADER)) {
                 System.err.println("Non-standard header");
             }
 

@@ -32,11 +32,8 @@
 	</module>
 
 	<module name="planCalcScore">
-		<param name="activityType_0" value="home" />
-		<param name="activityTypicalDuration_0" value="16:00:00" />
-
-		<param name="activityType_1" value="work" />
-		<param name="activityTypicalDuration_1" value="08:00:00" />
+		<param name="activityType_0" value="dummy" />
+		<param name="activityTypicalDuration_0" value="23:59:00" />
 	</module>
 
 	<module name="strategy">

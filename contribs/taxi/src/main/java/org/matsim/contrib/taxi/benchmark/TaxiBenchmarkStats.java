@@ -10,7 +10,7 @@ import org.matsim.core.controler.listener.*;
 import org.matsim.core.utils.io.IOUtils;
 
 
-public class MultiRunStats
+public class TaxiBenchmarkStats
     implements AfterMobsimListener, ShutdownListener
 
 {
@@ -33,7 +33,7 @@ public class MultiRunStats
     private final SummaryStatistics driveEmptyRatio = new SummaryStatistics();
 
 
-    public MultiRunStats(TaxiData taxiData, String outputDir, String id)
+    public TaxiBenchmarkStats(TaxiData taxiData, String outputDir, String id)
     {
         this.taxiData = taxiData;
         this.outputDir = outputDir;
@@ -60,7 +60,7 @@ public class MultiRunStats
     public void notifyShutdown(ShutdownEvent event)
     {
         PrintWriter pw = new PrintWriter(
-                IOUtils.getBufferedWriter(outputDir + "/multiStats_" + id + ".txt"));
+                IOUtils.getBufferedWriter(outputDir + "/benchmark_stats_" + id + ".txt"));
         pw.println(HEADER);
         pw.printf(
                 "%20s\t%d\t%d\t"//
