@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -90,7 +91,10 @@ public class NetworkTools {
 				i++;
 			}
 
-			return closestLinks;
+			if(closestLinks.size() > 0)
+				return closestLinks;
+			else
+				return null;
 		}
 	}
 
@@ -293,4 +297,9 @@ public class NetworkTools {
 	}
 
 
+	public static void visualizeWeightsAsLanes(Network network, Map<Id<Link>, Double> routeLinkWeights) {
+		for(Map.Entry<Id<Link>, Double> w : routeLinkWeights.entrySet()) {
+			network.getLinks().get(w.getKey()).setNumberOfLanes(w.getValue());
+		}
+	}
 }

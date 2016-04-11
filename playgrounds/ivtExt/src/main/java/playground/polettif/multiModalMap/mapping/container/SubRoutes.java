@@ -21,11 +21,9 @@ package playground.polettif.multiModalMap.mapping.container;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +35,10 @@ import java.util.Map;
  * <p>
  * access interStopPathSet via [fromStop, toStop]
  * access interStopPath via [fromLink, toLink]
+ *
+ * @deprecated use {@link LinkWeightCalculator} instead.
  */
+@Deprecated
 public class SubRoutes {
 
 	private Map<Tuple<TransitRouteStop, TransitRouteStop>, InterStopPathSet> subRoutes = new HashMap<>();
@@ -56,7 +57,7 @@ public class SubRoutes {
 
 	/**
 	 * Each interStopRoute that passes a link adds weight to the link. Higher weight means more paths have
-	 * passed a link. The weight is calculated in {@link #getWeight(InterStopPath)} and based on the travelTime
+	 * passed a link. The weight is calculated and based on the travelTime
 	 * of the path. Links that have been fixed on calculating paths are excluded from link weight calculations, except
 	 * for the link candidates of the first and last stop.
 	 *
@@ -75,8 +76,8 @@ public class SubRoutes {
 			InterStopPathSet interStopPathSet = this.get(previousStop, currentStop);
 
 			if(i == 1) {
-				for(InterStopPath isp : interStopPathSet.getPaths()) {
-					for(Id<Link> linkId : isp.getIntermediateLinkIdsIncludingFromLink()) {
+				for(PTPath isp : interStopPathSet.getPaths()) {
+					for(Id<Link> linkId : isp.getLinkIdsExcludingToLink()) {
 						if(!weights.containsKey(linkId)) {
 							weights.put(linkId, getWeight(isp));
 						} else {
@@ -85,8 +86,8 @@ public class SubRoutes {
 					}
 				}
 			} else if(i == routeStops.size()-1) {
-				for(InterStopPath isp : interStopPathSet.getPaths()) {
-					for(Id<Link> linkId : isp.getIntermediateLinkIdsIncludingToLink()) {
+				for(PTPath isp : interStopPathSet.getPaths()) {
+					for(Id<Link> linkId : isp.getLinkIdsExcludingFromLink()) {
 						if(!weights.containsKey(linkId)) {
 							weights.put(linkId, getWeight(isp));
 						} else {
@@ -95,7 +96,7 @@ public class SubRoutes {
 					}
 				}
 			} else {
-				for(InterStopPath isp : interStopPathSet.getPaths()) {
+				for(PTPath isp : interStopPathSet.getPaths()) {
 					for(Id<Link> linkId : isp.getIntermediateLinkIds()) {
 						if(!weights.containsKey(linkId)) {
 							weights.put(linkId, getWeight(isp));
@@ -122,8 +123,8 @@ public class SubRoutes {
 			InterStopPathSet interStopPathSet = this.get(previousStop, currentStop);
 
 			if(i == 1) {
-				for(InterStopPath isp : interStopPathSet.getPaths()) {
-					for(Id<Link> linkId : isp.getIntermediateLinkIdsIncludingFromLink()) {
+				for(PTPath isp : interStopPathSet.getPaths()) {
+					for(Id<Link> linkId : isp.getLinkIdsExcludingToLink()) {
 						if(!weights.containsKey(linkId)) {
 							weights.put(linkId, getWeight(isp));
 						} else {
@@ -132,8 +133,8 @@ public class SubRoutes {
 					}
 				}
 			} else if(i == routeStops.size()-1) {
-				for(InterStopPath isp : interStopPathSet.getPaths()) {
-					for(Id<Link> linkId : isp.getIntermediateLinkIdsIncludingToLink()) {
+				for(PTPath isp : interStopPathSet.getPaths()) {
+					for(Id<Link> linkId : isp.getLinkIdsExcludingFromLink()) {
 						if(!weights.containsKey(linkId)) {
 							weights.put(linkId, getWeight(isp));
 						} else {
@@ -142,7 +143,7 @@ public class SubRoutes {
 					}
 				}
 			} else {
-				for(InterStopPath isp : interStopPathSet.getPaths()) {
+				for(PTPath isp : interStopPathSet.getPaths()) {
 					for(Id<Link> linkId : isp.getIntermediateLinkIds()) {
 						if(!weights.containsKey(linkId)) {
 							weights.put(linkId, getWeight(isp));
@@ -165,7 +166,7 @@ public class SubRoutes {
 	 * @param interStopPath
 	 * @return 1
 	 */
-	private static double getWeight(InterStopPath interStopPath) {
+	private static double getWeight(PTPath interStopPath) {
 		return 3600 - interStopPath.getTravelTime();
 	}
 

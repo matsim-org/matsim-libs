@@ -16,31 +16,10 @@
  *                                                                         *
  * *********************************************************************** */
 
+package playground.polettif.multiModalMap.mapping.container;
 
-package playground.polettif.multiModalMap.workbench;
-
-import playground.polettif.multiModalMap.mapping.PTMapperLinkScoringMultiplyStops;
-
-public class RunPTMapperLinkScoringMultiplyStops {
-
-	public static void main(String[] args) {
-
-		String base = "E:/";
-		String outbase = base+"output/mtsMapping/";
-
-		// input
-//		final String mtsFile = base + "data/mts/zvv/zvv_unmappedSchedule_LV1903+.xml";
-//		final String mtsFile = base + "data/mts/uri/schedule_unmapped_cut.xml";
-//		final String mtsFile = base + "data/mts/uri/debug.xml";
-//		final String mtsFile = base + "data/mts/zvv_69er.xml";
-//		final String mtsFile = base + "data/mts/unmapped/fromHafas/zurich.xml";
-		final String mtsFile = base + "data/mts/unmapped/fromGtfs/zvv.xml";
-
-//		final String networkFile = base + "data/network/uri.xml.gz";
-//		final String networkFile = base + "data/network/zurich-city.xml.gz";
-		final String networkFile = base + "data/network/zurich-plus.xml.gz";
-
-		PTMapperLinkScoringMultiplyStops.main(new String[]{mtsFile, networkFile, outbase+"schedule.xml", outbase+"network.xml"});
-	}
-
+/**
+ * provides a container for parent and child stopfacilities and referenced links
+ */
+public class StopFacilityTree {
 }

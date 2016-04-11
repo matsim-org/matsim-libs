@@ -33,6 +33,7 @@ import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
 
+@Deprecated
 public class StopFacilityLinker {
 
 	protected static Logger log = Logger.getLogger(StopFacilityLinker.class);

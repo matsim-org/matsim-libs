@@ -31,14 +31,17 @@ import java.util.Map;
 
 /**
  * contains a set of interstop paths between fromStop and toStop
+ *
+ * @deprecated no need for additional container between {@link LinkWeightCalculator} and {@link PTPath}.
  */
+@Deprecated
 public class InterStopPathSet {
 
 	private final Tuple<TransitRouteStop, TransitRouteStop> id;
 	private final TransitRouteStop fromStop;
 	private final TransitRouteStop toStop;
 
-	private Map<Tuple<Link, Link>, InterStopPath> interStopPaths = new HashMap<>();
+	private Map<Tuple<Link, Link>, PTPath> interStopPaths = new HashMap<>();
 
 	/**
 	 * minimal distance between the stop facility and the link for the fromStop
@@ -59,16 +62,16 @@ public class InterStopPathSet {
 		this.id = new Tuple<>(fromStop, toStop);
 	}
 
-	public void put(InterStopPath interStopPath) {
+	public void put(PTPath interStopPath) {
 		interStopPaths.put(new Tuple<>(interStopPath.getFromLink(), interStopPath.getToLink()), interStopPath);
 
 		if(interStopPath.getTravelTime() < minTT)
 			minTT = interStopPath.getTravelTime();
 
-		if(interStopPath.getdistanceEndFacilityToLink() < minDistFrom)
+		if(interStopPath.getDistanceEndFacilityToLink() < minDistFrom)
 			minDistFrom = interStopPath.getDistanceStartFacilityToLink();
 
-		if(interStopPath.getdistanceEndFacilityToLink() < minDistTo)
+		if(interStopPath.getDistanceEndFacilityToLink() < minDistTo)
 			minDistTo = interStopPath.getDistanceStartFacilityToLink();
 	}
 
@@ -77,11 +80,11 @@ public class InterStopPathSet {
 		return id;
 	}
 
-	public List<InterStopPath> getPaths() {
+	public List<PTPath> getPaths() {
 		return new ArrayList<>(interStopPaths.values());
 	}
 
-	public InterStopPath getPath(Link currentLink, Link nextLink) {
+	public PTPath getPath(Link currentLink, Link nextLink) {
 		return interStopPaths.get(new Tuple<>(currentLink, nextLink));
 	}
 
@@ -92,7 +95,7 @@ public class InterStopPathSet {
 	public List<Id<Link>> getAllIntermediateLinkIds() {
 		List<Id<Link>> allIntermediateLinkIds = new ArrayList<>();
 
-		for(InterStopPath isp : interStopPaths.values()) {
+		for(PTPath isp : interStopPaths.values()) {
 			allIntermediateLinkIds.addAll(isp.getIntermediateLinkIds());
 		}
 
