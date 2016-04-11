@@ -37,7 +37,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
 public class EnergyConsumptionModelRicardoFaria2012 extends AbstractInterpolatedEnergyConsumptionModel {
 
 	public EnergyConsumptionModelRicardoFaria2012() {
-		initModell(1.0);
+		initModell(1.0); 
 	}
 	
 	// Given the very optimistic Value of the original Ricardo/Faria profile, values are multiplied by a factor here.
