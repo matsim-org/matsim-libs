@@ -108,25 +108,27 @@ public class ZHCutter {
 		ActivityFacilities filteredFacilities = cutter.filterFacilitiesWithPopulation();
 		TransitSchedule filteredSchedule = cutter.cutPT();
 		Vehicles filteredVehicles = cutter.cleanVehicles(filteredSchedule);
-		Network filteredNetwork = cutter.cutNetwork(filteredSchedule);
-		Network filteredOnlyCarNetwork = cutter.getOnlyCarNetwork(filteredNetwork);
+		Network filteredOnlyCarNetwork = cutter.getOnlyCarNetwork();
+		Network filteredNetwork = cutter.cutNetwork(filteredSchedule, filteredOnlyCarNetwork);
 		// write new files
 		F2LCreator.createF2L(filteredFacilities, filteredOnlyCarNetwork, cutterConfig.getPathToTargetFolder() + File.separator + FACILITIES2LINKS);
 		writeNewFiles(cutterConfig.getPathToTargetFolder() + File.separator, cutter.scenario,
 				filteredPopulation, filteredHouseholds, filteredFacilities, filteredSchedule, filteredVehicles, filteredNetwork);
 	}
 
-	private Network getOnlyCarNetwork(Network filteredNetwork) {
-		Network onlyCarNetwork = NetworkUtils.createNetwork();
-		for (Link link : filteredNetwork.getLinks().values()) {
-			if (link.getAllowedModes().contains("car")) {
-				addLink(onlyCarNetwork, link);
+	private Network getOnlyCarNetwork() {
+		Network carNetworkToKeep = NetworkUtils.createNetwork();
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			if ((link.getAllowedModes().contains("car") && link.getCapacity() > 1000) || // we keep all arterial links
+					(CoordUtils.calcEuclideanDistance(center, link.getCoord()) <= radius + 5000)) { // and we keep all links within radius + 5km)
+				addLink(carNetworkToKeep, link);
 			}
 		}
-		return onlyCarNetwork;
+		new NetworkCleaner().run(carNetworkToKeep);
+		return carNetworkToKeep;
 	}
 
-	private Network cutNetwork(TransitSchedule filteredSchedule) {
+	private Network cutNetwork(TransitSchedule filteredSchedule, Network filteredOnlyCarNetwork) {
 		Network filteredNetwork = NetworkUtils.createNetwork();
 		Set<Id<Link>> linksToKeep = new HashSet<>();
 		for (TransitLine transitLine : filteredSchedule.getTransitLines().values()) {
@@ -138,9 +140,13 @@ public class ZHCutter {
 		}
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			if (linksToKeep.contains(link.getId()) || // we keep all links we need for pt
-					(link.getAllowedModes().contains("car") && link.getCapacity() > 1000) || // we keep all arterial links
-					(CoordUtils.calcEuclideanDistance(center, link.getCoord()) <= radius + 5000)) { // and we keep all links within radius + 5km
+					filteredOnlyCarNetwork.getLinks().containsKey(link.getId())) {
 				addLink(filteredNetwork, link);
+				if (!linksToKeep.contains(link.getId())) {
+					Set<String> allowedModes = new HashSet<>();
+					allowedModes.add("car");
+					link.setAllowedModes(allowedModes);
+				}
 			}
 		}
 		return filteredNetwork;
@@ -156,6 +162,8 @@ public class ZHCutter {
 			network.addNode(node);
 		}
 		network.addLink(link);
+		link.setFromNode(network.getNodes().get(link.getFromNode().getId()));
+		link.setToNode(network.getNodes().get(link.getToNode().getId()));
 	}
 
 	private TransitSchedule cutPT() {
