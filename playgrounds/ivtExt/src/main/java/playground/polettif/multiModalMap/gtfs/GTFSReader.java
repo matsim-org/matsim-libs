@@ -657,7 +657,7 @@ public class GTFSReader {
 				return transitRouteId + "_01";
 			} else {
 				int i = ids.put(transitRouteId, ids.get(transitRouteId) + 1) + 1;
-				return transitRouteId + "_" + ( i < 10 ? "0"+Integer.toString(i) : Integer.toString(i));
+				return transitRouteId + "_" + String.format("%03d", i);
 			}
 
 		}

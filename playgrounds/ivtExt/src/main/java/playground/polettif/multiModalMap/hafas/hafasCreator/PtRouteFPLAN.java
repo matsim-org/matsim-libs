@@ -27,6 +27,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import playground.polettif.multiModalMap.hafas.HRDFDefinitions;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,15 +47,43 @@ public class PtRouteFPLAN {
 	private static TransitScheduleFactory scheduleBuilder = new TransitScheduleFactoryImpl();
 	private static Set<Id<TransitStopFacility>> facilitiesNotFound = new HashSet<>();
 
-	public static final String BUS = "bus";
+	/*
+	 * modes categorized equivalent to gtfs
+	 */
 
-	private enum allBusses {
-		BUS, NFB, TX, KB, NFO, EXB, NB
-	}
+	// 0 - Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.
 	public final static String TRAM = "tram";
 	private enum allTrams {
 		T, NFT
 	}
+
+	// 1 - Subway, Metro. Any underground rail system within a metropolitan area.
+
+
+	// 2 - Rail. Used for intercity or long-distance travel.
+	public final static String RAIL = "rail";
+	private enum allTrains {
+		R, LB, EC, ICE, RJ, IC, RE, CNL, EN, ICN, IR, S, TGV,
+		SN, D, EXT, NZ, M, GEX, BEX, VAE, ZUG, AG
+		}
+
+	public static final String BUS = "bus";
+	private enum allBusses {
+		BUS, NFB, TX, KB, NFO, EXB, NB
+
+	}
+
+	public final static String SHIP = "ship";
+	private enum allShips {
+		BAT, BAV, FAE
+	}
+
+	public final static String FUNICULAR = "funicular";
+	private enum allFunicular {
+		FUN
+	}
+
+
 	public final static String PT = "pt";
 
 	private final Id<TransitLine> idOwnerLine;
@@ -96,14 +125,9 @@ public class PtRouteFPLAN {
 	public void setUsedVehicle(Id<VehicleType> typeId, VehicleType type) {
 		usedVehicleType = type;
 		usedVehicleID = typeId.toString();
+
 		if (usedVehicleType != null) {
-			if (isTypeOf(allBusses.class, usedVehicleType.getId().toString())) {
-				usedMode = BUS;
-			} else if (isTypeOf(allTrams.class, usedVehicleType.getId().toString())) {
-				usedMode = TRAM;
-			} else {
-				usedMode = PT;
-			}
+			usedMode = HRDFDefinitions.Vehicles.valueOf(usedVehicleType.getId().toString()).getMode().toString();
 		}
 	}
 
