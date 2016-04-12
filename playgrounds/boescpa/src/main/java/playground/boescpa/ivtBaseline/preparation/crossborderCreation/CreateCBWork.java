@@ -179,7 +179,7 @@ public class CreateCBWork extends CreateSingleTripPopulation {
 			departureTime = returnTime - actDuration;
 		}
 
-		ActivityImpl actStart = new ActivityImpl(HOME, origFacility.getCoord(), origFacility.getLinkId());
+		ActivityImpl actStart = new ActivityImpl(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actStart.setFacilityId(origFacility.getId());
 		actStart.setStartTime(0.0);
 		actStart.setMaximumDuration(departureTime);
@@ -199,7 +199,7 @@ public class CreateCBWork extends CreateSingleTripPopulation {
 
 		plan.addLeg(new LegImpl("car"));
 
-		ActivityImpl actEnd = new ActivityImpl(HOME, origFacility.getCoord(), origFacility.getLinkId());
+		ActivityImpl actEnd = new ActivityImpl(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actEnd.setFacilityId(origFacility.getId());
 		actEnd.setStartTime(returnTime);
 		//actEnd.setMaximumDuration(24.0 * 3600.0 - returnTime);
