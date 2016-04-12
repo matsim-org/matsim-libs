@@ -29,6 +29,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class PTPathImpl implements PTPath {
 
 	private final Tuple<TransitStopFacility, TransitStopFacility> stopPair;

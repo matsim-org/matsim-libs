@@ -31,7 +31,7 @@ import org.matsim.core.router.util.TravelTime;
  *
  * @author boescpa
  */
-public interface PTLRouter extends TravelDisutility, TravelTime {
+public interface Router extends TravelDisutility, TravelTime {
 
     /**
      *

@@ -19,14 +19,14 @@
 
 package playground.polettif.multiModalMap.workbench;
 
-import playground.polettif.multiModalMap.mapping.PTMapperConstrainedRolloverScoring;
+import playground.polettif.multiModalMap.mapping.PTMapperPseudoShortestPath;
 
-public class RunPTMapperConstrainedRolloverScoring {
+public class RunPTMapperPseudoShortestPath {
 
 	public static void main(String[] args) {
 
-		String base = "C:/Users/Flavio/Desktop/";
-		String outbase = base+"output/mtsMappingConstrained/";
+		String base = "C:/Users/polettif/Desktop/";
+		String outbase = base+"output/mtsMapping_zh2/";
 
 		// input
 //		final String mtsFile = base + "data/mts/zvv/zvv_unmappedSchedule_LV1903+.xml";
@@ -34,14 +34,16 @@ public class RunPTMapperConstrainedRolloverScoring {
 //		final String mtsFile = base + "data/mts/uri/debug.xml";
 //		final String mtsFile = base + "data/mts/zvv_69er.xml";
 //		final String mtsFile = base + "data/mts/unmapped/fromHafas/uri.xml";
-		final String mtsFile = base + "data/mts/unmapped/fromHafas/debug.xml";
+//		final String mtsFile = base + "data/mts/unmapped/fromHafas/zurich.xml";
+		final String mtsFile = base + "data/mts/unmapped/fromGtfs/zvv.xml";
+//		final String mtsFile = base + "data/mts/unmapped/fromHafas/debug-pseudo.xml";
 
 //		final String networkFile = base + "data/network/uri.xml.gz";
-		final String networkFile = base + "data/network/zurich-city.xml.gz";
-//		final String networkFile = base + "data/network/zurich-plus.xml.gz";
+//		final String networkFile = base + "data/network/zurich-city.xml.gz";
+		final String networkFile = base + "data/network/zurich-plus.xml.gz";
 //		final String networkFile = base + "data/network/uri.xml.gz";
 
-		PTMapperConstrainedRolloverScoring.main(new String[]{mtsFile, networkFile, outbase+"schedule.xml", outbase+"network.xml"});
+		PTMapperPseudoShortestPath.main(new String[]{mtsFile, networkFile, outbase+"schedule.xml", outbase+"network.xml"});
 	}
 
 }

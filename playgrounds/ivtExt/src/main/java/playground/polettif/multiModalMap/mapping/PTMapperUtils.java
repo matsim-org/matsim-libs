@@ -20,20 +20,40 @@ package playground.polettif.multiModalMap.mapping;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.util.FastAStarEuclideanFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.mapping.container.PTPath;
 import playground.polettif.multiModalMap.mapping.container.PTPathImpl;
+import playground.polettif.multiModalMap.mapping.router.Router;
+import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 
 public class PTMapperUtils {
+
+	/**
+	 * ID prefix used for artificial link created if no nodes are found within NODE_SEARCH_RADIUS
+	 */
+	private final static String PREFIX_ARTIFICIAL_LINKS = "pt_";
+
+	/**
+	 * Suffix used for child stop facilities. A number for each child of a parent stop facility is appended (i.e. stop0123_fac:2)
+	 */
+	private final static String SUFFIX_CHILD_STOPFACILITIES = "_fac:";
 
 	protected static Logger log = Logger.getLogger(PTMapperUtils.class);
 
@@ -103,7 +123,6 @@ public class PTMapperUtils {
 		}
 
 		return rankedLinks.get(rankedLinks.lastKey());
-
 	}
 
 	/**
@@ -194,42 +213,140 @@ public class PTMapperUtils {
 		return false;
 	}
 
-	public void replaceStopFacilities() {
-/*
-		for(Id<TransitLine> lineId:stopFacilitiesToReplace.getLineIds())			{
-			for(Id<TransitRoute> routeId : stopFacilitiesToReplace.getRouteIds(lineId)) {
-
-				TransitLine line = this.schedule.getTransitLines().get(lineId);
-				TransitRoute route = this.schedule.getTransitLines().get(line.getId()).getRoutes().get(routeId);
-				Id<TransitRoute> oldRouteId = route.getId();
-				String oldTransportMode = route.getTransportMode();
-				List<TransitRouteStop> oldStopSequence = this.schedule.getTransitLines().get(line.getId()).getRoutes().get(route.getId()).getStops();
-				List<TransitRouteStop> newStopSequence = new ArrayList<>();
-
-				for(TransitRouteStop stop : oldStopSequence) {
-					TransitRouteStop newTransitRouteStop = scheduleFactory.createTransitRouteStop(stopFacilitiesToReplace.getStoredRoute(lineId).getReplacementPairs(routeId).get(stop.getStopFacility()), stop.getArrivalOffset(), stop.getDepartureOffset());
-					newTransitRouteStop.setAwaitDepartureTime(stop.isAwaitDepartureTime());
-					newStopSequence.add(newTransitRouteStop);
+	/**
+	 * cleans the schedule
+	 * @param schedule
+	 */
+	public static void cleanSchedule(TransitSchedule schedule) {
+		for (TransitLine line : schedule.getTransitLines().values()) {
+			Set<TransitRoute> toRemove = new HashSet<>();
+			for (TransitRoute transitRoute : line.getRoutes().values()) {
+				boolean removeRoute = false;
+				NetworkRoute networkRoute = transitRoute.getRoute();
+				if (networkRoute.getStartLinkId() == null || networkRoute.getEndLinkId() == null) {
+					removeRoute = true;
 				}
-
-				TransitRoute newRoute = scheduleFactory.createTransitRoute(oldRouteId, null, newStopSequence, oldTransportMode);
-
-				// add departures
-				route.getDepartures().values().forEach(newRoute::addDeparture);
-
-				this.schedule.getTransitLines().get(line.getId()).removeRoute(route);
-
-				newTransitLines.add(new Tuple<>(line, newRoute));
+				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
+					if (linkId == null) {
+						removeRoute = true;
+					}
+				}
+				if (removeRoute) {
+					log.error("NetworkRoute for " + transitRoute.getId().toString() + " incomplete. Remove route.");
+					toRemove.add(transitRoute);
+				}
+			}
+			if (!toRemove.isEmpty()) {
+				for (TransitRoute transitRoute : toRemove) {
+					line.removeRoute(transitRoute);
+				}
 			}
 		}
+	}
 
-		// add transit lines and routes again
-		for(Tuple<TransitLine, TransitRoute> entry : newTransitLines)
-
-		{
-			this.schedule.getTransitLines().get(entry.getFirst().getId()).addRoute(entry.getSecond());
+	/**
+	 * cleanStationsAndNetwork
+	 * boescpa
+	 */
+	public static void setConnectedStopFacilitiesToIsBlocking(TransitSchedule schedule, Network network) {
+		TransitScheduleFactory scheduleFactory = schedule.getFactory();
+		Set<TransitStopFacility> facilitiesToExchange = new HashSet<>();
+		for (TransitStopFacility oldFacility : schedule.getFacilities().values()) {
+			if (network.getLinks().get(oldFacility.getLinkId()).getAllowedModes().contains(TransportMode.car)) {
+				TransitStopFacility newFacility = scheduleFactory.createTransitStopFacility(
+						oldFacility.getId(), oldFacility.getCoord(), true);
+				newFacility.setName(oldFacility.getName());
+				newFacility.setLinkId(oldFacility.getLinkId());
+				newFacility.setStopPostAreaId(oldFacility.getStopPostAreaId());
+				facilitiesToExchange.add(newFacility);
+			}
 		}
-		*/
+		for (TransitStopFacility facility : facilitiesToExchange) {
+			TransitStopFacility facilityToRemove = schedule.getFacilities().get(facility.getId());
+			schedule.removeStopFacility(facilityToRemove);
+			schedule.addStopFacility(facility);
+		}
+	}
+
+
+	/**
+	 * cleanStationsAndNetwork
+	 * Add to any link that is passed by any route a "pt" in the modes, if it hasn't already one...
+	 * boescpa
+	 */
+	public static void addPTModeToNetwork(TransitSchedule schedule, Network network) {
+		Map<Id<Link>, ? extends Link> networkLinks = network.getLinks();
+		Set<Id<Link>> transitLinks = new HashSet<>();
+		for (TransitLine line : schedule.getTransitLines().values()) {
+			for (TransitRoute transitRoute : line.getRoutes().values()) {
+				NetworkRoute networkRoute = transitRoute.getRoute();
+				transitLinks.add(networkRoute.getStartLinkId());
+				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
+					transitLinks.add(linkId);
+				}
+				transitLinks.add(networkRoute.getEndLinkId());
+			}
+		}
+		for (Id<Link> transitLinkId : transitLinks) {
+			Link transitLink = networkLinks.get(transitLinkId);
+			if (!transitLink.getAllowedModes().contains(TransportMode.pt)) {
+				Set<String> modes = new HashSet<>();
+				modes.addAll(transitLink.getAllowedModes());
+				modes.add(TransportMode.pt);
+				transitLink.setAllowedModes(modes);
+			}
+		}
+	}
+
+	/**
+	 * Generates link sequences for all transit routes in the schedule, modifies the schedule.
+	 * StopFacilities must have a reference link.
+	 *
+	 * @param schedule where transitRoutes should be routed
+	 */
+	public static void routeSchedule(TransitSchedule schedule, Network network, Router router) {
+		Counter counterRoute = new Counter("route # ");
+
+		log.info("Routing all routes with referenced links...");
+		for(TransitLine line : schedule.getTransitLines().values()) {
+			for(TransitRoute route : line.getRoutes().values()) {
+				counterRoute.incCounter();
+
+				// TODO change modes
+				if(route.getTransportMode().equals("bus")) {
+
+					List<TransitRouteStop> routeStops = route.getStops();
+					List<Id<Link>> linkSequence = new ArrayList<>();
+
+					// add very first link
+					linkSequence.add(routeStops.get(0).getStopFacility().getLinkId());
+
+					// route
+					for(int i = 0; i < routeStops.size()-1; i++) {
+						if(routeStops.get(i).getStopFacility().getLinkId() == null) {
+							log.error("stop facility " + routeStops.get(i).getStopFacility().getName() + " (" + routeStops.get(i).getStopFacility().getId() + " not referenced!");
+						}
+						if(routeStops.get(i+1).getStopFacility().getLinkId() == null) {
+							log.error("stop facility " + routeStops.get(i-1).getStopFacility().getName() + " (" + routeStops.get(i+1).getStopFacility().getId() + " not referenced!");
+						}
+
+						Link currentLink = network.getLinks().get(routeStops.get(i).getStopFacility().getLinkId());
+						Link nextLink = network.getLinks().get(routeStops.get(i+1).getStopFacility().getLinkId());
+
+						List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode(), null, null));
+
+						if(path != null)
+							linkSequence.addAll(path);
+
+						linkSequence.add(nextLink.getId());
+					}
+
+					// add link sequence to schedule
+					route.setRoute(RouteUtils.createNetworkRoute(linkSequence, network));
+				}
+			}
+		}
+		log.info("Routing all routes with referenced links... done");
 	}
 
 }

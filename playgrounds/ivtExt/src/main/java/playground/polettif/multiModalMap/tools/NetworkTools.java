@@ -36,20 +36,37 @@ public class NetworkTools {
 
 	protected static Logger log = Logger.getLogger(NetworkTools.class);
 
+
 	/**
-	 * Looks for nodes within search radius of coord, then searches the closest n links
-	 * (calculated via distancePointLineSegment() in {@link org.matsim.core.utils.geometry.CoordUtils}).
-	 * Can return more than n links if links have the same distance from the facility (difference &lt; 2m).
+	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes(Coord, double)},
+	 * fetches all in- and outlinks and sorts them ascending by their
+	 * distance to the coordiantes given. Only returns maxNLinks or
+	 * all links within maxLinkDistance (whichever is reached earlier).
 	 *
-	 * @return the closest n links to coord
+	 * <p/>
+	 * Distance Link-Coordinate is calculated via  in {@link org.matsim.core.utils.geometry.CoordUtils#distancePointLinesegment(Coord, Coord, Coord)}).
+	 *
+	 * @param networkImpl A network implementation
+	 * @param coord the coordinate from which the closest links are
+	 *              to be searched
+	 * @param nodeSearchRadius Only links from and to nodes within this
+	 *                         radius are considered
+	 * @param maxNLinks How many links should be returned. Note: Method
+	 *                  an return more than n links if two links have the
+	 *                  same distance from the facility.
+	 * @param maxLinkDistance Only returns links which are closer than
+	 *                        this distance to the coordinate.
+	 * @return the list of closest links
 	 */
-	public static List<Link> findOnlyNClosestLinks(NetworkImpl networkImpl, Coord coord, double searchRadius, int n, double maxLinkDistance) {
-		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, searchRadius);
+	public static List<Link> findNClosestLinks(NetworkImpl networkImpl, Coord coord, double nodeSearchRadius, int maxNLinks, double maxLinkDistance) {
+		List<Link> closestLinks = new ArrayList<>();
+
+		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, nodeSearchRadius);
 		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
-		double incr = 0.1; double tol=2.0;
+		double incr = 0.0001; double tol=0.001;
 
 		if(nearestNodes.size() == 0) {
-			return null;
+			return closestLinks;
 		} else {
 			for (Node node : nearestNodes) {
 				Map<Id<Link>, ? extends Link> outLinks = node.getOutLinks();
@@ -79,74 +96,63 @@ public class NetworkTools {
 				}
 			}
 
-			List<Link> closestLinks = new ArrayList<>();
+			int i = 1; double previousDistance = 2*tol;
+			for(Map.Entry<Double, Link> entry : closestLinksMap.entrySet()) {
+				// if the distance difference to the previous link is less than tol, add the link as well
+				if(i > maxNLinks && Math.abs(entry.getKey() - previousDistance) >= tol) {
+					break;
+				}
+				if(entry.getKey() > maxLinkDistance) {
+					break;
+				}
 
-			int i = 1; double d=0;
-			for(Map.Entry<Double, Link> e : closestLinksMap.entrySet()) {
-				if(i > n && (e.getKey()-d > tol))
-					break;
-				if(e.getKey() > maxLinkDistance)
-					break;
-				closestLinks.add(e.getValue());
+				previousDistance = entry.getKey();
+				closestLinks.add(entry.getValue());
 				i++;
 			}
 
-			if(closestLinks.size() > 0)
-				return closestLinks;
-			else
-				return null;
+			return closestLinks;
 		}
 	}
 
-	public static List<Link> findOnlyNClosestLinks(NetworkImpl networkImpl, Coord coord, double nodeSearchRadius, int maxNClosestLinks) {
-		return findOnlyNClosestLinks(networkImpl, coord, nodeSearchRadius, maxNClosestLinks, Double.MAX_VALUE);
+	public static List<Link> findNClosestLinks(NetworkImpl networkImpl, Coord coord, int maxNClosestLinks, double nodeSearchRadius) {
+		return findNClosestLinks(networkImpl, coord, nodeSearchRadius, maxNClosestLinks, Double.MAX_VALUE);
+	}
+
+	public static List<Link> findNClosestLinks(NetworkImpl networkImpl, Coord coord, int maxNClosestLinks) {
+		return findNClosestLinks(networkImpl, coord, Double.MAX_VALUE, maxNClosestLinks, Double.MAX_VALUE);
 	}
 
 	/**
-	 * Adds a node on the splitPointCoordinates and splits the link into two new links
-	 * @param network network the operations runs on
-	 * @param linkId of the link which should be split
-	 * @param splitPointCoordinates of the point where the link should be separated. Practically the link is removed
-	 *                              and two new links connecting the nodes are added. The splitPoint is moved onto the link.
-	 *
-	 * @return edited network
+	 * Adds a node on the position of coord and connects it with two links to the neareast node of the network.
+	 * @param coord where the new node should be created
+	 * @param network that should be modified
+	 * @param idPrefix the prefix for the new node and links
+	 * @param idCounter is simply appended to the idPrefix and incremented
+	 * @return a list with the two newly created links
 	 */
-	// TODO move to class LinkSplitter, static implementation gets problematic
-	@Deprecated
-	public static Network splitLink(Network network, Id<Link> linkId, Coord splitPointCoordinates) {
+	public static List<Link> addArtificialLinksToNetwork(Coord coord, Network network, String idPrefix, int idCounter) {
+		NetworkImpl networkImpl = (NetworkImpl) network;
+		NetworkFactory networkFactory = network.getFactory();
 
-		Link link = network.getLinks().get(linkId);
-
-
-		// get coordinates on the link
-		Coord coordinatesOnLink = getClosestPointOnLine(link, splitPointCoordinates);
-
-		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(network);
-
-		// TODO generate different link name (current implementation gets veeeeery long
-		String hash = ""; //":"+Integer.toString(coordinatesOnLink.hashCode());
-		String newNodeIdString = link.getFromNode().getId().toString()+link.getToNode().getId().toString()+hash;
-		String newLinkIdString1 = linkId.toString()+"_"+newNodeIdString;
-		String newLinkIdString2 = newNodeIdString+"_"+linkId.toString();
-
-		Id<Node> newNodeId = Id.createNodeId(newNodeIdString);
-		Id<Link> newLinkId1 = Id.createLinkId(newLinkIdString1);
-		Id<Link> newLinkId2 = Id.createLinkId(newLinkIdString2);
-
-		Node newNode = networkFactory.createNode(newNodeId, coordinatesOnLink);
+		Node newNode = networkFactory.createNode(Id.create(idPrefix + "node_" + idCounter, Node.class), coord);
+		Node nearestNode = networkImpl.getNearestNode(coord);
+		Link newLink = networkFactory.createLink(Id.createLinkId(idPrefix + idCounter + ":1"), newNode, nearestNode);
+		Link newLink2 = networkFactory.createLink(Id.createLinkId(idPrefix + idCounter + ":2"), nearestNode, newNode);
 
 		network.addNode(newNode);
-		network.addLink(networkFactory.createLink(newLinkId1, newNode, network.getLinks().get(linkId).getToNode()));
-		network.addLink(networkFactory.createLink(newLinkId2, network.getLinks().get(linkId).getFromNode(), newNode));
-		network.removeLink(linkId);
+		network.addLink(newLink);
+		network.addLink(newLink2);
 
-		return network;
+		List<Link> newLinks = new ArrayList<>();
+		newLinks.add(newLink);
+		newLinks.add(newLink2);
+
+		return newLinks;
 	}
 
 	/**
-	 * Calculates bearing from two points
-	 *
-	 * @author polettif
+	 * Calculates azimuth from two points
 	 */
 	public static double getAzimuth(Coord from, Coord to) {
 		// calculates azimuth/bearing of two nodes in radians
@@ -167,13 +173,8 @@ public class NetworkTools {
 	}
 
 	/**
-	 *
-	 * Maybe have a look at CoordUtils.distancePointLinesegment
-	 *
-	 * @param lineStart
-	 * @param lineEnd
-	 * @param refPoint
-	 * @return
+	 * @return Returns the point on the line between lineStart and lineEnd which
+	 * is closest to refPoint.
 	 */
 	public static Coord getClosestPointOnLine(Coord lineStart, Coord lineEnd, Coord refPoint) {
 		double azLine = getAzimuth(lineStart, lineEnd);
@@ -193,34 +194,10 @@ public class NetworkTools {
 	public static Coord getClosestPointOnLine(Node from, Node to, Node refPoint) {	return getClosestPointOnLine(from.getCoord(), to.getCoord(), refPoint.getCoord());}
 	public static Coord getClosestPointOnLine(Node from, Node to, Coord refPoint) {	return getClosestPointOnLine(from.getCoord(), to.getCoord(), refPoint);}
 
+
 	/**
-	 * Based on org.matsim.contrib.networkEditor.visualizing.NetBlackboard
-	 *
-	 * Gets the nearest Link to a Coordinate using brute force to find it
-	 * @param coord
-	 * @return The closest link
-	 *
-	 * getNearestLinkImproved() does not work since it uses networkImpl methods
+	 * @return the opposite direction link
 	 */
-	public static Link getNearestLinkBrute(Network network, Coord coord, double threshold){
-		Link selected = null;
-		double minDist = Double.MAX_VALUE;
-		for(Link link : network.getLinks().values()){
-			double thisDist = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
-			if(thisDist < minDist) {
-				minDist = thisDist;
-				selected = link;
-				if(thisDist < threshold)
-					break;
-			}
-		}
-		return selected;
-	}
-
-	public static Link getNearestLinkBrute(Network network, Coord coord){
-		return getNearestLinkBrute(network, coord, 0.0);
-	}
-
 	public static Link getOppositeLink(Link link) {
 		if (link == null) {
 			return null;
@@ -240,66 +217,59 @@ public class NetworkTools {
 	}
 
 	/**
-	 * Within search radius look for nodes and then search for the closest link.
-	 *
-	 * @param coord Coordinate to search the closest link.
-	 * @return Null if no such link could be found.
+	 * A debug method to assign weights to network links as number of lanes.
 	 */
-	public static Link findClosestLink(Network network, Coord coord, double searchRadius) {
-		Collection<Node> nearestNodes = ((NetworkImpl) network).getNearestNodes(coord, searchRadius);
-
-		double minDist = Double.MAX_VALUE;
-		Link selected = null;
-		for(Node node : nearestNodes) {
-			Map<Id<Link>, ? extends Link> outLinks = node.getOutLinks();
-			Map<Id<Link>, ? extends Link> inLinks = node.getInLinks();
-			double lineSegmentDistance = 0;
-
-			for (Link linkCandidate : outLinks.values()) {
-				lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
-				if (lineSegmentDistance < minDist) {
-					minDist = lineSegmentDistance;
-					selected = linkCandidate;
-				}
-			}
-
-			for (Link linkCandidate : inLinks.values()) {
-				lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
-				if (lineSegmentDistance < minDist) {
-					minDist = lineSegmentDistance;
-					selected = linkCandidate;
-				}
-			}
-
-		}
-		return selected;
-	}
-
-	/**
-	 * Looks for nodes within search radius of coord, then searches the closest links. Returns links wich are closer
-	 * than maxLinkDistance (calculated via distancePointLineSegment() in {@link org.matsim.core.utils.geometry.CoordUtils}).
-	 */
-	public static List<Link> findClosestLinks(NetworkImpl networkImpl, Coord coord, double searchRadius, double maxLinkDistance) {
-		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, searchRadius);
-		List<Link> closestLinks = new ArrayList<>();
-		for (Node node : nearestNodes) {
-			Map<Id<Link>, ? extends Link> outLinks = node.getOutLinks();
-			double lineSegmentDistance;
-
-			for (Link linkCandidate : outLinks.values()) {
-				lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
-				if (lineSegmentDistance < maxLinkDistance) {
-					closestLinks.add(linkCandidate);
-				}
-			}
-		}
-		return closestLinks;
-	}
-
-
-	public static void visualizeWeightsAsLanes(Network network, Map<Id<Link>, Double> routeLinkWeights) {
-		for(Map.Entry<Id<Link>, Double> w : routeLinkWeights.entrySet()) {
+	public static void visualizeWeightsAsLanes(Network network, Map<Id<Link>, Double> weightMap) {
+		for(Map.Entry<Id<Link>, Double> w : weightMap.entrySet()) {
 			network.getLinks().get(w.getKey()).setNumberOfLanes(w.getValue());
 		}
 	}
+
+
+	/**
+	 * Adds a node on the splitPointCoordinates and splits the link into two new links
+	 * @param network network the operations runs on, is modified.
+	 * @param linkId of the link which should be split
+	 * @param splitPointCoordinates of the point where the link should be separated. Practically the link is removed
+	 *                              and two new links connecting the nodes are added. The splitPoint is moved onto the link.
+	 * @param newObjectPrefix prefix for new the link and node (default: "split_")
+	 */
+	public static void splitLink(Network network, Id<Link> linkId, Coord splitPointCoordinates, String newObjectPrefix) {
+		String prefix;
+
+		if(newObjectPrefix == null) {
+			prefix = "split_";
+		} else {
+			prefix = newObjectPrefix;
+		}
+
+		int intId = 0;
+
+		Link link = network.getLinks().get(linkId);
+
+		Coord coordinatesOnLink = getClosestPointOnLine(link, splitPointCoordinates);
+
+		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(network);
+
+		String newNodeIdString = link.getFromNode().getId().toString()+"_"+link.getToNode().getId().toString();
+		String newLinkIdString = newNodeIdString+"_"+linkId.toString();
+
+		while(network.getNodes().containsKey(Id.createNodeId(prefix+intId))) { intId++; }
+		while(network.getLinks().containsKey(Id.createLinkId(prefix+intId))) { intId++; }
+
+		Node newNode = networkFactory.createNode(Id.createNodeId(prefix+intId), coordinatesOnLink);
+		Link newLink = networkFactory.createLink(Id.createLinkId(prefix+intId), newNode, link.getToNode());
+		newLink.setLength(CoordUtils.calcEuclideanDistance(newNode.getCoord(), link.getToNode().getCoord()));
+		newLink.setAllowedModes(link.getAllowedModes());
+		newLink.setCapacity(link.getCapacity());
+		newLink.setFreespeed(link.getFreespeed());
+		newLink.setNumberOfLanes(link.getNumberOfLanes());
+
+		network.addNode(newNode);
+		network.addLink(newLink);
+
+		link.setToNode(newNode);
+		link.setLength(CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), newNode.getCoord()));
+	}
+
 }

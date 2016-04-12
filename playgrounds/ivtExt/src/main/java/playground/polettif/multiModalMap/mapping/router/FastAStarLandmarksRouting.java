@@ -43,12 +43,12 @@ import java.util.Map;
  *
  * @author boescpa
  */
-public class PTLRFastAStarLandmarksSimpleRouting implements PTLRouter {
+public class FastAStarLandmarksRouting implements Router {
 
     private final LeastCostPathCalculator pathCalculator;
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths = new HashMap<>();
 
-    public PTLRFastAStarLandmarksSimpleRouting(Network network) {
+    public FastAStarLandmarksRouting(Network network) {
         LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
         this.pathCalculator = factory.createPathCalculator(network, this, this);
 		// Suppress "no route found" statements...

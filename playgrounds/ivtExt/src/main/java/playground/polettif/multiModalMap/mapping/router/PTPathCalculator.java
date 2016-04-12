@@ -36,6 +36,7 @@ import java.util.List;
 /**
  *
  */
+@Deprecated
 public class PTPathCalculator implements TravelTime, TravelDisutility {
 
 	protected static Logger log = Logger.getLogger(PTPathCalculator.class);

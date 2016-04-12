@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class LinkWeightCalculator {
 
 	protected static Logger log = Logger.getLogger(LinkWeightCalculator.class);
@@ -73,25 +74,6 @@ public class LinkWeightCalculator {
 			 * for the link candidates of the first and last stop
 			 */
 			for (Id<Link> linkId : ptPath.getLinkCandidateIds()) {
-				MapUtils.addToDouble(linkId, weights, pathWeight, pathWeight);
-			}
-		}
-
-		return weights;
-	}
-
-	@Deprecated
-	public Map<Id<Link>, Double> getLinkWeightsMinTTrelative() {
-
-		for(PTPath ptPath : ptPaths.values()) {
-
-			int nStops = getNumberOfStopsInBetween(ptPath);
-
-			double minTT = minTTs.get(ptPath.getStopPair());
-
-			double pathWeight = 100*ptPath.getTravelTime()/minTT;
-
-			for(Id<Link> linkId : ptPath.getLinkIds()) {
 				MapUtils.addToDouble(linkId, weights, pathWeight, pathWeight);
 			}
 		}

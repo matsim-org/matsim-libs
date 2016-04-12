@@ -34,6 +34,7 @@ import java.util.List;
  *
  * @author polettif
  */
+@Deprecated
 public interface PTPath {
 
 	/**
