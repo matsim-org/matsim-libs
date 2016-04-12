@@ -49,9 +49,9 @@ public class DetailedTaxiStatsCalculator
     private final DailyHistograms dailyHistograms;
 
 
-    public DetailedTaxiStatsCalculator(Iterable<? extends Vehicle> vehicles, int hours)
+    public DetailedTaxiStatsCalculator(Iterable<? extends Vehicle> vehicles)
     {
-        this.hours = hours;
+        hours = calcHours(vehicles);
 
         hourlyStats = new HourlyTaxiStats[hours];
         hourlyHistograms = new HourlyHistograms[hours];
@@ -66,6 +66,20 @@ public class DetailedTaxiStatsCalculator
         for (Vehicle v : vehicles) {
             updateHourlyStatsForVehicle(v);
         }
+    }
+
+
+    private int calcHours(Iterable<? extends Vehicle> vehicles)
+    {
+        double maxEndTime = 0;
+        for (Vehicle v : vehicles) {
+            double endTime = v.getSchedule().getEndTime();
+            if (endTime > maxEndTime) {
+                maxEndTime = endTime;
+            }
+        }
+
+        return (int)Math.ceil(maxEndTime / 3600);
     }
 
 
@@ -84,12 +98,6 @@ public class DetailedTaxiStatsCalculator
     public DailyHistograms getDailyHistograms()
     {
         return dailyHistograms;
-    }
-
-
-    public int getHours()
-    {
-        return hours;
     }
 
 

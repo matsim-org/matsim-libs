@@ -22,6 +22,8 @@ package org.matsim.contrib.taxi.run;
 import org.matsim.contrib.dvrp.router.DynRoutingModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
+import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.vehicles.*;
 
@@ -34,18 +36,20 @@ public class TaxiModule
     public static final String TAXI_MODE = "taxi";
 
     private final TaxiData taxiData;
+    private final TaxiConfigGroup taxiCfg;
     private final VehicleType vehicleType;
 
 
-    public TaxiModule(TaxiData taxiData)
+    public TaxiModule(TaxiData taxiData, TaxiConfigGroup taxiCfg)
     {
-        this(taxiData, VehicleUtils.getDefaultVehicleType());
+        this(taxiData, taxiCfg, VehicleUtils.getDefaultVehicleType());
     }
 
 
-    public TaxiModule(TaxiData taxiData, VehicleType vehicleType)
+    public TaxiModule(TaxiData taxiData, TaxiConfigGroup taxiCfg, VehicleType vehicleType)
     {
         this.taxiData = taxiData;
+        this.taxiCfg = taxiCfg;
         this.vehicleType = vehicleType;
     }
 
@@ -57,5 +61,12 @@ public class TaxiModule
         bind(TaxiData.class).toInstance(taxiData);
         bind(VehicleType.class).annotatedWith(Names.named(TAXI_MODE)).toInstance(vehicleType);
         bind(TaxiOptimizerFactory.class).to(DefaultTaxiOptimizerFactory.class);
+        
+        addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
+        addControlerListenerBinding().to(TaxiStatsDumper.class);
+        
+        if (taxiCfg.getDetailedStats()) {
+            addControlerListenerBinding().to(DetailedTaxiStatsDumper.class);
+        }
     }
 }

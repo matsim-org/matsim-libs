@@ -17,41 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package playground.michalm.taxi;
 
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-
-import com.google.inject.Inject;
+import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 
 
-public class DetailedTaxiStatsDumper
-    implements AfterMobsimListener
+public class RunAudiAV
 {
-    private final TaxiData taxiData;
-    private final OutputDirectoryHierarchy controlerIO;
-
-
-    @Inject
-    public DetailedTaxiStatsDumper(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
+    public static void main(String[] args)
     {
-        this.taxiData = taxiData;
-        this.controlerIO = controlerIO;
-    }
-
-
-    @Override
-    public void notifyAfterMobsim(AfterMobsimEvent event)
-    {
-        String prefix = controlerIO.getIterationFilename(event.getIteration(), "taxi_");
-
-        DetailedTaxiStatsCalculator calculator = new DetailedTaxiStatsCalculator(
-                taxiData.getVehicles().values());
-        HourlyTaxiStats.printAllStats(calculator.getStats(), prefix + "hourly_stats.txt");
-        HourlyHistograms.printAllHistograms(calculator.getHourlyHistograms(),
-                prefix + "hourly_histograms.txt");
-        calculator.getDailyHistograms().printHistograms(prefix + "daily_histograms.txt");
+        RunTaxiBenchmark.run(args[0], 1);
     }
 }

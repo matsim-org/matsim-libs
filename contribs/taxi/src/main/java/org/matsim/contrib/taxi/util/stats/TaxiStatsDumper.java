@@ -23,23 +23,27 @@ import java.io.PrintWriter;
 import java.util.*;
 
 import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.utils.io.IOUtils;
+
+import com.google.inject.Inject;
 
 
 public class TaxiStatsDumper
     implements AfterMobsimListener, ShutdownListener
 {
     private final TaxiData taxiData;
-    private final String outputDir;
+    private final OutputDirectoryHierarchy controlerIO;
     private final List<TaxiStats> stats = new ArrayList<>();
 
 
-    public TaxiStatsDumper(TaxiData taxiData, String outputDir)
+    @Inject
+    public TaxiStatsDumper(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
     {
         this.taxiData = taxiData;
-        this.outputDir = outputDir;
+        this.controlerIO = controlerIO;
     }
 
 
@@ -53,7 +57,8 @@ public class TaxiStatsDumper
     @Override
     public void notifyShutdown(ShutdownEvent event)
     {
-        PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(outputDir + "/taxi_stats.txt"));
+        PrintWriter pw = new PrintWriter(
+                IOUtils.getBufferedWriter(controlerIO.getOutputFilename("taxi_stats.txt")));
         pw.println("iter\t" + TaxiStats.HEADER);
         for (int i = 0; i < stats.size(); i++) {
             pw.println(i + "\t" + stats.get(i));

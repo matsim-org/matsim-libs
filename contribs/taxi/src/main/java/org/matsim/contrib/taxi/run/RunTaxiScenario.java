@@ -26,8 +26,6 @@ import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,21 +53,12 @@ public class RunTaxiScenario
         new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new TaxiModule(taxiData));
+        controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
         if (otfvis) {
             controler.addOverridingModule(new OTFVisLiveModule());
-        }
-
-        controler.addControlerListener(new TaxiSimulationConsistencyChecker(taxiData));
-
-        String outputDir = config.controler().getOutputDirectory();
-        controler.addControlerListener(new TaxiStatsDumper(taxiData, outputDir));
-
-        if (taxiCfg.getDetailedStats()) {
-            controler.addControlerListener(new DetailedTaxiStatsDumper(taxiData, controler, 30));
         }
 
         return controler;

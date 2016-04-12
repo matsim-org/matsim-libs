@@ -5,16 +5,19 @@ import java.io.PrintWriter;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.utils.io.IOUtils;
+
+import com.google.inject.Inject;
 
 
 public class TaxiBenchmarkStats
     implements AfterMobsimListener, ShutdownListener
 
 {
-    static final String HEADER = "cfg\tn\tm\t"//
+    static final String HEADER = "n\tm\t"//
             + "PassWait\t"//
             + "PassWait_p95\t"//
             + "PassWait_max\t"//
@@ -22,8 +25,7 @@ public class TaxiBenchmarkStats
             + "EmptyRatio\t";
 
     private final TaxiData taxiData;
-    private final String outputDir;
-    private final String id;
+    private final OutputDirectoryHierarchy controlerIO;
 
     private final SummaryStatistics passengerWaitTime = new SummaryStatistics();
     private final SummaryStatistics pc95PassengerWaitTime = new SummaryStatistics();
@@ -33,11 +35,11 @@ public class TaxiBenchmarkStats
     private final SummaryStatistics driveEmptyRatio = new SummaryStatistics();
 
 
-    public TaxiBenchmarkStats(TaxiData taxiData, String outputDir, String id)
+    @Inject
+    public TaxiBenchmarkStats(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
     {
         this.taxiData = taxiData;
-        this.outputDir = outputDir;
-        this.id = id;
+        this.controlerIO = controlerIO;
     }
 
 
@@ -60,13 +62,12 @@ public class TaxiBenchmarkStats
     public void notifyShutdown(ShutdownEvent event)
     {
         PrintWriter pw = new PrintWriter(
-                IOUtils.getBufferedWriter(outputDir + "/benchmark_stats_" + id + ".txt"));
+                IOUtils.getBufferedWriter(controlerIO.getOutputFilename("benchmark_stats.txt")));
         pw.println(HEADER);
         pw.printf(
-                "%20s\t%d\t%d\t"//
+                "%d\t%d\t"//
                         + "%.0f\t%.0f\t%.0f\t"//
                         + "%.0f\t%.2f\t", //
-                id, //
                 taxiData.getRequests().size(), //
                 taxiData.getVehicles().size(), //
                 //
@@ -76,7 +77,7 @@ public class TaxiBenchmarkStats
                 //
                 driveOccupiedTime.getMean(), //
                 driveEmptyRatio.getMean() * 100); //in [%]
-        
+
         pw.close();
     }
 }
