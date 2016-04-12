@@ -8,6 +8,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import playground.balmermi.datapuls.CBPopulationPreparation;
 import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBPop;
 import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateSingleTripPopulation;
 import playground.boescpa.ivtBaseline.preparation.freightCreation.CreateFreightTraffic;
@@ -104,6 +105,13 @@ public class IVTConfigCreator {
 		config.transitRouter().setSearchRadius(2000.0);
 		PlanCalcScoreConfigGroup.ModeParams transitWalkSet = getModeParamsTransitWalk(config);
 		transitWalkSet.setMarginalUtilityOfTraveling(-12.0);
+		// Add scoring for subpopulations
+		PlanCalcScoreConfigGroup.ScoringParameterSet scoringParams = config.planCalcScore().getOrCreateScoringParameters(null);
+		scoringParams.getOrCreateActivityParams("cbHome").setScoringThisActivityAtAll(false);
+		scoringParams.getOrCreateActivityParams("cbWork").setScoringThisActivityAtAll(false);
+		scoringParams.getOrCreateActivityParams("cbShop").setScoringThisActivityAtAll(false);
+		scoringParams.getOrCreateActivityParams("cbLeisure").setScoringThisActivityAtAll(false);
+		scoringParams.getOrCreateActivityParams("freight").setScoringThisActivityAtAll(false);
         // Set threads to NUMBER_OF_THREADS
 		config.global().setNumberOfThreads(NUMBER_OF_THREADS);
 		config.parallelEventHandling().setNumberOfThreads(NUMBER_OF_THREADS);
