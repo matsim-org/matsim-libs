@@ -27,7 +27,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
  * @author wrashid
  *
  */
-public abstract class AbstractHybridElectricVehicle extends AbstractVehicleWithBattery {
+public abstract class AbstractHybridElectricVehicle extends VehicleWithBattery {
 
 	// TODO: implement both serial and hybrid versions
 	

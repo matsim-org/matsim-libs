@@ -74,7 +74,7 @@ public class ChargerImpl
             double actualCharge = chargeInJoule;
             double maximumSOC =  bev.getUsableBatteryCapacityInJoules();
             if ( chargeInJoule+bev.getSocInJoules() > maximumSOC ) actualCharge = maximumSOC-bev.getSocInJoules();
-            bev.chargeBattery(actualCharge);
+            bev.chargeVehicle(actualCharge);
             
         }   
     }

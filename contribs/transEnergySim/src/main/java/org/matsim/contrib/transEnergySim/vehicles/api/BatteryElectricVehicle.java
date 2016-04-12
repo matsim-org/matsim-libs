@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author wrashid
  * 
  */
-public abstract class BatteryElectricVehicle extends AbstractVehicleWithBattery {
+public abstract class BatteryElectricVehicle extends VehicleWithBattery {
 
 	/**
 	 * as electric vehicles can run out of battery during the simulation, this

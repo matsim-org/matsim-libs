@@ -31,7 +31,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
  * @author User
  * 
  */
-public abstract class AbstractVehicleWithBattery extends AbstractVehicle {
+public abstract class VehicleWithBattery extends AbstractVehicle {
 
 	/**
 	 * often not the full capacity of a battery can be used or is recommended to
@@ -46,9 +46,8 @@ public abstract class AbstractVehicleWithBattery extends AbstractVehicle {
 	protected double socInJoules;
 
 	protected EnergyConsumptionModel electricDriveEnergyConsumptionModel;
-    protected Id<Vehicle> vehicleId;
-	
-	
+	protected Id<Vehicle> vehicleId;
+
 	public double getRequiredEnergyInJoules() {
 		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules() - socInJoules;
 
@@ -72,15 +71,19 @@ public abstract class AbstractVehicleWithBattery extends AbstractVehicle {
 	 * 
 	 * @param energyChargeInJoule
 	 */
-	public void chargeBattery(double energyChargeInJoule) {
+	public void chargeVehicle(double energyChargeInJoule) {
 		if (!ignoreOverCharging) {
 			socInJoules += energyChargeInJoule;
 			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100)
 					&& socInJoules > getUsableBatteryCapacityInJoules()) {
-				DebugLib.stopSystemAndReportInconsistency("the car has been overcharged" + socInJoules + " but MC"
-						+ getUsableBatteryCapacityInJoules());
+				DebugLib.stopSystemAndReportInconsistency(
+						"the car has been overcharged" + socInJoules + " but MC" + getUsableBatteryCapacityInJoules());
 			}
 		}
+	}
+	
+	public void chargeVehicle(double duration, double chargerPowerInWatt){
+		chargeVehicle(duration*chargerPowerInWatt);
 	}
 
 	public double getUsableBatteryCapacityInJoules() {
@@ -93,13 +96,16 @@ public abstract class AbstractVehicleWithBattery extends AbstractVehicle {
 	}
 
 	public void ignoreOverCharging(boolean ignoreOverCharging) {
-		this.ignoreOverCharging=ignoreOverCharging;
+		this.ignoreOverCharging = ignoreOverCharging;
 	}
-	   @Override
-	    public Id<Vehicle> getId()
-	    {
-	        return this.vehicleId;
-	    }
 
+	@Override
+	public Id<Vehicle> getId() {
+		return this.vehicleId;
+	}
 
+	public double calcEndCharingTimeOfVehicle(double curTime, double chargerPowerInWatt){
+		return curTime + getRequiredEnergyInJoules()/chargerPowerInWatt;
+	}
+	
 }
