@@ -12,22 +12,25 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-public class ChargingEventManager extends EventManager<EVSimEngineEventHandler> {
-	EventManagerDelegate delegate;
+public abstract class ChargingEventManager extends EventManager<EVSimEngineEventHandler> {
+	protected EventManagerDelegate delegate;
 	HashMap<Id<Person>, Id<Vehicle>> personToVehicleMapping;
 
-	public ChargingEventManager(HashMap<Id<Person>, Id<Vehicle>> personToVehicleMapping, Controler controler, QSim qsim,
+	//TODO: create global method for mapping person to vehicle. it should be able to overwrite it (e.g. one to one mapping of ids).
+	public ChargingEventManager(HashMap<Id<Person>, Id<Vehicle>> personToVehicleMapping, Controler controler,
 			HashSet<String> travelModeFilter) {
 		this.personToVehicleMapping = personToVehicleMapping;
 		delegate = new EventManagerDelegate(this, personToVehicleMapping, travelModeFilter);
 		handlers = new LinkedList<>();
 		controler.getEvents().addHandler(delegate);
-		qsim.addMobsimEngine(delegate);
 	}
 
 	public void processVehicleDepartureEvent(double time, Id<Vehicle> vehicleId) {
@@ -47,7 +50,7 @@ public class ChargingEventManager extends EventManager<EVSimEngineEventHandler> 
 			handler.handleTimeStep(time);
 		}
 	}
-
+	
 	private class EventManagerDelegate implements PersonArrivalEventHandler, PersonDepartureEventHandler, MobsimEngine {
 
 		private ChargingEventManager chargingEventManager;
@@ -92,15 +95,29 @@ public class ChargingEventManager extends EventManager<EVSimEngineEventHandler> 
 
 		@Override
 		public void handleEvent(PersonDepartureEvent event) {
+			Id<Vehicle> vehicleId = getVehicleId(event.getPersonId());
+			
 			if (travelModeFilter.contains(event.getLegMode())) {
-				chargingEventManager.processVehicleDepartureEvent(event.getTime(), personToVehicleMapping.get(event.getPersonId()));
+				chargingEventManager.processVehicleDepartureEvent(event.getTime(), vehicleId);
 			}
+		}
+
+		private Id<Vehicle> getVehicleId(Id<Person> id) {
+			Id<Vehicle> vehicleId;
+			if (personToVehicleMapping==null){
+				vehicleId=Id.create(id, Vehicle.class);
+			} else {
+				vehicleId=personToVehicleMapping.get(id);
+			}
+			return vehicleId;
 		}
 
 		@Override
 		public void handleEvent(PersonArrivalEvent event) {
+			Id<Vehicle> vehicleId = getVehicleId(event.getPersonId());
+			
 			if (travelModeFilter.contains(event.getLegMode())) {
-				chargingEventManager.processVehicleArrivalEvent(event.getTime(), personToVehicleMapping.get(event.getPersonId()));
+				chargingEventManager.processVehicleArrivalEvent(event.getTime(), vehicleId);
 			}
 		}
 

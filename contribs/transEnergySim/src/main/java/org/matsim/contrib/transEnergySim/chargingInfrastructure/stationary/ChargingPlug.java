@@ -3,10 +3,11 @@ package org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.transEnergySim.vehicles.api.VehicleWithBattery;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 
-public interface ChargingPlug {
+public interface ChargingPlug extends Identifiable<ChargingPlug> {
 
 	double getChargingPowerInWatt(); 
 	

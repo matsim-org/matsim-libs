@@ -8,5 +8,6 @@ public interface ChargingEventHandler {
 
 	void handleStartChargingEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId);
 	void handleEndChargingEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId);
+	void handleTimeStep(double time);
 
 }

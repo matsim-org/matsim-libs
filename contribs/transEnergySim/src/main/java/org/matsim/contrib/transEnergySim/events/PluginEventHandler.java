@@ -7,17 +7,23 @@ import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 public abstract class PluginEventHandler extends EventManager<ChargingEventHandler> {
 
 	public abstract void handlePluginEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId);
-	public abstract void handleUnplugEvent(double time, Id<Vehicle> vehicleId);
+	public abstract void handleUnplugEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId);
 	
-	public void processPlugVehicleEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId) {
+	public void processStartChargingEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId) {
 		for (ChargingEventHandler handler : handlers) {
 			handler.handleStartChargingEvent(time, vehicleId, plugId);
 		}
 	}
 
-	public void processUnPlugVehicleEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId){
+	public void processEndChargingEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId){
 		for (ChargingEventHandler handler : handlers) {
 			handler.handleEndChargingEvent(time, vehicleId, plugId);
+		}
+	}
+
+	public void handleTimeStep(double time) {
+		for (ChargingEventHandler handler : handlers) {
+			handler.handleTimeStep(time);
 		}
 	}
 	

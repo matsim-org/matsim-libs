@@ -20,9 +20,15 @@ public abstract class EVSimEngineEventHandler extends EventManager<PluginEventHa
 		}
 	}
 
-	public void processUnPlugVehicleEvent(double time, Id<Vehicle> vehicleId){
+	public void processUnPlugVehicleEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId){
 		for (PluginEventHandler handler : handlers) {
-			handler.handleUnplugEvent(time, vehicleId);
+			handler.handleUnplugEvent(time, vehicleId, plugId);
+		}
+	}
+	
+	public void processTimeStep(double time){
+		for (PluginEventHandler handler : handlers) {
+			handler.handleTimeStep(time);
 		}
 	}
 
