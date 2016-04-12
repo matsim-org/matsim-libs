@@ -11,6 +11,9 @@
 		<param name="taxisFile" value="src/main/resources/mielec_2014_02/taxis-25.xml" />
 		<!-- param name="taxisFile" value="src/main/resources/mielec_2014_02/taxis-50.xml" / -->
 
+		<param name="timeProfiles" value="true" />
+		<param name="detailedStats" value="true" />
+
 		<parameterset type="optimizer">
 			<param name="type" value="RULE_BASED" />
 			<param name="id" value="example" />

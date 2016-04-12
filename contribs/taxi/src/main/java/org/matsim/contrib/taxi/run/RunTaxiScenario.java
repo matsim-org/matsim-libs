@@ -64,12 +64,12 @@ public class RunTaxiScenario
         }
 
         controler.addControlerListener(new TaxiSimulationConsistencyChecker(taxiData));
-        controler.addControlerListener(
-                new TaxiStatsDumper(taxiData, config.controler().getOutputDirectory()));
 
-        if (taxiCfg.getDetailedTaxiStatsDir() != null) {
-            controler.addControlerListener(
-                    new DetailedTaxiStatsDumper(taxiData, taxiCfg.getDetailedTaxiStatsDir(), 30));
+        String outputDir = config.controler().getOutputDirectory();
+        controler.addControlerListener(new TaxiStatsDumper(taxiData, outputDir));
+
+        if (taxiCfg.getDetailedStats()) {
+            controler.addControlerListener(new DetailedTaxiStatsDumper(taxiData, controler, 30));
         }
 
         return controler;
@@ -78,8 +78,8 @@ public class RunTaxiScenario
 
     public static void main(String[] args)
     {
-        //        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
-        String configFile = "./src/main/resources/mielec_2014_02/config.xml";
+        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
+        //String configFile = "./src/main/resources/mielec_2014_02/config.xml";
         RunTaxiScenario.run(configFile, true);
     }
 }

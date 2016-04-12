@@ -17,12 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.dvrp.router;
 
 import java.io.PrintWriter;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.matsim.contrib.dvrp.router.LeastCostPathCalculatorWithCache;
 
 
 public class LeastCostPathCalculatorCacheStats

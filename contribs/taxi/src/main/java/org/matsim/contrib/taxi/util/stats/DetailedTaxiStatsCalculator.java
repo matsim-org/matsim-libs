@@ -25,7 +25,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.schedule.*;
 
 
-public class HourlyTaxiStatsCalculator
+public class DetailedTaxiStatsCalculator
 {
     private static class HourlyVehicleStats
     {
@@ -49,7 +49,7 @@ public class HourlyTaxiStatsCalculator
     private final DailyHistograms dailyHistograms;
 
 
-    public HourlyTaxiStatsCalculator(Iterable<? extends Vehicle> vehicles, int hours)
+    public DetailedTaxiStatsCalculator(Iterable<? extends Vehicle> vehicles, int hours)
     {
         this.hours = hours;
 

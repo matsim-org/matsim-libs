@@ -69,7 +69,7 @@ public class VrpTravelTimeModules
         return new AbstractModule() {
             public void install()
             {
-                if (!ttCalculatorEnabled) {
+                if (!ttCalculatorEnabled) {//overwriting the default calculator
                     bind(TravelTimeCalculator.class).to(InactiveTravelTimeCalculator.class);
                 }
 

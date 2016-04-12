@@ -54,9 +54,9 @@ public class TaxiStatsDumper
     public void notifyShutdown(ShutdownEvent event)
     {
         PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(outputDir + "/taxi_stats.txt"));
-        pw.println(TaxiStats.HEADER);
-        for (TaxiStats s : stats) {
-            pw.println(s);
+        pw.println("iter\t" + TaxiStats.HEADER);
+        for (int i = 0; i < stats.size(); i++) {
+            pw.println(i + "\t" + stats.get(i));
         }
         pw.close();
     }

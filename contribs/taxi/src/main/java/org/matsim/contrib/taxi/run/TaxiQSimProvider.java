@@ -33,9 +33,10 @@ import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.taxi.util.stats.*;
-import org.matsim.contrib.taxi.util.stats.StatsCollector.StatsCalculator;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.router.util.*;
@@ -59,13 +60,15 @@ public class TaxiQSimProvider
     private final VehicleType vehicleType;
     private final TaxiOptimizerFactory optimizerFactory;
 
+    private final MatsimServices matsimServices;
+
 
     @Inject
     public TaxiQSimProvider(Scenario scenario, EventsManager events,
             Collection<AbstractQSimPlugin> plugins, TaxiData taxiData,
             @Named(VrpTravelTimeModules.DVRP) TravelTime travelTime, TaxiConfigGroup taxiCfg,
             @Named(TaxiModule.TAXI_MODE) VehicleType vehicleType,
-            TaxiOptimizerFactory optimizerFactory)
+            TaxiOptimizerFactory optimizerFactory, MatsimServices matsimServices)
     {
         this.scenario = scenario;
         this.events = events;
@@ -75,6 +78,7 @@ public class TaxiQSimProvider
         this.taxiCfg = taxiCfg;
         this.vehicleType = vehicleType;
         this.optimizerFactory = optimizerFactory;
+        this.matsimServices = matsimServices;
     }
 
 
@@ -98,7 +102,7 @@ public class TaxiQSimProvider
                 vehicleType);
         qSim.addAgentSource(agentSource);
 
-        addTaxiOverTimeCounters(qSim);
+        addTimeProfileCollector(qSim);
         return qSim;
     }
 
@@ -136,17 +140,19 @@ public class TaxiQSimProvider
     }
 
 
-    private void addTaxiOverTimeCounters(QSim qSim)
+    //TODO move outside QSimProvider
+    private void addTimeProfileCollector(QSim qSim)
     {
-        if (taxiCfg.getTaxiStatsFile() != null) {
-            StatsCalculator<String> dispatchStatsCalc = StatsCalculators.combineStatsCalculators(
-                    StatsCalculators.createCurrentTaxiTaskOfTypeCounter(taxiData), //
-                    StatsCalculators.createRequestsWithStatusCounter(taxiData,
+        if (taxiCfg.getTimeProfiles()) {
+            ProfileCalculator<String> dispatchStatsCalc = TimeProfiles.combineProfileCalculators(
+                    TimeProfiles.createCurrentTaxiTaskOfTypeCounter(taxiData), //
+                    TimeProfiles.createRequestsWithStatusCounter(taxiData,
                             TaxiRequestStatus.UNPLANNED));
-            qSim.addQueueSimulationListeners(new StatsCollector<>(dispatchStatsCalc, 300,
-                    StatsCalculators.TAXI_TASK_TYPES_HEADER + //
+
+            qSim.addQueueSimulationListeners(new TimeProfileCollector<>(dispatchStatsCalc, 300,
+                    TimeProfiles.TAXI_TASK_TYPES_HEADER + //
                             TaxiRequestStatus.UNPLANNED, //
-                    taxiCfg.getTaxiStatsFile()));
+                    matsimServices));
         }
     }
 }

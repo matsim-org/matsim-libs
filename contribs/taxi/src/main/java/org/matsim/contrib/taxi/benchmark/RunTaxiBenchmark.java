@@ -27,6 +27,7 @@ import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
+import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.*;
@@ -66,9 +67,15 @@ public class RunTaxiBenchmark
 
         controler.addControlerListener(new TaxiSimulationConsistencyChecker(taxiData));
 
+        String outputDir = config.controler().getOutputDirectory();
+        controler.addControlerListener(new TaxiStatsDumper(taxiData, outputDir));
+
+        if (taxiCfg.getDetailedStats()) {
+            controler.addControlerListener(new DetailedTaxiStatsDumper(taxiData, controler, 30));
+        }
+
         String id = taxiCfg.getOptimizerConfigGroup().getValue(AbstractTaxiOptimizerParams.ID);
-        controler.addControlerListener(
-                new TaxiBenchmarkStats(taxiData, config.controler().getOutputDirectory(), id));
+        controler.addControlerListener(new TaxiBenchmarkStats(taxiData, outputDir, id));
 
         controler.run();
     }

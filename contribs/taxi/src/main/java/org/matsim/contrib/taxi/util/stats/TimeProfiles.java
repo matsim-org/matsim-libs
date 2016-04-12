@@ -28,24 +28,24 @@ import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
-import org.matsim.contrib.taxi.util.stats.StatsCollector.StatsCalculator;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.EnumCounter;
 
 import com.google.common.collect.Iterables;
 
 
-public class StatsCalculators
+public class TimeProfiles
 {
-    public static StatsCalculator<String> combineStatsCalculators(
-            final StatsCalculator<?>... calculators)
+    public static ProfileCalculator<String> combineProfileCalculators(
+            final ProfileCalculator<?>... calculators)
     {
-        return new StatsCalculator<String>() {
+        return new ProfileCalculator<String>() {
             @Override
-            public String calculateStat()
+            public String calcCurrentPoint()
             {
                 String s = "";
-                for (StatsCalculator<?> sc : calculators) {
-                    s += sc.calculateStat() + "\t";
+                for (ProfileCalculator<?> pc : calculators) {
+                    s += pc.calcCurrentPoint() + "\t";
                 }
                 return s;
             }
@@ -53,30 +53,28 @@ public class StatsCalculators
     }
 
 
-    public static StatsCalculator<Integer> createIdleVehicleCounter(
+    public static ProfileCalculator<Integer> createIdleVehicleCounter(
             final TaxiOptimizerContext optimContext)
     {
-        return new StatsCalculator<Integer>() {
+        return new ProfileCalculator<Integer>() {
             @Override
-            public Integer calculateStat()
+            public Integer calcCurrentPoint()
             {
-                return Iterables.size(
-                        Iterables.filter(optimContext.taxiData.getVehicles().values(),
-                                TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
+                return Iterables.size(Iterables.filter(optimContext.taxiData.getVehicles().values(),
+                        TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
             }
         };
     }
 
-    
-    public static final String TAXI_TASK_TYPES_HEADER = combineValues(TaxiTaskType.values());
-    
 
-    public static StatsCalculator<String> createCurrentTaxiTaskOfTypeCounter(
-            final VrpData taxiData)
+    public static final String TAXI_TASK_TYPES_HEADER = combineValues(TaxiTaskType.values());
+
+
+    public static ProfileCalculator<String> createCurrentTaxiTaskOfTypeCounter(final VrpData taxiData)
     {
-        return new StatsCalculator<String>() {
+        return new ProfileCalculator<String>() {
             @Override
-            public String calculateStat()
+            public String calcCurrentPoint()
             {
                 EnumCounter<TaxiTaskType> counter = new EnumCounter<>(TaxiTaskType.class);
 
@@ -108,12 +106,12 @@ public class StatsCalculators
     }
 
 
-    public static StatsCalculator<Integer> createRequestsWithStatusCounter(final TaxiData taxiData,
+    public static ProfileCalculator<Integer> createRequestsWithStatusCounter(final TaxiData taxiData,
             final TaxiRequestStatus requestStatus)
     {
-        return new StatsCalculator<Integer>() {
+        return new ProfileCalculator<Integer>() {
             @Override
-            public Integer calculateStat()
+            public Integer calcCurrentPoint()
             {
                 return TaxiRequests.countRequestsWithStatus(taxiData.getTaxiRequests().values(),
                         requestStatus);

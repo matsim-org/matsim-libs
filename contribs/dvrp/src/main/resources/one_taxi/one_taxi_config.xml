@@ -28,12 +28,12 @@
 		<param name="outputDirectory" value="test/output/one_taxi" />
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="0" />
+		<param name="lastIteration" value="2" />
 	</module>
 
 	<module name="planCalcScore">
 		<param name="activityType_0" value="dummy" />
-		<param name="activityTypicalDuration_0" value="23:59:00" />
+		<param name="activityTypicalDuration_0" value="24:00:00" />
 	</module>
 
 	<module name="strategy">

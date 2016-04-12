@@ -22,69 +22,59 @@ package org.matsim.contrib.taxi.util.stats;
 import java.io.PrintWriter;
 import java.util.*;
 
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.*;
 import org.matsim.core.mobsim.framework.listeners.*;
 import org.matsim.core.utils.io.IOUtils;
 
 
-public class StatsCollector<T>
+public class TimeProfileCollector<T>
     implements MobsimBeforeSimStepListener, MobsimBeforeCleanupListener
 {
-    public interface StatsCalculator<S>
+    public interface ProfileCalculator<S>
     {
-        S calculateStat();
+        S calcCurrentPoint();
     }
 
 
-    private final StatsCalculator<T> calculator;
-    private final List<T> stats = new ArrayList<>();
-    private final int step;
-    private final String name;
-    private final String file;
+    private final ProfileCalculator<T> calculator;
+    private final List<T> timeProfile = new ArrayList<>();
+    private final int interval;
+    private final String header;
+    private final MatsimServices matsimServices;
 
 
-    public StatsCollector(StatsCalculator<T> calculator, int step, String name)
-    {
-        this(calculator, step, name, null);
-    }
-
-
-    public StatsCollector(StatsCalculator<T> calculator, int step, String name, String file)
+    public TimeProfileCollector(ProfileCalculator<T> calculator, int interval, String header,
+            MatsimServices matsimServices)
     {
         this.calculator = calculator;
-        this.step = step;
-        this.name = name;
-        this.file = file;
-    }
-
-
-    public List<T> getStats()
-    {
-        return stats;
+        this.interval = interval;
+        this.header = header;
+        this.matsimServices = matsimServices;
     }
 
 
     @Override
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
-        if (e.getSimulationTime() % step == 0) {
-            stats.add(calculator.calculateStat());
+        if (e.getSimulationTime() % interval == 0) {
+            timeProfile.add(calculator.calcCurrentPoint());
         }
     }
 
 
     @Override
-    public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
+    public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e)
     {
-        PrintWriter pw = file != null ? new PrintWriter(IOUtils.getBufferedWriter(file))
-                : new PrintWriter(System.out);
+        PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(matsimServices.getControlerIO()
+                .getIterationFilename(matsimServices.getIterationNumber(), "taxi_time_profiles.txt")));
 
-        pw.println("time\t" + name);
+        pw.println("time\t" + header);
 
-        for (int i = 0; i < stats.size(); i++) {
-            pw.println(i * step + "\t" + stats.get(i));
+        for (int i = 0; i < timeProfile.size(); i++) {
+            pw.println(i * interval + "\t" + timeProfile.get(i));
         }
-        
+
         pw.close();
     }
 }

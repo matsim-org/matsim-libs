@@ -20,6 +20,7 @@
 package org.matsim.contrib.taxi.util.stats;
 
 import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
@@ -28,14 +29,14 @@ public class DetailedTaxiStatsDumper
     implements AfterMobsimListener
 {
     private final TaxiData taxiData;
-    private final String outputDir;
+    private final MatsimServices matsimServices;
     private final int hours;
 
 
-    public DetailedTaxiStatsDumper(TaxiData taxiData, String outputDir, int hours)
+    public DetailedTaxiStatsDumper(TaxiData taxiData, MatsimServices matsimServices, int hours)
     {
         this.taxiData = taxiData;
-        this.outputDir = outputDir;
+        this.matsimServices = matsimServices;
         this.hours = hours;
     }
 
@@ -43,14 +44,14 @@ public class DetailedTaxiStatsDumper
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event)
     {
-        String suffix = "_" + event.getIteration() + ".txt";
-        HourlyTaxiStatsCalculator calculator = new HourlyTaxiStatsCalculator(
+        String prefix = matsimServices.getControlerIO().getIterationFilename(event.getIteration(),
+                "taxi_");
+
+        DetailedTaxiStatsCalculator calculator = new DetailedTaxiStatsCalculator(
                 taxiData.getVehicles().values(), hours);
-        HourlyTaxiStats.printAllStats(calculator.getStats(),
-                outputDir + "/hourly_stats_run" + suffix);
+        HourlyTaxiStats.printAllStats(calculator.getStats(), prefix + "hourly_stats.txt");
         HourlyHistograms.printAllHistograms(calculator.getHourlyHistograms(),
-                outputDir + "/hourly_histograms_run" + suffix);
-        calculator.getDailyHistograms()
-                .printHistograms(outputDir + "/daily_histograms_run" + suffix);
+                prefix + "hourly_histograms.txt");
+        calculator.getDailyHistograms().printHistograms(prefix + "daily_histograms.txt");
     }
 }

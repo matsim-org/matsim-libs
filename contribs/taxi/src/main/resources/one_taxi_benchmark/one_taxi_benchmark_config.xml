@@ -10,6 +10,9 @@
 
 		<param name="taxisFile" value="../dvrp/src/main/resources/one_taxi/one_taxi_vehicles.xml" />
 
+		<param name="timeProfiles" value="true" />
+		<param name="detailedStats" value="true" />
+
 		<parameterset type="optimizer">
 			<param name="type" value="RULE_BASED" />
 			<param name="id" value="example" />
@@ -46,7 +49,7 @@
 
 	<module name="planCalcScore">
 		<param name="activityType_0" value="dummy" />
-		<param name="activityTypicalDuration_0" value="23:59:00" />
+		<param name="activityTypicalDuration_0" value="24:00:00" />
 	</module>
 
 	<module name="strategy">
