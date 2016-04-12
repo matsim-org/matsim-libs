@@ -42,6 +42,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
@@ -55,11 +56,11 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.*;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 
 import static playground.boescpa.ivtBaseline.preparation.IVTConfigCreator.*;
 
@@ -114,12 +115,43 @@ public class ZHCutter {
 		F2LCreator.createF2L(filteredFacilities, filteredOnlyCarNetwork, cutterConfig.getPathToTargetFolder() + File.separator + FACILITIES2LINKS);
 		writeNewFiles(cutterConfig.getPathToTargetFolder() + File.separator, cutter.scenario,
 				filteredPopulation, filteredHouseholds, filteredFacilities, filteredSchedule, filteredVehicles, filteredNetwork);
+		cutter.cutPTCounts(filteredNetwork, cutterConfig);
+	}
+
+	private void cutPTCounts(Network filteredNetwork, ZHCutterConfigGroup cutterConfig) {
+		// ptStationCounts are manually cut...
+		final String fileName = File.separator + "ptLinkCountsIdentified.csv";
+		BufferedReader reader = IOUtils.getBufferedReader(cutterConfig.getPathToInputScenarioFolder() + fileName);
+		List<String> countsToKeep = new LinkedList<>();
+		BufferedWriter writer = IOUtils.getBufferedWriter(cutterConfig.getPathToTargetFolder() + fileName);
+		try {
+			countsToKeep.add(reader.readLine()); // header
+			String line = reader.readLine();
+			while (line != null) {
+				String[] lineElements = line.split(";");
+				Id<Link> linkId = Id.createLinkId(lineElements[0].trim());
+				if (filteredNetwork.getLinks().containsKey(linkId)
+						&& CoordUtils.calcEuclideanDistance(center, filteredNetwork.getLinks().get(linkId).getCoord()) <= radius - 5000) {
+							// we keep only counts well (5km) within the area (else border effects to strong)
+					countsToKeep.add(line);
+				}
+				line = reader.readLine();
+			}
+			reader.close();
+			for (String lineToWrite : countsToKeep) {
+				writer.write(lineToWrite);
+				writer.newLine();
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private Network getOnlyCarNetwork() {
 		Network carNetworkToKeep = NetworkUtils.createNetwork();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			if ((link.getAllowedModes().contains("car") && link.getCapacity() > 1000) || // we keep all arterial links
+			if ((link.getAllowedModes().contains("car") && link.getCapacity() >= 1000) || // we keep all arterial links
 					(CoordUtils.calcEuclideanDistance(center, link.getCoord()) <= radius + 5000)) { // and we keep all links within radius + 5km)
 				addLink(carNetworkToKeep, link);
 			}
