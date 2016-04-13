@@ -287,7 +287,7 @@ public class PreparationScript {
 		// add cb-facilities:
 		for (ActivityFacility facility : cbFacilities.getFacilities().values()) {
 			if (facility.getId().toString().contains(CreationOfCrossBorderFacilities.BC_TAG)) {
-				ActivityOption homeOption = facility.getActivityOptions().get(IVTConfigCreator.HOME);
+				ActivityOption homeOption = facility.getActivityOptions().get("cbHome");
 				homeOption.getOpeningTimes().clear();
 				fullyMergedFacilities.getFacilities().get(facility.getId()).addActivityOption(homeOption);
 			} else {
