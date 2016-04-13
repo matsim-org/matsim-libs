@@ -30,7 +30,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -44,16 +46,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.*;
 import org.matsim.households.*;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.*;
+import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBPop;
+import playground.boescpa.ivtBaseline.preparation.freightCreation.CreateFreightTraffic;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
 
 import java.io.BufferedReader;
@@ -81,8 +82,8 @@ public class ZHCutter {
 	private ZHCutter(ZHCutterConfigGroup cutterConfig) {
 		this.coordCache = new HashMap<>();
 		this.filteredAgents = new HashMap<>();
-		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final String pathToInputScenarioFolder = cutterConfig.getPathToInputScenarioFolder() + File.separator;
+		this.scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(pathToInputScenarioFolder + PreparationScript.CONFIG));
 		new PopulationReaderMatsimV5(scenario).readFile(pathToInputScenarioFolder + POPULATION);
 		new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).parse(pathToInputScenarioFolder + POPULATION_ATTRIBUTES);
 		new HouseholdsReaderV10(scenario.getHouseholds()).readFile(pathToInputScenarioFolder + HOUSEHOLDS);
@@ -111,11 +112,66 @@ public class ZHCutter {
 		Vehicles filteredVehicles = cutter.cleanVehicles(filteredSchedule);
 		Network filteredOnlyCarNetwork = cutter.getOnlyCarNetwork();
 		Network filteredNetwork = cutter.cutNetwork(filteredSchedule, filteredOnlyCarNetwork);
+		cutter.resetPopulation(filteredPopulation);
+		// adjust config
+		cutter.adjustConfig(cutterConfig);
 		// write new files
 		F2LCreator.createF2L(filteredFacilities, filteredOnlyCarNetwork, cutterConfig.getPathToTargetFolder() + File.separator + FACILITIES2LINKS);
 		writeNewFiles(cutterConfig.getPathToTargetFolder() + File.separator, cutter.scenario,
 				filteredPopulation, filteredHouseholds, filteredFacilities, filteredSchedule, filteredVehicles, filteredNetwork);
 		cutter.cutPTCounts(filteredNetwork, cutterConfig);
+	}
+
+	private void adjustConfig(ZHCutterConfigGroup cutterConfig) {
+		Config config = scenario.getConfig();
+		List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
+		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.5));
+		strategySettings.add(getStrategySetting("ReRoute", 0.2));
+		strategySettings.add(getStrategySetting("BlackListedTimeAllocationMutator", 0.1));
+		for (StrategyConfigGroup.StrategySettings strategy : strategySettings) {
+			strategy.setSubpopulation(cutterConfig.commuterTag);
+			config.getModule(StrategyConfigGroup.GROUP_NAME).addParameterSet(strategy);
+		}
+	}
+
+	private void resetPopulation(Population filteredPopulation) {
+		PopulationFactory factory = filteredPopulation.getFactory();
+		for (Person person : filteredPopulation.getPersons().values()) {
+			final Plan origPlan = person.getSelectedPlan();
+			// clean person completely and add cleaned plan
+			person.getPlans().clear();
+			final Plan newPlan = factory.createPlan();
+			person.addPlan(newPlan);
+			// create cleaned plan
+			boolean lastWasLeg = false;
+			for (PlanElement planElement : origPlan.getPlanElements()) {
+				if (planElement instanceof Activity) {
+					final Activity oldActivity = (Activity) planElement;
+					if (oldActivity.getType().equals("pt interaction")) {
+						continue;
+					}
+					final Coord actCoord = new Coord(oldActivity.getCoord().getX(), oldActivity.getCoord().getY());
+					final Activity activity = factory.createActivityFromCoord(oldActivity.getType(), actCoord);
+					activity.setEndTime(oldActivity.getEndTime());
+					activity.setMaximumDuration(oldActivity.getMaximumDuration());
+					activity.setStartTime(oldActivity.getStartTime());
+					if (oldActivity.getFacilityId() != null) {
+						final ActivityImpl activityImpl = (ActivityImpl) activity;
+						activityImpl.setFacilityId(Id.create(oldActivity.getFacilityId().toString(), ActivityFacility.class));
+					}
+					newPlan.addActivity(activity);
+					lastWasLeg = false;
+				} else if (planElement instanceof Leg && !lastWasLeg) {
+					final Leg oldLeg = (Leg) planElement;
+					if (oldLeg.getMode().equals("transit_walk")) {
+						newPlan.addLeg(factory.createLeg("pt"));
+					} else {
+						newPlan.addLeg(factory.createLeg(oldLeg.getMode()));
+					}
+					lastWasLeg = true;
+				}
+			}
+		}
 	}
 
 	private void cutPTCounts(Network filteredNetwork, ZHCutterConfigGroup cutterConfig) {
@@ -151,8 +207,8 @@ public class ZHCutter {
 	private Network getOnlyCarNetwork() {
 		Network carNetworkToKeep = NetworkUtils.createNetwork();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			if ((link.getAllowedModes().contains("car") && link.getCapacity() >= 1000) || // we keep all arterial links
-					(CoordUtils.calcEuclideanDistance(center, link.getCoord()) <= radius + 5000)) { // and we keep all links within radius + 5km)
+			if (link.getAllowedModes().contains("car") && (link.getCapacity() >= 1000 || // we keep all arterial links
+					(CoordUtils.calcEuclideanDistance(center, link.getCoord()) <= radius + 5000))) { // and we keep all links within radius + 5km)
 				addLink(carNetworkToKeep, link);
 			}
 		}
@@ -162,14 +218,7 @@ public class ZHCutter {
 
 	private Network cutNetwork(TransitSchedule filteredSchedule, Network filteredOnlyCarNetwork) {
 		Network filteredNetwork = NetworkUtils.createNetwork();
-		Set<Id<Link>> linksToKeep = new HashSet<>();
-		for (TransitLine transitLine : filteredSchedule.getTransitLines().values()) {
-			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
-					linksToKeep.add(linkId);
-				}
-			}
-		}
+		Set<Id<Link>> linksToKeep = getPTLinksToKeep(filteredSchedule);
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			if (linksToKeep.contains(link.getId()) || // we keep all links we need for pt
 					filteredOnlyCarNetwork.getLinks().containsKey(link.getId())) {
@@ -182,6 +231,20 @@ public class ZHCutter {
 			}
 		}
 		return filteredNetwork;
+	}
+
+	private Set<Id<Link>> getPTLinksToKeep(TransitSchedule filteredSchedule) {
+		Set<Id<Link>> linksToKeep = new HashSet<>();
+		for (TransitLine transitLine : filteredSchedule.getTransitLines().values()) {
+			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				linksToKeep.add(transitRoute.getRoute().getStartLinkId());
+				for (Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
+					linksToKeep.add(linkId);
+				}
+				linksToKeep.add(transitRoute.getRoute().getEndLinkId());
+			}
+		}
+		return linksToKeep;
 	}
 
 	private void addLink(Network network, Link link) {
@@ -262,6 +325,7 @@ public class ZHCutter {
 		new TransitScheduleWriter(filteredSchedule).writeFileV1(pathToTargetFolder + SCHEDULE);
 		new VehicleWriterV1(filteredVehicles).writeFile(pathToTargetFolder + VEHICLES);
 		new NetworkWriter(filteredNetwork).writeFileV1(pathToTargetFolder + NETWORK);
+		new ConfigWriter(scenario.getConfig()).writeFileV1(pathToTargetFolder + PreparationScript.CONFIG);
 	}
 
 	private Population geographicallyFilterPopulation() {

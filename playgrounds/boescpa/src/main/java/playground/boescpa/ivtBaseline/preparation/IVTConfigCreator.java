@@ -154,7 +154,7 @@ public class IVTConfigCreator {
         return strategySettings;
     }
 
-	protected StrategyConfigGroup.StrategySettings getStrategySetting(String strategyName, double strategyWeight) {
+	protected static StrategyConfigGroup.StrategySettings getStrategySetting(String strategyName, double strategyWeight) {
 		StrategyConfigGroup.StrategySettings strategySetting = new StrategyConfigGroup.StrategySettings();
 		strategySetting.setStrategyName(strategyName);
 		strategySetting.setWeight(strategyWeight);

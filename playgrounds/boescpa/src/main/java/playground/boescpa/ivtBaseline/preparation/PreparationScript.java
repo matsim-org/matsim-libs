@@ -58,7 +58,7 @@ public class PreparationScript {
     private static final String NETWORK_ONLYCAR = File.separator + "network_onlyCar.xml.gz";
     private static final String SECONDARY_FACILITIES = File.separator + "SecondaryFacilitiesInclBorder.xml.gz";
     // OTHER
-    private static final String CONFIG = File.separator + "defaultIVTConfig.xml";
+    protected static final String CONFIG = File.separator + "defaultIVTConfig.xml";
 	private static final String LC_CONFIG = File.separator + "lcIVTConfig.xml";
     private static final String FACILITIES2LINKS = File.separator + IVTConfigCreator.FACILITIES2LINKS;
 
