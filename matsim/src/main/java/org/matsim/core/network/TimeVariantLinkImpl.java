@@ -176,7 +176,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 */
 	@Override
 	public synchronized double getCapacity(final double time) {
-		return getFlowCapacityPerSec() * getCapacityPeriod();
+		return getFlowCapacityPerSec(time) * getCapacityPeriod();
 	}
 
 
