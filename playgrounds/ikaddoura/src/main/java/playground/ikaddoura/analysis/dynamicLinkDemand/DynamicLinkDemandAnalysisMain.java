@@ -56,7 +56,7 @@ public class DynamicLinkDemandAnalysisMain {
 		
 		Config config = ConfigUtils.loadConfig(OUTPUT_BASE_DIR + "output_config.xml.gz");
 		config.plans().setInputFile(null);
-		config.network().setChangeEventInputFile(null);
+		config.network().setChangeEventsInputFile(null);
 		config.network().setInputFile(OUTPUT_BASE_DIR + "output_network.xml.gz");
 		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);

@@ -647,7 +647,7 @@ public class SantiagoScenarioBuilder {
 	}
 	
 	private void setNetworkParameters(NetworkConfigGroup net){
-		net.setChangeEventInputFile(null);
+		net.setChangeEventsInputFile(null);
 		net.setInputFile(pathForMatsim + "input/network_merged_cl.xml.gz");
 		net.setLaneDefinitionsFile(null);
 		net.setTimeVariantNetwork(false);

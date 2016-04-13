@@ -90,7 +90,7 @@ public class Incident2NetworkChangeEventsTest {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		config.network().setInputFile(networkFile);
-		config.network().setChangeEventInputFile(outputDirectory + "networkChangeEvents_2016-03-15.xml.gz");
+		config.network().setChangeEventsInputFile(outputDirectory + "networkChangeEvents_2016-03-15.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		new NetworkWriter(scenario.getNetwork()).write(testUtils.getOutputDirectory() + "output-network.xml");
@@ -112,7 +112,7 @@ public class Incident2NetworkChangeEventsTest {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		config.network().setInputFile(testUtils.getPackageInputDirectory() + "network.xml");
-		config.network().setChangeEventInputFile(testUtils.getPackageInputDirectory() + "networkChangeEvents_2016-03-15.xml");
+		config.network().setChangeEventsInputFile(testUtils.getPackageInputDirectory() + "networkChangeEvents_2016-03-15.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		Network network = scenario.getNetwork();

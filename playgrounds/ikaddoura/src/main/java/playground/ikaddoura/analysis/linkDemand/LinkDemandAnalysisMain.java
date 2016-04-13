@@ -42,7 +42,7 @@ public class LinkDemandAnalysisMain {
 	
 		Config config = ConfigUtils.loadConfig(OUTPUT_BASE_DIR + "output_config.xml.gz");
 		config.plans().setInputFile(null);
-		config.network().setChangeEventInputFile(null);
+		config.network().setChangeEventsInputFile(null);
 		config.network().setInputFile(OUTPUT_BASE_DIR + "output_network.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();

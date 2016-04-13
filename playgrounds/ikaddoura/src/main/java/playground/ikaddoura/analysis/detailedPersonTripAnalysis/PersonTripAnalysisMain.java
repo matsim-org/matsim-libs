@@ -110,7 +110,7 @@ public class PersonTripAnalysisMain {
 		Config config = ConfigUtils.loadConfig(configFile);	
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
-		config.network().setChangeEventInputFile(null);
+		config.network().setChangeEventsInputFile(null);
 		
 		int finalIteration = config.controler().getLastIteration();
 		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
