@@ -204,12 +204,14 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 		if ( delay < 1.0 ) { 
 			linkInfo.getFlowQueue().clear(); 
 			return ; // should be ok but not tested (*)
-		} else {
+		} 
 		
-//		if (linkInfo.getFlowQueue().isEmpty() ) {
-//			// queue is already empty; nothing to do
-//			// seems like this cannot happen when (*) is used
-//		} else {
+		if (linkInfo.getFlowQueue().isEmpty() ) {
+			// queue is already empty; nothing to do
+			
+			// seems like this should never be called when (*) is used, but in practice it happens, i.e. tests fail when the above if condition
+			// is commented out.  maybe initialization?  kai, apr'16
+		} else {
 			double earliestLeaveTimeAfterVehicleAhead = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 			if ( time > earliestLeaveTimeAfterVehicleAhead + 1.) {
 				// Vehicle is delayed by more than 1/cap.  That is, we must be spill-back delayed.
