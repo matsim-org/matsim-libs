@@ -69,6 +69,7 @@ public class IVTConfigCreator {
 		config.controler().setWriteSnapshotsInterval(WRITE_OUT_INTERVAL);
 		config.counts().setWriteCountsInterval(WRITE_OUT_INTERVAL);
 		config.ptCounts().setPtCountsInterval(WRITE_OUT_INTERVAL);
+		config.linkStats().setWriteLinkStatsInterval(WRITE_OUT_INTERVAL);
         // Add f2l
         config.createModule(WorldConnectLocations.CONFIG_F2L);
         // Set coordinate system

@@ -53,8 +53,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.*;
-import playground.boescpa.ivtBaseline.preparation.crossborderCreation.CreateCBPop;
-import playground.boescpa.ivtBaseline.preparation.freightCreation.CreateFreightTraffic;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
 
 import java.io.BufferedReader;
@@ -113,17 +111,17 @@ public class ZHCutter {
 		Network filteredOnlyCarNetwork = cutter.getOnlyCarNetwork();
 		Network filteredNetwork = cutter.cutNetwork(filteredSchedule, filteredOnlyCarNetwork);
 		cutter.resetPopulation(filteredPopulation);
-		// adjust config
-		cutter.adjustConfig(cutterConfig);
 		// write new files
 		F2LCreator.createF2L(filteredFacilities, filteredOnlyCarNetwork, cutterConfig.getPathToTargetFolder() + File.separator + FACILITIES2LINKS);
 		writeNewFiles(cutterConfig.getPathToTargetFolder() + File.separator, cutter.scenario,
-				filteredPopulation, filteredHouseholds, filteredFacilities, filteredSchedule, filteredVehicles, filteredNetwork);
+				filteredPopulation, filteredHouseholds, filteredFacilities, filteredSchedule, filteredVehicles,
+				filteredNetwork, cutter.createConfig(cutterConfig));
 		cutter.cutPTCounts(filteredNetwork, cutterConfig);
 	}
 
-	private void adjustConfig(ZHCutterConfigGroup cutterConfig) {
-		Config config = scenario.getConfig();
+	private Config createConfig(ZHCutterConfigGroup cutterConfig) {
+		Config config = ConfigUtils.createConfig();
+		new IVTConfigCreator().makeConfigIVT(config, (int)(100*scenario.getConfig().qsim().getFlowCapFactor()));
 		List<StrategyConfigGroup.StrategySettings> strategySettings = new ArrayList<>();
 		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.5));
 		strategySettings.add(getStrategySetting("ReRoute", 0.2));
@@ -132,6 +130,7 @@ public class ZHCutter {
 			strategy.setSubpopulation(cutterConfig.commuterTag);
 			config.getModule(StrategyConfigGroup.GROUP_NAME).addParameterSet(strategy);
 		}
+		return config;
 	}
 
 	private void resetPopulation(Population filteredPopulation) {
@@ -314,18 +313,18 @@ public class ZHCutter {
 
 	private static void writeNewFiles(String pathToTargetFolder, Scenario scenario, Population filteredPopulation,
 									  Households filteredHouseholds, ActivityFacilities filteredFacilities,
-									  TransitSchedule filteredSchedule, Vehicles filteredVehicles, Network filteredNetwork) {
+									  TransitSchedule filteredSchedule, Vehicles filteredVehicles, Network filteredNetwork, Config subscenarioConfig) {
 		new PopulationWriter(filteredPopulation).write(pathToTargetFolder + POPULATION);
 		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes())
 				.writeFile(pathToTargetFolder + POPULATION_ATTRIBUTES);
 		new HouseholdsWriterV10(filteredHouseholds).writeFile(pathToTargetFolder + HOUSEHOLDS);
 		new ObjectAttributesXmlWriter(scenario.getHouseholds().getHouseholdAttributes())
 				.writeFile(pathToTargetFolder + HOUSEHOLD_ATTRIBUTES);
-		new FacilitiesWriter(filteredFacilities).writeV1(pathToTargetFolder + FACILITIES);
-		new TransitScheduleWriter(filteredSchedule).writeFileV1(pathToTargetFolder + SCHEDULE);
+		new FacilitiesWriter(filteredFacilities).write(pathToTargetFolder + FACILITIES);
+		new TransitScheduleWriter(filteredSchedule).writeFile(pathToTargetFolder + SCHEDULE);
 		new VehicleWriterV1(filteredVehicles).writeFile(pathToTargetFolder + VEHICLES);
-		new NetworkWriter(filteredNetwork).writeFileV1(pathToTargetFolder + NETWORK);
-		new ConfigWriter(scenario.getConfig()).writeFileV1(pathToTargetFolder + PreparationScript.CONFIG);
+		new NetworkWriter(filteredNetwork).write(pathToTargetFolder + NETWORK);
+		new ConfigWriter(subscenarioConfig).write(pathToTargetFolder + PreparationScript.CONFIG);
 	}
 
 	private Population geographicallyFilterPopulation() {
