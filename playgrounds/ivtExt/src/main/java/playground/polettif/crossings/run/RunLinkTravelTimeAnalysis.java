@@ -36,15 +36,18 @@ public class RunLinkTravelTimeAnalysis {
 
 		// set small
 		String eventsFile = "C:/Users/polettif/Desktop/crossings/output/small/ITERS/it.0/0.events.xml.gz";
+		String networkFile = "C:/Users/polettif/Desktop/crossings/output/small/output_network.xml.gz";
 		String outputCSVtt = "C:/Users/polettif/Desktop/crossings/analysis/small_travelTimes_"+System.nanoTime()+".csv";
 		String outputCSVvol= "C:/Users/polettif/Desktop/crossings/analysis/small_linkVolumes_"+System.nanoTime()+".csv";
+		String outputCSVtx= "C:/Users/polettif/Desktop/crossings/analysis/small_timeSpace_"+System.nanoTime()+".csv";
 		crossingIds.add(Id.createLinkId("23"));
 		crossingIds.add(Id.createLinkId("34"));
 		crossingIds.add(Id.createLinkId("45"));
 
-		LinkAnalysis linkAnalysis = new LinkAnalysis(crossingIds, eventsFile, "05:59:00", "06:04:00");
+		LinkAnalysis linkAnalysis = new LinkAnalysis(crossingIds, eventsFile, "05:50:00", "06:15:00", networkFile);
 		linkAnalysis.runTravelTimeAnalysis(outputCSVtt);
 		linkAnalysis.runLinkVolumeAnalysis(outputCSVvol);
+		linkAnalysis.runTimeSpaceAnalysis(outputCSVtx);
 
 		// set for pt-tutorial
 //		linkIdsPtTutorial.put(Id.createLinkId("1222-x22"), Id.createLinkId("1222"));
