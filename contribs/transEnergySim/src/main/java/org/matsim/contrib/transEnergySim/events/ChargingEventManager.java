@@ -29,7 +29,6 @@ public abstract class ChargingEventManager extends EventManager<EVSimEngineEvent
 			HashSet<String> travelModeFilter) {
 		this.personToVehicleMapping = personToVehicleMapping;
 		delegate = new EventManagerDelegate(this, personToVehicleMapping, travelModeFilter);
-		handlers = new LinkedList<>();
 		controler.getEvents().addHandler(delegate);
 	}
 
@@ -48,6 +47,7 @@ public abstract class ChargingEventManager extends EventManager<EVSimEngineEvent
 	public void processTimeStep(double time) {
 		for (EVSimEngineEventHandler handler : handlers) {
 			handler.handleTimeStep(time);
+			handler.processTimeStep(time);
 		}
 	}
 	

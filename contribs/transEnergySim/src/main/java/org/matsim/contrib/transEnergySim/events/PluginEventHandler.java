@@ -8,6 +8,7 @@ public abstract class PluginEventHandler extends EventManager<ChargingEventHandl
 
 	public abstract void handlePluginEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId);
 	public abstract void handleUnplugEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId);
+	public abstract void handleTimeStep(double time);
 	
 	public void processStartChargingEvent(double time, Id<Vehicle> vehicleId, Id<ChargingPlug> plugId) {
 		for (ChargingEventHandler handler : handlers) {
@@ -21,7 +22,7 @@ public abstract class PluginEventHandler extends EventManager<ChargingEventHandl
 		}
 	}
 
-	public void handleTimeStep(double time) {
+	public void processTimeStep(double time) {
 		for (ChargingEventHandler handler : handlers) {
 			handler.handleTimeStep(time);
 		}
