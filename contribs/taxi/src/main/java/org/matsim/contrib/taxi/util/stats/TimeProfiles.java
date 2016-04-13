@@ -70,7 +70,8 @@ public class TimeProfiles
     public static final String TAXI_TASK_TYPES_HEADER = combineValues(TaxiTaskType.values());
 
 
-    public static ProfileCalculator<String> createCurrentTaxiTaskOfTypeCounter(final VrpData taxiData)
+    public static ProfileCalculator<String> createCurrentTaxiTaskOfTypeCounter(
+            final VrpData taxiData)
     {
         return new ProfileCalculator<String>() {
             @Override
@@ -106,8 +107,8 @@ public class TimeProfiles
     }
 
 
-    public static ProfileCalculator<Integer> createRequestsWithStatusCounter(final TaxiData taxiData,
-            final TaxiRequestStatus requestStatus)
+    public static ProfileCalculator<Integer> createRequestsWithStatusCounter(
+            final TaxiData taxiData, final TaxiRequestStatus requestStatus)
     {
         return new ProfileCalculator<Integer>() {
             @Override
