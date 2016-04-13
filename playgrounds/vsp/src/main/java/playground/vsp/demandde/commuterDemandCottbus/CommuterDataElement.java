@@ -77,7 +77,7 @@ public class CommuterDataElement {
 	}
 	
 	public String toString(){
-		return ("F: "+fromId+" T: "+toId+" C: "+commuters);
+		return ("F:\t"+fromId+"\tT:\t"+toId+"\tC:\t"+commuters);
 		
 	}
 
