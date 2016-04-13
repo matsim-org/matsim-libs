@@ -159,10 +159,10 @@ public abstract class CreateSingleTripPopulation {
 	private void addHomeActivityIfNotInFacilityYet(ActivityFacilities facilities) {
 		for (ActivityFacility facility : facilities.getFacilities().values()) {
 			if (facility.getId().toString().contains(CreationOfCrossBorderFacilities.BC_TAG)) {
-				if (!facility.getActivityOptions().keySet().contains(HOME)) {
-					((ActivityFacilityImpl)facility).createAndAddActivityOption(HOME);
+				if (!facility.getActivityOptions().keySet().contains(this.configGroup.getTag() + "Home")) {
+					((ActivityFacilityImpl)facility).createAndAddActivityOption(this.configGroup.getTag() + "Home");
 					OpeningTime ot = new OpeningTimeImpl(0.0, 24.0 * 3600.0);
-					facility.getActivityOptions().get(HOME).addOpeningTime(ot);
+					facility.getActivityOptions().get(this.configGroup.getTag() + "Home").addOpeningTime(ot);
 				}
 			}
 		}
