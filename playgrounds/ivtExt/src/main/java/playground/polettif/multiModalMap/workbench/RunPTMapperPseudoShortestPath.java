@@ -25,8 +25,9 @@ public class RunPTMapperPseudoShortestPath {
 
 	public static void main(String[] args) {
 
+
 		String base = "C:/Users/polettif/Desktop/";
-		String outbase = base+"output/mtsMapping_zh2/";
+		String outbase = base+"output/mtsMapping_gtfs/";
 
 		// input
 //		final String mtsFile = base + "data/mts/zvv/zvv_unmappedSchedule_LV1903+.xml";

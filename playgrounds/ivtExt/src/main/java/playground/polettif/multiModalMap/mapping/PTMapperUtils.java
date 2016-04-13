@@ -214,7 +214,7 @@ public class PTMapperUtils {
 	}
 
 	/**
-	 * cleans the schedule
+	 * cleans the schedule by removing routes without link sequences
 	 * @param schedule
 	 */
 	public static void cleanSchedule(TransitSchedule schedule) {
@@ -245,9 +245,9 @@ public class PTMapperUtils {
 	}
 
 	/**
-	 * cleanStationsAndNetwork
-	 * boescpa
+	 * Sets the isBlocking value of every stop facility that is referenced to a car link to true.
 	 */
+	@Deprecated
 	public static void setConnectedStopFacilitiesToIsBlocking(TransitSchedule schedule, Network network) {
 		TransitScheduleFactory scheduleFactory = schedule.getFactory();
 		Set<TransitStopFacility> facilitiesToExchange = new HashSet<>();
@@ -270,9 +270,7 @@ public class PTMapperUtils {
 
 
 	/**
-	 * cleanStationsAndNetwork
-	 * Add to any link that is passed by any route a "pt" in the modes, if it hasn't already one...
-	 * boescpa
+	 * Add mode "pt" to any link of the network that is passed by any route.
 	 */
 	public static void addPTModeToNetwork(TransitSchedule schedule, Network network) {
 		Map<Id<Link>, ? extends Link> networkLinks = network.getLinks();

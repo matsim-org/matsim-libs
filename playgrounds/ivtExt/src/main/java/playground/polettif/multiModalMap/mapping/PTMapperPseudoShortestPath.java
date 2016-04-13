@@ -54,7 +54,6 @@ import java.util.*;
  */
 public class PTMapperPseudoShortestPath extends PTMapper {
 
-	// TODO ensure coordinate system is not WGS84 since this is not suitable for coordinate calculations (or warn accordingly)
 	// TODO move params to a config?
 
 	/**
@@ -74,16 +73,6 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 	 * The maximal distance [meter] a link candidate is allowed to have from the stop facility.
 	 */
 	private final static int MAX_STOPFACILITY_LINK_DISTANCE = 50;
-
-	/**
-	 * ID prefix used for artificial link created if no nodes are found within {@link #NODE_SEARCH_RADIUS}
-	 */
-	private final static String PREFIX_ARTIFICIAL_LINKS = "pt_";
-
-	/**
-	 * Suffix used for child stop facilities. A number for each child of a parent stop facility is appended (i.e. stop0123_fac:2)
-	 */
-	private final static String SUFFIX_CHILD_STOPFACILITIES = "_fac:";
 
 	/**
 	 * if two link candidates are the same travel time is multiplied by this factor. Otherwise travel time
@@ -249,76 +238,12 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 		 * Clean also the allowed modes for only the modes, no line-number any more...
 		 */
 		log.info("Clean Stations and Network...");
-//		cleanSchedule();
-//		addPTModeToNetwork();
+//		PTMapperUtils.cleanSchedule(schedule);
 		PTMapperUtils.removeNonUsedStopFacilities(schedule);
-//		setConnectedStopFacilitiesToIsBlocking();
+//		PTMapperUtils.addPTModeToNetwork(schedule, network);
+//		PTMapperUtils.setConnectedStopFacilitiesToIsBlocking(schedule, network);
 		log.info("Clean Stations and Network... done.");
 
 		log.info("Creating PT lines... done.");
-	}
-
-
-
-
-	/**
-	 * Container class to store the lines in with routes which have parent stop facilities needing to be replaced
-	 * with child stop facilities.
-	 */
-	private class ReplacementStorageLines {
-
-		private Map<Id<TransitLine>, ReplacementStorageRoutes> lines = new HashMap<>();
-
-		public void putReplacementPair(Id<TransitLine> lineId, Id<TransitRoute> routeId, TransitStopFacility parentStopFacility, TransitStopFacility childStopFacility) {
-			ReplacementStorageRoutes storageRoutes;
-			if (lines.containsKey(lineId)) {
-				storageRoutes = lines.get(lineId);
-			} else {
-				storageRoutes = new ReplacementStorageRoutes();
-			}
-			storageRoutes.addPair(routeId, parentStopFacility, childStopFacility);
-			lines.put(lineId, storageRoutes);
-		}
-
-		public Set<Id<TransitLine>> getLineIds() {
-			return lines.keySet();
-		}
-
-		public Set<Id<TransitRoute>> getRouteIds(Id<TransitLine> lineId) {
-			return lines.get(lineId).getRouteIds();
-		}
-
-		public ReplacementStorageRoutes getStoredRoute(Id<TransitLine> lineId) {
-			return lines.get(lineId);
-		}
-	}
-
-	/**
-	 * Container class to store routes with parent stop facilities that need to be replaced with child stop facilities.
-	 */
-	private class ReplacementStorageRoutes {
-
-		private Map<Id<TransitRoute>, Map<TransitStopFacility, TransitStopFacility>> routes = new HashMap<>();
-
-		public void addPair(Id<TransitRoute> routeId, TransitStopFacility parentStopFacility, TransitStopFacility childStopFacility) {
-			Map<TransitStopFacility, TransitStopFacility> tmp;
-			if (routes.containsKey(routeId)) {
-				tmp = routes.get(routeId);
-			} else {
-				tmp = new HashMap<>();
-			}
-
-			tmp.put(parentStopFacility, childStopFacility);
-
-			routes.put(routeId, tmp);
-		}
-
-		public Set<Id<TransitRoute>> getRouteIds() {
-			return routes.keySet();
-		}
-
-		public Map<TransitStopFacility, TransitStopFacility> getReplacementPairs(Id<TransitRoute> routeId) {
-			return routes.get(routeId);
-		}
 	}
 }
