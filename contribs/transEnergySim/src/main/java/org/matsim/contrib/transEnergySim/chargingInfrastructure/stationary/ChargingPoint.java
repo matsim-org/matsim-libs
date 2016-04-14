@@ -17,10 +17,6 @@ public interface ChargingPoint extends Identifiable<ChargingPoint> {
 	
 	ChargingSite getChargingSite();
 	
-	double getParkingPriceQuote(double time, double duration);
-	
-	double getChargingPriceQuote(double time, double duration);
-	
 	Collection<ChargingPlug> getAllChargingPlugs();
 	
 	void addChargingPlug(ChargingPlug chargingPlug);
