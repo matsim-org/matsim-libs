@@ -56,12 +56,15 @@ public class CreateMonthlyTravelTimes {
 	Map<Id<Link>, double[]> traveltimes = new HashMap<>();
 	Map<Id<Link>, double[]> averageTraveltimes = new HashMap<>();
 	Map<Id<Link>, double[]> standardDeviationTraveltimes = new HashMap<>();
+	Map<Id<Link>, double[]> minTraveltimes = new HashMap<>();
+	Map<Id<Link>, double[]> maxTraveltimes = new HashMap<>();
+
 
 	Network network;
 	String[] header;
 	int TIMESTEP = 15 * 60;
 	int firstday = 0;
-	int lastday = 2;
+	int lastday = 27;
 	int timebins;
 	int binsPerDay;
 //	String inputfolder = "D:/runs-svn/incidents/output/2b_reroute1.0/";
@@ -90,10 +93,15 @@ public class CreateMonthlyTravelTimes {
 		}
 		calculateAverageTraveltimes();
 		calculateStandardDeviationTraveltimes();
-		
-//		writeTravelTimes();
-		writeAnalysisValues(this.averageTraveltimes, "avgTravelTimes");
-		writeAnalysisValues(this.standardDeviationTraveltimes, "stdTravelTimes");
+		calculateMinTraveltimes();
+		calculateMaxTraveltimes();
+
+		writeTravelTimes();
+		writeAnalysisValues(this.averageTraveltimes, "tt_avg");
+		writeAnalysisValues(this.standardDeviationTraveltimes, "tt_std");
+		writeAnalysisValues(this.minTraveltimes, "tt_min");
+		writeAnalysisValues(this.maxTraveltimes, "tt_max");
+
 	}
 
 	private void writeTravelTimes() {
@@ -104,7 +112,7 @@ public class CreateMonthlyTravelTimes {
 		try {
 			String l1 = "LinkID,FreeSpeedTravelTime";
 			bw.append(l1);
-			bwt.append("\"String\",\"String\"");
+			bwt.append("\"String\",\"Real\"");
 			for (int currentDay = firstday; currentDay <= lastday; currentDay++) {
 			for (int i = 0; i<24*3600;i=i+TIMESTEP ){
 				double time = currentDay*24*3600+i;
@@ -199,6 +207,8 @@ public class CreateMonthlyTravelTimes {
 			traveltimes.put(linkId, new double[timebins]);
 			averageTraveltimes.put(linkId, new double[binsPerDay]);
 			standardDeviationTraveltimes.put(linkId, new double[binsPerDay]);
+			minTraveltimes.put(linkId, new double[binsPerDay]);
+			maxTraveltimes.put(linkId, new double[binsPerDay]);
 		}
 
 	}
@@ -244,6 +254,36 @@ public class CreateMonthlyTravelTimes {
 		}
 	}
 	
-	// add MIN, MAX ???
+	private void calculateMinTraveltimes(){
+		for (int i = 0;i<binsPerDay;i++){
+			for (Id<Link> linkId : network.getLinks().keySet()){
+			DescriptiveStatistics stats = new DescriptiveStatistics();
+			for (int currentDay = firstday; currentDay <= lastday; currentDay++) {
+				int currentBin = i + currentDay*binsPerDay;
+				double tt = this.traveltimes.get(linkId)[currentBin];
+				stats.addValue(tt);
+				}
+			double min = stats.getMin();
+			this.minTraveltimes.get(linkId)[i]=min;
+			}
+			
+		}
+	}
+	
+	private void calculateMaxTraveltimes(){
+		for (int i = 0;i<binsPerDay;i++){
+			for (Id<Link> linkId : network.getLinks().keySet()){
+			DescriptiveStatistics stats = new DescriptiveStatistics();
+			for (int currentDay = firstday; currentDay <= lastday; currentDay++) {
+				int currentBin = i + currentDay*binsPerDay;
+				double tt = this.traveltimes.get(linkId)[currentBin];
+				stats.addValue(tt);
+				}
+			double max = stats.getMax();
+			this.maxTraveltimes.get(linkId)[i]=max;
+			}
+			
+		}
+	}
 
 }
