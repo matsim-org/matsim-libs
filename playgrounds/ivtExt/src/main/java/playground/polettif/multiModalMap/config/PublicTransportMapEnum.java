@@ -1,8 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,30 +17,8 @@
  *                                                                         *
  * *********************************************************************** */
 
+package playground.polettif.multiModalMap.config;
 
-package playground.polettif.multiModalMap.workbench;
-
-import playground.polettif.multiModalMap.mapping.LinkScoring.PTMapperLinkScoring;
-
-public class RunPTMapperLinkScoring {
-
-	public static void main(String[] args) {
-
-		String base = "C:/Users/Flavio/Desktop/";
-		String outbase = base+"output/mtsMappingFree/";
-		// input
-//		final String mtsFile = base + "data/mts/zvv/zvv_unmappedSchedule_LV1903+.xml";
-//		final String mtsFile = base + "data/mts/uri/schedule_unmapped_cut.xml";
-//		final String mtsFile = base + "data/mts/uri/debug.xml";
-//		final String mtsFile = base + "data/mts/zvv_69er.xml";
-		final String mtsFile = base + "data/mts/unmapped/fromHafas/zurich.xml";
-//		final String mtsFile = base + "data/mts/unmapped/fromGtfs/zvv.xml";
-
-//		final String networkFile = base + "data/network/uri.xml.gz";
-		final String networkFile = base + "data/network/zurich-plus.xml.gz";
-//		final String networkFile = base + "data/network/uri.xml.gz";
-
-		PTMapperLinkScoring.main(new String[]{mtsFile, networkFile, outbase+"schedule.xml", outbase+"network.xml"});
-	}
-
+public enum PublicTransportMapEnum {
+	VALUE1, VALUE2;
 }

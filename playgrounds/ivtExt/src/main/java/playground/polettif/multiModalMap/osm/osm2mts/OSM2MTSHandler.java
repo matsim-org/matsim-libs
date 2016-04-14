@@ -17,7 +17,7 @@
  * *********************************************************************** */
 
 
-package playground.polettif.multiModalMap.osm;
+package playground.polettif.multiModalMap.osm.osm2mts;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;

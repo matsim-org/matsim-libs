@@ -17,24 +17,12 @@
  * *********************************************************************** */
 
 
-package playground.polettif.multiModalMap.osm;
+package playground.polettif.multiModalMap.osm.osm2mts;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.multiModalMap.osm.core.OsmNodeHandler;
 import playground.polettif.multiModalMap.osm.core.OsmParser;
-import playground.polettif.multiModalMap.osm.core.OsmRelationHandler;
-import playground.polettif.multiModalMap.osm.core.OsmWayHandler;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Convert available public transit data from OSM to a MATSim Transit Schedule (bus stops, transitRoutes and routeProfiles).

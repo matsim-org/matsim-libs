@@ -24,8 +24,10 @@ package playground.polettif.multiModalMap.mapping;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 
 /**
  * Provides the contract for an implementation of pt-lines routing.
@@ -38,6 +40,7 @@ public abstract class PTMapper {
 
 	protected final TransitSchedule schedule;
 	protected final TransitScheduleFactory scheduleFactory;
+	protected final PublicTransportMapConfigGroup config;
 	protected Network network;
 	protected NetworkFactory networkFactory;
 
@@ -50,14 +53,16 @@ public abstract class PTMapper {
 	 *
 	 * @param schedule which will be newly routed.
 	 */
-	protected PTMapper(TransitSchedule schedule) {
+	protected PTMapper(TransitSchedule schedule, PublicTransportMapConfigGroup config) {
 		this.schedule = schedule;
+		this.config = config;
 		this.scheduleFactory = this.schedule.getFactory();
 	}
 
-	protected PTMapper(TransitSchedule schedule, Network network) {
-		this(schedule);
-		this.setNetwork(network);
+	protected PTMapper(TransitSchedule schedule) {
+		this.schedule = schedule;
+		this.config = PublicTransportMapConfigGroup.createDefaultConfig();
+		this.scheduleFactory = this.schedule.getFactory();
 	}
 
 	/**

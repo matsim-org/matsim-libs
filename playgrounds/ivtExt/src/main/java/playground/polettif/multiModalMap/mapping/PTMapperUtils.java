@@ -347,4 +347,25 @@ public class PTMapperUtils {
 		log.info("Routing all routes with referenced links... done");
 	}
 
+	public static void removeNonTransitLinks(TransitSchedule schedule, Network network, Set<String> modesToCleanUp) {
+		Set<Id<Link>> usedTransitLinkIds = new HashSet<>();
+
+		for(TransitLine line : schedule.getTransitLines().values()) {
+			for(TransitRoute route : line.getRoutes().values()) {
+				usedTransitLinkIds.addAll(route.getRoute().getLinkIds());
+			}
+		}
+
+		Set<Id<Link>> linksToRemove = new HashSet<>();
+		for(Link link : network.getLinks().values()) {
+			// only remove link if there are only modes to remove on it
+			if(link.getAllowedModes().equals(modesToCleanUp) && !usedTransitLinkIds.contains(link.getId())) {
+				linksToRemove.add(link.getId());
+			}
+		}
+
+		for(Id<Link> linkId : linksToRemove) {
+			network.getLinks().remove(linkId);
+		}
+	}
 }

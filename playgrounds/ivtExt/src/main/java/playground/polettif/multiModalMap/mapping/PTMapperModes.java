@@ -36,7 +36,7 @@ import playground.polettif.multiModalMap.mapping.pseudoPTRouter.DijkstraAlgorith
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.PseudoGraph;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidate;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidatePath;
-import playground.polettif.multiModalMap.mapping.router.FastAStarLandmarksRouting;
+import playground.polettif.multiModalMap.mapping.router.DijkstraRouterModes;
 import playground.polettif.multiModalMap.mapping.router.Router;
 
 import java.util.*;
@@ -51,12 +51,19 @@ import java.util.*;
  *
  * @author polettif
  */
-public class PTMapperPseudoShortestPath extends PTMapper {
+public class PTMapperModes extends PTMapper {
+
+	// TODO move params to a config?
+
+
+	/**
+	 * fields
+	 */
 
 	/**
 	 * Constructor
 	 */
-	public PTMapperPseudoShortestPath(TransitSchedule schedule) {
+	public PTMapperModes(TransitSchedule schedule) {
 		super(schedule);
 	}
 
@@ -124,7 +131,7 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 		Map<Tuple<Link, Link>, LeastCostPathCalculator.Path> pathsStorage = new HashMap<>();
 
 		// initiate router
-		Router router = new FastAStarLandmarksRouting(this.network);
+		Router router = new DijkstraRouterModes(network);
 
 		/** [3]-[5]
 		 * iterate through
@@ -136,46 +143,44 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 		 */
 		for (TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				// todo modes!
-				if (transitRoute.getTransportMode().equals("bus")) {
 
-					List<TransitRouteStop> routeStops = transitRoute.getStops();
+				List<TransitRouteStop> routeStops = transitRoute.getStops();
 
-					counterLine.incCounter();
+				counterLine.incCounter();
 
-					PseudoGraph pseudoGraph = new PseudoGraph();
-					DijkstraAlgorithm dijkstra = new DijkstraAlgorithm(pseudoGraph);
+				PseudoGraph pseudoGraph = new PseudoGraph();
+				DijkstraAlgorithm dijkstra = new DijkstraAlgorithm(pseudoGraph);
 
-					/** [.]
-					 * calculate shortest paths between each link candidate
-					 */
+				/** [.]
+				 * calculate shortest paths between each link candidate
+				 */
 
-					// add dummy edges and nodes to pseudoGraph before the transitRoute
-					pseudoGraph.addDummyBefore(stopFacilityTree.getLinkCandidates(routeStops.get(0).getStopFacility()));
+				// add dummy edges and nodes to pseudoGraph before the transitRoute
+				pseudoGraph.addDummyBefore(stopFacilityTree.getLinkCandidates(routeStops.get(0).getStopFacility()));
 
-					for (int i = 0; i < routeStops.size()-1; i++) {
-						boolean firstPath = false, lastPath = false;
-						List<LinkCandidate> linkCandidatesCurrent = stopFacilityTree.getLinkCandidates(routeStops.get(i).getStopFacility());
-						List<LinkCandidate> linkCandidatesNext = stopFacilityTree.getLinkCandidates(routeStops.get(i+1).getStopFacility());
+				for (int i = 0; i < routeStops.size()-1; i++) {
+					boolean firstPath = false, lastPath = false;
+					List<LinkCandidate> linkCandidatesCurrent = stopFacilityTree.getLinkCandidates(routeStops.get(i).getStopFacility());
+					List<LinkCandidate> linkCandidatesNext = stopFacilityTree.getLinkCandidates(routeStops.get(i+1).getStopFacility());
 
-						if(i == 0) { firstPath = true; }
-						if(i == routeStops.size()-2) { lastPath = true; }
+					if(i == 0) { firstPath = true; }
+					if(i == routeStops.size()-2) { lastPath = true; }
 
-						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
-							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-								LeastCostPathCalculator.Path leastCostPath = router.calcLeastCostPath(linkCandidateCurrent.getLink().getToNode(), linkCandidateNext.getLink().getFromNode());
+					for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
+						for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
+							LeastCostPathCalculator.Path leastCostPath = router.calcLeastCostPath(linkCandidateCurrent.getLink().getToNode(), linkCandidateNext.getLink().getFromNode());
 
-								double travelTime = leastCostPath.travelTime;
+							double travelTime = leastCostPath.travelTime;
 
-								// if both links are the same and to link are the same, travel time should get higher since those
-								if(linkCandidateCurrent.getLink().equals(linkCandidateNext.getLink()))	{
-									travelTime = travelTime * config.getSameLinkPunishment();
-								}
-
-								pseudoGraph.addPath(new LinkCandidatePath(linkCandidateCurrent, linkCandidateNext, travelTime, firstPath, lastPath));
+							// if both links are the same and to link are the same, travel time should get higher since those
+							if(linkCandidateCurrent.getLink().equals(linkCandidateNext.getLink()))	{
+								travelTime = travelTime * config.getSameLinkPunishment();
 							}
+
+							pseudoGraph.addPath(new LinkCandidatePath(linkCandidateCurrent, linkCandidateNext, travelTime, firstPath, lastPath));
 						}
 					}
+
 
 					// add dummy edges and nodes to pseudoGraph before the transitRoute
 					pseudoGraph.addDummyAfter(stopFacilityTree.getLinkCandidates(routeStops.get(routeStops.size()-1).getStopFacility()));
@@ -211,6 +216,7 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 		PTMapperUtils.removeNonUsedStopFacilities(schedule);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);
 //		PTMapperUtils.setConnectedStopFacilitiesToIsBlocking(schedule, network);
+		PTMapperUtils.removeNonTransitLinks(schedule, network, config.getModesToCleanUp());
 		log.info("Clean Stations and Network... done.");
 
 		log.info("Creating PT lines... done.");

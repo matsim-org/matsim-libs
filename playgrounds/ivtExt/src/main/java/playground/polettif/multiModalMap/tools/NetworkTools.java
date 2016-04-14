@@ -22,12 +22,15 @@ package playground.polettif.multiModalMap.tools;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.*;
@@ -35,7 +38,6 @@ import java.util.*;
 public class NetworkTools {
 
 	protected static Logger log = Logger.getLogger(NetworkTools.class);
-
 
 	/**
 	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes(Coord, double)},
@@ -272,4 +274,23 @@ public class NetworkTools {
 		link.setLength(CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), newNode.getCoord()));
 	}
 
+	// TODO
+	public static HashMap<String, Network> getModeSeparatedNetworks(Network network) {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		NetworkFactory factory = network.getFactory();
+		HashMap<String, Network> separatedNetworks = new HashMap<>();
+
+		for(Link link : network.getLinks().values()) {
+			Set<String> linkModes = link.getAllowedModes();
+
+			for(String linkMode : linkModes) {
+				if(!separatedNetworks.keySet().contains(linkMode)) {
+//					separatedNetworks.put(linkMode, factory.crea)
+				}
+			}
+		}
+
+		return separatedNetworks;
+	}
 }

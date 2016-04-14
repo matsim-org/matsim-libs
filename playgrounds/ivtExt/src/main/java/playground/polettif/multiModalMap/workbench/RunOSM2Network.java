@@ -16,44 +16,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package playground.polettif.multiModalMap.workbench;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.OsmNetworkReader;
-import playground.polettif.boescpa.converters.osm.Osm2Network;
+import playground.polettif.multiModalMap.osm.MultimodalNetworkCreatorPT;
 
 public class RunOSM2Network {
 
-    public static void main(String[] args) {
-//		final String gtfsPath = "C:/Users/polettif/Desktop/data/gtfs/zvv/";
-        final String osmPath = "E:/data/osm/zurich-plus.osm";
-
-        final String outputPath = "E:/data/network/zurich-plus.xml.gz";
-//        final String mtsFile = "C:/Users/polettif/Desktop/output/gtfs2mts/google_sample.xml";
+    public static void main(String[] args){
 
         Config config = ConfigUtils.createConfig();
         Scenario sc = ScenarioUtils.createScenario(config);
-        Network net = sc.getNetwork();
-        CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
-                TransformationFactory.WGS84, TransformationFactory.CH1903_LV03_Plus);
+        Network network = sc.getNetwork();
 
-        OsmNetworkReader onr = new OsmNetworkReader(net, ct);
-        onr.parse(osmPath);
+        String path2OSMFile = "C:/Users/polettif/Desktop/data/osm/zurich-plus.osm";
+        String outputMultimodalNetwork = "C:/Users/polettif/Desktop/data/network/mm/zurich-plus-mm.xml";
 
-        new NetworkCleaner().run(net);
-        new NetworkWriter(net).write(outputPath);
-
-//        Osm2Network.main(new String[]{osmPath, outputPath});
+        new MultimodalNetworkCreatorPT(network).createMultimodalNetwork(path2OSMFile);
+        NetworkTransform networkTransform = new NetworkTransform(TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus"));
+        networkTransform.run(network);
+        new NetworkWriter(network).write(outputMultimodalNetwork);
 
     }
-
 }
