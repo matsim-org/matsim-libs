@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -54,15 +55,17 @@ public class CreateMonthlyTravelTimes {
 	Logger log = Logger.getLogger(getClass());
 	Map<Id<Link>, double[]> traveltimes = new HashMap<>();
 	Map<Id<Link>, double[]> averageTraveltimes = new HashMap<>();
+	Map<Id<Link>, double[]> standardDeviationTraveltimes = new HashMap<>();
 
 	Network network;
 	String[] header;
 	int TIMESTEP = 15 * 60;
 	int firstday = 0;
-	int lastday = 27;
+	int lastday = 2;
 	int timebins;
 	int binsPerDay;
-	String inputfolder = "D:/runs-svn/incidents/output/2b_reroute1.0/";
+//	String inputfolder = "D:/runs-svn/incidents/output/2b_reroute1.0/";
+	String inputfolder = "../../../runs-svn/incidents/output/2b_reroute1.0/";
 
 	public static void main(String[] args) {
 
@@ -86,10 +89,11 @@ public class CreateMonthlyTravelTimes {
 			extractTraveltimes(currentDay);
 		}
 		calculateAverageTraveltimes();
+		calculateStandardDeviationTraveltimes();
 		
-		writeTravelTimes();
-		writeAverageTravelTimes();
-		
+//		writeTravelTimes();
+		writeAnalysisValues(this.averageTraveltimes, "avgTravelTimes");
+		writeAnalysisValues(this.standardDeviationTraveltimes, "stdTravelTimes");
 	}
 
 	private void writeTravelTimes() {
@@ -130,15 +134,15 @@ public class CreateMonthlyTravelTimes {
 		}
 		}
 	
-	private void writeAverageTravelTimes() {
+	private void writeAnalysisValues(Map<Id<Link>, double[]> linkId2analysisValue, String filename) {
 		Locale.setDefault(Locale.US);
 		DecimalFormat df = new DecimalFormat( "####0.00" );
-		BufferedWriter bw = IOUtils.getBufferedWriter(inputfolder+"averagetraveltimes.csv");
-		BufferedWriter bwt = IOUtils.getBufferedWriter(inputfolder+"averagetraveltimes.csvt");
+		BufferedWriter bw = IOUtils.getBufferedWriter(inputfolder+filename+".csv");
+		BufferedWriter bwt = IOUtils.getBufferedWriter(inputfolder+filename+".csvt");
 		try {
 			String l1 = "LinkID,FreeSpeedTravelTime";
 			bw.append(l1);
-			bwt.append("\"String\",\"String\"");
+			bwt.append("\"String\",\"Real\"");
 			
 			for (int i = 0; i<24*3600;i=i+TIMESTEP ){
 				double time = i;
@@ -147,7 +151,7 @@ public class CreateMonthlyTravelTimes {
 			}	
 			
 			
-			for (Entry<Id<Link>, double[]> e :  this.averageTraveltimes.entrySet()){
+			for (Entry<Id<Link>, double[]> e :  linkId2analysisValue.entrySet()){
 				bw.newLine();
 				bw.append(e.getKey().toString()+",");
 				double freespeedTT = network.getLinks().get(e.getKey()).getLength()/network.getLinks().get(e.getKey()).getFreespeed();
@@ -194,6 +198,7 @@ public class CreateMonthlyTravelTimes {
 		for (Id<Link> linkId : network.getLinks().keySet()) {
 			traveltimes.put(linkId, new double[timebins]);
 			averageTraveltimes.put(linkId, new double[binsPerDay]);
+			standardDeviationTraveltimes.put(linkId, new double[binsPerDay]);
 		}
 
 	}
@@ -222,5 +227,23 @@ public class CreateMonthlyTravelTimes {
 			
 		}
 	}
+	
+	private void calculateStandardDeviationTraveltimes(){
+		for (int i = 0;i<binsPerDay;i++){
+			for (Id<Link> linkId : network.getLinks().keySet()){
+			DescriptiveStatistics stats = new DescriptiveStatistics();
+			for (int currentDay = firstday; currentDay <= lastday; currentDay++) {
+				int currentBin = i + currentDay*binsPerDay;
+				double tt = this.traveltimes.get(linkId)[currentBin];
+				stats.addValue(tt);
+				}
+			double stdTT = stats.getStandardDeviation();
+			this.standardDeviationTraveltimes.get(linkId)[i]=stdTT;
+			}
+			
+		}
+	}
+	
+	// add MIN, MAX ???
 
 }
