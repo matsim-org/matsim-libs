@@ -21,6 +21,7 @@
 
 package playground.polettif.multiModalMap.mapping.LinkScoring;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -42,6 +43,7 @@ import playground.polettif.multiModalMap.mapping.container.PTPath;
 import playground.polettif.multiModalMap.mapping.router.FastAStarLandmarksRouting;
 import playground.polettif.multiModalMap.mapping.router.Router;
 import playground.polettif.multiModalMap.tools.NetworkTools;
+import playground.polettif.multiModalMap.workbench.RunOSM2Network;
 
 import java.util.*;
 
@@ -289,7 +291,11 @@ public class PTMapperLinkScoring extends PTMapper {
 							for(Link linkCandidateCurrent : closestLinksCurrent) {
 								for(Link linkCandidateNext : closestLinksNext) {
 									if(!linkCandidateCurrent.equals(linkCandidateNext)) {
-										LeastCostPathCalculator.Path pathCandidate = router.calcLeastCostPath(linkCandidateCurrent.getToNode(), linkCandidateNext.getFromNode(), null, null);
+										LeastCostPathCalculator.Path pathCandidate = null ;
+//										LeastCostPathCalculator.Path pathCandidate = router.calcLeastCostPath(linkCandidateCurrent.getToNode(), linkCandidateNext.getFromNode(), null, null);
+										Logger.getLogger(RunOSM2Network.class).fatal("did not compile with the above line, thus commenting it out. kai") ;
+										System.exit(-1);
+
 										PTPath ptPath = PTMapperUtils.createPTPath(currentStop.getStopFacility(), linkCandidateCurrent, nextStop.getStopFacility(), linkCandidateNext, pathCandidate);
 
 										linkWeightCalculator.add(ptPath);

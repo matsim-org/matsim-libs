@@ -38,6 +38,7 @@ import playground.polettif.multiModalMap.mapping.container.PTPath;
 import playground.polettif.multiModalMap.mapping.container.PTPathImpl;
 import playground.polettif.multiModalMap.mapping.router.Router;
 import playground.polettif.multiModalMap.tools.NetworkTools;
+import playground.polettif.multiModalMap.workbench.RunOSM2Network;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -331,7 +332,11 @@ public class PTMapperUtils {
 						Link currentLink = network.getLinks().get(routeStops.get(i).getStopFacility().getLinkId());
 						Link nextLink = network.getLinks().get(routeStops.get(i+1).getStopFacility().getLinkId());
 
-						List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode(), null, null));
+						List<Id<Link>> path = null ;
+//						List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode(), null, null));
+						Logger.getLogger(RunOSM2Network.class).fatal("did not compile with the above line, thus commenting it out. kai") ;
+						System.exit(-1);
+					        
 
 						if(path != null)
 							linkSequence.addAll(path);

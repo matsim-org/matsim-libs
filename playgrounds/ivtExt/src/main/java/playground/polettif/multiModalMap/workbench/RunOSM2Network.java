@@ -18,6 +18,7 @@
 
 package playground.polettif.multiModalMap.workbench;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -26,7 +27,7 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import playground.polettif.multiModalMap.osm.MultimodalNetworkCreatorPT;
+//import playground.polettif.multiModalMap.osm.MultimodalNetworkCreatorPT;
 
 public class RunOSM2Network {
 
@@ -39,7 +40,9 @@ public class RunOSM2Network {
         String path2OSMFile = "C:/Users/polettif/Desktop/data/osm/zurich-plus.osm";
         String outputMultimodalNetwork = "C:/Users/polettif/Desktop/data/network/mm/zurich-plus-mm.xml";
 
-        new MultimodalNetworkCreatorPT(network).createMultimodalNetwork(path2OSMFile);
+//        new MultimodalNetworkCreatorPT(network).createMultimodalNetwork(path2OSMFile);
+        Logger.getLogger(RunOSM2Network.class).fatal("did not compile with the above line, thus commenting it out. kai") ;
+        System.exit(-1);
         NetworkTransform networkTransform = new NetworkTransform(TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus"));
         networkTransform.run(network);
         new NetworkWriter(network).write(outputMultimodalNetwork);
