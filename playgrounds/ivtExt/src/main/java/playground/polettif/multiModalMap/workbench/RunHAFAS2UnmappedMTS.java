@@ -36,28 +36,6 @@ import playground.polettif.multiModalMap.hafas.hafasCreator.PTScheduleCreatorHAF
  */
 public class RunHAFAS2UnmappedMTS {
 
-	public static void run(String osmFile, String  hafasFolder, String vehicleFile_Mixed, String vehicleFile_OnlyPT, Coord cutCenter, int cutRadius, Coord cutNW, Coord cutSE, String outbase) {
-
-		String[] inputArgs = new String[12];
-
-		inputArgs[0] = osmFile;
-		inputArgs[1] = hafasFolder;
-		inputArgs[2] = vehicleFile_Mixed;
-		inputArgs[3] = vehicleFile_OnlyPT;
-
-		inputArgs[4] = Double.toString(cutCenter.getX());
-		inputArgs[5] = Double.toString(cutCenter.getY());
-		inputArgs[6] = Integer.toString(cutRadius);
-		inputArgs[7] = Double.toString(cutNW.getX());
-		inputArgs[8] = Double.toString(cutNW.getY());
-		inputArgs[9] = Double.toString(cutSE.getX());
-		inputArgs[10] = Double.toString(cutSE.getY());
-
-		inputArgs[11] = outbase;
-
-		OSM2MixedIVT.main(inputArgs);
-	}
-
 	public static void main(String[] args) {
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

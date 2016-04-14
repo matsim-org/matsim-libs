@@ -21,6 +21,7 @@
 
 package playground.polettif.multiModalMap.hafas.hafasCreator;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -36,6 +37,9 @@ import java.util.*;
  */
 public class PtLineFPLAN {
 	private static TransitScheduleFactory scheduleBuilder = new TransitScheduleFactoryImpl();
+
+	protected static Logger log = Logger.getLogger(PtLineFPLAN.class);
+
 
 	private final Id<TransitLine> lineId;
 	private final List<PtRouteFPLAN> routesFPLAN = new ArrayList<>();
@@ -57,7 +61,7 @@ public class PtLineFPLAN {
 		TransitLine line = scheduleBuilder.createTransitLine(lineId);
 		for (PtRouteFPLAN route : this.routesFPLAN) {
 			TransitRoute transitRoute = route.getRoute();
-			if (transitRoute != null) {
+			if (transitRoute != null && !transitRoute.getTransportMode().equals("REMOVE")) {
 				line.addRoute(transitRoute);
 			}
 		}

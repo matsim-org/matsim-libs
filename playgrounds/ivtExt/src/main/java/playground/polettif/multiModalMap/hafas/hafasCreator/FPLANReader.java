@@ -21,14 +21,13 @@
 
 package playground.polettif.multiModalMap.hafas.hafasCreator;
 
+import gnu.trove.map.hash.TObjectByteHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vehicles.*;
+import playground.polettif.multiModalMap.hafas.HRDFDefinitions;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -110,12 +109,30 @@ public class FPLANReader {
 						Abfahrtszeitpunkt // 26-27 hour, 28-29 minute
 						31−36 [#]INT32 (optional) Index für das x. Auftreten oder
 						Ankunftszeitpunkt*/
+						boolean addToSchedule = true;
 						if (currentRouteFPLAN != null) {
 							// Vehicle Id:
 							Id<VehicleType> typeId = Id.create(newLine.substring(3, 6).trim(), VehicleType.class);
 							VehicleType vehicleType = vehicles.getVehicleTypes().get(typeId);
 							if (vehicleType == null) {
-								vehicles.addVehicleType(vehicleBuilder.createVehicleType(Id.create(typeId.toString(), VehicleType.class)));
+								String typeIdstr = typeId.toString();
+
+								vehicleType = vehicleBuilder.createVehicleType(Id.create(typeId.toString(), VehicleType.class));
+
+								// using default values for vehicle type
+								vehicleType.setLength(HRDFDefinitions.Vehicles.valueOf(typeIdstr).length);
+								vehicleType.setWidth(HRDFDefinitions.Vehicles.valueOf(typeIdstr).width);
+								vehicleType.setAccessTime(HRDFDefinitions.Vehicles.valueOf(typeIdstr).accessTime);
+								vehicleType.setEgressTime(HRDFDefinitions.Vehicles.valueOf(typeIdstr).egressTime);
+								vehicleType.setDoorOperationMode(HRDFDefinitions.Vehicles.valueOf(typeIdstr).doorOperation);
+								vehicleType.setPcuEquivalents(HRDFDefinitions.Vehicles.valueOf(typeIdstr).pcuEquivalents);
+
+								VehicleCapacity vehicleCapacity = vehicleBuilder.createVehicleCapacity();
+								vehicleCapacity.setSeats(HRDFDefinitions.Vehicles.valueOf(typeIdstr).capacitySeats);
+								vehicleCapacity.setStandingRoom(HRDFDefinitions.Vehicles.valueOf(typeIdstr).capacityStanding);
+								vehicleType.setCapacity(vehicleCapacity);
+
+								vehicles.addVehicleType(vehicleType);
 							}
 							currentRouteFPLAN.setUsedVehicle(typeId, vehicleType);
 							// First Departure:

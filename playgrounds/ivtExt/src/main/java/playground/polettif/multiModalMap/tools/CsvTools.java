@@ -36,18 +36,23 @@ public class CsvTools {
 	 * Converts a table with Tuple<line, column> as key to a list of csv lines.
 	 */
 	public List<String> convertToCsvLines(Map<Tuple<Integer, Integer>, String> keyTable) {
+		int maxCol = 0;
+
 		// From <<line, column>, value> to <line, <column, value>>
 		Map<Integer, Map<Integer, String>> lin_colVal = new TreeMap<>();
 		for(Map.Entry<Tuple<Integer, Integer>, String> entry : keyTable.entrySet()) {
 			Map<Integer, String> line = MapUtils.getMap(entry.getKey().getFirst(), lin_colVal);
 			line.put(entry.getKey().getSecond(), entry.getValue());
+			if(entry.getKey().getSecond() > maxCol) { maxCol = entry.getKey().getSecond(); }
 		}
 
 		// From <line, <column, value>> value> to <line, String>
 		Map<Integer, String> csvLines = new TreeMap<>();
 		for(Map.Entry<Integer, Map<Integer, String>> entry : lin_colVal.entrySet()) {
 			String line = "";
-			for(String value : entry.getValue().values()) {
+			Map<Integer, String> cols = entry.getValue();
+			for(int i=1; i <= maxCol; i++) {
+				String value = (cols.get(i) == null ? "" : cols.get(i));
 				line += value+";";
 			}
 			csvLines.put(entry.getKey(), line);

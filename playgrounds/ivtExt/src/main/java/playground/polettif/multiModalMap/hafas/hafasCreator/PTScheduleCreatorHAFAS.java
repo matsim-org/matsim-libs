@@ -83,8 +83,7 @@ public class PTScheduleCreatorHAFAS extends PTScheduleCreator implements RoutePr
 
 		// 3. Create all lines from HAFAS-Schedule
 		log.info("  Read transit lines...");
-		Map<String, Integer> vehiclesUndefined =
-				FPLANReader.readLines(schedule, vehicles, bitfeldNummern, operators, pathToInputFiles + "FPLAN");
+		FPLANReader.readLines(schedule, vehicles, bitfeldNummern, operators, pathToInputFiles + "FPLAN");
 		log.info("  Read transit lines... done.");
 
 		// 4. Clean schedule

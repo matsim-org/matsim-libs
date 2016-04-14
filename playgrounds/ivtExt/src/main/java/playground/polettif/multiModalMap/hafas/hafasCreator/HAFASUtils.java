@@ -25,7 +25,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
+import playground.polettif.multiModalMap.hafas.HRDFDefinitions;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -82,6 +84,16 @@ public class HAFASUtils {
 			if (!usedVehicles.contains(vehicleId)) {
 				vehicles.removeVehicle(vehicleId);
 			}
+		}
+
+		final Set<VehicleType> vehicleTypes2Remove = new HashSet<>();
+		for(VehicleType vehicleType : vehicles.getVehicleTypes().values()) {
+			if(!HRDFDefinitions.Vehicles.valueOf(vehicleType.getId().toString()).addToSchedule) {
+				vehicleTypes2Remove.add(vehicleType);
+			}
+		}
+		for (VehicleType vehicleType : vehicleTypes2Remove) {
+				vehicles.removeVehicleType(vehicleType.getId());
 		}
 	}
 
@@ -187,6 +199,14 @@ public class HAFASUtils {
 			if (bw != null) {
 				try { bw.close(); }
 				catch (IOException e) { System.out.print("Could not close stream."); }
+			}
+		}
+	}
+
+	public static void removeNonUsableVehicles(TransitSchedule schedule, Vehicles vehicles) {
+		for(TransitLine line : schedule.getTransitLines().values()) {
+			for(TransitRoute route : line.getRoutes().values()) {
+//				route.getDepartures().
 			}
 		}
 	}

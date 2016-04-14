@@ -19,6 +19,8 @@
 
 package playground.polettif.multiModalMap.hafas;
 
+import org.matsim.vehicles.VehicleType;
+
 /**
  * Definitions and categories for modes found in hafas files.
  * Assignment equivalent to GTFS.
@@ -53,82 +55,88 @@ public final class HRDFDefinitions {
 
 		NONE("");
 
-		String modeName;
+		public String modeName;
 
-		private TransportModes(String modeName) {
+		TransportModes(String modeName) {
 			this.modeName = modeName;
 		}
 	}
 
 	public enum Vehicles {
-		T   ("T", 	TransportModes.TRAM),
-		NFT ("NFT",	TransportModes.TRAM),
+		//										add		DEFAULT VALUES
+		//										to		length	width	accT	egrT	doorOp									capSeat	capSt	pcuEq	usesRN	description
+		//										sched.	[m]		[m]		s/pers	s/pers
+		AG  ("AG",	TransportModes.RAIL,		true,	200,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	400,	0,		27.1,	false,	"Agencytrain"),
+		ARZ ("ARZ", TransportModes.NONE,		false,	0.0, 	0.0, 	0.0, 	0.0, 	VehicleType.DoorOperationMode.serial, 	0, 		0, 		0.0, 	false, 	"Car-carrying train, Autoreisezug"),
+		ATZ ("ATZ", TransportModes.NONE,		false,	0.0, 	0.0,	0.0, 	0.0, 	VehicleType.DoorOperationMode.serial, 	0, 		0, 		0.0, 	false, 	"Car train, Autotunnelzug"),
+		TER ("TER", TransportModes.RAIL,		true,	150,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	400,	0,		20.4,	false,	"Train Express Regional"),
+		TE2 ("TE2", TransportModes.RAIL,		true,	360,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	900,	0,		48.4,	false,	"TER200"),
+		MP	("MP", 	TransportModes.NONE,		false,	0.0, 	0.0, 	0.0, 	0.0, 	VehicleType.DoorOperationMode.serial, 	0, 		0, 		0.0, 	false, 	"LeermaterialZ Personenbeförd"),
+		T   ("T", 	TransportModes.TRAM,		true,	20,		2.2,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	140,	0,		3.1,	true,	"Tramway"),
+		ICB	("ICB",	TransportModes.BUS,			true,	15,		2.5,	0.0,	0.0,	VehicleType.DoorOperationMode.serial,	70,		0,		2.8,	true,	"intercity bus"),
+		BUS	("BUS",	TransportModes.BUS,			true,	18,		2.5,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	70,		0,		2.8,	true,	"Bus"),
+		EXB	("EXB",	TransportModes.BUS,			true,	18,		2.5,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	70,		0,		2.8,	true,	"ExpressBus"),
+		NB	("NB",	TransportModes.BUS,			true,	18,		2.5,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	70,		0,		2.8,	true,	"Night-Bus"),
+		NFB	("NFB",	TransportModes.BUS,			true,	18,		2.5,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	70,		0,		2.8,	true,	"Low-floor bus"),
+		TRO	("TRO",	TransportModes.BUS,			true,	18,		2.5,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	70,		0,		2.8,	true,	"trolley bus"),
+		NFO	("NFO",	TransportModes.BUS,			true,	22,		2.5,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	100,	0,		3.3,	true,	"Low-floor trolley bus"),
+		KB	("KB",	TransportModes.BUS,			true,	12,		2.5,	1,		1,		VehicleType.DoorOperationMode.serial,	30,		0,		2,		true,	"Minibus"),
+		TX	("TX",	TransportModes.BUS,			true,	7.5,	1.8,	2,		2,		VehicleType.DoorOperationMode.serial,	4,		0,		1.4,	true,	"Taxi"),
+		FAE	("FAE",	TransportModes.FERRY,		true,	20,		6,		0.25,	0.25,	VehicleType.DoorOperationMode.serial,	100,	0,		3.1,	false,	"Ferry-boat"),
+		BAT	("BAT",	TransportModes.FERRY,		true,	50,		6,		0.5,	0.5,	VehicleType.DoorOperationMode.serial,	250,	0,		7.1,	false,	"Ship"),
+		BAV	("BAV",	TransportModes.FERRY,		true,	50,		6,		0.5,	0.5,	VehicleType.DoorOperationMode.serial,	250,	0,		7.1,	false,	"Steam ship"),
+		FUN	("FUN",	TransportModes.FUNICULAR,	true,	10,		2.5,	0.5	,	0.5, 	VehicleType.DoorOperationMode.serial,	100,	0,		1.7	,	false,	"Funicular"),
+		GB	("GB",	TransportModes.GONDOLA,		false,	0.0, 	0.0, 	0.0, 	0.0, 	VehicleType.DoorOperationMode.serial, 	0, 		0, 		0.0, 	false, 	"Gondelbahn"),
+		LB	("LB",	TransportModes.GONDOLA,		true,	6,		3.5,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	80,		0,		1.2,	false,	"Cableway"),
+		SL	("SL",	TransportModes.NONE,		false,	0.0, 	0.0, 	0.0,	0.0, 	VehicleType.DoorOperationMode.serial, 	0, 		0, 		0.0, 	false, 	"Chairlift, Sesselbahn"),
+		S	("S",	TransportModes.RAIL,		true,	300,	2.8,	0.05,	0.05,	VehicleType.DoorOperationMode.serial,	3000,	0,		40.4,	false,	"Urban train"),
+		SN	("SN",	TransportModes.RAIL,		true,	100,	2.9,	0.1,	0.1,	VehicleType.DoorOperationMode.serial,	500,	0,		13.7,	false,	"Night-urban train"),
+		D   ("D",	TransportModes.RAIL,		true,	150,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	400,	0,		20.4,	false,	"Fast train"),
+		IR	("IR",	TransportModes.RAIL,		true,	150,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	400,	0,		20.4,	false,	"InterRegio"),
+		RB	("RB",	TransportModes.RAIL,		true,	150,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	400,	0,		20.4,	false,	"Regionalbahn"),
+		RE	("RE",	TransportModes.RAIL,		true,	150,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	400,	0,		20.4,	false,	"RegioExpress"),
+		R	("R",	TransportModes.RAIL,		true,	150,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	400,	0,		20.4,	false,	"Regio"),
+		EC  ("EC",	TransportModes.RAIL,		true,	200,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	700,	0,		27.1,	false,	"EuroCity"),
+		EXT	("EXT",	TransportModes.RAIL,		true,	200,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	400,	0,		27.1,	false,	"Special train"),
+		IC	("IC",	TransportModes.RAIL,		true,	200,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	888,	0,		27.1,	false,	"InterCity"),
+		ZUG	("ZUG",	TransportModes.RAIL,		true,	200,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	400,	0,		27.1,	false,	"Train category unknown"),
+		ICN	("ICN",	TransportModes.RAIL,		true,	360,	2.8,	0.25,	0.25,	VehicleType.DoorOperationMode.serial,	900,	0,		48.4,	false,	"IC-tilting train"),
+		BEX ("BEX",	TransportModes.RAIL,		true,	150,	2.8,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	240,	0,		20.4,	false,	"Bernina Express"),
+		GEX	("GEX",	TransportModes.RAIL,		true,	150,	2.8,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	210,	0,		20.4,	false,	"Glacier Express"),
+		CNL ("CNL",	TransportModes.RAIL,		true,	200,	2.8,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	400,	0,		27.1,	false,	"CityNightLine"),
+		EN	("EN",	TransportModes.RAIL,		true,	200,	2.8,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	400,	0,		27.1,	false,	"EuroNight"),
+		NZ	("NZ",	TransportModes.RAIL,		true,	200,	2.8,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	400,	0,		27.1,	false,	"Night train"),
+		TGV	("TGV",	TransportModes.RAIL,		true,	200,	2.8,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	400,	0,		27.1,	false,	"Train à grande vit."),
+		ICE	("ICE",	TransportModes.RAIL,		true,	205,	3,		0.5,	0.5,	VehicleType.DoorOperationMode.serial,	481,	0,		27.7,	false,	"InterCityExpress"),
+		RJ	("RJ",	TransportModes.RAIL,		true,	205,	2.9,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	400,	0,		27.7,	false,	"Railjet"),
+		VAE	("VAE",	TransportModes.RAIL,		true,	240,	2.8,	0.5,	0.5,	VehicleType.DoorOperationMode.serial,	620,	0,		32.4,	false,	"Voralpen-Express"),
+		M   ("M",	TransportModes.SUBWAY,		true,	30,		2.45,	0.1,	0.1,	VehicleType.DoorOperationMode.serial,	300,	0,		4.4,	false,	"Underground"),
+		NFT ("NFT",	TransportModes.TRAM, 		true,	36,		2.4,	0.25,	0.25,	VehicleType.DoorOperationMode.serial, 	180,	0,		5.2	,	true,	"Low-floor tramway");
 
-		M   ("M",	TransportModes.SUBWAY),
+		public double length, width, accessTime, egressTime, pcuEquivalents;
+		public int capacitySeats, capacityStanding;
+		public String name, description;
+		public VehicleType.DoorOperationMode doorOperation;
+		public boolean usesRoadNetwork, addToSchedule;
+		public TransportModes mode;
 
-		AG  ("AG",	TransportModes.RAIL),
-		BEX ("BEX",	TransportModes.RAIL),
-		CNL ("CNL",	TransportModes.RAIL),
-		D   ("D",	TransportModes.RAIL),
-		EC  ("EC",	TransportModes.RAIL),
-		EN	("EN",	TransportModes.RAIL),
-		EXT	("EXT",	TransportModes.RAIL),
-		GEX	("GEX",	TransportModes.RAIL),
-		IC	("IC",	TransportModes.RAIL),
-		ICE	("ICE",	TransportModes.RAIL),
-		ICN	("ICN",	TransportModes.RAIL),
-		IR	("IR",	TransportModes.RAIL),
-
-		NZ	("NZ",	TransportModes.RAIL),
-		R	("R",	TransportModes.RAIL),
-		RE	("RE",	TransportModes.RAIL),
-		RJ	("RJ",	TransportModes.RAIL),
-		S	("S",	TransportModes.RAIL),
-		SN	("SN",	TransportModes.RAIL),
-		TGV	("TGV",	TransportModes.RAIL),
-		VAE	("VAE",	TransportModes.RAIL),
-		ZUG	("ZUG",	TransportModes.RAIL),
-
-		BUS	("BUS",	TransportModes.BUS),
-		NFB	("NFB",	TransportModes.BUS),
-		TX	("TX",	TransportModes.BUS),
-		KB	("KB",	TransportModes.BUS),
-		NFO	("NFO",	TransportModes.BUS),
-		EXB	("EXB",	TransportModes.BUS),
-		NB	("NB",	TransportModes.BUS),
-
-		BAT	("BAT",	TransportModes.FERRY),
-		BAV	("BAV",	TransportModes.FERRY),
-		FAE	("FAE",	TransportModes.FERRY),
-
-		LB	("LB",	TransportModes.GONDOLA),
-		GB	("GB",	TransportModes.GONDOLA),
-
-		FUN	("FUN",	TransportModes.FUNICULAR),
-
-		ARZ ("ARZ", TransportModes.NONE),	// Car-carrying train, Autoreisezug
-		ATZ ("ATZ", TransportModes.NONE),	// Car train, Autotunnelzug
-		MP	("MP", 	TransportModes.NONE),	// LeermaterialZ Personenbeförd
-		SL	("SL",	TransportModes.NONE),	// Chairlift, Sesselbahn
-
-		// todo look up initial values
-		TER ("TER", TransportModes.RAIL),	// Train Express Regional
-		TE2 ("TE2", TransportModes.RAIL),	// TER200
-		ICB	("ICB",	TransportModes.BUS),	// intercity bus
-		TRO	("TRO",	TransportModes.BUS),	// trolley bus
-		RB	("RB",	TransportModes.RAIL);	// Regionalbahn
-
-
-		String value;
-		TransportModes mode;
-		private Vehicles(String value, TransportModes mode) {
-			this.value = value;
+		Vehicles(String name, TransportModes mode, boolean addToSchedule, double length, double width, double accessTime, double egressTime, VehicleType.DoorOperationMode doorOperation, int capacitySeats, int capacityStanding, double pcuEquivalents, boolean usesRoadNetwork, String description) {
+			this.name = name;
 			this.mode = mode;
+			this.addToSchedule = addToSchedule;
+			this.length = length;
+			this.width = width;
+			this.accessTime = accessTime;
+			this.egressTime = egressTime;
+			this.doorOperation = doorOperation;
+			this.capacitySeats = capacitySeats;
+			this.capacityStanding = capacityStanding;
+			this.capacityStanding = capacityStanding;
+			this.pcuEquivalents = pcuEquivalents;
+			this.usesRoadNetwork = usesRoadNetwork;
+			this.description = description;
 		}
 
-		public TransportModes getMode() {
-			return mode;
-		}
 	}
 
 }
