@@ -19,7 +19,7 @@
 
 package playground.polettif.multiModalMap.workbench;
 
-import playground.polettif.multiModalMap.mapping.linkScoring.PTMapperLinkScoring;
+import playground.polettif.multiModalMap.mapping.LinkScoring.PTMapperLinkScoring;
 
 public class RunPTMapperLinkScoring {
 
