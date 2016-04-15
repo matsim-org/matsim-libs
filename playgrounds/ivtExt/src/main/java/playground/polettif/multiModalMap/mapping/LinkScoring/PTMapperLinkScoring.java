@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.multiModalMap.mapping.LinkScoring;
+package playground.polettif.multiModalMap.mapping.linkScoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

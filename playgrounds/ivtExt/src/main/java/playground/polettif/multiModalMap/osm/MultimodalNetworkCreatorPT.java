@@ -22,8 +22,6 @@
 package playground.polettif.multiModalMap.osm;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
@@ -33,23 +31,15 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  */
 public class MultimodalNetworkCreatorPT implements MultimodalNetworkCreator {
 
-	private final CoordinateTransformation transformation;
-	private Network network;
+	Network network;
 
 	public MultimodalNetworkCreatorPT(Network network) {
-		this(network, null);
-	}
-
-	public MultimodalNetworkCreatorPT(Network network, CoordinateTransformation transformation) {
 		this.network = network;
-		this.transformation = (transformation == null ? new IdentityTransformation() : transformation);
 	}
 
 	@Override
 	public void createMultimodalNetwork(String osmFile) {
-		// TODO add coordinate transformation in network reader
-
-		OsmNetworkReaderWithPT osmReader =	new OsmNetworkReaderWithPT(this.network, transformation, true);
+		OsmNetworkReaderWithPT osmReader =	new OsmNetworkReaderWithPT(this.network, true);
 
 		osmReader.setKeepPaths(false);
 

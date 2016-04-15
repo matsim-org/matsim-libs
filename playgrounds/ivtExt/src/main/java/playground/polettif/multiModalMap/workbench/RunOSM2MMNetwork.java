@@ -26,11 +26,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.polettif.multiModalMap.osm.MultimodalNetworkCreatorPT;
 
-public class RunOSM2MMNetwork {
+public class RunOSM2Network {
 
     public static void main(String[] args){
 
@@ -38,15 +37,14 @@ public class RunOSM2MMNetwork {
         Scenario sc = ScenarioUtils.createScenario(config);
         Network network = sc.getNetwork();
 
-        String path2OSMFile = "E:/data/osm/uri.osm";
-        String outputMultimodalNetwork = "E:/data/network/multimodal/uri-mm.xml.gz";
+        String path2OSMFile = "C:/Users/polettif/Desktop/data/osm/zurich-plus.osm";
+        String outputMultimodalNetwork = "C:/Users/polettif/Desktop/data/network/mm/zurich-plus-mm.xml";
 
-        CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
+        new MultimodalNetworkCreatorPT(network).createMultimodalNetwork(path2OSMFile);
 
-        new MultimodalNetworkCreatorPT(network, transformation).createMultimodalNetwork(path2OSMFile);
-
-//        NetworkTransform networkTransform = new NetworkTransform(transformation);
-//        networkTransform.run(network);
+        NetworkTransform networkTransform = new NetworkTransform(TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus"));
+        networkTransform.run(network);
         new NetworkWriter(network).write(outputMultimodalNetwork);
+
     }
 }
