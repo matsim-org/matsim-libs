@@ -70,7 +70,7 @@ public class RefPopulationBuilder {
         return refPersons;
     }
 
-    static class SetVacationsPurpose implements EpisodeTask {
+    public static class SetVacationsPurpose implements EpisodeTask {
 
         @Override
         public void apply(Episode episode) {
@@ -99,7 +99,7 @@ public class RefPopulationBuilder {
         }
     }
 
-    static class ReplaceHomePurpose implements EpisodeTask {
+    public static class ReplaceHomePurpose implements EpisodeTask {
 
         @Override
         public void apply(Episode episode) {
@@ -112,7 +112,7 @@ public class RefPopulationBuilder {
         }
     }
 
-    static class ReplaceLegPurposes implements EpisodeTask {
+    public static class ReplaceLegPurposes implements EpisodeTask {
 
         private Map<String, String> mapping;
 
@@ -140,7 +140,7 @@ public class RefPopulationBuilder {
         }
     }
 
-    static class NullifyPurpose implements EpisodeTask {
+    public static class NullifyPurpose implements EpisodeTask {
 
         private final String purpose;
 
@@ -158,7 +158,7 @@ public class RefPopulationBuilder {
         }
     }
 
-    static class GuessMissingPurposes implements EpisodeTask {
+    public static class GuessMissingPurposes implements EpisodeTask {
 
         private ChoiceSet<String> shortChoiceSet;
 
@@ -210,7 +210,7 @@ public class RefPopulationBuilder {
             }
         }
 
-        private static class ShortDistancePredicate implements Predicate<Segment> {
+        public static class ShortDistancePredicate implements Predicate<Segment> {
 
             @Override
             public boolean test(Segment segment) {

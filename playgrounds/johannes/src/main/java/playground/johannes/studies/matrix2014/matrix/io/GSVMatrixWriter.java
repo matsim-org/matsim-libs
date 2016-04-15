@@ -46,7 +46,7 @@ public class GSVMatrixWriter {
 
     private static final String VOLUME_KEY = "volume";
 
-    private static final String SEPARATOR = ";";
+    public static final String SEPARATOR = ";";
 
     public static void write(Collection<Pair<NumericMatrix, Map<String, String>>> matrices, String file) throws IOException {
         BufferedWriter writer = IOUtils.getBufferedWriter(file);

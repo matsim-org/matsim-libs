@@ -132,7 +132,7 @@ public class ExtendedAnalyzerBuilder {
 
         GSVMatrixSampler gsvSampler = new GSVMatrixSampler(engine.getRefPersons(),
                 engine.getDataPool(),
-                "tomtom",
+                "modena",
                 engine.getRandom(),
                 start,
                 step,

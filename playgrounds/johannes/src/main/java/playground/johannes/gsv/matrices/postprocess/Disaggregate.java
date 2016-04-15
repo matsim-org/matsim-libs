@@ -23,11 +23,15 @@ import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.common.util.XORShiftRandom;
+import org.matsim.core.utils.io.IOUtils;
 import playground.johannes.studies.matrix2014.stats.Histogram;
 import playground.johannes.synpop.matrix.MatrixOperations;
 import playground.johannes.synpop.matrix.NumericMatrix;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -80,7 +84,7 @@ public class Disaggregate {
          */
         logger.info("Load nuts3 matrix...");
         reader = new BufferedReader(new FileReader(inFile));
-        BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
+        BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
 
         line = reader.readLine();
         writer.write(line);
