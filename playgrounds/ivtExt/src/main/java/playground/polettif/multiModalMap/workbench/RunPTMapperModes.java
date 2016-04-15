@@ -26,7 +26,11 @@ public class RunPTMapperModes {
 	public static void main(String[] args) {
 
 
+<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 		String base = "E:/"; //"C:/Users/polettif/Desktop/";
+=======
+		String base = "C:/Users/polettif/Desktop/";
+>>>>>>> setup default config, new mode specific ptmapper
 		String outbase = base+"output/mtsMapping_modes/";
 
 		// input
@@ -34,16 +38,25 @@ public class RunPTMapperModes {
 //		final String mtsFile = base + "data/mts/uri/schedule_unmapped_cut.xml";
 //		final String mtsFile = base + "data/mts/uri/debug.xml";
 //		final String mtsFile = base + "data/mts/zvv_69er.xml";
+<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 		final String mtsFile = base + "data/mts/unmapped/fromHafas/uri.xml";
 //		final String mtsFile = base + "data/mts/unmapped/fromHafas/zurich.xml";
+=======
+//		final String mtsFile = base + "data/mts/unmapped/fromHafas/uri.xml";
+		final String mtsFile = base + "data/mts/unmapped/fromHafas/zurich.xml";
+>>>>>>> setup default config, new mode specific ptmapper
 //		final String mtsFile = base + "data/mts/unmapped/fromGtfs/zvv.xml";
 //		final String mtsFile = base + "data/mts/unmapped/fromHafas/debug-pseudo.xml";
 
 //		final String networkFile = base + "data/network/uri.xml.gz";
 //		final String networkFile = base + "data/network/zurich-city.xml.gz";
 //		final String networkFile = base + "data/network/zurich-plus.xml.gz";
+<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 //		final String networkFile = base + "data/network/multimodal/zurich-plus-mm.xml.gz";
 		final String networkFile = base + "data/network/multimodal/uri-mm.xml.gz";
+=======
+		final String networkFile = base + "data/network/mm/zurich-plus-mm.xml";
+>>>>>>> setup default config, new mode specific ptmapper
 //		final String networkFile = base + "data/network/uri.xml.gz";
 
 		PTMapperModes.main(new String[]{mtsFile, networkFile, outbase+"schedule.xml", outbase+"network.xml"});
