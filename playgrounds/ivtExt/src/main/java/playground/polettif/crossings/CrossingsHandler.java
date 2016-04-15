@@ -31,7 +31,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import playground.polettif.crossings.parser.Crossing;
 import playground.polettif.crossings.parser.CrossingsParser;
-import playground.polettif.crossings.parser.RailwayLink;
+import playground.polettif.crossings.parser.RailLink;
 import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
@@ -48,7 +48,7 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 	private Network network;
 
 	private Map<List<Object>, Double> enterEvents = new HashMap<>();
-	private Map<Id<Link>, RailwayLink> railwayLinks;
+	private Map<Id<Link>, RailLink> RailLinks;
 
 	public void reset(int iteration) {
 		System.out.println("reset...");
@@ -58,12 +58,12 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 		// from ScenarioLoaderImpl
 		CrossingsParser parser = new CrossingsParser();
 		parser.parse(filename);
-		this.railwayLinks = parser.getRailwayLinks();
+		this.RailLinks = parser.getRailLinks();
 		}
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {	
-		if(railwayLinks.keySet().contains(event.getLinkId())) {
+		if(RailLinks.keySet().contains(event.getLinkId())) {
 			List<Object> key = new ArrayList<>();
 			key.add(event.getVehicleId());
 			key.add(event.getLinkId());
@@ -75,7 +75,7 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if(railwayLinks.containsKey(event.getLinkId())) {
+		if(RailLinks.containsKey(event.getLinkId())) {
 			
 			// get corresponding enterEvent
 			List<Object> key = new ArrayList<>();
@@ -90,10 +90,10 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 			// todo combine change events with the same time
 			Id<Link> railId = event.getLinkId();
 			
-			RailwayLink railwayLink = railwayLinks.get(railId);
+			RailLink RailLink = RailLinks.get(railId);
 
 			int id=0;
-			for(Crossing crossing : railwayLink.getCrossings()) {
+			for(Crossing crossing : RailLink.getCrossings()) {
 				Id<Link> crossId = crossing.getRefLinkId();
 
 				// todo create method to get two closest link with identical distance
