@@ -45,13 +45,13 @@ import java.util.Map;
  *
  * @author boescpa
  */
-public class DijkstraRouterModes implements Router {
+public class DijkstraRouter implements Router {
 
 	private final Network network;
     private final LeastCostPathCalculator pathCalculator;
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths = new HashMap<>();
 
-    public DijkstraRouterModes(Network network) {
+    public DijkstraRouter(Network network) {
         LeastCostPathCalculatorFactory factory = new DijkstraFactory();
 		this.network = network;
         this.pathCalculator = factory.createPathCalculator(network, this, this);

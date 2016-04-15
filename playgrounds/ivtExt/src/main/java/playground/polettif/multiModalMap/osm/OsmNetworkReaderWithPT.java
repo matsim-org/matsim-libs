@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.polettif.multiModalMap.osm.core.*;
 
@@ -113,19 +114,20 @@ public class OsmNetworkReaderWithPT {
 	/*
 	Maps for unknown entities
 	 */
-	private final Set<String> unknownHighways = new HashSet<String>();
-	private final Set<String> unknownRailways = new HashSet<String>();
-	private final Set<String> unknownPTs = new HashSet<String>();
-	private final Set<String> unknownWays = new HashSet<String>();
-	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
-	private final Set<String> unknownLanesTags = new HashSet<String>();
+	private final Set<String> unknownHighways = new HashSet<>();
+	private final Set<String> unknownRailways = new HashSet<>();
+	private final Set<String> unknownPTs = new HashSet<>();
+	private final Set<String> unknownWays = new HashSet<>();
+	private final Set<String> unknownMaxspeedTags = new HashSet<>();
+	private final Set<String> unknownLanesTags = new HashSet<>();
+	private final CoordinateTransformation transformation; // is applied to nodes in OsmParserHandler
 	private long id = 0;
 
 	/*
 	Default values
 	 */
-	private final Map<String, OsmWayDefaults> highwayDefaults = new HashMap<String, OsmWayDefaults>();
-	private final Map<String, OsmWayDefaults> railwayDefaults = new HashMap<String, OsmWayDefaults>();
+	private final Map<String, OsmWayDefaults> highwayDefaults = new HashMap<>();
+	private final Map<String, OsmWayDefaults> railwayDefaults = new HashMap<>();
 	private final TagFilter ptFilter = new TagFilter();
 
 	/*
@@ -146,8 +148,8 @@ public class OsmNetworkReaderWithPT {
 	 *
 	 * @param network An empty network where the converted OSM data will be stored.
 	 */
-	public OsmNetworkReaderWithPT(final Network network) {
-		this(network, true);
+	public OsmNetworkReaderWithPT(final Network network, final CoordinateTransformation transformation) {
+		this(network, transformation, true);
 	}
 
 	/**
@@ -156,8 +158,9 @@ public class OsmNetworkReaderWithPT {
 	 * @param network An empty network where the converted OSM data will be stored.
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
-	public OsmNetworkReaderWithPT(final Network network, final boolean useHighwayDefaults) {
+	public OsmNetworkReaderWithPT(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
 		this.network = network;
+		this.transformation = transformation;
 
 		if (useHighwayDefaults) {
 			log.info("Falling back to default values.");
@@ -300,7 +303,7 @@ public class OsmNetworkReaderWithPT {
 	public void parse(final String osmFilename) throws UncheckedIOException {
 
 		OsmParser parser = new OsmParser();
-		parser.addHandler(new OsmParserHandler(this.nodes, this.ways, this.relations, this.wayIds));
+		parser.addHandler(new OsmParserHandler(this.nodes, this.ways, this.relations, this.wayIds, this.transformation));
 		parser.readFile(osmFilename);
 
 		this.convert();
@@ -574,7 +577,9 @@ public class OsmNetworkReaderWithPT {
 			}
 		}
 
-		if (railway != null) {modes.add(railway);}
+		if (railway != null && railwayDefaults.containsKey(railway)) {
+			modes.add(railway);
+		}
 
 		if (modes.isEmpty()) {modes.add("unknownStreetType");}
 
@@ -721,14 +726,16 @@ public class OsmNetworkReaderWithPT {
 		private final Map<Long, OsmRelation> relations;
 
 		private final Map<Long, Long> wayIds;
+		private final CoordinateTransformation transformation;
 
 		public OsmParserHandler(final Map<Long, OsmNode> nodes, final Map<Long, OsmWay> ways,
 							  final Map<Long, OsmRelation> relations,
-							  final Map<Long, Long> wayIds) {
+							  final Map<Long, Long> wayIds, CoordinateTransformation transformation) {
 			this.nodes = nodes;
 			this.ways = ways;
 			this.relations = relations;
 			this.wayIds = wayIds;
+			this.transformation = transformation;
 		}
 
 		@Override
@@ -738,32 +745,12 @@ public class OsmNetworkReaderWithPT {
 			// only use relations with a tag specified in ptFilter
 			if (OsmNetworkReaderWithPT.this.ptFilter.matches(currentRelation.tags)) {
 				this.relations.put(currentRelation.id, currentRelation);
-
-				// just use everything of a relation
-				/*
-				for (OsmParser.OsmRelationMember member : currentRelation.members) {
-
-					// add all member way ids of the relation to the map
-					if (member.type == OsmParser.OsmRelationMemberType.WAY) {
-						this.wayIds.put(member.refId, currentRelation.id);
-					}
-
-					// add all nodes which are stops to the map
-
-					if (member.type == OsmParser.OsmRelationMemberType.NODE) {
-						if((MEMBER_ROLE_STOP.equals(member.role) || MEMBER_ROLE_STOP_FORWARD.equals(member.role) || MEMBER_ROLE_STOP_BACKWARD.equals(member.role))) {
-							this.nodes.put(member.refId, currentRelation.id);
-						}
-					}
-
-				}
-			*/
 			}
 		}
 
 		@Override
 		public void handleNode(OsmParser.OsmNode node) {
-			this.nodes.put(node.id, new OsmNode(node.id, node.coord));
+			this.nodes.put(node.id, new OsmNode(node.id, transformation.transform(node.coord)));
 		}
 
 		@Override

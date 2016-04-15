@@ -16,35 +16,36 @@
  *                                                                         *
  * *********************************************************************** */
 
+
 package playground.polettif.multiModalMap.workbench;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.algorithms.NetworkTransform;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import playground.polettif.multiModalMap.osm.MultimodalNetworkCreatorPT;
+import playground.polettif.multiModalMap.mapping.PTMapperModes;
 
-public class RunOSM2Network {
+public class RunPTMapperModes {
 
-    public static void main(String[] args){
+	public static void main(String[] args) {
 
-        Config config = ConfigUtils.createConfig();
-        Scenario sc = ScenarioUtils.createScenario(config);
-        Network network = sc.getNetwork();
 
-        String path2OSMFile = "C:/Users/polettif/Desktop/data/osm/zurich-plus.osm";
-        String outputMultimodalNetwork = "C:/Users/polettif/Desktop/data/network/mm/zurich-plus-mm.xml";
+		String base = "C:/Users/polettif/Desktop/";
+		String outbase = base+"output/mtsMapping_modes/";
 
-        new MultimodalNetworkCreatorPT(network).createMultimodalNetwork(path2OSMFile);
+		// input
+//		final String mtsFile = base + "data/mts/zvv/zvv_unmappedSchedule_LV1903+.xml";
+//		final String mtsFile = base + "data/mts/uri/schedule_unmapped_cut.xml";
+//		final String mtsFile = base + "data/mts/uri/debug.xml";
+//		final String mtsFile = base + "data/mts/zvv_69er.xml";
+//		final String mtsFile = base + "data/mts/unmapped/fromHafas/uri.xml";
+		final String mtsFile = base + "data/mts/unmapped/fromHafas/zurich.xml";
+//		final String mtsFile = base + "data/mts/unmapped/fromGtfs/zvv.xml";
+//		final String mtsFile = base + "data/mts/unmapped/fromHafas/debug-pseudo.xml";
 
-        NetworkTransform networkTransform = new NetworkTransform(TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus"));
-        networkTransform.run(network);
-        new NetworkWriter(network).write(outputMultimodalNetwork);
+//		final String networkFile = base + "data/network/uri.xml.gz";
+//		final String networkFile = base + "data/network/zurich-city.xml.gz";
+//		final String networkFile = base + "data/network/zurich-plus.xml.gz";
+		final String networkFile = base + "data/network/mm/zurich-plus-mm.xml";
+//		final String networkFile = base + "data/network/uri.xml.gz";
 
-    }
+		PTMapperModes.main(new String[]{mtsFile, networkFile, outbase+"schedule.xml", outbase+"network.xml"});
+	}
+
 }

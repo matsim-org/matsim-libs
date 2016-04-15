@@ -46,6 +46,7 @@ public class StopFacilityTree {
 	private final double nodeSearchRadius;
 	private final int maxNclosestLinks;
 	private final double maxLinkFacilityDistance;
+	private final String transportMode;
 
 	private int artificialId = 0;
 
@@ -66,14 +67,16 @@ public class StopFacilityTree {
 	 *                         Note: if two links have the same distance to the stop facility both are used
 	 *                         regardless whether the maximum was already reached.
 	 */
-	// todo put searchRadius and so on in config and just use config as param
-	public StopFacilityTree(TransitSchedule transitSchedule, Network network, double nodeSearchRadius, int maxNclosestLinks, double maxLinkFacilityDistance) {
+	// todo rearrange stopFacilityTree to include all modes
+	public StopFacilityTree(TransitSchedule transitSchedule, Network network, String transportMode, double nodeSearchRadius, int maxNclosestLinks, double maxLinkFacilityDistance) {
 
 		this.schedule = transitSchedule;
 		this.nodeSearchRadius = nodeSearchRadius;
 		this.maxNclosestLinks = maxNclosestLinks;
 		this.maxLinkFacilityDistance = maxLinkFacilityDistance;
 		this.scheduleFactory = schedule.getFactory();
+
+		this.transportMode = transportMode;
 
 		Map<TransitStopFacility, Integer> childFacilityCounter = new HashMap<>();
 
@@ -105,7 +108,7 @@ public class StopFacilityTree {
 				int counter = (int) MapUtils.addToInteger(linkCandidate.getParentStop(), childFacilityCounter, 0, 1);
 
 				TransitStopFacility newFacility = scheduleFactory.createTransitStopFacility(
-						Id.create(linkCandidate.getParentStop().getId() + SUFFIX_CHILD_STOPFACILITIES + counter, TransitStopFacility.class),
+						Id.create(linkCandidate.getParentStop().getId() + SUFFIX_CHILD_STOPFACILITIES + linkCandidate.getLink().getId() + transportMode, TransitStopFacility.class),
 						linkCandidate.getParentStop().getCoord(),
 						linkCandidate.getParentStop().getIsBlockingLane()
 				);
@@ -124,9 +127,14 @@ public class StopFacilityTree {
 		childFacilities.forEach(schedule::addStopFacility);
 	}
 
-	/**
-	 * @return A list of link candidates for parentStopFacility
-	 */
+
+	public StopFacilityTree(TransitSchedule transitSchedule, Network network, double nodeSearchRadius, int maxNclosestLinks, double maxLinkFacilityDistance) {
+		this(transitSchedule, network, "", nodeSearchRadius, maxNclosestLinks, maxLinkFacilityDistance);
+	}
+
+		/**
+		 * @return A list of link candidates for parentStopFacility
+		 */
 	public List<LinkCandidate> getLinkCandidates(TransitStopFacility parentStopFacility) {
 		return MapUtils.getList(parentStopFacility, linkCandidates);
 	}

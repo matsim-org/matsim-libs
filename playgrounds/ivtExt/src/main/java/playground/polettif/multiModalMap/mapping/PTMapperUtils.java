@@ -23,22 +23,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.util.FastAStarEuclideanFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.mapping.container.PTPath;
 import playground.polettif.multiModalMap.mapping.container.PTPathImpl;
+import playground.polettif.multiModalMap.mapping.router.FastAStarLandmarksRouting;
 import playground.polettif.multiModalMap.mapping.router.Router;
-import playground.polettif.multiModalMap.tools.NetworkTools;
-import playground.polettif.multiModalMap.workbench.RunOSM2Network;
+import playground.polettif.multiModalMap.workbench.RunOSM2MMNetwork;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -303,40 +298,51 @@ public class PTMapperUtils {
 	 *
 	 * @param schedule where transitRoutes should be routed
 	 */
-	public static void routeSchedule(TransitSchedule schedule, Network network, Router router) {
+	public static void routeSchedule(TransitSchedule schedule, Network network, Map<String, Router> routers) {
 		Counter counterRoute = new Counter("route # ");
 
 		log.info("Routing all routes with referenced links...");
-		for(TransitLine line : schedule.getTransitLines().values()) {
-			for(TransitRoute route : line.getRoutes().values()) {
-				counterRoute.incCounter();
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 
-				// TODO change modes
-				if(route.getTransportMode().equals("bus")) {
+				Router router = null;
+				boolean doRoute = true;
+				if(routers == null) {
+					router = new FastAStarLandmarksRouting(network);
+				} else if(routers.size() == 1 && routers.containsKey("one")) {
+					router = routers.get("one");
+				} else if(routers.containsKey(transitRoute.getTransportMode())) {
+					router = routers.get(transitRoute.getTransportMode());
+				} else {
+					log.info("No router found for transport mode " + transitRoute.getTransportMode() + ".");
+					doRoute = false;
+				}
 
-					List<TransitRouteStop> routeStops = route.getStops();
+				if(doRoute) {
+					counterRoute.incCounter();
+
+					List<TransitRouteStop> routeStops = transitRoute.getStops();
 					List<Id<Link>> linkSequence = new ArrayList<>();
 
 					// add very first link
 					linkSequence.add(routeStops.get(0).getStopFacility().getLinkId());
 
 					// route
-					for(int i = 0; i < routeStops.size()-1; i++) {
+					for(int i = 0; i < routeStops.size() - 1; i++) {
 						if(routeStops.get(i).getStopFacility().getLinkId() == null) {
 							log.error("stop facility " + routeStops.get(i).getStopFacility().getName() + " (" + routeStops.get(i).getStopFacility().getId() + " not referenced!");
 						}
-						if(routeStops.get(i+1).getStopFacility().getLinkId() == null) {
-							log.error("stop facility " + routeStops.get(i-1).getStopFacility().getName() + " (" + routeStops.get(i+1).getStopFacility().getId() + " not referenced!");
+						if(routeStops.get(i + 1).getStopFacility().getLinkId() == null) {
+							log.error("stop facility " + routeStops.get(i - 1).getStopFacility().getName() + " (" + routeStops.get(i + 1).getStopFacility().getId() + " not referenced!");
 						}
 
 						Link currentLink = network.getLinks().get(routeStops.get(i).getStopFacility().getLinkId());
-						Link nextLink = network.getLinks().get(routeStops.get(i+1).getStopFacility().getLinkId());
+						Link nextLink = network.getLinks().get(routeStops.get(i + 1).getStopFacility().getLinkId());
 
-						List<Id<Link>> path = null ;
-//						List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode(), null, null));
-						Logger.getLogger(RunOSM2Network.class).fatal("did not compile with the above line, thus commenting it out. kai") ;
+						List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode()));
+						Logger.getLogger(RunOSM2MMNetwork.class).fatal("did not compile with the above line, thus commenting it out. kai");
 						System.exit(-1);
-					        
+
 
 						if(path != null)
 							linkSequence.addAll(path);
@@ -345,12 +351,30 @@ public class PTMapperUtils {
 					}
 
 					// add link sequence to schedule
-					route.setRoute(RouteUtils.createNetworkRoute(linkSequence, network));
+					transitRoute.setRoute(RouteUtils.createNetworkRoute(linkSequence, network));
 				}
 			}
 		}
 		log.info("Routing all routes with referenced links... done");
 	}
+
+	/**
+	 * Generates link sequences for all transit routes in the schedule, modifies the schedule.
+	 * StopFacilities must have a reference link.
+	 *
+	 * @param schedule
+	 * @param network
+	 * @param router initiates a new router with the given network if <code>null</code>
+	 */
+	public static void routeSchedule(TransitSchedule schedule, Network network, Router router) {
+		Map<String, Router> routers = null;
+		if(router != null) {
+			routers = new HashMap<>();
+			routers.put("one", router);
+		}
+		routeSchedule(schedule, network, routers);
+	}
+
 
 	public static void removeNonTransitLinks(TransitSchedule schedule, Network network, Set<String> modesToCleanUp) {
 		Set<Id<Link>> usedTransitLinkIds = new HashSet<>();
