@@ -52,9 +52,9 @@ public class CrossingsParser extends MatsimXmlParser {
 	// private members
 	// ========================================================================
 
-	private RailwayLink currentRailwayLink;
+	private RailLink currentRailLink;
 	
-	private Map<Id<Link>, RailwayLink> railwayLinks;
+	private Map<Id<Link>, RailLink> railwayLinks;
 
 	// ========================================================================
 	// constructor
@@ -70,12 +70,12 @@ public class CrossingsParser extends MatsimXmlParser {
 	
 	/**
 	 * Parses a file with crossings and returns a list with
-	 * instances of {@link RailwayLink}.
+	 * instances of {@link RailLink}.
 	 *
 	 * @param file
 	 *            a xml file containing network change events.
 	 */
-	public Map<Id<Link>, RailwayLink> parseCrossings(String file) {
+	public Map<Id<Link>, RailLink> parseCrossings(String file) {
 		railwayLinks = new HashMap<>();
 		super.parse(file);
 		return railwayLinks;
@@ -110,7 +110,7 @@ public class CrossingsParser extends MatsimXmlParser {
 	 *         {@link #parse(String)}, {@link #parse(String)} nor
 	 *         {@link #parse(URL)} has been called before.
 	 */
-	public Map<Id<Link>, RailwayLink> getRailwayLinks() {
+	public Map<Id<Link>, RailLink> getRailLinks() {
 		return railwayLinks;
 	}
 	
@@ -121,8 +121,8 @@ public class CrossingsParser extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(name.equalsIgnoreCase(PTLINK_TAG)) {
-			railwayLinks.put(currentRailwayLink.getId(), currentRailwayLink);
-			currentRailwayLink = null;
+			railwayLinks.put(currentRailLink.getId(), currentRailLink);
+			currentRailLink = null;
 		}
 	}
 
@@ -133,19 +133,19 @@ public class CrossingsParser extends MatsimXmlParser {
 		 */
 		if(name.equalsIgnoreCase(PTLINK_TAG)) {
 			String value = atts.getValue(PTLINK_KEY_ID);
-			currentRailwayLink = new RailwayLink(value);
+			currentRailLink = new RailLink(value);
 		/*
 		 * crossingLinks
 		 */
-		} else if(name.equalsIgnoreCase(CROSSING_TAG) && currentRailwayLink != null) {
+		} else if(name.equalsIgnoreCase(CROSSING_TAG) && currentRailLink != null) {
 			String refId = atts.getValue(CROSSING_KEY_REFID);
 			String x = atts.getValue(CROSSING_KEY_X);
 			String y = atts.getValue(CROSSING_KEY_Y);
 			if(refId != null) {
-				currentRailwayLink.addCrossing(new Crossing(Id.createLinkId(refId)));
+				currentRailLink.addCrossing(new Crossing(Id.createLinkId(refId)));
 				}
 			if(x != null && y != null) {
-				currentRailwayLink.addCrossing(new Crossing(Double.parseDouble(x), Double.parseDouble(y)));
+				currentRailLink.addCrossing(new Crossing(Double.parseDouble(x), Double.parseDouble(y)));
 			}
 		}
 		

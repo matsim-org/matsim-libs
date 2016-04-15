@@ -18,31 +18,28 @@
 
 package playground.polettif.crossings.parser;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * Public transport link with crossings on it
+ * Public transport link with referenced Crossings on it
  */
-public class RailwayLink {
-	
+public class RailLink {
+
 	private Id<Link> ptId;
 	private Set<Crossing> crossings = new HashSet<>();
 
-	public RailwayLink(String ptId) {
+	public RailLink(String ptId) {
 		this.ptId = Id.createLinkId(ptId);
 	}
-	
+
 	public void addCrossing(Crossing crossing) {
 		this.crossings.add(crossing);
 	}
-	
+
 	public Id<Link> getId() {
 		return ptId;
 	}
@@ -50,4 +47,5 @@ public class RailwayLink {
 	public Set<Crossing> getCrossings() {
 		return crossings;
 	}
+
 }
