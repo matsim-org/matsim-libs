@@ -24,6 +24,7 @@ import playground.balac.induceddemand.config.ActivityStrategiesConfigGroup;
 import playground.balac.induceddemand.controler.listener.ActivitiesAnalysisListener;
 import playground.balac.induceddemand.strategies.RandomActivitiesSwaperStrategy;
 import playground.balac.induceddemand.strategies.RemoveRandomActivityStrategy;
+import playground.balac.induceddemand.strategies.activitychainmodifier.ActivityChainModifierStrategy;
 import playground.balac.induceddemand.strategies.insertactivity.InsertRandomActivityWithLocationChoiceStrategy;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
@@ -91,7 +92,7 @@ public class ZurichScenarioControler {
 		
 		final QuadTreeRebuilder<ActivityFacility> shopFacilitiesQuadTree = new QuadTreeRebuilder<ActivityFacility>();
 		
-		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shopping").values()) {
+		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shop").values()) {
 			
 			shopFacilitiesQuadTree.put(af.getCoord(), af);
 		}
@@ -125,11 +126,12 @@ public class ZurichScenarioControler {
 		controler.addOverridingModule( new AbstractModule() {
 			@Override
 			public void install() {
-				this.addPlanStrategyBinding("InsertRandomActivityWithLocationChoiceStrategy").to( InsertRandomActivityWithLocationChoiceStrategy.class ) ;
+			//	this.addPlanStrategyBinding("InsertRandomActivityWithLocationChoiceStrategy").to( InsertRandomActivityWithLocationChoiceStrategy.class ) ;
 
-				this.addPlanStrategyBinding("RandomActivitiesSwaperStrategy").to( RandomActivitiesSwaperStrategy.class ) ;
+			//	this.addPlanStrategyBinding("RandomActivitiesSwaperStrategy").to( RandomActivitiesSwaperStrategy.class ) ;
 				
-				this.addPlanStrategyBinding("RemoveRandomActivityStrategy").to( RemoveRandomActivityStrategy.class ) ;
+			//	this.addPlanStrategyBinding("RemoveRandomActivityStrategy").to( RemoveRandomActivityStrategy.class ) ;
+				this.addPlanStrategyBinding("ActivityChainModifierStrategy").to(ActivityChainModifierStrategy.class);
 
 			}
 		});	
