@@ -16,7 +16,7 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 	
 	ChargingPlugStatus getChargingPlugStatus();
 	
-	HashMap<ChargingLevel,Double> getAvailableChargingLevels();
+	Collection<ChargingLevel> getAvailableChargingLevels();
 	
 	// We assume that one charging plug can potentially serve multiple parking spots located adjacent to it. But only one parked car at a time can use it.
 	// For example in the scenarios it could be assumed that the charger is released when charging is finished (e.g. electronic unlock - chargingPlugStatus=AVAILABLE).
@@ -30,8 +30,6 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 	
 	void selectChargingLevel(ChargingLevel chargingLevel);
 	
-	double getParkingPriceQuote(double time, double duration);
-	
-	double getChargingPriceQuote(double time, double duration);
+
 	
 }
