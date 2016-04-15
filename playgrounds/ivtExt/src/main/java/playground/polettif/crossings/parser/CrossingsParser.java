@@ -52,15 +52,9 @@ public class CrossingsParser extends MatsimXmlParser {
 	// private members
 	// ========================================================================
 
-<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 	private RailLink currentRailLink;
 	
 	private Map<Id<Link>, RailLink> railwayLinks;
-=======
-	private RailwayLink currentRailwayLink;
-	
-	private Map<Id<Link>, RailwayLink> railwayLinks;
->>>>>>> changed crossings handler, added coordinates
 
 	// ========================================================================
 	// constructor
@@ -76,20 +70,12 @@ public class CrossingsParser extends MatsimXmlParser {
 	
 	/**
 	 * Parses a file with crossings and returns a list with
-<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 	 * instances of {@link RailLink}.
-=======
-	 * instances of {@link RailwayLink}.
->>>>>>> changed crossings handler, added coordinates
 	 *
 	 * @param file
 	 *            a xml file containing network change events.
 	 */
-<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 	public Map<Id<Link>, RailLink> parseCrossings(String file) {
-=======
-	public Map<Id<Link>, RailwayLink> parseCrossings(String file) {
->>>>>>> changed crossings handler, added coordinates
 		railwayLinks = new HashMap<>();
 		super.parse(file);
 		return railwayLinks;
@@ -124,11 +110,7 @@ public class CrossingsParser extends MatsimXmlParser {
 	 *         {@link #parse(String)}, {@link #parse(String)} nor
 	 *         {@link #parse(URL)} has been called before.
 	 */
-<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 	public Map<Id<Link>, RailLink> getRailLinks() {
-=======
-	public Map<Id<Link>, RailwayLink> getRailwayLinks() {
->>>>>>> changed crossings handler, added coordinates
 		return railwayLinks;
 	}
 	
@@ -139,13 +121,8 @@ public class CrossingsParser extends MatsimXmlParser {
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(name.equalsIgnoreCase(PTLINK_TAG)) {
-<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 			railwayLinks.put(currentRailLink.getId(), currentRailLink);
 			currentRailLink = null;
-=======
-			railwayLinks.put(currentRailwayLink.getId(), currentRailwayLink);
-			currentRailwayLink = null;
->>>>>>> changed crossings handler, added coordinates
 		}
 	}
 
@@ -156,34 +133,19 @@ public class CrossingsParser extends MatsimXmlParser {
 		 */
 		if(name.equalsIgnoreCase(PTLINK_TAG)) {
 			String value = atts.getValue(PTLINK_KEY_ID);
-<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 			currentRailLink = new RailLink(value);
 		/*
 		 * crossingLinks
 		 */
 		} else if(name.equalsIgnoreCase(CROSSING_TAG) && currentRailLink != null) {
-=======
-			currentRailwayLink = new RailwayLink(value);
-		/*
-		 * crossingLinks
-		 */
-		} else if(name.equalsIgnoreCase(CROSSING_TAG) && currentRailwayLink != null) {
->>>>>>> changed crossings handler, added coordinates
 			String refId = atts.getValue(CROSSING_KEY_REFID);
 			String x = atts.getValue(CROSSING_KEY_X);
 			String y = atts.getValue(CROSSING_KEY_Y);
 			if(refId != null) {
-<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 				currentRailLink.addCrossing(new Crossing(Id.createLinkId(refId)));
 				}
 			if(x != null && y != null) {
 				currentRailLink.addCrossing(new Crossing(Double.parseDouble(x), Double.parseDouble(y)));
-=======
-				currentRailwayLink.addCrossing(new Crossing(Id.createLinkId(refId)));
-				}
-			if(x != null && y != null) {
-				currentRailwayLink.addCrossing(new Crossing(Double.parseDouble(x), Double.parseDouble(y)));
->>>>>>> changed crossings handler, added coordinates
 			}
 		}
 		
