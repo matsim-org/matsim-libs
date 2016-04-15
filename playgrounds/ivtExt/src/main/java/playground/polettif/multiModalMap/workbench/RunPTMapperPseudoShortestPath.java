@@ -27,7 +27,7 @@ public class RunPTMapperPseudoShortestPath {
 
 
 		String base = "C:/Users/polettif/Desktop/";
-		String outbase = base+"output/mtsMapping_gtfs/";
+		String outbase = base+"output/mtsMapping_test/";
 
 		// input
 //		final String mtsFile = base + "data/mts/zvv/zvv_unmappedSchedule_LV1903+.xml";
@@ -35,13 +35,13 @@ public class RunPTMapperPseudoShortestPath {
 //		final String mtsFile = base + "data/mts/uri/debug.xml";
 //		final String mtsFile = base + "data/mts/zvv_69er.xml";
 //		final String mtsFile = base + "data/mts/unmapped/fromHafas/uri.xml";
-//		final String mtsFile = base + "data/mts/unmapped/fromHafas/zurich.xml";
-		final String mtsFile = base + "data/mts/unmapped/fromGtfs/zvv.xml";
+		final String mtsFile = base + "data/mts/unmapped/fromHafas/zurich.xml";
+//		final String mtsFile = base + "data/mts/unmapped/fromGtfs/zvv.xml";
 //		final String mtsFile = base + "data/mts/unmapped/fromHafas/debug-pseudo.xml";
 
 //		final String networkFile = base + "data/network/uri.xml.gz";
 //		final String networkFile = base + "data/network/zurich-city.xml.gz";
-		final String networkFile = base + "data/network/zurich-plus.xml.gz";
+		final String networkFile = base + "data/network/mm/zurich-plus-mm.xml";
 //		final String networkFile = base + "data/network/uri.xml.gz";
 
 		PTMapperPseudoShortestPath.main(new String[]{mtsFile, networkFile, outbase+"schedule.xml", outbase+"network.xml"});

@@ -22,22 +22,23 @@
 package playground.polettif.multiModalMap.mapping;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
+import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.DijkstraAlgorithm;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.PseudoGraph;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidate;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidatePath;
-import playground.polettif.multiModalMap.mapping.router.DijkstraRouterModes;
+import playground.polettif.multiModalMap.mapping.router.DijkstraRouter;
+import playground.polettif.multiModalMap.mapping.router.ModeLinkFilter;
 import playground.polettif.multiModalMap.mapping.router.Router;
+import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
 
@@ -47,24 +48,21 @@ import java.util.*;
  *
  * Creates pseudo paths via all link candidates, chooses the path with the lowest travel time.
  * <p>
- * TODO doc input is modified
  *
  * @author polettif
  */
 public class PTMapperModes extends PTMapper {
 
-	// TODO move params to a config?
-
-
 	/**
-	 * fields
-	 */
-
-	/**
-	 * Constructor
+	 * Constructor.
+	 * The given schedule is modified via {@link #mapScheduleToNetwork(Network)}
 	 */
 	public PTMapperModes(TransitSchedule schedule) {
 		super(schedule);
+	}
+
+	public PTMapperModes(TransitSchedule schedule, PublicTransportMapConfigGroup config) {
+		super(schedule, config);
 	}
 
 	/**
@@ -103,7 +101,7 @@ public class PTMapperModes extends PTMapper {
 		TransitSchedule mainSchedule = mainScenario.getTransitSchedule();
 
 		log.info("Mapping transit schedule to network...");
-		new PTMapperPseudoShortestPath(mainSchedule).mapScheduleToNetwork(mainNetwork);
+		new PTMapperModes(mainSchedule, PublicTransportMapConfigGroup.createDefaultConfig()).mapScheduleToNetwork(mainNetwork);
 
 		log.info("Writing schedule and network to file...");
 		new TransitScheduleWriter(mainSchedule).writeFile(outputScheduleFile);
@@ -121,28 +119,42 @@ public class PTMapperModes extends PTMapper {
 
 		Counter counterLine = new Counter("route # ");
 
+		/**
+		 * Create differen network for all Routes, initiate routers.
+		 * TODO move to separate class, preprocess data
+ 		 */
+		Map<String, Network> modeNetworks = new HashMap<>(); // key: ScheduleTransportMode
+		Map<String, Router> routers = new HashMap<>(); 	// key: ScheduleTransportMode
+		for(Map.Entry<String, String> mode : config.getModes().entrySet()) {
+			log.info("Creating network for transportMode " + mode.getKey());
+			Network newNetwork = NetworkTools.getFilteredNetwork(network, new ModeLinkFilter(mode.getValue()), null);
+			modeNetworks.put(mode.getKey(), newNetwork);
+			new NetworkWriter(newNetwork).write("C:/Users/polettif/Desktop/output/modeNetworks/zh_"+mode.getKey()+".xml");
+			routers.put(mode.getKey(), new DijkstraRouter(newNetwork));
+		}
+
 		/** [.]
 		 * preload closest links and create child StopFacilities
 		 * if a stop facility is already referenced (manually beforehand for example) no child facilities are created
 		 * stopfacilities with no links within search radius need artificial links and nodes before routing starts
 		 */
-		StopFacilityTree stopFacilityTree = new StopFacilityTree(schedule, network, config.getNodeSearchRadius(), config.getMaxNClosestLinks(), config.getMaxStopFacilityDistance());
+		Map<String, StopFacilityTree> stopFacilityTrees = new HashMap<>();
+		for(String mode : config.getModes().keySet()) {
+			StopFacilityTree stopFacilityTree = new StopFacilityTree(schedule, modeNetworks.get(mode), mode, config.getNodeSearchRadius(), config.getMaxNClosestLinks(), config.getMaxStopFacilityDistance());
+			stopFacilityTrees.put(mode, stopFacilityTree);
+		}
 
-		Map<Tuple<Link, Link>, LeastCostPathCalculator.Path> pathsStorage = new HashMap<>();
 
-		// initiate router
-		Router router = new DijkstraRouterModes(network);
-
-		/** [3]-[5]
-		 * iterate through
-		 * - lines
-		 *   - routes
-		 * 	   - stops
-		 * 	   > calculate link weights
-		 * 	   > get best scoring link and assign child stop facility
+		/**
+		 * TODO doc
 		 */
 		for (TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
+
+				StopFacilityTree stopFacilityTree = stopFacilityTrees.get(transitRoute.getTransportMode());
+
+				String transitRouteTransportMode = transitRoute.getTransportMode();
+				Router modeRouter = routers.get(transitRouteTransportMode);
 
 				List<TransitRouteStop> routeStops = transitRoute.getStops();
 
@@ -154,7 +166,6 @@ public class PTMapperModes extends PTMapper {
 				/** [.]
 				 * calculate shortest paths between each link candidate
 				 */
-
 				// add dummy edges and nodes to pseudoGraph before the transitRoute
 				pseudoGraph.addDummyBefore(stopFacilityTree.getLinkCandidates(routeStops.get(0).getStopFacility()));
 
@@ -168,7 +179,7 @@ public class PTMapperModes extends PTMapper {
 
 					for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 						for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-							LeastCostPathCalculator.Path leastCostPath = router.calcLeastCostPath(linkCandidateCurrent.getLink().getToNode(), linkCandidateNext.getLink().getFromNode());
+							LeastCostPathCalculator.Path leastCostPath = modeRouter.calcLeastCostPath(linkCandidateCurrent.getLink().getToNode(), linkCandidateNext.getLink().getFromNode());
 
 							double travelTime = leastCostPath.travelTime;
 
@@ -198,13 +209,16 @@ public class PTMapperModes extends PTMapper {
 		 *
 		 */
 		log.info("Replacing parent StopFacilities with child StopFacilities...");
-		stopFacilityTree.replaceParentWithChildStopFacilities();
-
+		for(StopFacilityTree stopFacilityTree : stopFacilityTrees.values()) {
+			stopFacilityTree.replaceParentWithChildStopFacilities();
+		}
 
 		/** [7]
 		 * route all routes with the new referenced links
 		 */
-		PTMapperUtils.routeSchedule(schedule, network, router);
+		PTMapperUtils.routeSchedule(schedule, network, routers);
+
+		// TODO merge child stops with same link ref but different modes
 
 		/** [8]
 		 * After all lines created, clean all non-linked stations, all pt-exclusive links (check allowed modes)

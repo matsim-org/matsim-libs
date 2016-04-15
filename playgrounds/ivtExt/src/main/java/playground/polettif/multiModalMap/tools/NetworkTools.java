@@ -22,15 +22,16 @@ package playground.polettif.multiModalMap.tools;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.filter.NetworkLinkFilter;
+import org.matsim.core.network.filter.NetworkNodeFilter;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.*;
@@ -274,23 +275,96 @@ public class NetworkTools {
 		link.setLength(CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), newNode.getCoord()));
 	}
 
-	// TODO
-	public static HashMap<String, Network> getModeSeparatedNetworks(Network network) {
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	/**
+	 * Creates a deep copy of a network
+	 * @param network
+	 * @return
+	 */
+	public static Network copyNetwork(Network network) {
+		return createFilteredNetwork(network, null, null);
+	}
 
-		NetworkFactory factory = network.getFactory();
-		HashMap<String, Network> separatedNetworks = new HashMap<>();
+	/**
+	 * Creates a new network (deep copy) which only contains link with transportMode
+	 * @param network the base network that should be copied
+	 * @param linkFilter to decide which links should be kept
+	 * @return
+	 */
+	public static Network createFilteredNetwork(Network network, NetworkLinkFilter linkFilter, NetworkNodeFilter nodeFilter) {
+		Network newNetwork = NetworkUtils.createNetwork();
 
-		for(Link link : network.getLinks().values()) {
-			Set<String> linkModes = link.getAllowedModes();
+		NetworkLinkFilter lf = (linkFilter == null ? new NetworkLinkFilterAllLinks() : linkFilter);
+		NetworkNodeFilter nf = (nodeFilter == null ? new NetworkNodeFilterAllNodes() : nodeFilter);
 
-			for(String linkMode : linkModes) {
-				if(!separatedNetworks.keySet().contains(linkMode)) {
-//					separatedNetworks.put(linkMode, factory.crea)
-				}
+		// Add node if it passes filter
+		for (Node node : network.getNodes().values()) {
+			if(nf.judgeNode(node)) {
+				addNewNode(newNetwork, node);
 			}
 		}
 
-		return separatedNetworks;
+		// Add link if it passes filter
+		for(Link link : network.getLinks().values()) {
+			if(lf.judgeLink(link)) {
+				addNewLink(newNetwork, link);
+			}
+		}
+
+		new NetworkCleaner().run(newNetwork);
+		return newNetwork;
+	}
+
+	/**
+	 * Creates a  network which only contains link with transportMode
+	 * @param network the base network that should be copied
+	 * @param linkFilter to decide which links should be kept
+	 * @return
+	 */
+	public static Network getFilteredNetwork(Network network, NetworkLinkFilter linkFilter, NetworkNodeFilter nodeFilter) {
+		Network newNetwork = NetworkUtils.createNetwork();
+
+		NetworkLinkFilter lf = (linkFilter == null ? new NetworkLinkFilterAllLinks() : linkFilter);
+		NetworkNodeFilter nf = (nodeFilter == null ? new NetworkNodeFilterAllNodes() : nodeFilter);
+
+		// Add node if it passes filter
+		for (Node node : network.getNodes().values()) {
+			if(nf.judgeNode(node)) {
+				addNewNode(newNetwork, node);
+			}
+		}
+		for(Link link : network.getLinks().values()) {
+			if(lf.judgeLink(link)) {
+				newNetwork.addLink(link);
+			}
+		}
+
+		return newNetwork;
+	}
+
+
+	public static Network addNewNode(Network network, Node node) {
+		Id<Node> nodeId = Id.create(node.getId().toString(), Node.class);
+		if (!network.getNodes().containsKey(nodeId)) {
+			Node newNode = network.getFactory().createNode(nodeId, node.getCoord());
+			network.addNode(newNode);
+		}
+		return network;
+	}
+
+	public static Network addNewLink(Network network, Link link) {
+		Id<Link> linkId = Id.create(link.getId().toString(), Link.class);
+		Id<Node> fromNodeId = Id.create(link.getFromNode().getId().toString(), Node.class);
+		Id<Node> toNodeId = Id.create(link.getToNode().getId().toString(), Node.class);
+
+		if(!network.getLinks().containsKey(linkId)) { // todo && network.getNodes().containsKey(fromNodeId) && network.getNodes().containsKey(toNodeId))
+			Link newLink = network.getFactory().createLink(linkId, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId));
+			newLink.setAllowedModes(link.getAllowedModes());
+			newLink.setCapacity(link.getCapacity());
+			newLink.setFreespeed(link.getFreespeed());
+			newLink.setLength(link.getLength());
+			newLink.setNumberOfLanes(link.getNumberOfLanes());
+			network.addLink(newLink);
+		}
+		return network;
 	}
 }

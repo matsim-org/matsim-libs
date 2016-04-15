@@ -25,7 +25,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -59,6 +61,24 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	private double sameLinkPunishment = 10;
 	private String prefixArtificialLinks = "pt_";
 	private String suffixChildStopFacilities = ".fac:";
+
+	/**
+	 * References transportModes from the schedule (key) and the
+	 * allowed modes of a link from the network (value). <p/>
+	 * <p/>
+	 * Schedule transport modes should be in gtfs categories:
+	 * <ul>
+	 * <li>0 - Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.</li>
+	 * <li>1 - Subway, Metro. Any underground rail system within a metropolitan area.</li>
+	 * <li>2 - Rail. Used for intercity or long-distance travel.</li>
+	 * <li>3 - Bus. Used for short- and long-distance bus routes.</li>
+	 * <li>4 - Ferry. Used for short- and long-distance boat service.</li>
+	 * <li>5 - Cable car. Used for street-level cable cars where the cable runs beneath the car.</li>
+	 * <li>6 - Gondola, Suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.</li>
+	 * <li>7 - Funicular. Any rail system designed for steep inclines.</li>
+	 * </ul>
+	 */
+	private Map<String, String> modes = new HashMap<>();
 
 
 	public PublicTransportMapConfigGroup() {
@@ -181,6 +201,12 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		defaultConfig.modesToCleanUp.add("rail");
 		defaultConfig.mapBusTo.add("bus");
 
+		defaultConfig.modes.put("BUS", "bus");
+		defaultConfig.modes.put("TRAM", "tram");
+		defaultConfig.modes.put("RAIL", "rail");
+		// subway, gondola, funicular, ferry and cablecar are not mapped
+
+
 		return defaultConfig;
 	}
 
@@ -215,5 +241,9 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 
 	public Set<String> getMapBusTo() {
 		return mapBusTo;
+	}
+
+	public Map<String, String> getModes() {
+		return modes;
 	}
 }

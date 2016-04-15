@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;

@@ -199,7 +199,9 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 		/** [7]
 		 * route all routes with the new referenced links
 		 */
-		PTMapperUtils.routeSchedule(schedule, network, router);
+		Map<String, Router> routers = new HashMap<>();
+		routers.put("bus", router);
+		PTMapperUtils.routeSchedule(schedule, network, routers);
 
 		/** [8]
 		 * After all lines created, clean all non-linked stations, all pt-exclusive links (check allowed modes)
