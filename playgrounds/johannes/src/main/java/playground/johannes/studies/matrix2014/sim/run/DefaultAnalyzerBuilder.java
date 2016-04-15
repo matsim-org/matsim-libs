@@ -24,6 +24,7 @@ import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.Config;
 import playground.johannes.studies.matrix2014.analysis.*;
+import playground.johannes.studies.matrix2014.matrix.postprocess.SeasonTask;
 import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
@@ -31,6 +32,7 @@ import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneData;
 import playground.johannes.synpop.gis.ZoneDataLoader;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 
@@ -163,7 +165,8 @@ public class DefaultAnalyzerBuilder {
         /*
 
          */
-        task.addComponent(new DaySeasonTask());
+        TaskRunner.run(new SetSeason(), engine.getRefPersons());
+        task.addComponent(new SeasonTask(engine.getIOContext()));
 
     }
 }

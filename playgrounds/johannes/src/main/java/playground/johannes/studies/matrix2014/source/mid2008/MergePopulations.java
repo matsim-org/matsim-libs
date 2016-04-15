@@ -62,7 +62,7 @@ public class MergePopulations {
 
         logger.info("Converting ride legs to car legs...");
         TaskRunner.run(new ConvertRide2Car(), persons);
-        TaskRunner.run(new InputeDaysTask(persons), persons);
+//        TaskRunner.run(new InputeDaysTask(persons), persons);
 //        logger.info("Converting activities to misc type...");
 //        TaskRunner.run(new Convert2MiscType(), persons);
 

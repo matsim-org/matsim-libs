@@ -105,9 +105,9 @@ public class GSVMatrixSampler implements AnalyzerTask<Collection<? extends Perso
         Predicate<Segment> outPredicate = new DirectionPredicate(direction, true, random);
 
         Predicate<Segment> andPredicate = PredicateAndComposite.create(
-                modePredicate,
                 purposePredicate,
-                outPredicate);
+                outPredicate,
+                modePredicate);
 
         MatrixSampler builder = new MatrixSampler(new DefaultMatrixBuilder(locarions, zones), start, step);
         builder.setLegPredicate(andPredicate);
