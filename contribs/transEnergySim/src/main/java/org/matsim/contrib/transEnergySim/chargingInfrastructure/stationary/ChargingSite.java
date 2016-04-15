@@ -28,6 +28,8 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	// charging points
 	abstract ChargingNetworktOperator getChargingNetworktOperator();
 	
+	double getParkingPriceQuote(double time, double duration);
 	
+	double getChargingPriceQuote(double time, double duration, ChargingLevel chargingLevel);
 	
 }
