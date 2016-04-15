@@ -31,7 +31,11 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import playground.polettif.crossings.parser.Crossing;
 import playground.polettif.crossings.parser.CrossingsParser;
+<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 import playground.polettif.crossings.parser.RailLink;
+=======
+import playground.polettif.crossings.parser.RailwayLink;
+>>>>>>> changed crossings handler, added coordinates
 import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
@@ -48,7 +52,11 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 	private Network network;
 
 	private Map<List<Object>, Double> enterEvents = new HashMap<>();
+<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 	private Map<Id<Link>, RailLink> RailLinks;
+=======
+	private Map<Id<Link>, RailwayLink> railwayLinks;
+>>>>>>> changed crossings handler, added coordinates
 
 	public void reset(int iteration) {
 		System.out.println("reset...");
@@ -58,12 +66,20 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 		// from ScenarioLoaderImpl
 		CrossingsParser parser = new CrossingsParser();
 		parser.parse(filename);
+<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 		this.RailLinks = parser.getRailLinks();
+=======
+		this.railwayLinks = parser.getRailwayLinks();
+>>>>>>> changed crossings handler, added coordinates
 		}
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {	
+<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 		if(RailLinks.keySet().contains(event.getLinkId())) {
+=======
+		if(railwayLinks.keySet().contains(event.getLinkId())) {
+>>>>>>> changed crossings handler, added coordinates
 			List<Object> key = new ArrayList<>();
 			key.add(event.getVehicleId());
 			key.add(event.getLinkId());
@@ -75,7 +91,11 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 		if(RailLinks.containsKey(event.getLinkId())) {
+=======
+		if(railwayLinks.containsKey(event.getLinkId())) {
+>>>>>>> changed crossings handler, added coordinates
 			
 			// get corresponding enterEvent
 			List<Object> key = new ArrayList<>();
@@ -90,10 +110,17 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 			// todo combine change events with the same time
 			Id<Link> railId = event.getLinkId();
 			
+<<<<<<< ae643cdd9f0017dcb2b6960c1623a901d5b059af
 			RailLink RailLink = RailLinks.get(railId);
 
 			int id=0;
 			for(Crossing crossing : RailLink.getCrossings()) {
+=======
+			RailwayLink railwayLink = railwayLinks.get(railId);
+
+			int id=0;
+			for(Crossing crossing : railwayLink.getCrossings()) {
+>>>>>>> changed crossings handler, added coordinates
 				Id<Link> crossId = crossing.getRefLinkId();
 
 				// todo create method to get two closest link with identical distance
