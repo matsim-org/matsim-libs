@@ -16,38 +16,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.crossings;
+package playground.polettif.crossings.parser;
 
+
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-public class LinkChangeEvent {
-	
-	private Id<Link> linkId;
-	private String starttime;
-	private String stoptime;
-	private String capacity;
-     
-	public LinkChangeEvent(Id<Link> linkId, String starttime, String stoptime, String capacity) {
-		this.linkId = linkId;
-		this.starttime = starttime;
-		this.stoptime = stoptime;
-		this.capacity = capacity;
+public class Crossing {
+
+	private Id<Link> refLinkId = null;
+	private Coord coord = null;
+
+	public Crossing(Id<Link> refLinkId) {
+		this.refLinkId = refLinkId;
 	}
-	
-	public Id<Link> getLinkId() {
-		return linkId;
+	public Crossing(Coord coord) {
+		this.coord = coord;
 	}
-	
-	public String getStarttime() {
-		return starttime;
+	public Crossing(double x, double y) {
+		this.coord = new Coord(x, y);
 	}
-	
-	public String getStoptime() {
-		return stoptime;
+
+	public void setRefLinkId(Id<Link> refLinkId) {
+		this.refLinkId = refLinkId;
 	}
-	
-	public String getCapacity() {
-		return capacity;
+
+	public Id<Link> getRefLinkId() {
+		return refLinkId;
+	}
+
+	public Coord getCoord() {
+		return coord;
 	}
 }
