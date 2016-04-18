@@ -23,17 +23,15 @@ import java.util.*;
 
 public class DijkstraAlgorithm {
 	
-	private final List<LinkCandidate> nodes;
-	private final List<LinkCandidatePath> edges;
-	private final LinkCandidate destination;
-	private final LinkCandidate source;
-	private Set<LinkCandidate> settledNodes;
-	private Set<LinkCandidate> unSettledNodes;
-	private Map<LinkCandidate, LinkCandidate> predecessors;
-	private Map<LinkCandidate, Double> distance;
+	private final Set<PseudoRoutePath> edges;
+	private final PseudoRouteStop destination;
+	private final PseudoRouteStop source;
+	private Set<PseudoRouteStop> settledNodes;
+	private Set<PseudoRouteStop> unSettledNodes;
+	private Map<PseudoRouteStop, PseudoRouteStop> predecessors;
+	private Map<PseudoRouteStop, Double> distance;
 
 	public DijkstraAlgorithm(PseudoGraph graph) {
-		this.nodes = graph.getNodes();
 		this.edges = graph.getEdges();
 		this.source = graph.getSource();
 		this.destination = graph.getDestination();
@@ -47,20 +45,18 @@ public class DijkstraAlgorithm {
 		distance.put(source, 0.0);
 		unSettledNodes.add(source);
 		while (unSettledNodes.size() > 0) {
-			LinkCandidate node = getMinimum(unSettledNodes);
+			PseudoRouteStop node = getMinimum(unSettledNodes);
 			settledNodes.add(node);
 			unSettledNodes.remove(node);
 			findMinimalDistances(node);
 		}
 	}
 
-	private void findMinimalDistances(LinkCandidate node) {
-		List<LinkCandidate> adjacentNodes = getNeighbors(node);
-		for (LinkCandidate target : adjacentNodes) {
-			if (getShortestDistance(target) > getShortestDistance(node)
-					+ getDistance(node, target)) {
-				distance.put(target, getShortestDistance(node)
-						+ getDistance(node, target));
+	private void findMinimalDistances(PseudoRouteStop node) {
+		List<PseudoRouteStop> adjacentNodes = getNeighbors(node);
+		for (PseudoRouteStop target : adjacentNodes) {
+			if (getShortestDistance(target) > getShortestDistance(node) + getDistance(node, target)) {
+				distance.put(target, getShortestDistance(node) + getDistance(node, target));
 				predecessors.put(target, node);
 				unSettledNodes.add(target);
 			}
@@ -68,46 +64,46 @@ public class DijkstraAlgorithm {
 
 	}
 
-	private double getDistance(LinkCandidate node, LinkCandidate target) {
-		for (LinkCandidatePath LinkCandidatePath : edges) {
-			if (LinkCandidatePath.getFromLinkCandidate().equals(node)
-					&& LinkCandidatePath.getToLinkCandidate().equals(target)) {
-				return LinkCandidatePath.getWeight();
+	private double getDistance(PseudoRouteStop node, PseudoRouteStop target) {
+		for (PseudoRoutePath pseudoRoutePath : edges) {
+			if (pseudoRoutePath.getFromPseudoStop().equals(node)
+					&& pseudoRoutePath.getToPseudoStop().equals(target)) {
+				return pseudoRoutePath.getWeight();
 			}
 		}
-		return Double.MAX_VALUE;
+		throw new RuntimeException("Should not happen");
 	}
 
-	private List<LinkCandidate> getNeighbors(LinkCandidate node) {
-		List<LinkCandidate> neighbors = new ArrayList<>();
-		for (LinkCandidatePath LinkCandidatePath : edges) {
-			if (LinkCandidatePath.getFromLinkCandidate().equals(node)
-					&& !isSettled(LinkCandidatePath.getToLinkCandidate())) {
-				neighbors.add(LinkCandidatePath.getToLinkCandidate());
+	private List<PseudoRouteStop> getNeighbors(PseudoRouteStop node) {
+		List<PseudoRouteStop> neighbors = new ArrayList<>();
+		for (PseudoRoutePath pseudoRoutePath : edges) {
+			if (pseudoRoutePath.getFromPseudoStop().equals(node)
+					&& !isSettled(pseudoRoutePath.getToPseudoStop())) {
+				neighbors.add(pseudoRoutePath.getToPseudoStop());
 			}
 		}
 		return neighbors;
 	}
 
-	private LinkCandidate getMinimum(Set<LinkCandidate> LinkCandidatees) {
-		LinkCandidate minimum = null;
-		for (LinkCandidate LinkCandidate : LinkCandidatees) {
+	private PseudoRouteStop getMinimum(Set<PseudoRouteStop> pseudoRouteStopes) {
+		PseudoRouteStop minimum = null;
+		for (PseudoRouteStop pseudoRouteStop : pseudoRouteStopes) {
 			if (minimum == null) {
-				minimum = LinkCandidate;
+				minimum = pseudoRouteStop;
 			} else {
-				if (getShortestDistance(LinkCandidate) < getShortestDistance(minimum)) {
-					minimum = LinkCandidate;
+				if (getShortestDistance(pseudoRouteStop) < getShortestDistance(minimum)) {
+					minimum = pseudoRouteStop;
 				}
 			}
 		}
 		return minimum;
 	}
 
-	private boolean isSettled(LinkCandidate LinkCandidate) {
-		return settledNodes.contains(LinkCandidate);
+	private boolean isSettled(PseudoRouteStop pseudoRouteStop) {
+		return settledNodes.contains(pseudoRouteStop);
 	}
 
-	private double getShortestDistance(LinkCandidate destination) {
+	private Double getShortestDistance(PseudoRouteStop destination) {
 		Double d = distance.get(destination);
 		if (d == null) {
 			return Double.MAX_VALUE;
@@ -116,12 +112,14 @@ public class DijkstraAlgorithm {
 		}
 	}
 
+
 	/**
 	 * @return A list of LinkCandidates for the shortest path of the route
 	 */
-	public LinkedList<LinkCandidate> getBestLinkCandidates() {
-		LinkedList<LinkCandidate> path = new LinkedList<>();
-		LinkCandidate step = destination;
+	public LinkedList<PseudoRouteStop> getShortesPseudoPath() {
+		LinkedList<PseudoRouteStop> path = new LinkedList<>();
+		PseudoRouteStop step = destination;
+
 		// check if a path exists
 		if (predecessors.get(step) == null) {
 			return null;

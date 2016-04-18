@@ -12,15 +12,15 @@ import java.util.*;
 
 
 public class LinkAnalysisHandler extends AnalysisHandler {
-	
+
 	private static final Logger log = Logger.getLogger(LinkAnalysisHandler.class);
-	
+
 	List<Id<Link>> linkIds;
 	Map<List<Object>, Double> enterEvents = new HashMap<>();
-	
-	public static Map<Id<Link>, double[]> travelTimes = new TreeMap<>();
 
-	public static Map<Id<Link>, LinkVolumeStat> linksVolumes = new HashMap<>();
+	private Map<Id<Link>, double[]> travelTimes = new TreeMap<>();
+
+	private Map<Id<Link>, LinkVolumeStat> linksVolumes = new HashMap<>();
 
 	private Map<String, Map<Double, Double>> timeSpaceMap = new HashMap<>();
 
@@ -66,11 +66,11 @@ public class LinkAnalysisHandler extends AnalysisHandler {
 			}
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if(linkIds.contains(event.getLinkId())) {
-			
+
 			// get corresponding enterEvent
 			List<Object> key = new ArrayList<>();
 			key.add(event.getVehicleId());
@@ -95,7 +95,7 @@ public class LinkAnalysisHandler extends AnalysisHandler {
 		}
 
 		// time-space-diagram for all agents
-		Map<Double, Double> agentMap = getMap(event.getVehicleId().toString(), timeSpaceMap);
+		Map<Double, Double> agentMap = getTreeMap(event.getVehicleId().toString(), timeSpaceMap);
 		Double xPos = CoordUtils.calcEuclideanDistance(network.getNodes().get(Id.createNodeId("0")).getCoord(), network.getLinks().get(event.getLinkId()).getToNode().getCoord());
 		agentMap.put(event.getTime(), xPos);
 	}
@@ -137,6 +137,21 @@ public class LinkAnalysisHandler extends AnalysisHandler {
 		System.out.println("reset...");
 	}
 
+	public Map<String, Map<Double, Double>> getVolumesXY() {
+		Map<String, Map<Double, Double>> linkVolumesMap = new TreeMap<>();
+
+		for(Map.Entry<Id<Link>, LinkVolumeStat> entry : linksVolumes.entrySet()) {
+			Map<Double, Double> linkIdMap = getTreeMap(entry.getKey().toString(), linkVolumesMap);
+
+			for(Map.Entry<Integer, Double> linkVolumeEntry : entry.getValue().getLinkVolumes().entrySet()) {
+				Double time = Double.valueOf(linkVolumeEntry.getKey());
+				Double volume = linkVolumeEntry.getValue();
+				linkIdMap.put(time, volume);
+			}
+		}
+			return linkVolumesMap;
+	}
+
 	public class LinkVolumeStat {
 
 		Map<Integer, Double> linkVolumes = new TreeMap<>(); // <time, value>
@@ -172,7 +187,7 @@ public class LinkAnalysisHandler extends AnalysisHandler {
 	 * @param <V> type of the values in the secondary map
 	 * @return the Map (evt. newly) associated with the key
 	 */
-	public static <K,C,V> Map<C,V> getMap(
+	public static <K,C,V> Map<C,V> getTreeMap(
 			final K key,
 			final Map<K, Map<C,V>> map) {
 		Map<C,V> coll = map.get( key );

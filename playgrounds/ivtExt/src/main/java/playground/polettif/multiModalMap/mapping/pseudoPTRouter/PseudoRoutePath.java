@@ -24,47 +24,45 @@ import org.matsim.core.utils.collections.Tuple;
 /**
  * Describes the path between two link candidates for the pseudo network.
  */
-public class LinkCandidatePath {
+public class PseudoRoutePath {
 
-	private final Tuple<LinkCandidate, LinkCandidate> id;
-	private final LinkCandidate from;
-	private final LinkCandidate to;
+	private final Tuple<PseudoRouteStop, PseudoRouteStop> id;
+	private final PseudoRouteStop from;
+	private final PseudoRouteStop to;
 	private final double weight;
+	private boolean firstStop = false;
+	private boolean lastStop = false;
 
-	public LinkCandidatePath(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate, double travelTime) {
-		this(fromLinkCandidate, toLinkCandidate, travelTime, false, false);
+	public PseudoRoutePath(PseudoRouteStop fromStop, PseudoRouteStop toStop, double travelTime) {
+		this(fromStop, toStop, travelTime, false);
 	}
 
-	public LinkCandidatePath(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate, double travelTime, boolean firstPath, boolean lastPath) {
-		this.id = new Tuple<>(fromLinkCandidate, toLinkCandidate);
-		this.from = fromLinkCandidate;
-		this.to = toLinkCandidate;
+	public PseudoRoutePath(PseudoRouteStop fromStop, PseudoRouteStop toStop, double travelTime, boolean dummy) {
+		this.id = new Tuple<>(fromStop, toStop);
+		this.from = fromStop;
+		this.to = toStop;
 
-		if(firstPath) {
-			this.weight = travelTime + 0.5*fromLinkCandidate.getLinkTravelTime();
-		} else if(lastPath) {
-			this.weight = travelTime + 0.5*toLinkCandidate.getLinkTravelTime();
-		} else {
-			this.weight = travelTime + 0.5*fromLinkCandidate.getLinkTravelTime() + 0.5*toLinkCandidate.getLinkTravelTime();
-		}
+		this.weight = travelTime + (dummy ? 0 : 0.5 * fromStop.getLinkCandidate().getLinkTravelTime() + 0.5 * toStop.getLinkCandidate().getLinkTravelTime());
 	}
 
-	public Tuple<LinkCandidate, LinkCandidate> getId() {
+	public Tuple<PseudoRouteStop, PseudoRouteStop> getId() {
 		return id;
 	}
-	public LinkCandidate getToLinkCandidate() {
-		return to;
-	}
 
-	public LinkCandidate getFromLinkCandidate() {
-		return from;
-	}
 	public double getWeight() {
 		return weight;
 	}
 
 	@Override
 	public String toString() {
-		return from + " " + to;
+		return from + " -> " + to;
+	}
+
+	public PseudoRouteStop getFromPseudoStop() {
+		return from;
+	}
+
+	public PseudoRouteStop getToPseudoStop() {
+		return to;
 	}
 }

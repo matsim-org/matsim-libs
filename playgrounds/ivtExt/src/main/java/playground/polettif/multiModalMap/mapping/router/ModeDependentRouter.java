@@ -28,16 +28,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Based on the line, mode, and link type, the traveling on links is assigned different costs.
@@ -45,15 +42,17 @@ import java.util.Map;
  *
  * @author boescpa
  */
-public class DijkstraRouter implements Router {
+public class ModeDependentRouter implements Router {
 
 	private final Network network;
+	private Set<String> routingTransportModes;
     private final LeastCostPathCalculator pathCalculator;
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths = new HashMap<>();
 
-    public DijkstraRouter(Network network) {
-        LeastCostPathCalculatorFactory factory = new DijkstraFactory();
+    public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
+        LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(network, this);
 		this.network = network;
+		this.routingTransportModes = routingTransportModes;
         this.pathCalculator = factory.createPathCalculator(network, this, this);
 
 		// Suppress "no route found" statements...
@@ -61,7 +60,7 @@ public class DijkstraRouter implements Router {
     }
 
     @Override
-    public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode, String mode) {
+    public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode) {
         if (fromNode != null && toNode != null) {
             Tuple<Node, Node> nodes = new Tuple<>(fromNode, toNode);
             if (!paths.containsKey(nodes)) {
@@ -72,12 +71,6 @@ public class DijkstraRouter implements Router {
             return null;
         }
     }
-
-
-	public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode) {
-		return calcLeastCostPath(fromNode, toNode, "");
-	}
-
 
 	/**
 	 * @param link The link for which the travel disutility is calculated.
@@ -97,20 +90,27 @@ public class DijkstraRouter implements Router {
 	 */
     @Override
     public double getLinkMinimumTravelDisutility(Link link) {
-        return link.getLength()/link.getFreespeed();
-    }
+		return link.getLength() / link.getFreespeed();
+	}
 
 	/**
 	 * @param link The link for which the travel time is calculated.
 	 * @param time The departure time (in seconds since 00:00) at the beginning
 	 * 		of the link for which the travel time is calculated.
-	 * @param person TODO
-	 * @param vehicle TODO
-	 * @return
 	 */
 	@Override
     public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
         return link.getLength() / link.getFreespeed(time);
     }
 
+	private boolean linkHasRoutingMode(Link link) {
+		for(String routingTransportMode : this.routingTransportModes) {
+			for(String linkTransportMode : link.getAllowedModes()) {
+				if(routingTransportMode.equalsIgnoreCase(linkTransportMode)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }

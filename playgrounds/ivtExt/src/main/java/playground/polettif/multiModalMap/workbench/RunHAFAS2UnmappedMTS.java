@@ -23,6 +23,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -43,7 +45,9 @@ public class RunHAFAS2UnmappedMTS {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		Vehicles vehicles = scenario.getVehicles();
 
-		new PTScheduleCreatorHAFAS(schedule, vehicles, null).createSchedule(args[0]);
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
+
+		new PTScheduleCreatorHAFAS(schedule, vehicles, transformation).createSchedule(args[0]);
 
 		new TransitScheduleWriter(schedule).writeFile(args[1]+"schedule.xml");
 		new VehicleWriterV1(vehicles).writeFile(args[1]+"vehicles.xml");

@@ -46,6 +46,7 @@ public class StopFacilityTree {
 	private final double nodeSearchRadius;
 	private final int maxNclosestLinks;
 	private final double maxLinkFacilityDistance;
+
 	private final String transportMode;
 
 	private int artificialId = 0;
@@ -67,7 +68,7 @@ public class StopFacilityTree {
 	 *                         Note: if two links have the same distance to the stop facility both are used
 	 *                         regardless whether the maximum was already reached.
 	 */
-	// todo rearrange stopFacilityTree to include all modes
+	@Deprecated
 	public StopFacilityTree(TransitSchedule transitSchedule, Network network, String transportMode, double nodeSearchRadius, int maxNclosestLinks, double maxLinkFacilityDistance) {
 
 		this.schedule = transitSchedule;

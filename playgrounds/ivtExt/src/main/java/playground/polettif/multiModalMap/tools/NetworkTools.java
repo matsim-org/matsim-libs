@@ -134,6 +134,7 @@ public class NetworkTools {
 	 * @param idCounter is simply appended to the idPrefix and incremented
 	 * @return a list with the two newly created links
 	 */
+	@Deprecated
 	public static List<Link> addArtificialLinksToNetwork(Coord coord, Network network, String idPrefix, int idCounter) {
 		NetworkImpl networkImpl = (NetworkImpl) network;
 		NetworkFactory networkFactory = network.getFactory();
@@ -149,6 +150,29 @@ public class NetworkTools {
 
 		List<Link> newLinks = new ArrayList<>();
 		newLinks.add(newLink);
+		newLinks.add(newLink2);
+
+		return newLinks;
+	}
+
+	public static List<Link> addArtificialLinksToNetwork(Coord coord, Network network, Set<String> networkModes, String idPrefix, int idCounter) {
+		NetworkImpl networkImpl = (NetworkImpl) network;
+		NetworkFactory networkFactory = network.getFactory();
+
+		Node newNode = networkFactory.createNode(Id.create(idPrefix + "node_" + idCounter, Node.class), coord);
+		Node nearestNode = networkImpl.getNearestNode(coord);
+		Link newLink1 = networkFactory.createLink(Id.createLinkId(idPrefix + idCounter + ":1"), newNode, nearestNode);
+		Link newLink2 = networkFactory.createLink(Id.createLinkId(idPrefix + idCounter + ":2"), nearestNode, newNode);
+
+		newLink1.setAllowedModes(networkModes);
+		newLink2.setAllowedModes(networkModes);
+
+		network.addNode(newNode);
+		network.addLink(newLink1);
+		network.addLink(newLink2);
+
+		List<Link> newLinks = new ArrayList<>();
+		newLinks.add(newLink1);
 		newLinks.add(newLink2);
 
 		return newLinks;
@@ -367,4 +391,5 @@ public class NetworkTools {
 		}
 		return network;
 	}
+
 }

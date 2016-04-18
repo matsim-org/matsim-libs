@@ -37,11 +37,7 @@ public interface Router extends TravelDisutility, TravelTime {
      *
      * @param fromNode  Node to route from...
      * @param toNode    Node to route to...
-     * @param mode      Mode (e.g. for bus this would be bus).
      * @return  Least cost path.
      */
-    public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode, String mode);
-
     public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode);
-
 }

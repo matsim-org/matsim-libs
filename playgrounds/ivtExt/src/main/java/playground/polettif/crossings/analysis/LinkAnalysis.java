@@ -91,6 +91,10 @@ public class LinkAnalysis {
 		writeCsvFile(handler.getVolumes(), outputCSV);
 	}
 
+	public void runLinkVolumeAnalysisXY(String outputCSV) throws FileNotFoundException, UnsupportedEncodingException {
+		writeXYCsvFile(handler.getVolumesXY(), outputCSV);
+	}
+
 	public void runTimeSpaceAnalysis(String outputCSV) throws FileNotFoundException, UnsupportedEncodingException {
 		writeXYCsvFile(handler.getTimeSpace(), outputCSV);
 	}
