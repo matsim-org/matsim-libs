@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.carsharing.stations.FreeFloatingStation;
@@ -13,7 +13,8 @@ import org.matsim.core.utils.collections.QuadTree;
 public class FreeFloatingVehiclesLocation {
 	
 	private QuadTree<FreeFloatingStation> vehicleLocationQuadTree;	
-	
+	private static final Logger log = Logger.getLogger(FreeFloatingVehiclesLocation.class);
+
 	public FreeFloatingVehiclesLocation(Scenario scenario, ArrayList<FreeFloatingStation> stations) throws IOException {
 	    double minx = (1.0D / 0.0D);
 	    double miny = (1.0D / 0.0D);
@@ -98,34 +99,44 @@ public class FreeFloatingVehiclesLocation {
 	
 	public void removeVehicle(Link link, String id) {
 		
-		FreeFloatingStation f = vehicleLocationQuadTree.getClosest(link.getCoord().getX(), link.getCoord().getY());
+		Collection<FreeFloatingStation> stations = vehicleLocationQuadTree.getDisk(link.getCoord().getX(), link.getCoord().getY(), 0.0);
 		
-		if ( f.getLinkId().toString().equals(link.getId().toString())) {
+		for (FreeFloatingStation f : stations) {
 			
-			if (f.getNumberOfVehicles() == 1)
-				vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
-			
-			
-			else {
-				ArrayList<String> vehIDs = f.getIDs();
-				ArrayList<String> newvehIDs = new ArrayList<String>();
-				for (String s : vehIDs) {
-					newvehIDs.add(s);
-				}
-				newvehIDs.remove(id);
-				FreeFloatingStation fNew = new FreeFloatingStation(link, f.getNumberOfVehicles() - 1, newvehIDs);	
+			if ( f.getLinkId().toString().equals(link.getId().toString())) {
 				
-				vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
-				vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
+				if (f.getNumberOfVehicles() == 1) {
+					if (f.getIDs().get(0).equals(id)) {
+						vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
+												
+					}
+					else 
+						log.error("the freefloating station does not contain the id that was supposed to be removed");
+					
+				}
+				
+				
+				else {
+					ArrayList<String> vehIDs = f.getIDs();
+					ArrayList<String> newvehIDs = new ArrayList<String>();
+					for (String s : vehIDs) {
+						newvehIDs.add(s);
+					}
+					if (!newvehIDs.remove(id))
+						log.error("the freefloating station does not contain the id that was supposed to be removed");
+
+					FreeFloatingStation fNew = new FreeFloatingStation(link, f.getNumberOfVehicles() - 1, newvehIDs);	
+					
+					vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
+					vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
+				}
+				return;
 			}
 			
 		}
-		else {
-			
-			Log.error("trying to take a car from the link with no cars, this should never happen");
-			
-		}
 		
+			
+		log.error("trying to take a car from the link with no cars, this should never happen");
 		
 	}
 	
