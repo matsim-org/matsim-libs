@@ -17,8 +17,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -26,6 +24,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 
@@ -39,8 +38,7 @@ public class NeighboursCreator {
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private static final Logger logger = Logger.getLogger(NeighboursCreator.class);
 
-	public NeighboursCreator(StageActivityTypes stageActivityTypes
-			,
+	public NeighboursCreator(StageActivityTypes stageActivityTypes,
 			QuadTree<ActivityFacility> shopFacilityQuadTree, QuadTree<ActivityFacility> leisureFacilityQuadTree,
 			Scenario scenario, LeastCostPathCalculator pathCalculator, ScoringFunctionFactory scoringFunctionFactory){
 		this.shopFacilityQuadTree = shopFacilityQuadTree;
@@ -49,69 +47,94 @@ public class NeighboursCreator {
 		this.stageActivityTypes = stageActivityTypes;
 		this.pathCalculator = pathCalculator;
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		
+		
 	}
 
 	public void findBestNeighbour(Plan plan) {
 
-		//location choice is necessary for the inserted activity
 		List<Plan> newPlans = new LinkedList<Plan>();
 		
 		newPlans.addAll(getAllChainsWthRemoving(plan));
 		newPlans.addAll(getAllChainsWthSwapping(plan));
 		newPlans.addAll(getAllChainsWthInserting(plan));
+		
+		//we need start and end times of all the activities in order to be able to score the plan
 		updateTimesForScoring(newPlans);
 		scoreChains(newPlans);
+		
 		double score = plan.getScore();
+		Plan bestPlan = plan;
+		boolean foundBetter = false;
 		for (Plan newPlan : newPlans) {
 			if (newPlan.getScore() > score) {
-				PlanUtils.copyFrom(newPlan, plan);
-
+				bestPlan = newPlan;
+				foundBetter = true;
 				score = newPlan.getScore();
 			}
 			logger.info(newPlan.getScore());
 		}
+		if (foundBetter)
+			PlanUtils.copyFrom(bestPlan, plan);
 		
+		//we need to remove the end times of the activities that should not have it defined 
 		updateTimes(plan);
 	}
 	
 	private void updateTimes(Plan plan) {
-
+		boolean firstActivity = true;
+		Activity lastActivity = null;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				
+				lastActivity = (Activity) pe;
+				if (firstActivity) {
+					((Activity) pe).setStartTime(Time.UNDEFINED_TIME);
+					firstActivity = false;
+				}
 				if (((Activity) pe).getMaximumDuration() != Time.UNDEFINED_TIME) {
 					((Activity) pe).setEndTime(Time.UNDEFINED_TIME);
 				}
 			}
 		}
 		
+		lastActivity.setEndTime(Time.UNDEFINED_TIME);
+		
 	}
 
 	private void updateTimesForScoring(List<Plan> newPlans) {
-
+		
 		for (Plan plan : newPlans) {
 			double time = 0.0;
+			boolean firstActivity = true;
+			Activity lastActivity = null;
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
-					((Activity)pe).setStartTime(time);
+					if (!firstActivity) {
+						((Activity)pe).setStartTime(time);
+						
+					}
+					lastActivity = (Activity) pe;
+
+					firstActivity =  false;
 					if (((Activity) pe).getEndTime() == Time.UNDEFINED_TIME)
 						((Activity) pe).setEndTime(time + ((Activity)pe).getMaximumDuration());
 					
-					if (((Activity) pe).getEndTime() != Time.UNDEFINED_TIME)
-						time = ((Activity) pe).getEndTime();
+					if (((Activity) pe).getEndTime() != Time.UNDEFINED_TIME) {
+						
+						if (time < ((Activity)pe).getEndTime())
+							
+							time = ((Activity) pe).getEndTime();
+					}
 					else
-						time += ((Activity) pe).getMaximumDuration();
-					
-			//		if (time + ((Activity)pe).getMaximumDuration() < ((Activity)pe).getEndTime())
-			//			time += ((Activity) pe).getMaximumDuration();
-			//		else
-			//			time = ((Activity) pe).getEndTime();
+						time += ((Activity) pe).getMaximumDuration();					
+			
 				}
 				else
 					time += ((Leg)pe).getTravelTime();
 				
 				
 			}
+			lastActivity.setEndTime(Time.UNDEFINED_TIME);
 			
 		}
 		
@@ -155,8 +178,8 @@ public class NeighboursCreator {
 							primaryActivity.getCoord());
 					newActivity.setMaximumDuration(3600.0);
 					newActivity.setFacilityId(primaryActivity.getFacilityId());
-					//newActivity.setEndTime(  t.get(index - 1).getEndTime() + 3600.0);
-					
+					newActivity.setLinkId(startLink.getId());
+
 				}
 				else {
 					
@@ -168,18 +191,17 @@ public class NeighboursCreator {
 					newActivity = pf.createActivityFromCoord(actType,
 							actFacility.getCoord());
 					newActivity.setFacilityId(actFacility.getId());
+					newActivity.setLinkId(network.getNearestLinkExactly(actFacility.getCoord()).getId());
 					newActivity.setMaximumDuration(3600.0);
 
-				//	newActivity.setEndTime(  t.get(index - 1).getEndTime() + 3600.0);
 				}
 				
-				//newActivity.setStartTime(t.get(index - 1).getEndTime());
 				
 				newPlan.getPlanElements().add(actIndex, newActivity);
 				
 				Leg legAfterInsertedActivity = ( (Leg) newPlan.getPlanElements().get(actIndex + 2) );
-				
-				Leg newLeg = pf.createLeg(legAfterInsertedActivity.getMode());
+				String modeOfTheLegToBeInserted = legAfterInsertedActivity.getMode();
+				Leg newLeg = pf.createLeg(modeOfTheLegToBeInserted);
 				Link endLink = network.getNearestLinkExactly(t.get(index).getCoord());
 				double now = 0;
 				
@@ -208,32 +230,43 @@ public class NeighboursCreator {
 				double startOfThePreviousLeg = now;
 				now += 3600.0; //the duration of the inserted activity
 				
-				double estimatedTravelTime = estimateTravelTime(startLink, endLink, person, now);
+				double estimatedTravelTime = estimateTravelTime(startLink, endLink, person, now, modeOfTheLegToBeInserted);
 				
 				newLeg.setTravelTime(estimatedTravelTime);
 				newPlan.getPlanElements().add(actIndex + 1, newLeg);
 				
 				Link startLinkPreviousLeg = network.getNearestLinkExactly(t.get(index - 1).getCoord());
-				
-				double previousTravelTime = estimateTravelTime(startLinkPreviousLeg, startLink, person, startOfThePreviousLeg);
+
 				Leg previousLeg = (Leg) plan.getPlanElements().get(actIndex - 1);
+				String modeOfPreviousLeg = previousLeg.getMode();
+				double previousTravelTime = estimateTravelTime(startLinkPreviousLeg, startLink, person,
+						startOfThePreviousLeg, modeOfPreviousLeg);
 				previousLeg.setTravelTime(previousTravelTime);
 				newPlans.add(newPlan);
 			}
 			
-		}
-		
+		}		
 		
 		return newPlans;		
-		
 	}
 	
-	private double estimateTravelTime(Link startLink, Link endLink, Person person, double now) {
-
+	private double estimateTravelTime(Link startLink, Link endLink, Person person, double now, String mode) {
+		
 		double travelTime = 0.0;
-		Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getFromNode(), 
-				now, person, null ) ;
-		travelTime = path.travelTime;
+		if (mode.equals("car")) {
+			Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getToNode(), 
+					now, person, null ) ;
+			travelTime = path.travelTime;
+		}
+		else {
+			double beelineFactor = scenario.getConfig().plansCalcRoute().getBeelineDistanceFactors().get(mode);
+			double modeSpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(mode);
+			
+			double distance = CoordUtils.calcEuclideanDistance(startLink.getCoord(), endLink.getCoord());
+			
+			travelTime = distance * beelineFactor / modeSpeed;
+			
+		}
 		return travelTime;
 	}
 
@@ -251,11 +284,8 @@ public class NeighboursCreator {
 			//Plan newPlan = new PlanImpl(plan.getPerson());
 			Plan newPlan = PlanUtils.createCopy(plan);
 			newPlan.setPerson(plan.getPerson());
-
 			
-			int activitiesCount = countActivities(t.get(index).getType(), t);
-			
-			if ((t.get(index).getType().equals("work") || t.get(index).getType().equals("education")))// || activitiesCount == 1)
+			if ((t.get(index).getType().equals("work") || t.get(index).getType().equals("education")))
 				continue;
 			int actIndex = plan.getPlanElements().indexOf(t.get(index));
 
@@ -299,13 +329,11 @@ public class NeighboursCreator {
 						((Leg) pe).setMode(previousLegMode);
 				}			
 				
-			}	
-			
+			}			
 			
 			newPlans.add(newPlan);
 		}
-		return newPlans;
-		
+		return newPlans;		
 	}
 	
 	private void scoreChains(List<Plan> plansToScore){
@@ -319,9 +347,9 @@ public class NeighboursCreator {
 					scoringFunction.handleLeg((Leg) pe);
 				}
 				else {
-					if (((Activity) pe).getEndTime() == Time.UNDEFINED_TIME) {
-						((Activity)pe).setEndTime(24*3600*60);
-					}
+				//	if (((Activity) pe).getEndTime() == Time.UNDEFINED_TIME) {
+				//		((Activity)pe).setEndTime(24*3600*60);
+				//	}
 				
 					scoringFunction.handleActivity((Activity) pe);
 				}
@@ -343,18 +371,8 @@ public class NeighboursCreator {
 				return a;
 		
 		throw new NullPointerException("The activity type home is not known to the agent!");
-	}
+	}	
 	
-	private int countActivities(String type, List<Activity> t) {
-		
-		int count = 0;
-		for (Activity a : t) {
-			
-			if (a.getType().equals(type))
-				count++;
-		}
-		return count;
-	}
 	private ActivityFacility findActivityLocation(String actType, Coord coord) {		
 		
 		if (actType.equals("leisure"))
