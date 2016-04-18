@@ -25,14 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 import java.util.*;
-=======
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
->>>>>>> setup default config, new mode specific ptmapper
 
 
 /**
@@ -82,12 +75,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	 * <li>7 - Funicular. Any rail system designed for steep inclines.</li>
 	 * </ul>
 	 */
-<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 	private Map<String, Set<String>> modes = new HashMap<>();
-=======
-	private Map<String, String> modes = new HashMap<>();
-
->>>>>>> setup default config, new mode specific ptmapper
 
 	public PublicTransportMapConfigGroup() {
 		super( GROUP_NAME );
@@ -209,7 +197,6 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		defaultConfig.modesToCleanUp.add("rail");
 		defaultConfig.mapBusTo.add("bus");
 
-<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 		Set<String> busSet = new HashSet<>(); busSet.add("bus"); busSet.add("car");
 		defaultConfig.modes.put("BUS", busSet);
 
@@ -223,14 +210,6 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 */
 		// subway, gondola, funicular, ferry and cablecar are not mapped
 
-=======
-		defaultConfig.modes.put("BUS", "bus");
-		defaultConfig.modes.put("TRAM", "tram");
-		defaultConfig.modes.put("RAIL", "rail");
-		// subway, gondola, funicular, ferry and cablecar are not mapped
-
-
->>>>>>> setup default config, new mode specific ptmapper
 		return defaultConfig;
 	}
 
@@ -267,7 +246,6 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		return mapBusTo;
 	}
 
-<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 	public Map<String, Set<String>> getModes() {
 		return modes;
 	}
@@ -283,9 +261,4 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		modes.keySet().forEach(scheduleModes::add);
 		return scheduleModes;
 	}
-=======
-	public Map<String, String> getModes() {
-		return modes;
-	}
->>>>>>> setup default config, new mode specific ptmapper
 }

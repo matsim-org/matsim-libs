@@ -23,32 +23,21 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.MapUtils;
-=======
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.util.LeastCostPathCalculator;
->>>>>>> setup default config, new mode specific ptmapper
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 import playground.polettif.multiModalMap.mapping.container.PTPath;
 import playground.polettif.multiModalMap.mapping.container.PTPathImpl;
-<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidate;
 import playground.polettif.multiModalMap.mapping.router.FastAStarLandmarksRouting;
 import playground.polettif.multiModalMap.mapping.router.Router;
 import playground.polettif.multiModalMap.tools.NetworkTools;
-=======
-import playground.polettif.multiModalMap.mapping.router.FastAStarLandmarksRouting;
-import playground.polettif.multiModalMap.mapping.router.Router;
->>>>>>> setup default config, new mode specific ptmapper
 import playground.polettif.multiModalMap.workbench.RunOSM2MMNetwork;
 
 import java.util.*;
@@ -356,19 +345,12 @@ public class PTMapperUtils {
 						Link currentLink = network.getLinks().get(routeStops.get(i).getStopFacility().getLinkId());
 						Link nextLink = network.getLinks().get(routeStops.get(i + 1).getStopFacility().getLinkId());
 
-<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 						List<Id<Link>> path = null;
 						try {
 							path = PTMapperUtils.getLinkIdsFromPath(router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode()));
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-=======
-						List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode()));
-						Logger.getLogger(RunOSM2MMNetwork.class).fatal("did not compile with the above line, thus commenting it out. kai");
-						System.exit(-1);
-
->>>>>>> setup default config, new mode specific ptmapper
 
 						if(path != null)
 							linkSequence.addAll(path);
@@ -390,11 +372,7 @@ public class PTMapperUtils {
 	 *
 	 * @param schedule
 	 * @param network
-<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 	 * @param router   initiates a new router with the given network if <code>null</code>
-=======
-	 * @param router initiates a new router with the given network if <code>null</code>
->>>>>>> setup default config, new mode specific ptmapper
 	 */
 	public static void routeSchedule(TransitSchedule schedule, Network network, Router router) {
 		Map<String, Router> routers = null;

@@ -46,7 +46,6 @@ public class StopFacilityTree {
 	private final double nodeSearchRadius;
 	private final int maxNclosestLinks;
 	private final double maxLinkFacilityDistance;
-	private final String transportMode;
 
 	private final String transportMode;
 
@@ -69,11 +68,7 @@ public class StopFacilityTree {
 	 *                         Note: if two links have the same distance to the stop facility both are used
 	 *                         regardless whether the maximum was already reached.
 	 */
-<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
 	@Deprecated
-=======
-	// todo rearrange stopFacilityTree to include all modes
->>>>>>> setup default config, new mode specific ptmapper
 	public StopFacilityTree(TransitSchedule transitSchedule, Network network, String transportMode, double nodeSearchRadius, int maxNclosestLinks, double maxLinkFacilityDistance) {
 
 		this.schedule = transitSchedule;

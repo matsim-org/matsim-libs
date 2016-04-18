@@ -363,36 +363,6 @@ public class NetworkTools {
 		}
 
 		return newNetwork;
-<<<<<<< b1b7094614681fac2e0579491657bb3f28927df4
-=======
-	}
-
-
-	public static Network addNewNode(Network network, Node node) {
-		Id<Node> nodeId = Id.create(node.getId().toString(), Node.class);
-		if (!network.getNodes().containsKey(nodeId)) {
-			Node newNode = network.getFactory().createNode(nodeId, node.getCoord());
-			network.addNode(newNode);
-		}
-		return network;
-	}
-
-	public static Network addNewLink(Network network, Link link) {
-		Id<Link> linkId = Id.create(link.getId().toString(), Link.class);
-		Id<Node> fromNodeId = Id.create(link.getFromNode().getId().toString(), Node.class);
-		Id<Node> toNodeId = Id.create(link.getToNode().getId().toString(), Node.class);
-
-		if(!network.getLinks().containsKey(linkId)) { // todo && network.getNodes().containsKey(fromNodeId) && network.getNodes().containsKey(toNodeId))
-			Link newLink = network.getFactory().createLink(linkId, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId));
-			newLink.setAllowedModes(link.getAllowedModes());
-			newLink.setCapacity(link.getCapacity());
-			newLink.setFreespeed(link.getFreespeed());
-			newLink.setLength(link.getLength());
-			newLink.setNumberOfLanes(link.getNumberOfLanes());
-			network.addLink(newLink);
-		}
-		return network;
->>>>>>> setup default config, new mode specific ptmapper
 	}
 
 
