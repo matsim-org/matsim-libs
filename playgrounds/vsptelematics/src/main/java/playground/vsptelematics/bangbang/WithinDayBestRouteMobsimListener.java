@@ -24,16 +24,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -42,41 +41,51 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.utils.EditRoutes;
+
+import com.google.inject.Inject;
 
 /**
  * @author nagel
  *
  */
-class KNWithinDayMobsimListener2 implements MobsimBeforeSimStepListener {
-    
-	private static final Logger log = Logger.getLogger("dummy");
+class WithinDayBestRouteMobsimListener implements MobsimBeforeSimStepListener {
+
+	private static final Logger log = Logger.getLogger(WithinDayBestRouteMobsimListener.class);
+
+	private final Scenario scenario;
+	private EditRoutes editRoutes ;
 	
-	private TripRouter tripRouter;
-	private Scenario scenario;
-
-	private Netsim mobsim;
-
-	KNWithinDayMobsimListener2(TripRouter tripRouter) {
-		this.tripRouter = tripRouter;
+	@Inject
+	WithinDayBestRouteMobsimListener(Scenario scenario, LeastCostPathCalculatorFactory pathAlgoFactory, TravelTime travelTime,
+			Map<String, TravelDisutilityFactory> travelDisutilityFactories ) {
+		this.scenario = scenario ;
+		{
+			TravelDisutility travelDisutility = travelDisutilityFactories.get(TransportMode.car).createTravelDisutility( travelTime ) ;
+			LeastCostPathCalculator pathAlgo = pathAlgoFactory.createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime) ;
+			RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactory() ;
+			this.editRoutes = new EditRoutes( scenario.getNetwork(), pathAlgo, routeFactory ) ;
+		}
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
+		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan( (Netsim) event.getQueueSimulation() ); 
 		
-		this.mobsim = (Netsim) event.getQueueSimulation() ;
-		this.scenario = mobsim.getScenario();
-
-		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan(mobsim); 
-				
 		for (MobsimAgent ma : agentsToReplan) {
-			doReplanning(ma);
+			doReplanning(ma, (Netsim) event.getQueueSimulation());
 		}
 	}
-	
-	private static List<MobsimAgent> getAgentsToReplan(Netsim mobsim ) {
+
+	static List<MobsimAgent> getAgentsToReplan(Netsim mobsim ) {
 
 		List<MobsimAgent> set = new ArrayList<MobsimAgent>();
 
@@ -84,25 +93,26 @@ class KNWithinDayMobsimListener2 implements MobsimBeforeSimStepListener {
 		if ( now < 8.*3600. || Math.floor(now) % 10 != 0 ) {
 			return set;
 		}
-		
-		// find agents that are en-route (more interesting case)
-		for (NetsimLink link:mobsim.getNetsimNetwork().getNetsimLinks().values()){
+
+		// find agents that are on the "interesting" links:
+		for ( Id<Link> linkId : KNAccidentScenario.replanningLinkIds ) {
+			NetsimLink link = mobsim.getNetsimNetwork().getNetsimLink( linkId ) ;
 			for (MobsimVehicle vehicle : link.getAllNonParkedVehicles()) {
 				MobsimDriverAgent agent=vehicle.getDriver();
-//				System.out.println(agent.getId());
-				if ( KNBangBang.replanningLinkIds.contains( agent.getCurrentLinkId() ) ) {
+				if ( KNAccidentScenario.replanningLinkIds.contains( agent.getCurrentLinkId() ) ) {
 					System.out.println("found agent");
 					set.add(agent);
 				}
 			}
 		}
-		
+
 		return set;
+
 	}
 
-	private boolean doReplanning(MobsimAgent agent ) {
-		double now = mobsim.getSimTimer().getTimeOfDay() ;
-		
+	private boolean doReplanning(MobsimAgent agent, Netsim netsim ) {
+		double now = netsim.getSimTimer().getTimeOfDay() ;
+
 		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ; 
 
 		if (plan == null) {
@@ -117,51 +127,34 @@ class KNWithinDayMobsimListener2 implements MobsimBeforeSimStepListener {
 			log.info( "not a car leg; can only replan car legs; returning ... ") ;
 			return false;
 		}
-		
-		List<PlanElement> planElements = plan.getPlanElements() ;
+
 		final Integer planElementsIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
-		
-		if ( !(planElements.get(planElementsIndex+1) instanceof Activity || !(planElements.get(planElementsIndex+2) instanceof Leg)) ) {
-			log.error( "this version of withinday replanning cannot deal with plans where legs and acts do not alternate; returning ...") ;
-			return false ;
-		}
 
 		// ---
-		
+
 		final Leg leg = (Leg) plan.getPlanElements().get(planElementsIndex);
-		ArrayList<Id<Link>> previousLinkIds = new ArrayList<>(((NetworkRoute) leg.getRoute()).getLinkIds());
 		
-		Id<Link> currentLinkId = agent.getCurrentLinkId() ;
+		// for vis:
+		List<Id<Link>> oldLinkIds = new ArrayList<>( ((NetworkRoute) leg.getRoute()).getLinkIds() ) ; // forces a copy, which I need later
+
+		// "real" action:
+		final int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
+		editRoutes.replanCurrentLegRoute(leg, plan.getPerson(), currentLinkIndex, now ) ;
 		
-		boolean flag = false ;
-		for ( Id<Link> linkId : previousLinkIds ) {
-			if ( KNBangBang.replanningLinkIds.contains( currentLinkId ) ) {
-				flag = true ;
-			}
-			if ( flag ) {
-				System.out.println( linkId ) ;
-			}
+		// for vis:
+		ArrayList<Id<Link>> currentLinkIds = new ArrayList<>( ((NetworkRoute) leg.getRoute()).getLinkIds() ) ;
+		if ( !Arrays.deepEquals(oldLinkIds.toArray(), currentLinkIds.toArray()) ) {
+			log.warn("modified route");
+			this.scenario.getPopulation().getPersonAttributes().putAttribute( agent.getId().toString(), "marker", true ) ;
 		}
-		
-		
-		// new Route for current Leg.
-//		final Id<Link> destinationLinkId = ((Activity) plan.getPlanElements().get(planElementsIndex+1)).getLinkId();
-//		EditRoutes.relocateCurrentRoute(agent, destinationLinkId, now, scenario.getNetwork(), tripRouter);
-//		ArrayList<Id<Link>> currentLinkIds = new ArrayList<>(((NetworkRoute) leg.getRoute()).getLinkIds());
-//
-//		if ( !Arrays.deepEquals(previousLinkIds.toArray(), currentLinkIds.toArray()) ) {
-//			log.warn("modified route");
-//			this.scenario.getPopulation().getPersonAttributes().putAttribute( agent.getId().toString(), "marker", true ) ;
-//		}
 
 		// ---
-		
+
 		// finally reset the cached Values of the PersonAgent - they may have changed!
 		WithinDayAgentUtils.resetCaches(agent);
-//		WithinDayAgentUtils.rescheduleActivityEnd(agent, mobsim);
-		
+
 		return true;
 	}
 
-
 }
+

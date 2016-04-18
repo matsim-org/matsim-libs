@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.boescpa.converters.osm.networkCreator.osmWithPT.*;
@@ -489,7 +489,7 @@ public class Osm2TransitSimplified {
 					sortWays(sortedWays, sortedLinks, wayIds, relationWays);
 
 					NetworkRoute route = null;
-					ModeRouteFactory routeFactory = new ModeRouteFactory();
+					RouteFactoryImpl routeFactory = new RouteFactoryImpl();
 					if (sortedLinks.size() > 1) {
 						route = routeFactory.createRoute(NetworkRoute.class, sortedLinks.get(0), sortedLinks.get(sortedLinks.size() - 1));
 						route.setLinkIds(sortedLinks.get(0),	sortedLinks.subList(1, sortedLinks.size() - 1), sortedLinks.get(sortedLinks.size() - 1));

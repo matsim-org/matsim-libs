@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
@@ -42,7 +42,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 	private final String mode;
 	private final PopulationFactory populationFactory;
 
-	private final ModeRouteFactory routeFactory;
+	private final RouteFactoryImpl routeFactory;
 
 	private final double beelineDistanceFactor;
 	private final double networkTravelSpeed;
@@ -52,7 +52,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 	 public TeleportationRoutingModule(
 			final String mode,
 			final PopulationFactory populationFactory,
-			final ModeRouteFactory routeFactory,
+			final RouteFactoryImpl routeFactory,
 			final double networkTravelSpeed,
 			final double beelineDistanceFactor) {
 		this.routeFactory = routeFactory;

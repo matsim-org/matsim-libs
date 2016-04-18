@@ -38,7 +38,7 @@ import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.LinkWrapperFacility;
@@ -71,11 +71,11 @@ public class EditRoutes {
 
 	private  Network network ;
 	private  LeastCostPathCalculator pathCalculator ;
-	private  ModeRouteFactory routeFactories ;
+	private  RouteFactoryImpl routeFactories ;
 
 	public EditRoutes(){} // for backwards compatibility
 
-	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, ModeRouteFactory routeFactory ) {
+	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, RouteFactoryImpl routeFactory ) {
 		this.network = network ;
 		this.pathCalculator = pathCalculator ;
 		this.routeFactories = routeFactory ;

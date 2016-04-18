@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -52,7 +52,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 
 	private final Network network;
-	private final ModeRouteFactory routeFactory;
+	private final RouteFactoryImpl routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 
 
@@ -61,7 +61,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 			final PopulationFactory populationFactory,
 			final Network network,
 			final LeastCostPathCalculator routeAlgo,
-			final ModeRouteFactory routeFactory) {
+			final RouteFactoryImpl routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.routeFactory = routeFactory;

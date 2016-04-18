@@ -28,7 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -142,7 +142,7 @@ public class IdentifyParkAndRideFacilities {
 		TransitScheduleReaderV1 reader =
 			new TransitScheduleReaderV1(
 					schedule,
-					new ModeRouteFactory());
+					new RouteFactoryImpl());
 
 		reader.readFile( fileName );
 

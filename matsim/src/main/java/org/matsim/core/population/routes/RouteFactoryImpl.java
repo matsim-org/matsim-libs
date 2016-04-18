@@ -31,12 +31,12 @@ import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 /**
  * @author mrieser / senozon
  */
-public class ModeRouteFactory {
+public class RouteFactoryImpl {
 	private final Map<Class<? extends Route>, RouteFactory> routeFactories = new HashMap<>();
 	private RouteFactory defaultFactory = new GenericRouteFactory();
 	private final Map<String, Class<? extends Route>> type2class = new HashMap<>();
 
-	public ModeRouteFactory() {
+	public RouteFactoryImpl() {
 		this.setRouteFactory(NetworkRoute.class, new LinkNetworkRouteFactory());
 		this.setRouteFactory(ExperimentalTransitRoute.class, new ExperimentalTransitRouteFactory());
 	}
@@ -49,6 +49,7 @@ public class ModeRouteFactory {
 	 *
 	 * @see #setRouteFactory(Class, RouteFactory)
 	 */
+	@SuppressWarnings("unchecked")
 	public <R extends Route> R createRoute(final Class<R> routeClass, final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		RouteFactory factory = this.routeFactories.get(routeClass);
 		if (factory == null) {

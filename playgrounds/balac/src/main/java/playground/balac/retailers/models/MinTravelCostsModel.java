@@ -21,7 +21,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -72,7 +72,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
     Utils.setPersonPrimaryActivityQuadTree(Utils.createPersonPrimaryActivityQuadTree(this.controler));
     Utils.setShopsQuadTree(Utils.createShopsQuadTree(this.controler));
 
-      ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+      RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) this.controler.getScenario().getPopulation().getFactory()).getRouteFactory();
     
     for (Integer i = Integer.valueOf(0); i.intValue() < first.size(); i = Integer.valueOf(i.intValue() + 1)) {
       String linkId = this.first.get(i);
