@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -337,7 +337,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 			}
 		}
 		
-		ModeRouteFactory factory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory();
+		RouteFactoryImpl factory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getRouteFactory();
 		Class<? extends Route> routeClass = factory.getRouteClassForType(routeType);
 		
 		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(

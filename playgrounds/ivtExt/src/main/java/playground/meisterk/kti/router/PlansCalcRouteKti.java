@@ -23,7 +23,7 @@ package playground.meisterk.kti.router;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -65,7 +65,7 @@ public class PlansCalcRouteKti /*extends PlansCalcRoute*/ {
 			final TravelDisutility costCalculator,
 			final TravelTime timeCalculator,
 			final LeastCostPathCalculatorFactory factory,
-			final ModeRouteFactory routeFactory,
+			final RouteFactoryImpl routeFactory,
 			final PlansCalcRouteKtiInfo ptRoutingInfo) {
 		//super(group, network, costCalculator, timeCalculator, factory, routeFactory);
 		this.network = network;

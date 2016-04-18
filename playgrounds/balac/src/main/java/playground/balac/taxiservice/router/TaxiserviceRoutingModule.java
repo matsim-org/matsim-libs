@@ -51,7 +51,7 @@ public class TaxiserviceRoutingModule implements RoutingModule {
 		Leg taxiLeg = new LegImpl("taxi");
 		taxiLeg.setTravelTime( travelTime );
 		NetworkRoute route = 
-				((PopulationFactoryImpl)controler.getScenario().getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, fromFacility.getLinkId(), toFacility.getLinkId());
+				((PopulationFactoryImpl)controler.getScenario().getPopulation().getFactory()).getRouteFactory().createRoute(NetworkRoute.class, fromFacility.getLinkId(), toFacility.getLinkId());
 		route.setLinkIds( fromFacility.getLinkId(), ids, toFacility.getLinkId());
 		route.setTravelTime( travelTime);
 		taxiLeg.setRoute(route);
