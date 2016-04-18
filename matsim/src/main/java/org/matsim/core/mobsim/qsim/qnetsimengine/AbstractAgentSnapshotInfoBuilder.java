@@ -20,7 +20,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map.Entry;
@@ -28,7 +27,6 @@ import java.util.Queue;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -140,9 +138,12 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		return cnt2 ;
 	}
 
-	public final void positionAgentOnLink(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord,
+	public final void positionAgentGivenDistanceFromFNode(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord,
 			double lengthOfCurve, QVehicle veh, double distanceFromFromNode, 
 			Integer lane,	double speedValueBetweenZeroAndOne){
+		// I think that the main reason why this exists as public method is that AssignmentEmulatingQLane wants to use it directly.
+		// The reason for this, in return, is that positionVehiclesAlongLine(...) is a service method for queue models only.  kai, apr'16
+		
 		MobsimDriverAgent driverAgent = veh.getDriver();
 		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), startCoord, endCoord, 
 				distanceFromFromNode, lane, lengthOfCurve);
@@ -173,7 +174,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		double spacingOfOnePCE = this.calculateVehicleSpacing( curvedLength, storageCapacity, vehs );
 
 		double freespeedTraveltime = curvedLength / freeSpeed ;
-
 		
 		TreeMap<Double,Hole> consumableHoles = new TreeMap<>() ;
 		
@@ -199,32 +199,71 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			final double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
 			// (starts off relatively small (rightmost vehicle))
 			
-			final double spacing = mveh.getSizeInEquivalents()*spacingOfOnePCE;
+			final double previousDistanceFromFromNode = distanceFromFromNode ;
+
+			final double vehicleSpacing = mveh.getSizeInEquivalents()*spacingOfOnePCE;
 			distanceFromFromNode = this.calculateOdometerDistanceFromFromNode(curvedLength, 
-					spacing , distanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
+					vehicleSpacing , distanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
 			// (starts off relatively large (rightmost vehicle))
 			
+			Integer lane = VisUtils.guessLane(veh, numberOfLanesAsInt );
+			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh, inverseFlowCapPerTS, now, freeSpeed);
+			Gbl.assertNotNull( upstreamCoord ) ;
+			Gbl.assertNotNull( downstreamCoord ) ;
+			this.positionAgentGivenDistanceFromFNode(positions, upstreamCoord, downstreamCoord, curvedLength, veh, distanceFromFromNode, lane, speedValue);
+
+			final double epsilon = 0.01 ;
+			if ( distanceFromFromNode >= previousDistanceFromFromNode - vehicleSpacing - epsilon ) {
+				// (distance to vehicle ahead \sim spacing --> in queue)
+			
 			if ( this.scenario.getConfig().qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
-				while ( !consumableHoles.isEmpty() && consumableHoles.lastKey() > distanceFromFromNode ) {
+				if ( !consumableHoles.isEmpty() && distanceFromFromNode < consumableHoles.lastKey() ) {
 					// (i.e. if hole is to right of vehicle)
 					
 					Logger.getLogger( this.getClass() ).warn( "distanceFromFNode=" + distanceFromFromNode + "; lastKey=" + consumableHoles.lastKey() + "; firstKey=" + consumableHoles.firstKey() ) ;
 
 					Entry<Double, Hole> entry = consumableHoles.pollLastEntry() ;
-//					distanceFromFromNode +=  7.5 * entry.getValue().getSizeInEquivalents() ;
-					distanceFromFromNode -=  spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
+
+					//					distanceFromFromNode +=  7.5 * entry.getValue().getSizeInEquivalents() ;
+
+//					distanceFromFromNode -=  spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
+//					if ( entry.getKey() < distanceFromFromNode ) {
+//						distanceFromFromNode = entry.getKey() ;  // we don't add the full hole PCE if the hole is further downstream
+//						break ; // and we break out of the while loop
+//					}
+					
+					// while hole is downstream from current vehicle position, we just keep pulling holes.
+					// once hole is upstream from current vehicle position, we pull one hole and add it to the position, and then we
+					// move on to adding the next vehicle:
+					final double sizeOfCurrentHole = spacingOfOnePCE * entry.getValue().getSizeInEquivalents();
+//					if ( entry.getKey() - sizeOfCurrentHole < distanceFromFromNode ) {
+						distanceFromFromNode -= sizeOfCurrentHole ;
+//						distanceFromFromNode = entry.getKey();
+//						break ;
+//					}
+					
 				}
 			}
+			}
 
-			Integer lane = VisUtils.guessLane(veh, numberOfLanesAsInt );
-			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh, inverseFlowCapPerTS, now, freeSpeed);
-			Gbl.assertNotNull( upstreamCoord ) ;
-			Gbl.assertNotNull( downstreamCoord ) ;
-			this.positionAgentOnLink(positions, upstreamCoord, downstreamCoord, curvedLength, veh, distanceFromFromNode, lane, speedValue);
 
 		}
 		
 		return positions;
+		
+		// Some arguments re the vis of holes:
+		// () There needs to be enough space between holes to position vehicles.  Delta x for holes is (15km/h)/flowCap = (4.1m/s)/flowCap,
+		// where flowCap is the rescaled version. 
+		
+		// if (car not in queue){
+		//    plotAtFreeSpeedPosition() ;
+		// } else {
+		//    put at most one hole in between ;
+		// }
+		
+		// I think that the above works ... but the 15km/h seems too slow.  This may have something to do with the fact that the 
+		// capacity rate may be higher than what reaction time allows (1veh/2sec) ... since we squeeze multiple lanes into one queue.  Hm
+		
 	}
 
 

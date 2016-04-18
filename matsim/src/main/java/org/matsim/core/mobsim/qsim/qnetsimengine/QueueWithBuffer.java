@@ -515,11 +515,18 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 //			return false ;
 //		}
 		// at this point, storage is ok, so start checking holes:
-		if ( remainingHolesStorageCapacity <=0 ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
+		if ( remainingHolesStorageCapacity <=0 ) { 
+			// no holes available at all; in theory, this should not happen since covered by !storageOk (but that is commented out now)
+
 			//						log.warn( " !hasSpace since no holes available ") ;
 			return false ;
 		} 
 		return true ;
+		
+		// remainingHolesStorageCapacity is:
+		// * initialized at linkStorageCapacity
+		// * reduced by entering vehicles
+		// * increased by holes arriving at upstream end of link
 	}
 
 	private void recalcTimeVariantAttributes() {
@@ -683,7 +690,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		vehQueue.add(veh);
 
 		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
-			remainingHolesStorageCapacity = remainingHolesStorageCapacity - veh.getSizeInEquivalents();
+			remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
 		}
 	}
 

@@ -392,12 +392,12 @@ class AssignmentEmulatingQLane extends QLaneI {
 					/ ( veh.getEarliestLinkExitTime() - AssignmentEmulatingQLane.this.vehEnterTimeMap.get(veh.getId()) ) ;
 			if ( speedValue>1. ) { speedValue=1. ; }
 			if (this.otfLink != null){
-				snapshotInfoBuilder.positionAgentOnLink(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
+				snapshotInfoBuilder.positionAgentGivenDistanceFromFNode(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
 						AssignmentEmulatingQLane.this.length, veh, lastDistanceFromFromNode, 
 						lane, speedValue);
 			}
 			else {
-				snapshotInfoBuilder.positionAgentOnLink(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
+				snapshotInfoBuilder.positionAgentGivenDistanceFromFNode(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
 						AssignmentEmulatingQLane.this.length, veh , lastDistanceFromFromNode, lane, speedValue);
 			}
 			return lastDistanceFromFromNode;
