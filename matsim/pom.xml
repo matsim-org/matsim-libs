@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim</artifactId>
 	<name>MATSim</name>
-	<version>0.8.0-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<description>Multi-Agent Transport Simulation</description>
 	<url>matsim.org</url>
 	<inceptionYear>2005</inceptionYear>
