@@ -1,16 +1,15 @@
 package playground.dziemke.analysis;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.dziemke.accessibility.OTPMatrix.CSVReader;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
+import playground.dziemke.accessibility.OTPMatrix.CSVReader;
 
 /**
  * @author gthunig
@@ -20,7 +19,7 @@ public class TripAnalyzerBasicTest {
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
 
-    private static final Logger log = Logger.getLogger(TripAnalyzerBasicTest.class);
+//    private static final Logger log = Logger.getLogger(TripAnalyzerBasicTest.class);
 
     @Test
     public final void testTripAnalyzerBasic() {
