@@ -5,7 +5,6 @@ import com.conveyal.gtfs.model.Route;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.gtfs.GtfsConverter;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -13,8 +12,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.pt.utils.CreatePseudoNetwork;
-import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.io.File;
@@ -32,10 +29,6 @@ public class RunVBB2OTFVis {
 
         String gtfsPath = "playgrounds/vspshk/input/gthunig/VBB2OTFVis/380248.zip";
         String outputRoot = "playgrounds/vspshk/output/gthunig/VBB2OTFVis/";
-
-//        String gtfsPath = "/Users/michaelzilske/wurst/vbb/380248.zip";
-//        String outputRoot = "output";
-
         File outputFile = new File(outputRoot);
         if (outputFile.mkdir()) {
             log.info("Did not found output root at " + outputRoot + " Created it as a new directory.");
@@ -91,15 +84,42 @@ public class RunVBB2OTFVis {
         converter.setDate(LocalDate.of(2016, 5, 16));
         converter.convert();
 
-        CreatePseudoNetwork createPseudoNetwork = new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "");
-        createPseudoNetwork.createNetwork();
-
-        new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getTransitVehicles()).run();
+//        CreatePseudoNetwork createPseudoNetwork = new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "");
+//        createPseudoNetwork.createNetwork();
 
         log.info("Playing VBB scenario with OTFVis...");
 
-        OTFVis.playScenario(scenario);
+        final Controler controler = new Controler(scenario) ;
+        controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles ) ;
+//		controler.setDirtyShutdown(true);
+
+        //		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;
+        //		tc.addOverridingModule(new RandomizedTransitRouterModule());
+
+
+        OTFVisConfigGroup otfconfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ) ;
+        // (this should also materialize material from a config.xml--? kai, nov'15)
+
+        otfconfig.setDrawTransitFacilityIds(false);
+        otfconfig.setDrawTransitFacilities(false);
+        controler.addOverridingModule( new OTFVisLiveModule() );
+
+        // the following is only possible when constructing the mobsim yourself:
+        //			if(this.useHeadwayControler){
+        //				simulation.getQSimTransitEngine().setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
+        //				this.events.addHandler(new FixedHeadwayControler(simulation));
+        //			}
+
+//		controler.addOverridingModule(new OTFVisFileWriterModule());
+        //		tc.setCreateGraphs(false);
+
+//        PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("pt interaction") ;
+//        params.setScoringThisActivityAtAll(false);
+//        controler.getConfig().planCalcScore().addActivityParams(params);
+
+        controler.run();
+//        OTFVis.playScenario(scenario);
+
 
     }
-
 }
