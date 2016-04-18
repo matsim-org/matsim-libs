@@ -50,6 +50,10 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
 
     private double scaleFactor;
 
+//    private double refSum;
+
+//    private double simSum;
+
     private double binCount;
 
     private Object dataKey;
@@ -78,6 +82,8 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
 
     private final long resetInterval = (long)1e7;
 
+    private final boolean debugMode = false;
+
     public UnivariatFrequency2(TDoubleDoubleMap refHist, HistogramBuilder histBuilder,
                                String attrKey, Discretizer discretizer, boolean useWeights, boolean absoluteMode) {
         this.histBuilder = histBuilder;
@@ -101,7 +107,19 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
 
     private void initHistogram(Collection<? extends Person> simPersons) {
         TDoubleDoubleMap simHist = histBuilder.build(simPersons);
-        simFreq = DynamicArrayBuilder.build(simHist, discretizer);
+        DynamicDoubleArray tempFreq = DynamicArrayBuilder.build(simHist, discretizer);
+
+        if(simFreq != null) {
+            for (int i = 0; i < tempFreq.size(); i++) {
+                if (tempFreq.get(i) != simFreq.get(i))
+                    logger.warn(String.format("Histogram out of sync: idx = %s, old = %s, new = %s",
+                            i,
+                            simFreq.get(i),
+                            tempFreq.get(i)));
+            }
+        }
+
+        simFreq = tempFreq;
 
         double refSum = 0;
         double simSum = 0;
@@ -117,9 +135,12 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
 
     private void initHamiltonian() {
         hamiltonianValue = 0;
+//        double scaleFactor = simSum/refSum;
+
         for (int i = 0; i < binCount; i++) {
             double simVal = simFreq.get(i);
             double refVal = refFreq.get(i) * scaleFactor;
+
 
             hamiltonianValue += calculateError(simVal, refVal);
         }
@@ -128,19 +149,27 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
 
     @Override
     public void onChange(Object dataKey, Object oldValue, Object newValue, CachedElement element) {
-        if (this.dataKey == null) this.dataKey = Converters.getObjectKey(attrKey);
+        if(simFreq != null) {
+            if (this.dataKey == null) this.dataKey = Converters.getObjectKey(attrKey);
 
-        if (this.dataKey.equals(dataKey) && evaluatePredicate(element)) {
-            double delta = 1.0;
-            if(useWeights) delta = (Double)element.getData(weightKey);
+            if (this.dataKey.equals(dataKey) && evaluatePredicate(element)) {
+                double delta = 1.0;
+                if (useWeights) delta = (Double) element.getData(weightKey);
 
-            int bucket = discretizer.index((Double) oldValue);
-            double diff1 = changeBucketContent(bucket, -delta);
+                double diff1 = 0;
+                if (oldValue != null) {
+                    int bucket = discretizer.index((Double) oldValue);
+                    diff1 = changeBucketContent(bucket, -delta);
+                }
 
-            bucket = discretizer.index((Double) newValue);
-            double diff2 = changeBucketContent(bucket, delta);
+                double diff2 = 0;
+                if (newValue != null) {
+                    int bucket = discretizer.index((Double) newValue);
+                    diff2 = changeBucketContent(bucket, delta);
+                }
 
-            hamiltonianValue += (diff1 + diff2);
+                hamiltonianValue += (diff1 + diff2);
+            }
         }
     }
 
@@ -158,6 +187,8 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
     }
 
     private double changeBucketContent(int bucketIndex, double value) {
+//        double scaleFactor = simSum/refSum;
+
         double simVal = simFreq.get(bucketIndex);
         double refVal = refFreq.get(bucketIndex) * scaleFactor;
         double oldDiff = calculateError(simVal, refVal);
@@ -182,8 +213,10 @@ public class UnivariatFrequency2 implements Hamiltonian, AttributeChangeListener
         iterations++;
         if(iterations % resetInterval == 0) {
             double h_old = hamiltonianValue;
+            if(debugMode) initHistogram(population);
             initHamiltonian();
-            logger.trace(String.format("Reset hamiltonian: %s -> %s", h_old, hamiltonianValue));
+            if(h_old != hamiltonianValue)
+                logger.trace(String.format("Reset hamiltonian: %s -> %s", h_old, hamiltonianValue));
         }
 
         return hamiltonianValue/binCount;

@@ -458,7 +458,7 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		LegImpl carLeg = new LegImpl(mode);
 		
 		carLeg.setTravelTime( travelTime );
-		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId());
+		NetworkRoute route = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactory().createRoute(NetworkRoute.class, startLink.getId(), destinationLink.getId());
 		route.setLinkIds( startLink.getId(), ids, destinationLink.getId());
 		route.setTravelTime( travelTime);
 		if (mode.equals("twowaycarsharing"))

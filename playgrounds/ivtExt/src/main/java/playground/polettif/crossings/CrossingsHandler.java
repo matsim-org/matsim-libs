@@ -27,13 +27,14 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
+import playground.polettif.crossings.parser.Crossing;
 import playground.polettif.crossings.parser.CrossingsParser;
+import playground.polettif.crossings.parser.RailLink;
+import playground.polettif.multiModalMap.tools.NetworkTools;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
@@ -45,9 +46,10 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 	
 	private List<LinkChangeEvent> linkChangeEvents = new ArrayList<>();
 	private Network network;
-	private Map<Id<Link>, List<String>> crossings;
+
 	private Map<List<Object>, Double> enterEvents = new HashMap<>();
-		
+	private Map<Id<Link>, RailLink> RailLinks;
+
 	public void reset(int iteration) {
 		System.out.println("reset...");
 	}
@@ -56,12 +58,12 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 		// from ScenarioLoaderImpl
 		CrossingsParser parser = new CrossingsParser();
 		parser.parse(filename);
-		this.crossings = parser.getCrossings();
+		this.RailLinks = parser.getRailLinks();
 		}
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {	
-		if(crossings.containsKey(event.getLinkId())) {
+		if(RailLinks.keySet().contains(event.getLinkId())) {
 			List<Object> key = new ArrayList<>();
 			key.add(event.getVehicleId());
 			key.add(event.getLinkId());
@@ -73,7 +75,7 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if(crossings.containsKey(event.getLinkId())) {
+		if(RailLinks.containsKey(event.getLinkId())) {
 			
 			// get corresponding enterEvent
 			List<Object> key = new ArrayList<>();
@@ -85,29 +87,33 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 			enterEvents.remove(key);
 			
 			// add new changeEvents for all crossings on rail link
+			// todo combine change events with the same time
 			Id<Link> railId = event.getLinkId();
 			
-			List<String> crossingLinkIds = crossings.get(railId);
-					
-			for (int i = 0; i < crossingLinkIds.size(); i=i+2) {
-				Id<Link> crossId = Id.createLinkId(crossingLinkIds.get(i));
-				String crossId1 = crossingLinkIds.get(i);
-				String crossId2 = crossingLinkIds.get(i+1);
-				
+			RailLink RailLink = RailLinks.get(railId);
+
+			int id=0;
+			for(Crossing crossing : RailLink.getCrossings()) {
+				Id<Link> crossId = crossing.getRefLinkId();
+
+				// todo create method to get two closest link with identical distance
+				if(crossId == null) {
+					crossId = NetworkTools.findNClosestLinks((NetworkImpl) network, crossing.getCoord(), 1, 200.0).get(0).getId();
+				}
+
 				// calculate time(coordinates of crossing, coordinates of fromNode, train speed, linkEnterTime)
 				// -> time(distance, train speed, linkEnterTime
 				double timeOfCrossing = enterTime+getTimeToCrossing(railId, crossId, linkTravelTime);
 				
-				// log.info("time: "+enterTime+", link: "+railId);
-				
+
 				String starttime = Time.writeTime(timeOfCrossing-preBuffer, "HH:mm:ss");
 				String stoptime = Time.writeTime(timeOfCrossing+postBuffer, "HH:mm:ss");
 				String capacity = Double.toString( network.getLinks().get(crossId).getCapacity() );
 				
-				LinkChangeEvent tmpChangeEvent = new LinkChangeEvent(crossId1, crossId2, starttime, stoptime, capacity);
+				LinkChangeEvent tmpChangeEvent = new LinkChangeEvent(crossId, starttime, stoptime, capacity);
 								
 				linkChangeEvents.add(tmpChangeEvent);
-				// log.info("Network Change Event added ("+crossId1+"/" + crossId2 +", "+starttime + " - "+ stoptime);
+
 				}
 			}
 	}

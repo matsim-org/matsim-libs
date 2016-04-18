@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.model.SignalGroup;
 
 
 /**
@@ -36,10 +37,10 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
  */
 public class DgExtensionPoint {
 
-	private Map<Id, Integer> maxGreenTimes = new HashMap<Id, Integer>();
+	private Map<Id<SignalGroup>, Integer> maxGreenTimes = new HashMap<>();
 	private int secondInPlan;
-	private Set<Id> signalGroupIds = new HashSet<Id>();
-	private Set<SignalData> signals = new HashSet<SignalData>();
+	private Set<Id<SignalGroup>> signalGroupIds = new HashSet<>();
+	private Set<SignalData> signals = new HashSet<>();
 
 	public DgExtensionPoint(int secondInPlan){
 		this.secondInPlan = secondInPlan;
@@ -49,19 +50,19 @@ public class DgExtensionPoint {
 		return this.secondInPlan;
 	}
 	
-	public Set<Id> getSignalGroupIds() {
+	public Set<Id<SignalGroup>> getSignalGroupIds() {
 		return this.signalGroupIds ;
 	}
 	
-	public void addSignalGroupId(Id signalGroupId){
+	public void addSignalGroupId(Id<SignalGroup> signalGroupId){
 		this.signalGroupIds.add(signalGroupId);
 	}
 
-	public int getMaxGreenTime(Id signalGroupId) {
+	public int getMaxGreenTime(Id<SignalGroup> signalGroupId) {
 		return this.maxGreenTimes.get(signalGroupId);
 	}
 	
-	public void setMaxGreenTime(Id signalGroupId, int maxGreenTime){
+	public void setMaxGreenTime(Id<SignalGroup> signalGroupId, int maxGreenTime){
 		this.maxGreenTimes.put(signalGroupId, maxGreenTime);
 	}
 

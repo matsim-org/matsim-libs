@@ -91,7 +91,7 @@ public class OTPMatrixRouter {
         log.info("Shutdown");
     }
 
-    private static boolean buildGraph(String inputRoot) {
+    static boolean buildGraph(String inputRoot) {
         if (!new File(inputRoot + GRAPH_NAME).exists()) {
             log.info("No graphfile found. Building the graph from content from: " + new File(inputRoot).getAbsolutePath() + " ...");
             OTPMain.main(new String[]{"--build", inputRoot});

@@ -30,18 +30,35 @@ public class RunEmptyScenario {
 
 	public static void main(String[] args) {
 
+		String base = "C:/Users/polettif/Desktop/";
+
 		// This creates a default matsim config:
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.loadConfig(base+"data/test/config.xml");
+
+		config.setParam("controler", "outputDirectory", base+"output/emptySimulation/");
+		config.setParam("network", "inputNetworkFile", base+"output/mtsMapping_zh/network.xml");
+		config.setParam("transit", "vehiclesFile", base+"data/test/vehicles.xml");
+
+		config.setParam("transit", "transitScheduleFile", base+"output/mtsMapping_zh/schedule.xml");
+		config.setParam("plans", "inputPlansFile", base+"data/test/population.xml");
 
 		config.controler().setLastIteration(1);
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+//		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+//		config.controler().setOutputDirectory(base+"output/emptySimulation/");
+//		config.network().setInputCRS("CH1903_LV03_Plus");
+//		config.network().setInputFile(base+"output/mtsMapping_zh/network.xml");
+//		config.transit().setTransitScheduleFile(base+"output/mtsMapping_zh/schedule.xml");
+//		config.transit().setInputScheduleCRS("CH1903_LV03_Plus");
+//		config.transit().setUseTransit(true);
+//		config.vspExperimental().setWritingOutputEvents(true);
+//		config.plans().setInputFile("data/test/population.xml");
+
 
 		// This creates a default matsim scenario (which is empty):
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
 
 		Controler controler = new Controler( scenario ) ;
 
-		// This indeed runs iterations, but based on an empty scenario:
 		controler.run();
 
 	}

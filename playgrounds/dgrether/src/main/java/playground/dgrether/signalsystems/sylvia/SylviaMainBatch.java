@@ -19,18 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.sylvia;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigReader;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.utils.io.IOUtils;
-import playground.dgrether.DgPaths;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
-
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -39,6 +27,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.utils.io.IOUtils;
+
+import playground.dgrether.DgPaths;
+import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 
 
 /**
@@ -86,10 +86,7 @@ public class SylviaMainBatch {
 			baseConfig.controler().setRunId("fixed-time_scale_" + scale);
 			Controler controler = new Controler(baseConfig);
 			controler.addControlerListener(analysis);
-			controler.getConfig().controler().setOverwriteFileSetting(
-					true ?
-							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+			controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 			controler.run();
 			
 			//sylvia control
@@ -100,13 +97,9 @@ public class SylviaMainBatch {
 			baseConfig.controler().setRunId("sylvia_scale" + scale);
 			
 			controler = new Controler(baseConfig);
-            //FIXME: Take care that the normal SignalsControllerListener is NOT added.
-            controler.addControlerListener(new DgSylviaControlerListenerFactory(new DgSylviaConfig()).createSignalsControllerListener());
-            controler.addControlerListener(analysis);
-			controler.getConfig().controler().setOverwriteFileSetting(
-					true ?
-							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+			controler.addOverridingModule(new SylviaSignalsModule());
+			controler.addControlerListener(analysis);
+			controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 			controler.run();
 		}
 		

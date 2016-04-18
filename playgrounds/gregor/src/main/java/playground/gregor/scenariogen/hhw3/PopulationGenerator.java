@@ -311,7 +311,7 @@ public class PopulationGenerator {
 
 		new NetworkChangeEventsWriter().write(inputDir +"/networkChangeEvents.xml.gz", events);
 		sc.getConfig().network().setTimeVariantNetwork(true);
-		sc.getConfig().network().setChangeEventInputFile(inputDir+"/networkChangeEvents.xml.gz");
+		sc.getConfig().network().setChangeEventsInputFile(inputDir+"/networkChangeEvents.xml.gz");
 		new NetworkWriter(sc.getNetwork()).write(sc.getConfig().network().getInputFile());
 
 	}

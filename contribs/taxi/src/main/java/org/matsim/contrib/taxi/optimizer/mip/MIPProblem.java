@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.core.utils.io.IOUtils;
 
 
 public class MIPProblem
@@ -163,12 +164,9 @@ public class MIPProblem
 
         stats.calcSolved();
 
-        try (PrintWriter pw = new PrintWriter(workingDirectory + "MIP_stats")) {
-            stats.print(pw);
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(workingDirectory + "MIP_stats"));
+        stats.print(pw);
+        pw.close();
     }
 
 

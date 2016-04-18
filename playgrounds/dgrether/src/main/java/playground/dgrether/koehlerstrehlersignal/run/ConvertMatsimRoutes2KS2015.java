@@ -39,7 +39,7 @@ import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2015Network
 
 /**
  * Class to convert MATSim routes into BTU format.
- * Therefore all agents with the same route (same links, time unrelevant)
+ * Therefore all agents with the same route (same links, time irrelevant)
  * are merged as one commodity with this links as permitted streets.
  * 
  * The output is a full BTU scenario with all crossings, streets and commodities.

@@ -122,6 +122,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 	}
 
 	private double calcScoreFromEvents(EventsManager eventsManager, EventsToScore eventsToScore, final Fixture f) {
+		eventsToScore.beginIteration(0);
 		handleFirstActivity(eventsManager, f, (Activity) f.plan.getPlanElements().get(0));
 		handleLeg(eventsManager, f, (Leg) f.plan.getPlanElements().get(1));
 		handleActivity(eventsManager, f, (Activity) f.plan.getPlanElements().get(2));

@@ -24,6 +24,8 @@ import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
+import com.google.inject.Inject;
+
 
 public class TaxiSimulationConsistencyChecker
     implements AfterMobsimListener
@@ -31,6 +33,7 @@ public class TaxiSimulationConsistencyChecker
     private final TaxiData taxiData;
 
 
+    @Inject
     public TaxiSimulationConsistencyChecker(TaxiData taxiData)
     {
         this.taxiData = taxiData;

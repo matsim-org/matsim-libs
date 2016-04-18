@@ -56,9 +56,18 @@ import java.util.Set;
  */
 public class Example {
 
+
+	public static String REMOTE_HOST = "localhost";
+	public static int REMOTE_PORT = 9000;
+
 	private static final Logger log = Logger.getLogger(Example.class);
 
 	public static void main(String[] args) throws IOException, InterruptedException {
+
+		if (args.length == 2) {
+			REMOTE_HOST = args[0];
+			REMOTE_PORT = Integer.parseInt(args[1]);
+		}
 
 
 		Config c = ConfigUtils.createConfig();
@@ -253,7 +262,7 @@ public class Example {
 			srcb.setId(1);
 			srcb.setFrequency(5);
 			srcb.setMaxAgents(5);
-			srcb.setGroupId(0);
+			srcb.setGroupId(1);
 			srcb.setCaption("source2");
 		}
 
@@ -351,19 +360,19 @@ public class Example {
 			Activity a1 = fac.createActivityFromLinkId("destination",Id.createLinkId(3));
 			plan.addActivity(a1);
 		}
-		for (int i = 20; i < 40; i++) {
-			Person pers = fac.createPerson(Id.createPersonId(i));
-			pop.addPerson(pers);
-			Plan plan = fac.createPlan();
-			pers.addPlan(plan);
-			Activity a0 = fac.createActivityFromLinkId("origin",Id.createLinkId("3r"));
-			a0.setEndTime(i-20);
-			plan.addActivity(a0);
-			Leg leg = fac.createLeg("car");
-			plan.addLeg(leg);
-			Activity a1 = fac.createActivityFromLinkId("destination",Id.createLinkId("0r"));
-			plan.addActivity(a1);
-		}
+//		for (int i = 20; i < 40; i++) {
+//			Person pers = fac.createPerson(Id.createPersonId(i));
+//			pop.addPerson(pers);
+//			Plan plan = fac.createPlan();
+//			pers.addPlan(plan);
+//			Activity a0 = fac.createActivityFromLinkId("origin",Id.createLinkId("3r"));
+//			a0.setEndTime(i-20);
+//			plan.addActivity(a0);
+//			Leg leg = fac.createLeg("car");
+//			plan.addLeg(leg);
+//			Activity a1 = fac.createActivityFromLinkId("destination",Id.createLinkId("0r"));
+//			plan.addActivity(a1);
+//		}
 	}
 
 	private static void createNetwork(Scenario sc) {

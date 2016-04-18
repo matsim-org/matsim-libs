@@ -104,7 +104,7 @@ public class LinkVisualizationQueue {
 		
 		PriorityQueue<SortableMapObject<LinkEvent>> priorityQueue = linkEventQueues.get(linkId);
 		
-		while (priorityQueue!=null && priorityQueue.size()>0 && priorityQueue.peek().getScore()<=time){
+		while (priorityQueue!=null && priorityQueue.size()>0 && priorityQueue.peek().getWeight()<=time){
 			SortableMapObject<LinkEvent> poll = priorityQueue.poll();
 			
 			currentValueAtLink.incrementBy(linkId, poll.getKey().getValue());

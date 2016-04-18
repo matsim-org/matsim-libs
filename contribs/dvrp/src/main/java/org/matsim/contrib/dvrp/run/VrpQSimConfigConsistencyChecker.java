@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.run;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 
 
 public class VrpQSimConfigConsistencyChecker
@@ -36,9 +35,7 @@ public class VrpQSimConfigConsistencyChecker
     {
         super.checkConsistency(config);
 
-        QSimConfigGroup qSimConfig = config.qsim();
-
-        if (!qSimConfig.isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
+        if (!config.qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
             log.warn("Typically, vrp paths are calculated from startLink to endLink"
                     + "(not from startNode to endNode). That requires making some assumptions"
                     + "on how much time travelling on the first and last links takes. "
@@ -49,7 +46,7 @@ public class VrpQSimConfigConsistencyChecker
                     + "(though that still does not guarantee 1-second stay");
         }
 
-        if (qSimConfig.isRemoveStuckVehicles()) {
+        if (config.qsim().isRemoveStuckVehicles()) {
             throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
         }
     }

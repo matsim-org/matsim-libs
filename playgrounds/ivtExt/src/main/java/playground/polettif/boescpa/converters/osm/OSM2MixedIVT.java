@@ -87,7 +87,7 @@ public class OSM2MixedIVT {
 		cutNW = new Coord(Double.parseDouble(args[7]), Double.parseDouble(args[8]));
 		cutSE = new Coord(Double.parseDouble(args[9]), Double.parseDouble(args[10]));
 		// Prepare output
-		final String outputFolder = args[11] + "\\";
+		final String outputFolder = args[11];// + "\\";
 		String outputPrefix = "";
 		if (args.length == 13) {
 			outputPrefix = args[12];

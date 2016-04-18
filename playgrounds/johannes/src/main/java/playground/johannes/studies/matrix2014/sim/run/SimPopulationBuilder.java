@@ -94,6 +94,13 @@ public class SimPopulationBuilder {
         } else {
             logger.info("Loading sim population from file...");
             simPersons = PopulationIO.loadFromXML(simPopFile, new PlainFactory());
+            //TODO: temp fix!
+            TaskRunner.run(new RefPopulationBuilder.SetVacationsPurpose(), simPersons);
+            TaskRunner.run(new RefPopulationBuilder.ReplaceHomePurpose(), simPersons);
+            TaskRunner.run(new RefPopulationBuilder.NullifyPurpose(ActivityTypes.HOME), simPersons);
+            TaskRunner.run(new RefPopulationBuilder.NullifyPurpose(ActivityTypes.MISC), simPersons);
+            TaskRunner.run(new RefPopulationBuilder.ReplaceLegPurposes(), simPersons);
+            TaskRunner.run(new RefPopulationBuilder.GuessMissingPurposes(simPersons, engine.getLegPredicate(), engine.getRandom()), simPersons);
         }
 
         logger.info("Recalculate geo distances...");

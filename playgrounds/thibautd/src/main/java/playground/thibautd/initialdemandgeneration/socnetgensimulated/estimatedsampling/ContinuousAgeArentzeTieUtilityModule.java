@@ -48,16 +48,18 @@ public class ContinuousAgeArentzeTieUtilityModule extends AbstractModule {
 	private DeterministicPart createDeterministicPart( ArentzePopulation population , EstimatedSamplingModelConfigGroup pars ) {
 		return ( ego, alter ) -> {
 			final int ageDifference =
-			Math.abs(
-				population.getAgeCategory( ego ) -
-				population.getAgeCategory( alter ) );
+				Math.abs(
+					population.getAgeCategory( ego ) -
+					population.getAgeCategory( alter ) );
 
-			// increase distance by 1 (normally meter) to avoid linking with all agents
-			// living in the same place.
-			// TODO: test sensitivity of the results to this
-			return pars.getB_logDist() * Math.log( CoordUtils.calcEuclideanDistance(population.getCoord(ego), population.getCoord(alter)) + 1 )
+			final double distance =
+					CoordUtils.calcEuclideanDistance(
+							population.getCoord(ego),
+							population.getCoord(alter));
+
+			return pars.getB_logDist() * EstimatedSamplingModelConfigGroup.transform( pars.getDistanceTransformation() , distance ) +
 					+ pars.getB_sameGender() * dummy( population.isMale( ego ) == population.isMale( alter ) )
-					+ pars.getB_ageDiff() * dummy( ageDifference == 0 );
+					+ pars.getB_ageDiff() *  EstimatedSamplingModelConfigGroup.transform( pars.getAgeTransformation() , ageDifference );
 		};
 	}
 

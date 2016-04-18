@@ -24,45 +24,51 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 
-public class MyZoneReaderTest extends MatsimTestCase{
+public class MyZoneReaderTest{
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	private Logger log = Logger.getLogger(MyZoneReaderTest.class);
 	
+	@Test
 	public void testMyZoneReaderConstructor(){
-		File folder = new File(getInputDirectory());
+		File folder = new File(utils.getInputDirectory());
 		String shapefile = folder.getParent() + "/zones.shp";
 		MyZoneReader mzr1 = new MyZoneReader(shapefile);
-		assertEquals("MyZoneReader not created.", false, mzr1 == null);
-		assertEquals("Wrong shapefile name stored.", true, shapefile.equalsIgnoreCase(mzr1.getShapefileName()));
+		Assert.assertEquals("MyZoneReader not created.", false, mzr1 == null);
+		Assert.assertEquals("Wrong shapefile name stored.", true, shapefile.equalsIgnoreCase(mzr1.getShapefileName()));
 		
 		MyZoneReader mzr2 = null;
 		try{
 			mzr2 = new MyZoneReader(folder.getParent() + "/dummy.shp");
-			fail("Should have thrown an exception.");
+			Assert.fail("Should have thrown an exception.");
 		} catch(RuntimeException e){
 			log.info("Caught the expected exception.");
 		}
-		assertNull("Should not create instance if shapefile does not exist.", mzr2);
+		Assert.assertNull("Should not create instance if shapefile does not exist.", mzr2);
 	}
 	
+	@Test
 	public void testReadZones(){
-		File folder = new File(getInputDirectory());
+		File folder = new File(utils.getInputDirectory());
 		String shapefile = folder.getParent() + "/zones.shp";
 		MyZoneReader mzr = new MyZoneReader(shapefile);
 		mzr.readZones(1);
-		assertEquals("Wrong return type.", ArrayList.class, mzr.getZoneList().getClass());
+		Assert.assertEquals("Wrong return type.", ArrayList.class, mzr.getZoneList().getClass());
 		List<MyZone> zones = (List<MyZone>) mzr.getZoneList();
-		assertEquals("Wrong number of objects.", 4, zones.size());
+		Assert.assertEquals("Wrong number of objects.", 4, zones.size());
 		MyZone z = zones.get(0);
-		assertEquals("Wrong Id for first zone.", "0", z.getId().toString());
+		Assert.assertEquals("Wrong Id for first zone.", "0", z.getId().toString());
 		z = zones.get(1);
-		assertEquals("Wrong Id for second zone.", "1", z.getId().toString());
+		Assert.assertEquals("Wrong Id for second zone.", "1", z.getId().toString());
 		z = zones.get(2);
-		assertEquals("Wrong Id for third zone.", "2", z.getId().toString());
+		Assert.assertEquals("Wrong Id for third zone.", "2", z.getId().toString());
 		z = zones.get(3);
-		assertEquals("Wrong Id for fourth zone.", "3", z.getId().toString());
+		Assert.assertEquals("Wrong Id for fourth zone.", "3", z.getId().toString());
 	}
 }
 

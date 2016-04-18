@@ -162,7 +162,7 @@ class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime ) ;
 
-		EditRoutes editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory() ) ;
+		EditRoutes editRoutes = new EditRoutes( scenario.getNetwork(), pathCalculator, ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactory() ) ;
 		
 		// new Route for current Leg.
 		final Leg leg = (Leg) plan.getPlanElements().get(planElementsIndex);

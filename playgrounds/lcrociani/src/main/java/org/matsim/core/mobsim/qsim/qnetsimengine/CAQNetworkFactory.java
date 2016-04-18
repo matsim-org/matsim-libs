@@ -30,10 +30,10 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import pedCA.environment.markers.FinalDestination;
 
 public class CAQNetworkFactory extends QNetworkFactory {
-	@Inject private EventsManager events ;
-	@Inject private Network network ;
-	@Inject private QSimConfigGroup qsimConfig ;
-	@Inject private Scenario scenario ;
+	private final EventsManager events ;
+	private final Network network ;
+	private final QSimConfigGroup qsimConfig ;
+	private final Scenario scenario ;
 	
 	private CAEngine engineCA;
 	private CAAgentFactory agentFactoryCA;
@@ -41,11 +41,25 @@ public class CAQNetworkFactory extends QNetworkFactory {
 	private Map<Node, TransitionArea> nodeToTransitionArea = new HashMap<Node, TransitionArea>();
 	private NetsimEngineContext context;
 	private NetsimInternalInterface netsimEngine;
+	
+	@Inject
+	public CAQNetworkFactory( EventsManager events, Network network, QSimConfigGroup qsimConfig, Scenario scenario ) {
+		// there is a bit of replication in the above arguments. kai, mar'31
+		
+		this.events = events ;
+		this.network = network;
+		this.qsimConfig = qsimConfig;
+		this.scenario = scenario;
+	}
 
-	public CAQNetworkFactory(CAEngine engineCA, Scenario scenario, CAAgentFactory agentFactoryCA) {
+	public CAQNetworkFactory(CAEngine engineCA, Scenario scenario, CAAgentFactory agentFactoryCA, EventsManager events) {
 		this.engineCA = engineCA;
 		this.agentFactoryCA = agentFactoryCA;
 		this.scenarioCA = (CAScenario) scenario.getScenarioElement(Constants.CASCENARIO_NAME);
+		this.scenario = scenario ;
+		this.network = scenario.getNetwork() ;
+		this.qsimConfig = scenario.getConfig().qsim() ;
+		this.events = events ;
 	}
 	
 	@Override

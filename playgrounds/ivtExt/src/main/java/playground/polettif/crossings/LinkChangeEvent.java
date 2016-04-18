@@ -18,28 +18,25 @@
 
 package playground.polettif.crossings;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+
 public class LinkChangeEvent {
 	
-	private String linkId1;
-	private String linkId2;
+	private Id<Link> linkId;
 	private String starttime;
 	private String stoptime;
 	private String capacity;
      
-	public LinkChangeEvent(String linkId1, String linkId2, String starttime, String stoptime, String capacity) {
-		this.linkId1 = linkId1;
-		this.linkId2 = linkId2;
+	public LinkChangeEvent(Id<Link> linkId, String starttime, String stoptime, String capacity) {
+		this.linkId = linkId;
 		this.starttime = starttime;
 		this.stoptime = stoptime;
 		this.capacity = capacity;
 	}
 	
-	public String getLinkId1() {
-		return linkId1;
-	}
-	
-	public String getLinkId2() {
-		return linkId2;
+	public Id<Link> getLinkId() {
+		return linkId;
 	}
 	
 	public String getStarttime() {

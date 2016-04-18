@@ -37,6 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.TimeVariantLinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -90,20 +91,20 @@ public class Incident2NetworkChangeEventsTest {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		config.network().setInputFile(networkFile);
-		config.network().setChangeEventInputFile(outputDirectory + "networkChangeEvents_2016-03-15.xml.gz");
+		config.network().setChangeEventsInputFile(outputDirectory + "networkChangeEvents_2016-03-15.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		new NetworkWriter(scenario.getNetwork()).write(testUtils.getOutputDirectory() + "output-network.xml");
 				
-		Network network = scenario.getNetwork();
-		LinkImpl link = (LinkImpl) network.getLinks().get(Id.createLinkId("36087"));
+//		LinkImpl link = (LinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
+		TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
 		
-		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getCapacity(16 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getCapacity(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getFlowCapacityPerSec(16 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong freespeed during the afternoon.", 13.88888888888888, link.getFreespeed(16 * 3600.), MatsimTestUtils.EPSILON);
 		
-		// TODO:
-//		Assert.assertEquals("Wrong capacity during the morning.", 0.1, link.getCapacity(10 * 3600.), MatsimTestUtils.EPSILON);		
-//		Assert.assertEquals("Wrong freespeed during the morning.", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong capacity during the morning.", 0.1, link.getFlowCapacityPerSec(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong freespeed during the morning.", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
 	}
 	
 	@Test
@@ -112,18 +113,17 @@ public class Incident2NetworkChangeEventsTest {
 		Config config = ConfigUtils.createConfig();
 		config.network().setTimeVariantNetwork(true);
 		config.network().setInputFile(testUtils.getPackageInputDirectory() + "network.xml");
-		config.network().setChangeEventInputFile(testUtils.getPackageInputDirectory() + "networkChangeEvents_2016-03-15.xml");
+		config.network().setChangeEventsInputFile(testUtils.getPackageInputDirectory() + "networkChangeEvents_2016-03-15.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
-		Network network = scenario.getNetwork();
-		LinkImpl link = (LinkImpl) network.getLinks().get(Id.createLinkId("36087"));
+//		LinkImpl link = (LinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
+		TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(Id.createLinkId("36087"));
 		
-		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getCapacity(16 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong capacity during the afternoon.", 4700., link.getFlowCapacityPerSec(16 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong freespeed during the afternoon.", 13.88888888888888, link.getFreespeed(16 * 3600.), MatsimTestUtils.EPSILON);
 		
-		// TODO:
-//		Assert.assertEquals("Wrong capacity during the morning.", 1., link.getCapacity(10 * 3600.), MatsimTestUtils.EPSILON);		
-//		Assert.assertEquals("Wrong freespeed during the morning.", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong capacity during the morning.", 1., link.getFlowCapacityPerSec(10 * 3600.), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("Wrong freespeed during the morning.", 0.22227, link.getFreespeed(10 * 3600.), MatsimTestUtils.EPSILON);		
 	}
 		
 }

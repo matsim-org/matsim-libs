@@ -45,7 +45,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.PlanRouter;
@@ -74,7 +74,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	private Plan plan;
 	private TripRouter tripRouter;
 	private LeastCostPathCalculator pathCalculator ;
-	private ModeRouteFactory routeFactory ;
+	private RouteFactoryImpl routeFactory ;
 	
 	/**
 	 * @author cdobler
@@ -452,7 +452,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		TravelDisutility costFunction = new OnlyTimeDependentTravelDisutility( timeFunction ) ;
 		this.pathCalculator = new Dijkstra(scenario.getNetwork(), costFunction, timeFunction) ;
 		
-		this.routeFactory = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory() ;
+		this.routeFactory = ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getRouteFactory() ;
 	}
 	
 	/**

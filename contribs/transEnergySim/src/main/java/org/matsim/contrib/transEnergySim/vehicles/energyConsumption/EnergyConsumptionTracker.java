@@ -41,7 +41,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionLogRow;
 import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionOutputLog;
-import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
+import org.matsim.contrib.transEnergySim.vehicles.api.VehicleWithBattery;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
@@ -152,8 +152,8 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 			
 			double soc = 0;
 			double loc = 0;
-			if (vehicle instanceof AbstractVehicleWithBattery){
-				AbstractVehicleWithBattery a = (AbstractVehicleWithBattery)vehicle;
+			if (vehicle instanceof VehicleWithBattery){
+				VehicleWithBattery a = (VehicleWithBattery)vehicle;
 				soc = a.getSocInJoules();
 				loc = soc / a.getUsableBatteryCapacityInJoules();
 			}

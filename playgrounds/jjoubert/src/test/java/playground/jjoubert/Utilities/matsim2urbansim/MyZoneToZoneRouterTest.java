@@ -24,6 +24,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -31,7 +34,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -40,22 +43,26 @@ import com.vividsolutions.jts.geom.Polygon;
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
 
-public class MyZoneToZoneRouterTest extends MatsimTestCase{
+public class MyZoneToZoneRouterTest{
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
 	private Scenario scenario;
 	private List<MyZone> zones;
 	private String inputFolder;
 	
+	@Test
 	public void testMyZoneToZoneRouterConstructor(){
 		// TODO Test constructor. Want a routable network at this point.
 		setupNetwork();
 		MyZoneToZoneRouter mzzr = new MyZoneToZoneRouter(scenario, zones);
-		assertNull("Router should be null.", mzzr.getRouter());
+		Assert.assertNull("Router should be null.", mzzr.getRouter());
 		
 		mzzr.prepareTravelTimeData(inputFolder + "/50.events.xml");
-		assertNotNull("Router should exist.", mzzr.getRouter());
-		assertEquals("Router should be of type Dijkstra.", Dijkstra.class, mzzr.getRouter().getClass());
+		Assert.assertNotNull("Router should exist.", mzzr.getRouter());
+		Assert.assertEquals("Router should be of type Dijkstra.", Dijkstra.class, mzzr.getRouter().getClass());
 	}
 	
+	@Test
 	public void testProcessZones(){
 		setupNetwork();
 		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
@@ -71,14 +78,14 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 		MyLinkStatsReader mlsr = new MyLinkStatsReader(inputFolder + "/50.linkstats.txt");
 		boolean empties = mzzr.processZones(matrix, mlsr.readSingleHour("6-7"));
 		DenseDoubleMatrix2D od = mzzr.getOdMatrix(); 
-		mzzr.writeOdMatrixToDbf(getOutputDirectory() + "dbfCar.dbf", od);
+		mzzr.writeOdMatrixToDbf(utils.getOutputDirectory() + "dbfCar.dbf", od);
 //		mzzr.writeOdMatrixToDbf("/Users/johanwjoubert/Desktop/Temp/Equil/DbfFinal.dbf", od);
-		assertFalse("Final travel time matrix has empty entries.", empties);
-		assertEquals("Wrong intrazonal travel time for zone 1.", 435, Math.round(od.get(0, 0)));
-		assertEquals("Wrong intrazonal travel time for zone 2.", 270, Math.round(od.get(1, 1)));
-		assertEquals("Wrong intrazonal travel time for zone 3.", 270, Math.round(od.get(2, 2)));
-		assertEquals("Wrong intrazonal travel time for zone 4.", 252, Math.round(od.get(3, 3)));
-		assertEquals("Wrong intrazonal travel time for zone 5.", 660, Math.round(od.get(4, 4)));
+		Assert.assertFalse("Final travel time matrix has empty entries.", empties);
+		Assert.assertEquals("Wrong intrazonal travel time for zone 1.", 435, Math.round(od.get(0, 0)));
+		Assert.assertEquals("Wrong intrazonal travel time for zone 2.", 270, Math.round(od.get(1, 1)));
+		Assert.assertEquals("Wrong intrazonal travel time for zone 3.", 270, Math.round(od.get(2, 2)));
+		Assert.assertEquals("Wrong intrazonal travel time for zone 4.", 252, Math.round(od.get(3, 3)));
+		Assert.assertEquals("Wrong intrazonal travel time for zone 5.", 660, Math.round(od.get(4, 4)));
 		
 		// TODO Add some more asserts for interzonal travel time.		
 	}
@@ -89,7 +96,7 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 	 */
 	private void setupNetwork(){
 
-		inputFolder  = (new File(getInputDirectory())).getParentFile().getAbsolutePath();
+		inputFolder  = (new File(utils.getInputDirectory())).getParentFile().getAbsolutePath();
 		GeometryFactory gf = new GeometryFactory();
 		zones = new ArrayList<MyZone>(5);
 		// Zone 1.

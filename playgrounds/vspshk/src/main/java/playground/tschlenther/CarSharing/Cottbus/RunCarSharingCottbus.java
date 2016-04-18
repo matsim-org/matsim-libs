@@ -8,7 +8,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.tschlenther.Cottbus.Demand.CreateDemand;
+import playground.jbischoff.teach.demand.OSMLanduseBasedDemancGenerator;
 
 
 public class RunCarSharingCottbus {

@@ -39,9 +39,8 @@ class RunMobsimWithMultipleModeVehiclesExample {
 	public static void main ( String[] args ) {
 
 		// prepare the config:
-		@SuppressWarnings("unchecked")
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
-        config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.toString());
+		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.toString());
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
 
 		// prepare the scenario

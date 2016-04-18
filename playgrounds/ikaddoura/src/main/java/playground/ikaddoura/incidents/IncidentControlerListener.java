@@ -56,7 +56,7 @@ public class IncidentControlerListener implements IterationStartsListener {
 		NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		network.getNetworkChangeEvents().clear();
 		network.setNetworkChangeEvents(networkChangeEvents);
-		event.getServices().getConfig().network().setChangeEventInputFile(networkChangeEventsDirectory + "nce_" + event.getIteration() + "xml.gz");
+		event.getServices().getConfig().network().setChangeEventsInputFile(networkChangeEventsDirectory + "nce_" + event.getIteration() + "xml.gz");
 	}
 
 }

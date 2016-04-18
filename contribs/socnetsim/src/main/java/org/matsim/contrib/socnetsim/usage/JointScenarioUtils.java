@@ -40,7 +40,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -62,7 +62,7 @@ public class JointScenarioUtils {
 
 	public static Scenario createScenario(final Config config) {
 		final Scenario sc = ScenarioUtils.createScenario( config );
-		final ModeRouteFactory rFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
+		final RouteFactoryImpl rFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getRouteFactory();
 		rFactory.setRouteFactory(
 				DriverRoute.class,//JointActingTypes.DRIVER,
 				new DriverRouteFactory());

@@ -26,12 +26,8 @@ import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -57,7 +53,7 @@ public class RunTaxiScenario
         new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new TaxiModule(taxiData));
+        controler.addOverridingModule(new TaxiModule(taxiData, taxiCfg));
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
         controler.addOverridingModule(new DynQSimModule<>(TaxiQSimProvider.class));
 
@@ -65,47 +61,14 @@ public class RunTaxiScenario
             controler.addOverridingModule(new OTFVisLiveModule());
         }
 
-        addDetailedTaxiStats(controler, taxiCfg, taxiData, 30);
-        controler.addControlerListener(new TaxiSimulationConsistencyChecker(taxiData));
-
-        //TODO
-        //addTaxiStats:
-        //        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles().values())
-        //                .getStats();
-
         return controler;
-    }
-
-
-    private static void addDetailedTaxiStats(Controler controler, final TaxiConfigGroup taxiCfg,
-            final TaxiData taxiData, final int hours)
-    {
-        if (taxiCfg.getDetailedTaxiStatsDir() != null) {
-            controler.addControlerListener(new AfterMobsimListener() {
-                @Override
-                public void notifyAfterMobsim(AfterMobsimEvent event)
-                {
-                    int iteration = event.getIteration();
-                    HourlyTaxiStatsCalculator calculator = new HourlyTaxiStatsCalculator(
-                            taxiData.getVehicles().values(), hours);
-                    HourlyTaxiStats.printAllStats(calculator.getStats(),
-                            taxiCfg.getDetailedTaxiStatsDir() + "/hourly_stats_run_" + iteration);
-                    HourlyHistograms.printAllHistograms(calculator.getHourlyHistograms(),
-                            taxiCfg.getDetailedTaxiStatsDir() + "/hourly_histograms_run_"
-                                    + iteration);
-                    calculator.getDailyHistograms()
-                            .printHistograms(taxiCfg.getDetailedTaxiStatsDir()
-                                    + "/daily_histograms_run_" + iteration);
-                }
-            });
-        }
     }
 
 
     public static void main(String[] args)
     {
-        //        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
-        String configFile = "./src/main/resources/mielec_2014_02/config.xml";
+        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
+        //String configFile = "./src/main/resources/mielec_2014_02/config.xml";
         RunTaxiScenario.run(configFile, true);
     }
 }

@@ -68,7 +68,7 @@ public class FifoOptimizer extends AbstractTaxibusOptimizer {
 		LeastCostPathCalculator router = new Dijkstra(optimContext.scenario.getNetwork(),
 				optimContext.travelDisutility, optimContext.travelTime);
 		routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router,
-				new TimeDiscretizer(30 * 4, 15 * 60, false));
+		        TimeDiscretizer.OPEN_ENDED_15_MIN);
 		for (Id<TaxibusLine> line : this.dispatcher.getLines().keySet()) {
 			this.currentRequestPathForLine.put(line, null);
 			this.currentTwMax.put(line, null);

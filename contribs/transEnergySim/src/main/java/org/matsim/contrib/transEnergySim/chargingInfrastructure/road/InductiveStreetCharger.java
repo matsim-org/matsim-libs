@@ -45,7 +45,7 @@ import org.matsim.contrib.transEnergySim.analysis.charging.ChargingOutputLog;
 import org.matsim.contrib.transEnergySim.analysis.charging.InductiveChargingAtRoadOutputLog;
 import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
-import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
+import org.matsim.contrib.transEnergySim.vehicles.api.VehicleWithBattery;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -104,7 +104,7 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 
 	private boolean ignoreAgent(Id<Vehicle> vehicleId, Id<Link> linkId) {
 		return (samePowerAtAllLinks == null && !getChargableStreets().containsKey(linkId))
-				&& !(getVehicles().get(vehicleId) instanceof AbstractVehicleWithBattery);
+				&& !(getVehicles().get(vehicleId) instanceof VehicleWithBattery);
 	}
 
 	@Override
@@ -150,7 +150,7 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 
 		double chargableEnergyInJoules = availablePowerInWatt * timeSpendOnLink;
 
-		AbstractVehicleWithBattery vehicleWithBattery = (AbstractVehicleWithBattery) getVehicles().get(vehicleId);
+		VehicleWithBattery vehicleWithBattery = (VehicleWithBattery) getVehicles().get(vehicleId);
 		double energyToChargeInJoules = 0;
 		if (vehicleWithBattery.getRequiredEnergyInJoules() <= chargableEnergyInJoules) {
 			energyToChargeInJoules = vehicleWithBattery.getRequiredEnergyInJoules();
@@ -159,7 +159,7 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 		}
 
 		if (energyToChargeInJoules > 0) {
-			vehicleWithBattery.chargeBattery(energyToChargeInJoules);
+			vehicleWithBattery.chargeVehicle(energyToChargeInJoules);
 
 			if (loggingEnabled) {
 				ChargingLogRowLinkLevel chargingLogRow = new ChargingLogRowLinkLevel(vehicleId, linkId, linkEnterTime, energyToChargeInJoules

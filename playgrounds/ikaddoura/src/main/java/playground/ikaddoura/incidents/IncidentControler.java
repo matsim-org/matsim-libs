@@ -173,7 +173,7 @@ public class IncidentControler {
 		config.controler().setOutputDirectory(outputDirectory);
 		
 		config.network().setTimeVariantNetwork(true);
-		config.network().setChangeEventInputFile(networkChangeEventsFile);
+		config.network().setChangeEventsInputFile(networkChangeEventsFile);
 		
 		Controler controler = new Controler(config);
 		controler.run();
@@ -201,7 +201,7 @@ public class IncidentControler {
 			config.controler().setOutputDirectory(outputDirectoryThisRun);
 			
 			config.network().setTimeVariantNetwork(true);
-			config.network().setChangeEventInputFile(networkChangeFileThisRun);
+			config.network().setChangeEventsInputFile(networkChangeFileThisRun);
 			
 			Controler controler = new Controler(config);
 			controler.run();
