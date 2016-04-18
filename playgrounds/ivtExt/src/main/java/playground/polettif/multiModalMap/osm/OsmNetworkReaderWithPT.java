@@ -178,7 +178,7 @@ public class OsmNetworkReaderWithPT {
 			this.setHighwayDefaults(V_UNCLASSIFIED,  1,  45.0/3.6, 1.0,  600);
 			this.setHighwayDefaults(V_RESIDENTIAL,   1,  30.0/3.6, 1.0,  600);
 			this.setHighwayDefaults(V_LIVING_STREET, 1,  15.0/3.6, 1.0,  300);
-			this.setHighwayDefaults(V_SERVICE, 		 1,  15.0/3.6, 1.0,  200); // TODO service roads are used in zurich for bus-only roads
+//			this.setHighwayDefaults(V_SERVICE, 		 1,  15.0/3.6, 1.0,  200); // TODO service roads are used in zurich for bus-only roads
 
 			// Set railway-defaults (and with it the filter...)
 			this.setRailwayDefaults(V_RAIL, 		  1,  80.0/3.6, 1.0,  100, true);
@@ -569,12 +569,8 @@ public class OsmNetworkReaderWithPT {
 		// define modes allowed on link(s)
 		//	basic type:
 		Set<String> modes = new HashSet<String>();
-		if (highway != null) {
-			if(!highway.equals(V_SERVICE)) { // service roads are used in zurich for bus-only roads
-				modes.add("car");
-			} else {
-				modes.add(V_BUS);
-			}
+		if (highway != null) { // todo bus only roads
+			modes.add("car");
 		}
 
 		if (railway != null && railwayDefaults.containsKey(railway)) {

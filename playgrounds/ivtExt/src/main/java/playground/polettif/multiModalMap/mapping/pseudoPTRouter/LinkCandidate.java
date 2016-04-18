@@ -32,7 +32,7 @@ public class LinkCandidate  {
 	private TransitStopFacility childStopFacility;
 
 	public LinkCandidate(Link link, TransitStopFacility parentStopFacility) {
-		this.id = "ParentStopFacility: " + parentStopFacility.getName() + " (" + parentStopFacility.getId() + ") -> Link: " + link.getId();
+		this.id = parentStopFacility.getName() + " " + parentStopFacility.getId() + ":" + link.getId();
 		this.link = link;
 		this.parentStopFacility = parentStopFacility;
 	}

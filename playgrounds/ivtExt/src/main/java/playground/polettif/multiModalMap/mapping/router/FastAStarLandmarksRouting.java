@@ -56,7 +56,7 @@ public class FastAStarLandmarksRouting implements Router {
     }
 
     @Override
-    public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode, String mode) {
+    public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode) {
         if (fromNode != null && toNode != null) {
             Tuple<Node, Node> nodes = new Tuple<>(fromNode, toNode);
             if (!paths.containsKey(nodes)) {
@@ -67,10 +67,6 @@ public class FastAStarLandmarksRouting implements Router {
             return null;
         }
     }
-
-	public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode) {
-		return calcLeastCostPath(fromNode, toNode, null);
-	}
 
     @Override
     public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {

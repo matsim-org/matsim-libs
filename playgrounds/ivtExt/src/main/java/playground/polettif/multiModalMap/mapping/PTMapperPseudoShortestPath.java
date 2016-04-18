@@ -32,10 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.multiModalMap.mapping.pseudoPTRouter.DijkstraAlgorithm;
-import playground.polettif.multiModalMap.mapping.pseudoPTRouter.PseudoGraph;
-import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidate;
-import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidatePath;
+import playground.polettif.multiModalMap.mapping.pseudoPTRouter.*;
 import playground.polettif.multiModalMap.mapping.router.FastAStarLandmarksRouting;
 import playground.polettif.multiModalMap.mapping.router.Router;
 
@@ -49,8 +46,10 @@ import java.util.*;
  * <p>
  * TODO doc input is modified
  *
+ * @deprecated does not work since pseudoRouting was changed from linkcandidates to pseudo stops
  * @author polettif
  */
+@Deprecated
 public class PTMapperPseudoShortestPath extends PTMapper {
 
 	/**
@@ -150,9 +149,6 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 					 * calculate shortest paths between each link candidate
 					 */
 
-					// add dummy edges and nodes to pseudoGraph before the transitRoute
-					pseudoGraph.addDummyBefore(stopFacilityTree.getLinkCandidates(routeStops.get(0).getStopFacility()));
-
 					for (int i = 0; i < routeStops.size()-1; i++) {
 						boolean firstPath = false, lastPath = false;
 						List<LinkCandidate> linkCandidatesCurrent = stopFacilityTree.getLinkCandidates(routeStops.get(i).getStopFacility());
@@ -172,19 +168,18 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 									travelTime = travelTime * config.getSameLinkPunishment();
 								}
 
-								pseudoGraph.addPath(new LinkCandidatePath(linkCandidateCurrent, linkCandidateNext, travelTime, firstPath, lastPath));
-							}
+								PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(routeStops.get(i), linkCandidateCurrent);
+								PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(routeStops.get(i+1), linkCandidateNext);
+
+								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, travelTime, false), (i == 0), (i == routeStops.size() - 2));							}
 						}
 					}
-
-					// add dummy edges and nodes to pseudoGraph before the transitRoute
-					pseudoGraph.addDummyAfter(stopFacilityTree.getLinkCandidates(routeStops.get(routeStops.size()-1).getStopFacility()));
 
 					/* [.]
 					 * build pseudo network and find shortest path => List<LinkCandidate>
 					 */
 					dijkstra.run();
-					stopFacilityTree.setReplacementPairs(transitLine, transitRoute, dijkstra.getBestLinkCandidates());
+//					stopFacilityTree.setReplacementPairs(transitLine, transitRoute, dijkstra.getShortesPseudoPath());
 				}
 			} // - transitRoute loop
 		} // - line loop

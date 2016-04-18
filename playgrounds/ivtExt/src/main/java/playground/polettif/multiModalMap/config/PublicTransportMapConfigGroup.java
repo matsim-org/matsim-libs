@@ -25,10 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -56,7 +53,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	private Set<String> modesToCleanUp = new HashSet<>();
 	private Set<String> mapBusTo = new HashSet<>();
 	private double nodeSearchRadius = 300;
-	private int maxNClosestLinks = 8;
+	private int maxNClosestLinks = 2;
 	private double maxStopFacilityDistance = 80;
 	private double sameLinkPunishment = 10;
 	private String prefixArtificialLinks = "pt_";
@@ -78,8 +75,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	 * <li>7 - Funicular. Any rail system designed for steep inclines.</li>
 	 * </ul>
 	 */
-	private Map<String, String> modes = new HashMap<>();
-
+	private Map<String, Set<String>> modes = new HashMap<>();
 
 	public PublicTransportMapConfigGroup() {
 		super( GROUP_NAME );
@@ -201,11 +197,18 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		defaultConfig.modesToCleanUp.add("rail");
 		defaultConfig.mapBusTo.add("bus");
 
-		defaultConfig.modes.put("BUS", "bus");
-		defaultConfig.modes.put("TRAM", "tram");
-		defaultConfig.modes.put("RAIL", "rail");
-		// subway, gondola, funicular, ferry and cablecar are not mapped
+		Set<String> busSet = new HashSet<>(); busSet.add("bus"); busSet.add("car");
+		defaultConfig.modes.put("BUS", busSet);
 
+//		defaultConfig.modes.put("BUS", Collections.singleton("bus"));
+/*
+		Set<String> tramSet = new HashSet<>(); tramSet.add("tram");
+		defaultConfig.modes.put("TRAM", tramSet);
+
+		Set<String> railSet = new HashSet<>(); railSet.add("rail");
+		defaultConfig.modes.put("RAIL", railSet);
+*/
+		// subway, gondola, funicular, ferry and cablecar are not mapped
 
 		return defaultConfig;
 	}
@@ -243,7 +246,19 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		return mapBusTo;
 	}
 
-	public Map<String, String> getModes() {
+	public Map<String, Set<String>> getModes() {
 		return modes;
+	}
+
+	public Set<String> getNetworkModes() {
+		Set<String> networkModes = new HashSet<>();
+		modes.values().forEach(networkModes::addAll);
+		return networkModes;
+	}
+
+	public Set<String> getScheduleModes() {
+		Set<String> scheduleModes = new HashSet<>();
+		modes.keySet().forEach(scheduleModes::add);
+		return scheduleModes;
 	}
 }

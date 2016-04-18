@@ -21,6 +21,7 @@
 
 package playground.polettif.multiModalMap.mapping;
 
+import gnu.trove.map.hash.TByteIntHashMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
@@ -28,17 +29,14 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
-import playground.polettif.multiModalMap.mapping.pseudoPTRouter.DijkstraAlgorithm;
-import playground.polettif.multiModalMap.mapping.pseudoPTRouter.PseudoGraph;
-import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidate;
-import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidatePath;
-import playground.polettif.multiModalMap.mapping.router.DijkstraRouter;
-import playground.polettif.multiModalMap.mapping.router.ModeLinkFilter;
+import playground.polettif.multiModalMap.mapping.pseudoPTRouter.*;
+import playground.polettif.multiModalMap.mapping.router.ModeDependentRouter;
 import playground.polettif.multiModalMap.mapping.router.Router;
-import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
 
@@ -52,6 +50,8 @@ import java.util.*;
  * @author polettif
  */
 public class PTMapperModes extends PTMapper {
+
+	private static final double HIGH_TT_VALUE = 10800;
 
 	/**
 	 * Constructor.
@@ -113,112 +113,167 @@ public class PTMapperModes extends PTMapper {
 
 	@Override
 	public void mapScheduleToNetwork(Network networkParam) {
-		setNetwork(networkParam);
+		this.network = networkParam;
 
 		log.info("Creating PT lines...");
 
 		Counter counterLine = new Counter("route # ");
 
-		/**
-		 * Create differen network for all Routes, initiate routers.
-		 * TODO move to separate class, preprocess data
- 		 */
-		Map<String, Network> modeNetworks = new HashMap<>(); // key: ScheduleTransportMode
-		Map<String, Router> routers = new HashMap<>(); 	// key: ScheduleTransportMode
-		for(Map.Entry<String, String> mode : config.getModes().entrySet()) {
-			log.info("Creating network for transportMode " + mode.getKey());
-			Network newNetwork = NetworkTools.getFilteredNetwork(network, new ModeLinkFilter(mode.getValue()), null);
-			modeNetworks.put(mode.getKey(), newNetwork);
-			new NetworkWriter(newNetwork).write("C:/Users/polettif/Desktop/output/modeNetworks/zh_"+mode.getKey()+".xml");
-			routers.put(mode.getKey(), new DijkstraRouter(newNetwork));
-		}
+		Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoRoutes = new HashMap<>();
+
+		/** [.]
+		 * createPseudoNetwork for all modes. Link travel times are very high, so routing puts the transitroute
+		 * on the "real" network where available.
+		 * TODO only create pseudoNetwork outside of AOI otherwise we get way too many links
+		 */
+//		new IndependentNetworkCreator(schedule, network, config.getPrefixArtificialLinks()).createNetwork();
+//		new NetworkWriter(network).write("E:/output/test/independentNetworks.xml");
 
 		/** [.]
 		 * preload closest links and create child StopFacilities
 		 * if a stop facility is already referenced (manually beforehand for example) no child facilities are created
 		 * stopfacilities with no links within search radius need artificial links and nodes before routing starts
 		 */
-		Map<String, StopFacilityTree> stopFacilityTrees = new HashMap<>();
-		for(String mode : config.getModes().keySet()) {
-			StopFacilityTree stopFacilityTree = new StopFacilityTree(schedule, modeNetworks.get(mode), mode, config.getNodeSearchRadius(), config.getMaxNClosestLinks(), config.getMaxStopFacilityDistance());
-			stopFacilityTrees.put(mode, stopFacilityTree);
-		}
+		Map<TransitStopFacility, List<LinkCandidate>> linkCandidates = PTMapperUtils.generateLinkCandidates(schedule, network, config);
 
+		/**
+		 * Create differen network for all Routes, initiate routers.
+		 */
+		Map<String, Router> routers = new HashMap<>(); 	// key: ScheduleTransportMode
+		for(Map.Entry<String, Set<String>> modeAssignment : config.getModes().entrySet()) {
+			routers.put(modeAssignment.getKey(), new ModeDependentRouter(network, modeAssignment.getValue()));
+		}
 
 		/**
 		 * TODO doc
 		 */
 		for (TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				if(config.getModes().keySet().contains(transitRoute.getTransportMode())) {
+					String transitRouteTransportMode = transitRoute.getTransportMode();
+					Router modeRouter = routers.get(transitRouteTransportMode);
 
-				StopFacilityTree stopFacilityTree = stopFacilityTrees.get(transitRoute.getTransportMode());
+					List<TransitRouteStop> routeStops = transitRoute.getStops();
 
-				String transitRouteTransportMode = transitRoute.getTransportMode();
-				Router modeRouter = routers.get(transitRouteTransportMode);
+					counterLine.incCounter();
 
-				List<TransitRouteStop> routeStops = transitRoute.getStops();
+					if(transitRoute.getId().toString().equals("line404_00400_001")) {
+						log.debug("break");
+					}
 
-				counterLine.incCounter();
+					/** [.]
+					 * calculate shortest paths between each link candidate
+					 */
+					PseudoGraph pseudoGraph = new PseudoGraph();
+					DijkstraAlgorithm dijkstra = new DijkstraAlgorithm(pseudoGraph);
 
-				PseudoGraph pseudoGraph = new PseudoGraph();
-				DijkstraAlgorithm dijkstra = new DijkstraAlgorithm(pseudoGraph);
+					for(int i = 0; i < routeStops.size() - 1; i++) {
+						List<LinkCandidate> linkCandidatesCurrent = linkCandidates.get(routeStops.get(i).getStopFacility());
+						List<LinkCandidate> linkCandidatesNext = linkCandidates.get(routeStops.get(i + 1).getStopFacility());
 
-				/** [.]
-				 * calculate shortest paths between each link candidate
-				 */
-				// add dummy edges and nodes to pseudoGraph before the transitRoute
-				pseudoGraph.addDummyBefore(stopFacilityTree.getLinkCandidates(routeStops.get(0).getStopFacility()));
+						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
+							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
+								LeastCostPathCalculator.Path leastCostPath = modeRouter.calcLeastCostPath(linkCandidateCurrent.getLink().getToNode(), linkCandidateNext.getLink().getFromNode());
 
-				for (int i = 0; i < routeStops.size()-1; i++) {
-					boolean firstPath = false, lastPath = false;
-					List<LinkCandidate> linkCandidatesCurrent = stopFacilityTree.getLinkCandidates(routeStops.get(i).getStopFacility());
-					List<LinkCandidate> linkCandidatesNext = stopFacilityTree.getLinkCandidates(routeStops.get(i+1).getStopFacility());
+								double travelTime;
 
-					if(i == 0) { firstPath = true; }
-					if(i == routeStops.size()-2) { lastPath = true; }
+								// path is null if links are on separate networks
+								if(leastCostPath != null) {
+									travelTime = leastCostPath.travelTime;
 
-					for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
-						for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-							LeastCostPathCalculator.Path leastCostPath = modeRouter.calcLeastCostPath(linkCandidateCurrent.getLink().getToNode(), linkCandidateNext.getLink().getFromNode());
+									// if both links are the same, travel time should get higher since
+									if(linkCandidateCurrent.getLink().equals(linkCandidateNext.getLink())) {
+										travelTime *= config.getSameLinkPunishment();
+									}
+								} else {
+									travelTime = HIGH_TT_VALUE;
+								}
 
-							double travelTime = leastCostPath.travelTime;
+//								Map<LinkCandidate, PseudoRouteStop> pseudoRouteStopCurrent = MapUtils.getMap(linkCandidateCurrent, MapUtils.getMap(routeStops.get(i), pseudoRouteStops));
+								PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(routeStops.get(i), linkCandidateCurrent);
+								PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(routeStops.get(i+1), linkCandidateNext);
 
-							// if both links are the same and to link are the same, travel time should get higher since those
-							if(linkCandidateCurrent.getLink().equals(linkCandidateNext.getLink()))	{
-								travelTime = travelTime * config.getSameLinkPunishment();
+								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, travelTime), (i == 0), (i == routeStops.size() - 2));
 							}
-
-							pseudoGraph.addPath(new LinkCandidatePath(linkCandidateCurrent, linkCandidateNext, travelTime, firstPath, lastPath));
 						}
 					}
 
+					//debug
+					Set<PseudoRoutePath> paths = pseudoGraph.getEdges();
+					PseudoRoutePath path = null;
 
-					// add dummy edges and nodes to pseudoGraph before the transitRoute
-					pseudoGraph.addDummyAfter(stopFacilityTree.getLinkCandidates(routeStops.get(routeStops.size()-1).getStopFacility()));
+					for(PseudoRoutePath p : paths) {
+						if(p.getId().getFirst().getId().equals("source")) {
+							path = p;
+							break;
+						}
+					}
 
-					/* [.]
+					while(!path.getToPseudoStop().isDestination()) {
+						log.warn("starting from " + path.getFromPseudoStop());
+						for(PseudoRoutePath p : paths) {
+							log.info(p.getFromPseudoStop());
+							if(p.getToPseudoStop().equals(path.getFromPseudoStop())) {
+								path = p;
+								log.info("found one");
+								break;
+							}
+						}
+					}
+					// /debug
+
+					/** [.]
 					 * build pseudo network and find shortest path => List<LinkCandidate>
 					 */
 					dijkstra.run();
-					stopFacilityTree.setReplacementPairs(transitLine, transitRoute, dijkstra.getBestLinkCandidates());
+					List<PseudoRouteStop> linkCandidateSequence = MapUtils.getList(transitRoute, MapUtils.getMap(transitLine, pseudoRoutes));
+					linkCandidateSequence.addAll(dijkstra.getShortesPseudoPath());
+
 				}
 			} // - transitRoute loop
 		} // - line loop
 
 		/** [6]
-		 *
+		 * Replacing parent StopFacilities with child StopFacilities
 		 */
 		log.info("Replacing parent StopFacilities with child StopFacilities...");
-		for(StopFacilityTree stopFacilityTree : stopFacilityTrees.values()) {
-			stopFacilityTree.replaceParentWithChildStopFacilities();
+		List<Tuple<TransitLine, TransitRoute>> newRoutes = new ArrayList<>();
+		for(Map.Entry<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> lineEntry : pseudoRoutes.entrySet()) {
+			for(Map.Entry<TransitRoute, List<PseudoRouteStop>> routeEntry : lineEntry.getValue().entrySet()) {
+
+				List<PseudoRouteStop> pseudoStopSequence = routeEntry.getValue();
+				List<TransitRouteStop> newStopSequence = new ArrayList<>();
+
+				for(PseudoRouteStop pseudoStop : pseudoStopSequence) {
+					TransitRouteStop newTransitRouteStop = scheduleFactory.createTransitRouteStop(
+							pseudoStop.getChildStopFacility(), pseudoStop.getArrivalOffset(), pseudoStop.getDepartureOffset());
+					newTransitRouteStop.setAwaitDepartureTime(pseudoStop.isAwaitDepartureTime());
+
+					newStopSequence.add(newTransitRouteStop);
+				}
+
+				TransitRoute newRoute = scheduleFactory.createTransitRoute(routeEntry.getKey().getId(), null, newStopSequence, routeEntry.getKey().getTransportMode());
+
+				// add departures
+				routeEntry.getKey().getDepartures().values().forEach(newRoute::addDeparture);
+
+				// remove the old route
+				this.schedule.getTransitLines().get(lineEntry.getKey().getId()).removeRoute(routeEntry.getKey());
+
+				// add new route to container
+				newRoutes.add(new Tuple<>(lineEntry.getKey(), newRoute));
+			}
+		}
+
+		// add transit lines and routes again
+		for(Tuple<TransitLine, TransitRoute> entry : newRoutes) {
+			this.schedule.getTransitLines().get(entry.getFirst().getId()).addRoute(entry.getSecond());
 		}
 
 		/** [7]
 		 * route all routes with the new referenced links
 		 */
 		PTMapperUtils.routeSchedule(schedule, network, routers);
-
-		// TODO merge child stops with same link ref but different modes
 
 		/** [8]
 		 * After all lines created, clean all non-linked stations, all pt-exclusive links (check allowed modes)
@@ -227,7 +282,7 @@ public class PTMapperModes extends PTMapper {
 		 */
 		log.info("Clean Stations and Network...");
 //		PTMapperUtils.cleanSchedule(schedule);
-		PTMapperUtils.removeNonUsedStopFacilities(schedule);
+//		PTMapperUtils.removeNonUsedStopFacilities(schedule);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);
 //		PTMapperUtils.setConnectedStopFacilitiesToIsBlocking(schedule, network);
 		PTMapperUtils.removeNonTransitLinks(schedule, network, config.getModesToCleanUp());
