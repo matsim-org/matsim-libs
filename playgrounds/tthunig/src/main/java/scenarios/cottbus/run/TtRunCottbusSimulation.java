@@ -64,7 +64,6 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.CongestionTollTimeDistanceTravelDisutilityFactory;
-import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlType;
 
 /**
  * Class to run a cottbus simulation.
@@ -76,12 +75,12 @@ public class TtRunCottbusSimulation {
 
 	private static final Logger LOG = Logger.getLogger(TtRunCottbusSimulation.class);
 	
-	private final static ScenarioType SCENARIO_TYPE = ScenarioType.BaseCaseContinued_MatsimRoutes;
+	private final static ScenarioType SCENARIO_TYPE = ScenarioType.BaseCaseContinued_BtuRoutes;
 	private enum ScenarioType {
 		BaseCase, BaseCaseContinued_MatsimRoutes, BaseCaseContinued_BtuRoutes
 	}
 	
-	private final static SignalType SIGNAL_TYPE = SignalType.MS;
+	private final static SignalType SIGNAL_TYPE = SignalType.BTU_OPT;
 	private enum SignalType {
 		NONE, MS, MS_RANDOM_OFFSETS, BTU_OPT
 	}
@@ -140,7 +139,7 @@ public class TtRunCottbusSimulation {
 		// able or enable signals and lanes
 		config.qsim().setUseLanes( true );
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		signalConfigGroup.setUseSignalSystems(SIGNAL_TYPE.equals(SignalControlType.NONE) ? false : true);
+		signalConfigGroup.setUseSignalSystems(SIGNAL_TYPE.equals(SignalType.NONE) ? false : true);
 		switch (SIGNAL_TYPE) {
 		case MS:
 			if (SCENARIO_TYPE.equals(ScenarioType.BaseCase))
@@ -193,7 +192,7 @@ public class TtRunCottbusSimulation {
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultStrategy.TimeAllocationMutator.toString());
-			strat.setWeight(0.1);
+			strat.setWeight(0.0);
 			strat.setDisableAfter(config.controler().getLastIteration() - 100);
 			config.strategy().addStrategySettings(strat);
 			config.timeAllocationMutator().setMutationRange(1800); // 1800 is default
@@ -224,9 +223,9 @@ public class TtRunCottbusSimulation {
 		if (SCENARIO_TYPE.equals(ScenarioType.BaseCaseContinued_BtuRoutes))
 			config.strategy().setMaxAgentPlanMemorySize(0); //unlimited because ReRoute is switched off anyway
 		else 
-			config.strategy().setMaxAgentPlanMemorySize(5);
+			config.strategy().setMaxAgentPlanMemorySize(4);
 
-//		config.qsim().setStuckTime(3600 * 10.);
+		config.qsim().setStuckTime( 3600 );
 		config.qsim().setRemoveStuckVehicles(false);
 		
 		if (SCENARIO_TYPE.equals(ScenarioType.BaseCase)){
