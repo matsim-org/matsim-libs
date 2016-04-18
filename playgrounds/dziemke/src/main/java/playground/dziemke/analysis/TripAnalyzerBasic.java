@@ -22,8 +22,8 @@ public class TripAnalyzerBasic {
 	public static final Logger log = Logger.getLogger(TripAnalyzerBasic.class);
 	
 	/* Parameters */
-	private static final String runId = "run_168a";
-	private static final String usedIteration = "300"; // most frequently used value: 150
+	private static final String RUN_ID = "run_168a";
+	private static final String USED_ITERATION = "300"; // most frequently used value: 150
 
 	private static final int binWidthDuration_min = 1;
 	private static final int binWidthTime_h = 1;
@@ -31,10 +31,10 @@ public class TripAnalyzerBasic {
 	private static final int binWidthSpeed_km_h = 1;
 
 	/* Input and output */
-	private static final String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-	private static final String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + 
-			"/" + runId + "." + usedIteration + ".events.xml.gz";
-	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/test_analysis";
+	private static String networkFile = "../../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	private static String eventsFile = "../../../runs-svn/cemdapMatsimCadyts/" + RUN_ID + "/ITERS/it." + USED_ITERATION +
+			"/" + RUN_ID + "." + USED_ITERATION + ".events.xml.gz";
+	private static String outputDirectory = "../../../runs-svn/cemdapMatsimCadyts/" + RUN_ID + "/test_analysis";
 
 	/* Variables to store information */
 	private static double aggregateWeightOfConsideredTrips = 0;
@@ -44,6 +44,15 @@ public class TripAnalyzerBasic {
 
 	
 	public static void main(String[] args) {
+
+		if (args.length != 0 && args.length != 3) {
+			throw new RuntimeException("Number of arguments is wrong.");
+		} else if (args.length == 3) {
+			networkFile = args[0];
+			eventsFile = args[1];
+			outputDirectory = args[2];
+		}
+
 		new File(outputDirectory).mkdir();
 		
 		double numberOfTripsWithCalculableSpeedBeeline = 0;
