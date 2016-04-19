@@ -384,7 +384,7 @@ public class PTMapperUtils {
 	}
 
 
-	public static void removeNonTransitLinks(TransitSchedule schedule, Network network, Set<String> modesToCleanUp) {
+	public static void removeNotUsedTransitLinks(TransitSchedule schedule, Network network, Set<String> modesToCleanUp) {
 		Set<Id<Link>> usedTransitLinkIds = new HashSet<>();
 
 		for(TransitLine line : schedule.getTransitLines().values()) {

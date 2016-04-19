@@ -26,7 +26,7 @@ public class RunPTMapperModes {
 	public static void main(String[] args) {
 
 
-		String base = "E:/"; //"C:/Users/polettif/Desktop/";
+		String base = "C:/Users/Flavio/Desktop/";
 		String outbase = base+"output/mtsMapping_modes/";
 
 		// input

@@ -49,15 +49,25 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	// field without null conversion
 	private String nonNull = "some arbitrary default value.";
 
+/*
+for each schedule transport the following needs to be specified:
+- should it be mapped independently?
+- to which network transport modes it can be mapped
 
-	private Set<String> modesToCleanUp = new HashSet<>();
-	private Set<String> mapBusTo = new HashSet<>();
+for network transport modes:
+- should it be cleaned upt
+ */
+
+	private Set<String> modesToKeepOnCleanUp = new HashSet<>();
 	private double nodeSearchRadius = 300;
-	private int maxNClosestLinks = 2;
+	private int maxNClosestLinks = 8;
 	private double maxStopFacilityDistance = 80;
 	private double sameLinkPunishment = 10;
 	private String prefixArtificialLinks = "pt_";
 	private String suffixChildStopFacilities = ".fac:";
+	private double maxAoiDistance = 1000;
+
+	private double increasedNodeSearchRadius = 1.2;
 
 	/**
 	 * References transportModes from the schedule (key) and the
@@ -194,20 +204,19 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 
 		PublicTransportMapConfigGroup defaultConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), PublicTransportMapConfigGroup.GROUP_NAME, PublicTransportMapConfigGroup.class);
 
-		defaultConfig.modesToCleanUp.add("rail");
-		defaultConfig.mapBusTo.add("bus");
+		defaultConfig.modesToKeepOnCleanUp.add("car");
 
 		Set<String> busSet = new HashSet<>(); busSet.add("bus"); busSet.add("car");
 		defaultConfig.modes.put("BUS", busSet);
 
-//		defaultConfig.modes.put("BUS", Collections.singleton("bus"));
-/*
 		Set<String> tramSet = new HashSet<>(); tramSet.add("tram");
 		defaultConfig.modes.put("TRAM", tramSet);
 
-		Set<String> railSet = new HashSet<>(); railSet.add("rail");
+		Set<String> railSet = new HashSet<>();
+		railSet.add("rail");
+		railSet.add("pt");
 		defaultConfig.modes.put("RAIL", railSet);
-*/
+
 		// subway, gondola, funicular, ferry and cablecar are not mapped
 
 		return defaultConfig;
@@ -238,12 +247,8 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		return suffixChildStopFacilities;
 	}
 
-	public Set<String> getModesToCleanUp() {
-		return modesToCleanUp;
-	}
-
-	public Set<String> getMapBusTo() {
-		return mapBusTo;
+	public Set<String> getModesToKeepOnCleanUp() {
+		return modesToKeepOnCleanUp;
 	}
 
 	public Map<String, Set<String>> getModes() {
@@ -260,5 +265,13 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		Set<String> scheduleModes = new HashSet<>();
 		modes.keySet().forEach(scheduleModes::add);
 		return scheduleModes;
+	}
+
+	public double getMaxAoiDistance() {
+		return maxAoiDistance;
+	}
+
+	public double getIncreasedNodeSearchRadius() {
+		return increasedNodeSearchRadius;
 	}
 }
