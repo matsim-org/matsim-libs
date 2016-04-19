@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -26,7 +27,7 @@ public class SingaporeControlerListener implements StartupListener {
 	//private String path = "D:/Senozon/Models/FCL/inputdata/20160225_0/validation/";
 	private Population population;
 	public static String [] activities = {"home", "work", "leisure", "pudo", "personal", "primaryschool", "secondaryschool", "tertiaryschool", "foreignschool"};
-	public static String [] modes = {"car", "pt", "walk", "passenger", "taxi"}; // "other" removed
+	public static String [] modes = {"car", "pt", "walk", "passenger", "taxi", "other"};
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
@@ -61,8 +62,7 @@ public class SingaporeControlerListener implements StartupListener {
 				
 				ArrayList<Double> times; 
 				if (mode.equals("passenger")) times = this.readFile(path + "/time_" + "pass" + "-" + activity_to + ".txt");
-				else times = this.readFile(path + "/time_" + mode + "-" + activity_to + ".txt");
-				
+				else times = this.readFile(path + "/time_" + mode + "-" + activity_to + ".txt");			
 				
 				DistributionClass distanceDistributionClass = timeDistribution.createAndAddDistributionClass(mode + "-" + activity_to);
 				timeDistribution.addMainMode(distanceDistributionClass, mode);
@@ -117,11 +117,12 @@ public class SingaporeControlerListener implements StartupListener {
 	private ArrayList<Double> readFile(String inputFile) {
 		File file = new File(inputFile);
 	    List<String> lines;
-	    ArrayList<Double> distances = new ArrayList<Double>();
+	    ArrayList<Double> refmeasures = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)); // defaults to ...
 		try {
 			lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
-			System.out.println(lines.size() + " lines");
+			log.info(lines.size() + " lines");
 			
+			refmeasures.clear();
 			int cnt = 0;
 			for (String line : lines) {
 				if (cnt == 0) {
@@ -130,14 +131,15 @@ public class SingaporeControlerListener implements StartupListener {
 				}
 		        String[] elements = line.split("\t");
 		        
-		        distances.add(Double.parseDouble(elements[2]));
+		        refmeasures.add(Double.parseDouble(elements[2]));
 		    }
 		} catch (IOException e) {
 			for (int i = 0; i < 9; i++) {
-				distances.add(0.0);
+				log.warn("File " + inputFile + " not found!");
+				refmeasures.add(0.0); // TODO: remove, see above
 			}
 		}	
-		return distances;
+		return refmeasures;
 	}
 
 }
