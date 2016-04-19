@@ -9,21 +9,41 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class PseudoRouteStop {
 
-	private final TransitRouteStop routeStop;
 
+	public final String id;
+	private final int order;
+	private final String name;
 	private final LinkCandidate linkCandidate;
-	private final String id;
 
-	public PseudoRouteStop(TransitRouteStop routeStop, LinkCandidate linkCandidate) {
-		this.routeStop = routeStop;
+	private double departureOffset;
+	private double arrivalOffset;
+	private boolean awaitDepartureTime;
+
+	public PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
+		this.id = Integer.toString(order) + routeStop.getStopFacility().getId() + linkCandidate.getLink().getId();
+		this.order = order;
+		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLink().getId() + ")";
 		this.linkCandidate = linkCandidate;
-		this.id = routeStop + ":" + linkCandidate;
+
+		this.departureOffset = routeStop.getDepartureOffset();
+		this.arrivalOffset = routeStop.getArrivalOffset();
+		this.awaitDepartureTime = routeStop.isAwaitDepartureTime();
 	}
 
 	public PseudoRouteStop(String id) {
-		this.routeStop = null;
+		if(id.equals("SOURCE")) {
+			this.id = "SOURCE";
+			this.order = -2;
+		} else {
+			this.id = "DESTINATION";
+			this.order = -1;
+		}
+		this.name = id;
 		this.linkCandidate = null;
-		this.id = id;
+
+		this.departureOffset = 0.0;
+		this.arrivalOffset = 0.0;
+		this.awaitDepartureTime = false;
 	}
 
 	public LinkCandidate getLinkCandidate() {
@@ -31,35 +51,49 @@ public class PseudoRouteStop {
 	}
 
 	public TransitStopFacility getParentStopFacility() {
-		return routeStop.getStopFacility();
+		return linkCandidate.getParentStop();
 	}
 
 	public double getDepartureOffset() {
-		return routeStop.getDepartureOffset();
+		return departureOffset;
 	}
 
 	public double getArrivalOffset() {
-		return routeStop.getArrivalOffset();
+		return arrivalOffset;
 	}
 
 	public boolean isAwaitDepartureTime() {
-		return routeStop.isAwaitDepartureTime();
+		return awaitDepartureTime;
 	}
 
 	@Override
 	public String toString() {
-		return id;
-	}
-
-	public boolean isDestination() {
-		return id.equals("destination");
+		return name;
 	}
 
 	public TransitStopFacility getChildStopFacility() {
 		return linkCandidate.getChildStop();
 	}
 
-	public String getId() {
-		return id;
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+
+		PseudoRouteStop other = (PseudoRouteStop) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 }

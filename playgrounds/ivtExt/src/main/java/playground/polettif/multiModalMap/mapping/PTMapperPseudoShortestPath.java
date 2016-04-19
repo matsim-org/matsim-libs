@@ -152,10 +152,14 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 					for (int i = 0; i < routeStops.size()-1; i++) {
 						boolean firstPath = false, lastPath = false;
 						List<LinkCandidate> linkCandidatesCurrent = stopFacilityTree.getLinkCandidates(routeStops.get(i).getStopFacility());
-						List<LinkCandidate> linkCandidatesNext = stopFacilityTree.getLinkCandidates(routeStops.get(i+1).getStopFacility());
+						List<LinkCandidate> linkCandidatesNext = stopFacilityTree.getLinkCandidates(routeStops.get(i + 1).getStopFacility());
 
-						if(i == 0) { firstPath = true; }
-						if(i == routeStops.size()-2) { lastPath = true; }
+						if(i == 0) {
+							firstPath = true;
+						}
+						if(i == routeStops.size() - 2) {
+							lastPath = true;
+						}
 
 						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
@@ -164,22 +168,23 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 								double travelTime = leastCostPath.travelTime;
 
 								// if both links are the same and to link are the same, travel time should get higher since those
-								if(linkCandidateCurrent.getLink().equals(linkCandidateNext.getLink()))	{
+								if(linkCandidateCurrent.getLink().equals(linkCandidateNext.getLink())) {
 									travelTime = travelTime * config.getSameLinkPunishment();
 								}
 
-								PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(routeStops.get(i), linkCandidateCurrent);
-								PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(routeStops.get(i+1), linkCandidateNext);
+//								PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(routeStops.get(i), linkCandidateCurrent);
+//								PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(routeStops.get(i+1), linkCandidateNext);
 
-								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, travelTime, false), (i == 0), (i == routeStops.size() - 2));							}
+//								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, travelTime, false), (i == 0), (i == routeStops.size() - 2));							}
+							}
 						}
-					}
 
 					/* [.]
 					 * build pseudo network and find shortest path => List<LinkCandidate>
 					 */
-					dijkstra.run();
+						dijkstra.run();
 //					stopFacilityTree.setReplacementPairs(transitLine, transitRoute, dijkstra.getShortesPseudoPath());
+					}
 				}
 			} // - transitRoute loop
 		} // - line loop

@@ -21,11 +21,13 @@
 
 package playground.polettif.multiModalMap.mapping;
 
-import gnu.trove.map.hash.TByteIntHashMap;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -33,10 +35,12 @@ import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
+import playground.polettif.boescpa.lib.tools.spatialCutting.NetworkCutter;
 import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.*;
 import playground.polettif.multiModalMap.mapping.router.ModeDependentRouter;
 import playground.polettif.multiModalMap.mapping.router.Router;
+import playground.polettif.multiModalMap.tools.NetworkTools;
 
 import java.util.*;
 
@@ -126,8 +130,18 @@ public class PTMapperModes extends PTMapper {
 		 * on the "real" network where available.
 		 * TODO only create pseudoNetwork outside of AOI otherwise we get way too many links
 		 */
-//		new IndependentNetworkCreator(schedule, network, config.getPrefixArtificialLinks()).createNetwork();
-//		new NetworkWriter(network).write("E:/output/test/independentNetworks.xml");
+
+//		Coord[] extent = NetworkTools.getExtent(network);
+
+		Network independentNetwork = NetworkUtils.createNetwork();
+		IndependentNetworkCreator independentNetworkCreator = new IndependentNetworkCreator(schedule, independentNetwork, config);
+		independentNetworkCreator.createNetwork();
+
+		new NetworkWriter(independentNetwork).write("C:/Users/Flavio/Desktop/output/test/independentNetwork.xml");
+//		independentNetworkCreator.removeLinksWithinAOI(extent[0], extent[1]);
+		independentNetworkCreator.removeLinksWithinAOI(new Coord(2674070.0, 1152880.0), new Coord(2705500.0, 1208000.0));
+		new NetworkWriter(network).write("C:/Users/Flavio/Desktop/output/test/network.xml");
+		new NetworkWriter(independentNetwork).write("C:/Users/Flavio/Desktop/output/test/independentNetwork_cut.xml");
 
 		/** [.]
 		 * preload closest links and create child StopFacilities
@@ -147,6 +161,7 @@ public class PTMapperModes extends PTMapper {
 		/**
 		 * TODO doc
 		 */
+		log.info("Calculating pseudoRoutes...");
 		for (TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				if(config.getModes().keySet().contains(transitRoute.getTransportMode())) {
@@ -157,10 +172,6 @@ public class PTMapperModes extends PTMapper {
 
 					counterLine.incCounter();
 
-					if(transitRoute.getId().toString().equals("line404_00400_001")) {
-						log.debug("break");
-					}
-
 					/** [.]
 					 * calculate shortest paths between each link candidate
 					 */
@@ -168,6 +179,7 @@ public class PTMapperModes extends PTMapper {
 					DijkstraAlgorithm dijkstra = new DijkstraAlgorithm(pseudoGraph);
 
 					for(int i = 0; i < routeStops.size() - 1; i++) {
+
 						List<LinkCandidate> linkCandidatesCurrent = linkCandidates.get(routeStops.get(i).getStopFacility());
 						List<LinkCandidate> linkCandidatesNext = linkCandidates.get(routeStops.get(i + 1).getStopFacility());
 
@@ -189,45 +201,20 @@ public class PTMapperModes extends PTMapper {
 									travelTime = HIGH_TT_VALUE;
 								}
 
-//								Map<LinkCandidate, PseudoRouteStop> pseudoRouteStopCurrent = MapUtils.getMap(linkCandidateCurrent, MapUtils.getMap(routeStops.get(i), pseudoRouteStops));
-								PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(routeStops.get(i), linkCandidateCurrent);
-								PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(routeStops.get(i+1), linkCandidateNext);
+ 								PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+								PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i+1, routeStops.get(i+1), linkCandidateNext);
 
 								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, travelTime), (i == 0), (i == routeStops.size() - 2));
 							}
 						}
 					}
 
-					//debug
-					Set<PseudoRoutePath> paths = pseudoGraph.getEdges();
-					PseudoRoutePath path = null;
-
-					for(PseudoRoutePath p : paths) {
-						if(p.getId().getFirst().getId().equals("source")) {
-							path = p;
-							break;
-						}
-					}
-
-					while(!path.getToPseudoStop().isDestination()) {
-						log.warn("starting from " + path.getFromPseudoStop());
-						for(PseudoRoutePath p : paths) {
-							log.info(p.getFromPseudoStop());
-							if(p.getToPseudoStop().equals(path.getFromPseudoStop())) {
-								path = p;
-								log.info("found one");
-								break;
-							}
-						}
-					}
-					// /debug
-
 					/** [.]
 					 * build pseudo network and find shortest path => List<LinkCandidate>
 					 */
 					dijkstra.run();
-					List<PseudoRouteStop> linkCandidateSequence = MapUtils.getList(transitRoute, MapUtils.getMap(transitLine, pseudoRoutes));
-					linkCandidateSequence.addAll(dijkstra.getShortesPseudoPath());
+					List<PseudoRouteStop> pseudoStopSequence = MapUtils.getList(transitRoute, MapUtils.getMap(transitLine, pseudoRoutes));
+					pseudoStopSequence.addAll(dijkstra.getShortesPseudoPath());
 
 				}
 			} // - transitRoute loop
@@ -285,7 +272,7 @@ public class PTMapperModes extends PTMapper {
 //		PTMapperUtils.removeNonUsedStopFacilities(schedule);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);
 //		PTMapperUtils.setConnectedStopFacilitiesToIsBlocking(schedule, network);
-		PTMapperUtils.removeNonTransitLinks(schedule, network, config.getModesToCleanUp());
+//		PTMapperUtils.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
 		log.info("Clean Stations and Network... done.");
 
 		log.info("Creating PT lines... done.");
