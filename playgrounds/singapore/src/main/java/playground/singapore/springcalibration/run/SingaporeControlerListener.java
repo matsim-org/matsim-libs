@@ -93,8 +93,9 @@ public class SingaporeControlerListener implements StartupListener {
 		for (String activity_to: activities) {
 			for (String mode : modes) {
 				
-				
-				ArrayList<Double> distances = this.readFile(path + "/distance_" + mode + "-" + activity_to + ".txt");
+				ArrayList<Double> distances;
+				if (mode.equals("passenger")) distances = this.readFile(path + "/time_" + "pass" + "-" + activity_to + ".txt");
+				else distances = this.readFile(path + "/time_" + mode + "-" + activity_to + ".txt");
 				
 				DistributionClass distanceDistributionClass = distanceDistribution.createAndAddDistributionClass(mode + "-" + activity_to);
 				distanceDistribution.addMainMode(distanceDistributionClass, mode);
