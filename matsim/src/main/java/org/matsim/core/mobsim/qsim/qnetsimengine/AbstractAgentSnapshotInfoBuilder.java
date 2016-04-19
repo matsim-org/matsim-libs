@@ -212,39 +212,55 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			Gbl.assertNotNull( downstreamCoord ) ;
 			this.positionAgentGivenDistanceFromFNode(positions, upstreamCoord, downstreamCoord, curvedLength, veh, distanceFromFromNode, lane, speedValue);
 
-			final double epsilon = 0.01 ;
-			if ( distanceFromFromNode >= previousDistanceFromFromNode - vehicleSpacing - epsilon ) {
-				// (distance to vehicle ahead \sim spacing --> in queue)
-			
 			if ( this.scenario.getConfig().qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
-				if ( !consumableHoles.isEmpty() && distanceFromFromNode < consumableHoles.lastKey() ) {
-					// (i.e. if hole is to right of vehicle)
-					
-					Logger.getLogger( this.getClass() ).warn( "distanceFromFNode=" + distanceFromFromNode + "; lastKey=" + consumableHoles.lastKey() + "; firstKey=" + consumableHoles.firstKey() ) ;
-
-					Entry<Double, Hole> entry = consumableHoles.pollLastEntry() ;
-
-					//					distanceFromFromNode +=  7.5 * entry.getValue().getSizeInEquivalents() ;
-
-//					distanceFromFromNode -=  spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
-//					if ( entry.getKey() < distanceFromFromNode ) {
-//						distanceFromFromNode = entry.getKey() ;  // we don't add the full hole PCE if the hole is further downstream
-//						break ; // and we break out of the while loop
-//					}
-					
-					// while hole is downstream from current vehicle position, we just keep pulling holes.
-					// once hole is upstream from current vehicle position, we pull one hole and add it to the position, and then we
-					// move on to adding the next vehicle:
-					final double sizeOfCurrentHole = spacingOfOnePCE * entry.getValue().getSizeInEquivalents();
-//					if ( entry.getKey() - sizeOfCurrentHole < distanceFromFromNode ) {
-						distanceFromFromNode -= sizeOfCurrentHole ;
-//						distanceFromFromNode = entry.getKey();
-//						break ;
-//					}
-					
+				Entry<Double, Hole> entry = consumableHoles.pollLastEntry() ;
+				if ( entry != null && distanceFromFromNode < entry.getKey() ) { // hole to right of current vehicle position
+						double possibilityOne = distanceFromFromNode - spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
+						double possibilityTwo = entry.getKey() - spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
+//						distanceFromFromNode = Math.min(possibilityOne, possibilityTwo) ;
+						distanceFromFromNode = possibilityOne ;
 				}
 			}
-			}
+			
+			/* Speed of backwards moving holes is not (spacingOfOnePCE * getSizeInEquivalents)/sec, but something like
+			 * (cellSize * getSizeInEquivalents)/sec or maybe even just cellSize/sec.  
+			 * The difference is with multiple lanes: There, TWO holes move backwards one car position, meaning that in the queue
+			 * representation each hole moves with speed (2 * spacingOfOnePCE * getSizeInEquivalents).  !!!!
+			 * 
+			 */
+
+//				final double epsilon = 0.01 ;
+//				if ( previousDistanceFromFromNode - distanceFromFromNode <= vehicleSpacing + epsilon ) {
+//					// (distance to vehicle ahead \sim spacing --> in queue)
+//
+//					if ( !consumableHoles.isEmpty() && consumableHoles.lastKey() < distanceFromFromNode ) {
+//						// (i.e. if hole is to left of vehicle)
+//
+//						Logger.getLogger( this.getClass() ).warn( "distanceFromFNode=" + distanceFromFromNode + "; lastKey=" + consumableHoles.lastKey() + "; firstKey=" + consumableHoles.firstKey() ) ;
+//
+//						Entry<Double, Hole> entry = consumableHoles.pollLastEntry() ;
+//
+//						//					distanceFromFromNode +=  7.5 * entry.getValue().getSizeInEquivalents() ;
+//
+//						//					distanceFromFromNode -=  spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
+//						//					if ( entry.getKey() < distanceFromFromNode ) {
+//						//						distanceFromFromNode = entry.getKey() ;  // we don't add the full hole PCE if the hole is further downstream
+//						//						break ; // and we break out of the while loop
+//						//					}
+//
+//						// while hole is downstream from current vehicle position, we just keep pulling holes.
+//						// once hole is upstream from current vehicle position, we pull one hole and add it to the position, and then we
+//						// move on to adding the next vehicle:
+//						final double sizeOfCurrentHole = spacingOfOnePCE * entry.getValue().getSizeInEquivalents();
+//						//					if ( entry.getKey() - sizeOfCurrentHole < distanceFromFromNode ) {
+//						distanceFromFromNode -= sizeOfCurrentHole ;
+//						//						distanceFromFromNode = entry.getKey();
+//						//						break ;
+//						//					}
+//
+//					}
+//				}
+//			}
 
 
 		}
