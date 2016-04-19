@@ -35,6 +35,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.singapore.springcalibration.run.TaxiUtils;
+
 /**
  * Changes the transportation mode of one leg in a plan to a randomly chosen
  * mode, given a list of possible modes. Insures that the newly chosen mode
@@ -49,6 +51,7 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 	private double walkThreshold = 5000.0;
 	private Population population;
 	private static final Logger log = Logger.getLogger(SingaporeChooseRandomSingleLegMode.class);
+	private TaxiUtils taxiUtils;
 
 	private final Random rng;
 
@@ -58,10 +61,13 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 	 * @see TransportMode
 	 * @see MatsimRandom
 	 */
-	public SingaporeChooseRandomSingleLegMode(final String[] possibleModes, final Random rng, Population population) {
+	public SingaporeChooseRandomSingleLegMode(final String[] possibleModes, final Random rng, Population population, TaxiUtils taxiUtils) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
 		this.population = population;
+		this.taxiUtils = taxiUtils;
+		
+		this.taxiUtils.getWaitingTime(null); // TODO: remove
 		log.info("Replanning for population of size: " + population.getPersons().size());
 	}
 
@@ -89,7 +95,9 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 		}
 		
 		String ageStr = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "age");
-		int age = Integer.parseInt(ageStr);
+		// if there is no age given, e.g., for freight agents
+		int age = 25;		
+		if (ageStr != null) age = Integer.parseInt(ageStr);
 		if (age < 20) forbidOther = true;
 		if (age > 20) forbidSchoolbus = true;
 

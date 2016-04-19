@@ -23,8 +23,7 @@ import playground.singapore.springcalibration.run.analysis.SingaporeDistribution
 public class SingaporeControlerListener implements StartupListener {
 	
 	private final static Logger log = Logger.getLogger(SingaporeControlerListener.class);
-	private String path = "/cluster/scratch/fouriep/calibration/input/20160225_0/validation/";
-	//private String path = "D:/Senozon/Models/FCL/inputdata/20160225_0/validation/";
+	private String path = "D:/Senozon/Models/FCL/inputdata/20160225_0/validation/"; // "/cluster/scratch/fouriep/calibration/input/20160225_0/validation/";
 	private Population population;
 	public static String [] activities = {"home", "work", "leisure", "pudo", "personal", "primaryschool", "secondaryschool", "tertiaryschool", "foreignschool"};
 	public static String [] modes = {"car", "pt", "walk", "passenger", "taxi", "other"};
@@ -40,10 +39,12 @@ public class SingaporeControlerListener implements StartupListener {
 		this.init(controler, event);
 	}
 	
-	public void init(MatsimServices controler, StartupEvent event) {
+	public void init(MatsimServices controler, StartupEvent event) {		
 		CountsControlerListenerSingapore countsListener = new CountsControlerListenerSingapore();
 		controler.addControlerListener(countsListener);
 		countsListener.notifyStartup(event);
+		
+		//this.path = controler.getConfig().findParam("singapore", "validation_path");
 		
 		this.addDurationAnalyzers(controler);
 		this.addDistanceAnalyzers(controler);
@@ -53,7 +54,7 @@ public class SingaporeControlerListener implements StartupListener {
 	private void addDurationAnalyzers(MatsimServices controler) {
 		SingaporeDistributions timeDistribution = new SingaporeDistributions(this.population, 
 				new MainModeIdentifierImpl(), 
-				new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE),
+				new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, TaxiUtils.wait4Taxi),
 				"time");
 		controler.addControlerListener(timeDistribution);
 
@@ -86,7 +87,7 @@ public class SingaporeControlerListener implements StartupListener {
 	private void addDistanceAnalyzers(MatsimServices controler) {		
 		SingaporeDistributions distanceDistribution = new SingaporeDistributions(this.population, 
 				new MainModeIdentifierImpl(), 
-				new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE),
+				new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, TaxiUtils.wait4Taxi),
 				"distance");
 		controler.addControlerListener(distanceDistribution);
 
