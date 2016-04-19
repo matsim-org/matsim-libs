@@ -45,7 +45,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 
 	private final String[] possibleModes;
-	private boolean ignoreCarAvailability = true;
+	private boolean ignoreCarAvailability = false;
 	private double walkThreshold = 5000.0;
 	private Population population;
 	private static final Logger log = Logger.getLogger(SingaporeChooseRandomSingleLegMode.class);
@@ -73,6 +73,9 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 	public void run(final Plan plan) {
 		boolean forbidCar = false;
 		boolean forbidPassenger = false;
+		boolean forbidOther = false;
+		boolean forbidSchoolbus = false;
+		
 		if (!this.ignoreCarAvailability) {
 			String carAvail = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "car");
 			String license = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "license");						
@@ -84,6 +87,11 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 				forbidPassenger = true;
 			}
 		}
+		
+		String ageStr = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "age");
+		int age = Integer.parseInt(ageStr);
+		if (age < 20) forbidOther = true;
+		if (age > 20) forbidSchoolbus = true;
 
 		ArrayList<Leg> legs = new ArrayList<Leg>();
 		int cnt = 0;
@@ -107,14 +115,22 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 		double distance = CoordUtils.calcEuclideanDistance(previousAct.getCoord(), nextAct.getCoord());		
 		if (distance > walkThreshold) forbidWalk = true; 
 			
-		setRandomLegMode(chosenLeg, forbidCar, forbidPassenger, forbidWalk);
+		setRandomLegMode(plan, chosenLeg, forbidCar, forbidPassenger, forbidWalk, forbidOther, forbidSchoolbus);
 	}
 
-	private void setRandomLegMode(final Leg leg, final boolean forbidCar, final boolean forbidPassenger, final boolean forbidWalk) {
-		leg.setMode(chooseModeOtherThan(leg.getMode(), forbidCar, forbidPassenger, forbidWalk));
+	private void setRandomLegMode(Plan plan, final Leg leg, final boolean forbidCar, final boolean forbidPassenger, final boolean forbidWalk, final boolean forbidOther, boolean forbidSchoolbus) {
+		String previousActivity = PlanUtils.getPreviousActivity(plan, leg).getType();
+		String nextActivity = PlanUtils.getNextActivity(plan, leg).getType();
+		
+		if (!(previousActivity.equals("home") && nextActivity.contains("school") ||
+				(previousActivity.contains("school") && nextActivity.equals("home")))) {
+				forbidSchoolbus = true;	
+				}
+		
+		leg.setMode(chooseModeOtherThan(leg.getMode(), forbidCar, forbidPassenger, forbidWalk, forbidOther, forbidSchoolbus));
 	}
 
-	private String chooseModeOtherThan(final String currentMode, final boolean forbidCar, final boolean forbidPassenger, final boolean forbidWalk) {
+	private String chooseModeOtherThan(final String currentMode, final boolean forbidCar, final boolean forbidPassenger, final boolean forbidWalk, final boolean forbidOther, final boolean forbidSchoolbus) {
 		String newMode;
 		while (true) {
 			int newModeIdx = this.rng.nextInt(this.possibleModes.length - 1);
@@ -147,6 +163,24 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 			}
 			
 			if (!(forbidWalk && TransportMode.walk.equals(newMode))) {
+				break;
+			} else {
+				if (this.possibleModes.length == 2) {
+					newMode = currentMode; // there is no other mode available
+					break;
+				}
+			}
+			
+			if (!(forbidOther && TransportMode.other.equals(newMode))) {
+				break;
+			} else {
+				if (this.possibleModes.length == 2) {
+					newMode = currentMode; // there is no other mode available
+					break;
+				}
+			}
+			
+			if (!(forbidSchoolbus && "schoolbus".equals(newMode))) {
 				break;
 			} else {
 				if (this.possibleModes.length == 2) {
