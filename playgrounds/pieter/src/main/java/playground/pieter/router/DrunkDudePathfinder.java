@@ -20,6 +20,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
+import playground.pieter.network.SimpleNetworkPainter;
 import playground.pieter.singapore.utils.Sample;
 
 import java.util.*;
@@ -30,6 +31,7 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
     private final TravelTime travelTimes;
     // sensitivity parameter, making it smaller makes it less sensitive to distance
     private final double beta;
+    private SimpleNetworkPainter networkPainter;
 
     public DrunkDudePathfinder(Network network, TravelDisutility travelCosts,
                                TravelTime travelTimes, double beta) {
@@ -50,6 +52,8 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
         double travelTime = starttime;
         double travelCost = 0;
         Node currentNode = fromNode;
+        networkPainter.addForegroundPixel(fromNode.getId());
+        networkPainter.addForegroundPixel(toNode.getId());
         while (currentNode != toNode) {
             Object[] outLinks = currentNode.getOutLinks().values().toArray();
             //come up witha set of costs based on how much nearer (eucl) the link brings you to your destination,
@@ -70,14 +74,13 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
                 minCost = Math.min(minCost, linkCost);
                 maxCost = Math.max(maxCost, linkCost);
             }
-            minCost = Double.POSITIVE_INFINITY;
             for (int i = 0; i < outLinks.length; i++) {
                 double linkCost = dists[i] - minCost;
                 if (links.contains(outLinks[i]) || nodes.contains(((Link) outLinks[i]).getToNode())) {
                     linkCost = 2 * (maxCost-minCost);
                 }
-//                linkCost = Math.exp(-beta * linkCost);
-                minCost = Math.min(minCost, linkCost);
+                linkCost = Math.exp(-beta * linkCost);
+                linkCost = linkCost==1 ? 2 : linkCost;
                 cumulativeWeights[i] = i > 0 ? cumulativeWeights[i - 1] + linkCost : linkCost;
                 weights[i] = linkCost;
             }
@@ -97,11 +100,22 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
                     }
                 }
             }
+            networkPainter.addForegroundLine(selection.getId());
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             currentNode = selection.getToNode();
 
 
         }
-
+        try {
+            Thread.sleep(500);
+            networkPainter.clearForeground();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return new Path(nodes, links, travelTime, travelCost);
 
     }
@@ -110,15 +124,15 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
         Scenario scenario;
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario.getNetwork())
-                .readFile("/Users/fouriep/Sync/Sergio/input/network/SingaporeNetwork.xml");
+                .readFile(args[0]);
         Network network = scenario.getNetwork();
         Network net = NetworkUtils.createNetwork();
         Set<String> modes = new HashSet<>();
         modes.add(TransportMode.car);
-        new TransportModeNetworkFilter(network).filter(net,modes);
+        new TransportModeNetworkFilter(network).filter(net, modes);
         new NetworkCleaner().run(net);
         MatsimRandom.reset(123);
-        StochasticRouter stochasticRouter = new StochasticRouter(net,
+        DrunkDudePathfinder stochasticRouter = new DrunkDudePathfinder(net,
                 new TravelDisutility() {
 
                     @Override
@@ -137,10 +151,12 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
             public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
                 return link.getLength() / link.getFreespeed();
             }
-        }, 0.05);
-
-        stochasticRouter.calcLeastCostPath(network.getNodes().get(Id.createNodeId("3004-1")),
-                network.getNodes().get(Id.createNodeId("2530-1")), 3600, null, null);
+        }, 0.08);
+        SimpleNetworkPainter networkPainter = new SimpleNetworkPainter(400, 400);
+        networkPainter.setNetworkTransformation(network);
+        stochasticRouter.setNetworkPainter(networkPainter);
+//        stochasticRouter.calcLeastCostPath(network.getNodes().get(Id.createNodeId("11_311")),
+//                network.getNodes().get(Id.createNodeId("18_566")), 3600, null, null);
         Set<Node> nodeSet = new HashSet<>();
         nodeSet.addAll(net.getNodes().values());
         Node[] nodesArray = nodeSet.toArray(new Node[nodeSet.size()]);
@@ -148,7 +164,7 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
         long currentTimeMillis = -System.currentTimeMillis();
         for (int i = 0; i < 1e2; i++) {
             int[] ints = Sample.sampleMfromN(2, nodesArray.length);
-//            System.out.println(nodesArray[ints[0]] + " " + nodesArray[ints[1]]);
+            System.out.println(nodesArray[ints[0]] + " " + nodesArray[ints[1]]);
             stochasticRouter.calcLeastCostPath(nodesArray[ints[0]], nodesArray[ints[1]], 3600, null, null);
         }
         currentTimeMillis += System.currentTimeMillis();
@@ -181,5 +197,9 @@ public class DrunkDudePathfinder implements LeastCostPathCalculator {
         }
         currentTimeMillis += System.currentTimeMillis();
         System.out.println(currentTimeMillis);
+    }
+
+    public void setNetworkPainter(SimpleNetworkPainter networkPainter) {
+        this.networkPainter = networkPainter;
     }
 }
