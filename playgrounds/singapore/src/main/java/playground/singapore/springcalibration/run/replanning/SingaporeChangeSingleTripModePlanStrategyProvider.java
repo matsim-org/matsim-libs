@@ -31,6 +31,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
 
+import playground.singapore.springcalibration.run.SingaporeConfigGroup;
 import playground.singapore.springcalibration.run.TaxiUtils;
 
 import javax.inject.Inject;
@@ -52,14 +53,13 @@ public class SingaporeChangeSingleTripModePlanStrategyProvider implements Provid
 			ActivityFacilities activityFacilities, 
 			Provider<TripRouter> tripRouterProvider,
 			Population population,
-			Config config) {
+			SingaporeConfigGroup config) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.changeLegModeConfigGroup = changeLegModeConfigGroup;
 		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
 		this.population = population;
-		this.taxiUtils = new TaxiUtils();
-		this.taxiUtils.intialize(config);
+		this.taxiUtils = new TaxiUtils(config);
 	}
 
     @Override

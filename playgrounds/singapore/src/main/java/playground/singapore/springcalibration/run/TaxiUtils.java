@@ -10,8 +10,14 @@ public class TaxiUtils {
 	public static String wait4Taxi = "wait_4_taxi";
 	public static String taxi_walk = "taxi walk";
 	
-	public void intialize(Config config) {
-		String waitingTimesFile = config.findParam("singapore", "waitingTimesFile");
+	
+	public TaxiUtils(SingaporeConfigGroup config) {
+		this.intialize(config);
+	}
+	
+	private void intialize(SingaporeConfigGroup config) {
+		
+		String waitingTimesFile = config.getTaxiWaitingTimeFile();
 		log.info("Initializing TaxiUtils ... with file " + waitingTimesFile);
 			
 		try {
