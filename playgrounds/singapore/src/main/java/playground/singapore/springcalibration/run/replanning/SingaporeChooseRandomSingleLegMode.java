@@ -97,7 +97,7 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 		String ageStr = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "age");
 		// if there is no age given, e.g., for freight agents
 		int age = 25;		
-		if (ageStr != null) age = Integer.parseInt(ageStr);
+		if (ageStr != null) age = Integer.parseInt(ageStr.replace("age", ""));
 		if (age < 20) forbidOther = true;
 		if (age > 20) forbidSchoolbus = true;
 
