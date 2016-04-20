@@ -6,16 +6,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.gtfs.GtfsConverter;
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -43,11 +42,6 @@ public class RunVBB2OTFVis {
 
         log.info("Parsing GTFSFeed from file...");
         final GTFSFeed feed = GTFSFeed.fromFile(gtfsPath);
-
-        feed.feedInfo.values().stream().findFirst().ifPresent(feedInfo -> {
-            log.info("Feed start date: " + feedInfo.feed_start_date);
-            log.info("Feed end date: " + feedInfo.feed_end_date);
-        });
 
         log.info("Parsed trips: "+feed.trips.size());
         log.info("Parsed routes: "+feed.routes.size());
@@ -87,7 +81,11 @@ public class RunVBB2OTFVis {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         scenario.getConfig().transit().setUseTransit(true);
 
-        GtfsConverter converter = new GtfsConverter(feed, scenario, new IdentityTransformation());
+        String coordinateConversionSystem = "EPSG:25832";
+        CoordinateTransformation coordinateTransformation =
+                TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, coordinateConversionSystem);
+
+        GtfsConverter converter = new GtfsConverter(feed, scenario, coordinateTransformation);
         converter.setDate(LocalDate.of(2016, 5, 16));
         converter.convert();
 
