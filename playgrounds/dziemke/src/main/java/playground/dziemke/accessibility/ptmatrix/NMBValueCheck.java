@@ -1,23 +1,20 @@
 package playground.dziemke.accessibility.ptmatrix;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.router.TransitRouterConfig;
 import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterImpl;
 
 import java.io.File;
@@ -65,9 +62,9 @@ public class NMBValueCheck {
 
         CoordinateTransformation coordinateTransformation = TransformationFactory.
                 getCoordinateTransformation(TransformationFactory.WGS84_SA_Albers, TransformationFactory.WGS84);
-        Coord inverseCoord = new Coord(coordinateTransformation.transform(coord3).getY(), coordinateTransformation.transform(coord3).getY());
+        Coord inverseCoord = new Coord(coordinateTransformation.transform(coord3).getY(), coordinateTransformation.transform(coord3).getX());
         System.out.println("coord3 = " + inverseCoord);
-        inverseCoord = new Coord(coordinateTransformation.transform(coord4).getY(), coordinateTransformation.transform(coord4).getY());
+        inverseCoord = new Coord(coordinateTransformation.transform(coord4).getY(), coordinateTransformation.transform(coord4).getX());
         System.out.println("coord4 = " + inverseCoord);
 
         List<Leg> legList = transitRouter.calcRoute(coord3, coord4, departureTime, null);
@@ -83,10 +80,24 @@ public class NMBValueCheck {
             String mode = leg.getMode();
             System.out.println("mode = " + mode);
             Route legRoute = leg.getRoute();
-            List<Id<Link>> linkIds = ((NetworkRoute)legRoute).getLinkIds();
-            for (Id<Link> linkId : linkIds) {
-                Link link = scenario.getNetwork().getLinks().get(linkId);
-                System.out.println("Coord: " + link.getCoord());
+            if (legRoute != null) {
+                System.out.println("Route description: " + legRoute.getRouteDescription());
+                System.out.println("Route start link id: " + legRoute.getStartLinkId());
+                if (legRoute.getStartLinkId() != null) {
+                    Coord startLinkCoord = scenario.getNetwork().getLinks().get(legRoute.getStartLinkId()).getFromNode().getCoord();
+                    System.out.println("Route start link coord"
+                            + new Coord(coordinateTransformation.transform(startLinkCoord).getY(),
+                            coordinateTransformation.transform(startLinkCoord).getX()));
+                }
+                System.out.println("Route end link id: " + legRoute.getEndLinkId());
+                if (legRoute.getEndLinkId() != null) {
+                    Coord endLinkCoord = scenario.getNetwork().getLinks().get(legRoute.getEndLinkId()).getToNode().getCoord();
+                    System.out.println("Route start link coord"
+                            + new Coord(coordinateTransformation.transform(endLinkCoord).getY(),
+                            coordinateTransformation.transform(endLinkCoord).getX()));
+                }
+            } else {
+                System.out.println("LegRoute == null");
             }
         }
         System.out.println("final travelTime = " + travelTime);
