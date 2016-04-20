@@ -62,10 +62,10 @@ import scenarios.illustrative.braess.run.RunBraessSimulation.PricingType;
  * @author tthunig
  *
  */
-public final class FixBraessBehaviorTest{
+public final class FixBraessBehaviorIT{
 	
 	private static final Logger log = Logger
-			.getLogger(FixBraessBehaviorTest.class);
+			.getLogger(FixBraessBehaviorIT.class);
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
