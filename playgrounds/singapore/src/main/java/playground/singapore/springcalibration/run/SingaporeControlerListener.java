@@ -26,7 +26,7 @@ public class SingaporeControlerListener implements StartupListener {
 	private String path = "D:/Senozon/Models/FCL/inputdata/20160225_0/validation/"; // "/cluster/scratch/fouriep/calibration/input/20160225_0/validation/";
 	private Population population;
 	public static String [] activities = {"home", "work", "leisure", "pudo", "personal", "primaryschool", "secondaryschool", "tertiaryschool", "foreignschool"};
-	public static String [] modes = {"car", "pt", "walk", "passenger", "taxi", "other"};
+	public static String [] modes = {"car", "pt", "walk", "passenger", "taxi", "other", "schoolbus"};
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
