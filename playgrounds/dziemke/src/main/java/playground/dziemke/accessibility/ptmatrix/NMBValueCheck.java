@@ -1,7 +1,9 @@
 package playground.dziemke.accessibility.ptmatrix;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
@@ -15,6 +17,7 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterImpl;
 
 import java.io.File;
@@ -70,7 +73,6 @@ public class NMBValueCheck {
         List<Leg> legList = transitRouter.calcRoute(coord3, coord4, departureTime, null);
 
         double travelTime = 0.;
-        double travelDistance = 0.;
         for (Leg leg : legList) {
             if(leg == null) {
                 throw new RuntimeException("Leg is null.");
@@ -81,18 +83,25 @@ public class NMBValueCheck {
             System.out.println("mode = " + mode);
             Route legRoute = leg.getRoute();
             if (legRoute != null) {
+                System.out.println("legRoute travelTime: " + legRoute.getTravelTime());
                 System.out.println("Route description: " + legRoute.getRouteDescription());
-                System.out.println("Route start link id: " + legRoute.getStartLinkId());
-                if (legRoute.getStartLinkId() != null) {
-                    Coord startLinkCoord = scenario.getNetwork().getLinks().get(legRoute.getStartLinkId()).getFromNode().getCoord();
+                Id<Link> startLinkId = legRoute.getStartLinkId();
+                System.out.println("Route start link id: " + startLinkId);
+                if (startLinkId != null) {
+                    Coord startLinkCoord = scenario.getNetwork().getLinks().get(startLinkId).getFromNode().getCoord();
                     System.out.println("Route start link coord"
                             + new Coord(coordinateTransformation.transform(startLinkCoord).getY(),
                             coordinateTransformation.transform(startLinkCoord).getX()));
+                    for (TransitStopFacility stop : scenario.getTransitSchedule().getFacilities().values()) {
+                        if (stop.getLinkId().equals(startLinkId)) {
+                            stop.getId();
+                        }
+                    }
                 }
                 System.out.println("Route end link id: " + legRoute.getEndLinkId());
                 if (legRoute.getEndLinkId() != null) {
                     Coord endLinkCoord = scenario.getNetwork().getLinks().get(legRoute.getEndLinkId()).getToNode().getCoord();
-                    System.out.println("Route start link coord"
+                    System.out.println("Route end link coord"
                             + new Coord(coordinateTransformation.transform(endLinkCoord).getY(),
                             coordinateTransformation.transform(endLinkCoord).getX()));
                 }
