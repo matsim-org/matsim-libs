@@ -178,7 +178,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final AbstractQLink qLink;
 	private final Id<Lane> id;
 	private static int spaceCapWarningCount = 0;
-	final static double HOLE_SPEED = 15.0;
+	final static double HOLE_SPEED_KM_H = 15.0;
 
 	private final double length ;
 	private double unscaledFlowCapacity_s = Double.NaN ;
@@ -339,6 +339,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	private void calculateStorageCapacity() {
+		// yyyyyy the following is not adjusted for time-dependence!! kai, apr'16
+		
 		bufferStorageCapacity = (int) Math.ceil(flowCapacityPerTimeStep);
 
 		// first guess at storageCapacity:
@@ -367,6 +369,22 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				QueueWithBuffer.spaceCapWarningCount++;
 			}
 			storageCapacity = tempStorageCapacity;
+		}
+		
+		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
+//			final double minStorCapForHoles = 2. * flowCapacityPerTimeStep * context.getSimTimer().getSimTimestepSize();
+			final double freeSpeed = qLink.getLink().getFreespeed() ;
+			final double holeSpeed = HOLE_SPEED_KM_H/3.6;
+			final double minStorCapForHoles = 2.* length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
+			// yyyyyy I have no idea why the factor 2 needs to be there?!?!
+			// yyyyyy (not thought through for TS != 1sec!  (should use flow cap per second) kai, apr'16)
+			if ( storageCapacity < minStorCapForHoles ) {
+				if ( spaceCapWarningCount <= 10 ) { 
+					log.warn("storage capacity not sufficient for holes; increasing from " + storageCapacity + " to " + minStorCapForHoles ) ;
+					QueueWithBuffer.spaceCapWarningCount++;
+				}
+				storageCapacity = minStorCapForHoles ;
+			}
 		}
 	}
 
@@ -458,8 +476,23 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
 			QueueWithBuffer.Hole hole = new QueueWithBuffer.Hole() ;
-			double offset = length*3600./HOLE_SPEED/1000. ;
-			hole.setEarliestLinkExitTime( now + 1.0*offset + 0.0*MatsimRandom.getRandom().nextDouble()*offset ) ;
+			double ttimeOfHoles = length*3600./HOLE_SPEED_KM_H/1000. ;
+			
+//			double offset = this.storageCapacity/this.flowCapacityPerTimeStep ;
+			/* NOTE: Start with completely full link, i.e. N_storageCap cells filled.  Now make light at end of link green, discharge with
+			* flowCapPerTS.  After N_storageCap/flowCapPerTS, the link is empty.  Which also means that the holes must have reached
+			* the upstream end of the link.  I.e. speed_holes = length / (N_storageCap/flowCap) and 
+			* ttime_holes = lenth/speed = N_storCap/flowCap.
+			* Say length=75m, storCap=10, flowCap=1/2sec.  offset = 20sec.  75m/20sec = 225m/1min = 13.5km/h so this is normal.
+			* Say length=75m, storCap=20, flowCap=1/2sec.  offset = 40sec.  ... = 6.75km/h ... to low.  Reason: unphysical parameters.
+			* (Parameters assume 2-lane road, which should have discharge of 1/sec.  Or we have lots of  tuk tuks, which have only half a vehicle
+			* length.  Thus we incur the reaction time twice as often --> half speed of holes.
+			*/
+
+//			double nLanes = 2. * flowCapacityPerTimeStep ; // pseudo-lanes
+//			double ttimeOfHoles = 0.1 * this.storageCapacity/this.flowCapacityPerTimeStep/nLanes ;
+			
+			hole.setEarliestLinkExitTime( now + 1.0*ttimeOfHoles + 0.0*MatsimRandom.getRandom().nextDouble()*ttimeOfHoles ) ;
 			hole.setSizeInEquivalents(veh2Remove.getSizeInEquivalents());
 			holes.add( hole ) ;
 		}

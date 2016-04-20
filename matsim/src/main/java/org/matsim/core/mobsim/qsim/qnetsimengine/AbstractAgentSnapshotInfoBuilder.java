@@ -173,16 +173,18 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	{
 		double spacingOfOnePCE = this.calculateVehicleSpacing( curvedLength, storageCapacity, vehs );
 
-		double freespeedTraveltime = curvedLength / freeSpeed ;
+		double ttimeOfHoles = curvedLength / (QueueWithBuffer.HOLE_SPEED_KM_H*1000./3600.);
+
+//		double nLanes = 2./inverseFlowCapPerTS ; // pseudo-lanes
+//		double freespeedTraveltimeOfHole = 0.1 * storageCapacity * inverseFlowCapPerTS / nLanes ;
 		
 		TreeMap<Double,Hole> consumableHoles = new TreeMap<>() ;
 		
 		// holes, if applicable:
 		if ( QSimConfigGroup.SnapshotStyle.withHoles==scenario.getConfig().qsim().getSnapshotStyle() ) {
 			if ( !holes.isEmpty() ) {
-				double freespeedTraveltimeOfHole = curvedLength / (QueueWithBuffer.HOLE_SPEED*1000./3600.);
 				for (Hole hole : holes) {
-					double distanceOfHoleFromFromNode = computeHolePositionAndReturnDistance( freespeedTraveltimeOfHole, hole, now, curvedLength);
+					double distanceOfHoleFromFromNode = computeHolePositionAndReturnDistance( ttimeOfHoles, hole, now, curvedLength);
 					addHolePosition( positions, distanceOfHoleFromFromNode, hole, curvedLength, upstreamCoord, downstreamCoord ) ;
 					consumableHoles.put( distanceOfHoleFromFromNode, hole ) ;
 				}
@@ -190,6 +192,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		}
 		
 		// might be faster by sorting holes into a regular array list ...
+
+		double freespeedTraveltime = curvedLength / freeSpeed ;
 
 		double distanceFromFromNode = Double.NaN;
 
@@ -213,14 +217,33 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			this.positionAgentGivenDistanceFromFNode(positions, upstreamCoord, downstreamCoord, curvedLength, veh, distanceFromFromNode, lane, speedValue);
 
 			if ( this.scenario.getConfig().qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
-				Entry<Double, Hole> entry = consumableHoles.pollLastEntry() ;
+				Entry<Double, Hole> entry = consumableHoles.lastEntry() ;
 				if ( entry != null && distanceFromFromNode < entry.getKey() ) { // hole to right of current vehicle position
-						double possibilityOne = distanceFromFromNode - spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
-						double possibilityTwo = entry.getKey() - spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
-//						distanceFromFromNode = Math.min(possibilityOne, possibilityTwo) ;
-						distanceFromFromNode = possibilityOne ;
+					consumableHoles.pollLastEntry() ;
+					double possibilityOne = distanceFromFromNode - spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
+					double possibilityTwo = entry.getKey() - spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
+					//						distanceFromFromNode = Math.min(possibilityOne, possibilityTwo) ;
+					distanceFromFromNode = possibilityOne ;
 				}
 			}
+			
+			/*
+			 * sCap needs to be consistent with fCap.  Something like: 
+			 *    nLanes = fCap * 2. * 1sec
+			 *    sCap >= nLanes * len / 7.5m = fCap * 2 * len * 1sec / 7.5m
+			 * 
+			 * ttimeOfHoles is NOT sCap/fCap.  It is, instead, sCap/fCap / nLanes = sCap/fCap / (fCap*2*1sec) = 0.5 * sCap * fCap^2.  ????   
+			 */
+			
+			/*
+			 * Thought experiment: Start with all "cells" filled, e.g. from a permanently red light.  Say N such cells.
+			 * 
+			 * Now assume this is discharged, e.g. y vehs per sec.
+			 * 
+			 * Then we need time N/y to discharge the system.
+			 * 
+			 * In consequence, the backwards travelling speed is lengthOfLink/ (N/y) .
+			 */
 			
 			/* Speed of backwards moving holes is not (spacingOfOnePCE * getSizeInEquivalents)/sec, but something like
 			 * (cellSize * getSizeInEquivalents)/sec or maybe even just cellSize/sec.  
