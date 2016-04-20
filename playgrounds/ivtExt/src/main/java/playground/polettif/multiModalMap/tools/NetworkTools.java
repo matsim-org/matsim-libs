@@ -33,6 +33,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.network.filter.NetworkNodeFilter;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.*;
 
@@ -179,14 +180,11 @@ public class NetworkTools {
 	}
 
 	/**
-	 * Calculates azimuth from two points
+	 * @return the azimuth from two points in [rad]
 	 */
 	public static double getAzimuth(Coord from, Coord to) {
-		// calculates azimuth/bearing of two nodes in radians
-
 		double deltaE = to.getX()-from.getX();
 		double deltaN = to.getY()-from.getY();
-		double az = 0;
 
 		double az2 = Math.atan2(deltaE, deltaN);
 
@@ -197,6 +195,29 @@ public class NetworkTools {
 			az2 = az2-2*Math.PI;
 
 		return az2;
+	}
+
+	/**
+	 * @return whether Coord2 lies<br/>
+	 * [1] North-East<br/>
+	 * [2] South-East<br/>
+	 * [3] South-West<br/>
+	 * [4] North-West<br/>
+	 * of Coord1
+	 */
+	public static int getCompassQuarter(Coord baseCoord, Coord toCoord) {
+		double az = getAzimuth(baseCoord, toCoord);
+
+
+		if(az < Math.PI/2) {
+			return 1;
+		} else if(az >= Math.PI/2 && az < Math.PI) {
+			return 2;
+		} else if(az > Math.PI && az < 1.5*Math.PI) {
+			return 3;
+		} else {
+			return 4;
+		}
 	}
 
 	/**
@@ -218,8 +239,6 @@ public class NetworkTools {
 	}
 
 	public static Coord getClosestPointOnLine(Link link, Coord refPoint) {	return getClosestPointOnLine(link.getFromNode().getCoord(), link.getToNode().getCoord(), refPoint);}
-	public static Coord getClosestPointOnLine(Node from, Node to, Node refPoint) {	return getClosestPointOnLine(from.getCoord(), to.getCoord(), refPoint.getCoord());}
-	public static Coord getClosestPointOnLine(Node from, Node to, Coord refPoint) {	return getClosestPointOnLine(from.getCoord(), to.getCoord(), refPoint);}
 
 
 	/**
@@ -261,6 +280,7 @@ public class NetworkTools {
 	 *                              and two new links connecting the nodes are added. The splitPoint is moved onto the link.
 	 * @param newObjectPrefix prefix for new the link and node (default: "split_")
 	 */
+	@Deprecated
 	public static void splitLink(Network network, Id<Link> linkId, Coord splitPointCoordinates, String newObjectPrefix) {
 		String prefix;
 
@@ -314,6 +334,7 @@ public class NetworkTools {
 	 * @param linkFilter to decide which links should be kept
 	 * @return
 	 */
+	@Deprecated
 	public static Network createFilteredNetwork(Network network, NetworkLinkFilter linkFilter, NetworkNodeFilter nodeFilter) {
 		Network newNetwork = NetworkUtils.createNetwork();
 
@@ -344,6 +365,7 @@ public class NetworkTools {
 	 * @param linkFilter to decide which links should be kept
 	 * @return
 	 */
+	@Deprecated
 	public static Network getFilteredNetwork(Network network, NetworkLinkFilter linkFilter, NetworkNodeFilter nodeFilter) {
 		Network newNetwork = NetworkUtils.createNetwork();
 
@@ -365,7 +387,7 @@ public class NetworkTools {
 		return newNetwork;
 	}
 
-
+	@Deprecated
 	public static Network addNewNode(Network network, Node node) {
 		Id<Node> nodeId = Id.create(node.getId().toString(), Node.class);
 		if (!network.getNodes().containsKey(nodeId)) {
@@ -375,6 +397,7 @@ public class NetworkTools {
 		return network;
 	}
 
+	@Deprecated
 	public static Network addNewLink(Network network, Link link) {
 		Id<Link> linkId = Id.create(link.getId().toString(), Link.class);
 		Id<Node> fromNodeId = Id.create(link.getFromNode().getId().toString(), Node.class);
@@ -392,4 +415,32 @@ public class NetworkTools {
 		return network;
 	}
 
+	/**
+	 * Calculates the extent of the given network.
+	 * @param network
+	 * @return Array of Coords with the minimal South-West and the maximal North-East Coordinates
+	 */
+	public static Coord[] getExtent(Network network) {
+		double maxE = 0;
+		double maxN = 0;
+		double minS = Double.MAX_VALUE;
+		double minW = Double.MAX_VALUE;
+
+		for(Node node : network.getNodes().values()) {
+			if(node.getCoord().getX() > maxE) {
+				maxE = node.getCoord().getX();
+			}
+			if(node.getCoord().getY() > maxN) {
+				maxN = node.getCoord().getY();
+			}
+			if(node.getCoord().getX() < minW) {
+				minW = node.getCoord().getX();
+			}
+			if(node.getCoord().getY() < minS) {
+				minS = node.getCoord().getY();
+			}
+		}
+
+		return new Coord[]{new Coord(minW, minS), new Coord(maxE, maxN)};
+	}
 }

@@ -30,8 +30,6 @@ public class PseudoRoutePath {
 	private final PseudoRouteStop from;
 	private final PseudoRouteStop to;
 	private final double weight;
-	private boolean firstStop = false;
-	private boolean lastStop = false;
 
 	public PseudoRoutePath(PseudoRouteStop fromStop, PseudoRouteStop toStop, double travelTime) {
 		this(fromStop, toStop, travelTime, false);
@@ -55,7 +53,7 @@ public class PseudoRoutePath {
 
 	@Override
 	public String toString() {
-		return from + " -> " + to;
+		return to.getName()+";"+from.getName();
 	}
 
 	public PseudoRouteStop getFromPseudoStop() {
@@ -65,4 +63,5 @@ public class PseudoRoutePath {
 	public PseudoRouteStop getToPseudoStop() {
 		return to;
 	}
+
 }

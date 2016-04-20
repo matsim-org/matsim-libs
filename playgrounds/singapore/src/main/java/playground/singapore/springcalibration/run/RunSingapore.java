@@ -24,6 +24,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.singapore.scoring.CharyparNagelOpenTimesActivityScoring;
 import playground.singapore.springcalibration.run.roadpricing.SubpopRoadPricingModule;
@@ -37,8 +38,12 @@ public class RunSingapore {
 		log.info("Running SingaporeControlerRunner"); 
      
 		Config config = ConfigUtils.loadConfig( args[0], new RoadPricingConfigGroup() ) ;
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
+		
+		final SingaporeConfigGroup singaporeConfigGroup = ConfigUtils.addOrGetModule(
+				scenario.getConfig(), SingaporeConfigGroup.GROUP_NAME, SingaporeConfigGroup.class);
 		
 		CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
 										
