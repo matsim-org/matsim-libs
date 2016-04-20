@@ -106,7 +106,7 @@ public class TransitLeastCostPathTree {
     public void calcLeastCostPathTree(final Map<Node, InitialNode> fromNodes, final Person person, final Coord fromCoord) {
         this.resetNetworkVisited();
         this.person = person;
-        this.customDataManager.reset();
+//TODO        this.customDataManager.reset();
         this.origin = fromCoord;
         this.fromNodes = fromNodes;
 
@@ -174,7 +174,7 @@ public class TransitLeastCostPathTree {
     @SuppressWarnings("unchecked")
     public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person) {
         this.person = person;
-        this.customDataManager.reset();
+//TODO        this.customDataManager.reset();
 
         Set<Node> endNodes = new HashSet<>(toNodes.keySet());
 
@@ -321,20 +321,20 @@ public class TransitLeastCostPathTree {
                                         final RouterPriorityQueue<Node> pendingNodes, final double currTime,
                                         final double currCost) {
 
-        this.customDataManager.initForLink(l);
+//TODO        this.customDataManager.initForLink(l);
         double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, this.person, this.vehicle);
         double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle, this.customDataManager);
         DijkstraNodeData data = getData(n);
         double nCost = data.getCost();
         if (!data.isVisited(getIterationId())) {
             visitNode(n, data, pendingNodes, currTime + travelTime, currCost + travelCost, l);
-            this.customDataManager.storeTmpData();
+//TODO            this.customDataManager.storeTmpData();
             return true;
         }
         double totalCost = currCost + travelCost;
         if (totalCost < nCost) {
             revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
-            this.customDataManager.storeTmpData();
+//TODO            this.customDataManager.storeTmpData();
             return true;
         }
 
