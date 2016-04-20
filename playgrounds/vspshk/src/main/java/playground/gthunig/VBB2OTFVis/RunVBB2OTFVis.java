@@ -77,19 +77,21 @@ public class RunVBB2OTFVis {
         }
 
         Config config = ConfigUtils.createConfig();
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.
+                OverwriteFileSetting.deleteDirectoryIfExists);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         scenario.getConfig().transit().setUseTransit(true);
 
         String coordinateConversionSystem = "EPSG:25832";
-        CoordinateTransformation coordinateTransformation =
-                TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, coordinateConversionSystem);
+        CoordinateTransformation coordinateTransformation = TransformationFactory.
+                        getCoordinateTransformation(TransformationFactory.WGS84, coordinateConversionSystem);
 
         GtfsConverter converter = new GtfsConverter(feed, scenario, coordinateTransformation);
         converter.setDate(LocalDate.of(2016, 5, 16));
         converter.convert();
 
-        CreatePseudoNetwork createPseudoNetwork = new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "");
+        CreatePseudoNetwork createPseudoNetwork =
+                new CreatePseudoNetwork(scenario.getTransitSchedule(), scenario.getNetwork(), "");
         createPseudoNetwork.createNetwork();
 
         new CreateVehiclesForSchedule(scenario.getTransitSchedule(), scenario.getTransitVehicles()).run();
