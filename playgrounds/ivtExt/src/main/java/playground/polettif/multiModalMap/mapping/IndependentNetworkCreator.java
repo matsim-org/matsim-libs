@@ -73,7 +73,7 @@ public class IndependentNetworkCreator {
 		this.schedule = schedule;
 		this.network = network;
 		this.networkFactory = network.getFactory();
-		this.prefix = config.getPrefixArtificialLinks();
+		this.prefix = config.getPrefixArtificial();
 	}
 
 	public void createNetwork() {

@@ -71,8 +71,4 @@ public abstract class PTMapper {
 	 */
 	public abstract void mapScheduleToNetwork(Network network);
 
-	protected void setNetwork(Network network) {
-		this.network = network;
-		this.networkFactory = network.getFactory();
-	}
 }

@@ -107,7 +107,8 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 
 	@Override
 	public void mapScheduleToNetwork(Network networkParam) {
-		setNetwork(networkParam);
+		this.network = networkParam;
+		this.networkFactory = networkParam.getFactory();
 
 		log.info("Creating PT lines...");
 
@@ -116,7 +117,7 @@ public class PTMapperPseudoShortestPath extends PTMapper {
 		/** [.]
 		 * preload closest links and create child StopFacilities
 		 * if a stop facility is already referenced (manually beforehand for example) no child facilities are created
-		 * stopfacilities with no links within search radius need artificial links and nodes before routing starts
+		 * stopfacilities with no links within search radius need ARTIFICIAL_LINK_MODE links and nodes before routing starts
 		 */
 		StopFacilityTree stopFacilityTree = new StopFacilityTree(schedule, network, config.getNodeSearchRadius(), config.getMaxNClosestLinks(), config.getMaxStopFacilityDistance());
 

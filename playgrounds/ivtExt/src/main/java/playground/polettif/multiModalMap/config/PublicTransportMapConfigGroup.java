@@ -36,6 +36,8 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "MultiModalMap";
 
+	public static final String ARTIFICIAL_LINK_MODE = "ARTIFICIAL";
+
 	// TODO: test for ALL primitive types
 	private double doubleField = Double.NaN;
 
@@ -52,28 +54,79 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 /*
 for each schedule transport the following needs to be specified:
 - should it be mapped independently?
-- to which network transport modes it can be mapped
+- to which network transport modesAssignment it can be mapped
 
-for network transport modes:
-- should it be cleaned upt
+for network transport modesAssignment:
+- should it be cleaned up
  */
 
+	/**
+	 * All links that do not have a transit route on them are removed, except
+	 * the ones listed in this set (typically only car).
+	 */
 	private Set<String> modesToKeepOnCleanUp = new HashSet<>();
-	private double nodeSearchRadius = 300;
-	private int maxNClosestLinks = 8;
-	private double maxStopFacilityDistance = 80;
-	private double sameLinkPunishment = 10;
-	private String prefixArtificialLinks = "pt_";
-	private String suffixChildStopFacilities = ".fac:";
-	private double maxAoiDistance = 1000;
 
-	private double increasedNodeSearchRadius = 1.2;
+	/**
+	 * Defines the radius [meter] from a stop facility within nodes are searched.
+	 * Mainly a maximum value for performance.
+	 */
+	private double nodeSearchRadius = 300;
+
+	/**
+	 * Number of link candidates considered for all stops, depends on accuracy of
+	 * stops and desired performance. Somewhere between 4 and 10 seems reasonable,
+	 * depending on the accuracy of the stop facility coordinates. Default: 8
+	 */
+	private int maxNClosestLinks = 8;
+
+	/**
+	 * Number of link candidates considered for all stops, different for scheduleModes.
+	 * Depends on accuracy of stops and desired performance. Somewhere between 4 and 10 seems reasonable,
+	 * depending on the accuracy of the stop facility coordinates. Default: 8
+	 */
+	private Map<String, Integer> maxNClosestLinksByMode = new HashMap<>();
+
+	/**
+	 * The maximal distance [meter] a link candidate is allowed to have from
+	 * the stop facility.
+ 	 */
+	private double maxStopFacilityDistance = 80;
+
+	/**
+	 * if two link candidates are the same travel time is multiplied by this
+	 * factor. Otherwise travel time would just be the link traveltime
+	 * since routing works with nodes
+ 	 */
+	private double sameLinkPunishment = 10;
+
+	/**
+	 * ID prefix used for ARTIFICIAL_LINK_MODE links and nodes created if no nodes
+	 * are found within nodeSearchRadius
+	 */
+	private String prefixArtificial = "pt_";
+
+	/**
+	 * Suffix used for child stop facilities. A number for each child of a
+	 * parent stop facility is appended (i.e. stop0123.fac:2).
+	 */
+	private String suffixChildStopFacilities = ".fac:";
+
+	/**
+	 * All paths between two stops have a length > beelineDistanceMaxFactor * beelineDistance,
+	 * an ARTIFICIAL_LINK_MODE link is created.
+	 */
+	private double beelineDistanceMaxFactor = 6;
+
+	/**
+	 * Is increased each time the getter is called.
+	 */
+	private int artificialId = 0;
 
 	/**
 	 * References transportModes from the schedule (key) and the
-	 * allowed modes of a link from the network (value). <p/>
+	 * allowed modesAssignment of a link from the network (value). <p/>
 	 * <p/>
-	 * Schedule transport modes should be in gtfs categories:
+	 * Schedule transport modesAssignment should be in gtfs categories:
 	 * <ul>
 	 * <li>0 - Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.</li>
 	 * <li>1 - Subway, Metro. Any underground rail system within a metropolitan area.</li>
@@ -85,7 +138,7 @@ for network transport modes:
 	 * <li>7 - Funicular. Any rail system designed for steep inclines.</li>
 	 * </ul>
 	 */
-	private Map<String, Set<String>> modes = new HashMap<>();
+	private Map<String, Set<String>> modesAssignment = new HashMap<>();
 
 	public PublicTransportMapConfigGroup() {
 		super( GROUP_NAME );
@@ -206,16 +259,22 @@ for network transport modes:
 
 		defaultConfig.modesToKeepOnCleanUp.add("car");
 
-		Set<String> busSet = new HashSet<>(); busSet.add("bus"); busSet.add("car");
-		defaultConfig.modes.put("BUS", busSet);
+		Set<String> busSet = new HashSet<>();
+		busSet.add("bus");
+		busSet.add("car");
+		defaultConfig.modesAssignment.put("BUS", busSet);
 
 		Set<String> tramSet = new HashSet<>(); tramSet.add("tram");
-		defaultConfig.modes.put("TRAM", tramSet);
+		defaultConfig.modesAssignment.put("TRAM", tramSet);
 
 		Set<String> railSet = new HashSet<>();
 		railSet.add("rail");
 		railSet.add("pt");
-		defaultConfig.modes.put("RAIL", railSet);
+		defaultConfig.modesAssignment.put("RAIL", railSet);
+
+		defaultConfig.maxNClosestLinksByMode.put("BUS", 8);
+		defaultConfig.maxNClosestLinksByMode.put("TRAM", 8);
+		defaultConfig.maxNClosestLinksByMode.put("RAIL", 12);
 
 		// subway, gondola, funicular, ferry and cablecar are not mapped
 
@@ -239,8 +298,8 @@ for network transport modes:
 		return sameLinkPunishment;
 	}
 
-	public String getPrefixArtificialLinks() {
-		return prefixArtificialLinks;
+	public String getPrefixArtificial() {
+		return prefixArtificial;
 	}
 
 	public String getSuffixChildStopFacilities() {
@@ -251,27 +310,46 @@ for network transport modes:
 		return modesToKeepOnCleanUp;
 	}
 
-	public Map<String, Set<String>> getModes() {
-		return modes;
+	public Map<String, Set<String>> getModesAssignment() {
+		return modesAssignment;
+	}
+
+	public Map<String, Set<String>> getModesAssignmentCopy() {
+		Map<String, Set<String>> copy = new HashMap<>();
+
+		for(Map.Entry<String, Set<String>> entry : modesAssignment.entrySet()) {
+			Set<String> copySet = new HashSet<>();
+			for(String str : entry.getValue()) {
+				copySet.add(str);
+			}
+			copy.put(entry.getKey(), copySet);
+		}
+
+		return copy;
 	}
 
 	public Set<String> getNetworkModes() {
 		Set<String> networkModes = new HashSet<>();
-		modes.values().forEach(networkModes::addAll);
+		modesAssignment.values().forEach(networkModes::addAll);
 		return networkModes;
 	}
 
 	public Set<String> getScheduleModes() {
 		Set<String> scheduleModes = new HashSet<>();
-		modes.keySet().forEach(scheduleModes::add);
+		modesAssignment.keySet().forEach(scheduleModes::add);
 		return scheduleModes;
 	}
 
-	public double getMaxAoiDistance() {
-		return maxAoiDistance;
+	public double getBeelineDistanceMaxFactor() {
+		return beelineDistanceMaxFactor;
 	}
 
-	public double getIncreasedNodeSearchRadius() {
-		return increasedNodeSearchRadius;
+	public int getArtificialId() {
+		return artificialId++;
 	}
+
+	public Map<String, Integer> getMaxNClosestLinksByMode() {
+		return maxNClosestLinksByMode;
+	}
+
 }

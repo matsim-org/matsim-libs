@@ -45,19 +45,21 @@ import java.util.Set;
 public class ModeDependentRouter implements Router {
 
 	private final Network network;
-	private Set<String> routingTransportModes;
+	private final Set<String> routingTransportModes;
     private final LeastCostPathCalculator pathCalculator;
-    private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths = new HashMap<>();
+    private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
 
     public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
-        LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(network, this);
-		this.network = network;
 		this.routingTransportModes = routingTransportModes;
-        this.pathCalculator = factory.createPathCalculator(network, this, this);
+		this.network = network;
+		paths = new HashMap<>();
+
+		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
+		this.pathCalculator = factory.createPathCalculator(network, this, this);
 
 		// Suppress "no route found" statements...
 		Logger.getLogger( Dijkstra.class ).setLevel( Level.ERROR );
-    }
+	}
 
     @Override
     public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode) {
@@ -71,6 +73,7 @@ public class ModeDependentRouter implements Router {
             return null;
         }
     }
+
 
 	/**
 	 * @param link The link for which the travel disutility is calculated.
@@ -90,7 +93,7 @@ public class ModeDependentRouter implements Router {
 	 */
     @Override
     public double getLinkMinimumTravelDisutility(Link link) {
-		return link.getLength() / link.getFreespeed();
+		return (linkHasRoutingMode(link) ? 1 : 1000) * link.getLength();
 	}
 
 	/**
@@ -103,8 +106,12 @@ public class ModeDependentRouter implements Router {
         return link.getLength() / link.getFreespeed(time);
     }
 
-	private boolean linkHasRoutingMode(Link link) {
-		for(String routingTransportMode : this.routingTransportModes) {
+	public boolean linkHasRoutingMode(Link link) {
+		if(routingTransportModes == null) {
+			return true;
+		}
+
+		for(String routingTransportMode : routingTransportModes) {
 			for(String linkTransportMode : link.getAllowedModes()) {
 				if(routingTransportMode.equalsIgnoreCase(linkTransportMode)) {
 					return true;
