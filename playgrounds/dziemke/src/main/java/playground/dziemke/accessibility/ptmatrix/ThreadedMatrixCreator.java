@@ -19,12 +19,9 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouter;
-import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterConfig;
 import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterImpl;
-//import org.matsim.pt.router.TransitRouter;
-//import org.matsim.pt.router.TransitRouterConfig;
-//import org.matsim.pt.router.TransitRouterImpl;
+import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
 
 /**
  * @author dziemke, gthunig
