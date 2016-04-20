@@ -34,6 +34,7 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.network.filter.NetworkNodeFilter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 
 import java.util.*;
 
@@ -72,30 +73,32 @@ public class NetworkTools {
 		if(nearestNodes.size() == 0) {
 			return closestLinks;
 		} else {
+			// check every in- and outlink of each node
 			for (Node node : nearestNodes) {
 				Map<Id<Link>, ? extends Link> outLinks = node.getOutLinks();
 				Map<Id<Link>, ? extends Link> inLinks = node.getInLinks();
 				double lineSegmentDistance;
 
-				for (Link linkCandidate : outLinks.values()) {
+				for (Link outLink : outLinks.values()) {
 					// check if link is already in the closestLinks set
-					if (!closestLinksMap.containsValue(linkCandidate)) {
-						lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
+					if(!closestLinksMap.containsValue(outLink)) {
+						// only use links with a viable network transport mode
+						lineSegmentDistance = CoordUtils.distancePointLinesegment(outLink.getFromNode().getCoord(), outLink.getToNode().getCoord(), coord);
 
-						// since distance is used as key, we need to ensure the exact distance is not used already TODO maybe check for side of the road?
-						while (closestLinksMap.containsKey(lineSegmentDistance))
+						// since distance is used as key, we need to ensure the exact distance is not used already
+						while(closestLinksMap.containsKey(lineSegmentDistance))
 							lineSegmentDistance += incr;
 
-						closestLinksMap.put(lineSegmentDistance, linkCandidate);
+						closestLinksMap.put(lineSegmentDistance, outLink);
 					}
 				}
-				for (Link linkCandidate : inLinks.values()) {
-					if (!closestLinksMap.containsValue(linkCandidate)) {
-						lineSegmentDistance = CoordUtils.distancePointLinesegment(linkCandidate.getFromNode().getCoord(), linkCandidate.getToNode().getCoord(), coord);
-						while (closestLinksMap.containsKey(lineSegmentDistance)) {
+				for (Link inLink : inLinks.values()) {
+					if (!closestLinksMap.containsValue(inLink)) {
+						lineSegmentDistance = CoordUtils.distancePointLinesegment(inLink.getFromNode().getCoord(), inLink.getToNode().getCoord(), coord);
+						while(closestLinksMap.containsKey(lineSegmentDistance)) {
 							lineSegmentDistance += incr;
 						}
-						closestLinksMap.put(lineSegmentDistance, linkCandidate);
+						closestLinksMap.put(lineSegmentDistance, inLink);
 					}
 				}
 			}
@@ -128,6 +131,80 @@ public class NetworkTools {
 	}
 
 	/**
+	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes(Coord, double)},
+	 * fetches all in- and outlinks and sorts them ascending by their
+	 * distance to the coordiantes given. Only returns maxNLinks or
+	 * all links within maxLinkDistance (whichever is reached earlier).
+	 *
+	 * <p/>
+	 * Distance Link-Coordinate is calculated via  in {@link org.matsim.core.utils.geometry.CoordUtils#distancePointLinesegment(Coord, Coord, Coord)}).
+	 *
+	 * @param networkImpl A network implementation
+	 * @param coord the coordinate from which the closest links are
+	 *              to be searched
+	 * @param config
+	 * @return the list of closest links
+	 *
+	 * TODO doc
+	 */
+	public static List<Link> findNClosestLinksByMode(NetworkImpl networkImpl, Coord coord, String scheduleTransportMode, PublicTransportMapConfigGroup config) {
+		List<Link> closestLinks = new ArrayList<>();
+
+		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, config.getNodeSearchRadius());
+		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
+		double incr = 0.0001; double tol=0.001;
+
+		int maxNnodes = (config.getMaxNClosestLinksByMode().get(scheduleTransportMode) == null ? config.getMaxNClosestLinks() : config.getMaxNClosestLinksByMode().get(scheduleTransportMode));
+
+		Set<String> networkTransportModes = config.getModesAssignment().get(scheduleTransportMode);
+
+		if(nearestNodes.size() == 0) {
+			return closestLinks;
+		} else {
+			// check every in- and outlink of each node
+			for (Node node : nearestNodes) {
+				Set<Link> links = new HashSet<>(node.getInLinks().values());
+				links.addAll(node.getOutLinks().values());
+
+				double lineSegmentDistance;
+
+				for (Link link : links) {
+					// check if link is already in the closestLinks set
+					if(!closestLinksMap.containsValue(link)) {
+						// only use links with a viable network transport mode
+						if(setsShareMinOneEntry(link.getAllowedModes(), networkTransportModes)) {
+							lineSegmentDistance = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
+
+							// since distance is used as key, we need to ensure the exact distance is not used already
+							while(closestLinksMap.containsKey(lineSegmentDistance))
+								lineSegmentDistance += incr;
+
+							closestLinksMap.put(lineSegmentDistance, link);
+						}
+					}
+				}
+			}
+
+			int i = 1; double previousDistance = 2*tol;
+			for(Map.Entry<Double, Link> entry : closestLinksMap.entrySet()) {
+				// if the distance difference to the previous link is less than tol, add the link as well
+				if(i > maxNnodes && Math.abs(entry.getKey() - previousDistance) >= tol) {
+					break;
+				}
+				if(entry.getKey() > config.getMaxStopFacilityDistance()) {
+					break;
+				}
+
+				previousDistance = entry.getKey();
+				closestLinks.add(entry.getValue());
+				i++;
+			}
+
+			return closestLinks;
+		}
+	}
+
+	/**
 	 * Adds a node on the position of coord and connects it with two links to the neareast node of the network.
 	 * @param coord where the new node should be created
 	 * @param network that should be modified
@@ -136,7 +213,7 @@ public class NetworkTools {
 	 * @return a list with the two newly created links
 	 */
 	@Deprecated
-	public static List<Link> addArtificialLinksToNetwork(Coord coord, Network network, String idPrefix, int idCounter) {
+	public static List<Link> connectFacilityToNearestNode(Coord coord, Network network, String idPrefix, int idCounter) {
 		NetworkImpl networkImpl = (NetworkImpl) network;
 		NetworkFactory networkFactory = network.getFactory();
 
@@ -156,7 +233,7 @@ public class NetworkTools {
 		return newLinks;
 	}
 
-	public static List<Link> addArtificialLinksToNetwork(Coord coord, Network network, Set<String> networkModes, String idPrefix, int idCounter) {
+	public static List<Link> connectFacilityToNearestNode(Coord coord, Network network, Set<String> networkModes, String idPrefix, int idCounter) {
 		NetworkImpl networkImpl = (NetworkImpl) network;
 		NetworkFactory networkFactory = network.getFactory();
 
@@ -177,6 +254,24 @@ public class NetworkTools {
 		newLinks.add(newLink2);
 
 		return newLinks;
+	}
+
+	public static Link createArtificialStopFacilityLink(TransitStopFacility stopFacility, Network network) {
+		NetworkFactory networkFactory = network.getFactory();
+
+		Coord coord = stopFacility.getCoord();
+
+		Node dummyFromNode = networkFactory.createNode(Id.createNodeId(stopFacility.getId()+"_node"), coord);
+//		Node dummyToNode = networkFactory.createNode(Id.createNodeId(id+"_dummyNode.2"), coord);
+		Link newLink = networkFactory.createLink(Id.createLinkId(stopFacility.getId()+"_link"), dummyFromNode, dummyFromNode);
+
+		newLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
+
+		network.addNode(dummyFromNode);
+//		network.addNode(dummyToNode);
+		network.addLink(newLink);
+
+		return newLink;
 	}
 
 	/**
@@ -320,15 +415,6 @@ public class NetworkTools {
 	}
 
 	/**
-	 * Creates a deep copy of a network
-	 * @param network
-	 * @return
-	 */
-	public static Network copyNetwork(Network network) {
-		return createFilteredNetwork(network, null, null);
-	}
-
-	/**
 	 * Creates a new network (deep copy) which only contains link with transportMode
 	 * @param network the base network that should be copied
 	 * @param linkFilter to decide which links should be kept
@@ -442,5 +528,24 @@ public class NetworkTools {
 		}
 
 		return new Coord[]{new Coord(minW, minS), new Coord(maxE, maxN)};
+	}
+
+	/**
+	 * @return true, if two sets (e.g. scheduleTransportModes and NetworkTransportModes) have at
+	 * least one identical entry.
+	 */
+	public static boolean setsShareMinOneEntry(Set<String> set1, Set<String> set2) {
+		if(set1 == null || set2 == null) {
+			return false;
+		} else {
+			for(String entry1 : set1) {
+				for(String entry2 : set2) {
+					if(entry1.equalsIgnoreCase(entry2)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 	}
 }

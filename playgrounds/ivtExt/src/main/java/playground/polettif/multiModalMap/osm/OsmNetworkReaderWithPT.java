@@ -48,6 +48,8 @@ public class OsmNetworkReaderWithPT {
 
 	private final static Logger log = Logger.getLogger(OsmNetworkReaderWithPT.class);
 
+	// todo create lookup table for maxspeed
+
 	/*
 	OSM TAGS
 	*/
@@ -181,9 +183,9 @@ public class OsmNetworkReaderWithPT {
 //			this.setHighwayDefaults(V_SERVICE, 		 1,  15.0/3.6, 1.0,  200); // TODO service roads are used in zurich for bus-only roads
 
 			// Set railway-defaults (and with it the filter...)
-			this.setRailwayDefaults(V_RAIL, 		  1,  80.0/3.6, 1.0,  100, true);
-			this.setRailwayDefaults(V_TRAM, 		  1,  80.0/3.6, 1.0,  100, true);
-			this.setRailwayDefaults(V_LIGHT_RAIL, 	  1,  80.0/3.6, 1.0,  100, true);
+			this.setRailwayDefaults(V_RAIL, 		  1,  80.0/3.6, 1.0,  100);
+			this.setRailwayDefaults(V_TRAM, 		  1,  80.0/3.6, 1.0,  100);
+//			this.setRailwayDefaults(V_LIGHT_RAIL, 	  1,  80.0/3.6, 1.0,  100, true);
 
 			this.setRelationPTFilter(TAG_ROUTE, V_BUS);
 			this.setRelationPTFilter(TAG_ROUTE, V_TROLLEYBUS);
@@ -588,9 +590,14 @@ public class OsmNetworkReaderWithPT {
 					if (mode == null) {
 						break;
 					} else {
-						// combine bus and trolleybus
+						// todo ? combine bus and trolleybus
 						if(mode.equals(V_TROLLEYBUS)) {
 							mode = V_BUS;
+						}
+
+						// todo ? combine rail and light_railway
+						if(mode.equals(V_LIGHT_RAIL)) {
+							mode = V_RAIL;
 						}
 
 						modes.add(mode);

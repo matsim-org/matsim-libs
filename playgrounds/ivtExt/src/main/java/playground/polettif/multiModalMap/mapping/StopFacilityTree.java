@@ -33,6 +33,7 @@ import java.util.*;
 /**
  * provides a container for parent and child stopfacilities and referenced link candidates
  */
+@Deprecated
 public class StopFacilityTree {
 
 	private static final String PREFIX_ARTIFICIAL_LINKS = "pt_";
@@ -56,7 +57,7 @@ public class StopFacilityTree {
 
 	/**
 	 * Generates link candidates for all stopFacilities. For stop facilities where which no link can
-	 * be found within nodeSearchRadius an artificial node and two artificial links (in & out) are
+	 * be found within nodeSearchRadius an ARTIFICIAL_LINK_MODE node and two ARTIFICIAL_LINK_MODE links (in & out) are
 	 * created and added to the network. For each link candiate a child stop facility is generated
 	 * and referenced to the link. Child stop facilities are added to the schedule.
 	 *
@@ -93,7 +94,7 @@ public class StopFacilityTree {
 			List<Link> closestLinks = NetworkTools.findNClosestLinks(networkImpl, stopFacility.getCoord(), nodeSearchRadius, maxNclosestLinks, maxLinkFacilityDistance);
 
 			if(closestLinks.size() == 0) {
-				closestLinks.addAll(NetworkTools.addArtificialLinksToNetwork(stopFacility.getCoord(), network, PREFIX_ARTIFICIAL_LINKS, artificialId++));
+				closestLinks.addAll(NetworkTools.connectFacilityToNearestNode(stopFacility.getCoord(), network, PREFIX_ARTIFICIAL_LINKS, artificialId++));
 			}
 
 			for(Link link : closestLinks) {
