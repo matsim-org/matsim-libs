@@ -35,6 +35,8 @@ public class NeighboursCreator {
 	private LeastCostPathCalculator pathCalculator;
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private static final Logger logger = Logger.getLogger(NeighboursCreator.class);
+	
+	private boolean allowSplittingWorkActivity = false;
 
 	public NeighboursCreator(StageActivityTypes stageActivityTypes,
 			QuadTree<ActivityFacility> shopFacilityQuadTree, QuadTree<ActivityFacility> leisureFacilityQuadTree,
@@ -313,37 +315,17 @@ public class NeighboursCreator {
 		
 		return newPlans;		
 	}
-	
-	private double estimateTravelTime(Link startLink, Link endLink, Person person, double now, String mode) {
 		
-		double travelTime = 0.0;
-		if (mode.equals("car")) {
-			Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getToNode(), 
-					now, person, null ) ;
-			travelTime = path.travelTime;
-		}
-		else {
-			double beelineFactor = scenario.getConfig().plansCalcRoute().getBeelineDistanceFactors().get(mode);
-			double modeSpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(mode);
-			
-			double distance = CoordUtils.calcEuclideanDistance(startLink.getCoord(), endLink.getCoord());
-			
-			travelTime = distance * beelineFactor / modeSpeed;
-			
-		}
-		return travelTime;
-	}
-
 	private List<Plan> getAllChainsWthRemoving(Plan plan) {
 		
 		List<Plan> newPlans = new LinkedList<Plan>();
 		
 		List<Activity> t = TripStructureUtils.getActivities(plan, this.stageActivityTypes);
 
-		
+		//nothing to remove
 		if (t.size() == 1 || t.size() == 2)
-			//nothing to remove
 			return newPlans;
+		
 		//look at all the activities (not including first and last) and try to remove it
 		for (int index = 1; index < t.size() - 2; index++) {
 		
@@ -356,6 +338,7 @@ public class NeighboursCreator {
 				continue;
 			int actIndex = plan.getPlanElements().indexOf(t.get(index));
 
+			double durationRemovedActivity = t.get(index).getMaximumDuration();
 			Leg previousLeg = ((Leg) newPlan.getPlanElements().get(actIndex - 1));
 			Leg nextLeg = ((Leg) newPlan.getPlanElements().get(actIndex + 1));
 			
@@ -383,13 +366,43 @@ public class NeighboursCreator {
 						((Leg) pe).setMode(previousLegMode);
 				}
 				
-			}					
+			}		
+			
+			//check if after removing we have to work activities
+			if (t.get(index - 1).getType().equals("work") 
+					&& t.get(index + 1).getType().equals("work")) {
+				
+				double initialEndTime = t.get(index + 1).getEndTime();
+				newPlan.getPlanElements().remove(actIndex);
+				newPlan.getPlanElements().remove(actIndex);
+				((Activity)newPlan.getPlanElements().get(actIndex - 2)).setEndTime(initialEndTime - durationRemovedActivity);
+			}
 			
 			newPlans.add(newPlan);
 		}
 		return newPlans;		
 	}
 	
+	private double estimateTravelTime(Link startLink, Link endLink, Person person, double now, String mode) {
+		
+		double travelTime = 0.0;
+		if (mode.equals("car")) {
+			Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getToNode(), 
+					now, person, null ) ;
+			travelTime = path.travelTime;
+		}
+		else {
+			double beelineFactor = scenario.getConfig().plansCalcRoute().getBeelineDistanceFactors().get(mode);
+			double modeSpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(mode);
+			
+			double distance = CoordUtils.calcEuclideanDistance(startLink.getCoord(), endLink.getCoord());
+			
+			travelTime = distance * beelineFactor / modeSpeed;
+			
+		}
+		return travelTime;
+	}
+
 	private void scoreChains(List<Plan> plansToScore){
 		
 		for (Plan plan : plansToScore) {
