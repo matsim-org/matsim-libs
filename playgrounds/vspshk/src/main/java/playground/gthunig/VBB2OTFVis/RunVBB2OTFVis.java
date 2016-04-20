@@ -82,9 +82,8 @@ public class RunVBB2OTFVis {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         scenario.getConfig().transit().setUseTransit(true);
 
-        String coordinateConversionSystem = "EPSG:25832";
         CoordinateTransformation coordinateTransformation = TransformationFactory.
-                        getCoordinateTransformation(TransformationFactory.WGS84, coordinateConversionSystem);
+                        getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
 
         GtfsConverter converter = new GtfsConverter(feed, scenario, coordinateTransformation);
         converter.setDate(LocalDate.of(2016, 5, 16));
