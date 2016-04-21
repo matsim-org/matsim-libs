@@ -22,7 +22,10 @@ package playground.polettif.multiModalMap.mapping.pseudoPTRouter;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
- * Describes the path between two link candidates for the pseudo network.
+ * Describes the path between two pseudoRouteStops for the pseudoGraph (used by the
+ * Dijkstra algorithm).
+ *
+ * @author polettif
  */
 public class PseudoRoutePath {
 
@@ -35,12 +38,12 @@ public class PseudoRoutePath {
 		this(fromStop, toStop, travelTime, false);
 	}
 
-	public PseudoRoutePath(PseudoRouteStop fromStop, PseudoRouteStop toStop, double travelTime, boolean dummy) {
+	public PseudoRoutePath(PseudoRouteStop fromStop, PseudoRouteStop toStop, double travelCost, boolean dummy) {
 		this.id = new Tuple<>(fromStop, toStop);
 		this.from = fromStop;
 		this.to = toStop;
 
-		this.weight = travelTime + (dummy ? 0 : 0.5 * fromStop.getLinkCandidate().getLinkTravelTime() + 0.5 * toStop.getLinkCandidate().getLinkTravelTime());
+		this.weight = travelCost + (dummy ? 0 : 0.5 * fromStop.getLinkCandidate().getLinkLength() + 0.5 * toStop.getLinkCandidate().getLinkLength());
 	}
 
 	public Tuple<PseudoRouteStop, PseudoRouteStop> getId() {
@@ -53,7 +56,7 @@ public class PseudoRoutePath {
 
 	@Override
 	public String toString() {
-		return to.getName()+";"+from.getName();
+		return from.getName()+" -> "+to.getName();
 	}
 
 	public PseudoRouteStop getFromPseudoStop() {

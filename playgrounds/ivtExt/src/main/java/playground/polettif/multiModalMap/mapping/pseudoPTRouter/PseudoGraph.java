@@ -31,6 +31,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A pseudo graph with PseudoRouteStops and PseudoRoutePaths
+ * used to calculate the best path and thus link sequence
+ * from the first stop to the last stop of a transit route.
+ * <p/>
+ * Used by {@link DijkstraAlgorithm}
+ *
+ * @author polettif
+ */
 public class PseudoGraph {
 
 	private final List<PseudoRouteStop> nodes;

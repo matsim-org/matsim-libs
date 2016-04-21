@@ -33,7 +33,7 @@ import java.util.TreeMap;
 public class CsvTools {
 
 	/**
-	 * Converts a table with Tuple<line, column> as key to a list of csv lines.
+	 * Converts a table with Tuple&lt;line, column&gt; as key to a list of csv lines.
 	 */
 	public List<String> convertToCsvLines(Map<Tuple<Integer, Integer>, String> keyTable) {
 		int maxCol = 0;

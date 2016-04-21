@@ -109,7 +109,6 @@ public class PTMapperModes extends PTMapper {
 		log.info("Mapping public transit to network successful!");
 	}
 
-
 	@Override
 	public void mapScheduleToNetwork(Network networkParam) {
 		this.network = networkParam;
@@ -279,7 +278,7 @@ public class PTMapperModes extends PTMapper {
 		 * Clean also the allowed modes for only the modes, no line-number any more...
 		 */
 		log.info("Clean Stations and Network...");
-//		PTMapperUtils.cleanSchedule(schedule);
+//		PTMapperUtils.removeTransitRoutesWithoutLinkSequences(schedule);
 		PTMapperUtils.removeNonUsedStopFacilities(schedule);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);
 //		PTMapperUtils.setConnectedStopFacilitiesToIsBlocking(schedule, network);

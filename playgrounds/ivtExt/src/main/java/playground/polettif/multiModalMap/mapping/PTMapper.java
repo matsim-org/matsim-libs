@@ -29,9 +29,9 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 
 /**
- * Provides the contract for an implementation of pt-lines routing.
+ * Provides the contract for an implementation of ptLines routing.
  *
- * @author boescpa
+ * @author polettif
  */
 public abstract class PTMapper {
 

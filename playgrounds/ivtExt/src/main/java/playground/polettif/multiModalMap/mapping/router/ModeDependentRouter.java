@@ -44,14 +44,12 @@ import java.util.Set;
  */
 public class ModeDependentRouter implements Router {
 
-	private final Network network;
 	private final Set<String> routingTransportModes;
     private final LeastCostPathCalculator pathCalculator;
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
 
     public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
 		this.routingTransportModes = routingTransportModes;
-		this.network = network;
 		paths = new HashMap<>();
 
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);

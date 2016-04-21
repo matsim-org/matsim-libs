@@ -28,9 +28,9 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 /**
- * What is it for?
+ * A Router interface combining travelDisUtility and TravelTime.
  *
- * @author boescpa
+ * @author polettif
  */
 public interface Router extends TravelDisutility, TravelTime {
 
@@ -40,6 +40,6 @@ public interface Router extends TravelDisutility, TravelTime {
      * @param toNode    Node to route to...
      * @return  Least cost path.
      */
-    public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode);
+    LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode);
 
 }

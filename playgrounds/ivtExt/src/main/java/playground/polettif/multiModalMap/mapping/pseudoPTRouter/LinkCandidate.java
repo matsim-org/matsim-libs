@@ -23,6 +23,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+/**
+ * A possible link for a stop facility. A LinkCandidate contains a parent stop facility (the
+ * one used in the original schedule), an actual Link and a child stop facility which
+ * is referenced to the link.
+ *
+ * @author polettif
+ */
 public class LinkCandidate  {
 
 	final private String id;
@@ -32,7 +39,7 @@ public class LinkCandidate  {
 	private TransitStopFacility childStopFacility;
 
 	public LinkCandidate(Link link, TransitStopFacility parentStopFacility) {
-		this.id = parentStopFacility.getName() + " " + parentStopFacility.getId() + ":" + link.getId();
+		this.id = parentStopFacility.getName() + ": " + parentStopFacility.getId() + ".link:" + link.getId();
 		this.link = link;
 		this.parentStopFacility = parentStopFacility;
 	}
@@ -49,11 +56,11 @@ public class LinkCandidate  {
 		return link;
 	}
 
-	public double getLinkTravelTime() {
+	public double getLinkLength() {
 		if(link == null) {
 			return 0.0;
 		} else {
-			return link.getLength()/link.getFreespeed();
+			return link.getLength();
 		}
 	}
 
@@ -69,12 +76,32 @@ public class LinkCandidate  {
 		return id;
 	}
 
+	public double getStopDistance() {
+		return CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), parentStopFacility.getCoord());
+	}
+
 	@Override
 	public String toString() {
 		return id;
 	}
 
-	public double getStopDistance() {
-		return CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), parentStopFacility.getCoord());
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+
+		LinkCandidate other = (LinkCandidate) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
+
+
 }

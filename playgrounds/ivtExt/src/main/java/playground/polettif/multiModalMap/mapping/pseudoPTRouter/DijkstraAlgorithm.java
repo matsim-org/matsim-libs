@@ -21,6 +21,12 @@ package playground.polettif.multiModalMap.mapping.pseudoPTRouter;
 
 import java.util.*;
 
+/**
+ * A basic dijkstra algorithm used to calculate the shortes
+ * path for a transit route via link candidates of route stops.
+ *
+ * @author polettif
+ */
 public class DijkstraAlgorithm {
 	
 	private final Set<PseudoRoutePath> edges;
@@ -129,6 +135,7 @@ public class DijkstraAlgorithm {
 			step = predecessors.get(step);
 			path.add(step);
 		}
+
 		// Put it into the correct order
 		Collections.reverse(path);
 
