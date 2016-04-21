@@ -48,13 +48,13 @@ import playground.singapore.springcalibration.run.TaxiUtils;
  *
  * @author anhorni
  */
-public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
+public class SingaporeTripOrSubtourModeChange implements PlanAlgorithm {
 
 	private final String[] possibleModes;
 	private boolean ignoreCarAvailability = false;
 	private double walkThreshold = 5000.0;
 	private Population population;
-	private static final Logger log = Logger.getLogger(SingaporeChooseRandomSingleLegMode.class);
+	private static final Logger log = Logger.getLogger(SingaporeTripOrSubtourModeChange.class);
 	private TaxiUtils taxiUtils;
 
 	private final Random rng;
@@ -65,7 +65,7 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 	 * @see TransportMode
 	 * @see MatsimRandom
 	 */
-	public SingaporeChooseRandomSingleLegMode(final String[] possibleModes, final Random rng, Population population, TaxiUtils taxiUtils) {
+	public SingaporeTripOrSubtourModeChange(final String[] possibleModes, final Random rng, Population population, TaxiUtils taxiUtils) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
 		this.population = population;
@@ -256,7 +256,7 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 					taxiWalkLeg.setDepartureTime(currentActivity.getEndTime());
 					taxiWalkLeg.setTravelTime(0.0);
 										
-					Activity taxiWaitAct = new ActivityImpl(TaxiUtils.wait4Taxi, null, null);					
+					Activity taxiWaitAct = new ActivityImpl(TaxiUtils.wait4Taxi, currentActivity.getCoord(), currentActivity.getLinkId());					
 					taxiWaitAct.setEndTime(taxiWaitEndTime);
 					tmpPlan.addLeg(taxiWalkLeg);
 					tmpPlan.addActivity(taxiWaitAct);

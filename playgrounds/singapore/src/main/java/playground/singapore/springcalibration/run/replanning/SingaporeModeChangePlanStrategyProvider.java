@@ -20,7 +20,6 @@
 package playground.singapore.springcalibration.run.replanning;
 
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
@@ -37,7 +36,7 @@ import playground.singapore.springcalibration.run.TaxiUtils;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class SingaporeChangeSingleTripModePlanStrategyProvider implements Provider<PlanStrategy> {
+public class SingaporeModeChangePlanStrategyProvider implements Provider<PlanStrategy> {
 
 	private final GlobalConfigGroup globalConfigGroup;
 	private final ChangeLegModeConfigGroup changeLegModeConfigGroup;
@@ -47,7 +46,7 @@ public class SingaporeChangeSingleTripModePlanStrategyProvider implements Provid
 	private TaxiUtils taxiUtils;
 
 	@Inject
-	SingaporeChangeSingleTripModePlanStrategyProvider(
+	SingaporeModeChangePlanStrategyProvider(
 			GlobalConfigGroup globalConfigGroup, 
 			ChangeLegModeConfigGroup changeLegModeConfigGroup, 
 			ActivityFacilities activityFacilities, 
@@ -66,7 +65,7 @@ public class SingaporeChangeSingleTripModePlanStrategyProvider implements Provid
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new TripsToLegsModule(tripRouterProvider, globalConfigGroup));
-		strategy.addStrategyModule(new SingaporeChangeSingleLegMode(globalConfigGroup, changeLegModeConfigGroup, population, taxiUtils));
+		strategy.addStrategyModule(new SingaporeModeChangeAlgoGenerator(globalConfigGroup, changeLegModeConfigGroup, population, taxiUtils));
 		strategy.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
 		return strategy;
 	}
