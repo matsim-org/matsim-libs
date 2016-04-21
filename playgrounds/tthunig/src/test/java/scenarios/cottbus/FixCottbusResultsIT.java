@@ -45,7 +45,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.Default
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import analysis.TtCalculateTotalTravelTime;
+import analysis.TtTotalTravelTime;
 import scenarios.cottbus.run.TtRunCottbusSimulation.ScenarioType;
 import scenarios.cottbus.run.TtRunCottbusSimulation.SignalType;
 
@@ -94,7 +94,7 @@ public class FixCottbusResultsIT {
 		controler.addOverridingModule(new SignalsModule());
 		controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 
-		TtCalculateTotalTravelTime handler = new TtCalculateTotalTravelTime();
+		TtTotalTravelTime handler = new TtTotalTravelTime();
 		controler.addOverridingModule(new AbstractModule() {			
 			@Override
 			public void install() {
