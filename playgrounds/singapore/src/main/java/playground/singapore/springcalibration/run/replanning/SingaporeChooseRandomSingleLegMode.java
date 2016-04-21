@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -32,6 +33,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -66,8 +70,6 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 		this.rng = rng;
 		this.population = population;
 		this.taxiUtils = taxiUtils;
-		
-		this.taxiUtils.getWaitingTime(null); // TODO: remove
 		log.info("Replanning for population of size: " + population.getPersons().size());
 	}
 
@@ -135,9 +137,22 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 		if (!(previousActivity.equals("home") && nextActivity.contains("school") ||
 				(previousActivity.contains("school") && nextActivity.equals("home")))) {
 				forbidSchoolbus = true;	
-				}
+		}
 		
-		leg.setMode(chooseModeOtherThan(leg.getMode(), forbidCar, forbidPassenger, forbidWalk, forbidOther, forbidSchoolbus));
+		String newMode = chooseModeOtherThan(leg.getMode(), 
+				forbidCar, 
+				forbidPassenger, 
+				forbidWalk, 
+				forbidOther, 
+				forbidSchoolbus);
+		
+		if (!leg.getMode().equals("taxi") && newMode.equals("taxi")) {
+			this.handleTaxi(plan, leg, 1);
+		}
+		if (leg.getMode().equals("taxi") && !newMode.equals("taxi")) {
+			this.handleTaxi(plan, leg, -1);
+		}
+		leg.setMode(newMode);
 	}
 
 	private String chooseModeOtherThan(final String currentMode, final boolean forbidCar, final boolean forbidPassenger, final boolean forbidWalk, final boolean forbidOther, final boolean forbidSchoolbus) {
@@ -201,5 +216,60 @@ public class SingaporeChooseRandomSingleLegMode implements PlanAlgorithm {
 		}
 		return newMode;
 	}
-
+	
+	private void handleTaxi(Plan plan, Leg leg, int addOrRemove) {
+		// add or remove taxi waiting time act and leg
+		if (addOrRemove == 1) {
+			this.newPlanWithTaxiStages(plan, leg);
+			
+		} else if (addOrRemove == -1) {
+			Activity wait4taxiActivity = PlanUtils.getPreviousActivity(plan, leg);
+			Leg walk2taxiLeg = PlanUtils.getPreviousLeg(plan, wait4taxiActivity);
+			
+			// see also TransitActsRemover
+			//int act2RemoveIndex = plan.getPlanElements().indexOf(wait4taxiActivity);
+			// this one is not necessary as it will be removed with the leg!
+			//((PlanImpl) plan).removeActivity(act2RemoveIndex);
+			
+			int leg2RemoveIndex = plan.getPlanElements().indexOf(walk2taxiLeg);
+			((PlanImpl) plan).removeLeg(leg2RemoveIndex);
+		}
+	}
+	
+	/*
+	 * Is this really the most efficient way of adding an activiyt at a certain plan loc?
+	 */
+	private void newPlanWithTaxiStages(Plan plan, Leg leg) {
+		Plan tmpPlan = new PlanImpl();
+		
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				Activity currentActivity = (Activity)pe;
+				Leg nextLeg = PlanUtils.getNextLeg(plan, currentActivity);
+				if (nextLeg.getMode().equals("taxi")&& !currentActivity.equals(TaxiUtils.wait4Taxi)) {
+					Coord coord = currentActivity.getCoord();
+					int hour = (int)(currentActivity.getEndTime() / 3600.0);
+					double taxiWaitTime = this.taxiUtils.getWaitingTime(coord, hour);
+					double taxiWaitEndTime = currentActivity.getEndTime() + taxiWaitTime;
+					
+					Leg taxiWalkLeg = new LegImpl(TaxiUtils.taxi_walk);
+					taxiWalkLeg.setDepartureTime(currentActivity.getEndTime());
+					taxiWalkLeg.setTravelTime(0.0);
+										
+					Activity taxiWaitAct = new ActivityImpl(TaxiUtils.wait4Taxi, null, null);					
+					taxiWaitAct.setEndTime(taxiWaitEndTime);
+					tmpPlan.addLeg(taxiWalkLeg);
+					tmpPlan.addActivity(taxiWaitAct);
+				}
+				plan.addActivity(currentActivity);
+			}
+			if (pe instanceof Leg) {
+				Leg currentLeg = (Leg)pe;
+				tmpPlan.addLeg(currentLeg);
+			}
+			
+		}
+		plan.getPlanElements().clear();
+		PlanUtils.copyFrom(tmpPlan, plan);	
+	}
 }
