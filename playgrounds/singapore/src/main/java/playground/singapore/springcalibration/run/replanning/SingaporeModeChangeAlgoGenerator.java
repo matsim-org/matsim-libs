@@ -33,14 +33,14 @@ import playground.singapore.springcalibration.run.TaxiUtils;
 /* 
  * @author anhorni
  */
-public class SingaporeChangeSingleLegMode extends AbstractMultithreadedModule {
+public class SingaporeModeChangeAlgoGenerator extends AbstractMultithreadedModule {
 
 	private String[] availableModes = new String[] { TransportMode.car, TransportMode.pt };
 	private boolean ignoreCarAvailability = true;
 	private Population population;
 	private TaxiUtils taxiUtils;
 
-	public SingaporeChangeSingleLegMode(final GlobalConfigGroup globalConfigGroup, 
+	public SingaporeModeChangeAlgoGenerator(final GlobalConfigGroup globalConfigGroup, 
 			ChangeLegModeConfigGroup changeLegModeConfigGroup, 
 			Population population, 
 			TaxiUtils taxiUtils) {
@@ -53,7 +53,7 @@ public class SingaporeChangeSingleLegMode extends AbstractMultithreadedModule {
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		SingaporeChooseRandomSingleLegMode algo = new SingaporeChooseRandomSingleLegMode(
+		SingaporeTripOrSubtourModeChange algo = new SingaporeTripOrSubtourModeChange(
 				this.availableModes, MatsimRandom.getLocalInstance(), population, this.taxiUtils);
 		
 		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
