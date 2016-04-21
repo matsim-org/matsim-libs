@@ -261,7 +261,7 @@ public class SingaporeTripOrSubtourModeChange implements PlanAlgorithm {
 					tmpPlan.addLeg(taxiWalkLeg);
 					tmpPlan.addActivity(taxiWaitAct);
 				}
-				plan.addActivity(currentActivity);
+				tmpPlan.addActivity(currentActivity);
 			}
 			if (pe instanceof Leg) {
 				Leg currentLeg = (Leg)pe;
