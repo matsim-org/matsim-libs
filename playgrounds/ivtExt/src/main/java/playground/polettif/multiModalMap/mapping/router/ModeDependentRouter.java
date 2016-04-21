@@ -48,15 +48,17 @@ public class ModeDependentRouter implements Router {
     private final LeastCostPathCalculator pathCalculator;
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
 
-    public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
+	public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
 		this.routingTransportModes = routingTransportModes;
 		paths = new HashMap<>();
 
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
 		this.pathCalculator = factory.createPathCalculator(network, this, this);
 
-		// Suppress "no route found" statements...
+		// Suppress statements...
 		Logger.getLogger( Dijkstra.class ).setLevel( Level.ERROR );
+		Logger.getLogger( PreProcessEuclidean.class ).setLevel( Level.ERROR );
+		Logger.getLogger( PreProcessLandmarks.class ).setLevel( Level.ERROR );
 	}
 
     @Override

@@ -29,10 +29,12 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidate;
+import playground.polettif.multiModalMap.mapping.pseudoPTRouter.PseudoRouteStop;
 import playground.polettif.multiModalMap.mapping.router.Router;
 import playground.polettif.multiModalMap.tools.NetworkTools;
 
@@ -200,6 +202,50 @@ public class PTMapperUtils {
 		childFacilities.values().forEach(schedule::addStopFacility);
 
 		return tree;
+	}
+
+	/**
+	 * Modifies the schedule. Replaces the parent StopFacilities
+	 * with the child StopFacilities. The replacement pairs are
+	 * given by pseudoTransitRoutes and the PseudoRouteStop sequence
+	 * especially
+	 */
+	public static void replaceFacilities(TransitSchedule schedule, Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoRoutes) {
+
+		TransitScheduleFactory scheduleFactory = schedule.getFactory();
+		List<Tuple<TransitLine, TransitRoute>> newRoutes = new ArrayList<>();
+
+		for(Map.Entry<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> lineEntry : pseudoRoutes.entrySet()) {
+			for(Map.Entry<TransitRoute, List<PseudoRouteStop>> routeEntry : lineEntry.getValue().entrySet()) {
+
+				List<PseudoRouteStop> pseudoStopSequence = routeEntry.getValue();
+				List<TransitRouteStop> newStopSequence = new ArrayList<>();
+
+				for(PseudoRouteStop pseudoStop : pseudoStopSequence) {
+					TransitRouteStop newTransitRouteStop = scheduleFactory.createTransitRouteStop(
+							pseudoStop.getChildStopFacility(), pseudoStop.getArrivalOffset(), pseudoStop.getDepartureOffset());
+					newTransitRouteStop.setAwaitDepartureTime(pseudoStop.isAwaitDepartureTime());
+
+					newStopSequence.add(newTransitRouteStop);
+				}
+
+				TransitRoute newRoute = scheduleFactory.createTransitRoute(routeEntry.getKey().getId(), null, newStopSequence, routeEntry.getKey().getTransportMode());
+
+				// add departures
+				routeEntry.getKey().getDepartures().values().forEach(newRoute::addDeparture);
+
+				// remove the old route
+				schedule.getTransitLines().get(lineEntry.getKey().getId()).removeRoute(routeEntry.getKey());
+
+				// add new route to container
+				newRoutes.add(new Tuple<>(lineEntry.getKey(), newRoute));
+			}
+		}
+
+		// add transit lines and routes again
+		for(Tuple<TransitLine, TransitRoute> entry : newRoutes) {
+			schedule.getTransitLines().get(entry.getFirst().getId()).addRoute(entry.getSecond());
+		}
 	}
 
 	/**

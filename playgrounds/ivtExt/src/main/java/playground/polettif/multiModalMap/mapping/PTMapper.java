@@ -40,7 +40,6 @@ public abstract class PTMapper {
 	protected final TransitSchedule schedule;
 	protected final TransitScheduleFactory scheduleFactory;
 	protected final PublicTransportMapConfigGroup config;
-	protected Network network;
 	protected NetworkFactory networkFactory;
 
 	/**
