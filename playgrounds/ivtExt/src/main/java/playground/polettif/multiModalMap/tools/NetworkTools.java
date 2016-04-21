@@ -38,6 +38,11 @@ import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 
 import java.util.*;
 
+/**
+ * Provides Tools for analysing and manipulating networks.
+ *
+ * @author polettif
+ */
 public class NetworkTools {
 
 	protected static Logger log = Logger.getLogger(NetworkTools.class);
@@ -133,22 +138,26 @@ public class NetworkTools {
 	/**
 	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes(Coord, double)},
 	 * fetches all in- and outlinks and sorts them ascending by their
-	 * distance to the coordiantes given. Only returns maxNLinks or
-	 * all links within maxLinkDistance (whichever is reached earlier).
+	 * distance to the coordiantes given. Only returns links with the allowed
+	 * networkTransportMode for the input scheduleTransportMode (defined in
+	 * config). Returns maxNLinks or all links within maxLinkDistance (whichever
+	 * is reached earlier).
 	 *
 	 * <p/>
 	 * Distance Link-Coordinate is calculated via  in {@link org.matsim.core.utils.geometry.CoordUtils#distancePointLinesegment(Coord, Coord, Coord)}).
 	 *
-	 * @param networkImpl A network implementation
-	 * @param coord the coordinate from which the closest links are
-	 *              to be searched
-	 * @param config
-	 * @return the list of closest links
-	 *
-	 * TODO doc
+	 * @param networkImpl A network implementation (needed
+	 *                    for {@link NetworkImpl#getNearestNodes(Coord, double)}
+	 * @param coord the coordinate from which the closest links
+	 *              are searched
+	 * @param scheduleTransportMode the transport mode of the "current" transitRoute.
+	 *                              The config should define which networkTransportModes
+	 *                              are allowed for this scheduleMode
+	 * @param config	The config defining maxNnodes, search radius etc.
+	 * @return a Set of the closest links
 	 */
-	public static List<Link> findNClosestLinksByMode(NetworkImpl networkImpl, Coord coord, String scheduleTransportMode, PublicTransportMapConfigGroup config) {
-		List<Link> closestLinks = new ArrayList<>();
+	public static Set<Link> findNClosestLinksByMode(NetworkImpl networkImpl, Coord coord, String scheduleTransportMode, PublicTransportMapConfigGroup config) {
+		Set<Link> closestLinks = new HashSet<>();
 
 		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, config.getNodeSearchRadius());
 		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
@@ -213,7 +222,7 @@ public class NetworkTools {
 	 * @return a list with the two newly created links
 	 */
 	@Deprecated
-	public static List<Link> connectFacilityToNearestNode(Coord coord, Network network, String idPrefix, int idCounter) {
+	public static List<Link> createLinkToNearestNode(Coord coord, Network network, String idPrefix, int idCounter) {
 		NetworkImpl networkImpl = (NetworkImpl) network;
 		NetworkFactory networkFactory = network.getFactory();
 
@@ -233,49 +242,29 @@ public class NetworkTools {
 		return newLinks;
 	}
 
-	public static List<Link> connectFacilityToNearestNode(Coord coord, Network network, Set<String> networkModes, String idPrefix, int idCounter) {
-		NetworkImpl networkImpl = (NetworkImpl) network;
-		NetworkFactory networkFactory = network.getFactory();
-
-		Node newNode = networkFactory.createNode(Id.create(idPrefix + "node_" + idCounter, Node.class), coord);
-		Node nearestNode = networkImpl.getNearestNode(coord);
-		Link newLink1 = networkFactory.createLink(Id.createLinkId(idPrefix + idCounter + ":1"), newNode, nearestNode);
-		Link newLink2 = networkFactory.createLink(Id.createLinkId(idPrefix + idCounter + ":2"), nearestNode, newNode);
-
-		newLink1.setAllowedModes(networkModes);
-		newLink2.setAllowedModes(networkModes);
-
-		network.addNode(newNode);
-		network.addLink(newLink1);
-		network.addLink(newLink2);
-
-		List<Link> newLinks = new ArrayList<>();
-		newLinks.add(newLink1);
-		newLinks.add(newLink2);
-
-		return newLinks;
-	}
-
+	/**
+	 * Creates a node and dummy/loop link on the coordinate of the stop facility and
+	 * adds both to the network. The stop facility is NOT referenced.
+	 * @return the new Link.
+	 */
 	public static Link createArtificialStopFacilityLink(TransitStopFacility stopFacility, Network network) {
 		NetworkFactory networkFactory = network.getFactory();
 
 		Coord coord = stopFacility.getCoord();
 
-		Node dummyFromNode = networkFactory.createNode(Id.createNodeId(stopFacility.getId()+"_node"), coord);
-//		Node dummyToNode = networkFactory.createNode(Id.createNodeId(id+"_dummyNode.2"), coord);
-		Link newLink = networkFactory.createLink(Id.createLinkId(stopFacility.getId()+"_link"), dummyFromNode, dummyFromNode);
+		Node dummyNode = networkFactory.createNode(Id.createNodeId(stopFacility.getId()+"_node"), coord);
+		Link dummyLink = networkFactory.createLink(Id.createLinkId(stopFacility.getId()+"_link"), dummyNode, dummyNode);
 
-		newLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
+		dummyLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
 
-		network.addNode(dummyFromNode);
-//		network.addNode(dummyToNode);
-		network.addLink(newLink);
+		network.addNode(dummyNode);
+		network.addLink(dummyLink);
 
-		return newLink;
+		return dummyLink;
 	}
 
 	/**
-	 * @return the azimuth from two points in [rad]
+	 * @return the azimuth in [rad] of a line defined by two points.
 	 */
 	public static double getAzimuth(Coord from, Coord to) {
 		double deltaE = to.getX()-from.getX();
@@ -290,29 +279,6 @@ public class NetworkTools {
 			az2 = az2-2*Math.PI;
 
 		return az2;
-	}
-
-	/**
-	 * @return whether Coord2 lies<br/>
-	 * [1] North-East<br/>
-	 * [2] South-East<br/>
-	 * [3] South-West<br/>
-	 * [4] North-West<br/>
-	 * of Coord1
-	 */
-	public static int getCompassQuarter(Coord baseCoord, Coord toCoord) {
-		double az = getAzimuth(baseCoord, toCoord);
-
-
-		if(az < Math.PI/2) {
-			return 1;
-		} else if(az >= Math.PI/2 && az < Math.PI) {
-			return 2;
-		} else if(az > Math.PI && az < 1.5*Math.PI) {
-			return 3;
-		} else {
-			return 4;
-		}
 	}
 
 	/**
@@ -358,153 +324,9 @@ public class NetworkTools {
 	}
 
 	/**
-	 * A debug method to assign weights to network links as number of lanes.
-	 */
-	public static void visualizeWeightsAsLanes(Network network, Map<Id<Link>, Double> weightMap) {
-		for(Map.Entry<Id<Link>, Double> w : weightMap.entrySet()) {
-			network.getLinks().get(w.getKey()).setNumberOfLanes(w.getValue());
-		}
-	}
-
-
-	/**
-	 * Adds a node on the splitPointCoordinates and splits the link into two new links
-	 * @param network network the operations runs on, is modified.
-	 * @param linkId of the link which should be split
-	 * @param splitPointCoordinates of the point where the link should be separated. Practically the link is removed
-	 *                              and two new links connecting the nodes are added. The splitPoint is moved onto the link.
-	 * @param newObjectPrefix prefix for new the link and node (default: "split_")
-	 */
-	@Deprecated
-	public static void splitLink(Network network, Id<Link> linkId, Coord splitPointCoordinates, String newObjectPrefix) {
-		String prefix;
-
-		if(newObjectPrefix == null) {
-			prefix = "split_";
-		} else {
-			prefix = newObjectPrefix;
-		}
-
-		int intId = 0;
-
-		Link link = network.getLinks().get(linkId);
-
-		Coord coordinatesOnLink = getClosestPointOnLine(link, splitPointCoordinates);
-
-		NetworkFactoryImpl networkFactory = new NetworkFactoryImpl(network);
-
-		String newNodeIdString = link.getFromNode().getId().toString()+"_"+link.getToNode().getId().toString();
-		String newLinkIdString = newNodeIdString+"_"+linkId.toString();
-
-		while(network.getNodes().containsKey(Id.createNodeId(prefix+intId))) { intId++; }
-		while(network.getLinks().containsKey(Id.createLinkId(prefix+intId))) { intId++; }
-
-		Node newNode = networkFactory.createNode(Id.createNodeId(prefix+intId), coordinatesOnLink);
-		Link newLink = networkFactory.createLink(Id.createLinkId(prefix+intId), newNode, link.getToNode());
-		newLink.setLength(CoordUtils.calcEuclideanDistance(newNode.getCoord(), link.getToNode().getCoord()));
-		newLink.setAllowedModes(link.getAllowedModes());
-		newLink.setCapacity(link.getCapacity());
-		newLink.setFreespeed(link.getFreespeed());
-		newLink.setNumberOfLanes(link.getNumberOfLanes());
-
-		network.addNode(newNode);
-		network.addLink(newLink);
-
-		link.setToNode(newNode);
-		link.setLength(CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), newNode.getCoord()));
-	}
-
-	/**
-	 * Creates a new network (deep copy) which only contains link with transportMode
-	 * @param network the base network that should be copied
-	 * @param linkFilter to decide which links should be kept
-	 * @return
-	 */
-	@Deprecated
-	public static Network createFilteredNetwork(Network network, NetworkLinkFilter linkFilter, NetworkNodeFilter nodeFilter) {
-		Network newNetwork = NetworkUtils.createNetwork();
-
-		NetworkLinkFilter lf = (linkFilter == null ? new NetworkLinkFilterAllLinks() : linkFilter);
-		NetworkNodeFilter nf = (nodeFilter == null ? new NetworkNodeFilterAllNodes() : nodeFilter);
-
-		// Add node if it passes filter
-		for (Node node : network.getNodes().values()) {
-			if(nf.judgeNode(node)) {
-				addNewNode(newNetwork, node);
-			}
-		}
-
-		// Add link if it passes filter
-		for(Link link : network.getLinks().values()) {
-			if(lf.judgeLink(link)) {
-				addNewLink(newNetwork, link);
-			}
-		}
-
-		new NetworkCleaner().run(newNetwork);
-		return newNetwork;
-	}
-
-	/**
-	 * Creates a  network which only contains link with transportMode
-	 * @param network the base network that should be copied
-	 * @param linkFilter to decide which links should be kept
-	 * @return
-	 */
-	@Deprecated
-	public static Network getFilteredNetwork(Network network, NetworkLinkFilter linkFilter, NetworkNodeFilter nodeFilter) {
-		Network newNetwork = NetworkUtils.createNetwork();
-
-		NetworkLinkFilter lf = (linkFilter == null ? new NetworkLinkFilterAllLinks() : linkFilter);
-		NetworkNodeFilter nf = (nodeFilter == null ? new NetworkNodeFilterAllNodes() : nodeFilter);
-
-		// Add node if it passes filter
-		for (Node node : network.getNodes().values()) {
-			if(nf.judgeNode(node)) {
-				addNewNode(newNetwork, node);
-			}
-		}
-		for(Link link : network.getLinks().values()) {
-			if(lf.judgeLink(link)) {
-				newNetwork.addLink(link);
-			}
-		}
-
-		return newNetwork;
-	}
-
-	@Deprecated
-	public static Network addNewNode(Network network, Node node) {
-		Id<Node> nodeId = Id.create(node.getId().toString(), Node.class);
-		if (!network.getNodes().containsKey(nodeId)) {
-			Node newNode = network.getFactory().createNode(nodeId, node.getCoord());
-			network.addNode(newNode);
-		}
-		return network;
-	}
-
-	@Deprecated
-	public static Network addNewLink(Network network, Link link) {
-		Id<Link> linkId = Id.create(link.getId().toString(), Link.class);
-		Id<Node> fromNodeId = Id.create(link.getFromNode().getId().toString(), Node.class);
-		Id<Node> toNodeId = Id.create(link.getToNode().getId().toString(), Node.class);
-
-		if(!network.getLinks().containsKey(linkId)) { // todo && network.getNodes().containsKey(fromNodeId) && network.getNodes().containsKey(toNodeId))
-			Link newLink = network.getFactory().createLink(linkId, network.getNodes().get(fromNodeId), network.getNodes().get(toNodeId));
-			newLink.setAllowedModes(link.getAllowedModes());
-			newLink.setCapacity(link.getCapacity());
-			newLink.setFreespeed(link.getFreespeed());
-			newLink.setLength(link.getLength());
-			newLink.setNumberOfLanes(link.getNumberOfLanes());
-			network.addLink(newLink);
-		}
-		return network;
-	}
-
-	/**
 	 * Calculates the extent of the given network.
-	 * @param network
-	 * @return Array of Coords with the minimal South-West and the maximal North-East Coordinates
+	 * @return Array of Coords with the minimal South-West and the
+	 * 		   maximal North-East Coordinates
 	 */
 	public static Coord[] getExtent(Network network) {
 		double maxE = 0;
@@ -531,8 +353,32 @@ public class NetworkTools {
 	}
 
 	/**
-	 * @return true, if two sets (e.g. scheduleTransportModes and NetworkTransportModes) have at
-	 * least one identical entry.
+	 * @return whether Coord2 lies<br/>
+	 * [1] North-East<br/>
+	 * [2] South-East<br/>
+	 * [3] South-West<br/>
+	 * [4] North-West<br/>
+	 * of Coord1
+	 */
+	public static int getCompassQuarter(Coord baseCoord, Coord toCoord) {
+		double az = getAzimuth(baseCoord, toCoord);
+
+
+		if(az < Math.PI/2) {
+			return 1;
+		} else if(az >= Math.PI/2 && az < Math.PI) {
+			return 2;
+		} else if(az > Math.PI && az < 1.5*Math.PI) {
+			return 3;
+		} else {
+			return 4;
+		}
+	}
+
+
+	/**
+	 * @return true, if two sets (e.g. scheduleTransportModes and
+	 * networkTransportModes) have at least one identical entry.
 	 */
 	public static boolean setsShareMinOneEntry(Set<String> set1, Set<String> set2) {
 		if(set1 == null || set2 == null) {
@@ -546,6 +392,17 @@ public class NetworkTools {
 				}
 			}
 			return false;
+		}
+	}
+
+	/**
+	 * A debug method to assign weights to network links as number of lanes.
+	 * The network is changed permanently, so this should really only be used for
+	 * debugging.
+	 */
+	public static void visualizeWeightsAsLanes(Network network, Map<Id<Link>, Double> weightMap) {
+		for(Map.Entry<Id<Link>, Double> w : weightMap.entrySet()) {
+			network.getLinks().get(w.getKey()).setNumberOfLanes(w.getValue());
 		}
 	}
 }

@@ -32,7 +32,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 
 /**
- * Transforms a network file .
+ * Performs a coordinate transformation on a network file .
  *
  * @author polettif
  */

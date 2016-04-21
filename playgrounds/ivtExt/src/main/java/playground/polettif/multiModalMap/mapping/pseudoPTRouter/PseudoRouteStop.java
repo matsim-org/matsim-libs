@@ -4,14 +4,19 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
- * Link candidates are made for each stop facility. For routing unique
- * link candidates for each transitRouteStop are needed
+ * A RouteStop used in the pseudoGraph.
+ *
+ * Link Candidates are made for each stop facility. Since one
+ * stop facility might be accessed twice in the same transitRoute,
+ * unique Link Candidates for each transitRouteStop are needed. This
+ * is achieved via this class.
+ *
+ * @author polettif
  */
 public class PseudoRouteStop {
 
 
 	public final String id;
-	private final int order;
 	private final String name;
 	private final LinkCandidate linkCandidate;
 
@@ -21,7 +26,6 @@ public class PseudoRouteStop {
 
 	public PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
 		this.id = Integer.toString(order) + routeStop.getStopFacility().getId() + linkCandidate.getLink().getId();
-		this.order = order;
 		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLink().getId() + ")";
 		this.linkCandidate = linkCandidate;
 
@@ -33,10 +37,8 @@ public class PseudoRouteStop {
 	public PseudoRouteStop(String id) {
 		if(id.equals("SOURCE")) {
 			this.id = "SOURCE";
-			this.order = -2;
 		} else {
 			this.id = "DESTINATION";
-			this.order = -1;
 		}
 		this.name = id;
 		this.linkCandidate = null;
