@@ -33,6 +33,7 @@ import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.network.filter.NetworkNodeFilter;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 
@@ -324,6 +325,36 @@ public class NetworkTools {
 	}
 
 	/**
+	 * @return true, if two sets (e.g. scheduleTransportModes and
+	 * networkTransportModes) have at least one identical entry.
+	 */
+	public static boolean setsShareMinOneEntry(Set<String> set1, Set<String> set2) {
+		if(set1 == null || set2 == null) {
+			return false;
+		} else {
+			for(String entry1 : set1) {
+				for(String entry2 : set2) {
+					if(entry1.equalsIgnoreCase(entry2)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * A debug method to assign weights to network links as number of lanes.
+	 * The network is changed permanently, so this should really only be used for
+	 * debugging.
+	 */
+	public static void visualizeWeightsAsLanes(Network network, Map<Id<Link>, Double> weightMap) {
+		for(Map.Entry<Id<Link>, Double> w : weightMap.entrySet()) {
+			network.getLinks().get(w.getKey()).setNumberOfLanes(w.getValue());
+		}
+	}
+
+	/**
 	 * Calculates the extent of the given network.
 	 * @return Array of Coords with the minimal South-West and the
 	 * 		   maximal North-East Coordinates
@@ -353,6 +384,20 @@ public class NetworkTools {
 	}
 
 	/**
+	 * Checks if a coordinate is in the area given by SE and NE.
+	 * @param coord the coordinate to check
+	 * @param SW the south-west corner of the area
+	 * @param NE the north-east corner of the area
+	 */
+	public static boolean isInArea(Coord coord, Coord SW, Coord NE) {
+		return (getCompassQuarter(SW, coord) == 1 && getCompassQuarter(NE, coord) == 3);
+	}
+
+	public static boolean isInArea(Coord coord, Coord[] area) {
+		return (getCompassQuarter(area[0], coord) == 1 && getCompassQuarter(area[1], coord) == 3);
+	}
+
+	/**
 	 * @return whether Coord2 lies<br/>
 	 * [1] North-East<br/>
 	 * [2] South-East<br/>
@@ -375,34 +420,163 @@ public class NetworkTools {
 		}
 	}
 
+	/**
+	 * @return a Map with a boolean for each stop facility denoting whether
+	 * the facility is within the area or not.
+	 */
+	public static Map<TransitStopFacility, Boolean> getStopsInAreaBool(TransitSchedule schedule, Coord[] area) {
+		HashMap<TransitStopFacility, Boolean> stopsInArea = new HashMap<>();
+		for(TransitStopFacility stopFacility : schedule.getFacilities().values()) {
+			stopsInArea.put(stopFacility, NetworkTools.isInArea(stopFacility.getCoord(), area));
+		}
+		return stopsInArea;
+	}
+
 
 	/**
-	 * @return true, if two sets (e.g. scheduleTransportModes and
-	 * networkTransportModes) have at least one identical entry.
+	 * @return which border of a rectangular area of interest a line fromCoord-toCoord crosses. One coord has to be
+	 * inside area of interest<br/>
+	 * [10] north->inside<br/>
+	 * [17] inside->north<br/>
+	 * [20] east->inside<br/>
+	 * [27] inside->east<br/>
+	 * [30] south->inside<br/>
+	 * [37] inside->south<br/>
+	 * [40] west->inside<br/>
+	 * [47] inside->west<br/>
+	 * [0] line does not cross any border
 	 */
-	public static boolean setsShareMinOneEntry(Set<String> set1, Set<String> set2) {
-		if(set1 == null || set2 == null) {
-			return false;
-		} else {
-			for(String entry1 : set1) {
-				for(String entry2 : set2) {
-					if(entry1.equalsIgnoreCase(entry2)) {
-						return true;
-					}
+	public int getBorderCrossType(Coord SWcut, Coord NEcut, Coord fromCoord, Coord toCoord) {
+		int fromSector = getAreaOfInterestSector(SWcut, NEcut, fromCoord);
+		int toSector = getAreaOfInterestSector(SWcut, NEcut, toCoord);
+
+		if(fromSector == toSector) {
+			return 0;
+		}
+
+		double azFromTo = getAzimuth(fromCoord, toCoord);
+		double azFromSW = getAzimuth(fromCoord, SWcut);
+		double azFromNE = getAzimuth(fromCoord, NEcut);
+
+		double azToFrom = getAzimuth(toCoord, fromCoord);
+		double azToSW = getAzimuth(toCoord, SWcut);
+		double azToNE = getAzimuth(toCoord, NEcut);
+
+		if(fromSector != 0 ) {
+			switch (fromSector) {
+				case 1:
+					return 10;
+				case 2: {
+					if(azFromTo > azFromNE)
+						return 10;
+					else
+						return 20;
+				}
+				case 3:
+					return 20;
+				case 4: {
+					if(azFromTo > azFromNE)
+						return 20;
+					else
+						return 30;
+				}
+				case 5:
+					return 30;
+				case 6: {
+					if(azFromTo > azFromSW)
+						return 30;
+					else
+						return 40;
+				}
+				case 7:
+					return 40;
+				case 8: {
+					if(azFromTo > azFromSW)
+						return 40;
+					else
+						return 10;
 				}
 			}
-			return false;
 		}
+
+		if(toSector != 0) {
+			switch (toSector) {
+				case 1:
+					return 17;
+				case 2: {
+					if(azToFrom < azToNE)
+						return 17;
+					else
+						return 27;
+				}
+				case 3:
+					return 27;
+				case 4: {
+					if(azToFrom < azToNE)
+						return 27;
+					else
+						return 37;
+				}
+				case 5:
+					return 37;
+				case 6: {
+					if(azToFrom < azToSW)
+						return 37;
+					else
+						return 47;
+				}
+				case 7:
+					return 47;
+				case 8: {
+					if(azToFrom< azToSW)
+						return 47;
+					else
+						return 17;
+				}
+			}
+		}
+
+		return 0;
 	}
 
-	/**
-	 * A debug method to assign weights to network links as number of lanes.
-	 * The network is changed permanently, so this should really only be used for
-	 * debugging.
-	 */
-	public static void visualizeWeightsAsLanes(Network network, Map<Id<Link>, Double> weightMap) {
-		for(Map.Entry<Id<Link>, Double> w : weightMap.entrySet()) {
-			network.getLinks().get(w.getKey()).setNumberOfLanes(w.getValue());
+	private int getAreaOfInterestSector(Coord SWcut, Coord NEcut, Coord c) {
+		int qSW = getCompassQuarter(SWcut, c);
+		int qNE = getCompassQuarter(NEcut, c);
+
+		if(qSW == 1 && qNE == 3) {
+			return 0;
+		} else if(qSW == 1 && qNE == 4) {
+			return 1;
+		} else if(qSW == 1 && qNE == 1) {
+			return 2;
+		} else if(qSW == 1 && qNE == 2) {
+			return 3;
+		} else if(qSW == 2 && qNE == 2) {
+			return 4;
+		} else if(qSW == 2 && qNE == 3) {
+			return 5;
+		} else if(qSW == 3 && qNE == 3) {
+			return 6;
+		} else if(qSW == 4 && qNE == 3) {
+			return 7;
+		} else if(qSW == 4 && qNE == 4) {
+			return 8;
 		}
+
+		return 0;
 	}
+
+	@Deprecated
+	public void shortenLink(Link link, Node toNode) {
+		link.setToNode(toNode);
+		link.setLength(CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), toNode.getCoord()));
+	}
+
+	@Deprecated
+	public void shortenLink(Node fromNode, Link link) {
+		link.setFromNode(fromNode);
+		link.setLength(CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), fromNode.getCoord()));
+	}
+
+
 }

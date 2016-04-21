@@ -27,7 +27,7 @@ public class RunPTMapperModes {
 
 
 		String base = "C:/Users/polettif/Desktop/";
-		String outbase = base+"output/mtsMapping_modes/";
+		String outbase = base+"output/mtsMapping_zurich/";
 
 		// input
 //		final String mtsFile = base + "data/mts/zvv/zvv_unmappedSchedule_LV1903+.xml";

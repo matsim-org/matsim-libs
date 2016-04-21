@@ -38,7 +38,6 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String ARTIFICIAL_LINK_MODE = "ARTIFICIAL";
 
-	// TODO: test for ALL primitive types
 	private double doubleField = Double.NaN;
 
 	// Object fields:
@@ -51,14 +50,14 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	// field without null conversion
 	private String nonNull = "some arbitrary default value.";
 
-/*
-for each schedule transport the following needs to be specified:
-- should it be mapped independently?
-- to which network transport modesAssignment it can be mapped
-
-for network transport modesAssignment:
-- should it be cleaned up
- */
+	/**
+	 * for each schedule transport the following needs to be specified:
+	 * - should it be mapped independently?
+	 * - to which network transport modesAssignment it can be mapped
+	 *
+	 * for network transport modesAssignment:
+	 * - should it be cleaned up
+	 */
 
 	/**
 	 * All links that do not have a transit route on them are removed, except
@@ -115,7 +114,7 @@ for network transport modesAssignment:
 	 * All paths between two stops have a length > beelineDistanceMaxFactor * beelineDistance,
 	 * an ARTIFICIAL_LINK_MODE link is created.
 	 */
-	private double beelineDistanceMaxFactor = 6;
+	private double beelineDistanceMaxFactor = 3;
 
 	/**
 	 * Is increased each time the getter is called.
@@ -269,12 +268,12 @@ for network transport modesAssignment:
 
 		Set<String> railSet = new HashSet<>();
 		railSet.add("rail");
-		railSet.add("pt");
+		railSet.add("light_rail");
 		defaultConfig.modesAssignment.put("RAIL", railSet);
 
 		defaultConfig.maxNClosestLinksByMode.put("BUS", 8);
 		defaultConfig.maxNClosestLinksByMode.put("TRAM", 8);
-		defaultConfig.maxNClosestLinksByMode.put("RAIL", 12);
+		defaultConfig.maxNClosestLinksByMode.put("RAIL", 8);
 
 		// subway, gondola, funicular, ferry and cablecar are not mapped
 
@@ -288,7 +287,6 @@ for network transport modesAssignment:
 	public int getMaxNClosestLinks() {
 		return maxNClosestLinks;
 	}
-
 
 	public double getMaxStopFacilityDistance() {
 		return maxStopFacilityDistance;
