@@ -22,6 +22,7 @@ package playground.singapore.springcalibration.run.replanning;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -40,6 +41,7 @@ public class SingaporeModeChangePlanStrategyProvider implements Provider<PlanStr
 
 	private final GlobalConfigGroup globalConfigGroup;
 	private final ChangeLegModeConfigGroup changeLegModeConfigGroup;
+	private final SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
 	private Provider<TripRouter> tripRouterProvider;
 	private ActivityFacilities activityFacilities;
 	private Population population;
@@ -49,6 +51,7 @@ public class SingaporeModeChangePlanStrategyProvider implements Provider<PlanStr
 	SingaporeModeChangePlanStrategyProvider(
 			GlobalConfigGroup globalConfigGroup, 
 			ChangeLegModeConfigGroup changeLegModeConfigGroup, 
+			SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup,
 			ActivityFacilities activityFacilities, 
 			Provider<TripRouter> tripRouterProvider,
 			Population population,
@@ -58,6 +61,7 @@ public class SingaporeModeChangePlanStrategyProvider implements Provider<PlanStr
 		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
 		this.population = population;
+		this.subtourModeChoiceConfigGroup = subtourModeChoiceConfigGroup;
 		this.taxiUtils = new TaxiUtils(config);
 	}
 
@@ -65,7 +69,7 @@ public class SingaporeModeChangePlanStrategyProvider implements Provider<PlanStr
 	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new TripsToLegsModule(tripRouterProvider, globalConfigGroup));
-		strategy.addStrategyModule(new SingaporeModeChangeAlgoGenerator(globalConfigGroup, changeLegModeConfigGroup, population, taxiUtils));
+		strategy.addStrategyModule(new SingaporeModeChangeAlgoGenerator(globalConfigGroup, changeLegModeConfigGroup, subtourModeChoiceConfigGroup, population, taxiUtils));
 		strategy.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
 		return strategy;
 	}
