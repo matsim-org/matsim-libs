@@ -21,6 +21,9 @@
 package playground.singapore.springcalibration.run.replanning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -32,12 +35,20 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
+import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Subtour;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.PtConstants;
 
 import playground.singapore.springcalibration.run.TaxiUtils;
 
@@ -56,7 +67,8 @@ public class SingaporeTripOrSubtourModeChange implements PlanAlgorithm {
 	private Population population;
 	private static final Logger log = Logger.getLogger(SingaporeTripOrSubtourModeChange.class);
 	private TaxiUtils taxiUtils;
-
+	private SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
+		
 	private final Random rng;
 
 	/**
@@ -65,11 +77,12 @@ public class SingaporeTripOrSubtourModeChange implements PlanAlgorithm {
 	 * @see TransportMode
 	 * @see MatsimRandom
 	 */
-	public SingaporeTripOrSubtourModeChange(final String[] possibleModes, final Random rng, Population population, TaxiUtils taxiUtils) {
+	public SingaporeTripOrSubtourModeChange(final String[] possibleModes, final Random rng, Population population, TaxiUtils taxiUtils, SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
 		this.population = population;
 		this.taxiUtils = taxiUtils;
+		this.subtourModeChoiceConfigGroup = subtourModeChoiceConfigGroup;
 		log.info("Replanning for population of size: " + population.getPersons().size());
 	}
 
@@ -120,6 +133,22 @@ public class SingaporeTripOrSubtourModeChange implements PlanAlgorithm {
 		
 		Leg chosenLeg = legs.get(rndIdx);
 		
+		 
+		/*	
+		 If leg is in a subtour where car (or any other chain-based mode) is used, then break
+		  
+		  Legs can only be in a car subtour if they are themselves car legs, 
+		  thus we do not have to extract subtours and check for car and pipapo 
+		  but instead we can only check for leg ?= car and return if yes.
+		  In this way we are sure not to break the subtour constraints regarding mass conservation.
+		  */
+		String[] chainBasedModes = this.subtourModeChoiceConfigGroup.getChainBasedModes();
+		if (Arrays.asList(chainBasedModes).contains(chosenLeg.getMode())) return;
+		
+		// If freight mode also return. Probably this is ensured already by the subpop handling, TODO: check
+		if (chosenLeg.getMode().equals("freight")) return;
+							
+
 		// just to speed up relaxation
 		boolean forbidWalk= false;
 		Activity nextAct = PlanUtils.getNextActivity(plan, chosenLeg);
@@ -129,7 +158,7 @@ public class SingaporeTripOrSubtourModeChange implements PlanAlgorithm {
 			
 		setRandomLegMode(plan, chosenLeg, forbidCar, forbidPassenger, forbidWalk, forbidOther, forbidSchoolbus);
 	}
-
+	
 	private void setRandomLegMode(Plan plan, final Leg leg, final boolean forbidCar, final boolean forbidPassenger, final boolean forbidWalk, final boolean forbidOther, boolean forbidSchoolbus) {
 		String previousActivity = PlanUtils.getPreviousActivity(plan, leg).getType();
 		String nextActivity = PlanUtils.getNextActivity(plan, leg).getType();
