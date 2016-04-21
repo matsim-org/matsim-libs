@@ -30,11 +30,11 @@ public class TaxiUtils {
 		ArrayList<TaxiWaitingTime> tmpMap = this.readWaitingTimesFile(waitingTimesFile);
 		this.taxiWaitingTimesQuadTree = this.createQuadTree(tmpMap);
 			
-		try {
-		    Thread.sleep(20000);                 //1000 milliseconds is one second.
-		} catch(InterruptedException ex) {
-		    Thread.currentThread().interrupt();
-		}
+//		try {
+//		    Thread.sleep(20000);                 //1000 milliseconds is one second.
+//		} catch(InterruptedException ex) {
+//		    Thread.currentThread().interrupt();
+//		}
 	}
 	
 	private ArrayList<TaxiWaitingTime> readWaitingTimesFile(String waitingTimesFile) {
@@ -60,8 +60,8 @@ public class TaxiUtils {
 				waitingTime.setCentroid(centroid);
 				
 				for (int i = 0; i < 24; i++) {
-					double t = Double.parseDouble(elements[14 + i]);
-					waitingTime.setWaitingTime(i, t);
+					double t = Double.parseDouble(elements[14 + i]); // given in minutes
+					waitingTime.setWaitingTime(i, t * 60.0);
 				}				
 				tmpMap.add(waitingTime);					        
 			}
