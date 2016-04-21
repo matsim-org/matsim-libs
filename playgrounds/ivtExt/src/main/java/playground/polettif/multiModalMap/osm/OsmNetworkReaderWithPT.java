@@ -66,9 +66,11 @@ public class OsmNetworkReaderWithPT {
 	private final static String TAG_ACCESS = "access";
 
 	// Tags public transport network
+	private static final String TAG_SERVICE = "service";
+	private final static String TAG_ROUTE = "route";
+
 	private final static String TAG_PUBLIC_TRANSPORT = "public_transport";
 	private final static String TAG_TYPE = "type";
-	private final static String TAG_ROUTE = "route";
 
 
 	private static final String MEMBER_ROLE_STOP = "stop";
@@ -102,7 +104,6 @@ public class OsmNetworkReaderWithPT {
 	private static final String V_FUNICULAR = "funicular";
 	private static final String V_MONORAIL = "monorail";
 	private static final String V_SUBWAY = "subway";
-
 
 	/*
 	Maps for nodes, ways and relations
@@ -184,8 +185,8 @@ public class OsmNetworkReaderWithPT {
 
 			// Set railway-defaults (and with it the filter...)
 			this.setRailwayDefaults(V_RAIL, 		  1,  80.0/3.6, 1.0,  100);
-			this.setRailwayDefaults(V_TRAM, 		  1,  80.0/3.6, 1.0,  100);
-//			this.setRailwayDefaults(V_LIGHT_RAIL, 	  1,  80.0/3.6, 1.0,  100, true);
+			this.setRailwayDefaults(V_TRAM, 		  1,  80.0/3.6, 1.0,  100, true);
+			this.setRailwayDefaults(V_LIGHT_RAIL, 	  1,  80.0/3.6, 1.0,  100);
 
 			this.setRelationPTFilter(TAG_ROUTE, V_BUS);
 			this.setRelationPTFilter(TAG_ROUTE, V_TROLLEYBUS);
@@ -571,7 +572,7 @@ public class OsmNetworkReaderWithPT {
 		// define modes allowed on link(s)
 		//	basic type:
 		Set<String> modes = new HashSet<String>();
-		if (highway != null) { // todo bus only roads
+		if (highway != null) {
 			modes.add("car");
 		}
 
@@ -581,7 +582,7 @@ public class OsmNetworkReaderWithPT {
 
 		if (modes.isEmpty()) {modes.add("unknownStreetType");}
 
-		//	public transport: get relation which this way is part of, then get the relations route=*
+		//	public transport: get relation which this way is part of, then get the relations route=* (-> the mode)
 		for (OsmRelation relation : this.relations.values()) {
 			for (OsmParser.OsmRelationMember member : relation.members) {
 				if ((member.type == OsmParser.OsmRelationMemberType.WAY) && (member.refId == way.id) && OsmNetworkReaderWithPT.this.ptFilter.matches(relation.tags)) {
@@ -590,16 +591,9 @@ public class OsmNetworkReaderWithPT {
 					if (mode == null) {
 						break;
 					} else {
-						// todo ? combine bus and trolleybus
 						if(mode.equals(V_TROLLEYBUS)) {
 							mode = V_BUS;
 						}
-
-						// todo ? combine rail and light_railway
-						if(mode.equals(V_LIGHT_RAIL)) {
-							mode = V_RAIL;
-						}
-
 						modes.add(mode);
 					}
 					break;
@@ -763,6 +757,12 @@ public class OsmNetworkReaderWithPT {
 				// only take ways which are highway or railway
 				OsmWayDefaults osmHighwayDefaults = OsmNetworkReaderWithPT.this.highwayDefaults.get(currentWay.tags.get(TAG_HIGHWAY));
 				OsmWayDefaults osmRailwayDefaults = OsmNetworkReaderWithPT.this.railwayDefaults.get(currentWay.tags.get(TAG_RAILWAY));
+
+				// filter out not usable rails (with tags service=*)
+				if(currentWay.tags.containsKey(TAG_SERVICE)) {
+					osmRailwayDefaults = null;
+				}
+
 				if (osmHighwayDefaults != null || osmRailwayDefaults != null) {
 					currentWay.used = true;
 				}
