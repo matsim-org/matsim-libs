@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
  * 
  * @author tthunig
  */
-public class TtCalculateTotalTravelTime implements PersonDepartureEventHandler, PersonArrivalEventHandler{
+public class TtTotalTravelTime implements PersonDepartureEventHandler, PersonArrivalEventHandler{
 
 	private double totalTt = 0.0;
 	private Map<Id<Person>, Double> pers2lastDepatureTime = new HashMap<>();
