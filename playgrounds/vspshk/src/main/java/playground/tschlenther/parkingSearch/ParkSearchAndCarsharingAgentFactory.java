@@ -12,8 +12,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
-import com.google.inject.Inject;
-
 public class ParkSearchAndCarsharingAgentFactory implements AgentFactory{
 	private final Netsim simulation;
 	private CarSharingVehicles carSharingVehicles;

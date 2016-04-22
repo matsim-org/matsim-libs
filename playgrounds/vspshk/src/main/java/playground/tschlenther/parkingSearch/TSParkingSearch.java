@@ -21,9 +21,7 @@ package playground.tschlenther.parkingSearch;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-
 import javax.inject.Inject;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,12 +36,10 @@ import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
-import org.matsim.contrib.carsharing.qsim.CarsharingQsimFactory;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
 import org.matsim.contrib.carsharing.runExample.CarsharingUtils;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -57,13 +53,10 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.ActivityEnginePlugin;
-import org.matsim.core.mobsim.qsim.PopulationPlugin;
 import org.matsim.core.mobsim.qsim.QSimProvider;
 import org.matsim.core.mobsim.qsim.TeleportationPlugin;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
@@ -72,12 +65,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.pt.config.TransitConfigGroup;
-
 import com.google.inject.Module;
 import com.google.inject.Provides;
-
-import playground.tschlenther.createNetwork.CircuitNetworkCreator;
-import playground.tschlenther.createNetwork.ForkNetworkCreator;
 import playground.tschlenther.createNetwork.Nikolaus;
 
 /**
@@ -87,9 +76,11 @@ import playground.tschlenther.createNetwork.Nikolaus;
 final class TSParkingSearch {
 	
 	//defines whether car sharing is considered or not
-	private static final boolean USE_CS = false;
+	private static final boolean USE_CS = true;
 	
 	/* bind the CS and PS combining QSimFactory, inside the PSAndCSPersonDriverAgentImpl gets bound.
+	 * the park search logic is mainly to be found in that class, more precisely in chooseNextLinkId()
+	 * and isWantingToArriveOnCurrentLink()
 	* if CS is not used, we need to bind AgentFactory to ParkingSearchAgentFactory, this gets done in the
 	* ParkinSearchPopulationPlugin
 	*/
