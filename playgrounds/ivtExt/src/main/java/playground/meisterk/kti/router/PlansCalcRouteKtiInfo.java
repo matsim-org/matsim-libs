@@ -27,8 +27,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-import playground.balmermi.world.MatsimWorldReader;
-import playground.balmermi.world.World;
 import playground.meisterk.kti.config.KtiConfigGroup;
 
 import java.io.FileNotFoundException;
@@ -38,7 +36,7 @@ import java.io.IOException;
 public class PlansCalcRouteKtiInfo {
 	private Matrix ptTravelTimes = null;
 	private SwissHaltestellen haltestellen = null;
-	private World localWorld=null;
+	//private World localWorld=null;
 	private final KtiConfigGroup ktiConfigGroup;
 
 	private static final Logger log = Logger.getLogger(PlansCalcRouteKtiInfo.class);
@@ -56,8 +54,11 @@ public class PlansCalcRouteKtiInfo {
 
 		// municipality layer from world file
 		MutableScenario localScenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		this.localWorld = new World();
-		new MatsimWorldReader(localScenario, localWorld).parse(ktiConfigGroup.getWorldInputFilename());
+		if (true)
+			throw new RuntimeException("Reference to balmermi removed! the rest of the code is not working");
+
+		//this.localWorld = new World();
+		//new MatsimWorldReader(localScenario, localWorld).parse(ktiConfigGroup.getWorldInputFilename());
 
 		log.info("Reading traveltime matrix...");
 		Matrices matrices = new Matrices();
@@ -87,9 +88,9 @@ public class PlansCalcRouteKtiInfo {
 		return haltestellen;
 	}
 
-	public World getLocalWorld() {
-		return localWorld;
-	}
+//	public World getLocalWorld() {
+//		return localWorld;
+//	}
 
 	public KtiConfigGroup getKtiConfigGroup() {
 		return ktiConfigGroup;
