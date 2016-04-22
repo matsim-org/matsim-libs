@@ -97,9 +97,7 @@ public class ModeDependentRouter implements Router {
 	}
 
 	/**
-	 * @param link The link for which the travel time is calculated.
-	 * @param time The departure time (in seconds since 00:00) at the beginning
-	 * 		of the link for which the travel time is calculated.
+	 * Link travel time is ignored for pseudoRouting!
 	 */
 	@Override
     public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {

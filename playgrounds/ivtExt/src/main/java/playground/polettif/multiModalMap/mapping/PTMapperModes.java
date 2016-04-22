@@ -21,7 +21,6 @@
 
 package playground.polettif.multiModalMap.mapping;
 
-import gnu.trove.map.hash.TObjectByteHashMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -56,10 +55,12 @@ import java.util.*;
  */
 public class PTMapperModes extends PTMapper {
 
+	int artificialId = 0;
 	private Map<Tuple<LinkCandidate, LinkCandidate>, Link> artificialLinks = new HashMap<>();
-	Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoTransitRoutes = new HashMap<>();
+	private Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoTransitRoutes = new HashMap<>();
 	private Map<Tuple<LinkCandidate, LinkCandidate>, Double> alreadyCalculated = new HashMap<>();
 	private Network network;
+
 
 	/**
 	 * Constructor.
@@ -67,6 +68,10 @@ public class PTMapperModes extends PTMapper {
 	 */
 	public PTMapperModes(TransitSchedule schedule, PublicTransportMapConfigGroup config) {
 		super(schedule, config);
+	}
+
+	public PTMapperModes(String configPath) {
+		super(configPath);
 	}
 
 	/**
@@ -80,11 +85,20 @@ public class PTMapperModes extends PTMapper {
 	 *             [3] output network file path
 	 */
 	public static void main(String[] args) {
-		if (args.length != 4) {
+		if(args.length == 1) {
+			log.info("Mapping files from config...");
+			new PTMapperModes(args[0]).mapFilesFromConfig();
+		}
+		else if (args.length != 4) {
 			System.out.println("Incorrect number of arguments\n[0] unmapped schedule file\n[1] network file\n[2] output schedule path\n[3]output network path");
 		} else {
 			mapFromFiles(args[0], args[1], args[2], args[3]);
 		}
+	}
+
+	@Override
+	public void mapFilesFromConfig() {
+		mapFromFiles(config.getScheduleFile(), config.getNetworkFile(), config.getOutputScheduleFile(), config.getOutputNetworkFile());
 	}
 
 	/**
@@ -120,7 +134,11 @@ public class PTMapperModes extends PTMapper {
 		this.network = network;
 		this.networkFactory = network.getFactory();
 
-		Map<String, Set<String>> updatedModesAssignment = config.getModesAssignmentCopy();
+		mapScheduleToNetwork();
+	}
+
+	public void mapScheduleToNetwork() {
+		Set<String> noRoutingWarning = new HashSet<>();
 
 		log.info("Mapping transit schedule to network...");
 
@@ -140,7 +158,7 @@ public class PTMapperModes extends PTMapper {
 		/** [2]
 		 * Initiate routers for the different ScheduleTransportModes.
 		 */
-		Map<String, Router> routers = getModeRouters(network, updatedModesAssignment);
+		Map<String, Router> routers = getModeRouters(network, config.getModeRoutingAssignment());
 
 		/** [3]
 		 * Generating and calculating the pseudoTransitRoutes for all transitRoutes.
@@ -152,133 +170,135 @@ public class PTMapperModes extends PTMapper {
 		Counter counterLine = new Counter("route # ");
 		for (TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				String scheduleTransportMode = transitRoute.getTransportMode();
+				String scheduleTransportMode = transitRoute.getTransportMode().toUpperCase();
 
-				/**
-				 * If the scheduleTransportMode is not defined in the config, the
-				 * transitRoute will be mapped independently using artificial links.
-				 */
-				boolean mapScheduleModeArtificial = false;
-				if(!config.getModesAssignment().containsKey(scheduleTransportMode)) {
-					// put "newly found" schedule transport mode in modeAssignment
-					updatedModesAssignment.put(scheduleTransportMode, Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
-					mapScheduleModeArtificial = true;
-				}
-
-				Router modeRouter = routers.get(scheduleTransportMode);
-				List<TransitRouteStop> routeStops = transitRoute.getStops();
-
-				counterLine.incCounter();
-				log.info("transitRoute " + transitRoute.getId() + " " +
-						"from \""+ routeStops.get(0).getStopFacility().getName() +
-						"\" to \"" + routeStops.get(routeStops.size()-1).getStopFacility().getName() +
-						"\" [" + routeStops.size() + " stops]");
-
-				/**
-				 * Initiate pseudoGraph and Dijkstra algorithm for the current transitRoute.
-				 */
-				PseudoGraph pseudoGraph = new PseudoGraph();
-				DijkstraAlgorithm dijkstra = new DijkstraAlgorithm(pseudoGraph);
-
-				/** [3.1]
-				 * Calculate the shortest paths between each pair of routeStops/ParentStopFacility
-				 */
-				for(int i = 0; i < routeStops.size() - 1; i++) {
-					log.info("             " + (i + 1) + "-" + (i + 2));
-
-					TransitStopFacility currentStopFacility = routeStops.get(i).getStopFacility();
-					TransitStopFacility nextStopFacility = routeStops.get(i+1).getStopFacility();
-
-					double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
-					double maxAllowedTravelCost = beelineDistance*config.getBeelineDistanceMaxFactor();
-					double minTravelCost = Double.MAX_VALUE;
-					boolean atLeastOnerouteFound = false;
-
-					Set<LinkCandidate> linkCandidatesCurrent = linkCandidates.get(routeStops.get(i).getStopFacility()).get(scheduleTransportMode);
-					Set<LinkCandidate> linkCandidatesNext = linkCandidates.get(routeStops.get(i+1).getStopFacility()).get(scheduleTransportMode);
-
-					//Check if one of the two stops is outside the network extend.
-					boolean bothStopsInsideArea = true;
-					if(!stopIsInArea.get(currentStopFacility) || !stopIsInArea.get(nextStopFacility)) {
-						bothStopsInsideArea = false;
+				if(!config.getModeRoutingAssignment().containsKey(scheduleTransportMode)) {
+					if(!noRoutingWarning.contains(scheduleTransportMode)) {
+						log.warn("No routing assignment found for schedule transport mode " + scheduleTransportMode + ".");
 					}
+					noRoutingWarning.add(scheduleTransportMode);
+				} else {
 
-					if(!mapScheduleModeArtificial && bothStopsInsideArea) {
-						// Calculate the shortes path between all link candidates.
-						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
-							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
+					/**
+					 * If the scheduleTransportMode is not defined in the config, the
+					 * transitRoute will be mapped independently using artificial links.
+					 */
+					boolean mapScheduleModeArtificial = config.getModeRoutingAssignment().get(scheduleTransportMode).contains(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE);
 
-								Tuple<LinkCandidate, LinkCandidate> key = new Tuple<>(linkCandidateCurrent, linkCandidateNext);
-								double travelCost = initialMaxTravelCostValue;
+					Router modeRouter = routers.get(scheduleTransportMode);
+					List<TransitRouteStop> routeStops = transitRoute.getStops();
 
-								if(alreadyCalculated.containsKey(key)) {
-									travelCost = alreadyCalculated.get(key);
-								} else {
-									LeastCostPathCalculator.Path leastCostPath = modeRouter.calcLeastCostPath(linkCandidateCurrent.getLink().getToNode(), linkCandidateNext.getLink().getFromNode());
+					counterLine.incCounter();
+					log.info("transitRoute " + transitRoute.getId() + " " +
+							"from \""+ routeStops.get(0).getStopFacility().getName() +
+							"\" to \"" + routeStops.get(routeStops.size()-1).getStopFacility().getName() +
+							"\" [" + routeStops.size() + " stops]");
 
-									// path is null if links are on separate networks
-									if(leastCostPath != null) {
-										atLeastOnerouteFound = true;
-										travelCost = leastCostPath.travelTime;
+					/**
+					 * Initiate pseudoGraph and Dijkstra algorithm for the current transitRoute.
+					 */
+					PseudoGraph pseudoGraph = new PseudoGraph();
+					DijkstraAlgorithm dijkstra = new DijkstraAlgorithm(pseudoGraph);
 
-										// if both links are the same, travel time should get higher since
-										if(linkCandidateCurrent.getLink().equals(linkCandidateNext.getLink())) {
-											travelCost *= config.getSameLinkPunishment();
-										}
+					/** [3.1]
+					 * Calculate the shortest paths between each pair of routeStops/ParentStopFacility
+					 */
+					for(int i = 0; i < routeStops.size() - 1; i++) {
+						log.info("             " + (i + 1) + "-" + (i + 2));
 
-										if(travelCost < minTravelCost) {
-											minTravelCost = travelCost;
+						TransitStopFacility currentStopFacility = routeStops.get(i).getStopFacility();
+						TransitStopFacility nextStopFacility = routeStops.get(i+1).getStopFacility();
+
+						double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
+						double maxAllowedTravelCost = beelineDistance*config.getBeelineDistanceMaxFactor();
+						double minTravelCost = Double.MAX_VALUE;
+						boolean atLeastOnerouteFound = false;
+
+						Set<LinkCandidate> linkCandidatesCurrent = linkCandidates.get(routeStops.get(i).getStopFacility()).get(scheduleTransportMode);
+						Set<LinkCandidate> linkCandidatesNext = linkCandidates.get(routeStops.get(i+1).getStopFacility()).get(scheduleTransportMode);
+
+						//Check if one of the two stops is outside the network extend.
+						boolean bothStopsInsideArea = true;
+						if(!stopIsInArea.get(currentStopFacility) || !stopIsInArea.get(nextStopFacility)) {
+							bothStopsInsideArea = false;
+						}
+
+						if(!mapScheduleModeArtificial && bothStopsInsideArea) {
+							// Calculate the shortes path between all link candidates.
+							for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
+								for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
+
+									Tuple<LinkCandidate, LinkCandidate> key = new Tuple<>(linkCandidateCurrent, linkCandidateNext);
+									double travelCost = initialMaxTravelCostValue;
+
+									if(alreadyCalculated.containsKey(key)) {
+										travelCost = alreadyCalculated.get(key);
+									} else {
+										LeastCostPathCalculator.Path leastCostPath = modeRouter.calcLeastCostPath(linkCandidateCurrent.getLink().getToNode(), linkCandidateNext.getLink().getFromNode());
+
+										// path is null if links are on separate networks
+										if(leastCostPath != null) {
+											atLeastOnerouteFound = true;
+											travelCost = leastCostPath.travelCost;
+
+											// if both links are the same, travel time should get higher since
+											if(linkCandidateCurrent.getLink().equals(linkCandidateNext.getLink())) {
+												travelCost *= config.getSameLinkPunishment();
+											}
+
+											if(travelCost < minTravelCost) {
+												minTravelCost = travelCost;
+											}
 										}
 									}
+
+									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, travelCost), (i == 0), (i == routeStops.size() - 2));
 								}
-
-								PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-								PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i+1, routeStops.get(i+1), linkCandidateNext);
-
-								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, travelCost), (i == 0), (i == routeStops.size() - 2));
 							}
 						}
-					}
 
-					/** [.]
-					 * Create artificial links between two routeStops if:
-					 * 	 - scheduleMode should use artificial links
-					 *   - one of the two stops is outside the network area
-					 *   - no route could be found
-					 *   - the distance of the route found between the two
-					 *     stops exceeds the maximum allowed travel costs.
-					 *
-					 * Artificial links are created between all LinkCandidates
-					 * (usually this means between one dummy link for the stop
-					 * facility and the other linkCandidates).
-					 *
-					 * Note: the artificial link is not considered in further
-					 * during pseudoTransitRoute creation since this would
-					 * require reinitializing router.
+						/** [.]
+						 * Create artificial links between two routeStops if:
+						 * 	 - scheduleMode should use artificial links
+						 *   - one of the two stops is outside the network area
+						 *   - no route could be found
+						 *   - the distance of the route found between the two
+						 *     stops exceeds the maximum allowed travel costs.
+						 *
+						 * Artificial links are created between all LinkCandidates
+						 * (usually this means between one dummy link for the stop
+						 * facility and the other linkCandidates).
+						 *
+						 * Note: the artificial link is not considered in further
+						 * during pseudoTransitRoute creation since this would
+						 * require reinitializing router.
+						 */
+						if(	mapScheduleModeArtificial  	||
+								!bothStopsInsideArea  		||
+								!atLeastOnerouteFound 		||
+								minTravelCost > maxAllowedTravelCost) {
+							for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
+								for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
+									createArtificialLink(linkCandidateCurrent, linkCandidateNext, config.getBeelineDistanceMaxFactor());
+
+									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i+1, routeStops.get(i+1), linkCandidateNext);
+
+									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, maxAllowedTravelCost), (i == 0), (i == routeStops.size() - 2));
+								}
+							}
+						}
+					} // - routeStop loop
+
+					/** [3.2]
+					 * build pseudo network and find shortest path => List<LinkCandidate>
 					 */
-					if(	mapScheduleModeArtificial  	||
-							!bothStopsInsideArea  		||
-							!atLeastOnerouteFound 		||
-							minTravelCost > maxAllowedTravelCost) {
-						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
-							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-								createArtificialLink(linkCandidateCurrent, linkCandidateNext, config.getBeelineDistanceMaxFactor());
-
-								PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-								PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i+1, routeStops.get(i+1), linkCandidateNext);
-
-								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, maxAllowedTravelCost), (i == 0), (i == routeStops.size() - 2));
-							}
-						}
-					}
-				} // - routeStop loop
-
-				/** [3.2]
-				 * build pseudo network and find shortest path => List<LinkCandidate>
-				 */
-				dijkstra.run();
-				List<PseudoRouteStop> pseudoStopSequence = MapUtils.getList(transitRoute, MapUtils.getMap(transitLine, pseudoTransitRoutes));
-				pseudoStopSequence.addAll(dijkstra.getShortesPseudoPath());
+					dijkstra.run();
+					List<PseudoRouteStop> pseudoStopSequence = MapUtils.getList(transitRoute, MapUtils.getMap(transitLine, pseudoTransitRoutes));
+					pseudoStopSequence.addAll(dijkstra.getShortesPseudoPath());
+				}
 			} // - transitRoute loop
 		} // - line loop
 
@@ -291,9 +311,9 @@ public class PTMapperModes extends PTMapper {
 
 		/** [5]
 		 * route all routes with the new referenced links. Routers have to be initialized again
-		 * since the network has changed (ARTIFICIAL_LINK_MODE links).
+		 * since the network has changed (artificial links).
 		 */
-		Map<String, Router> finalRouters = getModeRouters(network, updatedModesAssignment);
+		Map<String, Router> finalRouters = getModeRouters(network, config.getModeRoutingAssignment());
 		PTMapperUtils.routeSchedule(schedule, network, finalRouters);
 
 		/** [6]
@@ -303,13 +323,13 @@ public class PTMapperModes extends PTMapper {
 		 */
 		log.info("Clean Stations and Network...");
 		PTMapperUtils.removeTransitRoutesWithoutLinkSequences(schedule);
-		PTMapperUtils.removeNonUsedStopFacilities(schedule);
-		PTMapperUtils.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
 		PTMapperUtils.assignScheduleModesToLinks(schedule, network);
 		PTMapperUtils.addPTModeToNetwork(schedule, network);
+		PTMapperUtils.removeNonUsedStopFacilities(schedule);
+		PTMapperUtils.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
 		log.info("Clean Stations and Network... done.");
 
-		log.info("Creating PT lines... done.");
+		log.info("Mapping transit schedule to network... done.");
 	}
 
 
@@ -340,13 +360,14 @@ public class PTMapperModes extends PTMapper {
 		Tuple<LinkCandidate, LinkCandidate> key = new Tuple<>(fromLinkCandidate, toLinkCandidate);
 
 		if(!artificialLinks.containsKey(key)) {
-			Link newLink = networkFactory.createLink(Id.createLinkId(config.getPrefixArtificial() + config.getArtificialId()),
+			Link newLink = networkFactory.createLink(Id.createLinkId(config.getPrefixArtificial() + artificialId++),
 					fromLinkCandidate.getLink().getToNode(),
 					toLinkCandidate.getLink().getFromNode());
 
 			newLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
 			newLink.setLength(lengthFactor * CoordUtils.calcEuclideanDistance(fromLinkCandidate.getLink().getToNode().getCoord(), toLinkCandidate.getLink().getFromNode().getCoord()));
 			this.network.addLink(newLink);
+
 
 			artificialLinks.put(key, newLink);
 

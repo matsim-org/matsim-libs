@@ -24,6 +24,8 @@ package playground.polettif.multiModalMap.mapping;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
@@ -38,7 +40,6 @@ public abstract class PTMapper {
 	protected static Logger log = Logger.getLogger(PTMapper.class);
 
 	protected final TransitSchedule schedule;
-	protected final TransitScheduleFactory scheduleFactory;
 	protected final PublicTransportMapConfigGroup config;
 	protected NetworkFactory networkFactory;
 
@@ -54,14 +55,21 @@ public abstract class PTMapper {
 	protected PTMapper(TransitSchedule schedule, PublicTransportMapConfigGroup config) {
 		this.schedule = schedule;
 		this.config = config;
-		this.scheduleFactory = this.schedule.getFactory();
 	}
 
 	protected PTMapper(TransitSchedule schedule) {
 		this.schedule = schedule;
 		this.config = PublicTransportMapConfigGroup.createDefaultConfig();
-		this.scheduleFactory = this.schedule.getFactory();
 	}
+
+	public PTMapper(String configPath) {
+		Config configAll = ConfigUtils.loadConfig(configPath, new PublicTransportMapConfigGroup() ) ;
+		this.config = ConfigUtils.addOrGetModule(configAll, PublicTransportMapConfigGroup.GROUP_NAME, PublicTransportMapConfigGroup.class ) ;
+
+		this.schedule = null;
+	}
+
+	public abstract void mapFilesFromConfig();
 
 	/**
 	 * Based on the stops in this.schedule und given the provided network, the lines will be routed.

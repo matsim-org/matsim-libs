@@ -26,12 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.filter.NetworkLinkFilter;
-import org.matsim.core.network.filter.NetworkNodeFilter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -164,9 +159,9 @@ public class NetworkTools {
 		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
 		double incr = 0.0001; double tol=0.001;
 
-		int maxNnodes = (config.getMaxNClosestLinksByMode().get(scheduleTransportMode) == null ? config.getMaxNClosestLinks() : config.getMaxNClosestLinksByMode().get(scheduleTransportMode));
+//		int maxNnodes = (config.getMaxNClosestLinksByMode().get(scheduleTransportMode) == null ? config.getMaxNClosestLinks() : config.getMaxNClosestLinksByMode().get(scheduleTransportMode));
 
-		Set<String> networkTransportModes = config.getModesAssignment().get(scheduleTransportMode);
+		Set<String> networkTransportModes = config.getModeRoutingAssignment().get(scheduleTransportMode);
 
 		if(nearestNodes.size() == 0) {
 			return closestLinks;
@@ -198,7 +193,7 @@ public class NetworkTools {
 			int i = 1; double previousDistance = 2*tol;
 			for(Map.Entry<Double, Link> entry : closestLinksMap.entrySet()) {
 				// if the distance difference to the previous link is less than tol, add the link as well
-				if(i > maxNnodes && Math.abs(entry.getKey() - previousDistance) >= tol) {
+				if(i > config.getMaxNClosestLinks() && Math.abs(entry.getKey() - previousDistance) >= tol) {
 					break;
 				}
 				if(entry.getKey() > config.getMaxStopFacilityDistance()) {
@@ -258,8 +253,10 @@ public class NetworkTools {
 
 		dummyLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
 
-		network.addNode(dummyNode);
-		network.addLink(dummyLink);
+		if(!network.getNodes().containsKey(dummyNode.getId())) {
+			network.addNode(dummyNode);
+			network.addLink(dummyLink);
+		}
 
 		return dummyLink;
 	}
