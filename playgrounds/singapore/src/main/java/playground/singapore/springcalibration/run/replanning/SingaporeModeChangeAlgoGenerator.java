@@ -57,7 +57,7 @@ public class SingaporeModeChangeAlgoGenerator extends AbstractMultithreadedModul
 	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		SingaporeTripOrSubtourModeChange algo = new SingaporeTripOrSubtourModeChange(
+		SingaporeLegModeChange algo = new SingaporeLegModeChange(
 				this.availableModes, MatsimRandom.getLocalInstance(), population, this.taxiUtils, subtourModeChoiceConfigGroup);
 		
 		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);

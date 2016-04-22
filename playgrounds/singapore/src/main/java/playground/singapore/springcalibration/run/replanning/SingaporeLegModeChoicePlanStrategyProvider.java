@@ -37,7 +37,7 @@ import playground.singapore.springcalibration.run.TaxiUtils;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class SingaporeModeChangePlanStrategyProvider implements Provider<PlanStrategy> {
+public class SingaporeLegModeChoicePlanStrategyProvider implements Provider<PlanStrategy> {
 
 	private final GlobalConfigGroup globalConfigGroup;
 	private final ChangeLegModeConfigGroup changeLegModeConfigGroup;
@@ -48,7 +48,7 @@ public class SingaporeModeChangePlanStrategyProvider implements Provider<PlanStr
 	private TaxiUtils taxiUtils;
 
 	@Inject
-	SingaporeModeChangePlanStrategyProvider(
+	SingaporeLegModeChoicePlanStrategyProvider(
 			GlobalConfigGroup globalConfigGroup, 
 			ChangeLegModeConfigGroup changeLegModeConfigGroup, 
 			SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup,

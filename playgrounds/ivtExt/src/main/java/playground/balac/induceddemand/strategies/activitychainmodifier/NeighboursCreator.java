@@ -2,8 +2,6 @@ package playground.balac.induceddemand.strategies.activitychainmodifier;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -37,6 +35,8 @@ public class NeighboursCreator {
 	private LeastCostPathCalculator pathCalculator;
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private static final Logger logger = Logger.getLogger(NeighboursCreator.class);
+	
+	private boolean allowSplittingWorkActivity = false;
 
 	public NeighboursCreator(StageActivityTypes stageActivityTypes,
 			QuadTree<ActivityFacility> shopFacilityQuadTree, QuadTree<ActivityFacility> leisureFacilityQuadTree,
@@ -140,12 +140,75 @@ public class NeighboursCreator {
 		
 		
 	}
+	
 
+	/**
+	 * Creates all chains with one swap of the activities in the original plan
+	 * @param plan original plan
+	 * @return List<Plan> a list of all the possible plans with one swap
+	 */
 	private List<Plan> getAllChainsWthSwapping(Plan plan) {
 		List<Plan> newPlans = new LinkedList<Plan>();
+		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
+		List<Activity> tOld = TripStructureUtils.getActivities(plan, this.stageActivityTypes);
 
+		for (int outerIndex = 1; outerIndex < tOld.size() - 2; outerIndex++) {
+			
+			for(int innerIndex = outerIndex + 1; innerIndex < tOld.size() - 1; innerIndex++) {
+				Plan newPlan = PlanUtils.createCopy(plan);
+				newPlan.setPerson(plan.getPerson());
+				List<Activity> t = TripStructureUtils.getActivities(newPlan, this.stageActivityTypes);
+
+				Activity act1 = t.get(outerIndex);
+				Activity act2 = t.get(innerIndex);
+				
+				if (!act1.getType().equals(act2.getType())) {
+					
+					int index1 = newPlan.getPlanElements().indexOf(act1);
+					int index2 = newPlan.getPlanElements().indexOf(act2);
+			
+					newPlan.getPlanElements().set(index1, act2);
+					newPlan.getPlanElements().set(index2, act1);					
+					
+					//updating the travel times for the affected trips
+					
+					Link startLink = network.getLinks().get(t.get(outerIndex - 1).getLinkId());
+					Link endLink = network.getLinks().get(act2.getLinkId());
+
+					Leg previousLeg = (Leg) plan.getPlanElements().get(index1 - 1);
+					double travelTime = estimateTravelTime(startLink, endLink, plan.getPerson(), previousLeg.getDepartureTime(), previousLeg.getMode());
+					previousLeg.setTravelTime(travelTime);
+					
+					startLink = network.getLinks().get(act2.getLinkId());
+					endLink = network.getLinks().get(t.get(outerIndex + 1).getLinkId());
+					
+					Leg nextLeg = (Leg) plan.getPlanElements().get(index1 + 1);
+					travelTime = estimateTravelTime(startLink, endLink, plan.getPerson(), nextLeg.getDepartureTime(), nextLeg.getMode());
+					nextLeg.setTravelTime(travelTime);
+					
+					if (innerIndex > outerIndex + 1) {
+						
+						startLink = network.getLinks().get(t.get(innerIndex - 1).getLinkId());
+						endLink = network.getLinks().get(act1.getLinkId());
+
+						previousLeg = (Leg) plan.getPlanElements().get(index2 - 1);
+						travelTime = estimateTravelTime(startLink, endLink, plan.getPerson(), previousLeg.getDepartureTime(), previousLeg.getMode());
+						previousLeg.setTravelTime(travelTime);
+					}
+					
+					startLink = network.getLinks().get(act1.getLinkId());
+					endLink = network.getLinks().get(t.get(innerIndex + 1).getLinkId());
+					
+					nextLeg = (Leg) plan.getPlanElements().get(index2 + 1);
+					travelTime = estimateTravelTime(startLink, endLink, plan.getPerson(), nextLeg.getDepartureTime(), nextLeg.getMode());
+					nextLeg.setTravelTime(travelTime);
+					
+					newPlans.add(newPlan);	
+
+				}				
+			}			
+		}
 		return newPlans;		
-		
 	}
 	
 	private List<Plan> getAllChainsWthInserting(Plan plan) {
@@ -153,10 +216,15 @@ public class NeighboursCreator {
 		PopulationFactory pf = scenario.getPopulation().getFactory() ;
 		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
 		Person person = plan.getPerson();
-		Set<String> insertableActivities = new TreeSet<String>();
-		insertableActivities.add("leisure");
-		insertableActivities.add("shop");
-		insertableActivities.add("home");
+	//	Set<String> insertableActivities = new TreeSet<String>();
+		
+		String actTypes = (String) this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(),
+				"activities");
+		String[] allActTypes = actTypes.split(",");
+
+	//	insertableActivities.add("leisure");
+	//	insertableActivities.add("shop");
+	//	insertableActivities.add("home");
 
 		List<Activity> t = TripStructureUtils.getActivities(plan, this.stageActivityTypes);
 
@@ -164,7 +232,7 @@ public class NeighboursCreator {
 
 			int actIndex = plan.getPlanElements().indexOf(t.get(index));
 
-			for (String actType:insertableActivities) {
+			for (String actType:allActTypes) {
 				Plan newPlan = PlanUtils.createCopy(plan);
 				newPlan.setPerson(plan.getPerson());
 				Activity newActivity;
@@ -231,7 +299,7 @@ public class NeighboursCreator {
 				now += 3600.0; //the duration of the inserted activity
 				
 				double estimatedTravelTime = estimateTravelTime(startLink, endLink, person, now, modeOfTheLegToBeInserted);
-				
+				newLeg.setDepartureTime(now);
 				newLeg.setTravelTime(estimatedTravelTime);
 				newPlan.getPlanElements().add(actIndex + 1, newLeg);
 				
@@ -247,6 +315,73 @@ public class NeighboursCreator {
 			
 		}		
 		
+		return newPlans;		
+	}
+		
+	private List<Plan> getAllChainsWthRemoving(Plan plan) {
+		
+		List<Plan> newPlans = new LinkedList<Plan>();
+		
+		List<Activity> t = TripStructureUtils.getActivities(plan, this.stageActivityTypes);
+
+		//nothing to remove
+		if (t.size() == 1 || t.size() == 2)
+			return newPlans;
+		
+		//look at all the activities (not including first and last) and try to remove it
+		for (int index = 1; index < t.size() - 2; index++) {
+		
+			Plan newPlan = PlanUtils.createCopy(plan);
+			
+			newPlan.setPerson(plan.getPerson());
+			
+			if ((t.get(index).getType().equals("work") || t.get(index).getType().equals("education")))
+				//don't remove mandatory activities
+				continue;
+			int actIndex = plan.getPlanElements().indexOf(t.get(index));
+
+			double durationRemovedActivity = t.get(index).getMaximumDuration();
+			Leg previousLeg = ((Leg) newPlan.getPlanElements().get(actIndex - 1));
+			Leg nextLeg = ((Leg) newPlan.getPlanElements().get(actIndex + 1));
+			
+			boolean previous = false;
+			boolean next = false;
+			
+			if (previousLeg.getMode().equals("car") ||
+					previousLeg.getMode().equals("bike"))
+				previous = true;
+			
+			if (nextLeg.getMode().equals("car") ||
+					nextLeg.getMode().equals("bike"))
+				next = true;
+			
+			//removing the activity and the trip after that activity
+			newPlan.getPlanElements().remove(actIndex);
+			newPlan.getPlanElements().remove(actIndex);			
+			
+			//setting all trips to the same mode in order to save some time figuring out which mode can be used here
+			if (!previousLeg.getMode().equals(nextLeg.getMode()) && !(!previous && !next)) {
+				String previousLegMode = previousLeg.getMode();
+				for(PlanElement pe : newPlan.getPlanElements()) {
+					
+					if (pe instanceof Leg)
+						((Leg) pe).setMode(previousLegMode);
+				}
+				
+			}		
+			
+			//check if after removing we have two work activities next to each other
+			if (t.get(index - 1).getType().equals("work") 
+					&& t.get(index + 1).getType().equals("work")) {
+				
+				double initialEndTime = t.get(index + 1).getEndTime();
+				newPlan.getPlanElements().remove(actIndex);
+				newPlan.getPlanElements().remove(actIndex);
+				((Activity)newPlan.getPlanElements().get(actIndex - 2)).setEndTime(initialEndTime - durationRemovedActivity);
+			}
+			
+			newPlans.add(newPlan);
+		}
 		return newPlans;		
 	}
 	
@@ -270,72 +405,6 @@ public class NeighboursCreator {
 		return travelTime;
 	}
 
-	private List<Plan> getAllChainsWthRemoving(Plan plan) {
-		
-		List<Plan> newPlans = new LinkedList<Plan>();
-		
-		List<Activity> t = TripStructureUtils.getActivities(plan, this.stageActivityTypes);
-
-		if (t.size() == 1 || t.size() == 2)
-			return newPlans;
-		
-		for (int index = 1; index < t.size() - 2; index++) {
-		
-			//Plan newPlan = new PlanImpl(plan.getPerson());
-			Plan newPlan = PlanUtils.createCopy(plan);
-			newPlan.setPerson(plan.getPerson());
-			
-			if ((t.get(index).getType().equals("work") || t.get(index).getType().equals("education")))
-				continue;
-			int actIndex = plan.getPlanElements().indexOf(t.get(index));
-
-			
-			boolean previous = false;
-			boolean next = false;
-			
-			if (((Leg) newPlan.getPlanElements().get(actIndex - 1)).getMode().equals("car") ||
-					((Leg) newPlan.getPlanElements().get(actIndex - 1)).getMode().equals("bike"))
-				previous = true;
-			
-			if (((Leg) newPlan.getPlanElements().get(actIndex + 1)).getMode().equals("car") ||
-					((Leg) newPlan.getPlanElements().get(actIndex + 1)).getMode().equals("bike"))
-				next = true;
-			
-			if  (((Leg) newPlan.getPlanElements().get(actIndex - 1)).getMode()
-					.equals(((Leg) newPlan.getPlanElements().get(actIndex - 1)).getMode())) {
-				
-				newPlan.getPlanElements().remove(actIndex);
-				newPlan.getPlanElements().remove(actIndex);
-				
-				
-				
-	
-			}
-			else if (!previous && !next) {
-				newPlan.getPlanElements().remove(actIndex);
-				newPlan.getPlanElements().remove(actIndex);
-				
-			}
-			else {
-				
-				String previousLegMode = ( (Leg) newPlan.getPlanElements().get(actIndex - 1) ).getMode();
-				
-				newPlan.getPlanElements().remove(actIndex);
-				newPlan.getPlanElements().remove(actIndex);
-				
-				for(PlanElement pe : newPlan.getPlanElements()) {
-					
-					if (pe instanceof Leg)
-						((Leg) pe).setMode(previousLegMode);
-				}			
-				
-			}			
-			
-			newPlans.add(newPlan);
-		}
-		return newPlans;		
-	}
-	
 	private void scoreChains(List<Plan> plansToScore){
 		
 		for (Plan plan : plansToScore) {
@@ -343,17 +412,11 @@ public class NeighboursCreator {
 
 			for (PlanElement pe: plan.getPlanElements()) {
 				
-				if (pe instanceof Leg) {
+				if (pe instanceof Leg) 
 					scoringFunction.handleLeg((Leg) pe);
-				}
-				else {
-				//	if (((Activity) pe).getEndTime() == Time.UNDEFINED_TIME) {
-				//		((Activity)pe).setEndTime(24*3600*60);
-				//	}
 				
+				else				
 					scoringFunction.handleActivity((Activity) pe);
-				}
-				
 				
 			}
 			scoringFunction.finish();
@@ -378,7 +441,7 @@ public class NeighboursCreator {
 		if (actType.equals("leisure"))
 			return (ActivityFacility)leisureFacilityQuadTree.getClosest(coord.getX(), coord.getY());		
 
-		else if (actType.equals("shop"))
+		else if (actType.equals("shopping"))
 		
 			return (ActivityFacility)shopFacilityQuadTree.getClosest(coord.getX(), coord.getY());		
 		else 
