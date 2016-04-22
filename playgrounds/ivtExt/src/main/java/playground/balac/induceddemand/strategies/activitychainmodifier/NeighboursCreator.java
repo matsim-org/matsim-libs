@@ -140,6 +140,8 @@ public class NeighboursCreator {
 		
 		
 	}
+	
+
 	/**
 	 * Creates all chains with one swap of the activities in the original plan
 	 * @param plan original plan
@@ -297,7 +299,7 @@ public class NeighboursCreator {
 				now += 3600.0; //the duration of the inserted activity
 				
 				double estimatedTravelTime = estimateTravelTime(startLink, endLink, person, now, modeOfTheLegToBeInserted);
-				
+				newLeg.setDepartureTime(now);
 				newLeg.setTravelTime(estimatedTravelTime);
 				newPlan.getPlanElements().add(actIndex + 1, newLeg);
 				
@@ -368,7 +370,7 @@ public class NeighboursCreator {
 				
 			}		
 			
-			//check if after removing we have to work activities
+			//check if after removing we have two work activities next to each other
 			if (t.get(index - 1).getType().equals("work") 
 					&& t.get(index + 1).getType().equals("work")) {
 				
@@ -439,7 +441,7 @@ public class NeighboursCreator {
 		if (actType.equals("leisure"))
 			return (ActivityFacility)leisureFacilityQuadTree.getClosest(coord.getX(), coord.getY());		
 
-		else if (actType.equals("shop"))
+		else if (actType.equals("shopping"))
 		
 			return (ActivityFacility)shopFacilityQuadTree.getClosest(coord.getX(), coord.getY());		
 		else 
