@@ -26,11 +26,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 
 /**
- * Provides the contract for an implementation of pt-lines routing.
+ * Provides the contract for an implementation of ptLines routing.
  *
- * @author boescpa
+ * @author polettif
  */
 public abstract class PTMapper {
 
@@ -38,7 +39,7 @@ public abstract class PTMapper {
 
 	protected final TransitSchedule schedule;
 	protected final TransitScheduleFactory scheduleFactory;
-	protected Network network;
+	protected final PublicTransportMapConfigGroup config;
 	protected NetworkFactory networkFactory;
 
 	/**
@@ -50,14 +51,16 @@ public abstract class PTMapper {
 	 *
 	 * @param schedule which will be newly routed.
 	 */
-	protected PTMapper(TransitSchedule schedule) {
+	protected PTMapper(TransitSchedule schedule, PublicTransportMapConfigGroup config) {
 		this.schedule = schedule;
+		this.config = config;
 		this.scheduleFactory = this.schedule.getFactory();
 	}
 
-	protected PTMapper(TransitSchedule schedule, Network network) {
-		this(schedule);
-		this.setNetwork(network);
+	protected PTMapper(TransitSchedule schedule) {
+		this.schedule = schedule;
+		this.config = PublicTransportMapConfigGroup.createDefaultConfig();
+		this.scheduleFactory = this.schedule.getFactory();
 	}
 
 	/**
@@ -65,10 +68,6 @@ public abstract class PTMapper {
 	 *
 	 * @param network is a multimodal network (see MultimodalNetworkCreator)
 	 */
-	public abstract void routePTLines(Network network);
+	public abstract void mapScheduleToNetwork(Network network);
 
-	protected void setNetwork(Network network) {
-		this.network = network;
-		this.networkFactory = network.getFactory();
-	}
 }

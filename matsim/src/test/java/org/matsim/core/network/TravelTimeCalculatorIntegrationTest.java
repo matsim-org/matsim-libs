@@ -41,7 +41,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 
 	public void testTravelTimeCalculatorArray() {
-        for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 4)) {
+        for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 3600)) {
     		Config config = loadConfig(null);
     
     		// create a network
@@ -78,7 +78,7 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 	}
 
 	public void testTravelTimeCalculatorHashMap() {
-        for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 4)) {
+        for (LinkFactory lf : TimeVariantLinkImplTest.linkFactories(15 * 60, 30 * 3600)) {
     		Config config = loadConfig(null);
     
     		// create a network

@@ -43,7 +43,7 @@ public class TransitRouteImpl implements TransitRoute {
 
 	private final Id<TransitRoute> routeId;
 	private NetworkRoute route;
-	private final List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+	private final List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(8);
 	private String description = null;
 	private final Map<Id<Departure>, Departure> departures = new TreeMap<Id<Departure>, Departure>();
 	private String transportMode;

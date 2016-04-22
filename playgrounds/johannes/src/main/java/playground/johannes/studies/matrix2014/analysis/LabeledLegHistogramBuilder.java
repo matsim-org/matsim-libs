@@ -42,7 +42,7 @@ public class LabeledLegHistogramBuilder {
 
     public LabeledLegHistogramBuilder(ValueProvider<String, Segment> provider) {
         valueCollector = new LegCollector<>(provider);
-        weightsCollector = new LegPersonCollector<>(new NumericAttributeProvider<>(CommonKeys.PERSON_WEIGHT));
+        weightsCollector = new LegPersonCollector<>(new NumericAttributeProvider<Person>(CommonKeys.PERSON_WEIGHT));
         builder = new LabeledHistogramBuilder(valueCollector, weightsCollector);
     }
 

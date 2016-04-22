@@ -30,7 +30,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class LinkDemandAnalysisMain {
 	
-	private static String OUTPUT_BASE_DIR = "../../../runs-svn/berlin-1pct/";
+//	private static String OUTPUT_BASE_DIR = "../../../runs-svn/berlin-1pct/";
+	private static String OUTPUT_BASE_DIR = "/Users/ihab/Desktop/ils4/kaddoura/incidents/output/2b_reroute1.0/nce_0/";
 	
 	public static void main(String[] args) {
 		LinkDemandAnalysisMain anaMain = new LinkDemandAnalysisMain();
@@ -40,7 +41,8 @@ public class LinkDemandAnalysisMain {
 	private void run() {
 	
 		Config config = ConfigUtils.loadConfig(OUTPUT_BASE_DIR + "output_config.xml.gz");
-		config.plans().setInputFile(null);		
+		config.plans().setInputFile(null);
+		config.network().setChangeEventsInputFile(null);
 		config.network().setInputFile(OUTPUT_BASE_DIR + "output_network.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();

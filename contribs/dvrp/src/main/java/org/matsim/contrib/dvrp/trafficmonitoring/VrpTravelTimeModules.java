@@ -23,7 +23,7 @@ import javax.inject.Singleton;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.trafficmonitoring.*;
 
 import com.google.inject.name.Names;
 
@@ -54,20 +54,25 @@ public class VrpTravelTimeModules
      * Travel times are fixed (useful for TimeVariantNetworks with variable free-flow speeds and no
      * other traffic)
      */
-    public static AbstractModule createFreespeedTravelTimeModule()
+    public static AbstractModule createFreespeedTravelTimeModule(boolean ttCalculatorEnabled)
     {
-        return createExternalTravelTimeModule(new FreeSpeedTravelTime());
+        return createExternalTravelTimeModule(new FreeSpeedTravelTime(), ttCalculatorEnabled);
     }
 
 
     /**
      * Travel times are fixed
      */
-    public static AbstractModule createExternalTravelTimeModule(final TravelTime travelTime)
+    public static AbstractModule createExternalTravelTimeModule(final TravelTime travelTime,
+            final boolean ttCalculatorEnabled)
     {
         return new AbstractModule() {
             public void install()
             {
+                if (!ttCalculatorEnabled) {//overwriting the default calculator
+                    bind(TravelTimeCalculator.class).to(InactiveTravelTimeCalculator.class);
+                }
+
                 bind(TravelTime.class).annotatedWith(Names.named(DVRP)).toInstance(travelTime);
             }
         };

@@ -50,7 +50,7 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
@@ -100,7 +100,7 @@ public final class PopulationUtils {
 	}
 
 	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network) {
-		ModeRouteFactory routeFactory = new ModeRouteFactory();
+		RouteFactoryImpl routeFactory = new RouteFactoryImpl();
 		String networkRouteType = plansConfigGroup.getNetworkRouteType();
 		RouteFactory factory;
 		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {

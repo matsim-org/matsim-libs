@@ -28,12 +28,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalSystemControllerDataImpl;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.model.Signal;
@@ -205,6 +209,23 @@ public class DgSignalsUtils {
 			green = off + cylceTimeSeconds - on;
 		}
 		return green;
+	}
+	
+	public static SignalControlData copySignalControlData(SignalControlData signalControlData){
+		
+		SignalControlData newSignalControl = new SignalControlDataImpl();
+		
+		for (SignalSystemControllerData oldSignalSystemControl : signalControlData.getSignalSystemControllerDataBySystemId().values()){
+			SignalSystemControllerData newSignalSystemControl = new SignalSystemControllerDataImpl(oldSignalSystemControl.getSignalSystemId());
+			newSignalSystemControl.setControllerIdentifier(oldSignalSystemControl.getControllerIdentifier());
+			
+			for (SignalPlanData oldSignalPlan : oldSignalSystemControl.getSignalPlanData().values()){
+				SignalPlanData newSignalPlan = copySignalPlanData(oldSignalPlan, signalControlData.getFactory());
+				newSignalSystemControl.addSignalPlanData(newSignalPlan);
+			}
+		}
+		
+		return newSignalControl;
 	}
 	
 }

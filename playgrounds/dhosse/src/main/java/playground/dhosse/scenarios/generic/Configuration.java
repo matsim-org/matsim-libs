@@ -11,7 +11,6 @@ public class Configuration {
 	private static final String SEP = "\t";
 	private static final String COMMENT = "#";
 	
-	private static final String OSM_FILE = "osmFile";
 	private static final String SURVEY_AREA_IDS = "surveyAreaIds";
 	private static final String CRS = "coordinateSystem";
 	private static final String WORKING_DIR = "workingDirectory";
@@ -19,17 +18,12 @@ public class Configuration {
 	private static final String INPUT_REVERSE_COMMUTER_FILE = "inputReverseCommuterFile";
 	private static final String POPULATION_TYPE = "populationType";
 	private static final String USE_HOUSEHOLDS = "useHouseholds";
-	private static final String DATABASE_URL = "databaseUrl";
-	private static final String MID_DATABASE = "midDatabase";
-	private static final String MID_HH_TABLE = "midHouseholds";
-	private static final String MID_PERSONS_TABLE = "midPersons";
 	private static final String DATABASE_USER = "databaseUser";
 	private static final String DATABASE_PASSWD = "password";
-	private static final String PERSONS_SQL_QUERY = "personsQuery";
-	private static final String WAYS_SQL_QUERY = "waysQuery";
+	private static final String SQL_QUERY_MID = "midQuery"; //TODO change this one in configuration files
+	private static final String ONLY_WORKING_DAYS = "onlyWorkingDays";
 	
 	//MEMBERS
-	private String osmFile;
 	private String[] surveyAreaIds;
 	private String crs;
 	private String workingDirectory;
@@ -38,8 +32,10 @@ public class Configuration {
 	private PopulationType popType;
 	private int personsInSurveyArea;
 	private boolean useHouseholds = false;
+	private boolean onlyWorkingDays = false;
 	
 	private String databaseUrl;
+	
 	private String midDatabase;
 	private String midHouseholdsTable;
 	private String midPersonsTable;
@@ -47,8 +43,7 @@ public class Configuration {
 	private String databaseUser;
 	private String userPassword;
 	
-	private String personsSqlQuery;
-	private String waysSqlQuery;
+	private String query;
 	
 	public enum PopulationType{dummy,commuter,complete};
 	
@@ -72,11 +67,7 @@ public class Configuration {
 					
 					String[] lineParts = line.split(SEP);
 					
-					if(OSM_FILE.equals(lineParts[0])){
-						
-						this.osmFile = lineParts[1];
-						
-					} else if(SURVEY_AREA_IDS.equals(lineParts[0])){
+					if(SURVEY_AREA_IDS.equals(lineParts[0])){
 						
 						this.surveyAreaIds = lineParts[1].split(",");
 						
@@ -104,18 +95,6 @@ public class Configuration {
 						
 						this.useHouseholds = Boolean.parseBoolean(lineParts[1]);
 						
-					} else if(DATABASE_URL.equals(lineParts[0])){
-						
-						this.databaseUrl = lineParts[1];
-						
-					} else if(MID_HH_TABLE.equals(lineParts[0])){
-						
-						this.midHouseholdsTable = lineParts[1];
-						
-					} else if(MID_PERSONS_TABLE.equals(lineParts[0])){
-						
-						this.midPersonsTable = lineParts[1];
-						
 					} else if(DATABASE_USER.equals(lineParts[0])){
 						
 						this.databaseUser = lineParts[1];
@@ -124,17 +103,13 @@ public class Configuration {
 						
 						this.userPassword = lineParts[1];
 						
-					} else if(MID_DATABASE.equals(lineParts[0])){
+					} else if(SQL_QUERY_MID.equals(lineParts[0])){
 						
-						this.midDatabase = lineParts[1];
+						this.query = lineParts[1];
 						
-					} else if(PERSONS_SQL_QUERY.equals(lineParts[0])){
+					} else if(ONLY_WORKING_DAYS.equals(lineParts[0])){
 						
-						this.personsSqlQuery = lineParts[1];
-						
-					} else if(WAYS_SQL_QUERY.equals(lineParts[0])){
-						
-						this.waysSqlQuery = lineParts[1];
+						this.onlyWorkingDays = Boolean.parseBoolean(lineParts[1]);
 						
 					}
 					
@@ -150,10 +125,6 @@ public class Configuration {
 		
 	}
 	
-	public String getOsmFile(){
-		return this.osmFile;
-	}
-
 	public String[] getSurveyAreaIds() {
 		return this.surveyAreaIds;
 	}
@@ -210,12 +181,12 @@ public class Configuration {
 		return (this.databaseUrl + this.midDatabase);
 	}
 
-	public String getPersonsSqlQuery() {
-		return personsSqlQuery;
+	public String getSqlQuery() {
+		return query;
 	}
 	
-	public String getWaysSqlQuery() {
-		return waysSqlQuery;
+	public boolean isOnlyUsingWorkingDays(){
+		return this.onlyWorkingDays;
 	}
 	
 }

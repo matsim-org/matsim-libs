@@ -89,9 +89,9 @@ public class CreateCrossingsTimetable {
 				for(LinkChangeEvent event : linkChangeEvents) {
 					out.write("\t<networkChangeEvent startTime=\"" + event.getStarttime() + "\">");
 					out.newLine();
-					out.write("\t\t<link refId=\"" + event.getLinkId1() + "\"/>");
+					out.write("\t\t<link refId=\"" + event.getLinkId() + "\"/>");
 					out.newLine();
-					out.write("\t\t<link refId=\"" + event.getLinkId2() + "\"/>");
+					out.write("\t\t<link refId=\"" + event.getLinkId() + "\"/>");
 					out.newLine();
 					out.write("\t\t<flowCapacity type=\"absolute\" value=\"0\"/>");
 					out.newLine();
@@ -99,9 +99,9 @@ public class CreateCrossingsTimetable {
 					out.newLine();
 					out.write("\t<networkChangeEvent startTime=\"" + event.getStoptime() + "\">");
 					out.newLine();
-					out.write("\t\t<link refId=\"" + event.getLinkId1() + "\"/>");
+					out.write("\t\t<link refId=\"" + event.getLinkId() + "\"/>");
 					out.newLine();
-					out.write("\t\t<link refId=\"" + event.getLinkId2() + "\"/>");
+					out.write("\t\t<link refId=\"" + event.getLinkId() + "\"/>");
 					out.newLine();
 					out.write("\t\t<flowCapacity type=\"absolute\" value=\"" + event.getCapacity() + "\"/>");
 					out.newLine();

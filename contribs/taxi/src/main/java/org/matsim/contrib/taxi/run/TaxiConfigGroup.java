@@ -34,9 +34,12 @@ public class TaxiConfigGroup
     public static final String A_STAR_EUCLIDEAN_OVERDO_FACTOR = "AStarEuclideanOverdoFactor";
     public static final String ONLINE_VEHICLE_TRACKER = "onlineVehicleTracker";
 
+    //input
     public static final String TAXIS_FILE = "taxisFile";
-    public static final String TAXI_STATS_FILE = "taxiStatsFile";
-    public static final String DETAILED_TAXI_STATS_DIR = "detailedTaxiStatsDir";
+
+    //output
+    public static final String TIME_PROFILES = "timeProfiles";
+    public static final String DETAILED_STATS = "detailedStats";
 
     public static final String OPTIMIZER_PARAMETER_SET = "optimizer";
 
@@ -48,8 +51,9 @@ public class TaxiConfigGroup
     private boolean onlineVehicleTracker = false;
 
     private String taxisFile = null;
-    private String taxiStatsFile = null;
-    private String detailedTaxiStatsDir = null;
+
+    private boolean timeProfiles = false;
+    private boolean detailedStats = false;
 
 
     public TaxiConfigGroup()
@@ -156,31 +160,31 @@ public class TaxiConfigGroup
     }
 
 
-    @StringGetter(TAXI_STATS_FILE)
-    public String getTaxiStatsFile()
+    @StringGetter(TIME_PROFILES)
+    public boolean getTimeProfiles()
     {
-        return taxiStatsFile;
+        return timeProfiles;
     }
 
 
-    @StringSetter(TAXI_STATS_FILE)
-    public void setTaxiStatsFile(String taxiStatsFile)
+    @StringSetter(TIME_PROFILES)
+    public void setTimeProfiles(boolean timeProfiles)
     {
-        this.taxiStatsFile = taxiStatsFile;
+        this.timeProfiles = timeProfiles;
     }
 
 
-    @StringGetter(DETAILED_TAXI_STATS_DIR)
-    public String getDetailedTaxiStatsDir()
+    @StringGetter(DETAILED_STATS)
+    public boolean getDetailedStats()
     {
-        return detailedTaxiStatsDir;
+        return detailedStats;
     }
 
 
-    @StringSetter(DETAILED_TAXI_STATS_DIR)
-    public void setDetailedTaxiStatsDir(String detailedTaxiStatsDir)
+    @StringSetter(DETAILED_STATS)
+    public void setDetailedStats(boolean detailedStats)
     {
-        this.detailedTaxiStatsDir = detailedTaxiStatsDir;
+        this.detailedStats = detailedStats;
     }
 
 

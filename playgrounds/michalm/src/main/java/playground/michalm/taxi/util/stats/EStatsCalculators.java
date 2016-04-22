@@ -20,7 +20,7 @@
 package playground.michalm.taxi.util.stats;
 
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
-import org.matsim.contrib.taxi.util.stats.StatsCollector.StatsCalculator;
+import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 
 import playground.michalm.ev.UnitConversionRatios;
 import playground.michalm.taxi.data.*;
@@ -28,11 +28,11 @@ import playground.michalm.taxi.data.*;
 
 public class EStatsCalculators
 {
-    public static StatsCalculator<Integer> createDischargedVehiclesCounter(final ETaxiData taxiData)
+    public static ProfileCalculator<Integer> createDischargedVehiclesCounter(final ETaxiData taxiData)
     {
-        return new StatsCalculator<Integer>() {
+        return new ProfileCalculator<Integer>() {
             @Override
-            public Integer calculateStat()
+            public Integer calcCurrentPoint()
             {
                 int count = 0;
                 for (ETaxi t : taxiData.getETaxis().values()) {
@@ -46,11 +46,11 @@ public class EStatsCalculators
     }
 
 
-    public static StatsCalculator<Double> createMeanSocCalculator(final ETaxiData taxiData)
+    public static ProfileCalculator<Double> createMeanSocCalculator(final ETaxiData taxiData)
     {
-        return new StatsCalculator<Double>() {
+        return new ProfileCalculator<Double>() {
             @Override
-            public Double calculateStat()
+            public Double calcCurrentPoint()
             {
                 Mean mean = new Mean();
                 for (ETaxi t : taxiData.getETaxis().values()) {

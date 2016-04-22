@@ -122,7 +122,7 @@ public final class TtCreateBraessNetworkAndLanes {
 			linkTTBig = 20;
 			minimalLinkTT = 1;
 		} else {
-			capFirstLast = numberOfPersons + 1;
+			capFirstLast = numberOfPersons + 400;
 			capMain = (numberOfPersons / 2 ) * (1 + capTolerance);
 			inflowLinkLength = 7.5 * 1;
 			linkLengthSmall = 1000;

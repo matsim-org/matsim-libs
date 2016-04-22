@@ -14,6 +14,8 @@ public class MiDPerson {
 	private boolean hasLicense;
 	private boolean isEmployed;
 	private double weight;
+	private int personGroup;
+	private int lifePhase;
 	
 	private List<MiDPlan> plans;
 	
@@ -80,6 +82,22 @@ public class MiDPerson {
 
 	public void setWeight(double weight) {
 		this.weight = weight;
+	}
+
+	public int getPersonGroup() {
+		return personGroup;
+	}
+
+	public void setPersonGroup(int personGroup) {
+		this.personGroup = personGroup;
+	}
+
+	public int getLifePhase() {
+		return lifePhase;
+	}
+
+	public void setLifePhase(int lifePhase) {
+		this.lifePhase = lifePhase;
 	}
 	
 }

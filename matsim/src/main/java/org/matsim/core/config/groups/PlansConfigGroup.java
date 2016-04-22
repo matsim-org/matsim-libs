@@ -72,7 +72,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		comments.put(
 				SUBPOPULATION_ATTRIBUTE,
 				"Name of the (Object)Attribute defining the subpopulation to which pertains a Person"+
-				" (as freight, through traffic, etc.). The attribute must be of String type." );
+				" (as freight, through traffic, etc.). The attribute must be of String type.  Change away from default only in desperate situations." );
 
 		StringBuilder str = new StringBuilder() ;
 		for ( PlansConfigGroup.ActivityDurationInterpretation itp : PlansConfigGroup.ActivityDurationInterpretation.values() ) {

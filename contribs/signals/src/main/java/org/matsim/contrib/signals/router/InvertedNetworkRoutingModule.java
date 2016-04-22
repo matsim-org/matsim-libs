@@ -39,7 +39,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -73,7 +73,7 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 
 	private Network invertedNetwork = null;
 
-	private ModeRouteFactory routeFactory = null;
+	private RouteFactoryImpl routeFactory = null;
 
 	private Network network = null;
 
@@ -87,7 +87,7 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 		this.populationFactory = populationFactory;
 		PlanCalcScoreConfigGroup cnScoringGroup = sc.getConfig().planCalcScore();
 		this.routeFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory())
-				.getModeRouteFactory();
+				.getRouteFactory();
 		this.network = sc.getNetwork();
 
 		Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = Utils.createAllowedTurnInfos(sc);

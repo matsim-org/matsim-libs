@@ -13,7 +13,7 @@
 
 		<parameterset type="optimizer">
 			<param name="type" value="RULE_BASED" />
-			<param name="id" value="example" />
+			<param name="id" value="KN" />
 			<param name="goal" value="DEMAND_SUPPLY_EQUIL" />
 			<param name="nearestRequestsLimit" value="99999" />
 			<param name="nearestVehiclesLimit" value="99999" />

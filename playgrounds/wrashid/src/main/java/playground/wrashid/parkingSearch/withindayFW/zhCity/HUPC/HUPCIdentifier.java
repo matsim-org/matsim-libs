@@ -199,7 +199,7 @@ public class HUPCIdentifier extends DuringLegAgentSelector implements MobsimInit
 
 					SortableMapObject<ActivityFacility> poll = priorityQueue.poll();
 					ActivityFacility bestParkingFacility = poll.getKey();
-					double bestParkingScore=poll.getScore();
+					double bestParkingScore=poll.getWeight();
 
 					if (bestParkingScore>1000){
 						

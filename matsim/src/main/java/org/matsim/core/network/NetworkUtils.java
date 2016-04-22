@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.*;
@@ -39,10 +41,27 @@ public class NetworkUtils {
 
     private static Logger log = Logger.getLogger(NetworkUtils.class);
 
-	public static Network createNetwork() {
-		return new NetworkImpl() ;
-	}
-	
+    public static Network createNetwork() {
+        return new NetworkImpl() ;
+    }
+
+
+    public static Network createNetwork(Config config) {
+        return createNetwork(config.network());
+    }
+
+
+    public static Network createNetwork(NetworkConfigGroup networkConfigGroup) {
+        NetworkImpl network = new NetworkImpl();
+        
+        if (networkConfigGroup.isTimeVariantNetwork()) {
+            network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
+        }
+        
+        return network;
+    }
+
+
 	/**
 	 * @return The bounding box of all the given nodes as <code>double[] = {minX, minY, maxX, maxY}</code>
 	 */

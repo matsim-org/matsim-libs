@@ -9,18 +9,20 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
+import org.matsim.pt.router.CustomDataManager;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.pt.router.TransitTravelDisutility;
 
 import java.util.*;
 
 /**
  * /**
- * Copied and adjusted from a class in the Matsim core code named MultiNodeDijkstra to keep the nodeData to finaly have
- * a LeastCostPathTree.
+ * Copied and adjusted from a class in the Matsim core code named TransitLeastCostPathTree to grant extended functionality.
+ * In this version over the calcLeastCostpathTree method a Tree is created and
  * Original class description:
  *
  * "A variant of Dijkstra's algorithm for route finding that supports multiple
@@ -63,7 +65,7 @@ public class TransitLeastCostPathTree {
     private Vehicle vehicle = null;
     private CustomDataManager customDataManager = new CustomDataManager();
     private Coord origin = null;
-    private Map<Node, InitialData> fromNodes = null;
+    private Map<Node, InitialNode> fromNodes = null;
 
     public TransitLeastCostPathTree(final Network network, final TransitTravelDisutility costFunction, final TravelTime timeFunction) {
         this.network = network;
@@ -101,15 +103,15 @@ public class TransitLeastCostPathTree {
     }
 
     @SuppressWarnings("unchecked")
-    public void calcLeastCostPathTree(final Map<Node, InitialData> fromNodes, final Person person, final Coord fromCoord) {
+    public void calcLeastCostPathTree(final Map<Node, InitialNode> fromNodes, final Person person, final Coord fromCoord) {
         this.resetNetworkVisited();
         this.person = person;
-        this.customDataManager.reset();
+//TODO        this.customDataManager.reset();
         this.origin = fromCoord;
         this.fromNodes = fromNodes;
 
         RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
-        for (Map.Entry<Node, InitialData> entry : fromNodes.entrySet()) {
+        for (Map.Entry<Node, InitialNode> entry : fromNodes.entrySet()) {
             DijkstraNodeData data = getData(entry.getKey());
             visitNode(entry.getKey(), data, pendingNodes, entry.getValue().initialTime, entry.getValue().initialCost, null);
         }
@@ -122,7 +124,7 @@ public class TransitLeastCostPathTree {
     }
 
     @SuppressWarnings("unchecked")
-    public LeastCostPathCalculator.Path getPath(final Map<Node, InitialData> toNodes) {
+    public Path getPath(final Map<Node, InitialNode> toNodes) {
 
         augmentIterationId();
 
@@ -131,7 +133,7 @@ public class TransitLeastCostPathTree {
         Node minCostNode = null;
         for (Node currentNode: toNodes.keySet()) {
             DijkstraNodeData data = getData(currentNode);
-            InitialData initData = toNodes.get(currentNode);
+            InitialNode initData = toNodes.get(currentNode);
             double cost = data.getCost() + initData.initialCost;
             if (cost != 0.0 || fromNodes.containsKey(currentNode)) {
                 if (cost < minCost) {
@@ -165,21 +167,21 @@ public class TransitLeastCostPathTree {
         DijkstraNodeData startNodeData = getData(nodes.get(0));
         DijkstraNodeData toNodeData = getData(minCostNode);
 
-        return new LeastCostPathCalculator.Path(nodes, links, toNodeData.getTime() - startNodeData.getTime(),
+        return new Path(nodes, links, toNodeData.getTime() - startNodeData.getTime(),
                 toNodeData.getCost() - startNodeData.getCost());
     }
 
     @SuppressWarnings("unchecked")
-    public LeastCostPathCalculator.Path calcLeastCostPath(final Map<Node, InitialData> fromNodes, final Map<Node, InitialData> toNodes, final Person person) {
+    public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person) {
         this.person = person;
-        this.customDataManager.reset();
+//TODO        this.customDataManager.reset();
 
         Set<Node> endNodes = new HashSet<>(toNodes.keySet());
 
         augmentIterationId();
 
         RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
-        for (Map.Entry<Node, InitialData> entry : fromNodes.entrySet()) {
+        for (Map.Entry<Node, InitialNode> entry : fromNodes.entrySet()) {
             DijkstraNodeData data = getData(entry.getKey());
             visitNode(entry.getKey(), data, pendingNodes, entry.getValue().initialTime, entry.getValue().initialCost, null);
         }
@@ -199,7 +201,7 @@ public class TransitLeastCostPathTree {
                 DijkstraNodeData data = getData(outNode);
                 boolean isEndNode = endNodes.remove(outNode);
                 if (isEndNode) {
-                    InitialData initData = toNodes.get(outNode);
+                    InitialNode initData = toNodes.get(outNode);
                     double cost = data.getCost() + initData.initialCost;
                     if (cost < minCost) {
                         minCost = cost;
@@ -215,7 +217,7 @@ public class TransitLeastCostPathTree {
         }
 
         if (minCostNode == null) {
-            log.warn("No route was found");
+            log.trace("No route was found");
             return null;
         }
         Node toNode = minCostNode;
@@ -233,7 +235,7 @@ public class TransitLeastCostPathTree {
         }
         DijkstraNodeData startNodeData = getData(nodes.get(0));
         DijkstraNodeData toNodeData = getData(toNode);
-        LeastCostPathCalculator.Path path = new LeastCostPathCalculator.Path(nodes, links, toNodeData.getTime() - startNodeData.getTime(), toNodeData.getCost() - startNodeData.getCost());
+        Path path = new LeastCostPathCalculator.Path(nodes, links, toNodeData.getTime() - startNodeData.getTime(), toNodeData.getCost() - startNodeData.getCost());
 
         return path;
     }
@@ -319,20 +321,20 @@ public class TransitLeastCostPathTree {
                                         final RouterPriorityQueue<Node> pendingNodes, final double currTime,
                                         final double currCost) {
 
-        this.customDataManager.initForLink(l);
+//TODO        this.customDataManager.initForLink(l);
         double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, this.person, this.vehicle);
         double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle, this.customDataManager);
         DijkstraNodeData data = getData(n);
         double nCost = data.getCost();
         if (!data.isVisited(getIterationId())) {
             visitNode(n, data, pendingNodes, currTime + travelTime, currCost + travelCost, l);
-            this.customDataManager.storeTmpData();
+//TODO            this.customDataManager.storeTmpData();
             return true;
         }
         double totalCost = currCost + travelCost;
         if (totalCost < nCost) {
             revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
-            this.customDataManager.storeTmpData();
+//TODO            this.customDataManager.storeTmpData();
             return true;
         }
 
@@ -374,10 +376,10 @@ public class TransitLeastCostPathTree {
         return data.getCost();
     }
 
-    public static class InitialData {
+    public static class InitialNode {
         public final double initialCost;
         public final double initialTime;
-        public InitialData(final double initialCost, final double initialTime) {
+        public InitialNode(final double initialCost, final double initialTime) {
             this.initialCost = initialCost;
             this.initialTime = initialTime;
         }

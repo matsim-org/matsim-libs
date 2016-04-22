@@ -25,23 +25,26 @@ import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.facilities.ActivityFacilities;
-import playground.johannes.studies.matrix2014.gis.ValidateFacilities;
-import playground.johannes.studies.matrix2014.gis.ZoneSetLAU2Class;
-import playground.johannes.studies.matrix2014.sim.run.ZoneFacilityTask;
-import playground.johannes.synpop.analysis.AnalyzerTaskComposite;
-import playground.johannes.synpop.analysis.FileIOContext;
-import playground.johannes.synpop.analysis.LegAttributePredicate;
-import playground.johannes.synpop.analysis.Predicate;
-import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.data.CommonValues;
-import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.gis.*;
+import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
+import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
+import playground.johannes.studies.matrix2014.analysis.SetSeason;
+import playground.johannes.studies.matrix2014.matrix.postprocess.SeasonTask;
+import playground.johannes.studies.matrix2014.sim.ValidatePersonWeight;
+import playground.johannes.studies.matrix2014.sim.run.RefPopulationBuilder;
+import playground.johannes.synpop.analysis.*;
+import playground.johannes.synpop.data.*;
+import playground.johannes.synpop.data.io.PopulationIO;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityDataLoader;
+import playground.johannes.synpop.gis.ZoneDataLoader;
+import playground.johannes.synpop.processing.GuessMissingActTypes;
+import playground.johannes.synpop.processing.TaskRunner;
+import playground.johannes.synpop.processing.ValidateMissingAttribute;
 import playground.johannes.synpop.util.Executor;
 
 import java.util.Collection;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -71,63 +74,47 @@ public class PopulationAnalyzer {
         dataPool.register(new FacilityDataLoader(configGroup.getValue("facilities"), random), FacilityDataLoader.KEY);
         dataPool.register(new ZoneDataLoader(configGroup), ZoneDataLoader.KEY);
 
-        ValidateFacilities.validate(dataPool, "nuts3");
+//        ValidateFacilities.validate(dataPool, "nuts3");
 
-        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
-        new ZoneSetLAU2Class().apply(lau2Zones);
+//        ZoneCollection lau2Zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer("lau2");
+//        new ZoneSetLAU2Class().apply(lau2Zones);
         /*
         Load population...
          */
-//        logger.info("Loading persons...");
-//        Set<Person> persons = PopulationIO.loadFromXML(config.findParam(MODULE_NAME, "simPopulation"), new PlainFactory());
-//        logger.info(String.format("Loaded %s persons.", persons.size()));
-//
-//        logger.info("Loading persons...");
-//        Set<Person> refPersons = PopulationIO.loadFromXML(config.findParam(MODULE_NAME, "popInputFile"), new
-//                PlainFactory());
-//        logger.info(String.format("Loaded %s persons.", persons.size()));
-//
-//        logger.info("Validating persons...");
-//        TaskRunner.validatePersons(new ValidateMissingAttribute(CommonKeys.PERSON_WEIGHT), persons);
-//        TaskRunner.validatePersons(new ValidatePersonWeight(), persons);
+        logger.info("Loading persons...");
+        Set<Person> persons = PopulationIO.loadFromXML(config.findParam(MODULE_NAME, "popInputFile"), new
+                PlainFactory());
+        logger.info(String.format("Loaded %s persons.", persons.size()));
+
+        logger.info("Validating persons...");
+        TaskRunner.validatePersons(new ValidateMissingAttribute(CommonKeys.PERSON_WEIGHT), persons);
+        TaskRunner.validatePersons(new ValidatePersonWeight(), persons);
+
+        Predicate<Segment> carPredicate = new LegAttributePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
+
+        TaskRunner.run(new RefPopulationBuilder.SetVacationsPurpose(), persons);
+        TaskRunner.run(new RefPopulationBuilder.ReplaceHomePurpose(), persons);
+        TaskRunner.run(new RefPopulationBuilder.NullifyPurpose(ActivityTypes.HOME), persons);
+        TaskRunner.run(new RefPopulationBuilder.NullifyPurpose(ActivityTypes.MISC), persons);
+        TaskRunner.run(new RefPopulationBuilder.ReplaceLegPurposes(), persons);
+        TaskRunner.run(new RefPopulationBuilder.GuessMissingPurposes(persons, carPredicate, random), persons);
+
+        TaskRunner.run(new ReplaceActTypes(), persons);
+        new GuessMissingActTypes(random).apply(persons);
+        TaskRunner.run(new Route2GeoDistance(new playground.johannes.studies.matrix2014.sim.Simulator.Route2GeoDistFunction()), persons);
+
         /*
         Build analyzer...
          */
-        Predicate<Segment> carPredicate = new LegAttributePredicate(CommonKeys.LEG_MODE, CommonValues.LEG_MODE_CAR);
+
         AnalyzerTaskComposite<Collection<? extends Person>> tasks = new AnalyzerTaskComposite<>();
 
-        ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
-        ZoneCollection modenaZones = zoneData.getLayer("modena");
+        TaskRunner.run(new SetSeason(), persons);
 
-        ActivityFacilities facilities = ((FacilityData)dataPool.get(FacilityDataLoader.KEY)).getAll();
-//        LegStatsPerZone legStatsPerZone = new LegStatsPerZone(zoneData.getLayer("nuts3"), facilities, ioContext);
-//        legStatsPerZone.setLegPredicate(carPredicate);
-//        tasks.addComponent(legStatsPerZone);
-//
-//        ZoneMobilityRate zoneMobilityRate = new ZoneMobilityRate(
-//                MiDKeys.PERSON_LAU2_CLASS,
-//                lau2Zones,
-//                carPredicate);
-//        zoneMobilityRate.analyze(refPersons, null);
-//
-//        new TransferZoneAttribute().apply(lau2Zones, modenaZones, MiDKeys.PERSON_LAU2_CLASS);
-//
-//        ValidatePopulationDensity popDensity = new ValidatePopulationDensity(
-//                dataPool,
-//                zoneMobilityRate.getMobilityRatePerZone(modenaZones),
-//                "modena");
-//
-//        popDensity.setIoContext(ioContext);
-//        tasks.addComponent(popDensity);
-//
-//        ValidateLAU2Attribute lau2Attr = new ValidateLAU2Attribute(dataPool);
-//        tasks.addComponent(lau2Attr);
+        tasks.addComponent(new SeasonTask(ioContext));
+        tasks.addComponent(new DayTask(ioContext));
 
-        ZoneFacilityTask fTask = new ZoneFacilityTask(facilities, ioContext);
-
-//        AnalyzerTaskRunner.run(persons, tasks, ioContext);
-
-        fTask.analyze(modenaZones, null);
+        AnalyzerTaskRunner.run(persons, tasks, ioContext);
 
         Executor.shutdown();
         logger.info("Done.");

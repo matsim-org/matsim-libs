@@ -38,7 +38,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -48,7 +48,7 @@ public class PseudoTransitRoutingModuleTest {
 	@Test
 	public void testRouteLeg() {
 		Fixture f = new Fixture();
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getModeRouteFactory();
+		RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getRouteFactory();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
 		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
 

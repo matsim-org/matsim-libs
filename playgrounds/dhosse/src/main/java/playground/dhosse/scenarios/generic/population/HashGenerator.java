@@ -6,6 +6,18 @@ public class HashGenerator {
 	
 	private HashGenerator(){};
 
+	public static String generateAgeGroupHash(MiDPerson person){
+		
+		if(person.getAge() < 18){
+			return PersonUtils.CHILD;
+		} else if(person.getAge() <= 65){
+			return PersonUtils.ADULT;
+		} else{
+			return PersonUtils.PENSIONER;
+		}
+		
+	}
+	
 	public static String generateMiDPersonHash(MiDPerson person){
 		
 		int lowerBound = (int)(person.getAge()/10) * 10;

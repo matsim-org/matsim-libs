@@ -63,7 +63,9 @@ class TravelDisutilityUtils {
 		for ( int ii=0 ; ii<N_TESTS+1 ; ii++ ) {
 			EventsManager eventsManager = EventsUtils.createEventsManager();
 			es.add(eventsManager);
-			e2s.add(EventsToScore.createWithoutScoreUpdating(scenario, scoringFunctionFactory, eventsManager)) ;
+			EventsToScore oneE2s = EventsToScore.createWithoutScoreUpdating(scenario, scoringFunctionFactory, eventsManager);
+			oneE2s.beginIteration(0);
+			e2s.add(oneE2s) ;
 		}
 		
 		double effMargUtlTTimeMAX = Double.NEGATIVE_INFINITY ;

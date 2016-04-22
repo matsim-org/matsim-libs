@@ -33,17 +33,17 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
-//import org.matsim.pt.router.MultiNodeDijkstra;
+import org.matsim.pt.router.*;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterNetwork.TransitRouterNetworkNode;
-import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterNetwork.TransitRouterNetworkLink;
-import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitLeastCostPathTree.InitialData;
+import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitLeastCostPathTree.InitialNode;
 
 import java.util.*;
 
 /**
- * Not thread-safe because MultiNodeDijkstra is not. Does not expect the TransitSchedule to change once constructed! michaz '13
+ * Not thread-safe because TransitLeastCostPathTree is not. Does not expect the TransitSchedule to change once constructed! michaz '13
  *
  * @author mrieser
  */
@@ -83,29 +83,20 @@ public class TransitRouterImpl implements TransitRouter {
         this.preparedTransitSchedule = preparedTransitSchedule;
     }
 
-    public static class NodeAndInitialData {
-        public final TransitRouterNetworkNode node;
-        public final InitialData initialData;
-        public NodeAndInitialData(final TransitRouterNetworkNode node, final InitialData initialData) {
-            this.node = node;
-            this.initialData = initialData;
-        }
-    }
-
-    private Map<Node, InitialData> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
-        Collection<TransitRouterNetwork.TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.config.getSearchRadius());
+    private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
+        Collection<TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.config.getSearchRadius());
         if (nearestNodes.size() < 2) {
             // also enlarge search area if only one stop found, maybe a second one is near the border of the search area
-            TransitRouterNetwork.TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(coord);
+            TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(coord);
             double distance = CoordUtils.calcEuclideanDistance(coord, nearestNode.stop.getStopFacility().getCoord());
             nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.config.getExtensionRadius());
         }
-        Map<Node, InitialData> wrappedNearestNodes = new LinkedHashMap<>();
-        for (TransitRouterNetwork.TransitRouterNetworkNode node : nearestNodes) {
+        Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<>();
+        for (TransitRouterNetworkNode node : nearestNodes) {
             Coord toCoord = node.stop.getStopFacility().getCoord();
             double initialTime = getWalkTime(person, coord, toCoord);
             double initialCost = getWalkDisutility(person, coord, toCoord);
-            wrappedNearestNodes.put(node, new InitialData(initialCost, initialTime + departureTime));
+            wrappedNearestNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
         }
         return wrappedNearestNodes;
     }
@@ -121,9 +112,9 @@ public class TransitRouterImpl implements TransitRouter {
     @Override
     public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
         // find possible start stops
-        Map<Node, InitialData> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromCoord, departureTime);
+        Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromCoord, departureTime);
         // find possible end stops
-        Map<Node, InitialData> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toCoord, departureTime);
+        Map<Node, InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toCoord, departureTime);
 
         if (this.transitLeastCostPathTree.getOrigin() == null ||
                 !this.transitLeastCostPathTree.getOrigin().equals(fromCoord)) {
@@ -134,11 +125,10 @@ public class TransitRouterImpl implements TransitRouter {
         Path p = this.transitLeastCostPathTree.getPath(wrappedToNodes);
 
         if (p == null) {
-            return this.createDirectWalkLegList(null, fromCoord, toCoord);
+            return null;
         }
 
         double directWalkCost = getWalkDisutility(person, fromCoord, toCoord);
-        double initialCost = wrappedFromNodes.get(p.nodes.get(0)).initialCost;
         double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 
         if (directWalkCost < pathCost) {
@@ -173,7 +163,7 @@ public class TransitRouterImpl implements TransitRouter {
         int transitLegCnt = 0;
         for (Link ll : path.links) {
             TransitRouterNetworkLink link = (TransitRouterNetworkLink) ll;
-            if (link.line == null) {
+            if (link.getLine() == null) {
                 // (it must be one of the "transfer" links.) finish the pt leg, if there was one before...
                 TransitStopFacility egressStop = link.fromNode.stop.getStopFacility();
                 if (route != null) {
@@ -197,7 +187,7 @@ public class TransitRouterImpl implements TransitRouter {
             } else {
                 // (a real pt link)
                 currentDistance += link.getLength();
-                if (link.route != route) {
+                if (link.getRoute() != route) {
                     // the line changed
                     TransitStopFacility egressStop = link.fromNode.stop.getStopFacility();
                     if (route == null) {
@@ -228,8 +218,8 @@ public class TransitRouterImpl implements TransitRouter {
                         }
                         currentDistance = 0;
                     }
-                    line = link.line;
-                    route = link.route;
+                    line = link.getLine();
+                    route = link.getRoute();
                     accessStop = egressStop;
                 }
             }

@@ -7,6 +7,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.*;
+import playground.boescpa.ivtBaseline.preparation.IVTConfigCreator;
 import playground.boescpa.lib.obj.CSVReader;
 
 /**
@@ -15,6 +16,8 @@ import playground.boescpa.lib.obj.CSVReader;
  * @author boescpa
  */
 public class CreationOfCrossBorderFacilities {
+
+	public static final String BC_TAG = "BC_";
 
     public static void main(final String[] args) {
         final String pathToCSV = args[0];
@@ -46,17 +49,17 @@ public class CreationOfCrossBorderFacilities {
 
             // new facility
             ActivityFacilityImpl newFacility = (ActivityFacilityImpl) factory.createActivityFacility(
-                    Id.create("BC_" + id, ActivityFacility.class),
+                    Id.create(BC_TAG + id, ActivityFacility.class),
                     coord);
             if (!publicFacilities) {
                 newFacility.setDesc(desc);
             }
             // new activities
-            ActivityOption newShopActivity = factory.createActivityOption("shop");
+            ActivityOption newShopActivity = factory.createActivityOption(IVTConfigCreator.SHOP);
             newShopActivity.setCapacity(shopCapacity);
             newShopActivity.addOpeningTime(new OpeningTimeImpl(shopOpenFrom, shopOpenTill));
             newFacility.addActivityOption(newShopActivity);
-            ActivityOption newLeisureActivity = factory.createActivityOption("leisure");
+            ActivityOption newLeisureActivity = factory.createActivityOption(IVTConfigCreator.LEISURE);
             newLeisureActivity.setCapacity(leisureCapacity);
             newLeisureActivity.addOpeningTime(new OpeningTimeImpl(leisureOpenFrom, leisureOpenTill));
             newFacility.addActivityOption(newLeisureActivity);

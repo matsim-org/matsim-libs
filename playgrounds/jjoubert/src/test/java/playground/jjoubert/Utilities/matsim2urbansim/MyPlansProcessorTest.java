@@ -25,6 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,39 +50,43 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class MyPlansProcessorTest extends MatsimTestCase{
+public class MyPlansProcessorTest{
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private Logger log = Logger.getLogger(MyPlansProcessorTest.class);
 	private Scenario scenario;
 	private List<MyZone> zones;
 
+	@Test
 	public void testMyPlansProcessorConstructor(){
 		setupTest();
 		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);
-		assertNotNull("Did not create MyPlansProcessor.", mpp);
-		assertNotNull("The Scenario object is null.", mpp.getScenario());
-		assertNotNull("The zones list is null.", mpp.getZones());
-		assertNotNull("The DenseDoubleMatrix2D is null.", mpp.getOdMatrix());
-		assertEquals("Matrix has wrong number of rows.", zones.size(), mpp.getOdMatrix().rows());
-		assertEquals("Matrix has wrong number of columns.", zones.size(), mpp.getOdMatrix().columns());
+		Assert.assertNotNull("Did not create MyPlansProcessor.", mpp);
+		Assert.assertNotNull("The Scenario object is null.", mpp.getScenario());
+		Assert.assertNotNull("The zones list is null.", mpp.getZones());
+		Assert.assertNotNull("The DenseDoubleMatrix2D is null.", mpp.getOdMatrix());
+		Assert.assertEquals("Matrix has wrong number of rows.", zones.size(), mpp.getOdMatrix().rows());
+		Assert.assertEquals("Matrix has wrong number of columns.", zones.size(), mpp.getOdMatrix().columns());
 	}
 
+	@Test
 	public void testProcessPlans(){
 		setupTest();
 		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);
 		mpp.processPlans();
-		assertEquals("Wrong travel time from zone 1 to 4.", ((30.0 + 40.0)*60)/2, mpp.getAvgOdTravelTime(0, 3));
-		assertEquals("Wrong travel time from zone 4 to 1.", ((10.0 + 20.0)*60)/2, mpp.getAvgOdTravelTime(3, 0));
+		Assert.assertEquals("Wrong travel time from zone 1 to 4.", ((30.0 + 40.0)*60.0)/2.0, mpp.getAvgOdTravelTime(0, 3), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time from zone 4 to 1.", ((10.0 + 20.0)*60.0)/2.0, mpp.getAvgOdTravelTime(3, 0), MatsimTestUtils.EPSILON);
 	}
 
+	@Test
 	public void testWriteOdMatrixToDbf(){
 		setupTest();
 		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);
 		mpp.processPlans();
-		mpp.writeOdMatrixToDbf(getOutputDirectory() + "testDbf.dbf");
-		assertTrue("Dbf table file does not exist", ((new File(getOutputDirectory() + "testDbf.dbf")).exists()));
+		mpp.writeOdMatrixToDbf(utils.getOutputDirectory() + "testDbf.dbf");
+		Assert.assertTrue("Dbf table file does not exist", ((new File(utils.getOutputDirectory() + "testDbf.dbf")).exists()));
 	}
 
 
@@ -88,7 +95,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 	 */
 	private void setupTest() {
 		// Set up zones.
-		File folder = new File(getInputDirectory());
+		File folder = new File(utils.getInputDirectory());
 		String shapefile = folder.getParent() + "/zones.shp";
 		MyZoneReader mzr = new MyZoneReader(shapefile);
 		mzr.readZones(1);
@@ -124,7 +131,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		n.addLink(nf.createLink(Id.create("43", Link.class), n4, n3));
 
 		NetworkWriter nw = new NetworkWriter(n);
-		nw.write(getOutputDirectory() + "/networkTest.xml");
+		nw.write(utils.getOutputDirectory() + "/networkTest.xml");
 		//=====================================================================
 
 
@@ -212,7 +219,7 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		p.addPerson(p2);
 
 		PopulationWriter pw = new PopulationWriter(p, n);
-		pw.writeFileV4(getOutputDirectory() + "/populationTest.xml");
+		pw.writeFileV4(utils.getOutputDirectory() + "/populationTest.xml");
 		//=====================================================================
 		log.info("Wrote population.");
 

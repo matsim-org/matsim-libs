@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
 
 import javax.inject.Inject;
@@ -38,10 +38,10 @@ import javax.inject.Inject;
  */
 public class PopulationFactoryImpl implements PopulationFactory {
 
-	private final ModeRouteFactory routeFactory;
+	private final RouteFactoryImpl routeFactory;
 
     @Inject
-	PopulationFactoryImpl(ModeRouteFactory routeFactory) {
+	PopulationFactoryImpl(RouteFactoryImpl routeFactory) {
         this.routeFactory = routeFactory;
     }
 
@@ -93,7 +93,8 @@ public class PopulationFactoryImpl implements PopulationFactory {
 		this.routeFactory.setRouteFactory(routeType, factory);
 	}
 
-	public ModeRouteFactory getModeRouteFactory() {
+	@Deprecated // "createRoute(...)", which is already in the official PopulationFactory interface, should be able to achieve the same thing. kai, apr'16
+	public RouteFactoryImpl getRouteFactory() {
 		return this.routeFactory;
 	}
 

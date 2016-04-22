@@ -19,23 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigReader;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFanCreator;
-import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballStrings;
-import playground.dgrether.signalsystems.cottbus.footballdemand.SimpleCottbusFanCreator;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,6 +28,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+
+import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFanCreator;
+import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballStrings;
+import playground.dgrether.signalsystems.cottbus.footballdemand.SimpleCottbusFanCreator;
+import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 
 
 /**
@@ -99,11 +98,9 @@ public class CottbusFootballBatch {
 			//add average tt handler for football fans
 			CottbusFootballAnalysisControllerListener cbfbControllerListener = new CottbusFootballAnalysisControllerListener();
 			controler.addControlerListener(cbfbControllerListener);
-			// enable sylvia
-			if ((boolean) ConfigUtils.addOrGetModule(baseConfig, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
-                //FIXME: Take care that the normal SignalsControllerListener is NOT added.
-                controler.addControlerListener(new DgSylviaControlerListenerFactory(new DgSylviaConfig()).createSignalsControllerListener());
-            }
+			//add the signals module
+			controler.addOverridingModule(new SylviaSignalsModule());
+			
 			controler.run();
 			if (cbfbControllerListener.getAverageTraveltime() != null){
 				percentageOfFans2AverageTTMap.put(numberOfFootballFans, cbfbControllerListener.getAverageTraveltime());

@@ -64,7 +64,7 @@ public class LegPurposeDistanceTask implements AnalyzerTask<Collection<? extends
 
     @Override
     public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        Collector<String> collector = new LegCollector<>(new AttributeProvider<>(CommonKeys.LEG_PURPOSE));
+        Collector<String> collector = new LegCollector<>(new AttributeProvider<Segment>(CommonKeys.LEG_PURPOSE));
         Set<String> types = new HashSet<>(collector.collect(persons));
         types.remove(null);
 

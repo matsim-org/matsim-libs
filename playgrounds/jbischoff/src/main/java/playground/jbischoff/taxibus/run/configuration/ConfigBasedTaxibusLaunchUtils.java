@@ -22,6 +22,7 @@ package playground.jbischoff.taxibus.run.configuration;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.core.controler.*;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.*;
@@ -48,12 +49,13 @@ public class ConfigBasedTaxibusLaunchUtils {
 		
 		Scenario scenario = controler.getScenario();
 		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) scenario.getConfig().getModule("taxibusConfig");
-        VrpData vrpData = new VrpDataImpl();
+        final VrpData vrpData = new VrpDataImpl();
         new VehicleReader(scenario.getNetwork(), vrpData).parse(tbcg.getVehiclesFile());
 
 		final LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),vrpData,tbcg);	
 		final TaxibusPassengerOrderManager orderManager = new TaxibusPassengerOrderManager();
-		
+		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
+
 		controler.addOverridingModule(new AbstractModule() {
 			
 			@Override
@@ -65,6 +67,7 @@ public class ConfigBasedTaxibusLaunchUtils {
 				addRoutingModuleBinding("taxibus").toInstance(new TaxibusServiceRoutingModule(controler));
 				bind(TaxibusPassengerOrderManager.class).toInstance(orderManager);
 				bind(LineDispatcher.class).toInstance(dispatcher);
+				bind(VrpData.class).toInstance(vrpData);
 
 			}
 		});

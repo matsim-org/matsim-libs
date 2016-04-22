@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.*;
  * @author illenberger
  *
  */
-class TimeVariantLinkImpl extends LinkImpl {
+public class TimeVariantLinkImpl extends LinkImpl {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -59,11 +59,11 @@ class TimeVariantLinkImpl extends LinkImpl {
     public static TimeVariantLinkImpl createLinkWithFixedIntervalAttributes(final Id<Link> id,
             final Node from, final Node to, final Network network, final double length,
             final double freespeed, final double capacity, final double lanes, final int interval,
-            final int intervalCount) {
+            final int maxTime) {
         return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, lanes,
-                new FixedIntervalTimeVariantAttribute(interval, intervalCount),
-                new FixedIntervalTimeVariantAttribute(interval, intervalCount),
-                new FixedIntervalTimeVariantAttribute(interval, intervalCount));
+                new FixedIntervalTimeVariantAttribute(interval, maxTime),
+                new FixedIntervalTimeVariantAttribute(interval, maxTime),
+                new FixedIntervalTimeVariantAttribute(interval, maxTime));
     }
 
    
@@ -176,7 +176,7 @@ class TimeVariantLinkImpl extends LinkImpl {
 	 */
 	@Override
 	public synchronized double getCapacity(final double time) {
-		return getFlowCapacityPerSec() * getCapacityPeriod();
+		return getFlowCapacityPerSec(time) * getCapacityPeriod();
 	}
 
 

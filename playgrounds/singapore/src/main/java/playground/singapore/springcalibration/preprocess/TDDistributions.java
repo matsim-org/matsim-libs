@@ -23,6 +23,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math.stat.descriptive.moment.Mean;
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
@@ -39,7 +40,7 @@ public class TDDistributions {
 	private final List<DistributionClass> classes;
 	private final String outdir;
 	private Counter counter = new Counter();
-	String [] allmodes = {"car", "pt", "other", "pass", "walk", "taxi"};
+	String [] allmodes = {"car","pt","other","pass","walk","taxi","schoolbus"};
 	private DecimalFormat df = new DecimalFormat("0.00");
 	
 	public TDDistributions(final Population population, String outdir) {

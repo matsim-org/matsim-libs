@@ -31,7 +31,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -70,7 +70,7 @@ public class RetailersLocationListener
   {
     this.controler = event.getServices();
     FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(this.controler.getConfig().planCalcScore());
-      ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+      RouteFactoryImpl routeFactory = ((PopulationFactoryImpl) this.controler.getScenario().getPopulation().getFactory()).getRouteFactory();
 
     this.facilityIdFile = this.controler.getConfig().findParam("Retailers", "retailers");
     if (this.facilityIdFile == null) throw new RuntimeException("In config file, param = retailers in module = Retailers not defined!");
