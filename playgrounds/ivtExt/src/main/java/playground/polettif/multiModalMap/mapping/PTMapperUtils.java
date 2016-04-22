@@ -486,10 +486,7 @@ public class PTMapperUtils {
 		}
 
 		for(Link link : network.getLinks().values()) {
-			// only remove link if there are only modes to remove on it
-			if(!transitLinkNetworkModes.containsKey(link.getId())) {
-				link.setAllowedModes(Collections.singleton("car"));
-			} else {
+			if(transitLinkNetworkModes.containsKey(link.getId())) {
 				Set<String> modes = new HashSet<>();
 				Set<String> linkModes = transitLinkNetworkModes.get(link.getId());
 				linkModes.addAll(link.getAllowedModes());
@@ -542,5 +539,26 @@ public class PTMapperUtils {
 		}
 
 		return map;
+	}
+
+	/**
+	 *
+	 * @param schedule
+	 * @param network
+	 */
+	public static void replaceNonCarModesWithPT(TransitSchedule schedule, Network network) {
+		log.info("... Replacing all non-car link modes with \"pt\"");
+
+		Map<Id<Link>, ? extends Link> networkLinks = network.getLinks();
+		Set<Id<Link>> transitLinkIds = new HashSet<>();
+
+		for(Link link : network.getLinks().values()) {
+			if(link.getAllowedModes().size() > 0 && link.getAllowedModes().contains("car")) {
+				Set<String> modes = new HashSet<>();
+				modes.add(TransportMode.car);
+				modes.add(TransportMode.pt);
+				link.setAllowedModes(modes);
+			}
+		}
 	}
 }

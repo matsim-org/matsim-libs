@@ -323,10 +323,11 @@ public class PTMapperModes extends PTMapper {
 		 */
 		log.info("Clean Stations and Network...");
 		PTMapperUtils.removeTransitRoutesWithoutLinkSequences(schedule);
-		PTMapperUtils.assignScheduleModesToLinks(schedule, network);
-		PTMapperUtils.addPTModeToNetwork(schedule, network);
 		PTMapperUtils.removeNonUsedStopFacilities(schedule);
 		PTMapperUtils.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
+		PTMapperUtils.assignScheduleModesToLinks(schedule, network);
+//		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
+		PTMapperUtils.addPTModeToNetwork(schedule, network);
 		log.info("Clean Stations and Network... done.");
 
 		log.info("Mapping transit schedule to network... done.");
