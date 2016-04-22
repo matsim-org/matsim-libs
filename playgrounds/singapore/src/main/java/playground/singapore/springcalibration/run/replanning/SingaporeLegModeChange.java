@@ -23,7 +23,6 @@ package playground.singapore.springcalibration.run.replanning;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -40,15 +39,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Subtour;
-import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.PtConstants;
 
 import playground.singapore.springcalibration.run.TaxiUtils;
 
@@ -59,15 +52,15 @@ import playground.singapore.springcalibration.run.TaxiUtils;
  *
  * @author anhorni
  */
-public class SingaporeTripOrSubtourModeChange implements PlanAlgorithm {
+public class SingaporeLegModeChange implements PlanAlgorithm {
 
 	private final String[] possibleModes;
 	private boolean ignoreCarAvailability = false;
 	private double walkThreshold = 5000.0;
-	private Population population;
-	private static final Logger log = Logger.getLogger(SingaporeTripOrSubtourModeChange.class);
+	private static final Logger log = Logger.getLogger(SingaporeLegModeChange.class);
 	private TaxiUtils taxiUtils;
 	private SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
+	private PermissibleModesCalculator permissibleModesCalculator;
 		
 	private final Random rng;
 
@@ -77,13 +70,19 @@ public class SingaporeTripOrSubtourModeChange implements PlanAlgorithm {
 	 * @see TransportMode
 	 * @see MatsimRandom
 	 */
-	public SingaporeTripOrSubtourModeChange(final String[] possibleModes, final Random rng, Population population, TaxiUtils taxiUtils, SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
-		this.possibleModes = possibleModes.clone();
+	public SingaporeLegModeChange(final String[] possibleModes, final Random rng, Population population, 
+			TaxiUtils taxiUtils, SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
+		
+		this.possibleModes = possibleModes.clone(); // here get the modes from change leg NOT subtour mode choice!
 		this.rng = rng;
-		this.population = population;
 		this.taxiUtils = taxiUtils;
 		this.subtourModeChoiceConfigGroup = subtourModeChoiceConfigGroup;
 		log.info("Replanning for population of size: " + population.getPersons().size());
+		
+		this.permissibleModesCalculator =
+				new SingaporePermissibleModesCalculator(
+						population,
+						possibleModes);
 	}
 
 	public void setIgnoreCarAvailability(final boolean ignoreCarAvailability) {
@@ -96,27 +95,16 @@ public class SingaporeTripOrSubtourModeChange implements PlanAlgorithm {
 		boolean forbidPassenger = false;
 		boolean forbidOther = false;
 		boolean forbidSchoolbus = false;
+				
+		Collection<String> permissibleModes = this.permissibleModesCalculator.getPermissibleModes(plan);
 		
 		if (!this.ignoreCarAvailability) {
-			String carAvail = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "car");
-			String license = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "license");						
-			// as defined only people with license and car are allowed to use car
-			if ("never".equals(carAvail) || "no".equals(license)) {
-				forbidCar = true;
-			}
-			if ("never".equals(carAvail)) {
-				forbidPassenger = true;
-			}
+			forbidCar = !permissibleModes.contains(TransportMode.car);
+			forbidPassenger = !permissibleModes.contains("passenger");
 		}
 		
-		String ageStr = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "age");
-		// if there is no age given, e.g., for freight agents
-		int age = 25;	
-		String cleanedAge = ageStr.replace("age", "");
-		cleanedAge = cleanedAge.replace("up", "");
-		if (ageStr != null) age = Integer.parseInt(cleanedAge);
-		if (age < 20) forbidOther = true;
-		if (age > 20) forbidSchoolbus = true;
+		forbidOther = !permissibleModes.contains(TransportMode.other);
+		forbidSchoolbus = !permissibleModes.contains("schoolbus");
 
 		ArrayList<Leg> legs = new ArrayList<Leg>();
 		int cnt = 0;
