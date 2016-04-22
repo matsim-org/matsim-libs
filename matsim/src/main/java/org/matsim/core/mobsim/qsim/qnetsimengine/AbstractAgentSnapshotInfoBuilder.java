@@ -175,23 +175,36 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		double ttimeOfHoles = curvedLength / (QueueWithBuffer.HOLE_SPEED_KM_H*1000./3600.);
 
-//		double nLanes = 2./inverseFlowCapPerTS ; // pseudo-lanes
-//		double freespeedTraveltimeOfHole = 0.1 * storageCapacity * inverseFlowCapPerTS / nLanes ;
-		
 		TreeMap<Double,Hole> consumableHoles = new TreeMap<>() ;
 		
 		// holes, if applicable:
 		if ( QSimConfigGroup.SnapshotStyle.withHoles==scenario.getConfig().qsim().getSnapshotStyle() ) {
 			if ( !holes.isEmpty() ) {
+				double firstHolePosition = Double.NaN ;
+				double distanceOfHoleFromFromNode = Double.NaN ;
+				double sum = 0 ;
 				for (Hole hole : holes) {
-					double distanceOfHoleFromFromNode = computeHolePositionAndReturnDistance( ttimeOfHoles, hole, now, curvedLength);
+					sum += hole.getSizeInEquivalents() ;
+					distanceOfHoleFromFromNode = computeHolePositionAndReturnDistance( ttimeOfHoles, hole, now, curvedLength);
+					if ( Double.isNaN( firstHolePosition ) ) {
+						firstHolePosition = distanceOfHoleFromFromNode ;
+						sum = 0 ; // don't include first vehicle
+					}
 					addHolePosition( positions, distanceOfHoleFromFromNode, hole, curvedLength, upstreamCoord, downstreamCoord ) ;
 					consumableHoles.put( distanceOfHoleFromFromNode, hole ) ;
+				}
+				final double spaceConsumptionOfHoles = sum*spacingOfOnePCE;
+				final double spaceAvailableForHoles = distanceOfHoleFromFromNode - firstHolePosition;
+				if ( spaceConsumptionOfHoles >= spaceAvailableForHoles ) {
+					Logger.getLogger(getClass()).warn("we have a problem: holes consume too much space:" ) ;
+					Logger.getLogger(getClass()).warn( "summed up space consumption of holes: " + spaceConsumptionOfHoles );
+					Logger.getLogger(getClass()).warn("distance bw first and last hole: " + spaceAvailableForHoles ) ; 
+
 				}
 			}
 		}
 		
-		// might be faster by sorting holes into a regular array list ...
+		// yyyyyy might be faster by sorting holes into a regular array list ...
 
 		double freespeedTraveltime = curvedLength / freeSpeed ;
 
@@ -203,11 +216,9 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			final double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
 			// (starts off relatively small (rightmost vehicle))
 			
-			final double previousDistanceFromFromNode = distanceFromFromNode ;
-
 			final double vehicleSpacing = mveh.getSizeInEquivalents()*spacingOfOnePCE;
-			distanceFromFromNode = this.calculateOdometerDistanceFromFromNode(curvedLength, 
-					vehicleSpacing , distanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
+			distanceFromFromNode = this.calculateOdometerDistanceFromFromNode(curvedLength, vehicleSpacing , distanceFromFromNode, 
+					now, freespeedTraveltime, remainingTravelTime);
 			// (starts off relatively large (rightmost vehicle))
 			
 			Integer lane = VisUtils.guessLane(veh, numberOfLanesAsInt );
@@ -217,91 +228,20 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			this.positionAgentGivenDistanceFromFNode(positions, upstreamCoord, downstreamCoord, curvedLength, veh, distanceFromFromNode, lane, speedValue);
 
 			if ( this.scenario.getConfig().qsim().getTrafficDynamics()==TrafficDynamics.withHoles ) {
-				Entry<Double, Hole> entry = consumableHoles.lastEntry() ;
-				if ( entry != null && distanceFromFromNode < entry.getKey() ) { // hole to right of current vehicle position
-					consumableHoles.pollLastEntry() ;
-					double possibilityOne = distanceFromFromNode - spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
-					double possibilityTwo = entry.getKey() - spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
-					//						distanceFromFromNode = Math.min(possibilityOne, possibilityTwo) ;
-					distanceFromFromNode = possibilityOne ;
+				while ( !consumableHoles.isEmpty() && distanceFromFromNode < consumableHoles.lastKey() ) {
+					Entry<Double, Hole> entry = consumableHoles.pollLastEntry() ;
+					distanceFromFromNode -= spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
 				}
 			}
-			
-			/*
-			 * sCap needs to be consistent with fCap.  Something like: 
-			 *    nLanes = fCap * 2. * 1sec
-			 *    sCap >= nLanes * len / 7.5m = fCap * 2 * len * 1sec / 7.5m
-			 * 
-			 * ttimeOfHoles is NOT sCap/fCap.  It is, instead, sCap/fCap / nLanes = sCap/fCap / (fCap*2*1sec) = 0.5 * sCap * fCap^2.  ????   
-			 */
-			
-			/*
-			 * Thought experiment: Start with all "cells" filled, e.g. from a permanently red light.  Say N such cells.
-			 * 
-			 * Now assume this is discharged, e.g. y vehs per sec.
-			 * 
-			 * Then we need time N/y to discharge the system.
-			 * 
-			 * In consequence, the backwards travelling speed is lengthOfLink/ (N/y) .
-			 */
-			
-			/* Speed of backwards moving holes is not (spacingOfOnePCE * getSizeInEquivalents)/sec, but something like
-			 * (cellSize * getSizeInEquivalents)/sec or maybe even just cellSize/sec.  
-			 * The difference is with multiple lanes: There, TWO holes move backwards one car position, meaning that in the queue
-			 * representation each hole moves with speed (2 * spacingOfOnePCE * getSizeInEquivalents).  !!!!
-			 * 
-			 */
-
-//				final double epsilon = 0.01 ;
-//				if ( previousDistanceFromFromNode - distanceFromFromNode <= vehicleSpacing + epsilon ) {
-//					// (distance to vehicle ahead \sim spacing --> in queue)
-//
-//					if ( !consumableHoles.isEmpty() && consumableHoles.lastKey() < distanceFromFromNode ) {
-//						// (i.e. if hole is to left of vehicle)
-//
-//						Logger.getLogger( this.getClass() ).warn( "distanceFromFNode=" + distanceFromFromNode + "; lastKey=" + consumableHoles.lastKey() + "; firstKey=" + consumableHoles.firstKey() ) ;
-//
-//						Entry<Double, Hole> entry = consumableHoles.pollLastEntry() ;
-//
-//						//					distanceFromFromNode +=  7.5 * entry.getValue().getSizeInEquivalents() ;
-//
-//						//					distanceFromFromNode -=  spacingOfOnePCE * entry.getValue().getSizeInEquivalents() ;
-//						//					if ( entry.getKey() < distanceFromFromNode ) {
-//						//						distanceFromFromNode = entry.getKey() ;  // we don't add the full hole PCE if the hole is further downstream
-//						//						break ; // and we break out of the while loop
-//						//					}
-//
-//						// while hole is downstream from current vehicle position, we just keep pulling holes.
-//						// once hole is upstream from current vehicle position, we pull one hole and add it to the position, and then we
-//						// move on to adding the next vehicle:
-//						final double sizeOfCurrentHole = spacingOfOnePCE * entry.getValue().getSizeInEquivalents();
-//						//					if ( entry.getKey() - sizeOfCurrentHole < distanceFromFromNode ) {
-//						distanceFromFromNode -= sizeOfCurrentHole ;
-//						//						distanceFromFromNode = entry.getKey();
-//						//						break ;
-//						//					}
-//
-//					}
-//				}
-//			}
-
-
 		}
 		
+		/* Can't explain the above in easy words.  Essentially, when vehicles leave the link at max rate, there still must be some space between
+		 * the holes that this generates.  That space is added up until a full vehicle fits into it.  There must be some better way of
+		 * explaining this, but I don't know it right now.  kai, apr'16
+		 */
+		
+		
 		return positions;
-		
-		// Some arguments re the vis of holes:
-		// () There needs to be enough space between holes to position vehicles.  Delta x for holes is (15km/h)/flowCap = (4.1m/s)/flowCap,
-		// where flowCap is the rescaled version. 
-		
-		// if (car not in queue){
-		//    plotAtFreeSpeedPosition() ;
-		// } else {
-		//    put at most one hole in between ;
-		// }
-		
-		// I think that the above works ... but the 15km/h seems too slow.  This may have something to do with the fact that the 
-		// capacity rate may be higher than what reaction time allows (1veh/2sec) ... since we squeeze multiple lanes into one queue.  Hm
 		
 	}
 
@@ -317,7 +257,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	private void addHolePosition(final Collection<AgentSnapshotInfo> positions, double distanceFromFromNode, Hole veh, 
 			double curvedLength, Coord upstreamCoord, Coord downstreamCoord)
 	{
-		Integer lane = 10 ;
+		Integer lane = 20 ;
 		double speedValue = 1. ;
 		AgentSnapshotInfo pos = this.snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class), upstreamCoord, downstreamCoord, 
 				distanceFromFromNode, lane, curvedLength);
