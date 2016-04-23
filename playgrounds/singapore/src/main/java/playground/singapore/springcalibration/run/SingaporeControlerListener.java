@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -44,8 +45,9 @@ public class SingaporeControlerListener implements StartupListener {
 		controler.addControlerListener(countsListener);
 		countsListener.notifyStartup(event);
 		
-		//this.path = controler.getConfig().findParam("singapore", "validation_path");
-		
+		ConfigGroup singaporeConfigGroup = controler.getConfig().getModule("singapore");
+		((SingaporeConfigGroup)singaporeConfigGroup).getValidationPath();
+				
 		this.addDurationAnalyzers(controler);
 		this.addDistanceAnalyzers(controler);
 		log.info("Initialized SingaporeControlerListener");
