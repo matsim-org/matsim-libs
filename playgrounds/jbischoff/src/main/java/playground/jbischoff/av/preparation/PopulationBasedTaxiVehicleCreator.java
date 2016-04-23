@@ -60,10 +60,11 @@ public class PopulationBasedTaxiVehicleCreator
 //	private String vehiclesFilePrefix = "../../../shared-svn/projects/vw_rufbus/av_simulation/vehicles/v";
 //	private String populationData = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/pop.csv";
 //	
-	private String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz";
-	private String shapeFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/Planungsraum.shp";
-	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/v10pct/taxi_vehicles_";
-	private String populationData = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/bevoelkerung.txt";
+    
+	private String networkFile = "../../../shared-svn/projects/audi_av/scenario/networkc.xml.gz";
+	private String shapeFile = "../../../shared-svn/projects/audi_av/shp/Planungsraum.shp";
+	private String vehiclesFilePrefix = "../../../shared-svn/projects/audi_av/scenario/flowpaper/vehicles/taxi_vehicles_";
+	private String populationData = "../../../shared-svn/projects/audi_av/shp/bevoelkerung.txt";
 	
 	
 	private Scenario scenario ;
@@ -74,7 +75,7 @@ public class PopulationBasedTaxiVehicleCreator
 
 	
 	public static void main(String[] args) {
-		for (int i = 1000; i<10000 ; i=i+100 ){
+		for (int i = 1100; i<=11000 ; i=i+1100 ){
 			PopulationBasedTaxiVehicleCreator tvc = new PopulationBasedTaxiVehicleCreator();
 			System.out.println(i);
 			tvc.run(i);
