@@ -263,7 +263,9 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 			if (pe instanceof Activity) {
 				Activity currentActivity = (Activity)pe;
 				Leg nextLeg = PlanUtils.getNextLeg(plan, currentActivity);
-				if (nextLeg.getMode().equals("taxi")&& !currentActivity.equals(TaxiUtils.wait4Taxi)) {
+				if (nextLeg != null && 
+						nextLeg.getMode().equals("taxi")&& !currentActivity.equals(TaxiUtils.wait4Taxi)) {
+					
 					Coord coord = currentActivity.getCoord();
 					int hour = (int)(currentActivity.getEndTime() / 3600.0);
 					double taxiWaitTime = this.taxiUtils.getWaitingTime(coord, hour);

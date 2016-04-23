@@ -68,13 +68,13 @@ public class RunSingapore {
 			}
 		}) ;		
 		
-//		final SubpopTravelDisutilityFactory subPopDisutilityCalculatorFactory = new SubpopTravelDisutilityFactory(parameters, TransportMode.car);
-//		controler.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				bindCarTravelDisutilityFactory().toInstance(subPopDisutilityCalculatorFactory);
-//			}
-//		});
+		final SubpopTravelDisutilityFactory subPopDisutilityCalculatorFactory = new SubpopTravelDisutilityFactory(parameters, "taxi");
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindCarTravelDisutilityFactory().toInstance(subPopDisutilityCalculatorFactory);
+			}
+		});
 						
 		final SubpopTravelDisutility.Builder builder_taxi =  new SubpopTravelDisutility.Builder("taxi", parameters);	
 		controler.addOverridingModule(new AbstractModule() {
