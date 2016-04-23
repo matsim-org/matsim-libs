@@ -266,8 +266,9 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 			if (pe instanceof Activity) {
 				Activity currentActivity = (Activity)pe;
 				Leg nextLeg = PlanUtils.getNextLeg(plan, currentActivity);
-				if (nextLeg == leg) {
-					
+				tmpPlan.addActivity(currentActivity);
+				
+				if (nextLeg == leg) {	
 					Coord coord = currentActivity.getCoord();
 					int hour = (int)(currentActivity.getEndTime() / 3600.0);
 					double taxiWaitTime = this.taxiUtils.getWaitingTime(coord, hour);
@@ -276,13 +277,13 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 					Leg taxiWalkLeg = new LegImpl(TaxiUtils.taxi_walk);
 					taxiWalkLeg.setDepartureTime(currentActivity.getEndTime());
 					taxiWalkLeg.setTravelTime(0.0);
+					tmpPlan.addLeg(taxiWalkLeg);
 										
 					Activity taxiWaitAct = new ActivityImpl(TaxiUtils.wait4Taxi, currentActivity.getCoord(), currentActivity.getLinkId());					
-					taxiWaitAct.setEndTime(taxiWaitEndTime);
+					taxiWaitAct.setEndTime(taxiWaitEndTime);	
 					tmpPlan.addActivity(taxiWaitAct);
-					tmpPlan.addLeg(taxiWalkLeg);					
 				}
-				tmpPlan.addActivity(currentActivity);
+				
 			}
 			if (pe instanceof Leg) {
 				Leg currentLeg = (Leg)pe;
