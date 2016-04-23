@@ -52,7 +52,7 @@ public class SingaporeConfigGroup extends ConfigGroup {
 		if (TAXI_WAITING_TIMES_FILE.equals(key)) {
 			return this.taxiWaitingTimeFile;
 		} 
-		if (VALIDATION_PATH.equals(key)) {
+		else if (VALIDATION_PATH.equals(key)) {
 			return this.validationPath;
 		} else {
 			throw new IllegalArgumentException(key + ".  There may exist a direct getter.");
@@ -68,7 +68,7 @@ public class SingaporeConfigGroup extends ConfigGroup {
 		if (TAXI_WAITING_TIMES_FILE.equals(key)) {
 			this.taxiWaitingTimeFile = value;
 		} 
-		if (VALIDATION_PATH.equals(key)) {
+		else if (VALIDATION_PATH.equals(key)) {
 			this.validationPath = value;
 		}
 		else {
