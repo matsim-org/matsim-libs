@@ -1,7 +1,8 @@
 package playground.singapore.springcalibration.run.replanning;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Plan;
@@ -20,9 +21,9 @@ public class SingaporePermissibleModesCalculator implements PermissibleModesCalc
 	
 
 	@Override
-	public Collection<String> getPermissibleModes(Plan plan) {
+	public List<String> getPermissibleModes(Plan plan) {
 		
-		Collection<String> permissibleModes = Arrays.asList(availableModes.clone());
+		List<String> permissibleModes = new LinkedList<String>(Arrays.asList(availableModes.clone())); Arrays.asList(availableModes.clone());
 						
 		String carAvail = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "car");
 		String license = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "license");
