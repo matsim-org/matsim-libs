@@ -67,7 +67,7 @@ public class SingaporeDistributions implements IterationEndsListener {
 	private final MainModeIdentifier mainModeIdentifier;
 	private final StageActivityTypes stageActivityTypes;
 	private final List<DistributionClass> classes;
-	private DecimalFormat df = new DecimalFormat("0.00");
+	private DecimalFormat df = new DecimalFormat("0.000");
 	private String measure = "";
 	private Counter counter = new Counter();
 	
