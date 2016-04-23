@@ -14,12 +14,12 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.pt.PtConstants;
 
 import playground.singapore.springcalibration.run.analysis.SingaporeDistributions;
 import playground.singapore.springcalibration.run.analysis.SingaporeDistributions.DistributionClass;
+import playground.singapore.springcalibration.run.replanning.SingaporeMainModeIdentifierImpl;
 
 public class SingaporeControlerListener implements StartupListener {
 	
@@ -55,8 +55,8 @@ public class SingaporeControlerListener implements StartupListener {
 	
 	private void addDurationAnalyzers(MatsimServices controler) {
 		SingaporeDistributions timeDistribution = new SingaporeDistributions(this.population, 
-				new MainModeIdentifierImpl(), 
-				new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, TaxiUtils.wait4Taxi),
+				new SingaporeMainModeIdentifierImpl(), 
+				new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE,TaxiUtils.wait4Taxi),
 				"time");
 		controler.addControlerListener(timeDistribution);
 
@@ -88,8 +88,8 @@ public class SingaporeControlerListener implements StartupListener {
 	
 	private void addDistanceAnalyzers(MatsimServices controler) {		
 		SingaporeDistributions distanceDistribution = new SingaporeDistributions(this.population, 
-				new MainModeIdentifierImpl(), 
-				new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE, TaxiUtils.wait4Taxi),
+				new SingaporeMainModeIdentifierImpl(), 
+				new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE,TaxiUtils.wait4Taxi),
 				"distance");
 		controler.addControlerListener(distanceDistribution);
 

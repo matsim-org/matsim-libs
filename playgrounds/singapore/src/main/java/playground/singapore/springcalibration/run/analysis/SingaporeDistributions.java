@@ -55,6 +55,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.singapore.springcalibration.run.SingaporeControlerListener;
+import playground.singapore.springcalibration.run.TaxiUtils;
 
 /**
  * @author anhorni
@@ -108,11 +109,14 @@ public class SingaporeDistributions implements IterationEndsListener {
 		for (Trip trip : trips) {
 			String originActivityType = trip.getOriginActivity().getType();
 			String destinationActivityType = trip.getDestinationActivity().getType();
-			
+						
 			originActivityType = this.mapActivity(originActivityType);
 			destinationActivityType = this.mapActivity(destinationActivityType);
 												
 			String mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
+			
+			//log.info(plan.getPerson().getId().toString() + ": " + mainMode + " - " + originActivityType + " - " + destinationActivityType);
+			
 			Tuple<String, String> tuple = new Tuple<String, String>(originActivityType, destinationActivityType);
 			for (DistributionClass distributionClass : classes) {
 				boolean containsMainMode = distributionClass.mainModes.contains(mainMode);

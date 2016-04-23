@@ -72,6 +72,7 @@ public class TaxiUtils {
 	}
 	
 	public double getWaitingTime(Coord coord, int hour) {
+		hour = Math.min(hour, 23);
 		return this.taxiWaitingTimesQuadTree.getClosest(coord.getX(), coord.getY()).getWaitingTime(hour);
 	}
 	
