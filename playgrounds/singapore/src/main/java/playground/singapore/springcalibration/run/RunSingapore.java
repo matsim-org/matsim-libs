@@ -68,7 +68,7 @@ public class RunSingapore {
 			}
 		}) ;		
 		
-		final SubpopTravelDisutilityFactory subPopDisutilityCalculatorFactory = new SubpopTravelDisutilityFactory(parameters, "taxi");
+		final SubpopTravelDisutilityFactory subPopDisutilityCalculatorFactory = new SubpopTravelDisutilityFactory(parameters, "freight");
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
