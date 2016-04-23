@@ -163,13 +163,16 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 				forbidOther, 
 				forbidSchoolbus);
 		
-		if (!leg.getMode().equals("taxi") && newMode.equals("taxi")) {
+		String oldMode = leg.getMode();
+		leg.setMode(newMode);
+		
+		if (!oldMode.equals("taxi") && newMode.equals("taxi")) {
 			this.handleTaxi(plan, leg, 1);
 		}
-		if (leg.getMode().equals("taxi") && !newMode.equals("taxi")) {
+		if (oldMode.equals("taxi") && !newMode.equals("taxi")) {
 			this.handleTaxi(plan, leg, -1);
 		}
-		leg.setMode(newMode);
+		
 	}
 
 	private String chooseModeOtherThan(final String currentMode, final boolean forbidCar, final boolean forbidPassenger, final boolean forbidWalk, final boolean forbidOther, final boolean forbidSchoolbus) {
@@ -263,8 +266,7 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 			if (pe instanceof Activity) {
 				Activity currentActivity = (Activity)pe;
 				Leg nextLeg = PlanUtils.getNextLeg(plan, currentActivity);
-				if (nextLeg != null && 
-						nextLeg.getMode().equals("taxi")&& !currentActivity.equals(TaxiUtils.wait4Taxi)) {
+				if (nextLeg == leg) {
 					
 					Coord coord = currentActivity.getCoord();
 					int hour = (int)(currentActivity.getEndTime() / 3600.0);
@@ -277,8 +279,8 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 										
 					Activity taxiWaitAct = new ActivityImpl(TaxiUtils.wait4Taxi, currentActivity.getCoord(), currentActivity.getLinkId());					
 					taxiWaitAct.setEndTime(taxiWaitEndTime);
-					tmpPlan.addLeg(taxiWalkLeg);
 					tmpPlan.addActivity(taxiWaitAct);
+					tmpPlan.addLeg(taxiWalkLeg);					
 				}
 				tmpPlan.addActivity(currentActivity);
 			}
