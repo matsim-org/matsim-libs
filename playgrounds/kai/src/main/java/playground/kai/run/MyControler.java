@@ -17,6 +17,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -40,6 +41,9 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 class MyControler {
 	
 	public static void main ( String[] args ) {
+		ControlerUtils.initializeOutputLogging();
+		
+
 		Logger.getLogger("blabla").warn("here") ;
 		
 		// prepare the config:
