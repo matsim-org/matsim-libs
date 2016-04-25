@@ -351,15 +351,15 @@ public class ZHCutter {
 					filteredPopulation.addPerson(p);
 					filteredAgents.put(p.getId(), p);
 					if (actNotInArea) {
-						personAttributes.putAttribute(p.toString(), "subpopulation", commuterTag);
+						personAttributes.putAttribute(p.getId().toString(), "subpopulation", commuterTag);
 					}
 				} else if (checkForRouteIntersection(p.getSelectedPlan())) {
 					filteredPopulation.addPerson(p);
 					filteredAgents.put(p.getId(), p);
-					personAttributes.putAttribute(p.toString(), "subpopulation", commuterTag);
+					personAttributes.putAttribute(p.getId().toString(), "subpopulation", commuterTag);
 				}
 				else {
-					personAttributes.removeAllAttributes(p.toString());
+					personAttributes.removeAllAttributes(p.getId().toString());
 				}
 			}
 		}
