@@ -134,7 +134,6 @@ public class ClusteredChainGeneratorTest{
 	@Test
 	public void testReconstructChains(){
 		setupClusters();
-		setupXmlFolders();
 		
 		ClusteredChainGenerator ccg = new ClusteredChainGenerator();
 		QuadTree<DigicoreFacility> qt = null;
@@ -293,10 +292,5 @@ public class ClusteredChainGeneratorTest{
 		oaw.putAttributeConverter(Polygon.class, new HullConverter());
 		oaw.writeFile(utils.getOutputDirectory() + "facilityAttributes.xml");
 	}
-	
-	
-	private void setupXmlFolders(){
 		
-	}
-	
 }
