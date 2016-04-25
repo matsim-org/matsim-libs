@@ -53,7 +53,8 @@ import java.util.*;
  *
  * @author polettif
  */
-public class PTMapperModes extends PTMapper {
+@Deprecated
+public class PTMapperModesOneNetwork extends PTMapper {
 
 	int artificialId = 0;
 	private Map<Tuple<LinkCandidate, LinkCandidate>, Link> artificialLinks = new HashMap<>();
@@ -66,11 +67,11 @@ public class PTMapperModes extends PTMapper {
 	 * Constructor.
 	 * The given schedule is modified via {@link #mapScheduleToNetwork(Network)}
 	 */
-	public PTMapperModes(TransitSchedule schedule, PublicTransportMapConfigGroup config) {
+	public PTMapperModesOneNetwork(TransitSchedule schedule, PublicTransportMapConfigGroup config) {
 		super(schedule, config);
 	}
 
-	public PTMapperModes(String configPath) {
+	public PTMapperModesOneNetwork(String configPath) {
 		super(configPath);
 	}
 
@@ -87,7 +88,7 @@ public class PTMapperModes extends PTMapper {
 	public static void main(String[] args) {
 		if(args.length == 1) {
 			log.info("Mapping files from config...");
-			new PTMapperModes(args[0]).mapFilesFromConfig();
+			new PTMapperModesOneNetwork(args[0]).mapFilesFromConfig();
 		}
 		else if (args.length != 4) {
 			System.out.println("Incorrect number of arguments\n[0] unmapped schedule file\n[1] network file\n[2] output schedule path\n[3]output network path");
@@ -119,7 +120,7 @@ public class PTMapperModes extends PTMapper {
 		TransitSchedule mainSchedule = mainScenario.getTransitSchedule();
 
 		log.info("Mapping transit schedule to network...");
-		new PTMapperModes(mainSchedule, PublicTransportMapConfigGroup.createDefaultConfig()).mapScheduleToNetwork(mainNetwork);
+		new PTMapperModesOneNetwork(mainSchedule, new PublicTransportMapConfigGroup()).mapScheduleToNetwork(mainNetwork);
 
 		log.info("Writing schedule and network to file...");
 		new TransitScheduleWriter(mainSchedule).writeFile(outputScheduleFile);
@@ -243,13 +244,15 @@ public class PTMapperModes extends PTMapper {
 
 											// if both links are the same, travel time should get higher since
 											if(linkCandidateCurrent.getLink().equals(linkCandidateNext.getLink())) {
-												travelCost *= config.getSameLinkPunishment();
+												travelCost *= 10;
 											}
 
 											if(travelCost < minTravelCost) {
 												minTravelCost = travelCost;
 											}
 										}
+
+										alreadyCalculated.put(key, travelCost);
 									}
 
 									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
@@ -366,7 +369,7 @@ public class PTMapperModes extends PTMapper {
 					toLinkCandidate.getLink().getFromNode());
 
 			newLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
-			newLink.setLength(lengthFactor * CoordUtils.calcEuclideanDistance(fromLinkCandidate.getLink().getToNode().getCoord(), toLinkCandidate.getLink().getFromNode().getCoord()));
+			newLink.setLength(lengthFactor * CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord()));
 			this.network.addLink(newLink);
 
 

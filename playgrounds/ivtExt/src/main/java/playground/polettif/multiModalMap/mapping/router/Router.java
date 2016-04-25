@@ -42,4 +42,6 @@ public interface Router extends TravelDisutility, TravelTime {
      */
     LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode);
 
+    LeastCostPathCalculator.Path calcLeastCostPath(Link fromLink, Link toLink);
+
 }

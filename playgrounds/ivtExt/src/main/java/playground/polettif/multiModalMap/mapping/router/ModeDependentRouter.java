@@ -31,16 +31,16 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import playground.polettif.multiModalMap.tools.MiscUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Based on the line, mode, and link type, the traveling on links is assigned different costs.
- * The better the match, the lower the costs.
+ * TODO doc
  *
- * @author boescpa
+ * @author polettif
  */
 public class ModeDependentRouter implements Router {
 
@@ -74,6 +74,11 @@ public class ModeDependentRouter implements Router {
         }
     }
 
+	@Override
+	public LeastCostPathCalculator.Path calcLeastCostPath(Link fromLink, Link toLink) {
+		return calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode());
+	}
+
 
 	/**
 	 * @param link The link for which the travel disutility is calculated.
@@ -105,17 +110,6 @@ public class ModeDependentRouter implements Router {
     }
 
 	public boolean linkHasRoutingMode(Link link) {
-		if(routingTransportModes == null) {
-			return true;
-		}
-
-		for(String routingTransportMode : routingTransportModes) {
-			for(String linkTransportMode : link.getAllowedModes()) {
-				if(routingTransportMode.equalsIgnoreCase(linkTransportMode)) {
-					return true;
-				}
-			}
-		}
-		return false;
+		return MiscUtils.setsShareMinOneEntry(link.getAllowedModes(), routingTransportModes);
 	}
 }

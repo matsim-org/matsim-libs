@@ -177,7 +177,7 @@ public class NetworkTools {
 					// check if link is already in the closestLinks set
 					if(!closestLinksMap.containsValue(link)) {
 						// only use links with a viable network transport mode
-						if(setsShareMinOneEntry(link.getAllowedModes(), networkTransportModes)) {
+						if(MiscUtils.setsShareMinOneEntry(link.getAllowedModes(), networkTransportModes)) {
 							lineSegmentDistance = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
 
 							// since distance is used as key, we need to ensure the exact distance is not used already
@@ -243,13 +243,13 @@ public class NetworkTools {
 	 * adds both to the network. The stop facility is NOT referenced.
 	 * @return the new Link.
 	 */
-	public static Link createArtificialStopFacilityLink(TransitStopFacility stopFacility, Network network) {
+	public static Link createArtificialStopFacilityLink(TransitStopFacility stopFacility, Network network, String prefix) {
 		NetworkFactory networkFactory = network.getFactory();
 
 		Coord coord = stopFacility.getCoord();
 
-		Node dummyNode = networkFactory.createNode(Id.createNodeId(stopFacility.getId()+"_node"), coord);
-		Link dummyLink = networkFactory.createLink(Id.createLinkId(stopFacility.getId()+"_link"), dummyNode, dummyNode);
+		Node dummyNode = networkFactory.createNode(Id.createNodeId(prefix+stopFacility.getId()+"_node"), coord);
+		Link dummyLink = networkFactory.createLink(Id.createLinkId(prefix+stopFacility.getId()+"_link"), dummyNode, dummyNode);
 
 		dummyLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
 
@@ -319,25 +319,6 @@ public class NetworkTools {
 		}
 
 		return oppositeDirectionLink;
-	}
-
-	/**
-	 * @return true, if two sets (e.g. scheduleTransportModes and
-	 * networkTransportModes) have at least one identical entry.
-	 */
-	public static boolean setsShareMinOneEntry(Set<String> set1, Set<String> set2) {
-		if(set1 == null || set2 == null) {
-			return false;
-		} else {
-			for(String entry1 : set1) {
-				for(String entry2 : set2) {
-					if(entry1.equalsIgnoreCase(entry2)) {
-						return true;
-					}
-				}
-			}
-			return false;
-		}
 	}
 
 	/**
@@ -427,6 +408,67 @@ public class NetworkTools {
 			stopsInArea.put(stopFacility, NetworkTools.isInArea(stopFacility.getCoord(), area));
 		}
 		return stopsInArea;
+	}
+
+	/**
+	 * Merges all network into baseNetworks. If a link id already
+	 * exists in the base network, the link is not added to it.
+	 *
+	 * @param baseNetwork the network in which all other networks are integrated
+	 * @param networks collection of networks to merge into the base network
+	 */
+	public static void mergeNetworks(Network baseNetwork, Collection<Network> networks) {
+		log.info("Merging networks...");
+
+		int numberOfLinksBefore = baseNetwork.getLinks().size();
+		int numberOfNodesBefore = baseNetwork.getNodes().size();
+
+		for(Network currentNetwork : networks) {
+			integrateNetwork(baseNetwork, currentNetwork);
+		}
+
+		log.info(" Merging Stats:");
+		log.info("  Total number of links added to network: " + (baseNetwork.getLinks().size()-numberOfLinksBefore));
+		log.info("  Total number of nodes added to network: " + (baseNetwork.getNodes().size()-numberOfNodesBefore));
+		log.info("Merging networks... done.");
+	}
+
+	/**
+	 * Integrates network B into network A. Network
+	 * A contains all links and nodes of both networks
+	 * after integration.
+	 *
+	 * @param networkA
+	 * @param networkB
+	 */
+	public static void integrateNetwork(final Network networkA, final Network networkB) {
+		final NetworkFactory factory = networkA.getFactory();
+
+		// Nodes
+		for (Node node : networkB.getNodes().values()) {
+			Id<Node> nodeId = Id.create(node.getId().toString(), Node.class);
+			if(!networkA.getNodes().containsKey(nodeId)) {
+				Node newNode = factory.createNode(nodeId, node.getCoord());
+				networkA.addNode(newNode);
+			}
+		}
+
+		// Links
+		double capacityFactor = networkA.getCapacityPeriod() / networkB.getCapacityPeriod();
+		for (Link link : networkB.getLinks().values()) {
+			Id<Link> linkId = Id.create(link.getId().toString(), Link.class);
+			if (!networkA.getLinks().containsKey(linkId)) {
+				Id<Node> fromNodeId = Id.create(link.getFromNode().getId().toString(), Node.class);
+				Id<Node> toNodeId = Id.create(link.getToNode().getId().toString(), Node.class);
+				Link newLink = factory.createLink(linkId, networkA.getNodes().get(fromNodeId), networkA.getNodes().get(toNodeId));
+				newLink.setAllowedModes(link.getAllowedModes());
+				newLink.setCapacity(link.getCapacity() * capacityFactor);
+				newLink.setFreespeed(link.getFreespeed());
+				newLink.setLength(link.getLength());
+				newLink.setNumberOfLanes(link.getNumberOfLanes());
+				networkA.addLink(newLink);
+			}
+		}
 	}
 
 

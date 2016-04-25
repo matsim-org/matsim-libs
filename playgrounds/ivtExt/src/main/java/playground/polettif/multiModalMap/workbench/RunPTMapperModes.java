@@ -19,7 +19,7 @@
 
 package playground.polettif.multiModalMap.workbench;
 
-import playground.polettif.multiModalMap.mapping.PTMapperModes;
+import playground.polettif.multiModalMap.mapping.PTMapperModesOneNetwork;
 
 public class RunPTMapperModes {
 
@@ -46,7 +46,7 @@ public class RunPTMapperModes {
 		final String networkFile = base + "data/network/multimodal/zurich-plus-mm.xml.gz";
 //		final String networkFile = base + "data/network/uri.xml.gz";
 
-		PTMapperModes.main(new String[]{mtsFile, networkFile, outbase+"schedule.xml", outbase+"network.xml"});
+		PTMapperModesOneNetwork.main(new String[]{mtsFile, networkFile, outbase+"schedule.xml", outbase+"network.xml"});
 	}
 
 }

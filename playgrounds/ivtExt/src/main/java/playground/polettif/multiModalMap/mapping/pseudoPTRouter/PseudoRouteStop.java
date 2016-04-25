@@ -1,5 +1,6 @@
 package playground.polettif.multiModalMap.mapping.pseudoPTRouter;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -25,8 +26,8 @@ public class PseudoRouteStop {
 	private boolean awaitDepartureTime;
 
 	public PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
-		this.id = Integer.toString(order) + routeStop.getStopFacility().getId() + linkCandidate.getLink().getId();
-		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLink().getId() + ")";
+		this.id = Integer.toString(order) + routeStop.getStopFacility().getId() + linkCandidate.getLinkId();
+		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLinkId() + ")";
 		this.linkCandidate = linkCandidate;
 
 		this.departureOffset = routeStop.getDepartureOffset();
@@ -73,8 +74,8 @@ public class PseudoRouteStop {
 		return name;
 	}
 
-	public TransitStopFacility getChildStopFacility() {
-		return linkCandidate.getChildStop();
+	public Id<TransitStopFacility> getChildStopFacilityId() {
+		return linkCandidate.getChildStop().getId();
 	}
 
 	public String getName() {

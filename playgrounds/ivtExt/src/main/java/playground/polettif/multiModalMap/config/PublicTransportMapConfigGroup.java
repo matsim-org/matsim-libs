@@ -21,6 +21,7 @@ package playground.polettif.multiModalMap.config;
 
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,14 +38,85 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String ARTIFICIAL_LINK_MODE = "artificial";
 
+	private static final String MODE_ROUTING_ASSIGNMENT ="modeRoutingAssignment";
+	private static final String MODES_TO_KEEP_ON_CLEAN_UP = "modesToKeepOnCleanUp";
+	private static final String NODE_SEARCH_RADIUS = "nodeSearchRadius";
+	private static final String PSEUDO_ROUTE_WEIGHT = "pseudoRouteWeight";
+	private static final String MAX_NCLOSEST_LINKS = "maxNClosestLinks";
+	private static final String MAX_STOP_FACILITY_DISTANCE = "maxStopFacilityDistance";
+	private static final String PREFIX_ARTIFICIAL = "prefixArtificial";
+	private static final String SUFFIX_CHILD_STOP_FACILITIES = "suffixChildStopFacilities";
+	private static final String BEELINE_DISTANCE_MAX_FACTOR = "beelineDistanceMaxFactor";
+	private static final String NETWORK_FILE = "networkFile";
+	private static final String SCHEDULE_FILE = "scheduleFile";
+	private static final String OUTPUT_NETWORK_FILE = "outputNetworkFile";
+	private static final String OUTPUT_SCHEDULE_FILE = "outputScheduleFile";
+
 	public PublicTransportMapConfigGroup() {
-		super( GROUP_NAME );
+		super(GROUP_NAME);
+
+		modesToKeepOnCleanUp.add("car");
+
+		Set<String> busSet = new HashSet<>();
+		busSet.add("bus");
+		busSet.add("car");
+		modeRoutingAssignment.put("BUS", busSet);
+
+		Set<String> tramSet = new HashSet<>();
+		tramSet.add(ARTIFICIAL_LINK_MODE);
+//		tramSet.add("tram");
+		modeRoutingAssignment.put("TRAM", tramSet);
+
+		Set<String> railSet = new HashSet<>();
+		railSet.add("rail");
+		railSet.add("light_rail");
+		modeRoutingAssignment.put("RAIL", railSet);
 	}
+
+
+
+
+	/**
+	 * NOT a config variable.
+	 */
+	private Map<String, TransitStopFacility> childStopFacilities = new HashMap<>();
 
 	private String networkFile = null;
 	private String scheduleFile = null;
 	private String outputNetworkFile = null;
 	private String outputScheduleFile = null;
+
+	@Override
+	public final Map<String, String> getComments() {
+		Map<String, String> map = super.getComments();
+		map.put(MODE_ROUTING_ASSIGNMENT,
+				"References transportModes from the schedule (key) and the allowed transportModes of a link from the network (values). " +
+						"Schedule transport modes not defined here are not mapped at all and routes using them are removed. One schedule transport" +
+						"mode can be mapped to multiple network transport modes, the latter have to be separated by \",\". To map a" +
+						"schedule transport mode independently from the network use \"artificial\". Assignments are separated by \"|\".");
+		map.put(MODES_TO_KEEP_ON_CLEAN_UP,
+				"All links that do not have a transit route on them are removed, except the ones " +
+				"listed in this set (typically only car). Separated by comma.");
+		map.put(MAX_NCLOSEST_LINKS,
+				"Number of link candidates considered for all stops, depends on accuracy " +
+				"of stops and desired performance. Somewhere between 4 and 10 seems reasonable," +
+				"depending on the accuracy of the stop facility coordinates. Default: " + nodeSearchRadius);
+		map.put(PSEUDO_ROUTE_WEIGHT, "");
+		map.put(NODE_SEARCH_RADIUS,
+				"Defines the radius [meter] from a stop facility within nodes are searched. Mainly a maximum value for performance.");
+		map.put(MAX_STOP_FACILITY_DISTANCE,
+				"The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
+		map.put(PREFIX_ARTIFICIAL,
+				"ID prefix used for artificial links and nodes created if no nodes are found within nodeSearchRadius.");
+		map.put(SUFFIX_CHILD_STOP_FACILITIES, "Suffix used for child stop facilities. The id of the referenced link is appended (i.e. stop0123.link:LINKID20123).");
+		map.put(BEELINE_DISTANCE_MAX_FACTOR , "If all paths between two stops have a length > beelineDistanceMaxFactor * beelineDistance, an artificial link is created.");
+		map.put(NETWORK_FILE, "Path to the input network file. Not needed if PTMapper is called within another class.");
+		map.put(SCHEDULE_FILE, "Path to the input schedule file. Not needed if PTMapper is called within another class.");
+		map.put(OUTPUT_NETWORK_FILE, "Path to the output network file. Not needed if PTMapper is used within another class.");
+		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
+		return map;
+	}
+
 
 	/**
 	 * for each schedule transport the following needs to be specified:
@@ -81,21 +153,21 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		this.modeRoutingAssignment = modeRoutingAssignment;
 	}
 
-	@StringGetter( "modeRoutingAssignment" )
+	@StringGetter(MODE_ROUTING_ASSIGNMENT)
 	private String getModeRoutingAssignmentString() {
 		String ret = "";
 		for(Map.Entry<String, Set<String>> entry : modeRoutingAssignment.entrySet()) {
-			ret += "|"+entry.getKey().toUpperCase()+":";
+			ret += "|" + entry.getKey().toUpperCase() + ":";
 			String value = "";
 			for(String mode : entry.getValue()) {
-				value = ","+mode;
+				value += "," + mode;
 			}
 			ret += value.substring(1);
 		}
 		return this.modesToKeepOnCleanUp == null ? null : ret.substring(1);
 	}
 
-	@StringSetter( "modeRoutingAssignment" )
+	@StringSetter(MODE_ROUTING_ASSIGNMENT)
 	private void setModeRoutingAssignmentString(String modeRoutingAssignmentString) {
 		if(modeRoutingAssignmentString == null) {
 			this.modeRoutingAssignment = null;
@@ -127,18 +199,18 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		this.modesToKeepOnCleanUp = modesToKeepOnCleanUp;
 	}
 
-	@StringGetter( "modesToKeepOnCleanUp" )
+	@StringGetter(MODES_TO_KEEP_ON_CLEAN_UP)
 	private String getModesToKeepOnCleanUpString() {
 		String ret = "";
 		if(modesToKeepOnCleanUp != null) {
 			for(String mode : modesToKeepOnCleanUp) {
-				ret += ","+mode;
+				ret += "," + mode;
 			}
 		}
 		return this.modesToKeepOnCleanUp == null ? null : ret.substring(1);
 	}
 
-	@StringSetter( "modesToKeepOnCleanUp" )
+	@StringSetter(MODES_TO_KEEP_ON_CLEAN_UP)
 	private void setModesToKeepOnCleanUp(String modesToKeepOnCleanUp) {
 		if(modesToKeepOnCleanUp == null) {
 			this.modesToKeepOnCleanUp = null;
@@ -155,14 +227,36 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	 * Mainly a maximum value for performance.
 	 */
 	private double nodeSearchRadius = 300;
-	@StringGetter( "nodeSearchRadius" )
+
+	@StringGetter(NODE_SEARCH_RADIUS)
 	public double getNodeSearchRadius() {
 		return nodeSearchRadius;
 	}
-	@StringSetter( "nodeSearchRadius" )
+
+	@StringSetter(NODE_SEARCH_RADIUS)
 	public void setNodeSearchRadius(double nodeSearchRadius) {
 		this.nodeSearchRadius = nodeSearchRadius;
 	}
+
+	/**
+	 * Defines which link attribute should be used for pseudo route
+	 * calculations. Default is link length (linkLength), pseudorouting
+	 * minimizes the distance travelled.
+	 * todo add possible traveltime throughout files
+	 */
+	/*
+	private PublicTransportMapEnum pseudoRouteWeight = PublicTransportMapEnum.LINKLENGTH;
+
+	@StringGetter(PSEUDO_ROUTE_WEIGHT)
+	public PublicTransportMapEnum getPseudoRouteWeight() {
+		return pseudoRouteWeight;
+	}
+
+	@StringSetter(PSEUDO_ROUTE_WEIGHT)
+	public void setPseudoRouteWeight(PublicTransportMapEnum weight) {
+		this.pseudoRouteWeight = weight;
+	}
+*/
 
 	/**
 	 * Number of link candidates considered for all stops, depends on accuracy of
@@ -170,11 +264,13 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	 * depending on the accuracy of the stop facility coordinates. Default: 8
 	 */
 	private int maxNClosestLinks = 8;
-	@StringGetter( "maxNClosestLinks" )
+
+	@StringGetter(MAX_NCLOSEST_LINKS)
 	public int getMaxNClosestLinks() {
 		return maxNClosestLinks;
 	}
-	@StringSetter( "maxNClosestLinks" )
+
+	@StringSetter(MAX_NCLOSEST_LINKS)
 	public void setMaxNClosestLinks(int maxNClosestLinks) {
 		this.maxNClosestLinks = maxNClosestLinks;
 	}
@@ -184,29 +280,15 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	 * the stop facility.
 	 */
 	private double maxStopFacilityDistance = 80;
-	@StringGetter( "maxStopFacilityDistance" )
+
+	@StringGetter(MAX_STOP_FACILITY_DISTANCE)
 	public double getMaxStopFacilityDistance() {
 		return maxStopFacilityDistance;
 	}
-	@StringSetter( "maxStopFacilityDistance" )
+
+	@StringSetter(MAX_STOP_FACILITY_DISTANCE)
 	public void setMaxStopFacilityDistance(double maxStopFacilityDistance) {
 		this.maxStopFacilityDistance = maxStopFacilityDistance;
-	}
-
-
-	/**
-	 * if two link candidates are the same travel time is multiplied by this
-	 * factor. Otherwise travel time would just be the link traveltime
-	 * since routing works with nodes
-	 */
-	private double sameLinkPunishment = 3;
-	@StringGetter( "sameLinkPunishment" )
-	public double getSameLinkPunishment() {
-		return sameLinkPunishment;
-	}
-	@StringSetter( "sameLinkPunishment" )
-	public void setSameLinkPunishment(double sameLinkPunishment) {
-		this.sameLinkPunishment = sameLinkPunishment;
 	}
 
 	/**
@@ -214,11 +296,13 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	 * are found within nodeSearchRadius
 	 */
 	private String prefixArtificial = "pt_";
-	@StringGetter( "prefixArtificial" )
+
+	@StringGetter(PREFIX_ARTIFICIAL)
 	public String getPrefixArtificial() {
 		return prefixArtificial;
 	}
-	@StringSetter( "prefixArtificial" )
+
+	@StringSetter(PREFIX_ARTIFICIAL)
 	public void setPrefixArtificial(String prefixArtificial) {
 		this.prefixArtificial = prefixArtificial;
 	}
@@ -228,11 +312,13 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	 * parent stop facility is appended (i.e. stop0123.fac:2).
 	 */
 	private String suffixChildStopFacilities = ".fac:";
-	@StringGetter( "suffixChildStopFacilities" )
+
+	@StringGetter(SUFFIX_CHILD_STOP_FACILITIES)
 	public String getSuffixChildStopFacilities() {
 		return suffixChildStopFacilities;
 	}
-	@StringSetter( "suffixChildStopFacilities" )
+
+	@StringSetter(SUFFIX_CHILD_STOP_FACILITIES)
 	public void setSuffixChildStopFacilities(String suffixChildStopFacilities) {
 		this.suffixChildStopFacilities = suffixChildStopFacilities;
 	}
@@ -242,11 +328,13 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	 * an artificial link is created.
 	 */
 	private double beelineDistanceMaxFactor = 3;
-	@StringGetter( "beelineDistanceMaxFactor" )
+
+	@StringGetter(BEELINE_DISTANCE_MAX_FACTOR)
 	public double getBeelineDistanceMaxFactor() {
 		return beelineDistanceMaxFactor;
 	}
-	@StringSetter( "beelineDistanceMaxFactor" )
+
+	@StringSetter(BEELINE_DISTANCE_MAX_FACTOR)
 	public void setBeelineDistanceMaxFactor(double beelineDistanceMaxFactor) {
 		this.beelineDistanceMaxFactor = beelineDistanceMaxFactor;
 	}
@@ -263,80 +351,61 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		return scheduleModes;
 	}
 
-	@StringGetter( "networkFile" )
-	public String getNetworkFile() { return this.networkFile; }
-	@StringSetter( "networkFile" )
+	@StringGetter(NETWORK_FILE)
+	public String getNetworkFile() {
+		return this.networkFile;
+	}
+
+	@StringSetter(NETWORK_FILE)
 	public String setNetworkFile(String networkFile) {
 		final String old = this.networkFile;
 		this.networkFile = networkFile;
 		return old;
 	}
 
-	@StringGetter( "scheduleFile" )
-	public String getScheduleFile() { return this.scheduleFile; }
-	@StringSetter( "scheduleFile" )
+	@StringGetter(SCHEDULE_FILE)
+	public String getScheduleFile() {
+		return this.scheduleFile;
+	}
+
+	@StringSetter(SCHEDULE_FILE)
 	public String setScheduleFile(String scheduleFile) {
 		final String old = this.scheduleFile;
 		this.scheduleFile = scheduleFile;
 		return old;
 	}
 
-	@StringGetter( "outputNetworkFile" )
-	public String getOutputNetworkFile() { return this.outputNetworkFile; }
-	@StringSetter( "outputNetworkFile" )
+	@StringGetter(OUTPUT_NETWORK_FILE)
+	public String getOutputNetworkFile() {
+		return this.outputNetworkFile;
+	}
+
+	@StringSetter(OUTPUT_NETWORK_FILE)
 	public String setOutputNetwork(String outputNetwork) {
 		final String old = this.outputNetworkFile;
 		this.outputNetworkFile = outputNetwork;
 		return old;
 	}
 
-	@StringGetter( "outputScheduleFile" )
-	public String getOutputScheduleFile() { return this.outputScheduleFile; }
-	@StringSetter( "outputScheduleFile" )
+	@StringGetter(OUTPUT_SCHEDULE_FILE)
+	public String getOutputScheduleFile() {
+		return this.outputScheduleFile;
+	}
+
+	@StringSetter(OUTPUT_SCHEDULE_FILE)
 	public String setOutputSchedule(String outputSchedule) {
 		final String old = this.outputScheduleFile;
 		this.outputScheduleFile = outputSchedule;
 		return old;
 	}
 
-	// /////////////////////////////////////////////////////////////////////
-	// Default
-	public static PublicTransportMapConfigGroup createDefaultConfig() {
-
-		PublicTransportMapConfigGroup defaultConfig = ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), PublicTransportMapConfigGroup.GROUP_NAME, PublicTransportMapConfigGroup.class);
-
-		defaultConfig.modesToKeepOnCleanUp.add("car");
-
-
-		Set<String> busSet = new HashSet<>();
-		busSet.add("bus");
-		busSet.add("car");
-		defaultConfig.modeRoutingAssignment.put("BUS", busSet);
-
-
-		Set<String> tramSet = new HashSet<>();
-		tramSet.add(ARTIFICIAL_LINK_MODE);
-//		tramSet.add("tram");
-		defaultConfig.modeRoutingAssignment.put("TRAM", tramSet);
-
-		Set<String> railSet = new HashSet<>();
-		railSet.add("rail");
-		railSet.add("light_rail");
-		defaultConfig.modeRoutingAssignment.put("RAIL", railSet);
-
-		// subway, gondola, funicular, ferry and cablecar are not mapped
-
-		return defaultConfig;
-	}
-
-
-	// todo change config to use different values for different modes
 	/**
 	 * Number of link candidates considered for all stops, different for scheduleModes.
 	 * Depends on accuracy of stops and desired performance. Somewhere between 4 and 10 seems reasonable,
 	 * depending on the accuracy of the stop facility coordinates. Default: 8
 	 */
-	public Map<String,Integer> getMaxNClosestLinksByMode() {
+	public Map<String, Integer> getMaxNClosestLinksByMode() {
 		return null;
 	}
+
 }

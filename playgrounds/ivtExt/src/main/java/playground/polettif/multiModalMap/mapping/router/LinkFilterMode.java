@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,8 +16,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.multiModalMap.config;
+package playground.polettif.multiModalMap.mapping.router;
 
-public enum PublicTransportMapEnum {
-	LINKLENGTH, TRAVELTIME;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.filter.NetworkLinkFilter;
+import playground.polettif.multiModalMap.tools.MiscUtils;
+
+import java.util.Set;
+
+/**
+ * A Link filter to separate links by allowed transport modes.
+ */
+public class LinkFilterMode implements NetworkLinkFilter {
+
+	private final Set<String> modes;
+
+	public LinkFilterMode(Set<String> modes) {
+		this.modes = modes;
+	}
+
+	@Override
+	public boolean judgeLink(Link l) {
+		return MiscUtils.setsShareMinOneEntry(l.getAllowedModes(), modes);
+	}
 }

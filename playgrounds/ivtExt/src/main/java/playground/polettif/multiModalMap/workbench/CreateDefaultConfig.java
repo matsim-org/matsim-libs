@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,8 +16,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.multiModalMap.config;
+package playground.polettif.multiModalMap.workbench;
 
-public enum PublicTransportMapEnum {
-	LINKLENGTH, TRAVELTIME;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class CreateDefaultConfig {
+	
+	public static void main(final String[] args) {
+		Config config = ConfigUtils.createConfig();
+
+		Set<String> toRemove = config.getModules().keySet().stream().filter(module -> !module.equals(PublicTransportMapConfigGroup.GROUP_NAME)).collect(Collectors.toSet());
+		toRemove.forEach(config::removeModule);
+
+		new ConfigWriter(config).write(args[0]);
+	}
 }

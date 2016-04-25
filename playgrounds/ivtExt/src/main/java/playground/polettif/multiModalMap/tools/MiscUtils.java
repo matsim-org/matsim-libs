@@ -16,32 +16,38 @@
  *                                                                         *
  * *********************************************************************** */
 
+package playground.polettif.multiModalMap.tools;
 
-package playground.polettif.crossings.analysis;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+public class MiscUtils {
 
-public class AnalysisHandler implements LinkEnterEventHandler, LinkLeaveEventHandler{
-
-	private int startTime;
-	private int endTime;
-	private int timeSpan;
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-
+	/**
+	 * @return true, if two sets (e.g. scheduleTransportModes and
+	 * networkTransportModes) have at least one identical entry.
+	 */
+	public static boolean setsShareMinOneEntry(Set<String> set1, Set<String> set2) {
+		if(set1 == null || set2 == null) {
+			return false;
+		} else {
+			for(String entry1 : set1) {
+				for(String entry2 : set2) {
+					if(entry1.equalsIgnoreCase(entry2)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
 	}
 
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-
-	}
-
-	@Override
-	public void reset(int iteration) {
-
+	public static Set<String> getSharedSetEntry(Set<String> set1, Set<String> set2) {
+		Set<String> shared = new HashSet<>();
+		for(String entry1 : set1) {
+			shared.addAll(set2.stream().filter(entry1::equalsIgnoreCase).map(entry2 -> entry1).collect(Collectors.toList()));
+		}
+		return shared;
 	}
 }

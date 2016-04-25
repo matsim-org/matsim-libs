@@ -59,7 +59,7 @@ public abstract class PTMapper {
 
 	protected PTMapper(TransitSchedule schedule) {
 		this.schedule = schedule;
-		this.config = PublicTransportMapConfigGroup.createDefaultConfig();
+		this.config = new PublicTransportMapConfigGroup();
 	}
 
 	public PTMapper(String configPath) {
