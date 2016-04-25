@@ -15,9 +15,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterImpl;
 
 import java.io.File;
@@ -32,15 +30,10 @@ public class NMBValueCheck {
 
     public static void main(String[] args) {
 
-        File file = new File("");
-        try {
-            System.out.println(file.getCanonicalPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String networkFile = "playgrounds/dziemke/input/NMBM_PT_V1.xml";
-        String transitScheduleFile = "playgrounds/dziemke/input/Transitschedule_PT_V1_WithVehicles.xml";
+//        String networkFile = "playgrounds/dziemke/input/NMBM_PT_V1.xml";
+//        String transitScheduleFile = "playgrounds/dziemke/input/Transitschedule_PT_V1_WithVehicles.xml";
+        String networkFile = "playgrounds/dziemke/input/jtlu14b.output_network.xml";
+        String transitScheduleFile = "playgrounds/dziemke/input/jtlu14b.300.transitScheduleScored.xml";
 
         Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
         config.network().setInputFile(networkFile);
@@ -57,59 +50,89 @@ public class NMBValueCheck {
         TransitRouter transitRouter = new TransitRouterImpl(transitRouterConfig, transitSchedule);
 
         Double departureTime = 8. * 60 * 60;
-        Coord coord1 = new Coord(129721.15152725934,-3690834.0129102874);
-        Coord coord2 = new Coord(147819.75957863466,-3699365.4230317925);
-        Coord coord3 = new Coord(137547.07266149623,-3706738.5909946687);
-        Coord coord4 = new Coord(140245.15520623303,-3693657.6437037485);
-        Coord coord5 = new Coord(149770.37397993292,-3689099.1898143673);
+//        Coord origin = new Coord(137547.07266149623,-3706738.5909946687);
+//        Coord destination = new Coord(140245.15520623303,-3693657.6437037485);
+        Coord origin = new Coord(143583.9441831379, -3699678.99131796);
+        Coord destination = new Coord(150583.9441831379,-3699678.99131796);
 
         CoordinateTransformation coordinateTransformation = TransformationFactory.
                 getCoordinateTransformation(TransformationFactory.WGS84_SA_Albers, TransformationFactory.WGS84);
-        Coord inverseCoord = new Coord(coordinateTransformation.transform(coord3).getY(), coordinateTransformation.transform(coord3).getX());
-        System.out.println("coord3 = " + inverseCoord);
-        inverseCoord = new Coord(coordinateTransformation.transform(coord4).getY(), coordinateTransformation.transform(coord4).getX());
-        System.out.println("coord4 = " + inverseCoord);
+        System.out.println("Origin = " + invertCoord(origin, coordinateTransformation));
 
-        List<Leg> legList = transitRouter.calcRoute(coord3, coord4, departureTime, null);
+        List<Leg> legList = transitRouter.calcRoute(origin, destination, departureTime, null);
 
-        double travelTime = 0.;
+        double travelTime = 0d;
         for (Leg leg : legList) {
             if(leg == null) {
                 throw new RuntimeException("Leg is null.");
             }
             travelTime += leg.getTravelTime();
-            System.out.println("travelTime = " + travelTime);
             String mode = leg.getMode();
-            System.out.println("mode = " + mode);
+            System.out.println("\nLegMode = " + mode);
             Route legRoute = leg.getRoute();
             if (legRoute != null) {
-                System.out.println("legRoute travelTime: " + legRoute.getTravelTime());
-                System.out.println("Route description: " + legRoute.getRouteDescription());
                 Id<Link> startLinkId = legRoute.getStartLinkId();
-                System.out.println("Route start link id: " + startLinkId);
+                Id<Link> endLinkId = legRoute.getEndLinkId();
+                System.out.println("StartLinkId " + startLinkId);
                 if (startLinkId != null) {
-                    Coord startLinkCoord = scenario.getNetwork().getLinks().get(startLinkId).getFromNode().getCoord();
-                    System.out.println("Route start link coord"
-                            + new Coord(coordinateTransformation.transform(startLinkCoord).getY(),
-                            coordinateTransformation.transform(startLinkCoord).getX()));
-                    for (TransitStopFacility stop : scenario.getTransitSchedule().getFacilities().values()) {
-                        if (stop.getLinkId().equals(startLinkId)) {
-                            stop.getId();
+                    System.out.println("StartLink WGS84 coord " +
+                            invertCoord(scenario.getNetwork().getLinks().get(startLinkId).getFromNode().getCoord(),
+                                    coordinateTransformation));
+                    System.out.println("StartLink Alberts coord " +
+                            scenario.getNetwork().getLinks().get(startLinkId).getFromNode().getCoord());
+                }
+                System.out.println("EndLinkId " + endLinkId);
+                if (endLinkId != null) {
+                    System.out.println("EndLink WGS84 coord " +
+                            invertCoord(scenario.getNetwork().getLinks().get(endLinkId).getFromNode().getCoord(),
+                                    coordinateTransformation));
+                    System.out.println("EndLink Alberts coord " +
+                            scenario.getNetwork().getLinks().get(endLinkId).getFromNode().getCoord());
+                }
+                if (leg.getMode().equals("pt")) {
+                    TransitStopFacility startStop = null;
+                    TransitStopFacility endStop = null;
+                    for (TransitStopFacility stop : transitSchedule.getFacilities().values()) {
+                        if (stop.getLinkId().equals(startLinkId)) startStop = stop;
+                        if (stop.getLinkId().equals(endLinkId)) endStop = stop;
+                    }
+                    if (startStop != null && endStop != null) {
+                        for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
+                            for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
+                                TransitRouteStop transitRouteStartStop = transitRoute.getStop(startStop);
+                                TransitRouteStop transitRouteEndStop = transitRoute.getStop(endStop);
+                                if (transitRouteStartStop != null && transitRouteEndStop != null) {
+                                    // that means the routes stops at both of our searched stops
+                                    for (Departure departure : transitRoute.getDepartures().values()) {
+                                        if (departureTime + travelTime ==
+                                                departure.getDepartureTime() + transitRouteEndStop.getArrivalOffset()) {
+
+                                            System.out.println("Route departure time at pt-origin = " +
+                                                    departure.getDepartureTime());
+                                            System.out.println("Route departure time at entry point = " +
+                                                    (departureTime + transitRouteStartStop.getDepartureOffset()));
+                                            System.out.println("Route arrival time at exit point = " + (departureTime +
+                                                    transitRouteEndStop.getArrivalOffset()));
+
+                                            System.out.println("transitLine = " + transitLine.getId());
+                                            System.out.println("transitRoute = " + transitRoute.getId());
+
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-                System.out.println("Route end link id: " + legRoute.getEndLinkId());
-                if (legRoute.getEndLinkId() != null) {
-                    Coord endLinkCoord = scenario.getNetwork().getLinks().get(legRoute.getEndLinkId()).getToNode().getCoord();
-                    System.out.println("Route end link coord"
-                            + new Coord(coordinateTransformation.transform(endLinkCoord).getY(),
-                            coordinateTransformation.transform(endLinkCoord).getX()));
-                }
-            } else {
-                System.out.println("LegRoute == null");
             }
         }
+        System.out.println("Destination = " + invertCoord(destination, coordinateTransformation));
         System.out.println("final travelTime = " + travelTime);
+    }
+
+    private static Coord invertCoord(Coord coord, CoordinateTransformation coordinateTransformation) {
+        return new Coord(coordinateTransformation.transform(coord).getY(),
+                coordinateTransformation.transform(coord).getX());
     }
 
 }
