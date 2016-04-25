@@ -27,7 +27,7 @@ public class PlanChecker {
 	public void run(String inputFile) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(scenario).readFile(inputFile);
-		this.check(scenario.getPopulation());
+		this.checkFreight(scenario.getPopulation());
 		
 		log.info("finished ##############################################");
 		
@@ -67,5 +67,26 @@ public class PlanChecker {
 			if (print) log.error("Person " + p.getId().toString() + " plan " + planStr);
 		}
 	}
+	
+	private void checkFreight(Population population) {
+		int freightCnt = 0;
+		int totalCnt = 0;
+		for (Person p : population.getPersons().values()) {
+			Plan plan = p.getSelectedPlan();
+			boolean freight = false;
+			for (PlanElement pe : plan.getPlanElements()){	
+				if(pe instanceof Leg){
+					String mode = ((Leg) pe).getMode();
+					if (mode.equals("freight")) freight = true;
+					
+ 				}
+			}
+			if (freight) freightCnt++;
+			totalCnt++;
+		}
+		
+		log.error(freightCnt + " freight agents, of " + totalCnt + " agents overall");
+		}
+	}
 
-}
+
