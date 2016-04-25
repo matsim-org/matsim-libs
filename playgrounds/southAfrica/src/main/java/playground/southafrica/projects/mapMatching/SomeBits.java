@@ -82,15 +82,6 @@ public class SomeBits {
 	public static void main(String[] args) {
 		Header.printHeader(SomeBits.class.toString(), args);
 		
-		Map<String, Integer> map = new TreeMap<String, Integer>();
-		File file = new File(args[0]);
-		String id = file.getName().substring(0, file.getName().indexOf("."));
-		if(!map.containsKey(id)){
-			map.put(id, map.size()+1);
-		}
-		int newId = map.get(id);
-		
-		splitTrips(file, String.valueOf(newId));
 		
 //		/* Read in the network. */ 
 //		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -103,68 +94,6 @@ public class SomeBits {
 	}
 	
 
-	public static void splitTrips(File file, String newId){
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "EPSG:3857");
-		String id = file.getName().substring(0, file.getName().indexOf("."));
-		File folder = file.getParentFile();
-		String folderName = folder.getAbsolutePath() + (folder.getAbsolutePath().endsWith("/") ? "" : "/") + newId + "/";
-		File newFolder = new File(folderName);
-		if(newFolder.exists() && newFolder.isDirectory()){
-			LOG.warn("The output folder exists and will be deleted: " + folderName);
-			FileUtils.delete(newFolder);
-		}
-		newFolder.mkdirs();
-		
-		LOG.info("Splitting trips for " + id );
-		LOG.info("  Writing trips to " + folderName);
-		BufferedReader br = IOUtils.getBufferedReader(file.getAbsolutePath());
-		int trips = 0;
-		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(folderName + newId + "_" + String.format("%03d.csv", trips));
-		try{
-			String line = br.readLine();
-			String[] sa = line.split(",");
-			long previousTime = Long.parseLong(sa[2]);
-			
-			while((line = br.readLine()) != null){
-				sa = line.split(",");
-				long time = Long.parseLong(sa[2]);
-				double diff = ((double)(time - previousTime)) / 1000.0;
-				double lon = Double.parseDouble(sa[3]);
-				double lat = Double.parseDouble(sa[4]);
-				Coord c = ct.transform(CoordUtils.createCoord(lon, lat));
-				
-				/* Get a more usable date format. */
-				Calendar cal = DigicoreUtils.getCalendarSince1996(time);
-				double MatsimTime = Time.parseTime(DigicoreUtils.getTimeOfDayFromCalendar(cal));
-				String cleanLine = String.format("%.2f,%.2f,%.3f\n", c.getX(), c.getY(), MatsimTime);
-				if(diff <= Time.parseTime("00:01:00")){
-					bw.write(cleanLine);
-				} else{
-					bw.close();
-					trips++;
-					bw = IOUtils.getAppendingBufferedWriter(folderName + newId + "_" + String.format("%03d.csv", trips));
-					bw.write(cleanLine);
-//					LOG.info("  diff: " + ((double)diff)/1000.0 + "sec");
-				}
-				previousTime = time;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot read from " + file.getAbsolutePath());
-		} finally{
-			try {
-				br.close();
-				bw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot close " + file.getAbsolutePath());
-			}
-		}
-		
-		
-		LOG.info("Done splitting");
-		LOG.info("Trips recorded: " + trips);
-	}
 
 	
 	
