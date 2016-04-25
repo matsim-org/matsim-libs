@@ -68,7 +68,8 @@ public class SingaporeDistributions implements IterationEndsListener {
 	private final MainModeIdentifier mainModeIdentifier;
 	private final StageActivityTypes stageActivityTypes;
 	private final List<DistributionClass> classes;
-	private DecimalFormat df = new DecimalFormat("0.000");
+	private DecimalFormat df = new DecimalFormat("0.00");
+	private DecimalFormat dfpercent = new DecimalFormat("0.0");
 	private String measure = "";
 	private Counter counter = new Counter();
 	
@@ -404,9 +405,9 @@ public class SingaporeDistributions implements IterationEndsListener {
 			for (String mode : SingaporeControlerListener.modes) {
 				stringBuffer = new StringBuffer();
 				stringBuffer.append(mode + "\t");
-				stringBuffer.append(df.format(this.counter.getShare(mode, "counts")) + "\t");
-				if (measure.equals("distance")) stringBuffer.append(df.format(this.counter.getShare(mode, "distance")) + "\t");
-				if (measure.equals("time")) stringBuffer.append(df.format(this.counter.getShare(mode, "time")));
+				stringBuffer.append(dfpercent.format(100.0 * this.counter.getShare(mode, "counts")) + "\t");
+				if (measure.equals("distance")) stringBuffer.append(dfpercent.format(100.0 * this.counter.getShare(mode, "distance")) + "\t");
+				if (measure.equals("time")) stringBuffer.append(dfpercent.format(100.0 * this.counter.getShare(mode, "time")));
 				writer.write(stringBuffer.toString());
 				writer.newLine();
 			}
