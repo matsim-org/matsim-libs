@@ -62,6 +62,14 @@ public class DigicoreVehiclesReaderTest {
 		
 		DigicoreVehicles dvsIn = createVehicles();
 		new DigicoreVehiclesReader(dvsIn).parse(utils.getOutputDirectory() + "vehicles.xml");
+		/* Check container. */
+		assertTrue("Wrong CRS.", dvsIn.getCoordinateReferenceSystem().equalsIgnoreCase(dvsOut.getCoordinateReferenceSystem()));
+		assertTrue("Wrong description.", dvsIn.getDescription().equalsIgnoreCase(dvsOut.getDescription()));
+		/* Check vehicles. */
+		assertTrue("Wrong number of vehicles.", dvsIn.getVehicles().size() == 2);
+		assertNotNull("Cannot find vehicle '1'.", dvsIn.getVehicles().get(Id.createVehicleId("1")));
+		assertNotNull("Cannot find vehicle '2'.", dvsIn.getVehicles().get(Id.createVehicleId("2")));
+		/* No need to test any further... I hope. */
 	}
 	
 	private DigicoreVehicles createVehicles(){

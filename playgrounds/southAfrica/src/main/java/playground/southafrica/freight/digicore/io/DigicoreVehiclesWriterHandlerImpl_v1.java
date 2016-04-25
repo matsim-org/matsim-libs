@@ -38,7 +38,7 @@ public class DigicoreVehiclesWriterHandlerImpl_v1 implements
 		out.write("\n<digicoreVehicles");
 		out.write(" crs=\"" + vehicles.getCoordinateReferenceSystem() + "\"");
 		if(vehicles.getDescription() != null){
-			out.write(" descr=\"" + vehicles.getDescription() + "\"");
+			out.write(" desc=\"" + vehicles.getDescription() + "\"");
 		}
 		out.write(">\n");
 	}

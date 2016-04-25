@@ -45,7 +45,7 @@ public class DigicoreVehiclesReader_v1 extends MatsimXmlParser {
 	
 	/* Attributes. */
 	private final static String ATTR_CRS = "crs";
-	private final static String ATTR_DESCR = "descr";
+	private final static String ATTR_DESCR = "desc";
 	private final static String ATTR_ID = "id";
 	private final static String ATTR_TIMEZONE = "timezone";
 	private final static String ATTR_LOCALE = "locale";
