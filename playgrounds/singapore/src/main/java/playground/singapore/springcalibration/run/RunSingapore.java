@@ -91,6 +91,8 @@ public class RunSingapore {
 										
 		controler.addControlerListener(new SingaporeControlerListener());
 		
+		controler.addControlerListener(new SingaporeIterationEndsListener());
+		
 		// Singapore transit router: --------------------------------------------------
 		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(
 				controler.getScenario().getPopulation(), 
