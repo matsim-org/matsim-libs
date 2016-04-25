@@ -94,9 +94,9 @@ public class CreateFreightTraffic {
 		CreateFreightTraffic creator = new CreateFreightTraffic(coordFile, facilitiesFile, percentagePopulation, randomSeed);
 		creator.readDepartures(cumulativeProbabilityFreightDeparturesFile);
 
-		creator.createFreightTraffic("UTV_", utilityVehiclesFile);
-		creator.createFreightTraffic("TRU_", trucksFile);
-		creator.createFreightTraffic("HDV_", heavyDutyVehiclesFile);
+		creator.createFreightTraffic("UtilityVehicle", utilityVehiclesFile);
+		creator.createFreightTraffic("Truck", trucksFile);
+		creator.createFreightTraffic("HeavyDutyVehicle", heavyDutyVehiclesFile);
 
 		creator.writeFreightFacilities(outputFacilities);
 		creator.writeFreightPopulation(outputPopulation);
@@ -124,7 +124,7 @@ public class CreateFreightTraffic {
 		log.info("Round downs: " + roundDowns);
 	}
 
-	private void createFreightTraffic(String prefix, String vehiclesFile) {
+	private void createFreightTraffic(String type, String vehiclesFile) {
 		Counter counter = new Counter(" OD-relationship # ");
 		int personIndex = 0;
 		BufferedReader reader = IOUtils.getBufferedReader(vehiclesFile);
@@ -138,7 +138,7 @@ public class CreateFreightTraffic {
 					if (random.nextDouble() <= percentage) {
 						ActivityFacility startFacility = getFacility(Integer.parseInt(line[0]));
 						ActivityFacility endFacility = getFacility(Integer.parseInt(line[2]));
-						createSingleTripAgent(prefix + ++personIndex, startFacility, endFacility);
+						createSingleTripAgent(type, ++personIndex, startFacility, endFacility);
 					}
 				}
 				nextLine = reader.readLine();
@@ -150,11 +150,12 @@ public class CreateFreightTraffic {
 		counter.printCounter();
 	}
 
-	private void createSingleTripAgent(String index, ActivityFacility startFacility, ActivityFacility endFacility) {
+	private void createSingleTripAgent(String type, int index, ActivityFacility startFacility, ActivityFacility endFacility) {
 		// create and add new agent
 		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(FREIGHT_TAG + "_" + index, Person.class));
 		freightPopulation.addPerson(p);
 		freightPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", FREIGHT_TAG);
+		freightPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "freight_type", type);
 		// create and add new plan
 		p.addPlan(createSingleTripPlan(startFacility, endFacility));
 	}
