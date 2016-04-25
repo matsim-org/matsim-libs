@@ -98,6 +98,7 @@ public class IVTConfigCreator {
 		config.transit().setUseTransit(true);
 		config.planCalcScore().setUtilityOfLineSwitch(-2.0);
 		config.transitRouter().setSearchRadius(2000.0);
+		config.transitRouter().setAdditionalTransferTime(0.5);
 		PlanCalcScoreConfigGroup.ModeParams transitWalkSet = getModeParamsTransitWalk(config);
 		transitWalkSet.setMarginalUtilityOfTraveling(-12.0);
 		// Add scoring for subpopulations
