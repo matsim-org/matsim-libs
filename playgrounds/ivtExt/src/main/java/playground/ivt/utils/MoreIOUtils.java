@@ -24,6 +24,8 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -73,6 +75,10 @@ public class MoreIOUtils {
 	 * creates an output directory if it does not exists, and creates a logfile.
 	 */
 	public static void initOut( final String outputDir ) {
+		initOut( outputDir , null );
+	}
+
+	public static void initOut( final String outputDir , final Config config ) {
 		try {
 			createDirectory( outputDir );
 
@@ -83,6 +89,9 @@ public class MoreIOUtils {
 			initOutputDirLogging(
 				outputDir+"/",
 				appender.getLogEvents());
+
+			if ( config != null ) new ConfigWriter( config ).write( outputDir+"/output_config.xml" );
+
 		} catch (IOException e) {
 			// do NOT continue without proper logging!
 			throw new RuntimeException("error while creating log file",e);

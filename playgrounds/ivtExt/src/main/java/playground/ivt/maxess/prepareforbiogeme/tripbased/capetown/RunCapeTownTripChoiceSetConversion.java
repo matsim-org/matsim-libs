@@ -73,7 +73,7 @@ public class RunCapeTownTripChoiceSetConversion {
 		Logger.getLogger( MultiNodeDijkstra.class ).setLevel( Level.ERROR );
 
 		if ( new File( group.getOutputPath() ).exists() ) throw new RuntimeException( group.getOutputPath()+" exists" );
-		MoreIOUtils.initOut( group.getOutputPath() );
+		MoreIOUtils.initOut( group.getOutputPath() , config );
 
 		final Scenario sc = ScenarioUtils.loadScenario( config );
 
