@@ -22,11 +22,15 @@
 package playground.boescpa.ivtBaseline.preparation;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -75,6 +79,7 @@ public class Anonymizer {
 		//		ok to make public
 		// population
 		anonymizer.simplifySocioDemographics();
+		anonymizer.unifyCoords();
 		// population_attributes
 		anonymizer.removeFreightTag();
 		anonymizer.simplifySeasonTickets();
@@ -90,8 +95,10 @@ public class Anonymizer {
 		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes())
 				.writeFile(pathToOutputFolder + POPULATION_ATTRIBUTES);
 		new HouseholdsWriterV10(scenario.getHouseholds()).writeFile(pathToOutputFolder + HOUSEHOLDS);
-		new ObjectAttributesXmlWriter(scenario.getHouseholds().getHouseholdAttributes())
-				.writeFile(pathToOutputFolder + HOUSEHOLD_ATTRIBUTES);
+		// We don't publish the Household Attributes.
+		scenario.getConfig().households().setInputHouseholdAttributesFile(null);
+		//new ObjectAttributesXmlWriter(scenario.getHouseholds().getHouseholdAttributes())
+		//		.writeFile(pathToOutputFolder + HOUSEHOLD_ATTRIBUTES);
 		new FacilitiesWriter(scenario.getActivityFacilities()).write(pathToOutputFolder + FACILITIES);
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(pathToOutputFolder + SCHEDULE);
 		new VehicleWriterV1(scenario.getTransitVehicles()).writeFile(pathToOutputFolder + VEHICLES);
@@ -141,6 +148,36 @@ public class Anonymizer {
 		}
 		counter.printCounter();
 		log.info("Removing freight tag... done.");
+	}
+
+	private void unifyCoords() {
+		log.info("Unifying coordinates...");
+		Counter counter = new Counter(" person ");
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Coord facilityCoord = null;
+			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+				if (pe instanceof Activity) {
+					Activity activity = (Activity) pe;
+					if (activity.getFacilityId() != null) {
+						facilityCoord = activity.getCoord();
+						break;
+					}
+				}
+			}
+			if (facilityCoord != null) {
+				for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+					if (pe instanceof Activity) {
+						Activity activity = (Activity) pe;
+						if (activity.getFacilityId() == null) {
+							((ActivityImpl) activity).setCoord(facilityCoord);
+						}
+					}
+				}
+			}
+			counter.incCounter();
+		}
+		counter.printCounter();
+		log.info("Unifying coordinates... done.");
 	}
 
 	private void simplifySocioDemographics() {
