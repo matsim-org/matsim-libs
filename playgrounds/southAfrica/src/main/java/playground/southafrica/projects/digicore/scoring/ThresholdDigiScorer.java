@@ -88,10 +88,10 @@ public class ThresholdDigiScorer implements DigiScorer {
 		Coordinate[] ca2 = {c21, c22, c23, c24, c21};
 		BergasaPolygon = gf.createPolygon(ca2);
 		
-		Coordinate c31 = new Coordinate(-200.0, -100.0);
-		Coordinate c32 = new Coordinate(+200.0, -100.0);
-		Coordinate c33 = new Coordinate(+200.0, +100.0);
-		Coordinate c34 = new Coordinate(-200.0, +100.0);
+		Coordinate c31 = new Coordinate(-100.0, -200.0);
+		Coordinate c32 = new Coordinate(+100.0, -200.0);
+		Coordinate c33 = new Coordinate(+100.0, +200.0);
+		Coordinate c34 = new Coordinate(-100.0, +200.0);
 		Coordinate[] ca3 = {c31, c32, c33, c34, c31};
 		PaefgenPolygon = gf.createPolygon(ca3);
 	}
@@ -151,7 +151,7 @@ public class ThresholdDigiScorer implements DigiScorer {
 			for(String id : distanceMap.keySet()){
 				bw.write(String.format("%s,%.2f,%d,%d,%d,%d\n", 
 						id,
-						distanceMap.get(id),
+						distanceMap.get(id)/1000.0,
 						map.get(id).size(),
 						riskMap.get(id)[0],
 						riskMap.get(id)[1],
@@ -213,15 +213,15 @@ public class ThresholdDigiScorer implements DigiScorer {
 	}
 	
 	private boolean isBaldwinRisky(Coord c){
-		return BaldwinPolygon.covers(convertCoordToPoint(c));
+		return !BaldwinPolygon.covers(convertCoordToPoint(c));
 	}
 
 	private boolean isBergasaRisky(Coord c){
-		return BergasaPolygon.covers(convertCoordToPoint(c));
+		return !BergasaPolygon.covers(convertCoordToPoint(c));
 	}
 	
 	private boolean isPaefgenRisky(Coord c){
-		return PaefgenPolygon.covers(convertCoordToPoint(c));
+		return !PaefgenPolygon.covers(convertCoordToPoint(c));
 	}
 	
 	private Geometry convertCoordToPoint(Coord c){
