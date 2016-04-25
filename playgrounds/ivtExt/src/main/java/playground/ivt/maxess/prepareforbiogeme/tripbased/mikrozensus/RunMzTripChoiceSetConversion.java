@@ -41,9 +41,13 @@ import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.MultiNodeDijkstra;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
-import playground.ivt.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 import playground.ivt.maxess.prepareforbiogeme.framework.Converter;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.*;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicConversionConfigGroup;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicDestinationSampler;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.RoutingChoiceSetSampler;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.TripChoiceSituation;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.TripChoicesIdentifier;
 import playground.ivt.router.CachingRoutingModuleWrapper;
 import playground.ivt.router.TripSoftCache;
 import playground.ivt.utils.MoreIOUtils;
@@ -100,17 +104,12 @@ public class RunMzTripChoiceSetConversion {
 								}
 							})
 					.withChoicesIdentifier(
-							new Provider<ChoicesIdentifier<TripChoiceSituation>>() {
-								@Override
-								public ChoicesIdentifier<TripChoiceSituation> get() {
-									return new TripChoicesIdentifier(
-											group.getActivityType(),
-											sc.getActivityFacilities(),
-											new StageActivityTypesImpl(
-													PtConstants.TRANSIT_ACTIVITY_TYPE),
-											new MainModeIdentifierImpl());
-								}
-							})
+							() -> new TripChoicesIdentifier(
+									group.getActivityType(),
+									sc.getActivityFacilities(),
+									new StageActivityTypesImpl(
+											PtConstants.TRANSIT_ACTIVITY_TYPE),
+									new MainModeIdentifierImpl()) )
 					.withNumberOfThreads(
 							group.getNumberOfThreads())
 					.create()
