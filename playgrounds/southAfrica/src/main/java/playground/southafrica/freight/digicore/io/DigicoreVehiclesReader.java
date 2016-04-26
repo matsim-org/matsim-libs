@@ -30,7 +30,7 @@ import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
 
 public class DigicoreVehiclesReader extends MatsimXmlParser {
 	private final static String DIGICORE_VEHICLES_V1 = "digicoreVehicles_v1.dtd";
-	private final static Logger LOG = Logger.getLogger(DigicoreVehiclesReaderTest.class);
+	private final static Logger LOG = Logger.getLogger(DigicoreVehiclesReader.class);
 	private MatsimXmlParser delegate = null;
 	private DigicoreVehicles vehicles;
 
