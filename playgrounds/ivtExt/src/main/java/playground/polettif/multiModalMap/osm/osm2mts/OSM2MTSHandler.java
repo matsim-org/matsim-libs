@@ -23,10 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.multiModalMap.osm.core.OsmNodeHandler;
-import playground.polettif.multiModalMap.osm.core.OsmParser;
-import playground.polettif.multiModalMap.osm.core.OsmRelationHandler;
-import playground.polettif.multiModalMap.osm.core.OsmWayHandler;
+import playground.polettif.multiModalMap.osm.core.*;
 
 import java.util.*;
 
@@ -64,155 +61,72 @@ import java.util.*;
     <tag k="type" v="route"/>
   </relation>
 	 */
+
+/**
+ * Handler to read out osm data (nodes, ways and relations). Just stores the data.
+ */
 public class OSM2MTSHandler implements OsmNodeHandler, OsmRelationHandler, OsmWayHandler {
 
+	// todo enum?
+	private static final String TAG_PUBLIC_TRANSPORT = "public_transport";
+	private final static String TAG_TYPE = "type";
+
+	private static final String V_STOP_POSITION = "stop_position";
+	private static final String V_ROUTE = "route";
+
+
 	private static final Logger log = Logger.getLogger(OSM2MTSHandler.class);
-	private static final Coord DUMMY_COORD = new Coord(7.5741, 4754336);
 
+	private final TagFilter nodeFilter;
+	private final TagFilter wayFilter;
+	private final TagFilter relationFilter;
 
-	private TransitSchedule transitSchedule;
-	private TransitScheduleFactory factory;
-	private Map<Long, OsmParser.OsmNode> ptStopNodes = new HashMap<>();
-	private	int routeNr = 1;
+	private Map<Long, OsmParser.OsmNode> nodes = new HashMap<>();
+	private Map<Long, OsmParser.OsmRelation> relations = new HashMap<>();
+	private Map<Long, OsmParser.OsmWay> ways = new HashMap<>();
 
+	public OSM2MTSHandler() {
+		// initiate filters
+		nodeFilter = new TagFilter();
+		nodeFilter.add(TAG_PUBLIC_TRANSPORT, V_STOP_POSITION);
 
+		relationFilter = new TagFilter();
+		relationFilter.add(TAG_TYPE, V_ROUTE);
 
-	public OSM2MTSHandler(TransitSchedule schedule) {
-		this.transitSchedule = schedule;
-		this.factory = schedule.getFactory();
+		wayFilter = new TagFilter();
+	}
+
+	public Map<Long, OsmParser.OsmWay> getWays() {
+		return ways;
+	}
+
+	public Map<Long, OsmParser.OsmNode> getNodes() {
+		return nodes;
+	}
+
+	public Map<Long, OsmParser.OsmRelation> getRelations() {
+		return relations;
 	}
 
 	@Override
 	public void handleNode(OsmParser.OsmNode node) {
-
-		// get stop facility and add to schedule
-//		if("bus".equals((node.tags.get("highway")))) {
-		if("stop_position".equals((node.tags.get("public_transport")))) {
-			// add node to set, the stopFacility is created with the routes
-			ptStopNodes.put(node.id, node);
-
+		if(nodeFilter.matches(node.tags)) {
+			nodes.put(node.id, node);
 		}
 	}
 
-	//@Override
+	@Override
 	public void handleRelation(OsmParser.OsmRelation relation) {
-
-		// todo types as enum
-
-		// todo check if route_master
-
-		// public transport routes
-		if("route".equals((relation.tags.get("type")))) {
-
-			// if relation is a bus route todo add route=train,light_rail,subway
-			if("bus".equals((relation.tags.get("route"))) || "trolleybus".equals(relation.tags.get("route"))) {
-				
-				Id<TransitLine> lineId = createLineId(relation);
-
-
-				// create line, if it does not yet exist
-				TransitLine line;
-
-				if(!transitSchedule.getTransitLines().containsKey(lineId)) {
-					line = factory.createTransitLine(lineId);
-					transitSchedule.addTransitLine(line);
-				} else {
-					line = transitSchedule.getTransitLines().get(lineId);
-				}
-
-				List<TransitRouteStop> stopSequenceForward = new ArrayList<>();
-				List<TransitRouteStop> stopSequenceBackward = new ArrayList<>();
-
-				// create different RouteStops and stopFacilities for forward and backward
-				for(OsmParser.OsmRelationMember member : relation.members) {
-					if(("stop".equals(member.role) || "stop_forward".equals(member.role) || "stop_backward".equals(member.role))) {
-
-						// check if referenced stop is within area
-						if(ptStopNodes.containsKey(member.refId)) {
-
-							TransitStopFacility transitStopFacility;
-
-							// add facility if it does not yet exist todo get coordinates!
-							if(!transitSchedule.getFacilities().containsKey(Id.create(member.refId, TransitStopFacility.class))) {
-								OsmParser.OsmNode node = ptStopNodes.get(member.refId);
-
-								transitStopFacility = factory.createTransitStopFacility(Id.create(member.refId, TransitStopFacility.class), node.coord, false);
-								transitStopFacility.setName(node.tags.get("name"));
-
-								transitSchedule.addStopFacility(transitStopFacility);
-							} else {
-								transitStopFacility = transitSchedule.getFacilities().get(Id.create(member.refId, TransitStopFacility.class));
-							}
-
-							TransitRouteStop newRouteStop = factory.createTransitRouteStop(transitStopFacility, 0.0, 0.0);
-
-							if(("stop_forward".equals(member.role) || "stop".equals(member.role)) && !"stop_backward".equals(member.role)) {
-								stopSequenceForward.add(newRouteStop);
-							} else if(("stop_backward".equals(member.role) || "stop".equals(member.role)) && !"stop_forward".equals(member.role)) {
-								stopSequenceBackward.add(0, newRouteStop);
-							}
-						}
-					}
-				}
-
-				// one relation has two routes, forward and back
-				TransitRoute routeForward = factory.createTransitRoute(Id.create(++routeNr, TransitRoute.class), null, stopSequenceForward, "bus");
-				TransitRoute routeBackward = factory.createTransitRoute(Id.create(++routeNr, TransitRoute.class), null, stopSequenceBackward, "bus");
-
-				// todo remove dummy departures? Are needed for visualisation in via
-				routeForward.addDeparture(factory.createDeparture(Id.create("departure"+routeNr, Departure.class), 60.0));
-				routeBackward.addDeparture(factory.createDeparture(Id.create("departure"+routeNr, Departure.class), 120.0));
-
-				// only add route if it has stops
-				if(stopSequenceForward.size() > 0)
-					line.addRoute(routeForward);
-
-				if(stopSequenceBackward.size() > 0)
-					line.addRoute(routeBackward);
-
-				log.info("routes added to line "+line.getId());
-			}
-
+		if(relationFilter.matches(relation.tags)) {
+			relations.put(relation.id, relation);
 		}
 	}
 
-	
-	private Id<TransitLine> createLineId(OsmParser.OsmRelation relation) {
-		String id;
-		boolean ref = false, operator=false, name=false;
-
-
-		if(relation.tags.containsKey("ref")) { ref = true; }
-		if(relation.tags.containsKey("operator")) { operator = true; }
-		if(relation.tags.containsKey("name")) { name = true; }
-
-		if(operator && ref) {
-			id = relation.tags.get("operator")+"_"+relation.tags.get("ref");
-		}
-		else if(operator && name) {
-			id = relation.tags.get("operator")+"_"+relation.tags.get("ref");
-		}
-		else if(name) {
-			id = relation.tags.get("name");
-		}
-		else if(ref){
-			id = relation.tags.get("ref");
-		}
-		else {
-			id = Long.toString(relation.id);
-		}
-
-		try {
-			return Id.create(id, TransitLine.class);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
 	@Override
 	public void handleWay(OsmParser.OsmWay way) {
-
+		if(relationFilter.matches(way.tags)) {
+			ways.put(way.id, way);
+		}
 	}
 }
 

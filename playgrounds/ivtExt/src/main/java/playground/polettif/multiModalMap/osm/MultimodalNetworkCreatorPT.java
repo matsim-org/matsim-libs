@@ -36,10 +36,6 @@ public class MultimodalNetworkCreatorPT implements MultimodalNetworkCreator {
 	private final CoordinateTransformation transformation;
 	private Network network;
 
-	public MultimodalNetworkCreatorPT(Network network) {
-		this(network, null);
-	}
-
 	public MultimodalNetworkCreatorPT(Network network, CoordinateTransformation transformation) {
 		this.network = network;
 		this.transformation = (transformation == null ? new IdentityTransformation() : transformation);
@@ -50,9 +46,7 @@ public class MultimodalNetworkCreatorPT implements MultimodalNetworkCreator {
 		// TODO add coordinate transformation in network reader
 
 		OsmNetworkReaderWithPT osmReader =	new OsmNetworkReaderWithPT(this.network, transformation, true);
-
 		osmReader.setKeepPaths(false);
-
 		osmReader.parse(osmFile);
 	}
 }

@@ -77,6 +77,7 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser, aneumann
  */
+@Deprecated
 public class OsmBusStopReader implements MatsimSomeReader {
 
 	private final static Logger log = Logger.getLogger(OsmBusStopReader.class);
