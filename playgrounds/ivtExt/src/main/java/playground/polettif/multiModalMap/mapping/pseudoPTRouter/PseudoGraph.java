@@ -83,7 +83,7 @@ public class PseudoGraph {
 	 */
 	public boolean pathExists(TransitStopFacility currentStopFacility, TransitStopFacility nextStopFacility) {
 		for(PseudoRoutePath e : edges) {
-			if(!e.getFromPseudoStop().getName().equals("SOURCE") && !e.getFromPseudoStop().getName().equals("DESTINATION")) {
+			if(!e.getFromPseudoStop().getName().equals("SOURCE") && !e.getFromPseudoStop().getName().equals("DESTINATION") && !e.getToPseudoStop().getName().equals("SOURCE") && !e.getToPseudoStop().getName().equals("DESTINATION")) {
 				if(e.getFromPseudoStop().getParentStopFacilityId().equals(currentStopFacility.getId().toString()) && e.getToPseudoStop().getParentStopFacilityId().equals(nextStopFacility.getId().toString())) {
 					return true;
 				}

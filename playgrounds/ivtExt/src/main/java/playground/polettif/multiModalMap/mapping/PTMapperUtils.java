@@ -216,7 +216,7 @@ public class PTMapperUtils {
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				for(TransitRouteStop transitRouteStop : transitRoute.getStops()) {
-					String scheduleTransportMode = transitRoute.getTransportMode().toUpperCase();
+					String scheduleTransportMode = transitRoute.getTransportMode().toLowerCase();
 					TransitStopFacility stopFacility = transitRouteStop.getStopFacility();
 
 					Set<LinkCandidate> modeLinkCandidates = MapUtils.getSet(stopFacility, MapUtils.getMap(scheduleTransportMode, tree));
@@ -272,7 +272,7 @@ public class PTMapperUtils {
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				for(TransitRouteStop transitRouteStop : transitRoute.getStops()) {
-					String scheduleTransportMode = transitRoute.getTransportMode().toUpperCase();
+					String scheduleTransportMode = transitRoute.getTransportMode().toLowerCase();
 					TransitStopFacility stopFacility = transitRouteStop.getStopFacility();
 
 					Map<String, Set<LinkCandidate>> parentFacilityLinkCandidates = MapUtils.getMap(stopFacility, tree);
@@ -360,7 +360,7 @@ public class PTMapperUtils {
 					newStopSequence.add(newTransitRouteStop);
 				}
 
-				TransitRoute newRoute = scheduleFactory.createTransitRoute(routeEntry.getKey().getId(), null, newStopSequence, routeEntry.getKey().getTransportMode().toUpperCase());
+				TransitRoute newRoute = scheduleFactory.createTransitRoute(routeEntry.getKey().getId(), null, newStopSequence, routeEntry.getKey().getTransportMode().toLowerCase());
 
 				// add departures
 				routeEntry.getKey().getDepartures().values().forEach(newRoute::addDeparture);
@@ -416,7 +416,7 @@ public class PTMapperUtils {
 					newStopSequence.add(newTransitRouteStop);
 				}
 
-				TransitRoute newRoute = scheduleFactory.createTransitRoute(routeEntry.getKey().getId(), null, newStopSequence, routeEntry.getKey().getTransportMode().toUpperCase());
+				TransitRoute newRoute = scheduleFactory.createTransitRoute(routeEntry.getKey().getId(), null, newStopSequence, routeEntry.getKey().getTransportMode().toLowerCase());
 
 				// add departures
 				routeEntry.getKey().getDepartures().values().forEach(newRoute::addDeparture);
@@ -595,8 +595,8 @@ public class PTMapperUtils {
 
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				if(routers.containsKey(transitRoute.getTransportMode().toUpperCase())) {
-					Router router = routers.get(transitRoute.getTransportMode().toUpperCase());
+				if(routers.containsKey(transitRoute.getTransportMode().toLowerCase()) && transitRoute.getStops().size() > 0) {
+					Router router = routers.get(transitRoute.getTransportMode().toLowerCase());
 
 					counterRoute.incCounter();
 
@@ -688,7 +688,7 @@ public class PTMapperUtils {
 			for(TransitRoute route : line.getRoutes().values()) {
 				List<Id<Link>> linkIds = route.getRoute().getLinkIds();
 				for(Id<Link> linkId : linkIds) {
-					MapUtils.getSet(linkId, transitLinkNetworkModes).add(route.getTransportMode().toUpperCase());
+					MapUtils.getSet(linkId, transitLinkNetworkModes).add(route.getTransportMode().toLowerCase());
 				}
 			}
 		}

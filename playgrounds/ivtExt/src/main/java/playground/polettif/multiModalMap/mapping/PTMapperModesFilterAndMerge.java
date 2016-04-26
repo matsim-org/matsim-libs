@@ -196,7 +196,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		Counter counterLine = new Counter("route # ");
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				String scheduleTransportMode = transitRoute.getTransportMode().toUpperCase();
+				String scheduleTransportMode = transitRoute.getTransportMode().toLowerCase();
 
 				if(!config.getModeRoutingAssignment().containsKey(scheduleTransportMode)) {
 					if(noRoutingWarning.add(scheduleTransportMode)) {
@@ -332,17 +332,18 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 							log.error("No pseudoPath between " + currentStopFacility.getName() + " and " + nextStopFacility.getName());
 						}
 					}
-					*/
+*/
 
 					/** [3.2]
 					 * build pseudo network and find shortest path => List<LinkCandidate>
 					 */
 					dijkstra.run();
 					List<PseudoRouteStop> pseudoStopSequence = MapUtils.getList(transitRoute, MapUtils.getMap(transitLine, pseudoTransitRoutes));
-					try {
-						pseudoStopSequence.addAll(dijkstra.getShortesPseudoPath());
-					} catch (Exception e) {
-						e.printStackTrace();
+					LinkedList<PseudoRouteStop> pseudoPath = dijkstra.getShortesPseudoPath();
+					if(pseudoPath == null) {
+						log.warn("PseudoRouting could not find a shortest path for transit route " + transitRoute.getId() + " from \"" +routeStops.get(0).getStopFacility().getName()+ "\" to \""+routeStops.get(routeStops.size()-1).getStopFacility().getName()+"\"");
+					} else {
+						pseudoStopSequence.addAll(pseudoPath);
 					}
 				} // - if correct schedule mode
 			} // - transitRoute loop

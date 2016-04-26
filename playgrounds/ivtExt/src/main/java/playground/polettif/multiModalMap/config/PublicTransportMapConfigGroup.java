@@ -65,6 +65,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		modeRoutingAssignment.put("TRAM", Collections.singleton(ARTIFICIAL_LINK_MODE));
 		modeRoutingAssignment.put("GONDOLA", Collections.singleton(ARTIFICIAL_LINK_MODE));
 		modeRoutingAssignment.put("FERRY", Collections.singleton(ARTIFICIAL_LINK_MODE));
+		modeRoutingAssignment.put("FUNICULAR", Collections.singleton(ARTIFICIAL_LINK_MODE));
 	}
 
 	private String networkFile = null;
@@ -153,7 +154,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	private String getModeRoutingAssignmentString() {
 		String ret = "";
 		for(Map.Entry<String, Set<String>> entry : modeRoutingAssignment.entrySet()) {
-			ret += "|" + entry.getKey().toUpperCase() + ":";
+			ret += "|" + entry.getKey().toLowerCase() + ":";
 			String value = "";
 			for(String mode : entry.getValue()) {
 				value += "," + mode;
@@ -176,7 +177,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 			for(String networkMode : tuple[1].trim().split(",")) {
 				set.add(networkMode.trim());
 			}
-			this.modeRoutingAssignment.put(tuple[0].toUpperCase(), set);
+			this.modeRoutingAssignment.put(tuple[0].toLowerCase(), set);
 		}
 	}
 
@@ -307,7 +308,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	 * Suffix used for child stop facilities. A number for each child of a
 	 * parent stop facility is appended (i.e. stop0123.fac:2).
 	 */
-	private String suffixChildStopFacilities = ".fac:";
+	private String suffixChildStopFacilities = ".link:";
 
 	@StringGetter(SUFFIX_CHILD_STOP_FACILITIES)
 	public String getSuffixChildStopFacilities() {
