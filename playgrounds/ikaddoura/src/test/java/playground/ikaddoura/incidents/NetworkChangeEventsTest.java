@@ -22,31 +22,22 @@
  */
 package playground.ikaddoura.incidents;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.TimeVariantLinkImpl;
-import org.matsim.core.network.TimeVariantLinkImplTest;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
+ * Currently, the flow capacity values in the network file are given in 'vehicles per capacity period (default: 3600sec)'.
+ * In contrast, the value specified in the network change events file is given in 'vehicles per sec'.
+ * 
  * @author ikaddoura
  *
  */
@@ -66,19 +57,16 @@ public class NetworkChangeEventsTest {
 //		LinkImpl link = (LinkImpl) scenario.getNetwork().getLinks().get(linkId1);
 		TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(linkId1);
 		
-		// TODO: The following two lines are inconsistent... why not '123. / 3600.' in the second line?
 		Assert.assertEquals("Wrong capacity (before network change event).", 1000. / 3600., link.getFlowCapacityPerSec(6 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong capacity (after network change event).", 123., link.getFlowCapacityPerSec(16 * 3600.), MatsimTestUtils.EPSILON);
 
-		// ok
 		Assert.assertEquals("Wrong freespeed (before network change event).", 10., link.getFreespeed(6 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong freespeed (after network change event).", 123., link.getFreespeed(16 * 3600.), MatsimTestUtils.EPSILON);
 		
 		Assert.assertEquals("Wrong capacity.", 1000., link.getCapacity(), MatsimTestUtils.EPSILON); 
 		Assert.assertEquals("Wrong capacity (before network change event).", 1000., link.getCapacity(6 * 3600.), MatsimTestUtils.EPSILON);
-		
-		// TODO: The following fails:
-		// Assert.assertEquals("Wrong capacity (before network change event).", 1000., link.getCapacity(16 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong capacity (before network change event)."
+				+ "The value specified in the network change events file is given in 'vehicles per sec'.", 123. * 3600., link.getCapacity(16 * 3600.), MatsimTestUtils.EPSILON);
 		
 		// It seems that the flow capacity value in the network change event is interpreted as vehicles per second!
 			
