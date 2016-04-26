@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -56,8 +57,15 @@ import playground.ivt.router.TripSoftCache;
 import playground.ivt.utils.MoreIOUtils;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static org.matsim.api.core.v01.TransportMode.ride;
+import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.l;
 
 /**
  * @author thibautd
@@ -115,6 +123,19 @@ public class RunCapeTownTripChoiceSetConversion {
 									group.getActivityType(),
 									sc.getActivityFacilities(),
 									new StageActivityTypesImpl(
+											// Assume o[ther] activities to be "stages".
+											// Not the case for all, but it seems to hold for the majority.
+											// actually, "o" corresponds to the following (south africa playground):
+											// UNKNOWN
+											// PICKUP_OTHER
+											// TRANSFER
+											// FUEL
+											// SERVICE
+											// WATER
+											// TEND_ANIMALS
+											// OTHER1
+											// OTHER2
+											"o",
 											PtConstants.TRANSIT_ACTIVITY_TYPE),
 									new CapeTownMainModeIdentifier(),
 									group.getModes() ) )
@@ -155,18 +176,23 @@ public class RunCapeTownTripChoiceSetConversion {
 	private static class CapeTownMainModeIdentifier implements MainModeIdentifier {
 		@Override
 		public String identifyMainMode( List<? extends PlanElement> tripElements ) {
-			if ( tripElements.size() > 1 ) throw new IllegalArgumentException( tripElements+" has size "+tripElements.size() );
+			final Set<String> usedModes =
+					tripElements.stream()
+							.filter( pe -> pe instanceof Leg )
+							.map( pe -> ( (Leg) pe ).getMode() )
+							.collect( Collectors.toSet() );
 
-			final Leg l = (Leg) tripElements.get( 0 );
-			switch ( l.getMode() ) {
-				// aggregate the different PT modes
-				case "brt":
-				case "bus":
-				case "rail":
-					return TransportMode.pt;
-				default:
-					return l.getMode();
-			}
+			// "hierarchy" of modes
+			if ( containsAny( usedModes , "brt" , "bus" , "rail" ) ) return TransportMode.pt;
+			// TODO: handle differently than formal pt
+			if ( containsAny( usedModes , "taxi" ) ) return TransportMode.pt;
+			if ( containsAny( usedModes , "car" , "ride" ) ) return TransportMode.car;
+			if ( containsAny( usedModes , "walk" ) ) return TransportMode.walk;
+			return "other";
 		}
+	}
+
+	private static boolean containsAny( Set<String> usedModes , String... modes ) {
+		return CollectionUtils.intersects( usedModes , Arrays.asList( modes ) );
 	}
 }
