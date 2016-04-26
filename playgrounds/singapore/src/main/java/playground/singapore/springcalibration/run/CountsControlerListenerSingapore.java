@@ -183,9 +183,7 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
 				
 				// NEW: we have to rescale the pt volumes here as they will be upscaled latter! ---------------
 				if (mode.equals("pt") || mode.equals("bus")) {
-					for (int i = 0; i < 24; i++) {
-						volumesForMode[i] =  volumesForMode[i] / this.config.getCountsScaleFactor();
-					}
+					volumesForMode = this.scaleVolumes(volumesForMode);
 				}	
 				// --------------------------------------------------------------------------------------------
 				
@@ -195,6 +193,11 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
 				Id<Link> linkIdHW = Id.createLinkId(linkId.toString() + "_HW");
 				double[] volumesForMode_HW = volumes.getVolumesPerHourForLink(linkIdHW, mode);
 				if (volumesForMode_HW == null) continue;
+				
+				if (mode.equals("pt") || mode.equals("bus")) {
+					volumesForMode_HW = this.scaleVolumes(volumesForMode_HW);
+				}
+				
 				for (int i = 0; i < 24; i++) {
 					newVolume[i] += volumesForMode_HW[i];
 				}
@@ -204,11 +207,19 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
 		} else {
 			double[] newVolume = new double[24];
 			Id<Link> linkIdHW = Id.createLinkId(linkId.toString() + "_HW");
+						
 			for (int i = 0; i < 24; i++) {
 				newVolume[i] += volumes.getVolumesPerHourForLink(linkId)[i] + volumes.getVolumesPerHourForLink(linkIdHW)[i];
 			}
 			return newVolume;
 		}
+	}
+	
+	private double[] scaleVolumes(double[] volumes) {
+		for (int i = 0; i < 24; i++) {
+			volumes[i] = volumes[i] / this.config.getCountsScaleFactor();
+		}
+		return volumes;
 	}
 	
 	private void reset() {
