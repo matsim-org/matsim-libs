@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -11,7 +13,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import java.util.*;
 
 
-public class LinkAnalysisHandler extends AnalysisHandler {
+public class LinkAnalysisHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private static final Logger log = Logger.getLogger(LinkAnalysisHandler.class);
 
