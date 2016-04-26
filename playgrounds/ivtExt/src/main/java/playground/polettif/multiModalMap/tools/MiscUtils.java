@@ -18,6 +18,9 @@
 
 package playground.polettif.multiModalMap.tools;
 
+import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidate;
+
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,10 +46,18 @@ public class MiscUtils {
 		}
 	}
 
-	public static Set<String> getSharedSetEntry(Set<String> set1, Set<String> set2) {
+	public static Set<String> getSharedSetStringEntries(Set<String> set1, Set<String> set2) {
 		Set<String> shared = new HashSet<>();
 		for(String entry1 : set1) {
 			shared.addAll(set2.stream().filter(entry1::equalsIgnoreCase).map(entry2 -> entry1).collect(Collectors.toList()));
+		}
+		return shared;
+	}
+
+	public static <E> Set<E> getSharedSetEntries(Set<E> set1, Set<E> set2) {
+		Set<E> shared = new HashSet<>();
+		for(E entry1 : set1) {
+			shared.addAll(set2.stream().filter(entry1::equals).map(entry2 -> entry1).collect(Collectors.toList()));
 		}
 		return shared;
 	}

@@ -28,6 +28,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import playground.polettif.multiModalMap.config.PublicTransportMapEnum;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +38,11 @@ public class FastAStarRouter implements Router {
 	
 	private final LeastCostPathCalculator pathCalculator;
 	private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
+
+	private static PublicTransportMapEnum pseudoRouteWeightType;
+	public static void setPseudoRouteWeightType(PublicTransportMapEnum type) {
+		pseudoRouteWeightType = type;
+	}
 
 	public FastAStarRouter(Network network) {
 		paths = new HashMap<>();
@@ -75,7 +81,7 @@ public class FastAStarRouter implements Router {
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		return link.getLength();
+		return (pseudoRouteWeightType.equals(PublicTransportMapEnum.travelTime) ? link.getLength() / link.getFreespeed() : link.getLength());
 	}
 
 	@Override

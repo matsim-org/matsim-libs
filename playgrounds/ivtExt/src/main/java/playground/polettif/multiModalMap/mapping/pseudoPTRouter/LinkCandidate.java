@@ -36,55 +36,71 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class LinkCandidate  {
 
 	final private String id;
-	private double linkLength = 0.0;
+	private final double stopFacilityDistance;
+	private final double linkLength;
+	private final double linkTravelTime;
 
-	private TransitStopFacility parentStopFacility;
+	private final String linkId;
+	private final String fromNodeId;
+
+	private final String toNodeId;
+	private final Coord stopFacilityCoord;
+	private final Coord fromNodeCoord;
+	private final Coord toNodeCoord;
+
 	private TransitStopFacility childStopFacility;
-	private Id<Node> fromNodeId;
-	private Id<Node> toNodeId;
-	private Coord fromNodeCoord;
-	private Coord toNodeCoord;
-	private Id<Link> linkId;
 
 	public LinkCandidate(Link link, TransitStopFacility parentStopFacility) {
 		this.id = parentStopFacility.getId().toString() + ".link:" + link.getId().toString();
 
-		this.linkId = link.getId();
+		this.linkId = link.getId().toString();
 		this.linkLength = link.getLength();
-		this.fromNodeId = link.getFromNode().getId();
-		this.toNodeId = link.getToNode().getId();
-		this.parentStopFacility = parentStopFacility;
+		this.linkTravelTime = linkLength / link.getFreespeed();
+
+		this.fromNodeId = link.getFromNode().getId().toString();
+		this.toNodeId = link.getToNode().getId().toString();
+		this.stopFacilityCoord = parentStopFacility.getCoord();
 
 		this.fromNodeCoord = link.getFromNode().getCoord();
 		this.toNodeCoord = link.getToNode().getCoord();
-	}
 
-	public TransitStopFacility getParentStop() {
-		return parentStopFacility;
-	}
-
-	public Id<TransitStopFacility> getParentStopId() {
-		return parentStopFacility.getId();
+		this.stopFacilityDistance = CoordUtils.distancePointLinesegment(fromNodeCoord, toNodeCoord, stopFacilityCoord);
 	}
 
 	public double getLinkLength() {
 		return linkLength;
 	}
 
-	public void setChildStop(TransitStopFacility childStopFacility) {
-		this.childStopFacility = childStopFacility;
-	}
-
-	public TransitStopFacility getChildStop() {
-		return childStopFacility;
+	public double getLinkTravelTime() {
+		return linkTravelTime;
 	}
 
 	public String getId() {
 		return id;
 	}
 
-	public double getStopDistance() {
-		return CoordUtils.distancePointLinesegment(fromNodeCoord, toNodeCoord, parentStopFacility.getCoord());
+	public double getStopFacilityDistance() {
+		return stopFacilityDistance;
+	}
+
+	public String getToNodeIdStr() {
+		return toNodeId;
+	}
+
+	public String getFromNodeIdStr() {
+		return fromNodeId;
+	}
+
+	public String getLinkIdStr() {
+		return linkId;
+	}
+
+	public Coord getFromNodeCoord() {
+		return fromNodeCoord;
+	}
+
+	public Coord getToNodeCoord() {
+		return toNodeCoord;
 	}
 
 	@Override
@@ -110,26 +126,15 @@ public class LinkCandidate  {
 		return true;
 	}
 
-	public Id<Node> getToNodeId() {
-		return toNodeId;
+	@Deprecated
+	public void setChildStop(TransitStopFacility childStopFacility) {
+		this.childStopFacility = childStopFacility;
 	}
 
-	public Id<Node> getFromNodeId() {
-		return fromNodeId;
-	}
-
-	public Coord getFromNodeCoord() {
-		return fromNodeCoord;
-	}
-
-	public Coord getToNodeCoord() {
-		return toNodeCoord;
-	}
-
-	public Id<Link> getLinkId() {
-		return linkId;
-	}
-
+	/**
+	 * @deprecated Should not be used since we work with different networks
+	 * during pseudoRouting
+	 */
 	@Deprecated
 	public Link getLink() {
 		return null;

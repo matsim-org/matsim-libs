@@ -31,6 +31,8 @@ public class CreateDefaultConfig {
 	public static void main(final String[] args) {
 		Config config = ConfigUtils.createConfig();
 
+		ConfigUtils.addOrGetModule(config, PublicTransportMapConfigGroup.GROUP_NAME, PublicTransportMapConfigGroup.class);
+
 		Set<String> toRemove = config.getModules().keySet().stream().filter(module -> !module.equals(PublicTransportMapConfigGroup.GROUP_NAME)).collect(Collectors.toSet());
 		toRemove.forEach(config::removeModule);
 

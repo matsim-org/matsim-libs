@@ -20,6 +20,7 @@
 package playground.polettif.multiModalMap.mapping.pseudoPTRouter;
 
 import org.matsim.core.utils.collections.Tuple;
+import playground.polettif.multiModalMap.config.PublicTransportMapEnum;
 
 /**
  * Describes the path between two pseudoRouteStops for the pseudoGraph (used by the
@@ -34,17 +35,24 @@ public class PseudoRoutePath {
 	private final PseudoRouteStop to;
 	private final double weight;
 
-	public PseudoRoutePath(PseudoRouteStop fromStop, PseudoRouteStop toStop, double travelTime) {
-		this(fromStop, toStop, travelTime, false);
+	private static PublicTransportMapEnum pseudoRouteWeightType;
+	public static void setPseudoRouteWeightType(PublicTransportMapEnum type) {
+		pseudoRouteWeightType = type;
 	}
 
-	public PseudoRoutePath(PseudoRouteStop fromStop, PseudoRouteStop toStop, double travelCost, boolean dummy) {
+	public PseudoRoutePath(PseudoRouteStop fromStop, PseudoRouteStop toStop, double weight) {
+		this(fromStop, toStop, weight, false);
+	}
+
+	public PseudoRoutePath(PseudoRouteStop fromStop, PseudoRouteStop toStop, double weight, boolean dummy) {
 		this.id = new Tuple<>(fromStop, toStop);
 		this.from = fromStop;
 		this.to = toStop;
 
-		this.weight = travelCost + (dummy ? 0 : 0.5 * fromStop.getLinkCandidate().getLinkLength() + 0.5 * toStop.getLinkCandidate().getLinkLength());
+		this.weight = weight + (dummy ? 0 : 0.5 * fromStop.getLinkWeight() + 0.5 * toStop.getLinkWeight());
 	}
+
+
 
 	public Tuple<PseudoRouteStop, PseudoRouteStop> getId() {
 		return id;

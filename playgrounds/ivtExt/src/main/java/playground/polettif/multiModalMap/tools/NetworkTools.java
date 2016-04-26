@@ -252,6 +252,7 @@ public class NetworkTools {
 		Link dummyLink = networkFactory.createLink(Id.createLinkId(prefix+stopFacility.getId()+"_link"), dummyNode, dummyNode);
 
 		dummyLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
+		dummyLink.setLength(1.0);
 
 		if(!network.getNodes().containsKey(dummyNode.getId())) {
 			network.addNode(dummyNode);

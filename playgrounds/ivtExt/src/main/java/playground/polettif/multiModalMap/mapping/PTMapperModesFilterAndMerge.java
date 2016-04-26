@@ -39,6 +39,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
+import playground.polettif.multiModalMap.config.PublicTransportMapEnum;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.*;
 import playground.polettif.multiModalMap.mapping.router.FastAStarRouter;
 import playground.polettif.multiModalMap.mapping.router.ModeDependentRouter;
@@ -58,6 +59,8 @@ import java.util.*;
  * @author polettif
  */
 public class PTMapperModesFilterAndMerge extends PTMapper {
+
+	public static final int SAME_LINK_PUNISHMENT = 5;
 
 	int artificialId = 0;
 	private Map<Tuple<LinkCandidate, LinkCandidate>, Link> artificialLinks = new HashMap<>();
@@ -153,6 +156,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 */
 		Map<String, Network> networks = new HashMap<>();
 		Map<String, Router> routers = new HashMap<>();
+		FastAStarRouter.setPseudoRouteWeightType(config.getPseudoRouteWeightType());
+		PseudoGraph.setPseudoRouterWeightType(config.getPseudoRouteWeightType());
 
 		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
 			log.info("Creating network for " + modeAssignment.getValue());
@@ -180,7 +185,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 */
 		Coord[] totalNetworkExtent = NetworkTools.getExtent(network);
 		Map<TransitStopFacility, Boolean> stopIsInArea = NetworkTools.getStopsInAreaBool(schedule, totalNetworkExtent);
-		final double initialMaxTravelCostValue = CoordUtils.calcEuclideanDistance(totalNetworkExtent[0], totalNetworkExtent[1]);
+		final double initialMaxPathDistance = CoordUtils.calcEuclideanDistance(totalNetworkExtent[0], totalNetworkExtent[1])*config.getBeelineDistanceMaxFactor();
 
 		/** [3]
 		 * Generating and calculating the pseudoTransitRoutes for all transitRoutes.
@@ -209,12 +214,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
 
 					counterLine.incCounter();
-					/*
-					log.debug("transitRoute " + transitRoute.getId() + " " +
-							"from \""+ routeStops.get(0).getStopFacility().getName() +
-							"\" to \"" + routeStops.get(routeStops.size()-1).getStopFacility().getName() +
-							"\" [" + routeStops.size() + " stops]");
-					*/
 
 					/**
 					 * Initiate pseudoGraph and Dijkstra algorithm for the current transitRoute.
@@ -228,31 +227,48 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 					for(int i = 0; i < routeStops.size() - 1; i++) {
 						TransitStopFacility currentStopFacility = routeStops.get(i).getStopFacility();
 						TransitStopFacility nextStopFacility = routeStops.get(i + 1).getStopFacility();
-
-						double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
-						double maxAllowedTravelCost = beelineDistance * config.getBeelineDistanceMaxFactor();
-						double minTravelCost = Double.MAX_VALUE;
-
 						Set<LinkCandidate> linkCandidatesCurrent = linkCandidates.get(scheduleTransportMode).get(routeStops.get(i).getStopFacility());
 						Set<LinkCandidate> linkCandidatesNext = linkCandidates.get(scheduleTransportMode).get(routeStops.get(i + 1).getStopFacility());
 
-						//Check if one of the two stops is outside the network extend.
-						boolean bothStopsInsideArea = true;
-						if(!stopIsInArea.get(currentStopFacility) || !stopIsInArea.get(nextStopFacility)) {
-							bothStopsInsideArea = false;
+						// This block would prevent that the same link is used for both stops,
+						// the link is used for the nearer stop facility. Is not needed however and
+						// performance decreases significantly.
+						/* using field private Map<Tuple<TransitStopFacility, TransitStopFacility>, Tuple<Set<LinkCandidate>, Set<LinkCandidate>>> separatedLinkCandidates = new HashMap<>();
+						if(!separatedLinkCandidates.containsKey(new Tuple<>(currentStopFacility, nextStopFacility))) {
+							int currentBefore = linkCandidatesCurrent.size();
+							int nextBefore = linkCandidatesNext.size();
+							PTMapperUtils.separateLinkCandidates(linkCandidatesCurrent, linkCandidatesNext);
+							separatedLinkCandidates.put(new Tuple<>(currentStopFacility, nextStopFacility), new Tuple<>(linkCandidatesCurrent, linkCandidatesNext));
+						} else {
+							Tuple<Set<LinkCandidate>, Set<LinkCandidate>> tmpTuple = separatedLinkCandidates.get(new Tuple<>(currentStopFacility, nextStopFacility));
+							linkCandidatesCurrent = tmpTuple.getFirst();
+							linkCandidatesNext = tmpTuple.getSecond();
 						}
 
+						if(linkCandidatesCurrent.size() == 0) {	log.error("no link candidates left!"); }
+						if(linkCandidatesNext.size() == 0) { log.error("no link candidates left!"); }
+						*/
+
+						final double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
+						final double maxAllowedPathLength = beelineDistance * config.getBeelineDistanceMaxFactor();
+
+						//Check if one of the two stops is outside the network
+						boolean bothStopsInsideArea = !(!stopIsInArea.get(currentStopFacility) || !stopIsInArea.get(nextStopFacility));
+						boolean pseudoPathFound = false;
+
 						if(!mapScheduleModeArtificial && bothStopsInsideArea) {
-							// Calculate the shortes path between all link candidates.
+							// Calculate the shortest path between all link candidates.
 							for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 								for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
+
 									String key = scheduleTransportMode + "." + linkCandidateCurrent.getId() + "." + linkCandidateNext.getId();
-									double travelCost = initialMaxTravelCostValue;
+									double travelCost = initialMaxPathDistance;
+
 									if(alreadyCalculated.containsKey(key)) {
 										travelCost = alreadyCalculated.get(key);
 									} else {
-										Node nodeA = modeNetwork.getNodes().get(linkCandidateCurrent.getToNodeId());
-										Node nodeB = modeNetwork.getNodes().get(linkCandidateNext.getFromNodeId());
+										Node nodeA = modeNetwork.getNodes().get(Id.createNodeId(linkCandidateCurrent.getToNodeIdStr()));
+										Node nodeB = modeNetwork.getNodes().get(Id.createNodeId(linkCandidateNext.getFromNodeIdStr()));
 
 										LeastCostPathCalculator.Path leastCostPath = modeRouter.calcLeastCostPath(nodeA, nodeB);
 
@@ -260,18 +276,20 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 										if(leastCostPath != null) {
 											travelCost = leastCostPath.travelCost;
 
-											// if both links are the same, travel time should get higher since
-											if(linkCandidateCurrent.getLinkId().equals(linkCandidateNext.getLinkId())) {
-												travelCost *= 10;
+											// if both links are the same, travel time should get higher
+											if(linkCandidateCurrent.getLinkIdStr().equals(linkCandidateNext.getLinkIdStr())) {
+												travelCost *= SAME_LINK_PUNISHMENT;
 											}
-
-											if(travelCost < minTravelCost) { minTravelCost = travelCost; }
 										}
 										alreadyCalculated.put(key, travelCost);
 									}
-									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, travelCost), (i == 0), (i == routeStops.size() - 2));
+
+									if(travelCost < maxAllowedPathLength) {
+										pseudoPathFound = true;
+										PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+										PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+										pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, travelCost), (i == 0), (i == routeStops.size() - 2));
+									}
 								}
 							}
 						}
@@ -294,41 +312,54 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 						 */
 						if(mapScheduleModeArtificial ||
 								!bothStopsInsideArea ||
-								minTravelCost > maxAllowedTravelCost) {
+								!pseudoPathFound) {
 							for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 								for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-									createArtificialLink(network, linkCandidateCurrent, linkCandidateNext, config.getBeelineDistanceMaxFactor());
+									createArtificialLink(network, linkCandidateCurrent, linkCandidateNext);
 
 									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
 									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-
-									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, maxAllowedTravelCost), (i == 0), (i == routeStops.size() - 2));
+									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, maxAllowedPathLength), (i == 0), (i == routeStops.size() - 2));
 								}
 							}
 						}
 					} // - routeStop loop
+
+					/* debug
+					for(int i = 0; i < routeStops.size() - 1; i++) {
+						TransitStopFacility currentStopFacility = routeStops.get(i).getStopFacility();
+						TransitStopFacility nextStopFacility = routeStops.get(i + 1).getStopFacility();
+						if(!pseudoGraph.pathExists(currentStopFacility, nextStopFacility)) {
+							log.error("No pseudoPath between " + currentStopFacility.getName() + " and " + nextStopFacility.getName());
+						}
+					}
+					*/
 
 					/** [3.2]
 					 * build pseudo network and find shortest path => List<LinkCandidate>
 					 */
 					dijkstra.run();
 					List<PseudoRouteStop> pseudoStopSequence = MapUtils.getList(transitRoute, MapUtils.getMap(transitLine, pseudoTransitRoutes));
-					pseudoStopSequence.addAll(dijkstra.getShortesPseudoPath());
-				}
+					try {
+						pseudoStopSequence.addAll(dijkstra.getShortesPseudoPath());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				} // - if correct schedule mode
 			} // - transitRoute loop
 		} // - line loop
+
+		/**
+		 * Merge all networks
+		 */
+		NetworkTools.mergeNetworks(network, networks.values());
 
 		/** [4]
 		 * Replace the parent stop facilities in the transitRoute routeProfiles
 		 * with child StopFacilities. Add the new transitRoutes to the schedule.
 		 */
 		log.info("Replacing parent StopFacilities with child StopFacilities...");
-		PTMapperUtils.replaceFacilities(schedule, pseudoTransitRoutes);
-
-		/**
-		 * Merge all networks
-		 */
-		NetworkTools.mergeNetworks(network, networks.values());
+		PTMapperUtils.createAndReplaceFacilities(schedule, pseudoTransitRoutes, config.getSuffixChildStopFacilities());
 
 		/** [5]
 		 * route all routes with the new referenced links. Routers have to be initialized again
@@ -350,12 +381,17 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		PTMapperUtils.assignScheduleModesToLinks(schedule, network);
 //		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);
+
 		log.info("Clean Stations and Network... done.");
 
+		log.info("================================================");
 		log.info("=== Mapping transit schedule to network... done.");
 
-		log.info("    Mapping statistics:\tinput\toutput\tdifference\tfactor");
-		log.info("    Stop Facilities\t\t"+nStopFacilities+"\t\t\t"+schedule.getFacilities().size()+"\t"+(schedule.getFacilities().size()-nStopFacilities)+"\t\t"+(schedule.getFacilities().size()/((double) nStopFacilities)));
+		log.info("    Stop Facilities statistics:");
+		log.info("    input    "+nStopFacilities);
+		log.info("    output   "+schedule.getFacilities().size());
+		log.info("    diff.    "+(schedule.getFacilities().size()-nStopFacilities));
+		log.info("    factor   "+(schedule.getFacilities().size()/((double) nStopFacilities)));
 	}
 
 
@@ -371,7 +407,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 			log.info("Creating Router for " + modeAssignment.getKey() + " ...");
 			routers.put(modeAssignment.getKey(), new ModeDependentRouter(network, modeAssignment.getValue()));
 		}
-		routers.put(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE, new ModeDependentRouter(network, Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE)));
 		return routers;
 	}
 
@@ -379,12 +414,9 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 	 * Creates a new link between two linkCandidates (or
 	 * more precisely a link connecting the to- and fromNode
 	 * of both linkCandidates).
-	 *
-	 * @param lengthFactor the euclidian distance
-	 *                     between the two nodes is multiplied by this factor
 	 * @return the new link
 	 */
-	private Link createArtificialLink(Network network, final LinkCandidate fromLinkCandidate, final LinkCandidate toLinkCandidate, double lengthFactor) {
+	private Link createArtificialLink(Network network, final LinkCandidate fromLinkCandidate, final LinkCandidate toLinkCandidate) {
 		Tuple<LinkCandidate, LinkCandidate> key = new Tuple<>(fromLinkCandidate, toLinkCandidate);
 
 		Link newLink;
@@ -393,8 +425,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 			newLink = artificialLinks.get(key);
 		} else {
 			String newLinkIdStr = config.getPrefixArtificial() + artificialId++;
-			Id<Node> fromNodeId = Id.create(fromLinkCandidate.getFromNodeId().toString(), Node.class);
-			Id<Node> toNodeId = Id.create(toLinkCandidate.getToNodeId().toString(), Node.class);
+			Id<Node> fromNodeId = Id.create(fromLinkCandidate.getFromNodeIdStr(), Node.class);
+			Id<Node> toNodeId = Id.create(toLinkCandidate.getToNodeIdStr(), Node.class);
 
 			Node fromNode;
 			Node toNode;
@@ -417,7 +449,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 					toNode);
 
 			newLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
-			newLink.setLength(lengthFactor * CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord()));
+			newLink.setLength(CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord()));
 			network.addLink(newLink);
 
 			artificialLinks.put(key, newLink);
