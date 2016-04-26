@@ -127,7 +127,7 @@ public class KNAccidentScenario {
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {
 				
-				this.addMobsimListenerBinding().to( WithinDayBestRouteMobsimListener.class );
+//				this.addMobsimListenerBinding().to( WithinDayBestRouteMobsimListener.class );
 //				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
 
 				this.addEventHandlerBinding().toInstance( travelTime ) ;
