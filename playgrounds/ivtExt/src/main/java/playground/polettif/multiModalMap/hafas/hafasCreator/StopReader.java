@@ -34,6 +34,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Reads all stops from HAFAS-BFKOORD_GEO and adds them to the provided TransitSchedule.
@@ -46,6 +48,7 @@ public class StopReader implements TransitStopCreator {
 	private final CoordinateTransformation transformation;
 	private TransitSchedule schedule;
 	private TransitScheduleFactory scheduleBuilder;
+	private Map<Coord, String> usedCoordinates = new HashMap<>();
 
 	protected StopReader(CoordinateTransformation transformation) {
 		this.transformation = transformation;
@@ -89,9 +92,19 @@ public class StopReader implements TransitStopCreator {
 	}
 
 	private void createStop(Id<TransitStopFacility> stopId, Coord coord, String stopName) {
+
+		//check if coordinates are already used by another facility
+		String check = usedCoordinates.put(coord, stopName);
+		if(check != null && !check.equals(stopName)) {
+			if(check.contains(stopName) || stopName.contains(check)) {
+				log.info("Two stop facilities at " + coord + " \"" + check + "\" & \"" + stopName + "\"");
+			} else {
+				log.warn("Two stop facilities at " + coord + " \"" + check + "\" & \"" + stopName + "\"");
+			}
+		}
+
 		TransitStopFacility stopFacility = this.scheduleBuilder.createTransitStopFacility(stopId, coord, false);
 		stopFacility.setName(stopName);
 		this.schedule.addStopFacility(stopFacility);
-		//log.info("Added " + schedule.getFacilities().get(stopId).toString());
 	}
 }
