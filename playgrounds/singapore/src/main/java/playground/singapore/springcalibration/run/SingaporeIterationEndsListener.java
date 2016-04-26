@@ -31,7 +31,7 @@ public class SingaporeIterationEndsListener implements IterationEndsListener {
             new MatsimEventsReader(events).readFile(eventsFileName);
 
             try {
-                eventsToTravelDiaries.writeSimulationResultsToTabSeparated(controler.getControlerIO().getTempPath(), "_" + currentIteration);
+                eventsToTravelDiaries.writeSimulationResultsToTabSeparated(controler.getControlerIO().getIterationPath(currentIteration), "_" + currentIteration);
             } catch (IOException e) {
                 e.printStackTrace();
             }

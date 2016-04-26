@@ -55,7 +55,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.singapore.springcalibration.run.SingaporeControlerListener;
-import playground.singapore.springcalibration.run.TaxiUtils;
+
 
 /**
  * @author anhorni
@@ -71,9 +71,9 @@ public class SingaporeDistributions implements IterationEndsListener {
 	private DecimalFormat df = new DecimalFormat("0.00");
 	private DecimalFormat dfpercent = new DecimalFormat("0.0");
 	private String measure = "";
-	private Counter counter = new Counter();
-	
+	private Counter counter = new Counter();	
 	private DistributionClass transit_walk_class = new DistributionClass();
+	private ModesHistoryPlotter modesHistoryPlotter = new ModesHistoryPlotter();
 	
 	public SingaporeDistributions(final Population population,
 			final MainModeIdentifier mainModeIdentifier, final StageActivityTypes stageActivityTypes, String measure) {
@@ -217,6 +217,8 @@ public class SingaporeDistributions implements IterationEndsListener {
 			writeDistributionClass(distributionClass, event.getIteration(), event.getServices().getControlerIO());
 		}		
 		this.writeCounter(event.getServices().getControlerIO(), event.getIteration());
+		this.updateAndRunModesHistoryPlotter(event.getServices().getControlerIO(), event.getIteration());
+		
 	}
 	
 	private void writeDistributionClass(DistributionClass distributionClass, int iteration, 
@@ -390,12 +392,20 @@ public class SingaporeDistributions implements IterationEndsListener {
 		}
 	}
 	
+	private void updateAndRunModesHistoryPlotter(OutputDirectoryHierarchy outputDirectoryHierarchy, int iteration) {
+		for (String mode : SingaporeControlerListener.modes) {
+			double share = this.counter.getShare(mode, "counts");
+			this.modesHistoryPlotter.addModeShare(iteration, mode, share);
+		}
+		this.modesHistoryPlotter.writeModesHistory(outputDirectoryHierarchy.getOutputPath(), iteration);
+	}
+	
 	private void writeCounter(OutputDirectoryHierarchy outputDirectoryHierarchy, int iteration) {
 		String path = outputDirectoryHierarchy.getIterationPath(iteration);
 		String fileName = path + "/counter_" + measure;		
 		
 		try {
-			BufferedWriter writer = IOUtils.getBufferedWriter(fileName + ".txt");
+			BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 			StringBuffer stringBuffer = new StringBuffer();
 			stringBuffer.append("mode" + "\t" + "counts" + "\t" + this.measure);			
 			writer.write(stringBuffer.toString());
