@@ -443,9 +443,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			final double length) {
 		String highway = way.tags.get(TAG_HIGHWAY);
 
-        if ("no".equals(way.tags.get(TAG_ACCESS))) {
-             return;
-        }
+//        if ("no".equals(way.tags.get(TAG_ACCESS))) {
+//             return;
+//        }
 		
 		// load defaults
 		OsmHighwayDefaults defaults = this.highwayDefaults.get(highway);
