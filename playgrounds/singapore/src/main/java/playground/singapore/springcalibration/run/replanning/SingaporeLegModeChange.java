@@ -99,12 +99,12 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 		Collection<String> permissibleModes = this.permissibleModesCalculator.getPermissibleModes(plan);
 		
 		if (!this.ignoreCarAvailability) {
-			forbidCar = !permissibleModes.contains(TransportMode.car);
-			forbidPassenger = !permissibleModes.contains("passenger");
+			forbidCar = !(permissibleModes.contains(TransportMode.car));
+			forbidPassenger = !(permissibleModes.contains("passenger"));
 		}
 		
-		forbidOther = !permissibleModes.contains(TransportMode.other);
-		forbidSchoolbus = !permissibleModes.contains("schoolbus");
+		forbidOther = !(permissibleModes.contains(TransportMode.other));
+		forbidSchoolbus = !(permissibleModes.contains("schoolbus"));
 
 		ArrayList<Leg> legs = new ArrayList<Leg>();
 		int cnt = 0;
@@ -177,6 +177,7 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 
 	private String chooseModeOtherThan(final String currentMode, final boolean forbidCar, final boolean forbidPassenger, final boolean forbidWalk, final boolean forbidOther, final boolean forbidSchoolbus) {
 		String newMode;
+		int cnt = 0;
 		while (true) {
 			int newModeIdx = this.rng.nextInt(this.possibleModes.length - 1);
 			for (int i = 0; i <= newModeIdx; i++) {
@@ -188,53 +189,26 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 					break;
 				}
 			}
-			newMode = this.possibleModes[newModeIdx];
-			if (!(forbidCar && TransportMode.car.equals(newMode))) {
+			newMode = this.possibleModes[newModeIdx];			
+			if (this.allConstraintsRespected(newMode, forbidCar, forbidPassenger, forbidWalk, forbidOther, forbidSchoolbus)) {
 				break;
-			} else {
-				if (this.possibleModes.length == 2) {
-					newMode = currentMode; // there is no other mode available
-					break;
-				}
-			}
-			
-			if (!(forbidPassenger && "passenger".equals(newMode))) {
+			} 
+			cnt++;
+			if (this.possibleModes.length == 2 || cnt >= this.possibleModes.length) {
+				newMode = currentMode; // there is no other mode available
 				break;
-			} else {
-				if (this.possibleModes.length == 2) {
-					newMode = currentMode; // there is no other mode available
-					break;
-				}
-			}
-			
-			if (!(forbidWalk && TransportMode.walk.equals(newMode))) {
-				break;
-			} else {
-				if (this.possibleModes.length == 2) {
-					newMode = currentMode; // there is no other mode available
-					break;
-				}
-			}
-			
-			if (!(forbidOther && TransportMode.other.equals(newMode))) {
-				break;
-			} else {
-				if (this.possibleModes.length == 2) {
-					newMode = currentMode; // there is no other mode available
-					break;
-				}
-			}
-			
-			if (!(forbidSchoolbus && "schoolbus".equals(newMode))) {
-				break;
-			} else {
-				if (this.possibleModes.length == 2) {
-					newMode = currentMode; // there is no other mode available
-					break;
-				}
-			}
+			}		
 		}
 		return newMode;
+	}
+	
+	private boolean allConstraintsRespected(String newMode, final boolean forbidCar, final boolean forbidPassenger, final boolean forbidWalk, final boolean forbidOther, final boolean forbidSchoolbus) {
+		if (forbidCar && TransportMode.car.equals(newMode)) return false;
+		if (forbidPassenger && "passenger".equals(newMode)) return false;
+		if (forbidWalk && TransportMode.walk.equals(newMode)) return false;
+		if (forbidOther && TransportMode.other.equals(newMode)) return false;
+		if (forbidSchoolbus && "schoolbus".equals(newMode)) return false;
+		return true;
 	}
 	
 	private void handleTaxi(Plan plan, Leg leg, int addOrRemove) {

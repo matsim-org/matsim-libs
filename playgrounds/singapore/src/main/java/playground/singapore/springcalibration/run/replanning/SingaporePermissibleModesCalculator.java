@@ -23,7 +23,7 @@ public class SingaporePermissibleModesCalculator implements PermissibleModesCalc
 	@Override
 	public List<String> getPermissibleModes(Plan plan) {
 		
-		List<String> permissibleModes = new LinkedList<String>(Arrays.asList(availableModes.clone())); Arrays.asList(availableModes.clone());
+		List<String> permissibleModes = new LinkedList<String>(Arrays.asList(availableModes.clone()));
 						
 		String carAvail = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "car");
 		String license = (String) population.getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "license");
