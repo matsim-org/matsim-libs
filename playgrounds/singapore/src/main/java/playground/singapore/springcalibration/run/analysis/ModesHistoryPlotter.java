@@ -31,7 +31,7 @@ public class ModesHistoryPlotter {
 		double shares [] = new double[iteration + 1];
 		
 		for (int i = 0; i <= iteration; i++) {
-			shares[i] = this.getModeShares(iteration).get(mode);
+			shares[i] = this.getModeShares(i).get(mode);
 		}
 		return shares;		
 	}
@@ -43,9 +43,9 @@ public class ModesHistoryPlotter {
 			
 			
 			for (int i = 0; i <= iteration; i++) {
-				TreeMap<String, Double> iterationvalues = this.getModeShares(iteration);
+				TreeMap<String, Double> iterationvalues = this.getModeShares(i);
 				
-				if (iteration == 0) {
+				if (i == 0) {
 					StringBuffer stringBuffer = new StringBuffer();
 					stringBuffer.append("iteration\t");
 					for (String mode : iterationvalues.keySet()) {					
@@ -56,7 +56,7 @@ public class ModesHistoryPlotter {
 				}
 				
 				StringBuffer stringBuffer = new StringBuffer();
-				stringBuffer.append(iteration + "\t");
+				stringBuffer.append(i + "\t");
 				for (double share : iterationvalues.values()) {
 					stringBuffer.append(dfpercent.format(100.0 * share) + "\t");
 				}
