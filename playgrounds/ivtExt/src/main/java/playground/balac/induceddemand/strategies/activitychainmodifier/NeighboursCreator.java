@@ -1,12 +1,15 @@
 package playground.balac.induceddemand.strategies.activitychainmodifier;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -14,7 +17,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -35,6 +41,7 @@ public class NeighboursCreator {
 	private LeastCostPathCalculator pathCalculator;
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private static final Logger logger = Logger.getLogger(NeighboursCreator.class);
+	//private LinkUtils linkUtils;
 	
 	private boolean allowSplittingWorkActivity = false;
 
@@ -47,7 +54,8 @@ public class NeighboursCreator {
 		this.stageActivityTypes = stageActivityTypes;
 		this.pathCalculator = pathCalculator;
 		this.scoringFunctionFactory = scoringFunctionFactory;
-		
+		//this.linkUtils = new LinkUtils(this.scenario.getNetwork());
+
 		
 	}
 
@@ -72,7 +80,7 @@ public class NeighboursCreator {
 				foundBetter = true;
 				score = newPlan.getScore();
 			}
-			logger.info(newPlan.getScore());
+			//logger.info(newPlan.getScore());
 		}
 		if (foundBetter)
 			PlanUtils.copyFrom(bestPlan, plan);
@@ -91,9 +99,9 @@ public class NeighboursCreator {
 					((Activity) pe).setStartTime(Time.UNDEFINED_TIME);
 					firstActivity = false;
 				}
-				if (((Activity) pe).getMaximumDuration() != Time.UNDEFINED_TIME) {
-					((Activity) pe).setEndTime(Time.UNDEFINED_TIME);
-				}
+			//	if (((Activity) pe).getMaximumDuration() != Time.UNDEFINED_TIME) {
+			//		((Activity) pe).setEndTime(Time.UNDEFINED_TIME);
+			//	}
 			}
 		}
 		
@@ -304,7 +312,7 @@ public class NeighboursCreator {
 				newPlan.getPlanElements().add(actIndex + 1, newLeg);
 				
 				Link startLinkPreviousLeg = network.getNearestLinkExactly(t.get(index - 1).getCoord());
-
+				
 				Leg previousLeg = (Leg) plan.getPlanElements().get(actIndex - 1);
 				String modeOfPreviousLeg = previousLeg.getMode();
 				double previousTravelTime = estimateTravelTime(startLinkPreviousLeg, startLink, person,
@@ -335,12 +343,15 @@ public class NeighboursCreator {
 			
 			newPlan.setPerson(plan.getPerson());
 			
-			if ((t.get(index).getType().equals("work") || t.get(index).getType().equals("education")))
+			if ((t.get(index).getType().startsWith("work") || t.get(index).getType().startsWith("education")))
 				//don't remove mandatory activities
 				continue;
 			int actIndex = plan.getPlanElements().indexOf(t.get(index));
-
-			double durationRemovedActivity = t.get(index).getMaximumDuration();
+			double durationRemovedActivity = 0.0;
+			if (t.get(index).getMaximumDuration() != Time.UNDEFINED_TIME)
+				durationRemovedActivity = t.get(index).getMaximumDuration();
+			else
+				durationRemovedActivity = t.get(index).getEndTime() - t.get(index - 1).getEndTime();
 			Leg previousLeg = ((Leg) newPlan.getPlanElements().get(actIndex - 1));
 			Leg nextLeg = ((Leg) newPlan.getPlanElements().get(actIndex + 1));
 			
@@ -371,8 +382,8 @@ public class NeighboursCreator {
 			}		
 			
 			//check if after removing we have two work activities next to each other
-			if (t.get(index - 1).getType().equals("work") 
-					&& t.get(index + 1).getType().equals("work")) {
+			if (t.get(index - 1).getType().startsWith("work") 
+					&& t.get(index + 1).getType().startsWith("work")) {
 				
 				double initialEndTime = t.get(index + 1).getEndTime();
 				newPlan.getPlanElements().remove(actIndex);
@@ -441,12 +452,12 @@ public class NeighboursCreator {
 		if (actType.equals("leisure"))
 			return (ActivityFacility)leisureFacilityQuadTree.getClosest(coord.getX(), coord.getY());		
 
-		else if (actType.equals("shopping"))
+		else if (actType.equals("shop"))
 		
 			return (ActivityFacility)shopFacilityQuadTree.getClosest(coord.getX(), coord.getY());		
 		else 
 			throw new NullPointerException("The activity type: " + actType + " ,is not known!");
 		
 	}
-
+	
 }

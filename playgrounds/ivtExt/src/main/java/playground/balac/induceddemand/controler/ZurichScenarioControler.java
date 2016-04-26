@@ -58,7 +58,7 @@ public class ZurichScenarioControler {
 				// this adds a new config group, used by the specific scoring function
 				// we use
 				new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup(),
-				new ActivityStrategiesConfigGroup(), new F2LConfigGroup());
+				new ActivityStrategiesConfigGroup());
 		
 		// This is currently needed for location choice: initializing
 		// the location choice writes K-values files to the output directory, which:
@@ -74,7 +74,7 @@ public class ZurichScenarioControler {
 		controler.getConfig().controler().setOverwriteFileSetting(
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles  );
 
-		connectFacilitiesWithNetwork( controler );
+		//connectFacilitiesWithNetwork( controler );
 
 		initializeLocationChoice( controler );
 		initializeActivityStrategies(scenario, controler);
@@ -90,7 +90,7 @@ public class ZurichScenarioControler {
 		
 		final QuadTreeRebuilder<ActivityFacility> shopFacilitiesQuadTree = new QuadTreeRebuilder<ActivityFacility>();
 		
-		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shopping").values()) {
+		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shop").values()) {
 			
 			shopFacilitiesQuadTree.put(af.getCoord(), af);
 		}
