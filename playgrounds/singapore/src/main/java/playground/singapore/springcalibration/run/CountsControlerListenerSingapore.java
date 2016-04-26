@@ -180,6 +180,15 @@ class CountsControlerListenerSingapore implements StartupListener, IterationEnds
 			for (String mode : this.analyzedModes) {
 				double[] volumesForMode = volumes.getVolumesPerHourForLink(linkId, mode);
 				if (volumesForMode == null) continue;
+				
+				// NEW: we have to rescale the pt volumes here as they will be upscaled latter! ---------------
+				if (mode.equals("pt") || mode.equals("bus")) {
+					for (int i = 0; i < 24; i++) {
+						volumesForMode[i] =  volumesForMode[i] / this.config.getCountsScaleFactor();
+					}
+				}	
+				// --------------------------------------------------------------------------------------------
+				
 				for (int i = 0; i < 24; i++) {
 					newVolume[i] += volumesForMode[i];
 				}				
