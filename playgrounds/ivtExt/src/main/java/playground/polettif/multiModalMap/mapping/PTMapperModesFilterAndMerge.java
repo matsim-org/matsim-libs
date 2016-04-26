@@ -39,11 +39,10 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
-import playground.polettif.multiModalMap.config.PublicTransportMapEnum;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.*;
 import playground.polettif.multiModalMap.mapping.router.FastAStarRouter;
-import playground.polettif.multiModalMap.mapping.router.ModeDependentRouter;
 import playground.polettif.multiModalMap.mapping.router.LinkFilterMode;
+import playground.polettif.multiModalMap.mapping.router.ModeDependentRouter;
 import playground.polettif.multiModalMap.mapping.router.Router;
 import playground.polettif.multiModalMap.tools.NetworkTools;
 
@@ -156,8 +155,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 */
 		Map<String, Network> networks = new HashMap<>();
 		Map<String, Router> routers = new HashMap<>();
-		FastAStarRouter.setPseudoRouteWeightType(config.getPseudoRouteWeightType());
-		PseudoGraph.setPseudoRouterWeightType(config.getPseudoRouteWeightType());
+//		FastAStarRouter.setPseudoRouteWeightType(config.getPseudoRouteWeightType());
+//		PseudoGraph.setPseudoRouterWeightType(config.getPseudoRouteWeightType());
 
 		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
 			log.info("Creating network for " + modeAssignment.getValue());

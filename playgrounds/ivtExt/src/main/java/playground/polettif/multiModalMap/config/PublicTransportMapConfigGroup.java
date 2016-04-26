@@ -20,7 +20,6 @@
 package playground.polettif.multiModalMap.config;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.*;
 
@@ -68,14 +67,6 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		modeRoutingAssignment.put("FERRY", Collections.singleton(ARTIFICIAL_LINK_MODE));
 	}
 
-
-
-
-	/**
-	 * NOT a config variable.
-	 */
-	private Map<String, TransitStopFacility> childStopFacilities = new HashMap<>();
-
 	private String networkFile = null;
 	private String scheduleFile = null;
 	private String outputNetworkFile = null;
@@ -93,10 +84,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		map.put(MODES_TO_KEEP_ON_CLEAN_UP,
 				"All links that do not have a transit route on them are removed, except the ones \n" +
 				"\t\tlisted in this set (typically only car). Separated by comma.");
-		map.put(PSEUDO_ROUTE_WEIGHT_TYPE,
-				"Defines which link attribute should be used for pseudo route calculations. Default is minimization \n" +
-				"\t\tof travel distance. If high quality information on link travel times is available, travelTime can be \n" +
-				"\t\tused. (Possible values \""+PublicTransportMapEnum.linkLength+"\" and \""+PublicTransportMapEnum.travelTime+"\"");
+
 		map.put(MAX_NCLOSEST_LINKS,
 				"Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
 				"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
@@ -118,6 +106,10 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		map.put(SCHEDULE_FILE, "Path to the input schedule file. Not needed if PTMapper is called within another class.");
 		map.put(OUTPUT_NETWORK_FILE, "Path to the output network file. Not needed if PTMapper is used within another class.");
 		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
+//		map.put(PSEUDO_ROUTE_WEIGHT_TYPE,
+//				"Defines which link attribute should be used for pseudo route calculations. Default is minimization \n" +
+//				"\t\tof travel distance. If high quality information on link travel times is available, travelTime can be \n" +
+//				"\t\tused. (Possible values \""+PublicTransportMapEnum.linkLength+"\" and \""+PublicTransportMapEnum.travelTime+"\"");
 		return map;
 	}
 
@@ -248,6 +240,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	 * information on link travel times is available, travelTime
 	 * can be used.
 	 */
+	/*
 	private PublicTransportMapEnum pseudoRouteWeightType = PublicTransportMapEnum.linkLength;
 
 	@StringGetter(PSEUDO_ROUTE_WEIGHT_TYPE)
@@ -259,7 +252,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	public void setPseudoRouteWeightType(PublicTransportMapEnum weight) {
 		this.pseudoRouteWeightType = weight;
 	}
-
+	*/
 
 	/**
 	 * Number of link candidates considered for all stops, depends on accuracy of

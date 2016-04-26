@@ -20,16 +20,9 @@
 package playground.polettif.multiModalMap.mapping.pseudoPTRouter;
 
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.api.Transit;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.multiModalMap.config.PublicTransportMapEnum;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -47,17 +40,19 @@ public class PseudoGraph {
 
 	public static final PseudoRouteStop SOURCE = new PseudoRouteStop("SOURCE");
 	public static final PseudoRouteStop DESTINATION = new PseudoRouteStop("DESTINATION");
-	private static PublicTransportMapEnum pseudoRouterWeightType;
 
 	public PseudoGraph() {
 		this.edges = new HashSet<>();
 	}
 
+	/*
+	private static PublicTransportMapEnum pseudoRouterWeightType;
 	public static void setPseudoRouterWeightType(PublicTransportMapEnum type) {
 		pseudoRouterWeightType = pseudoRouterWeightType;
 		PseudoRoutePath.setPseudoRouteWeightType(type);
 		PseudoRouteStop.setPseudoRouteWeightType(type);
 	}
+	*/
 
 	public Set<PseudoRoutePath> getEdges() {
 		return edges;

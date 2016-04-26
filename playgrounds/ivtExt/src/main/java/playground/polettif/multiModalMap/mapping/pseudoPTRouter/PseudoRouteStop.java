@@ -2,7 +2,6 @@ package playground.polettif.multiModalMap.mapping.pseudoPTRouter;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import playground.polettif.multiModalMap.config.PublicTransportMapEnum;
 
 /**
  * A RouteStop used in the pseudoGraph.
@@ -33,10 +32,12 @@ public class PseudoRouteStop {
 	private final String linkCandidateId;
 	private final double linkWeight;
 
+	/*
 	private static PublicTransportMapEnum pseudoRouteWeightType;
 	public static void setPseudoRouteWeightType(PublicTransportMapEnum weightType) {
 		pseudoRouteWeightType = weightType;
 	}
+	*/
 
 	/**
 	 * Constructor. All values are stored here as well to make access easier during
@@ -64,7 +65,8 @@ public class PseudoRouteStop {
 		this.awaitDepartureTime = routeStop.isAwaitDepartureTime();
 
 		// link value
-		this.linkWeight = (pseudoRouteWeightType.equals(PublicTransportMapEnum.travelTime) ? linkCandidate.getLinkTravelTime() : linkCandidate.getLinkLength());
+//		this.linkWeight = (pseudoRouteWeightType.equals(PublicTransportMapEnum.travelTime) ? linkCandidate.getLinkTravelTime() : linkCandidate.getLinkLength());
+		this.linkWeight = linkCandidate.getLinkLength();
 	}
 
 	public PseudoRouteStop(String id) {
