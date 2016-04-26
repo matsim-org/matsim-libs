@@ -36,17 +36,12 @@ public class ExternalParametersMatsim2010ScoringFunctionFactory implements Scori
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 		// get scenario elements at the lattest possible, to be sure all is initialized
-		final KtiLikeScoringConfigGroup ktiConfig = (KtiLikeScoringConfigGroup)
-			scenario.getConfig().getModule( KtiLikeScoringConfigGroup.GROUP_NAME );
 		final PlanCalcScoreConfigGroup config = scenario.getConfig().planCalcScore();
 
 		final DestinationChoiceBestResponseContext locationChoiceContext = (DestinationChoiceBestResponseContext)
 			scenario.getScenarioElement( DestinationChoiceBestResponseContext.ELEMENT_NAME );
-		final ObjectAttributes personAttributes =
-				scenario.getPopulation().getPersonAttributes();
 
 		final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-		//final ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		final CharyparNagelScoringParameters params = parametersForPerson.getScoringParameters( person );
 
 		// XXX THIS is the difference with default scoring function. Incorporate in the core and get rid of home-brewed
