@@ -39,6 +39,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.TimeVariantLinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -60,9 +61,12 @@ public class Incident2NetworkChangeEventsTest {
 		
 		String startDateTime = "2016-03-15";
 		String endDateTime = "2016-03-15";
+
+		String crs = TransformationFactory.DHDN_GK4;
 		
 		IncidentDataAnalysis analysis = new IncidentDataAnalysis(
 				networkFile,
+				crs,
 				inputDirectory,
 				outputDirectory,
 				false,

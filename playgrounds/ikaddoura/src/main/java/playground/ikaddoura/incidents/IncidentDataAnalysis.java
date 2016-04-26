@@ -34,6 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.ikaddoura.incidents.data.TrafficItem;
 import playground.ikaddoura.incidents.io.HereMapsTrafficItemXMLReader;
@@ -50,14 +51,18 @@ import playground.ikaddoura.incidents.io.Incident2SHPWriter;
 public class IncidentDataAnalysis {
 	private final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
 
-	private String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
-	private String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-berlin/";
-	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin-analysis-withDelays/";
+	private String networkFile = "../../../public-svn/matsim/scenarios/countries/de/cottbus/cottbus-with-pt/output/cb02/output_network.xml.gz";
+//	private String crs = TransformationFactory.DHDN_GK4;
+	private String crs = TransformationFactory.WGS84_UTM33N;
+	
+	private String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-germany/";
+	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-cottbus/";
 	
 	private boolean writeCSVFileForEachXMLFile = false;
 	
-	private boolean writeAllTrafficItems2ShapeFile = false;
-	private boolean writeDaySpecificTrafficItems2ShapeFile = true;
+	private boolean writeAllTrafficItems2ShapeFile = true;
+	
+	private boolean writeDaySpecificTrafficItems2ShapeFile = false;
 	private String shpFileStartDateTime = "2016-02-11";
 	private String shpFileEndDateTime = "2016-02-11";
 	
@@ -83,6 +88,7 @@ public class IncidentDataAnalysis {
 	
 	public IncidentDataAnalysis(
 			String networkFile,
+			String crs,
 			String inputDirectory,
 			String outputDirectory,
 			boolean writeCSVFileForEachXMLFile,
@@ -95,6 +101,7 @@ public class IncidentDataAnalysis {
 			String nceEndDateTime) {
 		
 		this.networkFile = networkFile;
+		this.crs = crs;
 		this.inputDirectory = inputDirectory;
 		this.outputDirectory = outputDirectory;
 		this.writeCSVFileForEachXMLFile = writeCSVFileForEachXMLFile;
@@ -125,7 +132,7 @@ public class IncidentDataAnalysis {
 		Incident2CSVWriter.writeTrafficItems(trafficItems.values(), outputDirectory + "incidentData.csv");
 				
 		// map incidents on network
-		final Incident2Network networkMapper = new Incident2Network(loadScenario(), this.trafficItems);
+		final Incident2Network networkMapper = new Incident2Network(loadScenario(), this.trafficItems, this.crs);
 		networkMapper.computeIncidentPaths();
 		final Map<String, Path> trafficItemId2path = networkMapper.getTrafficItemId2path();
 
@@ -134,10 +141,10 @@ public class IncidentDataAnalysis {
 		if (writeAllTrafficItems2ShapeFile) {
 			log.info("Writing all traffic items to shape file...");
 			
-			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_all.shp", this.trafficItems.keySet());
+			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_all.shp", this.trafficItems.keySet(), this.crs);
 			
 			final Set<String> trafficItemsToCheck = networkMapper.getTrafficItemsToCheck();
-			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_WARNING.shp", trafficItemsToCheck);
+			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_WARNING.shp", trafficItemsToCheck, this.crs);
 		}
 		
 		if (writeDaySpecificTrafficItems2ShapeFile) {
@@ -151,13 +158,13 @@ public class IncidentDataAnalysis {
 					filteredTrafficItems.add(item.getId());
 				}
 			}
-			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_" + shpFileStartDateTime + "_" + shpFileEndDateTime + ".shp", filteredTrafficItems);
-			shpWriter.writeCongestionInfo2ShapeFile(outputDirectory + "delays_" + shpFileStartDateTime + "_" + shpFileEndDateTime + ".shp", filteredTrafficItems);
+			shpWriter.writeTrafficItemLinksToShapeFile(outputDirectory + "trafficItems_" + shpFileStartDateTime + "_" + shpFileEndDateTime + ".shp", filteredTrafficItems, crs);
+			shpWriter.writeCongestionInfo2ShapeFile(outputDirectory + "delays_" + shpFileStartDateTime + "_" + shpFileEndDateTime + ".shp", filteredTrafficItems, crs);
 		}
 		
 		if (writeNetworkChangeEventFiles) {
 			// write network change events file and network incident shape file for each day
-			final Incident2NetworkChangeEventsWriter nceWriter = new Incident2NetworkChangeEventsWriter(this.tmc, this.trafficItems, trafficItemId2path);
+			final Incident2NetworkChangeEventsWriter nceWriter = new Incident2NetworkChangeEventsWriter(this.tmc, this.trafficItems, trafficItemId2path, this.crs);
 			nceWriter.writeIncidentLinksToNetworkChangeEventFile(this.networkChangeEventStartDateTime, this.networkChangeEventEndDateTime, this.outputDirectory);
 		}
 		

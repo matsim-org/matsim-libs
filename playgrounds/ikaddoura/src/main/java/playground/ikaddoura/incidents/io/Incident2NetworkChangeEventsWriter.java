@@ -65,12 +65,15 @@ public class Incident2NetworkChangeEventsWriter {
 	private Map<String, Path> trafficItemId2path = null;
 	private TMCAlerts tmc = null;
 	
+	private String crs = null;
+	
 	private final NetworkChangeEventFactory nceFactory = new NetworkChangeEventFactoryImpl();
 		
-	public Incident2NetworkChangeEventsWriter(TMCAlerts tmc, Map<String, TrafficItem> trafficItems, Map<String, Path> trafficItemId2path) {
+	public Incident2NetworkChangeEventsWriter(TMCAlerts tmc, Map<String, TrafficItem> trafficItems, Map<String, Path> trafficItemId2path, String crs) {
 		this.tmc = tmc;
 		this.trafficItems = trafficItems;
-		this.trafficItemId2path = trafficItemId2path;		
+		this.trafficItemId2path = trafficItemId2path;
+		this.crs = crs;
 	}
 
 	public void writeIncidentLinksToNetworkChangeEventFile(String startDateTime, String endDateTime, String outputDirectory) throws IOException {
@@ -89,7 +92,7 @@ public class Incident2NetworkChangeEventsWriter {
 
 			new NetworkChangeEventsWriter().write(outputDirectory + "networkChangeEvents_" + DateTime.secToDateTimeString(dateInSec) + ".xml.gz", allChangeEvents);
 			Incident2CSVWriter.writeProcessedNetworkIncidents(linkId2processedIncidentsCurrentDay, outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateTimeString(dateInSec) + ".csv");
-			Incident2SHPWriter.writeDailyIncidentLinksToShapeFile(linkId2processedIncidentsCurrentDay, outputDirectory, dateInSec);
+			Incident2SHPWriter.writeDailyIncidentLinksToShapeFile(linkId2processedIncidentsCurrentDay, outputDirectory, dateInSec, crs);
 			dateInSec = dateInSec + 24 * 3600.;
 		}
 		
