@@ -109,7 +109,8 @@ public class RunMzTripChoiceSetConversion {
 									sc.getActivityFacilities(),
 									new StageActivityTypesImpl(
 											PtConstants.TRANSIT_ACTIVITY_TYPE),
-									new MainModeIdentifierImpl()) )
+									new MainModeIdentifierImpl(),
+									group.getModes() ) )
 					.withNumberOfThreads(
 							group.getNumberOfThreads())
 					.create()

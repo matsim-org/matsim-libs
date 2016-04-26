@@ -116,7 +116,8 @@ public class RunCapeTownTripChoiceSetConversion {
 									sc.getActivityFacilities(),
 									new StageActivityTypesImpl(
 											PtConstants.TRANSIT_ACTIVITY_TYPE),
-									new CapeTownMainModeIdentifier()) )
+									new CapeTownMainModeIdentifier(),
+									group.getModes() ) )
 					.withNumberOfThreads(
 							group.getNumberOfThreads())
 					.create()
