@@ -163,7 +163,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 			for(String networkMode : tuple[1].trim().split(",")) {
 				set.add(networkMode.trim());
 			}
-			this.modeRoutingAssignment.put(tuple[0], set);
+			this.modeRoutingAssignment.put(tuple[0].trim(), set);
 		}
 	}
 

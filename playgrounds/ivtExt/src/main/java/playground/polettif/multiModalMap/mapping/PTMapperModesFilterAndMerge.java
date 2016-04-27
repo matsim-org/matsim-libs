@@ -93,41 +93,26 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		if(args.length == 1) {
 			log.info("Mapping files from config...");
 			new PTMapperModesFilterAndMerge(args[0]).mapFilesFromConfig();
-		} else if(args.length != 4) {
-			System.out.println("Incorrect number of arguments\n[0] unmapped schedule file\n[1] network file\n[2] output schedule path\n[3]output network path");
 		} else {
-			mapFromFiles(args[0], args[1], args[2], args[3]);
+			System.out.println("Incorrect number of arguments\n[0] config file");
 		}
 	}
 
 	@Override
 	public void mapFilesFromConfig() {
-		mapFromFiles(config.getScheduleFile(), config.getNetworkFile(), config.getOutputScheduleFile(), config.getOutputNetworkFile());
-	}
-
-	/**
-	 * Routes the unmapped MATSim Transit Schedule file to the network given by file. Writes the resulting
-	 * schedule and network to xml files.<p/>
-	 *
-	 * @param matsimTransitScheduleFile unmapped MATSim Transit Schedule (unmapped: stopFacilities are not referenced to links and routes do not have a network route (linkSequence) yet.
-	 * @param networkFile               MATSim network file
-	 * @param outputScheduleFile        the resulting MATSim Transit Schedule
-	 * @param outputNetworkFile         the resulting MATSim network (might have some additional links added)
-	 */
-	public static void mapFromFiles(String matsimTransitScheduleFile, String networkFile, String outputScheduleFile, String outputNetworkFile) {
 		log.info("Reading schedule and network file...");
 		Scenario mainScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network mainNetwork = mainScenario.getNetwork();
-		new TransitScheduleReader(mainScenario).readFile(matsimTransitScheduleFile);
-		new MatsimNetworkReader(mainNetwork).readFile(networkFile);
+		new TransitScheduleReader(mainScenario).readFile(config.getScheduleFile());
+		new MatsimNetworkReader(mainNetwork).readFile(config.getNetworkFile());
 		TransitSchedule mainSchedule = mainScenario.getTransitSchedule();
 
 		log.info("Mapping transit schedule to network...");
-		new PTMapperModesFilterAndMerge(mainSchedule, new PublicTransportMapConfigGroup()).mapScheduleToNetwork(mainNetwork);
+		new PTMapperModesFilterAndMerge(mainSchedule, config).mapScheduleToNetwork(mainNetwork);
 
 		log.info("Writing schedule and network to file...");
-		new TransitScheduleWriter(mainSchedule).writeFile(outputScheduleFile);
-		new NetworkWriter(mainNetwork).write(outputNetworkFile);
+		new TransitScheduleWriter(mainSchedule).writeFile(config.getOutputScheduleFile());
+		new NetworkWriter(mainNetwork).write(config.getOutputNetworkFile());
 
 		log.info("Mapping public transit to network successful!");
 	}
