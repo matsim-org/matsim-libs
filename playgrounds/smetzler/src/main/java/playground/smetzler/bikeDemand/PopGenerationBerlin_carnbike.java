@@ -26,10 +26,10 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.Point;
 
-public class PopGenerationBerlin implements Runnable {
+public class PopGenerationBerlin_carnbike implements Runnable {
 	
 
-	String outputPop = "../../../shared-svn/studies/countries/de/berlin-bike/input/demand/innenring_bike_500.xml";
+	String outputPop = "../../../shared-svn/studies/countries/de/berlin-bike/input/demand/Berlin_carnbike.xml";
 	//String DHDN = "EPSG:3068";
 
 
@@ -40,7 +40,7 @@ public class PopGenerationBerlin implements Runnable {
 	private Population population;
 
 	public static void main(String[] args) {
-		PopGenerationBerlin Pop = new PopGenerationBerlin();
+		PopGenerationBerlin_carnbike Pop = new PopGenerationBerlin_carnbike();
 		Pop.run();
 	}
 
@@ -57,25 +57,11 @@ public class PopGenerationBerlin implements Runnable {
 	// Create a GeometryFactory if you don't have one already
 	GeometryFactory geometryFactory = new GeometryFactory();
 
-////	//berlin quadrat
-//	double minX = 4578619;
-//	double maxX = 4608229;
-//	double minY = 5810205;
-//	double maxY = 5830048;
-	
-//	//tempelhof
-//	double minX =4593802;
-//	double minY =5816301;
-//	double maxX =4597418;
-//	double maxY =5818751;
-	
-	//	innenring
-	double minX = 4585793;
-	double maxX = 4600873;
-	double minY = 5815608;
-	double maxY = 5824924;
-	
-	
+//	//berlin quadrat
+	double minX = 4578619;
+	double maxX = 4608229;
+	double minY = 5810205;
+	double maxY = 5830048;
 //	Envelope e = new Envelope(minX, maxX, minY, maxY);
 	// Simply pass an array of Coordinate or a CoordinateSequence to its method
 	Coordinate sw = new Coordinate(minX, minY);
@@ -105,34 +91,35 @@ public class PopGenerationBerlin implements Runnable {
 	
 
 	private void generatePopulation() {
-		generateHomeWorkHomeTrips("home1", "work1", 500); // create 1000 trips from zone 'home1' to 'work1'
+		generateHomeWorkHomeTrips("home1", "work1", 3000, TransportMode.bike);
+		generateHomeWorkHomeTrips("home1", "work1", 3000, TransportMode.car);// create 1000 trips from zone 'home1' to 'work1'
 		//... generate more trips here
 	}
 
-	private void generateHomeWorkHomeTrips(String from, String to, int quantity) {
+	private void generateHomeWorkHomeTrips(String from, String to, int quantity, String mode ) {
 		for (int i=0; i<quantity; ++i) {
 //			Coord source = zoneGeometries.get(from);
 //			Coord sink = zoneGeometries.get(to);
 			Coord source = drawRandomPointFromGeometry();
 			Coord sink = drawRandomPointFromGeometry();
-			Person person = population.getFactory().createPerson(createId(from, to, i, TransportMode.bike));
+			Person person = population.getFactory().createPerson(createId(from, to, i, mode));
 			Plan plan = population.getFactory().createPlan();
 //			Coord homeLocation = shoot(ct.transform(source));
 //			Coord workLocation = shoot(ct.transform(sink));
 			Coord homeLocation = shoot(source);
 			Coord workLocation = shoot(sink);
 			plan.addActivity(createHome(homeLocation));
-					plan.addLeg(createDriveLeg());
+					plan.addLeg(createDriveLeg(mode));
 			plan.addActivity(createWork(workLocation));
-			plan.addLeg(createDriveLeg());
+			plan.addLeg(createDriveLeg(mode));
 			plan.addActivity(createHome(homeLocation));
 			person.addPlan(plan);
 			population.addPerson(person);
 		}
 	}
 
-	private Leg createDriveLeg() {
-		Leg leg = population.getFactory().createLeg(TransportMode.bike);
+	private Leg createDriveLeg(String mode) {
+		Leg leg = population.getFactory().createLeg(mode);
 		return leg;
 	}
 

@@ -18,7 +18,7 @@ public class ParseEleDataFromGeoTiff {
 	private static GridCoverage2D grid;
 	private static  Raster gridData;
 	
-	// so machen, dass init nur einmal aufgerufen werden muss! momentane lösung mit "firsttime" nicht so elegant
+	// so machen, dass init nur einmal aufgerufen werden muss! momentane loesung mit "firsttime" nicht so elegant
 	// methoden in unterschiedliche klassen?!
 	
 	public double parseGeoTiff(double xCoord, double yCoord, boolean firsttime) throws Exception {
@@ -32,8 +32,12 @@ public class ParseEleDataFromGeoTiff {
 //		// SRTM1
 //		File tiffFile = new File("../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/n52_e013_1arc_v3.tif");
 		// SRTM3 download: (http://srtm.csi.cgiar.org/SELECTION/listImages.asp)
+//		//berlin
 		File tiffFile = new File(
 				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/srtm3/srtm_39_02.tif");
+//		//stuttgart
+//		File tiffFile = new File(
+//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_stuttgart/srtm_38_03.tif");
 		
 		GeoTiffReader reader = new GeoTiffReader(tiffFile);
 

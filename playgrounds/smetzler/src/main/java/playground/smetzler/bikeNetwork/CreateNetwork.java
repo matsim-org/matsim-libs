@@ -19,12 +19,12 @@ public class CreateNetwork {
 		String DHDN_GK4 = "EPSG:31468"; //String DHDN = "EPSG:3068";
 		
 		
-		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/tempelhof/tempelhof_pegel.osm";
+		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/innenring/innenring.osm";
 //		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/berlin/berlin-latest.osm";
 		
 
-		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/tempelhof_MATsim_sepNet_bikeOnly_reverseBike.xml";
-		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/tempelhof_bikeatt_sepNet_bikeOnly_reverseBike.xml";
+		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/innenring_MATsim_bikeOnly_avgHeight.xml";
+		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/innenring_bikeatt_bikeOnly_avgHeight.xml";
 //		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/berlin_MATsim.xml";
 //		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/berlin_bikeatt.xml";
 		

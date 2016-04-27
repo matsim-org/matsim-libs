@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.Point;
 public class PopGenerationTempel implements Runnable {
 	
 
-	String outputPop = "../../../shared-svn/studies/countries/de/berlin-bike/input/demand/tempelhof_bike.xml";
+	String outputPop = "../../../shared-svn/studies/countries/de/berlin-bike/input/demand/tempelhof_carnbike.xml";
 	//String DHDN = "EPSG:3068";
 
 
@@ -89,34 +89,35 @@ public class PopGenerationTempel implements Runnable {
 	
 
 	private void generatePopulation() {
-		generateHomeWorkHomeTrips("home1", "work1", 1000); // create 1000 trips from zone 'home1' to 'work1'
+		generateHomeWorkHomeTrips("home1", "work1", 1000, TransportMode.bike);
+		generateHomeWorkHomeTrips("home1", "work1", 1000, TransportMode.car);/// create 1000 trips from zone 'home1' to 'work1'
 		//... generate more trips here
 	}
 
-	private void generateHomeWorkHomeTrips(String from, String to, int quantity) {
+	private void generateHomeWorkHomeTrips(String from, String to, int quantity, String mode) {
 		for (int i=0; i<quantity; ++i) {
 //			Coord source = zoneGeometries.get(from);
 //			Coord sink = zoneGeometries.get(to);
 			Coord source = drawRandomPointFromGeometry();
 			Coord sink = drawRandomPointFromGeometry();
-			Person person = population.getFactory().createPerson(createId(from, to, i, TransportMode.bike));
+			Person person = population.getFactory().createPerson(createId(from, to, i, mode));
 			Plan plan = population.getFactory().createPlan();
 //			Coord homeLocation = shoot(ct.transform(source));
 //			Coord workLocation = shoot(ct.transform(sink));
 			Coord homeLocation = shoot(source);
 			Coord workLocation = shoot(sink);
 			plan.addActivity(createHome(homeLocation));
-					plan.addLeg(createDriveLeg());
+					plan.addLeg(createDriveLeg(mode));
 			plan.addActivity(createWork(workLocation));
-			plan.addLeg(createDriveLeg());
+			plan.addLeg(createDriveLeg(mode));
 			plan.addActivity(createHome(homeLocation));
 			person.addPlan(plan);
 			population.addPerson(person);
 		}
 	}
 
-	private Leg createDriveLeg() {
-		Leg leg = population.getFactory().createLeg(TransportMode.bike);
+	private Leg createDriveLeg(String mode) {
+		Leg leg = population.getFactory().createLeg(mode);
 		return leg;
 	}
 

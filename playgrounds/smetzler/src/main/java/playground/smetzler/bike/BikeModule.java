@@ -2,6 +2,7 @@ package playground.smetzler.bike;
 
 
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 
 
 public class BikeModule extends AbstractModule {
@@ -11,16 +12,11 @@ public class BikeModule extends AbstractModule {
 
 		addTravelTimeBinding("bike").to(BikeTravelTime.class);
 
-		// hier muss meine BikeTravelDisutility rein, aber wie?
-		//        addTravelDisutilityFactoryBinding("bike").toInstance( new RandomizingTimeDistanceTravelDisutility.Builder("bike"));
-
 		addTravelDisutilityFactoryBinding("bike").to(BikeTravelDisutilityFactory.class);
+//		addTravelDisutilityFactoryBinding("car").toInstance( new RandomizingTimeDistanceTravelDisutility.Builder("car"));
 
-		//analog zu RunMobsimWithMultipleModeVehiclesExample, sorgt momentan lediglich dafür dass die maxV und PCU eingestellt ist.
+		//analog zu RunMobsimWithMultipleModeVehiclesExample, sorgt momentan lediglich dafuer dass die maxSpeed und PCU eingestellt ist.
 		bindMobsim().toProvider(BikeQSimFactory.class);
-
-
-
 	}
 }
 
