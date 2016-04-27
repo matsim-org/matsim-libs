@@ -43,8 +43,6 @@ public class MultimodalNetworkCreatorPT implements MultimodalNetworkCreator {
 
 	@Override
 	public void createMultimodalNetwork(String osmFile) {
-		// TODO add coordinate transformation in network reader
-
 		OsmNetworkReaderWithPT osmReader =	new OsmNetworkReaderWithPT(this.network, transformation, true);
 		osmReader.setKeepPaths(false);
 		osmReader.parse(osmFile);

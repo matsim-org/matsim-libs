@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.osm.core.*;
+import playground.polettif.multiModalMap.osm.lib.OsmTag;
+import playground.polettif.multiModalMap.osm.lib.OsmValue;
 
 import java.util.*;
 
@@ -66,15 +68,7 @@ import java.util.*;
  * Handler to read out osm data (nodes, ways and relations). Just stores the data.
  */
 public class OSM2MTSHandler implements OsmNodeHandler, OsmRelationHandler, OsmWayHandler {
-
-	// todo enum?
-	private static final String TAG_PUBLIC_TRANSPORT = "public_transport";
-	private final static String TAG_TYPE = "type";
-
-	private static final String V_STOP_POSITION = "stop_position";
-	private static final String V_ROUTE = "route";
-
-
+	
 	private static final Logger log = Logger.getLogger(OSM2MTSHandler.class);
 
 	private final TagFilter nodeFilter;
@@ -88,10 +82,23 @@ public class OSM2MTSHandler implements OsmNodeHandler, OsmRelationHandler, OsmWa
 	public OSM2MTSHandler() {
 		// initiate filters
 		nodeFilter = new TagFilter();
-		nodeFilter.add(TAG_PUBLIC_TRANSPORT, V_STOP_POSITION);
+		nodeFilter.add(OsmTag.PUBLIC_TRANSPORT, OsmValue.STOP_POSITION);
 
 		relationFilter = new TagFilter();
-		relationFilter.add(TAG_TYPE, V_ROUTE);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.BUS);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.TROLLEYBUS);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.RAIL);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.TRAM);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.LIGHT_RAIL);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.FUNICULAR);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.MONORAIL);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.SUBWAY);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.BUS);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.TROLLEYBUS);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.TRAM);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.MONORAIL);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.SUBWAY);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.FERRY);
 
 		wayFilter = new TagFilter();
 	}

@@ -38,8 +38,8 @@ public class RunOSM2MMNetwork {
         Scenario sc = ScenarioUtils.createScenario(config);
         Network network = sc.getNetwork();
 
-        String path2OSMFile = "C:/Users/polettif/Desktop/data/osm/zurich-plus.osm";
-        String outputMultimodalNetwork = "C:/Users/polettif/Desktop/data/network/multimodal/zurich-plus-mm.xml.gz";
+        String path2OSMFile = "C:/Users/polettif/Desktop/basel/osmInput/basel.osm";
+        String outputMultimodalNetwork = "C:/Users/polettif/Desktop/basel/network/basel-mm.xml.gz";
 
         CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
 
