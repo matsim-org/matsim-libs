@@ -98,7 +98,7 @@ public class LinkAnalysisHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 		// time-space-diagram for all agents
 		Map<Double, Double> agentMap = getTreeMap(event.getVehicleId().toString(), timeSpaceMap);
-		Double xPos = CoordUtils.calcEuclideanDistance(network.getNodes().get(Id.createNodeId("0")).getCoord(), network.getLinks().get(event.getLinkId()).getToNode().getCoord());
+		Double xPos = CoordUtils.calcEuclideanDistance(network.getNodes().get(Id.createNodeId("1")).getCoord(), network.getLinks().get(event.getLinkId()).getToNode().getCoord());
 		agentMap.put(event.getTime(), xPos);
 	}
 

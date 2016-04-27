@@ -51,21 +51,6 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		super(GROUP_NAME);
 
 		modesToKeepOnCleanUp.add("car");
-
-		Set<String> busSet = new HashSet<>();
-		busSet.add("bus");
-		busSet.add("car");
-		modeRoutingAssignment.put("BUS", busSet);
-
-		Set<String> railSet = new HashSet<>();
-		railSet.add("rail");
-		railSet.add("light_rail");
-		modeRoutingAssignment.put("RAIL", railSet);
-
-		modeRoutingAssignment.put("TRAM", Collections.singleton(ARTIFICIAL_LINK_MODE));
-		modeRoutingAssignment.put("GONDOLA", Collections.singleton(ARTIFICIAL_LINK_MODE));
-		modeRoutingAssignment.put("FERRY", Collections.singleton(ARTIFICIAL_LINK_MODE));
-		modeRoutingAssignment.put("FUNICULAR", Collections.singleton(ARTIFICIAL_LINK_MODE));
 	}
 
 	private String networkFile = null;
@@ -81,7 +66,8 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 				"\t\the network (values). Schedule transport modes not defined here are not mapped at all and routes \n" +
 				"\t\tusing them are removed. One schedule transport mode can be mapped to multiple network transport \n" +
 				"\t\tmodes, the latter have to be separated by \",\". To map a schedule transport mode independently \n" +
-				"\t\tfrom the network use \"artificial\". Assignments are separated by \"|\".");
+				"\t\tfrom the network use \"artificial\". Assignments are separated by \"|\" (case sensitive). \n" +
+				"Example: \"bus:bus,car|rail:rail,light_rail\"");
 		map.put(MODES_TO_KEEP_ON_CLEAN_UP,
 				"All links that do not have a transit route on them are removed, except the ones \n" +
 				"\t\tlisted in this set (typically only car). Separated by comma.");
@@ -154,7 +140,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	private String getModeRoutingAssignmentString() {
 		String ret = "";
 		for(Map.Entry<String, Set<String>> entry : modeRoutingAssignment.entrySet()) {
-			ret += "|" + entry.getKey().toLowerCase() + ":";
+			ret += "|" + entry.getKey() + ":";
 			String value = "";
 			for(String mode : entry.getValue()) {
 				value += "," + mode;
@@ -177,7 +163,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 			for(String networkMode : tuple[1].trim().split(",")) {
 				set.add(networkMode.trim());
 			}
-			this.modeRoutingAssignment.put(tuple[0].toLowerCase(), set);
+			this.modeRoutingAssignment.put(tuple[0], set);
 		}
 	}
 

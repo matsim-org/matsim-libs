@@ -196,7 +196,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		Counter counterLine = new Counter("route # ");
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				String scheduleTransportMode = transitRoute.getTransportMode().toLowerCase();
+				String scheduleTransportMode = transitRoute.getTransportMode();
 
 				if(!config.getModeRoutingAssignment().containsKey(scheduleTransportMode)) {
 					if(noRoutingWarning.add(scheduleTransportMode)) {
