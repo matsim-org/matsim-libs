@@ -131,6 +131,7 @@ public class RunMzTripChoiceSetConversion {
 		final FreespeedTravelTimeAndDisutility tt = new FreespeedTravelTimeAndDisutility(sc.getConfig().planCalcScore());
 
 		final TripRouterFactoryBuilderWithDefaults b = new TripRouterFactoryBuilderWithDefaults();
+		b.setTransitRouterFactory( TripRouterFactoryBuilderWithDefaults.createDefaultTransitRouter( sc ) );
 		b.setTravelTime( tt );
 		b.setTravelDisutility( tt );
 		final TripRouter tripRouter = b.build(sc).get();
