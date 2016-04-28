@@ -66,24 +66,4 @@ public class TaxiStats
     {
         return timesByTaskType.get(TaxiTaskType.DRIVE_OCCUPIED);
     }
-
-
-    public static final String HEADER = "WaitT\t" //
-            + "95pWaitT\t"//
-            + "MaxWaitT\t"//
-            + "OccupiedT\t"//
-            + "%EmptyDrive\t";
-
-
-    @Override
-    public String toString()
-    {
-        return new StringBuilder()//
-                .append(passengerWaitTimes.getMean()).append('\t') //
-                .append(passengerWaitTimes.getPercentile(95)).append('\t') //
-                .append(passengerWaitTimes.getMax()).append('\t') //
-                .append(getDriveOccupiedTimes().getMean()).append('\t') //
-                .append(getDriveEmptyRatio()).append('\t') //
-                .toString();
-    }
 }

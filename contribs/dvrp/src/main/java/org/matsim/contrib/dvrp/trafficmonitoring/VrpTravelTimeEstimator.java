@@ -21,24 +21,24 @@ package org.matsim.contrib.dvrp.trafficmonitoring;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 
-//TODO TTC is more flexible (simple averaging vs linear interpolation)
 public class VrpTravelTimeEstimator
     implements TravelTime, MobsimBeforeCleanupListener
 {
-    private final TravelTimeCalculator ttCalc;//observed travel times
+    private final TravelTime observedTT;
     private final Network network;
     private final int interval;
     private final int intervalCount;
@@ -46,18 +46,27 @@ public class VrpTravelTimeEstimator
 
 
     @Inject
-    public VrpTravelTimeEstimator(TravelTimeCalculator calculator, Network network)
+    public VrpTravelTimeEstimator(@Named(VrpTravelTimeModules.DVRP_INITIAL) TravelTime initialTT,
+            @Named(TransportMode.car) TravelTime observedTT, Network network,
+            TravelTimeCalculatorConfigGroup ttCalcConfig)
     {
-        this.ttCalc = calculator;
+        this.observedTT = observedTT;
         this.network = network;
 
-        this.interval = ttCalc.getTimeSlice();
-        this.intervalCount = ttCalc.getNumSlots();
+        int maxTime = 30 * 3600;//TODO TTC default
+        this.interval = ttCalcConfig.getTraveltimeBinSize();
+        this.intervalCount = maxTime / interval + 1;
 
         linkTTs = Maps.newHashMapWithExpectedSize(network.getLinks().size());
+        init(initialTT);
+    }
+
+
+    private void init(TravelTime initialTT)
+    {
         for (Link link : network.getLinks().values()) {
             double[] tt = new double[intervalCount];
-            updateTTs(link, tt);
+            updateTTs(link, tt, initialTT, 1.);
             linkTTs.put(link.getId(), tt);
         }
     }
@@ -66,8 +75,10 @@ public class VrpTravelTimeEstimator
     @Override
     public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle)
     {
+        //TODO TTC is more flexible (simple averaging vs linear interpolation, etc.)
+
         //the last time bin in TTC is used for a freely large time  
-        int idx = Math.min((int) (time / interval), intervalCount - 1);
+        int idx = Math.min((int)time / interval, intervalCount - 1);
         return linkTTs.get(link.getId())[idx];
     }
 
@@ -76,15 +87,20 @@ public class VrpTravelTimeEstimator
     public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
     {
         for (Link link : network.getLinks().values()) {
-            updateTTs(link, linkTTs.get(link.getId()));
+            updateTTs(link, linkTTs.get(link.getId()), observedTT, ALPHA);
         }
     }
 
 
-    private void updateTTs(Link link, double[] tt)
+    private static final double ALPHA = 0.05;//exponential moving average
+
+
+    private void updateTTs(Link link, double[] tt, TravelTime travelTime, double alpha)
     {
         for (int i = 0; i < intervalCount; i++) {
-            tt[i] = ttCalc.getLinkTravelTime(link.getId(), i * interval);
+            double oldEstimatedTT = tt[i];
+            double experiencedTT = travelTime.getLinkTravelTime(link, i * interval, null, null);
+            tt[i] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
         }
     }
 }

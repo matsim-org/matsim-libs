@@ -20,7 +20,6 @@
 package org.matsim.contrib.taxi.util.stats;
 
 import java.io.PrintWriter;
-import java.util.*;
 
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -34,35 +33,44 @@ import com.google.inject.Inject;
 public class TaxiStatsDumper
     implements AfterMobsimListener, ShutdownListener
 {
+    private static final String HEADER = "WaitT\t" //
+            + "95pWaitT\t"//
+            + "MaxWaitT\t"//
+            + "OccupiedT\t"//
+            + "%EmptyDrive\t";
+
     private final TaxiData taxiData;
-    private final OutputDirectoryHierarchy controlerIO;
-    private final List<TaxiStats> stats = new ArrayList<>();
+    private final PrintWriter pw;
 
 
     @Inject
     public TaxiStatsDumper(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
     {
         this.taxiData = taxiData;
-        this.controlerIO = controlerIO;
+        pw = new PrintWriter(
+                IOUtils.getBufferedWriter(controlerIO.getOutputFilename("taxi_stats.txt")));
+        pw.println("iter\t" + HEADER);
     }
 
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event)
     {
-        stats.add(new TaxiStatsCalculator(taxiData.getVehicles().values()).getStats());
+        TaxiStats ts = new TaxiStatsCalculator(taxiData.getVehicles().values()).getStats();
+        pw.printf("%d\t%.1f\t%.1f\t%.1f\t%.0f\t%.3f\n", //
+                event.getIteration(), //
+                ts.passengerWaitTimes.getMean(), //
+                ts.passengerWaitTimes.getPercentile(95), //
+                ts.passengerWaitTimes.getMax(), //
+                ts.getDriveOccupiedTimes().getMean(), //
+                ts.getDriveEmptyRatio());
+        pw.flush();
     }
 
 
     @Override
     public void notifyShutdown(ShutdownEvent event)
     {
-        PrintWriter pw = new PrintWriter(
-                IOUtils.getBufferedWriter(controlerIO.getOutputFilename("taxi_stats.txt")));
-        pw.println("iter\t" + TaxiStats.HEADER);
-        for (int i = 0; i < stats.size(); i++) {
-            pw.println(i + "\t" + stats.get(i));
-        }
         pw.close();
     }
 }

@@ -105,12 +105,15 @@ public class HourlyHistograms
     {
         PrintWriter hourlyHistogramsWriter = new PrintWriter(IOUtils.getBufferedWriter(file));
         hourlyHistogramsWriter.println(HourlyHistograms.MAIN_HEADER);
-        hourlyHistograms[0].printSubHeaders(hourlyHistogramsWriter);
 
+        if (hourlyHistograms.length != 0) {
+            hourlyHistograms[0].printSubHeaders(hourlyHistogramsWriter);
+        }
+        
         for (HourlyHistograms hh : hourlyHistograms) {
             hh.printHistograms(hourlyHistogramsWriter);
         }
-        
-         hourlyHistogramsWriter.close();
+
+        hourlyHistogramsWriter.close();
     }
 }

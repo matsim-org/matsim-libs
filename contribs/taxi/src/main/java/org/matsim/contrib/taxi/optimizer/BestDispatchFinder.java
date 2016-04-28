@@ -41,7 +41,7 @@ public class BestDispatchFinder
         this.optimContext = optimContext;
         this.scheduleInquiry = optimContext.scheduler;
 
-        router = new MultiNodeDijkstra(optimContext.scenario.getNetwork(),
+        router = new MultiNodeDijkstra(optimContext.getNetwork(),
                 optimContext.travelDisutility, optimContext.travelTime, false);
     }
 

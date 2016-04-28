@@ -56,7 +56,7 @@ public class MIPTaxiOptimizer
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 
         pathTreeTravelTimeCalc = new PathTreeBasedTravelTimeCalculator(
-                new DijkstraWithDijkstraTreeCache(optimContext.scenario.getNetwork(),
+                new DijkstraWithDijkstraTreeCache(optimContext.getNetwork(),
                         travelDisutility, travelTime, TimeDiscretizer.CYCLIC_24_HOURS));
     }
 

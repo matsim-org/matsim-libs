@@ -22,7 +22,7 @@ package playground.michalm.taxi;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 
 
-public class RunAudiAV
+public class RunAudiAVBenchmark
 {
     public static void main(String[] args)
     {

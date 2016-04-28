@@ -23,7 +23,7 @@ public class NPersonsProblem {
     public NPersonsProblem(TaxiOptimizerContext optimConfig)
     {
         this.optimConfig = optimConfig;
-        router = new Dijkstra(optimConfig.scenario.getNetwork(),
+        router = new Dijkstra(optimConfig.getNetwork(),
                 optimConfig.travelDisutility, optimConfig.travelTime);
         
         vrpFinder = new BestDispatchFinder(optimConfig);

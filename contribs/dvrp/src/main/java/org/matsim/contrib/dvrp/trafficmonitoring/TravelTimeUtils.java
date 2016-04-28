@@ -28,14 +28,20 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 public class TravelTimeUtils
 {
-    public static TravelTime createTravelTimesFromEvents(Scenario scenario,
-            String eventsFile)
+    public static TravelTime createTravelTimesFromEvents(Scenario scenario, String eventsFile)
     {
         TravelTimeCalculator ttCalculator = TravelTimeCalculator.create(scenario.getNetwork(),
                 scenario.getConfig().travelTimeCalculator());
-        EventsManager inputEvents = EventsUtils.createEventsManager();
-        inputEvents.addHandler(ttCalculator);
-        new EventsReaderXMLv1(inputEvents).parse(eventsFile);
+        initTravelTimeCalculatorFromEvents(ttCalculator, eventsFile);
         return ttCalculator.getLinkTravelTimes();
+    }
+
+
+    public static void initTravelTimeCalculatorFromEvents(TravelTimeCalculator ttCalculator,
+            String eventsFile)
+    {
+        EventsManager events = EventsUtils.createEventsManager();
+        events.addHandler(ttCalculator);
+        new MatsimEventsReader(events).readFile(eventsFile);
     }
 }

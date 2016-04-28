@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import javax.inject.Singleton;
-
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.*;
@@ -30,20 +28,30 @@ import com.google.inject.name.Names;
 
 public class VrpTravelTimeModules
 {
-    public static final String DVRP = "dvrp";
+    public static final String DVRP_INITIAL = "dvrp_initial";
+    public static final String DVRP_ESTIMATED = "dvrp_estimated";
+
+
+    public static AbstractModule createTravelTimeEstimatorModule()
+    {
+        return createTravelTimeEstimatorModule(new FreeSpeedTravelTime());
+    }
 
 
     /**
-     * Travel times recorded during the previous iteration. They are always updated after mobsim
+     * Travel times recorded during the previous iteration. They are always updated after the mobsim
      * ends. This is the standard approach for running DVRP
      */
-    public static AbstractModule createTravelTimeEstimatorModule()
+    public static AbstractModule createTravelTimeEstimatorModule(final TravelTime initialTravelTime)
     {
         return new AbstractModule() {
             public void install()
             {
-                bind(TravelTime.class).annotatedWith(Names.named(DVRP))
-                        .to(VrpTravelTimeEstimator.class).in(Singleton.class);
+                bind(TravelTime.class).annotatedWith(Names.named(DVRP_INITIAL))
+                        .toInstance(initialTravelTime);
+                bind(VrpTravelTimeEstimator.class).asEagerSingleton();
+                bind(TravelTime.class).annotatedWith(Names.named(DVRP_ESTIMATED))
+                        .to(VrpTravelTimeEstimator.class);
                 addMobsimListenerBinding().to(VrpTravelTimeEstimator.class);
             }
         };
@@ -73,7 +81,7 @@ public class VrpTravelTimeModules
                     bind(TravelTimeCalculator.class).to(InactiveTravelTimeCalculator.class);
                 }
 
-                bind(TravelTime.class).annotatedWith(Names.named(DVRP)).toInstance(travelTime);
+                bind(TravelTime.class).annotatedWith(Names.named(DVRP_ESTIMATED)).toInstance(travelTime);
             }
         };
     }
