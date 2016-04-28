@@ -56,7 +56,7 @@ public class SingaporeLegModeChange implements PlanAlgorithm {
 
 	private final String[] possibleModes;
 	private boolean ignoreCarAvailability = false;
-	private double walkThreshold = 5000.0;
+	private double walkThreshold = 2000.0;
 	private static final Logger log = Logger.getLogger(SingaporeLegModeChange.class);
 	private TaxiUtils taxiUtils;
 	private SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
