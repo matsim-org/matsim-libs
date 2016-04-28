@@ -27,23 +27,25 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
- * A possible link for a stop facility. A LinkCandidate contains a parent stop facility (the
- * one used in the original schedule), an actual Link and a child stop facility which
- * is referenced to the link.
+ * A possible link for a stop facility. A LinkCandidate contains
+ * theoretically a link and the parent stop facility. However, all
+ * values besides Coord are stored as primitive/String since one might
+ * be working with multiple mode separated networks.
  *
  * @author polettif
  */
 public class LinkCandidate  {
 
-	final private String id;
+	private final String id;
+	private final String parentStopFacilityId;
 	private final double stopFacilityDistance;
 	private final double linkLength;
 	private final double linkTravelTime;
 
 	private final String linkId;
 	private final String fromNodeId;
-
 	private final String toNodeId;
+
 	private final Coord stopFacilityCoord;
 	private final Coord fromNodeCoord;
 	private final Coord toNodeCoord;
@@ -52,6 +54,7 @@ public class LinkCandidate  {
 
 	public LinkCandidate(Link link, TransitStopFacility parentStopFacility) {
 		this.id = parentStopFacility.getId().toString() + ".link:" + link.getId().toString();
+		this.parentStopFacilityId = parentStopFacility.getId().toString();
 
 		this.linkId = link.getId().toString();
 		this.linkLength = link.getLength();

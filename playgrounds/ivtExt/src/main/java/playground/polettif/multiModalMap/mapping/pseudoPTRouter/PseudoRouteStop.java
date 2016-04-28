@@ -8,7 +8,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
  *
  * Link Candidates are made for each stop facility. Since one
  * stop facility might be accessed twice in the same transitRoute,
- * unique Link Candidates for each transitRouteStop are needed. This
+ * unique Link Candidates for each TransitRouteStop are needed. This
  * is achieved via this class.
  *
  * @author polettif

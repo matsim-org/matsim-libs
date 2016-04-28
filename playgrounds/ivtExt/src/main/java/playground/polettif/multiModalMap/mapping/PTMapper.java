@@ -44,9 +44,10 @@ public abstract class PTMapper {
 	protected NetworkFactory networkFactory;
 
 	/**
-	 * The provided schedule is expected to already contain for each line
+	 * The provided schedule is expected to already contain for each transit route
 	 * 	- the stops in the sequence they will be served.
 	 * 	- the scheduled times.
+	 *
 	 * The routes will be newly routed. Any former routes will be overwritten.
 	 * Changes are done on the schedule provided here.
 	 *
@@ -69,12 +70,19 @@ public abstract class PTMapper {
 		this.schedule = null;
 	}
 
+	/**
+	 * Reads the schedule and network file specified in the config and
+	 * maps the schedule to the network. Writes the output files as well
+	 * if defined in config.
+	 */
 	public abstract void mapFilesFromConfig();
 
 	/**
-	 * Based on the stops in this.schedule und given the provided network, the lines will be routed.
+	 * Based on the stop facilities and transit routes in this.schedule
+	 * the schedule will be mapped to the given network. Both schedule and
+	 * network are modified.
 	 *
-	 * @param network is a multimodal network (see MultimodalNetworkCreator)
+	 * @param network is a multimodal network
 	 */
 	public abstract void mapScheduleToNetwork(Network network);
 

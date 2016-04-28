@@ -38,7 +38,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TODO doc
+ * A LeastCostPathCalculator that allowes mode dependent routing on
+ * a network. The cost of using links without the allowed transport
+ * modes are increased. Only uses distance as travel disutility.
  *
  * @author polettif
  */
@@ -98,7 +100,7 @@ public class ModeDependentRouter implements Router {
 	 */
     @Override
     public double getLinkMinimumTravelDisutility(Link link) {
-		return (linkHasRoutingMode(link) ? 1 : 1000) * link.getLength();
+		return (linkHasRoutingMode(link) ? 1 : 10000) * link.getLength();
 	}
 
 	/**

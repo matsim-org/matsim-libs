@@ -49,8 +49,10 @@ import playground.polettif.multiModalMap.tools.NetworkTools;
 import java.util.*;
 
 /**
- * References an unmapped transit schedule to a  b network. Combines routing and referencing of stopFacilities. Creates additional
- * stop facilities if a stopFacility has more than one plausible link. @see main()
+ * References an unmapped transit schedule to a network. Combines routing of transit routes
+ * and referencing stopFacilities. Creates additional stop facilities if a stopFacility has
+ * more than one plausible link. Artificial links are added to the network if no route can
+ * be found.
  * <p/>
  * Creates pseudo paths via all link candidates, chooses the path with the lowest travel time.
  * <p/>
@@ -59,7 +61,7 @@ import java.util.*;
  */
 public class PTMapperModesFilterAndMerge extends PTMapper {
 
-	public static final int SAME_LINK_PUNISHMENT = 5;
+	private static final int SAME_LINK_PUNISHMENT = 5;
 
 	int artificialId = 0;
 	private Map<Tuple<LinkCandidate, LinkCandidate>, Link> artificialLinks = new HashMap<>();
@@ -80,18 +82,13 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 	}
 
 	/**
-	 * Routes the unmapped MATSim Transit Schedule file to the network given by file. Writes the resulting
-	 * schedule and network to xml files.<p/>
-	 * <p/>
+	 * Routes the unmapped MATSim Transit Schedule to the network using the file
+	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
 	 *
-	 * @param args <br/>[0] unmapped MATSim Transit Schedule file<br/>
-	 *             [1] MATSim network file<br/>
-	 *             [2] output schedule file path<br/>
-	 *             [3] output network file path
+	 * @param args <br/>[0] PublicTransportMap config file<br/>
 	 */
 	public static void main(String[] args) {
 		if(args.length == 1) {
-			log.info("Mapping files from config...");
 			new PTMapperModesFilterAndMerge(args[0]).mapFilesFromConfig();
 		} else {
 			System.out.println("Incorrect number of arguments\n[0] config file");
@@ -100,49 +97,46 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 
 	@Override
 	public void mapFilesFromConfig() {
-		log.info("Reading schedule and network file...");
-		Scenario mainScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network mainNetwork = mainScenario.getNetwork();
-		new TransitScheduleReader(mainScenario).readFile(config.getScheduleFile());
-		new MatsimNetworkReader(mainNetwork).readFile(config.getNetworkFile());
-		TransitSchedule mainSchedule = mainScenario.getTransitSchedule();
+		if(config.getScheduleFile() == null || config.getNetworkFile() == null) {
+			log.error("Not all input files defined in config.");
+		} else {
+			log.info("Mapping files from config...");
+			log.info("Reading schedule and network file...");
+			Scenario mainScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			Network mainNetwork = mainScenario.getNetwork();
+			new TransitScheduleReader(mainScenario).readFile(config.getScheduleFile());
+			new MatsimNetworkReader(mainNetwork).readFile(config.getNetworkFile());
+			TransitSchedule mainSchedule = mainScenario.getTransitSchedule();
 
-		log.info("Mapping transit schedule to network...");
-		new PTMapperModesFilterAndMerge(mainSchedule, config).mapScheduleToNetwork(mainNetwork);
+			new PTMapperModesFilterAndMerge(mainSchedule, config).mapScheduleToNetwork(mainNetwork);
 
-		log.info("Writing schedule and network to file...");
-		new TransitScheduleWriter(mainSchedule).writeFile(config.getOutputScheduleFile());
-		new NetworkWriter(mainNetwork).write(config.getOutputNetworkFile());
+			if(config.getOutputNetworkFile() != null && config.getOutputScheduleFile() != null) {
+				log.info("Writing schedule and network to file...");
+				new TransitScheduleWriter(mainSchedule).writeFile(config.getOutputScheduleFile());
+				new NetworkWriter(mainNetwork).write(config.getOutputNetworkFile());
+			} else {
+				log.info("No output pahts defined, schedule and network are not written to files.");
+			}
 
-		log.info("Mapping public transit to network successful!");
+		}
 	}
+
 
 	@Override
 	public void mapScheduleToNetwork(Network network) {
 		this.networkFactory = network.getFactory();
 
-		/**
-		 * Store some statistics
-		 */
+		log.info("Mapping transit schedule to network...");
 		int nStopFacilities = schedule.getFacilities().size();
-		int nTransitRoutes = 0;
-		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
-			nTransitRoutes += transitLine.getRoutes().size();
-		}
-
 		Set<String> noRoutingWarning = new HashSet<>();
 
-		log.info("Mapping transit schedule to network...");
 
 		/** [1]
-		 * Create separate network for all schedule modes and
+		 * Create a separate network for all schedule modes and
 		 * initiate routers.
 		 */
 		Map<String, Network> networks = new HashMap<>();
 		Map<String, Router> routers = new HashMap<>();
-//		FastAStarRouter.setPseudoRouteWeightType(config.getPseudoRouteWeightType());
-//		PseudoGraph.setPseudoRouterWeightType(config.getPseudoRouteWeightType());
-
 		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
 			log.info("Creating network for " + modeAssignment.getValue());
 			NetworkFilterManager filter = new NetworkFilterManager(network);
@@ -154,24 +148,22 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		}
 
 
-		/** [1]
-		 * Preload the closest links, create LinkCandidates and child
-		 * StopFacilities. If a stop facility is already referenced
-		 * (manually beforehand for example) no child facilities are
-		 * created. StopFacilities with no links within search radius
-		 * are given a dummy loop link right on their coordinates.
+		/** [2]
+		 * Preload the closest links and create LinkCandidates. StopFacilities
+		 * with no links within search radius are given a dummy loop link right
+		 * on their coordinates.
 		 */
 		Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates = PTMapperUtils.generateModeLinkCandidates(schedule, network, config);
 
 
-		/**
+		/** [3]
 		 * Get network extent to speed up routing outside of network area.
 		 */
 		Coord[] totalNetworkExtent = NetworkTools.getExtent(network);
 		Map<TransitStopFacility, Boolean> stopIsInArea = NetworkTools.getStopsInAreaBool(schedule, totalNetworkExtent);
 		final double initialMaxPathDistance = CoordUtils.calcEuclideanDistance(totalNetworkExtent[0], totalNetworkExtent[1])*config.getBeelineDistanceMaxFactor();
 
-		/** [3]
+		/** [4]
 		 * Generating and calculating the pseudoTransitRoutes for all transitRoutes.
 		 * If no route on the network can be found (or the scheduelTransportMode
 		 * should not be mapped to the network), artificial links between link
@@ -189,23 +181,28 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 								". Transit routes using this mode are removed from the schedule.");
 					}
 				} else {
-
-					boolean mapScheduleModeArtificial = config.getModeRoutingAssignment().get(scheduleTransportMode).
-							contains(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE);
+					counterLine.incCounter();
 
 					Router modeRouter = routers.get(scheduleTransportMode);
 					Network modeNetwork = networks.get(scheduleTransportMode);
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
 
-					counterLine.incCounter();
+					boolean mapScheduleModeArtificial = config.getModeRoutingAssignment().get(scheduleTransportMode).
+							contains(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE);
 
-					/**
+					/** [4.1]
 					 * Initiate pseudoGraph and Dijkstra algorithm for the current transitRoute.
+					 *
+					 * In the pseudoGraph, all link candidates are represented as nodes and the
+					 * network paths between link candidates are reduced to a representation edge
+					 * only storing the travel cost. With the pseudoGraph, the best linkCandidate
+					 * sequence can be calculated (using Dijkstra). From this sequence, the actual
+					 * path on the network can be routed later on.
 					 */
 					PseudoGraph pseudoGraph = new PseudoGraph();
 					DijkstraAlgorithm dijkstra = new DijkstraAlgorithm(pseudoGraph);
 
-					/** [3.1]
+					/** [4.2]
 					 * Calculate the shortest paths between each pair of routeStops/ParentStopFacility
 					 */
 					for(int i = 0; i < routeStops.size() - 1; i++) {
@@ -217,7 +214,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 						// This block would prevent that the same link is used for both stops,
 						// the link is used for the nearer stop facility. Is not needed however and
 						// performance decreases significantly.
-						/* using field private Map<Tuple<TransitStopFacility, TransitStopFacility>, Tuple<Set<LinkCandidate>, Set<LinkCandidate>>> separatedLinkCandidates = new HashMap<>();
+						/* using field: private Map<Tuple<TransitStopFacility, TransitStopFacility>, Tuple<Set<LinkCandidate>, Set<LinkCandidate>>> separatedLinkCandidates = new HashMap<>();
 						if(!separatedLinkCandidates.containsKey(new Tuple<>(currentStopFacility, nextStopFacility))) {
 							int currentBefore = linkCandidatesCurrent.size();
 							int nextBefore = linkCandidatesNext.size();
@@ -241,7 +238,9 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 						boolean pseudoPathFound = false;
 
 						if(!mapScheduleModeArtificial && bothStopsInsideArea) {
-							// Calculate the shortest path between all link candidates.
+							/**
+							 * Calculate the shortest path between all link candidates.
+ 							 */
 							for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 								for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
 
@@ -268,6 +267,9 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 										alreadyCalculated.put(key, travelCost);
 									}
 
+									/**
+									 * if the path between two link candidates is viable, add it to the pseudoGraph
+									 */
 									if(travelCost < maxAllowedPathLength) {
 										pseudoPathFound = true;
 										PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
@@ -290,9 +292,9 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 						 * (usually this means between one dummy link for the stop
 						 * facility and the other linkCandidates).
 						 *
-						 * Note: the artificial link is not considered in further
+						 * Note: the actual artificial link is not considered
 						 * during pseudoTransitRoute creation since this would
-						 * require reinitializing router.
+						 * require reinitializing the router.
 						 */
 						if(mapScheduleModeArtificial ||
 								!bothStopsInsideArea ||
@@ -300,7 +302,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 							for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 								for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
 									createArtificialLink(network, linkCandidateCurrent, linkCandidateNext);
-
 									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
 									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
 									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, maxAllowedPathLength), (i == 0), (i == routeStops.size() - 2));
@@ -309,18 +310,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 						}
 					} // - routeStop loop
 
-					/* debug
-					for(int i = 0; i < routeStops.size() - 1; i++) {
-						TransitStopFacility currentStopFacility = routeStops.get(i).getStopFacility();
-						TransitStopFacility nextStopFacility = routeStops.get(i + 1).getStopFacility();
-						if(!pseudoGraph.pathExists(currentStopFacility, nextStopFacility)) {
-							log.error("No pseudoPath between " + currentStopFacility.getName() + " and " + nextStopFacility.getName());
-						}
-					}
-*/
-
-					/** [3.2]
-					 * build pseudo network and find shortest path => List<LinkCandidate>
+					/** [4.3]
+					 * Build pseudo network and find shortest path using dijkstra
 					 */
 					dijkstra.run();
 					List<PseudoRouteStop> pseudoStopSequence = MapUtils.getList(transitRoute, MapUtils.getMap(transitLine, pseudoTransitRoutes));
@@ -334,65 +325,57 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 			} // - transitRoute loop
 		} // - line loop
 
-		/**
-		 * Merge all networks
+		/** [5]
+		 * Merge all networks so artificial links appear on the base network.
 		 */
 		NetworkTools.mergeNetworks(network, networks.values());
 
-		/** [4]
+		/** [6]
 		 * Replace the parent stop facilities in the transitRoute routeProfiles
 		 * with child StopFacilities. Add the new transitRoutes to the schedule.
 		 */
-		log.info("Replacing parent StopFacilities with child StopFacilities...");
 		PTMapperUtils.createAndReplaceFacilities(schedule, pseudoTransitRoutes, config.getSuffixChildStopFacilities());
 
-		/** [5]
-		 * route all routes with the new referenced links. Routers have to be initialized again
-		 * since the network has changed (artificial links).
+		/** [7]
+		 * The final routing should be done on the merged network, so a mode dependent
+		 * router for each schedule mode is initialized using the same merged network.
 		 */
-		Map<String, Router> finalRouters = getModeRouters(network, config.getModeRoutingAssignment());
-		PTMapperUtils.routeSchedule(schedule, network, finalRouters);
-
-		/** [6]
-		 * After all lines created, clean all non-linked stations, all pt-exclusive links (check allowed modes)
-		 * and all nodes which are non-linked to any link after the above cleaning...
-		 * Clean also the allowed modes for only the modes, no line-number any more...
-		 */
-		log.info("Clean Stations and Network...");
-		PTMapperUtils.removeTransitRoutesWithoutLinkSequences(schedule);
-		PTMapperUtils.removeNonUsedStopFacilities(schedule);
-		PTMapperUtils.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
-
-		PTMapperUtils.assignScheduleModesToLinks(schedule, network);
-//		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
-//		PTMapperUtils.addPTModeToNetwork(schedule, network);
-
-		log.info("Clean Stations and Network... done.");
-
-		log.info("================================================");
-		log.info("=== Mapping transit schedule to network... done.");
-
-		log.info("    Stop Facilities statistics:");
-		log.info("    input    "+nStopFacilities);
-		log.info("    output   "+schedule.getFacilities().size());
-		log.info("    diff.    "+(schedule.getFacilities().size()-nStopFacilities));
-		log.info("    factor   "+(schedule.getFacilities().size()/((double) nStopFacilities)));
-	}
-
-
-	/**
-	 * Create ModeDependentRouter for every scheduleTransportMode defined in the config.
-	 * Networks are filtered.
-	 *
-	 * @return A map with the routers (key: scheduleTransportMode).
-	 */
-	private Map<String, Router> getModeRouters(Network network, Map<String, Set<String>> modesAssignment) {
-		Map<String, Router> routers = new HashMap<>();    // key: ScheduleTransportMode
-		for(Map.Entry<String, Set<String>> modeAssignment : modesAssignment.entrySet()) {
+		Map<String, Router> finalRouters = new HashMap<>();    // key: ScheduleTransportMode
+		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
 			log.info("Creating Router for " + modeAssignment.getKey() + " ...");
 			routers.put(modeAssignment.getKey(), new ModeDependentRouter(network, modeAssignment.getValue()));
 		}
-		return routers;
+
+		/** [8]
+		 * Route all transitRoutes with the new referenced links. The shortest path
+		 * between child stopFacilities is calculated and added to the schedule.
+		 */
+		PTMapperUtils.routeSchedule(schedule, network, finalRouters);
+
+		/** [9]
+		 * After all lines created, clean the schedule and network. Removing
+		 * not used transit links includes removing artificial links that
+		 * needed to be added to the network for routing purposes.
+		 *
+		 */
+		log.info("Clean schedule and network...");
+		int routesRemoved = PTMapperUtils.removeTransitRoutesWithoutLinkSequences(schedule);
+		PTMapperUtils.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
+//		PTMapperUtils.removeNonUsedStopFacilities(schedule);
+		PTMapperUtils.assignScheduleModesToLinks(schedule, network);
+//		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
+//		PTMapperUtils.addPTModeToNetwork(schedule, network);
+		log.info("Clean Stations and Network... done.");
+
+		log.info("================================================");
+		log.info("=== Mapping transit schedule to network... done.\n");
+		log.info("    Stop Facilities statistics:");
+		log.info("       input    "+nStopFacilities);
+		log.info("       output   "+schedule.getFacilities().size());
+		log.info("       diff.    "+(schedule.getFacilities().size()-nStopFacilities));
+		log.info("       factor   "+(schedule.getFacilities().size()/((double) nStopFacilities)));
+		log.info("    Transit Route statistics:");
+		log.info("       removed  " + routesRemoved);
 	}
 
 	/**

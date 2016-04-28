@@ -379,19 +379,26 @@ public class PTMapperUtils {
 		}
 	}
 
-	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoRoutes, String childStopFacilitySuffix) {
+	/**
+	 * Using the pseudo schedule, the facilities in the stop sequences of the actual schedule
+	 * are replaced with child facilities. Child facilities are created in this step and
+	 * added to the schedule.
+	 * @param schedule where the facilities should be replaced
+	 * @param pseudoSchedule defines the actual sequence of pseudoRouteStops
+	 * @param childStopFacilitySuffix what suffix the child facility should get in the id
+	 */
+	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule, String childStopFacilitySuffix) {
+		log.info("Replacing parent StopFacilities with child StopFacilities...");
 		TransitScheduleFactory scheduleFactory = schedule.getFactory();
 		List<Tuple<TransitLine, TransitRoute>> newRoutes = new ArrayList<>();
 
-		for(Map.Entry<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> lineEntry : pseudoRoutes.entrySet()) {
+		for(Map.Entry<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> lineEntry : pseudoSchedule.entrySet()) {
 			for(Map.Entry<TransitRoute, List<PseudoRouteStop>> routeEntry : lineEntry.getValue().entrySet()) {
 
 				List<PseudoRouteStop> pseudoStopSequence = routeEntry.getValue();
 				List<TransitRouteStop> newStopSequence = new ArrayList<>();
 
 				for(PseudoRouteStop pseudoStop : pseudoStopSequence) {
-
-					// todo insert config value for child stops
 					Id<TransitStopFacility> childStopFacilityId = Id.create(pseudoStop.getParentStopFacilityId() + childStopFacilitySuffix + pseudoStop.getLinkIdStr(), TransitStopFacility.class);
 
 					// if child stop facility for this link has not yet been generated
@@ -407,15 +414,16 @@ public class PTMapperUtils {
 						schedule.addStopFacility(newFacility);
 					}
 
+					// create new TransitRouteStop and add it to the newStopSequence
 					TransitRouteStop newTransitRouteStop = scheduleFactory.createTransitRouteStop(
 							schedule.getFacilities().get(childStopFacilityId),
 							pseudoStop.getArrivalOffset(),
 							pseudoStop.getDepartureOffset());
 					newTransitRouteStop.setAwaitDepartureTime(pseudoStop.isAwaitDepartureTime());
-
 					newStopSequence.add(newTransitRouteStop);
 				}
 
+				// create a new transitRoute
 				TransitRoute newRoute = scheduleFactory.createTransitRoute(routeEntry.getKey().getId(), null, newStopSequence, routeEntry.getKey().getTransportMode());
 
 				// add departures
@@ -508,7 +516,7 @@ public class PTMapperUtils {
 	/**
 	 * Removes routes without link sequences
 	 */
-	public static void removeTransitRoutesWithoutLinkSequences(TransitSchedule schedule) {
+	public static int removeTransitRoutesWithoutLinkSequences(TransitSchedule schedule) {
 		log.info("... Removing transit routes without link sequences");
 
 		int removed = 0;
@@ -543,7 +551,7 @@ public class PTMapperUtils {
 				}
 			}
 		}
-		log.info("    "+removed+" transit routes removed");
+		return removed;
 	}
 
 	/**

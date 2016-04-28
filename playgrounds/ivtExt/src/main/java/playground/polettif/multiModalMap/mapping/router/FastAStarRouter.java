@@ -32,6 +32,10 @@ import org.matsim.vehicles.Vehicle;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A LeastCostPathCalculator using FasAStarLandmarks. Uses only distance as
+ * travelDisulity.
+ */
 public class FastAStarRouter implements Router {
 	
 	private final LeastCostPathCalculator pathCalculator;
@@ -71,7 +75,7 @@ public class FastAStarRouter implements Router {
 
 	@Override
 	public LeastCostPathCalculator.Path calcLeastCostPath(Link fromLink, Link toLink) {
-		return null;
+		return calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode());
 	}
 
 	@Override
