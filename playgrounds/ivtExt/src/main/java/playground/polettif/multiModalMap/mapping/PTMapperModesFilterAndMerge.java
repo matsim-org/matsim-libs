@@ -344,7 +344,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		Map<String, Router> finalRouters = new HashMap<>();    // key: ScheduleTransportMode
 		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
 			log.info("Creating Router for " + modeAssignment.getKey() + " ...");
-			routers.put(modeAssignment.getKey(), new ModeDependentRouter(network, modeAssignment.getValue()));
+			finalRouters.put(modeAssignment.getKey(), new ModeDependentRouter(network, modeAssignment.getValue()));
 		}
 
 		/** [8]

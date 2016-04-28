@@ -177,7 +177,7 @@ public class NetworkTools {
 					// check if link is already in the closestLinks set
 					if(!closestLinksMap.containsValue(link)) {
 						// only use links with a viable network transport mode
-						if(MiscUtils.setsShareMinOneEntry(link.getAllowedModes(), networkTransportModes)) {
+						if(MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), networkTransportModes)) {
 							lineSegmentDistance = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
 
 							// since distance is used as key, we need to ensure the exact distance is not used already
@@ -320,6 +320,30 @@ public class NetworkTools {
 		}
 
 		return oppositeDirectionLink;
+	}
+
+	/**
+	 * Checks if a link sequence has loops (i.e. the same link is passed twice).
+	 *
+	 * @param links
+	 */
+	public static boolean linkSequenceHasLoops(List<Link> links) {
+		Set tmpSet = new HashSet<>(links);
+		return tmpSet.size() < links.size();
+	}
+
+
+	/**
+	 * Checks if a link sequence has u-turns (i.e. the opposite direction link is
+	 * passed immediately after a link).
+	 */
+	public static boolean linkSequenceHasUTurns(List<Link> links) {
+		for(int i = 1; i < links.size(); i++) {
+			if(links.get(i).getToNode().equals(links.get(i - 1).getFromNode())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

@@ -303,30 +303,6 @@ public class PTMapperUtils {
 	}
 
 	/**
-	 * Checks if a link sequence has loops (i.e. the same link is passed twice).
-	 *
-	 * @param links
-	 */
-	public static boolean linkSequenceHasLoops(List<Link> links) {
-		Set tmpSet = new HashSet<>(links);
-		return tmpSet.size() < links.size();
-	}
-
-
-	/**
-	 * Checks if a link sequence has u-turns (i.e. the opposite direction link is
-	 * passed immediately after a link).
-	 */
-	public static boolean linkSequenceHasUTurns(List<Link> links) {
-		for(int i = 1; i < links.size(); i++) {
-			if(links.get(i).getToNode().equals(links.get(i - 1).getFromNode())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Removes routes without link sequences
 	 */
 	public static int removeTransitRoutesWithoutLinkSequences(TransitSchedule schedule) {
@@ -477,11 +453,11 @@ public class PTMapperUtils {
 		Set<Id<Link>> linksToRemove = new HashSet<>();
 		for(Link link : network.getLinks().values()) {
 			// only remove link if there are only modes to remove on it
-			if(!MiscUtils.setsShareMinOneEntry(link.getAllowedModes(), modesToKeep) && !usedTransitLinkIds.contains(link.getId())) {
+			if(!MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), modesToKeep) && !usedTransitLinkIds.contains(link.getId())) {
 				linksToRemove.add(link.getId());
 			}
 			// only retain modes that are actually used
-			else if(MiscUtils.setsShareMinOneEntry(link.getAllowedModes(), modesToKeep) && !usedTransitLinkIds.contains(link.getId())) {
+			else if(MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), modesToKeep) && !usedTransitLinkIds.contains(link.getId())) {
 				link.setAllowedModes(MiscUtils.getSharedSetStringEntries(link.getAllowedModes(), modesToKeep));
 			}
 		}
@@ -529,45 +505,6 @@ public class PTMapperUtils {
 		}
 	}
 
-
-	/**
-	 * normalizes the values of a map via value/maxValue
-	 *
-	 * @return the normalized map
-	 */
-	public static Map<Id<Link>, Double> normalize(Map<Id<Link>, Double> map) {
-		// get maximal weight
-		double maxValue = 0;
-		for(Double v : map.values()) {
-			if(v > maxValue)
-				maxValue = v;
-		}
-
-		// scale weights
-		for(Map.Entry<Id<Link>, Double> e : map.entrySet()) {
-			map.put(e.getKey(), map.get(e.getKey()) / maxValue);
-		}
-		return map;
-	}
-
-	/**
-	 * Normalizes the values of a map via 1-value/maxValue
-	 *
-	 * @return the normalized map
-	 */
-	public static Map<Id<Link>, Double> normalizeInvert(Map<Id<Link>, Double> map) {
-		double maxValue = 0;
-		for(Double v : map.values()) {
-			if(v > maxValue)
-				maxValue = v;
-		}
-
-		for(Map.Entry<Id<Link>, Double> e : map.entrySet()) {
-			map.put(e.getKey(), 1 - map.get(e.getKey()) / maxValue);
-		}
-
-		return map;
-	}
 
 	/**
 	 *

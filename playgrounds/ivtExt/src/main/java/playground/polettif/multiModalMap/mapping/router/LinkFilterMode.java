@@ -37,6 +37,6 @@ public class LinkFilterMode implements NetworkLinkFilter {
 
 	@Override
 	public boolean judgeLink(Link l) {
-		return MiscUtils.setsShareMinOneEntry(l.getAllowedModes(), modes);
+		return MiscUtils.setsShareMinOneStringEntry(l.getAllowedModes(), modes);
 	}
 }

@@ -18,10 +18,13 @@
 
 package playground.polettif.multiModalMap.tools;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.LinkCandidate;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,7 +34,7 @@ public class MiscUtils {
 	 * @return true, if two sets (e.g. scheduleTransportModes and
 	 * networkTransportModes) have at least one identical entry.
 	 */
-	public static boolean setsShareMinOneEntry(Set<String> set1, Set<String> set2) {
+	public static boolean setsShareMinOneStringEntry(Set<String> set1, Set<String> set2) {
 		if(set1 == null || set2 == null) {
 			return false;
 		} else {
@@ -46,6 +49,9 @@ public class MiscUtils {
 		}
 	}
 
+	/**
+	 * @return a set with entries present in both sets.
+	 */
 	public static Set<String> getSharedSetStringEntries(Set<String> set1, Set<String> set2) {
 		Set<String> shared = new HashSet<>();
 		for(String entry1 : set1) {
@@ -54,11 +60,72 @@ public class MiscUtils {
 		return shared;
 	}
 
+	/**
+	 * @return true, if two sets have at least one identical entry.
+	 */
+	public static <E> boolean setsShareMinOneEntry(Set<E> set1, Set<E> set2) {
+		if(set1 == null || set2 == null) {
+			return false;
+		} else {
+			for(E entry1 : set1) {
+				for(E entry2 : set2) {
+					if(entry1.equals(entry2)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * @return a set with entries present in both sets.
+	 */
 	public static <E> Set<E> getSharedSetEntries(Set<E> set1, Set<E> set2) {
 		Set<E> shared = new HashSet<>();
 		for(E entry1 : set1) {
 			shared.addAll(set2.stream().filter(entry1::equals).map(entry2 -> entry1).collect(Collectors.toList()));
 		}
 		return shared;
+	}
+
+
+	/**
+	 * normalizes the values of a map via value/maxValue
+	 *
+	 * @return the normalized map
+	 */
+	public static Map<Id<Link>, Double> normalize(Map<Id<Link>, Double> map) {
+		// get maximal weight
+		double maxValue = 0;
+		for(Double v : map.values()) {
+			if(v > maxValue)
+				maxValue = v;
+		}
+
+		// scale weights
+		for(Map.Entry<Id<Link>, Double> e : map.entrySet()) {
+			map.put(e.getKey(), map.get(e.getKey()) / maxValue);
+		}
+		return map;
+	}
+
+	/**
+	 * Normalizes the values of a map via 1-value/maxValue
+	 *
+	 * @return the normalized map
+	 */
+	public static Map<Id<Link>, Double> normalizeInvert(Map<Id<Link>, Double> map) {
+		double maxValue = 0;
+		for(Double v : map.values()) {
+			if(v > maxValue)
+				maxValue = v;
+		}
+
+		for(Map.Entry<Id<Link>, Double> e : map.entrySet()) {
+			map.put(e.getKey(), 1 - map.get(e.getKey()) / maxValue);
+		}
+
+		return map;
 	}
 }

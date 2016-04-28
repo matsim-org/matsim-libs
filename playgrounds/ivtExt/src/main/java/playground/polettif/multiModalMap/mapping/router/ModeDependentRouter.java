@@ -112,6 +112,6 @@ public class ModeDependentRouter implements Router {
     }
 
 	public boolean linkHasRoutingMode(Link link) {
-		return MiscUtils.setsShareMinOneEntry(link.getAllowedModes(), routingTransportModes);
+		return MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), routingTransportModes);
 	}
 }
