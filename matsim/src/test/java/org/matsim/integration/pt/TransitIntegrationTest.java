@@ -43,6 +43,9 @@ public class TransitIntegrationTest {
 		params.setScoringThisActivityAtAll(true);
 		params.setTypicalDuration(60.0);
 		config.planCalcScore().addActivityParams(params);
+		// ---
+		config.controler().setLastIteration(0); // in case the exception is _not_ thrown, we don't need 100 iterations to find that out ...
+		// ---
 		Controler controler = new Controler(config);
 		controler.run();
 	}
