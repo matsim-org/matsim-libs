@@ -62,9 +62,9 @@ public class VrpTravelTimeModules
      * Travel times are fixed (useful for TimeVariantNetworks with variable free-flow speeds and no
      * other traffic)
      */
-    public static AbstractModule createFreespeedTravelTimeModule(boolean ttCalculatorEnabled)
+    public static AbstractModule createFreespeedTravelTimeModule(boolean disableTTCalculator)
     {
-        return createExternalTravelTimeModule(new FreeSpeedTravelTime(), ttCalculatorEnabled);
+        return createExternalTravelTimeModule(new FreeSpeedTravelTime(), disableTTCalculator);
     }
 
 
@@ -72,12 +72,12 @@ public class VrpTravelTimeModules
      * Travel times are fixed
      */
     public static AbstractModule createExternalTravelTimeModule(final TravelTime travelTime,
-            final boolean ttCalculatorEnabled)
+            final boolean disableTTCalculator)
     {
         return new AbstractModule() {
             public void install()
             {
-                if (!ttCalculatorEnabled) {//overwriting the default calculator
+                if (disableTTCalculator) {//overwriting the default calculator
                     bind(TravelTimeCalculator.class).to(InactiveTravelTimeCalculator.class);
                 }
 
