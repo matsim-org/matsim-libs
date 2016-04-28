@@ -356,7 +356,9 @@ public class PTMapperUtils {
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
 				NetworkRoute networkRoute = transitRoute.getRoute();
+				transitLinkIds.add(networkRoute.getStartLinkId());
 				transitLinkIds.addAll(networkRoute.getLinkIds());
+				transitLinkIds.add(networkRoute.getEndLinkId());
 			}
 		}
 
@@ -467,12 +469,11 @@ public class PTMapperUtils {
 		}
 
 		log.info("    "+removed+" links removed");
-
 	}
 
 	/**
-	 * Adds mode "bus" to links used by busses. Removes
-	 * it elsewhere (osm). Adds mode "artificial" to artificial
+	 * Adds mode the schedule transport mode to links. Removes all network
+	 * modes elsewhere. Adds mode "artificial" to artificial
 	 * links. Used for debugging and visualization since networkModes
 	 * should be combined to pt anyway.
 	 */
@@ -483,7 +484,10 @@ public class PTMapperUtils {
 
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute route : line.getRoutes().values()) {
-				List<Id<Link>> linkIds = route.getRoute().getLinkIds();
+				Set<Id<Link>> linkIds = new HashSet<>();
+				linkIds.add(route.getRoute().getStartLinkId());
+				linkIds.addAll(route.getRoute().getLinkIds());
+				linkIds.add(route.getRoute().getEndLinkId());
 				for(Id<Link> linkId : linkIds) {
 					MapUtils.getSet(linkId, transitLinkNetworkModes).add(route.getTransportMode());
 				}

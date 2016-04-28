@@ -21,6 +21,7 @@ package playground.polettif.multiModalMap.mapping.pseudoPTRouter;
 
 
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,12 +37,17 @@ import java.util.Set;
  */
 public class PseudoGraph {
 
+	private final PublicTransportMapConfigGroup config;
+
 	private final Set<PseudoRoutePath> edges;
 
 	public static final PseudoRouteStop SOURCE = new PseudoRouteStop("SOURCE");
 	public static final PseudoRouteStop DESTINATION = new PseudoRouteStop("DESTINATION");
 
-	public PseudoGraph() {
+	public PseudoGraph(PublicTransportMapConfigGroup configGroup) {
+		this.config = configGroup;
+		PseudoRoutePath.setConfig(configGroup);
+		PseudoRouteStop.setConfig(configGroup);
 		this.edges = new HashSet<>();
 	}
 

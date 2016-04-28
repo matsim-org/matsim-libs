@@ -200,7 +200,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 					 * sequence can be calculated (using Dijkstra). From this sequence, the actual
 					 * path on the network can be routed later on.
 					 */
-					PseudoGraph pseudoGraph = new PseudoGraph();
+					PseudoGraph pseudoGraph = new PseudoGraph(config);
 					DijkstraAlgorithm dijkstra = new DijkstraAlgorithm(pseudoGraph);
 
 					/** [4.2]
@@ -362,7 +362,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		log.info("Clean schedule and network...");
 		int routesRemoved = PTMapperUtils.removeTransitRoutesWithoutLinkSequences(schedule);
 		PTMapperUtils.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
-//		PTMapperUtils.removeNonUsedStopFacilities(schedule);
+		PTMapperUtils.removeNonUsedStopFacilities(schedule);
 		PTMapperUtils.assignScheduleModesToLinks(schedule, network);
 //		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);

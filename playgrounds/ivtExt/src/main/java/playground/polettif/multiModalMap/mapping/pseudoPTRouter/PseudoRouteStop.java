@@ -2,6 +2,7 @@ package playground.polettif.multiModalMap.mapping.pseudoPTRouter;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 
 /**
  * A RouteStop used in the pseudoGraph.
@@ -14,6 +15,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
  * @author polettif
  */
 public class PseudoRouteStop {
+
+	private static PublicTransportMapConfigGroup config;
 
 	public final String id;
 	private final String name;
@@ -31,13 +34,11 @@ public class PseudoRouteStop {
 	private final String parentStopFacilityId;
 	private final String linkCandidateId;
 	private final double linkWeight;
+	private final double stopFacilityDistance;
 
-	/*
-	private static PublicTransportMapEnum pseudoRouteWeightType;
-	public static void setPseudoRouteWeightType(PublicTransportMapEnum weightType) {
-		pseudoRouteWeightType = weightType;
+	public static void setConfig(PublicTransportMapConfigGroup configGroup) {
+		config = configGroup;
 	}
-	*/
 
 	/**
 	 * Constructor. All values are stored here as well to make access easier during
@@ -51,6 +52,7 @@ public class PseudoRouteStop {
 		this.linkCandidateId = linkCandidate.getId();
 		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLinkIdStr() + ")";
 		this.linkId = linkCandidate.getLinkIdStr();
+		this.stopFacilityDistance = linkCandidate.getStopFacilityDistance();
 
 		// stop facility values
 		this.coord = routeStop.getStopFacility().getCoord();
@@ -78,6 +80,7 @@ public class PseudoRouteStop {
 		this.name = id;
 		this.linkCandidateId = null;
 		this.linkId = null;
+		this.stopFacilityDistance = 0.0;
 
 		// stop facility values
 		this.coord = null;
@@ -166,5 +169,9 @@ public class PseudoRouteStop {
 
 	public double getLinkWeight() {
 		return linkWeight;
+	}
+
+	public double getStopFacilityDistance() {
+		return stopFacilityDistance;
 	}
 }

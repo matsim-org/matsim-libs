@@ -20,6 +20,7 @@
 package playground.polettif.multiModalMap.mapping.pseudoPTRouter;
 
 import org.matsim.core.utils.collections.Tuple;
+import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 
 /**
  * Describes the path between two pseudoRouteStops for the pseudoGraph (used by the
@@ -28,6 +29,8 @@ import org.matsim.core.utils.collections.Tuple;
  * @author polettif
  */
 public class PseudoRoutePath {
+
+	private static PublicTransportMapConfigGroup config = null;
 
 	private final Tuple<PseudoRouteStop, PseudoRouteStop> id;
 	private final PseudoRouteStop from;
@@ -41,6 +44,10 @@ public class PseudoRoutePath {
 	}
 	*/
 
+	public static void setConfig(PublicTransportMapConfigGroup configGroup) {
+		config = configGroup;
+	}
+
 	public PseudoRoutePath(PseudoRouteStop fromStop, PseudoRouteStop toStop, double weight) {
 		this(fromStop, toStop, weight, false);
 	}
@@ -52,8 +59,6 @@ public class PseudoRoutePath {
 
 		this.weight = weight + (dummy ? 0 : 0.5 * fromStop.getLinkWeight() + 0.5 * toStop.getLinkWeight());
 	}
-
-
 
 	public Tuple<PseudoRouteStop, PseudoRouteStop> getId() {
 		return id;
