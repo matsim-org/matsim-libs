@@ -201,6 +201,7 @@ public class SingaporeDistributions implements IterationEndsListener {
 			for (Bin bin : distributionClass.distributionBins) {
 				bin.count = 0;
 			}
+			distributionClass.values.clear();
 		}
 		
 		for (String mode : SingaporeControlerListener.modes) {
