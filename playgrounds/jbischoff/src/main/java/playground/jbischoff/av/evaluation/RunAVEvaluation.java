@@ -30,6 +30,7 @@ import org.matsim.core.network.*;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import playground.jbischoff.av.evaluation.flowpaper.TravelTimeAnalysis;
 import playground.jbischoff.taxi.evaluation.TravelDistanceTimeEvaluator;
 import playground.jbischoff.utils.JbUtils;
 
@@ -54,17 +55,23 @@ public class RunAVEvaluation {
 		Network network = NetworkUtils.createNetwork() ;
 		new MatsimNetworkReader(network).readFile(networkFile);
 		
-		List<String> list = Arrays.asList(new String[]{"00.0k_AV1.0", "02.2k_AV1.0", "02.2k_AV1.5","02.2k_AV2.0","04.4k_AV1.0","04.4k_AV1.5","04.4k_AV2.0","06.6k_AV1.0","06.6k_AV1.5","06.6k_AV2.0","08.8k_AV1.0","08.8k_AV1.5","08.8k_AV2.0","11.0k_AV1.0","11.0k_AV1.5","11.0k_AV2.0"}); 
+//		List<String> list = Arrays.asList(new String[]{"00.0k_AV1.0", "02.2k_AV1.0", "02.2k_AV1.5","02.2k_AV2.0","04.4k_AV1.0","04.4k_AV1.5",
+//				"04.4k_AV2.0","06.6k_AV1.0","06.6k_AV1.5","06.6k_AV2.0","08.8k_AV1.0","08.8k_AV1.5","08.8k_AV2.0","11.0k_AV1.0","11.0k_AV1.5","11.0k_AV2.0"}); 
+//		List<String> list = Arrays.asList(new String[]{"11.0k_AV1.0"}); 
+//		List<String> list = Arrays.asList(new String[]{"00.0k_AV1.0", "02.2k_AV1.0", "02.2k_AV1.5","02.2k_AV2.0","04.4k_AV1.0","04.4k_AV1.5","04.4k_AV2.0","06.6k_AV1.0"});
+		List<String> list = Arrays.asList(new String[]{"06.6k_AV1.5","06.6k_AV2.0","08.8k_AV1.0","08.8k_AV1.5","08.8k_AV2.0","11.0k_AV1.0","11.0k_AV1.5","11.0k_AV2.0"}); 
 		
 		for (String run : list){
 		System.out.println("run "+ run);
 		ZoneBasedTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandler = new ZoneBasedTaxiCustomerWaitHandler(network, geo);
 		ZoneBasedTaxiStatusAnalysis zoneBasedTaxiStatusAnalysis = new ZoneBasedTaxiStatusAnalysis(network, geo);
 		TravelDistanceTimeEvaluator travelDistanceTimeEvaluator = new TravelDistanceTimeEvaluator(network, 0);
+		TravelTimeAnalysis timeAnalysis = new TravelTimeAnalysis();
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(zoneBasedTaxiCustomerWaitHandler);
 		events.addHandler(zoneBasedTaxiStatusAnalysis);
 		events.addHandler(travelDistanceTimeEvaluator);
+		events.addHandler(timeAnalysis);
 		
 			String outputFolder = "D:/runs-svn/avsim/flowpaper/"+run+"/";
 			String eventsFile = outputFolder+run+".output_events.xml.gz";
@@ -73,6 +80,7 @@ public class RunAVEvaluation {
 			zoneBasedTaxiCustomerWaitHandler.writeCustomerStats(outputFolder);
 			zoneBasedTaxiStatusAnalysis.evaluateAndWriteOutput(outputFolder);
 			travelDistanceTimeEvaluator.writeTravelDistanceStatsToFiles(outputFolder);
+			timeAnalysis.writeStats(outputFolder);
 		}
 		
 
