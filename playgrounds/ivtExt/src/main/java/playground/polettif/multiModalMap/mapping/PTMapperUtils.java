@@ -49,145 +49,6 @@ import java.util.stream.Collectors;
 public class PTMapperUtils {
 
 	protected static Logger log = Logger.getLogger(PTMapperUtils.class);
-
-	/**
-	 * Generates link candidates for all stopFacilities. For stop facilities where which no link can
-	 * be found within nodeSearchRadius an artificial node and two artificial links (in & out) are
-	 * created and added to the network. For each link candiate a child stop facility is generated
-	 * and referenced to the link. Child stop facilities are added to the schedule.
-	 *
-	 * @param schedule         with stopFacilities, is modified.
-	 * @param network          where link candidates should be mapped, is modified.
-	 * @param nodeSearchRadius only links within this radius from the stop facility are considered for closest links
-	 *                         calculations.
-	 * @param maxNclosestLinks the maximum number of closest links (and thus link candidates) should be used.
-	 *                         Note: if two links have the same distance to the stop facility both are used
-	 * @return the LinkCandidates for each stopFacility. Note: <code>List&lt;LinkCandidate&gt;</code> is <code>null</code> if no
-	 * links are close to the stopFacility.
-	 */
-	@Deprecated
-	public static Map<TransitStopFacility, Set<LinkCandidate>> generateLinkCandidates(TransitSchedule schedule, Network network, double nodeSearchRadius, int maxNclosestLinks, double maxLinkFacilityDistance) {
-
-		TransitScheduleFactory scheduleFactory = schedule.getFactory();
-		Map<TransitStopFacility, Set<LinkCandidate>> linkCandidates = new HashMap<>();
-		List<TransitStopFacility> childFacilities = new ArrayList<>();
-
-		NetworkImpl networkImpl = ((NetworkImpl) network);
-
-		/**
-		 * get closest links for each stop facility (separated by mode)
-		 */
-		for(TransitStopFacility stopFacility : schedule.getFacilities().values()) {
-			// limits number of links, for all links within search radius use networkTools.findClosestLinks()
-			List<Link> closestLinks = NetworkTools.findNClosestLinks(networkImpl, stopFacility.getCoord(), nodeSearchRadius, maxNclosestLinks, maxLinkFacilityDistance);
-
-			// if no close links are nearby, a loop link is created and referenced to the facility.
-			if(closestLinks.size() == 0) {
-				Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, "");
-				loopLink.setLength(10);
-				stopFacility.setLinkId(loopLink.getId());
-				closestLinks.add(loopLink);
-			}
-
-			/**
-			 * generate child stop facility for each linkcandidate and reference them
-			 */
-			for(Link link : closestLinks) {
-				LinkCandidate newLinkCandidate = new LinkCandidate(link, stopFacility);
-				MapUtils.getSet(stopFacility, linkCandidates).add(newLinkCandidate);
-
-				String id = stopFacility.getId() + ".link:" + link.getId();
-
-				TransitStopFacility newFacility = scheduleFactory.createTransitStopFacility(
-						Id.create(id, TransitStopFacility.class),
-						stopFacility.getCoord(),
-						stopFacility.getIsBlockingLane()
-				);
-				newFacility.setLinkId(link.getId());
-				newFacility.setName(stopFacility.getName());
-				newFacility.setStopPostAreaId(stopFacility.getStopPostAreaId());
-				childFacilities.add(newFacility);
-
-				newLinkCandidate.setChildStop(newFacility);
-
-			}
-		}
-		/**
-		 * assign new facilities to schedule
-		 */
-		childFacilities.forEach(schedule::addStopFacility);
-
-		return linkCandidates;
-	}
-
-	@Deprecated
-	public static Map<TransitStopFacility, Set<LinkCandidate>> generateLinkCandidatesModes(TransitSchedule schedule, Map<String, Set<String>> scheduleModes, Network modeNetwork, PublicTransportMapConfigGroup config) {
-
-		TransitScheduleFactory scheduleFactory = schedule.getFactory();
-		Map<TransitStopFacility, Set<LinkCandidate>> modeLinkCandidates = new HashMap<>();
-
-		Map<String, TransitStopFacility> childFacilities = new HashMap<>();
-
-		NetworkImpl networkImpl = ((NetworkImpl) modeNetwork);
-
-		/**
-		 * get closest links for each stop facility
-		 */
-		for(TransitLine transitLine : schedule.getTransitLines().values()) {
-			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				if(transitRoute.getTransportMode().equals(scheduleModes)) {
-					for(TransitRouteStop transitRouteStop : transitRoute.getStops()) {
-						TransitStopFacility stopFacility = transitRouteStop.getStopFacility();
-
-						// limits number of links, for all links within search radius use networkTools.findClosestLinks()
-						List<Link> closestLinks = NetworkTools.findNClosestLinks(networkImpl, stopFacility.getCoord(), config.getNodeSearchRadius(), config.getMaxNClosestLinks(), config.getMaxStopFacilityDistance());
-
-						// if no close links are nearby, a loop link is created and referenced to the facility.
-						if(closestLinks.size() == 0) {
-							Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, modeNetwork, config.getPrefixArtificial());
-							loopLink.setLength(10);
-							stopFacility.setLinkId(loopLink.getId());
-							closestLinks.add(loopLink);
-						}
-
-						/**
-						 * generate child stop facility for each linkcandidate and reference them
-						 */
-						for(Link link : closestLinks) {
-							LinkCandidate newLinkCandidate = new LinkCandidate(link, stopFacility);
-
-							Set<LinkCandidate> tmpSet = MapUtils.getSet(stopFacility, modeLinkCandidates);
-
-							if(!tmpSet.contains(newLinkCandidate)) {
-								tmpSet.add(newLinkCandidate);
-							}
-
-							String id = stopFacility.getId() + ".link:" + link.getId();
-
-							if(childFacilities.containsKey(id)) {
-								newLinkCandidate.setChildStop(childFacilities.get(id));
-							} else {
-								TransitStopFacility newFacility = scheduleFactory.createTransitStopFacility(
-										Id.create(id, TransitStopFacility.class),
-										stopFacility.getCoord(),
-										stopFacility.getIsBlockingLane()
-								);
-								newFacility.setLinkId(link.getId());
-								newFacility.setName(stopFacility.getName());
-								newFacility.setStopPostAreaId(stopFacility.getStopPostAreaId());
-								childFacilities.put(id, newFacility);
-
-								newLinkCandidate.setChildStop(newFacility);
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return modeLinkCandidates;
-	}
-
 	/**
 	 * Generates link candidates for all stopFacilities. For stop facilities where
 	 * no link can be found within nodeSearchRadius an artificial node and loop
@@ -196,14 +57,13 @@ public class PTMapperUtils {
 	 * the link. Link candidates for different modes with the same link use the same
 	 * child stop facility. Child stop facilities are not created and added to the schedule!
 	 * <p/>
-	 * Differs from {@link #generateLinkCandidatesModes}: This method returns a map with
-	 * the scheduleTransportMode as top level key.
 	 *
-	 * @param schedule with stopFacilities, is modified. Child facilities are stored
-	 *                 in the config.
-	 * @param network the network where link candidates should be looked for
+	 * @param schedule with stopFacilities, not modified.
+	 * @param network the network where link candidates should be looked for, is modified
+	 *                for stop facilities without a link nearby
 	 * @param config containing the modeRoutingAssignments and params for link searching
-	 * @return
+	 * @return a map with all link candidates for a stop facilitiy and
+	 * the scheduleTransportMode as top level key.
 	 */
 	public static Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> generateModeLinkCandidates(TransitSchedule schedule, Network network, PublicTransportMapConfigGroup config) {
 		Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> tree = new HashMap<>();
@@ -330,53 +190,6 @@ public class PTMapperUtils {
 		childFacilities.values().forEach(schedule::addStopFacility);
 
 		return tree;
-	}
-
-	/**
-	 * Modifies the schedule. Replaces the parent StopFacilities
-	 * with the child StopFacilities. The replacement pairs are
-	 * given by pseudoTransitRoutes and the PseudoRouteStop sequence
-	 * especially
-	 */
-	@Deprecated
-	public static void replaceFacilities(TransitSchedule schedule, Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoRoutes) {
-		TransitScheduleFactory scheduleFactory = schedule.getFactory();
-		Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = schedule.getFacilities();
-		List<Tuple<TransitLine, TransitRoute>> newRoutes = new ArrayList<>();
-
-		for(Map.Entry<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> lineEntry : pseudoRoutes.entrySet()) {
-			for(Map.Entry<TransitRoute, List<PseudoRouteStop>> routeEntry : lineEntry.getValue().entrySet()) {
-
-				List<PseudoRouteStop> pseudoStopSequence = routeEntry.getValue();
-				List<TransitRouteStop> newStopSequence = new ArrayList<>();
-
-				for(PseudoRouteStop pseudoStop : pseudoStopSequence) {
-					TransitRouteStop newTransitRouteStop = scheduleFactory.createTransitRouteStop(
-							stopFacilities.get(pseudoStop.getChildStopFacilityId()),
-							pseudoStop.getArrivalOffset(),
-							pseudoStop.getDepartureOffset());
-					newTransitRouteStop.setAwaitDepartureTime(pseudoStop.isAwaitDepartureTime());
-
-					newStopSequence.add(newTransitRouteStop);
-				}
-
-				TransitRoute newRoute = scheduleFactory.createTransitRoute(routeEntry.getKey().getId(), null, newStopSequence, routeEntry.getKey().getTransportMode());
-
-				// add departures
-				routeEntry.getKey().getDepartures().values().forEach(newRoute::addDeparture);
-
-				// remove the old route
-				schedule.getTransitLines().get(lineEntry.getKey().getId()).removeRoute(routeEntry.getKey());
-
-				// add new route to container
-				newRoutes.add(new Tuple<>(lineEntry.getKey(), newRoute));
-			}
-		}
-
-		// add transit lines and routes again
-		for(Tuple<TransitLine, TransitRoute> entry : newRoutes) {
-			schedule.getTransitLines().get(entry.getFirst().getId()).addRoute(entry.getSecond());
-		}
 	}
 
 	/**

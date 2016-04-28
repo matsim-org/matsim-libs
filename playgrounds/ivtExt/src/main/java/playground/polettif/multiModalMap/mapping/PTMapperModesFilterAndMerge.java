@@ -38,6 +38,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 import playground.polettif.multiModalMap.mapping.pseudoPTRouter.*;
 import playground.polettif.multiModalMap.mapping.router.FastAStarRouter;
@@ -365,7 +366,10 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		PTMapperUtils.assignScheduleModesToLinks(schedule, network);
 //		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);
-		log.info("Clean Stations and Network... done.");
+		log.info("Clean schedule and network... done.");
+
+		log.info("Validating schedule and network...");
+		TransitScheduleValidator.printResult(TransitScheduleValidator.validateAll(schedule, network));
 
 		log.info("================================================");
 		log.info("=== Mapping transit schedule to network... done.\n");
