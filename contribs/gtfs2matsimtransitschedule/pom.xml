@@ -8,11 +8,4 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>gtfs2matsimtransitschedule</artifactId>
   <name>gtfs2matsimtransitschedule</name>
-  <dependencies>
-    <dependency>
-      <groupId>org.matsim.contrib</groupId>
-      <artifactId>gtfs2matsimtransitschedule</artifactId>
-      <version>0.9.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
 </project>
