@@ -62,6 +62,7 @@ public class CreateFreightTraffic {
 
 	private final Random random;
 	private final double percentage;
+	private final double upScaling;
 	private int totalPopulationSize = 0;
 	private int roundDowns = 0;
 	private int roundUps = 0;
@@ -70,9 +71,15 @@ public class CreateFreightTraffic {
 	private final Population freightPopulation;
 	private final ActivityFacilities freightFacilities;
 
-	private CreateFreightTraffic(String coordFile, String facilitiesFile, double percentagePopulation, int randomSeed) {
+	private CreateFreightTraffic(String coordFile, String facilitiesFile, double scalingFactor, int randomSeed) {
 		readZones(coordFile, facilitiesFile);
-		this.percentage = percentagePopulation;
+		if (scalingFactor <= 1) {
+			this.percentage = scalingFactor;
+			this.upScaling = 1.0;
+		} else {
+			this.percentage = 1.0;
+			this.upScaling = scalingFactor;
+		}
 		this.random = new Random(randomSeed);
 		this.freightPopulation = PopulationUtils.getEmptyPopulation();
 		this.freightFacilities = FacilitiesUtils.createActivityFacilities();
@@ -85,13 +92,13 @@ public class CreateFreightTraffic {
 		final String trucksFile = args[3];
 		final String heavyDutyVehiclesFile = args[4];
 		final String cumulativeProbabilityFreightDeparturesFile = args[5];
-		final double percentagePopulation = Double.parseDouble(args[6]); // for example for a 1% population enter "0.01"
+		final double scalingFactor = Double.parseDouble(args[6]); // for example for a 1% population enter "0.01"
 		final int randomSeed = Integer.parseInt(args[7]);
 		final String outputFacilities = args[8];
 		final String outputPopulation = args[9];
 
 		log.info("Freight creation...");
-		CreateFreightTraffic creator = new CreateFreightTraffic(coordFile, facilitiesFile, percentagePopulation, randomSeed);
+		CreateFreightTraffic creator = new CreateFreightTraffic(coordFile, facilitiesFile, scalingFactor, randomSeed);
 		creator.readDepartures(cumulativeProbabilityFreightDeparturesFile);
 
 		creator.createFreightTraffic("UtilityVehicle", utilityVehiclesFile);
@@ -195,10 +202,12 @@ public class CreateFreightTraffic {
 	}
 
 	private int getNumberOfTrips(String floatingNumberOfTripsForThisODRelationship) {
+		// first scale number of trips
+		double floatingNumberOfTrips = this.upScaling * Double.parseDouble(floatingNumberOfTripsForThisODRelationship);
 		// first all full trips for this OD-relationship
-		int numberOfTrips = (int)Math.floor(Double.parseDouble(floatingNumberOfTripsForThisODRelationship));
+		int numberOfTrips = (int)Math.floor(floatingNumberOfTrips);
 		// then - if chance allows - another trip
-		double residualTrips = Double.parseDouble(floatingNumberOfTripsForThisODRelationship) - numberOfTrips;
+		double residualTrips = floatingNumberOfTrips - numberOfTrips;
 		if (random.nextDouble() <= residualTrips) {
 			numberOfTrips++;
 			roundUps++;
