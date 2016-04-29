@@ -123,7 +123,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 					new NetworkWriter(filterManager.applyFilters()).write(config.getOutputStreetNetworkFile());
 				}
 			} else {
-				log.info("No output pahts defined, schedule and network are not written to files.");
+				log.info("No output paths defined, schedule and network are not written to files.");
 			}
 
 		}
