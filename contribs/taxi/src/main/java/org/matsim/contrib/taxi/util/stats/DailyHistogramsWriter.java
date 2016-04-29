@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.schedule;
+package org.matsim.contrib.taxi.util.stats;
 
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import java.io.IOException;
+
+import org.matsim.core.utils.io.*;
+
+import com.opencsv.CSVWriter;
 
 
-public class TaxiDriveWithPassengerTask
-    extends DriveTaskImpl
-    implements TaxiTaskWithRequest
+public class DailyHistogramsWriter
 {
-    private TaxiRequest request;//non-final due to vehicle diversion
+    private final DailyHistograms dailyHistograms;
 
 
-    public TaxiDriveWithPassengerTask(VrpPathWithTravelData path, TaxiRequest request)
+    public DailyHistogramsWriter(DailyHistograms dailyHistograms)
     {
-        super(path);
+        this.dailyHistograms = dailyHistograms;
+    }
 
-        if (request.getFromLink() != path.getFromLink()
-                && request.getToLink() != path.getToLink()) {
-            throw new IllegalArgumentException();
+
+    public void write(String file)
+    {
+        try (CSVWriter writer = new CSVWriter(IOUtils.getBufferedWriter(file), '\t',
+                CSVWriter.NO_QUOTE_CHARACTER)) {
+            writeDailyHistogram(writer, "Empty Drive Ratio [%]", dailyHistograms.emptyDriveRatio);
+            writeDailyHistogram(writer, "Vehicle Wait Ratio [%]", dailyHistograms.stayRatio);
         }
-
-        this.request = request;
-        request.setDriveWithPassengerTask(this);
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
 
-    @Override
-    public void removeFromRequest()
+    private void writeDailyHistogram(CSVWriter writer, String header, Histogram histogram)
     {
-        request.setDriveWithPassengerTask(null);
-    }
-
-
-    @Override
-    public TaxiTaskType getTaxiTaskType()
-    {
-        return TaxiTaskType.OCCUPIED_DRIVE;
-    }
-
-
-    public TaxiRequest getRequest()
-    {
-        return request;
-    }
-
-
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+        writer.writeNext(CSVLines.line(header));
+        writer.writeNext(CSVHistogramUtils.createBinsLine(histogram, 100.));
+        writer.writeNext(CSVHistogramUtils.createValuesLine(histogram));
+        writer.writeNext(CSVLines.EMPTY_LINE);
     }
 }

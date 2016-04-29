@@ -176,7 +176,7 @@ public class TaxiScheduler
 
         TaxiTask currentTask = schedule.getCurrentTask();
         if (!Schedules.isLastTask(currentTask)
-                || currentTask.getTaxiTaskType() != TaxiTaskType.DRIVE_EMPTY) {
+                || currentTask.getTaxiTaskType() != TaxiTaskType.EMPTY_DRIVE) {
             return null;
         }
 
@@ -208,7 +208,7 @@ public class TaxiScheduler
         Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
         TaxiTask lastTask = Schedules.getLastTask(bestSched);
 
-        if (lastTask.getTaxiTaskType() == TaxiTaskType.DRIVE_EMPTY) {
+        if (lastTask.getTaxiTaskType() == TaxiTaskType.EMPTY_DRIVE) {
             divertDriveToRequest((TaxiDriveTask)lastTask, vrpPath);
         }
         else if (lastTask.getTaxiTaskType() == TaxiTaskType.STAY) {
@@ -420,8 +420,8 @@ public class TaxiScheduler
                     break;
                 }
 
-                case DRIVE_EMPTY:
-                case DRIVE_OCCUPIED: {
+                case EMPTY_DRIVE:
+                case OCCUPIED_DRIVE: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
                     VrpPathWithTravelData path = (VrpPathWithTravelData) ((DriveTask)task)
@@ -507,7 +507,7 @@ public class TaxiScheduler
                         schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
                         return;
 
-                    case DRIVE_EMPTY:
+                    case EMPTY_DRIVE:
                         if (!params.vehicleDiversion) {
                             throw new RuntimeException("Currently won't happen");
                         }
@@ -541,10 +541,10 @@ public class TaxiScheduler
             case PICKUP:
                 return params.destinationKnown ? 2 : null;
 
-            case DRIVE_OCCUPIED:
+            case OCCUPIED_DRIVE:
                 return 1;
 
-            case DRIVE_EMPTY:
+            case EMPTY_DRIVE:
                 if (params.vehicleDiversion) {
                     return 0;
                 }

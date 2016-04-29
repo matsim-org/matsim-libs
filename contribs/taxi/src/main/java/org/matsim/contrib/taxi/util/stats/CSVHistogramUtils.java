@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.schedule;
+package org.matsim.contrib.taxi.util.stats;
 
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import java.text.DecimalFormat;
 
 
-public class TaxiDriveWithPassengerTask
-    extends DriveTaskImpl
-    implements TaxiTaskWithRequest
+public class CSVHistogramUtils
 {
-    private TaxiRequest request;//non-final due to vehicle diversion
+    private static final DecimalFormat df = new DecimalFormat("#.##");
 
 
-    public TaxiDriveWithPassengerTask(VrpPathWithTravelData path, TaxiRequest request)
+    public static String[] createBinsLine(Histogram histogram, double scaling)
     {
-        super(path);
+        CSVLineBuilder lineBuilder = new CSVLineBuilder();
+        addBinsToBuilder(lineBuilder, histogram, scaling);
+        return lineBuilder.build();
+    }
 
-        if (request.getFromLink() != path.getFromLink()
-                && request.getToLink() != path.getToLink()) {
-            throw new IllegalArgumentException();
+
+    public static void addBinsToBuilder(CSVLineBuilder lineBuilder, Histogram histogram, double scaling)
+    {
+        for (int i = 0; i < histogram.getBinCount(); i++) {
+            lineBuilder.add(df.format(i * histogram.getBinSize() * scaling) + "+");
         }
-
-        this.request = request;
-        request.setDriveWithPassengerTask(this);
     }
 
 
-    @Override
-    public void removeFromRequest()
+    public static String[] createValuesLine(Histogram histogram)
     {
-        request.setDriveWithPassengerTask(null);
+        CSVLineBuilder lineBuilder = new CSVLineBuilder();
+        addValuesToBuilder(lineBuilder, histogram);
+        return lineBuilder.build();
     }
 
 
-    @Override
-    public TaxiTaskType getTaxiTaskType()
+    public static void addValuesToBuilder(CSVLineBuilder lineBuilder, Histogram histogram)
     {
-        return TaxiTaskType.OCCUPIED_DRIVE;
-    }
-
-
-    public TaxiRequest getRequest()
-    {
-        return request;
-    }
-
-
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+        for (int v : histogram.getValues()) {
+            lineBuilder.add(v + "");
+        }
     }
 }

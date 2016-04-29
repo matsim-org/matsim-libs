@@ -1,11 +1,11 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project, org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       , (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
+ * email           , info at matsim dot org                                *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,13 +19,17 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.io.PrintWriter;
-
-import org.matsim.core.utils.io.IOUtils;
+import java.util.*;
 
 
 public class HourlyHistograms
 {
+    public enum Type
+    {
+        passengerWaitTime, emptyDriveTime, occupiedDriveTime, emptyDriveRatio, stayRatio;
+    }
+
+
     public final int hour;
 
     public final Histogram passengerWaitTime = new Histogram(2.5 * 60, 25);
@@ -37,83 +41,19 @@ public class HourlyHistograms
     public final Histogram emptyDriveRatio = new Histogram(0.05, 20);
     public final Histogram stayRatio = new Histogram(0.05, 20);
 
+    public final Map<Type, Histogram> histogramMap;
+
 
     public HourlyHistograms(int hour)
     {
         this.hour = hour;
-    }
 
-
-    public static final String MAIN_HEADER = //
-            "\tPassenger_Wait_Time [min]" + tabs(25) + //
-            //
-                    "\tEmpty_Drive_Time [min]" + tabs(21) + //
-                    "\tOccupied_Drive_Time [min]" + tabs(21) + //
-                    //
-                    "\tEmpty_Drive_Ratio [%]" + tabs(20) + //
-                    "\tVehicle_Wait_Ratio [%]" + tabs(20); //
-
-
-    public static String tabs(int binCount)
-    {
-        String tabs = "";
-        for (int i = 0; i < binCount; i++) {
-            tabs += '\t';
-        }
-
-        return tabs;
-    }
-
-
-    public void printSubHeaders(PrintWriter pw)
-    {
-        pw.print("hour\t");
-        pw.print(passengerWaitTime.binsToString(1. / 60));
-        //
-        pw.print("hour\t");
-        pw.print(emptyDriveTime.binsToString(1. / 60));
-        pw.print("hour\t");
-        pw.print(occupiedDriveTime.binsToString(1. / 60));
-        //
-        pw.print("hour\t");
-        pw.print(emptyDriveRatio.binsToString(100));
-        pw.print("hour\t");
-        pw.print(stayRatio.binsToString(100));
-        pw.println();
-    }
-
-
-    public void printHistograms(PrintWriter pw)
-    {
-        pw.print(hour + "\t");
-        pw.print(passengerWaitTime.countsToString());
-        //
-        pw.print(hour + "\t");
-        pw.print(emptyDriveTime.countsToString());
-        pw.print(hour + "\t");
-        pw.print(occupiedDriveTime.countsToString());
-        //
-        pw.print(hour + "\t");
-        pw.print(emptyDriveRatio.countsToString());
-        pw.print(hour + "\t");
-        pw.print(stayRatio.countsToString());
-        pw.println();
-    }
-
-
-    public static void printAllHistograms(HourlyHistograms[] hourlyHistograms, String file)
-    {
-        PrintWriter hourlyHistogramsWriter = new PrintWriter(IOUtils.getBufferedWriter(file));
-        hourlyHistogramsWriter.println(HourlyHistograms.MAIN_HEADER);
-
-        if (hourlyHistograms.length != 0) {
-            hourlyHistograms[0].printSubHeaders(hourlyHistogramsWriter);
-        }
-        
-        for (HourlyHistograms hh : hourlyHistograms) {
-            hh.printHistograms(hourlyHistogramsWriter);
-        }
-
-        hourlyHistogramsWriter.close();
+        EnumMap<Type, Histogram> histogramMap = new EnumMap<>(Type.class);
+        histogramMap.put(Type.passengerWaitTime, passengerWaitTime);
+        histogramMap.put(Type.emptyDriveTime, emptyDriveTime);
+        histogramMap.put(Type.occupiedDriveTime, occupiedDriveTime);
+        histogramMap.put(Type.emptyDriveRatio, emptyDriveRatio);
+        histogramMap.put(Type.stayRatio, stayRatio);
+        this.histogramMap = Collections.unmodifiableMap(histogramMap);
     }
 }

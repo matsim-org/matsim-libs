@@ -138,7 +138,7 @@ public class TaxiRequest
         switch (pickupTask.getStatus()) {
             case PLANNED:
                 TaxiTask currentTask = (TaxiTask)pickupTask.getSchedule().getCurrentTask();
-                if (currentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_EMPTY && //
+                if (currentTask.getTaxiTaskType() == TaxiTaskType.EMPTY_DRIVE && //
                         pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
                     return TaxiRequestStatus.TAXI_DISPATCHED;
                 }

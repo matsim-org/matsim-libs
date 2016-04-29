@@ -62,8 +62,8 @@ public class TaxiStatsDumper
                 ts.passengerWaitTimes.getMean(), //
                 ts.passengerWaitTimes.getPercentile(95), //
                 ts.passengerWaitTimes.getMax(), //
-                ts.getDriveOccupiedTimes().getMean(), //
-                ts.getDriveEmptyRatio());
+                ts.getOccupiedDriveTimes().getMean(), //
+                ts.getEmptyDriveRatio());
         pw.flush();
     }
 

@@ -46,12 +46,12 @@ public class DetailedTaxiStatsDumper
     public void notifyAfterMobsim(AfterMobsimEvent event)
     {
         String prefix = controlerIO.getIterationFilename(event.getIteration(), "taxi_");
-
         DetailedTaxiStatsCalculator calculator = new DetailedTaxiStatsCalculator(
                 taxiData.getVehicles().values());
-        HourlyTaxiStats.printAllStats(calculator.getStats(), prefix + "hourly_stats.txt");
-        HourlyHistograms.printAllHistograms(calculator.getHourlyHistograms(),
-                prefix + "hourly_histograms.txt");
-        calculator.getDailyHistograms().printHistograms(prefix + "daily_histograms.txt");
+        new HourlyTaxiStatsWriter(calculator.getHourlyStats()).write(prefix + "hourly_stats.txt");
+        new HourlyHistogramsWriter(calculator.getHourlyHistograms())
+                .write(prefix + "hourly_histograms.txt");
+        new DailyHistogramsWriter(calculator.getDailyHistograms())
+                .write(prefix + "daily_histograms.txt");
     }
 }

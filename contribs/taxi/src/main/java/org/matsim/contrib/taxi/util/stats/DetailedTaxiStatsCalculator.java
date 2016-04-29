@@ -83,7 +83,7 @@ public class DetailedTaxiStatsCalculator
     }
 
 
-    public HourlyTaxiStats[] getStats()
+    public HourlyTaxiStats[] getHourlyStats()
     {
         return hourlyStats;
     }
@@ -134,13 +134,13 @@ public class DetailedTaxiStatsCalculator
                     hourlyHistograms[hour].passengerWaitTime.addValue(waitTime);
                     break;
 
-                case DRIVE_EMPTY:
+                case EMPTY_DRIVE:
                     hour = hour(t.getBeginTime());
                     hourlyHistograms[hour].emptyDriveTime
                             .addValue(t.getEndTime() - t.getBeginTime());
                     break;
 
-                case DRIVE_OCCUPIED:
+                case OCCUPIED_DRIVE:
                     hour = hour(t.getBeginTime());
                     hourlyHistograms[hour].occupiedDriveTime
                             .addValue(t.getEndTime() - t.getBeginTime());
@@ -171,7 +171,7 @@ public class DetailedTaxiStatsCalculator
         }
 
         switch (task.getTaxiTaskType()) {
-            case DRIVE_EMPTY:
+            case EMPTY_DRIVE:
                 stats[hour].empty += durationWithinHour;
                 return;
 
@@ -179,7 +179,7 @@ public class DetailedTaxiStatsCalculator
                 stats[hour].pickup += durationWithinHour;
                 return;
 
-            case DRIVE_OCCUPIED:
+            case OCCUPIED_DRIVE:
                 stats[hour].occupied += durationWithinHour;
                 return;
 

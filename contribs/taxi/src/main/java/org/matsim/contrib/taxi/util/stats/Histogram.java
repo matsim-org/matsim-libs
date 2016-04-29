@@ -19,26 +19,23 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.text.DecimalFormat;
-
-
 public class Histogram
 {
-    private final int[] counts;
+    private final int[] values;
     private final double binSize;
 
 
     public Histogram(double binSize, int binCount)
     {
         this.binSize = binSize;
-        counts = new int[binCount];
+        values = new int[binCount];
     }
 
 
     public void addValue(double value)
     {
-        int bin = Math.min((int) (value / binSize), counts.length - 1);
-        counts[bin]++;
+        int bin = Math.min((int) (value / binSize), values.length - 1);
+        values[bin]++;
     }
 
 
@@ -48,35 +45,14 @@ public class Histogram
     }
 
 
-    public int[] getCounts()
+    public int getBinCount()
     {
-        return counts;
+        return values.length;
     }
 
 
-    public String binsToString()
+    public int[] getValues()
     {
-        return binsToString(1.0);
-    }
-
-
-    public String binsToString(double scaleFactor)
-    {
-        DecimalFormat df = new DecimalFormat("#.##");
-        String str = "";
-        for (int i = 0; i < counts.length; i++) {
-            str += df.format(i * binSize * scaleFactor) + "+\t";
-        }
-        return str;
-    }
-
-
-    public String countsToString()
-    {
-        String str = "";
-        for (int i = 0; i < counts.length; i++) {
-            str += String.format("%d\t", counts[i]);
-        }
-        return str;
+        return values;
     }
 }

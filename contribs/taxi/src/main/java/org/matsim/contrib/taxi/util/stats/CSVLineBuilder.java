@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.schedule;
+package org.matsim.contrib.taxi.util.stats;
 
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
-import org.matsim.contrib.taxi.data.TaxiRequest;
+import java.util.*;
 
 
-public class TaxiDriveWithPassengerTask
-    extends DriveTaskImpl
-    implements TaxiTaskWithRequest
+public class CSVLineBuilder
 {
-    private TaxiRequest request;//non-final due to vehicle diversion
+    private List<String> line = new ArrayList<>();
 
 
-    public TaxiDriveWithPassengerTask(VrpPathWithTravelData path, TaxiRequest request)
+    public CSVLineBuilder add(String e)
     {
-        super(path);
-
-        if (request.getFromLink() != path.getFromLink()
-                && request.getToLink() != path.getToLink()) {
-            throw new IllegalArgumentException();
-        }
-
-        this.request = request;
-        request.setDriveWithPassengerTask(this);
+        line.add(e);
+        return this;
     }
 
 
-    @Override
-    public void removeFromRequest()
+    public CSVLineBuilder add(List<String> c)
     {
-        request.setDriveWithPassengerTask(null);
+        line.addAll(c);
+        return this;
     }
 
 
-    @Override
-    public TaxiTaskType getTaxiTaskType()
+    public CSVLineBuilder add(String[] a)
     {
-        return TaxiTaskType.OCCUPIED_DRIVE;
+        line.addAll(Arrays.asList(a));
+        return this;
     }
-
-
-    public TaxiRequest getRequest()
+    
+    
+    public String[] build()
     {
-        return request;
-    }
-
-
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+        return line.toArray(new String[line.size()]);
     }
 }

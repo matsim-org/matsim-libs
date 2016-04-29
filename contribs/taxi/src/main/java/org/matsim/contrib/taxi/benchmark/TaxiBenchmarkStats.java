@@ -48,13 +48,13 @@ public class TaxiBenchmarkStats
     {
         TaxiStats singleRunStats = new TaxiStatsCalculator(taxiData.getVehicles().values())
                 .getStats();
+        
+        passengerWaitTime.addValue(singleRunStats.getPassengerWaitTimes().getMean());
+        pc95PassengerWaitTime.addValue(singleRunStats.getPassengerWaitTimes().getPercentile(95));
+        maxPassengerWaitTime.addValue(singleRunStats.getPassengerWaitTimes().getMax());
 
-        passengerWaitTime.addValue(singleRunStats.passengerWaitTimes.getMean());
-        pc95PassengerWaitTime.addValue(singleRunStats.passengerWaitTimes.getPercentile(95));
-        maxPassengerWaitTime.addValue(singleRunStats.passengerWaitTimes.getMax());
-
-        driveOccupiedTime.addValue(singleRunStats.getDriveOccupiedTimes().getMean());
-        driveEmptyRatio.addValue(singleRunStats.getDriveEmptyRatio());
+        driveOccupiedTime.addValue(singleRunStats.getOccupiedDriveTimes().getMean());
+        driveEmptyRatio.addValue(singleRunStats.getEmptyDriveRatio());
     }
 
 

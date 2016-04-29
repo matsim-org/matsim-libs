@@ -60,12 +60,12 @@ public class HourlyTaxiStatsExtractor
         }
 
         try (CSVWriter writer = new CSVWriter(new FileWriter(path + "hourly_stats_combined.txt"),
-                '\t')) {
+                '\t', CSVWriter.NO_QUOTE_CHARACTER)) {
             writer.writeNext(header);
-            writer.writeAll(Arrays.asList(meanWaitTimes), false);
+            writer.writeAll(Arrays.asList(meanWaitTimes));
 
             writer.writeNext(header);
-            writer.writeAll(Arrays.asList(p95WaitTimes), false);
+            writer.writeAll(Arrays.asList(p95WaitTimes));
 
             writer.writeNext(header);
             writer.writeAll(Arrays.asList(meanEmptyRatios), false);

@@ -28,8 +28,8 @@ import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 
 public class TaxiStats
 {
-    public final DescriptiveStatistics passengerWaitTimes = new DescriptiveStatistics();
-    public final EnumMap<TaxiTaskType, DescriptiveStatistics> timesByTaskType;
+    final DescriptiveStatistics passengerWaitTimes = new DescriptiveStatistics();
+    final EnumMap<TaxiTaskType, DescriptiveStatistics> timesByTaskType;
 
 
     public TaxiStats()
@@ -46,12 +46,18 @@ public class TaxiStats
         double time = task.getEndTime() - task.getBeginTime();
         timesByTaskType.get(task.getTaxiTaskType()).addValue(time);
     }
-
-
-    public double getDriveEmptyRatio()
+    
+    
+    public DescriptiveStatistics getPassengerWaitTimes()
     {
-        double empty = timesByTaskType.get(TaxiTaskType.DRIVE_EMPTY).getSum();//not mean!
-        double occupied = timesByTaskType.get(TaxiTaskType.DRIVE_OCCUPIED).getSum();//not mean!
+        return passengerWaitTimes;
+    }
+
+
+    public double getEmptyDriveRatio()
+    {
+        double empty = timesByTaskType.get(TaxiTaskType.EMPTY_DRIVE).getSum();//not mean!
+        double occupied = timesByTaskType.get(TaxiTaskType.OCCUPIED_DRIVE).getSum();//not mean!
         return empty / (empty + occupied);
     }
 
@@ -62,8 +68,8 @@ public class TaxiStats
     }
 
 
-    public DescriptiveStatistics getDriveOccupiedTimes()
+    public DescriptiveStatistics getOccupiedDriveTimes()
     {
-        return timesByTaskType.get(TaxiTaskType.DRIVE_OCCUPIED);
+        return timesByTaskType.get(TaxiTaskType.OCCUPIED_DRIVE);
     }
 }

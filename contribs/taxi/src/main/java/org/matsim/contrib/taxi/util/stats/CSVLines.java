@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.schedule;
+package org.matsim.contrib.taxi.util.stats;
 
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-
-
-public class TaxiDriveWithPassengerTask
-    extends DriveTaskImpl
-    implements TaxiTaskWithRequest
+public class CSVLines
 {
-    private TaxiRequest request;//non-final due to vehicle diversion
+    public static final String[] EMPTY_LINE = {};
 
 
-    public TaxiDriveWithPassengerTask(VrpPathWithTravelData path, TaxiRequest request)
+    public static final String[] line(String... string)
     {
-        super(path);
-
-        if (request.getFromLink() != path.getFromLink()
-                && request.getToLink() != path.getToLink()) {
-            throw new IllegalArgumentException();
-        }
-
-        this.request = request;
-        request.setDriveWithPassengerTask(this);
-    }
-
-
-    @Override
-    public void removeFromRequest()
-    {
-        request.setDriveWithPassengerTask(null);
-    }
-
-
-    @Override
-    public TaxiTaskType getTaxiTaskType()
-    {
-        return TaxiTaskType.OCCUPIED_DRIVE;
-    }
-
-
-    public TaxiRequest getRequest()
-    {
-        return request;
-    }
-
-
-    @Override
-    protected String commonToString()
-    {
-        return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+        return string;
     }
 }
