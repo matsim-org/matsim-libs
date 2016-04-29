@@ -23,19 +23,17 @@
 package playground.ikaddoura.incidents;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.xml.stream.XMLStreamException;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.TimeVariantLinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -53,7 +51,7 @@ public class Incident2NetworkChangeEventsTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 	@Test
-	public final void test1() throws XMLStreamException, IOException{
+	public final void test1() throws XMLStreamException, IOException, ParseException{
 		
 		String networkFile = testUtils.getPackageInputDirectory() + "network.xml";
 		String inputDirectory = testUtils.getPackageInputDirectory() + "incidentsXML/";

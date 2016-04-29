@@ -20,6 +20,7 @@ package playground.ikaddoura.incidents;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -51,32 +52,31 @@ import playground.ikaddoura.incidents.io.Incident2SHPWriter;
 public class IncidentDataAnalysis {
 	private final Logger log = Logger.getLogger(IncidentDataAnalysis.class);
 
-	private String networkFile = "../../../public-svn/matsim/scenarios/countries/de/cottbus/cottbus-with-pt/output/cb02/output_network.xml.gz";
-//	private String crs = TransformationFactory.DHDN_GK4;
-	private String crs = TransformationFactory.WGS84_UTM33N;
+	private String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
+	private String crs = TransformationFactory.DHDN_GK4;
+//	private String crs = TransformationFactory.WGS84_UTM33N;
 	
-	private String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-germany/";
-	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-cottbus/";
+	private String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-berlin/";
+	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin_2016-04-27_b/";
 	
 	private boolean writeCSVFileForEachXMLFile = false;
 	
-	private boolean writeAllTrafficItems2ShapeFile = true;
+	private boolean writeAllTrafficItems2ShapeFile = false;
 	
-	private boolean writeDaySpecificTrafficItems2ShapeFile = false;
-	private String shpFileStartDateTime = "2016-02-11";
-	private String shpFileEndDateTime = "2016-02-11";
+	private boolean writeDaySpecificTrafficItems2ShapeFile = true;
+	private String shpFileStartDateTime = "2016-03-29";
+	private String shpFileEndDateTime = "2016-04-26";
 	
-	// start and end date should be in the same month... TODO: Account for the different months' lengths, only weekdays etc.
-	private boolean writeNetworkChangeEventFiles = false;
-	private String networkChangeEventStartDateTime = "2016-02-11";
-	private String networkChangeEventEndDateTime = "2016-02-29";
+	private boolean writeNetworkChangeEventFiles = true;
+	private String networkChangeEventStartDateTime = "2016-03-29";
+	private String networkChangeEventEndDateTime = "2016-04-26";
 		
 // ##################################################################
 	
 	private final Map<String, TrafficItem> trafficItems = new HashMap<>();
 	private final TMCAlerts tmc = new TMCAlerts();
 
-	public static void main(String[] args) throws XMLStreamException, IOException {
+	public static void main(String[] args) throws XMLStreamException, IOException, ParseException {
 		
 		IncidentDataAnalysis incidentAnalysis = new IncidentDataAnalysis();
 		incidentAnalysis.run();	
@@ -114,7 +114,7 @@ public class IncidentDataAnalysis {
 		this.networkChangeEventEndDateTime = nceEndDateTime;
 	}
 
-	public void run() throws XMLStreamException, IOException {
+	public void run() throws XMLStreamException, IOException, ParseException {
 		
 		OutputDirectoryLogging.catchLogEntries();
 		try {

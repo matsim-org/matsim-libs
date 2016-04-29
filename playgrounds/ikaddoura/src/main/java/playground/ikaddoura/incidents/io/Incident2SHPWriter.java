@@ -64,7 +64,7 @@ public class Incident2SHPWriter {
 
 	public static void writeDailyIncidentLinksToShapeFile(Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay, String outputDirectory, double dateInSec, String crs) {
 		
-		String outputShpFile = outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateTimeString(dateInSec) + ".shp";
+		String outputShpFile = outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateString(dateInSec) + ".shp";
 		
 		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
 				.setCrs(MGC.getCRS(crs))
@@ -117,8 +117,8 @@ public class Incident2SHPWriter {
 						incidentLink.getAllowedModes(),
 	
 						// start and end time
-						DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(incident.getStartTime()),
-						DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(endTime)
+						DateTime.secToDateString(dateInSec) + " " + Time.writeTime(incident.getStartTime()),
+						DateTime.secToDateString(dateInSec) + " " + Time.writeTime(endTime)
 				};
 				
 				SimpleFeature feature = factory.createPolyline(

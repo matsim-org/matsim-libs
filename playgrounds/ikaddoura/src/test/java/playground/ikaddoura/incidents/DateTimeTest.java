@@ -22,6 +22,8 @@
  */
 package playground.ikaddoura.incidents;
 
+import java.text.ParseException;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,13 +40,57 @@ public class DateTimeTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	@Test
-	public final void test1() {
+	public final void test1() throws ParseException {
 
-		double dateInSec = 2016 * 12 * 30.436875 * 24 * 3600 + 3 * 30.436875 * 24 * 3600 + 1 * 24 * 3600;
-		Assert.assertEquals("Wrong date / time", dateInSec, DateTime.parseDateTimeToDateTimeSeconds("2016-03-01"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong date / time", "2016-03-31", DateTime.secToDateString(1.4593752E9));
+		Assert.assertEquals("Wrong date / time", 1.4593752E9, DateTime.parseDateTimeToDateTimeSeconds("2016-03-31 00:00:00"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong date / time", 1.4593752E9, DateTime.parseDateTimeToDateTimeSeconds("2016-03-31"), MatsimTestUtils.EPSILON);
 		
-		Assert.assertEquals("Wrong date / time", "2016-03-01", DateTime.secToDateTimeString(dateInSec));
-		Assert.assertEquals("Wrong date / time", "2016-03-01", DateTime.secToDateTimeString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-01")));		
+		Assert.assertEquals("Wrong date / time", "2016-04-01", DateTime.secToDateString(1.4593752E9 + (24 * 3600.)));
+		Assert.assertEquals("Wrong date / time", "2016-03-31", DateTime.secToDateString(1.4593752E9 + (23 * 3600.)));
+		
+		// test String -> seconds -> String
+		Assert.assertEquals("Wrong date / time", "2016-03-01", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-01")));
+		
+		// test String -> seconds + x -> String
+		Assert.assertEquals("Wrong date / time", "2016-04-01", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-31") + (24 * 3600.)));
+		Assert.assertEquals("Wrong date / time", "2016-03-31", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-31") + (23 * 3600.)));
+
+		Assert.assertEquals("Wrong date / time", "2016-04-01", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-31 00:00:00") + (24 * 3600.)));
+		Assert.assertEquals("Wrong date / time", "2016-03-31", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-31 00:00:00") + (23 * 3600.)));
+		
+		Assert.assertEquals("Wrong date / time", "2016-04-01", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-31 12:00:00") + (24 * 3600.)));
+		Assert.assertEquals("Wrong date / time", "2016-03-31", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-31 00:30:00") + (23 * 3600.)));
+		Assert.assertEquals("Wrong date / time", "2016-04-01", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-31 02:00:00") + (23 * 3600.)));
+		
+		Assert.assertEquals("Wrong date / time", "2016-03-05", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-05")));
+		Assert.assertEquals("Wrong date / time", "2016-03-05", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-05") + (23 * 3600.)));
+		
+		Assert.assertEquals("Wrong date / time", "2016-05-27", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-05-27")));
+		Assert.assertEquals("Wrong date / time", "2016-05-27", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-05-27") + (23 * 3600.)));
+		
+		Assert.assertEquals("Wrong date / time", "2016-03-27", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-27 00:00:10")));
+		Assert.assertEquals("Wrong date / time", "2016-03-28", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-27") + (24 * 3600.)));
+		
+		Assert.assertEquals("winter time --> summer time!", "2016-03-28", DateTime.secToDateString(DateTime.parseDateTimeToDateTimeSeconds("2016-03-27") + (23 * 3600.)));
+
+//		System.out.println(DateTime.parseDateTimeToDateTimeSeconds("2016-03-31"));
+//		System.out.println(DateTime.parseDateTimeToDateTimeSeconds("2016-03-31 00:00:00"));
+//		System.out.println(DateTime.secToDateTimeString(1.4593752E9));
+//		System.out.println(DateTime.secToDateString(1.4593752E9));
+//		
+//		System.out.println();
+//		
+//		System.out.println(DateTime.parseDateTimeToDateTimeSeconds("2016-03-31 01:00:00"));
+//		System.out.println(DateTime.secToDateTimeString(1.4593788E9));
+//		System.out.println(DateTime.secToDateString(1.4593788E9));
+//	
+//		System.out.println();
+//		
+//		System.out.println(DateTime.parseDateTimeToDateTimeSeconds("2016-04-01"));
+//		
+//		System.out.println();
+				
 	}
 		
 }

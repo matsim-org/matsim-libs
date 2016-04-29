@@ -20,6 +20,7 @@
 package playground.ikaddoura.incidents.io;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -64,7 +65,6 @@ public class Incident2NetworkChangeEventsWriter {
 	private Map<String, TrafficItem> trafficItems = null;
 	private Map<String, Path> trafficItemId2path = null;
 	private TMCAlerts tmc = null;
-	
 	private String crs = null;
 	
 	private final NetworkChangeEventFactory nceFactory = new NetworkChangeEventFactoryImpl();
@@ -76,7 +76,7 @@ public class Incident2NetworkChangeEventsWriter {
 		this.crs = crs;
 	}
 
-	public void writeIncidentLinksToNetworkChangeEventFile(String startDateTime, String endDateTime, String outputDirectory) throws IOException {
+	public void writeIncidentLinksToNetworkChangeEventFile(String startDateTime, String endDateTime, String outputDirectory) throws IOException, ParseException {
 				
 		final double startDate = DateTime.parseDateTimeToDateTimeSeconds(startDateTime);
 		final double endDate = DateTime.parseDateTimeToDateTimeSeconds(endDateTime);
@@ -84,14 +84,14 @@ public class Incident2NetworkChangeEventsWriter {
 		double dateInSec = startDate;
 		while (dateInSec <= endDate) {
 			
-			log.info("Writing network change events for day " + DateTime.secToDateTimeString(dateInSec) + " (date in seconds: " + dateInSec + ")");
+			log.info("Writing network change events for day " + DateTime.secToDateString(dateInSec) + " (date in seconds: " + dateInSec + ")");
 			
 			Map<Id<Link>, List<NetworkIncident>> linkId2rawIncidentsCurrentDay = collectDayLinkIncidents(dateInSec);
 			Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay = processLinkIncidents(linkId2rawIncidentsCurrentDay);
 			List<NetworkChangeEvent> allChangeEvents = getNetworkChangeEvents(linkId2processedIncidentsCurrentDay);
 
-			new NetworkChangeEventsWriter().write(outputDirectory + "networkChangeEvents_" + DateTime.secToDateTimeString(dateInSec) + ".xml.gz", allChangeEvents);
-			Incident2CSVWriter.writeProcessedNetworkIncidents(linkId2processedIncidentsCurrentDay, outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateTimeString(dateInSec) + ".csv");
+			new NetworkChangeEventsWriter().write(outputDirectory + "networkChangeEvents_" + DateTime.secToDateString(dateInSec) + ".xml.gz", allChangeEvents);
+			Incident2CSVWriter.writeProcessedNetworkIncidents(linkId2processedIncidentsCurrentDay, outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateString(dateInSec) + ".csv");
 			Incident2SHPWriter.writeDailyIncidentLinksToShapeFile(linkId2processedIncidentsCurrentDay, outputDirectory, dateInSec, crs);
 			dateInSec = dateInSec + 24 * 3600.;
 		}
@@ -354,7 +354,7 @@ public class Incident2NetworkChangeEventsWriter {
 		return networkChangeEvents;
 	}
 	
-	private Map<Id<Link>, List<NetworkIncident>> collectDayLinkIncidents(double dateInSec) {
+	private Map<Id<Link>, List<NetworkIncident>> collectDayLinkIncidents(double dateInSec) throws ParseException {
 				
 		Map<Id<Link>, List<NetworkIncident>> linkId2rawIncidents = new HashMap<>();
 		
@@ -372,16 +372,20 @@ public class Incident2NetworkChangeEventsWriter {
 			double startTime = Double.NEGATIVE_INFINITY;
 			double endTime = Double.NEGATIVE_INFINITY;
 			
+			String info = null;
+			
 			if (DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) <= dateInSec 
 					|| DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) > dateInSec + (24 * 3600.)) {
 				// traffic item ends on a previous day or starts on a later day --> the traffic item is not relevant for this day
-			
+				info = "not relevant for this day";
+				
 			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) <= dateInSec
 					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) >= dateInSec + (24 * 3600.)) {
 				// traffic item starts on a previous day and ends on a later day
 				
 				startTime = 0.;
 				endTime = dayEndTime;
+				info = "A";
 				
 			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) <= dateInSec
 					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) > dateInSec
@@ -390,7 +394,8 @@ public class Incident2NetworkChangeEventsWriter {
 				
 				startTime = 0.;
 				endTime = DateTime.parseDateTimeToTimeSeconds(item.getEndDateTime());
-									
+				info = "B";
+
 			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) >= dateInSec
 					&& DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) <= dateInSec + (24 * 3600.)
 					&& DateTime.parseDateTimeToDateTimeSeconds(item.getEndDateTime()) >= dateInSec + (24 * 3600.)) {
@@ -398,6 +403,7 @@ public class Incident2NetworkChangeEventsWriter {
 
 				startTime = DateTime.parseDateTimeToTimeSeconds(item.getStartDateTime());
 				endTime = dayEndTime;
+				info = "C";
 								
 			} else if (DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) > dateInSec
 					&& DateTime.parseDateTimeToDateTimeSeconds(item.getStartDateTime()) < dateInSec + (24 * 3600.)
@@ -407,7 +413,8 @@ public class Incident2NetworkChangeEventsWriter {
 
 				startTime = DateTime.parseDateTimeToTimeSeconds(item.getStartDateTime());
 				endTime = DateTime.parseDateTimeToTimeSeconds(item.getEndDateTime());
-									
+				info = "D";
+				
 			} else {
 				throw new RuntimeException("Aborting..." + item.toString());
 			}
@@ -415,25 +422,31 @@ public class Incident2NetworkChangeEventsWriter {
 			// store the traffic item info which is relevant for this day.
 			if (startTime >= 0. && endTime >= 0.) {
 				
-				if (endTime <= startTime) {
+				if (endTime == startTime) {
+					log.warn("Info: " + info);
+					log.warn("Start time: " + startTime + " - End time: " + endTime + " - Traffic item: " + item.toString());
+				
+				} else if (endTime < startTime) {
+					log.warn("Info: " + info);
 					throw new RuntimeException("Start time: " + startTime + " - End time: " + endTime + " - Traffic item: " + item.toString());
-				}				
+				
+				} else {
+					for (Link link : this.trafficItemId2path.get(item.getId()).links) {
+						NetworkIncident incident = new NetworkIncident(item.getId(), startTime, endTime);
+						incident.setLink(link);
+						incident.setIncidentLink(tmc.getTrafficIncidentLink(link, this.trafficItems.get(item.getId())));
+						
+						if (incident.getIncidentLink() != null) {
+													
+							if (linkId2rawIncidents.containsKey(link.getId())) {
+								linkId2rawIncidents.get(link.getId()).add(incident);
 								
-				for (Link link : this.trafficItemId2path.get(item.getId()).links) {
-					NetworkIncident incident = new NetworkIncident(item.getId(), startTime, endTime);
-					incident.setLink(link);
-					incident.setIncidentLink(tmc.getTrafficIncidentLink(link, this.trafficItems.get(item.getId())));
-					
-					if (incident.getIncidentLink() != null) {
-												
-						if (linkId2rawIncidents.containsKey(link.getId())) {
-							linkId2rawIncidents.get(link.getId()).add(incident);
-							
-						} else {
-														
-							List<NetworkIncident> dayNetworkIncidents = new ArrayList<>();
-							dayNetworkIncidents.add(incident);
-							linkId2rawIncidents.put(link.getId(), dayNetworkIncidents);
+							} else {
+															
+								List<NetworkIncident> dayNetworkIncidents = new ArrayList<>();
+								dayNetworkIncidents.add(incident);
+								linkId2rawIncidents.put(link.getId(), dayNetworkIncidents);
+							}
 						}
 					}
 				}
