@@ -220,6 +220,11 @@ public class HalfTourCostMatrices {
 		}
 	}
 
+	// TODO NEW
+	public Matrices getHalfTourCostMatrices(final String costType) {
+		return this.costType2halfTourCostMatrices.get(costType);
+	}
+	
 	public void writeHistogramsToFile(final String histogramFileName) {
 
 		try {
