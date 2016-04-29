@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -211,7 +212,10 @@ public class SingaporeDistributions implements IterationEndsListener {
 		}
 		
 		List<Plan> plans = new ArrayList<Plan>();
-		for (Person person : this.population.getPersons().values()) plans.add(person.getSelectedPlan());
+		for (Person person : this.population.getPersons().values()) {
+			Plan bestPlan = new BestPlanSelector<Plan, Person>().selectPlan(person);
+			plans.add(bestPlan);
+		}
 		this.analyzePlans(plans);
 		
 		for (DistributionClass distributionClass : classes) {
@@ -245,7 +249,7 @@ public class SingaporeDistributions implements IterationEndsListener {
 			BufferedWriter writer = IOUtils.getBufferedWriter(fileName + ".txt");
 			
 			int i = 0;
-			log.info(measure + " distribution for class " + distributionClass.name);
+			log.info(measure + " best plan distribution for class " + distributionClass.name);
 			
 			StringBuffer stringBuffer = new StringBuffer();
 			stringBuffer.append("low" + "\t");
@@ -279,7 +283,7 @@ public class SingaporeDistributions implements IterationEndsListener {
 		Percentile percentile = new Percentile();
 		Double[] valuesarray = distributionClass.values.toArray(new Double[distributionClass.values.size()]);
 		percentile.setData(ArrayUtils.toPrimitive(valuesarray));
-		String title = measure + " distribution for class " + distributionClass.name;
+		String title = measure + " best plan distribution for class " + distributionClass.name;
 		String xAxisLabel = measure + " class:" + "\n" + " mean: " + df.format(distributionClass.mean.getResult()) + unit 
 				+ " - 50% percentile: " + df.format(percentile.evaluate(50)) + unit +
 				" # values: " + distributionClass.values.size();
@@ -408,7 +412,7 @@ public class SingaporeDistributions implements IterationEndsListener {
 		try {
 			BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 			StringBuffer stringBuffer = new StringBuffer();
-			stringBuffer.append("mode" + "\t" + "counts" + "\t" + this.measure);			
+			stringBuffer.append("mode" + "\t" + "best_plan_counts" + "\t" + this.measure);			
 			writer.write(stringBuffer.toString());
 			writer.newLine();
 			

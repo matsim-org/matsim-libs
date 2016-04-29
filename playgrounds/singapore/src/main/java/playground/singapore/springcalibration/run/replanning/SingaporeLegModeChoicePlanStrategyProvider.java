@@ -27,7 +27,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TripsToLegsModule;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
 
@@ -67,7 +67,7 @@ public class SingaporeLegModeChoicePlanStrategyProvider implements Provider<Plan
 
     @Override
 	public PlanStrategy get() {
-		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new BestPlanSelector());
 		strategy.addStrategyModule(new TripsToLegsModule(tripRouterProvider, globalConfigGroup));
 		strategy.addStrategyModule(new SingaporeModeChangeAlgoGenerator(globalConfigGroup, changeLegModeConfigGroup, subtourModeChoiceConfigGroup, population, taxiUtils));
 		strategy.addStrategyModule(new ReRoute(activityFacilities, tripRouterProvider, globalConfigGroup));
