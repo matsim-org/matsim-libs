@@ -73,6 +73,7 @@ public class Incident2CSVWriter {
 						+ item.getTMCAlert().getExtent() + ";"
 						+ item.getTMCAlert().getDescription());
 				bw.newLine();
+				bw.close();
 			}
 			log.info("Traffic items written to " + outputFile);
 		}
@@ -96,6 +97,7 @@ public class Incident2CSVWriter {
 							+ ";" + incident.getIncidentLink().getFreespeed()
 							+ ";" + incident.getIncidentLink().getNumberOfLanes());
 					bw.newLine();
+					bw.close();
 				}
 			}
 		}
