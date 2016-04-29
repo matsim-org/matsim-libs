@@ -1,6 +1,8 @@
 package playground.balac.induceddemand.controler;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -78,7 +80,6 @@ public class ZurichScenarioControler {
 
 		initializeLocationChoice( controler );
 		initializeActivityStrategies(scenario, controler);
-		controler.addControlerListener(new ActivitiesAnalysisListener(scenario));
 		// We use a specific scoring function, that uses individual preferences
 		// for activity durations.
 		controler.addOverridingModule( new MATSim2010ScoringModule() );
@@ -105,6 +106,7 @@ public class ZurichScenarioControler {
 		final QuadTree<ActivityFacility> shoping = shopFacilitiesQuadTree.getQuadTree();		
 		
 		final QuadTree<ActivityFacility> leisure = leisureFacilitiesQuadTree.getQuadTree();		
+		HashMap<String, Double> scoreChange = new HashMap<String, Double>();
 
 		controler.addOverridingModule(new AbstractModule() {
 
@@ -117,10 +119,14 @@ public class ZurichScenarioControler {
 				bind(QuadTree.class)
 				.annotatedWith(Names.named("leisureQuadTree"))
 				.toInstance(leisure);
+				bind(HashMap.class)
+				.annotatedWith(Names.named("scoreChangeMap"))
+				.toInstance(scoreChange);
 			}
 			
 		});		
-		
+		controler.addControlerListener(new ActivitiesAnalysisListener(sc, scoreChange));
+
 		controler.addOverridingModule( new AbstractModule() {
 			@Override
 			public void install() {

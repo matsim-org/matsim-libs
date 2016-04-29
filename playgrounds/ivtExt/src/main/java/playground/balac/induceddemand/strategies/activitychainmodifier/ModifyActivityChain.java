@@ -1,5 +1,6 @@
 package playground.balac.induceddemand.strategies.activitychainmodifier;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Provider;
@@ -15,11 +16,9 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
-import com.google.inject.Inject;
-
 
 public class ModifyActivityChain extends AbstractMultithreadedModule{
 	
@@ -31,12 +30,13 @@ public class ModifyActivityChain extends AbstractMultithreadedModule{
 	private Map<String, TravelTime> travelTimes;
 	private Map<String, TravelDisutilityFactory> travelDisutilityFactories;
 	private ScoringFunctionFactory scoringFunctionFactory;
-	
-	
+	private HashMap scoreChange;
+	private CharyparNagelScoringParametersForPerson parametersForPerson;
 	public ModifyActivityChain(final Scenario scenario, Provider<TripRouter> tripRouterProvider,
 			 QuadTree shopFacilityQuadTree, QuadTree leisureFacilityQuadTree,
 			 LeastCostPathCalculatorFactory pathCalculatorFactory, Map<String, TravelTime> travelTimes,
-			 Map<String, TravelDisutilityFactory> travelDisutilityFactories, ScoringFunctionFactory scoringFunctionFactory) {
+			 Map<String, TravelDisutilityFactory> travelDisutilityFactories, ScoringFunctionFactory scoringFunctionFactory,
+			 HashMap scoreChange, CharyparNagelScoringParametersForPerson parametersForPerson) {
 		
 		super(scenario.getConfig().global().getNumberOfThreads());
 		this.scenario = scenario;
@@ -47,6 +47,8 @@ public class ModifyActivityChain extends AbstractMultithreadedModule{
 		this.travelTimes = travelTimes;
 		this.travelDisutilityFactories = travelDisutilityFactories;
 		this.scoringFunctionFactory = scoringFunctionFactory;
+		this.scoreChange = scoreChange;
+		this.parametersForPerson = parametersForPerson;
 	}
 
 	@Override
@@ -56,10 +58,10 @@ public class ModifyActivityChain extends AbstractMultithreadedModule{
 
 		TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get( TransportMode.car ) ;
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime) ;
-
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime ) ;
 		ModifyAndChooseChain algo = new ModifyAndChooseChain(MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes(),
-				this.scenario, pathCalculator, this.shopFacilityQuadTree, this.leisureFacilityQuadTree, scoringFunctionFactory);
+				this.scenario, pathCalculator, this.shopFacilityQuadTree, this.leisureFacilityQuadTree, scoringFunctionFactory,
+				this.scoreChange, this.parametersForPerson);
 
 		return algo;
 	}
