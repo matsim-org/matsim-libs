@@ -246,6 +246,8 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 
 	@Override
 	public void finish() {
+		if (plan.getPerson().getId().toString().equals("3071716"))
+			System.out.println();
 		// not handling one-activity plan is not a problem as long as
 		// one does not modifies the activity chaining
 		//if (plan.getPlanElements().size() == 1) {
@@ -289,12 +291,12 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 
 		// initialize zero utility durations here for better code readability, because we only need them here
 		if ( !this.zeroUtilityDurations.containsKey(actType) ) {
-			final double zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / DEFAULT_PRIORITY);
+			final double zeroUtilityDuration = (typicalDuration/3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / DEFAULT_PRIORITY);
 			this.zeroUtilityDurations.put(actType, zeroUtilityDuration);
 		}
-
-		if (duration > 0.0) {
-			final double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
+		double utilPerf = 0.0;
+		if (duration > 3600. * this.zeroUtilityDurations.get(actType)) {
+			utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
 				* Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
 			if ( Double.isNaN( utilPerf ) || utilPerf == Double.POSITIVE_INFINITY ) {
 				throw new RuntimeException( "Invalid score for activity type "+actType+
@@ -305,12 +307,29 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 			}
 			return Math.max(0, utilPerf);
 		}
-
-		if (duration < 0.0) {
-			logger.error("Accumulated activity durations < 0.0 must not happen.");
+		else {
+			
+			double slopeAtZeroUtility = this.params.marginalUtilityOfPerforming_s * typicalDuration / ( 3600.*this.zeroUtilityDurations.get(actType) ) ;
+			if ( slopeAtZeroUtility < 0. ) {
+				// (beta_perf might be = 0)
+				System.err.println("beta_perf: " + this.params.marginalUtilityOfPerforming_s);
+				System.err.println("typicalDuration: " + typicalDuration );
+				System.err.println( "zero utl duration: " + this.zeroUtilityDurations.get(actType) );
+				throw new RuntimeException( "slope at zero utility < 0.; this should not happen ...");
+			}
+			double durationUnderrun = this.zeroUtilityDurations.get(actType)*3600. - duration ;
+			if ( durationUnderrun < 0. ) {
+				throw new RuntimeException( "durationUnderrun < 0; this should not happen ...") ;
+			}
+			utilPerf -= slopeAtZeroUtility * durationUnderrun ;
+			return Math.max(0, utilPerf);
 		}
 
-		return 0;
+		//if (duration < 0.0) {
+		//	logger.error("Accumulated activity durations < 0.0 must not happen.");
+		//}
+
+		
 	}
 
 	public double getTooShortDurationScore() {
