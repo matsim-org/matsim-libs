@@ -24,6 +24,7 @@ package playground.polettif.multiModalMap.mapping;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -31,6 +32,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.filter.NetworkFilterManager;
+import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.MapUtils;
@@ -104,17 +106,22 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 			log.info("Mapping files from config...");
 			log.info("Reading schedule and network file...");
 			Scenario mainScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			Network mainNetwork = mainScenario.getNetwork();
+			Network network = mainScenario.getNetwork();
 			new TransitScheduleReader(mainScenario).readFile(config.getScheduleFile());
-			new MatsimNetworkReader(mainNetwork).readFile(config.getNetworkFile());
+			new MatsimNetworkReader(network).readFile(config.getNetworkFile());
 			TransitSchedule mainSchedule = mainScenario.getTransitSchedule();
 
-			new PTMapperModesFilterAndMerge(mainSchedule, config).mapScheduleToNetwork(mainNetwork);
+			new PTMapperModesFilterAndMerge(mainSchedule, config).mapScheduleToNetwork(network);
 
 			if(config.getOutputNetworkFile() != null && config.getOutputScheduleFile() != null) {
 				log.info("Writing schedule and network to file...");
 				new TransitScheduleWriter(mainSchedule).writeFile(config.getOutputScheduleFile());
-				new NetworkWriter(mainNetwork).write(config.getOutputNetworkFile());
+				new NetworkWriter(network).write(config.getOutputNetworkFile());
+				if(config.getOutputStreetNetworkFile() != null) {
+					NetworkFilterManager filterManager = new NetworkFilterManager(network);
+					filterManager.addLinkFilter(new LinkFilterMode(Collections.singleton(TransportMode.car)));
+					new NetworkWriter(filterManager.applyFilters()).write(config.getOutputStreetNetworkFile());
+				}
 			} else {
 				log.info("No output pahts defined, schedule and network are not written to files.");
 			}
@@ -372,7 +379,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		TransitScheduleValidator.printResult(TransitScheduleValidator.validateAll(schedule, network));
 
 		log.info("================================================");
-		log.info("=== Mapping transit schedule to network... done.\n");
+		log.info("=== Mapping transit schedule to network... done.");
+		log.info("================================================");
 		log.info("    Stop Facilities statistics:");
 		log.info("       input    "+nStopFacilities);
 		log.info("       output   "+schedule.getFacilities().size());

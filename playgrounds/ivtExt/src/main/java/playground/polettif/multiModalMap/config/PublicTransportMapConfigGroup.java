@@ -46,6 +46,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	private static final String SCHEDULE_FILE = "scheduleFile";
 	private static final String OUTPUT_NETWORK_FILE = "outputNetworkFile";
 	private static final String OUTPUT_SCHEDULE_FILE = "outputScheduleFile";
+	private static final String OUTPUT_STREET_NETWORK_FILE = "outputStreetNetworkFile";
 
 	public PublicTransportMapConfigGroup() {
 		super(GROUP_NAME);
@@ -56,6 +57,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	private String networkFile = null;
 	private String scheduleFile = null;
 	private String outputNetworkFile = null;
+	private String outputStreetNetworkFile = null;
 	private String outputScheduleFile = null;
 
 	@Override
@@ -92,6 +94,8 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		map.put(NETWORK_FILE, "Path to the input network file. Not needed if PTMapper is called within another class.");
 		map.put(SCHEDULE_FILE, "Path to the input schedule file. Not needed if PTMapper is called within another class.");
 		map.put(OUTPUT_NETWORK_FILE, "Path to the output network file. Not needed if PTMapper is used within another class.");
+		map.put(OUTPUT_NETWORK_FILE, "Path to the output car only network file. The inpu multimodal map is filtered. \n" +
+				"\t\tNot needed if PTMapper is used within another class.");
 		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
 //		map.put(PSEUDO_ROUTE_WEIGHT_TYPE,
 //				"Defines which link attribute should be used for pseudo route calculations. Default is minimization \n" +
@@ -336,7 +340,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 
 	@StringGetter(NETWORK_FILE)
 	public String getNetworkFile() {
-		return this.networkFile;
+		return this.networkFile == null ? "" : this.networkFile;
 	}
 
 	@StringSetter(NETWORK_FILE)
@@ -348,7 +352,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 
 	@StringGetter(SCHEDULE_FILE)
 	public String getScheduleFile() {
-		return this.scheduleFile;
+		return this.scheduleFile == null ? "" : this.scheduleFile;
 	}
 
 	@StringSetter(SCHEDULE_FILE)
@@ -360,13 +364,25 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 
 	@StringGetter(OUTPUT_NETWORK_FILE)
 	public String getOutputNetworkFile() {
-		return this.outputNetworkFile;
+		return this.outputNetworkFile == null ? "" : this.outputNetworkFile;
 	}
 
 	@StringSetter(OUTPUT_NETWORK_FILE)
-	public String setOutputNetwork(String outputNetwork) {
+	public String setOutputNetworkFile(String outputNetwork) {
 		final String old = this.outputNetworkFile;
 		this.outputNetworkFile = outputNetwork;
+		return old;
+	}
+
+	@StringGetter(OUTPUT_STREET_NETWORK_FILE)
+	public String getOutputStreetNetworkFile() {
+		return this.outputStreetNetworkFile == null ? "" : this.outputStreetNetworkFile;
+	}
+
+	@StringSetter(OUTPUT_STREET_NETWORK_FILE)
+	public String setOutputStreetNetworkFile(String outputStreetNetwork) {
+		final String old = this.outputStreetNetworkFile;
+		this.outputStreetNetworkFile = outputStreetNetwork;
 		return old;
 	}
 
@@ -376,7 +392,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter(OUTPUT_SCHEDULE_FILE)
-	public String setOutputSchedule(String outputSchedule) {
+	public String setOutputScheduleFile(String outputSchedule) {
 		final String old = this.outputScheduleFile;
 		this.outputScheduleFile = outputSchedule;
 		return old;
@@ -390,5 +406,6 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	public Map<String, Integer> getMaxNClosestLinksByMode() {
 		return null;
 	}
+
 
 }
