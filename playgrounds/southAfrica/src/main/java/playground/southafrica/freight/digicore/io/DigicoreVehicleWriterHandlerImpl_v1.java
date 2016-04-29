@@ -60,6 +60,20 @@ public class DigicoreVehicleWriterHandlerImpl_v1 implements
 	@Override
 	public void startActivity(DigicoreActivity activity, BufferedWriter out)
 			throws IOException {
+		/* Check for required attributes. */
+		if(activity.getType() == null){
+			throw new RuntimeException("An activity must have a type, even if it is empty.");
+		}
+		if(activity.getCoord() == null){
+			throw new RuntimeException("An activity must have a coordinate.");
+		}
+		if(activity.getStartTimeGregorianCalendar() == null){
+			throw new RuntimeException("An activity must have a start time.");
+		}
+		if(activity.getEndTimeGregorianCalendar() == null){
+			throw new RuntimeException("An activity must have an end time.");
+		}
+		
 		out.write("\t\t<activity");
 		out.write(" type=\"" + activity.getType() + "\"\n");
 		out.write("\t\t\tstart=\"" + getDateString(activity.getStartTimeGregorianCalendar()) + "\"");
