@@ -63,8 +63,12 @@ public class NetworkChangeEventsAnalysis {
 	private Map<Id<Link>, double[]> averageLanes = new HashMap<>();
 	private Map<Id<Link>, double[]> standardDeviationLanes = new HashMap<>();
 
-	private int TIMESTEP = 15 * 60;
-	
+	private final int TIMESTEP = 15 * 60;
+	private final boolean writeDetailedOutput = false;
+	private final boolean analyzeCapacity = false;
+	private final boolean analyzeFreespeed = true;
+	private final boolean analyzeLanes = false;
+
 	private int days;
 	private int timebins;
 	private int binsPerDay;
@@ -102,17 +106,23 @@ public class NetworkChangeEventsAnalysis {
 		
 		for (Id<Link> linkId : scenario0.getNetwork().getLinks().keySet()) {
 			
-			capacities.put(linkId, new double[timebins]);
-			averageCapacity.put(linkId, new double[binsPerDay]);
-			standardDeviationCapacity.put(linkId, new double[binsPerDay]);
+			if (analyzeCapacity) {
+				capacities.put(linkId, new double[timebins]);
+				averageCapacity.put(linkId, new double[binsPerDay]);
+				standardDeviationCapacity.put(linkId, new double[binsPerDay]);
+			}
 			
-			freespeeds.put(linkId, new double[timebins]);
-			averageFreespeed.put(linkId, new double[binsPerDay]);
-			standardDeviationFreespeed.put(linkId, new double[binsPerDay]);
+			if (analyzeFreespeed) {
+				freespeeds.put(linkId, new double[timebins]);
+				averageFreespeed.put(linkId, new double[binsPerDay]);
+				standardDeviationFreespeed.put(linkId, new double[binsPerDay]);
+			}
 			
-			lanes.put(linkId, new double[timebins]);
-			averageLanes.put(linkId, new double[binsPerDay]);
-			standardDeviationLanes.put(linkId, new double[binsPerDay]);
+			if (analyzeLanes) {
+				lanes.put(linkId, new double[timebins]);
+				averageLanes.put(linkId, new double[binsPerDay]);
+				standardDeviationLanes.put(linkId, new double[binsPerDay]);
+			}
 		}
 		
 		int dayCounter = 0;
@@ -145,34 +155,37 @@ public class NetworkChangeEventsAnalysis {
 					
 					for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
 						TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(linkId);
-						this.capacities.get(linkId)[currentTimeBin] = link.getFlowCapacityPerSec(time) * 3600.;
-						this.freespeeds.get(linkId)[currentTimeBin] = link.getFreespeed(time);
-						this.lanes.get(linkId)[currentTimeBin] = link.getNumberOfLanes(time);
+						if (analyzeFreespeed) this.freespeeds.get(linkId)[currentTimeBin] = link.getFreespeed(time);
+						if (analyzeCapacity) this.capacities.get(linkId)[currentTimeBin] = link.getFlowCapacityPerSec(time) * 3600.;
+						if (analyzeLanes) this.lanes.get(linkId)[currentTimeBin] = link.getNumberOfLanes(time);
 					}
-
 				}
 				dayCounter++;
 			}
 		}
 		
 		calculateStatistics(scenario0);
-		
-		boolean writeDetailedOutput = true;
-		
+				
 		if (writeDetailedOutput) {
-			writeDetailedInformation(scenario0, this.freespeeds, "freespeed_all");
-			writeDetailedInformation(scenario0, this.capacities, "capacity_all");
-			writeDetailedInformation(scenario0, this.lanes, "lanes_all");
+			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "freespeed_all");
+			if (analyzeCapacity) writeDetailedInformation(scenario0, this.capacities, "capacity_all");
+			if (analyzeLanes) writeDetailedInformation(scenario0, this.lanes, "lanes_all");
 		}
 		
-		writeAnalysisValues(scenario0, this.averageFreespeed, "freespeed_avg");
-		writeAnalysisValues(scenario0, this.standardDeviationFreespeed, "freespeed_std");
+		if (analyzeFreespeed) { 
+			writeAnalysisValues(scenario0, this.averageFreespeed, "freespeed_avg");
+			writeAnalysisValues(scenario0, this.standardDeviationFreespeed, "freespeed_std");
+		}
 		
-		writeAnalysisValues(scenario0, this.averageCapacity, "capacity_avg");
-		writeAnalysisValues(scenario0, this.standardDeviationCapacity, "capacity_std");
+		if (analyzeCapacity)  {
+			writeAnalysisValues(scenario0, this.averageCapacity, "capacity_avg");
+			writeAnalysisValues(scenario0, this.standardDeviationCapacity, "capacity_std");
+		}
 		
-		writeAnalysisValues(scenario0, this.averageLanes, "lanes_avg");
-		writeAnalysisValues(scenario0, this.standardDeviationLanes, "lanes_std");
+		if (analyzeLanes) {
+			writeAnalysisValues(scenario0, this.averageLanes, "lanes_avg");
+			writeAnalysisValues(scenario0, this.standardDeviationLanes, "lanes_std");
+		}
 	}
 
 	private void writeDetailedInformation(Scenario scenario, Map<Id<Link>, double[]> values, String filename) {
@@ -273,19 +286,25 @@ public class NetworkChangeEventsAnalysis {
 	
 				for (int currentDay = 0; currentDay < days; currentDay++) {
 					int currentBin = i + currentDay * binsPerDay;
-					capacityStats.addValue(this.capacities.get(linkId)[currentBin]);
-					freeSpeedStats.addValue(this.freespeeds.get(linkId)[currentBin]);
-					laneStats.addValue(this.lanes.get(linkId)[currentBin]);
+					if (analyzeFreespeed) freeSpeedStats.addValue(this.freespeeds.get(linkId)[currentBin]);
+					if (analyzeCapacity) capacityStats.addValue(this.capacities.get(linkId)[currentBin]);
+					if (analyzeLanes) laneStats.addValue(this.lanes.get(linkId)[currentBin]);
 				}
 				
-				this.standardDeviationFreespeed.get(linkId)[i] = freeSpeedStats.getStandardDeviation();
-				this.averageFreespeed.get(linkId)[i] = freeSpeedStats.getMean();
+				if (analyzeFreespeed) {
+					this.standardDeviationFreespeed.get(linkId)[i] = freeSpeedStats.getStandardDeviation();
+					this.averageFreespeed.get(linkId)[i] = freeSpeedStats.getMean();	
+				}
 				
-				this.standardDeviationCapacity.get(linkId)[i] = capacityStats.getStandardDeviation();
-				this.averageCapacity.get(linkId)[i] = capacityStats.getMean();
+				if (analyzeCapacity) {
+					this.standardDeviationCapacity.get(linkId)[i] = capacityStats.getStandardDeviation();
+					this.averageCapacity.get(linkId)[i] = capacityStats.getMean();
+				}
 				
-				this.standardDeviationLanes.get(linkId)[i] = laneStats.getStandardDeviation();
-				this.averageLanes.get(linkId)[i] = laneStats.getMean();
+				if (analyzeLanes) {
+					this.standardDeviationLanes.get(linkId)[i] = laneStats.getStandardDeviation();
+					this.averageLanes.get(linkId)[i] = laneStats.getMean();	
+				}
 			}
 		}
 		log.info("Calculating statistics... Done.");
