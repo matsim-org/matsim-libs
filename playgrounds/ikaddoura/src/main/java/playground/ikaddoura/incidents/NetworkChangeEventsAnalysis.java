@@ -69,7 +69,7 @@ public class NetworkChangeEventsAnalysis {
 	private int timebins;
 	private int binsPerDay;
 	
-	private final String nceDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/berlin_2016-04-27/networkChangeEvents_test/";
+	private final String nceDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/berlin_2016-04-27/networkChangeEvents/";
 	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
 
 	public static void main(String[] args) {
