@@ -198,14 +198,16 @@ public class NeighboursCreator {
 				Activity act2 = tNew.get(innerIndex);
 				
 				
-				if (!act1.getType().equals(act2.getType())) {
+				if (!act1.getType().equals(act2.getType()) && !act1.getType().equals(tNew.get(innerIndex + 1)) &&
+						!act1.getType().equals(tNew.get(innerIndex - 1)) && !act2.getType().equals(tNew.get(outerIndex + 1)) && 
+						!act2.getType().equals(tNew.get(outerIndex - 1))) {
 					double time = 0.0;
 					double duration1 = act1.getEndTime() - act1.getStartTime();
 					double duration2 = act2.getEndTime() - act2.getStartTime();
 					
 					int index1 = newPlan.getPlanElements().indexOf(act1);
 					int index2 = newPlan.getPlanElements().indexOf(act2);
-			
+					
 					newPlan.getPlanElements().set(index1, act2);
 					newPlan.getPlanElements().set(index2, act1);					
 					
@@ -291,7 +293,7 @@ public class NeighboursCreator {
 						double ttLeg = leg.getTravelTime();
 						time += ttLeg;
 						
-					}					
+					}	
 					newPlans.add(newPlan);
 				}				
 			}			
@@ -319,6 +321,9 @@ public class NeighboursCreator {
 			int actIndex = plan.getPlanElements().indexOf(t.get(index));
 
 			for (String actType:allActTypes) {
+				if (t.get(index - 1).getType().equals(actType) ||
+						t.get(index).getType().equals(actType))
+					continue;
 				Plan newPlan = PlanUtils.createCopy(plan);
 				newPlan.setPerson(plan.getPerson());
 				
@@ -474,9 +479,9 @@ public class NeighboursCreator {
 				
 			}		
 			
-			//check if after removing we have two work activities next to each other
-			if (t.get(index - 1).getType().startsWith("work") 
-					&& t.get(index + 1).getType().startsWith("work")) {
+			//check if after removing we have two same activities next to each other
+			if (t.get(index - 1).getType().equals(t.get(index + 1).getType()) 
+					) {
 				
 				double initialEndTime = t.get(index + 1).getEndTime();
 				newPlan.getPlanElements().remove(actIndex);
