@@ -123,7 +123,6 @@ public class NetworkChangeEventsAnalysis {
 				String delimiter1 = "_";
 				String delimiter2 = ".";
 				String dateString = StringUtils.explode(StringUtils.explode(f.getName(), delimiter1.charAt(0))[1], delimiter2.charAt(0))[0];
-
 				log.info(">>>> Day: " + dateString);
 				
 				log.info("Loading scenario...");
@@ -147,8 +146,8 @@ public class NetworkChangeEventsAnalysis {
 					for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
 						TimeVariantLinkImpl link = (TimeVariantLinkImpl) scenario.getNetwork().getLinks().get(linkId);
 						this.capacities.get(linkId)[currentTimeBin] = link.getFlowCapacityPerSec(time) * 3600.;
-						this.freespeeds.get(linkId)[currentTimeBin] = link.getFreespeed(time) * 3600.;
-						this.lanes.get(linkId)[currentTimeBin] = link.getNumberOfLanes(time) * 3600.;
+						this.freespeeds.get(linkId)[currentTimeBin] = link.getFreespeed(time);
+						this.lanes.get(linkId)[currentTimeBin] = link.getNumberOfLanes(time);
 					}
 
 				}
@@ -157,10 +156,14 @@ public class NetworkChangeEventsAnalysis {
 		}
 		
 		calculateStatistics(scenario0);
-
-		writeCapacities(scenario0, this.freespeeds, "freespeed_all");
-		writeCapacities(scenario0, this.capacities, "capacity_all");
-		writeCapacities(scenario0, this.lanes, "lanes_all");
+		
+		boolean writeDetailedOutput = true;
+		
+		if (writeDetailedOutput) {
+			writeDetailedInformation(scenario0, this.freespeeds, "freespeed_all");
+			writeDetailedInformation(scenario0, this.capacities, "capacity_all");
+			writeDetailedInformation(scenario0, this.lanes, "lanes_all");
+		}
 		
 		writeAnalysisValues(scenario0, this.averageFreespeed, "freespeed_avg");
 		writeAnalysisValues(scenario0, this.standardDeviationFreespeed, "freespeed_std");
@@ -172,7 +175,7 @@ public class NetworkChangeEventsAnalysis {
 		writeAnalysisValues(scenario0, this.standardDeviationLanes, "lanes_std");
 	}
 
-	private void writeCapacities(Scenario scenario, Map<Id<Link>, double[]> values, String filename) {
+	private void writeDetailedInformation(Scenario scenario, Map<Id<Link>, double[]> values, String filename) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(nceDirectory + filename + ".csv");
 		BufferedWriter bwt = IOUtils.getBufferedWriter(nceDirectory + filename + ".csvt");
 		Locale.setDefault(Locale.US);
@@ -181,23 +184,28 @@ public class NetworkChangeEventsAnalysis {
 			String l1 = "LinkID;Original Freespeed [m/s];Original Capacity [veh/hour];Original Number of Lanes;Original Length [m]";
 			bw.append(l1);
 			bwt.append("\"String\";\"Real\";\"Real\";\"Real\";\"Real\"");
-			for (int day = 0; day <= days; day++) {
+			for (int day = 0; day < days; day++) {
 				for (int i = 0; i<24*3600;i=i+TIMESTEP ){
-					double time = day*24*3600+i;
-					bw.append(";"+Time.writeTime(time));
+					bw.append(";Day " + day + " Time: "+Time.writeTime(i));
 					bwt.append(";\"Real\"");
 				}	
 			}
 			
 			for (Entry<Id<Link>, double[]> e :  values.entrySet()){
 				bw.newLine();
-				bw.append(e.getKey().toString()+";");
+				bw.append(e.getKey().toString());
+				double freespeed = scenario.getNetwork().getLinks().get(e.getKey()).getFreespeed();
 				double capacity = scenario.getNetwork().getLinks().get(e.getKey()).getCapacity();
-				bw.append(df.format(capacity));
-				for (int i=0;i<e.getValue().length;i++){
-					bw.append(";"+df.format(e.getValue()[i]));
-				}
+				double length = scenario.getNetwork().getLinks().get(e.getKey()).getLength();
+				double lanes = scenario.getNetwork().getLinks().get(e.getKey()).getNumberOfLanes();
+				bw.append(";" + df.format(freespeed));
+				bw.append(";" + df.format(capacity));
+				bw.append(";" + df.format(lanes));
+				bw.append(";" + df.format(length));
 				
+				for (int i=0;i<e.getValue().length;i++){
+					bw.append(";" + df.format(e.getValue()[i]));
+				}
 			}
 			bw.flush();
 			bw.close();
@@ -210,6 +218,9 @@ public class NetworkChangeEventsAnalysis {
 	}
 	
 	private void writeAnalysisValues(Scenario scenario, Map<Id<Link>, double[]> linkId2analysisValue, String filename) {
+		
+		log.info("Writing analysis output:" + filename);
+		
 		Locale.setDefault(Locale.US);
 		DecimalFormat df = new DecimalFormat( "####0.00" );
 		BufferedWriter bw = IOUtils.getBufferedWriter(nceDirectory+filename+".csv");
@@ -227,19 +238,18 @@ public class NetworkChangeEventsAnalysis {
 			
 			for (Entry<Id<Link>, double[]> e :  linkId2analysisValue.entrySet()){
 				bw.newLine();
-				bw.append(e.getKey().toString()+";");
-				double capacity = scenario.getNetwork().getLinks().get(e.getKey()).getCapacity();
+				bw.append(e.getKey().toString());
 				double freespeed = scenario.getNetwork().getLinks().get(e.getKey()).getFreespeed();
+				double capacity = scenario.getNetwork().getLinks().get(e.getKey()).getCapacity();
 				double length = scenario.getNetwork().getLinks().get(e.getKey()).getLength();
 				double lanes = scenario.getNetwork().getLinks().get(e.getKey()).getNumberOfLanes();
-				bw.append(df.format(freespeed));
-				bw.append(df.format(capacity));
-				bw.append(df.format(lanes));
-				bw.append(df.format(length));
+				bw.append(";" + df.format(freespeed));
+				bw.append(";" + df.format(capacity));
+				bw.append(";" + df.format(lanes));
+				bw.append(";" + df.format(length));
 				for (int i=0;i<e.getValue().length;i++){
-					bw.append(";"+df.format(e.getValue()[i]));
+					bw.append(";" + df.format(e.getValue()[i]));
 				}
-				
 			}
 			bw.flush();
 			bw.close();
@@ -249,6 +259,7 @@ public class NetworkChangeEventsAnalysis {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		log.info("Done.");
 	}
 	
 	private void calculateStatistics(Scenario scenario){
