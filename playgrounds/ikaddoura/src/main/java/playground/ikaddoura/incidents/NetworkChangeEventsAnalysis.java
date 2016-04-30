@@ -65,9 +65,9 @@ public class NetworkChangeEventsAnalysis {
 
 	private final int TIMESTEP = 15 * 60;
 	private final boolean writeDetailedOutput = false;
+	private final boolean analyzeFreespeed = false;
 	private final boolean analyzeCapacity = false;
-	private final boolean analyzeFreespeed = true;
-	private final boolean analyzeLanes = false;
+	private final boolean analyzeLanes = true;
 
 	private int days;
 	private int timebins;
