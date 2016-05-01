@@ -70,9 +70,9 @@ public class TurnkeyExtractor {
 		LOG.info("Executing the turnkey extraction... this may take some time.");
 		
 		LOG.info("Creating the necessary folders.");
-		boolean createdVehiclesFolder = new File(outputFolder + "vehicles/").mkdirs(); 
+		boolean createdVehiclesFolder = new File(outputFolder + "Vehicles/").mkdirs(); 
 		if(!createdVehiclesFolder){
-			LOG.error("Could not create the ./vehicles/ folder.");
+			LOG.error("Could not create the ./Vehicles/ folder.");
 		}
 		boolean createdXmlFolder = new File(outputFolder + "xml/").mkdirs();
 		if(!createdXmlFolder){
