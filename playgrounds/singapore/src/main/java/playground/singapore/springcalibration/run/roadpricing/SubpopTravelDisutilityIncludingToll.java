@@ -37,7 +37,7 @@ import org.matsim.vehicles.Vehicle;
 class SubpopTravelDisutilityIncludingToll implements TravelDisutility {
 
 	private static final Logger log = Logger.getLogger( SubpopTravelDisutilityIncludingToll.class ) ;
-	private double tollCostFactor = 1.0/3.0;
+	private double tollCostFactor = 1.0;
 
 	private final RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
