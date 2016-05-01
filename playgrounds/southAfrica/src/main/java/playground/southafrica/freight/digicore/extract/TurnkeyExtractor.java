@@ -68,23 +68,20 @@ public class TurnkeyExtractor {
 	
 	private static void extract(String inputFile, String outputFolder){
 		LOG.info("Executing the turnkey extraction... this may take some time.");
+
+		/* Splitting */
+		String[] splitArgs = {inputFile, outputFolder, "2", "5", "0", "1", "2", "4", "3"};
+		DigicoreFileSplitter.main(splitArgs );
 		
-		LOG.info("Creating the necessary folders.");
-		boolean createdVehiclesFolder = new File(outputFolder + "Vehicles/").mkdirs(); 
-		if(!createdVehiclesFolder){
-			LOG.error("Could not create the ./Vehicles/ folder.");
-		}
+		/* Sorting */
+		String[] sortArgs = {outputFolder + "vehicles/"};
+		DigicoreFilesSorter.main(sortArgs);
+		
+		/* Extracting */
 		boolean createdXmlFolder = new File(outputFolder + "xml/").mkdirs();
 		if(!createdXmlFolder){
 			LOG.error("Could not create the ./xml/ folder.");
 		}
-		
-		String[] splitArgs = {inputFile, outputFolder, "2", "5", "0", "1", "2", "4", "3"};
-		DigicoreFileSplitter.main(splitArgs );
-		
-		String[] sortArgs = {outputFolder + "vehicles/"};
-		DigicoreFilesSorter.main(sortArgs);
-		
 		String[] extractArgs = {
 				outputFolder + "vehicles/",
 				"/home/share/data/digicore/2009/status.txt",
@@ -95,6 +92,7 @@ public class TurnkeyExtractor {
 				"WGS84_SA_Albers"};
 		MyMultiThreadChainExtractor.main(extractArgs);
 		
+		/* Collating */
 		String[] collateArgs = {outputFolder + "xml/", outputFolder + "digicoreVehicles.xml.gz", "WGS84_SA_Albers", "true"};
 		DigicoreVehicleCollator.main(collateArgs);
 		
