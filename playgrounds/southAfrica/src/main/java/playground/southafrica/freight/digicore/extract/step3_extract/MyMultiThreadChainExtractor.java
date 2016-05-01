@@ -46,7 +46,9 @@ public class MyMultiThreadChainExtractor {
 	 * 	<li> absolute path of file with On and off statuses;
 	 * 	<li> absolute path of XML (output) folder;
 	 * 	<li> number of threads;
-	 * 	<li> threshold (seconds) to distinguish between minor and major activities;
+	 * 	<li> threshold (seconds) to distinguish between minor and major 
+	 * 		 activities (typically 5 hours, or 18000 sec, according to Joubert
+	 * 		 and Axhausen (2011) );
 	 * 	<li> threshold (seconds) of minimum activity duration (we used 60 seconds);
 	 * 	<li> coordinate reference system, typically "WGS84_SA_Albers" for South 
 	 * 		 Africa (as captured in {@link MGC}).
