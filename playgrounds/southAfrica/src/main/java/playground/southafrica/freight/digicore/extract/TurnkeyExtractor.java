@@ -74,7 +74,7 @@ public class TurnkeyExtractor {
 		DigicoreFileSplitter.main(splitArgs );
 		
 		/* Sorting */
-		String[] sortArgs = {outputFolder + "vehicles/"};
+		String[] sortArgs = {outputFolder + "Vehicles/"};
 		DigicoreFilesSorter.main(sortArgs);
 		
 		/* Extracting */
