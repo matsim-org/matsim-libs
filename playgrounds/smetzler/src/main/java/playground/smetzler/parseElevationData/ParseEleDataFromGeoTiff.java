@@ -32,12 +32,18 @@ public class ParseEleDataFromGeoTiff {
 //		// SRTM1
 //		File tiffFile = new File("../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/n52_e013_1arc_v3.tif");
 		// SRTM3 download: (http://srtm.csi.cgiar.org/SELECTION/listImages.asp)
-//		//berlin
-		File tiffFile = new File(
-				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/srtm3/srtm_39_02.tif");
-//		//stuttgart
+//		
+////		//berlin
 //		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_stuttgart/srtm_38_03.tif");
+//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_berlin/srtm3/srtm_39_02.tif");
+		
+//		//paris
+//		File tiffFile = new File(
+//				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_paris/srtm_37_03.tif");
+		//stuttgart
+		File tiffFile = new File(
+				"../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/elevation_stuttgart/srtm_38_03.tif");
+		
 		
 		GeoTiffReader reader = new GeoTiffReader(tiffFile);
 

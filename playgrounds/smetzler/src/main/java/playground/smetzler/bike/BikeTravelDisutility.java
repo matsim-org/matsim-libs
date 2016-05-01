@@ -122,21 +122,23 @@ public class BikeTravelDisutility implements TravelDisutility {
 			case "asphalt;paving_stones:35":surfaceFactor=  60; break;
 			case "paving_stones:3": 		surfaceFactor=  40; break;
 			
-			default: 						surfaceFactor=  70; log.info(surface + " surface not recognized");
+			default: 						surfaceFactor=  70; //log.info(surface + " surface not recognized");
 			}
 		}
 		else {
-//			switch (highway){ 	//for many prim/sec streets there is no surface because the deafealt is asphalt; for tert street this is not true, f.e. friesenstr in kreuzberg
-//			case "primary": 				surfaceFactor= 100; break;
-//			case "primary_link": 			surfaceFactor= 100; break;
-//			case "secondary": 				surfaceFactor= 100; break;
-//			case "secondary_link": 			surfaceFactor= 100; break;
-//			}
-			if (highway.equals("primary") || highway.equals("primary_link") ||highway.equals("secondary") || highway.equals("secondary_link")) 
-			surfaceFactor= 100;
-			else
-			{surfaceFactor= 70;
-			//log.info("no surface info");
+			//			switch (highway){ 	//for many prim/sec streets there is no surface because the deafealt is asphalt; for tert street this is not true, f.e. friesenstr in kreuzberg
+			//			case "primary": 				surfaceFactor= 100; break;
+			//			case "primary_link": 			surfaceFactor= 100; break;
+			//			case "secondary": 				surfaceFactor= 100; break;
+			//			case "secondary_link": 			surfaceFactor= 100; break;
+			//			}
+			if (highway != null) {
+				if (highway.equals("primary") || highway.equals("primary_link") ||highway.equals("secondary") || highway.equals("secondary_link")) 
+					surfaceFactor= 100;
+				else
+				{surfaceFactor= 70;
+				//log.info("no surface info");
+				}
 			}
 		}
 		
@@ -263,6 +265,13 @@ public class BikeTravelDisutility implements TravelDisutility {
 	}
 
 }
+
+
+
+
+
+
+
 
 
 
