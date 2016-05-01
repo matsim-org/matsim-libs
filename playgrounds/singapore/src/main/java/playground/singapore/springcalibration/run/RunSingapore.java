@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSModule;
@@ -66,7 +67,34 @@ public class RunSingapore {
 
 				return sumScoringFunction;
 			}
-		}) ;		
+		}) ;
+		
+		final SubpopTravelDisutility.Builder builder_schoolbus =  new SubpopTravelDisutility.Builder("schoolbus", parameters);	
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addTravelTimeBinding("schoolbus").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("schoolbus").toInstance(builder_schoolbus);
+			}
+		});
+		
+		final SubpopTravelDisutility.Builder builder_passenger =  new SubpopTravelDisutility.Builder("passenger", parameters);	
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addTravelTimeBinding("passenger").to(networkTravelTime());
+				addTravelDisutilityFactoryBinding("passenger").toInstance(builder_passenger);
+			}
+		});
+		
+		final SubpopTravelDisutility.Builder builder_other =  new SubpopTravelDisutility.Builder(TransportMode.other, parameters);	
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addTravelTimeBinding(TransportMode.other).to(networkTravelTime());
+				addTravelDisutilityFactoryBinding(TransportMode.other).toInstance(builder_other);
+			}
+		});
 		
 		final SubpopTravelDisutility.Builder builder_freight =  new SubpopTravelDisutility.Builder("freight", parameters);	
 		controler.addOverridingModule(new AbstractModule() {
