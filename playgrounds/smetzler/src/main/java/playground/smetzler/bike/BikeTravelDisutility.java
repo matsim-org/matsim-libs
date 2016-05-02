@@ -12,21 +12,12 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * in this class traveltime is calculated depending on the following parameters:
- * surface, slope/elevation
+ * in this class disutility per link is calculateted for routing depending on the following parameters:
+ * traveltime, distance, surface, slope/elevation, cyclewaytype, highwaytype
+ * (straßen mit radwegen/radwege bevorzugen bzw. starßen ohne radwege mit extra dis)
  * 
- * following parameters are supposed to be implemented
- * cyclewaytype, smoothness? (vs surface), weather/wind?, #crossings (info in nodes)
- * 
- * 
- * following parameters are supposed to be implemented to the disutility
- * traveltime, distance, surface, smoothness, slope/elevation, #crossings (info in nodes), cyclewaytype, 
- * size of street aside, weather/wind, parkende autos?
- * 
- * 
- * straßen mit radwegen/radwege bevorzugen bzw. starßen ohne radwege mit extra dis
- * 
- * 
+ * following parameters may be added in the future
+ * smoothness? (vs surface), weather/wind?, #crossings (info in nodes), parkende autos?, prefere routes that are offical bike routes
  */
 
 
@@ -144,7 +135,7 @@ public class BikeTravelDisutility implements TravelDisutility {
 		
 	
 		// STREETTYPE
-		//how safe and comfoartable does one feel on this kind of street??
+		//how safe and comfortable does one feel on this kind of street?
 		//highway: big streets without cycleways bad, residential and footway ok
 		//cyclewaytype lane and track good & highway cycleway good
 				
@@ -213,7 +204,6 @@ public class BikeTravelDisutility implements TravelDisutility {
 			//log.info("no highway info");
 		}
 		
-		////////////////
 		
 		
 		
@@ -251,12 +241,7 @@ public class BikeTravelDisutility implements TravelDisutility {
 	
 	return disutility;
 	//return distance;
-	
-	
-
 	}
-
-
 
 
 	@Override
@@ -265,55 +250,3 @@ public class BikeTravelDisutility implements TravelDisutility {
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-//// dep code:
-//if (surface != null) {
-//	if      (surface.equals("paved")) 					{surfaceFactor= 100;} 
-//	else if (surface.equals("asphalt")) 				{surfaceFactor= 100;} 
-//	else if (surface.equals("cobblestone")) 			{surfaceFactor=  40;} //40
-//	else if (surface.equals("cobblestone:flattened"))	{surfaceFactor=  50;} 
-//	else if (surface.equals("sett")) 					{surfaceFactor=  50;} 
-//
-//	else if (surface.equals("concrete")) 				{surfaceFactor= 100;} 
-//	else if (surface.equals("concrete:lanes"))			{surfaceFactor=  95;}	
-//	else if (surface.equals("concrete:plates")) 		{surfaceFactor=  95;} 
-//	else if (surface.equals("paving_stones"))			{surfaceFactor=  80;} 
-//	else if (surface.equals("paving_stones:30")) 		{surfaceFactor=  80;} 
-//
-//	else if (surface.equals("unpaved")) 				{surfaceFactor=  60;} 
-//	else if (surface.equals("compacted"))				{surfaceFactor=  70;} 	
-//	else if (surface.equals("dirt")) 					{surfaceFactor=  30;} 
-//	else if (surface.equals("earth")) 					{surfaceFactor=  30;} 
-//	else if (surface.equals("fine_gravel"))				{surfaceFactor=  95;} 
-//
-//	else if (surface.equals("grass")) 					{surfaceFactor=  50;} 
-//	else if (surface.equals("grass_paver")) 			{surfaceFactor=  50;}	 
-//	else if (surface.equals("gravel")) 					{surfaceFactor=  60;} 
-//	else if (surface.equals("ground")) 					{surfaceFactor=  60;} 
-//	else if (surface.equals("ice"))						{surfaceFactor=  15;} 
-//
-//	else if (surface.equals("metal")) 					{surfaceFactor=  50;} 	 
-//	else if (surface.equals("mud")) 					{surfaceFactor=  30;}
-//	else if (surface.equals("pebblestone")) 			{surfaceFactor=  30;} 
-//	else if (surface.equals("salt")) 					{surfaceFactor=  15;} 
-//	else if (surface.equals("sand"))					{surfaceFactor=  10;} 
-//	else if (surface.equals("wood")) 					{surfaceFactor=  30;} 
-//	
-//	else if (surface.equals("bricks")) 					{surfaceFactor=  60;}
-//
-//	else {surfaceFactor= 50;
-////	log.info(surface + " surface not recognized");
-//	}
-//}

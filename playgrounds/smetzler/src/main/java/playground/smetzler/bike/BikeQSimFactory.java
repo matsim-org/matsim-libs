@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -18,12 +19,16 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import com.google.inject.Provider;
 
 public class BikeQSimFactory implements Provider<Mobsim> {
+	
+	@Inject Map<String, TravelTime> multiModalTravelTimes;
+
 	
 	@Inject Scenario scenario;
 	@Inject EventsManager eventsManager;
@@ -66,15 +71,8 @@ public class BikeQSimFactory implements Provider<Mobsim> {
 		bike.setPcuEquivalents(0.0);
 		modeVehicleTypes.put("bike", bike);
 
-//		VehicleType bicycles = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
-//		bicycles.setMaximumVelocity(15.0/3.6);
-//		bicycles.setPcuEquivalents(0.05);
-//		modeVehicleTypes.put("bicycle", bicycles);
-//
-//		VehicleType walks = VehicleUtils.getFactory().createVehicleType(Id.create("walk", VehicleType.class));
-//		walks.setMaximumVelocity(1.5);
-//		walks.setPcuEquivalents(0.10);  			// assumed pcu for walks is 0.1
-//		modeVehicleTypes.put("walk", walks);
+		new MultiModalQSimModule(scenario.getConfig(), this.multiModalTravelTimes).configure(qSim);
+
 
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 

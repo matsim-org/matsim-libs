@@ -2,7 +2,7 @@ package playground.smetzler.bike;
 
 
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.controler.PrepareForSim;
 
 
 public class BikeModule extends AbstractModule {
@@ -10,6 +10,7 @@ public class BikeModule extends AbstractModule {
 	@Override
 	public void install() {
 
+		bind(PrepareForSim.class).to(BikePrepareForSimImpl.class);
 		addTravelTimeBinding("bike").to(BikeTravelTime.class);
 
 		addTravelDisutilityFactoryBinding("bike").to(BikeTravelDisutilityFactory.class);
