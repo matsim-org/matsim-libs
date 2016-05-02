@@ -42,11 +42,13 @@ public class PlanPreprocessorRemoveWalks {
 		
 		for (Person person : population.getPersons().values()) {
 			Plan bestPlan = bestPlanSelector.selectPlan(person);
+			bestPlan.setScore(null);
 			
 			person.getPlans().clear();
 			
 			scenario.getPopulation().addPerson(person);
 			person.addPlan(bestPlan);
+			person.setSelectedPlan(bestPlan);
 		}	
 	}
 	

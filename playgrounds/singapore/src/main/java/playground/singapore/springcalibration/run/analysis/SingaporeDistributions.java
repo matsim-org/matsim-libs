@@ -134,7 +134,7 @@ public class SingaporeDistributions implements IterationEndsListener {
 						
 						if (leg.getTravelTime() > 120.0 * 60.0) {
 							log.warn("Agent " + plan.getPerson().getId().toString() + " has a huge travel time for mode " +  
-						leg.getMode() + ": distance " + leg.getRoute().getDistance() + " travel time" + leg.getTravelTime());
+						leg.getMode() + ": distance " + leg.getRoute().getDistance() + " travel time " + leg.getTravelTime() / 60.0 + " min");
 						}
 							
 						duration += leg.getTravelTime() / 60.0;												
