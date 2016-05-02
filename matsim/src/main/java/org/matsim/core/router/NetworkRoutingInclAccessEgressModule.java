@@ -120,7 +120,13 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final Coord fromCoord = fromFacility.getCoord();
 			if ( fromCoord != null ) { // otherwise the trip starts directly on the link; no need to bushwhack
 
-				Coord accessActCoord = network.getLinks().get( fromFacility.getLinkId() ).getToNode().getCoord() ;
+				Link link = network.getLinks().get( fromFacility.getLinkId() );
+				if ( link==null ) {
+					// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode.
+					link = NetworkUtils.getNearestLink(network, fromCoord) ;
+				}
+				
+				Coord accessActCoord = link.getToNode().getCoord() ;
 				// yy maybe use orthogonal distance instead?
 				Gbl.assertNotNull( accessActCoord );
 
@@ -149,7 +155,12 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final Coord toCoord = toFacility.getCoord();
 			if ( toCoord != null ) { // otherwise the trip ends directly on the link; no need to bushwhack
 
-				Coord egressActCoord = network.getLinks().get( egressActLinkId ).getToNode().getCoord() ;
+				Link link = network.getLinks().get( egressActLinkId );
+				if ( link==null ) {
+					// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode.
+					link = NetworkUtils.getNearestLink(network, toCoord) ;
+				}
+				Coord egressActCoord = link.getToNode().getCoord() ;
 				// yy maybe use orthogonal distance instead?
 				Gbl.assertNotNull( egressActCoord );
 
