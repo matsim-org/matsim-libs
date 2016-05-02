@@ -36,18 +36,22 @@ import org.matsim.core.network.NetworkImpl;
 public class IncidentControlerListener implements IterationStartsListener {
 	private static final Logger log = Logger.getLogger(IncidentControlerListener.class);
 
-	private String networkChangeEventsDirectory = null;
+	private List<String> networkChangeEventsFiles = null;
+	private int dayCounter = 0;
 	private Controler controler;	
 		
-	public IncidentControlerListener(Controler controler, String networkChangeEventsDirectory) {
-		this.networkChangeEventsDirectory = networkChangeEventsDirectory;
+	public IncidentControlerListener(Controler controler, List<String> networkChangeEventsFiles) {
+		this.networkChangeEventsFiles = networkChangeEventsFiles;
 		this.controler = controler;
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		
-		String nce = networkChangeEventsDirectory + "nce_" + event.getIteration() + ".xml.gz";
+		if (dayCounter == networkChangeEventsFiles.size()) {
+			dayCounter = 0;
+		}
+		String nce = networkChangeEventsFiles.get(dayCounter);
 
 		log.info("Setting network change events for the next iteration: " + nce);
 						
@@ -56,7 +60,7 @@ public class IncidentControlerListener implements IterationStartsListener {
 		NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		network.getNetworkChangeEvents().clear();
 		network.setNetworkChangeEvents(networkChangeEvents);
-		event.getServices().getConfig().network().setChangeEventsInputFile(networkChangeEventsDirectory + "nce_" + event.getIteration() + "xml.gz");
+		event.getServices().getConfig().network().setChangeEventsInputFile(nce);
 	}
 
 }
