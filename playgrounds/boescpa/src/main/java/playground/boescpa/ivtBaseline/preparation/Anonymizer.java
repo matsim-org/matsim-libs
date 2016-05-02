@@ -194,7 +194,8 @@ public class Anonymizer {
 
 	private void removeGender(Person person) {
 		if (person.getCustomAttributes().get("sex") != null) {
-			person.getCustomAttributes().put("sex", "x");
+			person.getCustomAttributes().put("sex", null);
+			//person.getCustomAttributes().put("sex", "x");
 		}
 	}
 
