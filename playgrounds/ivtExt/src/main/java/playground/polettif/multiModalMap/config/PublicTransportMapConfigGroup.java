@@ -47,6 +47,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	private static final String OUTPUT_NETWORK_FILE = "outputNetworkFile";
 	private static final String OUTPUT_SCHEDULE_FILE = "outputScheduleFile";
 	private static final String OUTPUT_STREET_NETWORK_FILE = "outputStreetNetworkFile";
+	private static final String LINK_DISTANCE_TOLERANCE = "linkDistanceTolerance";
 
 	public PublicTransportMapConfigGroup() {
 		super(GROUP_NAME);
@@ -69,7 +70,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 				"\t\tusing them are removed. One schedule transport mode can be mapped to multiple network transport \n" +
 				"\t\tmodes, the latter have to be separated by \",\". To map a schedule transport mode independently \n" +
 				"\t\tfrom the network use \"artificial\". Assignments are separated by \"|\" (case sensitive). \n" +
-				"Example: \"bus:bus,car|rail:rail,light_rail\"");
+				"\t\tExample: \"bus:bus,car|rail:rail,light_rail\"");
 		map.put(MODES_TO_KEEP_ON_CLEAN_UP,
 				"All links that do not have a transit route on them are removed, except the ones \n" +
 				"\t\tlisted in this set (typically only car). Separated by comma.");
@@ -151,7 +152,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 			}
 			ret += value.substring(1);
 		}
-		return this.modesToKeepOnCleanUp == null ? null : ret.substring(1);
+		return this.modeRoutingAssignment.size() == 0 ? "" : ret.substring(1);
 	}
 
 	@StringSetter(MODE_ROUTING_ASSIGNMENT)
@@ -224,6 +225,23 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	public void setNodeSearchRadius(double nodeSearchRadius) {
 		this.nodeSearchRadius = nodeSearchRadius;
 	}
+
+	/**
+	 * Defines the radius [meter] from a stop facility within nodes are searched.
+	 * Mainly a maximum value for performance.
+	 */
+	private double linkDistanceTolerance = 1.0;
+
+	@StringGetter(LINK_DISTANCE_TOLERANCE)
+	public double getLinkDistanceTolerance() {
+		return linkDistanceTolerance;
+	}
+
+	@StringSetter(LINK_DISTANCE_TOLERANCE)
+	public void setLinkDistanceTolerance(double linkDistanceTolerance) {
+		this.linkDistanceTolerance = linkDistanceTolerance;
+	}
+
 
 	/**
 	 * Defines which link attribute should be used for pseudo route
@@ -376,7 +394,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 
 	@StringGetter(OUTPUT_STREET_NETWORK_FILE)
 	public String getOutputStreetNetworkFile() {
-		return this.outputStreetNetworkFile == null ? "" : this.outputStreetNetworkFile;
+		return this.outputStreetNetworkFile == null ? null : this.outputStreetNetworkFile;
 	}
 
 	@StringSetter(OUTPUT_STREET_NETWORK_FILE)
@@ -406,6 +424,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	public Map<String, Integer> getMaxNClosestLinksByMode() {
 		return null;
 	}
+
 
 
 }

@@ -157,7 +157,7 @@ public class NetworkTools {
 	 * @param toleranceFactor [> 1]
 	 * @return the list of closest links
 	 */
-	public static List<Link> findNClosestLinksSoft(NetworkImpl networkImpl, Coord coord, double nodeSearchRadius, int maxNLinks, double maxLinkDistance, double toleranceFactor) {
+	public static List<Link> findClosestLinksSoftConstraints(NetworkImpl networkImpl, Coord coord, double nodeSearchRadius, int maxNLinks, double maxLinkDistance, double toleranceFactor) {
 		List<Link> closestLinks = new ArrayList<>();
 
 		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, nodeSearchRadius);
@@ -241,12 +241,14 @@ public class NetworkTools {
 	 * @param config	The config defining maxNnodes, search radius etc.
 	 * @return a Set of the closest links
 	 */
-	public static Set<Link> findNClosestLinksByMode(NetworkImpl networkImpl, Coord coord, String scheduleTransportMode, PublicTransportMapConfigGroup config) {
+	public static Set<Link> findClosestLinksByMode(NetworkImpl networkImpl, Coord coord, String scheduleTransportMode, PublicTransportMapConfigGroup config) {
 		Set<Link> closestLinks = new HashSet<>();
 
 		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, config.getNodeSearchRadius());
 		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
 		double incr = 0.0001; double tol=0.001;
+		double toleranceFactor = (config.getLinkDistanceTolerance() < 1 ? 1 : config.getLinkDistanceTolerance());
+		int maxNLinks = config.getMaxNClosestLinks();
 
 //		int maxNnodes = (config.getMaxNClosestLinksByMode().get(scheduleTransportMode) == null ? config.getMaxNClosestLinks() : config.getMaxNClosestLinksByMode().get(scheduleTransportMode));
 
@@ -279,6 +281,24 @@ public class NetworkTools {
 				}
 			}
 
+			int i = 1; double maxSoftDistance = 0;
+			for(Map.Entry<Double, Link> entry : closestLinksMap.entrySet()) {
+				if(i == maxNLinks) {
+					maxSoftDistance = (entry.getKey()+2*incr)*toleranceFactor;
+				}
+
+				// if the distance difference to the previous link is less than tol, add the link as well
+				if(i > maxNLinks && entry.getKey() > maxSoftDistance) {
+					break;
+				}
+				closestLinks.add(entry.getValue());
+				i++;
+			}
+
+			return closestLinks;
+		}
+
+			/*
 			int i = 1; double previousDistance = 2*tol;
 			for(Map.Entry<Double, Link> entry : closestLinksMap.entrySet()) {
 				// if the distance difference to the previous link is less than tol, add the link as well
@@ -296,6 +316,7 @@ public class NetworkTools {
 
 			return closestLinks;
 		}
+		*/
 	}
 
 	/**

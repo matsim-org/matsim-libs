@@ -120,7 +120,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 				if(config.getOutputStreetNetworkFile() != null) {
 					NetworkFilterManager filterManager = new NetworkFilterManager(network);
 					filterManager.addLinkFilter(new LinkFilterMode(Collections.singleton(TransportMode.car)));
-					new NetworkWriter(filterManager.applyFilters()).write(config.getOutputStreetNetworkFile());
+					Network streetNetwork = filterManager.applyFilters();
+					new NetworkWriter(streetNetwork).write(config.getOutputStreetNetworkFile());
 				}
 			} else {
 				log.info("No output paths defined, schedule and network are not written to files.");

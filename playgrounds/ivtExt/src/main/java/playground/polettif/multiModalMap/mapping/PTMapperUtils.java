@@ -84,7 +84,7 @@ public class PTMapperUtils {
 					// if no link candidates for the current stop and mode have been generated
 					if(modeLinkCandidates.size() == 0) {
 						// limits number of links, for all links within search radius use networkTools.findClosestLinks()
-						Set<Link> closestLinks = NetworkTools.findNClosestLinksByMode(networkImpl, stopFacility.getCoord(), scheduleTransportMode, config);
+						Set<Link> closestLinks = NetworkTools.findClosestLinksByMode(networkImpl, stopFacility.getCoord(), scheduleTransportMode, config);
 
 						// if no close links are nearby, a loop link is created and referenced to the facility.
 						if(closestLinks.size() == 0) {
@@ -141,7 +141,7 @@ public class PTMapperUtils {
 					// if no link candidates for the current stop and mode have been generated
 					if(modeLinkCandidates.size() == 0) {
 						// limits number of links, for all links within search radius use networkTools.findClosestLinks()
-						Set<Link> closestLinks = NetworkTools.findNClosestLinksByMode(networkImpl, stopFacility.getCoord(), scheduleTransportMode, config);
+						Set<Link> closestLinks = NetworkTools.findClosestLinksByMode(networkImpl, stopFacility.getCoord(), scheduleTransportMode, config);
 
 						// if no close links are nearby, a loop link is created and referenced to the facility.
 						if(closestLinks.size() == 0) {
