@@ -39,7 +39,7 @@ public class Worker extends Thread implements BasicEventHandler{
 
 	private static final Logger log = Logger.getLogger(Worker.class);
 
-	private final EventsManager e;
+	private final EventsManager eventsManager;
 	private final String eFile;
 	private final CyclicBarrier doComparison;
 
@@ -53,8 +53,8 @@ public class Worker extends Thread implements BasicEventHandler{
 		this.eFile = eFile1;
 		this.doComparison = doComparison;
 
-		this.e = EventsUtils.createEventsManager();
-		this.e.addHandler(this);
+		this.eventsManager = EventsUtils.createEventsManager();
+		this.eventsManager.addHandler(this);
 	}
 
 	/*package*/ String getEventsFile() {
@@ -64,7 +64,7 @@ public class Worker extends Thread implements BasicEventHandler{
 	@Override
 	public void run() {
 		try {
-			new MatsimEventsReader(this.e).readFile(this.eFile);
+			new MatsimEventsReader(this.eventsManager).readFile(this.eFile);
 			this.finished = true;
 			try {
 				this.doComparison.await();
@@ -140,7 +140,7 @@ public class Worker extends Thread implements BasicEventHandler{
 		Collections.sort(strings);
 		StringBuilder eventStr = new StringBuilder();
 		for (String str : strings) {
-			eventStr.append("_");
+			eventStr.append("|");
 			eventStr.append(str);
 		}
 		return eventStr.toString();

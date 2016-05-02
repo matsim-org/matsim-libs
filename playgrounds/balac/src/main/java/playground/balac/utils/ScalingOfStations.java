@@ -14,8 +14,8 @@ public class ScalingOfStations {
 		final BufferedReader readLink1 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/Stations_GreaterZurich.txt");
 
 		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/Stations_GreaterZurich_10%.txt");
-		String para = readLink1.readLine();
-		outLink.write(para);
+		//String para = readLink1.readLine();
+		//outLink.write(para);
 		outLink.newLine();
 		int total = 0;
 		String s = readLink1.readLine();

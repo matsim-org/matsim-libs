@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author thibautd
@@ -46,6 +47,7 @@ public class TripChoicesIdentifier implements ChoicesIdentifier<TripChoiceSituat
 	private final StageActivityTypes stages;
 	private final MainModeIdentifier modeIdentifier;
 	private final String destinationType;
+	private final Set<String> modes;
 
 	// incompatible with prism approach. Make configurable
 	private final boolean ignoreLastTrip = true;
@@ -54,11 +56,13 @@ public class TripChoicesIdentifier implements ChoicesIdentifier<TripChoiceSituat
 			final String destinationType,
 			final ActivityFacilities facilities,
 			final StageActivityTypes stages,
-			final MainModeIdentifier modeIdentifier) {
+			final MainModeIdentifier modeIdentifier,
+			final Set<String> modes ) {
 		this.modeIdentifier = modeIdentifier;
 		this.destinationType = destinationType;
 		this.facilities = facilities;
 		this.stages = stages;
+		this.modes = modes;
 	}
 
 	@Override
@@ -70,7 +74,7 @@ public class TripChoicesIdentifier implements ChoicesIdentifier<TripChoiceSituat
 		int i=0;
 		for ( TripStructureUtils.Trip t : trips ) {
 			if ( t.getDestinationActivity().getType().equals( destinationType ) &&
-					!modeIdentifier.identifyMainMode( t.getTripElements() ).equals( "other" ) ) {
+					modes.contains( modeIdentifier.identifyMainMode( t.getTripElements() ) ) ) {
 				if ( !ignoreLastTrip || i < trips.size() - 1 ) {
 					final Trip choice =
 							new Trip(

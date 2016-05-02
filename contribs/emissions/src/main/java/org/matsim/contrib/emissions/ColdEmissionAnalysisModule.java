@@ -21,22 +21,25 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
-import org.matsim.contrib.emissions.types.*;
+import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.contrib.emissions.types.HbefaColdEmissionFactor;
+import org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey;
+import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
+import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.vehicles.VehicleType;
 
 
 /**
@@ -109,31 +112,31 @@ public class ColdEmissionAnalysisModule {
 
 	public void calculateColdEmissionsAndThrowEvent(
 			Id<Link> coldEmissionEventLinkId,
-			Id<Person> personId,
-			Double eventTime,
-			Double parkingDuration,
+			Id<Vehicle> vehicleId,
+			double eventTime,
+			double parkingDuration,
             int distance_km,
-			String vehicleInformation) {
+			Id<VehicleType> vehicleTypeId) {
 
 		Map<ColdPollutant, Double> coldEmissions;
-		if(vehicleInformation == null){
-			throw new RuntimeException("Vehicle type description for person " + personId + "is missing. " +
+		if(vehicleTypeId == null){
+			throw new RuntimeException("Vehicle type description for vehicle " + vehicleId + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertString2Tuple(vehicleInformation);
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicleTypeId);
 		if (vehicleInformationTuple.getFirst() == null){
-			throw new RuntimeException("Vehicle category for person " + personId + " is not valid. " +
+			throw new RuntimeException("Vehicle category for vehicle " + vehicleId + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-        coldEmissions = getColdPollutantDoubleMap(personId, parkingDuration, vehicleInformationTuple, distance_km);
+        coldEmissions = getColdPollutantDoubleMap(vehicleId, parkingDuration, vehicleInformationTuple, distance_km);
 
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
 			coldEmissions = rescaleColdEmissions(coldEmissions);
 		}
-		Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, Id.create(personId, Vehicle.class), coldEmissions);
+		Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicleId, coldEmissions);
 		this.eventsManager.processEvent(coldEmissionEvent);
 	}
 
@@ -148,7 +151,7 @@ public class ColdEmissionAnalysisModule {
 		return rescaledColdEmissions;
 	}
 
-    private Map<ColdPollutant, Double> getColdPollutantDoubleMap(Id personId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km) {
+    private Map<ColdPollutant, Double> getColdPollutantDoubleMap(Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km) {
         Map<ColdPollutant, Double> coldEmissionsOfEvent = new HashMap<>();
 
         HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
@@ -176,16 +179,16 @@ public class ColdEmissionAnalysisModule {
         for (ColdPollutant coldPollutant : ColdPollutant.values()) {
             double generatedEmissions;
             if (distance_km == 1) {
-               generatedEmissions = getTableEmissions(personId, vehicleInformationTuple, 1, key, coldPollutant);
+               generatedEmissions = getTableEmissions(vehicleId, vehicleInformationTuple, 1, key, coldPollutant);
             } else {
-               generatedEmissions = getTableEmissions(personId, vehicleInformationTuple, 2, key, coldPollutant) - getTableEmissions(personId, vehicleInformationTuple, 1, key, coldPollutant);
+               generatedEmissions = getTableEmissions(vehicleId, vehicleInformationTuple, 2, key, coldPollutant) - getTableEmissions(vehicleId, vehicleInformationTuple, 1, key, coldPollutant);
             }
             coldEmissionsOfEvent.put(coldPollutant, generatedEmissions);
         }
         return coldEmissionsOfEvent;
     }
 
-    private double getTableEmissions(Id personId, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey key, ColdPollutant coldPollutant) {
+    private double getTableEmissions(Id<Vehicle> vehicleId, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey key, ColdPollutant coldPollutant) {
         key.setHbefaDistance(distance_km);
         double generatedEmissions;
 
@@ -205,7 +208,7 @@ public class ColdEmissionAnalysisModule {
 
                 if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
                     vehAttributesNotSpecifiedCnt++;
-                    logger.warn("Detailed vehicle attributes are not specified correctly for person " + personId + ": " +
+                    logger.warn("Detailed vehicle attributes are not specified correctly for vehicle " + vehicleId + ": " +
                             "`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
                     if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
                 }
@@ -216,12 +219,12 @@ public class ColdEmissionAnalysisModule {
         return generatedEmissions;
     }
 
-    private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertString2Tuple(String vehicleInformation) {
+    private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleTypeId2VehicleInformationTuple(Id<VehicleType> vehicleTypeId) {
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 		HbefaVehicleCategory hbefaVehicleCategory = null;
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
-		String[] vehicleInformationArray = vehicleInformation.split(";");
+		String[] vehicleInformationArray = vehicleTypeId.toString().split(";");
 
 		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
 			if(vehCat.toString().equals(vehicleInformationArray[0])){

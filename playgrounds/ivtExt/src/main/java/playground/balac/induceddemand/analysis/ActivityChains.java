@@ -12,11 +12,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ActivityChains {
 
@@ -33,7 +29,7 @@ public class ActivityChains {
 		Set<String> activityChains = new HashSet<String>();
 		Map<String, Integer> actPerType = new HashMap<String, Integer>();
 		
-		int[] sizeChain = new int[20];
+		int[] sizeChain = new int[30];
 		
 		stageTypes.addActivityTypes( new StageActivityTypesImpl( "pt interaction" ) );
 

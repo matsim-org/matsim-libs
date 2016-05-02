@@ -172,7 +172,7 @@ public class EnvironmentGenerator {
 							neighbour = MathUtility.gridPointDifference(cell, difference);
 						}while (environmentGrid.belongsToTacticalDestination(neighbour));
 					}
-					TacticalDestination tacticalDestination = new TacticalDestination(generateCoordinates(cells), cells);
+					TacticalDestination tacticalDestination = new TacticalDestination(generateCoordinates(cells), cells, environmentGrid.isStairsBorder(cells.get(0)));
 					markerConfiguration.addDestination(tacticalDestination);
 				}
 			}

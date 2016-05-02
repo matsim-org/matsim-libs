@@ -43,7 +43,7 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 	@Inject
 	AStarLandmarksFactory(PlanCalcScoreConfigGroup planCalcScoreConfigGroup, GlobalConfigGroup globalConfigGroup, Network network, Map<String, TravelTime> travelTime, Map<String, TravelDisutilityFactory> travelDisutilityFactory) {
 		//TODO: No guarantee that these are the same travel times for which the router is later requested.
-		this(network, travelDisutilityFactory.get(TransportMode.car).createTravelDisutility(travelTime.get(TransportMode.car), planCalcScoreConfigGroup), globalConfigGroup.getNumberOfThreads());
+		this(network, travelDisutilityFactory.get(TransportMode.car).createTravelDisutility(travelTime.get(TransportMode.car)), globalConfigGroup.getNumberOfThreads());
 	}
 
 	public AStarLandmarksFactory(Network network, final TravelDisutility fsttc) {

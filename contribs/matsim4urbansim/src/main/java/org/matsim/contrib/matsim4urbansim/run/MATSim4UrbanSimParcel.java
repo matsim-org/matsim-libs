@@ -156,8 +156,7 @@ class MATSim4UrbanSimParcel{
 			throw new RuntimeException("An error occured while initializing MATSim scenario ...") ;
 		}
 
-		scenario = ScenarioUtils.createScenario( connector.getConfig() );
-		ScenarioUtils.loadScenario(scenario);
+		scenario = ScenarioUtils.loadScenario( connector.getConfig() );
 		setControlerSettings();
 		// init Benchmark as default
 		benchmark = new Benchmark();
@@ -181,17 +180,19 @@ class MATSim4UrbanSimParcel{
 		cleanNetwork(network);
 
 		// get the data from UrbanSim (parcels and persons)
-		readFromUrbanSim();
+		prepareReadFromUrbanSim();
 
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
-		ActivityFacilitiesImpl parcels = null;
+//		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim parcels") ;
+		ActivityFacilitiesImpl parcels = (ActivityFacilitiesImpl) scenario.getActivityFacilities() ;
+
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunity locations (e.g. workplaces) for zones or parcels");
+		// yyyy parcels and opportunities should be come one ...
+		// yyyy ... and then become the matsim activity facilities.
 
 		// initializing parcels and zones from UrbanSim input
-		//readUrbansimParcelModel(parcels, zones);
 		if(isParcelMode){
-			parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 			// initializing parcels and zones from UrbanSim input
 			readFromUrbansim.readFacilitiesParcel(parcels, zones);
 			// initializing opportunity facilities (like work places) on parcel level
@@ -220,10 +221,7 @@ class MATSim4UrbanSimParcel{
 		runControler(zones, parcels, opportunities);
 	}
 
-	/**
-	 * 
-	 */
-	void readFromUrbanSim() {
+	private void prepareReadFromUrbanSim() {
 		// get the data from UrbanSim (parcels and persons)
 		if(getMATSim4UrbanSimControlerConfig().usingShapefileLocationDistribution()){
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),

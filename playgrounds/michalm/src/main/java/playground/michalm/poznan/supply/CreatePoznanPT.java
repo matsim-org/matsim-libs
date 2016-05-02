@@ -4,9 +4,8 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.*;
-import org.matsim.core.network.*;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -106,7 +105,7 @@ public class CreatePoznanPT
     {
         //String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/network_ver.4.net";
         //String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/network_ver.5_(33N).net";
-        String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/A ZTM.net";
+        String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/A {ZTM.net";
         String outDir = "d:/PP-rad/poznan/test/";
         String transitScheduleWithNetworkFile = outDir + "transitSchedule.xml";
         String transitNetworkFile = outDir + "pt_network.xml";

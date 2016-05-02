@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>playgrounds</artifactId>
 	<packaging>pom</packaging>
-	<version>0.8.0-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<name>MATSim-Playgrounds</name>
 
 	<scm>
@@ -20,8 +20,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
@@ -38,6 +38,19 @@
 					<argLine>-Xmx400m -Djava.awt.headless=true</argLine>
 					<enableAssertions>false</enableAssertions> <!-- this should be set to true, but we still have some tests that don't work otherwise... -->
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.19.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -73,14 +86,11 @@
 	<modules>
 		<module>agarwalamit</module>
 		<module>andreas</module>
-		<!--<module>anhorni</module>-->
 		<module>artemc</module>
 		<module>balac</module>
 		<module>balmermi</module>
 		<module>benjamin</module>
 		<module>bvitins</module>
-		<!--<module>christoph</module>-->
-		<!--<module>ciarif</module>-->
 		<module>cottbus</module>
 		<module>dgrether</module>
 		<module>dhisingh</module>
@@ -88,7 +98,7 @@
 		<module>droeder</module>
 		<module>duncan</module>
 		<module>dziemke</module>
-		<!--<module>fhuelsmann</module>-->
+		<module>farzadalemi</module>
 		<module>gregor</module>
 		<module>gunnar</module>
 		<module>hbecker</module>
@@ -101,12 +111,9 @@
 		<module>juliakern</module>
 		<module>kai</module>
 		<module>kturner</module>
-		<!--<module>lcrociani</module>-->
+		<module>lcrociani</module>
 		<module>lkroeger</module>
-		<module>ma</module>
 		<module>michalm</module>
-		<module>mkillat</module>
-		<module>boku</module>
 		<module>mrieser</module>
 		<module>muelleki</module>
 		<module>mzilske</module>
@@ -123,16 +130,14 @@
 		<module>smeintjes</module>
 		<module>smetzler</module>
 		<module>southAfrica</module>
-		<!--<module>staheale</module>-->
 		<module>stockholm</module>
 		<module>telaviv</module>
 		<module>thibautd</module>
 		<module>tthunig</module>
 		<module>toronto</module>
-		<module>wisinee</module>
 		<module>wrashid</module>
-		<module>yalcin</module>
 		<module>ucsb</module>
+		<module>vaadin-example</module>
 		<module>vsptelematics</module>
 		<module>vsp</module>
 		<module>vspshk</module>
@@ -163,14 +168,14 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>

@@ -76,7 +76,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 * Tests whether an absolute change in the freespeed really can be seen in the link's travel time
 	 */
 	public void testFreespeedChangeAbsolute() {
-        for (LinkFactory lf : linkFactories(15 * 60, 37 * 4)) {
+        for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
     		final NetworkImpl network = NetworkImpl.createNetwork();
     		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
     		nf.setLinkFactory(lf);
@@ -119,7 +119,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 * Tests whether a relative change in the freespeed really can be seen in the link's travel time
 	 */
 	public void testFreespeedChangeRelative() {
-        for (LinkFactory lf : linkFactories(15 * 60, 37 * 4)) {
+        for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
     		final NetworkImpl network = NetworkImpl.createNetwork();
     		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
     		nf.setLinkFactory(lf);
@@ -162,7 +162,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 * Tests how multiple freespeed changes interact with each other on the link.
 	 */
 	public void testMultipleFreespeedChanges() {
-        for (LinkFactory lf : linkFactories(15 * 60, 30 * 4)) {
+        for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
     		final NetworkImpl network = NetworkImpl.createNetwork();
     		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
     		nf.setLinkFactory(lf);
@@ -259,7 +259,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 * Tests whether an absolute change to the flow capacity really can be observed on the link .
 	 */
 	public void testFlowCapChangeAbsolute() {
-        for (LinkFactory lf : linkFactories(15 * 60, 30 * 4)) {
+        for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
     		final NetworkImpl network = NetworkImpl.createNetwork();
     		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
     		nf.setLinkFactory(lf);
@@ -272,7 +272,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     
     		// test base values
     		assertEquals(3600.0, link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(1.0, link.getFlowCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+    		assertEquals(1.0, link.getFlowCapacityPerSec(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
     
     		// add an absolute change
     		NetworkChangeEvent change = new NetworkChangeEvent(7*3600.0);
@@ -282,8 +282,8 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     
     		// do the tests
     		assertEquals(3600.0, link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(1.0, link.getFlowCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
-    		assertEquals(2.0, link.getFlowCapacity(7*3600), EPSILON);
+    		assertEquals(1.0, link.getFlowCapacityPerSec(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
+    		assertEquals(2.0, link.getFlowCapacityPerSec(7*3600), EPSILON);
     
     		// test derived values
     		// TODO test flowcap by sending vehicles through the link, this requires to create a queuenetwork from this time-variant network
@@ -296,7 +296,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	 * Tests whether an absolute change to the number of lanes really can be observed on the link.
 	 */
 	public void testLanesChangeAbsolute() {
-        for (LinkFactory lf : linkFactories(15 * 60, 30 * 4)) {
+        for (LinkFactory lf : linkFactories(15 * 60, 30 * 3600)) {
     		final NetworkImpl network = NetworkImpl.createNetwork();
     		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
     		nf.setLinkFactory(lf);
@@ -326,11 +326,11 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 	}
 
 
-    static LinkFactory[] linkFactories(int interval, int intervalCount)
+    static LinkFactory[] linkFactories(int interval, int maxTime)
     {
         return new LinkFactory[] {
             new VariableIntervalTimeVariantLinkFactory(),
-            new FixedIntervalTimeVariantLinkFactory(interval, intervalCount)
+            new FixedIntervalTimeVariantLinkFactory(interval, maxTime)
         };
     };
     

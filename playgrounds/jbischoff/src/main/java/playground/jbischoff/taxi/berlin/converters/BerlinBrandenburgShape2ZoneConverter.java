@@ -6,13 +6,12 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.zone.*;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.michalm.berlin.BerlinZoneUtils;
-import playground.michalm.zone.Zone;
-import playground.michalm.zone.Zones;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;

@@ -22,10 +22,7 @@ package org.matsim.core.scoring;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -54,22 +51,13 @@ public class EventsToScoreTest extends MatsimTestCase {
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsManager events = EventsUtils.createEventsManager();
-
-		EventsToScore e2s = EventsToScore.createWithScoreUpdating(scenario, sfFactory, events);
-
+		EventsToScore e2s = EventsToScore.createWithoutScoreUpdating(scenario, sfFactory, events);
+		e2s.beginIteration(0);
 		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4));
-
-		assertEquals("exactly one instance should have been requested.", 1, sfFactory.counter);
-		assertEquals(0, sfFactory.sf.cntEndAct);
-		assertEquals(0, sfFactory.sf.cntStartAct);
-		assertEquals(0, sfFactory.sf.cntEndLeg);
-		assertEquals(0, sfFactory.sf.cntStartLeg);
-		assertEquals(0, sfFactory.sf.cntFinish);
-		assertEquals(0, sfFactory.sf.cntGetScore);
-		assertEquals(0, sfFactory.sf.cntReset);
-		assertEquals(0, sfFactory.sf.cntStuck);
-		assertEquals(1, sfFactory.sf.cntMoney);
+		e2s.finish();
+		assertEquals(3.4, e2s.getAgentScore(person.getId()));
 	}
+
 	public void testMsaAveraging() {
 		Config config = ConfigUtils.createConfig() ;
 		
@@ -93,7 +81,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 
 		for ( int mockIteration = config.controler().getFirstIteration() ; mockIteration <= config.controler().getLastIteration() ; mockIteration++ ) {
 
-			events.resetHandlers(mockIteration) ;
+			e2s.beginIteration(mockIteration); ;
 
 			// generating a money event with amount mockIteration-98 (i.e. 1, 2, 3, 4):
 			events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), mockIteration-98 ));
@@ -156,86 +144,23 @@ public class EventsToScoreTest extends MatsimTestCase {
 
 	private static class MockScoringFunctionFactory implements ScoringFunctionFactory {
 
-		protected final MockScoringFunction sf = new MockScoringFunction();
-		protected int counter = 0;
-
-		public MockScoringFunctionFactory() {
-			// empty public constructor for private inner class
-		}
-
 		@Override
 		public ScoringFunction createNewScoringFunction(final Person person) {
-			this.counter++;
-			return this.sf;
-		}
-
-	}
-
-	private static class MockScoringFunction extends ScoringFunctionAdapter {
-
-		protected int cntMoney = 0;
-		protected int cntStuck = 0;
-		protected int cntEndAct = 0;
-		protected int cntEndLeg = 0;
-		protected int cntStartLeg = 0;
-		protected int cntStartAct = 0;
-		protected int cntFinish = 0;
-		protected int cntGetScore = 0;
-		protected int cntReset = 0;
-
-		public MockScoringFunction() {
-			// empty public constructor for private inner class
-		}
-
-		@Override
-		public void addMoney(final double amount) {
-			this.cntMoney++;
-		}
-
-		@Override
-		public void agentStuck(final double time) {
-			this.cntStuck++;
-		}
-
-		@Override
-		public void endLeg(final double time) {
-			this.cntEndLeg++;
-		}
-
-		@Override
-		public void finish() {
-			this.cntFinish++;
-		}
-
-		@Override
-		public double getScore() {
-			this.cntGetScore++;
-			return 0;
-		}
-
-        public void reset() {
-			this.cntReset++;
-		}
-
-		@Override
-		public void startActivity(final double time, final Activity act) {
-			this.cntStartAct++;
-		}
-
-		@Override
-		public void startLeg(final double time, final Leg leg) {
-			this.cntStartLeg++;
-		}
-
-		@Override
-		public void endActivity(double time, Activity activity) {
-			this.cntEndAct++;
-		}
-
-		@Override
-		public void handleEvent(Event event) {
-			// TODO Auto-generated method stub
-			
+			SumScoringFunction sumScoringFunction = new SumScoringFunction();
+			sumScoringFunction.addScoringFunction(new SumScoringFunction.MoneyScoring() {
+				double money = 0.0;
+				@Override
+				public void addMoney(double amount) {
+					money += amount;
+				}
+				@Override
+				public void finish() {}
+				@Override
+				public double getScore() {
+					return money;
+				}
+			});
+			return sumScoringFunction;
 		}
 
 	}

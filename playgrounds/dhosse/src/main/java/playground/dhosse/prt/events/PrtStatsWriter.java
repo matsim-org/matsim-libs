@@ -1,10 +1,7 @@
 package playground.dhosse.prt.events;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -12,24 +9,23 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.minibus.genericUtils.RecursiveStatsContainer;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.*;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.dhosse.prt.PrtConfigGroup;
+import playground.dhosse.prt.PrtConfig;
 import playground.michalm.taxi.data.TaxiRank;
 
 public class PrtStatsWriter {
 	
 	private Logger log = Logger.getLogger(PrtStatsWriter.class);
 	
-	private PrtConfigGroup config;
+	private PrtConfig config;
 	private CostContainerHandler costHandler;
 	private PrtRankAndPassengerStatsHandler rankHandler;
 	
 	private String path;
 	
-	public PrtStatsWriter(PrtConfigGroup config, CostContainerHandler costHandler, PrtRankAndPassengerStatsHandler rankHandler){
+	public PrtStatsWriter(PrtConfig config, CostContainerHandler costHandler, PrtRankAndPassengerStatsHandler rankHandler){
 		
 		this.config = config;
 		this.costHandler = costHandler;

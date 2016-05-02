@@ -23,8 +23,6 @@ package org.matsim.core.router;
 import java.util.Arrays;
 import java.util.List;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -36,11 +34,10 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 
 public final class PseudoTransitRoutingModule implements RoutingModule {
@@ -49,7 +46,7 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 
 	private final Network network;
-	private final ModeRouteFactory routeFactory;
+	private final RouteFactoryImpl routeFactory;
 	private final LeastCostPathCalculator routeAlgo;
 	private final double speedFactor;
 	private final double beelineDistanceFactor;
@@ -61,7 +58,7 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 			final LeastCostPathCalculator routeAlgo,
 			final double speedFactor,
 			double beelineDistanceFactor,
-			final ModeRouteFactory routeFactory) {
+			final RouteFactoryImpl routeFactory) {
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.speedFactor = speedFactor;
@@ -83,8 +80,8 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 		double travTime = routeLeg(
 				person,
 				newLeg,
-				new FacilityWrapper( fromFacility ),
-				new FacilityWrapper( toFacility ),
+				new FacilityWrapperActivity( fromFacility ),
+				new FacilityWrapperActivity( toFacility ),
 				departureTime);
 
 		// otherwise, information may be lost
@@ -102,75 +99,6 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 	public String toString() {
 		return "[LegRouterWrapper: mode="+mode+"]";
 	}
-
-	private static class FacilityWrapper implements Activity {
-		private final Facility wrapped;
-
-		public FacilityWrapper(final Facility toWrap) {
-			this.wrapped = toWrap;
-		}
-
-		@Override
-		public double getEndTime() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setEndTime(double seconds) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public String getType() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setType(String type) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public Coord getCoord() {
-			return wrapped.getCoord();
-		}
-
-		@Override
-		public double getStartTime() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setStartTime(double seconds) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public double getMaximumDuration() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setMaximumDuration(double seconds) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public Id<Link> getLinkId() {
-			return wrapped.getLinkId();
-		}
-
-		@Override
-		public Id<ActivityFacility> getFacilityId() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public String toString() {
-			return "[FacilityWrapper: wrapped="+wrapped+"]";
-		}
-	}
-
 
 	public double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
 		int travTime = 0;
@@ -192,9 +120,9 @@ public final class PseudoTransitRoutingModule implements RoutingModule {
 			route.setTravelTime(travTime);
 			double dist = 0;
 			if ((fromAct.getCoord() != null) && (toAct.getCoord() != null)) {
-				dist = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord());
+				dist = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord());
 			} else {
-				dist = CoordUtils.calcDistance(fromLink.getCoord(), toLink.getCoord());
+				dist = CoordUtils.calcEuclideanDistance(fromLink.getCoord(), toLink.getCoord());
 			}
 			route.setDistance(dist * beelineDistanceFactor);
 			leg.setRoute(route);

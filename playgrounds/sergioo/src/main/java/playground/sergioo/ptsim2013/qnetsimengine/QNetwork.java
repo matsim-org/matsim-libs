@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNode;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
@@ -53,7 +53,6 @@ public class QNetwork implements NetsimNetwork {
 
 	private final NetsimNetworkFactory<QNode, ? extends PTQLink> queueNetworkFactory;
 	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-	private final 	AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 	
 	private StopStopTime stopStopTime;
 	
@@ -124,11 +123,4 @@ public class QNetwork implements NetsimNetwork {
 	public NetsimNode getNetsimNode(final Id<Node> id) {
 		return this.nodes.get(id);
 	}
-
-	@Override
-	public  AgentSnapshotInfoFactory getAgentSnapshotInfoFactory(){
-		return this.snapshotInfoFactory;
-	}
-
-
 }

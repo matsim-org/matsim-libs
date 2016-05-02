@@ -65,7 +65,6 @@ public class EventFilterAgents {
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
 
 		log.info("Reading network xml file...");
 		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario.getNetwork());

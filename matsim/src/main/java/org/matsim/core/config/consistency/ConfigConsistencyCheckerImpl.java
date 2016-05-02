@@ -27,6 +27,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -50,37 +51,8 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		this.checkTravelTimeCalculationRoutingConfiguration(config);
 		this.checkLaneDefinitionRoutingConfiguration(config);
 		this.checkPlanCalcScore(config);
-		this.checkMobsimSelection(config);
+		this.checkTransit(config);
 	}
-
-	/**
-	 * Design comments:<ul>
-	 * <li> This is so complicated since currently it is possible to define some mobsim in the controler config module
-	 * but still run the jdeqsim.  The logical behavior would be to run the defined mobsim and to ignore the jdeqsim.
-	 * But this would silently change the behavior for people who have used it in that way.  If anybody finds this 
-	 * after, say, a year from now, it could/should be simplified (and made more restrictive).  kai, mar'12
-	 * </ul>
-	 */
-	private void checkMobsimSelection(final Config config) {
-		if ( config.getModule("JDEQSim")!=null) {
-			if ( !config.controler().getMobsim().equalsIgnoreCase(MobsimType.JDEQSim.toString()) ) {
-				throw new RuntimeException( "config module for JDEQSim defined but other mobsim selected in controler config" +
-						" module; aborting since there is no way to fix this AND remain backwards compatible.\n" +
-						" Either select jdeqsim in the controler config OR remove the jdeqsim config module.") ;
-			}
-		}
-
-		// older checks, valid for the implicit mobsim selection by putting in the corresponding config group.
-		if ( config.getModule("JDEQSim")!=null ) {
-			if (!config.controler().getMobsim().equals(MobsimType.JDEQSim.toString())) {
-				throw new RuntimeException("You have a 'JDEQSim' config group, but have not set " +
-						"the mobsim type to 'JDEQSim'. Aborting...");
-			}
-		}
-			
-		
-	}
-
 
 	/*package*/ void checkPlanCalcScore(final Config c) {
 		if (c.planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() > 0) {
@@ -101,9 +73,15 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		}
 		ActivityParams ptAct = c.planCalcScore().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE) ;
 		if ( ptAct != null ) {
-			if ( ptAct.getClosingTime()!=0. ) {
+//			if ( ptAct.getClosingTime()!=0. && ptAct.getClosingTime()!=Time.UNDEFINED_TIME ) {
+//				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams()==true ) {
+//					throw new RuntimeException("setting the pt interaction activity closing time away from 0/undefined is not allowed because it breaks pt scoring." +
+//					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
+//				}
+//			}
+			if ( ptAct.isScoringThisActivityAtAll() ) {
 				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams()==true ) {
-					throw new RuntimeException("setting the pt interaction activity closing time away from 0 is not allowed because it breaks pt scoring." +
+					throw new RuntimeException("Scoring " + ptAct.getActivityType() + " is not allowed because it breaks pt scoring." +
 					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
 				}
 			}
@@ -164,8 +142,13 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		if ((config.qsim().isUseLanes()) &&
 		    !config.controler().isLinkToLinkRoutingEnabled()){
 		  	log.warn("Using lanes without enabling linktolinkrouting might not lead to expected simulation results");
-		   }
+		}
 	}
 
+	private void checkTransit(final Config config) {
+		if ( config.transit().isUseTransit() && config.transit().getVehiclesFile()==null ) {
+			log.warn("Your are using Transit but have not provided a transit vehicles file. This most likely won't work.");
+		}
+	}
 
 }

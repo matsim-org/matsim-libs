@@ -41,7 +41,7 @@ public class CalcMileage {
         NumericMatrix m = new NumericMatrix();
         VisumOMatrixReader.read(m, "/home/johannes/gsv/miv-matrix/deploy/r33883/modena/miv.txt");
         ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.gk3.geojson",
-                "NO");
+                "NO", null);
 
         DistanceCalculator distCalc = CartesianDistanceCalculator.getInstance();
 

@@ -51,10 +51,13 @@ import playground.vsp.congestion.events.CongestionEvent;
 
 /** 
  * 
- * 1) For each agent leaving a link a total delay is calculated as the difference of actual leaving time and the leaving time according to freespeed.
- * 2) The delay due to the flow capacity of that link is computed and marginal congestion events are thrown, indicating the affected agent, the causing agent and the delay in sec.
- * 3) The remaining delay leads back to the storage capacity of downstream links. In this implementation the causing agent for a delay resulting from the storage capacity is assumed to be the agent who caused the spill-back at the bottleneck link.
- * That is, the affected agent keeps the delay caused by the storage capacity constraint until he/she reaches the bottleneck link and (hopefully) identifies there the agent who is causing the spill-backs.
+ * For each agent leaving a link: Compute a delay as the difference between free speed travel time and actual travel time.
+ * 
+ * In this implementation, the delay is partially allocated to ALL agents ahead in the flow queue.
+ * Each agent has to pay for 1 / c_flow.
+ * 
+ * Spill-back effects are taken into account by saving the delay resulting from the storage capacity constraint
+ * for later when possibly reaching the bottleneck link
  * 
  * @author ikaddoura
  *

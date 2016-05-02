@@ -49,10 +49,7 @@ import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryModule;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -262,10 +259,10 @@ public class GAPScenarioRunner {
 				addTravelDisutilityFactoryBinding(TransportMode.ride)
 						.toInstance(
 								new RandomizingTimeDistanceTravelDisutility.Builder(
-										TransportMode.ride));
+										TransportMode.ride, config.planCalcScore()));
 				addRoutingModuleBinding(TransportMode.ride)
 						.toProvider(
-								new TripRouterFactoryModule.NetworkRoutingModuleProvider(
+								new NetworkRouting(
 										TransportMode.ride));
 
 			}
@@ -371,10 +368,10 @@ public class GAPScenarioRunner {
 						addTravelDisutilityFactoryBinding(mode)
 								.toInstance(
 										new RandomizingTimeDistanceTravelDisutility.Builder(
-												mode));
+												mode, controler.getConfig().planCalcScore()));
 						addRoutingModuleBinding(mode)
 								.toProvider(
-										new TripRouterFactoryModule.NetworkRoutingModuleProvider(
+										new NetworkRouting(
 												mode));
 
 					} else if (mode.equals(TransportMode.walk)) {
@@ -385,10 +382,10 @@ public class GAPScenarioRunner {
 						addTravelDisutilityFactoryBinding(mode)
 								.toInstance(
 										new RandomizingTimeDistanceTravelDisutility.Builder(
-												mode));
+												mode, controler.getConfig().planCalcScore()));
 						addRoutingModuleBinding(mode)
 								.toProvider(
-										new TripRouterFactoryModule.NetworkRoutingModuleProvider(
+										new NetworkRouting(
 												mode));
 
 					}

@@ -36,7 +36,7 @@ public class RideToPTChange {
 				if (pe instanceof Leg) {
 					if (((Leg) pe).getMode().equals("ride")) {
 						
-						double distance = CoordUtils.calcDistance(network.getLinks().get(((Leg) pe).getRoute().getStartLinkId()).getCoord(), network.getLinks().get(((Leg) pe).getRoute().getEndLinkId()).getCoord());
+						double distance = CoordUtils.calcEuclideanDistance(network.getLinks().get(((Leg) pe).getRoute().getStartLinkId()).getCoord(), network.getLinks().get(((Leg) pe).getRoute().getEndLinkId()).getCoord());
 						
 						((Leg) pe).setMode("pt");
 						GenericRouteImpl route = new GenericRouteImpl(((Leg) pe).getRoute().getStartLinkId(), ((Leg) pe).getRoute().getEndLinkId());

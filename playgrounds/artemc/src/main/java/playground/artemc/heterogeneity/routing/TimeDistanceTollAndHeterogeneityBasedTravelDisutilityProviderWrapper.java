@@ -28,7 +28,8 @@ public class TimeDistanceTollAndHeterogeneityBasedTravelDisutilityProviderWrappe
 			@Override
 			public TravelDisutilityFactory get() {
 				RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-				TimeDistanceTollAndHeterogeneityBasedTravelDisutility.Builder travelDisutilityFactory = new TimeDistanceTollAndHeterogeneityBasedTravelDisutility.Builder(scheme);
+				TimeDistanceTollAndHeterogeneityBasedTravelDisutility.Builder travelDisutilityFactory = 
+						new TimeDistanceTollAndHeterogeneityBasedTravelDisutility.Builder(scheme, scenario.getConfig().planCalcScore());
 				travelDisutilityFactory.setSigma(rpConfig.getRoutingRandomness());
 				return travelDisutilityFactory;
 			}

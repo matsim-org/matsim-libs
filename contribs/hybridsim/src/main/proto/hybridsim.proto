@@ -1,0 +1,206 @@
+/****************************************************************************/
+// SUMO, Simulation of Urban MObility; see http://sumo.dlr.de/
+// Copyright (C) 2001-2016 DLR (http://www.dlr.de/) and contributors
+/****************************************************************************/
+//
+//   This file is part of SUMO.
+//   SUMO is free software: you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation, either version 3 of the License, or
+//   (at your option) any later version.
+//
+/****************************************************************************/
+
+syntax = "proto3";
+
+package hybridsim;
+
+option java_multiple_files = false;
+option java_package = "org.matsim.contrib.hybridsim.proto";
+option java_outer_classname = "HybridSimProto";
+
+service HybridSimulation {
+    rpc simulatedTimeInerval(LeftClosedRightOpenTimeInterval) returns (Empty) {}
+    rpc transferAgent(Agent) returns (Boolean) {}
+    rpc receiveTrajectories(Empty) returns (Trajectories) {}
+    rpc retrieveAgents(Empty) returns (Agents) {}
+    rpc shutdown(Empty) returns (Empty) {}
+    rpc initScenario(Scenario) returns (Empty) {}
+}
+message Scenario {
+    int32 seed = 1;
+    Environment environment = 2;
+    repeated Goal goal = 3;
+    repeated Group group = 4;
+    repeated Source source = 5;
+    Model model = 6;
+    repeated Router router = 7;
+}
+
+message Router {
+    int32 router_id = 1;
+    string description = 2;
+}
+
+message Model {
+    enum Type { Gompertz = 0;}
+    Type type = 1;
+    Gompertz gompertz = 2;
+}
+
+message Gompertz {
+    string solver = 1;
+    double stepsize = 2;
+    int32 exit_crossing_strategy = 3;
+    bool linked_cells_enabled = 4;
+    double cell_size = 5;
+    Force force_ped = 6;
+    Force force_wall = 7;
+    AgentParams agent_params = 8;
+}
+
+message AgentParams {
+    Distribution v0 = 1;
+    Distribution b_max = 2;
+    Distribution b_min = 3;
+    Distribution a_min = 4;
+    Distribution tau = 5;
+    Distribution atau = 6;
+    Distribution v0_upstairs = 7;
+    Distribution v0_downstairs = 8;
+    Distribution v0_escalator_up = 9;
+    Distribution v0_escalator_down = 10;
+    Distribution v0_idle_escalator_up = 11;
+    Distribution v0_idle_escalator_down = 12;
+    Distribution T = 13;
+}
+
+message Distribution {
+    double mu = 1;
+    double sigma = 2;
+}
+
+message Force {
+    double nu = 1;
+    double a = 2;
+    double b = 3;
+    double c = 4;
+}
+
+message Group {
+    int32 group_id = 1;
+    int32 room_id = 2;
+    int32 subroom_id = 3;
+    int32 number = 4;
+    int32 router_id = 5;
+    int32 agent_parameter_id = 6;
+    Coordinate min_x_y = 7;
+    Coordinate max_x_y = 8;
+}
+
+message Source {
+    int32 id = 1;
+    int32 frequency = 2;
+    int32 max_agents = 3;
+    int32 group_id = 4;
+    string caption = 5;
+
+}
+
+
+
+message Goal {
+    int32 id = 1;
+    bool final = 2;
+    string caption = 3;
+    Polygon p = 4;
+}
+
+message Environment {
+    repeated Room room = 1;
+    repeated Transition transition = 2;
+}
+
+message Transition {
+    int32 id = 1;
+    string caption = 2;
+    string type = 3;
+    int32 room1_id = 4;
+    int32 subroom1_id = 5;
+    int32 room2_id = 6;
+    int32 subroom2_id = 7;
+    Coordinate vert1 = 8;
+    Coordinate vert2 = 9;
+}
+
+
+message Room {
+    int32 id = 1;
+    string caption = 2;
+    repeated Subroom subroom = 3;
+}
+
+
+message Subroom {
+    int32 id = 1;
+    int32 closed = 2;
+    string class = 3;
+    repeated Polygon polygon = 4;
+}
+
+
+message Polygon {
+    string caption = 1;
+    repeated Coordinate coordinate = 2;
+}
+
+message LeftClosedRightOpenTimeInterval {
+    double fromTimeIncluding = 1;
+    double toTimeExcluding = 2;
+}
+
+message Empty {}
+
+message Boolean {
+    bool val = 1;
+}
+
+message Agent {
+    string id = 1;
+    Coordinate enterLocation = 2;
+    Coordinate leaveLocation = 3;
+    double x = 4;
+    double y = 5;
+    Leg leg = 6;
+}
+
+message Leg {
+    repeated Link link = 15;
+}
+
+message Link {
+    Coordinate centroid = 1;
+    string id = 2;
+}
+
+message Coordinate {
+    double x = 1;
+    double y = 2;
+}
+
+message Agents {
+    repeated Agent agents = 1;
+}
+
+message Trajectory {
+    string id = 1;
+    double x = 2;
+    double y = 3;
+    double spd = 4;
+    double phi = 5; //TODO: report vx / vy instead of spd and phi
+    string linkId = 6;
+}
+
+message Trajectories {
+    repeated Trajectory trajectories = 1;
+}

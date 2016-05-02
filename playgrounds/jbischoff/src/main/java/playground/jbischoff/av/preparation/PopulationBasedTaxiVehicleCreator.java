@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,19 +37,15 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
 
 import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
+import playground.jbischoff.utils.JbUtils;
 
 /**
  * @author  jbischoff
@@ -60,10 +55,17 @@ public class PopulationBasedTaxiVehicleCreator
 	{
 
 
-	private String networkFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/networkc.xml.gz";
-	private String shapeFile = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/Planungsraum.shp";
-	private String vehiclesFilePrefix = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/scenario/subscenarios/mobhubs/taxi_vehicles_";
-	private String populationData = "C:/Users/Joschka/Documents/shared-svn/projects/audi_av/shp/bevoelkerungInnenring.txt";
+//	private String networkFile = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/network_noptvw.xml";
+//	private String shapeFile = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/zones_via.shp";
+//	private String vehiclesFilePrefix = "../../../shared-svn/projects/vw_rufbus/av_simulation/vehicles/v";
+//	private String populationData = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/pop.csv";
+//	
+    
+	private String networkFile = "../../../shared-svn/projects/audi_av/scenario/networkc.xml.gz";
+	private String shapeFile = "../../../shared-svn/projects/audi_av/shp/Planungsraum.shp";
+	private String vehiclesFilePrefix = "../../../shared-svn/projects/audi_av/scenario/flowpaper/vehicles/taxi_vehicles_";
+	private String populationData = "../../../shared-svn/projects/audi_av/shp/bevoelkerung.txt";
+	
 	
 	private Scenario scenario ;
 	Map<String,Geometry> geometry;
@@ -73,7 +75,7 @@ public class PopulationBasedTaxiVehicleCreator
 
 	
 	public static void main(String[] args) {
-		for (int i = 4000; i<8001 ; i=i+500 ){
+		for (int i = 1100; i<=11000 ; i=i+1100 ){
 			PopulationBasedTaxiVehicleCreator tvc = new PopulationBasedTaxiVehicleCreator();
 			System.out.println(i);
 			tvc.run(i);
@@ -84,7 +86,8 @@ public class PopulationBasedTaxiVehicleCreator
 				
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-		this.geometry = readShapeFileAndExtractGeometry(shapeFile);	
+		this.geometry = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "SCHLUESSEL");	
+//		this.geometry = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "ID"); //wolfsburg	
 		this.wrs = new WeightedRandomSelection<>();
         readPopulationData();
 	}
@@ -92,7 +95,8 @@ public class PopulationBasedTaxiVehicleCreator
 	private void readPopulationData() {
 		
 		TabularFileParserConfig config = new TabularFileParserConfig();
-        config.setDelimiterTags(new String[] {"\t"});
+        config.setDelimiterTags(new String[] {"\t"}); //berlin
+//        config.setDelimiterTags(new String[] {","}); //wolfsburg
         config.setFileName(populationData);
         config.setCommentTags(new String[] { "#" });
         new TabularFileParser().parse(config, new TabularFileHandler() {
@@ -119,27 +123,7 @@ public class PopulationBasedTaxiVehicleCreator
 		new VehicleWriter(vehicles).write(vehiclesFilePrefix+amount+".xml.gz");
 	}
 	
-	static Map<String,Geometry> readShapeFileAndExtractGeometry(String filename){
-		
-		Map<String,Geometry> geometry = new TreeMap<>();	
-		for (SimpleFeature ft : ShapeFileReader.getAllFeatures(filename)) {
-			
-				GeometryFactory geometryFactory= new GeometryFactory();
-				WKTReader wktReader = new WKTReader(geometryFactory);
 
-				try {
-					Geometry geo = wktReader.read((ft.getAttribute("the_geom")).toString());
-					String lor = ft.getAttribute("SCHLUESSEL").toString();
-					geometry.put(lor, geo);
-				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-			 
-		}	
-		return geometry;
-	}
 
 	
 }

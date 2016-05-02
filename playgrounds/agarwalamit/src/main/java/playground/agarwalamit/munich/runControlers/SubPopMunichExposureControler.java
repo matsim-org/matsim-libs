@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -50,9 +52,6 @@ import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTrave
 import playground.benjamin.scenarios.munich.exposure.GridTools;
 import playground.benjamin.scenarios.munich.exposure.InternalizeEmissionResponsibilityControlerListener;
 import playground.benjamin.scenarios.munich.exposure.ResponsibilityGridTools;
-import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
-
-import javax.inject.Provider;
 
 /**
  * @author amit
@@ -88,7 +87,7 @@ public class SubPopMunichExposureControler {
 		String configFile = args[0];
 		String emissionEfficiencyFactor = args[1];
 		String considerCO2Costs = args[2];
-		String emissionCostFactor = args[3];
+		String emissionCostMultiplicationFactor = args[3];
 
 		String outputDir = args[4];
 		
@@ -161,8 +160,9 @@ public class SubPopMunichExposureControler {
 		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, links2xCells, links2yCells);
-		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostMultiplicationFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, links2xCells, links2yCells);
+		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
+				emissionCostModule, config.planCalcScore());
 		
 		controler.addOverridingModule(new AbstractModule() {
 			
@@ -175,8 +175,6 @@ public class SubPopMunichExposureControler {
 		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
 		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		
-		controler.addControlerListener(new WelfareAnalysisControlerListener((MutableScenario) controler.getScenario()));
-
 		if(isAveragingTollAfterRePlanning){
 			controler.addControlerListener(new MyTollAveragerControlerListner());
 		}

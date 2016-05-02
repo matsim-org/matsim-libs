@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -33,8 +34,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -55,30 +58,49 @@ import org.xml.sax.Attributes;
 public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSomeReader {
 
 	private final TransitSchedule schedule;
-	private final ModeRouteFactory routeFactory;
+	private final RouteFactoryImpl routeFactory;
 
 	private TransitLine currentTransitLine = null;
 	private TempTransitRoute currentTransitRoute = null;
 	private TempRoute currentRouteProfile = null;
 
+	private final CoordinateTransformation coordinateTransformation;
+	private final StringCache cache = new StringCache(); 
+
 	/**
 	 * @param schedule
 	 * @param network
-	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, ModeRouteFactory)}
+	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, RouteFactoryImpl)}
 	 */
 	@Deprecated
 	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network) {
-		this(schedule, new ModeRouteFactory());
+		this(schedule, new RouteFactoryImpl());
 	}
 
-	public TransitScheduleReaderV1(final TransitSchedule schedule, final ModeRouteFactory routeFactory) {
-		this.schedule = schedule;
-		this.routeFactory = routeFactory;
+	public TransitScheduleReaderV1(final TransitSchedule schedule, final RouteFactoryImpl routeFactory) {
+		this( new IdentityTransformation() , schedule , routeFactory );
 	}
 
 	public TransitScheduleReaderV1(final Scenario scenario) {
-		this.schedule = scenario.getTransitSchedule();
-		this.routeFactory = ((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getModeRouteFactory();
+		this( scenario.getTransitSchedule(),
+				((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getRouteFactory() );
+	}
+
+	public TransitScheduleReaderV1(
+			final CoordinateTransformation coordinateTransformation,
+			final Scenario scenario) {
+		this( coordinateTransformation,
+				scenario.getTransitSchedule(),
+				((PopulationFactoryImpl) (scenario.getPopulation().getFactory())).getRouteFactory() );
+	}
+
+	public TransitScheduleReaderV1(
+			CoordinateTransformation coordinateTransformation,
+			TransitSchedule schedule,
+			RouteFactoryImpl routeFactory) {
+		this.coordinateTransformation = coordinateTransformation;
+		this.schedule = schedule;
+		this.routeFactory = routeFactory;
 	}
 
 	public void readFile(final String fileName) throws UncheckedIOException {
@@ -89,14 +111,22 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if (Constants.STOP_FACILITY.equals(name)) {
 			boolean isBlocking = Boolean.parseBoolean(atts.getValue(Constants.IS_BLOCKING));
-			TransitStopFacility stop = schedule.getFactory().createTransitStopFacility(
-					Id.create(atts.getValue(Constants.ID), TransitStopFacility.class), new Coord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))), isBlocking);
+			TransitStopFacility stop =
+					schedule.getFactory().createTransitStopFacility(
+							Id.create(
+									atts.getValue(Constants.ID),
+									TransitStopFacility.class),
+							coordinateTransformation.transform(
+									new Coord(
+											Double.parseDouble(atts.getValue("x")),
+											Double.parseDouble(atts.getValue("y")))),
+							isBlocking);
 			if (atts.getValue(Constants.LINK_REF_ID) != null) {
 				Id<Link> linkId = Id.create(atts.getValue(Constants.LINK_REF_ID), Link.class);
 				stop.setLinkId(linkId);
 			}
 			if (atts.getValue(Constants.NAME) != null) {
-				stop.setName(atts.getValue(Constants.NAME));
+				stop.setName(this.cache.get(atts.getValue(Constants.NAME)));
 			}
 			this.schedule.addStopFacility(stop);
 		} else if (Constants.TRANSIT_LINE.equals(name)) {
@@ -222,6 +252,29 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser implements MatsimSo
 			}
 		}
 
+	}
+
+	private static class StringCache {
+
+		private ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<String, String>(10000);
+
+		/**
+		 * Returns the cached version of the given String. If the strings was
+		 * not yet in the cache, it is added and returned as well.
+		 *
+		 * @param string
+		 * @return cached version of string
+		 */
+		public String get(final String string) {
+			if (string == null) {
+				return null;
+			}
+			String s = cache.putIfAbsent(string, string);
+			if (s == null) {
+				return string;
+			}
+			return s;
+		}
 	}
 
 }

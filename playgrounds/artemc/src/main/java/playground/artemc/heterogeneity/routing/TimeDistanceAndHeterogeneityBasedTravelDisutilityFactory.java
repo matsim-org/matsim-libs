@@ -24,6 +24,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.inject.Inject;
+
 
 /**
  * @author dgrether
@@ -31,10 +33,12 @@ import org.matsim.core.router.util.TravelTime;
  */
 public final class TimeDistanceAndHeterogeneityBasedTravelDisutilityFactory implements TravelDisutilityFactory {
 
+	@Inject PlanCalcScoreConfigGroup cnScoringGroup;
+	
 	private double sigma = 0. ;
 
 	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		return new TimeDistanceAndHeterogeneityBasedTravelDisutility(timeCalculator, cnScoringGroup, this.sigma);
 	}
 	

@@ -47,11 +47,12 @@ public class PgStationPopulationGenerator {
 		
 		double flowProportion = 1./initLinks.size();
 		int generated = 0;
+		float h = 1.5f;
 		for (Link link : initLinks){
 			int linkLimit = (int)(populationSize*flowProportion);
 			for (int i = 0; i < linkLimit & generated<populationSize; i++) {
 				
-				double departureTime = 3600+(MatsimRandom.getRandom().nextGaussian()*1600);
+				double departureTime = (h*3600)+(MatsimRandom.getRandom().nextGaussian()*1800);
 				if (departureTime < 0)
 					departureTime = 0;
 				Person pers = factory.createPerson(Id.create("p"+population.getPersons().size(),Person.class));
@@ -70,6 +71,7 @@ public class PgStationPopulationGenerator {
 				population.addPerson(pers);
 				++generated;
 			}
+			h+=1.f;
 		}
 	}
 

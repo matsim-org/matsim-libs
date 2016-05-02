@@ -26,7 +26,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 
 public class GfipVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
 

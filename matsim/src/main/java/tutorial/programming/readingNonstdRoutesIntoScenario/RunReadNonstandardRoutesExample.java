@@ -31,7 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -42,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * are in the file.  This is sufficient information for teleportation.  Additional information needs to come from elsewhere, 
  * or the corresponding {@link PopulationReader} needs to be modified.
  * <p/>
- * Note, however, that for pure teleportation it is not necessary to set the route factory since the default {@link ModeRouteFactory} 
+ * Note, however, that for pure teleportation it is not necessary to set the route factory since the default {@link RouteFactoryImpl} 
  * will already generate an instance of {@link GenericRoute} when a mode is not registered. 
  * 
  * @author nagel
@@ -54,7 +54,7 @@ public class RunReadNonstandardRoutesExample {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
+		RouteFactoryImpl modeRouteFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactory();
 		modeRouteFactory.setRouteFactory(MySpecialRoute.class, new RouteFactory() {
 			@Override
 			public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId) {

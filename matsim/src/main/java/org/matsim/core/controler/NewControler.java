@@ -26,19 +26,18 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.pt.PtConstants;
 
 import javax.inject.Inject;
 import java.util.*;
 
 class NewControler extends AbstractController implements ControlerI {
 
+	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(NewControler.class);
 
 	private final Config config;
@@ -56,8 +55,8 @@ class NewControler extends AbstractController implements ControlerI {
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
 
 	@Inject
-	NewControler(Config config, MatsimServices matsimServices, IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling, PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider, PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd, Set<ControlerListener> controlerListenersDeclaredByModules, Collection<Provider<MobsimListener>> mobsimListeners, ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy outputDirectoryHierarchy) {
-		super(stopWatch, matsimServices);
+	NewControler(Config config, ControlerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices, IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling, PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider, PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd, Set<ControlerListener> controlerListenersDeclaredByModules, Collection<Provider<MobsimListener>> mobsimListeners, ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy outputDirectoryHierarchy) {
+		super(controlerListenerManager, stopWatch, matsimServices);
 		this.config = config;
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		this.prepareForSim = prepareForSim;
@@ -74,36 +73,9 @@ class NewControler extends AbstractController implements ControlerI {
 		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
 	}
 
-	static void preprocessConfig(Config config) {
-		if (config.transit().isUseTransit()) {
-			// yyyy this should go away somehow. :-)
-
-			log.info("setting up transit simulation");
-			if ( config.transit().getVehiclesFile()==null ) {
-				log.warn("Your are using Transit but have not provided a transit vehicles file. This most likely won't work.");
-			}
-
-			PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
-			transitActivityParams.setTypicalDuration(120.0);
-
-			// The following two lines were introduced in nov/12.  _In addition_, the conversion of ActivityParams to
-			// ActivityUtilityParameters will set the scoreAtAll flag to false (also introduced in nov/12).  kai, nov'12
-			transitActivityParams.setOpeningTime(0.) ;
-			transitActivityParams.setClosingTime(0.) ;
-
-			config.planCalcScore().addActivityParams(transitActivityParams);
-			// yy would this overwrite user-defined definitions of "pt interaction"?
-			// No, I think that the user-defined parameters are set later, in fact overwriting this setting here.
-			// kai, nov'12
-
-			// the QSim reads the config by itself, and configures itself as a
-			// transit-enabled mobsim. kai, nov'11
-		}
-	}
-
+	@Override
 	public final void run() {
 		super.setupOutputDirectory(outputDirectoryHierarchy);
-		preprocessConfig(this.config);
 		super.run(this.config);
 	}
 

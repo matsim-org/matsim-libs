@@ -142,7 +142,7 @@ public class FilesGenerator {
 							modePT = true;
 						Coord lastCoord = cT.transform(Household.LOCATIONS.get(lastTrip.getEndPostalCode()).getCoord());
 						if(consistentLocation && !lastTrip.getEndPostalCode().equals(trip.getStartPostalCode()))
-							if(CoordUtils.calcDistance(lastCoord, cT.transform(Household.LOCATIONS.get(trip.getStartPostalCode()).getCoord()))>MAX_DISTANCE) {
+							if(CoordUtils.calcEuclideanDistance(lastCoord, cT.transform(Household.LOCATIONS.get(trip.getStartPostalCode()).getCoord()))>MAX_DISTANCE) {
 								consistentLocation = false;
 								other++;
 							}
@@ -174,7 +174,7 @@ public class FilesGenerator {
 										if(line!=null) {
 											for(TransitRoute route:line.getRoutes().values())
 												for(TransitRouteStop stop:route.getStops()) {
-													double distance = CoordUtils.calcDistance(stop.getStopFacility().getCoord(), lastCoord);
+													double distance = CoordUtils.calcEuclideanDistance(stop.getStopFacility().getCoord(), lastCoord);
 													if(distance<minDistance) {
 														minDistance = distance;
 														lcoord = stop.getStopFacility().getCoord();
@@ -186,7 +186,7 @@ public class FilesGenerator {
 									}
 									double minDistance = Double.MAX_VALUE;
 									for(Coord coord:studyCoords) {
-										double distance = CoordUtils.calcDistance(cT.transform(coord), lcoord);
+										double distance = CoordUtils.calcEuclideanDistance(cT.transform(coord), lcoord);
 										if(distance<minDistance)
 											minDistance = distance;
 									}
@@ -314,7 +314,7 @@ public class FilesGenerator {
 						if(stage instanceof WaitStage && !(stage instanceof OtherBusStage))
 							modePT = true;
 					if(consistentLocation && !lastTrip.getEndPostalCode().equals(trip.getStartPostalCode()))
-						if(CoordUtils.calcDistance(cT.transform(Household.LOCATIONS.get(lastTrip.getEndPostalCode()).getCoord()), cT.transform(Household.LOCATIONS.get(trip.getStartPostalCode()).getCoord()))>MAX_DISTANCE) {
+						if(CoordUtils.calcEuclideanDistance(cT.transform(Household.LOCATIONS.get(lastTrip.getEndPostalCode()).getCoord()), cT.transform(Household.LOCATIONS.get(trip.getStartPostalCode()).getCoord()))>MAX_DISTANCE) {
 							consistentLocation = false;
 							other++;
 						}

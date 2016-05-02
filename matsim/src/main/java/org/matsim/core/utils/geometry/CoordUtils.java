@@ -68,7 +68,7 @@ public abstract class CoordUtils {
 		return centerWOffset ;
 	}
 
-	public static double calcDistance(Coord coord, Coord other) {
+	public static double calcEuclideanDistance(Coord coord, Coord other) {
 		//depending on the coordinate system that is used, determining the
 		//distance based on the euclidean distance will lead to wrong results.
 		//however, if the distance is not to large (<1km) this will be a usable distance estimation.
@@ -118,7 +118,7 @@ public abstract class CoordUtils {
 	
 		if ((lineDX == 0.0) && (lineDY == 0.0)) {
 			// the line segment is a point without dimension
-			return calcDistance(lineFrom, point);
+			return calcEuclideanDistance(lineFrom, point);
 		}
 	
 		double u = ((point.getX() - lineFrom.getX())*lineDX + (point.getY() - lineFrom.getY())*lineDY) /
@@ -126,13 +126,13 @@ public abstract class CoordUtils {
 	
 		if (u <= 0) {
 			// (x | y) is not on the line segment, but before lineFrom
-			return calcDistance(lineFrom, point);
+			return calcEuclideanDistance(lineFrom, point);
 		}
 		if (u >= 1) {
 			// (x | y) is not on the line segment, but after lineTo
-			return calcDistance(lineTo, point);
+			return calcEuclideanDistance(lineTo, point);
 		}
-		return calcDistance(new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY), point);
+		return calcEuclideanDistance(new Coord(lineFrom.getX() + u * lineDX, lineFrom.getY() + u * lineDY), point);
 	}
 
 }

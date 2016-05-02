@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
@@ -207,11 +208,13 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 				// update agent's route
 //				editRoutes.replanCurrentLegRoute(plan, withinDayAgent.getCurrentPlanElementIndex(),
 //						withinDayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.time);
-
-				this.editRoutes.relocateCurrentLegRoute(leg, plan.getPerson(), 
-						this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent), endLink, time, scenario.getNetwork(), tripRouter);			
 				
-				updateNextLeg = true;
+				throw new RuntimeException( Gbl.PROBLEM_WITH_ACCESS_EGRESS ) ;
+
+//				this.editRoutes.relocateCurrentLegRoute(leg, plan.getPerson(), 
+//						this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent), endLink, time, scenario.getNetwork(), tripRouter);			
+//				
+//				updateNextLeg = true;
 			}
 
 			// update walk leg away from arriving parking act

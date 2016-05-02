@@ -52,7 +52,7 @@ public class TomTom2Matrix {
 
 		reader.readFile(args[0]);
 
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get(args[1])));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("NO");

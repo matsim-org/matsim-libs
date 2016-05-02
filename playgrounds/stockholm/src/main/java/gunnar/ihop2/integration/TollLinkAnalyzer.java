@@ -15,6 +15,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import floetteroed.utilities.math.Histogram;
@@ -40,6 +41,8 @@ public class TollLinkAnalyzer implements LinkEnterEventHandler {
 
 	};
 
+	private final Vehicle2DriverEventHandler vehicle2DriverHandler;
+
 	private Set<Id<Person>> tollPayers = new LinkedHashSet<>();
 
 	private Set<Id<Person>> maxTollPayers = new LinkedHashSet<>();
@@ -48,7 +51,9 @@ public class TollLinkAnalyzer implements LinkEnterEventHandler {
 
 	private final Histogram all;
 
-	public TollLinkAnalyzer() {
+	public TollLinkAnalyzer(
+			final Vehicle2DriverEventHandler vehicle2DriverHandler) {
+		this.vehicle2DriverHandler = vehicle2DriverHandler;
 		all = Histogram.newHistogramWithUniformBins(0.0, 3600.0, 24);
 		this.linkIdStr2entryHist = new LinkedHashMap<>();
 		for (String linkIdStr : tollLinkIdStr) {
@@ -84,129 +89,71 @@ public class TollLinkAnalyzer implements LinkEnterEventHandler {
 		if (hist != null) {
 			this.all.add(event.getTime());
 			hist.add(event.getTime());
-			this.tollPayers.add(event.getDriverId());
+			// this.tollPayers.add(event.getDriverId());
+			this.tollPayers.add(this.vehicle2DriverHandler
+					.getDriverOfVehicle(event.getVehicleId()));
 			if ((event.getTime() >= 7.5 * 3600 && event.getTime() < 8.5 * 3600)
 					|| (event.getTime() >= 16.0 * 3600 && event.getTime() < 17.5 * 3600)) {
-				this.maxTollPayers.add(event.getDriverId());
+				// this.maxTollPayers.add(event.getDriverId());
+				this.maxTollPayers.add(this.vehicle2DriverHandler
+						.getDriverOfVehicle(event.getVehicleId()));
 			}
 		}
 	}
 
+	// -------------------- MAIN-FUNCTION --------------------
+
 	public static void main(String[] args) {
 
 		final String path = "/Nobackup/Profilen/Documents/proposals/2015/IHOP2/showcase/";
+		final String eventsFileName = path + "tla4_toll/1000.events.xml.gz";
+		final String plansFileName = path + "tla4_toll/1000.plans.xml.gz";
+		final String histFileName = "./ihop2-data/playground/tla4_toll.txt";
 
 		Config config = ConfigUtils.createConfig();
-		final TollLinkAnalyzer withoutToll = new TollLinkAnalyzer();
-		EventsManager events = EventsUtils.createEventsManager(config);
-		events.addHandler(withoutToll);
-		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(path
-				+ "2015-12-11_LARGE-2_RegentMATSim/no-toll/summary/iteration-3/it.500/500.events.xml.gz");
 
-		config.getModule("plans")
-				.addParam(
-						"inputPlansFile",
-						path
-								+ "2015-12-11_LARGE-2_RegentMATSim/no-toll/summary/iteration-3/it.500/500.plans.xml.gz");
+		EventsManager events;
+		MatsimEventsReader reader;
+		Vehicle2DriverEventHandler vehicle2driverHandler = new Vehicle2DriverEventHandler(); // null
+		final TollLinkAnalyzer tollLinkAnalyzer = new TollLinkAnalyzer(
+				vehicle2driverHandler);
+		events = EventsUtils.createEventsManager(config);
+		events.addHandler(vehicle2driverHandler);
+		events.addHandler(tollLinkAnalyzer);
+		reader = new MatsimEventsReader(events);
+		reader.readFile(eventsFileName);
+
+		config.getModule("plans").addParam("inputPlansFile", plansFileName);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		DepartureTimeHistogram hist = new DepartureTimeHistogram(0, 3600, 24);
-		for (Id<Person> personId : withoutToll.maxTollPayers) {
+		for (Id<Person> personId : tollLinkAnalyzer.maxTollPayers) {
 			hist.addPerson(scenario.getPopulation().getPersons().get(personId));
 		}
-		hist.writeHistogramsToFile("./ihop2-data/playground/no-toll_maxpayers.txt");
+		hist.writeHistogramsToFile(histFileName);
 
 		System.out.println();
-		System.out.println("ALL (NO-TOLL)");
+		System.out.println("ALL");
 		System.out.println();
 		PlansAnalyzer pa = new PlansAnalyzer();
 		pa.process(scenario.getPopulation().getPersons().keySet(),
 				scenario.getPopulation());
 		System.out.println(pa.getReport());
 		System.out.println();
-		System.out.println("PEAK (NO-TOLL)");
+		System.out.println();
+		System.out.println("PEAK");
 		System.out.println();
 		pa = new PlansAnalyzer();
-		pa.process(withoutToll.maxTollPayers, scenario.getPopulation());
+		pa.process(tollLinkAnalyzer.maxTollPayers, scenario.getPopulation());
 		System.out.println(pa.getReport());
 		System.out.println();
+		System.out.println();
 
-		// ----------
-
-		// config = ConfigUtils.createConfig();
-		// final TollLinkAnalyzer withToll = new TollLinkAnalyzer();
-		// events = EventsUtils.createEventsManager(config);
-		// events.addHandler(withToll);
-		// reader = new MatsimEventsReader(events);
-		// reader.readFile(path
-		// +
-		// "2015-11-23ab_LARGE_RegentMATSim/2015-11-23b_Toll_large/summary/iteration-3/it.400/400.events.xml.gz");
-		//
-		// config.getModule("plans")
-		// .addParam(
-		// "inputPlansFile",
-		// path
-		// +
-		// "2015-11-23ab_LARGE_RegentMATSim/2015-11-23b_Toll_large/summary/iteration-3/it.400/400.plans.xml.gz");
-		// scenario = ScenarioUtils.loadScenario(config);
-		// hist = new DepartureTimeHistogram(0, 3600, 24);
-		// for (Id<Person> personId : withToll.maxTollPayers) {
-		// hist.addPerson(scenario.getPopulation().getPersons().get(personId));
-		// }
-		// hist.writeHistogramsToFile("./ihop2-data/playground/with-toll_maxpayers.txt");
-		//
-		// System.out.println();
-		// System.out.println("ALL (TOLL)");
-		// System.out.println();
-		// pa = new PlansAnalyzer();
-		// pa.process(scenario.getPopulation().getPersons().keySet(),
-		// scenario.getPopulation());
-		// System.out.println(pa.getReport());
-		// System.out.println();
-		// System.out.println("PEAK (TOLL)");
-		// System.out.println();
-		// pa = new PlansAnalyzer();
-		// pa.process(withToll.maxTollPayers, scenario.getPopulation());
-		// System.out.println(pa.getReport());
-		// System.out.println();
-
-		// ==========
-
-		// System.out.println();
-		// for (String linkIdStr : tollLinkIdStr) {
-		//
-		// System.out.print(linkIdStr + "(no-toll)");
-		// for (int i = 1; i <= 24; i++) {
-		// System.out.print("\t");
-		// // bin 0 is before t=0.0
-		// System.out.print(withoutToll.linkIdStr2entryHist.get(linkIdStr)
-		// .cnt(i));
-		// }
-		// System.out.println();
-		// System.out.print(linkIdStr + "(toll)");
-		// for (int i = 1; i <= 24; i++) {
-		// System.out.print("\t");
-		// // bin 0 is before t=0.0
-		// System.out.print(withToll.linkIdStr2entryHist.get(linkIdStr)
-		// .cnt(i));
-		// }
-		// System.out.println();
-		// System.out.println();
-		// }
-		//
-		System.out.print("all" + "(no-toll)");
+		System.out.print("TIME PROFILE");
 		for (int i = 1; i <= 24; i++) {
 			System.out.print("\t");
 			// bin 0 is before t=0.0
-			System.out.print(withoutToll.all.cnt(i));
+			System.out.print(tollLinkAnalyzer.all.cnt(i));
 		}
-		System.out.println();
-		// System.out.print("all" + "(toll)");
-		// for (int i = 1; i <= 24; i++) {
-		// System.out.print("\t");
-		// // bin 0 is before t=0.0
-		// System.out.print(withToll.all.cnt(i));
-		// }
 		System.out.println();
 		System.out.println();
 	}

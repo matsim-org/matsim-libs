@@ -4,7 +4,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>contrib</artifactId>
 	<packaging>pom</packaging>
-	<version>0.8.0-SNAPSHOT</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<name>MATSim-Contrib</name>
 
 	<scm>
@@ -55,7 +55,20 @@
 					<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
 				</configuration>
 			</plugin>
-            <plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.19.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
                 <!-- Usage:
                     * Put a file like release.properties.template in the root directory of this project,
                       renaming it to release.properties and changing the version numbers in it.
@@ -100,6 +113,7 @@
 		<module>cadytsIntegration</module>
 		<module>carsharing</module>
 		<module>dvrp</module>
+		<module>taxi</module>
 		<module>emissions</module>
 		<module>freight</module>
 		<module>gtfs2matsimtransitschedule</module>
@@ -123,6 +137,10 @@
 		<module>eventsBasedPTRouter</module>
 		<module>map2mapmatching</module>
 		<module>travelsummary</module>
+		<module>deprecated</module>
+		<module>protobuf</module>
+		<module>hybridsim</module>
+		<module>noise</module>
 	</modules>
 	<repositories>
 		<repository>
@@ -154,14 +172,14 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>

@@ -37,10 +37,6 @@ import playground.gregor.ctsim.simulation.CTMobsimFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 
 public class CTRunner implements IterationStartsListener {
 
@@ -67,11 +63,11 @@ public class CTRunner implements IterationStartsListener {
 
 		final Controler controller = new Controler(sc);
 		if (vis) {
-			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-			Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-
-
-			sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
+//			Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+//			Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+//
+//
+//			sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sc2d);
 			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
 			InfoBox iBox = new InfoBox(dbg, sc);
 			dbg.addAdditionalDrawer(iBox);

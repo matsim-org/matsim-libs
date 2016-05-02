@@ -27,6 +27,8 @@ public class CreatePopulation {
 	//set population fraction
 	private double p=1;
 	private Random random = new Random();
+	
+	private int countAgents=0;
 
 	private ObjectAttributes homeLocations = new ObjectAttributes();
 	private ObjectAttributes homeTAZ = new ObjectAttributes();
@@ -57,7 +59,7 @@ public class CreatePopulation {
 
 			//define list of considered TAZ
 			Integer[] consideredTAZ={1955,1948,1949,1950,1951,1952,1953,1954,1956,1957,1958,1959,
-					1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,2127,2128,2129,2130};
+					1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,2127,2128,2129,2130,1919,1917,1921, 2185, 2186,2233,1992};
 			ArrayList<Integer> consideredTAZList=new ArrayList<Integer>(Arrays.asList(consideredTAZ));
 
 			// read data-file and create population
@@ -81,8 +83,10 @@ public class CreatePopulation {
 					//					ConditionTravelMode=true;
 					//				}
 					homeLocation=(Integer.parseInt(parts[index_homeLocation]));
-					if(parts[index_activityLocation].equals("IKEA")){ConditionTAZ=true;}
-					else{
+					if
+					(parts[index_activityLocation].equals("IKEA")){ConditionTAZ=true;}
+					else
+					{
 						activityLocation=(Integer.parseInt(parts[index_activityLocation]));
 						if(consideredTAZList.contains(activityLocation)){
 							ConditionTAZ=true;
@@ -101,6 +105,7 @@ public class CreatePopulation {
 
 						// add to population
 						population.addPerson(person);
+						countAgents=countAgents+1;
 
 						// set home coordinates
 						Coord homeCoord = coordTazManager.randomCoordinates(homeLocation);
@@ -120,6 +125,7 @@ public class CreatePopulation {
 				}
 			}
 			bufferedReader.close();
+			System.out.println("Number of Agents in population: "+countAgents);
 
 		} // end try
 		catch (IOException e) {

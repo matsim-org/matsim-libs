@@ -57,6 +57,10 @@ import com.vividsolutions.jts.geom.Coordinate;
 import playground.benjamin.utils.MergeNetworks;
 import playground.santiago.SantiagoScenarioConstants;
 
+/**
+ * @author dhosse, kturner, benjamin
+ *
+ */
 public class SantiagoNetworkBuilder {
 	private static final Logger log = Logger.getLogger(SantiagoNetworkBuilder.class);
 	
@@ -67,7 +71,7 @@ public class SantiagoNetworkBuilder {
 	private final String workingDirInputFiles = svnWorkingDir + "inputFromElsewhere/";
 	private final String outputDir = svnWorkingDir + "inputForMATSim/network/";
 
-	private final String transitNetworkFile = svnWorkingDir + "Kai_und_Daniel/inputForMATSim/transit/transitnetwork.xml.gz";
+	private final String transitNetworkFile = svnWorkingDir + "inputForMATSim/transit/transitnetwork.xml.gz";
 	
 	public static void main(String[] args) {
 		SantiagoNetworkBuilder snb = new SantiagoNetworkBuilder();

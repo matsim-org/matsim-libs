@@ -75,7 +75,7 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 		
 		TransitStopFacility baseStop = currentStopsToBeServed.get(0);
 		TransitStopFacility remoteStop = this.findStopWithLargestDistance(currentStopsToBeServed);
-		double bufferSizeBasedOnRatio = CoordUtils.calcDistance(baseStop.getCoord(), remoteStop.getCoord()) * this.ratio;
+		double bufferSizeBasedOnRatio = CoordUtils.calcEuclideanDistance(baseStop.getCoord(), remoteStop.getCoord()) * this.ratio;
 		
 		List<Geometry> lineStrings = this.createGeometryFromStops(currentStopsToBeServed, remoteStop);
 		Geometry buffer = this.createBuffer(lineStrings, Math.max(this.bufferSize, bufferSizeBasedOnRatio), this.excludeTermini);
@@ -129,7 +129,7 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 		TransitStopFacility stopWithSmallestDistance = stops.get(0);
 		TransitStopFacility stopWithSecondSmallestDistance = stops.get(0);
 		for (TransitStopFacility transitStopFacility : stops) {
-			double currentDistance = CoordUtils.calcDistance(stop.getCoord(), transitStopFacility.getCoord());
+			double currentDistance = CoordUtils.calcEuclideanDistance(stop.getCoord(), transitStopFacility.getCoord());
 			if (currentDistance < smallestDistance) {
 				smallestDistance = currentDistance;
 				stopWithSecondSmallestDistance = stopWithSmallestDistance;
@@ -175,7 +175,7 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 		double largestDistance = 0;
 		TransitStopFacility stopWithLargestDistance = stops.get(0);
 		for (TransitStopFacility transitStopFacility : stops) {
-			double currentDistance = CoordUtils.calcDistance(startCoord, transitStopFacility.getCoord());
+			double currentDistance = CoordUtils.calcEuclideanDistance(startCoord, transitStopFacility.getCoord());
 			if (currentDistance > largestDistance) {
 				largestDistance = currentDistance;
 				stopWithLargestDistance = transitStopFacility;

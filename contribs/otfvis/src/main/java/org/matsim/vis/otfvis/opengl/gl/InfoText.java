@@ -23,7 +23,7 @@ package org.matsim.vis.otfvis.opengl.gl;
 import java.awt.Color;
 import java.io.Serializable;
 
-import javax.media.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLAutoDrawable;
 
 import org.matsim.core.utils.collections.QuadTree.Rect;
 
@@ -54,9 +54,9 @@ public class InfoText implements Serializable {
 	public void draw(TextRenderer renderer, GLAutoDrawable drawable, Rect rect) {
         int width = (int) (rect.maxX - rect.minX);
         int height = (int) (rect.maxY - rect.minY);
-        int screenWidth = drawable.getWidth();
+        int screenWidth = drawable.getSurfaceWidth();
         float widthRatio = (float) screenWidth / (float) width;
-        int screenHeight = drawable.getHeight();
+        int screenHeight = drawable.getSurfaceHeight();
         float heightRatio = (float) screenHeight / (float) height;
         renderer.beginRendering(screenWidth, screenHeight);
 		renderer.setColor(color.getRed()/255.f, color.getGreen()/255.f, color.getBlue()/255.f, color.getAlpha()/255.f);

@@ -25,7 +25,7 @@ import org.apache.commons.math3.util.MathArrays;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.VehicleGenerator;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -83,7 +83,7 @@ public class BarcelonaTaxiGenerator
         double minWorkTime = 4.0 * 3600;
         double maxWorkTime = 12.0 * 3600;
 
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
         for (int i = 45; i <= 45; i += 2) {

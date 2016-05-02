@@ -29,14 +29,16 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 public class KtiTravelCostCalculatorFactory implements TravelDisutilityFactory {
 
 	private KtiConfigGroup ktiConfigGroup = null;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	
-	public KtiTravelCostCalculatorFactory(KtiConfigGroup ktiConfigGroup) {
+	public KtiTravelCostCalculatorFactory(KtiConfigGroup ktiConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup) {
 		super();
 		this.ktiConfigGroup = ktiConfigGroup;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator,	PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		return new KtiTravelTimeDistanceCostCalculator(timeCalculator, cnScoringGroup, ktiConfigGroup);
 	}
 

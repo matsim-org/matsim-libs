@@ -22,7 +22,13 @@
 
 package org.matsim.core.router;
 
+import com.google.inject.Key;
+import com.google.inject.Provides;
+import com.google.inject.name.Names;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.pt.router.TransitRouterModule;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -32,32 +38,41 @@ public class TripRouterModule extends AbstractModule {
 
     @Override
     public void install() {
-        install(new TripRouterFactoryModule());
         bind(MainModeIdentifier.class).to(MainModeIdentifierImpl.class);
-        bind(TripRouter.class).toProvider(RealTripRouterProvider.class);
+        install(new LeastCostPathCalculatorModule());
+        install(new TransitRouterModule());
+        bind(SingleModeNetworksCache.class).asEagerSingleton();
+        PlansCalcRouteConfigGroup routeConfigGroup = getConfig().plansCalcRoute();
+        for (String mode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()) {
+            if (getConfig().transit().isUseTransit() && getConfig().transit().getTransitModes().contains(mode)) {
+                // default config contains "pt" as teleported mode, but if we have simulated transit, this is supposed to override it
+                // better solve this on the config level eventually.
+                continue;
+            }
+            addRoutingModuleBinding(mode).toProvider(new PseudoTransit(getConfig().plansCalcRoute().getModeRoutingParams().get(mode)));
+        }
+        for (String mode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
+            addRoutingModuleBinding(mode).toProvider(new Teleportation(getConfig().plansCalcRoute().getModeRoutingParams().get(mode)));
+        }
+        for (String mode : routeConfigGroup.getNetworkModes()) {
+            addRoutingModuleBinding(mode).toProvider(new NetworkRouting(mode));
+        }
+        if (getConfig().transit().isUseTransit()) {
+            for (String mode : getConfig().transit().getTransitModes()) {
+                addRoutingModuleBinding(mode).toProvider(Transit.class);
+            }
+            addRoutingModuleBinding(TransportMode.transit_walk).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
+        }
+
     }
 
-    private static class RealTripRouterProvider implements Provider<TripRouter> {
-
-        final Map<String, Provider<RoutingModule>> routingModules;
-        private MainModeIdentifier mainModeIdentifier;
-
-        @Inject
-        RealTripRouterProvider(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier) {
-            this.routingModules = routingModules;
-            this.mainModeIdentifier = mainModeIdentifier;
+    @Provides TripRouter create(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier) {
+        TripRouter tripRouter = new TripRouter();
+        for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
+            tripRouter.setRoutingModule(entry.getKey(), entry.getValue().get());
         }
-
-        @Override
-        public TripRouter get() {
-            TripRouter tripRouter = new TripRouter();
-            for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
-                tripRouter.setRoutingModule(entry.getKey(), entry.getValue().get());
-            }
-            tripRouter.setMainModeIdentifier(mainModeIdentifier);
-            return tripRouter;
-        }
-
+        tripRouter.setMainModeIdentifier(mainModeIdentifier);
+        return tripRouter;
     }
 
 }

@@ -59,7 +59,7 @@ public class ConfigIO
 
 			scenario.getConfig().network().setTimeVariantNetwork(true);
 			String changeEventsFile = scenarioPath + "/networkChangeEvents.xml";
-			scenario.getConfig().network().setChangeEventInputFile(changeEventsFile);
+			scenario.getConfig().network().setChangeEventsInputFile(changeEventsFile);
 			new ConfigWriter(scenario.getConfig()).write(configFile);
 			
 			// create change event

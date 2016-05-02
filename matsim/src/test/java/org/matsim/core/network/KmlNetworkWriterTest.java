@@ -27,6 +27,7 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.google.common.io.ByteStreams;
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
@@ -97,9 +98,9 @@ public class KmlNetworkWriterTest extends MatsimTestCase {
 			}
 		}
 
-		long iconFileSize = new File(MatsimResource.getAsURL(MatsimKmlStyleFactory.DEFAULTNODEICONRESOURCE).getFile()).length();
-		assertEquals("uncompressed size of icon is wrong.", linkIconEntry.getSize(), iconFileSize);
-		assertEquals("uncompressed size of icon is wrong.", nodeIconEntry.getSize(), iconFileSize);
+		long iconFileSize = ByteStreams.toByteArray(MatsimResource.getAsInputStream(MatsimKmlStyleFactory.DEFAULTNODEICONRESOURCE)).length;
+		assertEquals("uncompressed size of icon is wrong.", iconFileSize, linkIconEntry.getSize());
+		assertEquals("uncompressed size of icon is wrong.", iconFileSize, nodeIconEntry.getSize());
 		assertEquals("uncompressed size of doc.kml is wrong.", 303, docKmlEntry.getSize());
 		assertEquals("uncompressed size of main.kml is wrong.", 45408, mainKmlEntry.getSize());
 	}

@@ -162,7 +162,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 		}
 
 		if (minCostNode == null) {
-			log.warn("No route was found");
+			log.trace("No route was found");
 			return null;
 		}
 		Node toNode = minCostNode;

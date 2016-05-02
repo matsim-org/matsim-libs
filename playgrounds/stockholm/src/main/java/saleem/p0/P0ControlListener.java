@@ -27,7 +27,7 @@ public class P0ControlListener implements StartupListener, IterationStartsListen
 		//handler = new P0QueueDelayControl(network, event.getIteration());
 		handler.initialise(event.getIteration());//To avoid creating objects every time, to save memory
 	    network.setNetworkChangeEvents(P0ControlHandler.events);
-	    P0ControlHandler.events.removeAll(P0ControlHandler.events);
+//	    P0ControlHandler.events.removeAll(P0ControlHandler.events);
 	    //event.getServices().getEvents().addHandler(handler);
 		
 	}

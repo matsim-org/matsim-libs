@@ -45,7 +45,7 @@ public class TripStatisticsModule extends AbstractModule {
 						@Override
 						public EventHandler get() {
 							final EventsToLegs eventsToLegs = new EventsToLegs( scenario );
-							eventsToLegs.setLegHandler(legHandler);
+							eventsToLegs.addLegHandler(legHandler);
 							return eventsToLegs;
 						}
 					} );
@@ -59,7 +59,7 @@ public class TripStatisticsModule extends AbstractModule {
 						public EventHandler get() {
 							final EventsToActivities eventsToActivities = new EventsToActivities( );
 							// Awful, just waiting for better design fo eventsToActivities
-							eventsToActivities.setActivityHandler(activityHandler);
+							eventsToActivities.addActivityHandler(activityHandler);
 							activityHandler.setEventsToActivities( eventsToActivities );
 							return eventsToActivities;
 						}

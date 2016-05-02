@@ -20,6 +20,14 @@
 
 package org.matsim.examples;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
@@ -32,17 +40,45 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
-
+@RunWith(Parameterized.class)
 public class EquilTest extends MatsimTestCase {
+	
+	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
+	private final boolean isUsingFastCapacityUpdate;
+
+	public EquilTest(boolean isUsingFastCapacityUpdate) {
+		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
+	}
+
+	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
+	public static Collection<Object> parameterObjects () {
+		Object [] capacityUpdates = new Object [] { false, true };
+		return Arrays.asList(capacityUpdates);
+	}
+
+	@Test
 	public void testEquil() {
 		Config c = loadConfig(null);
+		
+		c.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
+		
 		String netFileName = "test/scenarios/equil/network.xml";
 		String popFileName = "test/scenarios/equil/plans100.xml";
 
-		String referenceFileName = getInputDirectory() + "events.xml.gz";
+		String referenceFileName ;
+		
+		if(this.isUsingFastCapacityUpdate) {
+			System.out.println(helper.getInputDirectory());
+			referenceFileName = helper.getInputDirectory() + "events_fastCapacityUpdate.xml.gz";
+		} else {
+			System.out.println(helper.getInputDirectory());
+			referenceFileName = helper.getInputDirectory() + "events.xml.gz";
+		}
+		
 		String eventsFileName = getOutputDirectory() + "events.xml.gz";
 
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(c);
@@ -56,7 +92,7 @@ public class EquilTest extends MatsimTestCase {
 		EventWriterXML writer = new EventWriterXML(eventsFileName);
 		events.addHandler(writer);
 
-//		SimulationTimer.setTime(0); // I don't think this is needed. kai, may'10
+		//		SimulationTimer.setTime(0); // I don't think this is needed. kai, may'10
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();
 

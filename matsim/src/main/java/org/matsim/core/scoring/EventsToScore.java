@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
@@ -49,18 +51,18 @@ import javax.inject.Inject;
 public class EventsToScore implements BasicEventHandler {
 
 	private final NewScoreAssigner newScoreAssigner;
+	private final ControlerListenerManagerImpl controlerListenerManager;
 	private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 	private final Population population;
 
 	private boolean finished = false;
 
 	private int iteration = -1 ;
-	private EventsToActivities eventsToActivities;
 
 	@Inject
-	private EventsToScore(EventsManager eventsManager, ScoringFunctionsForPopulation scoringFunctionsForPopulation, EventsToActivities eventsToActivities, final Scenario scenario, NewScoreAssigner newScoreAssigner) {
+	private EventsToScore(ControlerListenerManagerImpl controlerListenerManager, EventsManager eventsManager, ScoringFunctionsForPopulation scoringFunctionsForPopulation, final Scenario scenario, NewScoreAssigner newScoreAssigner) {
+		this.controlerListenerManager = controlerListenerManager;
 		this.scoringFunctionsForPopulation = scoringFunctionsForPopulation;
-		this.eventsToActivities = eventsToActivities;
 		this.population = scenario.getPopulation();
 		this.newScoreAssigner = newScoreAssigner;
 		eventsManager.addHandler(this);
@@ -73,9 +75,12 @@ public class EventsToScore implements BasicEventHandler {
 				new AbstractModule() {
 					@Override
 					public void install() {
+						bind(ScoringFunctionsForPopulation.class).asEagerSingleton();
 						bind(ScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
 						bind(NewScoreAssigner.class).to(NewScoreAssignerImpl.class).asEagerSingleton();
 						bind(EventsToScore.class).asEagerSingleton();
+						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
+						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
 						bind(EventsManager.class).toInstance(eventsManager);
 					}
 				});
@@ -89,13 +94,21 @@ public class EventsToScore implements BasicEventHandler {
 				new AbstractModule() {
 					@Override
 					public void install() {
+						bind(ScoringFunctionsForPopulation.class).asEagerSingleton();
 						bind(ScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
 						bind(NewScoreAssigner.class).to(NoopNewScoreAssignerImpl.class).asEagerSingleton();
 						bind(EventsToScore.class).asEagerSingleton();
+						bind(ControlerListenerManagerImpl.class).asEagerSingleton();
+						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
 						bind(EventsManager.class).toInstance(eventsManager);
 					}
 				});
 		return injector.getInstance(EventsToScore.class);
+	}
+
+	public void beginIteration(int iteration) {
+		this.iteration = iteration;
+		this.controlerListenerManager.fireControlerIterationStartsEvent(iteration);
 	}
 
 	/**
@@ -103,11 +116,12 @@ public class EventsToScore implements BasicEventHandler {
 	 * to the plans if desired.
 	 */
 	public void finish() {
-		eventsToActivities.finish();	
-		scoringFunctionsForPopulation.finishScoringFunctions();
-		if (newScoreAssigner != null) {
-			newScoreAssigner.assignNewScores(this.iteration, scoringFunctionsForPopulation, population);
+		if (iteration == -1) {
+			throw new RuntimeException("Please initialize me before the iteration starts.");
 		}
+		controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
+		scoringFunctionsForPopulation.finishScoringFunctions();
+		newScoreAssigner.assignNewScores(this.iteration, scoringFunctionsForPopulation, population);
 		finished = true;
 	}
 
@@ -131,7 +145,6 @@ public class EventsToScore implements BasicEventHandler {
 
 	@Override
 	public void reset(int iteration) {
-		this.iteration = iteration;
 	}
 
 	@Override

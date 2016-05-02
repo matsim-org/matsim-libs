@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -46,9 +47,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
@@ -57,12 +59,15 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
 /**
  * @author nagel, ikaddoura
  */
 public final class PopulationUtils {
+	private static final Logger log = Logger.getLogger( PopulationUtils.class );
+
 	/**
 	 * Is a namespace, so don't instantiate:
 	 */
@@ -95,7 +100,7 @@ public final class PopulationUtils {
 	}
 
 	public static Population createPopulation(PlansConfigGroup plansConfigGroup, Network network) {
-		ModeRouteFactory routeFactory = new ModeRouteFactory();
+		RouteFactoryImpl routeFactory = new RouteFactoryImpl();
 		String networkRouteType = plansConfigGroup.getNetworkRouteType();
 		RouteFactory factory;
 		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
@@ -233,6 +238,16 @@ public final class PopulationUtils {
 			return this.delegate.toString() ;
 		}
 
+		@Override
+		public void setLinkId(Id<Link> id) {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public void setFacilityId(Id<ActivityFacility> id) {
+			throw new UnsupportedOperationException() ;
+		}
+
 	}
 
 	/**
@@ -354,6 +369,47 @@ public final class PopulationUtils {
 		return Time.UNDEFINED_TIME ;
 	}
 
+	private static int missingFacilityCnt = 0 ;
+	public static Id<Link> computeLinkIdFromActivity( Activity act, ActivityFacilities facs, Config config ) {
+		// the following might eventually become configurable by config. kai, feb'16
+		if ( act.getFacilityId()==null ) {
+			final Id<Link> linkIdFromActivity = act.getLinkId();
+			Gbl.assertNotNull( linkIdFromActivity );
+			return linkIdFromActivity ;
+		} else {
+			ActivityFacility facility = facs.getFacilities().get( act.getFacilityId() ) ;
+			if ( facility==null || facility.getLinkId()==null ) {
+				if ( facility==null ) {
+					if ( missingFacilityCnt < 10 ) {
+						log.warn("we have a facility ID for an activity, but can't find the facility; this should not really happen. Falling back on link ID.") ;
+						missingFacilityCnt++ ;
+						if ( missingFacilityCnt==10 ) {
+							log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+						}
+					}
+				}
+				final Id<Link> linkIdFromActivity = act.getLinkId();
+				Gbl.assertIf( linkIdFromActivity!=null );
+				return linkIdFromActivity ;
+			} else {
+				return facility.getLinkId() ;
+			} 
+			// yy sorry about this mess, I am just trying to make explicit which seems to have been the logic so far implicitly.  kai, feb'16
+		}
+	}
+
+	public static Coord computeCoordFromActivity( Activity act, ActivityFacilities facs, Config config ) {
+		// the following might eventually become configurable by config. kai, feb'16
+		if ( act.getFacilityId()==null ) {
+			return act.getCoord() ; // if not available, fall back on coord of link?
+		} else {
+			Gbl.assertIf( facs!=null ) ;
+			ActivityFacility facility = facs.getFacilities().get( act.getFacilityId() ) ;
+			Gbl.assertIf( facility!=null );
+			return facility.getCoord() ;
+		}
+	}
+	
 	/**
 	 * A pointer to material in TripStructureUtils
 	 *

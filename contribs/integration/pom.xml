@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
   </parent>
   
   <build>
@@ -32,8 +32,8 @@
           <includes>
             <include>**/SomeNonExistingTestName</include>
           </includes>
-          <forkMode>once</forkMode>
-          <argLine>-Xmx2000m -Djava.awt.headless=true</argLine>
+          <forkMode>always</forkMode>
+          <argLine>-Xmx1500m -Djava.awt.headless=true</argLine>
           <enableAssertions>false</enableAssertions>
         </configuration>
       </plugin>
@@ -79,12 +79,12 @@
   <dependency>
   	<groupId>org.matsim.contrib</groupId>
   	<artifactId>accessibility</artifactId>
-  	<version>0.8.0-SNAPSHOT</version>
+  	<version>0.9.0-SNAPSHOT</version>
   </dependency>
   <dependency>
   	<groupId>org.matsim.contrib</groupId>
   	<artifactId>analysis</artifactId>
-  	<version>0.8.0-SNAPSHOT</version>
+  	<version>0.9.0-SNAPSHOT</version>
   </dependency>
   <dependency>
     <groupId>org.geotools.jdbc</groupId>

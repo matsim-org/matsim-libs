@@ -24,6 +24,7 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -42,10 +43,10 @@ class VehicularDepartureHandler implements DepartureHandler {
 
 	private final Collection<String> transportModes;
 
-	VehicularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
+	VehicularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
-		this.transportModes = qNetsimEngine.getMobsim().getScenario().getConfig().qsim().getMainModes();
+		this.transportModes =qsimConfig.getMainModes();
 	}
 
 	@Override
@@ -68,7 +69,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 		// Thus, such trips are now simulated normally.
 		// See MATSIM-233 for details. td apr'14
 		Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
-		QLinkInternalI qlink = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
+		QLinkI qlink = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
 			if (vehicleBehavior == VehicleBehavior.teleport) {
@@ -111,7 +112,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 					log.info("No more occurrences of teleported vehicles will be reported.");
 				}
 			}
-			QLinkInternalI qlinkOld = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
+			QLinkI qlinkOld = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
 			QVehicle result = qlinkOld.removeParkedVehicle(vehicle.getId());
 			if ( result==null ) {
 				throw new RuntimeException( "Could not remove parked vehicle with id " + vehicle.getId() +" on the link id " 

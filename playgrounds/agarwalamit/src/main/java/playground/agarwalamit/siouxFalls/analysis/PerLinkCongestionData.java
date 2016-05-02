@@ -56,9 +56,8 @@ public class PerLinkCongestionData {
 
 		Scenario scenario = LoadMyScenarios.loadScenarioFromNetworkAndConfig(this.networkFile,this.configFile);
 		this.network = scenario.getNetwork();
-		ExperiencedDelayAnalyzer linkAnalyzer = new ExperiencedDelayAnalyzer(this.eventFile,scenario,1);
-		linkAnalyzer.preProcessData();
-		linkAnalyzer.postProcessData();
+		ExperiencedDelayAnalyzer linkAnalyzer = new ExperiencedDelayAnalyzer(this.eventFile,scenario,1, scenario.getConfig().qsim().getEndTime());
+		linkAnalyzer.run();
 		linkAnalyzer.checkTotalDelayUsingAlternativeMethod();
 		Map<Double, Map<Id<Link>, Double>> time2linkIdDelays = linkAnalyzer.getTimeBin2LinkId2Delay();
 		

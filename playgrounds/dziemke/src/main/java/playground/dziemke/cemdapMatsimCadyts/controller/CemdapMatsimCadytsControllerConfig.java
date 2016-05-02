@@ -20,6 +20,8 @@
 
 package playground.dziemke.cemdapMatsimCadyts.controller;
 
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
@@ -34,56 +36,42 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 
-import javax.inject.Inject;
-
+/**
+ * @author dziemke
+ */
 public class CemdapMatsimCadytsControllerConfig {
-//	private final static Logger log = Logger.getLogger(CemdapMatsimCadytsControllerConfig.class);
 	
 	public static void main(final String[] args) {
 		final Config config = ConfigUtils.loadConfig(args[0]);
 		
-		// start controller
 		final Controler controler = new Controler(config);
 		controler.addOverridingModule(new CadytsCarModule());
-		// cadytsContext (and cadytsCarConfigGroup)
-		// CadytsContext generates new CadytsCarConfigGroup with name "cadytsCar"
 
-		// plan strategy
-        // not necessary anymore, just use normal ChangeExpBeta
 
-//		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
-//			@Override
-//			public PlanStrategy get() {
-//				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(
-//						controler.getConfig().planCalcScore().getBrainExpBeta(), cContext));
-//			}
-//		});
-		
-		// scoring function
+		/* Add Cadyts component to scoring function */
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-			final CharyparNagelScoringParametersForPerson parameters = new SubpopulationCharyparNagelScoringParameters( controler.getScenario() );
-			@Inject private CadytsContext cContext;
+			@Inject private CadytsContext cadytsContext;
+			@Inject CharyparNagelScoringParametersForPerson parameters;
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = parameters.getScoringParameters( person );
+				final CharyparNagelScoringParameters params = parameters.getScoringParameters(person);
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cContext);
+				final CadytsScoring<Link> scoringFunction = new CadytsScoring<Link>(person.getSelectedPlan(), config, cadytsContext);
 				final double cadytsScoringWeight = Double.parseDouble(args[1]);
-				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
-				sumScoringFunction.addScoringFunction(scoringFunction );
+				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
+				sumScoringFunction.addScoringFunction(scoringFunction);
 
 				return sumScoringFunction;
 			}
-		}) ;
+		});
 
 		controler.run();
 	}

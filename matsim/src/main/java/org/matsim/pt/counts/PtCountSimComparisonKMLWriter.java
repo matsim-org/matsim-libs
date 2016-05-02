@@ -136,7 +136,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	 * Sets the data to the fields of this class
 	 *
 	 * @param countSimCompList
-	 * @param network
+	 * @param qnetwork
 	 * @param coordTransform
 	 */
 	@Deprecated // we should try to rather make CountSimComparisonKMLWriter more general. kai, dec'13

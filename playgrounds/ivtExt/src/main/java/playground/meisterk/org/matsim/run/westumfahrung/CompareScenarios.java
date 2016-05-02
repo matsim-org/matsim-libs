@@ -46,16 +46,10 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.utils.misc.Time;
-import playground.balmermi.world.World;
-import playground.meisterk.org.matsim.run.facilities.ShopsOf2005ToFacilities;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Pattern;
 
 
@@ -110,7 +104,7 @@ public class CompareScenarios {
 
 	}
 
-	private static final Logger log = Logger.getLogger(ShopsOf2005ToFacilities.class);
+	private static final Logger log = Logger.getLogger(CompareScenarios.class);
 
 	// transit agents have ids > 1'000'000'000
 	private static final String TRANSIT_PERSON_ID_PATTERN = "[0-9]{10}";
@@ -169,7 +163,10 @@ public class CompareScenarios {
 		log.info("Init...done.");
 		System.out.flush();
 		log.info("Performing analyses...");
-		this.doAnalyses(null);
+		if (true)
+			throw new RuntimeException("Reference to balmermi removed! the rest of the code is not working");
+
+		//this.doAnalyses(null);
 		log.info("Performing analyses...done.");
 		System.out.flush();
 		log.info("Writing out results...");
@@ -329,6 +326,7 @@ public class CompareScenarios {
 	 *
 	 * Summarize their average trip travel times, the scores of their selected plans, and their home locations.
 	 */
+	/*
 	private void doAnalyses(World world) {
 
 		TreeMap<Integer, TreeMap<String, PersonIdRecorder>> personIdRecorders = new TreeMap<Integer, TreeMap<String, PersonIdRecorder>>();
@@ -499,7 +497,7 @@ public class CompareScenarios {
 		}
 
 	}
-
+*/
 	private void writeComparison(final List<CaseStudyResult> results) {
 
 		this.scenarioComparisonLines.add("casestudy\tn_{agents}\tscore_{avg}\tt_{trip, avg}\td_{trip, avg}[m]");

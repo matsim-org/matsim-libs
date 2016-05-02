@@ -22,6 +22,7 @@ package playground.benjamin.scenarios.munich.exposure;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
@@ -60,7 +61,7 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 	}
 
 	private void calculateColdEmissionCostsAndThrowEvent(ColdEmissionEvent event) {
-		Id personId = event.getVehicleId();
+		Id<Person> personId = Id.createPersonId(event.getVehicleId());
 		double time = event.getTime();
 		double coldEmissionCosts = emissionResponsibilityCostModule.calculateColdEmissionCosts(event.getColdEmissions(), event.getLinkId(), time);
 		double amount2Pay = - coldEmissionCosts;
@@ -71,7 +72,7 @@ public class EmissionResponsibilityInternalizationHandler implements WarmEmissio
 	}
 
 	private void calculateWarmEmissionCostsAndThrowEvent(WarmEmissionEvent event) {
-		Id personId = event.getVehicleId();
+		Id<Person> personId = Id.createPersonId(event.getVehicleId());
 		double time = event.getTime();
 		double warmEmissionCosts = emissionResponsibilityCostModule.calculateWarmEmissionCosts(event.getWarmEmissions(), event.getLinkId(), time);
 		double amount2Pay = - warmEmissionCosts;

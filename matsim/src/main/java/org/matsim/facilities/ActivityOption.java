@@ -39,15 +39,4 @@ public interface ActivityOption extends MatsimFacilitiesObject {
 
 	public String getType();
 
-	public ActivityFacility getFacility();
-	
-	/**
-	 * Sets the reference to the facility this activity option belongs to.
-	 * This is done automatically if using {@link ActivityFacility#addActivityOption(ActivityOption)}.
-	 * Make sure that the bidirectional reference is set correctly if you are using this method!
-	 * 
-	 * @param facility
-	 */
-	public void setFacility(final ActivityFacility facility);
-	
 }

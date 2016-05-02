@@ -38,37 +38,37 @@ public class MessageFactory {
 	private static LinkedList<DeadlockPreventionMessage> deadlockPreventionMessageQueue = new LinkedList<DeadlockPreventionMessage>();
 
 	public static void disposeEndLegMessage(EndLegMessage message) {
-		if (!SimulationParameters.isGC_MESSAGES()) {
+		if (!JDEQSimConfigGroup.isGC_MESSAGES()) {
 			endLegMessageQueue.add(message);
 		}
 	}
 
 	public static void disposeEnterRoadMessage(EnterRoadMessage message) {
-		if (!SimulationParameters.isGC_MESSAGES()) {
+		if (!JDEQSimConfigGroup.isGC_MESSAGES()) {
 			enterRoadMessageQueue.add(message);
 		}
 	}
 
 	public static void disposeStartingLegMessage(StartingLegMessage message) {
-		if (!SimulationParameters.isGC_MESSAGES()) {
+		if (!JDEQSimConfigGroup.isGC_MESSAGES()) {
 			startingLegMessageQueue.add(message);
 		}
 	}
 
 	public static void disposeLeaveRoadMessage(LeaveRoadMessage message) {
-		if (!SimulationParameters.isGC_MESSAGES()) {
+		if (!JDEQSimConfigGroup.isGC_MESSAGES()) {
 			leaveRoadMessageQueue.add(message);
 		}
 	}
 
 	public static void disposeEndRoadMessage(EndRoadMessage message) {
-		if (!SimulationParameters.isGC_MESSAGES()) {
+		if (!JDEQSimConfigGroup.isGC_MESSAGES()) {
 			endRoadMessageQueue.add(message);
 		}
 	}
 
 	public static void disposeDeadlockPreventionMessage(DeadlockPreventionMessage message) {
-		if (!SimulationParameters.isGC_MESSAGES()) {
+		if (!JDEQSimConfigGroup.isGC_MESSAGES()) {
 			deadlockPreventionMessageQueue.add(message);
 		}
 	}

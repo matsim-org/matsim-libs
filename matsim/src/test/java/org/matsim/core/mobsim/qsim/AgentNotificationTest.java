@@ -15,7 +15,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -30,7 +32,9 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
 import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.Facility;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 
@@ -63,7 +67,7 @@ public class AgentNotificationTest {
 
 			PersonDriverAgentImpl delegate;
 
-			public MyAgent(Plan selectedPlan) {
+			MyAgent(Plan selectedPlan) {
 				delegate = new PersonDriverAgentImpl(selectedPlan, simulation);
 			}
 
@@ -160,7 +164,7 @@ public class AgentNotificationTest {
 				messageQueue.putMessage(m);
 			}
 
-			void onTenMinutesAfterDeparting() {
+			private void onTenMinutesAfterDeparting() {
 				simulation.getEventsManager().processEvent(new HomesicknessEvent());
 			}
 
@@ -206,11 +210,27 @@ public class AgentNotificationTest {
 					return attributes;
 				}
 			}
+
+			@Override
+			public Facility<? extends Facility<?>> getCurrentFacility() {
+				return delegate.getCurrentFacility() ;
+			}
+
+			@Override
+			public Facility<? extends Facility<?>> getDestinationFacility() {
+				return delegate.getDestinationFacility() ;
+			}
+
+			@Override
+			public PlanElement getPreviousPlanElement() {
+				return delegate.getPreviousPlanElement() ;
+			}
 		}
 
 	}
 
 
+	@SuppressWarnings("static-method")
 	@Test
 	public void testAgentNotification() {
 		Scenario scenario = createSimpleScenario();
@@ -242,15 +262,19 @@ public class AgentNotificationTest {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsCollector handler = new EventsCollector();
 		eventsManager.addHandler(handler);
+		
 		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
+
 		qSim.run();
+		// yyyyyy I can comment out the above line and the test still passes (will say: "skipped"). ?????? kai, feb'16
+		
 		assumeThat(handler.getEvents(), hasItem(
 				is(both(eventWithTime(25200.0)).and(instanceOf(PersonDepartureEvent.class)))));
 		assertThat(handler.getEvents(), hasItem(
 				is(both(eventWithTime(25800.0)).and(instanceOf(MyAgentFactory.MyAgent.HomesicknessEvent.class)))));
 	}
 
-	private Matcher<Event> eventWithTime(double time) {
+	private static Matcher<Event> eventWithTime(double time) {
 		return new FeatureMatcher<Event, Double>(is(time), "time", "time") {
 			@Override
 			protected Double featureValueOf(Event event) {
@@ -259,8 +283,15 @@ public class AgentNotificationTest {
 		};
 	}
 
-	private Scenario createSimpleScenario() {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private static Scenario createSimpleScenario() {
+		final Config config = ConfigUtils.createConfig();
+
+		ModeRoutingParams params = new ModeRoutingParams( TransportMode.walk ) ;
+		params.setBeelineDistanceFactor(1.3);
+		params.setTeleportedModeSpeed(1.);
+		config.plansCalcRoute().addModeRoutingParams( params );
+
+		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		// build simple network with 1 link
 		Network network = scenario.getNetwork();
@@ -276,21 +307,29 @@ public class AgentNotificationTest {
 		// build simple population with 1 person with 1 plan with 1 leg
 		Population population = scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
-		Person person = pb.createPerson(Id.create("1", Person.class));
-		Plan plan = pb.createPlan();
-		Activity act1 = pb.createActivityFromLinkId("h", link.getId());
-		act1.setEndTime(7.0*3600);
-		Leg leg = pb.createLeg(TransportMode.walk);
-		Route route = new GenericRouteImpl(link.getId(), link.getId());
-		route.setTravelTime(5.0*3600);
-		route.setDistance(100.0);
-		leg.setRoute(route);
-		Activity act2 = pb.createActivityFromLinkId("w", link.getId());
-		plan.addActivity(act1);
-		plan.addLeg(leg);
-		plan.addActivity(act2);
-		person.addPlan(plan);
-		population.addPerson(person);
+		{
+			Person person = pb.createPerson(Id.create("1", Person.class));
+			Plan plan = pb.createPlan();
+			{
+				Activity act1 = pb.createActivityFromLinkId("h", link.getId());
+				act1.setEndTime(7.0*3600);
+				plan.addActivity(act1);
+			}
+			{
+				Leg leg = pb.createLeg(TransportMode.walk);
+				Route route = new GenericRouteImpl(link.getId(), link.getId());
+				route.setTravelTime(5.0*3600);
+				route.setDistance(100.0);
+				leg.setRoute(route);
+				plan.addLeg(leg);
+			}
+			{
+				Activity act2 = pb.createActivityFromLinkId("w", link.getId());
+				plan.addActivity(act2);
+			}
+			person.addPlan(plan);
+			population.addPerson(person);
+		}
 		return scenario;
 	}
 

@@ -712,7 +712,7 @@ public class HITSToMATSim {
 	 * pre-processes the network for astar, and associating acts with links
 	 */
 	private void preProcessNetwork() {
-        XY2Links xY2Links = new XY2Links(network);
+        XY2Links xY2Links = new XY2Links(network, null);
 		this.links = network.getLinks();
 	}
 

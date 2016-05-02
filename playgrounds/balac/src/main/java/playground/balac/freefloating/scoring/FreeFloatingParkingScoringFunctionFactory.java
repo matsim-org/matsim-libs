@@ -27,8 +27,8 @@ public class FreeFloatingParkingScoringFunctionFactory implements ScoringFunctio
 	private Scenario scenario;
 	private CharyparNagelScoringParametersForPerson parameters;
 
-	@Inject
-	private ScoreTrackingListener tracker;
+	//@Inject
+	//private ScoreTrackingListener tracker;
 
 	@Inject
 	public FreeFloatingParkingScoringFunctionFactory(
@@ -72,7 +72,7 @@ public class FreeFloatingParkingScoringFunctionFactory implements ScoringFunctio
 			final Id<Person> person,
 			final SumScoringFunction function,
 			final BasicScoring element ) {
-		tracker.addScoringFunction(person, element);
+		//tracker.addScoringFunction(person, element);
 		function.addScoringFunction(element);
 	}
 

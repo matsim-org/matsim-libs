@@ -42,7 +42,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 
 // TODO: make abstract and create algorithm in Zuerich case -> provide protected helper methods already here.
-public class ParkingInfrastructureManager {
+public final class ParkingInfrastructureManager {
 
 	private ParkingScoreManager parkingScoreManager;
 	private HashMap<Id<PC2Parking>, PC2Parking> allParkings;
@@ -164,7 +164,7 @@ public class ParkingInfrastructureManager {
 		// availablePublicParkingAtCityCentre();
 	}
 
-	protected synchronized QuadTree<PC2Parking> getPublicParkingQuadTree() {
+	private synchronized QuadTree<PC2Parking> getPublicParkingQuadTree() {
 		return publicParkingsQuadTree;
 	}
 
@@ -264,7 +264,7 @@ public class ParkingInfrastructureManager {
 
 			// select the best one from the queue:
 			SortableMapObject<PC2Parking> poll = queue.peek();
-			finalScore = poll.getScore();
+			finalScore = poll.getWeight();
 			selectedParking = poll.getKey();
 
 			if (selectedParking instanceof RentableParking) {

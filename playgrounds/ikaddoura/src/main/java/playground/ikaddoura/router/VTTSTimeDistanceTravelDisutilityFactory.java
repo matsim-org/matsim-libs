@@ -35,13 +35,15 @@ public final class VTTSTimeDistanceTravelDisutilityFactory implements TravelDisu
 
 	private double sigma = 0. ;
 	private VTTSHandler vttsHandler;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	
-	public VTTSTimeDistanceTravelDisutilityFactory(VTTSHandler vttsHandler) {
+	public VTTSTimeDistanceTravelDisutilityFactory(VTTSHandler vttsHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.vttsHandler = vttsHandler ;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		return new VTTSTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma, vttsHandler);
 	}
 	

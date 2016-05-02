@@ -34,36 +34,32 @@ public class CreateMatrixBasedPtInputs {
 			throw new RuntimeException("Number of arguments is wrong.");
 		}
 		
-		
 		// ... for local use
 		// Input and Output
-		String networkFile = "../../../../Workspace/data/accessibility/nmb/scenario/NMBM_PT_V1.xml.gz";
+//		String networkFile = "../../../shared-svn/projects/maxess/data/nmb/transit/NMBM_PT_V1.xml.gz";
 //		String networkFile = "../../../../Workspace/shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz";
-//		String networkFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/jtlu14i.output_network.xml.gz";
-//		String networkFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14d/jtlu14d.output_network.xml.gz";
+		String networkFile = "../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/jtlu14b.output_network.xml.gz";
 //		String networkFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/network/2015-05-26/network.xml";
 		
-		String transitScheduleFile = "../../../../Workspace/data/accessibility/nmb/scenario/Transitschedule_PT_V1_WithVehicles.xml.gz";
+//		String transitScheduleFile = "../../../shared-svn/projects/maxess/data/nmb/transit/Transitschedule_PT_V1_WithVehicles.xml.gz";
 //		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/transitSchedule.xml.gz";
-//		String transitScheduleFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/ITERS/it.300/jtlu14i.300.transitScheduleScored.xml.gz";
-//		String transitScheduleFile = "../../../../Workspace/runs-svn/nmbm_minibuses/nmbm/output/jtlu14d/ITERS/it.300/jtlu14d.300.transitScheduleScored.xml.gz";
+		String transitScheduleFile = "../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/ITERS/it.300/jtlu14b.300.transitScheduleScored.xml.gz";
 //		String transitScheduleFile = "../../../../Workspace/shared-svn/projects/accessibility_berlin/gtfs/2015-07-03/transitschedule.xml";
 		
-		String outputRoot = "../../../../Workspace/data/accessibility/nmb/matrix/06/";
+//		String outputRoot = "../../../shared-svn/projects/maxess/data/nmb/transit/matrix/07/";
+		String outputRoot = "../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/matrix_03/";
 //		String outputRoot = "../../../../Workspace/shared-svn/projects/accessibility_berlin/travel_matrix/2016-01-05/";
-		
 //		String outputFileRoot = "../../data/accessibility/be_002/";
 		LogToOutputSaver.setOutputDirectory(outputRoot);
 		
 		// Parameters
-		Boolean measuringPointsAsPTStops = false;
+		Boolean measuringPointsAsPTStops = true;
 		Double cellSize = 1000.; // only relevant if "meauringPointsAsPTStops = true"
 		Double departureTime = 8. * 60 * 60;
 		Integer numberOfThreads = 1;
 //		Integer numberOfThreads = 20;
 //		String bounds = "4550000,5790000,4630000,5850000";
 		String bounds = "network"; // set bounds = "network" to compute bounds automatically based on the spatial extent of the network
-		
 		
 		// ... for server use
 		if (args.length == 8) {
@@ -77,7 +73,6 @@ public class CreateMatrixBasedPtInputs {
 			bounds = args[7];
 		}
 		
-		
 		// Logging
 		log.info("networkFile = " + networkFile);
 		log.info("transitScheduleFile = " + transitScheduleFile);
@@ -88,22 +83,19 @@ public class CreateMatrixBasedPtInputs {
 		log.info("numberOfThreads = " + numberOfThreads);
 		log.info("bounds = " + bounds);
 
-
 		// Infrastructure
 		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
 		config.network().setInputFile(networkFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getConfig().transit().setUseTransit(true);
 
-
 		// Read in public transport schedule
 		TransitScheduleReader reader = new TransitScheduleReader(scenario);
 		reader.readFile(transitScheduleFile);
 
-		
-		// A LinkedHashMap is a hash table and linked list implementation of the Map interface, with predictable iteration order.
-		// It differs from HashMap in that it maintains a doubly-linked list running through all of its entries. This linked list
-		// defines the iteration ordering, which is normally the order in which keys were inserted into the map insertion order.
+		/* A LinkedHashMap is a hash table and linked list implementation of the Map interface, with predictable iteration order.
+		 * It differs from HashMap in that it maintains a doubly-linked list running through all of its entries. This linked list
+		 * defines the iteration ordering, which is normally the order in which keys were inserted into the map insertion order. */
 		Map<Id<Coord>, Coord> ptMatrixLocationsMap = new LinkedHashMap<Id<Coord>, Coord>();
 		
 		if (measuringPointsAsPTStops == true) { // i.e. use regular, user-defined locations instead of stops from schedule
@@ -144,8 +136,7 @@ public class CreateMatrixBasedPtInputs {
 			MatrixBasedPtInputUtils.createStopsFile(ptMatrixLocationsMap, outputRoot + "ptStops.csv", ",");
 		}
 
-
-		// Split up map of locations into (approximately) equal parts
+		/* Split up map of locations into (approximately) equal parts */
 		int numberOfMeasuringPoints = ptMatrixLocationsMap.size();
 		log.info("numberOfMeasuringPoints = " + numberOfMeasuringPoints);
 		int arrayNumber = 0;
@@ -157,10 +148,9 @@ public class CreateMatrixBasedPtInputs {
 			mapOfLocationFacilitiesMaps.put(i, locationFacilitiesPartialMap);
 		}
 
-
-		// Now iterate over all locations and copy them into separate maps. Once the number of copied locations reaches a certain
-		// share of all measuringPoints, they are copied to the next map. This separation is necessary to be able to do the travel
-		// matrix computation multi-threaded.
+		/* Now iterate over all locations and copy them into separate maps. Once the number of copied locations reaches a certain
+		 * share of all measuringPoints, they are copied to the next map. This separation is necessary to be able to do the travel
+		 * matrix computation multi-threaded. */
 		for (Id<Coord> locationFacilityId : ptMatrixLocationsMap.keySet()) {
 			mapOfLocationFacilitiesMaps.get(arrayNumber).put(locationFacilityId, ptMatrixLocationsMap.get(locationFacilityId));
 			locationsAdded++;
@@ -169,7 +159,6 @@ public class CreateMatrixBasedPtInputs {
 				locationsAdded = 0;
 			}
 		}
-
 
 		for (int currentThreadNumber = 0; currentThreadNumber < numberOfThreads; currentThreadNumber++) {
 			new ThreadedMatrixCreator(scenario, mapOfLocationFacilitiesMaps.get(currentThreadNumber), 

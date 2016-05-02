@@ -40,14 +40,15 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
 public class LegModeDistanceDistributionSantiagoComparison {
 	private final static Logger logger = Logger.getLogger(LegModeDistanceDistributionSantiagoComparison.class);
 	
-	static String baseFolder1 = "../../../runs-svn/santiago/run40/output/";
+//	static String baseFolder1 = "../../../runs-svn/santiago/baseCase8/";
+	static String baseFolder1 = "../../../runs-svn/santiago/triangleCordon/";
 	static String configFile1 = baseFolder1 + "output_config.xml.gz";
-	static String iteration1 = "0";
+	static String iteration1 = "100";
 	
 	// ===
 	static String baseFolder2 = baseFolder1;
 	static String configFile2 = configFile1;
-	static String iteration2 = "100";
+	static String iteration2 = "200";
 	
 	//TODO: adapt this to agentAttributes
 	static UserGroup userGroup = null;

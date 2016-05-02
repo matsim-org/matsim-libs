@@ -220,6 +220,16 @@ public class TripRouterTest {
 		public boolean equals(final Object o) {
 			return true;
 		}
+		@Override
+		public void setLinkId(Id<Link> id) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
+		@Override
+		public void setFacilityId(Id<ActivityFacility> id) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented") ;
+		}
 	}
 }
 

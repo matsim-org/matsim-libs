@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
+import org.matsim.contrib.signals.model.SignalGroup;
 
 
 /**
@@ -32,7 +33,7 @@ import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
  */
 public class DgSignalSystemAnalysisData {
 
-  private Map<Id, DgSignalGroupAnalysisData> systemGroupDataMap = new HashMap<Id, DgSignalGroupAnalysisData>();
+  private Map<Id<SignalGroup>, DgSignalGroupAnalysisData> systemGroupDataMap = new HashMap<>();
   
   public void processStateChange(SignalGroupStateChangedEvent e) {
     DgSignalGroupAnalysisData groupData = this.systemGroupDataMap.get(e.getSignalGroupId());
@@ -44,7 +45,7 @@ public class DgSignalSystemAnalysisData {
   }
 
   
-  public Map<Id, DgSignalGroupAnalysisData> getSystemGroupAnalysisDataMap() {
+  public Map<Id<SignalGroup>, DgSignalGroupAnalysisData> getSystemGroupAnalysisDataMap() {
     return systemGroupDataMap;
   }
 }

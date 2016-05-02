@@ -440,7 +440,8 @@ public final class NetworkImpl implements Network {
 
 	public LinkImpl createAndAddLink(final Id<Link> id, final Node fromNode,
 			final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes,
-			final String origId, final String type) {
+			final String origId, final String type) 
+	{
 
 				if (this.nodes.get(fromNode.getId()) == null) {
 					throw new IllegalArgumentException(this+"[from="+fromNode+" does not exist]");

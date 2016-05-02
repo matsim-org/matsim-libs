@@ -50,7 +50,7 @@ public class AgentCounter extends ScenarioAnalyzerEventHandler implements Activi
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (!event.getPersonId().toString().contains("pt")) {
+		if (isPersonToConsider(event.getPersonId())) {
 			agentsAndLinks.add(new String[]{event.getPersonId().toString(), event.getLinkId().toString()});
 		}
 	}

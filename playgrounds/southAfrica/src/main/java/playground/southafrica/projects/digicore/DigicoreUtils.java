@@ -32,6 +32,15 @@ public class DigicoreUtils {
 		return c;
 	}
 	
+	public static String getTimeOfDayFromCalendar(Calendar cal){
+		String time = String.format("%02d:%02d:%02d.%03d", 
+				cal.get(Calendar.HOUR_OF_DAY),
+				cal.get(Calendar.MINUTE),
+				cal.get(Calendar.SECOND),
+				cal.get(Calendar.MILLISECOND));
+		return time;
+	}
+	
 	public static void main(String[] args) throws IOException{
 		Header.printHeader(DigicoreUtils.class.toString(), args);
 		int option = Integer.parseInt(args[0]);

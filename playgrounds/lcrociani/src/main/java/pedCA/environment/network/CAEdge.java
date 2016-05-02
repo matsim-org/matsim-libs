@@ -4,11 +4,13 @@ public class CAEdge {
 	private CANode n1;
 	private CANode n2;
 	private double length;
+	private boolean isStairs;
 	
-	public CAEdge(CANode n1, CANode n2, double ffDistance){
+	public CAEdge(CANode n1, CANode n2, double ffDistance, boolean isStairs){
 		this.n1 = n1;
 		this.n2 = n2;
 		this.length = ffDistance;
+		this.isStairs = isStairs;
 	}
 
 	public double getLength(){
@@ -21,6 +23,10 @@ public class CAEdge {
 	
 	public CANode getN2(){
 		return n2;
+	}
+	
+	public boolean isStairs(){
+		return isStairs;
 	}
 	
 	@Override

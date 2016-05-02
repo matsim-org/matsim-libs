@@ -6,8 +6,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.TransportMode;
 
 import playground.dhosse.gap.Global;
-import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
-import playground.dhosse.utils.EgapHashGenerator;
+import playground.dhosse.scenarios.generic.population.HashGenerator;
+import playground.dhosse.scenarios.generic.population.io.mid.MiDPersonGroupData;
 
 public class EgapPopulationUtilsV2 {
 	
@@ -28,17 +28,17 @@ public class EgapPopulationUtilsV2 {
 			MiDPersonGroupData students = new MiDPersonGroupData(6, 17);
 			students.setLegsPerPersonAndDay(2.81);
 			setPercentages(students);
-			EgapPopulationUtilsV2.personGroupData.put(EgapHashGenerator.generateAgeGroupHash(6, 17), students);
+			EgapPopulationUtilsV2.personGroupData.put(HashGenerator.generateAgeGroupHash(6, 17), students);
 			
 			MiDPersonGroupData adults = new MiDPersonGroupData(18, 65);
 			students.setLegsPerPersonAndDay(3.44);
 			setPercentages(adults);
-			EgapPopulationUtilsV2.personGroupData.put(EgapHashGenerator.generateAgeGroupHash(18, 65), adults);
+			EgapPopulationUtilsV2.personGroupData.put(HashGenerator.generateAgeGroupHash(18, 65), adults);
 			
 			MiDPersonGroupData pensioners = new MiDPersonGroupData(66, 100);
 			pensioners.setLegsPerPersonAndDay(2.29);
 			setPercentages(pensioners);
-			EgapPopulationUtilsV2.personGroupData.put(EgapHashGenerator.generateAgeGroupHash(66, 100), pensioners);
+			EgapPopulationUtilsV2.personGroupData.put(HashGenerator.generateAgeGroupHash(66, 100), pensioners);
 			
 			return EgapPopulationUtilsV2.personGroupData;
 			

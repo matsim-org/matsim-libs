@@ -20,6 +20,8 @@
 
 package org.matsim.core.scoring;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -32,14 +34,11 @@ import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 
 /**
  * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
  * scoring of plans in every iteration. Basically it integrates the
- * {@link org.matsim.core.scoring.EventsToScore} with the
+ * {@link org.matsim.core.scoring.ScoringFunctionsForPopulation} with the
  * {@link org.matsim.core.controler.Controler}.
  *
  * @author mrieser, michaz
@@ -52,6 +51,7 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 	@Inject private Population population;
 	@Inject private OutputDirectoryHierarchy controlerIO;
 	@Inject private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
+	@Inject private ExperiencedPlansService experiencedPlansService;
 
 	@Override
 	public void notifyScoring(final ScoringEvent event) {
@@ -65,12 +65,13 @@ final class PlansScoringImpl implements PlansScoring, ScoringListener, Iteration
 		if(planCalcScoreConfigGroup.isWriteExperiencedPlans()) {
 			final int writePlansInterval = controlerConfigGroup.getWritePlansInterval();
 			if (writePlansInterval > 0 && event.getIteration() % writePlansInterval == 0) {
-				this.scoringFunctionsForPopulation.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans"));
+				this.experiencedPlansService.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml.gz"));
+				this.scoringFunctionsForPopulation.writePartialScores(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans_scores.xml.gz"));
 			}
 		}
 		if (planCalcScoreConfigGroup.isMemorizingExperiencedPlans() ) {
 			for ( Person person : this.population.getPersons().values() ) {
-				Plan experiencedPlan = this.scoringFunctionsForPopulation.getAgentRecords().get( person.getId() ) ;
+				Plan experiencedPlan = this.experiencedPlansService.getAgentRecords().get( person.getId() ) ;
 				if ( experiencedPlan==null ) {
 					throw new RuntimeException("experienced plan is null; I don't think this should happen") ;
 				}

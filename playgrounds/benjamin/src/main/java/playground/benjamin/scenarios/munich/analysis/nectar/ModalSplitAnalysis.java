@@ -151,7 +151,7 @@ public class ModalSplitAnalysis {
 						if(legMode.equals(mode)){
 							Coord from = plan.getPreviousActivity(leg).getCoord();
 							Coord to = plan.getNextActivity(leg).getCoord();
-							Double legDist = CoordUtils.calcDistance(from, to);
+							Double legDist = CoordUtils.calcEuclideanDistance(from, to);
 							noOfLegs ++;
 							sumOfBeelineDistances += legDist;
 						}

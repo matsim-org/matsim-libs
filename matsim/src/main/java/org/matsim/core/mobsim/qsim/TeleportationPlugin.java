@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class TeleportationPlugin extends AbstractQSimPlugin {
-
 	public TeleportationPlugin(Config config) {
 		super(config);
 	}

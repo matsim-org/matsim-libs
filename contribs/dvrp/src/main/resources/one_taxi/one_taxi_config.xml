@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="one_taxi">
+		<param name="taxisFile" value="src/main/resources/one_taxi/one_taxi_vehicles.xml" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="src/main/resources/grid_network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="src/main/resources/one_taxi/one_taxi_population.xml" />
+	</module>
+
+	<module name="qsim">
+		<param name="simStarttimeInterpretation" value="onlyUseStarttime" />
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
+		<param name="snapshotStyle" value="queue" />
+	</module>
+	
+	<module name="otfvis">
+		<param name="coloringScheme" value="taxicab" />
+		<param name="drawNonMovingItems" value="true" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="test/output/one_taxi" />
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="2" />
+	</module>
+
+	<module name="planCalcScore">
+		<param name="activityType_0" value="dummy" />
+		<param name="activityTypicalDuration_0" value="24:00:00" />
+	</module>
+
+	<module name="strategy">
+		<!-- Either we have only DynAgents, or we want "standard" agents to serve as a background,
+		i.e. not to change their behavior -->
+		<param name="maxAgentPlanMemorySize" value="1" />
+		<param name="ModuleProbability_1" value="1.0" />
+		<param name="Module_1" value="BestScore" />
+	</module>
+</config>

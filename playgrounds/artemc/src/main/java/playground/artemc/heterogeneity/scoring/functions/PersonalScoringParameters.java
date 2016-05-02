@@ -86,7 +86,7 @@ public class PersonalScoringParameters implements MatsimParameters {
 			if (params.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				factory.setScoreAtAll(false) ;
 			}
-			tmpUtlParams.put(params.getActivityType(), factory.create() ) ;
+			tmpUtlParams.put(params.getActivityType(), factory.build() ) ;
 		}
 		utilParams = Collections.unmodifiableMap(tmpUtlParams );
 		

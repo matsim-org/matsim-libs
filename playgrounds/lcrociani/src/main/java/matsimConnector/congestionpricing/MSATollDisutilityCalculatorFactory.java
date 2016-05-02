@@ -37,13 +37,15 @@ import org.matsim.vehicles.Vehicle;
 public class MSATollDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
 	private final MSATollHandler tollHandler;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public MSATollDisutilityCalculatorFactory(MSATollHandler tollHandler) {
+	public MSATollDisutilityCalculatorFactory(MSATollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.tollHandler = tollHandler;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		final MSATollTravelDisutilityCalculator ttdc = new MSATollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, this.tollHandler);
 
 		return new TravelDisutility(){

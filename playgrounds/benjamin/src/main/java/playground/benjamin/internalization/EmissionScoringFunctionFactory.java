@@ -47,7 +47,7 @@ public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 	public EmissionScoringFunctionFactory(MatsimServices controler) {
 		this.controler = controler;
 		this.configGroup = controler.getConfig().planCalcScore();
-		this.params = CharyparNagelScoringParameters.getBuilder(configGroup, configGroup.getScoringParameters( null ), controler.getConfig().scenario()).create();
+		this.params = new CharyparNagelScoringParameters.Builder(configGroup, configGroup.getScoringParameters(null), controler.getConfig().scenario()).build();
 		this.network = controler.getScenario().getNetwork();
 		this.scoringFromEmissions = new ScoringFromEmissions(params);
 	}
@@ -56,7 +56,7 @@ public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 	public ScoringFunction createNewScoringFunction(Person person) {
 		
 		PlanCalcScoreConfigGroup configGroup = controler.getConfig().planCalcScore();
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(configGroup, configGroup.getScoringParameters( null ), controler.getConfig().scenario()).create();
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters.Builder(configGroup, configGroup.getScoringParameters(null), controler.getConfig().scenario()).build();
 		Network network = controler.getScenario().getNetwork();
 		
 		ScoringFunctionAccumulator accumulator = new ScoringFunctionAccumulator();

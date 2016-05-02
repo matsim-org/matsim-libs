@@ -61,7 +61,7 @@ public class Aggregate2Nuts3 {
 		reader.parse(matrixFile);
 		NumericMatrix m = reader.getMatrix();
 
-		ZoneCollection modenaZones = new ZoneCollection();
+		ZoneCollection modenaZones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get(zonesFile)));
 		modenaZones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		modenaZones.setPrimaryKey(ZONE_KEY);

@@ -19,5 +19,7 @@ public interface VisVehicle extends Identifiable<Vehicle> {
 	Vehicle getVehicle();
 
 	MobsimDriverAgent getDriver() ;
+	
+	double getSizeInEquivalents() ;
 
 }

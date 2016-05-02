@@ -38,7 +38,7 @@ public class TransitLineImpl implements TransitLine {
 
 	private final Id<TransitLine> lineId;
 	private String name = null;
-	private final Map<Id<TransitRoute>, TransitRoute> transitRoutes = new LinkedHashMap<Id<TransitRoute>, TransitRoute>();
+	private final Map<Id<TransitRoute>, TransitRoute> transitRoutes = new LinkedHashMap<Id<TransitRoute>, TransitRoute>(5);
 
 	protected TransitLineImpl(final Id<TransitLine> id) {
 		this.lineId = id;

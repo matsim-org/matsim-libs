@@ -6,13 +6,15 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.AverageWalkDistanceStatsZH;
 import playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis.ParkingGroupOccupanciesZH;
 
-public class RentPrivateParkingModel extends GeneralParkingModule {
+public class RentPrivateParkingModel extends GeneralParkingModule implements IterationStartsListener, IterationEndsListener {
 
 	private EventsManager eventsManager;
 	private EventWriterXML eventsWriter;
@@ -28,10 +30,6 @@ public class RentPrivateParkingModel extends GeneralParkingModule {
 	
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		super.notifyIterationStarts(event);
-		//resetForNewIterationStart();
-		// already called by free floating code
-		
 		eventsManager = EventsUtils.createEventsManager();
 		eventsWriter = new EventWriterXML(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingEvents.xml.gz"));
 		eventsManager.addHandler(eventsWriter);
@@ -46,8 +44,7 @@ public class RentPrivateParkingModel extends GeneralParkingModule {
 	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		super.notifyIterationEnds(event);
-		
+
 		parkingGroupOccupanciesZH.savePlot(event.getServices().getControlerIO().getIterationFilename(event.getIteration(), "parkingGroupOccupancy.png"));
 		averageWalkDistanceStatsZH.printStatistics();
 		
@@ -62,7 +59,7 @@ public class RentPrivateParkingModel extends GeneralParkingModule {
 		super.notifyStartup(event);
 		parkingGroupOccupanciesZH = new ParkingGroupOccupanciesZH(getControler());
 		getControler().getEvents().addHandler(parkingGroupOccupanciesZH);
-		averageWalkDistanceStatsZH = new AverageWalkDistanceStatsZH(parkingInfrastructureManager.getAllParkings());
+		averageWalkDistanceStatsZH = new AverageWalkDistanceStatsZH(getParkingInfrastructureManager().getAllParkings());
 		getControler().getEvents().addHandler(averageWalkDistanceStatsZH);
 	}
 

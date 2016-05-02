@@ -75,7 +75,7 @@ public class GrocaryDistanceTravelled {
 					
 					if (((Leg) pe).getMode().equals("car")) {
 						
-						previousDistance = RouteUtils.calcDistance((NetworkRoute)(((Leg) pe).getRoute()), scenario.getNetwork());
+						previousDistance = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute)(((Leg) pe).getRoute()), scenario.getNetwork());
 						
 					}
 				}

@@ -24,7 +24,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -50,7 +50,7 @@ public class SubNetworkLinkStats
         Predicate<Link> linkInsidePolygonPredicate = PolygonBasedFilter
                 .createLinkInsidePolygonPredicate(polygonGeometry, includeBorderLinks);
 
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         MatsimNetworkReader nr = new MatsimNetworkReader(scenario.getNetwork());
         nr.readFile(networkFile);
 

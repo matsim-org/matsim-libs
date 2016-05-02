@@ -203,26 +203,6 @@ public class M4UConfigUtils {
 //		InternalConstants.MATSIM_4_OPUS_TEMP = Paths.checkPathEnding(module.getMATSim4OpusTemp());
 //		InternalConstants.MATSIM_4_OPUS_BACKUP = Paths.checkPathEnding(module.getMATSim4OpusBackup());
 	}
-	
-	/**
-	 * @param matsim4urbansimConfigPart1
-	 * @throws UncheckedIOException
-	 */
-	 static ConfigGroup getM4UModuleFromExternalConfig(String externalMATSimConfigFilename) throws UncheckedIOException {
-
-		if(externalMATSimConfigFilename != null && Paths.pathExsits(externalMATSimConfigFilename)){
-			Config tempConfig = ConfigUtils.loadConfig( externalMATSimConfigFilename.trim() );
-
-			// loading additional matsim4urbansim parameter settings from external config file
-			ConfigGroup module = tempConfig.getModule(MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-			if(module == null)
-				log.info("No \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings found in " + externalMATSimConfigFilename);
-			else
-				log.info("Found \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings in " + externalMATSimConfigFilename);
-			return module ;
-		}
-		return null ;
-	}
 
 	/**
 	 * setting MATSim network
@@ -327,7 +307,8 @@ public class M4UConfigUtils {
 		qsimCG.setFlowCapFactor( popSampling );	
 		
 			
-		qsimCG.setStorageCapFactor( popSampling * Math.pow(popSampling, -0.25) ) ;   // same as: popSampling / Math.sqrt(Math.sqrt(sample))
+		qsimCG.setStorageCapFactor( popSampling * Math.pow(popSampling, -0.25) ) ;   // same as: sample / Math.sqrt(Math.sqrt(sample))
+		// yy and same as Math.pow( popSampling, 0.75 ), isn't it? 
 
 		qsimCG.setRemoveStuckVehicles( false );
 		qsimCG.setStuckTime(10.);

@@ -19,6 +19,14 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,23 +40,43 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.EventsManagerModule;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.DefaultMobsimModule;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.Builder;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.EventsLogger;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 /**
  * @author mrieser / Senozon AG
@@ -82,16 +110,73 @@ public class LinkSpeedCalculatorIntegrationTest {
 		Assert.assertEquals(11, lle.getTime() - lee.getTime(), 1e-8);
 	}
 	
+	@SuppressWarnings("static-method")
 	@Test
 	public void testIntegration_Slow() {
 		Fixture f = new Fixture();
-		EventsCollector collector = new EventsCollector();
-		f.events.addHandler(collector);
-		f.events.addHandler(new EventsLogger());
 
-	// Use a vehicle link speed of 5.0.
-		QSim qsim = configureQSim(f, new CustomLinkSpeedCalculator(5.0));
-		qsim.run();
+		final Scenario scenario = f.scenario ;
+		final Config config = scenario.getConfig() ;
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		
+		Collection<AbstractModule> defaultsModules = new ArrayList<>() ;
+		defaultsModules.add( new ScenarioByInstanceModule( scenario ) ) ;
+		defaultsModules.add( new EventsManagerModule() ) ;
+		defaultsModules.add( new DefaultMobsimModule() ) ;
+		
+		AbstractModule overrides = new AbstractModule() {
+			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(5.0) ;
+			@Override public void install() {
+				bind(QNetworkFactory.class).toInstance( new QNetworkFactory(){
+					@Inject QSimConfigGroup qsimConfig ;
+					@Inject EventsManager events ;
+					@Inject Network network ;
+					private AgentCounter agentCounter;
+					private NetsimInternalInterface netsimEngine;
+					private MobsimTimer mobsimTimer;
+					private NetsimEngineContext context;
+					@Override void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, NetsimInternalInterface netsimEngine1) {
+						this.agentCounter = agentCounter1 ;
+						this.mobsimTimer = mobsimTimer1 ;
+						this.netsimEngine = netsimEngine1 ;
+
+						double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
+
+						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+
+						this.context = new NetsimEngineContext( events, effectiveCellSize,
+								agentCounter, positionInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
+						
+					}
+					@Override QNode createNetsimNode(Node node) {
+						QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+						return builder.build( node ) ;
+					}
+					@Override QLinkI createNetsimLink(Link link, QNode queueNode) {
+						QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
+						laneBuilder.setLinkSpeedCalculator(linkSpeedCalculator);
+
+						Builder builder = new QLinkImpl.Builder(context, netsimEngine) ;
+						builder.setLaneFactory(laneBuilder);
+
+						return builder.build(link, queueNode) ;
+					}
+				} ) ;
+			}
+		} ;
+		
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override( defaultsModules, overrides ) ) ; 
+
+		EventsManager eventsManager = injector.getInstance( EventsManager.class ) ;
+		eventsManager.initProcessing(); 
+
+		EventsCollector collector = new EventsCollector();
+		eventsManager.addHandler(collector);
+		eventsManager.addHandler(new EventsLogger());
+
+		injector.getInstance( Mobsim.class ).run();
 		
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
@@ -108,15 +193,72 @@ public class LinkSpeedCalculatorIntegrationTest {
 		Assert.assertEquals(21, lle.getTime() - lee.getTime(), 1e-8);
 	}
 	
+	@SuppressWarnings("static-method")
 	@Test
 	public void testIntegration_Fast() {
 		Fixture f = new Fixture();
-		EventsCollector collector = new EventsCollector();
-		f.events.addHandler(collector);
-		f.events.addHandler(new EventsLogger());
 
-		QSim qsim = configureQSim(f, new CustomLinkSpeedCalculator(20.0));
-		qsim.run();
+		final Scenario scenario = f.scenario ;
+		final Config config = scenario.getConfig() ;
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		
+		Collection<AbstractModule> defaultsModules = new ArrayList<>() ;
+		defaultsModules.add( new ScenarioByInstanceModule( scenario ) ) ;
+		defaultsModules.add( new EventsManagerModule() ) ;
+		defaultsModules.add( new DefaultMobsimModule() ) ;
+		
+		AbstractModule overrides = new AbstractModule() {
+			final LinkSpeedCalculator linkSpeedCalculator = new CustomLinkSpeedCalculator(20.0) ;
+			@Override public void install() {
+				bind(QNetworkFactory.class).toInstance( new QNetworkFactory(){
+					@Inject private QSimConfigGroup qsimConfig ;
+					@Inject private EventsManager events ;
+					@Inject private Network network ;
+					private AgentCounter agentCounter;
+					private MobsimTimer mobsimTimer;
+					private NetsimInternalInterface netsimEngine;
+					private NetsimEngineContext context;
+					@Override void initializeFactory(AgentCounter agentCounter1, MobsimTimer mobsimTimer1, NetsimInternalInterface netsimEngine1) {
+						this.agentCounter = agentCounter1 ;
+						this.mobsimTimer = mobsimTimer1 ;
+						this.netsimEngine = netsimEngine1 ;
+
+						double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
+
+						SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+						AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+						AbstractAgentSnapshotInfoBuilder positionInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+
+						this.context = new NetsimEngineContext( events, effectiveCellSize,
+								agentCounter, positionInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
+					}
+					@Override QNode createNetsimNode(Node node) {
+						QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+						return builder.build( node ) ;
+					}
+					@Override QLinkI createNetsimLink(Link link, QNode queueNode) {
+						QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
+						laneBuilder.setLinkSpeedCalculator(linkSpeedCalculator);
+
+						Builder builder = new QLinkImpl.Builder(context, netsimEngine) ;
+						builder.setLaneFactory(laneBuilder);
+
+						return builder.build(link, queueNode) ;
+					}
+				} ) ;
+			}
+		} ;
+		
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override( defaultsModules, overrides ) ) ; 
+
+		EventsManager eventsManager = injector.getInstance( EventsManager.class ) ;
+		eventsManager.initProcessing(); 
+
+		EventsCollector collector = new EventsCollector();
+		eventsManager.addHandler(collector);
+		eventsManager.addHandler(new EventsLogger());
+
+		injector.getInstance( Mobsim.class ).run();
 		
 		List<Event> events = collector.getEvents();
 		Assert.assertTrue(events.get(5) instanceof LinkEnterEvent);
@@ -133,7 +275,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		Assert.assertEquals(6, lle.getTime() - lee.getTime(), 1e-8);
 	}
 	
-	private QSim configureQSim(Fixture f, LinkSpeedCalculator linkSpeedCalculator) {
+	private static QSim configureQSim(Fixture f, LinkSpeedCalculator linkSpeedCalculator) {
 		QSim qsim = new QSim(f.scenario, f.events);
 		
 		// handle activities
@@ -143,7 +285,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 
         QNetsimEngine netsimEngine = new QNetsimEngine(qsim);
 		if (linkSpeedCalculator != null) {
-			netsimEngine.setLinkSpeedCalculator(linkSpeedCalculator);
+			throw new RuntimeException( "does not work like this any more") ;
 		}
 		qsim.addMobsimEngine(netsimEngine);
 		qsim.addDepartureHandler(netsimEngine.getDepartureHandler());

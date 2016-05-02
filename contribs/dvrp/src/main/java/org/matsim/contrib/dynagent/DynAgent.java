@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.pt.*;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
@@ -60,12 +61,12 @@ public class DynAgent
 
     // =====
 
-    public DynAgent(Id<Person> id, Id<Link> startLinkId, Netsim netsim, DynAgentLogic agentLogic)
+    public DynAgent(Id<Person> id, Id<Link> startLinkId, EventsManager events, DynAgentLogic agentLogic)
     {
         this.id = id;
         this.currentLinkId = startLinkId;
         this.agentLogic = agentLogic;
-        this.events = netsim.getEventsManager();
+        this.events = events;
 
         // initial activity
         dynActivity = this.agentLogic.computeInitialActivity(this);
@@ -302,4 +303,18 @@ public class DynAgent
     {
         return 1;
     }
+
+
+@Override
+public Facility<? extends Facility<?>> getCurrentFacility() {
+	// TODO Auto-generated method stub
+	throw new RuntimeException("not implemented") ;
+}
+
+
+@Override
+public Facility<? extends Facility<?>> getDestinationFacility() {
+	// TODO Auto-generated method stub
+	throw new RuntimeException("not implemented") ;
+}
 }

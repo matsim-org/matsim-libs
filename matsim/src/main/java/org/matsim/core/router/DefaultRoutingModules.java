@@ -20,6 +20,7 @@ package org.matsim.core.router;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -44,25 +45,38 @@ public final class DefaultRoutingModules {
 				routeAlgo,
 				params.getTeleportedModeFreespeedFactor(),
 				params.getBeelineDistanceFactor(),
-				((PopulationFactoryImpl) popFac).getModeRouteFactory() ) ;
+				((PopulationFactoryImpl) popFac).getRouteFactory() ) ;
 	}
 
 	public static RoutingModule createTeleportationRouter( String mode, PopulationFactory popFac, ModeRoutingParams params ) {
 		return new TeleportationRoutingModule(
 				mode,
 				popFac,
-				((PopulationFactoryImpl) popFac).getModeRouteFactory(),
+				((PopulationFactoryImpl) popFac).getRouteFactory(),
 				params.getTeleportedModeSpeed(),
                 params.getBeelineDistanceFactor() );
 	}
 
-	public static RoutingModule createNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
-		return new NetworkRoutingModule(
+	/**
+	 * Creates network router without access/egress.
+	 */
+	public static RoutingModule createPureNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
+		return new NetworkRoutingModule(	
 				mode,
 				popFact,
 				net,
 				routeAlgo,
-				((PopulationFactoryImpl) popFact).getModeRouteFactory() );
+				((PopulationFactoryImpl) popFact).getRouteFactory() );
+	}
+	
+	public static RoutingModule createAccessEgressNetworkRouter( String mode, PopulationFactory popFact, Network net, 
+			final LeastCostPathCalculator routeAlgo, PlansCalcRouteConfigGroup calcRouteConfig ) {
+		return new NetworkRoutingInclAccessEgressModule(
+				mode,
+				popFact,
+				net,
+				routeAlgo,
+				((PopulationFactoryImpl) popFact).getRouteFactory(), calcRouteConfig );
 	}
 
 }

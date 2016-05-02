@@ -19,8 +19,8 @@
 
 package playground.michalm.chargerlocation;
 
-import playground.michalm.util.distance.DistanceCalculator;
-import playground.michalm.zone.Zone;
+import org.matsim.contrib.util.distance.DistanceCalculator;
+import org.matsim.contrib.zone.Zone;
 
 
 public class ChargerLocationProblem

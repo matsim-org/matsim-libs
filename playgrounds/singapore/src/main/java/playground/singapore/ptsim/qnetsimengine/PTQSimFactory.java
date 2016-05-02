@@ -36,7 +36,9 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
 import playground.singapore.ptsim.pt.BoardAlightVehicleTransitStopHandlerFactory;
 
@@ -73,11 +75,12 @@ public class PTQSimFactory implements MobsimFactory {
 		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-        QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
+		ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( eventsManager, sc ) ;
 		if(stopStopTime!=null)
-			netsimEngine.setLinkSpeedCalculator(new PTLinkSpeedCalculator(stopStopTime));
+			factory.setLinkSpeedCalculator(new PTLinkSpeedCalculator(stopStopTime));
 		else
-			netsimEngine.setLinkSpeedCalculator(new PTLinkSpeedCalculator());
+			factory.setLinkSpeedCalculator(new PTLinkSpeedCalculator());
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim,factory);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);

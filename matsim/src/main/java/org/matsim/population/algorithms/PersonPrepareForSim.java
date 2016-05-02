@@ -117,7 +117,13 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					else if (Double.isNaN(leg.getRoute().getDistance())){
 						Double dist = null;
 						if (leg.getRoute() instanceof NetworkRoute){
-							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
+							/* So far, 1.0 is always used as relative position on start and end link. 
+							 * This means that the end link is considered in route distance and the start link not.
+							 * tt feb'16
+							 */
+							double relativePositionStartLink = 1.0;
+							double relativePositionEndLink  = 1.0;
+							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, this.network);
 						}
 						if (dist != null){
 							leg.getRoute().setDistance(dist);

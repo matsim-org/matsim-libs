@@ -50,10 +50,10 @@ public class VisumTripCreator {
 
         Network network = NetworkUtils.readNetwork(networkFile);
         SpatialTripCutter spatialTripCutter = new SpatialTripCutter(new SHPFileCutter(shpFile), network);
-        trips = EventsToTrips.createTripsFromEvents(eventsFile, network);
+        trips = new EventsToTrips(network).createTripsFromEvents(eventsFile);
         trips = TripFilter.spatialTripFilter(trips, spatialTripCutter);
         trips = TripFilter.removeUnfinishedTrips(trips, failedAgents);
-        new TripWriter().writeTrips(trips, tripFile);
+        TripWriter.writeTrips(trips, tripFile);
 	}
 
 

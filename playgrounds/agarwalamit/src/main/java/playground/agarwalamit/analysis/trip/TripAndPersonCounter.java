@@ -96,12 +96,12 @@ public class TripAndPersonCounter implements PersonDepartureEventHandler, Person
 	
 	public int getTotalNumberOfTrips(){
 		checkPersonNotArrived();
-		return MapUtils.intSum(this.personId2AllTripCounter);
+		return MapUtils.intValueSum(this.personId2AllTripCounter);
 	}
 	
 	public int getNumberOfCarTrips(){
 		checkPersonNotArrived();
-		return MapUtils.intSum(this.personId2CarTripCounter);
+		return MapUtils.intValueSum(this.personId2CarTripCounter);
 	}
 	
 	public double getAverageCarTripPerCarPerson(){

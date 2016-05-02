@@ -184,7 +184,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
 				if (prevAct != null) {
-					double curr_dist = CoordUtils.calcDistance(act.getCoord(), prevAct.getCoord());
+					double curr_dist = CoordUtils.calcEuclideanDistance(act.getCoord(), prevAct.getCoord());
 					dist += curr_dist;
 				}
 				prevAct = act;
@@ -214,7 +214,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
 				if (prevAct != null) {
-					double dist = CoordUtils.calcDistance(act.getCoord(), prevAct.getCoord());
+					double dist = CoordUtils.calcEuclideanDistance(act.getCoord(), prevAct.getCoord());
 					if (dist < 1000.0) { cnts[0]++; }
 					else if (dist < 5000.0) { cnts[1]++; }
 					else if (dist < 20000.0) { cnts[2]++; }

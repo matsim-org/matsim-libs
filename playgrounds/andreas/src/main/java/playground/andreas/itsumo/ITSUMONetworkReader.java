@@ -150,7 +150,7 @@ public class ITSUMONetworkReader {
 			} else if (lname.equals("streets")) {
 
 			} else if (lname.equals("laneset")) {
-				double length = CoordUtils.calcDistance(ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetFrom, Node.class)).getCoord(), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetTo, Node.class)).getCoord());
+				double length = CoordUtils.calcEuclideanDistance(ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetFrom, Node.class)).getCoord(), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetTo, Node.class)).getCoord());
 				double capacity = 3600.0; // TODO calculate capacity from speed
 				ITSUMONetworkReader.this.network.createAndAddLink(Id.create(this.lanesetId, Link.class), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetFrom, Node.class)), ITSUMONetworkReader.this.network.getNodes().get(Id.create(this.lanesetTo, Node.class)),
 						length, this.laneSpeed / this.lanesCount, capacity, this.lanesCount);

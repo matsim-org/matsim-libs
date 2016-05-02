@@ -27,24 +27,17 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
  * @author wrashid
  *
  */
-public abstract class AbstractHybridElectricVehicle extends AbstractVehicleWithBattery {
+public abstract class AbstractHybridElectricVehicle extends VehicleWithBattery {
 
-	// TODO: both depletion mode and sustaining mode and other modes of use
-	// e.g. one mode which just switches to hybrid mode (soc not changing), when battery empty
-	// => in this case battery only chargable when connected to grid.
-	// => perhaps, this is also the only mode, we want to support here, because the other mode
-	// is just a normal hybrid, which d
+	// TODO: implement both serial and hybrid versions
 	
-	//TODO: irgendwo erwaehnen, dass wir annehmen, dass die network link length in meters angegeben sind!
-	// else provide tool to update network.
+	protected EnergyConsumptionModel engineECM;
 	
-	
-	EnergyConsumptionModel combustionEngineECM;
-	
-	public double updateEnergyUse(Link link, double averageSpeedDriven){
+	@Override
+	public double updateEnergyUse(double drivenDistanceInMeters, double maxSpeedOnLink, double averageSpeedDriven) {
 		double energyConsumptionForLinkInJoule;
 		if (socInJoules>0){
-			energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(link, averageSpeedDriven);
+			energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(drivenDistanceInMeters,maxSpeedOnLink,averageSpeedDriven);
 		
 			if (energyConsumptionForLinkInJoule<=socInJoules){
 				useBattery(energyConsumptionForLinkInJoule);
@@ -52,19 +45,17 @@ public abstract class AbstractHybridElectricVehicle extends AbstractVehicleWithB
 				double fractionOfLinkTravelWithBattery=socInJoules/energyConsumptionForLinkInJoule;
 				useBattery(socInJoules);
 				
-				energyConsumptionForLinkInJoule=combustionEngineECM.getEnergyConsumptionForLinkInJoule(link.getLength()*(1-fractionOfLinkTravelWithBattery), link.getFreespeed(), averageSpeedDriven);
-				useCombustionEngine(energyConsumptionForLinkInJoule);
+				energyConsumptionForLinkInJoule=engineECM.getEnergyConsumptionForLinkInJoule(drivenDistanceInMeters*(1-fractionOfLinkTravelWithBattery), maxSpeedOnLink, averageSpeedDriven);
+				logEngineEnergyConsumption(energyConsumptionForLinkInJoule);
 			}
 		} else {
-			energyConsumptionForLinkInJoule=combustionEngineECM.getEnergyConsumptionForLinkInJoule(link, averageSpeedDriven);
-			useCombustionEngine(energyConsumptionForLinkInJoule);
+			energyConsumptionForLinkInJoule = electricDriveEnergyConsumptionModel.getEnergyConsumptionForLinkInJoule(drivenDistanceInMeters,maxSpeedOnLink,averageSpeedDriven);
+			logEngineEnergyConsumption(energyConsumptionForLinkInJoule);
 		}
 		
 		return energyConsumptionForLinkInJoule;
 	}
 	
-	private void useCombustionEngine(double energyConsumptionInJoule){
-		// TODO: log this...
-	}
+	abstract protected void logEngineEnergyConsumption(double energyConsumptionInJoule);
 	
 }

@@ -65,7 +65,7 @@ public class Facilities2Zones {
         facReader.readFile(facIn);
 
         logger.info("Loading zones...");
-        ZoneCollection zones = new ZoneCollection();
+        ZoneCollection zones = new ZoneCollection(null);
         String data = new String(Files.readAllBytes(Paths.get(zonesIn)));
         zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
         zones.setPrimaryKey(zoneIdKey);

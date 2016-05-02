@@ -50,7 +50,7 @@ public class SimulatedAnnealing<S> {
 	// TODO >>>>> NEW >>>>>
 	private double successThreshold = Double.NEGATIVE_INFINITY;
 	// TODO <<<<< NEW <<<<<
-
+	
 	private S xOpt;
 
 	private double xQOpt;
@@ -186,14 +186,25 @@ public class SimulatedAnnealing<S> {
 
 			double yQ = this.evaluator.evaluation(y);
 			this.updateBestSolution(y, yQ);
-			final double lambda = greediness * Math.log(it);
-			final double alpha = Math.exp(lambda * (xQ - yQ));
-			if (Math.random() < alpha) {
-				x = y;
-				xQ = yQ;
-				failures = 0;
+			
+			if (Double.isInfinite(greediness)) {
+				if (yQ < xQ) {
+					x = y;
+					xQ = yQ;
+					failures = 0;
+				} else {
+					failures++;
+				}
 			} else {
-				failures++;
+				final double lambda = greediness * Math.log(it);
+				final double alpha = Math.exp(lambda * (xQ - yQ));
+				if (Math.random() < alpha) {
+					x = y;
+					xQ = yQ;
+					failures = 0;
+				} else {
+					failures++;
+				}				
 			}
 
 			this.msg(it, xQ);

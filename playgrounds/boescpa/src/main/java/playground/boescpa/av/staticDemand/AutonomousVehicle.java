@@ -55,7 +55,7 @@ public class AutonomousVehicle {
         if (Double.isNaN(newPosition.getX()) || Double.isNaN(newPosition.getY())) {
             throw new IllegalArgumentException("NaN-Coordinates as new position!");
         }
-        double distance = CoordUtils.calcDistance(myPosition, newPosition) * Constants.BEELINE_FACTOR_STREET;
+        double distance = CoordUtils.calcEuclideanDistance(myPosition, newPosition) * Constants.BEELINE_FACTOR_STREET;
         myPosition = newPosition;
         return distance / Constants.AV_SPEED;
     }

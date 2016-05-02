@@ -1,12 +1,15 @@
 package playground.dhosse.prt.launch;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.core.config.*;
+import org.matsim.core.controler.*;
+import org.matsim.core.scenario.ScenarioUtils;
 
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import playground.dhosse.prt.PrtConfigGroup;
 import playground.dhosse.prt.PrtModule;
 
 public class PrtLauncher {
@@ -23,9 +26,14 @@ public class PrtLauncher {
 		}
 		
 		Config config = ConfigUtils.createConfig();
-		PrtConfigGroup pcg = new PrtConfigGroup();
-		config.addModule(pcg);
+		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
+		config.addModule(taxiCfg);
 		ConfigUtils.loadConfig(config, args[0]);
+		
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        
+		TaxiData taxiData = new TaxiData();
+        new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
 		
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setOverwriteFileSetting(
@@ -34,7 +42,7 @@ public class PrtLauncher {
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		PrtModule module = new PrtModule();
-		module.configureControler(controler);
+		module.configureControler(controler, taxiData);
 		controler.run();
 
 	}

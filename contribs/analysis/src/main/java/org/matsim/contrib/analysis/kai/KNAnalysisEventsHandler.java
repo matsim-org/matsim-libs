@@ -70,7 +70,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 	private final TreeMap<Id<Person>, Integer> agentLegs = new TreeMap<>();
 
 	// statistics types:
-	enum StatType { durations, durationsOtherBins, beelineDistances, legDistances, scores, payments } ;
+	enum StatType { durations, durationsOtherBins, beelineDistances, beelineDistancesOtherBins, legDistances, scores, payments } ;
 
 	// container that contains the statistics containers:
 	private final Map<StatType,Databins<String>> statsContainer = new TreeMap<>() ;
@@ -87,7 +87,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 	
 	private Set<Id<Link>> otherTolledLinkIds = new HashSet<Id<Link>>() ;
 
-	private Vehicle2DriverEventHandler delegate;
+	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler() ;
 
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
 	// to avoid under- or over-counting with respect to loops.
@@ -144,6 +144,11 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 			switch ( type ) {
 			case beelineDistances: {
 				double[] dataBoundariesTmp = {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.} ;
+				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
+				this.statsContainer.put( type, databins) ;
+				break; }
+			case beelineDistancesOtherBins: {
+				double[] dataBoundariesTmp = {0., 2000., 4000., 6000., 8000., 10000.} ;
 				Databins<String> databins = new Databins<>( type.name(), dataBoundariesTmp ) ;
 				this.statsContainer.put( type, databins) ;
 				break; }
@@ -246,7 +251,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 					break;
 				case beelineDistances:
 					if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
-						item = CoordUtils.calcDistance(fromAct.getCoord(), toAct.getCoord()) ;
+						item = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord()) ;
 					} else {
 						if ( noCoordCnt < 1 ) {
 							noCoordCnt ++ ;
@@ -254,12 +259,25 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, VehicleEntersT
 						}
 						Link fromLink = scenario.getNetwork().getLinks().get( fromAct.getLinkId() ) ;
 						Link   toLink = scenario.getNetwork().getLinks().get(   toAct.getLinkId() ) ;
-						item = CoordUtils.calcDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
+						item = CoordUtils.calcEuclideanDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
+					}
+					break;
+				case beelineDistancesOtherBins:
+					if ( fromAct.getCoord()!=null && toAct.getCoord()!=null ) {
+						item = CoordUtils.calcEuclideanDistance(fromAct.getCoord(), toAct.getCoord()) ;
+					} else {
+						if ( noCoordCnt < 1 ) {
+							noCoordCnt ++ ;
+							log.warn("either fromAct or to Act has no Coord; using link coordinates as substitutes.\n" + Gbl.ONLYONCE ) ;
+						}
+						Link fromLink = scenario.getNetwork().getLinks().get( fromAct.getLinkId() ) ;
+						Link   toLink = scenario.getNetwork().getLinks().get(   toAct.getLinkId() ) ;
+						item = CoordUtils.calcEuclideanDistance( fromLink.getCoord(), toLink.getCoord() ) ; 
 					}
 					break;
 				case legDistances:
 					if ( leg.getRoute() instanceof NetworkRoute ) {
-						item = RouteUtils.calcDistance( ((NetworkRoute)leg.getRoute()), this.scenario.getNetwork() ) ;
+						item = RouteUtils.calcDistanceExcludingStartEndLink( ((NetworkRoute)leg.getRoute()), this.scenario.getNetwork() ) ;
 					} else if ( leg.getRoute()!=null && !Double.isNaN( leg.getRoute().getDistance() ) )  {
 						item = leg.getRoute().getDistance() ;
 					} else {

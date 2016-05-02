@@ -72,7 +72,7 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 		
 		TransitStopFacility baseStop = currentStopsToBeServed.get(0);
 		TransitStopFacility remoteStop = this.findStopWithLargestDistance(currentStopsToBeServed);
-		double bufferSizeBasedOnRatio = CoordUtils.calcDistance(baseStop.getCoord(), remoteStop.getCoord()) * this.ratio;
+		double bufferSizeBasedOnRatio = CoordUtils.calcEuclideanDistance(baseStop.getCoord(), remoteStop.getCoord()) * this.ratio;
 		
 		List<Geometry> lineStrings = this.createGeometryFromStops(currentStopsToBeServed, remoteStop);
 		Geometry bufferWithoutEndCaps = this.createBuffer(lineStrings, Math.max(this.bufferSize, bufferSizeBasedOnRatio), true);
@@ -105,7 +105,7 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 		ArrayList<TransitStopFacility> newStopsToBeServed = new ArrayList<>(currentStopsToBeServed);
 		
 		// decide which stop is closer
-		if (CoordUtils.calcDistance(baseStop.getCoord(), newStop.getCoord()) < CoordUtils.calcDistance(remoteStop.getCoord(), newStop.getCoord())) {
+		if (CoordUtils.calcEuclideanDistance(baseStop.getCoord(), newStop.getCoord()) < CoordUtils.calcEuclideanDistance(remoteStop.getCoord(), newStop.getCoord())) {
 			// baseStop is closer - insert before baseStop
 			newStopsToBeServed.add(0, newStop);
 		} else {
@@ -121,7 +121,7 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 		double largestDistance = 0;
 		TransitStopFacility stopWithLargestDistance = stops.get(0);
 		for (TransitStopFacility transitStopFacility : stops) {
-			double currentDistance = CoordUtils.calcDistance(startCoord, transitStopFacility.getCoord());
+			double currentDistance = CoordUtils.calcEuclideanDistance(startCoord, transitStopFacility.getCoord());
 			if (currentDistance > largestDistance) {
 				largestDistance = currentDistance;
 				stopWithLargestDistance = transitStopFacility;

@@ -37,7 +37,7 @@ public class CreateTaxibusSubpopulation {
 
 	private void run(){
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/vw058.output_plans.xml.gz");
+		new MatsimPopulationReader(scenario).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/VW79BC.output_plans.xml.gz");
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			boolean rep = false;
 			if (p.getId().toString().startsWith("BS_WB")||p.getId().toString().startsWith("WB_BS")){
@@ -59,7 +59,7 @@ public class CreateTaxibusSubpopulation {
 		}
 		
 		}
-		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/vw058.output_personAttributes.xml.gz");
+		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/bswb_pesonAttributes.xml");
 	}
 	
 	public static void main(String[] args) {

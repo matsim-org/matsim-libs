@@ -338,8 +338,9 @@ public class DigicoreClusterRunner {
 				throw new RuntimeException("ExecutionException caught in retieving thread results.");
 			}				
 		}
+		ActivityFacilitiesImpl r = ((ActivityFacilitiesImpl)facilities);
 		
-		((ActivityFacilitiesImpl)facilities).printFacilitiesCount();
+		LOG.info("    facility # " + r.getFacilities().size() );
 		
 		/*TODO Can remove after debugging. Report the number of
 		 * facilities that were ignored because of empty geometries. */

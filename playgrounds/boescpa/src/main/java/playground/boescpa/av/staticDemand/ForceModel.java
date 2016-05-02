@@ -60,7 +60,7 @@ public class ForceModel {
 	}
 
 	private Force getForce(Coord A, Coord B, int weightProduct) {
-		double distance = CoordUtils.calcDistance(A, B);
+		double distance = CoordUtils.calcEuclideanDistance(A, B);
 		double xPart = B.getX()-A.getX();
 		double yPart = B.getY()-A.getY();
 		double weight = 0;
@@ -70,7 +70,7 @@ public class ForceModel {
 		return new Force(weight*xPart, weight*yPart);
 	}
 
-	protected class Force {
+	public class Force {
 		public final double xPart;
 		public final double yPart;
 		public int identifier;

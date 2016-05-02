@@ -34,8 +34,8 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
-import playground.agarwalamit.analysis.emission.EmissionCostFactors;
 import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.benjamin.internalization.EmissionCostFactors;
 import playground.agarwalamit.utils.MapUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -147,9 +147,8 @@ public class DelaysAndEmissionCostsDiff {
 	}
 
 	private Map<Id<Person>, Double> getDelaysPerPerson(final String configFile, final String eventsFile, final Scenario sc){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile,sc,1);
-		personAnalyzer.preProcessData();
-		personAnalyzer.postProcessData();
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile,sc,1, sc.getConfig().qsim().getEndTime());
+		personAnalyzer.run();
 
 		Map<Id<Person>, Double> personId2DelaysCosts= new HashMap<Id<Person>, Double>();
 		Map<Id<Person>, Double> personId2DelaysInSec = personAnalyzer.getTimeBin2AffectedPersonId2Delay().get(sc.getConfig().qsim().getEndTime());

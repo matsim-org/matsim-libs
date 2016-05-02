@@ -11,24 +11,19 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.minibus.genericUtils.RecursiveStatsContainer;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
 public class GapAnalysis {
 
-	/*
-	 * Auswertung:
-	 * Modal split
-	 * -V'aufkommen
-	 * -V'leistung
-	 * standzeit
-	 * fahrleistung
-	 * auslastung (t_occupied / day)
-	 */
-	
 	private static final int idxPersonId = 0;
 	private static final int idxStartTime = 1;
 	private static final int idxEndTime = 2;
@@ -39,60 +34,216 @@ public class GapAnalysis {
 	private static final int idxEgressTime = 7;
 	private static final int idxVehicleId = 8;
 	
-	private static final int nVehicles = 204;
+//	private static final int nVehicles = 204;
+	
+	private static String inputPath = "/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/"
+			+ "2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/";
+	
+	private static Network network;
 	
 	public static void main(String args[]){
+	
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		network = sc.getNetwork();
+		new MatsimNetworkReader(network).readFile("/home/dhosse/run12/input/networkMultimodal.xml");
 		
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run12/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/base/12/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run17/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/base/17/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run21/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/base/21/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run25/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/base/25/");
+		String scenario = "base";
+		String outputDirectory = "/home/dhosse/stats/" + scenario + "/";
 		
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run13/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/base_reducedCosts/13/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run18/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/base_reducedCosts/18/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run22/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/base_reducedCosts/22/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run26/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/base_reducedCosts/26/");
+		GapAnalysis.run(inputPath + "run12/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run17/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run21/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run25/output/ITERS/it.100/100.ow_cs");
 		
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run15/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/ext/15/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run19/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/ext/19/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run23/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/ext/23/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run27/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/ext/27/");
+		new File(outputDirectory).mkdirs();
+		writeVehicleStats(outputDirectory, vehicleStats);
+		writeStationStats(outputDirectory, stationStats);
 		
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run16/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/ext_reducedCosts/16/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run20/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/ext_reducedCosts/20/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run24/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/ext_reducedCosts/24/");
-		GapAnalysis.run("/run/user/1009/gvfs/smb-share:server=innoz-dc01,share=innoz/2_MediengestützteMobilität/10_Projekte/eGAP/30_Modellierung/OUTPUT/"
-				+ "run28/output/ITERS/it.100/100.ow_cs", "/home/dhosse/stats/ext_reducedCosts/28/");
+		personStats = new HashMap<>();
+		vehicleStats = new HashMap<>();
+		stationStats = new HashMap<>();
+		vehicleTravelTime = new RecursiveStatsContainer();
+		vehicleTravelDistance = new RecursiveStatsContainer();
+		vehicleOccupancy = new RecursiveStatsContainer();
+		
+		scenario = "base_reducedCosts";
+		outputDirectory = "/home/dhosse/stats/" + scenario + "/";
+		
+		GapAnalysis.run(inputPath + "run13/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run18/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run22/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run26/output/ITERS/it.100/100.ow_cs");
+		
+		new File(outputDirectory).mkdirs();
+		writeVehicleStats(outputDirectory, vehicleStats);
+		writeStationStats(outputDirectory, stationStats);
+		
+		personStats = new HashMap<>();
+		vehicleStats = new HashMap<>();
+		stationStats = new HashMap<>();
+		vehicleTravelTime = new RecursiveStatsContainer();
+		vehicleTravelDistance = new RecursiveStatsContainer();
+		vehicleOccupancy = new RecursiveStatsContainer();
+		
+		scenario = "ext";
+		outputDirectory = "/home/dhosse/stats/" + scenario + "/";
+		
+		GapAnalysis.run(inputPath + "run15/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run19/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run23/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run27/output/ITERS/it.100/100.ow_cs");
+		
+		new File(outputDirectory).mkdirs();
+		writeVehicleStats(outputDirectory, vehicleStats);
+		writeStationStats(outputDirectory, stationStats);
+		
+		personStats = new HashMap<>();
+		vehicleStats = new HashMap<>();
+		stationStats = new HashMap<>();
+		vehicleTravelTime = new RecursiveStatsContainer();
+		vehicleTravelDistance = new RecursiveStatsContainer();
+		vehicleOccupancy = new RecursiveStatsContainer();
+		
+		scenario = "ext_reducedCosts";
+		outputDirectory = "/home/dhosse/stats/" + scenario + "/";
+		
+		GapAnalysis.run(inputPath + "run16/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run20/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run24/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run28/output/ITERS/it.100/100.ow_cs");
+		
+		new File(outputDirectory).mkdirs();
+		writeVehicleStats(outputDirectory, vehicleStats);
+		writeStationStats(outputDirectory, stationStats);
+		
+		personStats = new HashMap<>();
+		vehicleStats = new HashMap<>();
+		stationStats = new HashMap<>();
+		vehicleTravelTime = new RecursiveStatsContainer();
+		vehicleTravelDistance = new RecursiveStatsContainer();
+		vehicleOccupancy = new RecursiveStatsContainer();
+		
+		scenario = "infrastructure";
+		outputDirectory = "/home/dhosse/stats/" + scenario + "/";
+		
+		GapAnalysis.run(inputPath + "run29/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run31/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run33/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run35/output/ITERS/it.100/100.ow_cs");
+		
+		new File(outputDirectory).mkdirs();
+		writeVehicleStats(outputDirectory, vehicleStats);
+		writeStationStats(outputDirectory, stationStats);
+		
+		personStats = new HashMap<>();
+		vehicleStats = new HashMap<>();
+		stationStats = new HashMap<>();
+		vehicleTravelTime = new RecursiveStatsContainer();
+		vehicleTravelDistance = new RecursiveStatsContainer();
+		vehicleOccupancy = new RecursiveStatsContainer();
+		
+		scenario = "infrastructure_reducedCosts";
+		outputDirectory = "/home/dhosse/stats/" + scenario + "/";
+		
+		GapAnalysis.run(inputPath + "run30/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run32/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run34/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run36/output/ITERS/it.100/100.ow_cs");
+		
+		new File(outputDirectory).mkdirs();
+		writeVehicleStats(outputDirectory, vehicleStats);
+		writeStationStats(outputDirectory, stationStats);
+		
+		personStats = new HashMap<>();
+		vehicleStats = new HashMap<>();
+		stationStats = new HashMap<>();
+		vehicleTravelTime = new RecursiveStatsContainer();
+		vehicleTravelDistance = new RecursiveStatsContainer();
+		vehicleOccupancy = new RecursiveStatsContainer();
+		
+		scenario = "30kmZone";
+		outputDirectory = "/home/dhosse/stats/" + scenario + "/";
+		
+		GapAnalysis.run(inputPath + "run37/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run39/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run41/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run43/output/ITERS/it.100/100.ow_cs");
+		
+		new File(outputDirectory).mkdirs();
+		writeVehicleStats(outputDirectory, vehicleStats);
+		writeStationStats(outputDirectory, stationStats);
+		
+		personStats = new HashMap<>();
+		vehicleStats = new HashMap<>();
+		stationStats = new HashMap<>();
+		vehicleTravelTime = new RecursiveStatsContainer();
+		vehicleTravelDistance = new RecursiveStatsContainer();
+		vehicleOccupancy = new RecursiveStatsContainer();
+		
+		scenario = "30kmZone_reducedCosts";
+		outputDirectory = "/home/dhosse/stats/" + scenario + "/";
+		
+		GapAnalysis.run(inputPath + "run38/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run40/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run42/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run44/output/ITERS/it.100/100.ow_cs");
+		
+		new File(outputDirectory).mkdirs();
+		writeVehicleStats(outputDirectory, vehicleStats);
+		writeStationStats(outputDirectory, stationStats);
+		
+		personStats = new HashMap<>();
+		vehicleStats = new HashMap<>();
+		stationStats = new HashMap<>();
+		vehicleTravelTime = new RecursiveStatsContainer();
+		vehicleTravelDistance = new RecursiveStatsContainer();
+		vehicleOccupancy = new RecursiveStatsContainer();
+		
+		scenario = "mutable";
+		outputDirectory = "/home/dhosse/stats/" + scenario + "/";
+		
+		GapAnalysis.run(inputPath + "run45/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run47/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run49/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run51/output/ITERS/it.100/100.ow_cs");
+		
+		new File(outputDirectory).mkdirs();
+		writeVehicleStats(outputDirectory, vehicleStats);
+		writeStationStats(outputDirectory, stationStats);
+		
+		personStats = new HashMap<>();
+		vehicleStats = new HashMap<>();
+		stationStats = new HashMap<>();
+		vehicleTravelTime = new RecursiveStatsContainer();
+		vehicleTravelDistance = new RecursiveStatsContainer();
+		vehicleOccupancy = new RecursiveStatsContainer();
+		
+		scenario = "mutable_reducedCosts";
+		outputDirectory = "/home/dhosse/stats/" + scenario + "/";
+		
+		GapAnalysis.run(inputPath + "run46/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run48/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run50/output/ITERS/it.100/100.ow_cs");
+		GapAnalysis.run(inputPath + "run52/output/ITERS/it.100/100.ow_cs");
+		
+		new File(outputDirectory).mkdirs();
+		writeVehicleStats(outputDirectory, vehicleStats);
+		writeStationStats(outputDirectory, stationStats);
 		
 	}
 	
-	public static void run(String csStatsFile, String outputDirectory){
+	static Map<Id<Person>, PersonStats> personStats = new HashMap<>();
+	static Map<Id<Link>, StationStats> stationStats = new HashMap<>();
+	static Map<Id<Vehicle>, VehicleStats> vehicleStats = new HashMap<>();
+	
+	//TODO used and unused vehicles separately
+	static RecursiveStatsContainer vehicleTravelTime = new RecursiveStatsContainer();
+	static RecursiveStatsContainer vehicleTravelDistance = new RecursiveStatsContainer();
+	static RecursiveStatsContainer vehicleOccupancy = new RecursiveStatsContainer();
+	
+	public static void run(String csStatsFile){
 		
 		BufferedReader reader = IOUtils.getBufferedReader(csStatsFile);
-		
-		Map<Id<Person>, PersonStats> personStats = new HashMap<>();
-		Map<Id<Link>, StationStats> stationStats = new HashMap<>();
-		Map<Id<Vehicle>, VehicleStats> vehicleStats = new HashMap<>();
-		
-		//TODO used and unused vehicles separately
-		RecursiveStatsContainer vehicleTravelTime = new RecursiveStatsContainer();
-		RecursiveStatsContainer vehicleTravelDistance = new RecursiveStatsContainer();
-		RecursiveStatsContainer vehicleOccupancy = new RecursiveStatsContainer();
 		
 		try {
 			
@@ -168,11 +319,6 @@ public class GapAnalysis {
 			
 		}
 		
-		new File(outputDirectory).mkdirs();
-		
-		writeVehicleStats(outputDirectory, vehicleStats);
-		writeStationStats(outputDirectory, stationStats);
-		
 	}
 	
 	private static void writeVehicleStats(String outputDirectory, Map<Id<Vehicle>, VehicleStats> stats){
@@ -186,7 +332,9 @@ public class GapAnalysis {
 			for(Entry<Id<Vehicle>, VehicleStats> entry : stats.entrySet()){
 				
 				statsWriter.newLine();
-				statsWriter.write(entry.getKey().toString() + ";" + entry.getValue().numberOfRides + ";" + entry.getValue().driverIds.size() + ";" + entry.getValue().totalMileage + ";" + entry.getValue().totalTravelTime);
+				statsWriter.write(entry.getKey().toString() + ";" + (double)entry.getValue().numberOfRides / 4 + ";" +
+						(double)entry.getValue().driverIds.size() / 4 + ";" + (double)entry.getValue().totalMileage / 4 + ";" +
+						(double)entry.getValue().totalTravelTime / 4);
 				
 			}
 			
@@ -205,12 +353,15 @@ public class GapAnalysis {
 
 		try {
 			
-			stationStatsWriter.write("id;n_boardings;n_alightings");
+			stationStatsWriter.write("id;n_boardings;n_alightings;x;y");
 		
 			for(Entry<Id<Link>,StationStats> entry : stationStats.entrySet()){
 				
 				stationStatsWriter.newLine();
-				stationStatsWriter.write(entry.getKey().toString() + ";" + entry.getValue().numberOfBoardings + ";" + entry.getValue().numberOfAlightings);
+				stationStatsWriter.write(entry.getKey().toString() + ";" + (double)entry.getValue().numberOfBoardings / 4 +
+						";" + (double)entry.getValue().numberOfAlightings / 4 + ";" +
+						network.getLinks().get(entry.getKey()).getCoord().getX() +
+						";" + network.getLinks().get(entry.getKey()).getCoord().getY());
 				
 			}
 			

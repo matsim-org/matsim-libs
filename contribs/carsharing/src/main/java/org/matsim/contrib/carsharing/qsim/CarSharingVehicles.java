@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -21,6 +23,8 @@ import org.matsim.contrib.carsharing.vehicles.OneWayCarsharingVehicleLocation;
 import org.matsim.contrib.carsharing.vehicles.TwoWayCarsharingVehicleLocation;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -92,7 +96,7 @@ public class CarSharingVehicles {
 			    		
 			    		FreeFloatingStation oldStation = stationToLinkMap.get(l);
 			    		
-			    		log.warn("Merging freefloating carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+			    		log.warn("Merging freefloating carsharing stations that are mapped to the same link with id: " + oldStation.getLinkId().toString() + " .");
 
 			    		ArrayList<String> oldVehIDs = oldStation.getIDs();
 			    		ArrayList<String> newvehIDs = new ArrayList<String>();
@@ -150,7 +154,7 @@ public class CarSharingVehicles {
 			    		
 			    		OneWayCarsharingStation oldStation = stationToLinkMap.get(l);
 			    		
-			    		log.warn("Merging oneway carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+			    		log.warn("Merging oneway carsharing stations that are mapped to the same link with id: " + oldStation.getLinkId().toString() + " .");
 
 			    		ArrayList<String> oldVehIDs = oldStation.getIDs();
 			    		ArrayList<String> newvehIDs = new ArrayList<String>();
@@ -205,7 +209,7 @@ public class CarSharingVehicles {
 			    		
 			    		TwoWayCarsharingStation oldStation = stationToLinkMap.get(l);
 			    		
-			    		log.warn("Merging twoway carsharing stations that are mapped to the same link with id: " + oldStation.getLink().getId().toString() + " .");
+			    		log.warn("Merging twoway carsharing stations that are mapped to the same link with id: " + oldStation.getLinkId().toString() + " .");
 
 			    		ArrayList<String> oldVehIDs = oldStation.getIDs();
 			    		ArrayList<String> newvehIDs = new ArrayList<String>();
@@ -246,14 +250,20 @@ public class CarSharingVehicles {
 		
 		public LinkUtils(Network network) {
 			
-			this.network = (NetworkImpl) network;		}
-		
-		public LinkImpl getClosestLink(Coord coord) {
-			
-			
+			this.network = (NetworkImpl) NetworkUtils.createNetwork();
+			Set<String> restrictions = new HashSet<>();
+			restrictions = new HashSet<>();
+			restrictions.add("car");
+			TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(scenario.getNetwork());
 
-		    return (LinkImpl)network.getNearestLinkExactly(coord);
+			networkFilter = new TransportModeNetworkFilter(scenario.getNetwork());
+			networkFilter.filter(this.network, restrictions);
 			
+		}
+		
+		public LinkImpl getClosestLink(Coord coord) {			
+
+		    return (LinkImpl)network.getNearestLinkExactly(coord);			
 			
 		}
 	}

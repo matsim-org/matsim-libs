@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
@@ -126,13 +127,15 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		
 		Route preRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute().clone();
 		
-		this.editRoutes.relocateCurrentLegRoute(this.withinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent), plan.getPerson(), currentLinkIndex, 
-				parkingFacility.getLinkId(), time, scenario.getNetwork(), tripRouter);
+		throw new RuntimeException( Gbl.PROBLEM_WITH_ACCESS_EGRESS ) ;
 		
-		Route postRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute();
-
-		this.withinDayAgentUtils.resetCaches(withinDayAgent);
-		return true;
+//		this.editRoutes.relocateCurrentLegRoute(this.withinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent), plan.getPerson(), currentLinkIndex, 
+//				parkingFacility.getLinkId(), time, scenario.getNetwork(), tripRouter);
+//		
+//		Route postRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute();
+//
+//		this.withinDayAgentUtils.resetCaches(withinDayAgent);
+//		return true;
 	}
 
 	private boolean lastParkingOfDay(Integer secondParkingActIndex) {

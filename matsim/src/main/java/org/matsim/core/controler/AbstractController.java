@@ -24,7 +24,6 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
 public abstract class AbstractController {
@@ -43,7 +42,7 @@ public abstract class AbstractController {
     /**
      * This is deliberately not even protected.  kai, jul'12
      */
-    ControlerListenerManager controlerListenerManager;
+    ControlerListenerManagerImpl controlerListenerManagerImpl;
 
 
     private Integer thisIteration = null;
@@ -51,19 +50,16 @@ public abstract class AbstractController {
     private boolean dirtyShutdown = false;
 
     protected AbstractController() {
-        this(new IterationStopWatch(), null);
+        this(new ControlerListenerManagerImpl(), new IterationStopWatch(), null);
     }
 
-    AbstractController(IterationStopWatch stopWatch, MatsimServices matsimServices) {
-        OutputDirectoryLogging.catchLogEntries();
-        Gbl.printSystemInfo();
-        Gbl.printBuildInfo();
+    AbstractController(ControlerListenerManagerImpl controlerListenerManager, IterationStopWatch stopWatch, MatsimServices matsimServices) {
+        ControlerUtils.initializeOutputLogging();
         log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
-        this.controlerListenerManager = new ControlerListenerManager();
-        this.controlerListenerManager.setControler(matsimServices);
+        this.controlerListenerManagerImpl = controlerListenerManager;
+        this.controlerListenerManagerImpl.setControler(matsimServices);
         this.stopwatch = stopWatch;
     }
-
 
     private void resetRandomNumbers(long seed, int iteration) {
         MatsimRandom.reset(seed + iteration);
@@ -89,7 +85,7 @@ public abstract class AbstractController {
             @Override
             public void run() throws MatsimRuntimeModifications.UnexpectedShutdownException {
                 loadCoreListeners();
-                controlerListenerManager.fireControlerStartupEvent();
+                controlerListenerManagerImpl.fireControlerStartupEvent();
                 ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start");
                 prepareForSim();
                 doIterations(config);
@@ -97,10 +93,10 @@ public abstract class AbstractController {
 
             @Override
             public void shutdown(boolean unexpected) {
-                controlerListenerManager.fireControlerShutdownEvent(unexpected);
+                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected);
             }
         };
-        MatsimRuntimeModifications.run(runnable, dirtyShutdown);
+        MatsimRuntimeModifications.run(runnable);
         OutputDirectoryLogging.closeOutputDirLogging();
     }
 
@@ -127,7 +123,7 @@ public abstract class AbstractController {
     }
 
 
-    final String DIVIDER = "###################################################";
+    public static final String DIVIDER = "###################################################";
     final String MARKER = "### ";
 
     private void iteration(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
@@ -142,7 +138,7 @@ public abstract class AbstractController {
         iterationStep("iterationStartsListeners", new Runnable() {
             @Override
             public void run() {
-                controlerListenerManager.fireControlerIterationStartsEvent(iteration);
+                controlerListenerManagerImpl.fireControlerIterationStartsEvent(iteration);
             }
         });
 
@@ -150,7 +146,7 @@ public abstract class AbstractController {
             iterationStep("replanning", new Runnable() {
                 @Override
                 public void run() {
-                    controlerListenerManager.fireControlerReplanningEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerReplanningEvent(iteration);
                 }
             });
         }
@@ -161,7 +157,7 @@ public abstract class AbstractController {
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires scoring event");
-                controlerListenerManager.fireControlerScoringEvent(iteration);
+                controlerListenerManagerImpl.fireControlerScoringEvent(iteration);
             }
         });
 
@@ -169,7 +165,7 @@ public abstract class AbstractController {
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires iteration end event");
-                controlerListenerManager.fireControlerIterationEndsEvent(iteration);
+                controlerListenerManagerImpl.fireControlerIterationEndsEvent(iteration);
             }
         });
 
@@ -192,7 +188,7 @@ public abstract class AbstractController {
             iterationStep("beforeMobsimListeners", new Runnable() {
                 @Override
                 public void run() {
-                    controlerListenerManager.fireControlerBeforeMobsimEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration);
                 }
             });
 
@@ -224,7 +220,7 @@ public abstract class AbstractController {
                 @Override
                 public void run() {
                     log.info(MARKER + "ITERATION " + iteration + " fires after mobsim event");
-                    controlerListenerManager.fireControlerAfterMobsimEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerAfterMobsimEvent(iteration);
                 }
             });
         }
@@ -246,11 +242,11 @@ public abstract class AbstractController {
      * </ul>
      */
     public final void addControlerListener(ControlerListener l) {
-        this.controlerListenerManager.addControlerListener(l);
+        this.controlerListenerManagerImpl.addControlerListener(l);
     }
 
     protected final void addCoreControlerListener(ControlerListener l) {
-        this.controlerListenerManager.addCoreControlerListener(l);
+        this.controlerListenerManagerImpl.addCoreControlerListener(l);
     }
 
 

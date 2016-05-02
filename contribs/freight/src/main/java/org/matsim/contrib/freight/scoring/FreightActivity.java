@@ -2,8 +2,10 @@ package org.matsim.contrib.freight.scoring;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.facilities.ActivityFacility;
 
 public class FreightActivity implements Activity {
 
@@ -74,6 +76,18 @@ public class FreightActivity implements Activity {
 	@Override
 	public Id getFacilityId() {
 		return act.getFacilityId();
+	}
+
+	@Override
+	public void setLinkId(Id<Link> id) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public void setFacilityId(Id<ActivityFacility> id) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 }

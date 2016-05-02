@@ -130,17 +130,25 @@ public class MatrixDistanceCompare implements AnalyzerTask<Pair<NumericMatrix, N
         TDoubleArrayList values = new TDoubleArrayList();
         TDoubleArrayList weights = new TDoubleArrayList();
 
+        Set<String> notfound = new HashSet<>();
         Set<String> keys = m.keys();
         for(String i : keys) {
             for(String j : keys) {
                 Double vol = m.get(i, j);
                 if(vol != null && vol > 0) {
                     double d = getDistance(i, j);
-                    values.add(d);
-                    weights.add(vol);
+                    if(!Double.isInfinite(d)) {
+                        values.add(d);
+                        weights.add(vol);
+                    } else {
+                        if(zones.get(i) == null) notfound.add(i);
+                        if(zones.get(j) == null) notfound.add(j);
+                    }
                 }
             }
         }
+
+        if(!notfound.isEmpty()) logger.warn(String.format("Zone %s not found.", notfound.toString()));
 
         return Histogram.createHistogram(values.toArray(), weights.toArray(), discretizer, true);
     }
@@ -159,9 +167,9 @@ public class MatrixDistanceCompare implements AnalyzerTask<Pair<NumericMatrix, N
                 d = distanceCalculator.distance(p_i, p_j);
                 distanceMatrix.set(i, j, d);
             } else {
-                d = 0.0;
-                if(z_i == null) logger.warn(String.format("Zone %s not found.", i));
-                if(z_j == null) logger.warn(String.format("Zone %s not found.", j));
+                d = Double.POSITIVE_INFINITY;
+//                if(z_i == null) logger.warn(String.format("Zone %s not found.", i));
+//                if(z_j == null) logger.warn(String.format("Zone %s not found.", j));
             }
         }
 

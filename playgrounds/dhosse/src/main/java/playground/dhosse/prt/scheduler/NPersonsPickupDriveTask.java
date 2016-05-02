@@ -3,9 +3,8 @@ package playground.dhosse.prt.scheduler;
 import java.util.List;
 
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-
-import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.schedule.*;
+import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.schedule.TaxiDriveTask;
 
 public class NPersonsPickupDriveTask extends TaxiDriveTask{
 
@@ -20,7 +19,7 @@ public class NPersonsPickupDriveTask extends TaxiDriveTask{
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.DRIVE_EMPTY;
+        return TaxiTaskType.EMPTY_DRIVE;
     }
 
     public List<TaxiRequest> getRequests()

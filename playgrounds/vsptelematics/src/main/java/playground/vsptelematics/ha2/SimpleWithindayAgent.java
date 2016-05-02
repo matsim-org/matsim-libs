@@ -28,6 +28,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 
@@ -160,6 +161,18 @@ public class SimpleWithindayAgent implements MobsimDriverAgent {
 
 	public final Plan getCurrentPlan() {
 		return delegate.getCurrentPlan();
+	}
+
+	public Facility<? extends Facility<?>> getCurrentFacility() {
+		return this.delegate.getCurrentFacility();
+	}
+
+	public Facility<? extends Facility<?>> getDestinationFacility() {
+		return this.delegate.getDestinationFacility();
+	}
+
+	public final PlanElement getPreviousPlanElement() {
+		return this.delegate.getPreviousPlanElement();
 	}
 
 }

@@ -26,7 +26,8 @@ package floetteroed.opdyts.convergencecriteria;
 
 import java.util.List;
 
-import floetteroed.opdyts.trajectorysampling.TransitionSequence;
+import floetteroed.opdyts.DecisionVariable;
+import floetteroed.opdyts.trajectorysampling.Transition;
 
 /**
  * 
@@ -38,36 +39,12 @@ public interface ConvergenceCriterion {
 	/**
 	 * Evaluates the ConvergenceCriterion for the given TransitionSequence.
 	 * 
-	 * TODO The only public information currently available through
-	 * TransitionSequence is the number of transitions and the objective
-	 * function value sequence. But at least the to-state vectors should also be
-	 * available.
-	 * 
 	 * @param transitionSequence
 	 *            convergence is evaluated for this sequence
 	 */
-	public void evaluate(final TransitionSequence<?> transitionSequence);
+	public <U extends DecisionVariable> ConvergenceCriterionResult evaluate(
+			final List<Transition<U>> mostRecentTransitionSequence,
+			final int totalTransitionSequenceLength);
 
-	/**
-	 * @return if the most recently evaluated TransitionSequence is converged
-	 */
-	public boolean isConverged();
-
-	/**
-	 * @return the final (possibly post-processed, e.g. averaged) objective
-	 *         function value of the most recently evaluated TransitionSequence
-	 */
-	public Double getFinalObjectiveFunctionValue();
-
-	public void reset();
-
-	// TODO NEW
-	public List<Double> getFinalWeights();
-
-	// TODO NEW
-	public Double getFinalEquilbriumGap();
-
-	// TODO NEW
-	public Double getFinalUniformityGap();
-
+	// public double effectiveAveragingIterations();
 }

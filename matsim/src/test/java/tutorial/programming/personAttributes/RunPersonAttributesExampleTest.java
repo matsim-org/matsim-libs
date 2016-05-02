@@ -23,7 +23,6 @@
  */
 package tutorial.programming.personAttributes;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;

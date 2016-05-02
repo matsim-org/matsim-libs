@@ -19,8 +19,15 @@
  * *********************************************************************** */
 package playground.dgrether.daganzo2012;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -30,21 +37,15 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
-import org.matsim.contrib.signals.model.SignalSystem;
 
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 import playground.dgrether.signalsystems.analysis.DgGreenSplitWriter;
 import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
 import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
-import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Map.Entry;
+import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 
 
 /**
@@ -70,17 +71,18 @@ public class Daganzo2012Run {
 
 	private void run(String config) {
 		Controler controler = new Controler(config);
+		//add the signals module
 		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
 		sylviaConfig.setSignalGroupMaxGreenScale(2.0);
 		sylviaConfig.setUseFixedTimeCycleAsMaximalExtension(true);
-        //FIXME: Take care that the normal SignalsControllerListener is NOT added.
-        controler.addControlerListener(new DgSylviaControlerListenerFactory(sylviaConfig).createSignalsControllerListener());
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		SylviaSignalsModule sylviaSignalsModule = new SylviaSignalsModule();
+		sylviaSignalsModule.setSylviaConfig(sylviaConfig);
+		controler.addOverridingModule(sylviaSignalsModule);
+		
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.getConfig().controler().setCreateGraphs(false);
         addControlerListener(controler);
+        
 		controler.run();
 	}
 
@@ -143,9 +145,9 @@ public class Daganzo2012Run {
 				}
 				
 				
-				for (Id ssid : greenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
-					Map<Id, DgSignalGroupAnalysisData> signalGroupMap = greenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap();
-					for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGroupMap.entrySet()) {
+				for (Id<SignalSystem> ssid : greenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
+					Map<Id<SignalGroup>, DgSignalGroupAnalysisData> signalGroupMap = greenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap();
+					for (Entry<Id<SignalGroup>, DgSignalGroupAnalysisData> entry : signalGroupMap.entrySet()) {
 						// logg.info("for signalgroup: "+entry.getKey());
 						for (Entry<SignalGroupState, Double> ee : entry.getValue().getStateTimeMap().entrySet()) {
 							// logg.info(ee.getKey()+": "+ee.getValue());

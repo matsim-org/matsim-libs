@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,21 +37,22 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 /**
+ * 
+ * This test looks at the cost structure, i.e. each agent's caused and affected delay.
+ * 
  * @author ikaddoura
  *
  */
@@ -64,34 +68,30 @@ public class MarginalCongestionHandlerV3Test {
 		String configFile = testUtils.getPackageInputDirectory()+"MarginalCongestionHandlerV3Test/config.xml";
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
-		Controler controler = new Controler(configFile);
+		Config config = ConfigUtils.loadConfig( configFile ) ;
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+
+		final Controler controler = new Controler(config);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addEventHandlerBinding().toProvider(new Provider<EventHandler>() {
 					@Inject EventsManager eventsManager;
 					@Inject Scenario scenario;
-					@Override
-					public EventHandler get() {
+					@Override public EventHandler get() {
 						return new CongestionHandlerImplV3(eventsManager, scenario);
 					}
 				});
 				addEventHandlerBinding().toInstance(new CongestionEventHandler() {
-
-					@Override
-					public void reset(int iteration) {
-					}
-
-					@Override
-					public void handleEvent(CongestionEvent event) {
+					@Override public void reset(int iteration) { }
+					@Override public void handleEvent(CongestionEvent event) {
 						congestionEvents.add(event);
 					}
 				});
 			}
 		});
 
-		controler.getConfig().controler().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.run();
 		
 		// process

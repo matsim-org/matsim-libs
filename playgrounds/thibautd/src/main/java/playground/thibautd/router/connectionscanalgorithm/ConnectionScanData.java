@@ -85,7 +85,7 @@ public class ConnectionScanData {
 				final int id = stopNumericalIds.getIndex( s.getId() );
 				for ( Id<TransitStopFacility> other : close ) {
 					final double distance =
-							CoordUtils.calcDistance(
+							CoordUtils.calcEuclideanDistance(
 									schedule.getFacilities().get( s.getId() ).getCoord(),
 									schedule.getFacilities().get( other ).getCoord() );
 					footpaths.addFootpath(

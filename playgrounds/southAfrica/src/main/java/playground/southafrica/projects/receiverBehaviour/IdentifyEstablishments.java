@@ -59,9 +59,9 @@ public class IdentifyEstablishments {
 		PathDependentNetwork network = nr.getPathDependentNetwork();
 		Map<Id<Node>, Coord> nodeMap = new HashMap<Id<Node>, Coord>();
 		for(PathDependentNode node: network.getPathDependentNodes().values()){
-			double dMenlo = CoordUtils.calcDistance(menlo, node.getCoord());
-			double dWaterkloof = CoordUtils.calcDistance(waterkloof, node.getCoord());
-			double dWatermeyer = CoordUtils.calcDistance(watermeyer, node.getCoord());
+			double dMenlo = CoordUtils.calcEuclideanDistance(menlo, node.getCoord());
+			double dWaterkloof = CoordUtils.calcEuclideanDistance(waterkloof, node.getCoord());
+			double dWatermeyer = CoordUtils.calcEuclideanDistance(watermeyer, node.getCoord());
 			if(dMenlo <= 1000 || dWaterkloof <= 1000 || dWatermeyer <= 1000){
 				nodeMap.put(node.getId(), node.getCoord());
 			}

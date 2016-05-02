@@ -20,7 +20,6 @@
 package org.matsim.core.router;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsManagerModule;
@@ -84,7 +83,7 @@ public class TripRouterFactoryBuilderWithDefaults {
                                 if (carTravelDisutility != null) {
                                     addTravelDisutilityFactoryBinding("car").toInstance(new TravelDisutilityFactory() {
                                         @Override
-                                        public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+                                        public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
                                             return carTravelDisutility;
                                         }
                                     });

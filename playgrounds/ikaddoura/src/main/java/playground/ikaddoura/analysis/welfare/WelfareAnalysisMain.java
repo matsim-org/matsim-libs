@@ -33,6 +33,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.noise.events.NoiseEventsReader;
+import org.matsim.contrib.noise.utils.NoiseEventAnalysisHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -40,8 +42,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.noise2.events.NoiseEventsReader;
-import playground.ikaddoura.noise2.utils.NoiseEventAnalysisHandler;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 
 public class WelfareAnalysisMain {

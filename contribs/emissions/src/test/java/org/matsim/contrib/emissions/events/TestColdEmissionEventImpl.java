@@ -135,28 +135,4 @@ public class TestColdEmissionEventImpl {
 		Assert.assertEquals(numberOfColdPollutants, noMapNullPointers);
 	}
 	
-	@Test
-	public final void testgetAttributes_numberOfAttributes(){
-		//the number of attributes returned by getAttributes is related to the number of fields of coldEmissionEvent
-		
-		// create a normal event impl
-		Map<ColdPollutant, Double> coldEmissionsMap = new HashMap<>();
-		setColdEmissions(coldEmissionsMap);
-		ColdEmissionEvent ce = new ColdEmissionEvent(0.0, linkId, vehicleId, coldEmissionsMap);
-		Map<String, String> ceg = ce.getAttributes();
-
-		int numberOfColdPollutants = ColdPollutant.values().length;	
-		
-		// event parameters beside emissions: time, type, linkId, vehicleId = 4
-		int numberOfEventAttributes; // = 4; 
-		// linkId, vehicleId, coldEmissions
-		numberOfEventAttributes = ColdEmissionEvent.class.getFields().length;
-		//time as double, time as string, type
-
-		// -1 because the event type appears twice - once from the coldEmissionEvent and once from the superclass event
-		// the list of pollutants is not a field of coldEmissionEventImpl
-		// getAttributes does return each pollutant separately
-		// -> +1 for each pollutant
-		Assert.assertEquals(numberOfEventAttributes -1 + numberOfColdPollutants, ceg.size());
-	}
 }

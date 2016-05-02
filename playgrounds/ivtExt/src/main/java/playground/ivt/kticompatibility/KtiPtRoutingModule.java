@@ -24,11 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -43,9 +39,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.pt.PtConstants;
-import playground.balmermi.world.Layer;
-import playground.balmermi.world.World;
-import playground.balmermi.world.Zone;
+
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.router.SwissHaltestelle;
@@ -91,7 +85,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		// access
 		// ---------------------------------------------------------------------
 		final double distanceLeg1 =
-			CoordUtils.calcDistance( 
+			CoordUtils.calcEuclideanDistance( 
 					fromFacility.getCoord(),
 					stop1.getCoord() ) * KTI_CROWFLY_FACTOR;
 		final double travelTimeLeg1 = distanceLeg1 * config.getTeleportedModeSpeeds().get(TransportMode.walk);
@@ -111,12 +105,15 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		// pt
 		// ---------------------------------------------------------------------
-		final Layer municipalities = info.world.getLayer("municipality");
-		final List<Zone> froms = municipalities.getNearestLocations( stop1.getCoord() );
-		final List<Zone> tos = municipalities.getNearestLocations( stop2.getCoord() );
-		final Zone fromMunicipality = froms.get(0);
-		final Zone toMunicipality = tos.get(0);
+		if (true)
+			throw new RuntimeException("Reference to balmermi removed! the rest of the code is not working");
 
+	//	final Layer municipalities = info.world.getLayer("municipality");
+	//	final List<Zone> froms = municipalities.getNearestLocations( stop1.getCoord() );
+	//	final List<Zone> tos = municipalities.getNearestLocations( stop2.getCoord() );
+	//	final Zone fromMunicipality = froms.get(0);
+	//	final Zone toMunicipality = tos.get(0);
+/*
 		final Entry ptTravelTimeEntry =
 			info.ptTravelTimes.getEntry(
 					fromMunicipality.getId().toString(),
@@ -127,7 +124,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		final double ptDistance =
 			// factor hard-coded KTI-like
-			KTI_CROWFLY_FACTOR * CoordUtils.calcDistance(
+			KTI_CROWFLY_FACTOR * CoordUtils.calcEuclideanDistance(
 				stop1.getCoord(),
 				stop2.getCoord() );
 		final double ptTravelTime =
@@ -153,7 +150,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		// egress
 		// ---------------------------------------------------------------------
 		final double distanceLeg2 =
-			CoordUtils.calcDistance( 
+			CoordUtils.calcEuclideanDistance( 
 					stop2.getCoord(),
 					toFacility.getCoord() ) * KTI_CROWFLY_FACTOR;
 		final double travelTimeLeg2 = distanceLeg2 * config.getTeleportedModeSpeeds().get(TransportMode.walk);
@@ -165,7 +162,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		route2.setDistance( distanceLeg2 );
 		walk2.setRoute( route2 );
 		trip.add( walk2 );
-
+*/
 		return trip;
 	}
 
@@ -185,7 +182,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 	public static class KtiPtRoutingModuleInfo {
 		private final Matrix ptTravelTimes;
 		private final SwissHaltestellen ptStops;
-		private final World world;
+		//private final World world;
 		private final double intrazonalSpeed;
 
 		public KtiPtRoutingModuleInfo(
@@ -217,7 +214,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 			this.ptTravelTimes = ptInfo.getPtTravelTimes();
 			this.ptStops = ptInfo.getHaltestellen();
-			this.world = ptInfo.getLocalWorld();
+			//this.world = ptInfo.getLocalWorld();
 		}
 	}
 }

@@ -20,7 +20,7 @@
 package org.matsim.contrib.signals.model;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
 /**
  * @author dgrether

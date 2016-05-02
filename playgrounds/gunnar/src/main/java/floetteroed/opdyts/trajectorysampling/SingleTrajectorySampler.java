@@ -24,6 +24,7 @@
  */
 package floetteroed.opdyts.trajectorysampling;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterionResult;
 import floetteroed.utilities.statisticslogging.Statistic;
 
 /**
@@ -49,9 +51,15 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	private final ConvergenceCriterion convergenceCriterion;
 
+	private boolean initialized = false;
+
+	private ConvergenceCriterionResult convergenceResult = null;
+
 	private SimulatorState fromState = null;
 
 	private TransitionSequence<U> transitionSequence = null;
+
+	private int totalTransitionCnt = 0;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -72,17 +80,14 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	@Override
 	public boolean foundSolution() {
-		return this.convergenceCriterion.isConverged();
+		return ((this.convergenceResult != null) && this.convergenceResult.converged);
 	}
 
 	@Override
-	public Map<U, Double> getDecisionVariable2finalObjectiveFunctionValueView() {
-		final Map<U, Double> result = new LinkedHashMap<>();
-		if (this.convergenceCriterion.isConverged()) {
-			result.put(this.decisionVariable,
-					this.convergenceCriterion.getFinalObjectiveFunctionValue());
-		}
-		return result;
+	public Map<U, ConvergenceCriterionResult> getDecisionVariable2convergenceResultView() {
+		final Map<U, ConvergenceCriterionResult> result = new LinkedHashMap<>();
+		result.put(this.decisionVariable, this.convergenceResult);
+		return Collections.unmodifiableMap(result);
 	}
 
 	@Override
@@ -92,11 +97,17 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 
 	@Override
 	public void initialize() {
+		if (this.initialized) {
+			throw new RuntimeException(
+					"Create new instance instead of re-initializing.");
+		}
+		this.initialized = true;
 		this.decisionVariable.implementInSimulation();
 	}
 
 	@Override
 	public void afterIteration(SimulatorState newState) {
+		this.totalTransitionCnt++;
 		if (this.fromState != null) {
 			if (this.transitionSequence == null) {
 				this.transitionSequence = new TransitionSequence<U>(
@@ -107,18 +118,21 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 						this.decisionVariable, newState,
 						this.objectiveFunction.value(newState));
 			}
-			this.convergenceCriterion.evaluate(this.transitionSequence);
+			this.convergenceResult = this.convergenceCriterion.evaluate(
+					this.transitionSequence.getTransitions(),
+					this.transitionSequence.additionCnt());
 		}
 		this.fromState = newState;
 	}
 
 	@Override
 	public int getTotalTransitionCnt() {
-		if (this.transitionSequence != null) {
-			return this.transitionSequence.size();
-		} else {
-			return 0;
-		}
+		return this.totalTransitionCnt;
+		// if (this.transitionSequence != null) {
+		// return this.transitionSequence.size();
+		// } else {
+		// return 0;
+		// }
 	}
 
 	@Override
@@ -131,15 +145,4 @@ public class SingleTrajectorySampler<U extends DecisionVariable> implements
 	public void setStandardLogFileName(final String logFileName) {
 		throw new UnsupportedOperationException();
 	}
-
-	@Override
-	public Map<U, Double> getDecisionVariable2selfTunedEquilbriumGapWeightView() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Map<U, Double> getDecisionVariable2selfTunedUniformityGapWeightView() {
-		throw new UnsupportedOperationException();
-	}
-
 }

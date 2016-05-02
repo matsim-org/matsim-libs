@@ -66,7 +66,7 @@ public class InitRouteCreation {
 		//////////////////////////////////////////////////////////////////////
 
 		System.out.println("  adding person modules... ");
-		plans.addAlgorithm(new XY2Links(network));
+		plans.addAlgorithm(new XY2Links(network, null));
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 		plans.addAlgorithm(
 				new PlanRouter(

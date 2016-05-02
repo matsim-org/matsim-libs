@@ -20,7 +20,9 @@
 
 package org.matsim.roadpricing;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -221,6 +223,7 @@ import junit.framework.TestCase;
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore scoring = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
+		scoring.beginIteration(0);
 		sim.run();
 		scoring.finish();
 

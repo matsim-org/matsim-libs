@@ -89,6 +89,10 @@ import org.matsim.pt.config.TransitRouterConfigGroup;
 import playground.santiago.SantiagoScenarioConstants;
 import playground.santiago.SantiagoScenarioConstants.SubpopulationName;
 
+/**
+ * @author dhosse, benjamin
+ *
+ */
 public class SantiagoScenarioBuilder {
 	private static final Logger log = Logger.getLogger(SantiagoScenarioBuilder.class);
 	
@@ -643,7 +647,7 @@ public class SantiagoScenarioBuilder {
 	}
 	
 	private void setNetworkParameters(NetworkConfigGroup net){
-		net.setChangeEventInputFile(null);
+		net.setChangeEventsInputFile(null);
 		net.setInputFile(pathForMatsim + "input/network_merged_cl.xml.gz");
 		net.setLaneDefinitionsFile(null);
 		net.setTimeVariantNetwork(false);

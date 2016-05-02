@@ -20,14 +20,7 @@
 
 package org.matsim.population.algorithms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
@@ -153,7 +146,7 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				continue;
 			}
 
-			final Set<String> usableChainBasedModes = new HashSet<String>();
+			final Set<String> usableChainBasedModes = new LinkedHashSet<>();
 			final Id<? extends BasicLocation> subtourStartLocation = anchorAtFacilities ?
 				subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() :
 				subtour.getTrips().get( 0 ).getOriginActivity().getLinkId();
@@ -179,7 +172,7 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				}
 			}
 			
-			Set<String> usableModes = new HashSet<String>();
+			Set<String> usableModes = new LinkedHashSet<>();
 			if (isMassConserving(subtour)) { // We can only replace a subtour if it doesn't itself move a vehicle from one place to another
 				for (String candidate : permissibleModesForThisPerson) {
 					if (chainBasedModes.contains(candidate)) {
@@ -259,7 +252,7 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	private Activity findLastDestinationOfMode(
 			final List<Trip> tripsToSearch,
 			final String mode) {
-		final List<Trip> reversed = new ArrayList<Trip>( tripsToSearch );
+		final List<Trip> reversed = new ArrayList<>(tripsToSearch);
 		Collections.reverse( reversed );
 		for (Trip trip : reversed) {
 			if ( mode.equals( mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ) ) {

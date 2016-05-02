@@ -79,7 +79,7 @@ public class DemandFromEmissionEvents {
 			for(double time :linkCountMap.keySet()){
 				double hrDemand =0;
 				writer.write(time+"\t");
-				hrDemand = MapUtils.doubleSum(linkCountMap.get(time));
+				hrDemand = MapUtils.doubleValueSum(linkCountMap.get(time));
 				writer.write(hrDemand+"\n");
 			}
 			writer.close();

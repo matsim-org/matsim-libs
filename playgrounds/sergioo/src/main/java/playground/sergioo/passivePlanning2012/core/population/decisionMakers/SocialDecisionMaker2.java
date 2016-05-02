@@ -198,7 +198,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 		while(options.size()==0) {
 			for(KnownPlace knownPlace:knownPlaces.values()) {
 				ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(knownPlace.facilityId);
-				if(CoordUtils.calcDistance(location, facility.getCoord())<maximumDistance)
+				if(CoordUtils.calcEuclideanDistance(location, facility.getCoord())<maximumDistance)
 					for(Tuple<Period, String> types:knownPlace.timeTypes)
 						if(Period.getPeriod(time).equals(types.getFirst()))
 							options.add(new Tuple<String, Id<ActivityFacility>>(types.getSecond(), knownPlace.facilityId));

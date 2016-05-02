@@ -25,7 +25,7 @@ import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.RunMzTripChoiceSetConversion;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus.RunMzTripChoiceSetConversion;
 import playground.ivt.router.TripSoftCache;
 import playground.ivt.utils.ConcurrentStopWatch;
 

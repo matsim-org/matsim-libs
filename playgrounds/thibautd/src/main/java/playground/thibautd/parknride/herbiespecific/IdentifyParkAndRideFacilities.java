@@ -28,7 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -66,7 +66,7 @@ public class IdentifyParkAndRideFacilities {
 		final String networkFile = args[ 1 ];
 		final String outputFile = args[ 2 ];
 
-		final double minDist = CoordUtils.calcDistance( CENTER , BOUNDARY_POINT ) * factor;
+		final double minDist = CoordUtils.calcEuclideanDistance( CENTER , BOUNDARY_POINT ) * factor;
 		final PnrIds ids = new PnrIds();
 
 		NetworkImpl network = readNetwork( networkFile );
@@ -133,7 +133,7 @@ public class IdentifyParkAndRideFacilities {
 	}
 
 	private static boolean acceptStop(final Coord coord , final double dist) {
-		return CoordUtils.calcDistance( coord , CENTER ) > dist;
+		return CoordUtils.calcEuclideanDistance( coord , CENTER ) > dist;
 	}
 
 	private static TransitSchedule readSchedule( final String fileName ) {
@@ -142,7 +142,7 @@ public class IdentifyParkAndRideFacilities {
 		TransitScheduleReaderV1 reader =
 			new TransitScheduleReaderV1(
 					schedule,
-					new ModeRouteFactory());
+					new RouteFactoryImpl());
 
 		reader.readFile( fileName );
 

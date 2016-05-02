@@ -246,7 +246,7 @@ public class RoutePath {
 		String nearest = "";
 		double nearestDistance = Double.POSITIVE_INFINITY;
 		for(StopTime stopTime:trip.getStopTimes().values()) {
-			double distance = CoordUtils.calcDistance(stops.get(stopTime.getStopId()).getPoint(),coord);
+			double distance = CoordUtils.calcEuclideanDistance(stops.get(stopTime.getStopId()).getPoint(),coord);
 			if(distance<nearestDistance) {
 				nearest = stopTime.getStopId();
 				nearestDistance = distance;
@@ -257,9 +257,9 @@ public class RoutePath {
 	public Node getNearestNode(double x, double y) {
 		Coord point = new Coord(x, y);
 		Node nearest = links.get(0).getFromNode();
-		double nearestDistance = CoordUtils.calcDistance(point, nearest.getCoord());
+		double nearestDistance = CoordUtils.calcEuclideanDistance(point, nearest.getCoord());
 		for(Link link:links) {
-			double distance = CoordUtils.calcDistance(point,link.getToNode().getCoord());
+			double distance = CoordUtils.calcEuclideanDistance(point,link.getToNode().getCoord());
 			if(distance<nearestDistance) {
 				nearestDistance = distance;
 				nearest = link.getToNode();

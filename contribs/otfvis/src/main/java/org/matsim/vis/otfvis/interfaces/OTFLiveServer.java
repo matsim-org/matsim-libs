@@ -30,7 +30,7 @@ import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
  * @author dstrippgen
  *
  */
-public interface OTFLiveServer extends OTFServer, PlayPauseSimulationI {
+public interface OTFLiveServer extends OTFServer, PlayPauseSimulationControlI {
 	
 	public OTFQueryRemote answerQuery(AbstractQuery query);
 

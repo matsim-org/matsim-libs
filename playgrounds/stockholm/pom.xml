@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
@@ -12,17 +12,17 @@
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>cadytsIntegration</artifactId>
-  		<version>0.8.0-SNAPSHOT</version>
+  		<version>0.9.0-SNAPSHOT</version>
   	</dependency>
   	<dependency>
-  		<groupId>org.matsim.contrib</groupId>
-  		<artifactId>roadpricing</artifactId>
-  		<version>0.8.0-SNAPSHOT</version>
-  	</dependency>
+     	<groupId>org.apache.commons</groupId>
+     	<artifactId>commons-math3</artifactId>
+     	<version>3.4.1</version>
+     </dependency>
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>signals</artifactId>
-  		<version>0.8.0-SNAPSHOT</version>
+  		<version>0.9.0-SNAPSHOT</version>
   	</dependency>
   	
   	<dependency>	
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>gunnar</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
   	
   	<!-- [used by Patryk in his MSc code]
@@ -59,7 +59,7 @@
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>gtfs2matsimtransitschedule</artifactId>
-  		<version>0.8.0-SNAPSHOT</version>
+  		<version>0.9.0-SNAPSHOT</version>
   	</dependency>
   	<dependency>
         <groupId>org.jdom</groupId>
@@ -74,7 +74,7 @@
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>matrixbasedptrouter</artifactId>
-  		<version>0.8.0-SNAPSHOT</version>
+  		<version>0.9.0-SNAPSHOT</version>
   	</dependency>
   	  	
 <dependency>

@@ -18,14 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.combined;
 
-import java.io.BufferedWriter;
-import java.util.SortedMap;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.legMode.ModalShareGenerator;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromPlans;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -46,37 +42,11 @@ public class JointDemandModalSplit {
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(plansFile);
 		Population pop = sc.getPopulation();
-		ModalShareGenerator msg = new ModalShareGenerator();
+		ModalShareFromPlans msg = new ModalShareFromPlans(pop);
+		msg.run();
 		
 		String outFile = dir+folder+itNr+"/"+itNr+".modalSplit.txt";
-		BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
-		SortedMap<String, Integer> absoluteLeg = msg.getMode2NoOfLegs(pop);
-		SortedMap<String, Double> modalShare = msg.getMode2PctShareFromPlans(pop);
 		
-		try {
-			writer.write("absolute/Share \t");
-			for(String mode : absoluteLeg.keySet()){
-				writer.write(mode+"\t");
-			}
-			writer.newLine();
-			
-			writer.write("absolute \t");
-			for(String mode :absoluteLeg.keySet()){
-				writer.write(absoluteLeg.get(mode)+"\t");
-			}
-			writer.newLine();
-			
-			writer.write("share \t");
-			for(String mode :modalShare.keySet()){
-				writer.write(modalShare.get(mode)+"\t");
-			}
-			writer.newLine();
-			writer.close();
-		} catch (Exception e) {
-			throw new RuntimeException("Data is not written in file. Reason: "+ e);
-		}
-		
-		
+		msg.writeResults(outFile);
 	}
-	
 }

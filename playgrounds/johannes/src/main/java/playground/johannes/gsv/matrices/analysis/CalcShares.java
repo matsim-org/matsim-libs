@@ -70,7 +70,7 @@ public class CalcShares {
 		reader.parse("/home/johannes/gsv/matrices/analysis/marketShares/car.share.xml");
 		NumericMatrix shareRefMatrix = reader.getMatrix();
 		
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		data = null;

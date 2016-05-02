@@ -20,6 +20,7 @@
 
 package org.matsim.vis.otfvis;
 
+import com.jogamp.opengl.GLAutoDrawable;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
@@ -64,7 +65,8 @@ public class OTFClientFile implements Runnable {
 	}
 
 	private void createDrawer() {
-		OTFClient otfClient = new OTFClient();
+		GLAutoDrawable canvas = OTFOGLDrawer.createGLCanvas(new OTFVisConfigGroup());
+		OTFClient otfClient = new OTFClient(canvas);
 		OTFFileReader otfServer = new OTFFileReader(url);
 		otfClient.setServer(otfServer);
 		OTFVisConfigGroup otfVisConfig = otfServer.getOTFVisConfig();
@@ -80,8 +82,7 @@ public class OTFClientFile implements Runnable {
 		OTFServerQuadTree servQ = otfServer.getQuad(connect);
 		OTFClientQuadTree clientQ = servQ.convertToClient(otfServer, connect);
 		clientQ.getConstData();
-		OTFClientQuadTree clientQuadTree = clientQ;
-		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQuadTree, hostControlBar, otfVisConfig);
+		OTFOGLDrawer mainDrawer = new OTFOGLDrawer(clientQ, hostControlBar, otfVisConfig, canvas);
 		otfClient.addDrawerAndInitialize(mainDrawer, new SettingsSaver(url));
 		otfClient.pack();
         otfClient.setVisible(true);

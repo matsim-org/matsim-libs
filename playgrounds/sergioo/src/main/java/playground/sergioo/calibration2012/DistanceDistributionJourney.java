@@ -77,7 +77,7 @@ public class DistanceDistributionJourney {
 					Leg leg = (Leg)planElement;
 					double lastLinkLenght = network.getLinks().get(leg.getRoute().getEndLinkId()).getLength();
 					if(leg.getMode().equals("car")) {
-						chain.distances.add(RouteUtils.calcDistance((NetworkRoute)leg.getRoute(), network)+lastLinkLenght);
+						chain.distances.add(RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute)leg.getRoute(), network)+lastLinkLenght);
 						chain.modes.add("car");
 					}
 					else if(leg.getMode().equals("transit_walk") && !inPTLeg) {
@@ -92,10 +92,10 @@ public class DistanceDistributionJourney {
 						eRoute.setEndLinkId(leg.getRoute().getEndLinkId());
 						eRoute.setRouteDescription((leg.getRoute()).getRouteDescription());
 						TransitRoute route = transitSchedule.getTransitLines().get(eRoute.getLineId()).getRoutes().get(eRoute.getRouteId());
-						distancePT += RouteUtils.calcDistance(route.getRoute().getSubRoute(eRoute.getStartLinkId(), eRoute.getEndLinkId()), network)+lastLinkLenght;
+						distancePT += RouteUtils.calcDistanceExcludingStartEndLink(route.getRoute().getSubRoute(eRoute.getStartLinkId(), eRoute.getEndLinkId()), network)+lastLinkLenght;
 					}
 					else if(leg.getMode().equals("transit_walk"))
-						distancePT += CoordUtils.calcDistance(network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord()); 
+						distancePT += CoordUtils.calcEuclideanDistance(network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord()); 
 				}
 				else if(planElement instanceof Activity)
 					if(!((Activity)planElement).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) && inPTLeg) {

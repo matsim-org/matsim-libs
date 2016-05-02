@@ -31,6 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.EventHandler;
@@ -45,13 +46,12 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV8;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
-import scenarios.analysis.TtAbstractAnalysisTool;
-import scenarios.analysis.TtListenerToBindAndWriteAnalysis;
-import scenarios.braess.analysis.TtAnalyzeBraess;
-import scenarios.braess.createInput.TtCreateBraessPopulation;
-import scenarios.braess.createInput.TtCreateBraessPopulation.InitRoutes;
-import scenarios.braess.run.RunBraessSimulation;
-import scenarios.braess.run.RunBraessSimulation.PricingType;
+import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
+import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
+import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
+import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
+import scenarios.illustrative.braess.run.RunBraessSimulation;
+import scenarios.illustrative.braess.run.RunBraessSimulation.PricingType;
 
 /**
  * Test to fix the route distribution and travel times in Braess's scenario.
@@ -150,9 +150,13 @@ public final class FixBraessBehaviorTest{
 			controler.addControlerListener(initializer);
 		}
 					
-		// add a controller listener to analyze results
 		TtAbstractAnalysisTool handler = new TtAnalyzeBraess();
-		controler.addControlerListener(new TtListenerToBindAndWriteAnalysis(scenario, handler, false));
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().toInstance(handler);
+			}
+		});
 			
 		controler.run();		
 		
@@ -218,7 +222,7 @@ public final class FixBraessBehaviorTest{
 		TtCreateBraessPopulation popCreator = 
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(2000);
-		
+		popCreator.setSimulationStartTime(8*3600);
 		popCreator.createPersons(InitRoutes.ALL, 110.);
 	}
 	

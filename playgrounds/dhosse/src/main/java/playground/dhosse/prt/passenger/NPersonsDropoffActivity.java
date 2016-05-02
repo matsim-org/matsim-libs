@@ -1,14 +1,12 @@
 package playground.dhosse.prt.passenger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dynagent.DynAgent;
-
-import playground.michalm.taxi.data.TaxiRequest;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 
 public class NPersonsDropoffActivity extends VrpActivity {
 

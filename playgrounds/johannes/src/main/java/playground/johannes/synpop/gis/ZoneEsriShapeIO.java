@@ -41,7 +41,7 @@ public class ZoneEsriShapeIO {
 	}
 
 	public static ZoneCollection read(String filename) {
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		Set<Zone> zoneSet = new HashSet<>();
 		
 		try {

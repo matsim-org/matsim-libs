@@ -102,7 +102,7 @@ public class DistanceDistribution implements IterationEndsListener {
 							Route route = leg.getRoute();
 							double distance = 0.0;
 							if (route instanceof NetworkRoute) {
-								distance = RouteUtils.calcDistance((NetworkRoute) route, this.network);
+								distance = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, this.network);
 							} else distance = route.getDistance();
 							
 							for (DistanceBin distanceBin : distributionClass.distributionBins) {

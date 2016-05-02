@@ -372,7 +372,7 @@ public class FacilitiesToSQL {
                 if (actOption == null) {
 
                     actOption = implementation
-                            .createActivityOption(rs.getString("acttype"));
+                            .createAndAddActivityOption(rs.getString("acttype"));
                     actOption.setCapacity(rs.getDouble("capacity"));
                     actOption.addOpeningTime(new OpeningTimeImpl(rs.getDouble("starttime"), rs.getDouble("endtime")));
                 } else {

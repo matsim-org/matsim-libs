@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.ikaddoura.integrationCN;
 
+import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.router.VTTSTimeDistanceTravelDisutilityFactory;
 import playground.vsp.congestion.handlers.TollHandler;
 
@@ -39,20 +39,23 @@ public final class VTTSTollTimeDistanceTravelDisutilityFactory implements Travel
 	private VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory;
 	private final NoiseContext noiseContext;
 	private final TollHandler tollHandler;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public VTTSTollTimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, NoiseContext noiseContext, TollHandler tollHandler) {
+	public VTTSTollTimeDistanceTravelDisutilityFactory(VTTSTimeDistanceTravelDisutilityFactory vttsTimeDistanceTravelDisutilityFactory, 
+			NoiseContext noiseContext, TollHandler tollHandler, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.vttsTimeDistanceTravelDisutilityFactory = vttsTimeDistanceTravelDisutilityFactory;
 		this.noiseContext = noiseContext;
 		this.tollHandler = tollHandler;
+		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		
 		vttsTimeDistanceTravelDisutilityFactory.setSigma(sigma);
 		
 		return new TollTimeDistanceTravelDisutility(
-				vttsTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
+				vttsTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
 				this.noiseContext,
 				this.tollHandler,
 				cnScoringGroup.getMarginalUtilityOfMoney(),

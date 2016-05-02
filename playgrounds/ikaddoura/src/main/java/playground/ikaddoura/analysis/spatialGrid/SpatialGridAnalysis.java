@@ -31,6 +31,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.noise.NoiseConfigGroup;
+import org.matsim.contrib.noise.NoiseWriter;
+import org.matsim.contrib.noise.data.Grid;
+import org.matsim.contrib.noise.data.ReceiverPoint;
+import org.matsim.contrib.noise.events.NoiseEventsReader;
+import org.matsim.contrib.noise.utils.NoiseEventAnalysisHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -38,12 +44,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.noise2.NoiseWriter;
-import playground.ikaddoura.noise2.data.Grid;
-import playground.ikaddoura.noise2.data.GridParameters;
-import playground.ikaddoura.noise2.data.ReceiverPoint;
-import playground.ikaddoura.noise2.events.NoiseEventsReader;
-import playground.ikaddoura.noise2.utils.NoiseEventAnalysisHandler;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
@@ -121,10 +121,19 @@ public class SpatialGridAnalysis {
 		HashMap<Id<ReceiverPoint>, Double> rp2homeLocations = new HashMap<>();
 		HashMap<Id<ReceiverPoint>, Double> rp2totalCausedNoiseCost = new HashMap<>();
 		HashMap<Id<ReceiverPoint>, Double> rp2totalAffectedNoiseCost = new HashMap<>();
-
-		// grid parameters 
+			
+		// scenario
 		
-		GridParameters gridParameters = new GridParameters();
+//		String configFile = runDirectory + "output_config.xml.gz";
+		String populationFile = runDirectory + "output_plans.xml.gz";
+		String networkFile = runDirectory + "output_network.xml.gz";
+	
+//		Config config = ConfigUtils.loadConfig(configFile);		
+		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());		
+		config.plans().setInputFile(populationFile);
+		config.network().setInputFile(networkFile);
+		
+		NoiseConfigGroup gridParameters = (NoiseConfigGroup) config.getModule("noise");
 		gridParameters.setReceiverPointGap(receiverPointGap);
 					
 //		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
@@ -145,27 +154,14 @@ public class SpatialGridAnalysis {
 //		gridParameters.setReceiverPointsGridMaxY(yMax);
 			
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
-			
-		// scenario
-		
-//		String configFile = runDirectory + "output_config.xml.gz";
-		String populationFile = runDirectory + "output_plans.xml.gz";
-		String networkFile = runDirectory + "output_network.xml.gz";
-	
-//		Config config = ConfigUtils.loadConfig(configFile);		
-		Config config = ConfigUtils.createConfig();		
-		config.plans().setInputFile(populationFile);
-		config.network().setInputFile(networkFile);
+		gridParameters.setConsideredActivitiesForReceiverPointGridArray(consideredActivitiesForReceiverPointGrid);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		File file = new File(outputFilePath);
 		file.mkdirs();
-		
-		// grid
-		
-		Grid grid = new Grid(scenario, gridParameters);
+				
+		Grid grid = new Grid(scenario);
 		
 		// events	
 		

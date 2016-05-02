@@ -39,10 +39,11 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.FacilityWrapperActivity;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -72,7 +73,7 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 
 	private Network invertedNetwork = null;
 
-	private ModeRouteFactory routeFactory = null;
+	private RouteFactoryImpl routeFactory = null;
 
 	private Network network = null;
 
@@ -86,7 +87,7 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 		this.populationFactory = populationFactory;
 		PlanCalcScoreConfigGroup cnScoringGroup = sc.getConfig().planCalcScore();
 		this.routeFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory())
-				.getModeRouteFactory();
+				.getRouteFactory();
 		this.network = sc.getNetwork();
 
 		Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = Utils.createAllowedTurnInfos(sc);
@@ -99,7 +100,7 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 		// original network, and looks up the link2link tttime in the l2ltravelTimes data structure)
 		
 		TravelDisutility travelCost = travelCostCalculatorFactory.createTravelDisutility(
-				travelTimesProxy, cnScoringGroup);
+				travelTimesProxy);
 
 		this.leastCostPathCalculator = leastCostPathCalcFactory.createPathCalculator(
 				this.invertedNetwork, travelCost, travelTimesProxy);
@@ -162,7 +163,7 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 		route.setLinkIds(fromLinkId, linkIds, toLinkId);
 		route.setTravelTime((int) path.travelTime);
 		route.setTravelCost(path.travelCost);
-		route.setDistance(RouteUtils.calcDistance(route, this.network));
+		route.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route, this.network));
 		return route;
 	}
 
@@ -178,8 +179,8 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 		double travTime = routeLeg(
 				person,
 				newLeg,
-				new FacilityWrapper( fromFacility ),
-				new FacilityWrapper( toFacility ),
+				new FacilityWrapperActivity( fromFacility ),
+				new FacilityWrapperActivity( toFacility ),
 				departureTime);
 
 		// otherwise, information may be lost
@@ -193,71 +194,4 @@ class InvertedNetworkRoutingModule implements RoutingModule {
 		return EmptyStageActivityTypes.INSTANCE;
 	}
 
-	private static class FacilityWrapper implements Activity {
-		private final Facility wrapped;
-
-		public FacilityWrapper(final Facility toWrap) {
-			this.wrapped = toWrap;
-		}
-
-		@Override
-		public double getEndTime() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setEndTime(double seconds) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public String getType() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setType(String type) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public Coord getCoord() {
-			return wrapped.getCoord();
-		}
-
-		@Override
-		public double getStartTime() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setStartTime(double seconds) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public double getMaximumDuration() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public void setMaximumDuration(double seconds) {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public Id<Link> getLinkId() {
-			return wrapped.getLinkId();
-		}
-
-		@Override
-		public Id<ActivityFacility> getFacilityId() {
-			throw new UnsupportedOperationException( "only facility fields access are supported" );
-		}
-
-		@Override
-		public String toString() {
-			return "[FacilityWrapper: wrapped="+wrapped+"]";
-		}
-	}
 }

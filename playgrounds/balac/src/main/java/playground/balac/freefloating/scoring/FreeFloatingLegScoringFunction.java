@@ -1,5 +1,6 @@
 package playground.balac.freefloating.scoring;
 
+import java.util.ArrayList;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.TransportMode;
@@ -10,13 +11,13 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-
 public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.functions.CharyparNagelLegScoring {
 
 	private PlanImpl plan;
 	
 	private Config config;
-	
+	private ArrayList<Stats> freefloatingRentals = new ArrayList<Stats>();
+
 	public FreeFloatingLegScoringFunction(PlanImpl plan, CharyparNagelScoringParameters params, Config config,  Network network)
 	{
 		super(params, network);
@@ -32,6 +33,58 @@ public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.func
 	@Override
 	public void finish() {		
 		super.finish();
+		
+		double distance = 0.0;
+		double time = 0.0;
+		double specialTime = 0.0;
+		
+		if (!freefloatingRentals.isEmpty()) {
+			
+			double specialStartTime = Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("specialTimeStart"));
+			double specialEndTime = Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("specialTimeEnd"));
+
+			for(Stats s:freefloatingRentals) {
+			
+				distance += s.distance;
+				
+				if (s.startTime > specialEndTime || s.endTime < specialStartTime)
+				
+					time += (s.endTime - s.startTime);
+				else {
+					
+					boolean startBefore = s.startTime < specialStartTime;
+					boolean endBefore = s.endTime < specialEndTime;
+					
+					if (startBefore && endBefore) {
+						
+						specialTime += s.endTime - specialEndTime;
+						time += specialStartTime - s.startTime;
+					}
+					else if (!startBefore && endBefore) {
+						specialTime += s.endTime - s.startTime;
+					}
+					else if (!startBefore && !endBefore) {
+						
+						specialTime = specialEndTime - s.startTime;
+						time += s.endTime - specialEndTime;
+					}
+					else {
+						
+						specialTime += specialEndTime - specialStartTime;
+						time += specialStartTime - s.startTime;
+						time += s.endTime - specialEndTime;
+					}
+				}
+			}
+			
+			
+			
+			score += distance * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("distanceFeeFreeFloating"));
+			score += time * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("timeFeeFreeFloating"));
+			score += specialTime * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("specialTimeFee"));
+			
+			
+		}
 	}	
 	
 	
@@ -43,6 +96,16 @@ public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.func
 		double travelTime = arrivalTime - departureTime;
 		
 		double dist = 0.0D;
+		
+		if (leg.getMode().equals("freefloating")) {
+			
+			Stats s = new Stats();
+			s.startTime = departureTime;
+			s.endTime = arrivalTime;
+			s.distance = leg.getRoute().getDistance();
+			freefloatingRentals.add(s);
+			
+		}
 		
 		if (TransportMode.car.equals(leg.getMode()))
 		{
@@ -130,5 +193,12 @@ public class FreeFloatingLegScoringFunction extends org.matsim.core.scoring.func
 		score += this.params.modeParams.get(TransportMode.pt).constant;
 
 		return score;
+	}
+	
+	private class Stats {
+		private double startTime;
+		private double endTime;
+		private double distance;
+		
 	}
 }

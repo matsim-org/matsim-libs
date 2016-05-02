@@ -87,7 +87,7 @@ public class LinkAttached {
 	public double getDistance(List<Coord> points) {
 		double distance = 0;
 		for(int p=beginIndex; p<endIndex; p++)
-			distance+=CoordUtils.calcDistance(points.get(p),points.get(p+1));
+			distance+=CoordUtils.calcEuclideanDistance(points.get(p),points.get(p+1));
 		return distance;
 	}
 	public int getNunPoints() {

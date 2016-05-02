@@ -110,7 +110,7 @@ public class VisScenarioBuilder {
 	private void createVisLinks(Scenario scenario, VisScenario visScenario,
 			CoordinateTransformation transform) {
 		VisLaneModelBuilder visLaneModelBuilder = new VisLaneModelBuilder();
-		Lanes lanes = (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME);
+		Lanes lanes = (Lanes) scenario.getLanes();
 		for (Link l : scenario.getNetwork().getLinks().values()){
 			LanesToLinkAssignment20 l2l = null;
 			if (lanes != null) {

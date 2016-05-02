@@ -27,7 +27,6 @@ import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.matrices.Entry;
-import playground.balmermi.world.Zone;
 
 public class KtiPtRoute extends AbstractRoute {
 
@@ -97,12 +96,13 @@ public class KtiPtRoute extends AbstractRoute {
 		this.routeDescription = routeDescription ;
 		
 		if (routeDescription.startsWith(IDENTIFIER)) {
-			String[] routeDescriptionArray = StringUtils.explode(routeDescription, SEPARATOR);
-			this.fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(routeDescriptionArray[1]);
-			this.fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(Id.create(routeDescriptionArray[2], Zone.class));
-			this.inVehicleTime = Double.parseDouble(routeDescriptionArray[3]);
-			this.toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(Id.create(routeDescriptionArray[4], Zone.class));
-			this.toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(routeDescriptionArray[5]);
+			throw new RuntimeException("Reference to balmermi removed! the rest of the code is not working");
+			//String[] routeDescriptionArray = StringUtils.explode(routeDescription, SEPARATOR);
+			//this.fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(routeDescriptionArray[1]);
+			//this.fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(Id.create(routeDescriptionArray[2], Zone.class));
+			//this.inVehicleTime = Double.parseDouble(routeDescriptionArray[3]);
+			//this.toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(Id.create(routeDescriptionArray[4], Zone.class));
+			//this.toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(routeDescriptionArray[5]);
 		} else {
 			this.fromStop = null;
 			this.fromMunicipality = null;
@@ -113,7 +113,7 @@ public class KtiPtRoute extends AbstractRoute {
 	}
 
 	public double calcInVehicleDistance() {
-		return CoordUtils.calcDistance(this.getFromStop().getCoord(), this.getToStop().getCoord()) * CROW_FLY_FACTOR;
+		return CoordUtils.calcEuclideanDistance(this.getFromStop().getCoord(), this.getToStop().getCoord()) * CROW_FLY_FACTOR;
 	}
 
 	protected double calcInVehicleTime() {
@@ -139,8 +139,8 @@ public class KtiPtRoute extends AbstractRoute {
 	public double calcAccessEgressDistance(final Activity fromAct, final Activity toAct) {
 
 		return
-		(CoordUtils.calcDistance(fromAct.getCoord(), this.getFromStop().getCoord()) +
-		CoordUtils.calcDistance(toAct.getCoord(), this.getToStop().getCoord()))
+		(CoordUtils.calcEuclideanDistance(fromAct.getCoord(), this.getFromStop().getCoord()) +
+		CoordUtils.calcEuclideanDistance(toAct.getCoord(), this.getToStop().getCoord()))
 		* CROW_FLY_FACTOR;
 
 	}

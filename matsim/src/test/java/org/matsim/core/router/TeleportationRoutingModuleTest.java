@@ -31,7 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import junit.framework.Assert;
@@ -44,7 +44,7 @@ public class TeleportationRoutingModuleTest {
 	@Test
 	public void testRouteLeg() {
 		PopulationFactory populationFactory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
-		ModeRouteFactory routeFactory = new ModeRouteFactory();
+		RouteFactoryImpl routeFactory = new RouteFactoryImpl();
 		Person person = PopulationUtils.createPerson(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.walk);
 		Activity fromAct = new ActivityImpl("h", new Coord(0, 0));
