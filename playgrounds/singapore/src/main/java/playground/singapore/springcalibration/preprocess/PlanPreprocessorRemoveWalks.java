@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -26,11 +27,27 @@ public class PlanPreprocessorRemoveWalks {
 	
 	public void run(String plansFile, String plansOutFile) {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimPopulationReader(scenario).readFile(plansFile);		
+		MutableScenario scenarioTmp = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
+		new MatsimPopulationReader(scenarioTmp).readFile(plansFile);
+		
+		this.keepBestOnly(scenario, scenarioTmp);
 		this.correctForLongWalks(scenario);
 		this.writePlans(scenario.getPopulation(), scenario.getNetwork(), plansOutFile);
-		log.info("finished ###################################################");
+		log.info("finished ###################################################");	
+	}
+	
+	private void keepBestOnly(MutableScenario scenario, MutableScenario scenarioTmp) {
+		BestPlanSelector<Plan, Person> bestPlanSelector = new BestPlanSelector<Plan, Person>();
+		Population population = scenarioTmp.getPopulation();
 		
+		for (Person person : population.getPersons().values()) {
+			Plan bestPlan = bestPlanSelector.selectPlan(person);
+			
+			person.getPlans().clear();
+			
+			scenario.getPopulation().addPerson(person);
+			person.addPlan(bestPlan);
+		}	
 	}
 	
 	private void correctForLongWalks(MutableScenario scenario) {

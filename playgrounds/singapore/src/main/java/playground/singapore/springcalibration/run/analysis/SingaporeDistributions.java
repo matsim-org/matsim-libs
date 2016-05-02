@@ -131,9 +131,17 @@ public class SingaporeDistributions implements IterationEndsListener {
 							transit_walk_class.values.add(leg.getTravelTime());
 							//log.info("transit_walk_leg" + leg.getTravelTime());
 						}
+						
+						if (leg.getTravelTime() > 120.0 * 60.0) {
+							log.warn("Agent " + plan.getPerson().getId().toString() + " has a huge travel time for mode " +  leg.getMode());
+						}
 							
 						duration += leg.getTravelTime() / 60.0;												
 					}
+					
+					
+					
+					
 					for (Bin durationBin : distributionClass.distributionBins) {
 						if (duration >= durationBin.low && duration < durationBin.high) {
 							durationBin.count++;
