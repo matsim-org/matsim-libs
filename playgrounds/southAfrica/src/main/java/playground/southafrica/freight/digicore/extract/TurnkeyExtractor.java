@@ -83,7 +83,7 @@ public class TurnkeyExtractor {
 			LOG.error("Could not create the ./xml/ folder.");
 		}
 		String[] extractArgs = {
-				outputFolder + "vehicles/",
+				outputFolder + "Vehicles/",
 				"/home/share/data/digicore/2009/status.txt",
 				outputFolder + "xml/",
 				"40",
