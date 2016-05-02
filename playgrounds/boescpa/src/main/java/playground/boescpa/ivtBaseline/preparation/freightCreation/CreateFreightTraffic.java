@@ -70,10 +70,11 @@ public class CreateFreightTraffic {
 	private final Map<Integer, List<ActivityFacility>> zones = new HashMap<>();
 	private final Population freightPopulation;
 	private final ActivityFacilities freightFacilities;
+	private int personIndex = 0;
 
 	private CreateFreightTraffic(String coordFile, String facilitiesFile, double scalingFactor, int randomSeed) {
 		readZones(coordFile, facilitiesFile);
-		if (scalingFactor <= 1) {
+		if (scalingFactor <= 1.0) {
 			this.percentage = scalingFactor;
 			this.upScaling = 1.0;
 		} else {
@@ -133,7 +134,6 @@ public class CreateFreightTraffic {
 
 	private void createFreightTraffic(String type, String vehiclesFile) {
 		Counter counter = new Counter(" OD-relationship # ");
-		int personIndex = 0;
 		BufferedReader reader = IOUtils.getBufferedReader(vehiclesFile);
 		try {
 			String nextLine = reader.readLine();
