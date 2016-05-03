@@ -52,7 +52,7 @@ public class HourlyTaxiStatsWriter
         pw.println("hour\tmean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax");
 
         for (HourlyTaxiStats s : hourlyStats) {
-            pw.printf("%d\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f", //
+            pw.printf("%d\t%.1f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f", //
                     s.hour, //
                     s.passengerWaitTime.getMean(), //
                     s.passengerWaitTime.getMin(), //
@@ -77,7 +77,7 @@ public class HourlyTaxiStatsWriter
         pw.println("hour\tmean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax");
 
         for (HourlyTaxiStats s : hourlyStats) {
-            pw.printf("%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f", //
+            pw.printf("%d\t%.4f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f", //
                     s.hour, //
                     s.emptyDriveRatio.getMean(), //
                     s.emptyDriveRatio.getMin(), //
@@ -102,7 +102,7 @@ public class HourlyTaxiStatsWriter
         pw.println("hour\tmean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax");
 
         for (HourlyTaxiStats s : hourlyStats) {
-            pw.printf("%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f", //
+            pw.printf("%d\t%.4f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f", //
                     s.hour, //
                     s.stayRatio.getMean(), //
                     s.stayRatio.getMin(), //
@@ -127,7 +127,7 @@ public class HourlyTaxiStatsWriter
         pw.println("hour\t<1%\t<25%\t<50%\t<75%\t<100%\t<=100%");
 
         for (HourlyTaxiStats s : hourlyStats) {
-            pw.printf("%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f", //
+            pw.printf("%d\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f", //
                     s.hour, //
                     s.getStayLt1PctCount(), //
                     s.getStayLt25PctCount(), //
