@@ -108,9 +108,9 @@ public class OsmNetworkReaderWithPT {
 	/*
 	Maps for nodes, ways and relations
 	 */
-	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
-	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
-	private final Map<Long, OsmRelation> relations = new HashMap<Long, OsmRelation>();
+	private final Map<Long, OsmParser.OsmNode> nodes = new HashMap<Long, OsmParser.OsmNode>();
+	private final Map<Long, OsmParser.OsmWay> ways = new HashMap<Long, OsmParser.OsmWay>();
+	private final Map<Long, OsmParser.OsmRelation> relations = new HashMap<Long, OsmParser.OsmRelation>();
 
 	private final Map<Long, Long> wayIds = new HashMap<Long, Long>();
 
@@ -348,28 +348,28 @@ public class OsmNetworkReaderWithPT {
 		}
 
 		// check which ways are used
-		for (OsmWay way : this.ways.values()) {
+		for (OsmParser.OsmWay way : this.ways.values()) {
 			// here checks may be added to set additional ways "way.used = true"
 			break;
 		}
 
 		// remove unused ways
-		Iterator<Map.Entry<Long, OsmWay>> it = this.ways.entrySet().iterator();
+		Iterator<Map.Entry<Long, OsmParser.OsmWay>> it = this.ways.entrySet().iterator();
 		while (it.hasNext()) {
-			Map.Entry<Long, OsmWay> entry = it.next();
+			Map.Entry<Long, OsmParser.OsmWay> entry = it.next();
 			if (!entry.getValue().used) {
 				it.remove();
 			}
 		}
 
 		// check which nodes are used
-		for (OsmWay way : this.ways.values()) {
+		for (OsmParser.OsmWay way : this.ways.values()) {
 			// first and last are counted twice, so they are kept in all cases
 			this.nodes.get(way.nodes.get(0)).ways++;
 			this.nodes.get(way.nodes.get(way.nodes.size() - 1)).ways++;
 
 			for (Long nodeId : way.nodes) {
-				OsmNode node = this.nodes.get(nodeId);
+				OsmParser.OsmNode node = this.nodes.get(nodeId);
 				node.used = true;
 				node.ways++;
 			}
@@ -379,11 +379,11 @@ public class OsmNetworkReaderWithPT {
 		if (!this.keepPaths) {
 			// marked nodes as unused where only one way leads through
 			// but only if this doesn't lead to links longer than MAX_LINKLENGTH
-			for (OsmWay way : this.ways.values()) {
+			for (OsmParser.OsmWay way : this.ways.values()) {
 				double length = 0.0;
-				OsmNode lastNode = this.nodes.get(way.nodes.get(0));
+				OsmParser.OsmNode lastNode = this.nodes.get(way.nodes.get(0));
 				for (int i = 1; i < way.nodes.size(); i++) {
-					OsmNode node = this.nodes.get(way.nodes.get(i));
+					OsmParser.OsmNode node = this.nodes.get(way.nodes.get(i));
 					if (node.ways > 1) {
 						length = 0.0;
 						lastNode = node;
@@ -402,15 +402,15 @@ public class OsmNetworkReaderWithPT {
 				}
 			}
 			// verify we did not mark nodes as unused that build a loop
-			for (OsmWay way : this.ways.values()) {
+			for (OsmParser.OsmWay way : this.ways.values()) {
 				int prevRealNodeIndex = 0;
-				OsmNode prevRealNode = this.nodes.get(way.nodes.get(prevRealNodeIndex));
+				OsmParser.OsmNode prevRealNode = this.nodes.get(way.nodes.get(prevRealNodeIndex));
 
 				for (int i = 1; i < way.nodes.size(); i++) {
-					OsmNode node = this.nodes.get(way.nodes.get(i));
+					OsmParser.OsmNode node = this.nodes.get(way.nodes.get(i));
 					if (node.used) {
 						if (prevRealNode == node) {
-						/* We detected a loop between to "real" nodes.
+						/* We detected a loop between two "real" nodes.
 						 * Set some nodes between the start/end-loop-node to "used" again.
 						 * But don't set all of them to "used", as we still want to do some network-thinning.
 						 * I decided to use sqrt(.)-many nodes in between...
@@ -419,7 +419,7 @@ public class OsmNetworkReaderWithPT {
 							double nextNodeToKeep = prevRealNodeIndex + increment;
 							for (double j = nextNodeToKeep; j < i; j += increment) {
 								int index = (int) Math.floor(j);
-								OsmNode intermediaryNode = this.nodes.get(way.nodes.get(index));
+								OsmParser.OsmNode intermediaryNode = this.nodes.get(way.nodes.get(index));
 								intermediaryNode.used = true;
 							}
 						}
@@ -431,7 +431,7 @@ public class OsmNetworkReaderWithPT {
 		}
 
 		// create the required nodes
-		for (OsmNode node : this.nodes.values()) {
+		for (OsmParser.OsmNode node : this.nodes.values()) {
 			if (node.used) {
 				Node nn = this.network.getFactory().createNode(Id.create(node.id, Node.class), node.coord);
 				this.network.addNode(nn);
@@ -440,13 +440,13 @@ public class OsmNetworkReaderWithPT {
 
 		// create the links
 		this.id = 1;
-		for (OsmWay way : this.ways.values()) {
-			OsmNode fromNode = this.nodes.get(way.nodes.get(0));
+		for (OsmParser.OsmWay way : this.ways.values()) {
+			OsmParser.OsmNode fromNode = this.nodes.get(way.nodes.get(0));
 			double length = 0.0;
-			OsmNode lastToNode = fromNode;
+			OsmParser.OsmNode lastToNode = fromNode;
 			if (fromNode.used) {
 				for (int i = 1, n = way.nodes.size(); i < n; i++) {
-					OsmNode toNode = this.nodes.get(way.nodes.get(i));
+					OsmParser.OsmNode toNode = this.nodes.get(way.nodes.get(i));
 					if (toNode != lastToNode) {
 						length += CoordUtils.calcEuclideanDistance(lastToNode.coord, toNode.coord);
 						if (toNode.used) {
@@ -460,17 +460,13 @@ public class OsmNetworkReaderWithPT {
 			}
 		}
 
-
-		// todo create MATSim Transit Schedule with available data
-
-
 		// free up memory
 		this.nodes.clear();
 		this.ways.clear();
 		this.relations.clear();
 	}
 
-	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, final double length) {
+	private void createLink(final Network network, final OsmParser.OsmWay way, final OsmParser.OsmNode fromNode, final OsmParser.OsmNode toNode, final double length) {
 		double nofLanes;
 		double laneCapacity;
 		double freespeed;
@@ -583,7 +579,7 @@ public class OsmNetworkReaderWithPT {
 		if (modes.isEmpty()) {modes.add("unknownStreetType");}
 
 		//	public transport: get relation which this way is part of, then get the relations route=* (-> the mode)
-		for (OsmRelation relation : this.relations.values()) {
+		for (OsmParser.OsmRelation relation : this.relations.values()) {
 			for (OsmParser.OsmRelationMember member : relation.members) {
 				if ((member.type == OsmParser.OsmRelationMemberType.WAY) && (member.refId == way.id) && OsmNetworkReaderWithPT.this.ptFilter.matches(relation.tags)) {
 					String mode = relation.tags.get(TAG_ROUTE);
@@ -637,65 +633,6 @@ public class OsmNetworkReaderWithPT {
 		}
 	}
 
-	/**
-	 * Containers for OSM nodes, ways and relations
-	 */
-	private static class OsmNode {
-		public final long id;
-		public final Coord coord;
-		public final Map<String, String> tags;
-
-		public boolean used = false;
-		public int ways = 0;
-
-		public OsmNode(final long id, final Coord coord) {
-			this.id = id;
-			this.coord = coord;
-			tags = new HashMap<String, String>(5, 0.9f);
-		}
-		public OsmNode(OsmParser.OsmNode node) {
-			this.id = node.id;
-			this.coord = node.coord;
-			this.tags = node.tags;
-		}
-	}
-
-	private static class OsmWay {
-		public final long id;
-		public final List<Long> nodes;
-		public final Map<String, String> tags;
-
-		public boolean used = false;
-
-		public OsmWay(final long id) {
-			this.id = id;
-			nodes = new ArrayList<Long>(6);
-			tags = new HashMap<String, String>(5, 0.9f);
-		}
-		public OsmWay(OsmParser.OsmWay way) {
-			this.id = way.id;
-			this.nodes = way.nodes;
-			this.tags = way.tags;
-		}
-	}
-
-	private static class OsmRelation {
-		public final long id;
-		public final List<OsmParser.OsmRelationMember> members;
-		public final Map<String, String> tags;
-
-		public OsmRelation(long id) {
-			this.id = id;
-			members = new ArrayList<OsmParser.OsmRelationMember>(8);
-			tags = new HashMap<String, String>(5, 0.9f);
-		}
-		public OsmRelation(OsmParser.OsmRelation relation) {
-			this.id = relation.id;
-			this.members = relation.members;
-			this.tags = relation.tags;
-		}
-	}
-
 	private static class OsmWayDefaults {
 
 		public final double lanes;
@@ -718,16 +655,16 @@ public class OsmNetworkReaderWithPT {
 	 */
 	private class OsmParserHandler implements OsmNodeHandler, OsmWayHandler, OsmRelationHandler {
 
-		private final Map<Long, OsmNode> nodes;
-		private final Map<Long, OsmWay> ways;
-		private final Map<Long, OsmRelation> relations;
+		private final Map<Long, OsmParser.OsmNode> nodes;
+		private final Map<Long, OsmParser.OsmWay> ways;
+		private final Map<Long, OsmParser.OsmRelation> relations;
 
 		private final Map<Long, Long> wayIds;
 		private final CoordinateTransformation transformation;
 
-		public OsmParserHandler(final Map<Long, OsmNode> nodes, final Map<Long, OsmWay> ways,
-							  final Map<Long, OsmRelation> relations,
-							  final Map<Long, Long> wayIds, CoordinateTransformation transformation) {
+		public OsmParserHandler(final Map<Long, OsmParser.OsmNode> nodes, final Map<Long, OsmParser.OsmWay> ways,
+								final Map<Long, OsmParser.OsmRelation> relations,
+								final Map<Long, Long> wayIds, CoordinateTransformation transformation) {
 			this.nodes = nodes;
 			this.ways = ways;
 			this.relations = relations;
@@ -737,36 +674,34 @@ public class OsmNetworkReaderWithPT {
 
 		@Override
 		public void handleRelation(OsmParser.OsmRelation relation) {
-			OsmRelation currentRelation = new OsmRelation(relation);
 
 			// only use relations with a tag specified in ptFilter
-			if (OsmNetworkReaderWithPT.this.ptFilter.matches(currentRelation.tags)) {
-				this.relations.put(currentRelation.id, currentRelation);
+			if (OsmNetworkReaderWithPT.this.ptFilter.matches(relation.tags)) {
+				this.relations.put(relation.id, relation);
 			}
 		}
 
 		@Override
 		public void handleNode(OsmParser.OsmNode node) {
-			this.nodes.put(node.id, new OsmNode(node.id, transformation.transform(node.coord)));
+			this.nodes.put(node.id, new OsmParser.OsmNode(node.id, transformation.transform(node.coord)));
 		}
 
 		@Override
 		public void handleWay(OsmParser.OsmWay way) {
-			OsmWay currentWay = new OsmWay(way);
-			if (!currentWay.nodes.isEmpty()) {
+			if (!way.nodes.isEmpty()) {
 				// only take ways which are highway or railway
-				OsmWayDefaults osmHighwayDefaults = OsmNetworkReaderWithPT.this.highwayDefaults.get(currentWay.tags.get(TAG_HIGHWAY));
-				OsmWayDefaults osmRailwayDefaults = OsmNetworkReaderWithPT.this.railwayDefaults.get(currentWay.tags.get(TAG_RAILWAY));
+				OsmWayDefaults osmHighwayDefaults = OsmNetworkReaderWithPT.this.highwayDefaults.get(way.tags.get(TAG_HIGHWAY));
+				OsmWayDefaults osmRailwayDefaults = OsmNetworkReaderWithPT.this.railwayDefaults.get(way.tags.get(TAG_RAILWAY));
 
 				// filter out not usable rails (with tags service=*)
-				if(currentWay.tags.containsKey(TAG_SERVICE)) {
+				if(way.tags.containsKey(TAG_SERVICE)) {
 					osmRailwayDefaults = null;
 				}
 
 				if (osmHighwayDefaults != null || osmRailwayDefaults != null) {
-					currentWay.used = true;
+					way.used = true;
 				}
-				this.ways.put(currentWay.id, currentWay);
+				this.ways.put(way.id, way);
 			}
 		}
 	}

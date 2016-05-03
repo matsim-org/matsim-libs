@@ -59,6 +59,8 @@ public class OsmParser {
 		public final List<Long> nodes = new ArrayList<Long>(6);
 		public final Map<String, String> tags = new HashMap<String, String>(5, 0.9f);
 
+		public boolean used = false;
+
 		public OsmWay(final long id) {
 			this.id = id;
 		}
@@ -68,6 +70,9 @@ public class OsmParser {
 		public final long id;
 		public final Coord coord;
 		public final Map<String, String> tags = new HashMap<String, String>(5, 0.9f);
+
+		public boolean used = false;
+		public int ways = 0;
 
 		public OsmNode(final long id, final Coord coord) {
 			this.id = id;
