@@ -19,6 +19,9 @@
 
 package playground.polettif.multiModalMap.osm.core;
 
+import org.matsim.core.utils.collections.MapUtils;
+import playground.polettif.multiModalMap.tools.MiscUtils;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,25 +29,35 @@ import java.util.Set;
 
 /**
  * A helper class to easily find out if some OSM entity contains
- * the tags one's interested in or not.
+ * the key-value pairs or tags (with all possible values) one is
+ * interested in or not.
  * 
  * @author mrieser / Senozon AG
  */
 public class TagFilter {
 
 	public final static String MATCH_ALL = "*";
-	private final Map<String, Set<String>> filters = new HashMap<String, Set<String>>();
+	private final Map<String, Set<String>> keyValuePairs = new HashMap<>();
 
 	public TagFilter() {
 	}
 
+	/**
+	 *
+	 * @param key
+	 * @param value <code>null</code> if all values should be taken
+	 */
 	public void add(final String key, final String value) {
-		Set<String> values = this.filters.get(key);
-		if (values == null) {
-			values = new HashSet<String>();
-			this.filters.put(key, values);
+		if(value == null) {
+			keyValuePairs.put(key, null);
+		} else {
+			Set<String> values = MapUtils.getSet(key, keyValuePairs);
+			values.add(value);
 		}
-		values.add(value);
+	}
+
+	public void add(final String key) {
+		add(key, null);
 	}
 
 	/**
@@ -52,7 +65,10 @@ public class TagFilter {
 	 * @return <code>true</code> if at least one of the given tags matches any one of the specified filter-tags.
 	 */
 	public boolean matches(final Map<String, String> tags) {
-		for (Map.Entry<String, Set<String>> e : this.filters.entrySet()) {
+		for (Map.Entry<String, Set<String>> e : keyValuePairs.entrySet()) {
+			if(tags.containsKey(e.getKey()) && e.getValue() == null) {
+				return true;
+			}
 			String value = tags.get(e.getKey());
 			if (value != null && (e.getValue().contains(value) || e.getValue().contains(MATCH_ALL))) {
 				return true;

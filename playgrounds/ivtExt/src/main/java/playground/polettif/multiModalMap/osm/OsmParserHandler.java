@@ -17,15 +17,13 @@
  * *********************************************************************** */
 
 
-package playground.polettif.multiModalMap.osm.osm2mts;
+package playground.polettif.multiModalMap.osm;
 
+import com.sun.istack.internal.Nullable;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import playground.polettif.multiModalMap.osm.core.*;
-import playground.polettif.multiModalMap.osm.lib.OsmTag;
-import playground.polettif.multiModalMap.osm.lib.OsmValue;
 
 import java.util.*;
 
@@ -67,40 +65,25 @@ import java.util.*;
 /**
  * Handler to read out osm data (nodes, ways and relations). Just stores the data.
  */
-public class OSM2MTSHandler implements OsmNodeHandler, OsmRelationHandler, OsmWayHandler {
+public class OsmParserHandler implements OsmNodeHandler, OsmRelationHandler, OsmWayHandler {
 	
-	private static final Logger log = Logger.getLogger(OSM2MTSHandler.class);
+	private static final Logger log = Logger.getLogger(OsmParserHandler.class);
 
-	private final TagFilter nodeFilter;
-	private final TagFilter wayFilter;
-	private final TagFilter relationFilter;
+	private TagFilter nodeFilter;
+	private TagFilter wayFilter;
+	private TagFilter relationFilter;
 
 	private Map<Long, OsmParser.OsmNode> nodes = new HashMap<>();
 	private Map<Long, OsmParser.OsmRelation> relations = new HashMap<>();
 	private Map<Long, OsmParser.OsmWay> ways = new HashMap<>();
 
-	public OSM2MTSHandler() {
-		// initiate filters
-		nodeFilter = new TagFilter();
-		nodeFilter.add(OsmTag.PUBLIC_TRANSPORT, OsmValue.STOP_POSITION);
+	public OsmParserHandler() {
+	}
 
-		relationFilter = new TagFilter();
-		relationFilter.add(OsmTag.ROUTE, OsmValue.BUS);
-		relationFilter.add(OsmTag.ROUTE, OsmValue.TROLLEYBUS);
-		relationFilter.add(OsmTag.ROUTE, OsmValue.RAIL);
-		relationFilter.add(OsmTag.ROUTE, OsmValue.TRAM);
-		relationFilter.add(OsmTag.ROUTE, OsmValue.LIGHT_RAIL);
-		relationFilter.add(OsmTag.ROUTE, OsmValue.FUNICULAR);
-		relationFilter.add(OsmTag.ROUTE, OsmValue.MONORAIL);
-		relationFilter.add(OsmTag.ROUTE, OsmValue.SUBWAY);
-		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.BUS);
-		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.TROLLEYBUS);
-		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.TRAM);
-		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.MONORAIL);
-		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.SUBWAY);
-		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.FERRY);
-
-		wayFilter = new TagFilter();
+	public void addFilter(TagFilter nodeFilter, TagFilter wayFilter, TagFilter relationFilter) {
+		this.nodeFilter = nodeFilter;
+		this.wayFilter = wayFilter;
+		this.relationFilter = relationFilter;
 	}
 
 	public Map<Long, OsmParser.OsmWay> getWays() {
@@ -117,23 +100,25 @@ public class OSM2MTSHandler implements OsmNodeHandler, OsmRelationHandler, OsmWa
 
 	@Override
 	public void handleNode(OsmParser.OsmNode node) {
-		if(nodeFilter.matches(node.tags)) {
+		if(nodeFilter == null || nodeFilter.matches(node.tags)) {
 			nodes.put(node.id, node);
 		}
 	}
 
 	@Override
 	public void handleRelation(OsmParser.OsmRelation relation) {
-		if(relationFilter.matches(relation.tags)) {
+		if(relationFilter == null || relationFilter.matches(relation.tags)) {
 			relations.put(relation.id, relation);
 		}
 	}
 
 	@Override
 	public void handleWay(OsmParser.OsmWay way) {
-		if(relationFilter.matches(way.tags)) {
+		if(wayFilter == null || wayFilter.matches(way.tags)) {
 			ways.put(way.id, way);
 		}
 	}
+	
+
 }
 

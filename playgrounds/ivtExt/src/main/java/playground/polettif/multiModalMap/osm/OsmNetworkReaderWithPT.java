@@ -22,24 +22,27 @@
 package playground.polettif.multiModalMap.osm;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.polettif.multiModalMap.osm.core.*;
+import playground.polettif.multiModalMap.osm.lib.OsmTag;
+import playground.polettif.multiModalMap.osm.lib.OsmValue;
 
 import java.util.*;
 
 /**
  * org/matsim/core/utils/io/OsmNetworkReader.java extended with the functionality
  * to recognize and tag public transport.
- *
+ * <p/>
  * Streaming with org.xml.sax.InputSource had to be removed because of privacy issues.
  *
  * @author boescpa
@@ -55,64 +58,20 @@ public class OsmNetworkReaderWithPT {
 	*/
 
 	// general tags
-	private final static String TAG_HIGHWAY = "highway";
-	private final static String TAG_RAILWAY = "railway";
-
-	// Tags road network
-	private final static String TAG_LANES = "lanes";
-	private final static String TAG_MAXSPEED = "maxspeed";
-	private final static String TAG_JUNCTION = "junction";
-	private final static String TAG_ONEWAY = "oneway";
-	private final static String TAG_ACCESS = "access";
-
-	// Tags public transport network
-	private static final String TAG_SERVICE = "service";
-	private final static String TAG_ROUTE = "route";
-
-	private final static String TAG_PUBLIC_TRANSPORT = "public_transport";
-	private final static String TAG_TYPE = "type";
-
-
 	private static final String MEMBER_ROLE_STOP = "stop";
 	private static final String MEMBER_ROLE_STOP_FORWARD = "stop_forward";
 	private static final String MEMBER_ROLE_STOP_BACKWARD = "stop_backward";
 
-	// values for highway=*
-	private static final String V_MOTORWAY = "motorway";
-	private static final String V_MOTORWAY_LINK = "motorway_link";
-	private static final String V_TRUNK = "trunk";
-	private static final String V_TRUNK_LINK = "trunk_link";
-	private static final String V_PRIMARY = "primary";
-	private static final String V_PRIMARY_LINK = "primary_link";
-	private static final String V_SECONDARY = "secondary";
-	private static final String V_TERTIARY = "tertiary";
-	private static final String V_MINOR = "minor";
-	private static final String V_UNCLASSIFIED = "unclassified";
-	private static final String V_RESIDENTIAL = "residential";
-	private static final String V_LIVING_STREET = "living_street";
-	private static final String V_SERVICE = "service";
-
-	private final static String V_STOP_POSITION = "stop_position";
-	private final static String V_BUS = "bus";
-	private final static String V_TROLLEYBUS = "trolleybus";
-
-
-	// values for railway=*
-	private static final String V_RAIL = "rail";
-	private static final String V_TRAM = "tram";
-	private static final String V_LIGHT_RAIL = "light_rail";
-	private static final String V_FUNICULAR = "funicular";
-	private static final String V_MONORAIL = "monorail";
-	private static final String V_SUBWAY = "subway";
 
 	/*
 	Maps for nodes, ways and relations
 	 */
-	private final Map<Long, OsmParser.OsmNode> nodes = new HashMap<Long, OsmParser.OsmNode>();
-	private final Map<Long, OsmParser.OsmWay> ways = new HashMap<Long, OsmParser.OsmWay>();
-	private final Map<Long, OsmParser.OsmRelation> relations = new HashMap<Long, OsmParser.OsmRelation>();
+	private Map<Long, OsmParser.OsmNode> nodes;
+	private Map<Long, OsmParser.OsmWay> ways;
+	private Map<Long, OsmParser.OsmRelation> relations;
+	private Map<Long, Set<Long>> relationMembers = new HashMap<>();
 
-	private final Map<Long, Long> wayIds = new HashMap<Long, Long>();
+	private final Map<Long, Long> wayIds = new HashMap<>();
 
 	/*
 	Maps for unknown entities
@@ -143,7 +102,7 @@ public class OsmNetworkReaderWithPT {
 	 */
 	private boolean keepPaths = false;
 	private boolean scaleMaxSpeed = false;
-	private final static double MAX_LINKLENGTH = 500.0;
+	private double maxLinkLength = 500.0;
 
 
 	/**
@@ -158,41 +117,41 @@ public class OsmNetworkReaderWithPT {
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
 	 *
-	 * @param network An empty network where the converted OSM data will be stored.
+	 * @param network            An empty network where the converted OSM data will be stored.
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
 	public OsmNetworkReaderWithPT(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
 		this.network = network;
 		this.transformation = transformation;
 
-		if (useHighwayDefaults) {
+		if(useHighwayDefaults) {
 			log.info("Falling back to default values.");
 
 			// Set highway-defaults (and with it the filter...)
-			this.setHighwayDefaults(V_MOTORWAY,      2, 120.0/3.6, 1.0, 2000, true);
-			this.setHighwayDefaults(V_MOTORWAY_LINK, 1,  80.0/3.6, 1.0, 1500, true);
-			this.setHighwayDefaults(V_TRUNK,         1,  80.0/3.6, 1.0, 2000);
-			this.setHighwayDefaults(V_TRUNK_LINK,    1,  50.0/3.6, 1.0, 1500);
-			this.setHighwayDefaults(V_PRIMARY,       1,  80.0/3.6, 1.0, 1500);
-			this.setHighwayDefaults(V_PRIMARY_LINK,  1,  60.0/3.6, 1.0, 1500);
-			this.setHighwayDefaults(V_SECONDARY,     1,  60.0/3.6, 1.0, 1000);
-			this.setHighwayDefaults(V_TERTIARY,      1,  45.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(V_MINOR,         1,  45.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(V_UNCLASSIFIED,  1,  45.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(V_RESIDENTIAL,   1,  30.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(V_LIVING_STREET, 1,  15.0/3.6, 1.0,  300);
-//			this.setHighwayDefaults(V_SERVICE, 		 1,  15.0/3.6, 1.0,  200); // TODO service roads are used in zurich for bus-only roads
+			this.setHighwayDefaults(OsmValue.MOTORWAY, 2, 120.0 / 3.6, 1.0, 2000, true);
+			this.setHighwayDefaults(OsmValue.MOTORWAY_LINK, 1, 80.0 / 3.6, 1.0, 1500, true);
+			this.setHighwayDefaults(OsmValue.TRUNK, 1, 80.0 / 3.6, 1.0, 2000);
+			this.setHighwayDefaults(OsmValue.TRUNK_LINK, 1, 50.0 / 3.6, 1.0, 1500);
+			this.setHighwayDefaults(OsmValue.PRIMARY, 1, 80.0 / 3.6, 1.0, 1500);
+			this.setHighwayDefaults(OsmValue.PRIMARY_LINK, 1, 60.0 / 3.6, 1.0, 1500);
+			this.setHighwayDefaults(OsmValue.SECONDARY, 1, 60.0 / 3.6, 1.0, 1000);
+			this.setHighwayDefaults(OsmValue.TERTIARY, 1, 45.0 / 3.6, 1.0, 600);
+			this.setHighwayDefaults(OsmValue.MINOR, 1, 45.0 / 3.6, 1.0, 600);
+			this.setHighwayDefaults(OsmValue.UNCLASSIFIED, 1, 45.0 / 3.6, 1.0, 600);
+			this.setHighwayDefaults(OsmValue.RESIDENTIAL, 1, 30.0 / 3.6, 1.0, 600);
+			this.setHighwayDefaults(OsmValue.LIVING_STREET, 1, 15.0 / 3.6, 1.0, 300);
+//			this.setHighwayDefaults(OsmValue.SERVICE, 1, 15.0 / 3.6, 1.0, 200); // TODO service roads are used in zurich for bus-only roads
 
 			// Set railway-defaults (and with it the filter...)
-			this.setRailwayDefaults(V_RAIL, 		  1,  80.0/3.6, 1.0,  100);
-			this.setRailwayDefaults(V_TRAM, 		  1,  80.0/3.6, 1.0,  100, true);
-			this.setRailwayDefaults(V_LIGHT_RAIL, 	  1,  80.0/3.6, 1.0,  100);
+			this.setRailwayDefaults(OsmValue.RAIL, 1, 80.0 / 3.6, 1.0, 100);
+			this.setRailwayDefaults(OsmValue.TRAM, 1, 80.0 / 3.6, 1.0, 100, true);
+			this.setRailwayDefaults(OsmValue.LIGHT_RAIL, 1, 80.0 / 3.6, 1.0, 100);
 
-			this.setRelationPTFilter(TAG_ROUTE, V_BUS);
-			this.setRelationPTFilter(TAG_ROUTE, V_TROLLEYBUS);
-			this.setRelationPTFilter(TAG_ROUTE, V_TRAM);
-			this.setRelationPTFilter(TAG_ROUTE, V_RAIL);
-			this.setRelationPTFilter(TAG_ROUTE, V_LIGHT_RAIL);
+//			this.setRelationPTFilter(OsmTag.ROUTE, OsmValue.BUS);
+//			this.setRelationPTFilter(OsmTag.ROUTE, OsmValue.TROLLEYBUS);
+//			this.setRelationPTFilter(OsmTag.ROUTE, OsmValue.TRAM);
+//			this.setRelationPTFilter(OsmTag.ROUTE, OsmValue.RAIL);
+//			this.setRelationPTFilter(OsmTag.ROUTE, OsmValue.LIGHT_RAIL);
 
 
 			//this.setRailwayDefaults("funicular",	  1,  40.0/3.6, 1.0,  100);
@@ -217,30 +176,26 @@ public class OsmNetworkReaderWithPT {
 		}
 	}
 
-	public void setRelationPTFilter(final String key, final String value) {
-		this.ptFilter.add(key, value);
+	public void setMaxLinkLength(double maxLinkLength) {
+		this.maxLinkLength = maxLinkLength;
 	}
 
 	/**
 	 * Sets defaults for converting OSM highway paths into MATSim links, assuming it is no oneway road.
 	 *
-	 * @param highwayType The type of highway these defaults are for.
-	 * @param lanes number of lanes on that road type
-	 * @param freespeed the free speed vehicles can drive on that road type [meters/second]
-	 * @param freespeedFactor the factor the freespeed is scaled
+	 * @param highwayType             The type of highway these defaults are for.
+	 * @param lanes                   number of lanes on that road type
+	 * @param freespeed               the free speed vehicles can drive on that road type [meters/second]
+	 * @param freespeedFactor         the factor the freespeed is scaled
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
-	 *
 	 * @see <a href="http://wiki.openstreetmap.org/wiki/Map_Features#Highway">http://wiki.openstreetmap.org/wiki/Map_Features#Highway</a>
 	 */
 	public void setHighwayDefaults(final String highwayType, final double lanes, final double freespeed, final double freespeedFactor, final double laneCapacity_vehPerHour) {
 		setHighwayDefaults(highwayType, lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, false);
 	}
 
-	public void setRailwayDefaults(final String railwayType,
-								   final double lanes,
-								   final double freespeed,
-								   final double freespeedFactor,
-								   final double laneCapacity_vehPerHour) {
+	public void setRailwayDefaults(final String railwayType, final double lanes, final double freespeed,
+								   final double freespeedFactor, final double laneCapacity_vehPerHour) {
 		setRailwayDefaults(railwayType, lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, false);
 	}
 
@@ -248,17 +203,18 @@ public class OsmNetworkReaderWithPT {
 	/**
 	 * Sets defaults for converting OSM highway paths into MATSim links.
 	 *
-	 * @param highwayType The type of highway these defaults are for.
-	 * @param lanes number of lanes on that road type
-	 * @param freespeed the free speed vehicles can drive on that road type [meters/second]
-	 * @param freespeedFactor the factor the freespeed is scaled
+	 * @param highwayType             The type of highway these defaults are for.
+	 * @param lanes                   number of lanes on that road type
+	 * @param freespeed               the free speed vehicles can drive on that road type [meters/second]
+	 * @param freespeedFactor         the factor the freespeed is scaled
 	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
-	 * @param oneway <code>true</code> to say that this road is a oneway road
+	 * @param oneway                  <code>true</code> to say that this road is a oneway road
 	 */
 	public void setHighwayDefaults(final String highwayType, final double lanes, final double freespeed,
 								   final double freespeedFactor, final double laneCapacity_vehPerHour, final boolean oneway) {
 		this.highwayDefaults.put(highwayType, new OsmWayDefaults(lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
 	}
+
 	public void setRailwayDefaults(final String railwayType,
 								   final double lanes,
 								   final double freespeed,
@@ -275,7 +231,7 @@ public class OsmNetworkReaderWithPT {
 	 * Not keeping the detailed paths removes all nodes where only one road passes through, thus only real intersections
 	 * or branchings are kept as nodes. This reduces the number of nodes and links in the network, but can in some rare
 	 * cases generate extremely long links (e.g. for motorways with only a few ramps every few kilometers).
-	 *
+	 * <p/>
 	 * Defaults to <code>false</code>.
 	 *
 	 * @param keepPaths <code>true</code> to keep all details of the OSM roads
@@ -287,11 +243,11 @@ public class OsmNetworkReaderWithPT {
 	/**
 	 * In case the speed limit allowed does not represent the speed a vehicle can actually realize, e.g. by constrains of
 	 * traffic lights not explicitly modeled, a kind of "average simulated speed" can be used.
-	 *
+	 * <p/>
 	 * Defaults to <code>false</code>.
 	 *
 	 * @param scaleMaxSpeed <code>true</code> to scale the speed limit down by the value specified by the
-	 * {@link #setHighwayDefaults(String, double, double, double, double) defaults}.
+	 *                      {@link #setHighwayDefaults(String, double, double, double, double) defaults}.
 	 */
 	public void setScaleMaxSpeed(final boolean scaleMaxSpeed) {
 		this.scaleMaxSpeed = scaleMaxSpeed;
@@ -305,9 +261,29 @@ public class OsmNetworkReaderWithPT {
 	 */
 	public void parse(final String osmFilename) throws UncheckedIOException {
 
-		OsmParser parser = new OsmParser();
-		parser.addHandler(new OsmParserHandler(this.nodes, this.ways, this.relations, this.wayIds, this.transformation));
+		TagFilter parserWayFilter = new TagFilter();
+		parserWayFilter.add(OsmTag.HIGHWAY);
+		parserWayFilter.add(OsmTag.RAILWAY);
+
+		TagFilter parserRelationFilter = new TagFilter();
+		parserRelationFilter.add(OsmTag.ROUTE, OsmValue.BUS);
+		parserRelationFilter.add(OsmTag.ROUTE, OsmValue.TROLLEYBUS);
+		parserRelationFilter.add(OsmTag.ROUTE, OsmValue.RAIL);
+		parserRelationFilter.add(OsmTag.ROUTE, OsmValue.TRAM);
+		parserRelationFilter.add(OsmTag.ROUTE, OsmValue.LIGHT_RAIL);
+		parserRelationFilter.add(OsmTag.ROUTE, OsmValue.FUNICULAR);
+		parserRelationFilter.add(OsmTag.ROUTE, OsmValue.MONORAIL);
+		parserRelationFilter.add(OsmTag.ROUTE, OsmValue.SUBWAY);
+
+		OsmParser parser = new OsmParser(transformation);
+		OsmParserHandler handler = new OsmParserHandler();
+		handler.addFilter(null, parserWayFilter, parserRelationFilter);
+		parser.addHandler(handler);
 		parser.readFile(osmFilename);
+
+		this.ways = handler.getWays();
+		this.nodes = handler.getNodes();
+		this.relations = handler.getRelations();
 
 		this.convert();
 
@@ -315,46 +291,65 @@ public class OsmNetworkReaderWithPT {
 		log.info("MATSim: # nodes created: " + this.network.getNodes().size());
 		log.info("MATSim: # links created: " + this.network.getLinks().size());
 
-		if (this.unknownHighways.size() > 0) {
+		if(this.unknownHighways.size() > 0) {
 			log.info("The following highway-types had no defaults set and were thus NOT converted:");
-			for (String highwayType : this.unknownHighways) {
+			for(String highwayType : this.unknownHighways) {
 				log.info("- \"" + highwayType + "\"");
 			}
 		}
-		if (this.unknownRailways.size() > 0) {
+		if(this.unknownRailways.size() > 0) {
 			log.info("The following railway-types had no defaults set and were thus NOT converted:");
-			for (String railwayType : this.unknownRailways) {
+			for(String railwayType : this.unknownRailways) {
 				log.info("- \"" + railwayType + "\"");
 			}
 		}
-		if (this.unknownPTs.size() > 0) {
+		if(this.unknownPTs.size() > 0) {
 			log.info("The following PT-types had no defaults set and were thus NOT converted:");
-			for (String ptType : this.unknownPTs) {
+			for(String ptType : this.unknownPTs) {
 				log.info("- \"" + ptType + "\"");
 			}
 		}
-		if (this.unknownWays.size() > 0) {
+		if(this.unknownWays.size() > 0) {
 			log.info("The way-types with the following tags had no defaults set and were thus NOT converted:");
-			for (String wayType : this.unknownWays) {
+			for(String wayType : this.unknownWays) {
 				log.info("- \"" + wayType + "\"");
 			}
 		}
 		log.info("= end of conversion statistics ====================");
 	}
 
+	/**
+	 * Converts the parsed osm data to MATSim nodes and links.
+	 */
 	private void convert() {
-		if (this.network instanceof NetworkImpl) {
+		if(this.network instanceof NetworkImpl) {
 			((NetworkImpl) this.network).setCapacityPeriod(3600);
 		}
 
-		// check which ways are used
-		for (OsmParser.OsmWay way : this.ways.values()) {
-			// here checks may be added to set additional ways "way.used = true"
-			break;
+		// store of which relation a way is part of
+		for(OsmParser.OsmRelation relation : relations.values()) {
+			for(OsmParser.OsmRelationMember member : relation.members) {
+				MapUtils.getSet(member.refId, relationMembers).add(relation.id);
+			}
+		}
+
+		TagFilter serviceRailTracksFilter = new TagFilter();
+		serviceRailTracksFilter.add(OsmTag.SERVICE);
+
+		// remove unusable ways
+		for (OsmParser.OsmWay way : ways.values()) {
+			// remove service railways
+			if(way.tags.containsKey(OsmTag.RAILWAY) && way.tags.containsKey(OsmTag.SERVICE)) {
+				way.used = false;
+			}
+			// remove service roads without a transit route on them
+			if(!highwayDefaults.containsKey(way.tags.get(OsmTag.HIGHWAY)) && !relationMembers.containsKey(way.id) && !way.tags.containsKey(OsmTag.RAILWAY)) {
+				way.used = false;
+			}
 		}
 
 		// remove unused ways
-		Iterator<Map.Entry<Long, OsmParser.OsmWay>> it = this.ways.entrySet().iterator();
+		Iterator<Map.Entry<Long, OsmParser.OsmWay>> it = ways.entrySet().iterator();
 		while (it.hasNext()) {
 			Map.Entry<Long, OsmParser.OsmWay> entry = it.next();
 			if (!entry.getValue().used) {
@@ -363,12 +358,12 @@ public class OsmNetworkReaderWithPT {
 		}
 
 		// check which nodes are used
-		for (OsmParser.OsmWay way : this.ways.values()) {
+		for(OsmParser.OsmWay way : this.ways.values()) {
 			// first and last are counted twice, so they are kept in all cases
 			this.nodes.get(way.nodes.get(0)).ways++;
 			this.nodes.get(way.nodes.get(way.nodes.size() - 1)).ways++;
 
-			for (Long nodeId : way.nodes) {
+			for(Long nodeId : way.nodes) {
 				OsmParser.OsmNode node = this.nodes.get(nodeId);
 				node.used = true;
 				node.ways++;
@@ -376,20 +371,21 @@ public class OsmNetworkReaderWithPT {
 		}
 
 		// Clean network:
-		if (!this.keepPaths) {
+		if(!this.keepPaths) {
 			// marked nodes as unused where only one way leads through
 			// but only if this doesn't lead to links longer than MAX_LINKLENGTH
-			for (OsmParser.OsmWay way : this.ways.values()) {
+			for(OsmParser.OsmWay way : this.ways.values()) {
+
 				double length = 0.0;
 				OsmParser.OsmNode lastNode = this.nodes.get(way.nodes.get(0));
-				for (int i = 1; i < way.nodes.size(); i++) {
+				for(int i = 1; i < way.nodes.size(); i++) {
 					OsmParser.OsmNode node = this.nodes.get(way.nodes.get(i));
-					if (node.ways > 1) {
+					if(node.ways > 1) {
 						length = 0.0;
 						lastNode = node;
-					} else if (node.ways == 1) {
+					} else if(node.ways == 1) {
 						length += CoordUtils.calcEuclideanDistance(lastNode.coord, node.coord);
-						if (length <= MAX_LINKLENGTH) {
+						if(length <= maxLinkLength) {
 							node.used = false;
 							lastNode = node;
 						} else {
@@ -402,14 +398,14 @@ public class OsmNetworkReaderWithPT {
 				}
 			}
 			// verify we did not mark nodes as unused that build a loop
-			for (OsmParser.OsmWay way : this.ways.values()) {
+			for(OsmParser.OsmWay way : this.ways.values()) {
 				int prevRealNodeIndex = 0;
 				OsmParser.OsmNode prevRealNode = this.nodes.get(way.nodes.get(prevRealNodeIndex));
 
-				for (int i = 1; i < way.nodes.size(); i++) {
+				for(int i = 1; i < way.nodes.size(); i++) {
 					OsmParser.OsmNode node = this.nodes.get(way.nodes.get(i));
-					if (node.used) {
-						if (prevRealNode == node) {
+					if(node.used) {
+						if(prevRealNode == node) {
 						/* We detected a loop between two "real" nodes.
 						 * Set some nodes between the start/end-loop-node to "used" again.
 						 * But don't set all of them to "used", as we still want to do some network-thinning.
@@ -417,7 +413,7 @@ public class OsmNetworkReaderWithPT {
 						 */
 							double increment = Math.sqrt(i - prevRealNodeIndex);
 							double nextNodeToKeep = prevRealNodeIndex + increment;
-							for (double j = nextNodeToKeep; j < i; j += increment) {
+							for(double j = nextNodeToKeep; j < i; j += increment) {
 								int index = (int) Math.floor(j);
 								OsmParser.OsmNode intermediaryNode = this.nodes.get(way.nodes.get(index));
 								intermediaryNode.used = true;
@@ -431,8 +427,8 @@ public class OsmNetworkReaderWithPT {
 		}
 
 		// create the required nodes
-		for (OsmParser.OsmNode node : this.nodes.values()) {
-			if (node.used) {
+		for(OsmParser.OsmNode node : this.nodes.values()) {
+			if(node.used) {
 				Node nn = this.network.getFactory().createNode(Id.create(node.id, Node.class), node.coord);
 				this.network.addNode(nn);
 			}
@@ -440,16 +436,16 @@ public class OsmNetworkReaderWithPT {
 
 		// create the links
 		this.id = 1;
-		for (OsmParser.OsmWay way : this.ways.values()) {
+		for(OsmParser.OsmWay way : this.ways.values()) {
 			OsmParser.OsmNode fromNode = this.nodes.get(way.nodes.get(0));
 			double length = 0.0;
 			OsmParser.OsmNode lastToNode = fromNode;
-			if (fromNode.used) {
-				for (int i = 1, n = way.nodes.size(); i < n; i++) {
+			if(fromNode.used) {
+				for(int i = 1, n = way.nodes.size(); i < n; i++) {
 					OsmParser.OsmNode toNode = this.nodes.get(way.nodes.get(i));
-					if (toNode != lastToNode) {
+					if(toNode != lastToNode) {
 						length += CoordUtils.calcEuclideanDistance(lastToNode.coord, toNode.coord);
-						if (toNode.used) {
+						if(toNode.used) {
 							createLink(this.network, way, fromNode, toNode, length);
 							fromNode = toNode;
 							length = 0.0;
@@ -466,6 +462,9 @@ public class OsmNetworkReaderWithPT {
 		this.relations.clear();
 	}
 
+	/**
+	 * Creates a MATSim link from osm data
+	 */
 	private void createLink(final Network network, final OsmParser.OsmWay way, final OsmParser.OsmNode fromNode, final OsmParser.OsmNode toNode, final double length) {
 		double nofLanes;
 		double laneCapacity;
@@ -473,24 +472,31 @@ public class OsmNetworkReaderWithPT {
 		double freespeedFactor;
 		boolean oneway;
 		boolean onewayReverse = false;
+		boolean busOnlyLink = false;
 
 		// load defaults
-		String highway = way.tags.get(TAG_HIGHWAY);
-		String railway = way.tags.get(TAG_RAILWAY);
+		String highway = way.tags.get(OsmTag.HIGHWAY);
+		String railway = way.tags.get(OsmTag.RAILWAY);
 		OsmWayDefaults defaults;
-		if (highway != null) {
+		if(highway != null) {
 			defaults = this.highwayDefaults.get(highway);
-			if (defaults == null) {
-				this.unknownHighways.add(highway);
-				return;
+			if(defaults == null) {
+				// check if bus route is on link todo bus lane conditions as param?
+				if(relationMembers.containsKey(way.id) || way.tags.containsKey(OsmTag.PSV)) {
+					busOnlyLink = true;
+					defaults = highwayDefaults.get(OsmValue.UNCLASSIFIED);
+				} else {
+					this.unknownHighways.add(highway);
+					return;
+				}
 			}
-		} else if (railway != null) {
+		} else if(railway != null) {
 			defaults = this.railwayDefaults.get(railway);
-			if (defaults == null) {
+			if(defaults == null) {
 				this.unknownRailways.add(railway);
 				return;
 			}
-		}  else {
+		} else {
 			this.unknownWays.add(way.tags.values().toString());
 			return;
 		}
@@ -502,57 +508,57 @@ public class OsmNetworkReaderWithPT {
 
 		// check if there are tags that overwrite defaults
 		// - check tag "junction"
-		if ("roundabout".equals(way.tags.get(TAG_JUNCTION))) {
+		if("roundabout".equals(way.tags.get(OsmTag.JUNCTION))) {
 			// if "junction" is not set in tags, get() returns null and equals() evaluates to false
 			oneway = true;
 		}
 		// - check tag "oneway"
-		String onewayTag = way.tags.get(TAG_ONEWAY);
-		if (onewayTag != null) {
-			if ("yes".equals(onewayTag)) {
+		String onewayTag = way.tags.get(OsmTag.ONEWAY);
+		if(onewayTag != null) {
+			if("yes".equals(onewayTag)) {
 				oneway = true;
-			} else if ("true".equals(onewayTag)) {
+			} else if("true".equals(onewayTag)) {
 				oneway = true;
-			} else if ("1".equals(onewayTag)) {
+			} else if("1".equals(onewayTag)) {
 				oneway = true;
-			} else if ("-1".equals(onewayTag)) {
+			} else if("-1".equals(onewayTag)) {
 				onewayReverse = true;
 				oneway = false;
-			} else if ("no".equals(onewayTag)) {
+			} else if("no".equals(onewayTag)) {
 				oneway = false; // may be used to overwrite defaults
 			}
 		}
 		// - check tag "oneway" with trunks, primary and secondary roads
 		// 		(if they are marked as such, the default number of lanes should be two instead of one)
-		if (highway != null) {
-			if (highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary")) {
-				if (oneway && nofLanes == 1.0) {
+		if(highway != null) {
+			if(highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary")) {
+				if(oneway && nofLanes == 1.0) {
 					nofLanes = 2.0;
 				}
 			}
 		}
 		// - ckeck tag "maxspeed"
-		String maxspeedTag = way.tags.get(TAG_MAXSPEED);
-		if (maxspeedTag != null) {
+		String maxspeedTag = way.tags.get(OsmTag.MAXSPEED);
+		if(maxspeedTag != null) {
 			try {
 				freespeed = Double.parseDouble(maxspeedTag) / 3.6; // convert km/h to m/s
 			} catch (NumberFormatException e) {
-				if (!this.unknownMaxspeedTags.contains(maxspeedTag)) {
+				if(!this.unknownMaxspeedTags.contains(maxspeedTag)) {
 					this.unknownMaxspeedTags.add(maxspeedTag);
 					log.warn("Could not parse maxspeed tag:" + e.getMessage() + ". Ignoring it.");
 				}
 			}
 		}
 		// - check tag "lanes"
-		String lanesTag = way.tags.get(TAG_LANES);
-		if (lanesTag != null) {
+		String lanesTag = way.tags.get(OsmTag.LANES);
+		if(lanesTag != null) {
 			try {
 				double tmp = Double.parseDouble(lanesTag);
-				if (tmp > 0) {
+				if(tmp > 0) {
 					nofLanes = tmp;
 				}
 			} catch (Exception e) {
-				if (!this.unknownLanesTags.contains(lanesTag)) {
+				if(!this.unknownLanesTags.contains(lanesTag)) {
 					this.unknownLanesTags.add(lanesTag);
 					log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
 				}
@@ -561,38 +567,40 @@ public class OsmNetworkReaderWithPT {
 
 		// define the links' capacity and freespeed
 		double capacity = nofLanes * laneCapacity;
-		if (this.scaleMaxSpeed) {
+		if(this.scaleMaxSpeed) {
 			freespeed = freespeed * freespeedFactor;
 		}
 
 		// define modes allowed on link(s)
 		//	basic type:
-		Set<String> modes = new HashSet<String>();
-		if (highway != null) {
-			modes.add("car");
+		Set<String> modes = new HashSet<>();
+		if(!busOnlyLink && highway != null) {
+			modes.add(TransportMode.car);
+		}
+		if(busOnlyLink) {
+			modes.add("bus");
+			modes.add(TransportMode.pt);
 		}
 
-		if (railway != null && railwayDefaults.containsKey(railway)) {
+		if(railway != null && railwayDefaults.containsKey(railway)) {
 			modes.add(railway);
 		}
 
-		if (modes.isEmpty()) {modes.add("unknownStreetType");}
+		if(modes.isEmpty()) {
+			modes.add("unknownStreetType");
+		}
 
 		//	public transport: get relation which this way is part of, then get the relations route=* (-> the mode)
-		for (OsmParser.OsmRelation relation : this.relations.values()) {
-			for (OsmParser.OsmRelationMember member : relation.members) {
-				if ((member.type == OsmParser.OsmRelationMemberType.WAY) && (member.refId == way.id) && OsmNetworkReaderWithPT.this.ptFilter.matches(relation.tags)) {
-					String mode = relation.tags.get(TAG_ROUTE);
-					// mark that it is a link used by any pt:
-					if (mode == null) {
-						break;
-					} else {
-						if(mode.equals(V_TROLLEYBUS)) {
-							mode = V_BUS;
-						}
-						modes.add(mode);
+		Set<Long> containingRelations = relationMembers.get(way.id);
+		if(containingRelations != null) {
+			for(Long containingRelationId : containingRelations) {
+				OsmParser.OsmRelation rel = relations.get(containingRelationId);
+				String mode = rel.tags.get(OsmTag.ROUTE);
+				if(mode != null) {
+					if(mode.equals(OsmValue.TROLLEYBUS)) {
+						mode = OsmValue.BUS;
 					}
-					break;
+					modes.add(mode);
 				}
 			}
 		}
@@ -600,36 +608,35 @@ public class OsmNetworkReaderWithPT {
 		// only create link, if both nodes were found, node could be null, since nodes outside a layer were dropped
 		Id<Node> fromId = Id.create(fromNode.id, Node.class);
 		Id<Node> toId = Id.create(toNode.id, Node.class);
-		if(network.getNodes().get(fromId) != null && network.getNodes().get(toId) != null){
+		if(network.getNodes().get(fromId) != null && network.getNodes().get(toId) != null) {
 			String origId = Long.toString(way.id);
 
-			if (!onewayReverse) {
+			if(!onewayReverse) {
 				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
 				l.setLength(length);
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
-				if (l instanceof LinkImpl) {
+				if(l instanceof LinkImpl) {
 					((LinkImpl) l).setOrigId(origId);
 				}
 				network.addLink(l);
 				this.id++;
 			}
-			if (!oneway) {
+			if(!oneway) {
 				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
 				l.setLength(length);
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
 				l.setNumberOfLanes(nofLanes);
 				l.setAllowedModes(modes);
-				if (l instanceof LinkImpl) {
+				if(l instanceof LinkImpl) {
 					((LinkImpl) l).setOrigId(origId);
 				}
 				network.addLink(l);
 				this.id++;
 			}
-
 		}
 	}
 
@@ -653,7 +660,7 @@ public class OsmNetworkReaderWithPT {
 	/**
 	 * Parser/Handler for OSM data
 	 */
-	private class OsmParserHandler implements OsmNodeHandler, OsmWayHandler, OsmRelationHandler {
+/*	private class OsmParserHandler2 implements OsmNodeHandler, OsmWayHandler, OsmRelationHandler {
 
 		private final Map<Long, OsmParser.OsmNode> nodes;
 		private final Map<Long, OsmParser.OsmWay> ways;
@@ -662,7 +669,7 @@ public class OsmNetworkReaderWithPT {
 		private final Map<Long, Long> wayIds;
 		private final CoordinateTransformation transformation;
 
-		public OsmParserHandler(final Map<Long, OsmParser.OsmNode> nodes, final Map<Long, OsmParser.OsmWay> ways,
+		public OsmParserHandler2(final Map<Long, OsmParser.OsmNode> nodes, final Map<Long, OsmParser.OsmWay> ways,
 								final Map<Long, OsmParser.OsmRelation> relations,
 								final Map<Long, Long> wayIds, CoordinateTransformation transformation) {
 			this.nodes = nodes;
@@ -690,11 +697,11 @@ public class OsmNetworkReaderWithPT {
 		public void handleWay(OsmParser.OsmWay way) {
 			if (!way.nodes.isEmpty()) {
 				// only take ways which are highway or railway
-				OsmWayDefaults osmHighwayDefaults = OsmNetworkReaderWithPT.this.highwayDefaults.get(way.tags.get(TAG_HIGHWAY));
-				OsmWayDefaults osmRailwayDefaults = OsmNetworkReaderWithPT.this.railwayDefaults.get(way.tags.get(TAG_RAILWAY));
+				OsmWayDefaults osmHighwayDefaults = OsmNetworkReaderWithPT.this.highwayDefaults.get(way.tags.get(OsmTag.HIGHWAY));
+				OsmWayDefaults osmRailwayDefaults = OsmNetworkReaderWithPT.this.railwayDefaults.get(way.tags.get(OsmTag.RAILWAY));
 
 				// filter out not usable rails (with tags service=*)
-				if(way.tags.containsKey(TAG_SERVICE)) {
+				if(way.tags.containsKey(OsmTag.SERVICE)) {
 					osmRailwayDefaults = null;
 				}
 
@@ -705,6 +712,6 @@ public class OsmNetworkReaderWithPT {
 			}
 		}
 	}
-
+*/
 }
 

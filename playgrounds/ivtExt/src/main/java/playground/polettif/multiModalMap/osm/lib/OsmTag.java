@@ -25,4 +25,15 @@ public class OsmTag {
 	public static final String ROUTE_MASTER = "route_master";
 
 	public static final String PUBLIC_TRANSPORT = "public_transport";
+
+	public static final String RAILWAY = "railway";
+	public static final String HIGHWAY = "highway";
+	public static final String SERVICE = "service";
+
+	public final static String LANES = "lanes";
+	public final static String MAXSPEED = "maxspeed";
+	public final static String JUNCTION = "junction";
+	public final static String ONEWAY = "oneway";
+	public final static String ACCESS = "access";
+	public static final String PSV = "psv";
 }

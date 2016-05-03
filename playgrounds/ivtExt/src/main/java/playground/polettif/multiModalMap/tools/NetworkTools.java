@@ -368,7 +368,7 @@ public class NetworkTools {
 		dummyLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
 		dummyLink.setLength(1.0);
 
-		if(!network.getNodes().values().contains(dummyNode)) {
+		if(!network.getNodes().containsKey(dummyNode.getId())) {
 			network.addNode(dummyNode);
 			network.addLink(dummyLink);
 		}

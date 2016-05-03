@@ -43,8 +43,9 @@ public class MultimodalNetworkCreatorPT implements MultimodalNetworkCreator {
 
 	@Override
 	public void createMultimodalNetwork(String osmFile) {
-		OsmNetworkReaderWithPT osmReader =	new OsmNetworkReaderWithPT(this.network, transformation, true);
+		OsmNetworkReaderWithPT osmReader = new OsmNetworkReaderWithPT(this.network, transformation, true);
 		osmReader.setKeepPaths(false);
+		osmReader.setMaxLinkLength(400.0);
 		osmReader.parse(osmFile);
 	}
 }

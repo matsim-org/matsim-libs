@@ -27,6 +27,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.*;
+import playground.polettif.multiModalMap.osm.OsmParserHandler;
 import playground.polettif.multiModalMap.osm.core.OsmParser;
 import playground.polettif.multiModalMap.osm.core.TagFilter;
 import playground.polettif.multiModalMap.osm.lib.OsmTag;
@@ -50,7 +51,7 @@ public class OSM2MATSimTransitSchedule {
 	private final CoordinateTransformation transformation;
 	private final TransitSchedule transitSchedule;
 	private final TransitScheduleFactory factory;
-	private OSM2MTSHandler handler;
+	private OsmParserHandler handler;
 
 	// parser
 	private Map<Long, OsmParser.OsmNode> nodes;
@@ -114,7 +115,31 @@ public class OSM2MATSimTransitSchedule {
 	}
 
 	private void parse(String filenameOSMinput) {
-		handler = new OSM2MTSHandler();
+
+		TagFilter nodeFilter = new TagFilter();
+		nodeFilter.add(OsmTag.PUBLIC_TRANSPORT, OsmValue.STOP_POSITION);
+
+		TagFilter wayFilter = new TagFilter();
+
+		TagFilter relationFilter = new TagFilter();
+		relationFilter.add(OsmTag.ROUTE, OsmValue.BUS);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.TROLLEYBUS);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.RAIL);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.TRAM);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.LIGHT_RAIL);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.FUNICULAR);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.MONORAIL);
+		relationFilter.add(OsmTag.ROUTE, OsmValue.SUBWAY);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.BUS);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.TROLLEYBUS);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.TRAM);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.MONORAIL);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.SUBWAY);
+		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.FERRY);
+
+
+		handler = new OsmParserHandler();
+		handler.addFilter(nodeFilter, wayFilter, relationFilter);
 		OsmParser parser = new OsmParser();
 		parser.addHandler(handler);
 		parser.readFile(filenameOSMinput);

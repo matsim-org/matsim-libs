@@ -24,6 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import playground.polettif.multiModalMap.osm.core.OsmNodeHandler;
 import playground.polettif.multiModalMap.osm.core.OsmWayHandler;
 import playground.polettif.multiModalMap.osm.core.OsmRelationHandler;
@@ -38,7 +41,13 @@ public class OsmParser {
 
 	private final List<OsmHandler> handlers = new ArrayList<OsmHandler>();
 
+	private static CoordinateTransformation transformation = new IdentityTransformation();
+
 	public OsmParser() {
+	}
+
+	public OsmParser(CoordinateTransformation ct) {
+		transformation = ct;
 	}
 
 	public void addHandler(final OsmHandler handler) {
@@ -59,7 +68,7 @@ public class OsmParser {
 		public final List<Long> nodes = new ArrayList<Long>(6);
 		public final Map<String, String> tags = new HashMap<String, String>(5, 0.9f);
 
-		public boolean used = false;
+		public boolean used = true;
 
 		public OsmWay(final long id) {
 			this.id = id;
@@ -76,7 +85,7 @@ public class OsmParser {
 
 		public OsmNode(final long id, final Coord coord) {
 			this.id = id;
-			this.coord = coord;
+			this.coord = transformation.transform(coord);
 		}
 	}
 
