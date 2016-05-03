@@ -32,7 +32,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.filter.NetworkFilterManager;
-import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.MapUtils;
@@ -48,6 +47,7 @@ import playground.polettif.multiModalMap.mapping.router.LinkFilterMode;
 import playground.polettif.multiModalMap.mapping.router.ModeDependentRouter;
 import playground.polettif.multiModalMap.mapping.router.Router;
 import playground.polettif.multiModalMap.tools.NetworkTools;
+import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 import java.util.*;
 
@@ -359,7 +359,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 * Route all transitRoutes with the new referenced links. The shortest path
 		 * between child stopFacilities is calculated and added to the schedule.
 		 */
-		PTMapperUtils.routeSchedule(schedule, network, finalRouters);
+		ScheduleTools.routeSchedule(schedule, network, finalRouters);
 
 		/** [9]
 		 * After all lines created, clean the schedule and network. Removing
@@ -368,10 +368,10 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 *
 		 */
 		log.info("Clean schedule and network...");
-		int routesRemoved = PTMapperUtils.removeTransitRoutesWithoutLinkSequences(schedule);
-		PTMapperUtils.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
-		PTMapperUtils.removeNonUsedStopFacilities(schedule);
-		PTMapperUtils.assignScheduleModesToLinks(schedule, network);
+		int routesRemoved = ScheduleTools.removeTransitRoutesWithoutLinkSequences(schedule);
+		ScheduleTools.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
+		ScheduleTools.removeNonUsedStopFacilities(schedule);
+		ScheduleTools.assignScheduleModesToLinks(schedule, network);
 //		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);
 		log.info("Clean schedule and network... done.");

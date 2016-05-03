@@ -22,19 +22,16 @@ package playground.polettif.multiModalMap.osm.osm2mts;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.multiModalMap.mapping.PTMapperUtils;
 import playground.polettif.multiModalMap.osm.core.OsmParser;
 import playground.polettif.multiModalMap.osm.core.TagFilter;
 import playground.polettif.multiModalMap.osm.lib.OsmTag;
 import playground.polettif.multiModalMap.osm.lib.OsmValue;
+import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 import java.util.*;
 
@@ -197,7 +194,7 @@ public class OSM2MATSimTransitSchedule {
 		}
 
 		// remove non used facilities to schedule
-		PTMapperUtils.removeNonUsedStopFacilities(transitSchedule);
+		ScheduleTools.removeNonUsedStopFacilities(transitSchedule);
 	}
 
 	/**

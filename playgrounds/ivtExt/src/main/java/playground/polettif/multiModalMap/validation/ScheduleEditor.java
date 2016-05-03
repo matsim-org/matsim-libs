@@ -36,6 +36,7 @@ import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.multiModalMap.mapping.PTMapperUtils;
 import playground.polettif.multiModalMap.mapping.router.FastAStarRouter;
 import playground.polettif.multiModalMap.mapping.router.Router;
+import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -101,7 +102,7 @@ public class ScheduleEditor {
 		ScheduleEditor scheduleEditor = new ScheduleEditor(network, schedule, new FastAStarRouter(network));
 
 		scheduleEditor.parseCommandCsv(args[2]);
-		PTMapperUtils.assignScheduleModesToLinks(schedule, network);
+		ScheduleTools.assignScheduleModesToLinks(schedule, network);
 		scheduleEditor.writeFiles(args[3], args[4]);
 	}
 
