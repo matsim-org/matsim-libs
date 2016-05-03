@@ -23,26 +23,12 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
+import org.matsim.contrib.util.EnumAdder;
 
 
 public class DetailedTaxiStatsCalculator
 {
-    private static class HourlyVehicleStats
-    {
-        private double empty = 0;
-        private double pickup = 0;
-        private double occupied = 0;
-        private double dropoff = 0;
-        private double stay = 0;
-
-
-        private double total()
-        {
-            return empty + pickup + occupied + dropoff + stay;
-        }
-    }
-
-
     private final int hours;
     private final HourlyTaxiStats[] hourlyStats;
     private final HourlyHistograms[] hourlyHistograms;
@@ -108,7 +94,8 @@ public class DetailedTaxiStatsCalculator
             return;// do not evaluate - the vehicle is unused
         }
 
-        HourlyVehicleStats[] stats = new HourlyVehicleStats[hours];
+        @SuppressWarnings("unchecked")
+        EnumAdder<TaxiTask.TaxiTaskType>[] hourlySums = new EnumAdder[hours];
 
         int hourIdx = hour(schedule.getBeginTime());
 
@@ -118,12 +105,11 @@ public class DetailedTaxiStatsCalculator
             int toHour = hour(t.getEndTime());
             for (; hourIdx < toHour; hourIdx++) {
                 double to = (hourIdx + 1) * 3600;
-                updateHourlyVehicleStats(stats, hourIdx, t, to - from);
-
+                includeTaskIntoHourlySums(hourlySums, hourIdx, t, (int)(to - from));
                 from = to;
             }
 
-            updateHourlyVehicleStats(stats, toHour, t, t.getEndTime() - from);
+            includeTaskIntoHourlySums(hourlySums, toHour, t, (int)(t.getEndTime() - from));
 
             switch (t.getTaxiTaskType()) {
                 case PICKUP:
@@ -135,21 +121,24 @@ public class DetailedTaxiStatsCalculator
                     break;
 
                 case EMPTY_DRIVE:
+                    double driveTime = t.getEndTime() - t.getBeginTime();
                     hour = hour(t.getBeginTime());
+                    //                    hourlyStats[hour].emptyDriveTime.addValue(driveTime);
                     hourlyHistograms[hour].emptyDriveTime
                             .addValue(t.getEndTime() - t.getBeginTime());
                     break;
 
                 case OCCUPIED_DRIVE:
+                    driveTime = t.getEndTime() - t.getBeginTime();
                     hour = hour(t.getBeginTime());
-                    hourlyHistograms[hour].occupiedDriveTime
-                            .addValue(t.getEndTime() - t.getBeginTime());
+                    //                    hourlyStats[hour].occupiedDriveTime.addValue(driveTime);
+                    hourlyHistograms[hour].occupiedDriveTime.addValue(driveTime);
 
                 default:
             }
         }
 
-        updateHourlyStats(stats);
+        updateHourlyStats(hourlySums);
     }
 
 
@@ -159,45 +148,22 @@ public class DetailedTaxiStatsCalculator
     }
 
 
-    private void updateHourlyVehicleStats(HourlyVehicleStats[] stats, int hour, TaxiTask task,
-            double durationWithinHour)
+    private void includeTaskIntoHourlySums(EnumAdder<TaxiTask.TaxiTaskType>[] hourlySums, int hour,
+            TaxiTask task, int durationWithinHour)
     {
         if (durationWithinHour == 0) {
             return;
         }
 
-        if (stats[hour] == null) {
-            stats[hour] = new HourlyVehicleStats();
+        if (hourlySums[hour] == null) {
+            hourlySums[hour] = new EnumAdder<>(TaxiTask.TaxiTaskType.class);
         }
 
-        switch (task.getTaxiTaskType()) {
-            case EMPTY_DRIVE:
-                stats[hour].empty += durationWithinHour;
-                return;
-
-            case PICKUP:
-                stats[hour].pickup += durationWithinHour;
-                return;
-
-            case OCCUPIED_DRIVE:
-                stats[hour].occupied += durationWithinHour;
-                return;
-
-            case DROPOFF:
-                stats[hour].dropoff += durationWithinHour;
-                return;
-
-            case STAY:
-                stats[hour].stay += durationWithinHour;
-                return;
-
-            default:
-                throw new RuntimeException();
-        }
+        hourlySums[hour].add(task.getTaxiTaskType(), durationWithinHour);
     }
 
 
-    private void updateHourlyStats(HourlyVehicleStats[] vehStats)
+    private void updateHourlyStats(EnumAdder<TaxiTask.TaxiTaskType>[] hourlySums)
     {
         double dailyEmpty = 0;
         double dailyOccupied = 0;
@@ -205,53 +171,38 @@ public class DetailedTaxiStatsCalculator
         double dailyTotal = 0;
 
         for (int h = 0; h < hours; h++) {
-            HourlyVehicleStats vhs = vehStats[h];
+            EnumAdder<TaxiTask.TaxiTaskType> vhs = hourlySums[h];
             if (vhs == null) {
                 continue;
             }
 
-            double emptyRatio = vhs.empty / (vhs.empty + vhs.occupied);
-            double stayRatio = vhs.stay / vhs.total();
+            double empty = vhs.getSum(TaxiTaskType.EMPTY_DRIVE);
+            double occupied = vhs.getSum(TaxiTaskType.OCCUPIED_DRIVE);
+            double stay = vhs.getSum(TaxiTaskType.STAY);
+            double total = vhs.getTotalSum();
 
-            dailyEmpty += vhs.empty;
-            dailyOccupied += vhs.occupied;
-            dailyStay += vhs.stay;
-            dailyTotal += vhs.total();
+            double emptyRatio = empty / (empty + occupied);
+            double stayRatio = stay / total;
+
+            dailyEmpty += empty;
+            dailyOccupied += occupied;
+            dailyStay += stay;
+            dailyTotal += total;
 
             HourlyTaxiStats hs = hourlyStats[h];
+            HourlyHistograms hh = hourlyHistograms[h];
+
+            hs.taskTypeSums.addAll(vhs);
+
             if (!Double.isNaN(emptyRatio)) {
                 hs.emptyDriveRatio.addValue(emptyRatio);
-            }
-            hs.stayRatio.addValue(stayRatio);
-
-            hs.allCount++;
-
-            if (stayRatio < 1.0) {
-                hs.stayLt100PctCount++;
-
-                if (stayRatio < 0.75) {
-                    hs.stayLt75PctCount++;
-
-                    if (stayRatio < 0.5) {
-                        hs.stayLt50PctCount++;
-
-                        if (stayRatio < 0.25) {
-                            hs.stayLt25PctCount++;
-
-                            if (stayRatio < 0.01) {
-                                hs.stayLt1PctCount++;
-                            }
-                        }
-                    }
-                }
-            }
-
-            HourlyHistograms hh = hourlyHistograms[h];
-            if (!Double.isNaN(emptyRatio)) {
                 hh.emptyDriveRatio.addValue(emptyRatio);
             }
 
+            hs.stayRatio.addValue(stayRatio);
             hh.stayRatio.addValue(stayRatio);
+
+            hs.incrementStayRatioLevelCounter(stayRatio);
         }
 
         double dailyEmptyRatio = dailyEmpty / (dailyEmpty + dailyOccupied);

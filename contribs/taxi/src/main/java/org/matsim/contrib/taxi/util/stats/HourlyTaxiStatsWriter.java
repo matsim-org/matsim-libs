@@ -21,6 +21,8 @@ package org.matsim.contrib.taxi.util.stats;
 
 import java.io.PrintWriter;
 
+import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.taxi.util.stats.HourlyTaxiStats.StayRatioLevel;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -41,6 +43,7 @@ public class HourlyTaxiStatsWriter
             writePassengerWaitTimeStats(pw);
             writeEmptyDriveRatioStats(pw);
             writeVehicleWaitRatioStats(pw);
+            writeTaskTypeSums(pw);
             writeHourlyWaitRatioCounters(pw);
         }
     }
@@ -64,9 +67,8 @@ public class HourlyTaxiStatsWriter
                     s.passengerWaitTime.getPercentile(95), //
                     s.passengerWaitTime.getPercentile(98), //
                     s.passengerWaitTime.getMax());
+            pw.println();
         }
-
-        pw.println();
         pw.println();
     }
 
@@ -89,9 +91,8 @@ public class HourlyTaxiStatsWriter
                     s.emptyDriveRatio.getPercentile(95), //
                     s.emptyDriveRatio.getPercentile(98), //
                     s.emptyDriveRatio.getMax());
+            pw.println();
         }
-
-        pw.println();
         pw.println();
     }
 
@@ -114,9 +115,25 @@ public class HourlyTaxiStatsWriter
                     s.stayRatio.getPercentile(95), //
                     s.stayRatio.getPercentile(98), //
                     s.stayRatio.getMax());
+            pw.println();
         }
-
         pw.println();
+    }
+
+
+    private void writeTaskTypeSums(PrintWriter pw)
+    { 
+        pw.println("Total duration of tasks by type [h]");
+        pw.println(TimeProfiles.TAXI_TASK_TYPES_HEADER);
+
+        for (HourlyTaxiStats s : hourlyStats) {
+            pw.printf("%d", s.hour);
+
+            for (TaxiTask.TaxiTaskType t : TaxiTask.TaxiTaskType.values()) {
+                pw.printf("\t%.2f", (double)s.taskTypeSums.getSum(t) / 3600.);
+            }
+            pw.println();
+        }
         pw.println();
     }
 
@@ -124,19 +141,16 @@ public class HourlyTaxiStatsWriter
     private void writeHourlyWaitRatioCounters(PrintWriter pw)
     {
         pw.println("Hourly Wait Ratio Counts");
-        pw.println("hour\t<1%\t<25%\t<50%\t<75%\t<100%\t<=100%");
+        pw.println("hour\t0+%\t1+%\t25+%\t50+%\t75+%\t100%");
 
         for (HourlyTaxiStats s : hourlyStats) {
-            pw.printf("%d\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f", //
-                    s.hour, //
-                    s.getStayLt1PctCount(), //
-                    s.getStayLt25PctCount(), //
-                    s.getStayLt50PctCount(), //
-                    s.getStayLt75PctCount(), //
-                    s.getStayLt100PctCount(), //
-                    s.getAllCount());
-        }
+            pw.printf("%d", s.hour);
 
+            for (StayRatioLevel l : StayRatioLevel.values()) {
+                pw.printf("\t%d", s.stayRatioLevelCounter.getCount(l));
+            }
+            pw.println();
+        }
         pw.println();
     }
 }

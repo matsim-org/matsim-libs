@@ -17,15 +17,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.util;
 
-public class CSVLines
+import java.util.*;
+
+import org.apache.commons.lang3.mutable.MutableLong;
+
+
+public class EnumAdder<K extends Enum<K>>
 {
-    public static final String[] EMPTY_LINE = {};
+    private final EnumMap<K, MutableLong> sums;
 
 
-    public static String[] line(String... string)
+    public EnumAdder(Class<K> clazz)
     {
-        return string;
+        sums = new EnumMap<>(clazz);
+        for (K e : clazz.getEnumConstants()) {
+            sums.put(e, new MutableLong());
+        }
+    }
+
+
+    public void add(K e, int value)
+    {
+        sums.get(e).add(value);
+    }
+
+
+    public void addAll(EnumAdder<K> enumAdder)
+    {
+        for (Map.Entry<K, MutableLong> e : enumAdder.sums.entrySet()) {
+            sums.get(e.getKey()).add(e.getValue().longValue());
+        }
+    }
+
+
+    public long getSum(K e)
+    {
+        return sums.get(e).longValue();
+    }
+
+
+    public long getTotalSum()
+    {
+        long total = 0;
+        for (MutableLong s : sums.values()) {
+            total += s.longValue();
+        }
+        return total;
     }
 }
