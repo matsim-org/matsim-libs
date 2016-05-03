@@ -147,7 +147,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		Map<String, Network> networks = new HashMap<>();
 		Map<String, Router> routers = new HashMap<>();
 		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
-			log.info("Creating network for " + modeAssignment.getValue());
+			log.info("================================================");
+			log.info("Creating network and router for " + modeAssignment.getValue());
 			NetworkFilterManager filter = new NetworkFilterManager(network);
 			filter.addLinkFilter(new LinkFilterMode(modeAssignment.getValue()));
 			Network filteredNetwork = filter.applyFilters();
@@ -178,6 +179,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 * should not be mapped to the network), artificial links between link
 		 * candidates are created.
 		 */
+		log.info("================================================");
 		log.info("Calculating pseudoTransitRoutes...");
 		Counter counterLine = new Counter("route # ");
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
@@ -367,18 +369,27 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 * needed to be added to the network for routing purposes.
 		 *
 		 */
+		log.info("================================================");
 		log.info("Clean schedule and network...");
 		int routesRemoved = ScheduleTools.removeTransitRoutesWithoutLinkSequences(schedule);
 		ScheduleTools.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
-		ScheduleTools.removeNonUsedStopFacilities(schedule);
+		ScheduleTools.removeNotUsedStopFacilities(schedule);
 		ScheduleTools.assignScheduleModesToLinks(schedule, network);
 //		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);
 		log.info("Clean schedule and network... done.");
 
 		log.info("Validating schedule and network...");
-		TransitScheduleValidator.printResult(TransitScheduleValidator.validateAll(schedule, network));
+		TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(schedule, network);
+		if (validationResult.isValid()) { log.info("Schedule appears valid!");
+		} else { log.info("Schedule is NOT valid!"); }
+		if (validationResult.getErrors().size() > 0) { log.info("Validation errors:");
+			for (String e : validationResult.getErrors()) { log.info(e); } }
+		if (validationResult.getWarnings().size() > 0) { log.info("Validation warnings:");
+			for (String w : validationResult.getWarnings()) { log.info(w); } }
 
+
+		log.info("================================================");
 		log.info("================================================");
 		log.info("=== Mapping transit schedule to network... done.");
 		log.info("================================================");

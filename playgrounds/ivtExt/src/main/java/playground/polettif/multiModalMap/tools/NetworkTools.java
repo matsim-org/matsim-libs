@@ -26,7 +26,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -42,6 +45,20 @@ import java.util.*;
 public class NetworkTools {
 
 	protected static Logger log = Logger.getLogger(NetworkTools.class);
+
+	public static Network loadNetwork(String filePath) {
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readFile(filePath);
+		return network;
+	}
+
+	public static void writeNetwork(Network network, String filePath) {
+		new NetworkWriter(network).write(filePath);
+	}
+
+	public static Network createNetwork() {
+		return NetworkUtils.createNetwork();
+	}
 
 	/**
 	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes(Coord, double)},
@@ -755,6 +772,5 @@ public class NetworkTools {
 		link.setFromNode(fromNode);
 		link.setLength(CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), fromNode.getCoord()));
 	}
-
 
 }

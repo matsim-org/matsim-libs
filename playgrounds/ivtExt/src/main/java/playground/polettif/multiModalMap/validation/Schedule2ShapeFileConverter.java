@@ -36,6 +36,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.opengis.feature.simple.SimpleFeature;
+import playground.polettif.multiModalMap.tools.NetworkTools;
+import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,7 +53,7 @@ public class Schedule2ShapeFileConverter {
 	private final Network network;
 	private Collection<SimpleFeature> features;
 
-	public Schedule2ShapeFileConverter(TransitSchedule schedule, Network network) {
+	public Schedule2ShapeFileConverter(final TransitSchedule schedule, final Network network) {
 		this.schedule = schedule;
 		this.network = network;
 		features = new ArrayList<>();
@@ -60,15 +62,12 @@ public class Schedule2ShapeFileConverter {
 
 	public static void main(final String[] arg) {
 		String[] args = new String[4];
-		args[0] = "C:/Users/Flavio/Desktop/output/PublicTransportMap/zurich_gtfs_schedule.xml";
-		args[1] = "C:/Users/Flavio/Desktop/output/PublicTransportMap/zurich_gtfs_network.xml";
-		args[2] = "C:/Users/Flavio/Desktop/output/shp/lines.shp";
-		args[3] = "C:/Users/Flavio/Desktop/output/shp/stops.shp";
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network network = sc.getNetwork();
-		new TransitScheduleReader(sc).readFile(args[0]);
-		new MatsimNetworkReader(network).readFile(args[1]);
-		TransitSchedule schedule = sc.getTransitSchedule();
+		args[0] = "C:/Users/polettif/Desktop/output/results_2016-05-03/zurich_gtfs_schedule.xml";
+		args[1] = "C:/Users/polettif/Desktop/output/results_2016-05-03/zurich_gtfs_network.xml";
+		args[2] = "C:/Users/polettif/Desktop/output/shp/lines.shp";
+		args[3] = "C:/Users/polettif/Desktop/output/shp/stops.shp";
+		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(args[0]);
+		Network network = NetworkTools.loadNetwork(args[1]);
 
 		Schedule2ShapeFileConverter s2s = new Schedule2ShapeFileConverter(schedule, network);
 
@@ -118,76 +117,18 @@ public class Schedule2ShapeFileConverter {
 		linkList.addAll(networkRoute.getLinkIds());
 
 		for(Id<Link> linkId : linkList) {
-			try {
+			if(network.getLinks().containsKey(linkId)) {
 				coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkId).getFromNode().getCoord()));
-			} catch (Exception e) {
+			} else {
+				log.warn("Link " + linkId + " not found in network");
 				return null;
 			}
 		}
 
-		try {
-			coordList.add(MGC.coord2Coordinate(network.getLinks().get(networkRoute.getEndLinkId()).getToNode().getCoord()));
-		} catch (Exception e) {
-			return null;
-		}
+		coordList.add(MGC.coord2Coordinate(network.getLinks().get(networkRoute.getEndLinkId()).getToNode().getCoord()));
 
 		Coordinate[] returnArray = new Coordinate[coordList.size()];
 
 		return coordList.toArray(returnArray);
 	}
-
-	/*
-	public Network convert(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
-
-		NetworkFilterManager filterManager = new NetworkFilterManager(network);
-		filterManager.addLinkFilter(new TransitRouteLinkFilter(transitLineId, transitRouteId));
-
-		return filterManager.applyFilters();
-	}
-
-
-	private class TransitRouteLinkFilter implements NetworkLinkFilter {
-
-		List<Id<Link>> linkList = new ArrayList<>();
-
-		public TransitRouteLinkFilter(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId) {
-			for(TransitRoute transitRoute : schedule.getTransitLines().get(transitLineId).getRoutes().values()) {
-				if(transitRoute.getId().equals(transitRouteId)) {
-					NetworkRoute networkRoute = transitRoute.getRoute();
-					linkList.add(networkRoute.getStartLinkId());
-					linkList.addAll(networkRoute.getLinkIds());
-					linkList.add(networkRoute.getEndLinkId());
-				}
-			}
-		}
-
-		@Override
-		public boolean judgeLink(Link l) {
-			return linkList.contains(l.getId());
-		}
-	}
-
-	public static void old() {
-		String[] args = new String[3];
-		args[0] = "C:/Users/polettif/Desktop/output/PublicTransportMap/zurich_gtfs_schedule.xml";
-		args[1] = "C:/Users/polettif/Desktop/output/PublicTransportMap/zurich_gtfs_network.xml";
-		args[2] = "C:/Users/polettif/Desktop/output/shp/test.shp";
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network network = sc.getNetwork();
-		new TransitScheduleReader(sc).readFile(args[0]);
-		new MatsimNetworkReader(network).readFile(args[1]);
-		TransitSchedule schedule = sc.getTransitSchedule();
-
-		Schedule2ShapeFileConverter s2s = new Schedule2ShapeFileConverter(schedule, network);
-
-		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, "EPSG:2056");
-		builder.createFeatureGenerator();
-		builder.setWidthCoefficient(0.1);
-
-		Id<TransitLine> transitLineId =Id.create("2-33-P-j16-1", TransitLine.class);
-		Id<TransitRoute> transitRouteId = Id.create("607.T0.2-33-P-j16-1.21.H", TransitRoute.class);
-
-		new Links2ESRIShape(s2s.convert(transitLineId, transitRouteId), args[2], builder).write();
-	}
-	*/
 }

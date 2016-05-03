@@ -219,7 +219,7 @@ public class OSM2MATSimTransitSchedule {
 		}
 
 		// remove non used facilities to schedule
-		ScheduleTools.removeNonUsedStopFacilities(transitSchedule);
+		ScheduleTools.removeNotUsedStopFacilities(transitSchedule);
 	}
 
 	/**

@@ -41,6 +41,7 @@ import playground.polettif.multiModalMap.gtfs.containers.Trip;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -63,6 +64,7 @@ public class GTFSReader {
 	 */
 	private final String serviceIdsAlgorithm;
 	public static final String SERVICE_ID_MOST_USED = "mostused";
+	public static final String SERVICE_ID_ALL = "all";
 
 	/**
 	 * Path to the folder where the gtfs files are located
@@ -617,18 +619,19 @@ public class GTFSReader {
 	/**
 	 * sets the service id depending on the specified mode.
 	 *
-	 * @param serviceIdAlgorithm The algorithm with which you want to get the service ids.
-	 *                           Currently only <i>mostused</i> and <i>all</i> are implemented.
+	 * @param param The date for which all service ids should be looked up.
+	 *              Or the algorithm with which you want to get the service ids.
+	 *              (Currently only <i>mostused</i> and <i>all</i> are implemented).
 	 */
-	private void setServiceIds(String serviceIdAlgorithm) {
+	private void setServiceIds(String param) {
 
-		if(serviceIdAlgorithm.equals(SERVICE_ID_MOST_USED)) {
+		if(param.equals(SERVICE_ID_MOST_USED)) {
 			serviceIds = new String[1];
 			serviceIds[0] = getKeyOfMaxValue(serviceIdsCount);
 
 			log.info("        Getting most used service ID: " + serviceIds[0] + " (" + serviceIdsCount.get(serviceIds[0]) + " occurences)");
-		} else {
-			log.warn("Using all service IDs (probably way too much data)");
+		} else if(param.equals(SERVICE_ID_ALL)) {
+			log.warn("        Using all service IDs (probably way too much data)");
 
 			int i = 0;
 			serviceIds = new String[services.size()];
@@ -636,6 +639,8 @@ public class GTFSReader {
 				serviceIds[i] = s;
 				i++;
 			}
+		} else {
+			log.warn("        Using all service IDs on a specific date "+param+" not supported.");
 		}
 	}
 

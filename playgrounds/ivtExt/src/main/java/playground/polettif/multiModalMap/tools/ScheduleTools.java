@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -71,7 +72,7 @@ public class ScheduleTools {
 	 *
 	 * @param schedule the schedule in which the facilities should be removed
 	 */
-	public static void removeNonUsedStopFacilities(TransitSchedule schedule) {
+	public static void removeNotUsedStopFacilities(TransitSchedule schedule) {
 		log.info("... Removing non used stop facilities");
 		int removed = 0;
 
@@ -217,16 +218,30 @@ public class ScheduleTools {
 						Link currentLink = network.getLinks().get(currentLinkId);
 						Link nextLink = network.getLinks().get(routeStops.get(i + 1).getStopFacility().getLinkId());
 
-						List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode()));
+						LeastCostPathCalculator.Path leastCostPath = router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode());
 
-						if(path != null)
-							linkSequence.addAll(path);
+						if(leastCostPath != null) {
+							List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(leastCostPath);
+							if(path != null) {
+								linkSequence.addAll(path);
+							} else {
+								linkSequence = null;
+								break;
+							}
+						} else {
+							linkSequence = null;
+							break;
+						}
 
 						linkSequence.add(nextLink.getId());
 					}
 
 					// add link sequence to schedule
-					transitRoute.setRoute(RouteUtils.createNetworkRoute(linkSequence, network));
+					if(linkSequence != null) {
+						transitRoute.setRoute(RouteUtils.createNetworkRoute(linkSequence, network));
+					} else {
+						log.error("No path found for TransitRoute " + transitRoute.getId() + " on TransitLine " + transitLine.getId());
+					}
 				}
 			}
 		}
@@ -246,7 +261,9 @@ public class ScheduleTools {
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute route : line.getRoutes().values()) {
 				if(route.getRoute() != null)
+					usedTransitLinkIds.add(route.getRoute().getStartLinkId());
 					usedTransitLinkIds.addAll(route.getRoute().getLinkIds());
+					usedTransitLinkIds.add(route.getRoute().getEndLinkId());
 			}
 		}
 

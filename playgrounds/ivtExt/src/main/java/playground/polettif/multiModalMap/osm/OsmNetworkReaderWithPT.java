@@ -482,7 +482,7 @@ public class OsmNetworkReaderWithPT {
 			defaults = this.highwayDefaults.get(highway);
 			if(defaults == null) {
 				// check if bus route is on link todo bus lane conditions as param?
-				if(relationMembers.containsKey(way.id) || way.tags.containsKey(OsmTag.PSV)) {
+				if(way.tags.containsKey(OsmTag.PSV)) {
 					busOnlyLink = true;
 					defaults = highwayDefaults.get(OsmValue.UNCLASSIFIED);
 				} else {
@@ -656,62 +656,5 @@ public class OsmNetworkReaderWithPT {
 			this.oneway = oneway;
 		}
 	}
-
-	/**
-	 * Parser/Handler for OSM data
-	 */
-/*	private class OsmParserHandler2 implements OsmNodeHandler, OsmWayHandler, OsmRelationHandler {
-
-		private final Map<Long, OsmParser.OsmNode> nodes;
-		private final Map<Long, OsmParser.OsmWay> ways;
-		private final Map<Long, OsmParser.OsmRelation> relations;
-
-		private final Map<Long, Long> wayIds;
-		private final CoordinateTransformation transformation;
-
-		public OsmParserHandler2(final Map<Long, OsmParser.OsmNode> nodes, final Map<Long, OsmParser.OsmWay> ways,
-								final Map<Long, OsmParser.OsmRelation> relations,
-								final Map<Long, Long> wayIds, CoordinateTransformation transformation) {
-			this.nodes = nodes;
-			this.ways = ways;
-			this.relations = relations;
-			this.wayIds = wayIds;
-			this.transformation = transformation;
-		}
-
-		@Override
-		public void handleRelation(OsmParser.OsmRelation relation) {
-
-			// only use relations with a tag specified in ptFilter
-			if (OsmNetworkReaderWithPT.this.ptFilter.matches(relation.tags)) {
-				this.relations.put(relation.id, relation);
-			}
-		}
-
-		@Override
-		public void handleNode(OsmParser.OsmNode node) {
-			this.nodes.put(node.id, new OsmParser.OsmNode(node.id, transformation.transform(node.coord)));
-		}
-
-		@Override
-		public void handleWay(OsmParser.OsmWay way) {
-			if (!way.nodes.isEmpty()) {
-				// only take ways which are highway or railway
-				OsmWayDefaults osmHighwayDefaults = OsmNetworkReaderWithPT.this.highwayDefaults.get(way.tags.get(OsmTag.HIGHWAY));
-				OsmWayDefaults osmRailwayDefaults = OsmNetworkReaderWithPT.this.railwayDefaults.get(way.tags.get(OsmTag.RAILWAY));
-
-				// filter out not usable rails (with tags service=*)
-				if(way.tags.containsKey(OsmTag.SERVICE)) {
-					osmRailwayDefaults = null;
-				}
-
-				if (osmHighwayDefaults != null || osmRailwayDefaults != null) {
-					way.used = true;
-				}
-				this.ways.put(way.id, way);
-			}
-		}
-	}
-*/
 }
 
