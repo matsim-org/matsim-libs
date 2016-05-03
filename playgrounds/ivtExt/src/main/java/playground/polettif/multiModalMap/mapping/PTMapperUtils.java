@@ -48,6 +48,8 @@ import java.util.stream.Collectors;
  */
 public class PTMapperUtils {
 
+	// TODO cleanup and doc
+
 	protected static Logger log = Logger.getLogger(PTMapperUtils.class);
 	/**
 	 * Generates link candidates for all stopFacilities. For stop facilities where
@@ -56,7 +58,8 @@ public class PTMapperUtils {
 	 * For each link candiate a child stop facility is generated and referenced to
 	 * the link. Link candidates for different modes with the same link use the same
 	 * child stop facility. Child stop facilities are not created and added to the schedule!
-	 * <p/>
+	 * If a stop facility already has a referenced link, this link is used as the only link
+	 * candidate.<p/>
 	 *
 	 * @param schedule with stopFacilities, not modified.
 	 * @param network the network where link candidates should be looked for, is modified
@@ -83,21 +86,26 @@ public class PTMapperUtils {
 
 					// if no link candidates for the current stop and mode have been generated
 					if(modeLinkCandidates.size() == 0) {
-						// limits number of links, for all links within search radius use networkTools.findClosestLinks()
-						Set<Link> closestLinks = NetworkTools.findClosestLinksByMode(networkImpl, stopFacility.getCoord(), scheduleTransportMode, config);
 
-						// if no close links are nearby, a loop link is created and referenced to the facility.
-						if(closestLinks.size() == 0) {
-							Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial());
-							closestLinks.add(loopLink);
-						}
+						// if stop facilty already has a referenced link
+						if(stopFacility.getLinkId() != null) {
+							modeLinkCandidates.add(new LinkCandidate(network.getLinks().get(stopFacility.getLinkId()), stopFacility));
+						} else {
+							// limits number of links, for all links within search radius use networkTools.findClosestLinks()
+							Set<Link> closestLinks = NetworkTools.findClosestLinksByMode(networkImpl, stopFacility.getCoord(), scheduleTransportMode, config);
 
-						/**
-						 * generate child stop facility for each linkcandidate and reference them
-						 */
-						for(Link link : closestLinks) {
-							LinkCandidate newLinkCandidate = new LinkCandidate(link, stopFacility);
-							MapUtils.getSet(stopFacility, MapUtils.getMap(scheduleTransportMode, tree)).add(newLinkCandidate);
+							// if no close links are nearby, a loop link is created and referenced to the facility.
+							if(closestLinks.size() == 0) {
+								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial());
+								closestLinks.add(loopLink);
+							}
+
+							/**
+							 * generate a LinkCandidate for each close link
+							 */
+							for(Link link : closestLinks) {
+								modeLinkCandidates.add(new LinkCandidate(link, stopFacility));
+							}
 						}
 					}
 				}

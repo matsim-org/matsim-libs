@@ -157,6 +157,7 @@ public class NetworkTools {
 	 * @param toleranceFactor [> 1]
 	 * @return the list of closest links
 	 */
+	@Deprecated
 	public static List<Link> findClosestLinksSoftConstraints(NetworkImpl networkImpl, Coord coord, double nodeSearchRadius, int maxNLinks, double maxLinkDistance, double toleranceFactor) {
 		List<Link> closestLinks = new ArrayList<>();
 
@@ -246,7 +247,7 @@ public class NetworkTools {
 
 		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, config.getNodeSearchRadius());
 		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
-		double incr = 0.0001; double tol=0.001;
+		double incr = 0.001;
 		double toleranceFactor = (config.getLinkDistanceTolerance() < 1 ? 1 : config.getLinkDistanceTolerance());
 		int maxNLinks = config.getMaxNClosestLinks();
 
@@ -281,7 +282,7 @@ public class NetworkTools {
 				}
 			}
 
-			int i = 1; double maxSoftDistance = 0;
+			int i = 1; double maxSoftDistance = Double.MAX_VALUE;
 			for(Map.Entry<Double, Link> entry : closestLinksMap.entrySet()) {
 				if(i == maxNLinks) {
 					maxSoftDistance = (entry.getKey()+2*incr)*toleranceFactor;
@@ -289,6 +290,9 @@ public class NetworkTools {
 
 				// if the distance difference to the previous link is less than tol, add the link as well
 				if(i > maxNLinks && entry.getKey() > maxSoftDistance) {
+					break;
+				}
+				if(entry.getKey() > config.getMaxStopFacilityDistance()) {
 					break;
 				}
 				closestLinks.add(entry.getValue());
@@ -364,7 +368,7 @@ public class NetworkTools {
 		dummyLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
 		dummyLink.setLength(1.0);
 
-		if(!network.getNodes().containsKey(dummyNode.getId())) {
+		if(!network.getNodes().values().contains(dummyNode)) {
 			network.addNode(dummyNode);
 			network.addLink(dummyLink);
 		}

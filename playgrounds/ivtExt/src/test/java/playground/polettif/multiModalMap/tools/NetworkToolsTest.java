@@ -157,13 +157,6 @@ public class NetworkToolsTest {
 	}
 
 	@Test
-	public void checkTestDistances() {
-//		System.out.println("P to A: " + CoordUtils.calcEuclideanDistance(coordA,coordP));
-//		System.out.println("P to AB: "+ CoordUtils.distancePointLinesegment(coordA, coordB, coordP));
-//		System.out.println("P to AX: "+ CoordUtils.distancePointLinesegment(coordA, coordX, coordP));
-	}
-
-	@Test
 	public void testFindNClosestLinks() throws Exception {
 		assertEquals("found the wrong link!", linkAH, findNClosestLinks((NetworkImpl) network, coordZ, 10, 10, 10).get(0));
 		assertEquals("Not the correct number of closest links found!", 6, findNClosestLinks((NetworkImpl) network, coordX, 10, 6, 100).size());

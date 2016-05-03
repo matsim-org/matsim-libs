@@ -20,7 +20,6 @@ package playground.polettif.multiModalMap.validation;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -32,7 +31,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 import java.util.ArrayList;
@@ -58,10 +60,10 @@ public class Schedule2ShapeFileConverter {
 
 	public static void main(final String[] arg) {
 		String[] args = new String[4];
-		args[0] = "C:/Users/polettif/Desktop/output/PublicTransportMap/zurich_gtfs_schedule.xml";
-		args[1] = "C:/Users/polettif/Desktop/output/PublicTransportMap/zurich_gtfs_network.xml";
-		args[2] = "C:/Users/polettif/Desktop/output/shp/lines.shp";
-		args[3] = "C:/Users/polettif/Desktop/output/shp/stops.shp";
+		args[0] = "C:/Users/Flavio/Desktop/output/PublicTransportMap/zurich_gtfs_schedule.xml";
+		args[1] = "C:/Users/Flavio/Desktop/output/PublicTransportMap/zurich_gtfs_network.xml";
+		args[2] = "C:/Users/Flavio/Desktop/output/shp/lines.shp";
+		args[3] = "C:/Users/Flavio/Desktop/output/shp/stops.shp";
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = sc.getNetwork();
 		new TransitScheduleReader(sc).readFile(args[0]);
@@ -71,7 +73,7 @@ public class Schedule2ShapeFileConverter {
 		Schedule2ShapeFileConverter s2s = new Schedule2ShapeFileConverter(schedule, network);
 
 		s2s.routes2Polyline(args[2]);
-		s2s.stopFaclities2Points(args[3]);
+	//	s2s.stopFaclities2Points(args[3]);
 	}
 
 	private void stopFaclities2Points(String outFile) {
@@ -81,7 +83,7 @@ public class Schedule2ShapeFileConverter {
 
 	public void routes2Polyline(String outFile) {
 		PolylineFeatureFactory ff = new PolylineFeatureFactory.Builder()
-				.setName("schedule_zurich")
+				.setName("TransitRoutes")
 				.setCrs(MGC.getCRS("EPSG:2056"))
 				.addAttribute("Line", String.class)
 				.addAttribute("Route", String.class)
@@ -117,16 +119,14 @@ public class Schedule2ShapeFileConverter {
 
 		for(Id<Link> linkId : linkList) {
 			try {
-				Coord coord = network.getLinks().get(linkId).getFromNode().getCoord();
-				coordList.add(new Coordinate(coord.getX(), coord.getY()));
+				coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkId).getFromNode().getCoord()));
 			} catch (Exception e) {
 				return null;
 			}
 		}
 
 		try {
-			Coord lastCoord = network.getLinks().get(networkRoute.getEndLinkId()).getFromNode().getCoord();
-			coordList.add(new Coordinate(lastCoord.getX(), lastCoord.getY()));
+			coordList.add(MGC.coord2Coordinate(network.getLinks().get(networkRoute.getEndLinkId()).getToNode().getCoord()));
 		} catch (Exception e) {
 			return null;
 		}

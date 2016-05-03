@@ -23,6 +23,10 @@ import com.opencsv.CSVReader;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.*;
@@ -64,6 +68,7 @@ public class GTFSReader {
 	 * Path to the folder where the gtfs files are located
 	 */
 	private final String root;
+	private CoordinateTransformation transformation = new IdentityTransformation();
 
 	/**
 	 * The types of dates that will be represented by the new file
@@ -99,24 +104,30 @@ public class GTFSReader {
 	private TransitSchedule schedule = scheduleFactory.createTransitSchedule();
 
 	/**
-	 * Calls {@link #convertGTFS2MATSimTransitSchedule(String gtfsInputPath, String mtsOutputFile)}.
+	 * Calls {@link #convertGTFS2MATSimTransitSchedule}.
 	 */
 	public static void main(final String[] args) {
-		convertGTFS2MATSimTransitSchedule(args[0], args[1]);
+		convertGTFS2MATSimTransitSchedule(args[0], args[1], args[2]);
 	}
 
 	/**
 	 * Reads gtfs files in and converts them to an unmapped MATSim Transit Schedule (mts).
 	 * "Unmapped" means stopFacilities are not referenced to links and transit routes do not have routes (link sequences).
 	 * <p/>
-	 * GTFS and the unmapped schedule are both in WGS84, no coordinate transformation is applied.
 	 *
-	 * @param gtfsInputPath folder where the gtfs files are located (a single zip file is not yet supported)
+	 * @param gtfsInputPath folder where the gtfs files are located (a single zip file is not supported)
 	 * @param mtsOutputFile path to the (to be generated) unmapped transit schedule file
+	 * @param outputCoordinateSystem the output coordinate system. WGS84/identity transformation is used if <code>null</code>.
 	 */
-	public static void convertGTFS2MATSimTransitSchedule(String gtfsInputPath, String mtsOutputFile) {
+	public static void convertGTFS2MATSimTransitSchedule(String gtfsInputPath, String mtsOutputFile, String outputCoordinateSystem) {
 		GTFSReader gtfsReader = new GTFSReader(gtfsInputPath);
 
+		if(outputCoordinateSystem != null) {
+			CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, outputCoordinateSystem);
+			gtfsReader.setTransformation(ct);
+		}
+		gtfsReader.loadFiles();
+		gtfsReader.convert();
 		gtfsReader.writeTransitSchedule(mtsOutputFile);
 	}
 
@@ -125,10 +136,6 @@ public class GTFSReader {
 
 		// TODO there is only one algorithm to date
 		this.serviceIdsAlgorithm = SERVICE_ID_MOST_USED;
-
-		// run
-		this.loadFiles();
-		this.convert();
 	}
 
 	public void writeTransitSchedule(String outputPath) {
@@ -159,12 +166,13 @@ public class GTFSReader {
 		setServiceIds(SERVICE_ID_MOST_USED);
 
 		/** [1]
-		 * generating transitStopFacilities (mts) from gtfsStops and add them to the schedule
+		 * generating transitStopFacilities (mts) from gtfsStops and add them to the schedule.
+		 * Coordinates are transformed here.
 		 */
-		for(Entry<String, GTFSStop> stop : gtfsStops.entrySet()) {
-			Coord result = stop.getValue().getPoint();
-			TransitStopFacility stopFacility = scheduleFactory.createTransitStopFacility(Id.create(stop.getKey(), TransitStopFacility.class), result, stop.getValue().isBlocks());
-			stopFacility.setName(stop.getValue().getName());
+		for(Entry<String, GTFSStop> stopEntry : gtfsStops.entrySet()) {
+			Coord result = transformation.transform(stopEntry.getValue().getPoint());
+			TransitStopFacility stopFacility = scheduleFactory.createTransitStopFacility(Id.create(stopEntry.getKey(), TransitStopFacility.class), result, stopEntry.getValue().isBlocks());
+			stopFacility.setName(stopEntry.getValue().getName());
 			schedule.addStopFacility(stopFacility);
 		}
 
@@ -232,7 +240,6 @@ public class GTFSReader {
 					 * Calculate departures from frequencies (if available)
 					 */
 					if(usesFrequencies) {
-
 						TransitRoute newTransitRoute = scheduleFactory.createTransitRoute(Id.create(trip.getId(), TransitRoute.class), null, transitRouteStops, gtfsRoute.getRouteType().name);
 
 						for(Frequency frequency : trip.getFrequencies()) {
@@ -418,7 +425,7 @@ public class GTFSReader {
 					actual = new Shape(line[col.get("shape_id")]);
 					shapes.put(line[col.get("shape_id")], actual);
 				}
-				actual.addPoint(new Coord(Double.parseDouble(line[col.get("shape_pt_lat")]), Double.parseDouble(line[col.get("shape_pt_lon")])), Integer.parseInt(line[col.get("shape_pt_sequence")]));
+				actual.addPoint(new Coord(Double.parseDouble(line[col.get("shape_pt_lon")]), Double.parseDouble(line[col.get("shape_pt_lat")])), Integer.parseInt(line[col.get("shape_pt_sequence")]));
 				line = reader.readNext();
 			}
 			log.info("...     shapes.txt loaded");
@@ -483,11 +490,8 @@ public class GTFSReader {
 
 			// each trip uses one service id, increase statistics accordingly
 			if(serviceIdsAlgorithm.equals(SERVICE_ID_MOST_USED)) {
-				Integer count = serviceIdsCount.get(line[col.get("service_id")]);
-				if(count == null)
-					serviceIdsCount.put(line[col.get("service_id")], 1);
-				else
-					serviceIdsCount.put(line[col.get("service_id")], count + 1);
+				Integer count = MapUtils.getInteger(line[col.get("service_id")], serviceIdsCount, 1);
+				serviceIdsCount.put(line[col.get("service_id")], count + 1);
 			}
 			line = reader.readNext();
 		}
@@ -642,6 +646,10 @@ public class GTFSReader {
 	 */
 	private static String getKeyOfMaxValue(Map<String, Integer> map) {
 		return map.entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).get().getKey();
+	}
+
+	public void setTransformation(CoordinateTransformation transformation) {
+		this.transformation = transformation;
 	}
 
 	/**

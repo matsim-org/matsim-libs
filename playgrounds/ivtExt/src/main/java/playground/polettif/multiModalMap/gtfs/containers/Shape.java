@@ -20,10 +20,13 @@
 
 package playground.polettif.multiModalMap.gtfs.containers;
 
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 public class Shape {
 	
@@ -37,7 +40,8 @@ public class Shape {
 	 * The points of the shape
 	 */
 	private SortedMap<Integer,Coord> points;
-	
+	private Coordinate[] coordinates;
+
 	//Methods
 	/**
 	 * Constructs 
@@ -69,4 +73,11 @@ public class Shape {
 		points.put(pos,point);
 	}
 
+	public Coordinate[] getCoordinates() {
+		Coordinate[] coordinates = new Coordinate[points.size()];
+		for(Map.Entry<Integer, Coord> entry : points.entrySet()) {
+			coordinates[entry.getKey()-1] = MGC.coord2Coordinate(entry.getValue());
+		}
+		return coordinates;
+	}
 }

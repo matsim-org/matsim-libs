@@ -74,16 +74,19 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		map.put(MODES_TO_KEEP_ON_CLEAN_UP,
 				"All links that do not have a transit route on them are removed, except the ones \n" +
 				"\t\tlisted in this set (typically only car). Separated by comma.");
-
+		map.put(LINK_DISTANCE_TOLERANCE,
+				"[Link Candidates] After " +MAX_NCLOSEST_LINKS +" link candidates have been found, additional link \n" +
+				"\t\tcandidates within "+LINK_DISTANCE_TOLERANCE+"*(distance to the Nth link) are added to the set.\n" +
+				"\t\tMust be > 1.");
 		map.put(MAX_NCLOSEST_LINKS,
-				"Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
+				"[Link Candidates] Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
 				"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
 				"\t\tfacility coordinates. Default: " + nodeSearchRadius);
 		map.put(NODE_SEARCH_RADIUS,
-				"Defines the radius [meter] from a stop facility within nodes are searched. Mainly a maximum \n" +
+				"[Link Candidates] Defines the radius [meter] from a stop facility within nodes are searched. Mainly a maximum \n" +
 				"\t\tvalue for performance.");
 		map.put(MAX_STOP_FACILITY_DISTANCE,
-				"The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
+				"[Link Candidates] The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
 		map.put(PREFIX_ARTIFICIAL,
 				"ID prefix used for artificial links and nodes created if no nodes are found within nodeSearchRadius.");
 		map.put(SUFFIX_CHILD_STOP_FACILITIES,
@@ -239,7 +242,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter(LINK_DISTANCE_TOLERANCE)
 	public void setLinkDistanceTolerance(double linkDistanceTolerance) {
-		this.linkDistanceTolerance = linkDistanceTolerance;
+		this.linkDistanceTolerance = linkDistanceTolerance < 1 ? 1 : linkDistanceTolerance;
 	}
 
 
