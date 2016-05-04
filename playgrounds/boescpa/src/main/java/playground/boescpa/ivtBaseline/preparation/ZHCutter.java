@@ -126,6 +126,7 @@ public class ZHCutter {
 		strategySettings.add(getStrategySetting("ChangeExpBeta", 0.5));
 		strategySettings.add(getStrategySetting("ReRoute", 0.2));
 		strategySettings.add(getStrategySetting("BlackListedTimeAllocationMutator", 0.1));
+		strategySettings.add(getStrategySetting("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy", 0.1));
 		for (StrategyConfigGroup.StrategySettings strategy : strategySettings) {
 			strategy.setSubpopulation(cutterConfig.commuterTag);
 			config.getModule(StrategyConfigGroup.GROUP_NAME).addParameterSet(strategy);
