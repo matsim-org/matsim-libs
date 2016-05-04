@@ -19,7 +19,6 @@
 
 package playground.polettif.multiModalMap.osm;
 
-import com.sun.istack.internal.Nullable;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;

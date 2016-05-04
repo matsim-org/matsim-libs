@@ -84,8 +84,9 @@ public class Schedule2ShapeFileConverter {
 		PolylineFeatureFactory ff = new PolylineFeatureFactory.Builder()
 				.setName("TransitRoutes")
 				.setCrs(MGC.getCRS("EPSG:2056"))
-				.addAttribute("Line", String.class)
-				.addAttribute("Route", String.class)
+				.addAttribute("line", String.class)
+				.addAttribute("route", String.class)
+				.addAttribute("mode", String.class)
 				.create();
 
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
@@ -98,8 +99,9 @@ public class Schedule2ShapeFileConverter {
 					log.error("No links found for route " + transitRoute.getId() + " on line " + transitLine.getId());
 				} else {
 					SimpleFeature f = ff.createPolyline(coordinates);
-					f.setAttribute("Line", transitLine.getId().toString());
-					f.setAttribute("Route", transitRoute.getId().toString());
+					f.setAttribute("line", transitLine.getId().toString());
+					f.setAttribute("route", transitRoute.getId().toString());
+					f.setAttribute("mode", transitRoute.getTransportMode());
 					features.add(f);
 				}
 			}
