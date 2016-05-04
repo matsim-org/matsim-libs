@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityRunUtils;
@@ -31,76 +33,77 @@ import org.matsim.facilities.ActivityFacilities;
 
 import playground.dziemke.utils.LogToOutputSaver;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
 
-public class AccessibilityComputationBerlin {
-	public static final Logger log = Logger.getLogger( AccessibilityComputationBerlin.class ) ;
+public class AccessibilityComputationNMBNew {
+	public static final Logger log = Logger.getLogger(AccessibilityComputationNMBNew.class);
 	
-//	private static final double cellSize = 1000.;
-//	private static final double cellSize = 200.;
-	private static final double cellSize = 500.;
-
+	private static final double cellSize = 1000.;
+	
 	public static void main(String[] args) {
-		// Input and output
-//		String networkFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.all.xml";
-//		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-		// same network at alternate location
-		String networkFile = "../../../../SVN/shared-svn/projects/accessibility_berlin/iv_counts/network.xml";
+		// Input and output	
+		String networkFile = "../../../matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
+		String facilitiesFile = "../../../matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
+		String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/38/";
+//		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelTimeMatrix.csv.gz";
+//		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelDistanceMatrix.csv.gz";
+//		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/measuringPointsAsStops.csv.gz";
+//		String minibusPtTravelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_07/travelTimeMatrix.csv";
+//		String minibusPtTravelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_07/travelDistanceMatrix.csv";
+//		String measuringPointsAsPtStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_07/measuringPointsAsStops.csv";
 		
-//		String facilitiesFile = "../../shared-svn/projects/accessibility_berlin/osm/facilities_amenities_modified.xml";
-		// now using work facilities
-		String facilitiesFile = "../../../../SVN/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/facilities.xml";
-		
-		String outputDirectory = "../../../../SVN/shared-svn/projects/accessibility_berlin/output/08/";
-//		String travelTimeMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelTimeMatrix.csv.gz";
-//		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
-//		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
-		
-		String travelTimeMatrixFilePT = "../../matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
-		String travelDistanceMatrixFilePT = "../../matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
-		String ptStopsFilePT = "../../matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
-		
+		// Regular pt
+		String travelTimeMatrixFile = "../../../matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
+		String travelDistanceMatrixFile = "../../../matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
+		String ptStopsFile = "../../../matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
+
+		// Minibus pt
+//		String travelTimeMatrixFile = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_500/travelTimeMatrix_0.csv";
+//		String travelDistanceMatrixFile = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_500/travelDistanceMatrix_0.csv";
+//		String ptStopsFile = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_500/ptStops.csv";
+//		String travelTimeMatrixFile = "../../../matsimExamples/countries/za/nmb/minibus-pt/jtlu14b/matrix_grid_1000/travelTimeMatrix_0.csv.gz";
+//		String travelDistanceMatrixFile = "../../../matsimExamples/countries/za/nmb/minibus-pt/jtlu14b/matrix_grid_1000/travelDistanceMatrix_0.csv.gz";
+//		String ptStopsFile = "../../../matsimExamples/countries/za/nmb/minibus-pt/jtlu14b/matrix_grid_1000/ptStops.csv";
+
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
 		// Parameters
-		String crs = TransformationFactory.DHDN_GK4;
-//		String crs = "EPSG:31468"; // = DHDN GK4		
-		
+		String crs = TransformationFactory.WGS84_SA_Albers;
+
 		// QGis
 		boolean createQGisOutput = true;
-//		boolean includeDensityLayer = true;
-		boolean includeDensityLayer = false;
-//		Double lowerBound = 1.75;
-//		Double upperBound = 7.;
+		boolean includeDensityLayer = true;
+//		Double lowerBound = 2.;
+//		Double upperBound = 5.5;
 //		Double lowerBound = 0.;
-//		Double upperBound = 9.;
-		Double lowerBound = 2.25;
-		Double upperBound = 7.5;
+//		Double upperBound = 3.5;
+		Double lowerBound = -3.5;
+		Double upperBound = 3.5;
 		Integer range = 9;
-//		int symbolSize = 1010;
-//		int symbolSize = 210;
-		int symbolSize = 510;
+		int symbolSize = 1050;
 		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
-		
-        double[] mapViewExtent = {4574000-1000, 5802000-1000, 4620000+1000, 5839000+1000};
-				
+
+		/* Extent of the network are (as they can looked up by using the bounding box):
+		/* minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496 */
+//		double[] mapViewExtent = {100000,-3720000,180000,-3675000}; // choose map view a bit bigger
+		double[] mapViewExtent = {115000,-3718000,161000,-3679000}; // what actually needs to be drawn -- looks better
+
 		// Config and scenario
-		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
-		config.network().setInputFile(networkFile);
-		config.facilities().setInputFile(facilitiesFile);
+//		final Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
+		Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup());
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setOutputDirectory(outputDirectory);
+		config.network().setInputFile(networkFile);
+		config.facilities().setInputFile(facilitiesFile);
 		config.controler().setLastIteration(0);
 
-		final Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// Matrix-based pt
 		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-		mbpcg.setPtStopsInputFile(ptStopsFilePT);
+		mbpcg.setPtStopsInputFile(ptStopsFile);
 		mbpcg.setUsingTravelTimesAndDistances(true);
-		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFilePT);
-		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFilePT);
+		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFile);
+		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFile);
 
 		// plansClacRoute parameters
 		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
@@ -136,10 +139,11 @@ public class AccessibilityComputationBerlin {
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 		List<String> activityTypes = new ArrayList<String>();
 		activityTypes.add("s");
+		activityTypes.add("w");
 		log.error("Only using s as activity type to speed up for testing");
 
 		// collect homes
-		String activityFacilityType = FacilityTypes.HOME;
+		String activityFacilityType = "h";
 		final ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
 
 		final Controler controler = new Controler(scenario);
@@ -164,10 +168,7 @@ public class AccessibilityComputationBerlin {
 							listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 
 							listener.addAdditionalFacilityData(homes) ;
-//							listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-							// Boundaries of Berlin are approx.: 4570000, 4613000, 5836000, 5806000
-							listener.generateGridsAndMeasuringPointsByCustomBoundary(4574000, 5802000, 4620000, 5839000, cellSize);
-//							listener.generateGridsAndMeasuringPointsByCustomBoundary(4590000, 5815000, 4595000, 5820000, cellSize);
+							listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 							listener.writeToSubdirectoryWithName(actType);
 							listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 							return listener;
@@ -176,9 +177,8 @@ public class AccessibilityComputationBerlin {
 				}
 			}
 		});
-		
 		controler.run();
-			
+
 		/* Write QGis output */
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
@@ -188,10 +188,10 @@ public class AccessibilityComputationBerlin {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-					if ( !actType.equals("w") ) {
-						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-						continue ;
-					}
+//					if ( !actType.equals("w") ) {
+//						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+//						continue ;
+//					}
 					VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
