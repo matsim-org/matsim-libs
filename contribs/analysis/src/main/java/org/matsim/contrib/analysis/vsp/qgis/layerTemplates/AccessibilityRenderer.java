@@ -68,7 +68,7 @@ public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 		
 		// adjustable color ramp
 		this.ranges = new Range[this.range];
-		this.ranges[0] = new Range(-200., this.lowerBound, " " + this.lowerBound.toString());
+		this.ranges[0] = new Range(-1000., this.lowerBound, " " + this.lowerBound.toString());
 		for (int i = 0; i < range - 2; i++) {
 			Double lowerBoundary = this.lowerBound + i * stepSize;
 			Double upperBoundary = this.lowerBound + (i+1) * stepSize;
