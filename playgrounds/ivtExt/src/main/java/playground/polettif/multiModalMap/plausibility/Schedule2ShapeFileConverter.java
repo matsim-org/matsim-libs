@@ -39,11 +39,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Converts a MATSim Transit Schedule to a GIS shape file
+ *
+ * @author polettif
+ */
 public class Schedule2ShapeFileConverter {
 
 	private static final Logger log = Logger.getLogger(Schedule2ShapeFileConverter.class);
 
-	private Map<Id<Link>, ? extends Link> links;
 	private final TransitSchedule schedule;
 	private final Network network;
 	private Collection<SimpleFeature> features;
@@ -57,9 +61,9 @@ public class Schedule2ShapeFileConverter {
 
 	public static void main(final String[] arg) {
 		String[] args = new String[4];
-		args[0] = "C:/Users/polettif/Desktop/output/results_2016-05-03/zurich_gtfs_schedule.xml";
-		args[1] = "C:/Users/polettif/Desktop/output/results_2016-05-03/zurich_gtfs_network.xml";
-		args[2] = "C:/Users/polettif/Desktop/output/shp/lines.shp";
+		args[0] = "C:/Users/polettif/Desktop/output/results_2016-05-04/zurich_gtfs_schedule.xml.gz";
+		args[1] = "C:/Users/polettif/Desktop/output/results_2016-05-04/zurich_gtfs_network.xml.gz";
+		args[2] = "C:/Users/polettif/Desktop/output/results_2016-05-04/shp/lines.shp";
 		args[3] = "C:/Users/polettif/Desktop/output/shp/stops.shp";
 		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(args[0]);
 		Network network = NetworkTools.loadNetwork(args[1]);

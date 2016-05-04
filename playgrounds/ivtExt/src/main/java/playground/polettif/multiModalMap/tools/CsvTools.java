@@ -30,6 +30,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Methods to create and write csv data.
+ *
+ * @author polettif
+ */
 public class CsvTools {
 
 	/**

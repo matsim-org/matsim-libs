@@ -44,7 +44,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Provides tools for rerouting schedules.
+ * Provides tools for rerouting and adapting schedules via csv.
+ *
+ * @author polettif
  */
 public class ScheduleEditor {
 

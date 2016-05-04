@@ -31,6 +31,12 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
+/**
+ * Generates a histogram for all child stop facilities
+ * of a schedule
+ *
+ * @author polettif
+ */
 public class StopFacilityHistogram {
 	
 	private TransitSchedule schedule;
@@ -38,16 +44,17 @@ public class StopFacilityHistogram {
 	private double[] stopFacilityHistogram;
 
 	public static void main(final String[] args) {
-		TransitSchedule schedule = ScheduleTools.loadTransitSchedule("C:/Users/polettif/Desktop/output/results_2016-05-03/zurich_schedule.xml");
+		TransitSchedule schedule = ScheduleTools.loadTransitSchedule("C:/Users/polettif/Desktop/output/results_2016-05-04/zurich_gtfs_schedule.xml");
 
 		StopFacilityHistogram check = new StopFacilityHistogram(schedule);
 
 		check.calcHistogram(schedule);
-		check.createPng("C:/Users/polettif/Desktop/output/results_2016-05-03/histogram.png");
+		check.createPng("C:/Users/polettif/Desktop/output/results_2016-05-04/histogram.png");
 	}
 
 	public StopFacilityHistogram(TransitSchedule schedule) {
 		this.schedule = schedule;
+		calcHistogram(this.schedule);
 	}
 
 	public void calcHistogram(TransitSchedule schedule) {

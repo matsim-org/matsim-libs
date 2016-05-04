@@ -25,10 +25,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.*;
+import org.opengis.feature.simple.SimpleFeature;
 import playground.polettif.multiModalMap.gtfs.containers.*;
 import playground.polettif.multiModalMap.tools.ScheduleTools;
 
@@ -101,6 +105,7 @@ public class GTFSReader {
 	private SortedMap<String, GTFSRoute> gtfsRoutes = new TreeMap<>();
 	private Map<String, Service> services = new HashMap<>();
 	private Map<String, Shape> shapes = new HashMap<>();
+	private Collection<SimpleFeature> features = new ArrayList<>();
 	private TransitSchedule schedule;
 	private TransitScheduleFactory scheduleFactory;
 
@@ -133,6 +138,13 @@ public class GTFSReader {
 	public static void convertGTFS2MATSimTransitScheduleFile(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem, String mtsOutputFile) {
 		GTFSReader gtfsReader = new GTFSReader(gtfsInputPath, serviceIdsParam, outputCoordinateSystem);
 
+		ScheduleTools.writeTransitSchedule(gtfsReader.getSchedule(), mtsOutputFile);
+	}
+
+	public static void convertWithShapes(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem, String mtsOutputFile, String outputShapeFile) {
+		GTFSReader gtfsReader = new GTFSReader(gtfsInputPath, serviceIdsParam, outputCoordinateSystem);
+
+		gtfsReader.writeShapeFile(outputShapeFile);
 		ScheduleTools.writeTransitSchedule(gtfsReader.getSchedule(), mtsOutputFile);
 	}
 
@@ -756,5 +768,44 @@ public class GTFSReader {
 			}
 
 		}
+	}
+
+	public void writeShapeFile(String outFile) {
+		PolylineFeatureFactory ff = new PolylineFeatureFactory.Builder()
+				.setName("gtfs_shapes")
+				.setCrs(MGC.getCRS("EPSG:2056"))
+				.addAttribute("id", String.class)
+				.addAttribute("trip_id", String.class)
+				.addAttribute("trip_name", String.class)
+				.addAttribute("route_id", String.class)
+				.addAttribute("route_name", String.class)
+				.create();
+
+		for(GTFSRoute gtfsRoute : gtfsRoutes.values()) {
+			for(Trip trip : gtfsRoute.getTrips().values()) {
+				boolean useTrip = false;
+				for(String serviceId : serviceIds) {
+					if(trip.getService().equals(services.get(serviceId))) {
+						useTrip = true;
+						break;
+					}
+				}
+
+				if(useTrip) {
+					Shape shape = trip.getShape();
+					if(shape != null) {
+						SimpleFeature f = ff.createPolyline(shape.getCoordinates());
+						f.setAttribute("id", shape.getId());
+						f.setAttribute("trip_id", trip.getId());
+						f.setAttribute("trip_name", trip.getName());
+						f.setAttribute("route_id", gtfsRoute.getRouteId());
+						f.setAttribute("route_name", gtfsRoute.getShortName());
+						features.add(f);
+					}
+				}
+			}
+		}
+
+		ShapeFileWriter.writeGeometries(features, outFile);
 	}
 }

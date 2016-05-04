@@ -29,6 +29,12 @@ import org.matsim.pt.transitSchedule.api.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Methods to clean transit schedules by removing
+ * routes and stop facilities.
+ *
+ * @author polettif
+ */
 public class ScheduleCleaner {
 
 	protected static Logger log = Logger.getLogger(ScheduleTools.class);

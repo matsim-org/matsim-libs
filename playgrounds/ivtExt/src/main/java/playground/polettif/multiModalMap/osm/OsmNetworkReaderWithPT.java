@@ -140,7 +140,7 @@ public class OsmNetworkReaderWithPT {
 			this.setHighwayDefaults(OsmValue.UNCLASSIFIED, 1, 45.0 / 3.6, 1.0, 600);
 			this.setHighwayDefaults(OsmValue.RESIDENTIAL, 1, 30.0 / 3.6, 1.0, 600);
 			this.setHighwayDefaults(OsmValue.LIVING_STREET, 1, 15.0 / 3.6, 1.0, 300);
-//			this.setHighwayDefaults(OsmValue.SERVICE, 1, 15.0 / 3.6, 1.0, 200); // TODO service roads are used in zurich for bus-only roads
+//			this.setHighwayDefaults(OsmValue.SERVICE, 1, 15.0 / 3.6, 1.0, 200);
 
 			// Set railway-defaults (and with it the filter...)
 			this.setRailwayDefaults(OsmValue.RAIL, 1, 120.0 / 3.6, 1.0, 100);

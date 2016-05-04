@@ -50,8 +50,8 @@ public class Gtfs2ShapeFile {
 
 	public static void main(String[] arg) {
 		String[] args = new String[2];
-		args[0] = "C:/Users/polettif/Desktop/data/gtfs/zvv_clean/shapes.txt";
-		args[1] = "C:/Users/polettif/Desktop/output/shp/gtfs.shp";
+		args[0] = "C:/Users/polettif/Desktop/data/gtfs/zvv/shapes.txt";
+		args[1] = "C:/Users/polettif/Desktop/output/results_2016-05-04/shp/gtfs.shp";
 
 		Gtfs2ShapeFile converter = new Gtfs2ShapeFile();
 		converter.setTransformation(TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus"));

@@ -40,6 +40,11 @@ import playground.polettif.multiModalMap.mapping.router.Router;
 
 import java.util.*;
 
+/**
+ * Methods to load and change transit schedules
+ *
+ * @author polettif
+ */
 public class ScheduleTools {
 
 	protected static Logger log = Logger.getLogger(ScheduleTools.class);

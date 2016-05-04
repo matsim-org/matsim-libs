@@ -376,6 +376,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
 		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 		ScheduleTools.assignScheduleModesToLinks(schedule, network);
+		// todo config param for cleanup options
 //		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);
 		log.info("Clean schedule and network... done.");
