@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.*;
 
@@ -115,7 +116,6 @@ public class ScheduleCleaner {
 	 */
 	public static void removeNotUsedTransitLinks(TransitSchedule schedule, Network network, Set<String> modesToKeep) {
 		log.info("... Removing links that are not used by public transit");
-		int removed = 0;
 
 		Set<Id<Link>> usedTransitLinkIds = new HashSet<>();
 
@@ -144,6 +144,17 @@ public class ScheduleCleaner {
 			network.removeLink(linkId);
 		}
 
-		log.info("    "+removed+" links removed");
+		// removing nodes
+		Set<Id<Node>> nodesToRemove = new HashSet<>();
+		for(Node n : network.getNodes().values()) {
+			if(n.getOutLinks().size() == 0 && n.getInLinks().size() == 0) {
+				nodesToRemove.add(n.getId());
+			}
+		}
+		for(Id<Node> nodeId : nodesToRemove) {
+			network.removeNode(nodeId);
+		}
+
+		log.info("    "+linksToRemove.size()+" links removed");
 	}
 }

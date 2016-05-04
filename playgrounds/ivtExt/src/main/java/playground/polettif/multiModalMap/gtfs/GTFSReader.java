@@ -52,6 +52,10 @@ import java.util.Map.Entry;
 public class GTFSReader {
 
 	private static final Logger log = Logger.getLogger(GTFSReader.class);
+
+	// todo await departure time?
+	private boolean defaultAwaitDepartureTime = true;
+
 	/**
 	 * which algorithm should be used to get serviceIds
 	 */
@@ -99,6 +103,7 @@ public class GTFSReader {
 	private Map<String, Shape> shapes = new HashMap<>();
 	private TransitSchedule schedule;
 	private TransitScheduleFactory scheduleFactory;
+
 
 	/**
 	 * Calls {@link #convertGTFS2MATSimTransitScheduleFile}.
@@ -252,7 +257,9 @@ public class GTFSReader {
 								e.printStackTrace();
 							}
 						}
-						transitRouteStops.add(scheduleFactory.createTransitRouteStop(schedule.getFacilities().get(Id.create(stopTime.getStopId(), TransitStopFacility.class)), arrival, departure));
+						TransitRouteStop newTRS = scheduleFactory.createTransitRouteStop(schedule.getFacilities().get(Id.create(stopTime.getStopId(), TransitStopFacility.class)), arrival, departure);
+						newTRS.setAwaitDepartureTime(defaultAwaitDepartureTime);
+						transitRouteStops.add(newTRS);
 					}
 
 					/** [5.1]
@@ -548,7 +555,7 @@ public class GTFSReader {
 			for(GTFSRoute actualGTFSRoute : gtfsRoutes.values()) {
 				Trip trip = actualGTFSRoute.getTrips().get(line[col.get("trip_id")]);
 				if(trip != null) {
-					try { // todo why try/catch?
+					try {
 						trip.putStopTime(
 								Integer.parseInt(line[col.get("stop_sequence")]),
 								new StopTime(Integer.parseInt(line[col.get("stop_sequence")]),

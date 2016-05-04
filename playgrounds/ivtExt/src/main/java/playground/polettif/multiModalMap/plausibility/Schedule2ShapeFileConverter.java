@@ -16,25 +16,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.multiModalMap.validation;
+package playground.polettif.multiModalMap.plausibility;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.polettif.multiModalMap.tools.NetworkTools;
 import playground.polettif.multiModalMap.tools.ScheduleTools;

@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.multiModalMap.validation;
+package playground.polettif.multiModalMap.plausibility;
 
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.collections.MapUtils;
@@ -24,13 +24,14 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.multiModalMap.tools.CsvTools;
+import playground.polettif.multiModalMap.tools.MiscUtils;
 import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-public class SchedulePlausibilityCheck {
+public class StopFacilityHistogram {
 	
 	private TransitSchedule schedule;
 	private Map<Integer, String> stopFacilityHistogramMap = new TreeMap<>();
@@ -39,17 +40,17 @@ public class SchedulePlausibilityCheck {
 	public static void main(final String[] args) {
 		TransitSchedule schedule = ScheduleTools.loadTransitSchedule("C:/Users/polettif/Desktop/output/results_2016-05-03/zurich_schedule.xml");
 
-		SchedulePlausibilityCheck check = new SchedulePlausibilityCheck(schedule);
+		StopFacilityHistogram check = new StopFacilityHistogram(schedule);
 
-		check.calcStopFacilityHistogram(schedule);
-		check.createHistogramPng("C:/Users/polettif/Desktop/output/results_2016-05-03/histogram.png");
+		check.calcHistogram(schedule);
+		check.createPng("C:/Users/polettif/Desktop/output/results_2016-05-03/histogram.png");
 	}
 
-	public SchedulePlausibilityCheck(TransitSchedule schedule) {
+	public StopFacilityHistogram(TransitSchedule schedule) {
 		this.schedule = schedule;
 	}
 
-	public void calcStopFacilityHistogram(TransitSchedule schedule) {
+	public void calcHistogram(TransitSchedule schedule) {
 		Map<String, Integer> stopStat = new TreeMap<>();
 
 
@@ -59,7 +60,7 @@ public class SchedulePlausibilityCheck {
 			stopStat.put(parentFacility, ++count);
 		}
 
-		Map<String, Integer> stopStatSorted = sortAscending(stopStat);
+		Map<String, Integer> stopStatSorted = MiscUtils.sortAscending(stopStat);
 
 		stopFacilityHistogram = new double[stopStatSorted.size()];
 		int i=0;
@@ -69,7 +70,7 @@ public class SchedulePlausibilityCheck {
 		}
 	}
 
-	public void writeStopFacilityHisogramCsv(String outputFile) throws FileNotFoundException, UnsupportedEncodingException {
+	public void createCsv(String outputFile) throws FileNotFoundException, UnsupportedEncodingException {
 		Map<Tuple<Integer, Integer>, String> stopStatCsv = new HashMap<>();
 		int i=1;
 		for(Map.Entry<Integer, String> e : stopFacilityHistogramMap.entrySet()) {
@@ -84,31 +85,11 @@ public class SchedulePlausibilityCheck {
 	/**
 	 * @see org.matsim.core.utils.charts
 	 */
-	public void createHistogramPng(final String filename) {
+	public void createPng(final String filename) {
 		BarChart chart = new BarChart("Stop Facility Histogram", "", "# of child stop facilities");
 		chart.addSeries("# StopFacilities", stopFacilityHistogram);
 		chart.saveAsPng(filename, 800, 600);
 	}
 
 
-	private static Map<String, Integer> sortAscending(Map<String, Integer> unsortMap) {
-		// Convert Map to List
-		List<Map.Entry<String, Integer>> list =	new LinkedList<>(unsortMap.entrySet());
-
-		// Sort list with comparator, to compare the Map values
-		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-			public int compare(Map.Entry<String, Integer> o1,
-							   Map.Entry<String, Integer> o2) {
-				return (o1.getValue()).compareTo(o2.getValue());
-			}
-		});
-
-		// Convert sorted map back to a Map
-		Map<String, Integer> sortedMap = new LinkedHashMap<>();
-		for (Iterator<Map.Entry<String, Integer>> it = list.iterator(); it.hasNext();) {
-			Map.Entry<String, Integer> entry = it.next();
-			sortedMap.put(entry.getKey(), entry.getValue());
-		}
-		return sortedMap;
-	}
 }

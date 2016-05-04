@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -234,5 +235,20 @@ public class ScheduleTools {
 				link.setAllowedModes(modes);
 			}
 		}
+	}
+
+	/**
+	 * Transforms a MATSim Transit Schedule file. Overwrites the file.
+	 *
+	 */
+	public static void transformScheduleFile(String scheduleFile, String fromCoordinateSystem, String toCoordinateSystem) {
+		log.info("... Transformig schedule from "+fromCoordinateSystem+" to "+toCoordinateSystem);
+
+		final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(fromCoordinateSystem, toCoordinateSystem);
+		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		new TransitScheduleReader(coordinateTransformation, scenario).readFile(scheduleFile);
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		new TransitScheduleWriter(schedule).writeFile(scheduleFile);
 	}
 }

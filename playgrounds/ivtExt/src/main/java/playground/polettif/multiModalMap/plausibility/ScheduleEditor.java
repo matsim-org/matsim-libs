@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.multiModalMap.validation;
+package playground.polettif.multiModalMap.plausibility;
 
 import com.opencsv.CSVReader;
 import org.apache.log4j.Logger;

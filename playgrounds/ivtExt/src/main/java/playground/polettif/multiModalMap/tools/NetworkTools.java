@@ -63,8 +63,15 @@ public class NetworkTools {
 		return NetworkUtils.createNetwork();
 	}
 
-	public static void transformNetwork(Network network, String fromSystem, String toSystem) {
-		new NetworkTransform(TransformationFactory.getCoordinateTransformation(fromSystem, toSystem)).run(network);
+	public static void transformNetwork(Network network, String fromCoordinateSystem, String toCoordinateSystem) {
+		new NetworkTransform(TransformationFactory.getCoordinateTransformation(fromCoordinateSystem, toCoordinateSystem)).run(network);
+	}
+
+	public static void transformNetworkFile(String networkFile, String fromCoordinateSystem, String toCoordinateSystem) {
+		log.info("... Transformig network from "+fromCoordinateSystem+" to "+toCoordinateSystem);
+		Network network = loadNetwork(networkFile);
+		transformNetwork(network, fromCoordinateSystem, toCoordinateSystem);
+		writeNetwork(network, networkFile);
 	}
 
 	/**
@@ -145,14 +152,6 @@ public class NetworkTools {
 
 			return closestLinks;
 		}
-	}
-
-	public static List<Link> findNClosestLinks(NetworkImpl networkImpl, Coord coord, int maxNClosestLinks, double nodeSearchRadius) {
-		return findNClosestLinks(networkImpl, coord, nodeSearchRadius, maxNClosestLinks, Double.MAX_VALUE);
-	}
-
-	public static List<Link> findNClosestLinks(NetworkImpl networkImpl, Coord coord, int maxNClosestLinks) {
-		return findNClosestLinks(networkImpl, coord, Double.MAX_VALUE, maxNClosestLinks, Double.MAX_VALUE);
 	}
 
 	/**
@@ -275,8 +274,6 @@ public class NetworkTools {
 		double toleranceFactor = (config.getLinkDistanceTolerance() < 1 ? 1 : config.getLinkDistanceTolerance());
 		int maxNLinks = config.getMaxNClosestLinks();
 
-//		int maxNnodes = (config.getMaxNClosestLinksByMode().get(scheduleTransportMode) == null ? config.getMaxNClosestLinks() : config.getMaxNClosestLinksByMode().get(scheduleTransportMode));
-
 		Set<String> networkTransportModes = config.getModeRoutingAssignment().get(scheduleTransportMode);
 
 		if(nearestNodes.size() == 0) {
@@ -325,26 +322,6 @@ public class NetworkTools {
 
 			return closestLinks;
 		}
-
-			/*
-			int i = 1; double previousDistance = 2*tol;
-			for(Map.Entry<Double, Link> entry : closestLinksMap.entrySet()) {
-				// if the distance difference to the previous link is less than tol, add the link as well
-				if(i > config.getMaxNClosestLinks() && Math.abs(entry.getKey() - previousDistance) >= tol) {
-					break;
-				}
-				if(entry.getKey() > config.getMaxStopFacilityDistance()) {
-					break;
-				}
-
-				previousDistance = entry.getKey();
-				closestLinks.add(entry.getValue());
-				i++;
-			}
-
-			return closestLinks;
-		}
-		*/
 	}
 
 	/**
@@ -534,6 +511,11 @@ public class NetworkTools {
 		return (getCompassQuarter(SW, coord) == 1 && getCompassQuarter(NE, coord) == 3);
 	}
 
+	/**
+	 * Checks if a coordinate is in the area
+	 * @param coord the coordinate to check
+	 * @param area [0] the south-west corner of the area, [1] the north-east corner of the area
+	 */
 	public static boolean isInArea(Coord coord, Coord[] area) {
 		return (getCompassQuarter(area[0], coord) == 1 && getCompassQuarter(area[1], coord) == 3);
 	}
@@ -590,9 +572,8 @@ public class NetworkTools {
 			integrateNetwork(baseNetwork, currentNetwork);
 		}
 
-		log.info(" Merging Stats:");
-		log.info("  Total number of links added to network: " + (baseNetwork.getLinks().size()-numberOfLinksBefore));
-		log.info("  Total number of nodes added to network: " + (baseNetwork.getNodes().size()-numberOfNodesBefore));
+		log.info("... Total number of links added to network: " + (baseNetwork.getLinks().size()-numberOfLinksBefore));
+		log.info("... Total number of nodes added to network: " + (baseNetwork.getNodes().size()-numberOfNodesBefore));
 		log.info("Merging networks... done.");
 	}
 
@@ -648,6 +629,7 @@ public class NetworkTools {
 	 * [47] inside->west<br/>
 	 * [0] line does not cross any border
 	 */
+	@Deprecated
 	public int getBorderCrossType(Coord SWcut, Coord NEcut, Coord fromCoord, Coord toCoord) {
 		int fromSector = getAreaOfInterestSector(SWcut, NEcut, fromCoord);
 		int toSector = getAreaOfInterestSector(SWcut, NEcut, toCoord);
@@ -741,6 +723,7 @@ public class NetworkTools {
 		return 0;
 	}
 
+	@Deprecated
 	private int getAreaOfInterestSector(Coord SWcut, Coord NEcut, Coord c) {
 		int qSW = getCompassQuarter(SWcut, c);
 		int qNE = getCompassQuarter(NEcut, c);

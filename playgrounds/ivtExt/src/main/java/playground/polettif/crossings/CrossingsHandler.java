@@ -98,7 +98,7 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 
 				// todo create method to get two closest link with identical distance
 				if(crossId == null) {
-					crossId = NetworkTools.findNClosestLinks((NetworkImpl) network, crossing.getCoord(), 1, 200.0).get(0).getId();
+					crossId = NetworkTools.findNClosestLinks((NetworkImpl) network, crossing.getCoord(), 300, 2, 400.0).get(0).getId();
 				}
 
 				// calculate time(coordinates of crossing, coordinates of fromNode, train speed, linkEnterTime)
