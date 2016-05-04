@@ -47,6 +47,7 @@ import playground.polettif.multiModalMap.mapping.router.LinkFilterMode;
 import playground.polettif.multiModalMap.mapping.router.ModeDependentRouter;
 import playground.polettif.multiModalMap.mapping.router.Router;
 import playground.polettif.multiModalMap.tools.NetworkTools;
+import playground.polettif.multiModalMap.tools.ScheduleCleaner;
 import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 import java.util.*;
@@ -371,9 +372,9 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 */
 		log.info("================================================");
 		log.info("Clean schedule and network...");
-		int routesRemoved = ScheduleTools.removeTransitRoutesWithoutLinkSequences(schedule);
-		ScheduleTools.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
-		ScheduleTools.removeNotUsedStopFacilities(schedule);
+		int routesRemoved = ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule);
+		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
+		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 		ScheduleTools.assignScheduleModesToLinks(schedule, network);
 //		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);

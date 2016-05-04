@@ -35,7 +35,7 @@ public class CsvTools {
 	/**
 	 * Converts a table with Tuple&lt;line, column&gt; as key to a list of csv lines.
 	 */
-	public List<String> convertToCsvLines(Map<Tuple<Integer, Integer>, String> keyTable) {
+	public static List<String> convertToCsvLines(Map<Tuple<Integer, Integer>, String> keyTable) {
 		int maxCol = 0;
 
 		// From <<line, column>, value> to <line, <column, value>>
@@ -68,7 +68,7 @@ public class CsvTools {
 	 * @throws FileNotFoundException
 	 * @throws UnsupportedEncodingException
 	 */
-	public void writeToFile(List<String> csvLines, String filename) throws FileNotFoundException, UnsupportedEncodingException {
+	public static void writeToFile(List<String> csvLines, String filename) throws FileNotFoundException, UnsupportedEncodingException {
 		PrintWriter writer = new PrintWriter(filename, "UTF-8");
 
 		csvLines.forEach(writer::println);

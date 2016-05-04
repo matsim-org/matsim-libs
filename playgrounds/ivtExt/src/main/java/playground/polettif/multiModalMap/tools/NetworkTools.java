@@ -30,7 +30,10 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
@@ -58,6 +61,10 @@ public class NetworkTools {
 
 	public static Network createNetwork() {
 		return NetworkUtils.createNetwork();
+	}
+
+	public static void transformNetwork(Network network, String fromSystem, String toSystem) {
+		new NetworkTransform(TransformationFactory.getCoordinateTransformation(fromSystem, toSystem)).run(network);
 	}
 
 	/**

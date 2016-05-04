@@ -32,7 +32,7 @@ import playground.polettif.multiModalMap.osm.core.OsmParser;
 import playground.polettif.multiModalMap.osm.core.TagFilter;
 import playground.polettif.multiModalMap.osm.lib.OsmTag;
 import playground.polettif.multiModalMap.osm.lib.OsmValue;
-import playground.polettif.multiModalMap.tools.ScheduleTools;
+import playground.polettif.multiModalMap.tools.ScheduleCleaner;
 
 import java.util.*;
 
@@ -219,7 +219,7 @@ public class OSM2MATSimTransitSchedule {
 		}
 
 		// remove non used facilities to schedule
-		ScheduleTools.removeNotUsedStopFacilities(transitSchedule);
+		ScheduleCleaner.removeNotUsedStopFacilities(transitSchedule);
 	}
 
 	/**
