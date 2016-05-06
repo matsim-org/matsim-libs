@@ -19,12 +19,14 @@
 
 package playground.ikaddoura.incidents;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
+
 
 
 /**
@@ -116,10 +118,24 @@ public class DateTime {
 	
 	public static String secToDateString(double dateTimeInSec) {
 		
-		Date date = new Date((long) (dateTimeInSec * 1000));
+		BigDecimal dateTimeInSec2 = BigDecimal.valueOf( dateTimeInSec ) ;
+		Date date = new Date( dateTimeInSec2.multiply(BigDecimal.valueOf(1000)).longValue() ) ;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
 		String dateString = sdf.format(date);
 		return dateString;
+
+//		BigInteger secsAsInt = BigInteger.valueOf( (long) dateTimeInSec );
+//		if ( secsAsInt.longValue() == dateTimeInSec ) {
+//			Date date = new Date( secsAsInt.multiply(BigInteger.valueOf(1000)).longValue() ) ;
+//			SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
+//			String dateString = sdf.format(date);
+//			return dateString;
+//		} else {
+//			Date date = new Date((long) (dateTimeInSec * 1000));
+//			SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
+//			String dateString = sdf.format(date);
+//			return dateString;
+//		}
 	}
 }
 
