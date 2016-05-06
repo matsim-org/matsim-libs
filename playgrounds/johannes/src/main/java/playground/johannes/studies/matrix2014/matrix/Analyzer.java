@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,45 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.io;
+package playground.johannes.studies.matrix2014.matrix;
 
-import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrix;
-import org.matsim.visum.VisumMatrixReader;
+import org.matsim.contrib.common.gis.CartesianDistanceCalculator;
+import playground.johannes.synpop.analysis.FileIOContext;
+import playground.johannes.synpop.analysis.StratifiedDiscretizerBuilder;
+import playground.johannes.synpop.gis.ZoneCollection;
+import playground.johannes.synpop.gis.ZoneGeoJsonIO;
 import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.matrix.NumericMatrixIO;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @author johannes
- *
  */
-public class Visum2KeyMatrix {
+public class Analyzer {
 
-	public static NumericMatrix convert(Matrix visumMatrix) {
-		NumericMatrix keyMatrix = new NumericMatrix();
-		
-		for(List<Entry> entries : visumMatrix.getFromLocations().values()) {
-			for(Entry entry : entries) {
-				keyMatrix.add(entry.getFromLocation(), entry.getToLocation(), entry.getValue());
-			}
-		}
+    public static void main(String args[]) throws IOException {
+        String matrixFile = "/Users/johannes/gsv/fpd/telefonica/032016/data/plz5.rail.6week.txt";
+        String zonesFile = "/Users/johannes/gsv/gis/zones/geojson/plz5.gk3.geojson";
+        String outDir = "/Users/johannes/gsv/fpd/telefonica/032016/analysis";
 
-		return keyMatrix;
-	}
-	
-	public static void main(String[] args) throws IOException {
-		Matrix visumMatrix = new Matrix("1", null);
-		VisumMatrixReader reader = new VisumMatrixReader(visumMatrix);
-		reader.readFile("/Users/johannes/Desktop/Bahn_gesamt.txt");
-		
-		NumericMatrix keyMatrix = convert(visumMatrix);
-		
-//		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
-		NumericMatrixIO.write(keyMatrix, "/Users/johannes/Desktop/rail.2013.txt");
-//		writer.write(keyMatrix, "/Users/johannes/Desktop/rail.2013.txt");
-	}
+        NumericMatrix m = NumericMatrixIO.read(matrixFile);
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, "plz", "plz5");
+        FileIOContext ioContext = new FileIOContext(outDir);
 
+        GeoDistanceTask task = new GeoDistanceTask(
+                zones,
+                ioContext,
+                new StratifiedDiscretizerBuilder(100, 1),
+                CartesianDistanceCalculator.getInstance());
+
+        task.analyze(m, null);
+
+    }
 }
