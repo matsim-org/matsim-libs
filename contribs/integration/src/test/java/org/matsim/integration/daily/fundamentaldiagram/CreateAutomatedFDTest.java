@@ -476,11 +476,11 @@ public class CreateAutomatedFDTest {
 		Node nodeWork = network.createAndAddNode(Id.createNodeId("work"), new Coord((double) 1050, (double) 0));
 
 		double freeSpeedOnLink = 60/3.6;
-		network.createAndAddLink(Id.createLinkId("home"), nodeHome, node1, 25, freeSpeedOnLink, 27000, 1);
-		network.createAndAddLink(Id.createLinkId(0), node1, node2, 1000, freeSpeedOnLink, 2700, 1);
-		network.createAndAddLink(Id.createLinkId(1), node2, node3, 1000, freeSpeedOnLink, 2700, 1);
-		network.createAndAddLink(Id.createLinkId(2), node3, node1, 1000, freeSpeedOnLink, 2700, 1);
-		network.createAndAddLink(Id.createLinkId("work"), node2, nodeWork, 25, freeSpeedOnLink, 27000, 1);
+		network.createAndAddLink(Id.createLinkId("home"), nodeHome, node1, 25, freeSpeedOnLink, 7200, 1);
+		network.createAndAddLink(Id.createLinkId(0), node1, node2, 1000, freeSpeedOnLink, 1800, 1);
+		network.createAndAddLink(Id.createLinkId(1), node2, node3, 1000, freeSpeedOnLink, 1800, 1);
+		network.createAndAddLink(Id.createLinkId(2), node3, node1, 1000, freeSpeedOnLink, 1800, 1);
+		network.createAndAddLink(Id.createLinkId("work"), node2, nodeWork, 25, freeSpeedOnLink, 7200, 1);
 
 		Set<String> allowedModes = new HashSet<String>();
 		allowedModes.addAll(Arrays.asList(travelModes));
