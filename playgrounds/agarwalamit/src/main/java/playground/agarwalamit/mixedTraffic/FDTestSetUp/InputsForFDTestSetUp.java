@@ -57,7 +57,7 @@ public class InputsForFDTestSetUp {
 
 	private final double LINK_CAPACITY = 2700; //in PCU/h
 	private final double END_TIME = 24*3600;
-	private final double FREESPEED = 60.;	//in km/h, maximum authorized velocity on the track
+	private final double FREESPEED_KM_H = 60.;	//maximum authorized velocity on the track
 	private double stuckTime = 10;
 
 	private LinkDynamics linkDynamics = LinkDynamics.FIFO;
@@ -182,7 +182,7 @@ public class InputsForFDTestSetUp {
 
 			Link link =scenario.getNetwork().getFactory().createLink(Id.createLinkId(i), from, to);
 			link.setCapacity(LINK_CAPACITY);
-			link.setFreespeed(FREESPEED/3.6);
+			link.setFreespeed(FREESPEED_KM_H/3.6);
 			link.setLength(LINK_LENGTH);
 			link.setNumberOfLanes(NO_OF_LANES);
 			link.setAllowedModes(allowedModes);
@@ -194,7 +194,7 @@ public class InputsForFDTestSetUp {
 		Id<Link> startLinkId = Id.createLinkId("home");
 		Link startLink = scenario.getNetwork().getFactory().createLink( startLinkId, startNode, scenario.getNetwork().getNodes().get(Id.createNodeId(0)));
 		startLink.setCapacity(100*LINK_CAPACITY);
-		startLink.setFreespeed(FREESPEED);
+		startLink.setFreespeed(FREESPEED_KM_H);
 		startLink.setLength(25.);
 		startLink.setNumberOfLanes(1.);
 		startLink.setAllowedModes(allowedModes);
@@ -203,7 +203,7 @@ public class InputsForFDTestSetUp {
 		Id<Link> endLinkId = Id.createLinkId("work");
 		Link endLink = scenario.getNetwork().getFactory().createLink(endLinkId, scenario.getNetwork().getNodes().get(Id.createNodeId(SUBDIVISION_FACTOR)), endNode);
 		endLink.setCapacity(100*LINK_CAPACITY);
-		endLink.setFreespeed(FREESPEED);
+		endLink.setFreespeed(FREESPEED_KM_H);
 		endLink.setLength(25.);
 		endLink.setNumberOfLanes(1.);
 		endLink.setAllowedModes(allowedModes);
