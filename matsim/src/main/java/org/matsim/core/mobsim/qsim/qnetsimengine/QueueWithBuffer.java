@@ -386,8 +386,10 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 //			final double minStorCapForHoles = 2. * flowCapacityPerTimeStep * context.getSimTimer().getSimTimestepSize();
 			final double freeSpeed = qLink.getLink().getFreespeed() ;
 			final double holeSpeed = HOLE_SPEED_KM_H/3.6;
-			final double minStorCapForHoles = 2.* length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
-			// yyyyyy I have no idea why the factor 2 needs to be there?!?!
+			final double minStorCapForHoles = length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
+//			final double minStorCapForHoles = 2.* length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
+			// I have no idea why the factor 2 needs to be there?!?! kai, apr'16
+			// I just removed the factor of 2 ... seems to work now without.  kai, may'16
 			// yyyyyy (not thought through for TS != 1sec!  (should use flow cap per second) kai, apr'16)
 			if ( storageCapacity < minStorCapForHoles ) {
 				if ( spaceCapWarningCount <= 10 ) { 
