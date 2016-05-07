@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
@@ -121,6 +122,7 @@ public class DateTime {
 		BigDecimal dateTimeInSec2 = BigDecimal.valueOf( dateTimeInSec ) ;
 		Date date = new Date( dateTimeInSec2.multiply(BigDecimal.valueOf(1000)).longValue() ) ;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
+		sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
 		String dateString = sdf.format(date);
 		return dateString;
 
