@@ -79,6 +79,7 @@ public class DateTime {
 		}
 					
 		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
 		Date date = sdf.parse(dateString + " 00:00:00");
 		long dateMilliSec = date.getTime();
 		double dateSec = (double) dateMilliSec / 1000.;
@@ -113,7 +114,7 @@ public class DateTime {
 		
 		Date date = new Date((long) (dateTimeInSec * 1000));
 		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
-		
+		sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
 		return sdf.format(date);
 	}
 	
