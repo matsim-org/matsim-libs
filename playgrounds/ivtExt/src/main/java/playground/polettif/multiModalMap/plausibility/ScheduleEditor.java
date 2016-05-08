@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.multiModalMap.validation;
+package playground.polettif.multiModalMap.plausibility;
 
 import com.opencsv.CSVReader;
 import org.apache.log4j.Logger;
@@ -44,7 +44,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Provides tools for rerouting schedules.
+ * Provides tools for rerouting and adapting schedules via csv.
+ *
+ * @author polettif
  */
 public class ScheduleEditor {
 
@@ -79,7 +81,7 @@ public class ScheduleEditor {
 	}
 
 	// commands
-	private final String CHILD_FACILITY_SUFFIX = ".link:";
+	private final String CHILD_FACILITY_SUFFIX = "[.]link:";
 	private final String REPLACE_STOP_FACILITY = "replaceStopFacility";
 	private final String ALL_TRANSIT_ROUTES_ON_LINK = "allTransitRoutesOnLink";
 	private final String CHANGE_REF_LINK = "changeRefLink";
@@ -365,12 +367,7 @@ public class ScheduleEditor {
 		Set<TransitRoute> transitRoutesOnLink = new HashSet<>();
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				Set<Id<Link>> linkSequence = new HashSet<>();
-				NetworkRoute route = transitRoute.getRoute();
-				linkSequence.add(route.getStartLinkId());
-				linkSequence.addAll(route.getLinkIds());
-				linkSequence.add(route.getEndLinkId());
-				if(linkSequence.contains(linkId)) {
+				if(ScheduleTools.getLinkIds(transitRoute).contains(linkId)) {
 					transitRoutesOnLink.add(transitRoute);
 				}
 			}

@@ -19,6 +19,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,6 +27,9 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -57,19 +61,38 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 
 /**
- * Tests that minimum of speed on link and vehicle speed is used in the simulation.
- * 
+ * Tests that minimum of link speed and vehicle speed is used in the simulation.
+ * @author amit
  */
-public class VehVsNetworkSpeedTest {
 
+@RunWith(Parameterized.class)
+public class VehVsLinkSpeedTest {
+	
+	public VehVsLinkSpeedTest(final double vehSpeed) {
+		this.vehSpeed = vehSpeed;
+	}
+	
+	private double vehSpeed ;
+	private final static double MAX_SPEED_ON_LINK = 25; //in m/s
+
+	@Parameters(name = "{index}: vehicleSpeed == {0};")
+	public static Collection<Object> createFds() {
+		Object [] vehSpeeds = new Object [] { 
+				30, 20
+		};
+		return Arrays.asList(vehSpeeds);
+	}
+	
 	@Test 
-	public void testIfVehSpeedIsGreater(){
+	public void testVehicleSpeed(){
 		SimpleNetwork net = new SimpleNetwork();
+		
 		Id<Person> id = Id.createPersonId(0);
 		Person p = net.population.getFactory().createPerson(id);
 		Plan plan = net.population.getFactory().createPlan();
@@ -93,51 +116,18 @@ public class VehVsNetworkSpeedTest {
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
 
-		QSim qSim = createQSim(net,manager,30);
+		QSim qSim = createQSim(net, manager, this.vehSpeed);
 		qSim.run();
 
 		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.create("0", Person.class));
+	
+		Link desiredLink = net.scenario.getNetwork().getLinks().get(Id.createLinkId(2));
+		
+		double carTravelTime = travelTime1.get(desiredLink.getId()); // 1000 / min(25, vehSpeed)
+		double speedUsedInSimulation = Math.round( desiredLink.getLength() / (carTravelTime - 1) );
 
-		int carTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
-
-		Assert.assertEquals("Minimum speed is vehicle speed and it is not used.", 41, carTravelTime);
-	}
-
-	@Test 
-	public void testIfVehSpeedIsSmaller(){
-
-		SimpleNetwork net = new SimpleNetwork();
-
-		Id<Person> id = Id.createPersonId(0);
-		Person p = net.population.getFactory().createPerson(id);
-		Plan plan = net.population.getFactory().createPlan();
-		p.addPlan(plan);
-		Activity a1 = net.population.getFactory().createActivityFromLinkId("h", net.link1.getId());
-		a1.setEndTime(8*3600);
-		Leg leg = net.population.getFactory().createLeg(TransportMode.car);
-		plan.addActivity(a1);
-		plan.addLeg(leg);
-		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-		NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
-		route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
-		leg.setRoute(route);
-		Activity a2 = net.population.getFactory().createActivityFromLinkId("w", net.link3.getId());
-		plan.addActivity(a2);
-		net.population.addPerson(p);
-
-		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>, Double>>();
-
-		EventsManager manager = EventsUtils.createEventsManager();
-		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
-
-		QSim qSim = createQSim(net,manager,20);
-		qSim.run();
-
-		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.create("0", Person.class));
-
-		int carTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
-
-		Assert.assertEquals("Minimum speed is vehicle speed and it is not used.", 51, carTravelTime);
+		Assert.assertEquals("In the simulation minimum of vehicle speed and link speed should be used.", 
+				Math.min(vehSpeed, MAX_SPEED_ON_LINK), speedUsedInSimulation, MatsimTestUtils.EPSILON);
 	}
 
 	private QSim createQSim (SimpleNetwork net, EventsManager manager, double maxVelocity){
@@ -196,9 +186,9 @@ public class VehVsNetworkSpeedTest {
 
 			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList("car","bike"));
 
-			link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 25, 60, 1, null, "22"); //capacity is 1 PCU per min.
-			link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1000, 25, 60, 1, null, "22");	
-			link3 = network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 25, 60, 1, null, "22");
+			link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, MAX_SPEED_ON_LINK, 60, 1, null, "22"); 
+			link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1000, MAX_SPEED_ON_LINK, 60, 1, null, "22");	
+			link3 = network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, MAX_SPEED_ON_LINK, 60, 1, null, "22");
 
 			population = scenario.getPopulation();
 		}

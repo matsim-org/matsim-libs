@@ -43,7 +43,7 @@ class AccessibilityComputationTestModule extends AbstractModule {
 				@Override
 				public ControlerListener get() {
 					GridBasedAccessibilityControlerListenerV3 listener =
-							new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityType), ptMatrix, getConfig(), scenario, travelTimes, travelDisutilityFactories);
+							new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType), ptMatrix, getConfig(), scenario, travelTimes, travelDisutilityFactories);
 					listener.addAdditionalFacilityData(networkDensityFacilities);
 					listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 					listener.writeToSubdirectoryWithName(activityType);

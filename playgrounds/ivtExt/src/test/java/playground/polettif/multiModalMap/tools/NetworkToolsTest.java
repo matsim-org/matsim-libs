@@ -22,41 +22,41 @@ public class NetworkToolsTest {
 	double testDelta = 1/1000.;
 	Network network;
 
-	Coord coordA = new Coord(0.0, 0.0);
-	Coord coordB = new Coord(2.0, 0.0);
-	Coord coordC = new Coord(2.0, 2.0);
+	private Coord coordA = new Coord(0.0, 0.0);
+	private Coord coordB = new Coord(2.0, 0.0);
+	private Coord coordC = new Coord(2.0, 2.0);
 
-	Coord coordD = new Coord(0.0, 2.0);
-	Coord coordE = new Coord(-2.0, 2.0);
-	Coord coordF = new Coord(-2.0, 0.0);
-	Coord coordG = new Coord(-2.0, -2.0);
-	Coord coordH = new Coord(0.0, -2.0);
+	private Coord coordD = new Coord(0.0, 2.0);
+	private Coord coordE = new Coord(-2.0, 2.0);
+	private Coord coordF = new Coord(-2.0, 0.0);
+	private Coord coordG = new Coord(-2.0, -2.0);
+	private Coord coordH = new Coord(0.0, -2.0);
 
-	Coord coordI = new Coord(2.0, -2.0);
-	Coord coordW = new Coord(-1.0, 3.0);
-	Coord coordX = new Coord(0.5, 0.5);
-	Coord coordY = new Coord(1.0, 0.0);
-	Coord coordP = new Coord(0.7, 0.1);
-	Coord coordZ = new Coord(1.0, -3.0);
+	private Coord coordI = new Coord(2.0, -2.0);
+	private Coord coordW = new Coord(-1.0, 3.0);
+	private Coord coordX = new Coord(0.5, 0.5);
+	private Coord coordY = new Coord(1.0, 0.0);
+	private Coord coordP = new Coord(0.7, 0.1);
+	private Coord coordZ = new Coord(1.0, -3.0);
 
-	Node nodeA;
-	Node nodeB;
-	Node nodeC;
-	Node nodeD;
-	Node nodeX;
-	Node nodeY;
-	Node nodeZ;
-	Node nodeW;
-	Node nodeH;
+	private Node nodeA;
+	private Node nodeB;
+	private Node nodeC;
+	private Node nodeD;
+	private Node nodeX;
+	private Node nodeY;
+	private Node nodeZ;
+	private Node nodeW;
+	private Node nodeH;
 
-	Link linkAB;
-	Link linkBC;
-	Link linkCD;
-	Link linkDA;
-	Link linkDB;
-	Link linkDX;
-	Link linkXA;
-	Link linkAH;
+	private Link linkAB;
+	private Link linkBC;
+	private Link linkCD;
+	private Link linkDA;
+	private Link linkDB;
+	private Link linkDX;
+	private Link linkXA;
+	private Link linkAH;
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -125,14 +125,14 @@ public class NetworkToolsTest {
 
 	@Test
 	public void testGetAzimuth() {
-		assertEquals(0,   200* getAzimuth(coordA,coordD)/Math.PI, testDelta);
-		assertEquals(50,  200* getAzimuth(coordA,coordC)/Math.PI, testDelta);
-		assertEquals(100, 200* getAzimuth(coordA,coordB)/Math.PI, testDelta);
-		assertEquals(150, 200* getAzimuth(coordA,coordI)/Math.PI, testDelta);
-		assertEquals(200, 200* getAzimuth(coordA,coordH)/Math.PI, testDelta);
-		assertEquals(250, 200* getAzimuth(coordA,coordG)/Math.PI, testDelta);
-		assertEquals(300, 200* getAzimuth(coordA,coordF)/Math.PI, testDelta);
-		assertEquals(350, 200* getAzimuth(coordA,coordE)/Math.PI, testDelta);
+		assertEquals(0,   200* CoordTools.getAzimuth(coordA,coordD)/Math.PI, testDelta);
+		assertEquals(50,  200* CoordTools.getAzimuth(coordA,coordC)/Math.PI, testDelta);
+		assertEquals(100, 200* CoordTools.getAzimuth(coordA,coordB)/Math.PI, testDelta);
+		assertEquals(150, 200* CoordTools.getAzimuth(coordA,coordI)/Math.PI, testDelta);
+		assertEquals(200, 200* CoordTools.getAzimuth(coordA,coordH)/Math.PI, testDelta);
+		assertEquals(250, 200* CoordTools.getAzimuth(coordA,coordG)/Math.PI, testDelta);
+		assertEquals(300, 200* CoordTools.getAzimuth(coordA,coordF)/Math.PI, testDelta);
+		assertEquals(350, 200* CoordTools.getAzimuth(coordA,coordE)/Math.PI, testDelta);
 	}
 
 	@Test
@@ -151,7 +151,7 @@ public class NetworkToolsTest {
 
 	@Test
 	public void testGetClosestPointOnLine() {
-		Coord splitPoint = getClosestPointOnLine(coordD, coordB, coordX);
+		Coord splitPoint = CoordTools.getClosestPointOnLine(coordD, coordB, coordX);
 
 		System.out.println(splitPoint);
 	}

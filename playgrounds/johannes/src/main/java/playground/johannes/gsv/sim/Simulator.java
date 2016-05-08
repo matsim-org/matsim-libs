@@ -54,9 +54,8 @@ import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.*;
+import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -66,7 +65,6 @@ import playground.johannes.gsv.analysis.CountsCompareAnalyzer;
 import playground.johannes.gsv.analysis.PkmGeoTask;
 import playground.johannes.gsv.sim.cadyts.CadytsContext;
 import playground.johannes.gsv.sim.cadyts.CadytsScoring;
-import playground.johannes.gsv.sim.cadyts.ODAdjustorListener;
 import playground.johannes.gsv.synPop.Proxy2Matsim;
 
 import java.io.IOException;
@@ -102,7 +100,7 @@ public class Simulator {
         controler.setModules(new AbstractModule() {
             @Override
             public void install() {
-//                install(new CharyparNagelScoringFunctionModule());
+                install(new CharyparNagelScoringFunctionModule());
                 install(new EventsManagerModule());
                 // include(new TravelTimeCalculatorModule());
                 install(new TravelDisutilityModule());
@@ -117,6 +115,9 @@ public class Simulator {
                 // include(new PtCountsModule());
                 // include(new VspPlansCleanerModule());
                 // include(new SignalsModule());
+                install(new ExperiencedPlansModule());
+                install(new ExperiencedPlanElementsModule());
+                install(new PlansScoringModule());
 
 				/*
                  * setup scoring and cadyts integration
@@ -217,9 +218,9 @@ public class Simulator {
 			/*
 			 * Setup ODAdjustor
 			 */
-            logger.info("Setting up ODAdjustor...");
-            ODAdjustorListener odAdjustor = new ODAdjustorListener(event.getServices());
-            event.getServices().addControlerListener(odAdjustor);
+//            logger.info("Setting up ODAdjustor...");
+//            ODAdjustorListener odAdjustor = new ODAdjustorListener(event.getServices());
+//            event.getServices().addControlerListener(odAdjustor);
         }
 
     }

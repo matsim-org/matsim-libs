@@ -211,6 +211,8 @@ public class IncidentControler {
 				
 				Controler controler = new Controler(config);
 				controler.run();
+				
+				dayCounter++;
 			}
 		}
 	}
@@ -240,6 +242,8 @@ public class IncidentControler {
 				
 				log.info("Day: " + dateString + " --> Iteration #" + dayCounter);
 				files.add(f.toString());
+				
+				dayCounter++;
 			}
 		}
 		

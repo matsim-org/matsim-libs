@@ -19,6 +19,7 @@
 package playground.polettif.multiModalMap.workbench;
 
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import playground.polettif.multiModalMap.tools.ScheduleCleaner;
 import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 public class GtfsZvvCleaner {
@@ -27,7 +28,7 @@ public class GtfsZvvCleaner {
 		String in = "C:/Users/polettif/Desktop/data/mts/unmapped/fromGtfs/zvv_clean.xml";
 		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(in);
 
-		ScheduleTools.removeNotUsedStopFacilities(schedule);
+		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 
 		ScheduleTools.writeTransitSchedule(schedule, in);
 	}

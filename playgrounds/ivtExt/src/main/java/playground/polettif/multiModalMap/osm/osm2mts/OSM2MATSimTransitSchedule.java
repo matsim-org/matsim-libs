@@ -32,15 +32,13 @@ import playground.polettif.multiModalMap.osm.core.OsmParser;
 import playground.polettif.multiModalMap.osm.core.TagFilter;
 import playground.polettif.multiModalMap.osm.lib.OsmTag;
 import playground.polettif.multiModalMap.osm.lib.OsmValue;
-import playground.polettif.multiModalMap.tools.ScheduleTools;
+import playground.polettif.multiModalMap.tools.ScheduleCleaner;
 
 import java.util.*;
 
 /**
  * Convert available public transit data from OSM to a MATSim Transit Schedule (stop facilities,
  * transitRoutes and routeProfiles). Creates an unmapped schedule with missing departures.
- *
- * TODO implement in network creator?
  *
  * @author polettif
  */
@@ -219,7 +217,7 @@ public class OSM2MATSimTransitSchedule {
 		}
 
 		// remove non used facilities to schedule
-		ScheduleTools.removeNotUsedStopFacilities(transitSchedule);
+		ScheduleCleaner.removeNotUsedStopFacilities(transitSchedule);
 	}
 
 	/**
@@ -311,12 +309,6 @@ public class OSM2MATSimTransitSchedule {
 		Id<TransitRoute> transitRouteId = Id.create(createStringId(relation)+ (++routeNr), TransitRoute.class);
 		TransitRoute newTransitRoute = factory.createTransitRoute(transitRouteId, null, stopSequenceForward, relation.tags.get(OsmTag.ROUTE));
 		newTransitRoute.addDeparture(factory.createDeparture(Id.create("departure" + routeNr, Departure.class), 60.0));
-
-		// todo backward route
-//		Collections.reverse(stopSequenceBackward);
-//		TransitRoute routeBackward = factory.createTransitRoute(Id.create(++routeNr, TransitRoute.class), null, stopSequenceBackward, relation.tags.get(OsmTag.ROUTE));
-//		routeBackward.addDeparture(factory.createDeparture(Id.create("departure" + routeNr, Departure.class), 120.0));
-		// todo remove dummy departures? Are needed for visualisation in via
 
 		return newTransitRoute;
 	}

@@ -20,32 +20,52 @@
 
 package playground.polettif.multiModalMap.gtfs.containers;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import org.matsim.core.utils.collections.MapUtils;
+
+import java.time.LocalDate;
+import java.util.*;
 
 public class Service {
 	
 	//Attributes
-	private boolean[] days;
-	private String initialDate;
-	private String finalDate;
-	private Collection<String> additions;
-	private Collection<String> exceptions;
+	private final String id;
+	private final boolean[] days;
+	private final LocalDate startDate;
+	private final LocalDate endDate;
+	private Collection<LocalDate> additions;
+	private Collection<LocalDate> exceptions;
+
+	public static Map<LocalDate, Set<String>> dateStats = new HashMap<>();
 
 	//Methods
+
 	/**
+	 *
+	 * @param serviceId
 	 * @param days
-	 * @param initialDate
-	 * @param finalDate
+	 * @param startDateStr
+	 * @param endDateStr
 	 */
-	public Service(boolean[] days, String initialDate, String finalDate) {
+	public Service(String serviceId, boolean[] days, String startDateStr, String endDateStr) {
 		super();
+		this.id = serviceId;
 		this.days = days;
-		this.initialDate = initialDate;
-		this.finalDate = finalDate;
-		this.additions = new ArrayList<String>();
-		this.exceptions = new ArrayList<String>();
+		this.startDate = parseDateFormat(startDateStr);
+		this.endDate = parseDateFormat(endDateStr);
+		this.additions = new ArrayList<>();
+		this.exceptions = new ArrayList<>();
+
+		LocalDate currentDate = parseDateFormat(startDateStr);
+
+		while(currentDate.isBefore(endDate)) {
+			int weekday = currentDate.getDayOfWeek().getValue() - 1;
+			if(days[weekday]) {
+				MapUtils.getSet(currentDate, dateStats).add(serviceId);
+			}
+			currentDate = currentDate.plusDays(1);
+		}
 	}
+
 	/**
 	 * @return the days
 	 */
@@ -53,27 +73,27 @@ public class Service {
 		return days;
 	}
 	/**
-	 * @return the initialDate
+	 * @return the startDate
 	 */
-	public String getInitialDate() {
-		return initialDate;
+	public LocalDate getStartDate() {
+		return startDate;
 	}
 	/**
-	 * @return the finalDate
+	 * @return the endDate
 	 */
-	public String getFinalDate() {
-		return finalDate;
+	public LocalDate getEndDate() {
+		return endDate;
 	}
 	/**
 	 * @return the additions
 	 */
-	public Collection<String> getAdditions() {
+	public Collection<LocalDate> getAdditions() {
 		return additions;
 	}
 	/**
 	 * @return the exceptions
 	 */
-	public Collection<String> getExceptions() {
+	public Collection<LocalDate> getExceptions() {
 		return exceptions;
 	}
 	/**
@@ -81,14 +101,28 @@ public class Service {
 	 * @param addition
 	 */
 	public void addAddition(String addition) {
-		additions.add(addition);
+		LocalDate additionDate = parseDateFormat(addition);
+		additions.add(additionDate);
+		MapUtils.getSet(additionDate, dateStats).add(this.getId());
 	}
 	/**
 	 * Adds a new exception date
 	 * @param exception
 	 */
 	public void addException(String exception) {
-		additions.add(exception);
+		LocalDate exceptionDate = parseDateFormat(exception);
+		additions.add(exceptionDate);
+		MapUtils.getSet(exceptionDate, dateStats).remove(this.getId());
 	}
 	
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * parses the date format YYYYMMDD to LocalDate
+	 */
+	private LocalDate parseDateFormat(String yyyymmdd) {
+		return LocalDate.of(Integer.parseInt(yyyymmdd.substring(0, 4)), Integer.parseInt(yyyymmdd.substring(4, 6)), Integer.parseInt(yyyymmdd.substring(6, 8)));
+	}
 }

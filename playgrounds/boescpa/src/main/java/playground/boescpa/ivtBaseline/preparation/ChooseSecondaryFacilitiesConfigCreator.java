@@ -39,6 +39,7 @@ import java.util.List;
  *
  * @author boescpa
  */
+@Deprecated
 public class ChooseSecondaryFacilitiesConfigCreator extends IVTConfigCreator {
 
 	public static void main(String[] args) {

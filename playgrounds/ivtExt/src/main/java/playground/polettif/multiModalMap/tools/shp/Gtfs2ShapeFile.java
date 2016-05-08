@@ -16,54 +16,57 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.multiModalMap.validation;
+package playground.polettif.multiModalMap.tools.shp;
 
 import com.opencsv.CSVReader;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.opengis.feature.simple.SimpleFeature;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
 import playground.polettif.multiModalMap.gtfs.containers.GTFSDefinitions;
 import playground.polettif.multiModalMap.gtfs.containers.Shape;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RouteShapeValidator {
+public class Gtfs2ShapeFile {
 
-	private final TransitSchedule schedule;
-	private final TransitScheduleFactory scheduleFactory;
-	private final Network network;
+	private CoordinateTransformation transformation = new IdentityTransformation();
 	private Map<String, Shape> gtfsShapes;
-	private Map<String, Shape> scheduleShapes;
+	private Collection<SimpleFeature> features;
 
-	public RouteShapeValidator(TransitSchedule schedule, Network network) {
-		this.schedule = schedule;
-		this.scheduleFactory = schedule.getFactory();
-		this.network = network;
+	public Gtfs2ShapeFile() {
+		features = new ArrayList<>();
 	}
 
-	public static void main(final String[] args) throws IOException {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network network = scenario.getNetwork();
-		new TransitScheduleReader(scenario).readFile(args[0]);
-		new MatsimNetworkReader(network).readFile(args[1]);
-		TransitSchedule schedule = scenario.getTransitSchedule();
+	public static void main(String[] arg) {
+		String[] args = new String[2];
+		args[0] = "C:/Users/polettif/Desktop/data/gtfs/zvv/shapes.txt";
+		args[1] = "C:/Users/polettif/Desktop/output/results_2016-05-04/shp/gtfs.shp";
 
-		RouteShapeValidator validator = new RouteShapeValidator(schedule, network);
-		validator.readShapes(args[2]);
+		Gtfs2ShapeFile converter = new Gtfs2ShapeFile();
+		converter.setTransformation(TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus"));
 
+		try {
+			converter.readShapes(args[0]);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		converter.convert(args[1]);
 	}
 
 	public void readShapes(String filePath) throws IOException {
 		gtfsShapes = new HashMap<>();
-		CSVReader reader = new CSVReader(new FileReader(filePath), ';');
+		CSVReader reader = new CSVReader(new FileReader(filePath));
 
 		String[] header = reader.readNext();
 		Map<String, Integer> col = GTFSReader.getIndices(header, GTFSDefinitions.SHAPES.columns);
@@ -75,19 +78,32 @@ public class RouteShapeValidator {
 				actual = new Shape(line[col.get("shape_id")]);
 				gtfsShapes.put(line[col.get("shape_id")], actual);
 			}
-			actual.addPoint(new Coord(Double.parseDouble(line[col.get("shape_pt_lat")]), Double.parseDouble(line[col.get("shape_pt_lon")])), Integer.parseInt(line[col.get("shape_pt_sequence")]));
+			Coord point;
+			point = new Coord(Double.parseDouble(line[col.get("shape_pt_lon")]), Double.parseDouble(line[col.get("shape_pt_lat")]));
+			actual.addPoint(transformation.transform(point), Integer.parseInt(line[col.get("shape_pt_sequence")]));
 
 			line = reader.readNext();
 		}
 		reader.close();
 	}
 
-	public void convertScheduleToShapes() {
-		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
-			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+	public void convert(String outFile) {
+		PolylineFeatureFactory ff = new PolylineFeatureFactory.Builder()
+				.setName("schedule_zurich")
+				.setCrs(MGC.getCRS("EPSG:2056"))
+				.addAttribute("id", String.class)
+				.create();
 
-			}
+		for(Map.Entry<String, Shape> entry : gtfsShapes.entrySet()) {
+				SimpleFeature f = ff.createPolyline(entry.getValue().getCoordinates());
+				f.setAttribute("id", entry.getKey());
+				features.add(f);
 		}
+
+		ShapeFileWriter.writeGeometries(features, outFile);
 	}
 
+	public void setTransformation(CoordinateTransformation transformation) {
+		this.transformation = transformation;
+	}
 }

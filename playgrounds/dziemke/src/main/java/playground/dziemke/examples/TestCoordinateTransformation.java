@@ -15,11 +15,13 @@ public class TestCoordinateTransformation {
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation
 //				("EPSG:4326", "EPSG:31468");
 //				("EPSG:4326", "EPSG:21037");
-				("EPSG:3006", "EPSG:4326");
+//				("EPSG:3006", "EPSG:4326");
+				(TransformationFactory.WGS84_SA_Albers, "EPSG:4326");
 
 //		Coord originalCoord1 = new Coord(36.82829619497265, -1.291087691581653); // near Nairobi, Kenya
-		Coord originalCoord1 = new Coord(372300, 5802900); // Berlin lower left
+//		Coord originalCoord1 = new Coord(372300, 5802900); // Berlin lower left
 //		Coord originalCoord1 = new Coord(413300, 5833900); // Berlin upper right
+		Coord originalCoord1 = new Coord(150583.9441831379,-3699678.99131796); // somewhere in NMB in SA_Albers
 //		Coord originalCoord2 = new Coord(171583.944, y);
 		
 		Coord convertedCoord1 = transformation.transform(originalCoord1);

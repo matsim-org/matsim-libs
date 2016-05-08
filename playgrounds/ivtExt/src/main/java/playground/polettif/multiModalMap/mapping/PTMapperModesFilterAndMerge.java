@@ -46,7 +46,9 @@ import playground.polettif.multiModalMap.mapping.router.FastAStarRouter;
 import playground.polettif.multiModalMap.mapping.router.LinkFilterMode;
 import playground.polettif.multiModalMap.mapping.router.ModeDependentRouter;
 import playground.polettif.multiModalMap.mapping.router.Router;
+import playground.polettif.multiModalMap.tools.CoordTools;
 import playground.polettif.multiModalMap.tools.NetworkTools;
+import playground.polettif.multiModalMap.tools.ScheduleCleaner;
 import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 import java.util.*;
@@ -169,8 +171,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		/** [3]
 		 * Get network extent to speed up routing outside of network area.
 		 */
-		Coord[] totalNetworkExtent = NetworkTools.getExtent(network);
-		Map<TransitStopFacility, Boolean> stopIsInArea = NetworkTools.getStopsInAreaBool(schedule, totalNetworkExtent);
+		Coord[] totalNetworkExtent = CoordTools.getExtent(network);
+		Map<TransitStopFacility, Boolean> stopIsInArea = CoordTools.getStopsInAreaBool(schedule, totalNetworkExtent);
 		final double initialMaxPathDistance = CoordUtils.calcEuclideanDistance(totalNetworkExtent[0], totalNetworkExtent[1])*config.getBeelineDistanceMaxFactor();
 
 		/** [4]
@@ -371,10 +373,11 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 */
 		log.info("================================================");
 		log.info("Clean schedule and network...");
-		int routesRemoved = ScheduleTools.removeTransitRoutesWithoutLinkSequences(schedule);
-		ScheduleTools.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
-		ScheduleTools.removeNotUsedStopFacilities(schedule);
+		int routesRemoved = ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule);
+		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
+		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 		ScheduleTools.assignScheduleModesToLinks(schedule, network);
+		// todo config param for cleanup options
 //		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
 //		PTMapperUtils.addPTModeToNetwork(schedule, network);
 		log.info("Clean schedule and network... done.");
