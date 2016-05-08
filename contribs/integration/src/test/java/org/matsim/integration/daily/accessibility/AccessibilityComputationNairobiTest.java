@@ -114,7 +114,7 @@ public class AccessibilityComputationNairobiTest {
 
 		
 		// collect activity types
-		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
+		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
 		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14

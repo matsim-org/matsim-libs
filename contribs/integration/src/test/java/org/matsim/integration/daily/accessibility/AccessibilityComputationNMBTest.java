@@ -169,7 +169,7 @@ public class AccessibilityComputationNMBTest {
 		
 		// collect homes
 		String activityFacilityType = "h";
-		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
+		ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
 
 
 //		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();

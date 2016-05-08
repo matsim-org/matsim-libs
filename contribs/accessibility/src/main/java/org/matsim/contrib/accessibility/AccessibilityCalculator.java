@@ -318,9 +318,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 				for ( Modes4Accessibility mode : config.getIsComputingMode() ) {
 					if(!useRawSum){ 	// get log sum
-						System.err.println(" ------------------ gcs[mode.ordinal()].getSum() = " + gcs[mode.ordinal()].getSum());
+//						System.err.println(" ------------------ gcs[mode.ordinal()].getSum() = " + gcs[mode.ordinal()].getSum());
 						// does not seem to ever be "-infinity"
-						System.err.println(" ------------- inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ) = " + inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ));
+//						System.err.println(" ------------- inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ) = " + inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ));
 						accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ) ) ;
 					} else {
 						// this was used by IVT within SustainCity.  Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
