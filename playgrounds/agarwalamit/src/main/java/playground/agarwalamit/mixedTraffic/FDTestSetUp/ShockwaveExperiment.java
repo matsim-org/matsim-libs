@@ -43,7 +43,7 @@ public class ShockwaveExperiment {
 
 	public static void main(String[] args) {
 
-		boolean isUsingOTFVis = true;
+		boolean isUsingOTFVis = false;
 
 		InputsForFDTestSetUp inputs = new InputsForFDTestSetUp();
 		inputs.setTravelModes(new String [] {"car"});
@@ -55,7 +55,7 @@ public class ShockwaveExperiment {
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData(inputs);
 		generateFDData.setRunDirectory(RUN_DIR);
-		generateFDData.setReduceDataPointsByFactor(140);
+		generateFDData.setReduceDataPointsByFactor(40);
 		generateFDData.setIsPlottingDistribution(false);
 		generateFDData.setIsUsingLiveOTFVis(isUsingOTFVis);
 		generateFDData.setIsWritingEventsFileForEachIteration(true);

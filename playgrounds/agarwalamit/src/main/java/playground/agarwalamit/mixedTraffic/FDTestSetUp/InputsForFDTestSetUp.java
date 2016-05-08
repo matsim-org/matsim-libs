@@ -63,7 +63,7 @@ public class InputsForFDTestSetUp {
 	private Collection<String> snapshotFormats = new ArrayList<>();
 	private static final double SNAPSHOT_PERIOD = 1.0;
 
-	private final double LINK_CAPACITY = 2700; //in PCU/h
+	private final double LINK_CAPACITY = 1800; //in PCU/h
 	private final double END_TIME = 24*3600;
 	private final double FREESPEED_KM_H = 60.;	//maximum authorized velocity on the track
 	private double stuckTime = 10;
@@ -222,7 +222,7 @@ public class InputsForFDTestSetUp {
 		//additional startLink and endLink for home and work activities
 		Id<Link> startLinkId = Id.createLinkId("home");
 		Link startLink = scenario.getNetwork().getFactory().createLink( startLinkId, startNode, scenario.getNetwork().getNodes().get(Id.createNodeId(0)));
-		startLink.setCapacity(100*LINK_CAPACITY);
+		startLink.setCapacity(10*LINK_CAPACITY);
 		startLink.setFreespeed(FREESPEED_KM_H/3.6);
 		startLink.setLength(25.);
 		startLink.setNumberOfLanes(1.);
@@ -231,7 +231,7 @@ public class InputsForFDTestSetUp {
 
 		Id<Link> endLinkId = Id.createLinkId("work");
 		Link endLink = scenario.getNetwork().getFactory().createLink(endLinkId, scenario.getNetwork().getNodes().get(Id.createNodeId(SUBDIVISION_FACTOR)), endNode);
-		endLink.setCapacity(100*LINK_CAPACITY);
+		endLink.setCapacity(10*LINK_CAPACITY);
 		endLink.setFreespeed(FREESPEED_KM_H/3.6);
 		endLink.setLength(25.);
 		endLink.setNumberOfLanes(1.);
