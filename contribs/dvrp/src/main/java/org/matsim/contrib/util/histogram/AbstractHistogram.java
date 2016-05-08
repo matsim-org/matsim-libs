@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,44 +17,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.util.histogram;
 
-import java.text.DecimalFormat;
-
-
-public class CSVHistogramUtils
+public abstract class AbstractHistogram<T>
+    implements Histogram<T>
 {
-    private static final DecimalFormat df = new DecimalFormat("#.##");
+    protected final long[] counts;
+    protected long totalCount = 0;
 
 
-    public static String[] createBinsLine(Histogram histogram, double scaling)
+    public AbstractHistogram(int binCount)
     {
-        CSVLineBuilder lineBuilder = new CSVLineBuilder();
-        addBinsToBuilder(lineBuilder, histogram, scaling);
-        return lineBuilder.build();
+        counts = new long[binCount];
+    }
+
+    
+    public void increment(int idx)
+    {
+        counts[idx]++;
+        totalCount++;
+    }
+    
+
+    @Override
+    public int getBinCount()
+    {
+        return counts.length;
     }
 
 
-    public static void addBinsToBuilder(CSVLineBuilder lineBuilder, Histogram histogram, double scaling)
+    @Override
+    public long getCount(int idx)
     {
-        for (int i = 0; i < histogram.getBinCount(); i++) {
-            lineBuilder.add(df.format(i * histogram.getBinSize() * scaling) + "+");
-        }
+        return counts[idx];
     }
 
 
-    public static String[] createValuesLine(Histogram histogram)
+    @Override
+    public long getTotalCount()
     {
-        CSVLineBuilder lineBuilder = new CSVLineBuilder();
-        addValuesToBuilder(lineBuilder, histogram);
-        return lineBuilder.build();
-    }
-
-
-    public static void addValuesToBuilder(CSVLineBuilder lineBuilder, Histogram histogram)
-    {
-        for (int v : histogram.getValues()) {
-            lineBuilder.add(v + "");
-        }
+        return totalCount;
     }
 }

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,10 +17,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.util;
 
-public class DailyHistograms
+public abstract class AbstractEnumAdder<K extends Enum<K>, N extends Number>
+    implements EnumAdder<K, N>
 {
-    public final Histogram emptyDriveRatio = new Histogram(0.05, 20);
-    public final Histogram stayRatio = new Histogram(0.05, 20);
+    protected final K[] keys;
+
+
+    public AbstractEnumAdder(Class<K> clazz)
+    {
+        this.keys = clazz.getEnumConstants();
+    }
+
+
+    public K[] getKeys()
+    {
+        return keys;
+
+    }
+
+
+    public void increment(K e)
+    {
+        add(e, 1);//(Integer)1 is cached internally
+    }
+
+
+    @Override
+    public void addAll(EnumAdder<K, ?> enumAdder)
+    {
+        for (K e : keys) {
+            add(e, enumAdder.getSum(e));
+        }
+    }
 }

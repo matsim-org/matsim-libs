@@ -19,22 +19,64 @@
 
 package org.matsim.contrib.util;
 
-public interface EnumAdder<K extends Enum<K>, N extends Number>
+import java.util.EnumMap;
+
+import org.apache.commons.lang3.mutable.MutableLong;
+
+
+public class LongEnumAdder<K extends Enum<K>>
+    extends AbstractEnumAdder<K, Long>
 {
-    K[] getKeys();
+    private final EnumMap<K, MutableLong> sums;
+    private long totalSum = 0;
 
 
-    N getSum(K e);
+    public LongEnumAdder(Class<K> clazz)
+    {
+        super(clazz);
+        sums = new EnumMap<>(clazz);
+        for (K e : keys) {
+            sums.put(e, new MutableLong());
+        }
+    }
 
 
-    N getTotalSum();
+    public void add(K e, long value)
+    {
+        sums.get(e).add(value);
+        totalSum += value;
+    }
 
 
-    void increment(K e);
+    @Override
+    public void add(K e, Number value)
+    {
+        add(e, value.longValue());
+    }
 
 
-    void add(K e, Number value);
+    public long getLongSum(K e)
+    {
+        return sums.get(e).longValue();
+    }
 
 
-    void addAll(EnumAdder<K, ?> enumAdder);
+    public long getLongTotalSum()
+    {
+        return totalSum;
+    }
+
+
+    @Override
+    public Long getSum(K e)
+    {
+        return getLongSum(e);
+    }
+
+
+    @Override
+    public Long getTotalSum()
+    {
+        return getLongTotalSum();
+    }
 }

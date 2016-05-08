@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,42 +19,28 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.io.IOException;
-
-import org.matsim.core.utils.io.*;
-
-import com.opencsv.CSVWriter;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.util.DoubleEnumAdder;
 
 
-public class DailyHistogramsWriter
+public class DailyTaxiStats
+    extends TaxiStats
 {
-    private final DailyHistograms dailyHistograms;
+    //public final DescriptiveStatistics passengerWaitTime = new DescriptiveStatistics();
 
+    //needs to be double instead of long due to integer overflow
+    //20k taxis each with 30-h stay tasks would cause an overflow
+    //public final DoubleEnumAdder<TaxiTask.TaxiTaskType> taskTimeSumsByType
 
-    public DailyHistogramsWriter(DailyHistograms dailyHistograms)
+    //daily vehicle's empty ratio
+    //public final DescriptiveStatistics vehicleEmptyDriveRatio = new DescriptiveStatistics();
+
+    //daily vehicle's empty ratio
+    //public final DescriptiveStatistics vehicleStayRatio = new DescriptiveStatistics();
+
+    public DailyTaxiStats()
     {
-        this.dailyHistograms = dailyHistograms;
+        super("daily", new DoubleEnumAdder<>(TaxiTask.TaxiTaskType.class));
     }
 
-
-    public void write(String file)
-    {
-        try (CSVWriter writer = new CSVWriter(IOUtils.getBufferedWriter(file), '\t',
-                CSVWriter.NO_QUOTE_CHARACTER)) {
-            writeDailyHistogram(writer, "Empty Drive Ratio [%]", dailyHistograms.emptyDriveRatio);
-            writeDailyHistogram(writer, "Vehicle Wait Ratio [%]", dailyHistograms.stayRatio);
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-
-    private void writeDailyHistogram(CSVWriter writer, String header, Histogram histogram)
-    {
-        writer.writeNext(CSVLines.line(header));
-        writer.writeNext(CSVHistogramUtils.createBinsLine(histogram, 100.));
-        writer.writeNext(CSVHistogramUtils.createValuesLine(histogram));
-        writer.writeNext(CSVLines.EMPTY_LINE);
-    }
 }

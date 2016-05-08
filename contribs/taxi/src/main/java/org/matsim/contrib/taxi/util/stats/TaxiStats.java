@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,57 +19,54 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.EnumMap;
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
+import org.matsim.contrib.util.EnumAdder;
 
 
 public class TaxiStats
 {
-    final DescriptiveStatistics passengerWaitTimes = new DescriptiveStatistics();
-    final EnumMap<TaxiTaskType, DescriptiveStatistics> timesByTaskType;
-
-
-    public TaxiStats()
-    {
-        timesByTaskType = new EnumMap<>(TaxiTaskType.class);
-        for (TaxiTaskType t : TaxiTaskType.values()) {
-            timesByTaskType.put(t, new DescriptiveStatistics());
-        }
-    }
-
-
-    public void addTask(TaxiTask task)
-    {
-        double time = task.getEndTime() - task.getBeginTime();
-        timesByTaskType.get(task.getTaxiTaskType()).addValue(time);
-    }
+    public final String id;
     
-    
-    public DescriptiveStatistics getPassengerWaitTimes()
+    public final DescriptiveStatistics passengerWaitTime = new DescriptiveStatistics();
+
+    public final EnumAdder<TaxiTask.TaxiTaskType, ?> taskTimeSumsByType;
+
+    public final DescriptiveStatistics vehicleEmptyDriveRatio = new DescriptiveStatistics();
+
+    public final DescriptiveStatistics vehicleStayRatio = new DescriptiveStatistics();
+
+
+    public TaxiStats(String id, EnumAdder<TaxiTask.TaxiTaskType, ?> taskTimeSumsByType)
     {
-        return passengerWaitTimes;
+        this.id = id;
+        this.taskTimeSumsByType = taskTimeSumsByType;
     }
 
 
-    public double getEmptyDriveRatio()
+    public double getAggregatedEmptyDriveRatio()
     {
-        double empty = timesByTaskType.get(TaxiTaskType.EMPTY_DRIVE).getSum();//not mean!
-        double occupied = timesByTaskType.get(TaxiTaskType.OCCUPIED_DRIVE).getSum();//not mean!
-        return empty / (empty + occupied);
+        double emptySum = taskTimeSumsByType.getSum(TaxiTask.TaxiTaskType.EMPTY_DRIVE)
+                .doubleValue();
+        double occupiedSum = taskTimeSumsByType.getSum(TaxiTask.TaxiTaskType.EMPTY_DRIVE)
+                .doubleValue();
+        return emptySum / (emptySum + occupiedSum);
     }
 
 
-    public double getStayTime()
+    public double getAggregatedStayRatio()
     {
-        return timesByTaskType.get(TaxiTaskType.STAY).getSum();//not mean!
+        double staySum = taskTimeSumsByType.getSum(TaxiTask.TaxiTaskType.STAY).doubleValue();
+        double totalSum = taskTimeSumsByType.getTotalSum().doubleValue();
+        return staySum / totalSum;
     }
 
 
-    public DescriptiveStatistics getOccupiedDriveTimes()
+    public double getOccupiedDriveRatio()
     {
-        return timesByTaskType.get(TaxiTaskType.OCCUPIED_DRIVE);
+        double occupied = taskTimeSumsByType.getSum(TaxiTaskType.OCCUPIED_DRIVE).doubleValue();
+        double total = taskTimeSumsByType.getTotalSum().doubleValue();
+        return occupied / total;
     }
 }

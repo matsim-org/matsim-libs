@@ -20,8 +20,10 @@
 package org.matsim.contrib.taxi.util.stats;
 
 import java.io.PrintWriter;
+import java.util.Map;
 
 import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
@@ -33,44 +35,83 @@ import com.google.inject.Inject;
 public class TaxiStatsDumper
     implements AfterMobsimListener, ShutdownListener
 {
-    private static final String HEADER = "WaitT\t" //
-            + "95pWaitT\t"//
-            + "MaxWaitT\t"//
-            + "OccupiedT\t"//
-            + "%EmptyDrive\t";
+    private static final String HEADER = "iter"//
+            + "\t|\tTP_avg\tTP_sd\tTP_p95\tTP_max"//
+            + "\t|\tRE_agg_avg\tRE_avg\tRE_sd"//
+            + "\t|\tRW_agg_avg\tRW_avg\tRW_sd"//
+            + "\t|\tTO";
 
     private final TaxiData taxiData;
-    private final PrintWriter pw;
+    private final TaxiConfigGroup taxiCfg;
+    private final OutputDirectoryHierarchy controlerIO;
+    private final PrintWriter multiDayWriter;
 
 
     @Inject
-    public TaxiStatsDumper(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
+    public TaxiStatsDumper(TaxiData taxiData, TaxiConfigGroup taxiCfg, OutputDirectoryHierarchy controlerIO)
     {
         this.taxiData = taxiData;
-        pw = new PrintWriter(
-                IOUtils.getBufferedWriter(controlerIO.getOutputFilename("taxi_stats.txt")));
-        pw.println("iter\t" + HEADER);
+        this.taxiCfg = taxiCfg;
+        this.controlerIO = controlerIO;
+        multiDayWriter = new PrintWriter(
+                IOUtils.getBufferedWriter(controlerIO.getOutputFilename("taxi_daily_stats.txt")));
+        multiDayWriter.println(HEADER);
     }
 
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event)
     {
-        TaxiStats ts = new TaxiStatsCalculator(taxiData.getVehicles().values()).getStats();
-        pw.printf("%d\t%.1f\t%.1f\t%.1f\t%.0f\t%.3f\n", //
-                event.getIteration(), //
-                ts.passengerWaitTimes.getMean(), //
-                ts.passengerWaitTimes.getPercentile(95), //
-                ts.passengerWaitTimes.getMax(), //
-                ts.getOccupiedDriveTimes().getMean(), //
-                ts.getEmptyDriveRatio());
-        pw.flush();
+        TaxiStatsCalculator calculator = new TaxiStatsCalculator(
+                taxiData.getVehicles().values());
+
+        appendToMultiDayStats(calculator.getDailyStats(), event);
+        
+        if (taxiCfg.getDetailedStats()) {
+            writeDetailedStats(calculator.getTaxiStats(), event);
+        }
+    }
+
+
+    private void appendToMultiDayStats(DailyTaxiStats s, AfterMobsimEvent event)
+    {
+        multiDayWriter.printf("%d", event.getIteration());
+
+        multiDayWriter.printf("\t|\t%.1f\t%.1f\t%.1f\t%.1f", //
+                s.passengerWaitTime.getMean(), //
+                s.passengerWaitTime.getStandardDeviation(), //
+                s.passengerWaitTime.getPercentile(95), //
+                s.passengerWaitTime.getMax());
+
+        multiDayWriter.printf("\t|\t%.3f\t%.3f\t%.3f", //
+                s.getAggregatedEmptyDriveRatio(), //
+                s.vehicleEmptyDriveRatio.getMean(), //
+                s.vehicleEmptyDriveRatio.getStandardDeviation());
+
+        multiDayWriter.printf("\t|\t%.3f\t%.3f\t%.3f", //
+                s.getAggregatedStayRatio(), //
+                s.vehicleStayRatio.getMean(), //
+                s.vehicleStayRatio.getStandardDeviation());
+
+        multiDayWriter.printf("\t|\t%.3f", s.getOccupiedDriveRatio());
+
+        multiDayWriter.println();
+        multiDayWriter.flush();
+    }
+
+
+    private void writeDetailedStats(Map<String, TaxiStats> taxiStats, AfterMobsimEvent event)
+    {
+        String prefix = controlerIO.getIterationFilename(event.getIteration(), "taxi_");
+
+        new TaxiStatsWriter(taxiStats).write(prefix + "detailed_stats.txt");
+        new TaxiHistogramsWriter(taxiStats).write(prefix + "detailed_histograms.txt");
     }
 
 
     @Override
     public void notifyShutdown(ShutdownEvent event)
     {
-        pw.close();
+        multiDayWriter.close();
     }
 }

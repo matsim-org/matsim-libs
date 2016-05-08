@@ -17,41 +17,66 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.util;
 
-import org.matsim.contrib.taxi.data.TaxiData;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
+import java.util.*;
 
-import com.google.inject.Inject;
+import org.apache.commons.lang3.mutable.MutableDouble;
 
 
-public class DetailedTaxiStatsDumper
-    implements AfterMobsimListener
+public class DoubleEnumAdder<K extends Enum<K>>
+    extends AbstractEnumAdder<K, Double>
 {
-    private final TaxiData taxiData;
-    private final OutputDirectoryHierarchy controlerIO;
+    private final EnumMap<K, MutableDouble> sums;
+    private double totalSum;
 
 
-    @Inject
-    public DetailedTaxiStatsDumper(TaxiData taxiData, OutputDirectoryHierarchy controlerIO)
+    public DoubleEnumAdder(Class<K> clazz)
     {
-        this.taxiData = taxiData;
-        this.controlerIO = controlerIO;
+        super(clazz);
+        sums = new EnumMap<>(clazz);
+        for (K e : keys) {
+            sums.put(e, new MutableDouble());
+        }
     }
 
 
-    @Override
-    public void notifyAfterMobsim(AfterMobsimEvent event)
+    public void add(K e, double value)
     {
-        String prefix = controlerIO.getIterationFilename(event.getIteration(), "taxi_");
-        DetailedTaxiStatsCalculator calculator = new DetailedTaxiStatsCalculator(
-                taxiData.getVehicles().values());
-        new HourlyTaxiStatsWriter(calculator.getHourlyStats()).write(prefix + "hourly_stats.txt");
-        new HourlyHistogramsWriter(calculator.getHourlyHistograms())
-                .write(prefix + "hourly_histograms.txt");
-        new DailyHistogramsWriter(calculator.getDailyHistograms())
-                .write(prefix + "daily_histograms.txt");
+        sums.get(e).add(value);
+        totalSum += value;
+    }
+    
+    
+    @Override
+    public void add(K e, Number value)
+    {
+        add(e, value.doubleValue());
+    }
+
+
+    public double getDoubleSum(K e)
+    {
+        return sums.get(e).doubleValue();
+    }
+
+
+    public double getDoubleTotalSum()
+    {
+        return totalSum;
+    }
+    
+    
+    @Override
+    public Double getSum(K e)
+    {
+        return getDoubleSum(e);
+    }
+    
+    
+    @Override
+    public Double getTotalSum()
+    {
+        return getDoubleTotalSum();
     }
 }

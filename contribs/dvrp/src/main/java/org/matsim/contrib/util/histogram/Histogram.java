@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.util.histogram;
 
-public class CSVLines
+/**
+ * This is a read-only interface: you can get but cannot set values.
+ * 
+ * @param <T>
+ */
+public interface Histogram<T>
 {
-    public static final String[] EMPTY_LINE = {};
+    int getBinCount();
 
 
-    public static String[] line(String... string)
-    {
-        return string;
-    }
+    T getBin(int idx);
+
+
+    long getCount(int idx);
+
+
+    long getTotalCount();
 }

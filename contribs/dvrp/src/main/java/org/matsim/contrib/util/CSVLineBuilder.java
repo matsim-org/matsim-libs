@@ -19,33 +19,48 @@
 
 package org.matsim.contrib.util;
 
-import java.util.EnumMap;
+import java.util.*;
 
-import org.apache.commons.lang3.mutable.MutableInt;
+import com.google.common.collect.Iterables;
 
 
-public class EnumCounter<K extends Enum<K>>
+public class CSVLineBuilder
 {
-    private final EnumMap<K, MutableInt> counts;
+    public static final String[] EMPTY_LINE = {};
 
 
-    public EnumCounter(Class<K> clazz)
+    public static String[] line(String... string)
     {
-        counts = new EnumMap<>(clazz);
-        for (K e : clazz.getEnumConstants()) {
-            counts.put(e, new MutableInt());
-        }
+        return string;
     }
 
 
-    public void increment(K e)
+    private List<String> line = new ArrayList<>();
+
+
+    public CSVLineBuilder add(String e)
     {
-        counts.get(e).increment();
+        line.add(e);
+        return this;
     }
 
 
-    public int getCount(K e)
+    public CSVLineBuilder addAll(Iterable<String> cells)
     {
-        return counts.get(e).intValue();
+        Iterables.addAll(line, cells);
+        return this;
+    }
+
+
+    public CSVLineBuilder addAll(String... cells)
+    {
+        Collections.addAll(line, cells);
+        return this;
+    }
+
+
+    public String[] build()
+    {
+        return line.toArray(new String[line.size()]);
     }
 }

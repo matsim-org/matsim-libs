@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,42 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.util.histogram;
 
-public class Histogram
+import org.matsim.contrib.util.EnumAdder;
+
+
+public class EnumAdderHistogram<T extends Enum<T>, N extends Number>
+    implements Histogram<T>
 {
-    private final int[] values;
-    private final double binSize;
+    private final EnumAdder<T, N> adder;
 
 
-    public Histogram(double binSize, int binCount)
+    public EnumAdderHistogram(EnumAdder<T, N> adder)
     {
-        this.binSize = binSize;
-        values = new int[binCount];
+        this.adder = adder;
     }
 
 
-    public void addValue(double value)
-    {
-        int bin = Math.min((int) (value / binSize), values.length - 1);
-        values[bin]++;
-    }
-
-
-    public double getBinSize()
-    {
-        return binSize;
-    }
-
-
+    @Override
     public int getBinCount()
     {
-        return values.length;
+        return adder.getKeys().length;
     }
 
 
-    public int[] getValues()
+    @Override
+    public T getBin(int idx)
     {
-        return values;
+        return adder.getKeys()[idx];
+    }
+
+
+    @Override
+    public long getCount(int idx)
+    {
+        T key = getBin(idx);
+        return adder.getSum(key).longValue();
+    }
+
+
+    @Override
+    public long getTotalCount()
+    {
+        return adder.getTotalSum().longValue();
     }
 }

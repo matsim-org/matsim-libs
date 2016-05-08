@@ -21,8 +21,8 @@ public class TaxiBenchmarkStats
             + "PassWait\t"//
             + "PassWait_p95\t"//
             + "PassWait_max\t"//
-            + "PassDrive\t"//
-            + "EmptyRatio\t";
+            + "EmptyDriveRatio\t"//
+            + "StayRatio\t";
 
     private final TaxiData taxiData;
     private final OutputDirectoryHierarchy controlerIO;
@@ -31,8 +31,8 @@ public class TaxiBenchmarkStats
     private final SummaryStatistics pc95PassengerWaitTime = new SummaryStatistics();
     private final SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
 
-    private final SummaryStatistics driveOccupiedTime = new SummaryStatistics();
-    private final SummaryStatistics driveEmptyRatio = new SummaryStatistics();
+    private final SummaryStatistics emptyDriveRatio = new SummaryStatistics();
+    private final SummaryStatistics stayRatio = new SummaryStatistics();
 
 
     @Inject
@@ -47,14 +47,14 @@ public class TaxiBenchmarkStats
     public void notifyAfterMobsim(AfterMobsimEvent event)
     {
         TaxiStats singleRunStats = new TaxiStatsCalculator(taxiData.getVehicles().values())
-                .getStats();
-        
-        passengerWaitTime.addValue(singleRunStats.getPassengerWaitTimes().getMean());
-        pc95PassengerWaitTime.addValue(singleRunStats.getPassengerWaitTimes().getPercentile(95));
-        maxPassengerWaitTime.addValue(singleRunStats.getPassengerWaitTimes().getMax());
+                .getDailyStats();
 
-        driveOccupiedTime.addValue(singleRunStats.getOccupiedDriveTimes().getMean());
-        driveEmptyRatio.addValue(singleRunStats.getEmptyDriveRatio());
+        passengerWaitTime.addValue(singleRunStats.passengerWaitTime.getMean());
+        pc95PassengerWaitTime.addValue(singleRunStats.passengerWaitTime.getPercentile(95));
+        maxPassengerWaitTime.addValue(singleRunStats.passengerWaitTime.getMax());
+
+        emptyDriveRatio.addValue(singleRunStats.getAggregatedEmptyDriveRatio());
+        stayRatio.addValue(singleRunStats.getAggregatedStayRatio());
     }
 
 
@@ -66,8 +66,8 @@ public class TaxiBenchmarkStats
         pw.println(HEADER);
         pw.printf(
                 "%d\t%d\t"//
-                        + "%.0f\t%.0f\t%.0f\t"//
-                        + "%.0f\t%.2f\t", //
+                        + "%.1f\t%.0f\t%.0f\t"//
+                        + "%.3f\t%.3f\t", //
                 taxiData.getRequests().size(), //
                 taxiData.getVehicles().size(), //
                 //
@@ -75,8 +75,8 @@ public class TaxiBenchmarkStats
                 pc95PassengerWaitTime.getMean(), //
                 maxPassengerWaitTime.getMean(), //
                 //
-                driveOccupiedTime.getMean(), //
-                driveEmptyRatio.getMean() * 100); //in [%]
+                emptyDriveRatio.getMean(), //
+                stayRatio.getMean());
 
         pw.close();
     }

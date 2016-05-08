@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,24 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util;
+package org.matsim.contrib.util.histogram;
 
-public interface EnumAdder<K extends Enum<K>, N extends Number>
+public class UniformHistogram
+    extends AbstractHistogram<String>
 {
-    K[] getKeys();
+    public static UniformHistogram create(double binSize, int binCount, double[] values)
+    {
+        UniformHistogram histogram = new UniformHistogram(binSize, binCount);
+        histogram.addValues(values);
+        return histogram;
+    }
 
 
-    N getSum(K e);
+    private final double binSize;
 
 
-    N getTotalSum();
+    public UniformHistogram(double binSize, int binCount)
+    {
+        super(binCount);
+        this.binSize = binSize;
+    }
 
 
-    void increment(K e);
+    public void addValues(double[] values)
+    {
+        for (double v : values) {
+            addValue(v);
+        }
+    }
 
 
-    void add(K e, Number value);
+    public void addValue(double value)
+    {
+        increment(Math.min((int) (value / binSize), counts.length - 1));
+    }
 
 
-    void addAll(EnumAdder<K, ?> enumAdder);
+    @Override
+    public String getBin(int idx)
+    {
+        return (idx * binSize) + "+";
+    }
 }

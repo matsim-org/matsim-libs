@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,62 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.util.histogram;
 
-import java.util.*;
+import java.util.Arrays;
 
 
-public class CSVLineBuilder
+public class BoundedHistogram
+    extends AbstractHistogram<String>
 {
-    private List<String> line = new ArrayList<>();
-
-
-    public CSVLineBuilder add(String e)
+    public static BoundedHistogram create(double[] bounds, double[] values)
     {
-        line.add(e);
-        return this;
+        BoundedHistogram histogram = new BoundedHistogram(bounds);
+        histogram.addValues(values);
+        return histogram;
     }
 
 
-    public CSVLineBuilder add(List<String> c)
+    private final double[] bounds;
+
+
+    public BoundedHistogram(double[] bounds)
     {
-        line.addAll(c);
-        return this;
+        super(bounds.length - 1);
+
+        for (int i = 1; i < bounds.length; i++) {
+            if (bounds[i - 1] >= bounds[i]) {
+                throw new IllegalArgumentException("Bounds are not sorted");
+            }
+        }
+
+        this.bounds = bounds;
     }
 
 
-    public CSVLineBuilder add(String[] a)
+    public void addValues(double[] values)
     {
-        line.addAll(Arrays.asList(a));
-        return this;
+        for (double v : values) {
+            addValue(v);
+        }
     }
-    
-    
-    public String[] build()
+
+
+    //fails if value is outside the bounds
+    public void addValue(double value)
     {
-        return line.toArray(new String[line.size()]);
+        int idx = Arrays.binarySearch(bounds, value);
+        if (idx <= 0) {
+            idx = -idx - 2;
+        }
+        increment(idx);
+    }
+
+
+    @Override
+    public String getBin(int idx)
+    {
+        return bounds[idx] + "+";
+        //return "[" + bounds[idx] + "," + bounds[idx + 1] + ")";
     }
 }
