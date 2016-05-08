@@ -3,10 +3,17 @@ package org.matsim.contrib.accessibility.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.network.LinkImpl;
@@ -17,24 +24,26 @@ import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.FacilitiesWriter;
 
 /**
  * @author dziemke
  */
 public class AccessibilityRunUtils {
+	public static final Logger log = Logger.getLogger(AccessibilityRunUtils.class);
 	
 	/**
 	 * Collects all facilities of a given type that have been loaded to the sceanrio.
 	 * 
 	 * @param scenario
-	 * @param activityFacilityType
+	 * @param activityOptionType
 	 * @return
 	 */
-	public static ActivityFacilities collectActivityFacilitiesOfType(Scenario scenario, String activityFacilityType) {
-		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(activityFacilityType) ;
+	public static ActivityFacilities collectActivityFacilitiesWithOptionOfType(Scenario scenario, String activityOptionType) {
+		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities(activityOptionType) ;
 		for (ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()) {
 			for (ActivityOption option : fac.getActivityOptions().values()) {
-				if ( option.getType().equals(activityFacilityType) ) {
+				if (option.getType().equals(activityOptionType)) {
 					activityFacilities.addActivityFacility(fac);
 				}
 			}
@@ -49,17 +58,17 @@ public class AccessibilityRunUtils {
 	 * @param scenario
 	 * @return
 	 */
-	public static List<String> collectAllFacilityTypes(Scenario scenario) {
-		List<String> activityTypes = new ArrayList<String>() ;
-		for (ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()) {
-			for (ActivityOption option : fac.getActivityOptions().values()) {
+	public static List<String> collectAllFacilityOptionTypes(Scenario scenario) {
+		List<String> activityOptionTypes = new ArrayList<String>() ;
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
+			for (ActivityOption option : facility.getActivityOptions().values()) {
 				// collect all activity types that are contained within the provided facilities file
-				if ( !activityTypes.contains(option.getType()) ) {
-					activityTypes.add( option.getType() ) ;
+				if (!activityOptionTypes.contains(option.getType())) {
+					activityOptionTypes.add(option.getType()) ;
 				}
 			}
 		}
-		return activityTypes;
+		return activityOptionTypes;
 	}
 
 	
@@ -151,5 +160,52 @@ public class AccessibilityRunUtils {
 		}
 		double giniCoefficient = sumOfAbsoluteDifferences / (2 * Math.pow(numberOfValues, 2) * arithmeticMean);
 		return giniCoefficient;
+	}
+	
+	
+	/**
+	 * Creates facilities from plans. Note that a new additional facility is created for each activity.
+	 * @param population
+	 * @return
+	 */
+	public static ActivityFacilities createFacilitiesFromPlans(Population population) {
+		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
+		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
+		
+		for(Person person : population.getPersons().values()) {
+			for(Plan plan : person.getPlans()) {
+				Id <Person> personId = person.getId();
+				
+				for (PlanElement planElement : plan.getPlanElements()) {
+					if (planElement instanceof Activity) {
+						Activity activity = (Activity) planElement;
+						
+						Coord coord= activity.getCoord();
+						if (coord == null) {
+							throw new NullPointerException("Activity does not have any coordinates.");
+						}
+						
+						String activityType = activity.getType();
+						
+						// In case an agent visits the same activity location twice, create another activity facility with a modified ID
+						Integer i = 1;					
+						Id<ActivityFacility> facilityId = Id.create(activityType + "_" + personId.toString() + "_" + i.toString(), ActivityFacility.class);
+						while (facilities.getFacilities().containsKey(facilityId)) {
+							i++;
+							facilityId = Id.create(activityType + "_" + personId.toString() + "_" + i.toString(), ActivityFacility.class);
+						}
+
+						ActivityFacility facility = aff.createActivityFacility(facilityId, activity.getCoord());
+						
+						facility.addActivityOption(aff.createActivityOption(activityType));
+						facilities.addActivityFacility(facility);
+//						log.info("Created activity with option of type " + activityType + " and ID " + facilityId + ".");
+					}
+				}
+			}
+		}
+//		FacilitiesWriter facilitiesWriter = new FacilitiesWriter(facilities);
+//		facilitiesWriter.write("../../../public-svn/matsim/specifiy_location/...xml.gz");
+		return facilities;
 	}
 }
