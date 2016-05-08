@@ -93,7 +93,7 @@ public class ScheduleCleaner {
 				} else if(networkRoute.getStartLinkId() == null || networkRoute.getEndLinkId() == null) {
 					removeRoute = true;
 
-					for(Id<Link> linkId : transitRoute.getRoute().getLinkIds()) {
+					for(Id<Link> linkId : ScheduleTools.getLinkIds(transitRoute)) {
 						if(linkId == null) {
 							removeRoute = true;
 						}
@@ -128,9 +128,7 @@ public class ScheduleCleaner {
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute route : line.getRoutes().values()) {
 				if(route.getRoute() != null)
-					usedTransitLinkIds.add(route.getRoute().getStartLinkId());
-					usedTransitLinkIds.addAll(route.getRoute().getLinkIds());
-					usedTransitLinkIds.add(route.getRoute().getEndLinkId());
+					usedTransitLinkIds.addAll(ScheduleTools.getLinkIds(route));
 			}
 		}
 

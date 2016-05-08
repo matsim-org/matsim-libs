@@ -16,14 +16,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.multiModalMap.plausibility;
+package playground.polettif.multiModalMap.tools.shp;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -37,22 +36,21 @@ import playground.polettif.multiModalMap.tools.ScheduleTools;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Converts a MATSim Transit Schedule to a GIS shape file
  *
  * @author polettif
  */
-public class Schedule2ShapeFileConverter {
+public class Schedule2ShapeFile {
 
-	private static final Logger log = Logger.getLogger(Schedule2ShapeFileConverter.class);
+	private static final Logger log = Logger.getLogger(Schedule2ShapeFile.class);
 
 	private final TransitSchedule schedule;
 	private final Network network;
 	private Collection<SimpleFeature> features;
 
-	public Schedule2ShapeFileConverter(final TransitSchedule schedule, final Network network) {
+	public Schedule2ShapeFile(final TransitSchedule schedule, final Network network) {
 		this.schedule = schedule;
 		this.network = network;
 		features = new ArrayList<>();
@@ -68,7 +66,7 @@ public class Schedule2ShapeFileConverter {
 		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(args[0]);
 		Network network = NetworkTools.loadNetwork(args[1]);
 
-		Schedule2ShapeFileConverter s2s = new Schedule2ShapeFileConverter(schedule, network);
+		Schedule2ShapeFile s2s = new Schedule2ShapeFile(schedule, network);
 
 		s2s.routes2Polyline(args[2]);
 	//	s2s.stopFaclities2Points(args[3]);
@@ -111,11 +109,7 @@ public class Schedule2ShapeFileConverter {
 
 	private Coordinate[] getCoordinatesFromRoute(TransitRoute transitRoute) {
 		List<Coordinate> coordList = new ArrayList<>();
-		List<Id<Link>> linkList = new ArrayList<>();
-
-		NetworkRoute networkRoute = transitRoute.getRoute();
-		linkList.add(networkRoute.getStartLinkId());
-		linkList.addAll(networkRoute.getLinkIds());
+		List<Id<Link>> linkList = ScheduleTools.getLinkIds(transitRoute);
 
 		for(Id<Link> linkId : linkList) {
 			if(network.getLinks().containsKey(linkId)) {
@@ -126,7 +120,7 @@ public class Schedule2ShapeFileConverter {
 			}
 		}
 
-		coordList.add(MGC.coord2Coordinate(network.getLinks().get(networkRoute.getEndLinkId()).getToNode().getCoord()));
+		coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkList.get(linkList.size()-1)).getToNode().getCoord()));
 
 		Coordinate[] returnArray = new Coordinate[coordList.size()];
 

@@ -44,12 +44,14 @@ public class StopFacilityHistogram {
 	private double[] stopFacilityHistogram;
 
 	public static void main(final String[] args) {
-		TransitSchedule schedule = ScheduleTools.loadTransitSchedule("C:/Users/polettif/Desktop/output/results_2016-05-04/zurich_gtfs_schedule.xml");
+		// "C:/Users/polettif/Desktop/output/results_2016-05-04/zurich_gtfs_schedule.xml"
+		// "C:/Users/polettif/Desktop/output/results_2016-05-04/histogram.png"
+		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(args[0]);
 
 		StopFacilityHistogram check = new StopFacilityHistogram(schedule);
 
 		check.calcHistogram(schedule);
-		check.createPng("C:/Users/polettif/Desktop/output/results_2016-05-04/histogram.png");
+		check.createPng(args[1]);
 	}
 
 	public StopFacilityHistogram(TransitSchedule schedule) {

@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.multiModalMap.plausibility;
+package playground.polettif.multiModalMap.tools.shp;
 
 import com.opencsv.CSVReader;
 import org.matsim.api.core.v01.Coord;

@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -89,10 +88,7 @@ public class ScheduleTools {
 
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
-				NetworkRoute networkRoute = transitRoute.getRoute();
-				transitLinkIds.add(networkRoute.getStartLinkId());
-				transitLinkIds.addAll(networkRoute.getLinkIds());
-				transitLinkIds.add(networkRoute.getEndLinkId());
+				transitLinkIds.addAll(getLinkIds(transitRoute));
 			}
 		}
 
@@ -196,11 +192,7 @@ public class ScheduleTools {
 
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute route : line.getRoutes().values()) {
-				Set<Id<Link>> linkIds = new HashSet<>();
-				linkIds.add(route.getRoute().getStartLinkId());
-				linkIds.addAll(route.getRoute().getLinkIds());
-				linkIds.add(route.getRoute().getEndLinkId());
-				for(Id<Link> linkId : linkIds) {
+				for(Id<Link> linkId : getLinkIds(route)) {
 					MapUtils.getSet(linkId, transitLinkNetworkModes).add(route.getTransportMode());
 				}
 			}
@@ -255,5 +247,19 @@ public class ScheduleTools {
 		new TransitScheduleReader(coordinateTransformation, scenario).readFile(scheduleFile);
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		new TransitScheduleWriter(schedule).writeFile(scheduleFile);
+	}
+
+
+	/**
+	 * @return the list of link ids used by transit routes (first and last
+	 * 		   links are included)
+	 */
+	public static List<Id<Link>> getLinkIds(TransitRoute transitRoute) {
+		List<Id<Link>> list = new ArrayList<>();
+		NetworkRoute networkRoute = transitRoute.getRoute();
+		list.add(networkRoute.getStartLinkId());
+		list.addAll(networkRoute.getLinkIds());
+		list.add(networkRoute.getEndLinkId());
+		return list;
 	}
 }
