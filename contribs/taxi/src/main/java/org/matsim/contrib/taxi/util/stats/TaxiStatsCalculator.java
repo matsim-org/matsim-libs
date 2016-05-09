@@ -103,10 +103,6 @@ public class TaxiStatsCalculator
         @SuppressWarnings("unchecked")
         LongEnumAdder<TaxiTask.TaxiTaskType>[] vehicleHourlySums = new LongEnumAdder[hours];
         int hourIdx = hour(schedule.getBeginTime());
-        int lastHour = hour(schedule.getEndTime());
-        for (int h = hourIdx; h < lastHour; h++) {
-            vehicleHourlySums[h] = new LongEnumAdder<>(TaxiTask.TaxiTaskType.class);
-        }
 
         for (TaxiTask t : schedule.getTasks()) {
             double from = t.getBeginTime();
@@ -114,11 +110,10 @@ public class TaxiStatsCalculator
             int toHour = hour(t.getEndTime());
             for (; hourIdx < toHour; hourIdx++) {
                 double to = (hourIdx + 1) * 3600;
-                vehicleHourlySums[hourIdx].add(t.getTaxiTaskType(), (int) (to - from));
+                includeTaskIntoHourlySums(vehicleHourlySums, hourIdx, t, from, to);
                 from = to;
             }
-
-            vehicleHourlySums[toHour].add(t.getTaxiTaskType(), (int) (t.getEndTime() - from));
+            includeTaskIntoHourlySums(vehicleHourlySums, toHour, t, from, t.getEndTime());
 
             if (t.getTaxiTaskType() == TaxiTaskType.PICKUP) {
                 Request req = ((TaxiPickupTask)t).getRequest();
@@ -139,13 +134,25 @@ public class TaxiStatsCalculator
     }
 
 
+    private void includeTaskIntoHourlySums(LongEnumAdder<TaxiTask.TaxiTaskType>[] hourlySums, int hour,
+            TaxiTask task, double fromTime, double toTime)
+    {
+        if (fromTime < toTime) {
+            if (hourlySums[hour] == null) {
+                hourlySums[hour] = new LongEnumAdder<>(TaxiTask.TaxiTaskType.class);
+            }
+            hourlySums[hour].add(task.getTaxiTaskType(), (long)(toTime - fromTime));
+        }
+    }
+
+
     private void includeVehicleHourlySumsIntoStats(LongEnumAdder<TaxiTaskType>[] vehicleHourlySums)
     {
         LongEnumAdder<TaxiTaskType> vehicleDailySums = new LongEnumAdder<>(TaxiTaskType.class);
 
         for (int h = 0; h < hours; h++) {
             LongEnumAdder<TaxiTask.TaxiTaskType> vhs = vehicleHourlySums[h];
-            if (vhs != null && vhs.getLongTotalSum() > 0) {
+            if (vhs != null && vhs.getLongTotal() > 0) {
                 updateTaxiStats(hourlyStats[h], vhs);
                 vehicleDailySums.addAll(vhs);
             }
@@ -166,8 +173,8 @@ public class TaxiStatsCalculator
     private void updateEmptyDriveRatio(DescriptiveStatistics emptyDriveRatioStats,
             LongEnumAdder<TaxiTaskType> durations)
     {
-        double empty = durations.getLongSum(TaxiTaskType.EMPTY_DRIVE);
-        double occupied = durations.getLongSum(TaxiTaskType.OCCUPIED_DRIVE);
+        double empty = durations.getLong(TaxiTaskType.EMPTY_DRIVE);
+        double occupied = durations.getLong(TaxiTaskType.OCCUPIED_DRIVE);
 
         if (empty != 0 || occupied != 0) {
             double emptyRatio = empty / (empty + occupied);
@@ -179,9 +186,9 @@ public class TaxiStatsCalculator
     private void updateStayRatio(DescriptiveStatistics stayRatioStats,
             LongEnumAdder<TaxiTaskType> durations)
     {
-        double total = durations.getLongTotalSum();
+        double total = durations.getLongTotal();
         if (total != 0) {
-            double stayRatio = durations.getLongSum(TaxiTaskType.STAY) / total;
+            double stayRatio = durations.getLong(TaxiTaskType.STAY) / total;
             stayRatioStats.addValue(stayRatio);
         }
     }

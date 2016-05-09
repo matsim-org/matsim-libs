@@ -87,7 +87,7 @@ public class DemandAggregator
     public void printCounters()
     {
         for (TripType type : TripType.values()) {
-            System.out.println(type.name() + " trips:\t" + counter.getSum(type));
+            System.out.println(type.name() + " trips:\t" + counter.get(type));
         }
     }
 

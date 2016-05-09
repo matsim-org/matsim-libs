@@ -41,42 +41,42 @@ public class DoubleEnumAdder<K extends Enum<K>>
     }
 
 
-    public void add(K e, double value)
+    public void addDouble(K e, double value)
     {
         sums.get(e).add(value);
         totalSum += value;
     }
-    
-    
+
+
     @Override
     public void add(K e, Number value)
     {
-        add(e, value.doubleValue());
+        addDouble(e, value.doubleValue());
     }
 
 
-    public double getDoubleSum(K e)
+    public double getDouble(K e)
     {
         return sums.get(e).doubleValue();
     }
 
 
-    public double getDoubleTotalSum()
+    public double getDoubleTotal()
     {
         return totalSum;
     }
-    
-    
+
+
     @Override
-    public Double getSum(K e)
+    public Double get(K e)
     {
-        return getDoubleSum(e);
+        return getDouble(e);
     }
-    
-    
+
+
     @Override
-    public Double getTotalSum()
+    public Double getTotal()
     {
-        return getDoubleTotalSum();
+        return getDoubleTotal();
     }
 }

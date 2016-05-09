@@ -24,10 +24,10 @@ public interface EnumAdder<K extends Enum<K>, N extends Number>
     K[] getKeys();
 
 
-    N getSum(K e);
+    N get(K e);
 
 
-    N getTotalSum();
+    N getTotal();
 
 
     void increment(K e);

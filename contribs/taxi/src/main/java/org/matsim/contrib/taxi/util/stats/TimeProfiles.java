@@ -89,7 +89,7 @@ public class TimeProfiles
 
                 String s = "";
                 for (TaxiTaskType e : TaxiTaskType.values()) {
-                    s += counter.getLongSum(e) + "\t";
+                    s += counter.getLong(e) + "\t";
                 }
                 return s;
             }

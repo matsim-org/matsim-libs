@@ -28,7 +28,7 @@ import org.matsim.contrib.util.EnumAdder;
 public class TaxiStats
 {
     public final String id;
-    
+
     public final DescriptiveStatistics passengerWaitTime = new DescriptiveStatistics();
 
     public final EnumAdder<TaxiTask.TaxiTaskType, ?> taskTimeSumsByType;
@@ -47,26 +47,24 @@ public class TaxiStats
 
     public double getAggregatedEmptyDriveRatio()
     {
-        double emptySum = taskTimeSumsByType.getSum(TaxiTask.TaxiTaskType.EMPTY_DRIVE)
-                .doubleValue();
-        double occupiedSum = taskTimeSumsByType.getSum(TaxiTask.TaxiTaskType.EMPTY_DRIVE)
-                .doubleValue();
-        return emptySum / (emptySum + occupiedSum);
+        double empty = taskTimeSumsByType.get(TaxiTask.TaxiTaskType.EMPTY_DRIVE).doubleValue();
+        double occupied = taskTimeSumsByType.get(TaxiTask.TaxiTaskType.EMPTY_DRIVE).doubleValue();
+        return empty / (empty + occupied);
     }
 
 
     public double getAggregatedStayRatio()
     {
-        double staySum = taskTimeSumsByType.getSum(TaxiTask.TaxiTaskType.STAY).doubleValue();
-        double totalSum = taskTimeSumsByType.getTotalSum().doubleValue();
-        return staySum / totalSum;
+        double stay = taskTimeSumsByType.get(TaxiTask.TaxiTaskType.STAY).doubleValue();
+        double total = taskTimeSumsByType.getTotal().doubleValue();
+        return stay / total;
     }
 
 
     public double getOccupiedDriveRatio()
     {
-        double occupied = taskTimeSumsByType.getSum(TaxiTaskType.OCCUPIED_DRIVE).doubleValue();
-        double total = taskTimeSumsByType.getTotalSum().doubleValue();
+        double occupied = taskTimeSumsByType.get(TaxiTaskType.OCCUPIED_DRIVE).doubleValue();
+        double total = taskTimeSumsByType.getTotal().doubleValue();
         return occupied / total;
     }
 }

@@ -52,13 +52,13 @@ public class EnumAdderHistogram<T extends Enum<T>, N extends Number>
     public long getCount(int idx)
     {
         T key = getBin(idx);
-        return adder.getSum(key).longValue();
+        return adder.get(key).longValue();
     }
 
 
     @Override
     public long getTotalCount()
     {
-        return adder.getTotalSum().longValue();
+        return adder.getTotal().longValue();
     }
 }

@@ -40,7 +40,7 @@ public abstract class AbstractEnumAdder<K extends Enum<K>, N extends Number>
 
     public void increment(K e)
     {
-        add(e, 1);//(Integer)1 is cached internally
+        add(e, 1);//(Integer)1 is cached internally by JVM, so shouldn't be so costly
     }
 
 
@@ -48,7 +48,7 @@ public abstract class AbstractEnumAdder<K extends Enum<K>, N extends Number>
     public void addAll(EnumAdder<K, ?> enumAdder)
     {
         for (K e : keys) {
-            add(e, enumAdder.getSum(e));
+            add(e, enumAdder.get(e));
         }
     }
 }
