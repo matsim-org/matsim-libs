@@ -27,21 +27,19 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TravelTimeMessage implements LogMessage {
+public class TravelTimeMessage extends LogMessage {
 
 	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
 	public static Map<TransitRoute, Integer> routeStat = new HashMap<>();
 
-	private final TransitLine transitLine;
-	private final TransitRoute transitRoute;
+
 	private final TransitRouteStop fromStop;
 	private final TransitRouteStop toStop;
 	private final double ttActual;
 	private double ttSchedule;
 
 	public TravelTimeMessage(TransitLine transitLine, TransitRoute transitRoute, TransitRouteStop fromStop, TransitRouteStop toStop, double ttActual, double ttSchedule) {
-		this.transitLine = transitLine;
-		this.transitRoute = transitRoute;
+		super(transitLine, transitRoute);
 		this.fromStop = fromStop;
 		this.toStop = toStop;
 		this.ttActual = ttActual;
@@ -53,7 +51,7 @@ public class TravelTimeMessage implements LogMessage {
 
 	@Override
 	public String toString() {
-		return "TRAVEL TIME INCONSISTENT\tline " +transitLine.getId()+"\troute "+transitRoute.getId()+"\t"+ttActual+" "+ttSchedule;
+		return "TT INCONSISTENT \tstops:\t\t"+fromStop.getStopFacility().getName()+"\t->\t"+toStop.getStopFacility().getName()+"\ttt actual:"+ttActual+"\ttt expected: "+ttSchedule;
 	}
 
 }

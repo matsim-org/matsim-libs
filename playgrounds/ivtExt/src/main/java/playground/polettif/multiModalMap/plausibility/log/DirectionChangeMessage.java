@@ -26,20 +26,17 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DirectionChangeMessage implements LogMessage {
+public class DirectionChangeMessage extends LogMessage {
 
 	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
 	public static Map<TransitRoute, Integer> routeStat = new HashMap<>();
 
-	private final TransitLine transitLine;
-	private final TransitRoute transitRoute;
 	private final Link link1;
 	private final Link link2;
 	private final double diff;
 
 	public DirectionChangeMessage(TransitLine transitLine, TransitRoute transitRoute, Link link1, Link link2, double diff) {
-		this.transitLine = transitLine;
-		this.transitRoute = transitRoute;
+		super(transitLine, transitRoute);
 		this.link1 = link1;
 		this.link2 = link2;
 		this.diff = diff;
@@ -50,6 +47,6 @@ public class DirectionChangeMessage implements LogMessage {
 
 	@Override
 	public String toString() {
-		return "DIRECTION CHANGE        \tline " +transitLine.getId()+"\troute "+transitRoute.getId()+"\t"+diff;
+		return "DIRECTION CHANGE\tlinks: "+link1.getId()+"\t->\t"+link2.getId()+"\t\tdiff: "+diff*200/Math.PI +" gon";
 	}
 }

@@ -47,7 +47,11 @@ public class PlausibilityCheck {
 
 	private List<LogMessage> log = new ArrayList<>();
 
-	private double uTurnAngleThreshold = Math.PI/8;
+	private static final double PI = Math.PI;
+	private static final double PI2 = 2*Math.PI;
+
+	// todo mode dependent threshold
+	private double uTurnAngleThreshold = 0.75*PI;
 
 	private TransitSchedule schedule;
 	private Network network;
@@ -64,7 +68,7 @@ public class PlausibilityCheck {
 		PlausibilityCheck check = new PlausibilityCheck(schedule, network);
 		check.run();
 
-		check.printLineSummary();
+		check.printResult();
 	}
 
 	public void run() {
@@ -104,9 +108,9 @@ public class PlausibilityCheck {
 						log.add(new LoopMessage(transitLine, transitRoute, linkFrom.getFromNode()));
 					}
 
-					// angle check
+					// angle check (check if one link has length 0)
 					double angleDiff = getAzimuthDiff(linkFrom, linkTo);
-					if(Math.abs(angleDiff) > uTurnAngleThreshold) {
+					if(Math.abs(angleDiff) > uTurnAngleThreshold && linkFrom.getLength() > 0 && linkTo.getLength() > 0) {
 						log.add(new DirectionChangeMessage(transitLine, transitRoute, linkFrom, linkTo, angleDiff));
 					}
 				}
@@ -115,8 +119,13 @@ public class PlausibilityCheck {
 	}
 
 	public void printResult() {
+		TransitLine previousLine = null;
+		TransitRoute previousRoute = null;
 		for(LogMessage entry : log) {
+			entry.printLineRouteInfo(previousLine, previousRoute);
 			System.out.println(entry);
+			previousLine = entry.getTransitLine();
+			previousRoute = entry.getTransitRoute();
 		}
 	}
 
@@ -143,7 +152,18 @@ public class PlausibilityCheck {
 	private double getAzimuthDiff(Link link1, Link link2) {
 		double az1 = getAzimuth(link1.getFromNode().getCoord(), link1.getToNode().getCoord());
 		double az2 = getAzimuth(link2.getFromNode().getCoord(), link2.getToNode().getCoord());
+		double diff = az2-az1;
 
-		return az2-az1;
+		// todo difference > 200 gon
+
+		if(diff > PI) {
+			diff = PI2-diff;
+		}
+		if(diff < 0) {
+			diff = diff+PI2;
+		}
+
+		return (diff > PI2 ? diff-PI2 : diff);
 	}
+
 }

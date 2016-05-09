@@ -27,18 +27,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class LoopMessage implements LogMessage{
+public class LoopMessage extends LogMessage {
 
 	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
 	public static Map<TransitRoute, Integer> routeStat = new HashMap<>();
 
-	private final TransitLine transitLine;
-	private final TransitRoute transitRoute;
 	private final Node node;
 
 	public LoopMessage(TransitLine transitLine, TransitRoute transitRoute, Node node) {
-		this.transitLine = transitLine;
-		this.transitRoute = transitRoute;
+		super(transitLine, transitRoute);
 		this.node = node;
 
 		MapUtils.addToInteger(transitLine, lineStat, 1, 1);
@@ -47,7 +44,6 @@ public class LoopMessage implements LogMessage{
 
 	@Override
 	public String toString() {
-		return "LOOP                    \tline " +transitLine.getId()+"\troute "+transitRoute.getId()+"\tnode "+node.getId();
+		return "LOOP            \tnode: "+node.getId();
 	}
-
 }

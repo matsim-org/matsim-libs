@@ -19,6 +19,30 @@
 package playground.polettif.multiModalMap.plausibility.log;
 
 
-public interface LogMessage {
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
+public abstract class LogMessage {
+
+	protected final TransitLine transitLine;
+	protected final TransitRoute transitRoute;
+
+	public LogMessage(TransitLine transitLine, TransitRoute transitRoute) {
+		this.transitLine = transitLine;
+		this.transitRoute = transitRoute;
+	}
+
+	public void printLineRouteInfo(TransitLine previousLine, TransitRoute previousRoute) {
+		if(((previousLine == null && previousRoute == null) || !previousLine.equals(transitLine) || !previousRoute.equals(transitRoute))) {
+			System.out.println("\t" + transitLine.getId() + "\t" + transitRoute.getId());
+		}
+	}
+
+	public TransitRoute getTransitRoute() {
+		return transitRoute;
+	}
+
+	public TransitLine getTransitLine() {
+		return transitLine;
+	}
 }
