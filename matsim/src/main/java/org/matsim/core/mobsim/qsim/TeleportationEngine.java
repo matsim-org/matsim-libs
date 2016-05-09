@@ -93,7 +93,7 @@ VisData {
 	public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> snapshotList) {
 		double time = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (TeleportationVisData teleportationVisData : teleportationData.values()) {
-			teleportationVisData.calculatePosition(time);
+			teleportationVisData.updatePosition(time);
 			snapshotList.add(teleportationVisData);
 		}
 		return snapshotList;

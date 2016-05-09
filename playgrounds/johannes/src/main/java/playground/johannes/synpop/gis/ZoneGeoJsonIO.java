@@ -35,8 +35,8 @@ import java.util.Map.Entry;
  */
 public class ZoneGeoJsonIO {
 
-	public static ZoneCollection readFromGeoJSON(String file, String primaryKey) throws IOException {
-		ZoneCollection zones = new ZoneCollection();
+	public static ZoneCollection readFromGeoJSON(String file, String primaryKey, String id) throws IOException {
+		ZoneCollection zones = new ZoneCollection(id);
 		String data = new String(Files.readAllBytes(Paths.get(file)));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey(primaryKey);

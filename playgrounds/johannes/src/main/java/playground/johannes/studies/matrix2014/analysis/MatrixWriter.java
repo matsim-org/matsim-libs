@@ -38,27 +38,14 @@ public class MatrixWriter implements AnalyzerTask<Collection<? extends Person>> 
 
     private final FileIOContext ioContext;
 
-//    private boolean useWeights;
-
-//    private Predicate<Segment> predicate;
 
     public MatrixWriter(MatrixBuilder builder, FileIOContext ioContext) {
         matrixBuilder = builder;
         this.ioContext = ioContext;
     }
 
-//    public void setPredicate(Predicate<Segment> predicate) {
-//        this.predicate = predicate;
-//    }
-
-//    public void setUseWeights(boolean useWeights) {
-//        this.useWeights = useWeights;
-//    }
-
     @Override
     public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-//        matrixBuilder.setLegPredicate(predicate);
-//        matrixBuilder.setUseWeights(useWeights);
         NumericMatrix matrix = matrixBuilder.build(persons);
 
         try {

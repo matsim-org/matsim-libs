@@ -19,19 +19,12 @@
 
 package playground.jbischoff.av.preparation;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.taxi.TaxiUtils;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -51,7 +44,7 @@ public class WobPlansFilter {
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()){
 				if (pe instanceof Leg){
-					if (((Leg) pe).getMode().equals(TaxiUtils.TAXI_MODE)){
+					if (((Leg) pe).getMode().equals(TaxiModule.TAXI_MODE)){
 						copyPerson = true;
 					}
 				}

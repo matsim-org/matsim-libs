@@ -90,7 +90,7 @@ public class SrV2008TripParser {
 			Map<String,Integer> columnNumbers = new LinkedHashMap<String,Integer>(heads.length);
 			for (int i = 0; i < heads.length; i++) {
 				columnNumbers.put(heads[i],i);
-				//System.out.println("Column No.=" + i + " has an entry with title=" + heads[i]);
+				//log.info("Column No.=" + i + " has an entry with title=" + heads[i]);
 			}
 			
 			// read data and write relevant information to a new Trip object
@@ -160,27 +160,27 @@ public class SrV2008TripParser {
 				
 				trip.setWeight(weight);
 				
-//				System.out.println("personId = " + trip.getDriverId());
-//				System.out.println("tripId = " + trip.getTripId());
-//				System.out.println("tripActivityEndType = " + trip.getActivityEndActType());
-//				System.out.println("departureZoneId = " + trip.getDepartureZoneId());
-//				System.out.println("departureTime = " + trip.getDepartureTime());
-//				System.out.println("useHouseholdCar = " + trip.getUseHouseholdCar());
-//				System.out.println("useOtherCar = " + trip.getUseOtherCar());
-//				System.out.println("mode = " + trip.getMode());
-//				System.out.println("distanceBeeline = " + trip.getDistanceBeeline());
-//				System.out.println("distanceRoutedFastest = " + trip.getDistanceRoutedFastest());
-//				System.out.println("distanceRoutedShortest = " + trip.getDistanceRoutedShortest());
-//				System.out.println("speed = " + trip.getSpeed());
-//				System.out.println("duration = " + trip.getDuration());
+//				log.info("personId = " + trip.getDriverId());
+//				log.info("tripId = " + trip.getTripId());
+//				log.info("tripActivityEndType = " + trip.getActivityEndActType());
+//				log.info("departureZoneId = " + trip.getDepartureZoneId());
+//				log.info("departureTime = " + trip.getDepartureTime());
+//				log.info("useHouseholdCar = " + trip.getUseHouseholdCar());
+//				log.info("useOtherCar = " + trip.getUseOtherCar());
+//				log.info("mode = " + trip.getMode());
+//				log.info("distanceBeeline = " + trip.getDistanceBeeline());
+//				log.info("distanceRoutedFastest = " + trip.getDistanceRoutedFastest());
+//				log.info("distanceRoutedShortest = " + trip.getDistanceRoutedShortest());
+//				log.info("speed = " + trip.getSpeed());
+//				log.info("duration = " + trip.getDuration());
 //				double time = trip.getArrivalTime() - trip.getDepartureTime();
-//				System.out.println("calculated duration = " + time);
+//				log.info("calculated duration = " + time);
 //				double calculatedSpeed = trip.getDistanceBeeline() / time * 60.;
-//				System.out.println("calculated speed = " + calculatedSpeed);
-//				System.out.println("arrivalZoneId = " + trip.getArrivalZoneId());
-//				System.out.println("arrivalTime = " + trip.getArrivalTime());
-//				System.out.println("activityStartActType = " + trip.getActivityStartActType());
-//				System.out.println("---------------------------------------------------");
+//				log.info("calculated speed = " + calculatedSpeed);
+//				log.info("arrivalZoneId = " + trip.getArrivalZoneId());
+//				log.info("arrivalTime = " + trip.getArrivalTime());
+//				log.info("activityStartActType = " + trip.getActivityStartActType());
+//				log.info("---------------------------------------------------");
 				
 				trips.put(tripId, trip);
 			}

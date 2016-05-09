@@ -9,7 +9,7 @@ import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
@@ -19,22 +19,22 @@ import playground.dhosse.prt.scheduler.NPersonsPickupStayTask;
 
 public class NPersonsVehicleRequestPathFinder
 {
-    private final TaxiOptimizerContext optimConfig;
+    private final TaxiOptimizerContext optimContext;
 
-    private final TaxiScheduler scheduler;
+    private final TaxiScheduleInquiry scheduler;
     private final int vehicleCapacity;
     private final LeastCostPathCalculator router;
 
 
-    public NPersonsVehicleRequestPathFinder(TaxiOptimizerContext optimConfig,
+    public NPersonsVehicleRequestPathFinder(TaxiOptimizerContext optimContext,
             int vehicleCapacity)
     {
-        this.optimConfig = optimConfig;
+        this.optimContext = optimContext;
         this.vehicleCapacity = vehicleCapacity;
-        this.scheduler = optimConfig.scheduler;
+        this.scheduler = optimContext.scheduler;
 
-        router = new Dijkstra(optimConfig.context.getScenario().getNetwork(),
-                optimConfig.travelDisutility, optimConfig.travelTime);
+        router = new Dijkstra(optimContext.getNetwork(),
+                optimContext.travelDisutility, optimContext.travelTime);
 
     }
 
@@ -132,7 +132,7 @@ public class NPersonsVehicleRequestPathFinder
 
         return departure == null ? null
                 : VrpPaths.calcAndCreatePath(departure.link, req.getFromLink(), departure.time,
-                        router, optimConfig.travelTime);
+                        router, optimContext.travelTime);
 
     }
 

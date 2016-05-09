@@ -235,7 +235,7 @@ public class TTMatrixGenerator {
 		reader.parse(netFile);
 		
 		logger.info("Loading zones...");
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, zoneIdKey);
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, zoneIdKey, null);
 		
 		TTMatrixGenerator generator = new TTMatrixGenerator();
 		NumericMatrix m = generator.generate(scenario.getNetwork(), zones, zoneIdKey, nThreads);

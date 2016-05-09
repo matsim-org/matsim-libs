@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
 
 
@@ -68,5 +69,19 @@ public class MovingAgentsRegister
     public void reset(int iteration)
     {
         movingAgentsMap.clear();
+    }
+
+
+    private static final MovingAgentsRegister MOVING_AGENTS_REGISTER = new MovingAgentsRegister();
+
+
+    public static AbstractModule createModule()
+    {
+        return new AbstractModule() {
+            public void install()
+            {
+                addEventHandlerBinding().toInstance(MOVING_AGENTS_REGISTER);
+            }
+        };
     }
 }

@@ -21,6 +21,7 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.*;
 
+import org.matsim.analysis.IterationStopWatch;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.taxi.data.TaxiRequest;
@@ -42,9 +43,13 @@ public abstract class AbstractTaxiOptimizer
 
     protected boolean requiresReoptimization = false;
 
+    private static final String TAXI_OPTIMIZATION = "taxiOptim";
+    private final IterationStopWatch stopWatch;
+
 
     public AbstractTaxiOptimizer(TaxiOptimizerContext optimContext,
-            Collection<TaxiRequest> unplannedRequests, boolean doUnscheduleAwaitingRequests)
+            AbstractTaxiOptimizerParams params, Collection<TaxiRequest> unplannedRequests,
+            boolean doUnscheduleAwaitingRequests)
     {
         this.optimContext = optimContext;
         this.unplannedRequests = unplannedRequests;
@@ -52,7 +57,9 @@ public abstract class AbstractTaxiOptimizer
 
         destinationKnown = optimContext.scheduler.getParams().destinationKnown;
         vehicleDiversion = optimContext.scheduler.getParams().vehicleDiversion;
-        reoptimizationTimeStep = optimContext.optimizerParams.reoptimizationTimeStep;
+        reoptimizationTimeStep = params.reoptimizationTimeStep;
+
+        stopWatch = optimContext.matsimServices.getStopwatch();
     }
 
 
@@ -60,6 +67,8 @@ public abstract class AbstractTaxiOptimizer
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
         if (requiresReoptimization && (e.getSimulationTime() % reoptimizationTimeStep == 0)) {
+            stopWatch.beginOperation(TAXI_OPTIMIZATION);
+
             if (doUnscheduleAwaitingRequests) {
                 unscheduleAwaitingRequests();
             }
@@ -68,7 +77,7 @@ public abstract class AbstractTaxiOptimizer
             //TODO (2) update timeline only if the algo really wants to reschedule in this time step,
             //perhaps by checking if there are any unplanned requests??
             if (doUnscheduleAwaitingRequests) {
-                for (Vehicle v : optimContext.context.getVrpData().getVehicles().values()) {
+                for (Vehicle v : optimContext.taxiData.getVehicles().values()) {
                     optimContext.scheduler
                             .updateTimeline(TaxiSchedules.asTaxiSchedule(v.getSchedule()));
                 }
@@ -81,6 +90,7 @@ public abstract class AbstractTaxiOptimizer
             }
 
             requiresReoptimization = false;
+            stopWatch.endOperation(TAXI_OPTIMIZATION);
         }
     }
 
@@ -126,7 +136,7 @@ public abstract class AbstractTaxiOptimizer
 
     protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask)
     {
-        return !destinationKnown && newCurrentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_OCCUPIED;
+        return !destinationKnown && newCurrentTask.getTaxiTaskType() == TaxiTaskType.OCCUPIED_DRIVE;
     }
 
 
@@ -138,12 +148,5 @@ public abstract class AbstractTaxiOptimizer
 
         //TODO we may here possibly decide whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}
-    }
-
-
-    @Override
-    public TaxiOptimizerContext getOptimizerContext()
-    {
-        return optimContext;
     }
 }

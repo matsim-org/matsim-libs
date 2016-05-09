@@ -264,7 +264,7 @@ public final class ParkingInfrastructureManager {
 
 			// select the best one from the queue:
 			SortableMapObject<PC2Parking> poll = queue.peek();
-			finalScore = poll.getScore();
+			finalScore = poll.getWeight();
 			selectedParking = poll.getKey();
 
 			if (selectedParking instanceof RentableParking) {

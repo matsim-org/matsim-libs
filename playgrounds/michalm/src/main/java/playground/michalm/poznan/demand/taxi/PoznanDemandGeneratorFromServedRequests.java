@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.michalm.demand.taxi.AbstractDemandGeneratorFromServedRequests;
@@ -64,7 +64,7 @@ public class PoznanDemandGeneratorFromServedRequests
 
     public static void main(String[] args)
     {
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
         Iterable<PoznanServedRequest> requests = PoznanServedRequests.readRequests(4);
         Date zeroDate = PoznanServedRequestsReader.parseDate("09-04-2014 00:00:00");

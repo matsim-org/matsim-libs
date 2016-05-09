@@ -213,6 +213,8 @@ public class Window extends JFrame implements ActionListener {
 		infoPanel.add(coordsPanel, BorderLayout.EAST);
 		this.add(infoPanel, BorderLayout.SOUTH);
 		isOk();
+		this.setExtendedState(this.getExtendedState() | this.MAXIMIZED_BOTH);
+
 	}
 	public Window(String title, Network network, String mode, Trip trip, Map<String,Stop> stops, List<Link> links, RoutesPathsGenerator routesPathsGenerator) {
 		this(title, network, mode, trip, stops, null, links, routesPathsGenerator);
@@ -329,6 +331,7 @@ public class Window extends JFrame implements ActionListener {
 		}
 		else*/
 			isOk();
+			this.setExtendedState(this.getExtendedState() | this.MAXIMIZED_BOTH);
 		
 	}
 	public Option getOption() {

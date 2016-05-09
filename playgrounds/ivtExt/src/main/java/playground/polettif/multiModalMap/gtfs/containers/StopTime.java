@@ -22,10 +22,13 @@ package playground.polettif.multiModalMap.gtfs.containers;
 
 import java.util.Date;
 
-
+/**
+ * Container for GTFS StopTime. Contains stopId, arrivalTime and departureTime
+ */
 public class StopTime {
 	
 	//Attributes
+	private Integer sequencePosition;
 	private Date arrivalTime;
 	private Date departureTime;
 	private String stopId;
@@ -36,30 +39,42 @@ public class StopTime {
 	 * @param departureTime
 	 * @param stopId
 	 */
-	public StopTime(Date arrivalTime, Date departureTime, String stopId) {
+	public StopTime(Integer sequencePosition, Date arrivalTime, Date departureTime, String stopId) {
 		super();
+		this.sequencePosition = sequencePosition;
 		this.arrivalTime = arrivalTime;
 		this.departureTime = departureTime;
 		this.stopId = stopId;
 	}
+
+	/**
+	 * @return the position of the stopTime within the stopSequence
+	 */
+	public Integer getSeuencePosition() {
+		return sequencePosition;
+	}
+
 	/**
 	 * @return the arrivalTime
 	 */
 	public Date getArrivalTime() {
 		return arrivalTime;
 	}
+
 	/**
 	 * @return the departureTime
 	 */
 	public Date getDepartureTime() {
 		return departureTime;
 	}
+
 	/**
 	 * @return the stopId
 	 */
 	public String getStopId() {
 		return stopId;
 	}
+
 	/**
 	 * @param stopId the stopId to set
 	 */

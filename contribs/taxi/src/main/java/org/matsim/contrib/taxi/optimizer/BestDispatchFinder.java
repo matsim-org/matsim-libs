@@ -8,7 +8,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -33,15 +33,15 @@ public class BestDispatchFinder
 
     private final TaxiOptimizerContext optimContext;
     private final MultiNodeDijkstra router;
-    private final TaxiScheduler scheduler;
+    private final TaxiScheduleInquiry scheduleInquiry;
 
 
     public BestDispatchFinder(TaxiOptimizerContext optimContext)
     {
         this.optimContext = optimContext;
-        this.scheduler = optimContext.scheduler;
+        this.scheduleInquiry = optimContext.scheduler;
 
-        router = new MultiNodeDijkstra(optimContext.context.getScenario().getNetwork(),
+        router = new MultiNodeDijkstra(optimContext.getNetwork(),
                 optimContext.travelDisutility, optimContext.travelTime, false);
     }
 
@@ -50,14 +50,14 @@ public class BestDispatchFinder
     //minimize TW
     public Dispatch findBestVehicleForRequest(TaxiRequest req, Iterable<? extends Vehicle> vehicles)
     {
-        double currTime = optimContext.context.getTime();
+        double currTime = optimContext.timer.getTimeOfDay();
         Link toLink = req.getFromLink();
         Node toNode = toLink.getFromNode();
 
         Map<Id<Node>, Vehicle> initialVehicles = new HashMap<>();
         Map<Id<Node>, InitialNode> initialNodes = new HashMap<>();
         for (Vehicle veh : vehicles) {
-            LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(veh);
+            LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh);
             if (departure != null) {
 
                 Node vehNode;
@@ -94,7 +94,8 @@ public class BestDispatchFinder
         //(no initial times/costs for imaginary<->initial are included)
         Node fromNode = path.nodes.get(0);
         Vehicle bestVehicle = initialVehicles.get(fromNode.getId());
-        LinkTimePair bestDeparture = scheduler.getImmediateDiversionOrEarliestIdleness(bestVehicle);
+        LinkTimePair bestDeparture = scheduleInquiry
+                .getImmediateDiversionOrEarliestIdleness(bestVehicle);
 
         VrpPathWithTravelData vrpPath = VrpPaths.createPath(bestDeparture.link, toLink,
                 bestDeparture.time, path, optimContext.travelTime);
@@ -106,7 +107,7 @@ public class BestDispatchFinder
     //minimize TP
     public Dispatch findBestRequestForVehicle(Vehicle veh, Iterable<TaxiRequest> unplannedRequests)
     {
-        LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(veh);
+        LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh);
         Node fromNode = departure.link.getToNode();
 
         Map<Id<Node>, TaxiRequest> initialRequests = new HashMap<>();

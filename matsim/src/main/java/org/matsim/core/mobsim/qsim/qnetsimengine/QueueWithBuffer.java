@@ -178,7 +178,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final AbstractQLink qLink;
 	private final Id<Lane> id;
 	private static int spaceCapWarningCount = 0;
-	private final double HOLE_SPEED = 15.0;
+	final static double HOLE_SPEED_KM_H = 15.0;
 
 	private final double length ;
 	private double unscaledFlowCapacity_s = Double.NaN ;
@@ -339,6 +339,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	private void calculateStorageCapacity() {
+		// yyyyyy the following is not adjusted for time-dependence!! kai, apr'16
+		
 		bufferStorageCapacity = (int) Math.ceil(flowCapacityPerTimeStep);
 
 		// first guess at storageCapacity:
@@ -367,6 +369,35 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				QueueWithBuffer.spaceCapWarningCount++;
 			}
 			storageCapacity = tempStorageCapacity;
+		}
+		
+		/* About minStorCapForHoles: 
+		 * () uncongested branch is q(rho) = rho * v_max
+		 * () congested branch is q(rho) = (rho - rho_jam) * v_holes
+		 * () rho_maxflow is where these two meet, resulting in rho_maxflow = v_holes * rho_jam / ( v_holes + v_max )
+		 * () max flow is q(rho_maxflow), resulting in v_max * v_holes * rho_jam / ( v_holes + v_max ) 
+		 * () Since everything else is given, rho_jam needs to be large enough so that q(rho_maxflow) can reach capacity, resulting in
+		 *    rho_jam >= capacity * (v_holes + v_max) / (v_max * v_holes) ;
+		 * () In consequence, storage capacity needs to be larger than curved_length * rho_jam .
+		 * 
+		 */
+		
+		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
+//			final double minStorCapForHoles = 2. * flowCapacityPerTimeStep * context.getSimTimer().getSimTimestepSize();
+			final double freeSpeed = qLink.getLink().getFreespeed() ;
+			final double holeSpeed = HOLE_SPEED_KM_H/3.6;
+			final double minStorCapForHoles = length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
+//			final double minStorCapForHoles = 2.* length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
+			// I have no idea why the factor 2 needs to be there?!?! kai, apr'16
+			// I just removed the factor of 2 ... seems to work now without.  kai, may'16
+			// yyyyyy (not thought through for TS != 1sec!  (should use flow cap per second) kai, apr'16)
+			if ( storageCapacity < minStorCapForHoles ) {
+				if ( spaceCapWarningCount <= 10 ) { 
+					log.warn("storage capacity not sufficient for holes; increasing from " + storageCapacity + " to " + minStorCapForHoles ) ;
+					QueueWithBuffer.spaceCapWarningCount++;
+				}
+				storageCapacity = minStorCapForHoles ;
+			}
 		}
 	}
 
@@ -458,8 +489,23 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
 			QueueWithBuffer.Hole hole = new QueueWithBuffer.Hole() ;
-			double offset = length*3600./HOLE_SPEED/1000. ;
-			hole.setEarliestLinkExitTime( now + 1.0*offset + 0.0*MatsimRandom.getRandom().nextDouble()*offset ) ;
+			double ttimeOfHoles = length*3600./HOLE_SPEED_KM_H/1000. ;
+			
+//			double offset = this.storageCapacity/this.flowCapacityPerTimeStep ;
+			/* NOTE: Start with completely full link, i.e. N_storageCap cells filled.  Now make light at end of link green, discharge with
+			* flowCapPerTS.  After N_storageCap/flowCapPerTS, the link is empty.  Which also means that the holes must have reached
+			* the upstream end of the link.  I.e. speed_holes = length / (N_storageCap/flowCap) and 
+			* ttime_holes = lenth/speed = N_storCap/flowCap.
+			* Say length=75m, storCap=10, flowCap=1/2sec.  offset = 20sec.  75m/20sec = 225m/1min = 13.5km/h so this is normal.
+			* Say length=75m, storCap=20, flowCap=1/2sec.  offset = 40sec.  ... = 6.75km/h ... to low.  Reason: unphysical parameters.
+			* (Parameters assume 2-lane road, which should have discharge of 1/sec.  Or we have lots of  tuk tuks, which have only half a vehicle
+			* length.  Thus we incur the reaction time twice as often --> half speed of holes.
+			*/
+
+//			double nLanes = 2. * flowCapacityPerTimeStep ; // pseudo-lanes
+//			double ttimeOfHoles = 0.1 * this.storageCapacity/this.flowCapacityPerTimeStep/nLanes ;
+			
+			hole.setEarliestLinkExitTime( now + 1.0*ttimeOfHoles + 0.0*MatsimRandom.getRandom().nextDouble()*ttimeOfHoles ) ;
 			hole.setSizeInEquivalents(veh2Remove.getSizeInEquivalents());
 			holes.add( hole ) ;
 		}
@@ -515,11 +561,18 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 //			return false ;
 //		}
 		// at this point, storage is ok, so start checking holes:
-		if ( remainingHolesStorageCapacity <=0 ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
+		if ( remainingHolesStorageCapacity <=0 ) { 
+			// no holes available at all; in theory, this should not happen since covered by !storageOk (but that is commented out now)
+
 			//						log.warn( " !hasSpace since no holes available ") ;
 			return false ;
 		} 
 		return true ;
+		
+		// remainingHolesStorageCapacity is:
+		// * initialized at linkStorageCapacity
+		// * reduced by entering vehicles
+		// * increased by holes arriving at upstream end of link
 	}
 
 	private void recalcTimeVariantAttributes() {
@@ -683,7 +736,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		vehQueue.add(veh);
 
 		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.withHoles ) {
-			remainingHolesStorageCapacity = remainingHolesStorageCapacity - veh.getSizeInEquivalents();
+			remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
 		}
 	}
 
@@ -748,93 +801,66 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 
 		@Override
-		final double getSizeInEquivalents() {
+		public final double getSizeInEquivalents() {
 			return this.pcu;
 		}
 
 		final void setSizeInEquivalents(double pcuFactorOfHole) {
 			this.pcu = pcuFactorOfHole;
 		}
+
+		@Override
+		public Vehicle getVehicle() {
+			return null ;
+		}
+
+		@Override
+		public MobsimDriverAgent getDriver() {
+			return null ;
+		}
+
+		@Override
+		public Id<Vehicle> getId() {
+			return null ;
+		}
 	}
 
 	class VisDataImpl implements QLaneI.VisData {
 		private Coord upstreamCoord;
-		private Coord downsteamCoord;
-		private double euklideanDistance;
+		private Coord downstreamCoord;
 
 		@Override
 		public final Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions, double now) {
-			TreeMap<Double, Hole> holePositions = new TreeMap<>() ;
-			if ( QSimConfigGroup.SnapshotStyle.withHoles==context.qsimConfig.getSnapshotStyle() ) {
-				// holes:
-				if ( !holes.isEmpty() ) {
-					double spacing = context.snapshotInfoBuilder.calculateVehicleSpacing(length, holes.size(), getStorageCapacity() );
-					double freespeedTraveltime = length / (HOLE_SPEED*1000./3600.);
-					double lastDistanceFromFromNode = Double.NaN;
-					for (Hole hole : holes) {
-						lastDistanceFromFromNode = createHolePositionAndReturnDistance(lastDistanceFromFromNode, spacing, freespeedTraveltime,
-								hole);
-						if ( QSimConfigGroup.SnapshotStyle.withHoles==context.qsimConfig.getSnapshotStyle() ) {
-							addHolePosition( positions, lastDistanceFromFromNode, hole ) ;
-						}
-						holePositions.put( lastDistanceFromFromNode, hole ) ;
-					}
-				}
-			}
-
-			// vehicles:
-			if ( !buffer.isEmpty() || !vehQueue.isEmpty() ) {
-				// vehicle positions are computed in snapshotInfoBuilder as a service:
+			if ( !buffer.isEmpty() || !vehQueue.isEmpty() || !holes.isEmpty() ) {
 				Gbl.assertNotNull(positions);
-				Gbl.assertNotNull(holePositions);
-				Gbl.assertNotNull(qLink.getLink());
 				Gbl.assertNotNull( context.snapshotInfoBuilder );
-				context.snapshotInfoBuilder.positionVehiclesAlongLine(
+				if ( this.upstreamCoord==null ) {
+					this.upstreamCoord = qLink.getLink().getFromNode().getCoord() ;
+				}
+				if ( this.downstreamCoord==null ) {
+					this.downstreamCoord = qLink.getLink().getToNode().getCoord() ;
+				}
+				// vehicle positions are computed in snapshotInfoBuilder as a service:
+				positions = context.snapshotInfoBuilder.positionVehiclesAlongLine(
 						positions, 
 						now, 
 						getAllVehicles(), 
-						holePositions, 
 						length, 
 						storageCapacity + bufferStorageCapacity, 
-						((LinkImpl) qLink.getLink()).getEuklideanLength(), 
-						qLink.getLink().getFromNode().getCoord(), 
-						qLink.getLink().getToNode().getCoord(), 
+						this.upstreamCoord,
+						this.downstreamCoord,
 						inverseFlowCapacityPerTimeStep, 
-						qLink.getLink().getFreespeed(now), NetworkUtils.getNumberOfLanesAsInt(now, qLink.getLink())
+						qLink.getLink().getFreespeed(now), 
+						NetworkUtils.getNumberOfLanesAsInt(now, qLink.getLink()), 
+						holes
 						);
 			}
 			return positions ;
 		}
 
-		private double createHolePositionAndReturnDistance(double lastDistanceFromFromNode,
-				double spacing, double freespeedTraveltime, Hole veh)
-		{
-			double now = context.getSimTimer().getTimeOfDay() ;
-			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
-			double distanceFromFromNode = context.snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(QueueWithBuffer.this.length, spacing,
-					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
-			return distanceFromFromNode;
-		}
-		
-		private void addHolePosition(final Collection<AgentSnapshotInfo> positions, double distanceFromFromNode, Hole veh)
-		{
-			Integer lane = 10 ;
-			double speedValue = 1. ;
-			if (this.upstreamCoord != null){
-				context.snapshotInfoBuilder.positionQItem(positions, this.upstreamCoord, this.downsteamCoord,
-						QueueWithBuffer.this.length, this.euklideanDistance, veh,
-						distanceFromFromNode, lane, speedValue);
-			} else {
-				context.snapshotInfoBuilder.positionQItem(positions, qLink.getLink().getFromNode().getCoord(), qLink.getLink().getToNode().getCoord(),
-						QueueWithBuffer.this.length, ((LinkImpl)qLink.getLink()).getEuklideanLength() , veh, 
-						distanceFromFromNode, lane, speedValue);
-			}
-		}
-		
-		void setVisInfo(Coord upstreamCoord, Coord downstreamCoord, double euklideanDistance) {
+		void setVisInfo(Coord upstreamCoord, Coord downstreamCoord) {
 			this.upstreamCoord = upstreamCoord;
-			this.downsteamCoord = downstreamCoord;
-			this.euklideanDistance = euklideanDistance;
+			this.downstreamCoord = downstreamCoord;
 		}
 	}
 

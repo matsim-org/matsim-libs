@@ -15,6 +15,7 @@ class MIPSolutionScheduler
     private final TaxiOptimizerContext optimContext;
     private final MIPRequestData rData;
     private final VehicleData vData;
+
     private final int m;
     private final int n;
 
@@ -24,16 +25,15 @@ class MIPSolutionScheduler
     private Vehicle currentVeh;
 
 
-    MIPSolutionScheduler(TaxiOptimizerContext optimContext, MIPRequestData rData,
-            VehicleData vData)
+    MIPSolutionScheduler(TaxiOptimizerContext optimContext, MIPRequestData rData, VehicleData vData)
     {
         this.optimContext = optimContext;
         this.rData = rData;
         this.vData = vData;
         this.m = vData.dimension;
         this.n = rData.dimension;
-        
-        router = new DijkstraWithThinPath(optimContext.context.getScenario().getNetwork(),
+
+        router = new DijkstraWithThinPath(optimContext.getNetwork(),
                 optimContext.travelDisutility, optimContext.travelTime);
     }
 

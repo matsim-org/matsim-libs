@@ -52,6 +52,7 @@ public class OptimalWalkPlanFinderTest {
 	}
 
 	private double calcScoreFromEvents(EventsManager events, EventsToScore eventsToScore, final Fixture f) {
+		eventsToScore.beginIteration(0);
 		handleFirstActivity(events, f, (Activity) f.plan.getPlanElements().get(0));
 		handleLeg(events, f, (Leg) f.plan.getPlanElements().get(1));
 		handleActivity(events, f, (Activity) f.plan.getPlanElements().get(2));

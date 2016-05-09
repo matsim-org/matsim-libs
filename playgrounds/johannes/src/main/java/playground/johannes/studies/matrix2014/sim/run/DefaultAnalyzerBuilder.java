@@ -18,12 +18,13 @@
  * *********************************************************************** */
 package playground.johannes.studies.matrix2014.sim.run;
 
+import gnu.trove.list.array.TDoubleArrayList;
+import org.matsim.contrib.common.stats.Discretizer;
 import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.core.config.Config;
-import playground.johannes.studies.matrix2014.analysis.AnalyzerTaskGroup;
-import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
-import playground.johannes.studies.matrix2014.analysis.ZoneMobilityRate;
+import playground.johannes.studies.matrix2014.analysis.*;
+import playground.johannes.studies.matrix2014.matrix.postprocess.SeasonTask;
 import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
@@ -31,6 +32,7 @@ import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.gis.ZoneData;
 import playground.johannes.synpop.gis.ZoneDataLoader;
+import playground.johannes.synpop.processing.TaskRunner;
 import playground.johannes.synpop.source.mid2008.MiDKeys;
 import playground.johannes.synpop.source.mid2008.MiDValues;
 
@@ -97,7 +99,7 @@ public class DefaultAnalyzerBuilder {
                 histogramWriter));
 
 //        LegCollector<String> purposeCollector = new LegCollector<>(new AttributeProvider<Segment>(CommonKeys.LEG_PURPOSE));
-//        purposeCollector.setPredicate(engine.getLegPredicate());
+//        purposeCollector.setLegPredicate(engine.getLegPredicate());
 //        Set<String> purposes = new HashSet<>(purposeCollector.collect(engine.getRefPersons()));
 //        purposes.remove(null);
 //        for (String purpose : purposes) {
@@ -140,6 +142,31 @@ public class DefaultAnalyzerBuilder {
         trips per person
          */
         task.addComponent(new TripsPerPersonTask().build(engine.getIOContext()));
+        /*
+        leg purposes over distance
+         */
+        /*
+        Create the geo distance discretizer.
+         */
+        TDoubleArrayList borders = new TDoubleArrayList();
+        borders.add(-1);
+        for (int d = 2000; d < 10000; d += 2000) borders.add(d);
+        for (int d = 10000; d < 50000; d += 10000) borders.add(d);
+        for (int d = 50000; d < 500000; d += 50000) borders.add(d);
+        for (int d = 500000; d < 1000000; d += 100000) borders.add(d);
+        borders.add(Double.MAX_VALUE);
+        Discretizer discretizer = new FixedBordersDiscretizer(borders.toArray());
+
+        LegPurposeDistanceTask lpdTask = new LegPurposeDistanceTask();
+        lpdTask.setPredicate(engine.getLegPredicate());
+        lpdTask.setIoContext(engine.getIOContext());
+        lpdTask.setDiscretizer(discretizer);
+        task.addComponent(lpdTask);
+        /*
+
+         */
+        TaskRunner.run(new SetSeason(), engine.getRefPersons());
+        task.addComponent(new SeasonTask(engine.getIOContext()));
 
     }
 }

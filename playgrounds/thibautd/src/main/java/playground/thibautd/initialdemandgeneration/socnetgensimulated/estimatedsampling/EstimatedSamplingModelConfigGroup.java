@@ -30,7 +30,12 @@ public class EstimatedSamplingModelConfigGroup extends ReflectiveConfigGroup {
 	private double b_sameGender = 2.7568;
 	private double b_ageDiff = -0.0955;
 
+	private Transformation distanceTransformation = Transformation.log;
+	private Transformation ageTransformation = Transformation.linear;
+
 	private double primarySample = 15682.0677;
+
+	public enum Transformation { linear, log; }
 
 	public EstimatedSamplingModelConfigGroup() {
 		super(GROUP_NAME);
@@ -75,5 +80,33 @@ public class EstimatedSamplingModelConfigGroup extends ReflectiveConfigGroup {
 	public void setPrimarySample( double primarySample ) {
 		if ( primarySample < 0 ) throw new IllegalArgumentException( "negative sample size "+primarySample );
 		this.primarySample = primarySample;
+	}
+
+	@StringGetter("ageTransformation")
+	public Transformation getAgeTransformation() {
+		return ageTransformation;
+	}
+
+	@StringSetter("ageTransformation")
+	public void setAgeTransformation( Transformation ageTransformation ) {
+		this.ageTransformation = ageTransformation;
+	}
+
+	@StringGetter("distanceTransformation")
+	public Transformation getDistanceTransformation() {
+		return distanceTransformation;
+	}
+
+	@StringSetter("distanceTransformation")
+	public void setDistanceTransformation( Transformation distanceTransformation ) {
+		this.distanceTransformation = distanceTransformation;
+	}
+
+	public static double transform( final Transformation transformation , double value ) {
+		switch ( transformation ) {
+			case linear: return value;
+			case log: return Math.log( value + 1 );
+			default: throw new RuntimeException( transformation+" not implemented???");
+		}
 	}
 }

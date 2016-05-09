@@ -35,11 +35,16 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.utils.gis.matsim2esri.network.CapacityBasedWidthCalculator;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilderImpl;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.PolygonFeatureGenerator;
 import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -54,9 +59,17 @@ public class IKNetworkPopulationWriter {
 
 	private Scenario scenario;
 	
-	private final String networkFile = "../../../runs-svn/berlin-1pct/output_network.xml.gz";
+	private final String networkFile = "../../../public-svn/matsim/scenarios/countries/de/cottbus/cottbus-with-pt/output/cb02/output_network.xml.gz";
 	private final String populationFile = null;
-	private final String outputPath = "../../../runs-svn/berlin-1pct/gis/";
+	private final String outputPath = "../../../public-svn/matsim/scenarios/countries/de/cottbus/cottbus-with-pt/output/cb02/gis/";
+	
+	private final String crs = TransformationFactory.WGS84_UTM33N;
+//	private final String crs = TransformationFactory.DHDN_GK4;
+//	private final String crs = TransformationFactory.WGS84;
+	
+	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(crs, crs);
+//	private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, crs);
+
 
 //	private final String networkFile = "../../shared-svn/studies/ihab/noiseTestScenario/output/output_network.xml.gz";
 //	private final String populationFile = "../../shared-svn/studies/ihab/noiseTestScenario/output/output_plans.xml.gz";
@@ -75,55 +88,28 @@ public class IKNetworkPopulationWriter {
 		File file = new File(outputPath);
 		file.mkdirs();
 		
-		exportNetwork2Shp();
+		// network
+		exportNetwork2Shp1();
+		exportNetwork2Shp2();
+		
+		// population
 //		exportActivities2Shp();
 		
 	}
-	
+
 	private void loadScenario() {
 		Config config = ConfigUtils.createConfig();
 		scenario = ScenarioUtils.createScenario(config);
 	}
 	
-	private void exportActivities2Shp(){
+	private void exportNetwork2Shp1(){
 		
-		new PopulationReaderMatsimV5(scenario).readFile(populationFile);
-		
-		PointFeatureFactory factory = new PointFeatureFactory.Builder()
-		.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
-		.setName("Activity")
-		.addAttribute("Type", String.class)
-		.addAttribute("Person Id", String.class)
-		.create();
-		
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
-		for (Person p : scenario.getPopulation().getPersons().values()){
-			
-			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
-
-				if (pe instanceof Activity){
-					
-					Activity act = (Activity) pe;
-					SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(act.getCoord()), new Object[] {act.getType(), p.getId().toString()}, null);
-					features.add(feature);
-				}
-			}
-		}
-		
-		log.info("Writing out activity points shapefile... ");
-		ShapeFileWriter.writeGeometries(features, outputPath + "activities.shp");
-		log.info("Writing out activity points shapefile... Done.");		
-	}
-	
-	private void exportNetwork2Shp(){
-
 		if (this.scenario.getNetwork().getLinks().size() == 0) {
 			new NetworkReaderMatsimV1(scenario.getNetwork()).parse(this.networkFile);
 		}
 		
 		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
-		.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
+		.setCrs(MGC.getCRS(crs))
 		.setName("Link")
 		.addAttribute("Id", String.class)
 		.addAttribute("Length", Double.class)
@@ -139,8 +125,10 @@ public class IKNetworkPopulationWriter {
 			if (link.getAllowedModes().contains("car")) {
 				SimpleFeature feature = factory.createPolyline(
 						new Coordinate[]{
-								new Coordinate(MGC.coord2Coordinate(link.getFromNode().getCoord())),
-								new Coordinate(MGC.coord2Coordinate(link.getToNode().getCoord()))
+//								new Coordinate(MGC.coord2Coordinate(link.getFromNode().getCoord())),
+//								new Coordinate(MGC.coord2Coordinate(link.getToNode().getCoord()))
+								new Coordinate(MGC.coord2Coordinate(ct.transform(link.getFromNode().getCoord()))),
+								new Coordinate(MGC.coord2Coordinate(ct.transform(link.getToNode().getCoord())))
 						}, new Object[] {link.getId(), link.getLength(), link.getCapacity(), link.getNumberOfLanes(), link.getFreespeed(), link.getAllowedModes()
 						}, null
 				);
@@ -153,4 +141,51 @@ public class IKNetworkPopulationWriter {
 		log.info("Writing out network lines shapefile... Done.");
 	}
 
+	private void exportNetwork2Shp2() {
+		
+		if (this.scenario.getNetwork().getLinks().size() == 0) {
+			new NetworkReaderMatsimV1(scenario.getNetwork()).parse(this.networkFile);
+		}
+
+		FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(scenario.getNetwork(), crs);
+
+		boolean commonWealth = false;
+		builder.setWidthCoefficient((commonWealth  ? -1 : 1) * 0.01);
+		builder.setFeatureGeneratorPrototype(PolygonFeatureGenerator.class);
+		builder.setWidthCalculatorPrototype(CapacityBasedWidthCalculator.class);
+		
+		new Links2ESRIShape(scenario.getNetwork(), outputPath + "net.shp", builder).write();
+	}
+	
+	private void exportActivities2Shp(){
+		
+		new PopulationReaderMatsimV5(scenario).readFile(populationFile);
+		
+		PointFeatureFactory factory = new PointFeatureFactory.Builder()
+		.setCrs(MGC.getCRS(crs))
+		.setName("Activity")
+		.addAttribute("Type", String.class)
+		.addAttribute("Person Id", String.class)
+		.create();
+		
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		for (Person p : scenario.getPopulation().getPersons().values()){
+			
+			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
+
+				if (pe instanceof Activity){
+					
+					Activity act = (Activity) pe;
+					// TODO: Add coordinate transformation?
+					SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(act.getCoord()), new Object[] {act.getType(), p.getId().toString()}, null);
+					features.add(feature);
+				}
+			}
+		}
+		
+		log.info("Writing out activity points shapefile... ");
+		ShapeFileWriter.writeGeometries(features, outputPath + "activities.shp");
+		log.info("Writing out activity points shapefile... Done.");		
+	}
 }

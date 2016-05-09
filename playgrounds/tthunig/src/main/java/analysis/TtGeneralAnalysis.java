@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -63,8 +64,8 @@ public final class TtGeneralAnalysis implements PersonDepartureEventHandler, Per
 	private Map<Id<Vehicle>, LinkedList<Double>> distancePerVehiclePerTrip = new HashMap<>();
 	private Map<Id<Vehicle>, LinkedList<Double>> avgSpeedPerVehiclePerTrip = new HashMap<>();
 	
-	private Map<Id<Vehicle>, Double> veh2lastVehEntersTrafficTime = new HashMap<>();
 	private Map<Id<Vehicle>, Double> veh2earliestLinkExitTime = new HashMap<>();
+	private Map<Id<Person>, Double> pers2lastDepatureTime = new HashMap<>();
 	
 	private Map<Id<Link>, Double> totalDelayPerLink = new HashMap<>();
 //	private Map<Id<Link>, Map<Double, Double>> delayPerLinkPerHour;
@@ -98,8 +99,8 @@ public final class TtGeneralAnalysis implements PersonDepartureEventHandler, Per
 		this.delayPerVehiclePerTrip.clear();
 		this.distancePerVehiclePerTrip.clear();
 		this.avgSpeedPerVehiclePerTrip.clear();
-		this.veh2lastVehEntersTrafficTime.clear();
 		this.veh2earliestLinkExitTime.clear();
+		this.pers2lastDepatureTime.clear();
 		this.totalDelayPerLink.clear();
 		this.numberOfVehPerLink.clear();
 		this.numberOfTripsPerTripDistanceInterval.clear();
@@ -119,14 +120,14 @@ public final class TtGeneralAnalysis implements PersonDepartureEventHandler, Per
 		}
 		int entry = numberOfDeparturesPerTimeInterval.get(timeInterval);
 		numberOfDeparturesPerTimeInterval.put(timeInterval, ++entry);
+		
+		pers2lastDepatureTime.put(event.getPersonId(), event.getTime());
 	}
 
 	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {		
-		// for the first link every agent needs one second without delay
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		// for the first link every vehicle needs one second without delay
 		veh2earliestLinkExitTime.put(event.getVehicleId(), event.getTime() + 1);
-		
-		veh2lastVehEntersTrafficTime.put(event.getVehicleId(), event.getTime());
 		
 		// initialize vehicle based data structure for the first trip
 		if (!delayPerVehiclePerTrip.containsKey(event.getVehicleId())){
@@ -181,8 +182,14 @@ public final class TtGeneralAnalysis implements PersonDepartureEventHandler, Per
 		veh2earliestLinkExitTime.put(event.getVehicleId(), event.getTime() + matsimFreespeedTT);
 	}
 
+	/**
+	 * Trip duration is measured between PersonDepartureEvent and
+	 * VehicleLeavesTrafficEvent. Despite, it is the correct duration because
+	 * VehicleLeavesTrafficEvent and PersonArrivalEvent occur at the same time
+	 * step.
+	 */
 	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
+	public void handleEvent(VehicleLeavesTrafficEvent event) {		
 		// trip is finished ... handle its distance
 		double tripDistance = distancePerVehiclePerTrip.get(event.getVehicleId()).peekLast();
 		totalDistance += tripDistance;
@@ -194,7 +201,8 @@ public final class TtGeneralAnalysis implements PersonDepartureEventHandler, Per
 		numberOfTripsPerTripDistanceInterval.put(distInterval, ++distEntry);
 		
 		// ... handle its duration
-		double tripDuration = event.getTime() - veh2lastVehEntersTrafficTime.get(event.getVehicleId());
+//		double tripDuration = event.getTime() - veh2lastVehEntersTrafficTime.get(event.getVehicleId());
+		double tripDuration = event.getTime() - pers2lastDepatureTime.get(event.getPersonId());
 		totalTt += tripDuration;
 		ttPerVehiclePerTrip.get(event.getVehicleId()).add(tripDuration);
 		double durationInterval = Math.floor(tripDuration / 100) * 100;

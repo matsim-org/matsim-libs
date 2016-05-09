@@ -59,11 +59,9 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -73,6 +71,32 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
  * @author dstrippgen
  */
 public class QNetsimEngine implements MobsimEngine {
+	public interface NetsimInternalInterface {
+
+		QNetwork getNetsimNetwork();
+
+		void arrangeNextAgentState(MobsimAgent pp);
+
+		void letVehicleArrive(QVehicle veh);
+	}
+	NetsimInternalInterface ii = new NetsimInternalInterface(){
+
+		@Override
+		public QNetwork getNetsimNetwork() {
+			return network ;
+		}
+
+		@Override
+		public void arrangeNextAgentState(MobsimAgent driver) {
+			QNetsimEngine.this.arrangeNextAgentState(driver);
+		}
+
+		@Override
+		public void letVehicleArrive(QVehicle veh) {
+			QNetsimEngine.this.letVehicleArrive( veh ) ;
+		}
+		
+	} ;
 
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
 
@@ -84,7 +108,6 @@ public class QNetsimEngine implements MobsimEngine {
 
 	private final QSim qsim;
 
-	private final double stucktimeCache;
 	private final VehicularDepartureHandler dpHandler;
 
 	private double infoTime = 0;
@@ -98,7 +121,7 @@ public class QNetsimEngine implements MobsimEngine {
 
 	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 
-	/*package*/ InternalInterface internalInterface = null;
+	private InternalInterface internalInterface = null;
 
 	private int numOfRunners;
 
@@ -125,7 +148,6 @@ public class QNetsimEngine implements MobsimEngine {
 
 		final Config config = sim.getScenario().getConfig();
 		final QSimConfigGroup qsimConfigGroup = config.qsim();
-		this.stucktimeCache = qsimConfigGroup.getStuckTime();
 		this.usingThreadpool = qsimConfigGroup.isUsingThreadpool();
 
 
@@ -141,7 +163,7 @@ public class QNetsimEngine implements MobsimEngine {
 		default:
 			throw new RuntimeException("Unknown vehicle behavior option.");			
 		}
-		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior);
+		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior, qSimConfigGroup);
 		
 		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
 			log.info("Seepage is allowed. Seep mode is " + qSimConfigGroup.getSeepMode() + ".");
@@ -157,15 +179,15 @@ public class QNetsimEngine implements MobsimEngine {
 			EventsManager events = sim.getEventsManager() ;
 			QSimConfigGroup qsimConfig = sim.getScenario().getConfig().qsim() ;
 			Network net = scenario.getNetwork() ;
-			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( qsimConfig, events, net, scenario );
-			MobsimTimer mobsimTimer = this.getMobsim().getSimTimer() ;
-			AgentCounter agentCounter = this.getMobsim().getAgentCounter() ;
-			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, this );
+			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
+			MobsimTimer mobsimTimer = sim.getSimTimer() ;
+			AgentCounter agentCounter = sim.getAgentCounter() ;
+			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, ii );
 			network = new QNetwork(sim.getScenario().getNetwork(), netsimNetworkFactory2 );
 		}
-		network.initialize(this);
+		network.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
 
-		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
+		this.numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 
 	private static int wrnCnt = 0;
@@ -185,20 +207,20 @@ public class QNetsimEngine implements MobsimEngine {
 		qlink.addParkedVehicle(veh);
 	}
 
-	static AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
+	static AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario, SnapshotLinkWidthCalculator linkWidthCalculator) {
 		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
 		switch(snapshotStyle) {
 		case queue:
-			return new QueueAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
+			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		case withHoles:
 			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
 			// ??? kai, nov'15
-			return new WithHolesAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
+			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		case equiDist:
-			return new EquiDistAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
+			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		default:
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
-			return new EquiDistAgentSnapshotInfoBuilder(scenario, agentSnapshotInfoFactory);
+			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		}
 	}
 
@@ -356,19 +378,13 @@ public class QNetsimEngine implements MobsimEngine {
 		return numNodes;
 	}
 
-	QSim getMobsim() {
-		return this.qsim;
-	}
+//	QSim getMobsim() {
+//		return this.qsim;
+//	}
+	// do not hand out back pointers! kai, mar'16
 
 	public NetsimNetwork getNetsimNetwork() {
 		return this.network;
-	}
-
-	/**
-	 * convenience method so that stuck time can be cached without caching it in every node separately.  kai, jun'10
-	 */
-	double getStuckTime() {
-		return this.stucktimeCache;
 	}
 
 	public VehicularDepartureHandler getDepartureHandler() {
@@ -395,7 +411,7 @@ public class QNetsimEngine implements MobsimEngine {
 		return qLink.unregisterAdditionalAgentOnLink(agentId);
 	}
 
-	void letVehicleArrive(QVehicle veh) {
+	private void letVehicleArrive(QVehicle veh) {
 		double now = this.qsim.getSimTimer().getTimeOfDay();
 		MobsimDriverAgent driver = veh.getDriver();
 		this.qsim.getEventsManager().processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
@@ -541,5 +557,9 @@ public class QNetsimEngine implements MobsimEngine {
 		public Thread newThread(Runnable r) {
 			return new Thread( r , "QNetsimEngine_PooledThread_" + count++);
 		}
+	}
+
+	private final void arrangeNextAgentState(MobsimAgent pp) {
+		internalInterface.arrangeNextAgentState(pp);
 	}
 }

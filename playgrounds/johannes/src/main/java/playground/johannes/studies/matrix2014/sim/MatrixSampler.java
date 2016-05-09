@@ -21,8 +21,10 @@ package playground.johannes.studies.matrix2014.sim;
 
 import org.apache.log4j.Logger;
 import playground.johannes.studies.matrix2014.analysis.MatrixBuilder;
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.sim.MarkovEngineListener;
 import playground.johannes.synpop.sim.data.CachedPerson;
@@ -33,7 +35,7 @@ import java.util.Set;
 /**
  * @author johannes
  */
-public class MatrixSampler implements playground.johannes.studies.matrix2014.analysis.MatrixBuilder, MarkovEngineListener {
+public class MatrixSampler implements MatrixBuilder, MarkovEngineListener {
 
     private static final Logger logger = Logger.getLogger(MatrixSampler.class);
 
@@ -56,6 +58,7 @@ public class MatrixSampler implements playground.johannes.studies.matrix2014.ana
         this.start = start;
         this.step = step;
         avrMatrix = new NumericMatrix();
+
     }
 
     public void drawSample(Collection<? extends Person> persons) {
@@ -94,6 +97,16 @@ public class MatrixSampler implements playground.johannes.studies.matrix2014.ana
             drawSample(population);
             logger.debug("Done drawing matrix sample.");
         }
+    }
+
+    @Override
+    public void setLegPredicate(Predicate<Segment> predicate) {
+        builder.setLegPredicate(predicate);
+    }
+
+    @Override
+    public void setUseWeights(boolean useWeights) {
+        builder.setUseWeights(useWeights);
     }
 
     @Override

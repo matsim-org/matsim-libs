@@ -52,7 +52,7 @@ public class DistDistribution {
 		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.xml");
 		NumericMatrix m = reader.getMatrix();
 
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/psmobility.geojson", "NO");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/psmobility.geojson", "NO", null);
 		DistanceCalculator dCalc = new WGS84DistanceCalculator();
 		DescriptivePiStatistics stats = new DescriptivePiStatistics();
 

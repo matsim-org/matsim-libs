@@ -68,16 +68,16 @@ public class ClusteredChainGeneratorTest{
 	@Test
 	public void testSetup(){
 		setupClusters();
-		File vehicleFile = new File(utils.getClassInputDirectory() + "xml/vehicle.xml.gz");
+		File vehicleFile = new File(utils.getOutputDirectory() + "xml/vehicle.xml.gz");
 		Assert.assertTrue("Vehicle file does not exist.", vehicleFile.exists());
 		
-		File facilityFile = new File(utils.getClassInputDirectory() + "facilities.xml");
+		File facilityFile = new File(utils.getOutputDirectory() + "facilities.xml");
 		Assert.assertTrue("Facility file does not exist.", facilityFile.exists());
 		
 		/* Check facilities. */
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
-		fr.parse(utils.getClassInputDirectory() + "facilities.xml");
+		fr.parse(utils.getOutputDirectory() + "facilities.xml");
 		ActivityFacilities afs = sc.getActivityFacilities();
 		Assert.assertTrue("Facility 1 not in map.", afs.getFacilities().containsKey(Id.create("f1", Facility.class)));
 		Assert.assertTrue("Facility 2 not in map.", afs.getFacilities().containsKey(Id.create("f2", Facility.class)));
@@ -88,7 +88,7 @@ public class ClusteredChainGeneratorTest{
 		Assert.assertEquals("Wrong centroid for f2", new Coord((3.0 + 4.0 + 5.0) / 3.0, (1.0 + 3.0 + 3.0) / 3.0), afs.getFacilities().get(Id.create("f2", Facility.class)).getCoord());
 		Assert.assertEquals("Wrong centroid for f3", new Coord(5.0, 6.0), afs.getFacilities().get(Id.create("f3", Facility.class)).getCoord());
 		
-		File facilityAttributeFile = new File(utils.getClassInputDirectory() + "facilityAttributes.xml");
+		File facilityAttributeFile = new File(utils.getOutputDirectory() + "facilityAttributes.xml");
 		Assert.assertTrue("Facility attributes file does not exist.", facilityAttributeFile.exists());
 	}
 	
@@ -106,20 +106,20 @@ public class ClusteredChainGeneratorTest{
 		
 		/* Should catch IOExceptions for non-existing files. */
 		try {
-			qt = ccg.buildFacilityQuadTree("dummy.xml", utils.getClassInputDirectory() + "facilityAttributes.xml");
+			qt = ccg.buildFacilityQuadTree("dummy.xml", utils.getOutputDirectory() + "facilityAttributes.xml");
 			Assert.fail("Facility file does not exist.");
 		} catch (Exception e1) {
 			/* Pass. */
 		}
 		try {
-			qt = ccg.buildFacilityQuadTree(utils.getClassInputDirectory() + "facilities.xml", "dummy.xml");
+			qt = ccg.buildFacilityQuadTree(utils.getOutputDirectory() + "facilities.xml", "dummy.xml");
 //			fail("Facility attributes file does not exist.");
 		} catch (Exception e1) {
 			/* Pass. */
 		}
 		
 		try{
-			qt = ccg.buildFacilityQuadTree(utils.getClassInputDirectory() + "facilities.xml", utils.getClassInputDirectory() + "facilityAttributes.xml");
+			qt = ccg.buildFacilityQuadTree(utils.getOutputDirectory() + "facilities.xml", utils.getOutputDirectory() + "facilityAttributes.xml");
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail("Should not catch an IOException.");
@@ -134,26 +134,25 @@ public class ClusteredChainGeneratorTest{
 	@Test
 	public void testReconstructChains(){
 		setupClusters();
-		setupXmlFolders();
 		
 		ClusteredChainGenerator ccg = new ClusteredChainGenerator();
 		QuadTree<DigicoreFacility> qt = null;
 		try {
-			qt = ccg.buildFacilityQuadTree(utils.getClassInputDirectory() + "facilities.xml", utils.getClassInputDirectory() + "facilityAttributes.xml");
+			qt = ccg.buildFacilityQuadTree(utils.getOutputDirectory() + "facilities.xml", utils.getOutputDirectory() + "facilityAttributes.xml");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		/* Set up files and shapefiles. */
-		String facilityAttributes = utils.getClassInputDirectory() + "facilityAttributes.xml";
+		String facilityAttributes = utils.getOutputDirectory() + "facilityAttributes.xml";
 		ObjectAttributes oa = new ObjectAttributes();
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
 		oar.putAttributeConverter(Point.class, new HullConverter());
 		oar.putAttributeConverter(Polygon.class, new HullConverter());
 		oar.parse(facilityAttributes);
 		
-		String inputFolder = utils.getClassInputDirectory() + "xml/";
-		String outputFolder = utils.getClassInputDirectory() + "xml2/";
+		String inputFolder = utils.getOutputDirectory() + "xml/";
+		String outputFolder = utils.getOutputDirectory() + "xml2/";
 		Coordinate[] ca = new Coordinate[5];
 		ca[0] = new Coordinate(0.0, 0.0);
 		ca[1] = new Coordinate(0.0, 7.0);
@@ -170,7 +169,7 @@ public class ClusteredChainGeneratorTest{
 		
 		/* Check that the correct three activities do have facility Ids. */
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-		dvr.parse(utils.getClassInputDirectory() + "xml2/v1.xml.gz");
+		dvr.parse(utils.getOutputDirectory() + "xml2/v1.xml.gz");
 		DigicoreChain chain = dvr.getVehicle().getChains().get(0);
 		Assert.assertNotNull("First activity must have an id.", chain.getAllActivities().get(0).getFacilityId());
 		Assert.assertEquals("First activity has wrong id.", Id.create("f1", Facility.class), chain.getAllActivities().get(0).getFacilityId());
@@ -202,6 +201,14 @@ public class ClusteredChainGeneratorTest{
 	 *  |____> x                   
 	 */
 	private void setupClusters(){
+		/* Create the output directories. */
+		File directory = new File(utils.getOutputDirectory());
+		directory.mkdirs();
+		File directoryXml = new File(utils.getOutputDirectory() + "xml/");
+		directoryXml.mkdirs();
+		File directoryXml2 = new File(utils.getOutputDirectory() + "xml2/");
+		directoryXml2.mkdirs();
+		
 		/* Set up basic activities. */
 		DigicoreActivity a1 = new DigicoreActivity("t1", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
 		a1.setCoord(new Coord((double) 0, (double) 6));
@@ -273,22 +280,17 @@ public class ClusteredChainGeneratorTest{
 		/* Write vehicle to file. First create the folder  */
 		
 		DigicoreVehicleWriter vw = new DigicoreVehicleWriter();
-		vw.write(utils.getClassInputDirectory() + "xml/vehicle.xml.gz", vehicle);
+		vw.write(utils.getOutputDirectory() + "xml/vehicle.xml.gz", vehicle);
 		
 		/* Write facilities. */
 		FacilitiesWriter fw = new FacilitiesWriter(facilities);
-		fw.write(utils.getClassInputDirectory() + "facilities.xml");
+		fw.write(utils.getOutputDirectory() + "facilities.xml");
 		
 		/* Write facility attributes. */
 		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(attributes);
 		oaw.putAttributeConverter(Point.class, new HullConverter());
 		oaw.putAttributeConverter(Polygon.class, new HullConverter());
-		oaw.writeFile(utils.getClassInputDirectory() + "facilityAttributes.xml");
+		oaw.writeFile(utils.getOutputDirectory() + "facilityAttributes.xml");
 	}
-	
-	
-	private void setupXmlFolders(){
 		
-	}
-	
 }

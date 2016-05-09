@@ -14,7 +14,7 @@ public class ModifyNetwork {
 
 	MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
-	double freeSpeedFactor = 0.7;
+	double freeSpeedFactor = 1.5;
 	String outputFilePath = null;
 	String networkFilePath = null;
 	public ModifyNetwork(String networkFilePath, String outputFilePath) {
@@ -31,17 +31,17 @@ public class ModifyNetwork {
 		for(Link link : scenario.getNetwork().getLinks().values()) {
 			if (link.getAllowedModes().contains("car")) {
 				
-				if (link.getFreespeed() < 5)
-					link.setFreespeed(link.getFreespeed());
+				//if (link.getFreespeed() < 5)
+				//	link.setFreespeed(link.getFreespeed());
 				
-				else
-					link.setFreespeed(link.getFreespeed() * 0.70);
+			//	else
+					link.setFreespeed(link.getFreespeed() * freeSpeedFactor);
 				
 			}
 			
 		}
 		
-		new NetworkWriter(scenario.getNetwork()).write(outputFilePath + "/network" + "_reduced_30perc.xml");
+		new NetworkWriter(scenario.getNetwork()).write(outputFilePath + "/network" + "_increased_50perc.xml.gz");
 	}
 	
 	

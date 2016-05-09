@@ -21,15 +21,21 @@ package org.matsim.core.network;
 
 import java.util.*;
 
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
 
 
+/**
+ * This class follows the rules assumed in {@link TravelTimeCalculator}: The constructor arguments
+ * {@link timeSlice} and {@link maxTime} have the same meaning, and the last time bin is open ended.
+ */
 public class FixedIntervalTimeVariantAttribute
     implements TimeVariantAttribute
 {
-    private final int interval;
-    private final int intervalCount;
+    private final int timeSlice;
+    private final int numSlots;
 
     private double baseValue;
     private double[] values;
@@ -38,10 +44,10 @@ public class FixedIntervalTimeVariantAttribute
     private int eventsCountWhenLastRecalc = -1;
 
 
-    public FixedIntervalTimeVariantAttribute(int interval, int intervalCount)
+    public FixedIntervalTimeVariantAttribute(int timeSlice, int maxTime)
     {
-        this.interval = interval;
-        this.intervalCount = intervalCount;
+        this.timeSlice = timeSlice;
+        this.numSlots = (maxTime / timeSlice) + 1;
     }
 
 
@@ -52,6 +58,7 @@ public class FixedIntervalTimeVariantAttribute
     }
 
 
+    //TODO before calling this method we could convert changeEvents into a sequence of non-null changeValues
     @Override
     public void recalc(TreeMap<Double, NetworkChangeEvent> changeEvents,
             ChangeValueGetter valueGetter, double baseValue)
@@ -62,8 +69,11 @@ public class FixedIntervalTimeVariantAttribute
             return;
         }
 
+        //To save memory, the array is constructed only if there is at least one ChangeEvent.
+        //This saves a lot of memory in cases when only one attribute is time variant, while
+        //the remaining two are invariant.
         if (values == null) {
-            values = new double[intervalCount];
+            values = new double[numSlots];
         }
 
         int numEvent = 0;
@@ -75,7 +85,7 @@ public class FixedIntervalTimeVariantAttribute
                 if (value != null) {
                     numEvent++;
 
-                    int toBin = (int) (event.getStartTime() / interval);//exclusive
+                    int toBin = (int) (event.getStartTime() / timeSlice);//exclusive
                     Arrays.fill(values, fromBin, toBin, currentValue);
 
                     if (value.getType() == NetworkChangeEvent.ChangeType.FACTOR) {
@@ -105,7 +115,11 @@ public class FixedIntervalTimeVariantAttribute
             return baseValue;
         }
 
-        int bin = (int) (time / interval);
+        int bin = ((int)time) / timeSlice;
+        if (bin >= numSlots) {
+            bin = numSlots - 1;
+        }
+
         return values[bin];
     }
 

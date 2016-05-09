@@ -1,8 +1,7 @@
 package playground.gthunig.generalJavaBehavior;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 public class PassByValuePrincipleTest {
 
@@ -11,7 +10,7 @@ public class PassByValuePrincipleTest {
 		boolean bool = true;
 //		bool = getChangedValue(bool);
 		changeValue(bool);
-		Assert.assertEquals(true, bool);
+		Assert.assertTrue(bool);
 //		TODO mit nichtprimitivem Datentyp testen
 	}
 	

@@ -90,7 +90,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
 		int index = getBinIndex(event.getTime());
-		if ((population == null || population.getPersons().keySet().contains(event.getPersonId()) && event.getLegMode() != null)) {
+		if ((population == null || population.getPersons().keySet().contains(event.getPersonId())) && event.getLegMode() != null) {
 			DataFrame dataFrame = getDataForMode(event.getLegMode());
 			dataFrame.countsDep[index]++;
 		}
@@ -99,7 +99,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
 		int index = getBinIndex(event.getTime());
-		if ((population == null || population.getPersons().keySet().contains(event.getPersonId()) && event.getLegMode() != null)) {
+		if ((population == null || population.getPersons().keySet().contains(event.getPersonId())) && event.getLegMode() != null) {
 			DataFrame dataFrame = getDataForMode(event.getLegMode());
 			dataFrame.countsArr[index]++;
 		}
@@ -108,7 +108,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	@Override
 	public void handleEvent(final PersonStuckEvent event) {
 		int index = getBinIndex(event.getTime());
-		if ((population == null || population.getPersons().keySet().contains(event.getPersonId()) && event.getLegMode() != null)) {
+		if ((population == null || population.getPersons().keySet().contains(event.getPersonId())) && event.getLegMode() != null) {
 			DataFrame dataFrame = getDataForMode(event.getLegMode());
 			dataFrame.countsStuck[index]++;
 		}

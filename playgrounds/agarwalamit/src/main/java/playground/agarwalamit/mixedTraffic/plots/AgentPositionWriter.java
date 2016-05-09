@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -36,6 +37,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -46,46 +48,54 @@ import org.matsim.vis.snapshotwriters.TransimsSnapshotWriter.Labels;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
- * Create Transims snapshot file from events and 
- * read it again to write data in simpler form for space time plotting.
- * <b>At the moment, this should be only used for race track experiment. The methodology can work for other scenarios.
- * But, some paraments many need to change and yet to be tested. 
+ * 1) Create Transims snapshot file from events or use given Transims snapshot file. 
+ * 2) Read events to get mode information 
+ * 3) Write data in simpler form for space time plotting.
+ * <b> At the moment, this should be only used for race track experiment. The methodology can work for other scenarios.
+ * But, some parameters many need to change and yet to be tested. 
  * @author amit 
  */
 
 public class AgentPositionWriter {
 
-	private final static double SANPSOHOT_PERIOD = 1;
+	private final static Logger LOGGER = Logger.getLogger(AgentPositionWriter.class);
+	private final static boolean IS_WRITING_TRANSIM_FILE = false;
 	private final double trackLength = 3000;
 	private final double maxSpeed = 60/3.6;
 
 	public static void main(String[] args) 
 	{
-		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car/";
+		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW_kn/";
 		final String networkFile = dir+"/network.xml";
 		final String configFile = dir+"/config.xml";
-		final String prefix = "events[40]";
-		final String eventsFile = dir+"/events/"+prefix+".xml";
-		
+		final String prefix = "40";
+		final String eventsFile = dir+"/events/events["+prefix+"].xml";
+
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile, configFile);
+		final SnapshotStyle snapshotStyle = sc.getConfig().qsim().getSnapshotStyle();
 
-		//sc.getConfig().qsim().setSnapshotStyle(SnapshotStyle.withHoles);// not supported
-		sc.getConfig().qsim().setSnapshotStyle(SnapshotStyle.queue);
-		sc.getConfig().qsim().setSnapshotPeriod(SANPSOHOT_PERIOD);
-		sc.getConfig().qsim().setLinkWidthForVis((float)0);
-		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.);
-		
-		sc.getConfig().controler().setSnapshotFormat(Arrays.asList("transims"));
-		
-		AgentPositionWriter apw = new AgentPositionWriter(dir+"rDataPersonPosition_"+prefix+".txt", sc, eventsFile); 
-		apw.run();
+		AgentPositionWriter apw = new AgentPositionWriter(dir+"/snapshotFiles/position_"+prefix+"_"+snapshotStyle+".txt");
+		String transimFile;
+
+		if( IS_WRITING_TRANSIM_FILE ){
+			// not sure, if following three lines are required.
+			sc.getConfig().qsim().setLinkWidthForVis((float)0);
+			((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(0.);
+
+			sc.getConfig().controler().setSnapshotFormat(Arrays.asList("transims"));
+			transimFile = apw.createAndReturnTransimSnapshotFile(sc, eventsFile);
+		} else {
+			transimFile = dir+"/TransVeh/T_["+prefix+"].veh.gz";
+		}
+
+		apw.storePerson2Modes(eventsFile);
+		apw.readTransimFileAndWriteData(transimFile);
 	}
-
 
 	/**
 	 * Constructor opens writer, creates transims file and stores person 2 mode from events file.
 	 */
-	public AgentPositionWriter(String outFile, Scenario scenario, String eventsFile)
+	public AgentPositionWriter(String outFile)
 	{
 		writer = IOUtils.getBufferedWriter(outFile);
 		try {
@@ -93,16 +103,14 @@ public class AgentPositionWriter {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to the file. Reason :"+e);
 		}
-		createTransimSnapshotFile(scenario, eventsFile);
-		storePerson2Modes(eventsFile);
 	}
 
-	private void createTransimSnapshotFile(Scenario sc, String eventsFile)
+	private String createAndReturnTransimSnapshotFile(Scenario sc, String eventsFile)
 	{
 		Events2Snapshot e2s = new Events2Snapshot();
 		File file = new File(eventsFile);
 		e2s.run(file, sc.getConfig(), sc.getNetwork());
-		this.transimFile = file.getParent() + "/" +"T.veh";
+		return file.getParent() + "/" +"T.veh";
 	}
 
 	private void storePerson2Modes(String eventsFile)
@@ -121,19 +129,20 @@ public class AgentPositionWriter {
 		new MatsimEventsReader(manager).readFile(eventsFile);
 	}
 
-	private String transimFile;
 	private BufferedWriter writer ;
 
 	private Map<Id<Person>,String> person2mode = new HashMap<>();
-	private Map<Id<Person>,Double> prevEasting = new HashMap<>();
-	private Map<Id<Person>,Double> prevNorthing = new HashMap<>();
+	private Map<Id<Person>,Tuple<Double,Double>> prevEastingNorthing = new HashMap<>();
 	private Map<Id<Person>,Double> prevPosition = new HashMap<>();
+	private Map<Id<Person>,Double> prevTime = new HashMap<>();
 	private Map<Id<Person>,Integer> prevCycle = new HashMap<>();
 
-	public void run()
+	private void readTransimFileAndWriteData(String inputFile)
 	{
+		LOGGER.info("Reading transim file "+ inputFile);
+
 		TabularFileParserConfig config = new TabularFileParserConfig() ;
-		config.setFileName( this.transimFile );
+		config.setFileName( inputFile );
 		config.setDelimiterTags( new String []{"\t"} );
 		// ---
 		TabularFileHandler handler = new TabularFileHandler(){
@@ -143,6 +152,7 @@ public class AgentPositionWriter {
 				List<String> strs = Arrays.asList( row ) ;
 
 				if ( row[0].substring(0, 1).matches("[A-Za-z]") ) {
+					if ( row[0].startsWith("hole") ) return; 
 					for ( String str : strs ) {
 						labels.add( str ) ;
 					}
@@ -150,15 +160,16 @@ public class AgentPositionWriter {
 					double time = Double.parseDouble( strs.get( labels.indexOf( Labels.TIME.toString() ) ) ) ;
 					double easting = Double.parseDouble( strs.get( labels.indexOf( Labels.EASTING.toString() ) ) ) ;
 					double northing = Double.parseDouble( strs.get( labels.indexOf( Labels.NORTHING.toString() ) ) ) ;
-//					double velocity = Double.parseDouble( strs.get( labels.indexOf( Labels.VELOCITY.toString() ) ) ) ;
 					Id<Person> agentId = Id.createPersonId( strs.get( labels.indexOf( Labels.VEHICLE.toString() ) ) ) ;
 					try {
-						if( prevEasting.containsKey(agentId) ){
-							double currentDist = Math.sqrt( (easting - prevEasting.get(agentId))*(easting - prevEasting.get(agentId)) 
-									+ (northing- prevNorthing.get(agentId))*(northing- prevNorthing.get(agentId)) );
+						if( prevEastingNorthing.containsKey(agentId) ){
+							Tuple<Double,Double> eastingNorthing = prevEastingNorthing.get(agentId);
+							double currentDist = Math.sqrt( (easting - eastingNorthing.getFirst() )*(easting - eastingNorthing.getFirst()) 
+									+ (northing- eastingNorthing.getSecond())*(northing- eastingNorthing.getSecond() ) );
 							
-							double velocity = currentDist / (SANPSOHOT_PERIOD); // denominator should be equal to snapshot period.
-							if(velocity > maxSpeed ) { // person arriving (vehicle leaving traffic) are falling in this category
+							double timegap =  time - prevTime.get(agentId);
+							double velocity = currentDist / (timegap); // denominator should be equal to snapshot period.
+							if(Math.round( velocity) > Math.round( maxSpeed) ) { // person arriving (vehicle leaving traffic) are falling in this category
 								return;
 							}else if (velocity < 0.0) throw new RuntimeException("Speed can not be negative. Aborting ...");
 						
@@ -175,8 +186,8 @@ public class AgentPositionWriter {
 							prevPosition.put(agentId, 0.);
 							prevCycle.put(agentId, 1);
 						}
-						prevEasting.put(agentId, easting);
-						prevNorthing.put(agentId, northing);
+						prevEastingNorthing.put(agentId, new Tuple<Double, Double>(easting, northing));
+						prevTime.put(agentId, time);
 					} catch (Exception e) {
 						throw new RuntimeException("Data is not written to the file. Reason :"+e);
 					}
@@ -186,6 +197,7 @@ public class AgentPositionWriter {
 		TabularFileParser reader = new TabularFileParser() ;
 		reader.parse(config, handler);
 		try{
+			LOGGER.info("Data writing is complete.");
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to the file. Reason :"+e);

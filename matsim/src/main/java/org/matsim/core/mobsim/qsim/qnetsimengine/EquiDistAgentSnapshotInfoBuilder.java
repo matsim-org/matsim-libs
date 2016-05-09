@@ -19,8 +19,11 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 /**
  * A builder for AgentSnapshotInfo objects that can be used by links with queue logic
@@ -28,19 +31,23 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
  */
 final class EquiDistAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 
-	EquiDistAgentSnapshotInfoBuilder( Scenario sc, AgentSnapshotInfoFactory agentSnapshotInfoFactory ){
-		super(sc, agentSnapshotInfoFactory);
+	EquiDistAgentSnapshotInfoBuilder( Scenario sc, SnapshotLinkWidthCalculator linkWidthCalculator ){
+		super(sc, linkWidthCalculator);
 	}
 
 	
 	@Override
-	public double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink,
-			double overallStorageCapacity) {
-		return linkLength / numberOfVehiclesOnLink;
+	public double calculateVehicleSpacing(double linkLength, double overallStorageCapacity,
+			Collection<? extends VisVehicle> vehs) {
+		double sum = 0. ;
+		for ( VisVehicle veh : vehs ) {
+			sum += veh.getSizeInEquivalents() ;
+		}
+		return linkLength / sum ;
 	}
 
 	@Override
-	public double calculateDistanceOnVectorFromFromNode2(double length, double spacing,
+	public double calculateOdometerDistanceFromFromNode(double length, double spacing,
 			 double lastDistanceFromFromNode, double now, double freespeedTraveltime, double remainingTravelTime) {
 		double distanceOnVector = 0.;
 		if (Double.isNaN(lastDistanceFromFromNode)){

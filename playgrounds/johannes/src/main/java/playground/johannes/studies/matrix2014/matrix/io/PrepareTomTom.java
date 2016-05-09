@@ -46,7 +46,7 @@ public class PrepareTomTom {
         VisumOMatrixReader.read(m, inFile);
 
         logger.info("Loading zones...");
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, primaryKey);
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zonesFile, primaryKey, null);
 
         logger.info("Extracting DE matrix...");
         ZoneAttributePredicate p = new ZoneAttributePredicate("NUTS0_CODE", "DE", zones);

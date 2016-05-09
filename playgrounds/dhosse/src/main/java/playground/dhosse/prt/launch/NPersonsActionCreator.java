@@ -1,18 +1,15 @@
 package playground.dhosse.prt.launch;
 
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.DynAction;
-import org.matsim.contrib.taxi.TaxiActionCreator;
 import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 
-import playground.dhosse.prt.passenger.NPersonsDropoffActivity;
-import playground.dhosse.prt.passenger.NPersonsPickupActivity;
-import playground.dhosse.prt.scheduler.NPersonsDropoffStayTask;
-import playground.dhosse.prt.scheduler.NPersonsPickupStayTask;
+import playground.dhosse.prt.passenger.*;
+import playground.dhosse.prt.scheduler.*;
 
 public class NPersonsActionCreator extends TaxiActionCreator{
 
@@ -34,8 +31,8 @@ public class NPersonsActionCreator extends TaxiActionCreator{
         TaxiTask tt = (TaxiTask)task;
 
         switch (tt.getTaxiTaskType()) {
-            case DRIVE_EMPTY:
-            case DRIVE_OCCUPIED:
+            case EMPTY_DRIVE:
+            case OCCUPIED_DRIVE:
                 return legCreator.createLeg((DriveTask)task);
 
             case PICKUP:

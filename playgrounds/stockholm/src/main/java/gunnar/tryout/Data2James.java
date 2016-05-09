@@ -5,6 +5,7 @@ import gunnar.ihop2.regent.demandreading.Zone;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -18,10 +19,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
+import sergio.AssignmentMatrixColumnInventor;
+import sergio.Trip;
 
 /**
  * 
@@ -61,6 +65,9 @@ public class Data2James {
 		final int earliestDptTime_s = 4 * 3600;
 		final int latestDptTime_s = 10 * 3600;
 
+		final AssignmentMatrixColumnInventor amci = new AssignmentMatrixColumnInventor(
+				scenario.getNetwork(), zonalSystem, MatsimRandom.getRandom());
+
 		final Set<Zone> fromZones = new LinkedHashSet<>();
 		final Set<Zone> toZones = new LinkedHashSet<>();
 		final Set<Id<Link>> routeLinks = new LinkedHashSet<>();
@@ -70,7 +77,7 @@ public class Data2James {
 			final Plan plan = person.getSelectedPlan();
 			// check if there is a relevant route
 			if (plan != null) {
-				
+
 				Double lastDptTime_s = null;
 				for (int i = 0; i < plan.getPlanElements().size(); i++) {
 					final PlanElement element = plan.getPlanElements().get(i);
@@ -90,6 +97,7 @@ public class Data2James {
 									routeCnt++;
 
 									// column 1: from-zone
+									final Zone fromZone;
 									{
 										final Id<Link> fromLinkId = ((Activity) plan
 												.getPlanElements().get(i - 1))
@@ -97,14 +105,15 @@ public class Data2James {
 										final Link fromLink = scenario
 												.getNetwork().getLinks()
 												.get(fromLinkId);
-										final Zone fromZone = zonalSystem
-												.getZone(fromLink.getFromNode());
+										fromZone = zonalSystem.getZone(fromLink
+												.getFromNode());
 										fromZones.add(fromZone);
 										writer.print(fromZone.getId());
 										writer.print(",");
 									}
 
 									// column 2: to-zone
+									final Zone toZone;
 									{
 										final Id<Link> toLinkId = ((Activity) plan
 												.getPlanElements().get(i + 1))
@@ -112,11 +121,13 @@ public class Data2James {
 										final Link toLink = scenario
 												.getNetwork().getLinks()
 												.get(toLinkId);
-										final Zone toZone = zonalSystem
-												.getZone(toLink.getFromNode());
+										toZone = zonalSystem.getZone(toLink
+												.getFromNode());
 										toZones.add(toZone);
 										writer.print(toZone.getId());
 									}
+
+									amci.registerUsedOdPair(fromZone, toZone);
 
 									// column 3, ... : links in path
 									writer.print(",");
@@ -148,6 +159,14 @@ public class Data2James {
 		System.out.println("distinct destination zones: " + toZones.size());
 		System.out.println("distinct routes:            " + routeCnt);
 		System.out.println("distinct en-route links:    " + routeLinks.size());
+
+		long cnt = 0;
+		for (Iterator<Trip> it = amci.missingRoutesIterator(); it.hasNext();) {
+			final Trip trip = it.next();
+			if (++cnt % 1000 == 0) {
+				System.out.println("unused trip number " + cnt + ": " + trip);
+			}
+		}
 
 		System.out.println("...DONE");
 

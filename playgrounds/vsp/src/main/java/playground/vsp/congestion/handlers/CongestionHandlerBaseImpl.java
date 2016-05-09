@@ -53,7 +53,6 @@ import playground.vsp.congestion.events.CongestionEvent;
 /**
  * This class provides the basic functionality to calculate congestion effects which may be used for internalization.
  * One of the main tasks is to keep track of the queues on each link.
- *
  * 
  * @author ikaddoura
  *
@@ -204,25 +203,26 @@ public class CongestionHandlerBaseImpl implements CongestionHandler {
 
 		if ( delay < 1.0 ) { 
 			linkInfo.getFlowQueue().clear(); 
-		}
+			return ; // should be ok but not tested (*)
+		} 
 		
 		if (linkInfo.getFlowQueue().isEmpty() ) {
 			// queue is already empty; nothing to do
+			
+			// seems like this should never be called when (*) is used, but in practice it happens, i.e. tests fail when the above if condition
+			// is commented out.  maybe initialization?  kai, apr'16
 		} else {
-			double earliestLeaveTime = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-//			earliestLeaveTime = delayInfo.freeSpeedLeaveTime ;
-			if ( time > earliestLeaveTime + 1.) { 
-				// bottleneck is not active anymore.
+			double earliestLeaveTimeAfterVehicleAhead = linkInfo.getLastLeaveEvent().getTime() + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+			if ( time > earliestLeaveTimeAfterVehicleAhead + 1.) {
+				// Vehicle is delayed by more than 1/cap.  That is, we must be spill-back delayed.
+				
+				double freeSpeedLeaveTimeGap = delayInfo.freeSpeedLeaveTime - linkInfo.getFlowQueue().getLast().freeSpeedLeaveTime ; 
 
-				// bottleneck no longer active. However, first check for combination of flow and storage delay:
-				DelayInfo agentAheadDelayInfo = linkInfo.getFlowQueue().getLast() ;
-				double freeSpeedLeaveTimeGap = delayInfo.freeSpeedLeaveTime - agentAheadDelayInfo.freeSpeedLeaveTime ; 
-				/* The following is to catch the possibility of agent getting delayed due to flow capacity and storage
-				 * capacity respectively.
-				 */
 				if(freeSpeedLeaveTimeGap < linkInfo.getMarginalDelayPerLeavingVehicle_sec()){
-					// Though bottleneck is not active, last leaving agent is causing delay.
+					// we are ALSO be flow delayed.  Therefore, we consider the bottleneck still active
+					
 				} else {
+					// we are NOT also be flow delayed.  The bottleneck is now inactive:
 					linkInfo.getFlowQueue().clear();
 				}
 				// yy this is what I think we would have to accept if we wanted to bring V3 and V4 under the same umbrella.

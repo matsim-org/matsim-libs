@@ -53,7 +53,7 @@ public class ModalSplitPopDensity {
         final NumericMatrix airVol = new NumericMatrix();
 
         logger.info("Loading zones...");
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, "NO", null);
         TObjectDoubleHashMap<String> zoneRho = calcDensity(inhabFile, zones);
 
         logger.info("Reading matrix...");

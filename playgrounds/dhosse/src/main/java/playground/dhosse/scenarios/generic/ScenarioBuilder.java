@@ -6,10 +6,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dhosse.scenarios.generic.facilities.FacilitiesCreator;
-import playground.dhosse.scenarios.generic.network.NetworkCreator;
 import playground.dhosse.scenarios.generic.population.PopulationCreator;
 import playground.dhosse.scenarios.generic.utils.Geoinformation;
 
@@ -30,12 +32,11 @@ public class ScenarioBuilder {
 		
 		Configuration configuration = new Configuration(args[0]);
 		
-		String matsimFilesDir = configuration.getWorkingDirectory() + "/matsimInput/";
-		new File(matsimFilesDir).mkdirs();
+		new File(configuration.getWorkingDirectory()).mkdirs();
 		
 		try {
 			
-			OutputDirectoryLogging.initLoggingWithOutputDirectory(matsimFilesDir);
+			OutputDirectoryLogging.initLoggingWithOutputDirectory(configuration.getWorkingDirectory());
 			
 		} catch (IOException e) {
 			
@@ -45,25 +46,23 @@ public class ScenarioBuilder {
 		
 		log.info("########## Creating a scenario from parameters given in configuration file " + args[0]);
 		
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
 		log.info("########## network generation");
 		
-		NetworkCreator.main(new String[]{
-				configuration.getCrs(),
-				configuration.getWorkingDirectory() + configuration.getOsmFile(),
-				matsimFilesDir + "network.xml.gz"
-				});
+		//TODO: change network creator to use osm db
+//		NetworkCreator.main(new String[]{
+//				configuration.getCrs(),
+//				configuration.getWorkingDirectory() + configuration.getOsmFile(),
+//				configuration.getWorkingDirectory() + "network.xml.gz"
+//				});
 		
 		log.info("########## activity facilities generation");
 		
-		FacilitiesCreator.main(new String[]{
-				configuration.getCrs(),
-				configuration.getWorkingDirectory() + configuration.getOsmFile(),
-				matsimFilesDir + "facilities.xml.gz",
-				matsimFilesDir + "facilityAttributes.xml.gz"
-		});
+		FacilitiesCreator.run(configuration, scenario);
 		
 		log.info("########## creating transit schedule");
-		//TODO pt
+		//TODO pt (make it optional?)
 		
 		log.info("########## loading administrative borders");
 		//TODO load admin borders
@@ -79,7 +78,7 @@ public class ScenarioBuilder {
 		
 		try {
 			
-			Geoinformation.readGeodataFromDatabase(filterIds);
+			Geoinformation.readGeodataFromDatabase(configuration, filterIds);
 			
 		} catch (Exception e) {
 			

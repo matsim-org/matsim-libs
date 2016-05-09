@@ -27,6 +27,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -72,9 +73,15 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		}
 		ActivityParams ptAct = c.planCalcScore().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE) ;
 		if ( ptAct != null ) {
-			if ( ptAct.getClosingTime()!=0. ) {
+//			if ( ptAct.getClosingTime()!=0. && ptAct.getClosingTime()!=Time.UNDEFINED_TIME ) {
+//				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams()==true ) {
+//					throw new RuntimeException("setting the pt interaction activity closing time away from 0/undefined is not allowed because it breaks pt scoring." +
+//					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
+//				}
+//			}
+			if ( ptAct.isScoringThisActivityAtAll() ) {
 				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams()==true ) {
-					throw new RuntimeException("setting the pt interaction activity closing time away from 0 is not allowed because it breaks pt scoring." +
+					throw new RuntimeException("Scoring " + ptAct.getActivityType() + " is not allowed because it breaks pt scoring." +
 					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
 				}
 			}

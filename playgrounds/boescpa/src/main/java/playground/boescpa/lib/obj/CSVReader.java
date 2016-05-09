@@ -22,11 +22,13 @@ public class CSVReader {
         this.bufferedReader = IOUtils.getBufferedReader(pathToCSVFile);
     }
 
+	public CSVReader(final String pathToCSVFile, final String delimiter) {
+		this(pathToCSVFile);
+		this.delimiter = delimiter;
+	}
+
     /**
-     *
      * @return String array with the split elements of the CSV line, or Null if the end of the file is reached.
-     *
-     * @throws IOException
      */
     public String[] readLine() {
         try {

@@ -41,7 +41,7 @@ public class PrepareTomTomMatrix {
         String idKey = "NO";
 
         NumericMatrix m = NumericMatrixIO.read(in);
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, idKey);
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, idKey, null);
         DistanceCalculator dCalc = CartesianDistanceCalculator.getInstance();
         double threshold = 100000;
 

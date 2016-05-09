@@ -32,6 +32,9 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.ActivityImpl;
 
 import javax.inject.Inject;
@@ -63,7 +66,13 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
     }
 
     @Inject
-    EventsToActivities(EventsManager eventsManager) {
+    EventsToActivities(ControlerListenerManager controlerListenerManager, EventsManager eventsManager) {
+        controlerListenerManager.addControlerListener(new AfterMobsimListener() {
+            @Override
+            public void notifyAfterMobsim(AfterMobsimEvent event) {
+                finish();
+            }
+        });
         eventsManager.addHandler(this);
     }
 

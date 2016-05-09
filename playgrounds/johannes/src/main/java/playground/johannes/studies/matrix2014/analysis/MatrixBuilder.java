@@ -19,7 +19,9 @@
 
 package playground.johannes.studies.matrix2014.analysis;
 
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.matrix.NumericMatrix;
 
 import java.util.Collection;
@@ -28,6 +30,10 @@ import java.util.Collection;
  * @author johannes
  */
 public interface MatrixBuilder {
+
+    void setLegPredicate(Predicate<Segment> predicate);
+
+    void setUseWeights(boolean useWeights);
 
     NumericMatrix build(Collection<? extends Person> population);
 }

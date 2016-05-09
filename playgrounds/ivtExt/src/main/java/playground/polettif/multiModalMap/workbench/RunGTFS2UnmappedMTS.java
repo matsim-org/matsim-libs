@@ -19,25 +19,27 @@
 
 package playground.polettif.multiModalMap.workbench;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.multiModalMap.gtfs.GTFSReader;
+import playground.polettif.multiModalMap.tools.ScheduleCleaner;
+import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 public class RunGTFS2UnmappedMTS {
 	
 	public static void main(final String[] args) {
+//		final String gtfsPath = "C:/Users/polettif/Desktop/data/gtfs/zvv/";
 		final String gtfsPath = "C:/Users/polettif/Desktop/data/gtfs/zvv/";
-		final String gtfsPath_sample = "C:/Users/polettif/Desktop/data/gtfs/google_sample/";
-		final String mtsFile = "C:/Users/polettif/Desktop/output/test/zvv_unmappedSchedule.xml";
-		final String mtsFile_sample = "C:/Users/polettif/Desktop/output/test/google_sample.xml";
+		final String mtsFile = "C:/Users/polettif/Desktop/data/mts/unmapped/fromGtfs/zvv_mostServices.xml";
+		final String shapeFile = "C:/Users/polettif/Desktop/data/gtfs/shp/zvv_mostServices.shp";
+//		final String mtsFile = "C:/Users/polettif/Desktop/output/gtfs2mts/zvv_unmappedSchedule.xml";
+//		final String mtsFile = "C:/Users/polettif/Desktop/output/gtfs2mts/google_sample.xml";
 
 		// Load Schedule
-		GTFSReader gtfsReader = new GTFSReader(gtfsPath);
-		gtfsReader.writeTransitSchedule(mtsFile);
+		GTFSReader gtfsReader = new GTFSReader(gtfsPath, GTFSReader.DAY_WITH_MOST_SERVICES, "CH1903_LV03_Plus");
+		gtfsReader.writeShapeFile(shapeFile);
+		TransitSchedule schedule = gtfsReader.getSchedule();
+		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
+		ScheduleTools.writeTransitSchedule(schedule, mtsFile);
 	}
 	
 }

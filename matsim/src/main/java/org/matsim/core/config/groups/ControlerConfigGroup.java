@@ -55,13 +55,13 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
 	private static final String OVERWRITE_FILE = "overwriteFiles";
-	public static final String CREATE_GRAPHS = "createGraphs";
-	final String DUMP_DATA_AT_END = "dumpDataAtEnd";
+	private static final String CREATE_GRAPHS = "createGraphs";
+	private static final String DUMP_DATA_AT_END = "dumpDataAtEnd";
 
 	/*package*/ static final String MOBSIM = "mobsim";
 	public enum MobsimType {qsim, JDEQSim}
 
-    public static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
+	private static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 
 
 	private String outputDirectory = "./output";

@@ -22,9 +22,9 @@ package playground.michalm.poznan.demand.ptap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.contrib.util.random.RandomUtils;
 import org.matsim.contrib.zone.*;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -53,7 +53,7 @@ public class PoznanDemandGeneration
         int randomSeed = RandomUtils.DEFAULT_SEED;
         RandomUtils.reset(randomSeed);
 
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
         Map<Id<Zone>, Zone> zones = Zones.readZones(zonesXmlFile, zonesShpFile);
 

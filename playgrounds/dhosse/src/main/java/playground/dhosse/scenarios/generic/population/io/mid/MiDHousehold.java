@@ -3,15 +3,13 @@ package playground.dhosse.scenarios.generic.population.io.mid;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.households.Income;
-
 public class MiDHousehold {
 	
 	private String id;
 	
 	private List<String> memberIds;
 	private int nCars;
-	private Income hhIncome;
+	private double hhIncome;
 	
 	public MiDHousehold(String id){
 		
@@ -44,13 +42,13 @@ public class MiDHousehold {
 		
 	}
 	
-	public Income getIncome(){
+	public double getIncome(){
 		
 		return this.hhIncome;
 		
 	}
 	
-	public void setIncome(Income income){
+	public void setIncome(double income){
 		
 		this.hhIncome = income;
 		

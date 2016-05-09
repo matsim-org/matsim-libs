@@ -1,7 +1,6 @@
 package playground.dhosse.prt.passenger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.schedule.StayTask;

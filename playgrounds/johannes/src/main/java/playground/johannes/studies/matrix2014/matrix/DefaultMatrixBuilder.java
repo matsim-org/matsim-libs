@@ -56,11 +56,10 @@ public class DefaultMatrixBuilder implements MatrixBuilder {
 
     private boolean useWeights;
 
-    public DefaultMatrixBuilder(ActivityLocationLayer locations, ZoneCollection zones, String layerName) {
-//        this.facilities = facilities;
+    public DefaultMatrixBuilder(ActivityLocationLayer locations, ZoneCollection zones) {
         this.locationLayer = locations;
         this.zones = zones;
-        zoneIdKey = layerName + "_zone_id";
+        zoneIdKey = zones.getId() + "_zone_id";
         zoneIds = new ConcurrentHashMap<>();
     }
 

@@ -2,45 +2,36 @@ package playground.dhosse.prt.router;
 
 import java.util.Collections;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import javax.inject.Provider;
+
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.DefaultRoutingModules;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 
 import playground.dhosse.prt.data.PrtData;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
 
-import javax.inject.Provider;
-
 public class PrtTripRouterFactoryImpl implements Provider<TripRouter> {
 	
-	private final MatsimVrpContext context;
+    private VrpData vrpData;
+    private Scenario scenario;
 	private final TravelTime travelTime;
 	private final TravelDisutility travelDisutility;
 	private final PrtData data;
 	
-	public PrtTripRouterFactoryImpl(final MatsimVrpContext context, final TravelTime ttime, final TravelDisutility tdis, PrtData data){
+	public PrtTripRouterFactoryImpl(VrpData vrpData, Scenario scenario, final TravelTime ttime, final TravelDisutility tdis, PrtData data){
 
-		this.context = context;
+        this.vrpData = vrpData;
+        this.scenario = scenario;
 		this.travelTime = ttime;
 		this.travelDisutility = tdis;
 		this.data = data;
@@ -50,14 +41,14 @@ public class PrtTripRouterFactoryImpl implements Provider<TripRouter> {
 	@Override
 	public TripRouter get() {
 		
-		Network network = this.context.getScenario().getNetwork();
-		LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory = createDefaultLeastCostPathCalculatorFactory(this.context.getScenario());
-		PopulationFactory populationFactory = this.context.getScenario().getPopulation().getFactory();
-		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl)populationFactory).getModeRouteFactory();
+		Network network = this.scenario.getNetwork();
+		LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory = createDefaultLeastCostPathCalculatorFactory(this.scenario);
+		PopulationFactory populationFactory = this.scenario.getPopulation().getFactory();
+		RouteFactoryImpl modeRouteFactory = ((PopulationFactoryImpl)populationFactory).getRouteFactory();
 		
 		TripRouter tripRouter = new TripRouter();
 
-		PlansCalcRouteConfigGroup routeConfigGroup = this.context.getScenario().getConfig().plansCalcRoute();
+		PlansCalcRouteConfigGroup routeConfigGroup = this.scenario.getConfig().plansCalcRoute();
 
 		System.out.println(routeConfigGroup.getModeRoutingParams().get(TransportMode.walk));
 		
@@ -118,7 +109,7 @@ public class PrtTripRouterFactoryImpl implements Provider<TripRouter> {
 		
 		tripRouter.setRoutingModule(
 				PrtRequestCreator.MODE, new PrtRouterWrapper(PrtRequestCreator.MODE, network,
-				populationFactory, (MatsimVrpContextImpl) this.context, this.data,
+				populationFactory, this.data,
 				DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, populationFactory, routeConfigGroup.getModeRoutingParams().get(TransportMode.walk) ) ) 
 			);
 		

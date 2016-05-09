@@ -48,7 +48,7 @@ public class AdjustDays {
     public static void main(String args[]) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(args[0]));
         BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], "NO", null);
 
         DistanceCalculator distCalc = WGS84DistanceCalculator.getInstance();
         NumericMatrix distances = new NumericMatrix();

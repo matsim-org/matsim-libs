@@ -25,6 +25,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Location;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.strtree.STRtree;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -34,6 +35,10 @@ import java.util.*;
  */
 public class ZoneCollection {
 
+	private static final Logger logger = Logger.getLogger(ZoneCollection.class);
+
+	private final String id;
+
 	private final Set<Zone> zones;
 
 	private SpatialIndex spatialIndex;
@@ -42,8 +47,13 @@ public class ZoneCollection {
 
 	private String primaryKey;
 
-	public ZoneCollection() {
+	public ZoneCollection(String id) {
+		this.id = id;
 		zones = new LinkedHashSet<>();
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public void setPrimaryKey(String key) {
@@ -78,7 +88,8 @@ public class ZoneCollection {
 				if(key == null)
 					throw new NullPointerException();
 				if(null != keyIndex.put(key, zone)) {
-					throw new RuntimeException("Overwriting key " + zone.getAttribute(primaryKey));
+					logger.warn(String.format("Overwriting key %s.", zone.getAttribute(primaryKey)));
+//					throw new RuntimeException("Overwriting key " + zone.getAttribute(primaryKey));
 				}
 			}
 		}

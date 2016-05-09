@@ -1,24 +1,38 @@
 package playground.balac.induceddemand.controler.listener;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 
+import playground.balac.induceddemand.strategies.activitychainmodifier.NeighboursCreator;
+
 import java.util.*;
 
-public class ActivitiesAnalysisListener implements IterationEndsListener {
+public class ActivitiesAnalysisListener implements IterationEndsListener, IterationStartsListener, BeforeMobsimListener {
 	
 	private Scenario scenario;
+	private static final Logger logger = Logger.getLogger(ActivitiesAnalysisListener.class);
 
-	public ActivitiesAnalysisListener(Scenario scenario) {
+	
+	private Map<String, Double> scoreChange;
+	
+	public ActivitiesAnalysisListener(Scenario scenario, HashMap<String, Double> scoreChange2) {
 		
 		this.scenario = scenario;
+		this.scoreChange = scoreChange2;
 	}
 	
 	@Override
@@ -29,7 +43,7 @@ public class ActivitiesAnalysisListener implements IterationEndsListener {
 			Set<String> activityChains = new HashSet<String>();
 			Map<String, Integer> actPerType = new HashMap<String, Integer>();
 			
-			int[] sizeChain = new int[20];
+			int[] sizeChain = new int[30];
 			
 			stageTypes.addActivityTypes( new StageActivityTypesImpl( "pt interaction" ) );
 	
@@ -100,6 +114,28 @@ public class ActivitiesAnalysisListener implements IterationEndsListener {
 			}
 		}
 		
+		for (String s : this.scoreChange.keySet()) {
+			Person person = scenario.getPopulation().getPersons().get(Id.create(s, Person.class));
+			Plan plan = person.getSelectedPlan();
+			
+			double score = plan.getScore();
+			double change = score - this.scoreChange.get(s);
+			logger.info(change + " " + person.getId());
+			}
+		
+		
+		
+	}
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+			this.scoreChange.clear();
+		
+	}
+
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+
 		
 	}
 

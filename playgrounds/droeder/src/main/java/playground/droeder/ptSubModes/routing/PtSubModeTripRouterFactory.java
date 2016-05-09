@@ -29,7 +29,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -54,7 +54,7 @@ public class PtSubModeTripRouterFactory implements javax.inject.Provider<TripRou
 	private TravelDisutilityFactory travelDisutilityFactory;
 	private TravelTime travelTime;
 	private LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory;
-	private ModeRouteFactory modeRouteFactory;
+	private RouteFactoryImpl modeRouteFactory;
 	private PopulationFactory populationFactory;
 	private Provider<TransitRouter> transitRouterFactory;
 	private TransitSchedule transitSchedule;
@@ -93,7 +93,7 @@ public class PtSubModeTripRouterFactory implements javax.inject.Provider<TripRou
 //                        routingContext.getTravelDisutility(),
 //                        routingContext.getTravelTime());
 		this.leastCostPathAlgorithmFactory = createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
-		this.modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+		this.modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getRouteFactory();
 		this.populationFactory = controler.getScenario().getPopulation().getFactory();
 //		this.transitRouterFactory = controler.getTransitRouterFactory();
 		this.transitSchedule = controler.getScenario().getTransitSchedule();

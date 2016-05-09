@@ -20,83 +20,29 @@
 package playground.dgrether.signalsystems.sylvia.controler;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.controler.SignalsControllerListener;
+import org.matsim.contrib.signals.data.SignalsScenarioWriter;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.scenario.MutableScenario;
-import org.matsim.lanes.data.v20.Lanes;
-import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.controler.SignalsControllerListener;
-import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
-import org.matsim.contrib.signals.model.SignalSystemsManager;
+
+import com.google.inject.Inject;
 
 import playground.dgrether.signalsystems.DgSensorManager;
-import playground.dgrether.signalsystems.sylvia.model.DgSylviaSignalModelFactory;
 
 
 /**
- * @author dgrether
- *
+ * @author dgrether, tthunig
  */
-public class DgSylviaSignalControlerListener implements SignalsControllerListener , StartupListener, IterationStartsListener,
+public class DgSylviaSignalControlerListener implements SignalsControllerListener, IterationStartsListener,
 		ShutdownListener {
 
-	private SignalSystemsManager signalManager;
-	private DgSensorManager sensorManager;
-	private DgSylviaConfig sylviaConfig;
-	private boolean alwaysSameMobsimSeed = false ;
+	@Inject private SignalSystemsManager signalManager;
+	@Inject private DgSensorManager sensorManager;
 	
-	public DgSylviaSignalControlerListener(DgSylviaConfig sylviaConfig) {
-		this.sylviaConfig = sylviaConfig;
-	}
-
-	public DgSylviaSignalControlerListener(DgSylviaConfig sylviaConfig, boolean alwaysSameMobsimSeed ) {
-		this.sylviaConfig = sylviaConfig;
-		this.alwaysSameMobsimSeed = alwaysSameMobsimSeed ;
-	}
-
-
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		MutableScenario scenario = (MutableScenario) event.getServices().getScenario();
-		
-		this.sensorManager = new DgSensorManager(event.getServices().getScenario().getNetwork());
-		if ( scenario.getConfig().network().getLaneDefinitionsFile()!=null || scenario.getConfig().qsim().isUseLanes()){
-			this.sensorManager.setLaneDefinitions((Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME));
-		}
-		event.getServices().getEvents().addHandler(sensorManager);
-		
-		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
-				new DgSylviaSignalModelFactory(new DefaultSignalModelFactory(), sensorManager, this.sylviaConfig) , event.getServices().getEvents());
-		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		
-		SignalEngine engine = new QSimSignalEngine(this.signalManager);
-//		event.getServices().getMobsimListeners().add(engine);
-		
-		if ( this.alwaysSameMobsimSeed ) {
-			MobsimInitializedListener randomSeedResetter = new MobsimInitializedListener(){
-				@Override
-				public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-					MatsimRandom.reset(0); // make sure it is same random seed every time
-				}
-			};
-//			event.getServices().getMobsimListeners().add(randomSeedResetter) ;
-		}
-		throw new RuntimeException();
-	}
-
-
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		this.signalManager.resetModel(event.getIteration());
@@ -110,7 +56,6 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 	
 	public void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
 		new SignalsScenarioWriter(controlerIO).writeSignalsData(sc);
-	}
-	
+	}	
 	
 }

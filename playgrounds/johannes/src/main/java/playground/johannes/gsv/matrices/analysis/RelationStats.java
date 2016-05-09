@@ -51,7 +51,7 @@ public class RelationStats {
 		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.xml");
 		NumericMatrix m = reader.getMatrix();
 
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.json")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");

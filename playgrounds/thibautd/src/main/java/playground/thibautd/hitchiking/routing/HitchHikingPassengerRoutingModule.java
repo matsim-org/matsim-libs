@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -50,7 +50,7 @@ import java.util.Random;
 public class HitchHikingPassengerRoutingModule implements RoutingModule {
 	private final static double BEEFLY_ESTIMATED_SPEED = 25000d / 3600d;
 	private final RoutingModule ptRoutingModule;
-	private final ModeRouteFactory routeFactory;
+	private final RouteFactoryImpl routeFactory;
 	private final HitchHikingSpots spots;
 	private final SpotWeighter spotWeighter;
 	private final HitchHikingConfigGroup config;
@@ -59,7 +59,7 @@ public class HitchHikingPassengerRoutingModule implements RoutingModule {
 	public HitchHikingPassengerRoutingModule(
 			final RoutingModule ptRoutingModule,
 			final HitchHikingSpots spots,
-			final ModeRouteFactory factory,
+			final RouteFactoryImpl factory,
 			final SpotWeighter spotWeighter,
 			final HitchHikingConfigGroup config,
 			final Random random) {

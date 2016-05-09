@@ -26,7 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -53,7 +53,7 @@ public class TestPTMapperBusAndTram {
 	public void prepareTests() {
 		this.network = NetworkUtils.readNetwork(utils.getClassInputDirectory() + "ZurichCentre.xml");
 		this.schedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(this.schedule, new ModeRouteFactory());
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(this.schedule, new RouteFactoryImpl());
 		reader.readFile(utils.getClassInputDirectory() + "ScheduleTest.xml");
 	}
 
@@ -85,7 +85,7 @@ public class TestPTMapperBusAndTram {
 	@Test
 	public void testCreateAdditionalLinks() {
 		TransitSchedule transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(transitSchedule, new ModeRouteFactory());
+		TransitScheduleReaderV1 reader = new TransitScheduleReaderV1(transitSchedule, new RouteFactoryImpl());
 		reader.readFile(utils.getClassInputDirectory() + "ScheduleTest_AdditionalLinks.xml");
 		PTMapperBusAndTram router = new PTMapperBusAndTram(transitSchedule, this.network);
 		router.linkStationsToNetwork();

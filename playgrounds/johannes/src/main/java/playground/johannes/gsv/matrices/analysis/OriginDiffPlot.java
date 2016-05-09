@@ -63,7 +63,7 @@ public class OriginDiffPlot {
 		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.xml");
 		NumericMatrix refMatrix = reader.getMatrix();
 
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.json", "gsvId");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.json", "gsvId", null);
 
 		ODUtils.cleanDistances(refMatrix, zones, 100000, WGS84DistanceCalculator.getInstance());
 		// ODUtils.cleanDistances(simMatrix, zones, 100000,

@@ -46,4 +46,11 @@ public class PopulationUtils {
 		return scenario.getPopulation();
 	}
 
+	/**
+	 * Creates and returns an empty population.
+	 */
+	public static Population getEmptyPopulation() {
+		return ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
+	}
+
 }

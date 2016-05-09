@@ -24,7 +24,6 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
 public abstract class AbstractController {
@@ -51,19 +50,16 @@ public abstract class AbstractController {
     private boolean dirtyShutdown = false;
 
     protected AbstractController() {
-        this(new IterationStopWatch(), null);
+        this(new ControlerListenerManagerImpl(), new IterationStopWatch(), null);
     }
 
-    AbstractController(IterationStopWatch stopWatch, MatsimServices matsimServices) {
-        OutputDirectoryLogging.catchLogEntries();
-        Gbl.printSystemInfo();
-        Gbl.printBuildInfo();
+    AbstractController(ControlerListenerManagerImpl controlerListenerManager, IterationStopWatch stopWatch, MatsimServices matsimServices) {
+        ControlerUtils.initializeOutputLogging();
         log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
-        this.controlerListenerManagerImpl = new ControlerListenerManagerImpl();
+        this.controlerListenerManagerImpl = controlerListenerManager;
         this.controlerListenerManagerImpl.setControler(matsimServices);
         this.stopwatch = stopWatch;
     }
-
 
     private void resetRandomNumbers(long seed, int iteration) {
         MatsimRandom.reset(seed + iteration);

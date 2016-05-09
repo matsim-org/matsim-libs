@@ -36,7 +36,7 @@ public class OptFileReader extends AbstractTabularFileHandlerWithHeaderLine {
 		return this.summary;
 	}
 
-	// --------------- IMPLEMENTATION OF TabularFileHandler ---------------
+	// --------------- IMPLEMENTATION OF TabularFileHandler... ---------------
 
 	@Override
 	public String preprocess(final String line) {

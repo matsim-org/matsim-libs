@@ -24,8 +24,10 @@ import org.apache.log4j.Logger;
 import playground.johannes.studies.matrix2014.matrix.ODPredicate;
 import playground.johannes.studies.matrix2014.matrix.VolumePredicate;
 import playground.johannes.synpop.analysis.AnalyzerTask;
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.analysis.StatsContainer;
 import playground.johannes.synpop.data.Person;
+import playground.johannes.synpop.data.Segment;
 import playground.johannes.synpop.matrix.MatrixOperations;
 import playground.johannes.synpop.matrix.NumericMatrix;
 
@@ -54,6 +56,14 @@ public class MatrixComparator implements AnalyzerTask<Collection<? extends Perso
         this.tasks = tasks;
         this.builder = builder;
         volumeThreshold = 0;
+    }
+
+    public void setLegPredicate(Predicate<Segment> predicate) {
+        builder.setLegPredicate(predicate);
+    }
+
+    public void setUseWeights(boolean useWeights) {
+        builder.setUseWeights(useWeights);
     }
 
     public void setNormPredicate(ODPredicate<String, Double> normPredicate) {

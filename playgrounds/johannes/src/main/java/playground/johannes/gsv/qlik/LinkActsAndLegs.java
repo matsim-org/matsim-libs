@@ -52,7 +52,7 @@ public class LinkActsAndLegs {
 
 		Set<PlainPerson> persons = (Set<PlainPerson>)parser.getPersons();
 
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.geojson", "NO");
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.geojson", "NO", null);
 		List<Zone> list = new ArrayList<>(zones.getZones());
 
 		long counter = 0;

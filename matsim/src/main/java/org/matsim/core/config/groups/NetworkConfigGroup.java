@@ -73,7 +73,7 @@ public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( CHANGE_EVENTS_INPUT_FILE )
-	public void setChangeEventInputFile(final String changeEventsInputFile) {
+	public void setChangeEventsInputFile(final String changeEventsInputFile) {
 		this.changeEventsInputFile = changeEventsInputFile;
 	}
 	@StringGetter( CHANGE_EVENTS_INPUT_FILE )

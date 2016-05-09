@@ -1,24 +1,13 @@
 package playground.dhosse.prt;
 
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
 
 import playground.dhosse.prt.data.PrtData;
-import playground.dhosse.prt.events.CostContainerHandler;
-import playground.dhosse.prt.events.CostContainers2PersonMoneyEvent;
-import playground.dhosse.prt.events.PrtRankAndPassengerStatsHandler;
-import playground.dhosse.prt.events.PrtStatsWriter;
-import playground.dhosse.prt.events.PrtVehicleFactory;
+import playground.dhosse.prt.events.*;
 import playground.michalm.util.MovingAgentsRegister;
 
 /**
@@ -38,15 +27,16 @@ public class PrtControllerListener implements StartupListener, IterationStartsLi
 	private PrtRankAndPassengerStatsHandler rsh;
 	private PrtStatsWriter statsWriter;
 
-	public PrtControllerListener(PrtConfigGroup config, MatsimServices controler, MatsimVrpContextImpl context,
-			PrtData data) {
+
+	public PrtControllerListener(PrtConfig config, MatsimServices controler,
+			PrtData data, VrpData vrpData, Scenario scenario) {
 		
 		this.cch = new CostContainerHandler(controler.getScenario().getNetwork(),
 				config.getFixedCost(), config.getVariableCostsD());
 		this.cc = new CostContainers2PersonMoneyEvent(controler, cch);
-		this.rsh = new PrtRankAndPassengerStatsHandler(context, data);
+		this.rsh = new PrtRankAndPassengerStatsHandler(vrpData, scenario, data);
 		this.statsWriter = new PrtStatsWriter(config, cch, rsh);
-		this.vfl = new PrtVehicleFactory(config, context, rsh);
+		this.vfl = new PrtVehicleFactory(config, vrpData, scenario, rsh);
 		
 	}
 	

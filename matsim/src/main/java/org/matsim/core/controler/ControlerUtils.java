@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * @author nagel
@@ -64,5 +65,11 @@ public final class ControlerUtils {
 	    config.checkConsistency();
 	    log.info("Checking consistency of config done.");
 	}
+
+	public static void initializeOutputLogging() {
+		    OutputDirectoryLogging.catchLogEntries();
+		    Gbl.printSystemInfo();
+		    Gbl.printBuildInfo();
+	    }
 
 }

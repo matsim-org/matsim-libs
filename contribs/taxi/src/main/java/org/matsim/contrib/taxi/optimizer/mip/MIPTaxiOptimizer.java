@@ -43,19 +43,20 @@ public class MIPTaxiOptimizer
     private int optimCounter = 0;
 
 
-    public MIPTaxiOptimizer(TaxiOptimizerContext optimContext)
+    public MIPTaxiOptimizer(TaxiOptimizerContext optimContext, MIPTaxiOptimizerParams params)
     {
-        super(optimContext, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
+        super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
 
         if (!optimContext.scheduler.getParams().destinationKnown) {
             throw new IllegalArgumentException("Destinations must be known ahead");
         }
 
+        //TODO should they be taken from optimContext????; what to used then in TaxiScheduler?
         TravelTime travelTime = new FreeSpeedTravelTime();
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
 
         pathTreeTravelTimeCalc = new PathTreeBasedTravelTimeCalculator(
-                new DijkstraWithDijkstraTreeCache(optimContext.context.getScenario().getNetwork(),
+                new DijkstraWithDijkstraTreeCache(optimContext.getNetwork(),
                         travelDisutility, travelTime, TimeDiscretizer.CYCLIC_24_HOURS));
     }
 
@@ -79,7 +80,7 @@ public class MIPTaxiOptimizer
 
         optimCounter++;
         if (optimCounter % 10 == 0) {
-            System.err.println(optimCounter + "; time=" + optimContext.context.getTime());
+            System.err.println(optimCounter + "; time=" + optimContext.timer.getTimeOfDay());
         }
 
         wasLastPlanningHorizonFull = mipProblem.isPlanningHorizonFull();

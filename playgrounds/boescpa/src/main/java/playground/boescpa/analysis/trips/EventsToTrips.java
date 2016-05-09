@@ -26,8 +26,6 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import playground.boescpa.lib.tools.NetworkUtils;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -41,29 +39,31 @@ import java.util.List;
 public class EventsToTrips {
 	private static Logger log = Logger.getLogger(EventsToTrips.class);
 
+	private final TripEventHandler tripHandler;
+
+	public EventsToTrips(TripEventHandler tripHandler) {
+		this.tripHandler = tripHandler;
+	}
+
+	public EventsToTrips(Network network) {
+		this.tripHandler = new TripEventHandler(network);
+	}
+
     public static void main(String[] args) {
-        String eventsFile = args[0]; // Path to an events-File.
-        String networkFile = args[1]; // Path to the network-File used for the simulation resulting in the events-File.
-        String tripFile = args[2]; // Path to where the trip file should be written to.
+        String pathEventsFile = args[0]; // Path to an events-File.
+        String pathNetworkFile = args[1]; // Path to the network-File used for the simulation resulting in the events-File.
+        String pathTripFile = args[2]; // Path to where the trip file should be written to.
 
-        TripEventHandler.setAnonymizeTrips(true);
-        List<Trip> trips = createTripsFromEvents(eventsFile, networkFile);
-
+		TripEventHandler.setAnonymizeTrips(true);
+		Network network = NetworkUtils.readNetwork(pathNetworkFile);
+        List<Trip> trips = new EventsToTrips(network).createTripsFromEvents(pathEventsFile);
         log.info("Write trips...");
-        new TripWriter().writeTrips(trips, tripFile);
+        TripWriter.writeTrips(trips, pathTripFile);
         log.info("Write trips...done.");
     }
 
-    public static List<Trip> createTripsFromEvents(String pathToEventsFile, String pathToNetworkFile) {
-        log.info("Reading network xml file...");
-        Network network = NetworkUtils.readNetwork(pathToNetworkFile);
-        log.info("Reading network xml file...done.");
-        return createTripsFromEvents(pathToEventsFile, network);
-    }
-
-	public static List<Trip> createTripsFromEvents(String pathToEventsFile, Network network) {
-		TripEventHandler tripHandler = new TripEventHandler(network);
-        tripHandler.reset(0);
+	public List<Trip> createTripsFromEvents(String pathToEventsFile) {
+		tripHandler.reset(0);
         EventsManager events = EventsUtils.createEventsManager();
         events.addHandler(tripHandler);
 

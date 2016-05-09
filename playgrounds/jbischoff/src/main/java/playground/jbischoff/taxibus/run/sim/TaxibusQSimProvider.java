@@ -19,155 +19,112 @@
  * *********************************************************************** */
 package playground.jbischoff.taxibus.run.sim;
 
-import java.util.Map;
+import java.util.Collection;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
-import org.matsim.contrib.dvrp.router.DistanceAsTravelDisutility;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
-import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
+import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
-import org.matsim.contrib.dynagent.run.DynAgentLauncherUtils;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.router.util.*;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import com.google.inject.*;
+import com.google.inject.name.Named;
 
 import playground.jbischoff.taxibus.algorithm.TaxibusActionCreator;
-import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizer;
-import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerConfiguration;
-import playground.jbischoff.taxibus.algorithm.optimizer.fifo.FifoOptimizer;
-import playground.jbischoff.taxibus.algorithm.optimizer.fifo.MultipleFifoOptimizer;
+import playground.jbischoff.taxibus.algorithm.optimizer.*;
+import playground.jbischoff.taxibus.algorithm.optimizer.fifo.*;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusPassengerEngine;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
-import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequestCreator;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusScheduler;
-import playground.jbischoff.taxibus.algorithm.scheduler.TaxibusSchedulerParams;
+import playground.jbischoff.taxibus.algorithm.passenger.*;
+import playground.jbischoff.taxibus.algorithm.scheduler.*;
 import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
+
 /**
  * @author jbischoff
- *
  */
 
-public class TaxibusQSimProvider implements Provider<QSim> {
-	private TaxibusConfigGroup tbcg;
-	private MatsimVrpContextImpl context;
-	private TaxibusOptimizer optimizer;
-	private EventsManager events;
-	private TravelTime travelTime;
-	private LineDispatcher dispatcher;
-	private TaxibusPassengerEngine passengerEngine;
-	private TaxibusPassengerOrderManager orderManager;
-	private TaxibusScheduler scheduler;
-	private TaxibusOptimizerConfiguration optimConfig;
-	private TaxibusSchedulerParams params;
-	private TravelDisutility travelDisutility;
+public class TaxibusQSimProvider
+    implements Provider<QSim>
+{
+    private final Scenario scenario;
+    private final EventsManager events;
+    private final Collection<AbstractQSimPlugin> plugins;
+    private final VrpData vrpData;
+    private final TravelTime travelTime;
+    private final TaxibusConfigGroup tbcg;
+    private final LineDispatcher dispatcher;
+    private final TaxibusPassengerOrderManager orderManager;
 
-	@Inject
-	TaxibusQSimProvider(Config config, MatsimVrpContext context, EventsManager events,
-			Map<String, TravelTime> travelTimes, LineDispatcher dispatcher, TaxibusPassengerOrderManager orderManager) {
-		this.dispatcher = dispatcher;
-		this.tbcg = (TaxibusConfigGroup) config.getModule("taxibusConfig");
-		this.context = (MatsimVrpContextImpl) context;
-		this.events = events;
-		this.travelTime = travelTimes.get("car");
-		this.orderManager = orderManager;
-		
-		
 
-	}
+    @Inject
+    TaxibusQSimProvider(Scenario scenario, EventsManager events,
+            Collection<AbstractQSimPlugin> plugins, VrpData vrpData,
+            @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxibusConfigGroup tbcg,
+            LineDispatcher dispatcher, TaxibusPassengerOrderManager orderManager)
+    {
+        this.scenario = scenario;
+        this.events = events;
+        this.plugins = plugins;
+        this.vrpData = vrpData;
+        this.travelTime = travelTime;
+        this.tbcg = tbcg;
+        this.dispatcher = dispatcher;
+        this.orderManager = orderManager;
+    }
 
-	private QSim createMobsim(Scenario sc, EventsManager eventsManager) {
-		initiate();
-		QSim qSim = DynAgentLauncherUtils.initQSim(sc, eventsManager);
-		
-		if (sc.getConfig().transit().isUseTransit()) {
-			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-			qSim.addDepartureHandler(transitEngine);
-			qSim.addAgentSource(transitEngine);
-			qSim.addMobsimEngine(transitEngine);
-		}
-		
-		qSim.addQueueSimulationListeners(optimizer);
 
-		context.setMobsimTimer(qSim.getSimTimer());
+    @Override
+    public QSim get()
+    {
+        QSim qSim = QSimUtils.createQSim(scenario, events, plugins);
 
-		qSim.addMobsimEngine(passengerEngine);
-		qSim.addDepartureHandler(passengerEngine);
-		qSim.addQueueSimulationListeners(orderManager);
+        TaxibusOptimizer optimizer = createTaxibusOptimizer(qSim);
+        qSim.addQueueSimulationListeners(optimizer);
 
-		LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
-		TaxibusActionCreator actionCreator = new TaxibusActionCreator(passengerEngine, legCreator,
-				tbcg.getPickupDuration());
-//        qSim.addAgentSource(new VrpAgentSource(actionCreator, context, optimizer, qSim));
-		qSim.addAgentSource(new VrpAgentSource(actionCreator, context, optimizer, qSim));
-        qSim.addAgentSource(new PopulationAgentSource(context.getScenario().getPopulation(),
-                new TransitAgentFactory(qSim), qSim));
-//		VrpLauncherUtils.initAgentSources(qSim, context, optimizer, actionCreator);
-		if (tbcg.isOtfvis()) {
-			OTFClientLive.run(sc.getConfig(),
-					OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim));
-		}
-		return qSim;
-	}
+        TaxibusPassengerEngine passengerEngine = new TaxibusPassengerEngine(
+                TaxibusUtils.TAXIBUS_MODE, events, new TaxibusRequestCreator(), optimizer, vrpData,
+                scenario.getNetwork());
+        orderManager.setPassengerEngine(passengerEngine);
+        qSim.addMobsimEngine(passengerEngine);
+        qSim.addDepartureHandler(passengerEngine);
+        qSim.addQueueSimulationListeners(orderManager);
 
-	void initiate() {
-		travelDisutility = new DistanceAsTravelDisutility();
+        LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
+        TaxibusActionCreator actionCreator = new TaxibusActionCreator(passengerEngine, legCreator,
+                tbcg.getPickupDuration());
+        qSim.addAgentSource(new VrpAgentSource(actionCreator, vrpData, optimizer, qSim));
 
-		params = new TaxibusSchedulerParams(tbcg.getPickupDuration(), tbcg.getDropoffDuration());
+        return qSim;
+    }
 
-		resetSchedules(context.getVrpData().getVehicles().values());
 
-		scheduler = new TaxibusScheduler(context, params);
+    private TaxibusOptimizer createTaxibusOptimizer(QSim qSim)
+    {
+        //Joschka, now you can safely use travel times for disutility - these are from the past
+        //(not the currently collected)
+        TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
+        TaxibusSchedulerParams params = new TaxibusSchedulerParams(tbcg.getPickupDuration(),
+                tbcg.getDropoffDuration());
+        TaxibusScheduler scheduler = new TaxibusScheduler(vrpData, qSim.getSimTimer(), params);
+        TaxibusOptimizerContext optimizerContext = new TaxibusOptimizerContext(vrpData, scenario,
+                qSim.getSimTimer(), travelTime, travelDisutility, scheduler, tbcg.getOutputDir(),
+                tbcg);
 
-		optimConfig = new TaxibusOptimizerConfiguration(context, travelTime, travelDisutility, scheduler,
-				tbcg.getOutputDir(),tbcg);
+        switch (tbcg.getAlgorithmConfig()) {
+            case "line":
+                return new FifoOptimizer(optimizerContext, dispatcher, false);
 
-		if (tbcg.getAlgorithmConfig().equals("line")) {
+            case "multipleLine":
+                return new MultipleFifoOptimizer(optimizerContext, dispatcher, false);
 
-			optimizer = new FifoOptimizer(optimConfig, dispatcher, false);
-
-		} else if (tbcg.getAlgorithmConfig().equals("multipleLine")) {
-			optimizer = new MultipleFifoOptimizer(optimConfig, dispatcher, false);
-
-		} else
-			throw new RuntimeException("No config parameter set for algorithm, please check and assign in config");
-		passengerEngine = new TaxibusPassengerEngine(TaxibusUtils.TAXIBUS_MODE, events, new TaxibusRequestCreator(),
-				optimizer, context);
-		orderManager.setPassengerEngine(passengerEngine);
-	}
-
-	private void resetSchedules(Iterable<Vehicle> vehicles) {
-
-		for (Vehicle v : vehicles) {
-			VehicleImpl vi = (VehicleImpl) v;
-			vi.resetSchedule();
-
-		}
-	}
-
-	@Override
-	public QSim get() {
-		return createMobsim(context.getScenario(), this.events);
-	}
-
+            default:
+                throw new RuntimeException(
+                        "No config parameter set for algorithm, please check and assign in config");
+        }
+    }
 }

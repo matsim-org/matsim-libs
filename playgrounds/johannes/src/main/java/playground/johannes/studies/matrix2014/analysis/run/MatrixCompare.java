@@ -65,7 +65,7 @@ public class MatrixCompare {
 
         FileIOContext ioContext = new FileIOContext(outDir);
 
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(zoneFile, "NO", null);
         ODPredicate<String, Double> odPredicate = null;//new ZoneDistancePredicate(zones, 100000,
 //                CartesianDistanceCalculator.getInstance());
 

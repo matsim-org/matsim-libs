@@ -61,12 +61,12 @@ public class DynAgent
 
     // =====
 
-    public DynAgent(Id<Person> id, Id<Link> startLinkId, Netsim netsim, DynAgentLogic agentLogic)
+    public DynAgent(Id<Person> id, Id<Link> startLinkId, EventsManager events, DynAgentLogic agentLogic)
     {
         this.id = id;
         this.currentLinkId = startLinkId;
         this.agentLogic = agentLogic;
-        this.events = netsim.getEventsManager();
+        this.events = events;
 
         // initial activity
         dynActivity = this.agentLogic.computeInitialActivity(this);

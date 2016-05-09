@@ -24,6 +24,7 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -42,10 +43,10 @@ class VehicularDepartureHandler implements DepartureHandler {
 
 	private final Collection<String> transportModes;
 
-	VehicularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
+	VehicularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
-		this.transportModes = qNetsimEngine.getMobsim().getScenario().getConfig().qsim().getMainModes();
+		this.transportModes =qsimConfig.getMainModes();
 	}
 
 	@Override

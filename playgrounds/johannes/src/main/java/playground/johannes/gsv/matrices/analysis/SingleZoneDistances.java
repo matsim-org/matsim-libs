@@ -53,7 +53,7 @@ public class SingleZoneDistances {
 		reader.parse("/home/johannes/gsv/matrices/simmatrices/miv.695.xml");
 		NumericMatrix m = reader.getMatrix();
 
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		zones.setPrimaryKey("gsvId");

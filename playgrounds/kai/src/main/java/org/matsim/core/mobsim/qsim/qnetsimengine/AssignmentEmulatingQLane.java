@@ -37,9 +37,9 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.vis.VisLinkWLanes;
@@ -95,19 +95,19 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 	private final NetsimEngineContext context;
 
-	private final QNetsimEngine netsimEngine;
+	private final NetsimInternalInterface netsimEngine;
 
 	private final LinkSpeedCalculator linkSpeedCalculator;
 
 
 	
 	AssignmentEmulatingQLane(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id id, 
-			NetsimEngineContext context, QNetsimEngine netsimEngine, LinkSpeedCalculator linkSpeedCalculator ) {
+			NetsimEngineContext context, NetsimInternalInterface netsimEngine2, LinkSpeedCalculator linkSpeedCalculator ) {
 		this.id = id ;
 		this.qLink = qLinkImpl;
 		this.vehQueue = vehicleQueue ;
 		this.context = context;
-		this.netsimEngine = netsimEngine;
+		this.netsimEngine = netsimEngine2;
 		this.linkSpeedCalculator = linkSpeedCalculator;
 
 	}
@@ -383,22 +383,22 @@ class AssignmentEmulatingQLane extends QLaneI {
 				double spacing, double freespeedTraveltime, QVehicle veh)
 		{
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
-			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(AssignmentEmulatingQLane.this.length, spacing, 
+			lastDistanceFromFromNode = snapshotInfoBuilder.calculateOdometerDistanceFromFromNode(AssignmentEmulatingQLane.this.length, spacing, 
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
-			Integer lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+			Integer lane = VisUtils.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 //			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, 
 //					AssignmentEmulatingQLane.this.inverseFlowCapacityPerTimeStep, now, link.getFreespeed());
 			double speedValue = AssignmentEmulatingQLane.this.freespeedTravelTime 
 					/ ( veh.getEarliestLinkExitTime() - AssignmentEmulatingQLane.this.vehEnterTimeMap.get(veh.getId()) ) ;
 			if ( speedValue>1. ) { speedValue=1. ; }
 			if (this.otfLink != null){
-				snapshotInfoBuilder.positionAgentOnLink(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
-						AssignmentEmulatingQLane.this.length, this.otfLink.getEuklideanDistance(), veh, 
-						lastDistanceFromFromNode, lane, speedValue);
+				snapshotInfoBuilder.positionAgentGivenDistanceFromFNode(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
+						AssignmentEmulatingQLane.this.length, veh, lastDistanceFromFromNode, 
+						lane, speedValue);
 			}
 			else {
-				snapshotInfoBuilder.positionAgentOnLink(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
-						AssignmentEmulatingQLane.this.length, ((LinkImpl)link).getEuklideanLength() , veh, lastDistanceFromFromNode, lane, speedValue);
+				snapshotInfoBuilder.positionAgentGivenDistanceFromFNode(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
+						AssignmentEmulatingQLane.this.length, veh , lastDistanceFromFromNode, lane, speedValue);
 			}
 			return lastDistanceFromFromNode;
 		}

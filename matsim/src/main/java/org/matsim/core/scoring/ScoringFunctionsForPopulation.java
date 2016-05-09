@@ -34,9 +34,10 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.BufferedWriter;
@@ -55,7 +56,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author michaz
  *
  */
-class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler, ExperiencedPlansService {
+class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
 
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
 	private final PlansConfigGroup plansConfigGroup;
@@ -74,13 +75,18 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 	 * cdobler, nov'15
 	 */
 	private final Map<Id<Person>, ScoringFunction> agentScorers = new HashMap<>();
-	private final Map<Id<Person>, Plan> agentRecords = new HashMap<>();
 	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
 	private final AtomicReference<Throwable> exception = new AtomicReference<>();
 
 	@Inject
-	ScoringFunctionsForPopulation(EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
+	ScoringFunctionsForPopulation(ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
 								  PlansConfigGroup plansConfigGroup, Network network, Population population, ScoringFunctionFactory scoringFunctionFactory) {
+		controlerListenerManager.addControlerListener(new IterationStartsListener() {
+			@Override
+			public void notifyIterationStarts(IterationStartsEvent event) {
+				init();
+			}
+		});
 		this.plansConfigGroup = plansConfigGroup;
 		this.network = network;
 		this.population = population;
@@ -88,14 +94,12 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 		eventsManager.addHandler(this);
 		eventsToActivities.addActivityHandler(this);
 		eventsToLegs.addLegHandler(this);
-		log.info("Using old scoring.");
 	}
 
-	public void onIterationStarts() {
+	private void init() {
 		for (Person person : population.getPersons().values()) {
 			ScoringFunction data = scoringFunctionFactory.createNewScoringFunction(person);
 			this.agentScorers.put(person.getId(), data);
-			this.agentRecords.put(person.getId(), new PlanImpl());
 			this.partialScores.put(person.getId(), new TDoubleArrayList());
 		}
 	}
@@ -126,7 +130,6 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
 		if (scoringFunction != null) {
 			scoringFunction.handleLeg(leg);
-			agentRecords.get(agentId).addLeg(leg);
 			TDoubleCollection partialScoresForAgent = partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
 		}
@@ -138,7 +141,6 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 		ScoringFunction scoringFunction = ScoringFunctionsForPopulation.this.getScoringFunctionForAgent(agentId);
 		if (scoringFunction != null) {
 			scoringFunction.handleActivity(activity);
-			agentRecords.get(agentId).addActivity(activity);
 			TDoubleCollection partialScoresForAgent = partialScores.get(agentId);
 			partialScoresForAgent.add(scoringFunction.getScore());
 		}
@@ -156,11 +158,6 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 	 */
 	public ScoringFunction getScoringFunctionForAgent(final Id<Person> agentId) {
 		return this.agentScorers.get(agentId);
-	}
-
-	@Override
-	public Map<Id<Person>, Plan> getAgentRecords() {
-		return this.agentRecords;
 	}
 
 	public void finishScoringFunctions() {
@@ -181,29 +178,13 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 		}
 	}
 
-	public void writeExperiencedPlans(String iterationFilename) {
-		Population tmpPop = PopulationUtils.createPopulation(plansConfigGroup, network);
-		for (Entry<Id<Person>, Plan> entry : this.agentRecords.entrySet()) {
-			Person person = PopulationUtils.createPerson(entry.getKey());
-			Plan plan = entry.getValue();
-			plan.setScore(getScoringFunctionForAgent(person.getId()).getScore());
-			person.addPlan(plan);
-			tmpPop.addPerson(person);
-			if (plan.getScore().isNaN()) {
-				log.warn("score is NaN; plan:" + plan.toString());
-			}
-		}
-		new PopulationWriter(tmpPop, network).write(iterationFilename + ".xml.gz");
-		// I removed the "V5" here in the assumption that it is better to move along with future format changes.  If this is 
-		// undesired, please change back but could you then please also add a comment why you prefer this.  Thanks.
-		// kai, jan'16
-
-		try ( BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename + "_scores.xml.gz") ) {
+	public void writePartialScores(String iterationFilename) {
+		try ( BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename) ) {
 			for (Entry<Id<Person>, TDoubleCollection> entry : this.partialScores.entrySet()) {
 				out.write(entry.getKey().toString());
 				TDoubleIterator iterator = entry.getValue().iterator();
 				while (iterator.hasNext()) {
-					out.write('\t' + String.valueOf(iterator.next()));					
+					out.write('\t' + String.valueOf(iterator.next()));
 				}
 				out.newLine();
 			}

@@ -62,12 +62,12 @@ public class Incident2SHPWriter {
 		this.trafficItemId2path = trafficItemId2path;
 	}
 
-	public static void writeDailyIncidentLinksToShapeFile(Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay, String outputDirectory, double dateInSec) {
+	public static void writeDailyIncidentLinksToShapeFile(Map<Id<Link>, List<NetworkIncident>> linkId2processedIncidentsCurrentDay, String outputDirectory, double dateInSec, String crs) {
 		
-		String outputShpFile = outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateTimeString(dateInSec) + ".shp";
+		String outputShpFile = outputDirectory + "processedNetworkIncidents_" + DateTime.secToDateString(dateInSec) + ".shp";
 		
 		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
-				.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
+				.setCrs(MGC.getCRS(crs))
 				.setName("Link")
 				.addAttribute("LinkId", String.class)
 				.addAttribute("IncidentId", String.class)
@@ -117,8 +117,8 @@ public class Incident2SHPWriter {
 						incidentLink.getAllowedModes(),
 	
 						// start and end time
-						DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(incident.getStartTime()),
-						DateTime.secToDateTimeString(dateInSec) + " " + Time.writeTime(endTime)
+						DateTime.secToDateString(dateInSec) + " " + Time.writeTime(incident.getStartTime()),
+						DateTime.secToDateString(dateInSec) + " " + Time.writeTime(endTime)
 				};
 				
 				SimpleFeature feature = factory.createPolyline(
@@ -140,10 +140,10 @@ public class Incident2SHPWriter {
 		}
 	}
 	
-	public void writeTrafficItemLinksToShapeFile(String outputShpFile, Set<String> itemIdsToPrint) {
+	public void writeTrafficItemLinksToShapeFile(String outputShpFile, Set<String> itemIdsToPrint, String crs) {
 		
 		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
-				.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
+				.setCrs(MGC.getCRS(crs))
 				.setName("Link")
 				.addAttribute("LinkId", String.class)
 				.addAttribute("IncidentId", String.class)
@@ -235,9 +235,9 @@ public class Incident2SHPWriter {
 		return incidentObject;
 	}
 
-	public void writeCongestionInfo2ShapeFile(String outputShpFile, Set<String> itemIdsToPrint) {
+	public void writeCongestionInfo2ShapeFile(String outputShpFile, Set<String> itemIdsToPrint, String crs) {
 		PolylineFeatureFactory factory = new PolylineFeatureFactory.Builder()
-				.setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4))
+				.setCrs(MGC.getCRS(crs))
 				.setName("Link")
 				.addAttribute("LinkId", String.class)
 				.addAttribute("IncidentId", String.class)

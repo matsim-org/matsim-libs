@@ -74,7 +74,7 @@ public class SquareGrid
                 maxY = n.getCoord().getY();
             }
         }
-        minX -= 1.0;
+        minX -= 1.0;//TODO use epsilon instead
         minY -= 1.0;
         maxX += 1.0;
         maxY += 1.0;
@@ -91,8 +91,8 @@ public class SquareGrid
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 int idx = r * cols + c;
-                Coord coord = new Coord(c * cellSize + x0, r * cellSize + y0);
-                zones[idx] = new Zone(Id.create(idx, Zone.class), "square", coord);
+                Coord centroid = new Coord(c * cellSize + x0, r * cellSize + y0);
+                zones[idx] = new Zone(Id.create(idx, Zone.class), "square", centroid);
             }
         }
     }
@@ -106,8 +106,8 @@ public class SquareGrid
 
     public Zone getZone(Coord coord)
     {
-        int r = (int)Math.round( ( (coord.getY() - minY) / cellSize));
-        int c = (int)Math.round( ( (coord.getX() - minX) / cellSize));
+        int r = (int) ( (coord.getY() - minY) / cellSize);// == Math.floor
+        int c = (int) ( (coord.getX() - minX) / cellSize);// == Math.floor
         return zones[r * cols + c];
     }
 }

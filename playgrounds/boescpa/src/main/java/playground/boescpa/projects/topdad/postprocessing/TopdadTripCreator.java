@@ -49,10 +49,10 @@ public class TopdadTripCreator {
 
         Network network = NetworkUtils.readNetwork(networkFile);
         SpatialTripCutter spatialTripCutter = new SpatialTripCutter(new CirclePointCutter(zoneRadius, 683518.0, 246836.0), network);
-        trips = EventsToTrips.createTripsFromEvents(eventsFile, network);
+        trips = new EventsToTrips(network).createTripsFromEvents(eventsFile);
         trips = TripFilter.spatialTripFilter(trips, spatialTripCutter);
         travelTimesAndDistances = TravelTimesAndDistances.calcTravelTimeAndDistance(trips, valueFile);
-        new TripWriter().writeTrips(trips, tripFile);
+        TripWriter.writeTrips(trips, tripFile);
     }
 
 }

@@ -31,9 +31,11 @@ public class FifoTaxiOptimizer
 {
     private final BestDispatchFinder dispatchFinder;
 
-    public FifoTaxiOptimizer(TaxiOptimizerContext optimContext)
+
+    public FifoTaxiOptimizer(TaxiOptimizerContext optimContext, FifoTaxiOptimizerParams params)
     {
-        super(optimContext, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), true);
+        super(optimContext, params, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR),
+                true);
         dispatchFinder = new BestDispatchFinder(optimContext);
     }
 

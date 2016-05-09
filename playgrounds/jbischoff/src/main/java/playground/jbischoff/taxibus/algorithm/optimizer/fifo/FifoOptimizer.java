@@ -43,7 +43,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.AbstractTaxibusOptimizer;
-import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerConfiguration;
+import playground.jbischoff.taxibus.algorithm.optimizer.TaxibusOptimizerContext;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.TaxibusLine;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
@@ -61,14 +61,14 @@ public class FifoOptimizer extends AbstractTaxibusOptimizer {
 	private Map<Id<TaxibusLine>, Double> currentTwMax = new HashMap<>();
 	private static final Logger log = Logger.getLogger(FifoOptimizer.class);
 
-	public FifoOptimizer(TaxibusOptimizerConfiguration optimConfig, LineDispatcher dispatcher,
+	public FifoOptimizer(TaxibusOptimizerContext optimContext, LineDispatcher dispatcher,
 			boolean doUnscheduleAwaitingRequests) {
-		super(optimConfig, doUnscheduleAwaitingRequests);
+		super(optimContext, doUnscheduleAwaitingRequests);
 		this.dispatcher = dispatcher;
-		LeastCostPathCalculator router = new Dijkstra(optimConfig.context.getScenario().getNetwork(),
-				optimConfig.travelDisutility, optimConfig.travelTime);
+		LeastCostPathCalculator router = new Dijkstra(optimContext.scenario.getNetwork(),
+				optimContext.travelDisutility, optimContext.travelTime);
 		routerWithCache = new DefaultLeastCostPathCalculatorWithCache(router,
-				new TimeDiscretizer(30 * 4, 15 * 60, false));
+		        TimeDiscretizer.OPEN_ENDED_15_MIN);
 		for (Id<TaxibusLine> line : this.dispatcher.getLines().keySet()) {
 			this.currentRequestPathForLine.put(line, null);
 			this.currentTwMax.put(line, null);
@@ -90,7 +90,7 @@ public class FifoOptimizer extends AbstractTaxibusOptimizer {
 				continue;
 			}
 			
-			if (this.optimConfig.context.getTime()>req.getT0()-3600){
+			if (this.optimContext.timer.getTimeOfDay()>req.getT0()-3600){
 			
 			TaxibusVehicleRequestPath requestPath = this.currentRequestPathForLine.get(line.getId());
 			if (requestPath == null) {
@@ -132,12 +132,12 @@ public class FifoOptimizer extends AbstractTaxibusOptimizer {
 			requestPath.addPath(nextTuple.getFirst());
 			allRequests.remove(nextTuple.getSecond());
 		}
-		Link toLink = this.optimConfig.context.getScenario().getNetwork().getLinks()
+		Link toLink = this.optimContext.scenario.getNetwork().getLinks()
 				.get(this.dispatcher.calculateNextHoldingPointForTaxibus(requestPath.vehicle,id));
 		VrpPathWithTravelData lastPath = VrpPaths.calcAndCreatePath(requestPath.getLastPathAdded().getToLink(), toLink,
-				requestPath.getEarliestNextDeparture(), routerWithCache, optimConfig.travelTime);
+				requestPath.getEarliestNextDeparture(), routerWithCache, optimContext.travelTime);
 		requestPath.addPath(lastPath);
-        optimConfig.scheduler.scheduleRequest(requestPath);
+        optimContext.scheduler.scheduleRequest(requestPath);
 
 		// in the very end, add path to opposite direction
 	}
@@ -170,17 +170,17 @@ public class FifoOptimizer extends AbstractTaxibusOptimizer {
 	}
 
 	private VrpPathWithTravelData calculateVrpPath(Vehicle veh, TaxibusRequest req) {
-		LinkTimePair departure = optimConfig.scheduler.getImmediateDiversionOrEarliestIdleness(veh);
+		LinkTimePair departure = optimContext.scheduler.getImmediateDiversionOrEarliestIdleness(veh);
 		return departure == null ? //
 				null
 				: VrpPaths.calcAndCreatePath(departure.link, req.getFromLink(), departure.time, routerWithCache,
-						optimConfig.travelTime);
+						optimContext.travelTime);
 	}
 
 	private VrpPathWithTravelData calculateFromPickupToPickup(VrpPathWithTravelData previous, TaxibusRequest current,
 			double time) {
 		return VrpPaths.calcAndCreatePath(previous.getToLink(), current.getFromLink(), time, routerWithCache,
-				optimConfig.travelTime);
+				optimContext.travelTime);
 	}
 
 	private Tuple<VrpPathWithTravelData, TaxibusRequest> getNextDropoffSegment(Set<TaxibusRequest> allRequests,
@@ -190,7 +190,7 @@ public class FifoOptimizer extends AbstractTaxibusOptimizer {
 		Tuple<VrpPathWithTravelData, TaxibusRequest> bestSegment = null;
 		for (TaxibusRequest request : allRequests) {
 			VrpPathWithTravelData segment = VrpPaths.calcAndCreatePath(departureLink, request.getToLink(),
-					departureTime, routerWithCache, optimConfig.travelTime);
+					departureTime, routerWithCache, optimContext.travelTime);
 			if (segment.getTravelTime() < bestTime) {
 				bestTime = segment.getTravelTime();
 				bestSegment = new Tuple<>(segment, request);

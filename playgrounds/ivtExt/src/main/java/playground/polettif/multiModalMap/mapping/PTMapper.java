@@ -24,51 +24,66 @@ package playground.polettif.multiModalMap.mapping;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
 
 /**
- * Provides the contract for an implementation of pt-lines routing.
+ * Provides the contract for an implementation of ptLines routing.
  *
- * @author boescpa
+ * @author polettif
  */
 public abstract class PTMapper {
 
 	protected static Logger log = Logger.getLogger(PTMapper.class);
 
 	protected final TransitSchedule schedule;
-	protected final TransitScheduleFactory scheduleFactory;
-	protected Network network;
+	protected final PublicTransportMapConfigGroup config;
 	protected NetworkFactory networkFactory;
 
 	/**
-	 * The provided schedule is expected to already contain for each line
+	 * The provided schedule is expected to already contain for each transit route
 	 * 	- the stops in the sequence they will be served.
 	 * 	- the scheduled times.
+	 *
 	 * The routes will be newly routed. Any former routes will be overwritten.
 	 * Changes are done on the schedule provided here.
 	 *
 	 * @param schedule which will be newly routed.
 	 */
-	protected PTMapper(TransitSchedule schedule) {
+	protected PTMapper(TransitSchedule schedule, PublicTransportMapConfigGroup config) {
 		this.schedule = schedule;
-		this.scheduleFactory = this.schedule.getFactory();
+		this.config = config;
 	}
 
-	protected PTMapper(TransitSchedule schedule, Network network) {
-		this(schedule);
-		this.setNetwork(network);
+	protected PTMapper(TransitSchedule schedule) {
+		this.schedule = schedule;
+		this.config = new PublicTransportMapConfigGroup();
+	}
+
+	public PTMapper(String configPath) {
+		Config configAll = ConfigUtils.loadConfig(configPath, new PublicTransportMapConfigGroup() ) ;
+		this.config = ConfigUtils.addOrGetModule(configAll, PublicTransportMapConfigGroup.GROUP_NAME, PublicTransportMapConfigGroup.class ) ;
+
+		this.schedule = null;
 	}
 
 	/**
-	 * Based on the stops in this.schedule und given the provided network, the lines will be routed.
-	 *
-	 * @param network is a multimodal network (see MultimodalNetworkCreator)
+	 * Reads the schedule and network file specified in the config and
+	 * maps the schedule to the network. Writes the output files as well
+	 * if defined in config.
 	 */
-	public abstract void routePTLines(Network network);
+	public abstract void mapFilesFromConfig();
 
-	protected void setNetwork(Network network) {
-		this.network = network;
-		this.networkFactory = network.getFactory();
-	}
+	/**
+	 * Based on the stop facilities and transit routes in this.schedule
+	 * the schedule will be mapped to the given network. Both schedule and
+	 * network are modified.
+	 *
+	 * @param network is a multimodal network
+	 */
+	public abstract void mapScheduleToNetwork(Network network);
+
 }

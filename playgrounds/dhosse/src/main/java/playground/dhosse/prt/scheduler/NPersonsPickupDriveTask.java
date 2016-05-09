@@ -19,7 +19,7 @@ public class NPersonsPickupDriveTask extends TaxiDriveTask{
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.DRIVE_EMPTY;
+        return TaxiTaskType.EMPTY_DRIVE;
     }
 
     public List<TaxiRequest> getRequests()

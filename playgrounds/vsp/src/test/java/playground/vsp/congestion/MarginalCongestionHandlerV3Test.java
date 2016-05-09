@@ -50,6 +50,9 @@ import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 /**
+ * 
+ * This test looks at the cost structure, i.e. each agent's caused and affected delay.
+ * 
  * @author ikaddoura
  *
  */

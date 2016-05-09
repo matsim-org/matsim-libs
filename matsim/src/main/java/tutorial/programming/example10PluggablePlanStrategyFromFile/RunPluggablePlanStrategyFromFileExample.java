@@ -22,10 +22,13 @@ package tutorial.programming.example10PluggablePlanStrategyFromFile;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerUtils;
 
 public class RunPluggablePlanStrategyFromFileExample {
 
 	public static void main(final String[] args) {
+		ControlerUtils.initializeOutputLogging();
+		
 
 		Config config;
 		if ( args.length==0 ) {

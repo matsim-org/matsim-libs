@@ -27,9 +27,13 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.network.Link;
 
+/**
+ * Container for a GTFS Trip
+ */
 public class Trip {
 	
 	//Attributes
+	private final String tripId;
 	private final Service service;
 	private final Shape shape;
 	private final String name;
@@ -38,8 +42,9 @@ public class Trip {
 	private List<Link> links;
 
 	//Methods
-	public Trip(Service service, Shape shape, String name) {
+	public Trip(String tripId, Service service, Shape shape, String name) {
 		super();
+		this.tripId = tripId;
 		this.service = service;
 		this.shape = shape;
 		this.name = name;
@@ -47,50 +52,58 @@ public class Trip {
 		frequencies = new ArrayList<>();
 		links = new ArrayList<>();
 	}	
+
 	/**
 	 * @return the service
 	 */
 	public Service getService() {
 		return service;
 	}
+
 	/**
 	 * @return the shape
 	 */
 	public Shape getShape() {
 		return shape;
 	}
+
 	/**
 	 * @return the name
 	 */
 	public String getName() {
 		return name;
 	}
+
 	/**
 	 * @return the stopTimes
 	 */
 	public SortedMap<Integer, StopTime> getStopTimes() {
 		return stopTimes;
 	}
+
 	/**
 	 * @return the frequencies
 	 */
 	public List<Frequency> getFrequencies() {
 		return frequencies;
 	}
+
 	/**
 	 * @return the route
 	 */
 	public List<Link> getLinks() {
 		return links;
 	}
+
 	/**
 	 * Puts a new stopTime
-	 * @param key
+	 * @param stopSequencePosition which stop number in the stopSequence this stopTime is referencing
 	 * @param stopTime
 	 */
-	public void putStopTime(Integer key, StopTime stopTime) {
-		stopTimes.put(key, stopTime);
+	public void putStopTime(Integer stopSequencePosition, StopTime stopTime) {
+		stopTimes.put(stopSequencePosition, stopTime);
 	}
+
 	/**
 	 * Adds a new frequency
 	 * @param frequency
@@ -98,17 +111,26 @@ public class Trip {
 	public void addFrequency(Frequency frequency) {
 		frequencies.add(frequency);
 	}
+
 	/**
 	 * @param route the route to set
 	 */
 	public void setRoute(List<Link> route) {
 		this.links = route;
 	}
+
 	/**
 	 * Adds a new link
 	 * @param link
 	 */
 	public void addLink(Link link) {
 		links.add(link);
+	}
+
+	/**
+	 * @return the tripId
+	 */
+	public String getId() {
+		return tripId;
 	}
 }

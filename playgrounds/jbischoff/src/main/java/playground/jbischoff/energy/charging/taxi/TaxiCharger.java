@@ -124,7 +124,7 @@ public void chargeVehicles(double chargeTime){
         double actualCharge = chargeInJoule;
         double maximumSOC =  maxsoc * taxi.getBev().getUsableBatteryCapacityInJoules();
         if ( chargeInJoule+taxi.getBev().getSocInJoules() > maximumSOC ) actualCharge = maximumSOC-taxi.getBev().getSocInJoules();
-        taxi.getBev().chargeBattery(actualCharge);
+        taxi.getBev().chargeVehicle(actualCharge);
         
     }
 }

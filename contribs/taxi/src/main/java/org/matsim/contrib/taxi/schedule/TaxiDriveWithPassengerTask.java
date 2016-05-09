@@ -55,7 +55,7 @@ public class TaxiDriveWithPassengerTask
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.DRIVE_OCCUPIED;
+        return TaxiTaskType.OCCUPIED_DRIVE;
     }
 
 

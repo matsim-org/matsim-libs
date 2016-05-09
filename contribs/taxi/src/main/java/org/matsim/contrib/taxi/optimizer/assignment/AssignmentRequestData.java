@@ -38,7 +38,7 @@ class AssignmentRequestData
     AssignmentRequestData(TaxiOptimizerContext optimContext,
             SortedSet<TaxiRequest> unplannedRequests, double planningHorizon)
     {
-        double currTime = optimContext.context.getTime();
+        double currTime = optimContext.timer.getTimeOfDay();
         double maxT0 = currTime + planningHorizon;
         int urgentReqCounter = 0;
         int idx = 0;

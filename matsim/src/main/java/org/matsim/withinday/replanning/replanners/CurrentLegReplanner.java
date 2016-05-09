@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -54,10 +54,10 @@ import org.matsim.withinday.utils.EditRoutes;
 public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 
 	private final LeastCostPathCalculator pathCalculator;
-	private ModeRouteFactory modeRouteFactory;
+	private RouteFactoryImpl modeRouteFactory;
 	
 	/*package*/ CurrentLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, 
-			LeastCostPathCalculator pathCalculator, ModeRouteFactory modeRouteFactory) {
+			LeastCostPathCalculator pathCalculator, RouteFactoryImpl modeRouteFactory) {
 		super(id, scenario, internalInterface);
 		this.pathCalculator = pathCalculator;
 		this.modeRouteFactory = modeRouteFactory;

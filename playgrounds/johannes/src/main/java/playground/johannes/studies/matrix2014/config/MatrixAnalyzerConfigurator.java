@@ -54,20 +54,19 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
 
     private final FileIOContext ioContext;
 
-    private final MatrixBuilder builder;
+    private final MatrixBuilderFactory factory;
 
-    public MatrixAnalyzerConfigurator(ConfigGroup config, DataPool dataPool, FileIOContext ioContext, MatrixBuilder builder) {
+    public MatrixAnalyzerConfigurator(ConfigGroup config, DataPool dataPool, MatrixBuilderFactory factory, FileIOContext ioContext) {
         this.config = config;
         this.dataPool = dataPool;
+        this.factory = factory;
         this.ioContext = ioContext;
-        this.builder = builder;
     }
 
     @Override
     public Object load() {
         String zoneLayerName = config.getValue(ZONE_LAYER_NAME);
 
-//        FacilityData facilityData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
         ActivityLocationLayer locationLayer = (ActivityLocationLayer) dataPool.get(ActivityLocationLayerLoader.KEY);
         ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
         ZoneCollection zones = zoneData.getLayer(zoneLayerName);
@@ -80,10 +79,6 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
             threshold = Double.parseDouble(strThreshold);
 
         NumericMatrix m = NumericMatrixIO.read(path);
-
-//        MatrixAnalyzer analyzer = new MatrixAnalyzer(facilityData.getAll(), zones, m, name);
-//        analyzer.setFileIOContext(ioContext);
-//        analyzer.setVolumeThreshold(threshold);
 
         AnalyzerTaskComposite<Pair<NumericMatrix, NumericMatrix>> composite = new AnalyzerTaskComposite<>();
 
@@ -104,8 +99,7 @@ public class MatrixAnalyzerConfigurator implements DataLoader {
         composite.addComponent(distTask);
         composite.addComponent(marTask);
 
-//        DefaultMatrixBuilder builder = new DefaultMatrixBuilder(locationLayer, zones, zoneLayerName);
-        MatrixComparator analyzer = new MatrixComparator(m, builder, composite);
+        MatrixComparator analyzer = new MatrixComparator(m, factory.create(locationLayer, zones), composite);
         analyzer.setVolumeThreshold(threshold);
 
         return analyzer;

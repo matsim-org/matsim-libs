@@ -20,28 +20,31 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.testcases.MatsimTestCase;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class MyZoneTest extends MatsimTestCase{
+public class MyZoneTest{
 	private GeometryFactory gf = new GeometryFactory();
 	private Polygon[] ps = setupPolygon();
 	private Id<MyZone> id = Id.create("0", MyZone.class);
 
+	@Test
 	public void testMyZoneConstructor(){
 		MyZone mz = new MyZone(ps, gf, id);
-		assertEquals("MyZone not created.", true, mz != null);
+		Assert.assertEquals("MyZone not created.", true, mz != null);
 	}
 	
+	@Test
 	public void testGetId(){
 		MyZone mz = new MyZone(ps, gf, id);
-		assertEquals("Wrong Id returned.", true, mz.getId().equals(id));
-		assertEquals("Id not unique.", false, mz.getId().equals("0"));
+		Assert.assertEquals("Wrong Id returned.", true, mz.getId().equals(id));
+		Assert.assertEquals("Id not unique.", false, mz.getId().equals("0"));
 	}
 	
 	private Polygon[] setupPolygon(){

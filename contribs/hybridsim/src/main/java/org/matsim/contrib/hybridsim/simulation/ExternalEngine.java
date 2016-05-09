@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.hybridsim.grpc.GRPCExternalClient;
 import org.matsim.contrib.hybridsim.proto.HybridSimProto;
+import org.matsim.contrib.hybridsim.run.Example;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -61,7 +62,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 		this.em = eventsManager;
 		this.sim = sim;
 		this.net = sim.getScenario().getNetwork();
-		this.client = new GRPCExternalClient("localhost", 8989);
+		this.client = new GRPCExternalClient(Example.REMOTE_HOST, Example.REMOTE_PORT);
 		this.sc = sim.getScenario();
 	}
 
@@ -243,9 +244,9 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 	@Override
 	public void onPrepareSim() {
 
-//		HybridSimProto.Scenario hsc = (HybridSimProto.Scenario) sc.getScenarioElement("hybrid_scenario");
+		HybridSimProto.Scenario hsc = (HybridSimProto.Scenario) sc.getScenarioElement("hybrid_scenario");
 
-//		this.client.getBlockingStub().initScenario(HybridSimProto.Scenario.getDefaultInstance());
+		this.client.getBlockingStub().initScenario(hsc);
 
 	}
 

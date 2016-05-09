@@ -23,31 +23,35 @@ package playground.jjoubert.Utilities.matsim2urbansim;
 import java.io.File;
 import java.io.IOException;
 
-import nl.knaw.dans.common.dbflib.CorruptedTableException;
-
 import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
+import nl.knaw.dans.common.dbflib.CorruptedTableException;
 import playground.fabrice.primloc.CumulativeDistribution;
 
 
-public class MyCdfMapperTest extends MatsimTestCase{
+public class MyCdfMapperTest{
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	private final Logger log = Logger.getLogger(MyCdfMapperTest.class);
 	
 	public void testMyCdfMapperConstructor(){
 		
 	}
 	
+	@Test
 	public void testReadCarDbf(){
-		String dbf = new File(getInputDirectory()).getParent() + "/dbfCar.dbf";
+		String dbf = new File(utils.getInputDirectory()).getParent() + "/dbfCar.dbf";
 		MyCdfMapper mcm = new MyCdfMapper();
 		
 		// Try and read non-existing file;
 		try {
 			mcm.readCarDbf("dummy.dbf");
 		} catch (CorruptedTableException e1) {
-			fail("Nonexisting Dbf file should not be corrupted.");
+			Assert.fail("Nonexisting Dbf file should not be corrupted.");
 		} catch (IOException e1) {
 			log.info("Caught expected IOException.");
 		}
@@ -56,11 +60,11 @@ public class MyCdfMapperTest extends MatsimTestCase{
 		try {
 			mcm.readCarDbf(dbf);
 		} catch (CorruptedTableException e) {
-			fail("Dbf file should not be corrupted.");
+			Assert.fail("Dbf file should not be corrupted.");
 		} catch (IOException e) {
-			fail("Dbf file should exist.");
+			Assert.fail("Dbf file should exist.");
 		}
-		assertEquals("Wrong number of bins.", 100, mcm.getCdfCar().getNumBins());
+		Assert.assertEquals("Wrong number of bins.", 100, mcm.getCdfCar().getNumBins());
 		CumulativeDistribution c = mcm.getCdfCar();
 	}
 

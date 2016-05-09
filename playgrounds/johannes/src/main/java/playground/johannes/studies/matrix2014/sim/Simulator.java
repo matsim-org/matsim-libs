@@ -305,7 +305,7 @@ public class Simulator {
 //
 ////        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP-2")
 ////                , dataPool, ioContext).load();
-////        mAnalyzer.setPredicate(modePredicate);
+////        mAnalyzer.setLegPredicate(modePredicate);
 ////        mAnalyzer.setUseWeights(true);
 ////        task.addComponent(mAnalyzer);
 //
@@ -321,14 +321,14 @@ public class Simulator {
 
 //        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom-2")
 //                , dataPool, ioContext).load();
-//        mAnalyzer.setPredicate(modePredicate);
+//        mAnalyzer.setLegPredicate(modePredicate);
 //        mAnalyzer.setODPredicate(distPredicate);
 //        mAnalyzer.setUseWeights(true);
 //        task.addComponent(mAnalyzer);
 
 //        ActivityFacilities facilities = ((FacilityData) dataPool.get(FacilityDataLoader.KEY)).getAll();
 //        MatrixWriter matrixWriter = new MatrixWriter(facilities, zones, ioContext);
-//        matrixWriter.setPredicate(DEFAULT_LEG_PREDICATE);
+//        matrixWriter.setLegPredicate(DEFAULT_LEG_PREDICATE);
 //        matrixWriter.setUseWeights(USE_WEIGTHS);
 //        matrixTasks.addComponent(matrixWriter);
 //
@@ -347,7 +347,7 @@ public class Simulator {
 //        FacilityData fData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
 //        NumericAnalyzer actDist = new ActDistanceBuilder()
 //                .setHistogramWriter(histogramWriter)
-//                .setPredicate(DEFAULT_LEG_PREDICATE, DEFAULT_LEG_PREDICATE_NAME)
+//                .setLegPredicate(DEFAULT_LEG_PREDICATE, DEFAULT_LEG_PREDICATE_NAME)
 //                .setUseWeights(USE_WEIGTHS)
 //                .build(fData.getAll());
 //        task.addComponent(actDist);
@@ -461,7 +461,7 @@ public class Simulator {
                 DEFAULT_LEG_PREDICATE_NAME + ".outOfTown", histogramWriter));
 
 //        LegCollector<String> purposeCollector = new LegCollector<>(new AttributeProvider<Segment>(CommonKeys.LEG_PURPOSE));
-//        purposeCollector.setPredicate(modePredicate);
+//        purposeCollector.setLegPredicate(modePredicate);
 //        Set<String> purposes = new HashSet<>(purposeCollector.collect(persons));
 //        purposes.remove(null);
 //        for (String purpose : purposes) {

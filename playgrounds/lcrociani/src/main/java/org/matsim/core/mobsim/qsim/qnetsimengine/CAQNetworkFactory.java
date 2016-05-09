@@ -22,6 +22,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -29,26 +30,40 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import pedCA.environment.markers.FinalDestination;
 
 public class CAQNetworkFactory extends QNetworkFactory {
-	@Inject private EventsManager events ;
-	@Inject private Network network ;
-	@Inject private QSimConfigGroup qsimConfig ;
-	@Inject private Scenario scenario ;
+	private final EventsManager events ;
+	private final Network network ;
+	private final QSimConfigGroup qsimConfig ;
+	private final Scenario scenario ;
 	
 	private CAEngine engineCA;
 	private CAAgentFactory agentFactoryCA;
 	private CAScenario scenarioCA;
 	private Map<Node, TransitionArea> nodeToTransitionArea = new HashMap<Node, TransitionArea>();
 	private NetsimEngineContext context;
-	private QNetsimEngine netsimEngine;
+	private NetsimInternalInterface netsimEngine;
+	
+	@Inject
+	public CAQNetworkFactory( EventsManager events, Network network, QSimConfigGroup qsimConfig, Scenario scenario ) {
+		// there is a bit of replication in the above arguments. kai, mar'31
+		
+		this.events = events ;
+		this.network = network;
+		this.qsimConfig = qsimConfig;
+		this.scenario = scenario;
+	}
 
-	public CAQNetworkFactory(CAEngine engineCA, Scenario scenario, CAAgentFactory agentFactoryCA) {
+	public CAQNetworkFactory(CAEngine engineCA, Scenario scenario, CAAgentFactory agentFactoryCA, EventsManager events) {
 		this.engineCA = engineCA;
 		this.agentFactoryCA = agentFactoryCA;
 		this.scenarioCA = (CAScenario) scenario.getScenarioElement(Constants.CASCENARIO_NAME);
+		this.scenario = scenario ;
+		this.network = scenario.getNetwork() ;
+		this.qsimConfig = scenario.getConfig().qsim() ;
+		this.events = events ;
 	}
 	
 	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, QNetsimEngine netsimEngine1) {
+	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
 		double effectiveCellSize = ((NetworkImpl) network).getEffectiveCellSize() ;
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -57,7 +72,7 @@ public class CAQNetworkFactory extends QNetworkFactory {
 			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 		}
 		AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, snapshotInfoFactory );
+		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
 		this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, snapshotInfoBuilder, qsimConfig, mobsimTimer, 
 				linkWidthCalculator ) ;
@@ -66,8 +81,9 @@ public class CAQNetworkFactory extends QNetworkFactory {
 	}
 	
 	@Override
-	public QNode createNetsimNode(Node node, QNetwork qnetwork) {
-		return new QNode(node, qnetwork);
+	public QNode createNetsimNode(Node node) {
+		QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+		return builder.build( node ) ;
 	}
 
 	@Override

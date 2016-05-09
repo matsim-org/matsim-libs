@@ -3,6 +3,8 @@ package playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -18,7 +20,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.StringUtils;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
@@ -37,6 +45,9 @@ public class WalkDistances implements BasicEventHandler {
 	double walkCS = 0.0;
 	int count = 0;
 	int counx = 0;
+	int i =1;
+    CoordinateReferenceSystem crs = MGC.getCRS("EPSG:21781");    // EPSG Code for Swiss CH1903_LV03 coordinate system
+    Collection<SimpleFeature> featuresMovedIncrease = new ArrayList<SimpleFeature>();
 	
 	@Override
 	public void reset(int iteration) {
@@ -95,6 +106,32 @@ public class WalkDistances implements BasicEventHandler {
 				}
 				
 			}
+			
+			else {
+				
+				Id<PC2Parking> parkingId = ParkingArrivalEvent.getParkingId(event.getAttributes());
+				Coord parkCoord = parking.get(parkingId).getCoord();
+				
+				
+		        PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
+		                setCrs(crs).
+		                setName("nodes").
+		                addAttribute("ID", String.class).
+		               //addAttribute("Customers", Integer.class).
+		                //addAttribute("Be Af Mo", String.class).
+		                
+		                create();
+			
+			
+			      
+			     SimpleFeature ft = nodeFactory.createPoint(parkCoord, new Object[] {Integer.toString(i)}, null);
+	  			//if (!scenario1.getActivityFacilities().getFacilities().containsKey(f1.getId()))
+	  			featuresMovedIncrease.add(ft);
+	  			i++;
+		    	
+		    
+				
+			}
 		}		
 	}
 	
@@ -112,6 +149,8 @@ public class WalkDistances implements BasicEventHandler {
 	
 	
 	public void outp() {
+        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/ff_zone_city_startLocations_medium.shp");
+
 		int[] walkGroups = new int[150];
 
 		for (String group : walkDistancesPrivate.keySet()) {

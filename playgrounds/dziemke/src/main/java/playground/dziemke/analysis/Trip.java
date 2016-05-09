@@ -3,6 +3,7 @@ package playground.dziemke.analysis;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -13,6 +14,8 @@ import playground.dziemke.cemdapMatsimCadyts.Zone;
 
 
 public class Trip {
+	public static final Logger log = Logger.getLogger(Trip.class);
+
 	private Id<Household> householdId;
 	private Id<Person> personId;
 	private Id<Trip> tripId;
@@ -335,7 +338,7 @@ public class Trip {
 	private void calculateRoutedDistance_m(Network network) {
 		double tripDistance_m = 0.;
 		if (links.isEmpty()) {
-			throw new RuntimeException("List of links is empty. This computation is most likely not suitable for the present case.");
+			log.warn("List of links is empty.");
 		}
 		for (int i = 0; i < links.size(); i++) {
 			Id<Link> linkId = links.get(i);
