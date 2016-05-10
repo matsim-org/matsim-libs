@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.plots.vsDensity;
+package playground.agarwalamit.mixedTraffic.FDTestSetUp.plots.vsDensity;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

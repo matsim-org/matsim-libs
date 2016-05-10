@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.plots;
+package playground.agarwalamit.mixedTraffic.FDTestSetUp.plots;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +43,7 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
-import playground.agarwalamit.mixedTraffic.plots.LinkPersonInfoContainer.PersonPositionChecker;
+import playground.agarwalamit.mixedTraffic.FDTestSetUp.plots.LinkPersonInfoContainer.PersonPositionChecker;
 
 /**
  * @author amit

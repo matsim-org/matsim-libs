@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.plots;
+package playground.agarwalamit.mixedTraffic.FDTestSetUp.plots;
 
 import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
