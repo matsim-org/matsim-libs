@@ -314,10 +314,10 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 								!pseudoPathFound) {
 							for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 								for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-									createArtificialLink(network, linkCandidateCurrent, linkCandidateNext);
+									Link newLink = createArtificialLink(network, linkCandidateCurrent, linkCandidateNext);
 									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
 									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, maxAllowedPathLength), (i == 0), (i == routeStops.size() - 2));
+									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, newLink.getLength()+1), (i == 0), (i == routeStops.size() - 2));
 								}
 							}
 						}
@@ -399,7 +399,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		log.info("    Stop Facilities statistics:");
 		log.info("       input    "+nStopFacilities);
 		log.info("       output   "+schedule.getFacilities().size());
-		log.info("       difference.    "+(schedule.getFacilities().size()-nStopFacilities));
+		log.info("       diff.    "+(schedule.getFacilities().size()-nStopFacilities));
 		log.info("       factor   "+(schedule.getFacilities().size()/((double) nStopFacilities)));
 		log.info("    Transit Route statistics:");
 		log.info("       removed  " + routesRemoved);

@@ -31,6 +31,8 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import playground.polettif.multiModalMap.config.PublicTransportMapConfigGroup;
+import playground.polettif.multiModalMap.mapping.PTMapperModesFilterAndMerge;
 import playground.polettif.multiModalMap.tools.MiscUtils;
 
 import java.util.HashMap;
@@ -51,6 +53,7 @@ public class ModeDependentRouter implements Router {
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
 
 	public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
+		routingTransportModes.add(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE);
 		this.routingTransportModes = routingTransportModes;
 		paths = new HashMap<>();
 
