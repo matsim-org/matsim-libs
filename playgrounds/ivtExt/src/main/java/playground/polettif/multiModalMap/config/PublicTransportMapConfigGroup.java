@@ -48,6 +48,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	private static final String OUTPUT_SCHEDULE_FILE = "outputScheduleFile";
 	private static final String OUTPUT_STREET_NETWORK_FILE = "outputStreetNetworkFile";
 	private static final String LINK_DISTANCE_TOLERANCE = "linkDistanceTolerance";
+	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
 
 	public PublicTransportMapConfigGroup() {
 		super(GROUP_NAME);
@@ -89,6 +90,8 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 				"[Link Candidates] The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
 		map.put(PREFIX_ARTIFICIAL,
 				"ID prefix used for artificial links and nodes created if no nodes are found within nodeSearchRadius.");
+		map.put(FREESPEED_ARTIFICIAL,
+				"The freespeed [m/s] of artificially created links.");
 		map.put(SUFFIX_CHILD_STOP_FACILITIES,
 				"Suffix used for child stop facilities. The id of the referenced link is appended\n" +
 				"\t\t(i.e. stop0123.link:LINKID20123).");
@@ -347,6 +350,24 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		this.beelineDistanceMaxFactor = beelineDistanceMaxFactor;
 	}
 
+	/**
+	 * The freespeed of artificially created links.
+	 */
+	private double freespeedArtificialLinks = 200.0/3.6;
+
+	@StringGetter(FREESPEED_ARTIFICIAL)
+	public double getFreespeedArtificial() {
+		return freespeedArtificialLinks;
+	}
+
+	@StringSetter(FREESPEED_ARTIFICIAL)
+	public void setFreespeedArtificial(double freespeedArtificialLinks) {
+		this.freespeedArtificialLinks = freespeedArtificialLinks;
+	}
+
+	/**
+	 *
+	 */
 	public Set<String> getNetworkModes() {
 		Set<String> networkModes = new HashSet<>();
 		modeRoutingAssignment.values().forEach(networkModes::addAll);
@@ -359,6 +380,9 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		return scheduleModes;
 	}
 
+	/**
+	 * Params for filepahts
+	 */
 	@StringGetter(NETWORK_FILE)
 	public String getNetworkFile() {
 		return this.networkFile == null ? "" : this.networkFile;
@@ -427,7 +451,4 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	public Map<String, Integer> getMaxNClosestLinksByMode() {
 		return null;
 	}
-
-
-
 }

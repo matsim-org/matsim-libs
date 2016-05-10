@@ -399,7 +399,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		log.info("    Stop Facilities statistics:");
 		log.info("       input    "+nStopFacilities);
 		log.info("       output   "+schedule.getFacilities().size());
-		log.info("       diff.    "+(schedule.getFacilities().size()-nStopFacilities));
+		log.info("       difference.    "+(schedule.getFacilities().size()-nStopFacilities));
 		log.info("       factor   "+(schedule.getFacilities().size()/((double) nStopFacilities)));
 		log.info("    Transit Route statistics:");
 		log.info("       removed  " + routesRemoved);
@@ -408,7 +408,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 	/**
 	 * Creates a new link between two linkCandidates (or
 	 * more precisely a link connecting the to- and fromNode
-	 * of both linkCandidates).
+	 * of both linkCandidates). The freespeed of the link is set
+	 * via config.
 	 * @return the new link
 	 */
 	private Link createArtificialLink(Network network, final LinkCandidate fromLinkCandidate, final LinkCandidate toLinkCandidate) {
@@ -439,12 +440,11 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 				toNode = network.getNodes().get(toNodeId);
 			}
 
-			newLink = network.getFactory().createLink(Id.createLinkId(newLinkIdStr),
-					fromNode,
-					toNode);
+			newLink = network.getFactory().createLink(Id.createLinkId(newLinkIdStr), fromNode,	toNode);
 
 			newLink.setAllowedModes(Collections.singleton(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE));
 			newLink.setLength(CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord()));
+			newLink.setFreespeed(config.getFreespeedArtificial());
 			network.addLink(newLink);
 
 			artificialLinks.put(key, newLink);

@@ -262,4 +262,17 @@ public class ScheduleTools {
 		list.add(networkRoute.getEndLinkId());
 		return list;
 	}
+
+	/**
+	 * @return the list of link ids used by transit routes (first and last
+	 * 		   links are included)
+	 */
+	public static List<Id<Link>> getSubRouteLinkIds(TransitRoute transitRoute, Id<Link> fromLinkId, Id<Link> toLinkId) {
+		List<Id<Link>> list = new ArrayList<>();
+		NetworkRoute networkRoute = transitRoute.getRoute().getSubRoute(fromLinkId, toLinkId);
+		list.add(networkRoute.getStartLinkId());
+		list.addAll(networkRoute.getLinkIds());
+		list.add(networkRoute.getEndLinkId());
+		return list;
+	}
 }
