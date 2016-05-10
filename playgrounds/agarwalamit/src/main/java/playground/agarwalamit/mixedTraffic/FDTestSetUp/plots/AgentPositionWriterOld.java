@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.mixedTraffic.plots;
+package playground.agarwalamit.mixedTraffic.FDTestSetUp.plots;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -51,14 +51,22 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  * 1) Create Transims snapshot file from events or use given Transims snapshot file. 
  * 2) Read events to get mode information 
  * 3) Write data in simpler form for space time plotting.
- * <b> At the moment, this should be only used for race track experiment. The methodology can work for other scenarios.
- * But, some parameters many need to change and yet to be tested. 
+ *  
+ *  @deprecated
+ *  The distance between two subsequent easting, northing does not result in the true position. 
+ *  For e.g.\ Take two points on either edges of a vertex as subsequent points ... (993.0,0) and (991,14)
+ *  In the FD scenario set up, the true distance is not the distance between two points 
+ *  instead, sum of distance between (993.0,0) (1000.0,0.0) and (1000,0) (991,14).
+ *  This is here only for documentation, I will remove the whole class eventually.
+ *  
+ *  Alternatively see {@link AgentPositionWriter.class}
  * @author amit 
  */
 
-public class AgentPositionWriter {
+@Deprecated
+public class AgentPositionWriterOld {
 
-	private final static Logger LOGGER = Logger.getLogger(AgentPositionWriter.class);
+	private final static Logger LOGGER = Logger.getLogger(AgentPositionWriterOld.class);
 	private final static boolean IS_WRITING_TRANSIM_FILE = false;
 	private final double trackLength = 3000;
 	private final double maxSpeed = 60/3.6;
@@ -68,13 +76,13 @@ public class AgentPositionWriter {
 		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW_kn/";
 		final String networkFile = dir+"/network.xml";
 		final String configFile = dir+"/config.xml";
-		final String prefix = "40";
+		final String prefix = "5";
 		final String eventsFile = dir+"/events/events["+prefix+"].xml";
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile, configFile);
 		final SnapshotStyle snapshotStyle = sc.getConfig().qsim().getSnapshotStyle();
 
-		AgentPositionWriter apw = new AgentPositionWriter(dir+"/snapshotFiles/position_"+prefix+"_"+snapshotStyle+".txt");
+		AgentPositionWriterOld apw = new AgentPositionWriterOld(dir+"/snapshotFiles/position_"+prefix+"_"+snapshotStyle+".txt");
 		String transimFile;
 
 		if( IS_WRITING_TRANSIM_FILE ){
@@ -95,7 +103,7 @@ public class AgentPositionWriter {
 	/**
 	 * Constructor opens writer, creates transims file and stores person 2 mode from events file.
 	 */
-	public AgentPositionWriter(String outFile)
+	public AgentPositionWriterOld(String outFile)
 	{
 		writer = IOUtils.getBufferedWriter(outFile);
 		try {
@@ -169,8 +177,9 @@ public class AgentPositionWriter {
 							
 							double timegap =  time - prevTime.get(agentId);
 							double velocity = currentDist / (timegap); // denominator should be equal to snapshot period.
-							if(Math.round( velocity) > Math.round( maxSpeed) ) { // person arriving (vehicle leaving traffic) are falling in this category
-								return;
+							if(Math.round( velocity) > Math.round( maxSpeed) ) { 
+								// person arriving (vehicle leaving traffic) and rounding errors 
+								velocity = maxSpeed;
 							}else if (velocity < 0.0) throw new RuntimeException("Speed can not be negative. Aborting ...");
 						
 							double position = prevPosition.get(agentId) + currentDist ;

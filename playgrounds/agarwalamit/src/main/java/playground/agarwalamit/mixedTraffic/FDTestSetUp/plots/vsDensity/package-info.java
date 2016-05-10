@@ -22,7 +22,7 @@
  */
 
 @Deprecated
-package playground.agarwalamit.mixedTraffic.plots.vsDensity;
+package playground.agarwalamit.mixedTraffic.FDTestSetUp.plots.vsDensity;
 
 
 
