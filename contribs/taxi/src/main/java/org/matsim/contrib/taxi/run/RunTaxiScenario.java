@@ -28,7 +28,6 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -48,7 +47,7 @@ public class RunTaxiScenario
         TaxiConfigGroup taxiCfg = (TaxiConfigGroup)config.getModule(TaxiConfigGroup.GROUP_NAME);
         config.addConfigConsistencyChecker(new VrpQSimConfigConsistencyChecker());
         config.checkConsistency();
-        config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+
         Scenario scenario = ScenarioUtils.loadScenario(config);
         TaxiData taxiData = new TaxiData();
         new VehicleReader(scenario.getNetwork(), taxiData).parse(taxiCfg.getTaxisFile());
@@ -68,8 +67,8 @@ public class RunTaxiScenario
 
     public static void main(String[] args)
     {
-        String configFile = "C:/Users/Joschka/Desktop/av4cottbus/config02.xml";
+        String configFile = "./src/main/resources/one_taxi/one_taxi_config.xml";
         //String configFile = "./src/main/resources/mielec_2014_02/config.xml";
-        RunTaxiScenario.run(configFile, false);
+        RunTaxiScenario.run(configFile, true);
     }
 }
