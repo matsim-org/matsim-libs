@@ -75,7 +75,7 @@ public class AgentPositionWriter {
 		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW_kn/";
 		final String networkFile = dir+"/network.xml";
 		final String configFile = dir+"/config.xml";
-		final String prefix = "5";
+		final String prefix = "10";
 		final String eventsFile = dir+"/events/events["+prefix+"].xml";
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(networkFile, configFile);
@@ -143,6 +143,7 @@ public class AgentPositionWriter {
 	private Map<Id<Person>,Double> prevTime = new HashMap<>();
 	private Map<Id<Person>,Double> prevTrackPositions = new HashMap<>();
 	private Map<Id<Person>,Integer> prevCycle = new HashMap<>();
+	private Map<Id<Person>,Double> prevLink = new HashMap<>();
 
 	public void readTransimFileAndWriteData(String inputFile)
 	{
@@ -190,10 +191,10 @@ public class AgentPositionWriter {
 
 							throw new RuntimeException("Position can not be negative or higher than track length ("+trackLength+"m).");
 
-						} else if(trackPosition < prevPosition  && linkId != 0.0 ){ 
+						} else if(trackPosition < prevPosition  && linkId == prevLink.get(agentId) ){ 
 
 							// prev = 1986 and now = 1980 should not happen however, prev = 2993, now = 6 is possible.
-//							throw new RuntimeException("Should not happen.");
+							//							throw new RuntimeException("Should not happen.");
 							LOGGER.warn("Prev position is "+prevPosition+" and current position is "+ trackPosition+". "
 									+ "\n This is an error coming from simulation which should be fixed in due time."
 									+ " \n For now, setting current position same as prev position.");
@@ -223,7 +224,7 @@ public class AgentPositionWriter {
 
 						if(Math.round(velocity) > Math.round(maxSpeed) ){
 							// sometimes its positioning errors from simulation snapshots
-							if (velocity <= 25.0 ) {
+							if (velocity <= 50.0 ) {
 								if(warnCount<1){
 									warnCount++;
 									LOGGER.warn("Velocity is "+velocity+".This comes from the error in positioning "
@@ -232,18 +233,20 @@ public class AgentPositionWriter {
 									LOGGER.warn(Gbl.ONLYONCE);
 								}
 							} else {
-								LOGGER.error("Velocity is "+velocity+". This is way too high.");
 								LOGGER.info("Prev and current track positions are " + prevPosition +", " + trackPosition +" and time gap between two snapshots is "+ timegap );
+								//LOGGER.error("Velocity is "+velocity+". This is way too high.");
+								throw new RuntimeException("Velocity is "+velocity+". This is way too high.");
 							}
-
 							velocity = Math.min(velocity, maxSpeed);
 						}
 
 						prevTrackPositions.put(agentId, trackPosition);
+						prevLink.put(agentId, linkId);
 					} else {
 						velocity = maxSpeed;
 						prevCycle.put(agentId, 1);
 						prevTrackPositions.put(agentId, currentPositionOnLink);
+						prevLink.put(agentId, linkId);
 					}
 
 					prevTime.put(agentId, time);
