@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,34 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.taxibus.run.sim;
 
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.router.*;
+package playground.jbischoff.av.preparation;
 
-import playground.jbischoff.taxibus.algorithm.utils.TaxibusUtils;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.inject.Provider;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.VehicleImpl;
+import org.matsim.contrib.dvrp.data.file.VehicleWriter;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkUtils;
 
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
-public class TaxibusTripRouterFactory implements Provider<TripRouter> {
+public class CottbusTaxiCreator {
 
-	private MatsimServices controler;
-	
-	public TaxibusTripRouterFactory(MatsimServices controler) {
-		this.controler = controler;
-	}
-	
-	@Override
-	public TripRouter get() {
-		final Provider<TripRouter> delegate = TripRouterFactoryBuilderWithDefaults.createDefaultTripRouterFactoryImpl(controler.getScenario());
+	public static void main(String[] args) {
+		List<Vehicle> taxis = new ArrayList<>();
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readFile("C:/Users/Joschka/Desktop/av4cottbus/cb02/output_network.xml.gz");
+		for (int i = 0; i<1000 ;i++){
 
-        TripRouter tr = delegate.get();
-        tr.setRoutingModule(TaxibusUtils.TAXIBUS_MODE, new TaxibusServiceRoutingModule(controler));
-		return tr;
+			Vehicle v = new VehicleImpl(Id.create("taxi_"+i, Vehicle.class),network.getLinks().get(Id.createLinkId(10617)) , 4, 0.0, 25*3600);
+			taxis.add(v);
+		}
+		new VehicleWriter(taxis).write("C:/Users/Joschka/Desktop/av4cottbus/taxis.xml");
+		
 	}
 
 }
