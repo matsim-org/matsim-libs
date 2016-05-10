@@ -38,6 +38,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -51,7 +52,7 @@ import org.matsim.vis.snapshotwriters.TransimsSnapshotWriter.Labels;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
- * 1) Create Transims snapshot file from events or just existing file. 
+ * 1) Create Transims snapshot file from events or use existing file. 
  * 2) read events 
  * 3) Write data in simpler form for space time plotting.
  * <b> At the moment, this should be only used for race track experiment. The methodology can work for other scenarios.
@@ -67,6 +68,7 @@ public class AgentPositionWriter {
 	private final double trackLength = 3000;
 	private final double maxSpeed = 60/3.6;
 	private final Scenario sc;
+	private int warnCount = 0;
 
 	public static void main(String[] args) 
 	{
@@ -96,7 +98,6 @@ public class AgentPositionWriter {
 		apw.storePerson2Modes(eventsFile);
 		apw.readTransimFileAndWriteData(transimFile);
 	}
-
 
 	/**
 	 * Constructor opens writer, creates transims file and stores person 2 mode from events file.
@@ -171,7 +172,7 @@ public class AgentPositionWriter {
 
 					Tuple<Double, Double> posAndLinkId = getDistanceFromFromNode ( new Coord(easting , northing) ); 
 					if (posAndLinkId == null) return;
-					
+
 					double currentPositionOnLink = posAndLinkId.getFirst();
 					double linkId = posAndLinkId.getSecond();
 
@@ -179,24 +180,37 @@ public class AgentPositionWriter {
 					Double trackPosition = 0. ;
 
 					Double prevPosition = prevTrackPositions.get(agentId);
-					
+
 					if (prevTime.containsKey(agentId)) {
 						double timegap = time - prevTime.get(agentId);
 
 						trackPosition =  linkId  * linkLength  + currentPositionOnLink;
 
-						if ( Math.round(trackPosition) == Math.round(prevPosition) ) {
+						if(trackPosition < 0. || trackPosition > trackLength) {
+
+							throw new RuntimeException("Position can not be negative or higher than track length ("+trackLength+"m).");
+
+						} else if(trackPosition < prevPosition  && linkId != 0.0 ){ 
+
+							// prev = 1986 and now = 1980 should not happen however, prev = 2993, now = 6 is possible.
+//							throw new RuntimeException("Should not happen.");
+							LOGGER.warn("Prev position is "+prevPosition+" and current position is "+ trackPosition+". "
+									+ "\n This is an error coming from simulation which should be fixed in due time."
+									+ " \n For now, setting current position same as prev position.");
+							trackPosition = prevPosition;
+						} else if ( Math.round(trackPosition) == Math.round(prevPosition) ) {
+
 							// same cycle, but rounding errors, for e.g. first position 933.33 and next position 933.0
 							trackPosition = prevPosition;
-						
-						} else if( trackPosition >= 0.0 &&  prevPosition <= trackLength && trackPosition < prevPosition ) {// next cycle
-						
-							if(trackPosition > 0.) { // for such cases, get speed
-								velocity = ( trackPosition + trackLength - prevPosition ) / timegap;
-							} else if ( trackPosition == 0.) {
+
+						} else if ( trackPosition < prevPosition ) {// next cycle
+
+							if ( trackPosition == 0.) {
 								// agent is EXACTLY at the end of the track, thus need to write it twice.
 								velocity =  Math.min( ( trackLength - prevPosition ) / timegap , maxSpeed) ;
 								writeString(agentId+"\t"+person2mode.get(agentId)+"\t"+ trackLength +"\t"+time+"\t"+velocity+"\t"+prevCycle.get(agentId)+"\n");
+							} else {
+								velocity = ( trackPosition + trackLength - prevPosition ) / timegap;
 							}
 							prevCycle.put(agentId, prevCycle.get(agentId) + 1 ); 
 						} 
@@ -206,10 +220,22 @@ public class AgentPositionWriter {
 						} else if(velocity < 0. ) {
 							System.err.println("In appropriate speed "+velocity);
 						} 
-						
+
 						if(Math.round(velocity) > Math.round(maxSpeed) ){
-							System.out.println("Velocity "+velocity+" is found, which is higher than max speed. This could happen due to rounding errors."
-									+ "Setting it to max speed.");
+							// sometimes its positioning errors from simulation snapshots
+							if (velocity <= 25.0 ) {
+								if(warnCount<1){
+									warnCount++;
+									LOGGER.warn("Velocity is "+velocity+".This comes from the error in positioning "
+											+ "during snapshot generation in the simulation. Setting it to max speed.");
+									LOGGER.warn("Prev and current track positions are " + prevPosition +", " + trackPosition +" and time gap between two snapshots is "+ timegap );
+									LOGGER.warn(Gbl.ONLYONCE);
+								}
+							} else {
+								LOGGER.error("Velocity is "+velocity+". This is way too high.");
+								LOGGER.info("Prev and current track positions are " + prevPosition +", " + trackPosition +" and time gap between two snapshots is "+ timegap );
+							}
+
 							velocity = Math.min(velocity, maxSpeed);
 						}
 
@@ -251,13 +277,13 @@ public class AgentPositionWriter {
 	private Tuple<Double, Double> getDistanceFromFromNode (final Coord eastinNorthing) {
 		// check if easting is on "Home" or "Work" links
 		if (eastinNorthing.getX() < 0 || eastinNorthing.getX() > 1000) return null;
-		
+
 		double distFromFromNode = Double.NaN;
 		double linkId = Double.NaN;
 		for (Link l : sc.getNetwork().getLinks().values()) {
 			Coord fromNode = l.getFromNode().getCoord();
 			Coord toNode = l.getToNode().getCoord();
-			
+
 			double distFromNodeAndPoint = NetworkUtils.getEuclideanDistance(eastinNorthing, fromNode); // alternatively use Point2D.distance(...)
 			double distPointAndToNode = NetworkUtils.getEuclideanDistance(eastinNorthing, toNode);
 			double distFromNodeAndToNode = NetworkUtils.getEuclideanDistance(fromNode, toNode);
@@ -269,7 +295,19 @@ public class AgentPositionWriter {
 				break;
 			}
 		}
-		if( Double.isNaN(distFromFromNode) ) throw new RuntimeException("Easting, northing ("+ eastinNorthing.getX() +","+eastinNorthing.getY() +") is outside the network.");
+		if( Double.isNaN(distFromFromNode) ) { // this is possible, because of minor errors --
+
+			Link nearestLink = NetworkUtils.getNearestLink(sc.getNetwork(), eastinNorthing);
+			linkId = Double.valueOf(nearestLink.getId().toString());
+			distFromFromNode = NetworkUtils.getEuclideanDistance(eastinNorthing, nearestLink.getFromNode().getCoord());
+
+			// since easting northing is slightly out, dist should not higher than link length
+			distFromFromNode = Math.min(nearestLink.getLength(), distFromFromNode); 
+			LOGGER.warn("Easting northing "+eastinNorthing.toString() + " is not found to be on the link. \n"
+					+ "Thus, using, nearest link to get the distance.");
+			LOGGER.info("Thus, identified link is "+nearestLink.getId()+" and the distance of the point from from node is "+distFromFromNode);
+			//throw new RuntimeException("Easting, northing ("+ eastinNorthing.getX() +","+eastinNorthing.getY() +") is outside the network.");
+		}
 		return new Tuple<Double, Double>(distFromFromNode, linkId);
 	}
 }
