@@ -18,35 +18,43 @@
 
 package playground.polettif.multiModalMap.plausibility.log;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
+import java.util.List;
 
-public class DirectionChangeMessage extends LogMessage {
+public interface PlausibilityWarning extends Comparable<PlausibilityWarning> {
 
-	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
-	public static Map<TransitRoute, Integer> routeStat = new HashMap<>();
+	String getType();
 
-	private final Link link1;
-	private final Link link2;
-	private final double diff;
+	int getOrder();
 
-	public DirectionChangeMessage(TransitLine transitLine, TransitRoute transitRoute, Link link1, Link link2, double diff) {
-		super(transitLine, transitRoute);
-		this.link1 = link1;
-		this.link2 = link2;
-		this.diff = diff;
+	List<Id<Link>> getLinkIds();
 
-		MapUtils.addToInteger(transitLine, lineStat, 1, 1);
-		MapUtils.addToInteger(transitRoute, routeStat, 1, 1);
-	}
+	TransitLine getTransitLine();
 
-	@Override
-	public String toString() {
-		return "DIRECTION CHANGE\tlinks: "+link1.getId()+"\t->\t"+link2.getId()+"\t\tdiff: "+diff*200/Math.PI +" gon";
-	}
+	TransitRoute getTransitRoute();
+
+	Coordinate[] getCoordinates();
+
+	String getFromId();
+
+	String getToId();
+
+	double getExpected();
+
+	double getActual();
+
+	double getDifference();
+
+	Tuple<Object,Object> getPair();
+
+	String getCsvLine();
+
+	List<String> getCsvLineForEachLink();
 }

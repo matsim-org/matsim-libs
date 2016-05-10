@@ -18,25 +18,39 @@
 
 package playground.polettif.multiModalMap.plausibility.log;
 
-import org.matsim.api.core.v01.network.Node;
+import com.vividsolutions.jts.geom.Coordinate;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import java.util.HashMap;
 import java.util.Map;
 
-
-public class LoopMessage extends LogMessage {
+public class DirectionChangeWarning extends PlausibilityWarningAbstract {
 
 	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
 	public static Map<TransitRoute, Integer> routeStat = new HashMap<>();
 
-	private final Node node;
+	private final Link link1;
+	private final Link link2;
+	private final double diff;
 
-	public LoopMessage(TransitLine transitLine, TransitRoute transitRoute, Node node) {
-		super(transitLine, transitRoute);
-		this.node = node;
+	public DirectionChangeWarning(TransitLine transitLine, TransitRoute transitRoute, Link link1, Link link2, double diff) {
+		super(3, "direction", transitLine, transitRoute);
+		this.link1 = link1;
+		this.link2 = link2;
+		this.diff = diff;
+
+		expected = 0;
+		actual = 0;
+		difference = diff;
+
+		coordinates = new Coordinate[3];
+		coordinates[0] = MGC.coord2Coordinate(link1.getFromNode().getCoord());
+		coordinates[1] = MGC.coord2Coordinate(link1.getToNode().getCoord());
+		coordinates[2] = MGC.coord2Coordinate(link2.getToNode().getCoord());
 
 		MapUtils.addToInteger(transitLine, lineStat, 1, 1);
 		MapUtils.addToInteger(transitRoute, routeStat, 1, 1);
@@ -44,6 +58,6 @@ public class LoopMessage extends LogMessage {
 
 	@Override
 	public String toString() {
-		return "LOOP            \tnode: "+node.getId();
+		return "\tDIRECTION CHANGE\tlinks: "+link1.getId()+"\t->\t"+link2.getId()+"\t\tdifference: "+diff*200/Math.PI +" gon";
 	}
 }
