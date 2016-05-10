@@ -30,7 +30,7 @@ public class GenericP0ControlListener implements StartupListener, IterationStart
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		//handler = new P0QueueDelayControl(network, event.getIteration());
-		handler.initialise(event.getIteration());//To avoid creating objects every time, to save memory
+		handler.initialise();//To avoid creating objects every time, to save memory
 	    network.setNetworkChangeEvents(handler.events);
 //	    GenericP0ControlHandler.events.removeAll(GenericP0ControlHandler.events);
 		
