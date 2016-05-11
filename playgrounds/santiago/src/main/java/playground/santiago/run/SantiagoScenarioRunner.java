@@ -62,7 +62,7 @@ import javax.inject.Provider;
  *
  */
 public class SantiagoScenarioRunner {
-	private static String inputPath = "../../../runs-svn/santiago/triangleCordon/input/";
+	private static String inputPath = "../../../runs-svn/santiago/casoBase3_NP/input/";
 	private static boolean doModeChoice = true;
 //	private static boolean mapActs2Links = true;
 	private static boolean mapActs2Links = false;
@@ -72,8 +72,8 @@ public class SantiagoScenarioRunner {
 	public static void main(String args[]){
 
 		if(args.length==0){
-//			configFile = inputPath + "config_final.xml";
-			configFile = inputPath + "config_triangleCordon.xml";
+			configFile = inputPath + "config_final.xml";
+//			configFile = inputPath + "config_triangleCordon.xml";
 		} else {
 			configFile = args[0];
 			mapActs2Links = Boolean.parseBoolean(args[1]);
@@ -104,7 +104,7 @@ public class SantiagoScenarioRunner {
 		if(mapActs2Links) mapActivities2properLinks(scenario);
 		
 		// adding roadpricing contrib for cordon policies
-		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
+//		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 		
 		controler.run();
 	}
