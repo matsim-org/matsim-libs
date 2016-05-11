@@ -32,7 +32,7 @@ import org.matsim.core.utils.misc.Time;
 import playground.polettif.crossings.parser.Crossing;
 import playground.polettif.crossings.parser.CrossingsParser;
 import playground.polettif.crossings.parser.RailLink;
-import playground.polettif.multiModalMap.tools.NetworkTools;
+import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.*;
 
