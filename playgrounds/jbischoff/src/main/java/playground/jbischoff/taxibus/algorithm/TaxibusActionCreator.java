@@ -66,14 +66,14 @@ public class TaxibusActionCreator
             case PICKUP:
                 final TaxibusPickupTask pst = (TaxibusPickupTask)task;
                 return new SinglePassengerPickupActivity(passengerEngine, pst, pst.getRequest(),
-                        pickupDuration);
+                        pickupDuration, "TaxibusPickup");
 
             case DROPOFF:
                 final TaxibusDropoffTask dst = (TaxibusDropoffTask)task;
-                return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest());
+                return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest(), "TaxibusDropoff");
 
             case STAY:
-                return new VrpActivity("Stay", (TaxibusStayTask)task);
+                return new VrpActivity("TaxibusStay", (TaxibusStayTask)task);
 
             default:
                 throw new IllegalStateException();

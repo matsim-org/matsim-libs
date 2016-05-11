@@ -168,7 +168,7 @@ public class PrtScheduler
         VrpPathWithTravelData path = calcPath(currentLink, nearestRank, time);
         if (path.getArrivalTime() > veh.getT1())
             return; // no rank return if vehicle is going out of service anyway
-        sched.addTask(new TaxiDriveTask(path));
+        sched.addTask(new TaxiEmptyDriveTask(path));
         sched.addTask(new TaxiStayTask(path.getArrivalTime(), veh.getT1(), nearestRank));
 
     }
