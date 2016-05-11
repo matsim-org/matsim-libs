@@ -13,9 +13,11 @@ public class BikeTravelDisutilityFactory implements TravelDisutilityFactory {
 		
 	@Inject
 	BikeConfigGroup bikeConfigGroup;
+	@Inject
+	PlanCalcScoreConfigGroup cnScoringGroup;
 	
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		return new BikeTravelDisutility(bikeConfigGroup, cnScoringGroup);
 	}
 

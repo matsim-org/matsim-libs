@@ -18,6 +18,10 @@ public class RunBikes {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
+		//TODO add setInsert,...
+		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		
+		
 		// muss ich im default-mode trotzdem mit addOverridingModule ein modul hinzufuegen oder muss ich in der config was ausschalten?
 		controler.addOverridingModule(new BikeModule());
 

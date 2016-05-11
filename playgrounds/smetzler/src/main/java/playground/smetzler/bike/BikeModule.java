@@ -10,7 +10,7 @@ public class BikeModule extends AbstractModule {
 	@Override
 	public void install() {
 
-		bind(PrepareForSim.class).to(BikePrepareForSimImpl.class);
+	//	bind(PrepareForSim.class).to(BikePrepareForSimImpl.class);
 		addTravelTimeBinding("bike").to(BikeTravelTime.class);
 
 		addTravelDisutilityFactoryBinding("bike").to(BikeTravelDisutilityFactory.class);

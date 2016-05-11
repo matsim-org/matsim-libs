@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.controler.PrepareForSim;
@@ -73,14 +74,19 @@ class BikePrepareForSimImpl implements PrepareForSim {
 			XY2Links xy2LinksCar = new XY2Links(carNetwork, null);
 			XY2Links xy2LinksBike = new XY2Links(bikeNetwork, null);
 	
-			
+
 			for (Person person : population.getPersons().values()) {
-				// TODO check if bike user or car user.
-				boolean isCarUser = false; // ....
-				if (isCarUser) {
-					xy2LinksCar.run(person);
-				} else {
-					xy2LinksBike.run(person);
+				// TODO check if bike user or car user. DONE?!
+				String bla = person.getSelectedPlan().getPlanElements().get(1).toString();
+
+				if (bla.contains("mode=bike")){
+					boolean isCarUser = false; // ....
+
+					if (isCarUser) {
+						xy2LinksCar.run(person);
+					} else {
+						xy2LinksBike.run(person);
+					}
 				}
 			}
 		}

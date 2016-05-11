@@ -23,8 +23,8 @@ public class CreateNetwork {
 //		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/sonstiges/network_sonstiges/berlin/berlin-latest.osm";
 		
 
-		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/innenring_MATsim_bikeAndCar.xml";
-		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/innenring_bikeatt_bikeAndCar.xml";
+		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/innenring_MATsim_bikeAndCar_EUDEM.xml";
+		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/innenring_bikeatt_bikeAndCar_EUDEM.xml";
 //		String outputXML =     "../../../shared-svn/studies/countries/de/berlin-bike/input/network/berlin_MATsim.xml";
 //		String outputBikeXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/berlin_bikeatt.xml";
 		
