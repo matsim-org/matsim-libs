@@ -288,6 +288,9 @@ public class Gui extends JFrame {
 		tabbedPane.addTab("Warnings & Errors", null, scrollPane_1, null);
 		
 		textErrOut = new JTextArea();
+		textErrOut.setWrapStyleWord(true);
+		textErrOut.setTabSize(4);
+		textErrOut.setEditable(false);
 		scrollPane_1.setViewportView(textErrOut);
 
 		getContentPane().setLayout(groupLayout);
@@ -375,6 +378,7 @@ public class Gui extends JFrame {
 						txtConfigfilename.getText()
 				};
 				Gui.this.textStdOut.setText("");
+				Gui.this.textErrOut.setText("");
 				Gui.this.exeRunner = ExeRunner.run(cmdArgs, Gui.this.textStdOut, Gui.this.textErrOut, new File(txtConfigfilename.getText()).getParent());
 				Gui.this.btnStartMatsim.setText("Stop MATSim");
 				Gui.this.btnStartMatsim.setEnabled(true);
@@ -394,6 +398,9 @@ public class Gui extends JFrame {
 					Gui.this.textStdOut.append("\n");
 					Gui.this.textStdOut.append("The simulation did not run properly. Error/Exit code: " + exitcode);
 					Gui.this.textStdOut.setCaretPosition(Gui.this.textStdOut.getDocument().getLength());
+					Gui.this.textErrOut.append("\n");
+					Gui.this.textErrOut.append("The simulation did not run properly. Error/Exit code: " + exitcode);
+					Gui.this.textErrOut.setCaretPosition(Gui.this.textStdOut.getDocument().getLength());
 					throw new RuntimeException("There was a problem running MATSim. exit code: " + exitcode);
 				}
 			}
@@ -411,6 +418,9 @@ public class Gui extends JFrame {
 			Gui.this.textStdOut.setText("");
 			Gui.this.textStdOut.append("The configuration file could not be loaded. Error message:\n");
 			Gui.this.textStdOut.append(e.getMessage());
+			Gui.this.textErrOut.setText("");
+			Gui.this.textErrOut.append("The configuration file could not be loaded. Error message:\n");
+			Gui.this.textErrOut.append(e.getMessage());
 			return;
 		}
 		txtConfigfilename.setText(configFilename);
@@ -440,6 +450,9 @@ public class Gui extends JFrame {
 					Gui.this.textStdOut.append("\n");
 					Gui.this.textStdOut.append("The simulation was stopped forcefully.");
 					Gui.this.textStdOut.setCaretPosition(Gui.this.textStdOut.getDocument().getLength());
+					Gui.this.textErrOut.append("\n");
+					Gui.this.textErrOut.append("The simulation was stopped forcefully.");
+					Gui.this.textErrOut.setCaretPosition(Gui.this.textStdOut.getDocument().getLength());
 				}
 			});
 		}
