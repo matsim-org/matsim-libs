@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.run.Controler;
@@ -55,6 +56,7 @@ public class Gui extends JFrame {
 	private JMenu mnTools;
 	private JMenuItem mntmCompressFile;
 	private JMenuItem mntmUncompressFile;
+	private JMenuItem mntmCreateDefaultConfig;
 	private JMenuItem mntmCreateSamplePopulation;
 
 	private PopulationSampler popSampler = null;
@@ -316,6 +318,23 @@ public class Gui extends JFrame {
 		
 		mnTools.addSeparator();
 		
+		mntmCreateDefaultConfig = new JMenuItem("Create Default config.xml…");
+		mnTools.add(mntmCreateDefaultConfig);
+		mntmCreateDefaultConfig.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SaveFileSaver chooser = new SaveFileSaver();
+				chooser.setSelectedFile(new File("defaultConfig.xml"));
+				int saveResult = chooser.showSaveDialog(null);
+				if (saveResult == JFileChooser.APPROVE_OPTION) {
+					File destFile = chooser.getSelectedFile();
+					Config config = ConfigUtils.createConfig();
+					new ConfigWriter(config).write(destFile.getAbsolutePath());
+				}
+
+			}
+		});
+
 		mntmCreateSamplePopulation = new JMenuItem("Create Sample Population…");
 		mnTools.add(mntmCreateSamplePopulation);
 		mntmCreateSamplePopulation.addActionListener(new ActionListener() {
