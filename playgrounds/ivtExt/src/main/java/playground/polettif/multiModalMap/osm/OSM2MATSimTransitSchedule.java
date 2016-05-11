@@ -17,7 +17,7 @@
  * *********************************************************************** */
 
 
-package playground.polettif.multiModalMap.osm.osm2mts;
+package playground.polettif.multiModalMap.osm;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -27,12 +27,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.multiModalMap.osm.OsmParserHandler;
 import playground.polettif.multiModalMap.osm.core.OsmParser;
 import playground.polettif.multiModalMap.osm.core.TagFilter;
 import playground.polettif.multiModalMap.osm.lib.OsmTag;
 import playground.polettif.multiModalMap.osm.lib.OsmValue;
 import playground.polettif.multiModalMap.tools.ScheduleCleaner;
+import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 import java.util.*;
 
@@ -96,8 +96,15 @@ public class OSM2MATSimTransitSchedule {
 		ptRoute.add(OsmTag.ROUTE, OsmValue.SUBWAY);
 	}
 
+	/**
+	 * Converts the available public transit data of an osm file to a MATSim transit schedule
+	 * @param args [0] osm file
+	 *             [1] output schedule file
+	 *             [2] output coordinate system (optional)
+	 */
 	public static void main(final String[] args) {
-		OSM2MATSimTransitSchedule osm2mts = new OSM2MATSimTransitSchedule(ScenarioUtils.createScenario(ConfigUtils.createConfig()).getTransitSchedule(), TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus"));
+		CoordinateTransformation ct = args.length == 3 ? TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus") : null;
+		OSM2MATSimTransitSchedule osm2mts = new OSM2MATSimTransitSchedule(ScheduleTools.createSchedule(), ct);
 		osm2mts.parse(args[0]);
 		osm2mts.createSchedule();
 		osm2mts.writeFile(args[1]);
@@ -134,7 +141,6 @@ public class OSM2MATSimTransitSchedule {
 		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.MONORAIL);
 		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.SUBWAY);
 		relationFilter.add(OsmTag.ROUTE_MASTER, OsmValue.FERRY);
-
 
 		handler = new OsmParserHandler();
 		handler.addFilter(nodeFilter, wayFilter, relationFilter);

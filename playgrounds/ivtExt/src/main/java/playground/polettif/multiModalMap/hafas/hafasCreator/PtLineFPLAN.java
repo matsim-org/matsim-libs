@@ -57,7 +57,7 @@ public class PtLineFPLAN {
 		this.lineId = Id.create(lineId.toString(), TransitLine.class);
 	}
 
-	public TransitLine createLine() {
+	public TransitLine createTransitLine() {
 		TransitLine line = scheduleBuilder.createTransitLine(lineId);
 		for (PtRouteFPLAN route : this.routesFPLAN) {
 			TransitRoute transitRoute = route.getRoute();

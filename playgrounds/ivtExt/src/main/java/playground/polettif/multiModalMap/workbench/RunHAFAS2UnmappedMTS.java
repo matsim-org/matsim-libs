@@ -32,6 +32,7 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.polettif.boescpa.converters.osm.OSM2MixedIVT;
 import playground.polettif.multiModalMap.hafas.hafasCreator.PTScheduleCreatorHAFAS;
+import playground.polettif.multiModalMap.tools.ScheduleTools;
 
 /**
  * based on boescpa.converters.scheduleCreator.PTScheduleCreatorDefaultV2
@@ -49,7 +50,7 @@ public class RunHAFAS2UnmappedMTS {
 
 		new PTScheduleCreatorHAFAS(schedule, vehicles, transformation).createSchedule(args[0]);
 
-		new TransitScheduleWriter(schedule).writeFile(args[1]+"schedule.xml");
+		ScheduleTools.writeTransitSchedule(schedule, args[1]+"schedule.xml");
 		new VehicleWriterV1(vehicles).writeFile(args[1]+"vehicles.xml");
 	}
 

@@ -49,6 +49,7 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	private static final String OUTPUT_STREET_NETWORK_FILE = "outputStreetNetworkFile";
 	private static final String LINK_DISTANCE_TOLERANCE = "linkDistanceTolerance";
 	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
+	public static final String COMBINE_PT_MODES = "combinePtModes";
 
 	public PublicTransportMapConfigGroup() {
 		super(GROUP_NAME);
@@ -75,6 +76,9 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		map.put(MODES_TO_KEEP_ON_CLEAN_UP,
 				"All links that do not have a transit route on them are removed, except the ones \n" +
 				"\t\tlisted in this set (typically only car). Separated by comma.");
+		map.put(COMBINE_PT_MODES,
+				"Defines whether at the end of mapping, all non-car link modes (bus, rail, etc) \n" +
+				"\t\tshould be replaced with pt (true) or not. Default: false");
 		map.put(LINK_DISTANCE_TOLERANCE,
 				"[Link Candidates] After " +MAX_NCLOSEST_LINKS +" link candidates have been found, additional link \n" +
 				"\t\tcandidates within "+LINK_DISTANCE_TOLERANCE+"*(distance to the Nth link) are added to the set.\n" +
@@ -215,6 +219,21 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 		}
 	}
 
+	/**
+	 * Defines whether at the end of mapping, all non-car link modes (bus, rail, etc)
+	 * should be replaced with pt (true) or not. Default: false.
+	 */
+	private boolean combinePtModes = false;
+
+	@StringGetter(COMBINE_PT_MODES)
+	public boolean getCombinePtModes() {
+		return combinePtModes;
+	}
+
+	@StringSetter(COMBINE_PT_MODES)
+	public void setCombinePtModes(boolean v) {
+		this.combinePtModes = v;
+	}
 
 	/**
 	 * Defines the radius [meter] from a stop facility within nodes are searched.
@@ -451,4 +470,5 @@ public class PublicTransportMapConfigGroup extends ReflectiveConfigGroup {
 	public Map<String, Integer> getMaxNClosestLinksByMode() {
 		return null;
 	}
+
 }

@@ -21,7 +21,6 @@
 
 package playground.polettif.multiModalMap.hafas.hafasCreator;
 
-import gnu.trove.map.hash.TObjectByteHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Counter;
@@ -190,12 +189,12 @@ public class FPLANReader {
 					if (currentRouteFPLAN != null) {
 						double arrivalTime = 0;
 						try {
-							arrivalTime = Double.parseDouble(newLine.substring(31, 33)) * 60 * 60 +
+							arrivalTime = Double.parseDouble(newLine.substring(31, 33)) * 3600 +
 									Double.parseDouble(newLine.substring(33, 35)) * 60;
 						} catch (Exception e) {	}
 						double departureTime = 0;
 						try {
-							departureTime = Double.parseDouble(newLine.substring(38, 40)) * 60 * 60 +
+							departureTime = Double.parseDouble(newLine.substring(38, 40)) * 3600 +
 									Double.parseDouble(newLine.substring(40, 42)) * 60;
 						} catch (Exception e) {	}
 						Id<TransitStopFacility> stopId = Id.create(newLine.substring(0, 7), TransitStopFacility.class);
@@ -211,8 +210,8 @@ public class FPLANReader {
 			readsLines.close();
 			counter.printCounter();
 			// Create lines:
-			for (Id<TransitLine> transitLine : linesFPLAN.keySet()) {
-				TransitLine line = linesFPLAN.get(transitLine).createLine();
+			for (Id<TransitLine> transitLineId : linesFPLAN.keySet()) {
+				TransitLine line = linesFPLAN.get(transitLineId).createTransitLine();
 				if (line != null) {
 					schedule.addTransitLine(line);
 				}

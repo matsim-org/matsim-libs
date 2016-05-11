@@ -51,8 +51,6 @@ public class OsmNetworkReaderWithPT {
 
 	private final static Logger log = Logger.getLogger(OsmNetworkReaderWithPT.class);
 
-	// todo create lookup table for maxspeed
-
 	/*
 	OSM TAGS
 	*/
@@ -103,6 +101,8 @@ public class OsmNetworkReaderWithPT {
 	private boolean keepPaths = false;
 	private boolean scaleMaxSpeed = false;
 	private double maxLinkLength = 500.0;
+	// todo doc if a maxspeed tag looks like "50; 80" or similar, uses the first two digits
+	private boolean guessFreeSpeed = true;
 
 
 	/**
@@ -135,44 +135,17 @@ public class OsmNetworkReaderWithPT {
 			this.setHighwayDefaults(OsmValue.PRIMARY, 1, 80.0 / 3.6, 1.0, 1500);
 			this.setHighwayDefaults(OsmValue.PRIMARY_LINK, 1, 60.0 / 3.6, 1.0, 1500);
 			this.setHighwayDefaults(OsmValue.SECONDARY, 1, 60.0 / 3.6, 1.0, 1000);
-			this.setHighwayDefaults(OsmValue.TERTIARY, 1, 45.0 / 3.6, 1.0, 600);
-			this.setHighwayDefaults(OsmValue.MINOR, 1, 45.0 / 3.6, 1.0, 600);
-			this.setHighwayDefaults(OsmValue.UNCLASSIFIED, 1, 45.0 / 3.6, 1.0, 600);
+			this.setHighwayDefaults(OsmValue.TERTIARY, 1, 50.0 / 3.6, 1.0, 600);
+			this.setHighwayDefaults(OsmValue.MINOR, 1, 40.0 / 3.6, 1.0, 600);
+			this.setHighwayDefaults(OsmValue.UNCLASSIFIED, 1, 50.0 / 3.6, 1.0, 600);
 			this.setHighwayDefaults(OsmValue.RESIDENTIAL, 1, 30.0 / 3.6, 1.0, 600);
 			this.setHighwayDefaults(OsmValue.LIVING_STREET, 1, 15.0 / 3.6, 1.0, 300);
 //			this.setHighwayDefaults(OsmValue.SERVICE, 1, 15.0 / 3.6, 1.0, 200);
 
 			// Set railway-defaults (and with it the filter...)
-			this.setRailwayDefaults(OsmValue.RAIL, 1, 120.0 / 3.6, 1.0, 100);
+			this.setRailwayDefaults(OsmValue.RAIL, 1, 160.0 / 3.6, 1.0, 100);
 			this.setRailwayDefaults(OsmValue.TRAM, 1, 40.0 / 3.6, 1.0, 100, true);
 			this.setRailwayDefaults(OsmValue.LIGHT_RAIL, 1, 80.0 / 3.6, 1.0, 100);
-
-//			this.setRelationPTFilter(OsmTag.ROUTE, OsmValue.BUS);
-//			this.setRelationPTFilter(OsmTag.ROUTE, OsmValue.TROLLEYBUS);
-//			this.setRelationPTFilter(OsmTag.ROUTE, OsmValue.TRAM);
-//			this.setRelationPTFilter(OsmTag.ROUTE, OsmValue.RAIL);
-//			this.setRelationPTFilter(OsmTag.ROUTE, OsmValue.LIGHT_RAIL);
-
-
-			//this.setRailwayDefaults("funicular",	  1,  40.0/3.6, 1.0,  100);
-			//this.setRailwayDefaults("light_rail",	  1,  80.0/3.6, 1.0,  100);
-			//this.setRailwayDefaults("subway",		  1,  80.0/3.6, 1.0,  100, true);
-			// Set pt-defaults (and with it the filter...)
-			//this.setPTDefaults("ferry", 	  1, 120.0/3.6, 1.0,  100);
-			//this.setPTDefaults("ship",		  1,  80.0/3.6, 1.0,  100);
-			//this.setPTDefaults("cable_car",	  1,  80.0/3.6, 1.0,  100);
-			// Set default pt-filter:
-			//this.setRelationPTFilter("train");
-			//this.setRelationPTFilter("rail");
-			//this.setRelationPTFilter("railway");
-			//this.setRelationPTFilter("light_rail");
-
-			//this.setRelationPTFilter("ship");
-			//this.setRelationPTFilter("ferry");
-			//this.setRelationPTFilter("cable_car");
-			//this.setRelationPTFilter("funicular");
-			//this.setRelationPTFilter("funiculair");
-			//this.setRelationPTFilter("subway");
 		}
 	}
 
@@ -337,7 +310,7 @@ public class OsmNetworkReaderWithPT {
 		serviceRailTracksFilter.add(OsmTag.SERVICE);
 
 		// remove unusable ways
-		for (OsmParser.OsmWay way : ways.values()) {
+		for(OsmParser.OsmWay way : ways.values()) {
 			// remove service railways
 			if(way.tags.containsKey(OsmTag.RAILWAY) && way.tags.containsKey(OsmTag.SERVICE)) {
 				way.used = false;
@@ -350,9 +323,9 @@ public class OsmNetworkReaderWithPT {
 
 		// remove unused ways
 		Iterator<Map.Entry<Long, OsmParser.OsmWay>> it = ways.entrySet().iterator();
-		while (it.hasNext()) {
+		while(it.hasNext()) {
 			Map.Entry<Long, OsmParser.OsmWay> entry = it.next();
-			if (!entry.getValue().used) {
+			if(!entry.getValue().used) {
 				it.remove();
 			}
 		}
@@ -543,9 +516,18 @@ public class OsmNetworkReaderWithPT {
 			try {
 				freespeed = Double.parseDouble(maxspeedTag) / 3.6; // convert km/h to m/s
 			} catch (NumberFormatException e) {
-				if(!this.unknownMaxspeedTags.contains(maxspeedTag)) {
+				boolean message = true;
+				if(guessFreeSpeed) {
+					try {
+						message = false;
+						freespeed = Double.parseDouble(maxspeedTag.substring(0, 2)) / 3.6;
+					} catch (NumberFormatException e1) {
+						message = true;
+					}
+				}
+				if(!this.unknownMaxspeedTags.contains(maxspeedTag) && message) {
 					this.unknownMaxspeedTags.add(maxspeedTag);
-					log.warn("Could not parse maxspeed tag:" + e.getMessage() + ". Ignoring it.");
+					log.warn("Could not parse maxspeed tag: " + e.getMessage() + " (way " + way.id + ") Ignoring it.");
 				}
 			}
 		}
@@ -560,7 +542,7 @@ public class OsmNetworkReaderWithPT {
 			} catch (Exception e) {
 				if(!this.unknownLanesTags.contains(lanesTag)) {
 					this.unknownLanesTags.add(lanesTag);
-					log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
+					log.warn("Could not parse lanes tag: " + e.getMessage() + ". Ignoring it.");
 				}
 			}
 		}

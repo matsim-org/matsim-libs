@@ -122,8 +122,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 				if(config.getOutputStreetNetworkFile() != null) {
 					NetworkFilterManager filterManager = new NetworkFilterManager(network);
 					filterManager.addLinkFilter(new LinkFilterMode(Collections.singleton(TransportMode.car)));
-					Network streetNetwork = filterManager.applyFilters();
-					new NetworkWriter(streetNetwork).write(config.getOutputStreetNetworkFile());
+					NetworkTools.writeNetwork(filterManager.applyFilters(), config.getOutputStreetNetworkFile());
 				}
 			} else {
 				log.info("No output paths defined, schedule and network are not written to files.");
@@ -149,14 +148,16 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		Map<String, Network> networks = new HashMap<>();
 		Map<String, Router> routers = new HashMap<>();
 		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
-			log.info("================================================");
-			log.info("Creating network and router for " + modeAssignment.getValue());
-			NetworkFilterManager filter = new NetworkFilterManager(network);
-			filter.addLinkFilter(new LinkFilterMode(modeAssignment.getValue()));
-			Network filteredNetwork = filter.applyFilters();
+			if(!modeAssignment.getValue().contains(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE)) {
+				log.info("================================================");
+				log.info("Creating network and router for " + modeAssignment.getValue());
+				NetworkFilterManager filter = new NetworkFilterManager(network);
+				filter.addLinkFilter(new LinkFilterMode(modeAssignment.getValue()));
+				Network filteredNetwork = filter.applyFilters();
 
-			networks.put(modeAssignment.getKey(), filter.applyFilters());
-			routers.put(modeAssignment.getKey(), new FastAStarRouter(filteredNetwork));
+				networks.put(modeAssignment.getKey(), filter.applyFilters());
+				routers.put(modeAssignment.getKey(), new FastAStarRouter(filteredNetwork));
+			}
 		}
 
 
@@ -226,7 +227,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 
 						// This block would prevent that the same link is used for both stops,
 						// the link is used for the nearer stop facility. Is not needed however and
-						// performance decreases significantly.
+						// performance decreases significantly if used
 						/* using field: private Map<Tuple<TransitStopFacility, TransitStopFacility>, Tuple<Set<LinkCandidate>, Set<LinkCandidate>>> separatedLinkCandidates = new HashMap<>();
 						if(!separatedLinkCandidates.containsKey(new Tuple<>(currentStopFacility, nextStopFacility))) {
 							int currentBefore = linkCandidatesCurrent.size();
@@ -377,9 +378,10 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
 		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 		ScheduleTools.assignScheduleModesToLinks(schedule, network);
-		// todo config param for cleanup options
-//		PTMapperUtils.replaceNonCarModesWithPT(schedule, network);
-//		PTMapperUtils.addPTModeToNetwork(schedule, network);
+		if(config.getCombinePtModes()) {
+			ScheduleTools.replaceNonCarModesWithPT(network);
+		}
+//		ScheduleTools.addPTModeToNetwork(schedule, network);
 		log.info("Clean schedule and network... done.");
 
 		log.info("Validating schedule and network...");
@@ -392,7 +394,16 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 			for (String w : validationResult.getWarnings()) { log.info(w); } }
 
 
-		log.info("================================================");
+		/**
+		 * Statistics
+		 */
+		int artificialLinks = 0;
+		for(Link l : network.getLinks().values()) {
+			if(l.getAllowedModes().contains(PublicTransportMapConfigGroup.ARTIFICIAL_LINK_MODE)) {
+				artificialLinks++;
+			}
+		}
+
 		log.info("================================================");
 		log.info("=== Mapping transit schedule to network... done.");
 		log.info("================================================");
@@ -403,6 +414,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		log.info("       factor   "+(schedule.getFacilities().size()/((double) nStopFacilities)));
 		log.info("    Transit Route statistics:");
 		log.info("       removed  " + routesRemoved);
+		log.info("    Artificial Links:");
+		log.info("       created  " + artificialLinks);
 	}
 
 	/**

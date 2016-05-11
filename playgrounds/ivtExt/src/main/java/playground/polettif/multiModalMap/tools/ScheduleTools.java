@@ -214,22 +214,30 @@ public class ScheduleTools {
 	}
 	
 	/**
-	 *
-	 * @param schedule
+	 * Replaces all non-car link modes with "pt"
 	 * @param network
 	 */
-	public static void replaceNonCarModesWithPT(TransitSchedule schedule, Network network) {
+	public static void replaceNonCarModesWithPT(Network network) {
 		log.info("... Replacing all non-car link modes with \"pt\"");
 
-		Map<Id<Link>, ? extends Link> networkLinks = network.getLinks();
-		Set<Id<Link>> transitLinkIds = new HashSet<>();
+		Set<String> modesCar = Collections.singleton(TransportMode.car);
+
+		Set<String> modesCarPt = new HashSet<>();
+		modesCarPt.add(TransportMode.car);
+		modesCarPt.add(TransportMode.pt);
+
+		Set<String> modesPt = new HashSet<>();
+		modesPt.add(TransportMode.pt);
 
 		for(Link link : network.getLinks().values()) {
-			if(link.getAllowedModes().size() > 0 && link.getAllowedModes().contains("car")) {
-				Set<String> modes = new HashSet<>();
-				modes.add(TransportMode.car);
-				modes.add(TransportMode.pt);
-				link.setAllowedModes(modes);
+			if(link.getAllowedModes().size() == 0 && link.getAllowedModes().contains(TransportMode.car)) {
+				link.setAllowedModes(modesCar);
+			}
+			if(link.getAllowedModes().size() > 0 && link.getAllowedModes().contains(TransportMode.car)) {
+				link.setAllowedModes(modesCarPt);
+			}
+			else if(!link.getAllowedModes().contains(TransportMode.car)) {
+				link.setAllowedModes(modesPt);
 			}
 		}
 	}

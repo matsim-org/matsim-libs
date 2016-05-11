@@ -80,12 +80,26 @@ public class PlausibilityCheck {
 		PlausibilityCheck check = new PlausibilityCheck(schedule, network);
 		check.run();
 
+		// todo combine warnings
+		/*
+		define output folder
+		raw log file (csv)
+		combined warnings for routes with same stop sequence
+		combined warning (all routes affected by it in one "tag")
+		warning for each link
+		shapefile (one for traveltime, loops and directionChange)
+		get whole loop (link sequence) instead of just nodes
+		 */
+
 //		check.printResultByLink();
-		check.writeCsvResultsBySchedule("C:/Users/polettif/Desktop/output/results_2016-05-10/hafas/plausibilityWarningsSchedule.csv");
-		check.writeCsvResultsByLinkId("C:/Users/polettif/Desktop/output/results_2016-05-10/hafas/plausibilityWarningsLinkIds.csv");
+		check.writeCsvResultsBySchedule("C:/Users/polettif/Desktop/output/results_2016-05-11/hafas/plausibilityWarningsSchedule.csv");
+		check.writeCsvResultsByLinkId("C:/Users/polettif/Desktop/output/results_2016-05-11/hafas/plausibilityWarningsLinkIds.csv");
 		check.createResultShapeFile(args[2]);
 	}
 
+	/**
+	 * Performs the plausibility check on the schedule
+	 */
 	public void run() {
 		PlausibilityWarningAbstract.setNetwork(network);
 
@@ -217,9 +231,9 @@ public class PlausibilityCheck {
 				.addAttribute("route", String.class)
 				.addAttribute("from", String.class)
 				.addAttribute("to", String.class)
-				.addAttribute("diff", String.class)
-				.addAttribute("exp", String.class)
-				.addAttribute("act", String.class)
+				.addAttribute("diff", Double.class)
+				.addAttribute("exp", Double.class)
+				.addAttribute("act", Double.class)
 				.create();
 /*
 		for(Map<TransitRoute, TreeSet<PlausibilityWarning>> e : warningsSchedule.values()) {
