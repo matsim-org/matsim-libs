@@ -37,13 +37,13 @@ import playground.dziemke.utils.LogToOutputSaver;
 public class AccessibilityComputationNMBNew {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationNMBNew.class);
 	
-	private static final double cellSize = 1000.;
+	private static final double cellSize = 500.;
 	
 	public static void main(String[] args) {
 		// Input and output	
 		String networkFile = "../../../matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = "../../../matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
-		String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/38/";
+		String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/43/";
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelDistanceMatrix.csv.gz";
 //		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/measuringPointsAsStops.csv.gz";
@@ -52,14 +52,14 @@ public class AccessibilityComputationNMBNew {
 //		String measuringPointsAsPtStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_07/measuringPointsAsStops.csv";
 		
 		// Regular pt
-		String travelTimeMatrixFile = "../../../matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
-		String travelDistanceMatrixFile = "../../../matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
-		String ptStopsFile = "../../../matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
+//		String travelTimeMatrixFile = "../../../matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
+//		String travelDistanceMatrixFile = "../../../matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
+//		String ptStopsFile = "../../../matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
 
 		// Minibus pt
-//		String travelTimeMatrixFile = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_500/travelTimeMatrix_0.csv";
-//		String travelDistanceMatrixFile = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_500/travelDistanceMatrix_0.csv";
-//		String ptStopsFile = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_500/ptStops.csv";
+		String travelTimeMatrixFile = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_500/travelTimeMatrix_0.csv";
+		String travelDistanceMatrixFile = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_500/travelDistanceMatrix_0.csv";
+		String ptStopsFile = "../../../shared-svn/projects/maxess/data/nmb/minibus-pt/jtlu14b/matrix_grid_500/ptStops.csv";
 //		String travelTimeMatrixFile = "../../../matsimExamples/countries/za/nmb/minibus-pt/jtlu14b/matrix_grid_1000/travelTimeMatrix_0.csv.gz";
 //		String travelDistanceMatrixFile = "../../../matsimExamples/countries/za/nmb/minibus-pt/jtlu14b/matrix_grid_1000/travelDistanceMatrix_0.csv.gz";
 //		String ptStopsFile = "../../../matsimExamples/countries/za/nmb/minibus-pt/jtlu14b/matrix_grid_1000/ptStops.csv";
@@ -79,8 +79,8 @@ public class AccessibilityComputationNMBNew {
 		Double lowerBound = -3.5;
 		Double upperBound = 3.5;
 		Integer range = 9;
-		int symbolSize = 1050;
-		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
+		int symbolSize = 525;
+		int populationThreshold = (int) (120 / (1000/cellSize * 1000/cellSize));
 
 		/* Extent of the network are (as they can looked up by using the bounding box):
 		/* minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496 */
@@ -140,6 +140,8 @@ public class AccessibilityComputationNMBNew {
 		List<String> activityTypes = new ArrayList<String>();
 		activityTypes.add("s");
 		activityTypes.add("w");
+		activityTypes.add("l");
+		activityTypes.add("e");
 		log.error("Only using s as activity type to speed up for testing");
 
 		// collect homes

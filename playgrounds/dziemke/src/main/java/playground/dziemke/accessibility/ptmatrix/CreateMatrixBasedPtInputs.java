@@ -53,7 +53,7 @@ public class CreateMatrixBasedPtInputs {
 		LogToOutputSaver.setOutputDirectory(outputRoot);
 		
 		// Parameters
-		Boolean measuringPointsAsPTStops = true;
+		Boolean measuringPointsAsPTStops = true; // if "true" -> use regular, user-defined locations instead of stops from schedule
 //		Double cellSize = 1000.; // only relevant if "meauringPointsAsPTStops = true"
 		Double cellSize = 500.; // only relevant if "meauringPointsAsPTStops = true"
 		Double departureTime = 8. * 60 * 60;
@@ -99,7 +99,7 @@ public class CreateMatrixBasedPtInputs {
 		 * defines the iteration ordering, which is normally the order in which keys were inserted into the map insertion order. */
 		Map<Id<Coord>, Coord> ptMatrixLocationsMap = new LinkedHashMap<Id<Coord>, Coord>();
 		
-		if (measuringPointsAsPTStops == true) { // i.e. use regular, user-defined locations instead of stops from schedule
+		if (measuringPointsAsPTStops == true) { 
 			
 			BoundingBox boundingBox;
 			if (bounds == "network") {
