@@ -91,11 +91,11 @@ public class PtRouteFPLAN {
 
 		if (usedVehicleType != null) {
 			if(HRDFDefinitions.Vehicles.valueOf(usedVehicleType.getId().toString()).addToSchedule) {
-				usedMode = HRDFDefinitions.Vehicles.valueOf(usedVehicleType.getId().toString()).mode.toString();
+				usedMode = HRDFDefinitions.Vehicles.valueOf(usedVehicleType.getId().toString()).transportMode.modeName;
 			} else {
 				usedMode = "REMOVE";
 			}
-			}
+		}
 	}
 
 	public String getUsedVehicleId() {

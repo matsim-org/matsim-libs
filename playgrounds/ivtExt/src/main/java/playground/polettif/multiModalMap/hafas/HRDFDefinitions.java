@@ -118,11 +118,11 @@ public final class HRDFDefinitions {
 		public String name, description;
 		public VehicleType.DoorOperationMode doorOperation;
 		public boolean usesRoadNetwork, addToSchedule;
-		public TransportModes mode;
+		public TransportModes transportMode;
 
-		Vehicles(String name, TransportModes mode, boolean addToSchedule, double length, double width, double accessTime, double egressTime, VehicleType.DoorOperationMode doorOperation, int capacitySeats, int capacityStanding, double pcuEquivalents, boolean usesRoadNetwork, String description) {
+		Vehicles(String name, TransportModes transportMode, boolean addToSchedule, double length, double width, double accessTime, double egressTime, VehicleType.DoorOperationMode doorOperation, int capacitySeats, int capacityStanding, double pcuEquivalents, boolean usesRoadNetwork, String description) {
 			this.name = name;
-			this.mode = mode;
+			this.transportMode = transportMode;
 			this.addToSchedule = addToSchedule;
 			this.length = length;
 			this.width = width;
@@ -136,7 +136,5 @@ public final class HRDFDefinitions {
 			this.usesRoadNetwork = usesRoadNetwork;
 			this.description = description;
 		}
-
 	}
-
 }
