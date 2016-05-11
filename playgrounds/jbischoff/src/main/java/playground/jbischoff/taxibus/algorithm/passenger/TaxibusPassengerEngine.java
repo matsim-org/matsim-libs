@@ -54,7 +54,7 @@ public class TaxibusPassengerEngine
             return false;
         }
 
-        boolean rejected = super.handleDeparture(now, agent, fromLinkId);
+        boolean rejected = (!super.handleDeparture(now, agent, fromLinkId));
 
         //FIXME
         //there is no dismissal of immediate requests; on the other hand, the prior solution was
@@ -74,8 +74,9 @@ public class TaxibusPassengerEngine
                         .error("no more aborted taxibus agents will be displayed");
             //		        	agent.setStateToAbort(now);
         }
+        	
         
-        return rejected;
+        return (!rejected);
     }
 
 

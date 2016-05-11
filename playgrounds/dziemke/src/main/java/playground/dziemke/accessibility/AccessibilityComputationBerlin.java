@@ -140,7 +140,7 @@ public class AccessibilityComputationBerlin {
 
 		// collect homes
 		String activityFacilityType = FacilityTypes.HOME;
-		final ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
+		final ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
 
 		final Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
@@ -156,7 +156,7 @@ public class AccessibilityComputationBerlin {
 						@Override
 						public ControlerListener get() {
 							GridBasedAccessibilityControlerListenerV3 listener =
-									new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType), ptMatrix, config, scenario, travelTimes, travelDisutilityFactories);
+									new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), ptMatrix, config, scenario, travelTimes, travelDisutilityFactories);
 							listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 							listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 							listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);

@@ -229,6 +229,7 @@ public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 			for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
 				newInstantaneousStateVector.set(i++,
 						this.occupancyAnalyser.getOccupancy_veh(stopId, bin));
+//				System.out.print(this.occupancyAnalyser.getOccupancy_veh(stopId, bin) + "...");
 			}
 			
 		}

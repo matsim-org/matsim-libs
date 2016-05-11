@@ -36,12 +36,13 @@ public class P0Controller {
 	public static void main(String[] args) {
 		
 		Config config = ConfigUtils.loadConfig("H:\\Mike Work\\input\\config.xml");
+//		Config config = ConfigUtils.loadConfig("/home/saleem/P0/input/config.xml");
 		config.network().setTimeVariantNetwork(true);
         Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		NetworkFactoryImpl nf = (NetworkFactoryImpl) scenario.getNetwork().getFactory();
 		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
-		controler.addControlerListener(new GenericP0ControlListener((NetworkImpl) scenario.getNetwork()));
+		controler.addControlerListener(new GenericP0ControlListener(scenario, (NetworkImpl) scenario.getNetwork()));
 		controler.run();
 	}
 

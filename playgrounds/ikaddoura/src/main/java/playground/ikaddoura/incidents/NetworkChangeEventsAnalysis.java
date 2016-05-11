@@ -63,17 +63,17 @@ public class NetworkChangeEventsAnalysis {
 	private Map<Id<Link>, double[]> averageLanes = new HashMap<>();
 	private Map<Id<Link>, double[]> standardDeviationLanes = new HashMap<>();
 
-	private final int TIMESTEP = 15 * 60;
-	private final boolean writeDetailedOutput = false;
-	private final boolean analyzeFreespeed = false;
+	private final int TIMESTEP = 3600 * 3;
+	private final boolean writeDetailedOutput = true;
+	private final boolean analyzeFreespeed = true;
 	private final boolean analyzeCapacity = false;
-	private final boolean analyzeLanes = true;
+	private final boolean analyzeLanes = false;
 
 	private int days;
 	private int timebins;
 	private int binsPerDay;
 	
-	private final String nceDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/berlin_2016-04-27/networkChangeEvents/";
+	private final String nceDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/berlin_2016-02-11-2016-04-26/workingDays/";
 	private final String networkFile = "../../../shared-svn/studies/ihab/berlin/network.xml";
 
 	public static void main(String[] args) {
@@ -166,10 +166,21 @@ public class NetworkChangeEventsAnalysis {
 		
 		calculateStatistics(scenario0);
 				
+		int morningTime = TIMESTEP * 2;
+		int nightTime = TIMESTEP * 0;
+		
 		if (writeDetailedOutput) {
 			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "freespeed_all");
+			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "freespeed_" + morningTime, morningTime);
+			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "freespeed_" + nightTime, nightTime);
+
 			if (analyzeCapacity) writeDetailedInformation(scenario0, this.capacities, "capacity_all");
+			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "capacity_" + morningTime, morningTime);
+			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "capacity_" + nightTime, nightTime);
+			
 			if (analyzeLanes) writeDetailedInformation(scenario0, this.lanes, "lanes_all");
+			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "lanes_" + morningTime, morningTime);
+			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "lanes_" + nightTime, nightTime);
 		}
 		
 		if (analyzeFreespeed) { 
@@ -189,6 +200,10 @@ public class NetworkChangeEventsAnalysis {
 	}
 
 	private void writeDetailedInformation(Scenario scenario, Map<Id<Link>, double[]> values, String filename) {
+		writeDetailedInformation(scenario, values, filename, -1);
+	}
+	
+	private void writeDetailedInformation(Scenario scenario, Map<Id<Link>, double[]> values, String filename, int analysisTime) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(nceDirectory + filename + ".csv");
 		BufferedWriter bwt = IOUtils.getBufferedWriter(nceDirectory + filename + ".csvt");
 		Locale.setDefault(Locale.US);
@@ -199,8 +214,15 @@ public class NetworkChangeEventsAnalysis {
 			bwt.append("\"String\";\"Real\";\"Real\";\"Real\";\"Real\"");
 			for (int day = 0; day < days; day++) {
 				for (int i = 0; i<24*3600;i=i+TIMESTEP ){
-					bw.append(";Day " + day + " Time: "+Time.writeTime(i));
-					bwt.append(";\"Real\"");
+					if (analysisTime == -1) {
+						bw.append(";Day " + day + " Time: "+Time.writeTime(i));
+						bwt.append(";\"Real\"");
+					} else {
+						if (i == analysisTime) {
+							bw.append(";Day " + day + " Time: "+Time.writeTime(i));
+							bwt.append(";\"Real\"");
+						}
+					}
 				}	
 			}
 			
@@ -216,8 +238,21 @@ public class NetworkChangeEventsAnalysis {
 				bw.append(";" + df.format(lanes));
 				bw.append(";" + df.format(length));
 				
+				int time = 0;
 				for (int i=0;i<e.getValue().length;i++){
-					bw.append(";" + df.format(e.getValue()[i]));
+					if (analysisTime == -1) {
+						bw.append(";" + df.format(e.getValue()[i]));
+					} else {
+						
+						if (time == analysisTime) {
+							bw.append(";" + df.format(e.getValue()[i]));
+						}
+						
+						time = time + TIMESTEP;
+						if (time >= 24 * 3600) {
+							time = 0;
+						}
+					}
 				}
 			}
 			bw.flush();

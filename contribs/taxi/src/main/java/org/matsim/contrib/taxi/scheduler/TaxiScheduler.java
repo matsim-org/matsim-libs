@@ -209,7 +209,7 @@ public class TaxiScheduler
         TaxiTask lastTask = Schedules.getLastTask(bestSched);
 
         if (lastTask.getTaxiTaskType() == TaxiTaskType.EMPTY_DRIVE) {
-            divertDriveToRequest((TaxiDriveTask)lastTask, vrpPath);
+            divertDriveToRequest((TaxiEmptyDriveTask)lastTask, vrpPath);
         }
         else if (lastTask.getTaxiTaskType() == TaxiTaskType.STAY) {
             scheduleDriveToRequest((TaxiStayTask)lastTask, vrpPath);
@@ -228,7 +228,7 @@ public class TaxiScheduler
     }
 
 
-    private void divertDriveToRequest(TaxiDriveTask lastTask, VrpPathWithTravelData vrpPath)
+    private void divertDriveToRequest(TaxiEmptyDriveTask lastTask, VrpPathWithTravelData vrpPath)
     {
         if (!params.vehicleDiversion) {
             throw new IllegalStateException();
@@ -263,7 +263,7 @@ public class TaxiScheduler
         }
 
         if (vrpPath.getLinkCount() > 1) {
-            bestSched.addTask(new TaxiDriveTask(vrpPath));
+            bestSched.addTask(new TaxiEmptyDriveTask(vrpPath));
         }
     }
 
@@ -292,7 +292,7 @@ public class TaxiScheduler
         }
 
         Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(veh.getSchedule());
-        TaxiDriveTask driveTask = (TaxiDriveTask)Schedules.getLastTask(schedule);
+        TaxiEmptyDriveTask driveTask = (TaxiEmptyDriveTask)Schedules.getLastTask(schedule);
 
         OnlineDriveTaskTracker tracker = (OnlineDriveTaskTracker)driveTask.getTaskTracker();
         LinkTimePair stopPoint = tracker.getDiversionPoint();
@@ -339,7 +339,7 @@ public class TaxiScheduler
         double t3 = pickupStayTask.getEndTime();
 
         VrpPathWithTravelData path = calcPath(reqFromLink, reqToLink, t3);
-        schedule.addTask(new TaxiDriveWithPassengerTask(path, req));
+        schedule.addTask(new TaxiOccupiedDriveTask(path, req));
 
         double t4 = path.getArrivalTime();
         double t5 = t4 + params.dropoffDuration;

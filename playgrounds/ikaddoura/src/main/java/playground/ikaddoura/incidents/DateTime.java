@@ -19,12 +19,15 @@
 
 package playground.ikaddoura.incidents;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
+
 
 
 /**
@@ -76,6 +79,7 @@ public class DateTime {
 		}
 					
 		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
 		Date date = sdf.parse(dateString + " 00:00:00");
 		long dateMilliSec = date.getTime();
 		double dateSec = (double) dateMilliSec / 1000.;
@@ -110,16 +114,31 @@ public class DateTime {
 		
 		Date date = new Date((long) (dateTimeInSec * 1000));
 		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd hh:mm:ss");
-		
+		sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
 		return sdf.format(date);
 	}
 	
 	public static String secToDateString(double dateTimeInSec) {
 		
-		Date date = new Date((long) (dateTimeInSec * 1000));
+		BigDecimal dateTimeInSec2 = BigDecimal.valueOf( dateTimeInSec ) ;
+		Date date = new Date( dateTimeInSec2.multiply(BigDecimal.valueOf(1000)).longValue() ) ;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
+		sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
 		String dateString = sdf.format(date);
 		return dateString;
+
+//		BigInteger secsAsInt = BigInteger.valueOf( (long) dateTimeInSec );
+//		if ( secsAsInt.longValue() == dateTimeInSec ) {
+//			Date date = new Date( secsAsInt.multiply(BigInteger.valueOf(1000)).longValue() ) ;
+//			SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
+//			String dateString = sdf.format(date);
+//			return dateString;
+//		} else {
+//			Date date = new Date((long) (dateTimeInSec * 1000));
+//			SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd");
+//			String dateString = sdf.format(date);
+//			return dateString;
+//		}
 	}
 }
 
