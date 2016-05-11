@@ -26,21 +26,33 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.DefaultRoutingModules;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -411,6 +423,129 @@ public class TransitRouterImplTest {
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testLongTransferTime() {
+		// 5 minutes additional transfer time
+		{	
+			TransferFixture f = new TransferFixture(5 * 60.0);
+			TransitRouterImpl router = new TransitRouterImpl(f.routerConfig, f.schedule);
+			Coord fromCoord = f.fromFacility.getCoord();
+			Coord toCoord = f.toFacility.getCoord();
+			List<Leg> legs = router.calcRoute(fromCoord, toCoord, 7.0*3600 + 50*60, null);
+			double legDuration = calcTripDuration(new ArrayList<PlanElement>(legs));
+			Assert.assertEquals(5, legs.size());
+			Assert.assertEquals(100, legs.get(0).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
+			Assert.assertEquals(800, legs.get(1).getTravelTime(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
+			Assert.assertEquals(304, legs.get(2).getTravelTime(), 0.0);	// 0.004km with 1m/s walk speed and additional waiting time -> 4s + 300s = 304s; arrival at 08:10:04
+			Assert.assertEquals(596, legs.get(3).getTravelTime(), 0.0);	// 4m 56s waiting for pt departure and 5m pt travel time -> 296s + 300s = 596s; arrival at 08:15:00
+			Assert.assertEquals(100, legs.get(4).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
+			Assert.assertEquals(1900.0, legDuration, 0.0);
+			
+			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario.getPopulation().getFactory(), 
+					f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
+			
+			TransitRouterWrapper routingModule = new TransitRouterWrapper(
+	        		router,
+	                f.schedule,
+	                f.scenario.getNetwork(), // use a walk router in case no PT path is found
+	                walkRoutingModule);
+			
+			TransitRouterWrapper wrapper = new TransitRouterWrapper(router, f.schedule, f.scenario.getNetwork(), routingModule);
+			List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
+			double tripDuration = calcTripDuration(planElements);
+			Assert.assertEquals(9, planElements.size());
+			Assert.assertEquals(100, ((Leg) planElements.get(0)).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
+			Assert.assertEquals(800, ((Leg) planElements.get(2)).getTravelTime(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
+			Assert.assertEquals(304, ((Leg) planElements.get(4)).getTravelTime(), 0.0);	// 0.004km with 1m/s walk speed and additional waiting time -> 4s + 300s = 304s; arrival at 08:10:04
+			Assert.assertEquals(596, ((Leg) planElements.get(6)).getTravelTime(), 0.0);	// 4m 56s waiting for pt departure and 5m pt travel time -> 296s + 300s = 596s; arrival at 08:15:00
+			Assert.assertEquals(100, ((Leg) planElements.get(8)).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
+			Assert.assertEquals(1900.0, tripDuration, 0.0);
+		}
+		
+		// 65 minutes additional transfer time - miss one departure
+		{
+			TransferFixture f = new TransferFixture(65 * 60.0);
+			TransitRouterImpl router = new TransitRouterImpl(f.routerConfig, f.schedule);
+			Coord fromCoord = f.fromFacility.getCoord();
+			Coord toCoord = f.toFacility.getCoord();
+			List<Leg> legs = router.calcRoute(fromCoord, toCoord, 7.0*3600 + 50*60, null);
+			double legDuration = calcTripDuration(new ArrayList<PlanElement>(legs));
+			Assert.assertEquals(5, legs.size());
+			Assert.assertEquals(100, legs.get(0).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
+			Assert.assertEquals(800, legs.get(1).getTravelTime(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
+			Assert.assertEquals(3904, legs.get(2).getTravelTime(), 0.0);	// 0.004km with 1m/s walk speed and additional waiting time -> 4s + 3900s = 3904s; arrival at 09:10:04
+			Assert.assertEquals(596, legs.get(3).getTravelTime(), 0.0);	// 4m 56s waiting for pt departure and 5m pt travel time -> 296s + 300s = 596s; arrival at 09:15:00
+			Assert.assertEquals(100, legs.get(4).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
+			Assert.assertEquals(5500.0, legDuration, 0.0);
+			
+			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario.getPopulation().getFactory(), 
+					f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
+			
+			TransitRouterWrapper routingModule = new TransitRouterWrapper(
+	        		router,
+	                f.schedule,
+	                f.scenario.getNetwork(), // use a walk router in case no PT path is found
+	                walkRoutingModule);
+			
+			TransitRouterWrapper wrapper = new TransitRouterWrapper(router, f.schedule, f.scenario.getNetwork(), routingModule);
+			List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
+			double tripDuration = calcTripDuration(planElements);
+			Assert.assertEquals(9, planElements.size());
+			Assert.assertEquals(100, ((Leg) planElements.get(0)).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
+			Assert.assertEquals(800, ((Leg) planElements.get(2)).getTravelTime(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
+			Assert.assertEquals(3904, ((Leg) planElements.get(4)).getTravelTime(), 0.0);	// 0.004km with 1m/s walk speed and additional waiting time -> 4s + 3900s = 3904s; arrival at 09:10:04
+			Assert.assertEquals(596, ((Leg) planElements.get(6)).getTravelTime(), 0.0);	// 4m 56s waiting for pt departure and 5m pt travel time -> 296s + 300s = 596s; arrival at 09:15:00
+			Assert.assertEquals(100, ((Leg) planElements.get(8)).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
+			Assert.assertEquals(5500.0, tripDuration, 0.0);
+		}
+		
+		// 600 minutes additional transfer time - miss all departures
+		{
+			TransferFixture f = new TransferFixture(600 * 60.0);
+			TransitRouterImpl router = new TransitRouterImpl(f.routerConfig, f.schedule);
+			Coord fromCoord = f.fromFacility.getCoord();
+			Coord toCoord = f.toFacility.getCoord();
+			List<Leg> legs = router.calcRoute(fromCoord, toCoord, 7.0*3600 + 50*60, null);
+			double legDuration = calcTripDuration(new ArrayList<PlanElement>(legs));
+			Assert.assertEquals(1, legs.size());
+			Assert.assertEquals(50000, legDuration, 1.0);
+			
+			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario.getPopulation().getFactory(), 
+					f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
+			
+			TransitRouterWrapper routingModule = new TransitRouterWrapper(
+	        		router,
+	                f.schedule,
+	                f.scenario.getNetwork(), // use a walk router in case no PT path is found
+	                walkRoutingModule);
+			
+			TransitRouterWrapper wrapper = new TransitRouterWrapper(router, f.schedule, f.scenario.getNetwork(), routingModule);
+			List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
+			double tripDuration = calcTripDuration(planElements);
+			Assert.assertEquals(1, planElements.size());
+			Assert.assertEquals(50000, tripDuration, 1.0);
+		}
+	}
+	
+	private static double calcTripDuration(List<PlanElement> planElements) {
+		double duration = 0.0;
+		for (PlanElement pe : planElements) {			
+			if (pe instanceof Activity) {
+				Activity act = (Activity) pe;
+				double endTime = act.getEndTime();
+				double startTime = act.getStartTime();
+				if (startTime != Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
+					duration += (endTime - startTime);
+				}
+			} else if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				duration += leg.getTravelTime();
+			}
+		}
+		return duration;
+	}
+	
 	/**
 	 * Generates the following network for testing:
 	 * <pre>
@@ -564,5 +699,131 @@ public class TransitRouterImplTest {
 		}
 
 	}
+	
+	/**
+	 * Generates the following network for testing:
+	 * <pre>
+	 *  (n) node
+	 *  [s] stop facilities
+	 *   l  link
+	 *  
+	 *  [0]       [1]
+	 *  (0)---0---(1)---1---(2)
+	 *            [2]       [3]
+	 *  
+	 * </pre>
+	 * 
+	 * Simple setup with one line from 0 to 1 and one from 2 to 3.
+	 * 
+	 * Departures are every 5 minutes. PT travel time from (1) to (2) and from (2) to (1) is one hour.
+	 * A short cut is realized via an entry in the transfer matrix (5 minutes).
+	 *
+	 * @author cdobler
+	 */
+	private static class TransferFixture {
+		
+		/*package*/ final Config config;
+		/*package*/ final Scenario scenario;
+		/*package*/ final TransitSchedule schedule;
+		/*package*/ final TransitRouterConfig routerConfig;
 
+		final TransitStopFacility stop0;
+		final TransitStopFacility stop1;
+		final TransitStopFacility stop2;
+		final TransitStopFacility stop3;
+
+		final ActivityFacility fromFacility;
+		final ActivityFacility toFacility;
+		
+		/*package*/ TransferFixture(double additionalTransferTime) {
+			this.config = ConfigUtils.createConfig();
+			this.config.transitRouter().setAdditionalTransferTime(additionalTransferTime);
+			this.scenario = ScenarioUtils.createScenario(this.config);
+			this.scenario.getConfig().transit().setUseTransit(true);
+			this.routerConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore(), this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(), this.scenario.getConfig().vspExperimental());
+			this.routerConfig.setSearchRadius(500.0);
+			this.routerConfig.setBeelineWalkConnectionDistance(100.0);
+			this.routerConfig.setBeelineWalkSpeed(1.0); // so the agents can walk the distance in 100 seconds
+
+			// network
+			Network network = this.scenario.getNetwork();
+			
+			Node node0 = network.getFactory().createNode(Id.create("0", Node.class), new Coord(0, 1000));
+			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new Coord(25000, 1000));
+			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new Coord(50000, 1000));
+			network.addNode(node0);
+			network.addNode(node1);
+			network.addNode(node2);
+
+			Link link0 = network.getFactory().createLink(Id.create("0", Link.class), node0, node1);
+			Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
+			network.addLink(link0);
+			network.addLink(link1);
+
+			// facilities
+			ActivityFacilities facilities = this.scenario.getActivityFacilities();
+			
+			this.fromFacility = facilities.getFactory().createActivityFacility(Id.create("fromFacility", ActivityFacility.class), new Coord(0, 1102));
+			this.toFacility = facilities.getFactory().createActivityFacility(Id.create("toFacility", ActivityFacility.class), new Coord(50000, 898));
+			facilities.addActivityFacility(this.fromFacility);
+			facilities.addActivityFacility(this.toFacility);			
+			
+			// schedule
+			this.schedule = this.scenario.getTransitSchedule();
+			TransitScheduleFactory sb = this.schedule.getFactory();
+
+			this.stop0 = sb.createTransitStopFacility(Id.create("0", TransitStopFacility.class), new Coord(0, 1002), false);
+			this.stop1 = sb.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(25000,  1002), false);
+			this.stop2 = sb.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord(25000, 998), false);
+			this.stop3 = sb.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord(50000, 998), false);
+			this.schedule.addStopFacility(this.stop0);
+			this.schedule.addStopFacility(this.stop1);
+			this.schedule.addStopFacility(this.stop2);
+			this.schedule.addStopFacility(this.stop3);
+			this.stop0.setLinkId(link0.getId());
+			this.stop1.setLinkId(link0.getId());
+			this.stop2.setLinkId(link1.getId());
+			this.stop3.setLinkId(link1.getId());
+			
+			// route from 0 to 1
+			{ 
+				TransitLine line0to1 = sb.createTransitLine(Id.create("0to1", TransitLine.class));
+				this.schedule.addTransitLine(line0to1);
+				NetworkRoute netRoute = new LinkNetworkRouteImpl(link0.getId(), link0.getId());
+				List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
+				netRoute.setLinkIds(link0.getId(), routeLinks, link0.getId());
+				List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+				stops.add(sb.createTransitRouteStop(this.stop0, Time.UNDEFINED_TIME, 0.0));
+				stops.add(sb.createTransitRouteStop(this.stop1, 5*60.0, Time.UNDEFINED_TIME));
+				TransitRoute route = sb.createTransitRoute(Id.create("0to1", TransitRoute.class), netRoute, stops, "train");
+				line0to1.addRoute(route);
+
+				route.addDeparture(sb.createDeparture(Id.create("l0to1 d0", Departure.class), 8.0*3600));	
+				route.addDeparture(sb.createDeparture(Id.create("l0to1 d1", Departure.class), 9.0*3600));
+				route.addDeparture(sb.createDeparture(Id.create("l0to1 d2", Departure.class), 10.0*3600));
+				route.addDeparture(sb.createDeparture(Id.create("l0to1 d3", Departure.class), 11.0*3600));
+				route.addDeparture(sb.createDeparture(Id.create("l0to1 d4", Departure.class), 12.0*3600));
+			}
+			
+			// route from 2 to 3
+			{ 
+				TransitLine line2to3 = sb.createTransitLine(Id.create("2to3", TransitLine.class));
+				this.schedule.addTransitLine(line2to3);
+				NetworkRoute netRoute = new LinkNetworkRouteImpl(link1.getId(), link1.getId());
+				List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
+				netRoute.setLinkIds(link1.getId(), routeLinks, link1.getId());
+				List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+				stops.add(sb.createTransitRouteStop(this.stop2, Time.UNDEFINED_TIME, 0.0));
+				stops.add(sb.createTransitRouteStop(this.stop3, 5*60.0, Time.UNDEFINED_TIME));
+				TransitRoute route = sb.createTransitRoute(Id.create("2to3", TransitRoute.class), netRoute, stops, "train");
+				line2to3.addRoute(route);
+
+				route.addDeparture(sb.createDeparture(Id.create("l2to3 d0", Departure.class), 8.0*3600 + 15 * 60));	
+				route.addDeparture(sb.createDeparture(Id.create("l2to3 d1", Departure.class), 9.0*3600 + 15 * 60));
+				route.addDeparture(sb.createDeparture(Id.create("l2to3 d2", Departure.class), 10.0*3600 + 15 * 60));
+				route.addDeparture(sb.createDeparture(Id.create("l2to3 d3", Departure.class), 11.0*3600 + 15 * 60));
+				route.addDeparture(sb.createDeparture(Id.create("l2to3 d4", Departure.class), 12.0*3600 + 15 * 60));
+			}
+		}
+	}
 }

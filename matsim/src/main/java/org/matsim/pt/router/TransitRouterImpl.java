@@ -104,6 +104,10 @@ public class TransitRouterImpl implements TransitRouter {
         return travelDisutility.getTravelTime(person, coord, toCoord);
     }
 
+    private double getTransferTime(Person person, Coord coord, Coord toCoord) {
+    	return travelDisutility.getTravelTime(person, coord, toCoord) + this.config.getAdditionalTransferTime();
+    }
+    
     private double getWalkDisutility(Person person, Coord coord, Coord toCoord) {
         return travelDisutility.getTravelDisutility(person, coord, toCoord);
     }
@@ -190,13 +194,17 @@ public class TransitRouterImpl implements TransitRouter {
 					    if (accessStop != egressStop) {
 						    if (accessStop != null) {
 							    leg = new LegImpl(TransportMode.transit_walk);
-							    double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord());
+//							    double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord());
+							    double transferTime = getTransferTime(person, accessStop.getCoord(), egressStop.getCoord());
 							    Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
-							    walkRoute.setTravelTime(walkTime);
+//							    walkRoute.setTravelTime(walkTime);
+							    walkRoute.setTravelTime(transferTime);
 								walkRoute.setDistance( currentDistance );
 							    leg.setRoute(walkRoute);
-							    leg.setTravelTime(walkTime);
-							    time += walkTime;
+//							    leg.setTravelTime(walkTime);
+							    leg.setTravelTime(transferTime);
+//							    time += walkTime;
+							    time += transferTime;
 							    legs.add(leg);
 						    } else { // accessStop == null, so it must be the first walk-leg
 								leg = new LegImpl(TransportMode.transit_walk);
