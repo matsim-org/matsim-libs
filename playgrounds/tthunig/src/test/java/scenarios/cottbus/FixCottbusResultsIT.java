@@ -57,9 +57,6 @@ public class FixCottbusResultsIT {
 	
 	private static final Logger log = Logger.getLogger(FixCottbusResultsIT.class);
 
-	private static final String INPUT_BASE_DIR = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/";
-	private static final String BTU_BASE_DIR = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
-	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
@@ -115,16 +112,16 @@ public class FixCottbusResultsIT {
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 
 		if (scenarioType.equals(ScenarioType.BaseCase)){
-			config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n.xml");
-			config.network().setLaneDefinitionsFile(INPUT_BASE_DIR + "lanes.xml");
-			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
+			config.network().setInputFile(testUtils.getClassInputDirectory() + "matsimData/network_wgs84_utm33n.xml.gz");
+			config.network().setLaneDefinitionsFile(testUtils.getClassInputDirectory() + "matsimData/lanes.xml");
+			config.plans().setInputFile(testUtils.getClassInputDirectory() + "matsimData/cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
 		} else { // BaseCaseContinued
-			config.network().setInputFile(BTU_BASE_DIR + "network_small_simplified.xml.gz");
-			config.network().setLaneDefinitionsFile(BTU_BASE_DIR + "lanes_network_small.xml.gz");
+			config.network().setInputFile(testUtils.getClassInputDirectory() + "btuOpt/network_small_simplified.xml.gz");
+			config.network().setLaneDefinitionsFile(testUtils.getClassInputDirectory() + "btuOpt/lanes_network_small.xml.gz");
 			if (scenarioType.equals(ScenarioType.BaseCaseContinued_MatsimRoutes))
-				config.plans().setInputFile(BTU_BASE_DIR + "trip_plans_from_morning_peak_ks_commodities_minFlow50.0.xml");
+				config.plans().setInputFile(testUtils.getClassInputDirectory() + "btuOpt/trip_plans_from_morning_peak_ks_commodities_minFlow50.0.xml");
 			else // BtuRoutes	
-				config.plans().setInputFile(BTU_BASE_DIR + "routeComparison/2015-03-10_sameEndTimes_ksOptRouteChoice_paths.xml");
+				config.plans().setInputFile(testUtils.getClassInputDirectory() + "btuOpt/2015-03-10_sameEndTimes_ksOptRouteChoice_paths.xml");
 		}
 		
 		// set number of iterations
@@ -136,15 +133,15 @@ public class FixCottbusResultsIT {
 		signalConfigGroup.setUseSignalSystems( true );
 		// set signal files
 		if (scenarioType.equals(ScenarioType.BaseCase)){
-			signalConfigGroup.setSignalSystemFile(INPUT_BASE_DIR + "signal_systems_no_13.xml");
+			signalConfigGroup.setSignalSystemFile(testUtils.getClassInputDirectory() + "matsimData/signal_systems_no_13.xml");
 		} else { // BaseCaseContinued
-			signalConfigGroup.setSignalSystemFile(BTU_BASE_DIR + "output_signal_systems_v2.0.xml.gz");
+			signalConfigGroup.setSignalSystemFile(testUtils.getClassInputDirectory() + "btuOpt/output_signal_systems_v2.0.xml.gz");
 		}
-		signalConfigGroup.setSignalGroupsFile(INPUT_BASE_DIR + "signal_groups_no_13.xml");
+		signalConfigGroup.setSignalGroupsFile(testUtils.getClassInputDirectory() + "matsimData/signal_groups_no_13.xml");
 		if (signalType.equals(SignalType.MS)){
-			signalConfigGroup.setSignalControlFile(INPUT_BASE_DIR + "signal_control_no_13.xml");
+			signalConfigGroup.setSignalControlFile(testUtils.getClassInputDirectory() + "matsimData/signal_control_no_13.xml");
 		} else { // SignalType.BTU_OPT
-			signalConfigGroup.setSignalControlFile(BTU_BASE_DIR + "btu/signal_control_opt.xml");
+			signalConfigGroup.setSignalControlFile(testUtils.getClassInputDirectory() + "btuOpt/signal_control_opt.xml");
 		}
 		
 		// set brain exp beta

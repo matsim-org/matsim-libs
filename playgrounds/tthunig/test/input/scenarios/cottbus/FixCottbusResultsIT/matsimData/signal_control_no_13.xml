@@ -1,0 +1,1030 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<signalControl xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalControl_v2.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <signalSystem refId="19">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="2209">
+                    <onset sec="0"/>
+                    <dropping sec="55"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2212">
+                    <onset sec="0"/>
+                    <dropping sec="55"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2201">
+                    <onset sec="60"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="17">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="2101">
+                    <onset sec="60"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2102">
+                    <onset sec="75"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2103">
+                    <onset sec="60"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2104">
+                    <onset sec="45"/>
+                    <dropping sec="70"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2105">
+                    <onset sec="45"/>
+                    <dropping sec="70"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2106">
+                    <onset sec="45"/>
+                    <dropping sec="55"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2107">
+                    <onset sec="30"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2108">
+                    <onset sec="30"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2109">
+                    <onset sec="30"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2110">
+                    <onset sec="0"/>
+                    <dropping sec="15"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2111">
+                    <onset sec="0"/>
+                    <dropping sec="25"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2112">
+                    <onset sec="0"/>
+                    <dropping sec="25"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="18">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="2001">
+                    <onset sec="0"/>
+                    <dropping sec="25"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2002">
+                    <onset sec="30"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2003">
+                    <onset sec="0"/>
+                    <dropping sec="25"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2004">
+                    <onset sec="0"/>
+                    <dropping sec="25"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2005">
+                    <onset sec="0"/>
+                    <dropping sec="25"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2006">
+                    <onset sec="30"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2007">
+                    <onset sec="45"/>
+                    <dropping sec="70"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2008">
+                    <onset sec="75"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2009">
+                    <onset sec="45"/>
+                    <dropping sec="70"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2010">
+                    <onset sec="75"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2011">
+                    <onset sec="45"/>
+                    <dropping sec="70"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2012">
+                    <onset sec="45"/>
+                    <dropping sec="70"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="16">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="1201">
+                    <onset sec="0"/>
+                    <dropping sec="42"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1204">
+                    <onset sec="0"/>
+                    <dropping sec="42"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1207">
+                    <onset sec="50"/>
+                    <dropping sec="82"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1210">
+                    <onset sec="50"/>
+                    <dropping sec="82"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="14">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="1101">
+                    <onset sec="60"/>
+                    <dropping sec="75"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1102">
+                    <onset sec="77"/>
+                    <dropping sec="87"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1103">
+                    <onset sec="60"/>
+                    <dropping sec="75"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1104">
+                    <onset sec="60"/>
+                    <dropping sec="75"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1105">
+                    <onset sec="60"/>
+                    <dropping sec="75"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1106">
+                    <onset sec="77"/>
+                    <dropping sec="87"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1107">
+                    <onset sec="0"/>
+                    <dropping sec="90"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1108">
+                    <onset sec="0"/>
+                    <dropping sec="10"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1109">
+                    <onset sec="0"/>
+                    <dropping sec="25"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1110">
+                    <onset sec="37"/>
+                    <dropping sec="57"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1111">
+                    <onset sec="12"/>
+                    <dropping sec="57"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1112">
+                    <onset sec="12"/>
+                    <dropping sec="57"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="12">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="1401">
+                    <onset sec="0"/>
+                    <dropping sec="42"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1402">
+                    <onset sec="0"/>
+                    <dropping sec="8"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1403">
+                    <onset sec="0"/>
+                    <dropping sec="42"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1404">
+                    <onset sec="10"/>
+                    <dropping sec="52"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1405">
+                    <onset sec="10"/>
+                    <dropping sec="52"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1406">
+                    <onset sec="44"/>
+                    <dropping sec="52"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1407">
+                    <onset sec="55"/>
+                    <dropping sec="75"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1408">
+                    <onset sec="55"/>
+                    <dropping sec="75"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1409">
+                    <onset sec="55"/>
+                    <dropping sec="75"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1410">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1411">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1412">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="21">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="2401">
+                    <onset sec="50"/>
+                    <dropping sec="65"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2402">
+                    <onset sec="50"/>
+                    <dropping sec="65"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2403">
+                    <onset sec="50"/>
+                    <dropping sec="65"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2407">
+                    <onset sec="70"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2408">
+                    <onset sec="70"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2409">
+                    <onset sec="70"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2410">
+                    <onset sec="0"/>
+                    <dropping sec="12"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2411">
+                    <onset sec="0"/>
+                    <dropping sec="45"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2412">
+                    <onset sec="0"/>
+                    <dropping sec="45"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2404">
+                    <onset sec="0"/>
+                    <dropping sec="12"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2405">
+                    <onset sec="0"/>
+                    <dropping sec="45"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2406">
+                    <onset sec="0"/>
+                    <dropping sec="45"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="20">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="2301">
+                    <onset sec="8"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2302">
+                    <onset sec="8"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2303">
+                    <onset sec="8"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2304">
+                    <onset sec="0"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2305">
+                    <onset sec="0"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2306">
+                    <onset sec="0"/>
+                    <dropping sec="5"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2307">
+                    <onset sec="43"/>
+                    <dropping sec="88"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2308">
+                    <onset sec="43"/>
+                    <dropping sec="88"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2309">
+                    <onset sec="43"/>
+                    <dropping sec="88"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2310">
+                    <onset sec="43"/>
+                    <dropping sec="88"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2311">
+                    <onset sec="43"/>
+                    <dropping sec="88"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2312">
+                    <onset sec="43"/>
+                    <dropping sec="88"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="23">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="2601">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2602">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2603">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2604">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2605">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2606">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2607">
+                    <onset sec="30"/>
+                    <dropping sec="87"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2608">
+                    <onset sec="30"/>
+                    <dropping sec="87"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2609">
+                    <onset sec="30"/>
+                    <dropping sec="87"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2610">
+                    <onset sec="30"/>
+                    <dropping sec="87"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2611">
+                    <onset sec="30"/>
+                    <dropping sec="87"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2612">
+                    <onset sec="30"/>
+                    <dropping sec="87"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="24">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="2701">
+                    <onset sec="0"/>
+                    <dropping sec="30"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2704">
+                    <onset sec="0"/>
+                    <dropping sec="30"/>
+                </signalGroupSettings>
+			    <signalGroupSettings refId="2707">
+                    <onset sec="35"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2710">
+                    <onset sec="35"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2713">
+                    <onset sec="35"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="25">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="2801">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2804">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2807">
+                    <onset sec="30"/>
+                    <dropping sec="57"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2810">
+                    <onset sec="30"/>
+                    <dropping sec="57"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="26">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="2901">
+                    <onset sec="0"/>
+                    <dropping sec="35"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2902">
+                    <onset sec="0"/>
+                    <dropping sec="35"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2904">
+                    <onset sec="0"/>
+                    <dropping sec="35"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2905">
+                    <onset sec="0"/>
+                    <dropping sec="35"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2907">
+                    <onset sec="40"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2910">
+                    <onset sec="40"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="2911">
+                    <onset sec="40"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="27">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="3001">
+                    <onset sec="0"/>
+                    <dropping sec="50"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3003">
+                    <onset sec="0"/>
+                    <dropping sec="50"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3004">
+                    <onset sec="0"/>
+                    <dropping sec="30"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3007">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3008">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3010">
+                    <onset sec="55"/>
+                    <dropping sec="75"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="28">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="3201">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3202">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3203">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3204">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3205">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3206">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3207">
+                    <onset sec="0"/>
+                    <dropping sec="50"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3208">
+                    <onset sec="0"/>
+                    <dropping sec="15"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3209">
+                    <onset sec="0"/>
+                    <dropping sec="50"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3210">
+                    <onset sec="20"/>
+                    <dropping sec="50"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3211">
+                    <onset sec="20"/>
+                    <dropping sec="50"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3212">
+                    <onset sec="20"/>
+                    <dropping sec="50"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="29">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="3101">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3102">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3104">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3105">
+                    <onset sec="0"/>
+                    <dropping sec="27"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3107">
+                    <onset sec="50"/>
+                    <dropping sec="70"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3110">
+                    <onset sec="30"/>
+                    <dropping sec="45"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3111">
+                    <onset sec="30"/>
+                    <dropping sec="60"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="3">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="3501">
+                    <onset sec="0"/>
+                    <dropping sec="35"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3504">
+                    <onset sec="10"/>
+                    <dropping sec="60"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3506">
+                    <onset sec="40"/>
+                    <dropping sec="60"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3507">
+                    <onset sec="65"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3510">
+                    <onset sec="65"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <!--signalSystem refId="2">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="1709">
+                    <onset sec="0"/>
+                    <dropping sec="90"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1712">
+                    <onset sec="0"/>
+                    <dropping sec="90"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem-->
+    <!--signalSystem refId="10">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="3901">
+                    <onset sec="0"/>
+                    <dropping sec="45"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3904">
+                    <onset sec="0"/>
+                    <dropping sec="34"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem-->
+    <signalSystem refId="1">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="1901">
+                    <onset sec="15"/>
+                    <dropping sec="50"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1902">
+                    <onset sec="0"/>
+                    <dropping sec="10"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1903">
+                    <onset sec="15"/>
+                    <dropping sec="50"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1904">
+                    <onset sec="15"/>
+                    <dropping sec="50"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1905">
+                    <onset sec="15"/>
+                    <dropping sec="50"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1906">
+                    <onset sec="0"/>
+                    <dropping sec="10"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1907">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1908">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1909">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1910">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1911">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1912">
+                    <onset sec="55"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="7">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="3301">
+                    <onset sec="0"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3302">
+                    <onset sec="45"/>
+                    <dropping sec="60"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3304">
+                    <onset sec="0"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3305">
+                    <onset sec="0"/>
+                    <dropping sec="40"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3310">
+                    <onset sec="65"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3311">
+                    <onset sec="45"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="6">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="1502">
+                    <onset sec="65"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1503">
+                    <onset sec="65"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1508">
+                    <onset sec="24"/>
+                    <dropping sec="60"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1509">
+                    <onset sec="0"/>
+                    <dropping sec="60"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1511">
+                    <onset sec="0"/>
+                    <dropping sec="20"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1512">
+                    <onset sec="0"/>
+                    <dropping sec="20"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="5">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="1801">
+                    <onset sec="50"/>
+                    <dropping sec="65"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1802">
+                    <onset sec="70"/>
+                    <dropping sec="80"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1803">
+                    <onset sec="50"/>
+                    <dropping sec="65"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1804">
+                    <onset sec="50"/>
+                    <dropping sec="65"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1805">
+                    <onset sec="50"/>
+                    <dropping sec="65"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1806">
+                    <onset sec="70"/>
+                    <dropping sec="80"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1807">
+                    <onset sec="0"/>
+                    <dropping sec="30"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1808">
+                    <onset sec="0"/>
+                    <dropping sec="10"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1809">
+                    <onset sec="0"/>
+                    <dropping sec="30"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1810">
+                    <onset sec="35"/>
+                    <dropping sec="45"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1811">
+                    <onset sec="15"/>
+                    <dropping sec="45"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1812">
+                    <onset sec="15"/>
+                    <dropping sec="45"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <!--signalSystem refId="4">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="3601">
+                    <onset sec="0"/>
+                    <dropping sec="90"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3603">
+                    <onset sec="0"/>
+                    <dropping sec="90"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3606">
+                    <onset sec="0"/>
+                    <dropping sec="90"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3607">
+                    <onset sec="0"/>
+                    <dropping sec="90"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem-->
+    <signalSystem refId="9">
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="3401">
+                    <onset sec="0"/>
+                    <dropping sec="55"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3404">
+                    <onset sec="0"/>
+                    <dropping sec="55"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="3407">
+                    <onset sec="60"/>
+                    <dropping sec="80"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+    <signalSystem refId="8" >
+        <signalSystemController>
+            <controllerIdentifier>DefaultPlanbasedSignalSystemController</controllerIdentifier>
+            <signalPlan id="1">
+                <start daytime="00:00:00"/>
+                <stop daytime="00:00:00"/>
+                <cycleTime sec="90"/>
+                <offset sec="3"/>
+                <signalGroupSettings refId="1609">
+                    <onset sec="0"/>
+                    <dropping sec="48"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1612">
+                    <onset sec="10"/>
+                    <dropping sec="58"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1601">
+                    <onset sec="65"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+                <signalGroupSettings refId="1604">
+                    <onset sec="65"/>
+                    <dropping sec="85"/>
+                </signalGroupSettings>
+            </signalPlan>
+        </signalSystemController>
+    </signalSystem>
+</signalControl>
