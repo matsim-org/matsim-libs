@@ -113,6 +113,8 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		
 		// say that the effective walk time is the transfer time minus some "buffer"
 		double walktime = transfertime - waittime;
+		// (this looks like walktime might become negative.  But at least in the default version, the additional transfer time is always
+		// _added_ to the walk time (see getLinkTravelTime below) so at least in that case this cannot happen.  kai, triggered by cd, may'16)
 		
 		double walkDistance = link.getLength() ;
 		
