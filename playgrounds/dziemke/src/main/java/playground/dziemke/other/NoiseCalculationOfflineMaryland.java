@@ -143,7 +143,7 @@ public class NoiseCalculationOfflineMaryland {
 		merger.setWorkingDirectory(workingDirectories);
 		merger.setLabel(labels);
 		merger.setOutputFormat(OutputFormat.xyt);
-		merger.setThreshold(-1.);
+		merger.setThreshold(-1.); // Kai uses "1" here
 		merger.run();
 	}
 }
