@@ -33,14 +33,12 @@ public class DirectionChangeWarning extends AbstractPlausibilityWarning {
 	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
 	public static Map<TransitRoute, Integer> routeStat = new HashMap<>();
 
-	private final Link link1;
-	private final Link link2;
 	private final double diff;
 
 	public DirectionChangeWarning(TransitLine transitLine, TransitRoute transitRoute, Link link1, Link link2, double diff) {
 		super(PlausibilityCheck.DIRECTION_CHANGE_WARNING, transitLine, transitRoute);
-		this.link1 = link1;
-		this.link2 = link2;
+		this.fromId = link1.getId().toString();
+		this.toId = link2.getId().toString();
 		this.diff = diff;
 
 		expected = 0;
@@ -55,6 +53,6 @@ public class DirectionChangeWarning extends AbstractPlausibilityWarning {
 
 	@Override
 	public String toString() {
-		return "\tDIRECTION CHANGE\tlinks: "+link1.getId()+"\t->\t"+link2.getId()+"\t\tdifference: "+diff*200/Math.PI +" gon";
+		return "\tDIRECTION CHANGE\tlinks: "+fromId+"\t->\t"+toId+"\t\tdifference: "+diff*200/Math.PI +" gon";
 	}
 }

@@ -31,13 +31,11 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.*;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.polettif.publicTransitMapping.plausibility.log.*;
 import playground.polettif.publicTransitMapping.tools.CsvTools;
+import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
@@ -101,8 +99,8 @@ public class PlausibilityCheck {
 		 */
 
 //		check.printResultByLink();
-		check.writeCsvResultsBySchedule(args[2] + "plausibilityWarningsSchedule.csv");
-		check.writeCsvResultsByLinkId(args[2] + "plausibilityWarningsLinkIds.csv");
+		check.writeCsv(args[2] + "allPlausibilityWarnings.csv");
+//		check.writeCsvResultsByLinkId(args[2] + "plausibilityWarningsLinkIds.csv");
 		check.writeResultShapeFiles(args[2]);
 	}
 
@@ -135,13 +133,7 @@ public class PlausibilityCheck {
 						double ttSchedule = nextStop.getArrivalOffset() - departTime;
 						if(ttActual > ttSchedule) {
 							PlausibilityWarning warning = new TravelTimeWarning(transitLine, transitRoute, previousStop, nextStop, ttActual, ttSchedule);
-
-							MapUtils.getSet(transitRoute, MapUtils.getMap(transitLine, this.warningsSchedule)).add(warning);
-							MapUtils.getSet(warning.getLinkIds(), warningsLinkIds).add(warning);
-
-							for(Id<Link> linkId : warning.getLinkIds()) {
-								MapUtils.getSet(linkId, warningsLinks).add(warning);
-							}
+							addWarningToContainers(warning);
 						}
 						// reset
 						ttActual = 0;
@@ -160,70 +152,33 @@ public class PlausibilityCheck {
 					double angleDiff = getAzimuthDiff(linkFrom, linkTo);
 					if(Math.abs(angleDiff) > uTurnAngleThreshold && linkFrom.getLength() > 0 && linkTo.getLength() > 0 && angleDiff != PI) {
 						PlausibilityWarning warning = new DirectionChangeWarning(transitLine, transitRoute, linkFrom, linkTo, angleDiff);
-						MapUtils.getSet(transitRoute, MapUtils.getMap(transitLine, this.warningsSchedule)).add(warning);
-//						MapUtils.getSet(warning.getLinkIds(), this.warningsLinkIds).add(warning);
+						addWarningToContainers(warning);
 					}
 				}
 
-				// todo more efficient loop checking
+				// get "loop" that are part of a bigger loop
 				Set<List<Id<Link>>> subsetLoops = new HashSet<>();
 				for(List<Id<Link>> loop1 : loops) {
 					for(List<Id<Link>> loop2 : loops) {
-						if(!loop1.equals(loop2) && listIsSubset(loop1, loop2)) {
+						if(!loop1.equals(loop2) && MiscUtils.listIsSubset(loop1, loop2)) {
 							subsetLoops.add(loop1);
 						}
 					}
 				}
-
+				// add LoopWarning
 				for(List<Id<Link>> loop : loops) {
 					if(!subsetLoops.contains(loop)) {
 						PlausibilityWarning warning = new LoopWarning(transitLine, transitRoute, loop);
-						MapUtils.getSet(transitRoute, MapUtils.getMap(transitLine, this.warningsSchedule)).add(warning);
-						MapUtils.getSet(warning.getLinkIds(), this.warningsLinkIds).add(warning);
+						addWarningToContainers(warning);
 					}
-				}
-			}
-		}
-	}
-
-	public void printResultByTransitRoute() {
-		for(Map.Entry<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> e : warningsSchedule.entrySet()) {
-			p("\n#################################\n" + e.getKey().getId());
-			for(Map.Entry<TransitRoute, Set<PlausibilityWarning>> e2 : e.getValue().entrySet()) {
-				p("\t" + e2.getKey().getId());
-				for(PlausibilityWarning l : e2.getValue()) {
-					System.out.println("\t" + l);
-				}
-			}
-		}
-	}
-
-	public void printResultByLink() {
-		for(Map.Entry<Id<Link>, Set<PlausibilityWarning>> e : warningsLinks.entrySet()) {
-			System.out.println("Link " + e.getKey().toString());
-			Set<Tuple<Object, Object>> stopPairs = new HashSet<>();
-			for(PlausibilityWarning warning : e.getValue()) {
-				if(stopPairs.add(warning.getPair())) {
-						System.out.println(warning);
 				}
 			}
 		}
 	}
 
 	public void writeCsv(String outputFile) {
-
-	}
-
-	public void writeCsvResultsBySchedule(String outputFile) {
 		List<String> csvLines = new ArrayList<>();
-		csvLines.add("WarningType" + PlausibilityCheck.CsvSeparator +
-				"TransitLine" + PlausibilityCheck.CsvSeparator +
-				"TransitRoute" + PlausibilityCheck.CsvSeparator +
-				"fromId" + PlausibilityCheck.CsvSeparator +
-				"toId" + PlausibilityCheck.CsvSeparator +
-				"diff" + PlausibilityCheck.CsvSeparator +
-				"expected" + PlausibilityCheck.CsvSeparator +
-				"actual");
+		csvLines.add(AbstractPlausibilityWarning.CSV_HEADER);
 		for(Map.Entry<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> e : warningsSchedule.entrySet()) {
 			for(Map.Entry<TransitRoute, Set<PlausibilityWarning>> e2 : e.getValue().entrySet()) {
 				for(PlausibilityWarning warning : e2.getValue()) {
@@ -232,21 +187,7 @@ public class PlausibilityCheck {
 			}
 		}
 		try {
-			CsvTools.writeToFile(csvLines, outputFile);
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void writeCsvResultsByLinkId(String outputFile) {
-		List<String> csvLines = new ArrayList<>();
-		for(Map.Entry<Id<Link>, Set<PlausibilityWarning>> e : warningsLinks.entrySet()) {
-			for(PlausibilityWarning warning : e.getValue()) {
-				csvLines.addAll(warning.getCsvLineForEachLink());
-			}
-		}
-
-		try {
+			log.info("Writing warnings to csv file " +outputFile +" ...");
 			CsvTools.writeToFile(csvLines, outputFile);
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -254,21 +195,21 @@ public class PlausibilityCheck {
 	}
 
 	public void writeResultShapeFiles(String outputPath) {
+		log.info("Writing warnings shapefiles in folder " + outputPath + " ...");
+
 		Collection<SimpleFeature> traveltTimeWarningsFeatures = new ArrayList<>();
 		Collection<SimpleFeature> loopWarningsFeatures = new ArrayList<>();
+		Collection<SimpleFeature> directionChangeWarningsFeatures = new ArrayList<>();
 		Map<List<Id<Link>>, SimpleFeature> uniqueFeatures = new HashMap<>();
 
 		PolylineFeatureFactory travelTimeWarningsFF = new PolylineFeatureFactory.Builder()
 				.setName("TravelTimeWarnings")
 				.setCrs(MGC.getCRS("EPSG:2056"))
-				.addAttribute("type", String.class)
-				.addAttribute("line", String.class)
-				.addAttribute("route", String.class)
-				.addAttribute("from", String.class)
-				.addAttribute("to", String.class)
-				.addAttribute("diff", Double.class)
-				.addAttribute("exp", Double.class)
-				.addAttribute("act", Double.class)
+				.addAttribute("warningIds", String.class)
+				.addAttribute("routeIds", String.class)
+				.addAttribute("linkIds", String.class)
+				.addAttribute("diff_min", Double.class)
+				.addAttribute("diff_max", Double.class)
 				.create();
 
 		PolylineFeatureFactory loopWarningsFF = new PolylineFeatureFactory.Builder()
@@ -279,22 +220,78 @@ public class PlausibilityCheck {
 				.addAttribute("linkIds", String.class)
 				.create();
 
-		// route through all linkidlists
+		PolylineFeatureFactory directionChangeWarnings = new PolylineFeatureFactory.Builder()
+				.setName("DirectionChangeWarnings")
+				.setCrs(MGC.getCRS("EPSG:2056"))
+				.addAttribute("warningIds", String.class)
+				.addAttribute("routeIds", String.class)
+				.addAttribute("linkIds", String.class)
+				.addAttribute("diff [rad]", String.class)
+				.addAttribute("diff [gon]", String.class)
+				.create();
+
+		// route through all linkIdLists
 		for(Map.Entry<List<Id<Link>>, Set<PlausibilityWarning>> e : warningsLinkIds.entrySet()) {
 			boolean createLoopFeature = false;
 			boolean createTravelTimeFeature = false;
 			boolean createDirectionChangeFeature = false;
 
+			double diffMin = Double.MAX_VALUE, diffMax = 0.0, azDiff = 0.0;
+
+
 			Set<Id<PlausibilityWarning>> warningIds = new HashSet<>();
 			Set<String> routeIds = new HashSet<>();
 
 			for(PlausibilityWarning w : e.getValue()) {
+				// Travel Time Warnings
+				if(w instanceof TravelTimeWarning) {
+					createTravelTimeFeature = true;
+					if(w.getDifference() < diffMin) {
+						diffMin = w.getDifference();
+					}
+					if(w.getDifference() > diffMax) {
+						diffMax = w.getDifference();
+					}
+					warningIds.add(w.getId());
+					routeIds.add(w.getTransitLine().getId() + ":" + w.getTransitRoute().getId());
+				}
+
+				// Direction Change Warnings
+				if(w instanceof DirectionChangeWarning) {
+					createDirectionChangeFeature = true;
+					warningIds.add(w.getId());
+					routeIds.add(w.getTransitLine().getId() + ":" + w.getTransitRoute().getId());
+					azDiff = w.getDifference();
+				}
+
 				// Loop Warnings
 				if(w instanceof LoopWarning) {
 					createLoopFeature = true;
 					warningIds.add(w.getId());
 					routeIds.add(w.getTransitLine().getId() + ":" + w.getTransitRoute().getId());
 				}
+			}
+
+			// Travel Time Warnings
+			if(createTravelTimeFeature) {
+				SimpleFeature f = travelTimeWarningsFF.createPolyline(linkIdList2Coordinates(e.getKey()));
+				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
+				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
+				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
+				f.setAttribute("diff_min", diffMin);
+				f.setAttribute("diff_max", diffMax);
+				traveltTimeWarningsFeatures.add(f);
+			}
+
+			// Direction Change Warning
+			if(createDirectionChangeFeature) {
+				SimpleFeature f = directionChangeWarnings.createPolyline(linkIdList2Coordinates(e.getKey()));
+				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
+				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
+				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
+				f.setAttribute("diff [rad]", azDiff);
+				f.setAttribute("diff [gon]", 200*azDiff/Math.PI);
+				directionChangeWarningsFeatures.add(f);
 			}
 
 			// Loop Warnings
@@ -307,75 +304,20 @@ public class PlausibilityCheck {
 			}
 		}
 
-		ShapeFileWriter.writeGeometries(loopWarningsFeatures, outputPath + "loopWarnings.shp");
-
-		// one feature for every warningsSchedule
-		/*
-		for(Map<TransitRoute, Set<PlausibilityWarning>> e : warningsSchedule.values()) {
-			for(Set<PlausibilityWarning> e2 : e.values()) {
-				for(PlausibilityWarning logMessage : e2) {
-					SimpleFeature f = travelTimeWarningsFF.createPolyline(logMessage.getCoordinates());
-					f.setAttribute("type", 	logMessage.getType());
-					f.setAttribute("line", 	logMessage.getTransitLine().getId());
-					f.setAttribute("route",	logMessage.getTransitRoute().getId());
-					f.setAttribute("from", 	logMessage.getFromId());
-					f.setAttribute("to", 	logMessage.getToId());
-					f.setAttribute("diff", 	logMessage.getDifference());
-					f.setAttribute("exp", 	logMessage.getExpected());
-					f.setAttribute("act", 	logMessage.getActual());
-					traveltTimeWarningsfeatures.add(f);
-				}
-			}
-		}
-*/
-
-		/*
-		for(Map<TransitRoute, TreeSet<PlausibilityWarning>> e : warningsSchedule.values()) {
-			for(TreeSet<PlausibilityWarning> e2 : e.values()) {
-				for(PlausibilityWarning warning : e2) {
-					if(uniqueFeatures.containsKey(warning.getCoordinates())) {
-						SimpleFeature f = uniqueFeatures.get(warning.getLinkIds());
-						Set<String> routesAttr = CollectionUtils.stringToSet((String) f.getAttribute("routes"));
-						routesAttr.add(warning.getTransitRoute().getId().toString());
-						f.setAttribute("routes", CollectionUtils.setToString(routesAttr));
-					} else {
-						SimpleFeature f = travelTimeWarningsFF.createPolyline(warning.getCoordinates());
-						f.setAttribute("type", 	warning.getType());
-						f.setAttribute("line", 	warning.getTransitLine().getId());
-						f.setAttribute("route", warning.getTransitRoute().getId());
-						f.setAttribute("from", 	warning.getFromId());
-						f.setAttribute("to", 	warning.getToId());
-						f.setAttribute("diff", 	warning.getDifference());
-						f.setAttribute("exp", 	warning.getExpected());
-						f.setAttribute("act", 	warning.getActual());
-						features.add(f);
-						uniqueFeatures.put(warning.getLinkIds(), f);
-					}
-				}
-			}
-		}
-*/
-
-//		ShapeFileWriter.writeGeometries(uniqueFeatures.values(), outFile);
+		ShapeFileWriter.writeGeometries(traveltTimeWarningsFeatures, outputPath + "TravelTimeWarnings.shp");
+		ShapeFileWriter.writeGeometries(directionChangeWarningsFeatures, outputPath + "DirectionChangeWarnings.shp");
+		ShapeFileWriter.writeGeometries(loopWarningsFeatures, outputPath + "LoopWarnings.shp");
 	}
 
-	public void printSummary() {
-		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
-			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				System.out.println(transitRoute.getId());
-				System.out.println("    tt:   " + TravelTimeWarning.routeStat.get(transitRoute));
-				System.out.println("    loop: " + LoopWarning.routeStat.get(transitRoute));
-				System.out.println("    dir:  " + DirectionChangeWarning.routeStat.get(transitRoute));
-			}
-		}
-	}
+	/**
+	 * Adds a warning object to the different data containers.
+	 */
+	private void addWarningToContainers(PlausibilityWarning warning) {
+		MapUtils.getSet(warning.getTransitRoute(), MapUtils.getMap(warning.getTransitLine(), this.warningsSchedule)).add(warning);
+		MapUtils.getSet(warning.getLinkIds(), warningsLinkIds).add(warning);
 
-	public void printLineSummary() {
-		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
-			System.out.println(transitLine.getId());
-			System.out.println("    tt:   " + TravelTimeWarning.lineStat.get(transitLine));
-			System.out.println("    loop: " + LoopWarning.lineStat.get(transitLine));
-			System.out.println("    dir:  " + DirectionChangeWarning.lineStat.get(transitLine));
+		for(Id<Link> linkId : warning.getLinkIds()) {
+			MapUtils.getSet(linkId, warningsLinks).add(warning);
 		}
 	}
 
@@ -402,7 +344,7 @@ public class PlausibilityCheck {
 	 * @param link2
 	 * @return the difference in [rad]
 	 */
-	private double getAzimuthDiff(Link link1, Link link2) {
+	private static double getAzimuthDiff(Link link1, Link link2) {
 		Coord c1 = link1.getFromNode().getCoord();
 		Coord c2 = link2.getToNode().getCoord();
 
@@ -414,53 +356,101 @@ public class PlausibilityCheck {
 		double az2 = getAzimuth(link2.getFromNode().getCoord(), c2);
 		double diff = Math.abs(az2 - az1);
 
-		if(diff > PI) {
-			diff = PI2 - diff;
-		}
-
-		return (diff > PI2 ? diff - PI2 : diff);
+		return (diff > PI ? PI2 - diff : diff);
 	}
 
-
-	public static <K, V> TreeSet<V> getTreeSet(
-			final K key,
-			final Map<K, TreeSet<V>> map) {
-		TreeSet<V> coll = map.get(key);
-
-		if(coll == null) {
-			coll = new TreeSet<>();
-			map.put(key, coll);
-		}
-
-		return coll;
-	}
 
 	private void p(Object s) {
 		System.out.println(s);
 	}
 
-	/**
-	 * Checks whether list1 is a subset of list2. Returns false
-	 * if list1 is greater than list 2.
-	 */
-	public <E> boolean listIsSubset(List<E> list1, List<E> list2) {
-		if(list1.size() > list2.size()) {
-			return false;
-		}
-		for(int i = 0; i < list2.size(); i++) {
-			E e = list2.get(i);
-			if(e.equals(list1.get(0))) {
-				for(int j = 0; j < list1.size(); j++) {
-					if((i+j) >= list2.size()) {
-						return false;
-					}
-					if(!list1.get(j).equals(list2.get(i + j))) {
-						return false;
-					}
+
+
+	@Deprecated
+	public void writeCsvResultsBySchedule(String outputFile) {
+		List<String> csvLines = new ArrayList<>();
+		csvLines.add("WarningType" + PlausibilityCheck.CsvSeparator +
+				"TransitLine" + PlausibilityCheck.CsvSeparator +
+				"TransitRoute" + PlausibilityCheck.CsvSeparator +
+				"fromId" + PlausibilityCheck.CsvSeparator +
+				"toId" + PlausibilityCheck.CsvSeparator +
+				"diff" + PlausibilityCheck.CsvSeparator +
+				"expected" + PlausibilityCheck.CsvSeparator +
+				"actual");
+		for(Map.Entry<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> e : warningsSchedule.entrySet()) {
+			for(Map.Entry<TransitRoute, Set<PlausibilityWarning>> e2 : e.getValue().entrySet()) {
+				for(PlausibilityWarning warning : e2.getValue()) {
+					csvLines.add(warning.getCsvLine());
 				}
-				return true;
 			}
 		}
-		return false;
+		try {
+			CsvTools.writeToFile(csvLines, outputFile);
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Deprecated
+	public void writeCsvResultsByLinkId(String outputFile) {
+		List<String> csvLines = new ArrayList<>();
+		for(Map.Entry<Id<Link>, Set<PlausibilityWarning>> e : warningsLinks.entrySet()) {
+			for(PlausibilityWarning warning : e.getValue()) {
+				csvLines.addAll(warning.getCsvLineForEachLink());
+			}
+		}
+
+		try {
+			CsvTools.writeToFile(csvLines, outputFile);
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	public void printSummary() {
+		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				System.out.println(transitRoute.getId());
+				System.out.println("    tt:   " + TravelTimeWarning.routeStat.get(transitRoute));
+				System.out.println("    loop: " + LoopWarning.routeStat.get(transitRoute));
+				System.out.println("    dir:  " + DirectionChangeWarning.routeStat.get(transitRoute));
+			}
+		}
+	}
+
+	public void printLineSummary() {
+		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
+			System.out.println(transitLine.getId());
+			System.out.println("    tt:   " + TravelTimeWarning.lineStat.get(transitLine));
+			System.out.println("    loop: " + LoopWarning.lineStat.get(transitLine));
+			System.out.println("    dir:  " + DirectionChangeWarning.lineStat.get(transitLine));
+		}
+	}
+
+	@Deprecated
+	public void printResultByTransitRoute() {
+		for(Map.Entry<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> e : warningsSchedule.entrySet()) {
+			p("\n#################################\n" + e.getKey().getId());
+			for(Map.Entry<TransitRoute, Set<PlausibilityWarning>> e2 : e.getValue().entrySet()) {
+				p("\t" + e2.getKey().getId());
+				for(PlausibilityWarning l : e2.getValue()) {
+					System.out.println("\t" + l);
+				}
+			}
+		}
+	}
+
+	@Deprecated
+	public void printResultByLink() {
+		for(Map.Entry<Id<Link>, Set<PlausibilityWarning>> e : warningsLinks.entrySet()) {
+			System.out.println("Link " + e.getKey().toString());
+			Set<Tuple<Object, Object>> stopPairs = new HashSet<>();
+			for(PlausibilityWarning warning : e.getValue()) {
+				if(stopPairs.add(warning.getPair())) {
+					System.out.println(warning);
+				}
+			}
+		}
 	}
 }

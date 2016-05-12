@@ -26,8 +26,17 @@ import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfi
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Creates a default publicTransitMapping config file.
+ *
+ * @author polettif
+ */
 public class CreateDefaultConfig {
-	
+
+	/**
+	 * Creates a default publicTransitMapping config file.
+	 * @param args [0] default config filename
+	 */
 	public static void main(final String[] args) {
 		Config config = ConfigUtils.createConfig();
 
