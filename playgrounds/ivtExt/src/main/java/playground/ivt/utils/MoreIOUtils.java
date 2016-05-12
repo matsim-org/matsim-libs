@@ -49,6 +49,17 @@ public class MoreIOUtils {
 		//no instanciation 
 	}
 
+	public static File checkFile(final String file) {
+		final File f = new File( file +"/" );
+
+		log.info( "Check if file "+file+" does not exist" );
+		if ( f.exists() ) {
+			throw new IllegalStateException( "file "+file+" exists!" );
+		}
+
+		return f;
+	}
+
 	public static File checkDirectory(final String outputDir) {
 		final File f = new File( outputDir +"/" );
 
