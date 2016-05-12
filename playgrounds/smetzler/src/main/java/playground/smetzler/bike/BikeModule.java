@@ -10,7 +10,7 @@ public class BikeModule extends AbstractModule {
 	@Override
 	public void install() {
 
-		bind(PrepareForSim.class).to(BikePrepareForSimImpl.class);
+//		bind(PrepareForSim.class).to(BikePrepareForSimImpl.class);
 		addTravelTimeBinding("bike").to(BikeTravelTime.class);
 
 		addTravelDisutilityFactoryBinding("bike").to(BikeTravelDisutilityFactory.class);
@@ -19,7 +19,7 @@ public class BikeModule extends AbstractModule {
 		//analog zu RunMobsimWithMultipleModeVehiclesExample, sorgt momentan lediglich dafuer dass die maxSpeed und PCU eingestellt ist.
 		
 		//fuer equil ohne qsim
-		//bindMobsim().toProvider(BikeQSimFactory.class);
+		bindMobsim().toProvider(BikeQSimFactory.class);
 	}
 }
 
