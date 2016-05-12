@@ -192,6 +192,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		return vehArrivalTime ;		
 	}
 
+	@Override
 	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
 		//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
 		double timeCost = - getTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
@@ -203,6 +204,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		return timeCost + distanceCost ;
 	}
 
+	@Override
 	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
 		double distance = CoordUtils.calcEuclideanDistance(coord, toCoord);
 		double initialTime = distance / config.getBeelineWalkSpeed();
