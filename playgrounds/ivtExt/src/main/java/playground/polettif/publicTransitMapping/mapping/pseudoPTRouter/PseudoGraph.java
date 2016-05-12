@@ -51,15 +51,6 @@ public class PseudoGraph {
 		this.edges = new HashSet<>();
 	}
 
-	/*
-	private static PublicTransportMapEnum pseudoRouterWeightType;
-	public static void setPseudoRouterWeightType(PublicTransportMapEnum type) {
-		pseudoRouterWeightType = pseudoRouterWeightType;
-		PseudoRoutePath.setPseudoRouteWeightType(type);
-		PseudoRouteStop.setPseudoRouteWeightType(type);
-	}
-	*/
-
 	public Set<PseudoRoutePath> getEdges() {
 		return edges;
 	}

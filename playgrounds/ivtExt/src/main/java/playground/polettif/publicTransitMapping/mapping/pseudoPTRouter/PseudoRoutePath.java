@@ -37,13 +37,6 @@ public class PseudoRoutePath {
 	private final PseudoRouteStop to;
 	private final double weight;
 
-	/*
-	private static PublicTransportMapEnum pseudoRouteWeightType;
-	public static void setPseudoRouteWeightType(PublicTransportMapEnum type) {
-		pseudoRouteWeightType = type;
-	}
-	*/
-
 	public static void setConfig(PublicTransitMappingConfigGroup configGroup) {
 		config = configGroup;
 	}

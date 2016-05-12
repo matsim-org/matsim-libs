@@ -51,6 +51,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
 	public static final String COMBINE_PT_MODES = "combinePtModes";
 
+
 	public PublicTransitMappingConfigGroup() {
 		super(GROUP_NAME);
 
@@ -83,6 +84,10 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"[Link Candidates] After " +MAX_NCLOSEST_LINKS +" link candidates have been found, additional link \n" +
 				"\t\tcandidates within "+LINK_DISTANCE_TOLERANCE+"*(distance to the Nth link) are added to the set.\n" +
 				"\t\tMust be > 1.");
+		map.put(PSEUDO_ROUTE_WEIGHT_TYPE,
+				"Defines which link attribute should be used for pseudo route calculations. Default is minimization \n" +
+				"\t\tof travel distance. If high quality information on link travel times is available, travelTime can be \n" +
+				"\t\tused. (Possible values \""+PseudoRouteWeightType.linkLength+"\" and \""+PseudoRouteWeightType.travelTime+"\"");
 		map.put(MAX_NCLOSEST_LINKS,
 				"[Link Candidates] Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
 				"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
@@ -108,10 +113,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(OUTPUT_NETWORK_FILE, "Path to the output car only network file. The inpu multimodal map is filtered. \n" +
 				"\t\tNot needed if PTMapper is used within another class.");
 		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
-//		map.put(PSEUDO_ROUTE_WEIGHT_TYPE,
-//				"Defines which link attribute should be used for pseudo route calculations. Default is minimization \n" +
-//				"\t\tof travel distance. If high quality information on link travel times is available, travelTime can be \n" +
-//				"\t\tused. (Possible values \""+PublicTransportMapEnum.linkLength+"\" and \""+PublicTransportMapEnum.travelTime+"\"");
 		return map;
 	}
 
@@ -274,19 +275,21 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * information on link travel times is available, travelTime
 	 * can be used.
 	 */
-	/*
-	private PublicTransportMapEnum pseudoRouteWeightType = PublicTransportMapEnum.linkLength;
+	public enum PseudoRouteWeightType {
+		travelTime, linkLength
+	}
+	private PseudoRouteWeightType pseudoRouteWeightType = PseudoRouteWeightType.linkLength;
 
 	@StringGetter(PSEUDO_ROUTE_WEIGHT_TYPE)
-	public PublicTransportMapEnum getPseudoRouteWeightType() {
+	public PseudoRouteWeightType getPseudoRouteWeightType() {
 		return pseudoRouteWeightType;
 	}
 
 	@StringSetter(PSEUDO_ROUTE_WEIGHT_TYPE)
-	public void setPseudoRouteWeightType(PublicTransportMapEnum weight) {
-		this.pseudoRouteWeightType = weight;
+	public void setPseudoRouteWeightType(PseudoRouteWeightType type) {
+		this.pseudoRouteWeightType = type;
 	}
-	*/
+
 
 	/**
 	 * Number of link candidates considered for all stops, depends on accuracy of
@@ -358,6 +361,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * an artificial link is created.
 	 */
 	private double beelineDistanceMaxFactor = 5.0;
+	private double beelineFreespeed = 50 / 3.6; // todo include in config
 
 	@StringGetter(BEELINE_DISTANCE_MAX_FACTOR)
 	public double getBeelineDistanceMaxFactor() {
@@ -367,6 +371,10 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(BEELINE_DISTANCE_MAX_FACTOR)
 	public void setBeelineDistanceMaxFactor(double beelineDistanceMaxFactor) {
 		this.beelineDistanceMaxFactor = beelineDistanceMaxFactor;
+	}
+
+	public double getBeelineFreespeed() {
+		return beelineFreespeed;
 	}
 
 	/**

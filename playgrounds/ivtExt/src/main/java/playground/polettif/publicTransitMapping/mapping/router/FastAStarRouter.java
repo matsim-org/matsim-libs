@@ -28,6 +28,7 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,15 +41,14 @@ public class FastAStarRouter implements Router {
 	
 	private final LeastCostPathCalculator pathCalculator;
 	private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
-
-	/*
-	private static PublicTransportMapEnum pseudoRouteWeightType;
-	public static void setPseudoRouteWeightType(PublicTransportMapEnum type) {
-		pseudoRouteWeightType = type;
-	}
-	*/
+	PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType;
 
 	public FastAStarRouter(Network network) {
+		this(network, PublicTransitMappingConfigGroup.PseudoRouteWeightType.linkLength);
+	}
+
+	public FastAStarRouter(Network network, PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType) {
+		this.pseudoRouteWeightType = pseudoRouteWeightType;
 		paths = new HashMap<>();
 
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
@@ -85,8 +85,7 @@ public class FastAStarRouter implements Router {
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-//		return (pseudoRouteWeightType.equals(PublicTransportMapEnum.travelTime) ? link.getLength() / link.getFreespeed() : link.getLength());
-		return link.getLength();
+		return (pseudoRouteWeightType.equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? link.getLength() / link.getFreespeed() : link.getLength());
 	}
 
 	@Override

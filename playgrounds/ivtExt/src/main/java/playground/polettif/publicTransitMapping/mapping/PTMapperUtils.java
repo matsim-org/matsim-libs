@@ -294,4 +294,5 @@ public class PTMapperUtils {
 		removeFromCurrent.forEach(linkCandidatesCurrent::remove);
 		removeFromNext.forEach(linkCandidatesNext::remove);
 	}
+
 }
