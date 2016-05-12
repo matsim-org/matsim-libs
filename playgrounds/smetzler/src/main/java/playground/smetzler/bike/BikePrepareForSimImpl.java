@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
@@ -77,16 +78,17 @@ class BikePrepareForSimImpl implements PrepareForSim {
 
 			for (Person person : population.getPersons().values()) {
 				// TODO check if bike user or car user. DONE?!
-				String bla = person.getSelectedPlan().getPlanElements().get(1).toString();
+//				String bla = person.getSelectedPlan().getPlanElements().get(1).toString();
+				Leg firstLeg = (Leg) person.getSelectedPlan().getPlanElements().get(1);
+				String mode = firstLeg.getMode();
+				// VERY important: This works *only* if *all* persons have only trips which are all with
+				// the same mode (for the whole day)
+//				System.out.println(bla);
 
-				if (bla.contains("mode=bike")){
-					boolean isCarUser = false; // ....
-
-					if (isCarUser) {
-						xy2LinksCar.run(person);
-					} else {
-						xy2LinksBike.run(person);
-					}
+				if (mode.equals("car")){
+					xy2LinksCar.run(person);
+				} else {
+					xy2LinksBike.run(person);
 				}
 			}
 		}

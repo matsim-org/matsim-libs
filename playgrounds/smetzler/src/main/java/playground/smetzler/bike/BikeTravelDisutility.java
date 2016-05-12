@@ -2,6 +2,8 @@ package playground.smetzler.bike;
 
 
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -212,8 +214,17 @@ public class BikeTravelDisutility implements TravelDisutility {
 	double comfortDisutility_util_m = -(marginalUtilityOfComfort *(Math.abs(surfaceFactor-100) + Math.abs(streetFactor-100))/100);   //     (Math.pow((1/surfaceFactor), 2) + Math.pow((1/streetFactor), 2)); // vielleicht quadratisch?
 	double comfortDisutility 	    = comfortDisutility_util_m * distance;
 			
-	//
-	double disutility = travelTimeDisutility + distanceDisutility + comfortDisutility; //TODO add randomfactor (see example below)
+
+	// Randomfactor with
+//	Random r = new Random();
+//	int standardDeviation = 1;
+//	int mean = 1;
+//	double randomfactor = r.nextGaussian()*standardDeviation+mean;
+	
+	
+	double disutility = (travelTimeDisutility + distanceDisutility + comfortDisutility); //* randomfactor; //TODO add randomfactor (see example below)
+	
+
 
 	//// beispiel aus RandomizingTimeDistanceTravelDisutility
 //	double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
