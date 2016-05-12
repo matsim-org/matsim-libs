@@ -72,7 +72,9 @@ public class StayRecorder
         ScheduleBuilder builder = reconstructor.scheduleBuilders.get(personId);
 
         if (builder != null) {
-            if (event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)) {
+            if (event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)
+                    || event.getActType().equals("After schedule") //old naming (TODO to be removed soon)
+            ) {
                 builder.endSchedule(event.getTime());
             }
             else {
@@ -93,10 +95,12 @@ public class StayRecorder
             stay.endTime = event.getTime();
             reconstructor.scheduleBuilders.get(personId).addStay(stay);
         }
-        else if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
+        else if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)
+                || event.getActType().equals("Before schedule") //old naming (TODO to be removed soon)
+        ) {
             Link startLink = reconstructor.links.get(event.getLinkId());
-            reconstructor.scheduleBuilders.put(personId, new ScheduleBuilder(
-                    reconstructor.taxiData, personId, startLink, event.getTime()));
+            reconstructor.scheduleBuilders.put(personId, new ScheduleBuilder(reconstructor.taxiData,
+                    personId, startLink, event.getTime()));
         }
     }
 
