@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.maxess.nestedlogitaccessibility.scripts;
+package playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -37,6 +37,7 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
+import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 import playground.ivt.utils.ConcurrentStopWatch;
 
