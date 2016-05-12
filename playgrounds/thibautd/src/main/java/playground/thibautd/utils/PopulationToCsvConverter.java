@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,19 +16,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.thibautd.utils;
 
-package org.matsim.core.replanning;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
- * A partial, inside view of the Controler which is available during replanning.
- * @author michaz
- *
+ * @author thibautd
  */
-public interface ReplanningContext {
+public class PopulationToCsvConverter {
+	public interface FieldExtractor {
+		Map<String, String> getFields( Person p );
+	}
 
-	/**
-	 * The current iteration.
-	 */
-	int getIteration();
+	public static void convert(
+			final Population population,
+			final String csvFile,
+			final FieldExtractor fields ) {
+		final CsvUtils.TitleLine titleLine = new CsvUtils.TitleLine(
+				fields.getFields(
+						population.getPersons().values().stream().
+								findAny().get() ).keySet() );
 
+		try ( final CsvWriter writer = new CsvWriter( '\t' , '\"' , titleLine , csvFile ) ) {
+			for ( Person p : population.getPersons().values() ) {
+				final Map<String,String> fs = fields.getFields( p );
+				writer.nextLine();
+				for ( Map.Entry<String,String> e : fs.entrySet() ) {
+					writer.setField( e.getKey() , e.getValue() );
+				}
+			}
+		}
+		catch ( IOException e ) {
+			throw new UncheckedIOException( e );
+		}
+	}
 }

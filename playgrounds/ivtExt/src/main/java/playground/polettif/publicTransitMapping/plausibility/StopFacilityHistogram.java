@@ -69,7 +69,7 @@ public class StopFacilityHistogram {
 			stopStat.put(parentFacility, ++count);
 		}
 
-		Map<String, Integer> stopStatSorted = MiscUtils.sortAscending(stopStat);
+		Map<String, Integer> stopStatSorted = MiscUtils.sortAscendingByValue(stopStat);
 
 		stopFacilityHistogram = new double[stopStatSorted.size()];
 		int i=0;

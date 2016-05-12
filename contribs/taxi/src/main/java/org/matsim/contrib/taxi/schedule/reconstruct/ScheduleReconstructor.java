@@ -100,7 +100,7 @@ public class ScheduleReconstructor
     }
 
 
-    public static void run(String networkFile, String eventsFile)
+    public static TaxiData reconstructFromFile(String networkFile, String eventsFile)
     {
         TaxiData taxiData = new TaxiData();
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -110,6 +110,6 @@ public class ScheduleReconstructor
         ScheduleReconstructor reconstructor = new ScheduleReconstructor(taxiData,
                 scenario.getNetwork(), eventsManager);
         new MatsimEventsReader(eventsManager).readFile(eventsFile);
-        reconstructor.getTaxiData();
+        return reconstructor.getTaxiData();
     }
 }

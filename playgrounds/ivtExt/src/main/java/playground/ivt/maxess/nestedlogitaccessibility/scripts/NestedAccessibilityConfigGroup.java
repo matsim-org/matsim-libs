@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,19 +16,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.ivt.maxess.nestedlogitaccessibility.scripts;
 
-package org.matsim.core.replanning;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
- * A partial, inside view of the Controler which is available during replanning.
- * @author michaz
- *
+ * @author thibautd
  */
-public interface ReplanningContext {
+public class NestedAccessibilityConfigGroup extends ReflectiveConfigGroup {
+	public static final String GROUP_NAME = "nestedAccessibility";
 
-	/**
-	 * The current iteration.
-	 */
-	int getIteration();
+	private String activityType = "leisure";
+	private int choiceSetSize = 200;
+	private int distanceBudget = 20 * 1000;
 
+	public NestedAccessibilityConfigGroup( ) {
+		super( GROUP_NAME );
+	}
+
+	@StringGetter( "activityType" )
+	public String getActivityType() {
+		return activityType;
+	}
+
+	@StringSetter( "activityType" )
+	public void setActivityType( final String activityType ) {
+		this.activityType = activityType;
+	}
+
+	@StringGetter( "choiceSetSize" )
+	public int getChoiceSetSize() {
+		return choiceSetSize;
+	}
+
+	@StringSetter( "choiceSetSize" )
+	public void setChoiceSetSize( final int choiceSetSize ) {
+		this.choiceSetSize = choiceSetSize;
+	}
+
+	@StringGetter( "distanceBudget" )
+	public int getDistanceBudget() {
+		return distanceBudget;
+	}
+
+	@StringSetter( "distanceBudget" )
+	public void setDistanceBudget( final int distanceBudget ) {
+		this.distanceBudget = distanceBudget;
+	}
 }

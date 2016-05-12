@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -48,7 +49,8 @@ public class ScheduleTools {
 
 	protected static Logger log = Logger.getLogger(ScheduleTools.class);
 
-	private ScheduleTools() {}
+	private ScheduleTools() {
+	}
 
 	/**
 	 * @return the transitSchedule from scheduleFile.
@@ -75,7 +77,7 @@ public class ScheduleTools {
 	public static void writeTransitSchedule(TransitSchedule schedule, String filePath) {
 		new TransitScheduleWriter(schedule).writeFile(filePath);
 	}
-	
+
 	/**
 	 * Add mode "pt" to any link of the network that is
 	 * passed by any transitRoute of the schedule.
@@ -102,7 +104,7 @@ public class ScheduleTools {
 			}
 		}
 	}
-	
+
 	/**
 	 * Generates link sequences for all transit routes in the schedule, modifies the schedule.
 	 * All stopFacilities used by a route must have a link referenced.
@@ -178,7 +180,7 @@ public class ScheduleTools {
 		}
 		log.info("Routing all routes with referenced links... done");
 	}
-	
+
 	/**
 	 * Adds mode the schedule transport mode to links. Removes all network
 	 * modes elsewhere. Adds mode "artificial" to artificial
@@ -212,9 +214,10 @@ public class ScheduleTools {
 			}
 		}
 	}
-	
+
 	/**
 	 * Replaces all non-car link modes with "pt"
+	 *
 	 * @param network
 	 */
 	public static void replaceNonCarModesWithPT(Network network) {
@@ -235,8 +238,7 @@ public class ScheduleTools {
 			}
 			if(link.getAllowedModes().size() > 0 && link.getAllowedModes().contains(TransportMode.car)) {
 				link.setAllowedModes(modesCarPt);
-			}
-			else if(!link.getAllowedModes().contains(TransportMode.car)) {
+			} else if(!link.getAllowedModes().contains(TransportMode.car)) {
 				link.setAllowedModes(modesPt);
 			}
 		}
@@ -244,10 +246,9 @@ public class ScheduleTools {
 
 	/**
 	 * Transforms a MATSim Transit Schedule file. Overwrites the file.
-	 *
 	 */
 	public static void transformScheduleFile(String scheduleFile, String fromCoordinateSystem, String toCoordinateSystem) {
-		log.info("... Transformig schedule from "+fromCoordinateSystem+" to "+toCoordinateSystem);
+		log.info("... Transformig schedule from " + fromCoordinateSystem + " to " + toCoordinateSystem);
 
 		final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(fromCoordinateSystem, toCoordinateSystem);
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -260,7 +261,7 @@ public class ScheduleTools {
 
 	/**
 	 * @return the list of link ids used by transit routes (first and last
-	 * 		   links are included)
+	 * links are included)
 	 */
 	public static List<Id<Link>> getLinkIds(TransitRoute transitRoute) {
 		List<Id<Link>> list = new ArrayList<>();
@@ -271,16 +272,86 @@ public class ScheduleTools {
 		return list;
 	}
 
-	/**
-	 * @return the list of link ids used by transit routes (first and last
-	 * 		   links are included)
-	 */
 	public static List<Id<Link>> getSubRouteLinkIds(TransitRoute transitRoute, Id<Link> fromLinkId, Id<Link> toLinkId) {
+		NetworkRoute route = transitRoute.getRoute();
+		if(fromLinkId == null) {
+			fromLinkId = route.getStartLinkId();
+		}
+		if(toLinkId == null) {
+			toLinkId = route.getEndLinkId();
+		}
 		List<Id<Link>> list = new ArrayList<>();
-		NetworkRoute networkRoute = transitRoute.getRoute().getSubRoute(fromLinkId, toLinkId);
+		NetworkRoute networkRoute = route.getSubRoute(fromLinkId, toLinkId);
 		list.add(networkRoute.getStartLinkId());
 		list.addAll(networkRoute.getLinkIds());
 		list.add(networkRoute.getEndLinkId());
 		return list;
+	}
+
+
+	/**
+	 * Based on {@link org.matsim.core.population.routes.LinkNetworkRouteImpl#getSubRoute}
+	 *
+	 * @param transitRoute the transitRoute
+	 * @param fromLinkId   first link of the subroute. If <tt>null</tt> the first link of the route is used.
+	 * @param toLinkId     last link of the subroute. If <tt>null</tt> the first link of the route is used.
+	 * @return the list of link ids used by transit routes (fromLink and toLink
+	 * links are included)
+	 */
+	public static List<Id<Link>> getLoopSubRouteLinkIds(TransitRoute transitRoute, Id<Link> fromLinkId, Id<Link> toLinkId) {
+		NetworkRoute route = transitRoute.getRoute();
+		if(fromLinkId == null) {
+			fromLinkId = route.getStartLinkId();
+		}
+		if(toLinkId == null) {
+			toLinkId = route.getEndLinkId();
+		}
+
+		List<Id<Link>> linkIdList = getLinkIds(transitRoute);
+
+		/**
+		 * the index where the link after fromLinkId can be found in the route:
+		 * fromIndex==0 --> fromLinkId == startLinkId,
+		 * fromIndex==1 --> fromLinkId == first link in the route, etc.
+		 */
+		int fromIndex = -1;
+		/**
+		 * the index where toLinkId can be found in the route
+		 */
+		int toIndex = -1;
+
+		if(fromLinkId.equals(route.getStartLinkId())) {
+			fromIndex = 0;
+		} else {
+			for(int i = 0, n = linkIdList.size(); (i < n) && (fromIndex < 0); i++) {
+				if(fromLinkId.equals(linkIdList.get(i))) {
+					fromIndex = i;
+				}
+			}
+			if(fromIndex < 0 && fromLinkId.equals(route.getEndLinkId())) {
+				fromIndex = linkIdList.size();
+			}
+			if(fromIndex < 0) {
+				throw new IllegalArgumentException("Cannot create subroute because fromLinkId is not part of the route.");
+			}
+		}
+
+		if(fromLinkId.equals(toLinkId)) {
+			toIndex = fromIndex - 1;
+		} else {
+			for(int i = fromIndex, n = linkIdList.size(); (i < n) && (toIndex < 0); i++) {
+				if(toLinkId.equals(linkIdList.get(i))) {
+					toIndex = i;
+				}
+			}
+			if(toIndex < 0 && toLinkId.equals(route.getEndLinkId())) {
+				toIndex = linkIdList.size();
+			}
+			if(toIndex < 0) {
+				throw new IllegalArgumentException("Cannot create subroute because toLinkId is not part of the route.");
+			}
+		}
+
+		return linkIdList.subList(fromIndex, toIndex);
 	}
 }

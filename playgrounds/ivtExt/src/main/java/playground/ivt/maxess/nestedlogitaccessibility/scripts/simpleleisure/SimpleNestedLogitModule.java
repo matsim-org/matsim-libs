@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.maxess.nestedlogitaccessibility.scripts;
+package playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure;
 
 
 import com.google.inject.AbstractModule;
@@ -25,6 +25,8 @@ import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
+import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
+import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilityConfigGroup;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus.RunMzTripChoiceSetConversion;
 import playground.ivt.router.TripSoftCache;
 import playground.ivt.utils.ConcurrentStopWatch;
@@ -35,9 +37,6 @@ import playground.ivt.utils.ConcurrentStopWatch;
 public class SimpleNestedLogitModule extends AbstractModule {
 	public final ConcurrentStopWatch<SimpleNestedLogitModelChoiceSetIdentifier.Measurement> stopWatch =
 			new ConcurrentStopWatch<>( SimpleNestedLogitModelChoiceSetIdentifier.Measurement.class );
-	private final String TYPE = "leisure";
-	private final int N_SAMPLES = 200;
-	private final int DISTANCE_BUDGET = 20 * 1000;
 
 	// only one cache across threads
 	private final TripSoftCache cache =
@@ -55,15 +54,18 @@ public class SimpleNestedLogitModule extends AbstractModule {
 
 	@Provides
 	public SimpleNestedLogitModelChoiceSetIdentifier createChoiceSetIdentifier( final Scenario scenario ) {
+		final NestedAccessibilityConfigGroup group = (NestedAccessibilityConfigGroup)
+				scenario.getConfig().getModule( NestedAccessibilityConfigGroup.GROUP_NAME );
 		return new SimpleNestedLogitModelChoiceSetIdentifier(
+				(SimpleNestedLogitUtilityConfigGroup)  scenario.getConfig().getModule( SimpleNestedLogitUtilityConfigGroup.GROUP_NAME ),
 				stopWatch,
-				TYPE,
-				N_SAMPLES,
+				group.getActivityType(),
+				group.getChoiceSetSize(),
 				RunMzTripChoiceSetConversion.createTripRouter(
 						scenario,
 						cache ),
 				scenario.getActivityFacilities(),
 				scenario.getPopulation().getPersonAttributes(),
-				DISTANCE_BUDGET );
+				group.getDistanceBudget() );
 	}
 }

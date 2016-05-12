@@ -29,24 +29,31 @@ import com.opencsv.CSVWriter;
 
 public class HourlyTaxiStatsExtractor
 {
+    public static final String[] FLEETS = { "02.2", "04.4", "06.6", "08.8", "11.0" };
+    public static final String[] AVS = { "1.0", "1.5", "2.0" };
+    public static final int COUNT = FLEETS.length * AVS.length;
+    
+    public static String getId(String fleet, String av)
+    {
+        return fleet + "k_AV" + av;
+    }
+
+    
     public static void main(String[] args)
     {
         String path = "../../../shared-svn/projects/audi_av/papers/03_transport_special_issue/results_0.15fc/";
-        String[] fleets = { "02.2", "04.4", "06.6", "08.8", "11.0" };
-        String[] avs = { "1.0", "1.5", "2.0" };
-        int count = fleets.length * avs.length;
         int hours = 25;
         int iter = 50;
 
-        String[] header = new String[count];
-        String[][] meanWaitTimes = new String[hours][count];
-        String[][] p95WaitTimes = new String[hours][count];
-        String[][] meanEmptyRatios = new String[hours][count];
+        String[] header = new String[COUNT];
+        String[][] meanWaitTimes = new String[hours][COUNT];
+        String[][] p95WaitTimes = new String[hours][COUNT];
+        String[][] meanEmptyRatios = new String[hours][COUNT];
 
         int i = 0;
-        for (String fleet : fleets) {
-            for (String av : avs) {
-                String file = path + fleet + "k_AV" + av + "." + iter + ".taxi_hourly_stats.txt";
+        for (String fleet : FLEETS) {
+            for (String av : AVS) {
+                String file = path + getId(fleet, av) + "." + iter + ".taxi_hourly_stats.txt";
                 HourlyTaxiStatsReader r = new HourlyTaxiStatsReader(file);
 
                 header[i] = fleet + "_" + av;

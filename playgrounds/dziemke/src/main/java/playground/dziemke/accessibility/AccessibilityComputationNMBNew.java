@@ -37,13 +37,13 @@ import playground.dziemke.utils.LogToOutputSaver;
 public class AccessibilityComputationNMBNew {
 	public static final Logger log = Logger.getLogger(AccessibilityComputationNMBNew.class);
 	
-	private static final double cellSize = 1000.;
+	private static final double cellSize = 500.;
 	
 	public static void main(String[] args) {
 		// Input and output	
 		String networkFile = "../../../matsimExamples/countries/za/nmb/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = "../../../matsimExamples/countries/za/nmb/facilities/20121010/facilities.xml.gz";
-		String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/38/";
+		String outputDirectory = "../../../shared-svn/projects/maxess/data/nmb/output/44/";
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelDistanceMatrix.csv.gz";
 //		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/measuringPointsAsStops.csv.gz";
@@ -72,20 +72,16 @@ public class AccessibilityComputationNMBNew {
 		// QGis
 		boolean createQGisOutput = true;
 		boolean includeDensityLayer = true;
-//		Double lowerBound = 2.;
-//		Double upperBound = 5.5;
-//		Double lowerBound = 0.;
-//		Double upperBound = 3.5;
 		Double lowerBound = -3.5;
 		Double upperBound = 3.5;
 		Integer range = 9;
-		int symbolSize = 1050;
-		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
+		int symbolSize = 525;
+		int populationThreshold = (int) (120 / (1000/cellSize * 1000/cellSize));
 
 		/* Extent of the network are (as they can looked up by using the bounding box):
 		/* minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496 */
 //		double[] mapViewExtent = {100000,-3720000,180000,-3675000}; // choose map view a bit bigger
-		double[] mapViewExtent = {115000,-3718000,161000,-3679000}; // what actually needs to be drawn -- looks better
+		double[] mapViewExtent = {115000,-3718000,161000,-3679000};
 
 		// Config and scenario
 //		final Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
@@ -140,6 +136,8 @@ public class AccessibilityComputationNMBNew {
 		List<String> activityTypes = new ArrayList<String>();
 		activityTypes.add("s");
 		activityTypes.add("w");
+		activityTypes.add("l");
+		activityTypes.add("e");
 		log.error("Only using s as activity type to speed up for testing");
 
 		// collect homes
@@ -188,10 +186,6 @@ public class AccessibilityComputationNMBNew {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-//					if ( !actType.equals("w") ) {
-//						log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-//						continue ;
-//					}
 					VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
 							lowerBound, upperBound, range, symbolSize, populationThreshold);
 					VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);

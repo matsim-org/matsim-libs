@@ -20,6 +20,7 @@ package playground.polettif.publicTransitMapping.plausibility.log;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -27,19 +28,15 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import java.util.List;
 
-public interface PlausibilityWarning extends Comparable<PlausibilityWarning> {
+public interface PlausibilityWarning extends Identifiable<PlausibilityWarning> {
 
 	String getType();
-
-	int getOrder();
 
 	List<Id<Link>> getLinkIds();
 
 	TransitLine getTransitLine();
 
 	TransitRoute getTransitRoute();
-
-	Coordinate[] getCoordinates();
 
 	String getFromId();
 
