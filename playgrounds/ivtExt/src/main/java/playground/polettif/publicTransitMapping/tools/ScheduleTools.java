@@ -188,7 +188,7 @@ public class ScheduleTools {
 	 * should be combined to pt anyway.
 	 */
 	public static void assignScheduleModesToLinks(TransitSchedule schedule, Network network) {
-		log.debug("... Assigning schedule transport mode to network");
+		log.info("... Assigning schedule transport mode to network");
 
 		Map<Id<Link>, Set<String>> transitLinkNetworkModes = new HashMap<>();
 

@@ -49,7 +49,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String OUTPUT_STREET_NETWORK_FILE = "outputStreetNetworkFile";
 	private static final String LINK_DISTANCE_TOLERANCE = "linkDistanceTolerance";
 	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
-	public static final String COMBINE_PT_MODES = "combinePtModes";
+	private static final String COMBINE_PT_MODES = "combinePtModes";
 
 
 	public PublicTransitMappingConfigGroup() {
@@ -345,6 +345,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * parent stop facility is appended (i.e. stop0123.fac:2).
 	 */
 	private String suffixChildStopFacilities = ".link:";
+	private String suffixChildStopFacilitiesRegex = "[.]link:";
 
 	@StringGetter(SUFFIX_CHILD_STOP_FACILITIES)
 	public String getSuffixChildStopFacilities() {
@@ -354,6 +355,11 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(SUFFIX_CHILD_STOP_FACILITIES)
 	public void setSuffixChildStopFacilities(String suffixChildStopFacilities) {
 		this.suffixChildStopFacilities = suffixChildStopFacilities;
+		this.suffixChildStopFacilitiesRegex = suffixChildStopFacilities.replace(".", "[.]"); // todo regex escape
+	}
+
+	public String getSuffixChildStopFacilitiesRegex() {
+		return suffixChildStopFacilitiesRegex;
 	}
 
 	/**
