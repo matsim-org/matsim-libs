@@ -38,16 +38,14 @@ public class RecalcStatsAudiAVFlowPaper
                 TaxiData taxiData = ScheduleReconstructor.reconstructFromFile(networkFile,
                         path + id + "/" + id + ".output_events.xml.gz");
 
-                DetailedTaxiStatsCalculator calculator = new DetailedTaxiStatsCalculator(
+                TaxiStatsCalculator calculator = new TaxiStatsCalculator(
                         taxiData.getVehicles().values());
                 String prefix = path + id + "/ITERS/it.50/" + id + ".50.";
 
-                new HourlyTaxiStatsWriter(calculator.getHourlyStats())
+                new TaxiStatsWriter(calculator.getTaxiStats())
                         .write(prefix + "hourly_stats_new_layout.txt");
-                new HourlyHistogramsWriter(calculator.getHourlyHistograms())
+                new TaxiHistogramsWriter(calculator.getTaxiStats())
                         .write(prefix + "hourly_histograms_new_layout.txt");
-                new DailyHistogramsWriter(calculator.getDailyHistograms())
-                        .write(prefix + "daily_histograms_new_layout.txt");
             }
         }
     }
