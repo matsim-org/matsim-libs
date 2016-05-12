@@ -26,6 +26,11 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public class SimpleNestedLogitUtilityConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "simpleNestedUtility";
 
+	private double muCar = 1;
+	private double muPt = 1;
+	private double muBike = 6.4;
+	private double muWalk = 1.74;
+
 	private double ascCar = 0;
 	private double betaTtCar = -0.276;
 
@@ -165,5 +170,45 @@ public class SimpleNestedLogitUtilityConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter("betaTtWalk")
 	public void setBetaTtWalk( final double betaTtWalk ) {
 		this.betaTtWalk = betaTtWalk;
+	}
+
+	@StringGetter("muBike")
+	public double getMuBike() {
+		return muBike;
+	}
+
+	@StringSetter("muBike")
+	public void setMuBike( final double muBike ) {
+		this.muBike = muBike;
+	}
+
+	@StringGetter("muCar")
+	public double getMuCar() {
+		return muCar;
+	}
+
+	@StringSetter("muCar")
+	public void setMuCar( final double muCar ) {
+		this.muCar = muCar;
+	}
+
+	@StringGetter("muPt")
+	public double getMuPt() {
+		return muPt;
+	}
+
+	@StringSetter("muPt")
+	public void setMuPt( final double muPt ) {
+		this.muPt = muPt;
+	}
+
+	@StringGetter("muWalk")
+	public double getMuWalk() {
+		return muWalk;
+	}
+
+	@StringSetter("muWalk")
+	public void setMuWalk( final double muWalk ) {
+		this.muWalk = muWalk;
 	}
 }

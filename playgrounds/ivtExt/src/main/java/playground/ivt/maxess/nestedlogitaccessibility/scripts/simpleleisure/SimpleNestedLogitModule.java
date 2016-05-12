@@ -57,6 +57,7 @@ public class SimpleNestedLogitModule extends AbstractModule {
 		final NestedAccessibilityConfigGroup group = (NestedAccessibilityConfigGroup)
 				scenario.getConfig().getModule( NestedAccessibilityConfigGroup.GROUP_NAME );
 		return new SimpleNestedLogitModelChoiceSetIdentifier(
+				(SimpleNestedLogitUtilityConfigGroup)  scenario.getConfig().getModule( SimpleNestedLogitUtilityConfigGroup.GROUP_NAME ),
 				stopWatch,
 				group.getActivityType(),
 				group.getChoiceSetSize(),

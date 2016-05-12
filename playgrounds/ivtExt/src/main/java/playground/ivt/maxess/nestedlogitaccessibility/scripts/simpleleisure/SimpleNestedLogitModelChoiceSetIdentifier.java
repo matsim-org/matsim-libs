@@ -48,10 +48,6 @@ import java.util.*;
  */
 public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdentifier<ModeNests> {
 	public enum Measurement { carTravelTime, ptTravelTime, bikeTravelTime, walkTravelTime, prismSampling; }
-	private static final double MU_CAR = 1;
-	private static final double MU_PT = 1;
-	private static final double MU_BIKE = 6.4;
-	private static final double MU_WALK = 1.74;
 
 	private final Random random = MatsimRandom.getLocalInstance();
 	private final int nSamples;
@@ -62,9 +58,12 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 	private final QuadTree<ActivityFacility> relevantFacilities;
 	private final int budget_m;
 
+	private final SimpleNestedLogitUtilityConfigGroup configGroup;
+
 	private final ConcurrentStopWatch<Measurement> stopWatch;
 
 	public SimpleNestedLogitModelChoiceSetIdentifier(
+			final SimpleNestedLogitUtilityConfigGroup configGroup,
 			final ConcurrentStopWatch<Measurement> stopWatch,
 			final String type,
 			final int nSamples,
@@ -72,6 +71,7 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 			final ActivityFacilities allFacilities,
 			final ObjectAttributes personAttributes,
 			final int budget_m ) {
+		this.configGroup = configGroup;
 		this.stopWatch = stopWatch;
 		this.nSamples = nSamples;
 		this.router = router;
@@ -90,12 +90,12 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 
 	@Override
 	public Map<String, NestedChoiceSet<ModeNests>> identifyChoiceSet( final Person person ) {
-		final ChoiceSetBuilder baseBuilder = new ChoiceSetBuilder();
-		final ChoiceSetBuilder nocarBuilder = new ChoiceSetBuilder();
-		final ChoiceSetBuilder noptBuilder = new ChoiceSetBuilder();
-		final ChoiceSetBuilder nobikeBuilder = new ChoiceSetBuilder();
-		final ChoiceSetBuilder nowalkBuilder = new ChoiceSetBuilder();
-		final ChoiceSetBuilder allBuilder = new ChoiceSetBuilder();
+		final ChoiceSetBuilder baseBuilder = new ChoiceSetBuilder( configGroup );
+		final ChoiceSetBuilder nocarBuilder = new ChoiceSetBuilder( configGroup );
+		final ChoiceSetBuilder noptBuilder = new ChoiceSetBuilder( configGroup );
+		final ChoiceSetBuilder nobikeBuilder = new ChoiceSetBuilder( configGroup );
+		final ChoiceSetBuilder nowalkBuilder = new ChoiceSetBuilder( configGroup );
+		final ChoiceSetBuilder allBuilder = new ChoiceSetBuilder( configGroup );
 
 		// Sample and route alternatives
 		stopWatch.startMeasurement( Measurement.prismSampling );
@@ -287,22 +287,30 @@ public class SimpleNestedLogitModelChoiceSetIdentifier implements ChoiceSetIdent
 	}
 
 	private static class ChoiceSetBuilder {
-		final Nest.Builder<ModeNests> carNestBuilder =
-				new Nest.Builder<ModeNests>()
-						.setMu( MU_CAR )
-						.setName( ModeNests.car );
-		final Nest.Builder<ModeNests> ptNestBuilder =
-				new Nest.Builder<ModeNests>()
-						.setMu( MU_PT )
-						.setName( ModeNests.pt );
-		final Nest.Builder<ModeNests> bikeNestBuilder =
-				new Nest.Builder<ModeNests>()
-						.setMu( MU_BIKE )
-						.setName( ModeNests.bike );
-		final Nest.Builder<ModeNests> walkNestBuilder =
-				new Nest.Builder<ModeNests>()
-						.setMu( MU_WALK )
-						.setName( ModeNests.walk );
+		final Nest.Builder<ModeNests> carNestBuilder;
+		final Nest.Builder<ModeNests> ptNestBuilder ;
+		final Nest.Builder<ModeNests> bikeNestBuilder ;
+		final Nest.Builder<ModeNests> walkNestBuilder ;
+
+		public ChoiceSetBuilder( SimpleNestedLogitUtilityConfigGroup c ) {
+			carNestBuilder =
+					new Nest.Builder<ModeNests>()
+							.setMu( c.getMuCar() )
+							.setName( ModeNests.car );
+			ptNestBuilder =
+					new Nest.Builder<ModeNests>()
+							.setMu( c.getMuPt() )
+							.setName( ModeNests.pt );
+			bikeNestBuilder =
+					new Nest.Builder<ModeNests>()
+							.setMu( c.getMuBike() )
+							.setName( ModeNests.bike );
+			walkNestBuilder =
+					new Nest.Builder<ModeNests>()
+							.setMu( c.getMuWalk() )
+							.setName( ModeNests.walk );
+
+		}
 
 		public NestedChoiceSet<ModeNests> build() {
 			return new NestedChoiceSet<>(
