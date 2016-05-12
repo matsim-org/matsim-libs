@@ -18,20 +18,17 @@
 
 package playground.polettif.publicTransitMapping.plausibility.log;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.*;
 
-public class TravelTimeWarning extends PlausibilityWarningAbstract {
+public class TravelTimeWarning extends AbstractPlausibilityWarning {
 
 	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
 	public static Map<TransitRoute, Integer> routeStat = new HashMap<>();
@@ -42,7 +39,7 @@ public class TravelTimeWarning extends PlausibilityWarningAbstract {
 	private double ttSchedule;
 
 	public TravelTimeWarning(TransitLine transitLine, TransitRoute transitRoute, TransitRouteStop fromStop, TransitRouteStop toStop, double ttActual, double ttSchedule) {
-		super(1, "tt", transitLine, transitRoute);
+		super(PlausibilityCheck.TRAVEL_TIME_WARNING, transitLine, transitRoute);
 		this.fromStop = fromStop;
 		this.toStop = toStop;
 		this.ttActual = ttActual;
@@ -55,15 +52,7 @@ public class TravelTimeWarning extends PlausibilityWarningAbstract {
 		actual = ttActual;
 		difference = ttActual - ttSchedule;
 
-		// create coordinates
-		List<Coordinate> coordList = new ArrayList<>();
-		linkList = ScheduleTools.getSubRouteLinkIds(transitRoute, fromStop.getStopFacility().getLinkId(), toStop.getStopFacility().getLinkId());
-		for(Id<Link> linkId : linkList) {
-			coordList.add(MGC.coord2Coordinate(net.getLinks().get(linkId).getFromNode().getCoord()));
-		}
-		coordList.add(MGC.coord2Coordinate(net.getLinks().get(linkList.get(linkList.size()-1)).getToNode().getCoord()));
-		coordinates = new Coordinate[coordList.size()];
-		coordList.toArray(coordinates);
+		linkIdList = ScheduleTools.getSubRouteLinkIds(transitRoute, fromStop.getStopFacility().getLinkId(), toStop.getStopFacility().getLinkId());
 
 		MapUtils.addToInteger(transitLine, lineStat, 1, 1);
 		MapUtils.addToInteger(transitRoute, routeStat, 1, 1);

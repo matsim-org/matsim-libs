@@ -517,4 +517,17 @@ public class NetworkTools {
 			return closestLinks;
 		}
 	}
+
+	/**
+	 * Sets the free speed of all links with the networkMode to the
+	 * defined value.
+	 * @param network
+	 */
+	public static void setFreeSpeedOfLinks(Network network, String networkMode, double freespeedValue) {
+		for(Link link : network.getLinks().values()) {
+			if(link.getAllowedModes().contains(networkMode)) {
+				link.setFreespeed(freespeedValue);
+			}
+		}
+	}
 }

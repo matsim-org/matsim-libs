@@ -18,17 +18,17 @@
 
 package playground.polettif.publicTransitMapping.plausibility.log;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.MapUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
+import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class DirectionChangeWarning extends PlausibilityWarningAbstract {
+public class DirectionChangeWarning extends AbstractPlausibilityWarning {
 
 	public static Map<TransitLine, Integer> lineStat = new HashMap<>();
 	public static Map<TransitRoute, Integer> routeStat = new HashMap<>();
@@ -38,7 +38,7 @@ public class DirectionChangeWarning extends PlausibilityWarningAbstract {
 	private final double diff;
 
 	public DirectionChangeWarning(TransitLine transitLine, TransitRoute transitRoute, Link link1, Link link2, double diff) {
-		super(3, "direction", transitLine, transitRoute);
+		super(PlausibilityCheck.DIRECTION_CHANGE_WARNING, transitLine, transitRoute);
 		this.link1 = link1;
 		this.link2 = link2;
 		this.diff = diff;
@@ -47,10 +47,7 @@ public class DirectionChangeWarning extends PlausibilityWarningAbstract {
 		actual = 0;
 		difference = diff;
 
-		coordinates = new Coordinate[3];
-		coordinates[0] = MGC.coord2Coordinate(link1.getFromNode().getCoord());
-		coordinates[1] = MGC.coord2Coordinate(link1.getToNode().getCoord());
-		coordinates[2] = MGC.coord2Coordinate(link2.getToNode().getCoord());
+		linkIdList = ScheduleTools.getLoopSubRouteLinkIds(transitRoute, link1.getId(), link2.getId());
 
 		MapUtils.addToInteger(transitLine, lineStat, 1, 1);
 		MapUtils.addToInteger(transitRoute, routeStat, 1, 1);
