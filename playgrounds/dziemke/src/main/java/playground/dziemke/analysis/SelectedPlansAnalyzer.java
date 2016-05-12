@@ -25,10 +25,9 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class SelectedPlansAnalyzer {
 	// Parameters
-	private static final  String runId = "run_168a";
-	private static final  int numberOfIterations = 300;
-	//static int plansFileInterval = 50;
-	private static final  int plansFileInterval = 300;
+	private static final  String runId = "run_162";
+	private static final  int numberOfIterations = 100;
+	private static final  int plansFileInterval = 100;
 	private static final  boolean useInterimPlans = true;
 	private static final  boolean useOutputPlans = false;
 	
@@ -142,9 +141,14 @@ public class SelectedPlansAnalyzer {
 			FileWriter fileWriter = new FileWriter(output);
 			bufferedWriter = new BufferedWriter(fileWriter);
 			
-			for (int key : stayHomePlansMap.keySet()) {
-    			bufferedWriter.write(key + "\t" + stayHomePlansMap.get(key) + "\t" + otherPlansMap.get(key) + "\t" 
-    					+ carPlansMap.get(key) + "\t" + ptPlansMap.get(key) + "\t" + walkPlansMap.get(key));
+			// Header
+			bufferedWriter.write("It." + "\t" + "stayHomePlans" + "\t" + "otherPlans" + "\t" 
+					+ "carPlans" + "\t" + "ptPlans" + "\t" + "walkPlans");
+			bufferedWriter.newLine();
+			
+			for (int iteration : stayHomePlansMap.keySet()) {
+    			bufferedWriter.write(iteration + "\t" + stayHomePlansMap.get(iteration) + "\t" + otherPlansMap.get(iteration) + "\t" 
+    					+ carPlansMap.get(iteration) + "\t" + ptPlansMap.get(iteration) + "\t" + walkPlansMap.get(iteration));
     			bufferedWriter.newLine();
     		}    		
 	    } catch (FileNotFoundException ex) {

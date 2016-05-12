@@ -73,7 +73,7 @@ public class RunAVEvaluation {
 		events.addHandler(travelDistanceTimeEvaluator);
 		events.addHandler(timeAnalysis);
 		
-			String outputFolder = "D:/runs-svn/avsim/flowpaper/"+run+"/";
+			String outputFolder = "D:/runs-svn/avsim/flowpaper_0.15fc/"+run+"/";
 			String eventsFile = outputFolder+run+".output_events.xml.gz";
 			
 			new MatsimEventsReader(events).readFile(eventsFile);

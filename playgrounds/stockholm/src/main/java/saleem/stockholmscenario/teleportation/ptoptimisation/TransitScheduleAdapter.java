@@ -56,10 +56,10 @@ public class TransitScheduleAdapter {
 		int size = lines.size();
 		for(int i=0;i<size;i++) {
 			TransitLine tline = lines.get(i);
-			if(Math.random()<=0.05){//With 5% probability
-				if(Math.random()<=0.5){//With 50% probability
+			if(Math.random()<=0.1){//With 5% probability
+//				if(Math.random()<=0.5){//With 50% probability
 					vehadder.addDeparturesToLine(tline, 0.1);//Adds 10 % departures and corresponding vehicles from tline
-				}
+//				}
 			}
 		}
 		return new PTSchedule(scenario, schedule, vehicles);
@@ -72,13 +72,35 @@ public class TransitScheduleAdapter {
 		int size = lines.size();
 		for(int i=0;i<size;i++) {
 			TransitLine tline = lines.get(i);
-			if(Math.random()<=0.05){//With 5% probability
-				if(Math.random()<=0.5){//With 50% probability
+			if(Math.random()<=0.1){//With 5% probability
+//				if(Math.random()<=0.5){//With 50% probability
 					vehremover.removeDeparturesFromLine(tline, 0.1);//Removes  10 % departures and corresponding vehicles from tline
-				}
+//				}
 			}
 		}
 		return new PTSchedule(scenario, schedule, vehicles);
+	}
+	//With 5% chance of selecting a line, and 50% chance of randomly adding vehicles to it and adjusting departure times.
+		public PTSchedule updateScheduleDeleteRoute(Scenario scenario, TransitSchedule schedule){
+			CollectionUtil<TransitLine> cutilforlines = new CollectionUtil<TransitLine>();
+			CollectionUtil<TransitRoute> cutilforroutes = new CollectionUtil<TransitRoute>();
+			ArrayList<TransitLine> lines = cutilforlines.toArrayList(schedule.getTransitLines().values().iterator());
+			int size = lines.size();
+			for(int i=0;i<size;i++) {
+				TransitLine tline = lines.get(i);
+				if(Math.random()<=0.1){//With 10% probability
+					ArrayList<TransitRoute> routes = cutilforroutes.toArrayList(tline.getRoutes().values().iterator());
+					int sizer = routes.size();
+					for(int j=0;j<sizer;j++) {
+						TransitRoute troute = routes.get(j);
+						if(Math.random()<=0.1){
+							tline.removeRoute(troute);
+						}
+					}
+				}
+			}
+			writeSchedule(schedule, "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\AdaptedTransitSchedule.xml");
+			return new PTSchedule(scenario, schedule, scenario.getTransitVehicles());
 	}
 	public void writeSchedule(TransitSchedule schedule, String path){
 		

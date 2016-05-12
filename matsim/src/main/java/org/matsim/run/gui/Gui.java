@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.run.Controler;
@@ -55,6 +56,7 @@ public class Gui extends JFrame {
 	private JMenu mnTools;
 	private JMenuItem mntmCompressFile;
 	private JMenuItem mntmUncompressFile;
+	private JMenuItem mntmCreateDefaultConfig;
 	private JMenuItem mntmCreateSamplePopulation;
 
 	private PopulationSampler popSampler = null;
@@ -286,6 +288,9 @@ public class Gui extends JFrame {
 		tabbedPane.addTab("Warnings & Errors", null, scrollPane_1, null);
 		
 		textErrOut = new JTextArea();
+		textErrOut.setWrapStyleWord(true);
+		textErrOut.setTabSize(4);
+		textErrOut.setEditable(false);
 		scrollPane_1.setViewportView(textErrOut);
 
 		getContentPane().setLayout(groupLayout);
@@ -316,6 +321,23 @@ public class Gui extends JFrame {
 		
 		mnTools.addSeparator();
 		
+		mntmCreateDefaultConfig = new JMenuItem("Create Default config.xml…");
+		mnTools.add(mntmCreateDefaultConfig);
+		mntmCreateDefaultConfig.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				SaveFileSaver chooser = new SaveFileSaver();
+				chooser.setSelectedFile(new File("defaultConfig.xml"));
+				int saveResult = chooser.showSaveDialog(null);
+				if (saveResult == JFileChooser.APPROVE_OPTION) {
+					File destFile = chooser.getSelectedFile();
+					Config config = ConfigUtils.createConfig();
+					new ConfigWriter(config).write(destFile.getAbsolutePath());
+				}
+
+			}
+		});
+
 		mntmCreateSamplePopulation = new JMenuItem("Create Sample Population…");
 		mnTools.add(mntmCreateSamplePopulation);
 		mntmCreateSamplePopulation.addActionListener(new ActionListener() {
@@ -356,6 +378,7 @@ public class Gui extends JFrame {
 						txtConfigfilename.getText()
 				};
 				Gui.this.textStdOut.setText("");
+				Gui.this.textErrOut.setText("");
 				Gui.this.exeRunner = ExeRunner.run(cmdArgs, Gui.this.textStdOut, Gui.this.textErrOut, new File(txtConfigfilename.getText()).getParent());
 				Gui.this.btnStartMatsim.setText("Stop MATSim");
 				Gui.this.btnStartMatsim.setEnabled(true);
@@ -375,6 +398,9 @@ public class Gui extends JFrame {
 					Gui.this.textStdOut.append("\n");
 					Gui.this.textStdOut.append("The simulation did not run properly. Error/Exit code: " + exitcode);
 					Gui.this.textStdOut.setCaretPosition(Gui.this.textStdOut.getDocument().getLength());
+					Gui.this.textErrOut.append("\n");
+					Gui.this.textErrOut.append("The simulation did not run properly. Error/Exit code: " + exitcode);
+					Gui.this.textErrOut.setCaretPosition(Gui.this.textStdOut.getDocument().getLength());
 					throw new RuntimeException("There was a problem running MATSim. exit code: " + exitcode);
 				}
 			}
@@ -392,6 +418,9 @@ public class Gui extends JFrame {
 			Gui.this.textStdOut.setText("");
 			Gui.this.textStdOut.append("The configuration file could not be loaded. Error message:\n");
 			Gui.this.textStdOut.append(e.getMessage());
+			Gui.this.textErrOut.setText("");
+			Gui.this.textErrOut.append("The configuration file could not be loaded. Error message:\n");
+			Gui.this.textErrOut.append(e.getMessage());
 			return;
 		}
 		txtConfigfilename.setText(configFilename);
@@ -421,6 +450,9 @@ public class Gui extends JFrame {
 					Gui.this.textStdOut.append("\n");
 					Gui.this.textStdOut.append("The simulation was stopped forcefully.");
 					Gui.this.textStdOut.setCaretPosition(Gui.this.textStdOut.getDocument().getLength());
+					Gui.this.textErrOut.append("\n");
+					Gui.this.textErrOut.append("The simulation was stopped forcefully.");
+					Gui.this.textErrOut.setCaretPosition(Gui.this.textStdOut.getDocument().getLength());
 				}
 			});
 		}

@@ -46,7 +46,7 @@ public class ModifyPopulation {
 		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(INPUT_BASE_DIR + "network_wgs84_utm33n.xml.gz");
-		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/"
+		config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/"
 				+ "commuter_population_wgs84_utm33n_car_only.xml.gz");
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -65,7 +65,7 @@ public class ModifyPopulation {
 			}
 		}
 		
-		new PopulationWriter(scenario.getPopulation()).write(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse/"
+		new PopulationWriter(scenario.getPopulation()).write(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/"
 				+ "commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
 	}
 

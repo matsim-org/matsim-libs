@@ -33,9 +33,9 @@ public class SinglePassengerDropoffActivity
 
 
     public SinglePassengerDropoffActivity(PassengerEngine passengerEngine, StayTask dropoffTask,
-            PassengerRequest request)
+            PassengerRequest request, String activityType)
     {
-        super("PassengerDropoff", dropoffTask);
+        super(activityType, dropoffTask);
 
         this.passengerEngine = passengerEngine;
         this.dropoffTask = dropoffTask;

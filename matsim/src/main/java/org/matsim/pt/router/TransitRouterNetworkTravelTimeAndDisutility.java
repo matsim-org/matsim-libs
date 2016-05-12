@@ -113,6 +113,11 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		
 		// say that the effective walk time is the transfer time minus some "buffer"
 		double walktime = transfertime - waittime;
+		// (this looks like walktime might become negative.  But at least in the default version, the additional transfer time is always
+		// _added_ to the walk time (see getLinkTravelTime below) so at least in that case this cannot happen.  kai, triggered by cd, may'16)
+		if ( walktime < 0. ) {
+			throw new RuntimeException( "negative walk time; should not happen; needs to be repaired" ) ;
+		}
 		
 		double walkDistance = link.getLength() ;
 		
@@ -192,6 +197,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		return vehArrivalTime ;		
 	}
 
+	@Override
 	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
 		//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
 		double timeCost = - getTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
@@ -203,6 +209,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		return timeCost + distanceCost ;
 	}
 
+	@Override
 	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
 		double distance = CoordUtils.calcEuclideanDistance(coord, toCoord);
 		double initialTime = distance / config.getBeelineWalkSpeed();

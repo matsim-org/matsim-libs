@@ -53,7 +53,7 @@ public class OptimisePT {
 				100, 50);
 		final TimeDiscretization timeDiscretization = new TimeDiscretization(0,
 				3600, 24); // OK to start with
-		final ObjectiveFunction objectiveFunction = new PTObjectiveFunction(); // TODO this is minimized
+		final ObjectiveFunction objectiveFunction = new PTObjectiveFunction(scenario); // TODO this is minimized
 		
 		// Changing vehicle and road capacity according to sample size
 		PTCapacityAdjusmentPerSample capadjuster = new PTCapacityAdjusmentPerSample();
