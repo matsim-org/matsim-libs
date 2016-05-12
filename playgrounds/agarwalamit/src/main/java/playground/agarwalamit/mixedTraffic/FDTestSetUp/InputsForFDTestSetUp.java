@@ -63,7 +63,7 @@ public class InputsForFDTestSetUp {
 	private Collection<String> snapshotFormats = new ArrayList<>();
 	private static final double SNAPSHOT_PERIOD = 1.0;
 
-	private final double LINK_CAPACITY = 1800; //in PCU/h
+	private final double LINK_CAPACITY = 1600; //in PCU/h
 	private final double END_TIME = 24*3600;
 	private final double FREESPEED_KM_H = 60.;	//maximum authorized velocity on the track
 	private double stuckTime = 10;
