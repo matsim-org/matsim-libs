@@ -21,11 +21,7 @@
 
 package playground.polettif.publicTransitMapping.osm;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -48,14 +44,29 @@ public class MultimodalNetworkCreatorPT implements MultimodalNetworkCreator {
 	 *             [2] output coordinate system (optional)
 	 */
 	public static void main(String[] args) {
-		Config config = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(config);
-		Network network = sc.getNetwork();
+		if(args.length == 2) {
+			run(args[0], args[1], null);
+		} else if(args.length == 3) {
+			run(args[0], args[1], args[2]);
+		} else {
+			throw new IllegalArgumentException("Wrong number parameters.");
+		}
+	}
 
-		CoordinateTransformation transformation = (args.length == 3 ? TransformationFactory.getCoordinateTransformation("WGS84", args[2]) : null);
+	/**
+	 * Creates a MATSim network file from osm.
+	 * @param osmFile the osm file
+	 * @param outputNetworkFile the filepath to the output MATSim network file
+	 * @param outputCoordinateSystem output coordinate System (no transformation used if <tt>null</tt>)
+	 */
+	public static void run(String osmFile, String outputNetworkFile, String outputCoordinateSystem) {
+		Network network = NetworkTools.createNetwork();
 
-		new MultimodalNetworkCreatorPT(network, transformation).createMultimodalNetwork(args[0]);
-		NetworkTools.writeNetwork(network, args[1]);
+		CoordinateTransformation transformation = (outputCoordinateSystem != null ?
+				TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem) : null);
+
+		new MultimodalNetworkCreatorPT(network, transformation).createMultimodalNetwork(osmFile);
+		NetworkTools.writeNetwork(network, outputNetworkFile);
 	}
 
 	public MultimodalNetworkCreatorPT(Network network, CoordinateTransformation transformation) {

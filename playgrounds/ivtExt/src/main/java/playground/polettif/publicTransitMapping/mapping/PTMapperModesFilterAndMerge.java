@@ -100,6 +100,15 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		}
 	}
 
+	/**
+	 * Routes the unmapped MATSim Transit Schedule to the network using the file
+	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
+	 * @param configFile the PublicTransitMapping config file
+	 */
+	public static void run(String configFile) {
+		new PTMapperModesFilterAndMerge(configFile).mapFilesFromConfig();
+	}
+
 	@Override
 	public void mapFilesFromConfig() {
 		if(config.getScheduleFile() == null || config.getNetworkFile() == null) {
@@ -131,7 +140,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 
 		}
 	}
-
 
 	@Override
 	public void mapScheduleToNetwork(Network network) {
@@ -168,8 +176,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 */
 		Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates = PTMapperUtils.generateModeLinkCandidates(schedule, network, config);
 		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixChildStopFacilitiesRegex());
-
-
 
 		/** [3]
 		 * Get network extent to speed up routing outside of network area.
@@ -376,7 +382,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		/** [9]
 		 * Now that all lines have been routed, it is possible that a route passes
 		 * a link closer to a stop facility than its referenced link.
-		 *
 		 */
 		PTMapperUtils.concentrateStopFacilities(schedule, network);
 

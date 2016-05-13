@@ -24,13 +24,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 
-import java.util.*;
-
-import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Methods to clean transit schedules by removing
@@ -163,6 +160,25 @@ public class ScheduleCleaner {
 		}
 
 		log.info("    "+linksToRemove.size()+" links removed");
+	}
+
+	/**
+	 * Changes the schedule to an unmapped schedule by removes all link sequences
+	 * from a transit schedule and removing referenced links from stop facilities.
+	 * @param schedule
+	 */
+	public static void removeMapping(TransitSchedule schedule) {
+		log.info("... Removing reference links and link sequences from schedule");
+
+		for(TransitStopFacility stopFacility : schedule.getFacilities().values()) {
+			stopFacility.setLinkId(null);
+		}
+
+		for(TransitLine line : schedule.getTransitLines().values()) {
+			for(TransitRoute route : line.getRoutes().values()) {
+				route.setRoute(null);
+			}
+		}
 	}
 
 }

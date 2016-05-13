@@ -48,8 +48,6 @@ public class LinkCandidate  {
 	private final Coord fromNodeCoord;
 	private final Coord toNodeCoord;
 
-	private TransitStopFacility childStopFacility;
-
 	public LinkCandidate(Link link, TransitStopFacility parentStopFacility) {
 		this.id = parentStopFacility.getId().toString() + ".link:" + link.getId().toString();
 		this.parentStopFacilityId = parentStopFacility.getId().toString();
@@ -127,10 +125,6 @@ public class LinkCandidate  {
 		return true;
 	}
 
-	@Deprecated
-	public void setChildStop(TransitStopFacility childStopFacility) {
-		this.childStopFacility = childStopFacility;
-	}
 
 	/**
 	 * @deprecated Should not be used since we work with different networks

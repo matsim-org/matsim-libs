@@ -1,8 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,22 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.polettif.publicTransitMapping.workbench;
-
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
-import playground.polettif.publicTransitMapping.tools.ScheduleTools;
-
-public class GtfsZvvCleaner {
-	
-	public static void main(final String[] args) {
-		String in = "C:/Users/polettif/Desktop/data/mts/unmapped/fromGtfs/zvv_clean.xml";
-		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(in);
-
-		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
-
-		ScheduleTools.writeTransitSchedule(schedule, in);
-	}
-	
-}
+/**
+ * @author nagel
+ *
+ */
+package tutorial.programming.downsamplePopulation;

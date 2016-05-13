@@ -344,6 +344,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * Suffix used for child stop facilities. A number for each child of a
 	 * parent stop facility is appended (i.e. stop0123.fac:2).
 	 */
+	// TODO remove suffix from config file and set as static to ensure other parts of the package work
 	private String suffixChildStopFacilities = ".link:";
 	private String suffixChildStopFacilitiesRegex = "[.]link:";
 

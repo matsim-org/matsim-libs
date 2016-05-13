@@ -49,12 +49,12 @@ public class Visum2KeyMatrix {
 	public static void main(String[] args) throws IOException {
 		Matrix visumMatrix = new Matrix("1", null);
 		VisumMatrixReader reader = new VisumMatrixReader(visumMatrix);
-		reader.readFile("/Users/johannes/Desktop/Bahn_gesamt.txt");
+		reader.readFile("/Users/johannes/gsv/miv-matrix/raw/modena/miv.edu.txt");
 		
 		NumericMatrix keyMatrix = convert(visumMatrix);
 		
 //		NumericMatrixXMLWriter writer = new NumericMatrixXMLWriter();
-		NumericMatrixIO.write(keyMatrix, "/Users/johannes/Desktop/rail.2013.txt");
+		NumericMatrixIO.write(keyMatrix, "/Users/johannes/gsv/miv-matrix/raw/modena/miv.edu.2.txt");
 //		writer.write(keyMatrix, "/Users/johannes/Desktop/rail.2013.txt");
 	}
 

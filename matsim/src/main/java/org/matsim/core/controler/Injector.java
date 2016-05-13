@@ -64,9 +64,11 @@ public abstract class Injector {
         for (Map.Entry<Key<?>, Binding<?>> entry : realInjector.getBindings().entrySet()) {
       	  Level level = Level.INFO ;
       	  if ( entry.getKey().toString().contains("type=org.matsim") ) {
-              Annotation annotation = entry.getKey().getAnnotation();
-              logger.log( level, entry.getKey().getTypeLiteral() + " " + (annotation != null ? annotation.toString() : ""));
-              logger.log(level, "   -> " + entry.getValue().getProvider());
+      		  Annotation annotation = entry.getKey().getAnnotation();
+      		  logger.log( level, entry.getKey().getTypeLiteral() + " " + (annotation != null ? annotation.toString() : ""));
+      		  logger.log(level, "   -> " + entry.getValue().getProvider());
+      		  logger.log(level, "  ==full==> " + entry.getValue() );
+      		  // yy could probably format the above in a better way. kai, may'16
       	  }
         }
         return realInjector;
