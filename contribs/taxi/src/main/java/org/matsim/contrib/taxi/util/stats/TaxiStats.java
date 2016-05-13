@@ -45,15 +45,15 @@ public class TaxiStats
     }
 
 
-    public double getAggregatedEmptyDriveRatio()
+    public double getFleetEmptyDriveRatio()
     {
         double empty = taskTimeSumsByType.get(TaxiTask.TaxiTaskType.EMPTY_DRIVE).doubleValue();
-        double occupied = taskTimeSumsByType.get(TaxiTask.TaxiTaskType.EMPTY_DRIVE).doubleValue();
+        double occupied = taskTimeSumsByType.get(TaxiTask.TaxiTaskType.OCCUPIED_DRIVE).doubleValue();
         return empty / (empty + occupied);
     }
 
 
-    public double getAggregatedStayRatio()
+    public double getFleetStayRatio()
     {
         double stay = taskTimeSumsByType.get(TaxiTask.TaxiTaskType.STAY).doubleValue();
         double total = taskTimeSumsByType.getTotal().doubleValue();

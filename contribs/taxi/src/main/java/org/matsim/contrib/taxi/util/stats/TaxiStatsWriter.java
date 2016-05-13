@@ -52,11 +52,12 @@ public class TaxiStatsWriter
     private void writePassengerWaitTimeStats(PrintWriter pw)
     {
         pw.println("Passenger Wait Time [s]");
-        pw.println("hour\t" + DETAILED_STATS_SUBHEADER);
+        pw.println("hour\tn\t" + DETAILED_STATS_SUBHEADER);
 
         for (TaxiStats s : taxiStats.values()) {
+            String prefix = String.format("%s\t%d", s.id, s.passengerWaitTime.getN());
             printfDetailedStats(pw,
-                    s.id + "\t%.1f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f",
+                    prefix + "\t%.1f\t%.1f\t|\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f",
                     s.passengerWaitTime);
         }
         pw.println();
@@ -65,13 +66,13 @@ public class TaxiStatsWriter
 
     private void writeVehicleEmptyDriveRatioStats(PrintWriter pw)
     {
-        pw.println("Vehicle Empty Drive Ratio [%]");
-        pw.println("hour\tagg_mean\t" + DETAILED_STATS_SUBHEADER);
+        pw.println("Vehicle Empty Drive Ratio");
+        pw.println("hour\tfleet\t" + DETAILED_STATS_SUBHEADER);
 
         for (TaxiStats s : taxiStats.values()) {
-            String prefix = String.format("%s\t%.4f", s.id, s.getAggregatedEmptyDriveRatio());
+            String prefix = String.format("%s\t%.4f", s.id, s.getFleetEmptyDriveRatio());
             printfDetailedStats(pw,
-                    prefix + "\t%.4f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f",
+                    prefix + "\t%.4f\t%.4f\t|\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f",
                     s.vehicleEmptyDriveRatio);
         }
         pw.println();
@@ -80,26 +81,29 @@ public class TaxiStatsWriter
 
     private void writeVehicleWaitRatioStats(PrintWriter pw)
     {
-        pw.println("Vehicle Wait Ratio [%]");
-        pw.println("hour\tagg_mean\t" + DETAILED_STATS_SUBHEADER);
+        pw.println("Vehicle Wait Ratio");
+        pw.println("hour\tfleet\t" + DETAILED_STATS_SUBHEADER);
 
         for (TaxiStats s : taxiStats.values()) {
-            String prefix = String.format("%s\t%.4f", s.id, s.getAggregatedStayRatio());
+            String prefix = String.format("%s\t%.4f", s.id, s.getFleetStayRatio());
             printfDetailedStats(pw,
-                    prefix + "\t%.4f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f",
+                    prefix + "\t%.4f\t%.4f\t|\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f",
                     s.vehicleStayRatio);
         }
         pw.println();
     }
 
 
-    private static final String DETAILED_STATS_SUBHEADER = "mean\tmin\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax";
+    private static final String DETAILED_STATS_SUBHEADER = "mean\tsd\t|\t"
+            + "min\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax";
 
 
     private void printfDetailedStats(PrintWriter pw, String format, DescriptiveStatistics stats)
     {
         pw.printf(format, //
                 stats.getMean(), //
+                stats.getStandardDeviation(), //
+                //
                 stats.getMin(), //
                 stats.getPercentile(2), //
                 stats.getPercentile(5), //
@@ -116,14 +120,14 @@ public class TaxiStatsWriter
     private void writeTaskTypeSums(PrintWriter pw)
     {
         pw.println("Total duration of tasks by type [h]");
-        pw.println(TimeProfiles.TAXI_TASK_TYPES_HEADER);
+        pw.println(TimeProfiles.TAXI_TASK_TYPES_HEADER + "\tall");
 
         for (TaxiStats s : taxiStats.values()) {
-            pw.printf("%s", s.id);
-
+            pw.print(s.id);
             for (TaxiTask.TaxiTaskType t : TaxiTask.TaxiTaskType.values()) {
-                pw.printf("\t%.2f", s.taskTimeSumsByType.get(t).doubleValue() / 3600.);
+                pw.printf("\t%.2f", s.taskTimeSumsByType.get(t).doubleValue() / 3600);
             }
+            pw.printf("\t%.2f", s.taskTimeSumsByType.getTotal().doubleValue() / 3600);
             pw.println();
         }
         pw.println();

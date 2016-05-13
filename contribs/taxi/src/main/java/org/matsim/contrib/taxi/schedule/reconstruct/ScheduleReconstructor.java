@@ -29,13 +29,14 @@ import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.*;
-import org.matsim.core.network.*;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 
 public class ScheduleReconstructor
 {
-    final TaxiData taxiData;
+    final TaxiData taxiData = new TaxiData();
     final Map<Id<Link>, ? extends Link> links;
 
     final Map<Id<Person>, ScheduleBuilder> scheduleBuilders = new LinkedHashMap<>();
@@ -46,9 +47,9 @@ public class ScheduleReconstructor
     private final RequestRecorder requestRecorder;
 
 
-    public ScheduleReconstructor(TaxiData taxiData, Network network, EventsManager eventsManager)
+    @Inject
+    public ScheduleReconstructor(Network network, EventsManager eventsManager)
     {
-        this.taxiData = taxiData;
         links = network.getLinks();
 
         driveRecorder = new DriveRecorder(this);
@@ -99,14 +100,10 @@ public class ScheduleReconstructor
     }
 
 
-    public static TaxiData reconstructFromFile(String networkFile, String eventsFile)
+    public static TaxiData reconstructFromFile(Network network, String eventsFile)
     {
-        TaxiData taxiData = new TaxiData();
-        Network network = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(network).readFile(networkFile);
         EventsManager eventsManager = EventsUtils.createEventsManager();
-
-        ScheduleReconstructor reconstructor = new ScheduleReconstructor(taxiData, network,
+        ScheduleReconstructor reconstructor = new ScheduleReconstructor(network,
                 eventsManager);
         new MatsimEventsReader(eventsManager).readFile(eventsFile);
         return reconstructor.getTaxiData();

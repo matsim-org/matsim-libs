@@ -58,13 +58,17 @@ public class BoundedHistogram
     }
 
 
-    //fails if value is outside the bounds
     public void addValue(double value)
     {
+        if (value < bounds[0] || value >= bounds[bounds.length - 1]) {
+            throw new IllegalArgumentException("Value=" + value + " beyond the bounds");
+        }
+
         int idx = Arrays.binarySearch(bounds, value);
-        if (idx <= 0) {
+        if (idx < 0) {
             idx = -idx - 2;
         }
+
         increment(idx);
     }
 

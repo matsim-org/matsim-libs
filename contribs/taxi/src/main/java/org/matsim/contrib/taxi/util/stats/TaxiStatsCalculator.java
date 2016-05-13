@@ -164,9 +164,9 @@ public class TaxiStatsCalculator
 
     private void updateTaxiStats(TaxiStats taxiStats, LongEnumAdder<TaxiTaskType> vehicleSums)
     {
-        updateEmptyDriveRatio(dailyStats.vehicleEmptyDriveRatio, vehicleSums);
-        updateStayRatio(dailyStats.vehicleStayRatio, vehicleSums);
-        dailyStats.taskTimeSumsByType.addAll(vehicleSums);
+        updateEmptyDriveRatio(taxiStats.vehicleEmptyDriveRatio, vehicleSums);
+        updateStayRatio(taxiStats.vehicleStayRatio, vehicleSums);
+        taxiStats.taskTimeSumsByType.addAll(vehicleSums);
     }
 
 

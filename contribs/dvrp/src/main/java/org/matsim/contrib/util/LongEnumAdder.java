@@ -79,4 +79,11 @@ public class LongEnumAdder<K extends Enum<K>>
     {
         return getLongTotal();
     }
+
+
+    @Override
+    public String toString()
+    {
+        return sums + ", total=" + totalSum;
+    }
 }

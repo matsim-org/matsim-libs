@@ -68,7 +68,8 @@ public class TaxiHistogramsWriter
 
     private void writeVehicleEmptyDriveRatio(CSVWriter writer)
     {
-        writeHistogramHeader(writer, "Vehicle Empty Drive Ratio [%]", new UniformHistogram(5, 20));
+        writeHistogramHeader(writer, "Vehicle Empty Drive Ratio",
+                new UniformHistogram(0.05, 20));
         for (TaxiStats s : taxiStats.values()) {
             writeHistogramValues(writer, s.id,
                     UniformHistogram.create(0.05, 20, s.vehicleEmptyDriveRatio.getValues()));
@@ -79,7 +80,7 @@ public class TaxiHistogramsWriter
 
     private void writeVehicleStayRatio(CSVWriter writer)
     {
-        writeHistogramHeader(writer, "Vehicle Stay Ratio [%]", new UniformHistogram(5, 20));
+        writeHistogramHeader(writer, "Vehicle Wait Ratio", new UniformHistogram(0.05, 20));
         for (TaxiStats s : taxiStats.values()) {
             writeHistogramValues(writer, s.id,
                     UniformHistogram.create(0.05, 20, s.vehicleStayRatio.getValues()));
@@ -94,7 +95,7 @@ public class TaxiHistogramsWriter
         // [0.01, 0.25) and [0.25, 0.5) both busy for most of the time
         // [0.5, 0.75) and [0.75, 1) both idle for most of the time 
         // [1, 1] //== always idle
-        double[] bounds = { 0, 0.01, 0.25, 0.5, 0.75, 1, 1.0000001 };
+        double[] bounds = { 0, 0.01, 0.25, 0.5, 0.75, 1, 1.00000001 };
 
         writeHistogramHeader(writer, "Vehicle Wait Ratio Counts", new BoundedHistogram(bounds));
         for (TaxiStats s : taxiStats.values()) {
@@ -110,7 +111,7 @@ public class TaxiHistogramsWriter
         writer.writeNext(CSVLineBuilder.line(header));
         CSVLineBuilder lineBuilder = new CSVLineBuilder().add("hour");
         for (int i = 0; i < histogram.getBinCount(); i++) {
-            lineBuilder.add(histogram.getBin(i) + "");
+            lineBuilder.addf("%.2f", histogram.getBin(i));
         }
         writer.writeNext(lineBuilder.build());
     }

@@ -35,12 +35,26 @@ public class CSVLineBuilder
     }
 
 
-    private List<String> line = new ArrayList<>();
+    private final List<String> line = new ArrayList<>();
 
 
-    public CSVLineBuilder add(String e)
+    public CSVLineBuilder add(String cell)
     {
-        line.add(e);
+        line.add(cell);
+        return this;
+    }
+
+
+    public CSVLineBuilder addf(String format, Object cell)
+    {
+        line.add(String.format(format, cell));
+        return this;
+    }
+
+
+    public CSVLineBuilder addEmpty()
+    {
+        line.add(null);
         return this;
     }
 

@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.util;
 
-import java.util.*;
+import java.util.EnumMap;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 
@@ -78,5 +78,12 @@ public class DoubleEnumAdder<K extends Enum<K>>
     public Double getTotal()
     {
         return getDoubleTotal();
+    }
+
+
+    @Override
+    public String toString()
+    {
+        return sums + ", total=" + totalSum;
     }
 }

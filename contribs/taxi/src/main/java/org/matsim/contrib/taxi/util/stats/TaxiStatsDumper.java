@@ -37,8 +37,8 @@ public class TaxiStatsDumper
 {
     private static final String HEADER = "iter"//
             + "\t|\tTP_avg\tTP_sd\tTP_p95\tTP_max"//
-            + "\t|\tRE_agg_avg\tRE_avg\tRE_sd"//
-            + "\t|\tRW_agg_avg\tRW_avg\tRW_sd"//
+            + "\t|\tRE_fleet\tRE_avg\tRE_sd"//
+            + "\t|\tRW_fleet\tRW_avg\tRW_sd"//
             + "\t|\tTO";
 
     private final TaxiData taxiData;
@@ -84,12 +84,12 @@ public class TaxiStatsDumper
                 s.passengerWaitTime.getMax());
 
         multiDayWriter.printf("\t|\t%.3f\t%.3f\t%.3f", //
-                s.getAggregatedEmptyDriveRatio(), //
+                s.getFleetEmptyDriveRatio(), //
                 s.vehicleEmptyDriveRatio.getMean(), //
                 s.vehicleEmptyDriveRatio.getStandardDeviation());
 
         multiDayWriter.printf("\t|\t%.3f\t%.3f\t%.3f", //
-                s.getAggregatedStayRatio(), //
+                s.getFleetStayRatio(), //
                 s.vehicleStayRatio.getMean(), //
                 s.vehicleStayRatio.getStandardDeviation());
 
