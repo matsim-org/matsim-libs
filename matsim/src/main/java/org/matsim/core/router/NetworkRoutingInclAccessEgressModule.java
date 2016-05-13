@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -109,8 +110,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final double departureTime,
 			final Person person) {
 
-		final Id<Link> accessActLinkId = fromFacility.getLinkId();
-		final Id<Link> egressActLinkId = toFacility.getLinkId();
+		Id<Link> accessActLinkId = fromFacility.getLinkId();
+		Id<Link> egressActLinkId = toFacility.getLinkId();
 		double now = departureTime ;
 
 		List<PlanElement> result = new ArrayList<>() ;
@@ -118,26 +119,42 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		// === access:
 		{
 			final Coord fromCoord = fromFacility.getCoord();
+			Coord accessActCoord  ;
 			if ( fromCoord != null ) { // otherwise the trip starts directly on the link; no need to bushwhack
-
-				Link link = network.getLinks().get( fromFacility.getLinkId() );
-				if ( link==null ) {
-					// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode.
-					link = NetworkUtils.getNearestLink(network, fromCoord) ;
+				// yyyyyy but test if this is correct!! kai, may'16
+				{
+					Link link = network.getLinks().get( fromFacility.getLinkId() );
+					if ( link==null ) {
+						// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode.
+						link = NetworkUtils.getNearestLink(network, fromCoord) ;
+						Gbl.assertNotNull(link);
+					}
+					accessActLinkId = link.getId();
+					accessActCoord = link.getToNode().getCoord() ;
+				}{
+					Link link = network.getLinks().get( toFacility.getLinkId() );
+					if ( link==null ) {
+						// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode.
+						link = NetworkUtils.getNearestLink(network, fromCoord) ;
+						Gbl.assertNotNull(link);
+					}
+					egressActLinkId = link.getId();
 				}
-				
-				Coord accessActCoord = link.getToNode().getCoord() ;
-				// yy maybe use orthogonal distance instead?
+				// yyyy maybe use orthogonal distance instead?
 				Gbl.assertNotNull( accessActCoord );
 
 				Leg accessLeg = this.populationFactory.createLeg( TransportMode.access_walk ) ;
 				accessLeg.setDepartureTime( now );
 				now += routeBushwhackingLeg(person, accessLeg, fromCoord, accessActCoord, now, accessActLinkId, accessActLinkId ) ;
+
 				// (in this setup, street address of starting point and link of interaction activity are the same)
 
 				result.add( accessLeg ) ;
+				Logger.getLogger(this.getClass()).warn( accessLeg );
 
-				result.add( createInteractionActivity(accessActCoord, accessActLinkId) ) ;
+				final ActivityImpl interactionActivity = createInteractionActivity(accessActCoord, accessActLinkId);
+				result.add( interactionActivity ) ;
+				Logger.getLogger(this.getClass()).warn( interactionActivity );
 			}
 		}
 
@@ -148,6 +165,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			now += routeLeg( person, newLeg, accessActLinkId, egressActLinkId, now );
 
 			result.add( newLeg ) ;
+			Logger.getLogger(this.getClass()).warn( newLeg );
 		}
 
 		// === egress:
@@ -164,7 +182,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				// yy maybe use orthogonal distance instead?
 				Gbl.assertNotNull( egressActCoord );
 
-				result.add( createInteractionActivity( egressActCoord, egressActLinkId ) ) ;
+				final ActivityImpl interactionActivity = createInteractionActivity( egressActCoord, egressActLinkId );
+				result.add( interactionActivity ) ;
+				Logger.getLogger(this.getClass()).warn( interactionActivity );
 
 				Leg egressLeg = this.populationFactory.createLeg( TransportMode.egress_walk ) ;
 				egressLeg.setDepartureTime( now );
@@ -172,12 +192,14 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				// (in this setup, link of interaction activity and street address of destination are the same)
 
 				result.add( egressLeg ) ;
+				Logger.getLogger(this.getClass()).warn( egressLeg );
 			}
+			Logger.getLogger(this.getClass()).warn( "===" );
 		}
 
 		return result ;
 	}
-	
+
 	private ActivityImpl createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink) {
 		ActivityImpl act = new ActivityImpl( stageActivityType, interactionCoord, interactionLink);
 		act.setMaximumDuration(0.0);
@@ -189,10 +211,10 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		// I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
 		// map facilities, and if you follow throgh to the teleportation routers one even finds activity wrappers, which is yet another
 		// complication which I certainly don't want here.  kai, dec'15
-		
+
 		// dpLinkId, arLinkId need to be in Route for lots of code to function.   So I am essentially putting in the "street address"
 		// for completeness. Note that if we are walking to a parked car, this can be different from the car link id!!  kai, dec'15
-		
+
 		// make simple assumption about distance and walking speed
 		double dist = CoordUtils.calcEuclideanDistance(fromCoord,toCoord);
 
