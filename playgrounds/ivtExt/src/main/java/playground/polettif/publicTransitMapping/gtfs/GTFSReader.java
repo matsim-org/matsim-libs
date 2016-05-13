@@ -224,7 +224,7 @@ public class GTFSReader {
 			/** [2]
 			 * Create a MTS transitLine for each GTFSRoute
 			 */
-			TransitLine transitLine = scheduleFactory.createTransitLine(Id.create(gtfsRoute.getRouteId(), TransitLine.class));
+			TransitLine transitLine = scheduleFactory.createTransitLine(Id.create(gtfsRoute.getShortName()+"_"+gtfsRoute.getRouteId(), TransitLine.class));
 			schedule.addTransitLine(transitLine);
 			counterLines++;
 

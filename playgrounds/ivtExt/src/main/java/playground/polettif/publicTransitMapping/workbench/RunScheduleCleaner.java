@@ -22,10 +22,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
-public class GtfsZvvCleaner {
+public class RunScheduleCleaner {
 	
 	public static void main(final String[] args) {
-		String in = "C:/Users/polettif/Desktop/data/mts/unmapped/fromGtfs/zvv_clean.xml";
+		String in = "C:/Users/Flavio/Desktop/data/mts/fromHafas/vbz.xml";
 		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(in);
 
 		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
