@@ -19,7 +19,6 @@
 package playground.polettif.publicTransitMapping.plausibility;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import gnu.trove.map.hash.TByteByteHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -32,7 +31,10 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.polettif.publicTransitMapping.plausibility.log.*;
 import playground.polettif.publicTransitMapping.tools.CsvTools;
@@ -67,7 +69,7 @@ public class PlausibilityCheck {
 	public static final String LOOP_WARNING = "LoopWarning";
 	public static final String DIRECTION_CHANGE_WARNING = "DirectionChangeWarning";
 
-	private Set<PlausibilityWarning> warnings = new HashSet<>();
+	private Set<PlausibilityWarning> allWarnings = new HashSet<>();
 	private Map<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> warningsSchedule = new HashMap<>();
 	private Map<List<Id<Link>>, Set<PlausibilityWarning>> warningsLinkIds = new HashMap<>();
 	private Map<Id<Link>, Set<PlausibilityWarning>> warningsLinks = new HashMap<>();
@@ -181,12 +183,8 @@ public class PlausibilityCheck {
 	public void writeCsv(String outputFile) {
 		List<String> csvLines = new ArrayList<>();
 		csvLines.add(AbstractPlausibilityWarning.CSV_HEADER);
-		for(Map.Entry<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> e : warningsSchedule.entrySet()) {
-			for(Map.Entry<TransitRoute, Set<PlausibilityWarning>> e2 : e.getValue().entrySet()) {
-				for(PlausibilityWarning warning : e2.getValue()) {
-					csvLines.add(warning.getCsvLine());
-				}
-			}
+		for(PlausibilityWarning w : allWarnings) {
+			csvLines.add(w.getCsvLine());
 		}
 		try {
 			log.info("Writing warnings to csv file " +outputFile +" ...");
@@ -202,7 +200,6 @@ public class PlausibilityCheck {
 		Collection<SimpleFeature> traveltTimeWarningsFeatures = new ArrayList<>();
 		Collection<SimpleFeature> loopWarningsFeatures = new ArrayList<>();
 		Collection<SimpleFeature> directionChangeWarningsFeatures = new ArrayList<>();
-		Map<List<Id<Link>>, SimpleFeature> uniqueFeatures = new HashMap<>();
 
 		PolylineFeatureFactory travelTimeWarningsFF = new PolylineFeatureFactory.Builder()
 				.setName("TravelTimeWarnings")
@@ -319,6 +316,7 @@ public class PlausibilityCheck {
 	 * Adds a warning object to the different data containers.
 	 */
 	private void addWarningToContainers(PlausibilityWarning warning) {
+		allWarnings.add(warning);
 		MapUtils.getSet(warning.getTransitRoute(), MapUtils.getMap(warning.getTransitLine(), this.warningsSchedule)).add(warning);
 		MapUtils.getSet(warning.getLinkIds(), warningsLinkIds).add(warning);
 

@@ -100,6 +100,15 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		}
 	}
 
+	/**
+	 * Routes the unmapped MATSim Transit Schedule to the network using the file
+	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
+	 * @param configFile the PublicTransitMapping config file
+	 */
+	public static void run(String configFile) {
+		new PTMapperModesFilterAndMerge(configFile).mapFilesFromConfig();
+	}
+
 	@Override
 	public void mapFilesFromConfig() {
 		if(config.getScheduleFile() == null || config.getNetworkFile() == null) {
@@ -131,7 +140,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 
 		}
 	}
-
 
 	@Override
 	public void mapScheduleToNetwork(Network network) {

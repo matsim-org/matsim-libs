@@ -51,21 +51,24 @@ public abstract class PTMapper {
 	 * Changes are done on the schedule provided here.
 	 *
 	 * @param schedule which will be newly routed.
+	 * @param config a PublicTransitMapping config that defines all parameters used
+	 *               for mapping.
 	 */
 	protected PTMapper(TransitSchedule schedule, PublicTransitMappingConfigGroup config) {
 		this.schedule = schedule;
 		this.config = config;
 	}
 
-	protected PTMapper(TransitSchedule schedule) {
-		this.schedule = schedule;
-		this.config = new PublicTransitMappingConfigGroup();
-	}
-
+	/**
+	 * Loads the PublicTransitMapping config file. If pahts to input files
+	 * (schedule and network) are provided in the config, mapping can be run
+	 * via {@link #mapFilesFromConfig()}
+	 *
+	 * @param configPath the config file
+	 */
 	public PTMapper(String configPath) {
 		Config configAll = ConfigUtils.loadConfig(configPath, new PublicTransitMappingConfigGroup() ) ;
-		this.config = ConfigUtils.addOrGetModule(configAll, PublicTransitMappingConfigGroup.GROUP_NAME, PublicTransitMappingConfigGroup.class ) ;
-
+		this.config = ConfigUtils.addOrGetModule(configAll, PublicTransitMappingConfigGroup.GROUP_NAME, PublicTransitMappingConfigGroup.class );
 		this.schedule = null;
 	}
 
