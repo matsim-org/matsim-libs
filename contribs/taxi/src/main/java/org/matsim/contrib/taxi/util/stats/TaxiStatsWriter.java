@@ -19,11 +19,11 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.io.PrintWriter;
 import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.util.*;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -40,96 +40,102 @@ public class TaxiStatsWriter
 
     public void write(String file)
     {
-        try (PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(file))) {
-            writePassengerWaitTimeStats(pw);
-            writeVehicleEmptyDriveRatioStats(pw);
-            writeVehicleWaitRatioStats(pw);
-            writeTaskTypeSums(pw);
+        try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file))) {
+            writePassengerWaitTimeStats(writer);
+            writeVehicleEmptyDriveRatioStats(writer);
+            writeVehicleWaitRatioStats(writer);
+            writeTaskTypeSums(writer);
         }
     }
 
 
-    private void writePassengerWaitTimeStats(PrintWriter pw)
+    private void writePassengerWaitTimeStats(CompactCSVWriter writer)
     {
-        pw.println("Passenger Wait Time [s]");
-        pw.println("hour\tn\t" + DETAILED_STATS_SUBHEADER);
+        writer.writeNext("Passenger Wait Time [s]");
+        writer.writeNext(getStatsSubheader("n"));
 
         for (TaxiStats s : taxiStats.values()) {
-            String prefix = String.format("%s\t%d", s.id, s.passengerWaitTime.getN());
-            printfDetailedStats(pw,
-                    prefix + "\t%.1f\t%.1f\t|\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f\t%.0f",
-                    s.passengerWaitTime);
+            CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id)
+                    .add(s.passengerWaitTime.getN() + "");
+            addStats(lineBuilder, "%.1f", "%.0f", s.passengerWaitTime);
+            writer.writeNext(lineBuilder);
         }
-        pw.println();
+        writer.writeNextEmpty();
     }
 
 
-    private void writeVehicleEmptyDriveRatioStats(PrintWriter pw)
+    private void writeVehicleEmptyDriveRatioStats(CompactCSVWriter writer)
     {
-        pw.println("Vehicle Empty Drive Ratio");
-        pw.println("hour\tfleet\t" + DETAILED_STATS_SUBHEADER);
+        writer.writeNext("Vehicle Empty Drive Ratio");
+        writer.writeNext(getStatsSubheader("fleet"));
 
         for (TaxiStats s : taxiStats.values()) {
-            String prefix = String.format("%s\t%.4f", s.id, s.getFleetEmptyDriveRatio());
-            printfDetailedStats(pw,
-                    prefix + "\t%.4f\t%.4f\t|\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f",
-                    s.vehicleEmptyDriveRatio);
+            CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).//
+                    addf("%.4f", s.getFleetEmptyDriveRatio());
+            addStats(lineBuilder, "%.4f", "%.3f", s.vehicleEmptyDriveRatio);
+            writer.writeNext(lineBuilder);
         }
-        pw.println();
+        writer.writeNextEmpty();
     }
 
 
-    private void writeVehicleWaitRatioStats(PrintWriter pw)
+    private void writeVehicleWaitRatioStats(CompactCSVWriter writer)
     {
-        pw.println("Vehicle Wait Ratio");
-        pw.println("hour\tfleet\t" + DETAILED_STATS_SUBHEADER);
+        writer.writeNext("Vehicle Wait Ratio");
+        writer.writeNext(getStatsSubheader("fleet"));
 
         for (TaxiStats s : taxiStats.values()) {
-            String prefix = String.format("%s\t%.4f", s.id, s.getFleetStayRatio());
-            printfDetailedStats(pw,
-                    prefix + "\t%.4f\t%.4f\t|\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f",
-                    s.vehicleStayRatio);
+            CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).//
+                    addf("%.4f", s.getFleetStayRatio());
+            addStats(lineBuilder, "%.4f", "%.3f", s.vehicleStayRatio);
+            writer.writeNext(lineBuilder);
         }
-        pw.println();
+        writer.writeNextEmpty();
     }
 
 
-    private static final String DETAILED_STATS_SUBHEADER = "mean\tsd\t|\t"
-            + "min\tpc_2\tpc_5\tpc_25\tpc_50\tpc_75\tpc_95\tpc_98\tmax";
-
-
-    private void printfDetailedStats(PrintWriter pw, String format, DescriptiveStatistics stats)
+    private String[] getStatsSubheader(String header2)
     {
-        pw.printf(format, //
-                stats.getMean(), //
-                stats.getStandardDeviation(), //
-                //
-                stats.getMin(), //
-                stats.getPercentile(2), //
-                stats.getPercentile(5), //
-                stats.getPercentile(25), //
-                stats.getPercentile(50), //
-                stats.getPercentile(75), //
-                stats.getPercentile(95), //
-                stats.getPercentile(98), //
-                stats.getMax());
-        pw.println();
+        return new String[] { "hour", header2, "mean", "sd", null, //
+                "min", "2%ile", "5%ile", "25%ile", "50%ile", "75%ile", "95%ile", "98%ile", "max" };
     }
 
 
-    private void writeTaskTypeSums(PrintWriter pw)
+    private void addStats(CSVLineBuilder lineBuilder, String format1, String format2,
+            DescriptiveStatistics stats)
     {
-        pw.println("Total duration of tasks by type [h]");
-        pw.println(TimeProfiles.TAXI_TASK_TYPES_HEADER + "\tall");
+        lineBuilder.addf(format1, stats.getMean()).//
+                addf(format1, stats.getStandardDeviation()).//
+                add(null).//
+                addf(format2, stats.getMin()). //
+                addf(format2, stats.getPercentile(2)). //
+                addf(format2, stats.getPercentile(5)). //
+                addf(format2, stats.getPercentile(25)). //
+                addf(format2, stats.getPercentile(50)). //
+                addf(format2, stats.getPercentile(75)). //
+                addf(format2, stats.getPercentile(95)). //
+                addf(format2, stats.getPercentile(98)). //
+                addf(format2, stats.getMax());
+    }
+
+
+    private void writeTaskTypeSums(CompactCSVWriter writer)
+    {
+        writer.writeNext("Total duration of tasks by type [h]");
+        CSVLineBuilder headerBuilder = new CSVLineBuilder().add("hour");
+        for (TaxiTask.TaxiTaskType t : TaxiTask.TaxiTaskType.values()) {
+            headerBuilder.add(t.name());
+        }
+        writer.writeNext(headerBuilder.add("all"));
 
         for (TaxiStats s : taxiStats.values()) {
-            pw.print(s.id);
+            CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id);
             for (TaxiTask.TaxiTaskType t : TaxiTask.TaxiTaskType.values()) {
-                pw.printf("\t%.2f", s.taskTimeSumsByType.get(t).doubleValue() / 3600);
+                lineBuilder.addf("%.2f", s.taskTimeSumsByType.get(t).doubleValue() / 3600);
             }
-            pw.printf("\t%.2f", s.taskTimeSumsByType.getTotal().doubleValue() / 3600);
-            pw.println();
+            lineBuilder.addf("%.2f", s.taskTimeSumsByType.getTotal().doubleValue() / 3600);
+            writer.writeNext(lineBuilder);
         }
-        pw.println();
+        writer.writeNextEmpty();
     }
 }

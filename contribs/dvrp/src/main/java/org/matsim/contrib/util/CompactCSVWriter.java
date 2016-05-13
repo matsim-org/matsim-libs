@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,65 +17,59 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util.histogram;
+package org.matsim.contrib.util;
 
-import java.util.Arrays;
+import java.io.*;
+
+import com.opencsv.CSVWriter;
 
 
-public class BoundedHistogram
-    extends AbstractHistogram<Double>
+public class CompactCSVWriter
+    extends CSVWriter
 {
-    public static BoundedHistogram create(double[] bounds, double[] values)
+    public static final String[] EMPTY_LINE = {};
+    public static final String EMPTY_CELL = null;
+
+
+    public CompactCSVWriter(Writer writer)
     {
-        BoundedHistogram histogram = new BoundedHistogram(bounds);
-        histogram.addValues(values);
-        return histogram;
+        this(writer, '\t');
     }
 
 
-    private final double[] bounds;
-
-
-    public BoundedHistogram(double[] bounds)
+    public CompactCSVWriter(Writer writer, char separator)
     {
-        super(bounds.length - 1);
-
-        for (int i = 1; i < bounds.length; i++) {
-            if (bounds[i - 1] >= bounds[i]) {
-                throw new IllegalArgumentException("Bounds are not sorted");
-            }
-        }
-
-        this.bounds = bounds;
-    }
-
-
-    public void addValues(double[] values)
-    {
-        for (double v : values) {
-            addValue(v);
-        }
-    }
-
-
-    public void addValue(double value)
-    {
-        if (value < bounds[0] || value >= bounds[bounds.length - 1]) {
-            throw new IllegalArgumentException("Value=" + value + " beyond the bounds");
-        }
-
-        int idx = Arrays.binarySearch(bounds, value);
-        if (idx < 0) {
-            idx = -idx - 2;
-        }
-
-        increment(idx);
+        super(writer, separator, CSVWriter.NO_QUOTE_CHARACTER);
     }
 
 
     @Override
-    public Double getBin(int idx)
+    public void writeNext(String... nextLine)
     {
-        return bounds[idx];
+        super.writeNext(nextLine);
+    }
+
+
+    public void writeNextEmpty()
+    {
+        writeNext(EMPTY_LINE);
+    }
+    
+    
+    public void writeNext(CSVLineBuilder lineBuilder)
+    {
+        writeNext(lineBuilder.build());
+    }
+
+
+    @Override
+    public void close()
+    {
+        try {
+            super.close();
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }

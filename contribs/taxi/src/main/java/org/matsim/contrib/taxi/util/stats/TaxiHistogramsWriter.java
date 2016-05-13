@@ -19,14 +19,11 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.io.*;
 import java.util.Map;
 
-import org.matsim.contrib.util.CSVLineBuilder;
+import org.matsim.contrib.util.*;
 import org.matsim.contrib.util.histogram.*;
 import org.matsim.core.utils.io.IOUtils;
-
-import com.opencsv.CSVWriter;
 
 
 public class TaxiHistogramsWriter
@@ -42,54 +39,49 @@ public class TaxiHistogramsWriter
 
     public void write(String file)
     {
-        try (CSVWriter writer = new CSVWriter(IOUtils.getBufferedWriter(file), '\t',
-                CSVWriter.NO_QUOTE_CHARACTER)) {
+        try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file))) {
             writePassengerWaitTime(writer);
             writeVehicleEmptyDriveRatio(writer);
             writeVehicleStayRatio(writer);
             writeHourlyWaitRatioCounters(writer);
         }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
     }
 
 
-    private void writePassengerWaitTime(CSVWriter writer)
+    private void writePassengerWaitTime(CompactCSVWriter writer)
     {
         writeHistogramHeader(writer, "Passenger Wait Time [min]", new UniformHistogram(2.5, 25));
         for (TaxiStats s : taxiStats.values()) {
             writeHistogramValues(writer, s.id,
                     UniformHistogram.create(2.5 * 60, 25, s.passengerWaitTime.getValues()));
         }
-        writer.writeNext(CSVLineBuilder.EMPTY_LINE);
+        writer.writeNextEmpty();
     }
 
 
-    private void writeVehicleEmptyDriveRatio(CSVWriter writer)
+    private void writeVehicleEmptyDriveRatio(CompactCSVWriter writer)
     {
-        writeHistogramHeader(writer, "Vehicle Empty Drive Ratio",
-                new UniformHistogram(0.05, 20));
+        writeHistogramHeader(writer, "Vehicle Empty Drive Ratio", new UniformHistogram(0.05, 20));
         for (TaxiStats s : taxiStats.values()) {
             writeHistogramValues(writer, s.id,
                     UniformHistogram.create(0.05, 20, s.vehicleEmptyDriveRatio.getValues()));
         }
-        writer.writeNext(CSVLineBuilder.EMPTY_LINE);
+        writer.writeNextEmpty();
     }
 
 
-    private void writeVehicleStayRatio(CSVWriter writer)
+    private void writeVehicleStayRatio(CompactCSVWriter writer)
     {
         writeHistogramHeader(writer, "Vehicle Wait Ratio", new UniformHistogram(0.05, 20));
         for (TaxiStats s : taxiStats.values()) {
             writeHistogramValues(writer, s.id,
                     UniformHistogram.create(0.05, 20, s.vehicleStayRatio.getValues()));
         }
-        writer.writeNext(CSVLineBuilder.EMPTY_LINE);
+        writer.writeNextEmpty();
     }
 
 
-    private void writeHourlyWaitRatioCounters(CSVWriter writer)
+    private void writeHourlyWaitRatioCounters(CompactCSVWriter writer)
     {
         // [0, 0.01) approx. "always busy"; 0pct is impossible due to 1-sec stay tasks
         // [0.01, 0.25) and [0.25, 0.5) both busy for most of the time
@@ -102,22 +94,23 @@ public class TaxiHistogramsWriter
             writeHistogramValues(writer, s.id,
                     BoundedHistogram.create(bounds, s.vehicleStayRatio.getValues()));
         }
-        writer.writeNext(CSVLineBuilder.EMPTY_LINE);
+        writer.writeNextEmpty();
     }
 
 
-    private void writeHistogramHeader(CSVWriter writer, String header, Histogram<?> histogram)
+    private void writeHistogramHeader(CompactCSVWriter writer, String header,
+            Histogram<?> histogram)
     {
-        writer.writeNext(CSVLineBuilder.line(header));
+        writer.writeNext(header);
         CSVLineBuilder lineBuilder = new CSVLineBuilder().add("hour");
         for (int i = 0; i < histogram.getBinCount(); i++) {
-            lineBuilder.addf("%.2f", histogram.getBin(i));
+            lineBuilder.addf("%.2f+", histogram.getBin(i));
         }
         writer.writeNext(lineBuilder.build());
     }
 
 
-    private void writeHistogramValues(CSVWriter writer, String hour, Histogram<?> histogram)
+    private void writeHistogramValues(CompactCSVWriter writer, String hour, Histogram<?> histogram)
     {
         CSVLineBuilder lineBuilder = new CSVLineBuilder().add(hour + "");
         for (int i = 0; i < histogram.getBinCount(); i++) {

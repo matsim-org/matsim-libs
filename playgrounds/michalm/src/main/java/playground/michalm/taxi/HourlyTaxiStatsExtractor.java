@@ -19,12 +19,11 @@
 
 package playground.michalm.taxi;
 
-import java.io.*;
 import java.util.Arrays;
 
 import org.matsim.contrib.taxi.util.stats.HourlyTaxiStatsReader;
-
-import com.opencsv.CSVWriter;
+import org.matsim.contrib.util.CompactCSVWriter;
+import org.matsim.core.utils.io.IOUtils;
 
 
 public class HourlyTaxiStatsExtractor
@@ -32,13 +31,14 @@ public class HourlyTaxiStatsExtractor
     public static final String[] FLEETS = { "02.2", "04.4", "06.6", "08.8", "11.0" };
     public static final String[] AVS = { "1.0", "1.5", "2.0" };
     public static final int COUNT = FLEETS.length * AVS.length;
-    
+
+
     public static String getId(String fleet, String av)
     {
         return fleet + "k_AV" + av;
     }
 
-    
+
     public static void main(String[] args)
     {
         String path = "../../../shared-svn/projects/audi_av/papers/03_transport_special_issue/results_0.15fc/";
@@ -67,8 +67,8 @@ public class HourlyTaxiStatsExtractor
             }
         }
 
-        try (CSVWriter writer = new CSVWriter(new FileWriter(path + "hourly_stats_combined.txt"),
-                '\t', CSVWriter.NO_QUOTE_CHARACTER)) {
+        try (CompactCSVWriter writer = new CompactCSVWriter(
+                IOUtils.getBufferedWriter(path + "hourly_stats_combined.txt"))) {
             writer.writeNext(header);
             writer.writeAll(Arrays.asList(meanWaitTimes));
 
@@ -77,9 +77,6 @@ public class HourlyTaxiStatsExtractor
 
             writer.writeNext(header);
             writer.writeAll(Arrays.asList(meanEmptyRatios), false);
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }

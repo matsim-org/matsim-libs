@@ -54,11 +54,12 @@ public class RecalcStatsAudiAVFlowPaper
                 String prefix = path + id + "/ITERS/it.50/" + id + ".50.";
 
                 new TaxiStatsWriter(calculator.getTaxiStats())
-                        .write(prefix + "hourly_stats_new_stats2.txt");
+                        .write(prefix + "hourly_stats_new_stats.txt");
                 new TaxiHistogramsWriter(calculator.getTaxiStats())
-                        .write(prefix + "hourly_histograms_new_stats2.txt");
+                        .write(prefix + "hourly_histograms_new_stats.txt");
                 });
             }
         }
+        service.shutdown();
     }
 }

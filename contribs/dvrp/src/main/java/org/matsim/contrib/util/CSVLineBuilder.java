@@ -26,15 +26,6 @@ import com.google.common.collect.Iterables;
 
 public class CSVLineBuilder
 {
-    public static final String[] EMPTY_LINE = {};
-
-
-    public static String[] line(String... string)
-    {
-        return string;
-    }
-
-
     private final List<String> line = new ArrayList<>();
 
 

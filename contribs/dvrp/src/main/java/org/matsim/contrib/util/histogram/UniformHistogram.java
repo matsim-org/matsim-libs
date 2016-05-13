@@ -20,7 +20,7 @@
 package org.matsim.contrib.util.histogram;
 
 public class UniformHistogram
-    extends AbstractHistogram<String>
+    extends AbstractHistogram<Double>
 {
     public static UniformHistogram create(double binSize, int binCount, double[] values)
     {
@@ -55,8 +55,8 @@ public class UniformHistogram
 
 
     @Override
-    public String getBin(int idx)
+    public Double getBin(int idx)
     {
-        return (idx * binSize) + "+";
+        return idx * binSize;
     }
 }
