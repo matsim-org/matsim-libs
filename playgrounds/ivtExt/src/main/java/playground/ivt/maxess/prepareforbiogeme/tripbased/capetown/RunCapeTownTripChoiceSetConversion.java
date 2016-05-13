@@ -59,13 +59,9 @@ import playground.ivt.utils.MoreIOUtils;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static org.matsim.api.core.v01.TransportMode.ride;
-import static playground.meisterk.PersonAnalyseTimesByActivityType.Activities.l;
 
 /**
  * @author thibautd
