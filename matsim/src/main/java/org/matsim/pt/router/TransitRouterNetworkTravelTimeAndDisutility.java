@@ -119,14 +119,14 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 			throw new RuntimeException( "negative walk time; should not happen; needs to be repaired" ) ;
 		}
 		
-		double walkDistance = link.getLength() ;
+		double walkDistance = link.getLength();
 		
 		// weigh this "buffer" not with the walk time disutility, but with the wait time disutility:
 		// (note that this is the same "additional disutl of wait" as in the scoring function.  Its default is zero.
 		// only if you are "including the opportunity cost of time into the router", then the disutility of waiting will
 		// be the same as the marginal opprotunity cost of time).  kai, nov'11
 		cost = - walktime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
-		       - walkDistance * this.config.getMarginalUtilityOfTravelDistancePt_utl_m() 
+		       - walkDistance * this.config.getMarginalUtilityOfTravelDistanceWalk_utl_m() 
 		       - waittime * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 		       - this.config.getUtilityOfLineSwitch_utl();
 		return cost;

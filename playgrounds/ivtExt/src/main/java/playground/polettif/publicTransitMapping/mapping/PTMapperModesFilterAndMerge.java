@@ -125,6 +125,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 					NetworkTools.writeNetwork(filterManager.applyFilters(), config.getOutputStreetNetworkFile());
 				}
 			} else {
+				log.info("");
 				log.info("No output paths defined, schedule and network are not written to files.");
 			}
 
@@ -139,7 +140,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		log.info("Mapping transit schedule to network...");
 		int nStopFacilities = schedule.getFacilities().size();
 		Set<String> noRoutingWarning = new HashSet<>();
-
 
 		/** [1]
 		 * Create a separate network for all schedule modes and
@@ -167,6 +167,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 * on their coordinates.
 		 */
 		Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates = PTMapperUtils.generateModeLinkCandidates(schedule, network, config);
+		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixChildStopFacilitiesRegex());
+
 
 
 		/** [3]
@@ -372,6 +374,13 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		ScheduleTools.routeSchedule(schedule, network, finalRouters);
 
 		/** [9]
+		 * Now that all lines have been routed, it is possible that a route passes
+		 * a link closer to a stop facility than its referenced link.
+		 *
+		 */
+		PTMapperUtils.concentrateStopFacilities(schedule, network);
+
+		/** [10]
 		 * After all lines created, clean the schedule and network. Removing
 		 * not used transit links includes removing artificial links that
 		 * needed to be added to the network for routing purposes.

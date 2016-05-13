@@ -34,7 +34,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
-import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
@@ -56,15 +55,15 @@ public class ScheduleEditor {
 	private final Network network;
 	private final TransitSchedule schedule;
 	private final TransitScheduleFactory scheduleFactory;
-	private final Router router;
+	private final Map<String, Router> routers;
 
 	private final Map<String, TransitRoute> transitRoutes;
 
-	public ScheduleEditor(Network network, TransitSchedule schedule, Router router) {
+	public ScheduleEditor(TransitSchedule schedule, Network network, Map<String, Router> routers) {
 		this.network = network;
 		this.schedule = schedule;
 		this.scheduleFactory = schedule.getFactory();
-		this.router = router;
+		this.routers = routers;
 
 		this.transitRoutes = new HashMap<>();
 
@@ -101,11 +100,11 @@ public class ScheduleEditor {
 		new MatsimNetworkReader(network).readFile(args[1]);
 		TransitSchedule schedule = sc.getTransitSchedule();
 
-		ScheduleEditor scheduleEditor = new ScheduleEditor(network, schedule, new FastAStarRouter(network));
+//		ScheduleEditor scheduleEditor = new ScheduleEditor(network, schedule, new FastAStarRouter(network));
 
-		scheduleEditor.parseCommandCsv(args[2]);
-		ScheduleTools.assignScheduleModesToLinks(schedule, network);
-		scheduleEditor.writeFiles(args[3], args[4]);
+//		scheduleEditor.parseCommandCsv(args[2]);
+//		ScheduleTools.assignScheduleModesToLinks(schedule, network);
+//		scheduleEditor.writeFiles(args[3], args[4]);
 	}
 
 	private void writeFiles(String outputScheduleFile, String outputNetworkFile) {
@@ -174,7 +173,7 @@ public class ScheduleEditor {
 					if(transitRoute == null) {
 						throw new IllegalArgumentException("TransitRoute " + cmd[2] + " on TransitLine " + cmd[1] + " not found!");
 					} else {
-						replaceChildStopFacilityInRoute(transitRoute, oldSFId, newSFId);
+						replaceStopFacilityInRoute(transitRoute, oldSFId, newSFId);
 					}
 					break;*/
 			}
@@ -242,6 +241,8 @@ public class ScheduleEditor {
 	 * @param viaLinkId
 	 */
 	public void rerouteFromStop(TransitRoute transitRoute, TransitRouteStop fromRouteStop, Id<Link> viaLinkId) {
+		Router router = routers.get(transitRoute.getTransportMode());
+
 		List<TransitRouteStop> routeStops = transitRoute.getStops();
 		TransitRouteStop toRouteStop = routeStops.get(routeStops.indexOf(fromRouteStop)+1);
 
@@ -305,7 +306,7 @@ public class ScheduleEditor {
 			this.schedule.addStopFacility(childStopReplaceWith);
 		}
 
-		replaceChildStopFacilityInRoute(transitRoute, childStopToReplace, childStopReplaceWith);
+		replaceStopFacilityInRoute(transitRoute, childStopToReplace, childStopReplaceWith);
 	}
 
 	private TransitStopFacility createStopFacility(Id<TransitStopFacility> facilityId, Coord coord, String name, Id<Link> linkId) {
@@ -322,7 +323,7 @@ public class ScheduleEditor {
 	 * @param toReplaceId
 	 * @param replaceWithId
 	 */
-	private void replaceChildStopFacilityInRoute(TransitRoute transitRoute, Id<TransitStopFacility> toReplaceId, Id<TransitStopFacility> replaceWithId) {
+	public void replaceStopFacilityInRoute(TransitRoute transitRoute, Id<TransitStopFacility> toReplaceId, Id<TransitStopFacility> replaceWithId) {
 		TransitStopFacility toReplace = schedule.getFacilities().get(toReplaceId);
 		TransitStopFacility replaceWith = schedule.getFacilities().get(replaceWithId);
 
@@ -331,10 +332,10 @@ public class ScheduleEditor {
 		} else if(replaceWith == null) {
 			log.warn("StopFacility " + replaceWithId + " not found in schedule!");
 		}
-		replaceChildStopFacilityInRoute(transitRoute, toReplace, replaceWith);
+		replaceStopFacilityInRoute(transitRoute, toReplace, replaceWith);
 	}
 
-	private void replaceChildStopFacilityInRoute(TransitRoute transitRoute, TransitStopFacility toReplace, TransitStopFacility replaceWith) {
+	public void replaceStopFacilityInRoute(TransitRoute transitRoute, TransitStopFacility toReplace, TransitStopFacility replaceWith) {
 		TransitRouteStop routeStopToReplace = transitRoute.getStop(toReplace);
 		if(routeStopToReplace != null) {
 			routeStopToReplace.setStopFacility(replaceWith);
@@ -355,7 +356,7 @@ public class ScheduleEditor {
 
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute route : line.getRoutes().values()) {
-				replaceChildStopFacilityInRoute(route, toReplace, replaceWith);
+				replaceStopFacilityInRoute(route, toReplace, replaceWith);
 			}
 		}
 	}
@@ -380,6 +381,7 @@ public class ScheduleEditor {
 	 * of the stop facilities.
 	 */
 	public void refreshTransitRoute(TransitRoute transitRoute) {
+		Router router = routers.get(transitRoute.getTransportMode());
 		List<TransitRouteStop> routeStops = transitRoute.getStops();
 		List<Id<Link>> linkSequence = new ArrayList<>();
 		linkSequence.add(routeStops.get(0).getStopFacility().getLinkId());
@@ -409,5 +411,4 @@ public class ScheduleEditor {
 		// add link sequence to schedule
 		transitRoute.setRoute(RouteUtils.createNetworkRoute(linkSequence, network));
 	}
-
 }

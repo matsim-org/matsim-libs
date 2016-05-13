@@ -49,7 +49,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String OUTPUT_STREET_NETWORK_FILE = "outputStreetNetworkFile";
 	private static final String LINK_DISTANCE_TOLERANCE = "linkDistanceTolerance";
 	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
-	public static final String COMBINE_PT_MODES = "combinePtModes";
+	private static final String COMBINE_PT_MODES = "combinePtModes";
 
 
 	public PublicTransitMappingConfigGroup() {
@@ -73,7 +73,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"\t\tusing them are removed. One schedule transport mode can be mapped to multiple network transport \n" +
 				"\t\tmodes, the latter have to be separated by \",\". To map a schedule transport mode independently \n" +
 				"\t\tfrom the network use \"artificial\". Assignments are separated by \"|\" (case sensitive). \n" +
-				"\t\tExample: \"bus:bus,car|rail:rail,light_rail\"");
+				"\t\tExample: \"bus:bus,car | rail:rail,light_rail\"");
 		map.put(MODES_TO_KEEP_ON_CLEAN_UP,
 				"All links that do not have a transit route on them are removed, except the ones \n" +
 				"\t\tlisted in this set (typically only car). Separated by comma.");
@@ -87,7 +87,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(PSEUDO_ROUTE_WEIGHT_TYPE,
 				"Defines which link attribute should be used for pseudo route calculations. Default is minimization \n" +
 				"\t\tof travel distance. If high quality information on link travel times is available, travelTime can be \n" +
-				"\t\tused. (Possible values \""+PseudoRouteWeightType.linkLength+"\" and \""+PseudoRouteWeightType.travelTime+"\"");
+				"\t\tused. (Possible values \""+PseudoRouteWeightType.linkLength+"\" and \""+PseudoRouteWeightType.travelTime+"\")");
 		map.put(MAX_NCLOSEST_LINKS,
 				"[Link Candidates] Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
 				"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
@@ -98,7 +98,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(MAX_STOP_FACILITY_DISTANCE,
 				"[Link Candidates] The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
 		map.put(PREFIX_ARTIFICIAL,
-				"ID prefix used for artificial links and nodes created if no nodes are found within nodeSearchRadius.");
+				"ID prefix used for all artificial links and nodes created during mapping.");
 		map.put(FREESPEED_ARTIFICIAL,
 				"The freespeed [m/s] of artificially created links.");
 		map.put(SUFFIX_CHILD_STOP_FACILITIES,
@@ -345,6 +345,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * parent stop facility is appended (i.e. stop0123.fac:2).
 	 */
 	private String suffixChildStopFacilities = ".link:";
+	private String suffixChildStopFacilitiesRegex = "[.]link:";
 
 	@StringGetter(SUFFIX_CHILD_STOP_FACILITIES)
 	public String getSuffixChildStopFacilities() {
@@ -354,6 +355,11 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(SUFFIX_CHILD_STOP_FACILITIES)
 	public void setSuffixChildStopFacilities(String suffixChildStopFacilities) {
 		this.suffixChildStopFacilities = suffixChildStopFacilities;
+		this.suffixChildStopFacilitiesRegex = suffixChildStopFacilities.replace(".", "[.]"); // todo regex escape
+	}
+
+	public String getSuffixChildStopFacilitiesRegex() {
+		return suffixChildStopFacilitiesRegex;
 	}
 
 	/**
@@ -380,7 +386,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * The freespeed of artificially created links.
 	 */
-	private double freespeedArtificialLinks = 200.0/3.6;
+	private double freespeedArtificialLinks = 50;
 
 	@StringGetter(FREESPEED_ARTIFICIAL)
 	public double getFreespeedArtificial() {

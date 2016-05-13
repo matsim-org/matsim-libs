@@ -16,16 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.maxess.nestedlogitaccessibility.scripts;
+package playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
+import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 
 import java.util.List;
 
@@ -33,31 +35,22 @@ import java.util.List;
  * @author thibautd
  */
 public class SimpleNestedLogitModelUtility implements Utility<ModeNests> {
-	private static final double ASC_CAR = 0;
-	private static final double BETA_TT_CAR = -0.276;
-
-	private static final double ASC_PT = 0.0644;
-	private static final double BETA_TT_PT = -0.508;
-	private static final double BETA_TT_PT_GA = 0.158;
-	private static final double BETA_TT_PT_HT = 0.0653;
-	private static final double BETA_TT_PT_LOCAL = 0.169;
-
-	private static final double ASC_BIKE = 1.85;
-	private static final double BETA_TT_BIKE = -0.235;
-	private static final double BETA_LICENSE_BIKE = -0.614;
-
-	private static final double ASC_WALK = 6.86;
-	private static final double BETA_TT_WALK = -0.917;
-
 	private final ObjectAttributes personAttributes;
+	private final SimpleNestedLogitUtilityConfigGroup pars;
 
 	@Inject
-	public SimpleNestedLogitModelUtility( final Population population ) {
-		this( population.getPersonAttributes() );
+	public SimpleNestedLogitModelUtility(
+			final Config config,
+			final Population population ) {
+		this( (SimpleNestedLogitUtilityConfigGroup) config.getModule( SimpleNestedLogitUtilityConfigGroup.GROUP_NAME ),
+				population.getPersonAttributes() );
 	}
 
-	public SimpleNestedLogitModelUtility( final ObjectAttributes personAttributes ) {
+	public SimpleNestedLogitModelUtility(
+			final SimpleNestedLogitUtilityConfigGroup configGroup,
+			final ObjectAttributes personAttributes ) {
 		this.personAttributes = personAttributes;
+		this.pars = configGroup;
 	}
 
 	@Override
@@ -65,26 +58,26 @@ public class SimpleNestedLogitModelUtility implements Utility<ModeNests> {
 		final double logTT = Math.log( 1 + getTravelTime( a ) );
 		switch ( a.getNestId() ) {
 			case car:
-				return ASC_CAR +
-						BETA_TT_CAR * logTT;
+				return pars.getAscCar() +
+						pars.getBetaTtCar() * logTT;
 			case pt:
 				double hasGA = hasGa( p ) ? 1 : 0;
 				double hasHT = hasHT( p ) ? 1 : 0;
 				double hasLocal = hasLocalAbo( p ) ? 1 : 0;
 
-				return ASC_PT +
-						BETA_TT_PT * logTT +
-						BETA_TT_PT_GA * hasGA * logTT +
-						BETA_TT_PT_HT * hasHT * logTT +
-						BETA_TT_PT_LOCAL * hasLocal * logTT;
+				return pars.getAscPt() +
+						pars.getBetaTtPt() * logTT +
+						pars.getBetaTtPtGa() * hasGA * logTT +
+						pars.getBetaTtPtHt() * hasHT * logTT +
+						pars.getBetaTtPtLocal() * hasLocal * logTT;
 			case bike:
 				final double hasLicense = hasLicense( p ) ? 1 : 0;
-				return ASC_BIKE +
-						BETA_TT_BIKE * logTT +
-						BETA_LICENSE_BIKE * hasLicense;
+				return pars.getAscBike() +
+						pars.getBetaTtBike() * logTT +
+						pars.getBetaLicenseBike() * hasLicense;
 			case walk:
-				return ASC_WALK +
-						BETA_TT_WALK * logTT;
+				return pars.getAscWalk() +
+						pars.getBetaTtWalk() * logTT;
 			default:
 				throw new RuntimeException( "unknown nest "+a.getNestId() );
 		}

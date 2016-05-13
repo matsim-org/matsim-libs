@@ -24,10 +24,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+
+import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
 
 /**
  * Methods to clean transit schedules by removing
@@ -161,4 +164,5 @@ public class ScheduleCleaner {
 
 		log.info("    "+linksToRemove.size()+" links removed");
 	}
+
 }

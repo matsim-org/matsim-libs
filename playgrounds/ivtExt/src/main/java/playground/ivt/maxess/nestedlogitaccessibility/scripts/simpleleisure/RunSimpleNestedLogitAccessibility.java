@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.maxess.nestedlogitaccessibility.scripts;
+package playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure;
 
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
@@ -33,6 +33,8 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.AccessibilityCom
 import playground.ivt.maxess.nestedlogitaccessibility.framework.BaseNestedAccessibilityComputationModule;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
+import playground.ivt.maxess.nestedlogitaccessibility.scripts.AdvantageColumnCalculator;
+import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.router.CachingFreespeedCarRouterModule;
 import playground.ivt.router.lazyschedulebasedmatrix.LazyScheduleBasedMatrixModule;
@@ -54,7 +56,7 @@ public class RunSimpleNestedLogitAccessibility {
 		MoreIOUtils.initOut( outputDir );
 
 		try {
-			final Config config = ConfigUtils.loadConfig( configFile );
+			final Config config = ConfigUtils.loadConfig( configFile , new SimpleNestedLogitUtilityConfigGroup() );
 			final Scenario scenario = ScenarioUtils.loadScenario( config );
 
 			// Todo: put in a scenario provider

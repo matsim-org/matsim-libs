@@ -24,6 +24,11 @@ import org.matsim.api.core.v01.network.Link;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Some utils for collection manipulation
+ *
+ * @author polettif
+ */
 public class MiscUtils {
 
 	/**
@@ -91,16 +96,15 @@ public class MiscUtils {
 	 *
 	 * @return the normalized map
 	 */
-	public static Map<Id<Link>, Double> normalize(Map<Id<Link>, Double> map) {
-		// get maximal weight
-		double maxValue = 0;
+	public static <K> Map<K, Double> normalize(Map<K, Double> map) {
+		Double maxValue = 0.0;
 		for(Double v : map.values()) {
 			if(v > maxValue)
 				maxValue = v;
 		}
 
 		// scale weights
-		for(Map.Entry<Id<Link>, Double> e : map.entrySet()) {
+		for(Map.Entry<K, Double> e : map.entrySet()) {
 			map.put(e.getKey(), map.get(e.getKey()) / maxValue);
 		}
 		return map;
@@ -111,14 +115,13 @@ public class MiscUtils {
 	 *
 	 * @return the normalized map
 	 */
-	public static Map<Id<Link>, Double> normalizeInvert(Map<Id<Link>, Double> map) {
-		double maxValue = 0;
+	public static <K> Map<K, Double> normalizeInvert(Map<K, Double> map) {
+		Double maxValue = 0.0;
 		for(Double v : map.values()) {
 			if(v > maxValue)
 				maxValue = v;
 		}
-
-		for(Map.Entry<Id<Link>, Double> e : map.entrySet()) {
+		for(Map.Entry<K, Double> e : map.entrySet()) {
 			map.put(e.getKey(), 1 - map.get(e.getKey()) / maxValue);
 		}
 
@@ -131,24 +134,98 @@ public class MiscUtils {
 	 * @param unsortMap the unsortedMap
 	 * @return the sorted map
 	 */
-	public static Map<String, Integer> sortAscending(Map<String, Integer> unsortMap) {
+	public static <K, V extends Comparable<V>> Map<K, V> sortAscendingByValue(Map<K, V> unsortMap) {
 		// Convert Map to List
-		List<Map.Entry<String, Integer>> list = new LinkedList<>(unsortMap.entrySet());
+		List<Map.Entry<K, V>> list = new LinkedList<>(unsortMap.entrySet());
 
 		// Sort list with comparator, to compare the Map values
-		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-			public int compare(Map.Entry<String, Integer> o1,
-							   Map.Entry<String, Integer> o2) {
+		Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+			public int compare(Map.Entry<K, V> o1,
+							   Map.Entry<K, V> o2) {
 				return (o1.getValue()).compareTo(o2.getValue());
 			}
 		});
 
 		// Convert sorted map back to a Map
-		Map<String, Integer> sortedMap = new LinkedHashMap<>();
-		for(Iterator<Map.Entry<String, Integer>> it = list.iterator(); it.hasNext(); ) {
-			Map.Entry<String, Integer> entry = it.next();
+		Map<K, V> sortedMap = new LinkedHashMap<>();
+		for(Map.Entry<K, V> entry : list) {
 			sortedMap.put(entry.getKey(), entry.getValue());
 		}
 		return sortedMap;
+	}
+
+	/**
+	 * Checks whether list1 is a subset of list2. Returns false
+	 * if list1 is greater than list 2. Returns true if the reversed
+	 * list1 is a subset of list2
+	 */
+	public static <E> boolean listIsSubset(List<E> list1, List<E> list2) {
+		int size1 = list1.size();
+		int size2 = list2.size();
+		if(size1 > size2) {
+			return false;
+		}
+		if(size1 == 1) {
+			return list2.contains(list1.get(0));
+		}
+		if(size2 == 1) {
+			return list1.contains(list2.get(0));
+		}
+
+		for(int i = 0; i < size2; i++) {
+			if(list2.get(i).equals(list1.get(0))) {
+
+				if(i < size2-1 && list1.get(1).equals(list2.get(i + 1))) {
+					// check forward
+					for(int j = 1; j < list1.size(); j++) {
+						if((i + j) == size2) {
+							return false;
+						}
+						if(!list1.get(j).equals(list2.get(i + j))) {
+							return false;
+						}
+					}
+					return true;
+				} else if(list1.get(1).equals(list2.get(i - 1))) {
+					// check backward
+					for(int j = 1; j < size1; j++) {
+						if((i - j) == -1) {
+							return false;
+						}
+						if(!list1.get(j).equals(list2.get(i - j))) {
+							return false;
+						}
+					}
+					return true;
+				} else {
+					return false;
+				}
+			}
+		}
+		return false;
+	}
+
+
+	/**
+	 * Gets the tree set associated with the key in this map, or create an empty set if no mapping exists yet.
+	 *
+	 * @param key the key of the mapping
+	 * @param map the map in which to search
+	 * @param <K> type of the key
+	 * @param <V> parameter of the set type
+	 * @return the set (evt. newly) associated with the key
+	 * @see org.matsim.core.utils.collections.MapUtils
+	 */
+	public static <K, V> TreeSet<V> getTreeSet(
+			final K key,
+			final Map<K, TreeSet<V>> map) {
+		TreeSet<V> coll = map.get(key);
+
+		if(coll == null) {
+			coll = new TreeSet<>();
+			map.put(key, coll);
+		}
+
+		return coll;
 	}
 }
