@@ -21,7 +21,6 @@
 
 package playground.boescpa.ivtBaseline;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -29,9 +28,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -41,10 +42,12 @@ import org.matsim.facilities.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import playground.boescpa.ivtBaseline.preparation.*;
+import playground.boescpa.ivtBaseline.preparation.IVTConfigCreator;
+import playground.boescpa.ivtBaseline.preparation.PrefsCreator;
 import playground.boescpa.lib.tools.fileCreation.F2LConfigGroup;
 import playground.boescpa.lib.tools.fileCreation.F2LCreator;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,9 +60,8 @@ public class TestRunBaseline {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Before
-	public void prepareTests() {
-
+	@Test
+	public void testScenario() {
 		final String pathToOnlyStreetNetwork = utils.getClassInputDirectory() + "onlystreetnetwork.xml";
 		final String pathToNetwork = "test/scenarios/pt-tutorial/multimodalnetwork.xml";
 		final String pathToInitialPopulation = utils.getClassInputDirectory() + "population.xml";
@@ -82,11 +84,11 @@ public class TestRunBaseline {
 		// create config
 		String[] argsConfig = {pathToConfig, "100"};
 		IVTConfigCreator.main(argsConfig);
-		Config config = ConfigUtils.loadConfig(pathToConfig, new F2LConfigGroup());
+		Config config = ConfigUtils.loadConfig(pathToConfig, new F2LConfigGroup(), new DestinationChoiceConfigGroup());
 		config.setParam("controler", "outputDirectory", utils.getOutputDirectory() + "output/");
-			// Reduce iterations to one write out interval + 1
-		config.setParam("controler", "lastIteration", "11");
-			// Set files
+		// Reduce iterations
+		config.setParam("controler", "lastIteration", "2");
+		// Set files
 		config.setParam("facilities", "inputFacilitiesFile", pathToFacilities);
 		config.setParam("f2l", "inputF2LFile", pathToF2L);
 		config.setParam("households", "inputFile", "null");
@@ -96,19 +98,24 @@ public class TestRunBaseline {
 		config.setParam("plans", "inputPlansFile", pathToPopulation);
 		config.setParam("transit", "transitScheduleFile", pathToSchedule);
 		config.setParam("transit", "vehiclesFile", pathToVehicles);
-			// Set threads to 1
+		// Set threads to 1
 		config.setParam("global", "numberOfThreads", "1");
 		config.setParam("parallelEventHandling", "numberOfThreads", "1");
 		config.setParam("qsim", "numberOfThreads", "1");
+		// remove LC
+		config.removeModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		Collection<StrategyConfigGroup.StrategySettings> strategySettings = config.strategy().getStrategySettings();
+		config.strategy().clearStrategySettings();
+		for (StrategyConfigGroup.StrategySettings strategy : strategySettings) {
+			if (!strategy.getStrategyName().equals("org.matsim.contrib.locationchoice.BestReplyLocationChoicePlanStrategy")) {
+				config.strategy().addStrategySettings(strategy);
+			}
+		}
+		// write config
 		new ConfigWriter(config).write(pathToConfig);
 
 		String[] argsSim = {pathToConfig};
 		RunIVTBaseline.main(argsSim);
-	}
-
-	@Test
-	public void testScenario() {
-
 	}
 
 	public static void createPrefs(Scenario tempScenario, String pathToPrefsFile) {
