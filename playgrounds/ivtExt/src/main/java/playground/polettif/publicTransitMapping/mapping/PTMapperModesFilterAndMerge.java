@@ -169,8 +169,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates = PTMapperUtils.generateModeLinkCandidates(schedule, network, config);
 		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixChildStopFacilitiesRegex());
 
-
-
 		/** [3]
 		 * Get network extent to speed up routing outside of network area.
 		 */
@@ -376,7 +374,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		/** [9]
 		 * Now that all lines have been routed, it is possible that a route passes
 		 * a link closer to a stop facility than its referenced link.
-		 *
 		 */
 		PTMapperUtils.concentrateStopFacilities(schedule, network);
 

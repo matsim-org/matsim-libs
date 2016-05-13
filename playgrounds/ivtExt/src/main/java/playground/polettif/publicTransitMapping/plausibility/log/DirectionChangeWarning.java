@@ -25,6 +25,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,17 +36,19 @@ public class DirectionChangeWarning extends AbstractPlausibilityWarning {
 
 	private final double diff;
 
-	public DirectionChangeWarning(TransitLine transitLine, TransitRoute transitRoute, Link link1, Link link2, double diff) {
+	public DirectionChangeWarning(TransitLine transitLine, TransitRoute transitRoute, Link link1, Link link2, double threshold, double diff) {
 		super(PlausibilityCheck.DIRECTION_CHANGE_WARNING, transitLine, transitRoute);
 		this.fromId = link1.getId().toString();
 		this.toId = link2.getId().toString();
 		this.diff = diff;
 
-		expected = 0;
-		actual = 0;
+		expected = threshold;
+		actual = threshold+diff;
 		difference = diff;
 
-		linkIdList = ScheduleTools.getLoopSubRouteLinkIds(transitRoute, link1.getId(), link2.getId());
+		linkIdList = new ArrayList<>();
+		linkIdList.add(link1.getId());
+		linkIdList.add(link2.getId());
 
 		MapUtils.addToInteger(transitLine, lineStat, 1, 1);
 		MapUtils.addToInteger(transitRoute, routeStat, 1, 1);

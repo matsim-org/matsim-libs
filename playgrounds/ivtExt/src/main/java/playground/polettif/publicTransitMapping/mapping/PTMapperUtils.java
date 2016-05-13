@@ -321,57 +321,59 @@ public class PTMapperUtils {
 		TransitScheduleFactory factory = schedule.getFactory();
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
-				Iterator<TransitRouteStop> stopsIterator = transitRoute.getStops().iterator();
+				if(transitRoute.getRoute() != null) {
+					Iterator<TransitRouteStop> stopsIterator = transitRoute.getStops().iterator();
 
-				List<Id<Link>> linkIdList = ScheduleTools.getLinkIds(transitRoute);
-				List<Link> linkList = NetworkTools.getLinksFromIds(network, linkIdList);
+					List<Id<Link>> linkIdList = ScheduleTools.getLinkIds(transitRoute);
 
-				TransitRouteStop currentStop = stopsIterator.next();
+					List<Link> linkList = NetworkTools.getLinksFromIds(network, linkIdList);
 
-				for(int i = 0; i < linkList.size(); i++) {
+					TransitRouteStop currentStop = stopsIterator.next();
 
-					if(linkIdList.get(i).equals(currentStop.getStopFacility().getLinkId())) {
-						TransitStopFacility currentStopFacility = currentStop.getStopFacility();
-						Collection<Link> precedingLinks = new ArrayList<>();
-						// for first link check all preceding links
-						if(i > 0 && i < linkList.size()-1) {
-							Link currentLink = linkList.get(i);
-							Link precedingLink = linkList.get(i - 1);
-							Link succeedingLink = linkList.get(i + 1);
+					for(int i = 0; i < linkList.size(); i++) {
 
-							// check if previous link is closer to stop facility
-							double distCurrent = CoordTools.distanceStopFacilityToLink(currentStopFacility, currentLink);
-							double distPrevious = CoordTools.distanceStopFacilityToLink(currentStopFacility, precedingLink);
-							double distNext = CoordTools.distanceStopFacilityToLink(currentStopFacility, succeedingLink);
+						if(linkIdList.get(i).equals(currentStop.getStopFacility().getLinkId())) {
+							TransitStopFacility currentStopFacility = currentStop.getStopFacility();
+							Collection<Link> precedingLinks = new ArrayList<>();
+							// for first link check all preceding links
+							if(i > 0 && i < linkList.size() - 1) {
+								Link currentLink = linkList.get(i);
+								Link precedingLink = linkList.get(i - 1);
+								Link succeedingLink = linkList.get(i + 1);
 
-							String[] split = currentStopFacility.getId().toString().split(suffixChildStopFacilitiesRegex);
-							TransitStopFacility newChildStopFacility;
+								// check if previous link is closer to stop facility
+								double distCurrent = CoordTools.distanceStopFacilityToLink(currentStopFacility, currentLink);
+								double distPrevious = CoordTools.distanceStopFacilityToLink(currentStopFacility, precedingLink);
+								double distNext = CoordTools.distanceStopFacilityToLink(currentStopFacility, succeedingLink);
 
-							if(distPrevious < distCurrent && distPrevious < distNext) {
-								Id<TransitStopFacility> newChildStopFacilityId = Id.create(split[0] + suffixChildStopFacilities + precedingLink.getId(), TransitStopFacility.class);
-								if(schedule.getFacilities().containsKey(newChildStopFacilityId)) {
-									newChildStopFacility = schedule.getFacilities().get(newChildStopFacilityId);
-								} else {
-									newChildStopFacility = factory.createTransitStopFacility(newChildStopFacilityId, currentStopFacility.getCoord(), false);
-									newChildStopFacility.setLinkId(precedingLink.getId());
-									schedule.addStopFacility(newChildStopFacility);
+								String[] split = currentStopFacility.getId().toString().split(suffixChildStopFacilitiesRegex);
+								TransitStopFacility newChildStopFacility;
+
+								if(distPrevious < distCurrent && distPrevious < distNext) {
+									Id<TransitStopFacility> newChildStopFacilityId = Id.create(split[0] + suffixChildStopFacilities + precedingLink.getId(), TransitStopFacility.class);
+									if(schedule.getFacilities().containsKey(newChildStopFacilityId)) {
+										newChildStopFacility = schedule.getFacilities().get(newChildStopFacilityId);
+									} else {
+										newChildStopFacility = factory.createTransitStopFacility(newChildStopFacilityId, currentStopFacility.getCoord(), false);
+										newChildStopFacility.setLinkId(precedingLink.getId());
+										schedule.addStopFacility(newChildStopFacility);
+									}
+									transitRoute.getStop(currentStopFacility).setStopFacility(newChildStopFacility);
+								} else if(distNext < distCurrent) {
+									Id<TransitStopFacility> newChildStopFacilityId = Id.create(split[0] + suffixChildStopFacilities + succeedingLink.getId(), TransitStopFacility.class);
+									if(schedule.getFacilities().containsKey(newChildStopFacilityId)) {
+										newChildStopFacility = schedule.getFacilities().get(newChildStopFacilityId);
+									} else {
+										newChildStopFacility = factory.createTransitStopFacility(newChildStopFacilityId, currentStopFacility.getCoord(), false);
+										newChildStopFacility.setLinkId(succeedingLink.getId());
+										schedule.addStopFacility(newChildStopFacility);
+									}
+									transitRoute.getStop(currentStopFacility).setStopFacility(newChildStopFacility);
 								}
-								transitRoute.getStop(currentStopFacility).setStopFacility(newChildStopFacility);
 							}
-							else if(distNext < distCurrent) {
-								Id<TransitStopFacility> newChildStopFacilityId = Id.create(split[0] + suffixChildStopFacilities + succeedingLink.getId(), TransitStopFacility.class);
-								if(schedule.getFacilities().containsKey(newChildStopFacilityId)) {
-									newChildStopFacility = schedule.getFacilities().get(newChildStopFacilityId);
-								} else {
-									newChildStopFacility = factory.createTransitStopFacility(newChildStopFacilityId, currentStopFacility.getCoord(), false);
-									newChildStopFacility.setLinkId(succeedingLink.getId());
-									schedule.addStopFacility(newChildStopFacility);
-								}
-								transitRoute.getStop(currentStopFacility).setStopFacility(newChildStopFacility);
+							if(stopsIterator.hasNext()) {
+								currentStop = stopsIterator.next();
 							}
-						}
-						if(stopsIterator.hasNext()) {
-							currentStop = stopsIterator.next();
 						}
 					}
 				}
