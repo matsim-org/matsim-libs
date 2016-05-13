@@ -163,6 +163,7 @@ public final class ActivityImpl implements Activity {
 				"[linkId=" + this.linkId + "]" +
 				"[startTime=" + Time.writeTime(this.getStartTime()) + "]" +
 				"[endTime=" + Time.writeTime(this.getEndTime()) + "]" +
+				"[duration=" + Time.writeTime(this.getMaximumDuration()) + "]" +
 				"[facilityId=" + this.facilityId + "]" ;
 	}
 
