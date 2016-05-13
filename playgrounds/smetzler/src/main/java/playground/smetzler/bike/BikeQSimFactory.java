@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -18,7 +19,12 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -49,7 +55,22 @@ public class BikeQSimFactory implements Provider<Mobsim> {
 		qSim.addActivityHandler(activityEngine);
 
 		// add the netsim engine:
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim) ;
+
+		// possible variant without Dobler approach, where link speed calculator is used to influence bicycle speeds:
+//		ConfigurableQNetworkFactory qNetworkFactory = new ConfigurableQNetworkFactory(eventsManager, scenario) ;
+//		qNetworkFactory.setLinkSpeedCalculator(new LinkSpeedCalculator(){
+//			LinkSpeedCalculator delegate = new DefaultLinkSpeedCalculator() ;
+//			@Override public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
+//				if ( vehicle.getVehicle().getType().equals( "bike" ) ) {
+//					return 0.1 ; // compute bicycle speed instead
+//				} else {
+//					return delegate.getMaximumVelocity(vehicle, link, time) ;
+//				}
+//			}
+//		});
+//		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, qNetworkFactory ) ;
+
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim ) ;
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
@@ -72,8 +93,7 @@ public class BikeQSimFactory implements Provider<Mobsim> {
 		modeVehicleTypes.put("bike", bike);
 
 		new MultiModalQSimModule(scenario.getConfig(), this.multiModalTravelTimes).configure(qSim);
-
-
+		
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 
 		qSim.addAgentSource(agentSource);

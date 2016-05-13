@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -25,6 +26,8 @@ public class RunBikes {
 		config.global().setNumberOfThreads(1);
 		
 		config.controler().setLastIteration(0);
+		
+//		config.qsim().setLinkDynamics( LinkDynamics.PassingQ.name() );
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
