@@ -173,6 +173,9 @@ public class NetworkChangeEventsAnalysis {
 			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "freespeed_all");
 			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "freespeed_" + morningTime, morningTime);
 			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "freespeed_" + nightTime, nightTime);
+			
+			if (analyzeFreespeed) writeFreeSpeedActualSpeedRatio(scenario0, this.freespeeds, "freespeedActSpeedRatio_" + morningTime, morningTime);
+			if (analyzeFreespeed) writeFreeSpeedActualSpeedRatio(scenario0, this.freespeeds, "freespeedActSpeedRatio_" + nightTime, nightTime);
 
 			if (analyzeCapacity) writeDetailedInformation(scenario0, this.capacities, "capacity_all");
 			if (analyzeFreespeed) writeDetailedInformation(scenario0, this.freespeeds, "capacity_" + morningTime, morningTime);
@@ -246,6 +249,68 @@ public class NetworkChangeEventsAnalysis {
 						
 						if (time == analysisTime) {
 							bw.append(";" + df.format(e.getValue()[i]));
+						}
+						
+						time = time + TIMESTEP;
+						if (time >= 24 * 3600) {
+							time = 0;
+						}
+					}
+				}
+			}
+			bw.flush();
+			bw.close();
+			bwt.flush();
+			bwt.close();
+	
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void writeFreeSpeedActualSpeedRatio(Scenario scenario, Map<Id<Link>, double[]> values, String filename, int analysisTime) {
+		BufferedWriter bw = IOUtils.getBufferedWriter(nceDirectory + filename + ".csv");
+		BufferedWriter bwt = IOUtils.getBufferedWriter(nceDirectory + filename + ".csvt");
+		Locale.setDefault(Locale.US);
+		DecimalFormat df = new DecimalFormat( "####0.00" );
+		try {
+			String l1 = "LinkID;Original Freespeed [m/s];Original Capacity [veh/hour];Original Number of Lanes;Original Length [m]";
+			bw.append(l1);
+			bwt.append("\"String\";\"Real\";\"Real\";\"Real\";\"Real\"");
+			for (int day = 0; day < days; day++) {
+				for (int i = 0; i<24*3600;i=i+TIMESTEP ){
+					if (analysisTime == -1) {
+						bw.append(";Day " + day + " Time: "+Time.writeTime(i));
+						bwt.append(";\"Real\"");
+					} else {
+						if (i == analysisTime) {
+							bw.append(";Day " + day + " Time: "+Time.writeTime(i));
+							bwt.append(";\"Real\"");
+						}
+					}
+				}	
+			}
+			
+			for (Entry<Id<Link>, double[]> e :  values.entrySet()){
+				bw.newLine();
+				bw.append(e.getKey().toString());
+				double freespeed = scenario.getNetwork().getLinks().get(e.getKey()).getFreespeed();
+				double capacity = scenario.getNetwork().getLinks().get(e.getKey()).getCapacity();
+				double length = scenario.getNetwork().getLinks().get(e.getKey()).getLength();
+				double lanes = scenario.getNetwork().getLinks().get(e.getKey()).getNumberOfLanes();
+				bw.append(";" + df.format(freespeed));
+				bw.append(";" + df.format(capacity));
+				bw.append(";" + df.format(lanes));
+				bw.append(";" + df.format(length));
+				
+				int time = 0;
+				for (int i=0;i<e.getValue().length;i++){
+					if (analysisTime == -1) {
+						bw.append(";" + df.format(e.getValue()[i]));
+					} else {
+						
+						if (time == analysisTime) {
+							bw.append(";" + df.format(e.getValue()[i] / freespeed));
 						}
 						
 						time = time + TIMESTEP;
