@@ -34,8 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A LeastCostPathCalculator using FasAStarLandmarks. Uses only distance as
- * travelDisulity.
+ * A LeastCostPathCalculator using FasAStarLandmarks.
  */
 public class FastAStarRouter implements Router {
 	
@@ -47,7 +46,7 @@ public class FastAStarRouter implements Router {
 		this(network, PublicTransitMappingConfigGroup.PseudoRouteWeightType.linkLength);
 	}
 
-	public FastAStarRouter(Network network, PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType) {
+	public  FastAStarRouter(Network network, PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType) {
 		this.pseudoRouteWeightType = pseudoRouteWeightType;
 		paths = new HashMap<>();
 
@@ -61,7 +60,7 @@ public class FastAStarRouter implements Router {
 	}
 
 	@Override
-	public LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode) {
+	public synchronized LeastCostPathCalculator.Path calcLeastCostPath(Node fromNode, Node toNode) {
 		if (fromNode != null && toNode != null) {
 			Tuple<Node, Node> nodes = new Tuple<>(fromNode, toNode);
 			if (!paths.containsKey(nodes)) {

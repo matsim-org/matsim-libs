@@ -88,6 +88,9 @@ public class PlausibilityCheck {
 		this.thresholds.put("rail", 0.2 * PI);
 	}
 
+	/**
+	 * @param args schedule file, network file, output folder
+	 */
 	public static void main(final String[] args) {
 		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(args[0]);
 		Network network = NetworkTools.loadNetwork(args[1]);

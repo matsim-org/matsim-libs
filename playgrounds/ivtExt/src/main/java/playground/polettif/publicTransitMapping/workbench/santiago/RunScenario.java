@@ -17,49 +17,30 @@
  * *********************************************************************** */
 
 
-package playground.polettif.publicTransitMapping.workbench;
+package playground.polettif.publicTransitMapping.workbench.santiago;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class RunEmptyScenario {
+public class RunScenario {
 
 	public static void main(String[] args) {
-
-		String base = "C:/Users/polettif/Desktop/";
+		String base = "E:/data/santiago/";
 
 		// This creates a default matsim config:
-		Config config = ConfigUtils.loadConfig(base+"data/test/config.xml");
+		Config config = ConfigUtils.loadConfig(base+"scenario/input/config_standard.xml");
 
-		config.setParam("controler", "outputDirectory", base+"output/emptySimulation/");
-		config.setParam("network", "inputNetworkFile", base+"output/mtsMapping_zh/network.xml");
-		config.setParam("transit", "vehiclesFile", base+"data/test/vehicles.xml");
-
-		config.setParam("transit", "transitScheduleFile", base+"output/mtsMapping_zh/schedule.xml");
-		config.setParam("plans", "inputPlansFile", base+"data/test/population.xml");
-
-		config.controler().setLastIteration(1);
-//		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-//		config.controler().setOutputDirectory(base+"output/emptySimulation/");
-//		config.network().setInputCRS("CH1903_LV03_Plus");
-//		config.network().setInputFile(base+"output/mtsMapping_zh/network.xml");
-//		config.transit().setTransitScheduleFile(base+"output/mtsMapping_zh/schedule.xml");
-//		config.transit().setInputScheduleCRS("CH1903_LV03_Plus");
-//		config.transit().setUseTransit(true);
-//		config.vspExperimental().setWritingOutputEvents(true);
-//		config.plans().setInputFile("data/test/population.xml");
-
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+//		config.setParam("controler", "outputDirectory", base+"output/emptySimulation/");
 
 		// This creates a default matsim scenario (which is empty):
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
-
-		Controler controler = new Controler( scenario ) ;
+		Controler controler = new Controler(scenario);
 
 		controler.run();
-
 	}
-
 }

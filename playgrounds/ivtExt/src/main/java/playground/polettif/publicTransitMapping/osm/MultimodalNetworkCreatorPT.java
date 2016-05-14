@@ -21,11 +21,16 @@
 
 package playground.polettif.publicTransitMapping.osm;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
+import sun.plugin2.message.transport.Transport;
+
+import java.util.Collections;
 
 /**
  * A version of MultimodalNetworkCreator that retains the pt tags in the mode tag of the network.
@@ -66,7 +71,14 @@ public class MultimodalNetworkCreatorPT implements MultimodalNetworkCreator {
 				TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem) : null);
 
 		new MultimodalNetworkCreatorPT(network, transformation).createMultimodalNetwork(osmFile);
-		NetworkTools.writeNetwork(network, outputNetworkFile);
+
+		// clean up networks
+		Network streetNetwork = NetworkTools.filterNetworkByLinkMode(network, Collections.singleton(TransportMode.car));
+		Network restNetwork = NetworkTools.filterNetworkExceptLinkMode(network, Collections.singleton(TransportMode.car));
+		new NetworkCleaner().run(streetNetwork);
+		NetworkTools.integrateNetwork(streetNetwork, restNetwork);
+
+		NetworkTools.writeNetwork(streetNetwork, outputNetworkFile);
 	}
 
 	public MultimodalNetworkCreatorPT(Network network, CoordinateTransformation transformation) {

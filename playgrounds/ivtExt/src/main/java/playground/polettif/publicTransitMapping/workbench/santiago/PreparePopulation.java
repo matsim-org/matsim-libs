@@ -16,39 +16,21 @@
  *                                                                         *
  * *********************************************************************** */
 
+package playground.polettif.publicTransitMapping.workbench.santiago;
 
-package playground.polettif.publicTransitMapping.workbench;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vehicles.Vehicles;
-
-import playground.polettif.publicTransitMapping.hafas.hafasCreator.PTScheduleCreatorHAFAS;
+import playground.polettif.boescpa.lib.tools.PopulationUtils;
+import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 /**
- * based on boescpa.converters.scheduleCreator.PTScheduleCreatorDefaultV2
+ * Adapts the provided population for the new network.
  */
-public class RunHAFAS2UnmappedMTS {
+public class PreparePopulation {
 
 	public static void main(String[] args) {
+		String base = "C:/Users/Flavio/Desktop/data/santiago/";
 
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-		TransitSchedule schedule = scenario.getTransitSchedule();
-		Vehicles vehicles = scenario.getVehicles();
-
-		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
-
-		new PTScheduleCreatorHAFAS(schedule, vehicles, transformation).createSchedule(args[0]);
-
-//		ScheduleTools.writeTransitSchedule(schedule, args[1]+"schedule.xml");
-		new VehicleWriterV1(vehicles).writeFile(args[1]+"vehicles.xml");
+		PopulationUtils.readPopulation(base + "input_original/plans_final.xml");
 	}
-
 }

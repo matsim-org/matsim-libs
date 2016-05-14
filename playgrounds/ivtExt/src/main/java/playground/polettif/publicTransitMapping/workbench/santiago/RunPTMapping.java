@@ -19,16 +19,14 @@
 
 package playground.polettif.publicTransitMapping.workbench.santiago;
 
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.polettif.publicTransitMapping.mapping.PTMapperModesFilterAndMerge;
-import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
-import playground.polettif.publicTransitMapping.tools.ScheduleTools;
+import playground.polettif.publicTransitMapping.mapping.PTMapperThreaded;
 
 public class RunPTMapping {
 
 	public static void main(String[] args) {
-		String base = "C:/Users/Flavio/Desktop/data/santiago/";
-		PTMapperModesFilterAndMerge.run(base+"mts/mappingConfig.xml");
+		String base = "E:/data/santiago/";
+//		PTMapperModesFilterAndMerge.run(base+"mts/mappingConfig.xml");
+		PTMapperThreaded.run(base+"mts/mappingConfig.xml");
 	}
-
 }

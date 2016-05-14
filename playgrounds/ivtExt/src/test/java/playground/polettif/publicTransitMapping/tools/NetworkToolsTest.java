@@ -14,13 +14,15 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static playground.polettif.publicTransitMapping.tools.NetworkTools.*;
 
 public class NetworkToolsTest {
 
-	double testDelta = 1/1000.;
-	Network network;
+	private double testDelta = 1/1000.;
+	private Network network;
 
 	private Coord coordA = new Coord(0.0, 0.0);
 	private Coord coordB = new Coord(2.0, 0.0);
@@ -57,6 +59,7 @@ public class NetworkToolsTest {
 	private Link linkDX;
 	private Link linkXA;
 	private Link linkAH;
+	private Link linkYE;
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -84,6 +87,7 @@ public class NetworkToolsTest {
 		linkDX = networkFactory.createLink(Id.createLinkId("link:D:X"), nodeD, nodeX);
 		linkXA = networkFactory.createLink(Id.createLinkId("link:X:A"), nodeX, nodeA);
 		linkAH = networkFactory.createLink(Id.createLinkId("link:A:H"), nodeA, nodeH);
+		linkYE = networkFactory.createLink(Id.createLinkId("link:D:W"), nodeY, nodeW);
 
 
 		network.addNode(nodeA);
@@ -103,6 +107,7 @@ public class NetworkToolsTest {
 		network.addLink(linkDX);
 		network.addLink(linkXA);
 		network.addLink(linkAH);
+		network.addLink(linkYE);
 	}
 
 	/*
@@ -163,6 +168,25 @@ public class NetworkToolsTest {
 		assertEquals("Not the correct number of closest links found!", 2, findNClosestLinks((NetworkImpl) network, coordX, 10, 2, 100).size());
 		assertEquals("Not the correct closest link found!", linkAH, findNClosestLinks((NetworkImpl) network, coordZ, 10, 10, 100).get(0));
 		assertEquals("Not the correct second closest link found!", linkAB, findNClosestLinks((NetworkImpl) network, coordZ, 10, 10, 100).get(1));
+	}
+
+	@Test
+	public void testRightSide() {
+		assertFalse(coordIsOnRightSideOfLink(coordX, linkAB));
+		assertFalse(coordIsOnRightSideOfLink(coordE, linkAB));
+		assertFalse(coordIsOnRightSideOfLink(coordX, linkBC));
+		assertFalse(coordIsOnRightSideOfLink(coordX, linkCD));
+		assertFalse(coordIsOnRightSideOfLink(coordX, linkDA));
+
+		assertTrue(coordIsOnRightSideOfLink(coordE, linkXA));
+		assertFalse(coordIsOnRightSideOfLink(coordI, linkXA));
+
+		assertFalse(coordIsOnRightSideOfLink(coordF, linkYE));
+		assertFalse(coordIsOnRightSideOfLink(coordI, linkYE));
+		assertFalse(coordIsOnRightSideOfLink(coordH, linkYE));
+		assertTrue(coordIsOnRightSideOfLink(coordW, linkYE));
+		assertTrue(coordIsOnRightSideOfLink(coordB, linkYE));
+		assertTrue(coordIsOnRightSideOfLink(coordC, linkYE));
 	}
 
 
