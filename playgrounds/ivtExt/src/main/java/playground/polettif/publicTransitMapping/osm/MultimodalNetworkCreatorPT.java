@@ -28,7 +28,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
-import sun.plugin2.message.transport.Transport;
 
 import java.util.Collections;
 
