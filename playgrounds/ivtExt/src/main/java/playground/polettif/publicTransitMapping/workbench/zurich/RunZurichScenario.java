@@ -70,7 +70,7 @@ public class RunZurichScenario {
 		controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
 		// We use a specific scoring function, that uses individual preferences for activity durations.
 		controler.setScoringFunctionFactory(
-				new IVTBaselineScoringFunctionFactory(controler.getScenario(),
+				new IVTBaselineScoringFunctionFactoryCopy(controler.getScenario(),
 						new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE)));
 
 		controler.run();

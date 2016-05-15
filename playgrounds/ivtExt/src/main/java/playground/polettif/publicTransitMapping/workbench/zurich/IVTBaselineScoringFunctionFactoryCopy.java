@@ -50,7 +50,7 @@ import java.util.Set;
  *
  * @author boescpa
  */
-public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory {
+public class IVTBaselineScoringFunctionFactoryCopy implements ScoringFunctionFactory {
 
 	private final Scenario scenario;
 	private final StageActivityTypes blackList;
@@ -61,7 +61,7 @@ public class IVTBaselineScoringFunctionFactory implements ScoringFunctionFactory
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
 	// /////////////////////////////////////////////////////////////////////////
-	public IVTBaselineScoringFunctionFactory(
+	public IVTBaselineScoringFunctionFactoryCopy(
 			final Scenario scenario,
 			final StageActivityTypes typesNotToScore ) {
 		this.scenario = scenario;
