@@ -17,73 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util;
+package playground.michalm.taxi.audiAV;
 
-import java.io.*;
-
-import org.matsim.core.utils.io.UncheckedIOException;
-
-import com.opencsv.CSVWriter;
+import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 
 
-public class CompactCSVWriter
-    extends CSVWriter
+public class RunAudiAVBenchmark
 {
-    public static final String[] EMPTY_LINE = {};
-    public static final String EMPTY_CELL = null;
-
-
-    public CompactCSVWriter(Writer writer)
+    public static void main(String[] args)
     {
-        this(writer, '\t');
-    }
-
-
-    public CompactCSVWriter(Writer writer, char separator)
-    {
-        super(writer, separator, CSVWriter.NO_QUOTE_CHARACTER);
-    }
-
-
-    @Override
-    public void writeNext(String... nextLine)
-    {
-        super.writeNext(nextLine);
-    }
-
-
-    public void writeNextEmpty()
-    {
-        writeNext(EMPTY_LINE);
-    }
-
-
-    public void writeNext(CSVLineBuilder lineBuilder)
-    {
-        writeNext(lineBuilder.build());
-    }
-
-
-    @Override
-    public void flush()
-    {
-        try {
-            super.flush();
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-
-    @Override
-    public void close()
-    {
-        try {
-            super.close();
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        RunTaxiBenchmark.run(args[0], 1);
     }
 }

@@ -17,15 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi;
+package org.matsim.contrib.util;
 
-import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
+import java.io.*;
+import java.util.List;
+
+import org.matsim.core.utils.io.UncheckedIOException;
+
+import com.opencsv.*;
 
 
-public class RunAudiAVBenchmark
+public class CSVReaders
 {
-    public static void main(String[] args)
+    public static List<String[]> readTSVFile(String file)
     {
-        RunTaxiBenchmark.run(args[0], 1);
+        return readCSVFile(file, '\t');
+    }
+
+
+    public static List<String[]> readCSVFile(String file)
+    {
+        return readCSVFile(file, CSVParser.DEFAULT_SEPARATOR);
+    }
+
+
+    public static List<String[]> readCSVFile(String file, char separator)
+    {
+        try (CSVReader reader = new CSVReader(new FileReader(file), separator)) {
+            return reader.readAll();
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }

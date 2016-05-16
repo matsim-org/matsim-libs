@@ -29,9 +29,9 @@ public class CSVLineBuilder
     private final List<String> line = new ArrayList<>();
 
 
-    public CSVLineBuilder add(String cell)
+    public CSVLineBuilder add(Object cell)
     {
-        line.add(cell);
+        line.add(cell.toString());
         return this;
     }
 

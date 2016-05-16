@@ -56,7 +56,7 @@ public class TaxiStatsWriter
 
         for (TaxiStats s : taxiStats.values()) {
             CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id)
-                    .add(s.passengerWaitTime.getN() + "");
+                    .add(s.passengerWaitTime.getN());
             addStats(lineBuilder, "%.1f", "%.0f", s.passengerWaitTime);
             writer.writeNext(lineBuilder);
         }

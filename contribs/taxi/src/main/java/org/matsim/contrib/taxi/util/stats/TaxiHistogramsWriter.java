@@ -112,9 +112,9 @@ public class TaxiHistogramsWriter
 
     private void writeHistogramValues(CompactCSVWriter writer, String hour, Histogram<?> histogram)
     {
-        CSVLineBuilder lineBuilder = new CSVLineBuilder().add(hour + "");
+        CSVLineBuilder lineBuilder = new CSVLineBuilder().add(hour);
         for (int i = 0; i < histogram.getBinCount(); i++) {
-            lineBuilder.add(histogram.getCount(i) + "");
+            lineBuilder.add(histogram.getCount(i));
         }
         writer.writeNext(lineBuilder.build());
     }

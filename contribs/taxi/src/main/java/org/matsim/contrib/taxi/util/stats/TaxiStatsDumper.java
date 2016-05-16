@@ -19,11 +19,11 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.io.PrintWriter;
 import java.util.Map;
 
 import org.matsim.contrib.taxi.data.TaxiData;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.util.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
@@ -35,38 +35,38 @@ import com.google.inject.Inject;
 public class TaxiStatsDumper
     implements AfterMobsimListener, ShutdownListener
 {
-    private static final String HEADER = "iter"//
-            + "\t|\tTP_avg\tTP_sd\tTP_p95\tTP_max"//
-            + "\t|\tRE_fleet\tRE_avg\tRE_sd"//
-            + "\t|\tRW_fleet\tRW_avg\tRW_sd"//
-            + "\t|\tTO";
+    private static final String[] HEADER = { "iter", null, //
+            "TP_avg", "TP_sd", "TP_95%ile", "TP_max", null, //
+            "RE_fleet", "RE_avg", "RE_sd", null, //
+            "RW_fleet", "RW_avg", "RW_sd", null, //
+            "TO" };
 
     private final TaxiData taxiData;
     private final TaxiConfigGroup taxiCfg;
     private final OutputDirectoryHierarchy controlerIO;
-    private final PrintWriter multiDayWriter;
+    private final CompactCSVWriter multiDayWriter;
 
 
     @Inject
-    public TaxiStatsDumper(TaxiData taxiData, TaxiConfigGroup taxiCfg, OutputDirectoryHierarchy controlerIO)
+    public TaxiStatsDumper(TaxiData taxiData, TaxiConfigGroup taxiCfg,
+            OutputDirectoryHierarchy controlerIO)
     {
         this.taxiData = taxiData;
         this.taxiCfg = taxiCfg;
         this.controlerIO = controlerIO;
-        multiDayWriter = new PrintWriter(
+        multiDayWriter = new CompactCSVWriter(
                 IOUtils.getBufferedWriter(controlerIO.getOutputFilename("taxi_daily_stats.txt")));
-        multiDayWriter.println(HEADER);
+        multiDayWriter.writeNext(HEADER);
     }
 
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event)
     {
-        TaxiStatsCalculator calculator = new TaxiStatsCalculator(
-                taxiData.getVehicles().values());
+        TaxiStatsCalculator calculator = new TaxiStatsCalculator(taxiData.getVehicles().values());
 
         appendToMultiDayStats(calculator.getDailyStats(), event);
-        
+
         if (taxiCfg.getDetailedStats()) {
             writeDetailedStats(calculator.getTaxiStats(), event);
         }
@@ -75,27 +75,22 @@ public class TaxiStatsDumper
 
     private void appendToMultiDayStats(DailyTaxiStats s, AfterMobsimEvent event)
     {
-        multiDayWriter.printf("%d", event.getIteration());
-
-        multiDayWriter.printf("\t|\t%.1f\t%.1f\t%.1f\t%.1f", //
-                s.passengerWaitTime.getMean(), //
-                s.passengerWaitTime.getStandardDeviation(), //
-                s.passengerWaitTime.getPercentile(95), //
-                s.passengerWaitTime.getMax());
-
-        multiDayWriter.printf("\t|\t%.3f\t%.3f\t%.3f", //
-                s.getFleetEmptyDriveRatio(), //
-                s.vehicleEmptyDriveRatio.getMean(), //
-                s.vehicleEmptyDriveRatio.getStandardDeviation());
-
-        multiDayWriter.printf("\t|\t%.3f\t%.3f\t%.3f", //
-                s.getFleetStayRatio(), //
-                s.vehicleStayRatio.getMean(), //
-                s.vehicleStayRatio.getStandardDeviation());
-
-        multiDayWriter.printf("\t|\t%.3f", s.getOccupiedDriveRatio());
-
-        multiDayWriter.println();
+        multiDayWriter.writeNext(new CSVLineBuilder().add(event.getIteration()) //
+                .add(null) //
+                .addf("%.1f", s.passengerWaitTime.getMean())
+                .addf("%.1f", s.passengerWaitTime.getStandardDeviation()) //
+                .addf("%.0f", s.passengerWaitTime.getPercentile(95)) //
+                .addf("%.0f", s.passengerWaitTime.getMax()) //
+                .add(null) //
+                .addf("%.4f", s.getFleetEmptyDriveRatio()) //
+                .addf("%.4f", s.vehicleEmptyDriveRatio.getMean()) //
+                .addf("%.4f", s.vehicleEmptyDriveRatio.getStandardDeviation()) //
+                .add(null) //
+                .addf("%.4f", s.getFleetStayRatio()) //
+                .addf("%.4f", s.vehicleStayRatio.getMean()) //
+                .addf("%.4f", s.vehicleStayRatio.getStandardDeviation()) //
+                .add(null) //
+                .addf("%.4f", s.getOccupiedDriveRatio()));
         multiDayWriter.flush();
     }
 
@@ -104,8 +99,8 @@ public class TaxiStatsDumper
     {
         String prefix = controlerIO.getIterationFilename(event.getIteration(), "taxi_");
 
-        new TaxiStatsWriter(taxiStats).write(prefix + "detailed_stats.txt");
-        new TaxiHistogramsWriter(taxiStats).write(prefix + "detailed_histograms.txt");
+        new TaxiStatsWriter(taxiStats).write(prefix + "stats.txt");
+        new TaxiHistogramsWriter(taxiStats).write(prefix + "histograms.txt");
     }
 
 
