@@ -114,7 +114,7 @@ public class TaxiHistogramsWriter
     {
         CSVLineBuilder lineBuilder = new CSVLineBuilder().add(hour);
         for (int i = 0; i < histogram.getBinCount(); i++) {
-            lineBuilder.add(histogram.getCount(i));
+            lineBuilder.add(histogram.getCount(i) + "");
         }
         writer.writeNext(lineBuilder.build());
     }

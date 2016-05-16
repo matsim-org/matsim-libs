@@ -56,7 +56,7 @@ public class TaxiStatsWriter
 
         for (TaxiStats s : taxiStats.values()) {
             CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id)
-                    .add(s.passengerWaitTime.getN());
+                    .add(s.passengerWaitTime.getN() + "");
             addStats(lineBuilder, "%.1f", "%.0f", s.passengerWaitTime);
             writer.writeNext(lineBuilder);
         }
@@ -106,7 +106,7 @@ public class TaxiStatsWriter
     {
         lineBuilder.addf(format1, stats.getMean()).//
                 addf(format1, stats.getStandardDeviation()).//
-                add(null).//
+                addEmpty().//
                 addf(format2, stats.getMin()). //
                 addf(format2, stats.getPercentile(2)). //
                 addf(format2, stats.getPercentile(5)). //
