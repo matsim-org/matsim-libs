@@ -40,7 +40,7 @@ public class CongestionInfo {
 	// time independent values
 	
 	private final double TIME_BIN_SIZE = 5 * 60.;
-	private final int WRITE_OUTPUT_ITERATION = 1;
+	private final int WRITE_OUTPUT_ITERATION = 10;
 	private final InternalizationApproach INTERNALIZATION_APPROACH = InternalizationApproach.MaximumDelay;
 	
 	public enum InternalizationApproach {

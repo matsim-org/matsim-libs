@@ -27,11 +27,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -46,35 +43,8 @@ import playground.ikaddoura.analysis.vtts.VTTSHandler;
  * @author ikaddoura
  *
  */
-public class PersonTripAnalysis {
-	private static final Logger log = Logger.getLogger(PersonTripAnalysis.class);
-
-	public void printAvgValuePerParameter(String csvFile, SortedMap<Double, List<Double>> parameter2values) {
-		String fileName = csvFile;
-		File file = new File(fileName);			
-
-		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-
-			for (Double parameter : parameter2values.keySet()) {
-				double sum = 0.;
-				int counter = 0;
-				for (Double value : parameter2values.get(parameter)) {
-					sum = sum + value;
-					counter++;
-				}
-				
-				bw.write(String.valueOf(parameter) + ";" + sum / counter);
-				bw.newLine();
-			}
-			log.info("Output written to " + fileName);
-			bw.close();
-			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
+public class PersonTripCongestionNoiseAnalysis {
+	private static final Logger log = Logger.getLogger(PersonTripCongestionNoiseAnalysis.class);
 	
 	public void printPersonInformation(String outputPath,
 			String mode,
@@ -357,46 +327,6 @@ public class PersonTripAnalysis {
 			e.printStackTrace();
 		}
 	}
-	
-	public SortedMap<Double, List<Double>> getParameter2Values(
-			String mode,
-			BasicPersonTripAnalysisHandler basicHandler,
-			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2parameter,
-			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2value,
-			double intervalLength, double finalInterval) {
-		
-		Map<Id<Person>, Map<Integer, String>> personId2tripNumber2legMode = basicHandler.getPersonId2tripNumber2legMode();
-		
-		SortedMap<Double, List<Double>> parameter2values = new TreeMap<>();
-		Map<Integer, List<Double>> nr2values = new HashMap<>();
-		
-		for (Id<Person> id : personId2tripNumber2legMode.keySet()) {
-			
-			for (Integer trip : personId2tripNumber2legMode.get(id).keySet()) {
-				
-				if (personId2tripNumber2legMode.get(id).get(trip).equals(mode)) {
-					
-					double departureTime = personId2tripNumber2parameter.get(id).get(trip);
-					int nr = (int) (departureTime / intervalLength) + 1;
-					
-					if (nr2values.containsKey(nr)) {
-						List<Double> values = nr2values.get(nr);
-						values.add(personId2tripNumber2value.get(id).get(trip));
-						nr2values.put(nr, values);
-					} else {
-						List<Double> values = new ArrayList<>();
-						values.add(personId2tripNumber2value.get(id).get(trip));
-						nr2values.put(nr, values);
-					}				
-				}
-			}
-		}
-		for (Integer nr : nr2values.keySet()) {
-			parameter2values.put(nr * intervalLength, nr2values.get(nr));
-		}
-		return parameter2values;
-	}
-
 
 	public void printAggregatedResults(String outputPath,
 			String mode,
@@ -558,9 +488,6 @@ public class PersonTripAnalysis {
 			bw.newLine();
 			
 			bw.write("caused congestion [hours];" + causedCongestion / 3600.);
-			bw.newLine();
-			
-			bw.write("total caused/affected congestion [hours] (alternative computation);" + congestionHandler.getTotalDelay() / 3600.);
 			bw.newLine();
 			
 			bw.newLine();
