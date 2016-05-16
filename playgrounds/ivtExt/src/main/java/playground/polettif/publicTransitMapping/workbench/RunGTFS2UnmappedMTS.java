@@ -27,19 +27,21 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 public class RunGTFS2UnmappedMTS {
 	
 	public static void main(final String[] args) {
-//		final String gtfsPath = "C:/Users/polettif/Desktop/data/gtfs/zvv/";
-		final String gtfsPath = "C:/Users/polettif/Desktop/data/gtfs/zvv/";
-		final String mtsFile = "C:/Users/polettif/Desktop/data/mts/unmapped/fromGtfs/zvv_mostServices.xml";
-		final String shapeFile = "C:/Users/polettif/Desktop/data/gtfs/shp/zvv_mostServices.shp";
-//		final String mtsFile = "C:/Users/polettif/Desktop/output/gtfs2mts/zvv_unmappedSchedule.xml";
-//		final String mtsFile = "C:/Users/polettif/Desktop/output/gtfs2mts/google_sample.xml";
+		String base = "C:/Users/Flavio/Desktop/data/";
+
+		String gtfsPath = base+"gtfs/zvv/";
+		String mtsFile = base+"mts/fromGtfs/zvv_mostServices.xml";
+		String vehiclesFile = base+"vehicles/fromGtfs/zvv_mostServices_vehicles.xml";
+		String shapeFile = base+"gtfs/shp/zvv_mostServices.shp";
 
 		// Load Schedule
 		GTFSReader gtfsReader = new GTFSReader(gtfsPath, GTFSReader.DAY_WITH_MOST_SERVICES, "CH1903_LV03_Plus");
 		gtfsReader.writeShapeFile(shapeFile);
+
 		TransitSchedule schedule = gtfsReader.getSchedule();
 		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 		ScheduleTools.writeTransitSchedule(schedule, mtsFile);
+
+		ScheduleTools.writeVehicles(gtfsReader.getVehicles(), vehiclesFile);
 	}
-	
 }

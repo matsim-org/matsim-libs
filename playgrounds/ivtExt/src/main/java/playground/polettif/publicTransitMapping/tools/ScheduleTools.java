@@ -34,6 +34,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.vehicles.*;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 
@@ -74,8 +75,47 @@ public class ScheduleTools {
 	 * Writes the transit schedule to filePath.
 	 */
 	public static void writeTransitSchedule(TransitSchedule schedule, String filePath) {
+		log.info("Writing transit schedule to file " + filePath);
 		new TransitScheduleWriter(schedule).writeFile(filePath);
 	}
+
+	/**
+	 * Creates vehicles with default vehicle types depending on the schedule
+	 * transport mode.
+	 */
+	public static Vehicles createVehicles(TransitSchedule schedule) {
+		log.info("Creating vehicles from schedule...");
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		VehiclesFactory vf = vehicles.getFactory();
+		Map<String, VehicleType> vehicleTypes = new HashMap<>();
+
+		long vehId = 0;
+		for(TransitLine line : schedule.getTransitLines().values()) {
+			for(TransitRoute route : line.getRoutes().values()) {
+				// create vehicle type
+				if(!vehicleTypes.containsKey(route.getTransportMode())) {
+					Id<VehicleType> vehicleTypeId = Id.create(route.getTransportMode(), VehicleType.class);
+					VehicleType vehicleType = vf.createVehicleType(vehicleTypeId);
+					VehicleCapacity capacity = new VehicleCapacityImpl();
+					capacity.setSeats(50);
+					capacity.setStandingRoom(0);
+					vehicleType.setCapacity(capacity);
+					vehicles.addVehicleType(vehicleType);
+					vehicleTypes.put(route.getTransportMode(), vehicleType);
+				}
+				VehicleType vehicleType = vehicleTypes.get(route.getTransportMode());
+
+				// create a vehicle for each departure
+				for(Departure departure : route.getDepartures().values()) {
+					Vehicle veh = vf.createVehicle(Id.create("veh_" + Long.toString(vehId++) + "_" + route.getTransportMode(), Vehicle.class), vehicleType);
+					vehicles.addVehicle(veh);
+					departure.setVehicleId(veh.getId());
+				}
+			}
+		}
+		return vehicles;
+	}
+
 
 	/**
 	 * Add mode "pt" to any link of the network that is
@@ -352,5 +392,13 @@ public class ScheduleTools {
 		}
 
 		return linkIdList.subList(fromIndex, toIndex);
+	}
+
+	/**
+	 * Writes the vehicles to the output file.
+	 */
+	public static void writeVehicles(Vehicles vehicles, String filePath) {
+		log.info("Writing vehicles to file " + filePath);
+		new VehicleWriterV1(vehicles).writeFile(filePath);
 	}
 }

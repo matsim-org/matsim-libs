@@ -75,8 +75,6 @@ public class PTMapperUtils {
 	public static Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> generateModeLinkCandidates(TransitSchedule schedule, Network network, PublicTransitMappingConfigGroup config) {
 		Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> tree = new HashMap<>();
 
-		NetworkImpl networkImpl = ((NetworkImpl) network);
-
 		/**
 		 * get closest links for each stop facility (separated by mode)
 		 */
