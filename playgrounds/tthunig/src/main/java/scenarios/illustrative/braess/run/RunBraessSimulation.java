@@ -60,6 +60,7 @@ import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerLis
 import matsimConnector.congestionpricing.MSATollDisutilityCalculatorFactory;
 import matsimConnector.congestionpricing.MSATollHandler;
 import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
+import playground.ikaddoura.intervalBasedCongestionPricing.IntervalBasedCongestionPricing;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -94,7 +95,7 @@ public final class RunBraessSimulation {
 
 	/* population parameter */
 	
-	private static final int NUMBER_OF_PERSONS = 3600; // per hour
+	private static final int NUMBER_OF_PERSONS = 2000; // per hour
 	private static final int SIMULATION_PERIOD = 1; // in hours
 	private static final double SIMULATION_START_TIME = 0.0; // seconds from midnight
 	
@@ -108,9 +109,9 @@ public final class RunBraessSimulation {
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.NONE;
+	private static final PricingType PRICING_TYPE = PricingType.INTERVALBASED;
 	public enum PricingType{
-		NONE, V3, V4, V7, V8, V9, V10, FLOWBASED, GREGOR
+		NONE, V3, V4, V7, V8, V9, V10, FLOWBASED, GREGOR, INTERVALBASED
 	}
 
 	// choose a sigma for the randomized router
@@ -119,7 +120,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/capacityAdoption/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/intervalBased/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -266,7 +267,7 @@ public final class RunBraessSimulation {
 			controler.addOverridingModule(new InvertedNetworkRoutingModuleModule());
 		}
 
-		if (!PRICING_TYPE.equals(PricingType.NONE) && !PRICING_TYPE.equals(PricingType.FLOWBASED) && !PRICING_TYPE.equals(PricingType.GREGOR)){
+		if (!PRICING_TYPE.equals(PricingType.NONE) && !PRICING_TYPE.equals(PricingType.FLOWBASED) && !PRICING_TYPE.equals(PricingType.GREGOR) && !PRICING_TYPE.equals(PricingType.INTERVALBASED)){
 			// add tolling
 			TollHandler tollHandler = new TollHandler(scenario);
 			
@@ -341,7 +342,22 @@ public final class RunBraessSimulation {
 			
 			throw new UnsupportedOperationException("Not yet implemented!");
 //			Initializer initializer = new Initializer();
-//			controler.addControlerListener(initializer);		
+//			controler.addControlerListener(initializer);
+			
+		} else if (PRICING_TYPE.equals(PricingType.INTERVALBASED)) {
+			
+			controler.addControlerListener(new IntervalBasedCongestionPricing(scenario));
+			
+			final RandomizingTimeDistanceTravelDisutility.Builder builder = 
+					new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, config.planCalcScore() );
+			builder.setSigma(SIGMA);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindCarTravelDisutilityFactory().toInstance(builder);
+				}
+			});
+			
 		} else { // no pricing
 			
 			// adapt sigma for randomized routing
