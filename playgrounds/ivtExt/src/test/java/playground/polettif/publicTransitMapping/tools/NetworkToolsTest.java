@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -45,6 +44,7 @@ public class NetworkToolsTest {
 	private Node nodeB;
 	private Node nodeC;
 	private Node nodeD;
+	private Node nodeE;
 	private Node nodeX;
 	private Node nodeY;
 	private Node nodeZ;
@@ -73,6 +73,7 @@ public class NetworkToolsTest {
 		nodeB = networkFactory.createNode(Id.createNodeId("B"), coordB);
 		nodeC = networkFactory.createNode(Id.createNodeId("C"), coordC);
 		nodeD = networkFactory.createNode(Id.createNodeId("D"), coordD);
+		nodeE = networkFactory.createNode(Id.createNodeId("E"), coordE);
 		nodeX = networkFactory.createNode(Id.createNodeId("X"), coordX);
 		nodeY = networkFactory.createNode(Id.createNodeId("Y"), coordY);
 		nodeZ = networkFactory.createNode(Id.createNodeId("Z"), coordZ);
@@ -87,13 +88,14 @@ public class NetworkToolsTest {
 		linkDX = networkFactory.createLink(Id.createLinkId("link:D:X"), nodeD, nodeX);
 		linkXA = networkFactory.createLink(Id.createLinkId("link:X:A"), nodeX, nodeA);
 		linkAH = networkFactory.createLink(Id.createLinkId("link:A:H"), nodeA, nodeH);
-		linkYE = networkFactory.createLink(Id.createLinkId("link:D:W"), nodeY, nodeW);
+		linkYE = networkFactory.createLink(Id.createLinkId("link:Y:E"), nodeY, nodeE);
 
 
 		network.addNode(nodeA);
 		network.addNode(nodeB);
 		network.addNode(nodeC);
 		network.addNode(nodeD);
+		network.addNode(nodeE);
 		network.addNode(nodeX);
 		network.addNode(nodeY);
 		network.addNode(nodeZ);
@@ -108,6 +110,8 @@ public class NetworkToolsTest {
 		network.addLink(linkXA);
 		network.addLink(linkAH);
 		network.addLink(linkYE);
+
+		NetworkTools.writeNetwork(network, "C:/Users/Flavio/Desktop/data/networktoolstest.xml");
 	}
 
 	/*
@@ -163,11 +167,16 @@ public class NetworkToolsTest {
 
 	@Test
 	public void testFindNClosestLinks() throws Exception {
-		assertEquals("found the wrong link!", linkAH, findNClosestLinks((NetworkImpl) network, coordZ, 10, 10, 10).get(0));
-		assertEquals("Not the correct number of closest links found!", 6, findNClosestLinks((NetworkImpl) network, coordX, 10, 6, 100).size());
-		assertEquals("Not the correct number of closest links found!", 2, findNClosestLinks((NetworkImpl) network, coordX, 10, 2, 100).size());
-		assertEquals("Not the correct closest link found!", linkAH, findNClosestLinks((NetworkImpl) network, coordZ, 10, 10, 100).get(0));
-		assertEquals("Not the correct second closest link found!", linkAB, findNClosestLinks((NetworkImpl) network, coordZ, 10, 10, 100).get(1));
+		assertEquals("found the wrong link!", linkAH, findClosestLinks(network, coordZ, 10, 10, 1, null, 10).get(0));
+		assertEquals("Not the correct number of closest links found!", 3, findClosestLinks(network, coordZ, 100, 2, 1, null, 100).size());
+		assertEquals("Not the correct number of closest links found!", 5, findClosestLinks(network, coordW, 10, 2, 1, null, 100).size());
+
+		assertEquals("Not the correct closest link found!", linkAH, findClosestLinks(network, coordZ, 10, 10, 1, null, 100).get(0));
+		assertEquals("Not the correct third closest link found!", linkYE, findClosestLinks(network, coordX, 10, 10, 2, null, 100).get(2));
+
+//		findClosestLinks(network, coordW, null, 10, 10, 1, 100).get(0);
+//		findClosestLinks(network, coordW, null, 10, 10, 1, 100).get(1);
+
 	}
 
 	@Test

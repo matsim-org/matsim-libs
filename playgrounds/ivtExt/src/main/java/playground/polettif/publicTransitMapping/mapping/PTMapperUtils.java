@@ -19,6 +19,7 @@
 package playground.polettif.publicTransitMapping.mapping;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -95,7 +96,7 @@ public class PTMapperUtils {
 							modeLinkCandidates.add(new LinkCandidate(network.getLinks().get(stopFacility.getLinkId()), stopFacility));
 						} else {
 							// limits number of links, for all links within search radius use networkTools.findClosestLinks()
-							Set<Link> closestLinks = NetworkTools.findClosestLinksByMode(networkImpl, stopFacility.getCoord(), scheduleTransportMode, config);
+							List<Link> closestLinks = findClosestLinksByScheduleMode(network, stopFacility.getCoord(), scheduleTransportMode, config);
 
 							// if no close links are nearby, a loop link is created and referenced to the facility.
 							if(closestLinks.size() == 0) {
@@ -288,5 +289,35 @@ public class PTMapperUtils {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes(Coord, double)},
+	 * fetches all in- and outlinks and sorts them ascending by their
+	 * distance to the coordiantes given. Only returns links with the allowed
+	 * networkTransportMode for the input scheduleTransportMode (defined in
+	 * config). Returns maxNLinks or all links within maxLinkDistance (whichever
+	 * is reached earlier).
+	 * <p>
+	 * <p/>
+	 * Distance Link-Coordinate is calculated via  in {@link org.matsim.core.utils.geometry.CoordUtils#distancePointLinesegment(Coord, Coord, Coord)}).
+	 *
+	 * @param network               A network (needs to be NetworkImpl
+	 *                              for {@link NetworkImpl#getNearestNodes(Coord, double)}
+	 * @param coord                 the coordinate from which the closest links
+	 *                              are searched
+	 * @param scheduleTransportMode the transport mode of the "current" transitRoute.
+	 *                              The config should define which networkTransportModes
+	 *                              are allowed for this scheduleMode
+	 * @param config                The config defining maxNnodes, search radius etc.
+	 * @return a Set of the closest links
+	 */
+	public static List<Link> findClosestLinksByScheduleMode(Network network, Coord coord, String scheduleTransportMode, PublicTransitMappingConfigGroup config) {
+		return NetworkTools.findClosestLinks(
+				network,
+				coord,
+				config.getNodeSearchRadius(), config.getMaxNClosestLinks(), config.getLinkDistanceTolerance(), config.getModeRoutingAssignment().get(scheduleTransportMode),
+				config.getMaxLinkCandidateDistance()
+		);
 	}
 }

@@ -22,7 +22,6 @@ package playground.polettif.publicTransitMapping.tools;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -34,15 +33,13 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.router.LinkFilterMode;
 
 import java.util.*;
-
-import static playground.polettif.publicTransitMapping.tools.NetworkTools.coordIsOnRightSideOfLink;
 
 /**
  * Provides Tools for analysing and manipulating networks.
@@ -108,13 +105,13 @@ public class NetworkTools {
 				links.addAll(node.getInLinks().values());
 				double lineSegmentDistance;
 
-				for(Link outLink : links) {
+				for(Link link : links) {
 					// only use links with a viable network transport mode
-					lineSegmentDistance = CoordUtils.distancePointLinesegment(outLink.getFromNode().getCoord(), outLink.getToNode().getCoord(), coord);
+					lineSegmentDistance = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
 
 					if(lineSegmentDistance < minDistance) {
 						minDistance = lineSegmentDistance;
-						closestLink = outLink;
+						closestLink = link;
 					}
 
 				}
@@ -134,167 +131,77 @@ public class NetworkTools {
 	}
 
 	/**
-	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes(Coord, double)},
+	 * Looks for nodes within search radius of <tt>coord</tt> (using {@link NetworkImpl#getNearestNodes},
 	 * fetches all in- and outlinks and sorts them ascending by their
-	 * distance to the coordiantes given. Only returns maxNLinks or
-	 * all links within maxLinkDistance (whichever is reached earlier).
-	 * <p>
+	 * distance to the coordiantes given.
 	 * <p/>
-	 * Distance Link-Coordinate is calculated via  in {@link org.matsim.core.utils.geometry.CoordUtils#distancePointLinesegment(Coord, Coord, Coord)}).
-	 *
-	 * @param networkImpl      A network implementation
-	 * @param coord            the coordinate from which the closest links are
-	 *                         to be searched
-	 * @param nodeSearchRadius Only links from and to nodes within this
-	 *                         radius are considered
-	 * @param maxNLinks        How many links should be returned. Note: Method
-	 *                         an return more than n links if two links have the
-	 *                         same distance from the facility.
-	 * @param maxLinkDistance  Only returns links which are closer than
-	 *                         this distance to the coordinate.
-	 * @return the list of closest links
+	 * The method then returns <tt>maxNLinks</tt> or all links within <tt>maxLinkDistance</tt>
+	 * (whichever is reached earlier). Note: This method returns more than N links if two links have the same
+	 * distance to the facility.
+	 * <p/>
+	 * Distance Link to Coordinate is calculated using {@link org.matsim.core.utils.geometry.CoordUtils#distancePointLinesegment}).
+
+	 * @param network               	The network (must be instance of {@link NetworkImpl})
+	 * @param coord                 	the coordinate from which the closest links are
+	 *                         			to be searched
+	 * @param nodeSearchRadius        	Only links from and to nodes within this radius are considered.
+	 * @param maxNLinks             	How many links should be returned.
+	 * @param toleranceFactor       	After maxNLinks links have been found, additional links within
+	 *                              	<tt>toleranceFactor</tt>*<tt>distance to the Nth link</tt>
+	 *                              	are added to the set. Must be >= 1.
+	 * @param networkTransportModes 	Only links with at least one of these transport modes are considered.
+	 *                              	All links are considered if <tt>null</tt>.
+	 * @param maxLinkDistance       	Only returns links which are closer than
+	 *                         			this distance to the coordinate.
+	 * @return list of the closest links from coordinate <tt>coord</tt>.
 	 */
-	public static List<Link> findNClosestLinks(NetworkImpl networkImpl, Coord coord, double nodeSearchRadius, int maxNLinks, double maxLinkDistance) {
+	public static List<Link> findClosestLinks(Network network, Coord coord, double nodeSearchRadius, int maxNLinks, double toleranceFactor, Set<String> networkTransportModes, double maxLinkDistance) {
+		if(!(network instanceof NetworkImpl)) {
+			throw new IllegalArgumentException("network is not an instance of NetworkImpl");
+		}
+
 		List<Link> closestLinks = new ArrayList<>();
+		Collection<Node> nearestNodes = ((NetworkImpl) network).getNearestNodes(coord, nodeSearchRadius);
 
-		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, nodeSearchRadius);
-		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
-		double incr = 0.0001;
-		double tol = 0.001;
-
-		if(nearestNodes.size() == 0) {
-			return closestLinks;
-		} else {
-			// check every in- and outlink of each node
+		if(nearestNodes.size() != 0) {
+			// fetch every in- and outlink of each node
+			HashSet<Link> links = new HashSet<>();
 			for(Node node : nearestNodes) {
-				Map<Id<Link>, ? extends Link> outLinks = node.getOutLinks();
-				Map<Id<Link>, ? extends Link> inLinks = node.getInLinks();
-				double lineSegmentDistance;
-
-				for(Link outLink : outLinks.values()) {
-					// check if link is already in the closestLinks set
-					if(!closestLinksMap.containsValue(outLink)) {
-						// only use links with a viable network transport mode
-						lineSegmentDistance = CoordUtils.distancePointLinesegment(outLink.getFromNode().getCoord(), outLink.getToNode().getCoord(), coord);
-
-						// since distance is used as key, we need to ensure the exact distance is not used already
-						while(closestLinksMap.containsKey(lineSegmentDistance))
-							lineSegmentDistance += incr;
-
-						closestLinksMap.put(lineSegmentDistance, outLink);
-					}
-				}
-				for(Link inLink : inLinks.values()) {
-					if(!closestLinksMap.containsValue(inLink)) {
-						lineSegmentDistance = CoordUtils.distancePointLinesegment(inLink.getFromNode().getCoord(), inLink.getToNode().getCoord(), coord);
-						while(closestLinksMap.containsKey(lineSegmentDistance)) {
-							lineSegmentDistance += incr;
-						}
-						closestLinksMap.put(lineSegmentDistance, inLink);
-					}
-				}
-			}
-
-			int i = 1;
-			double previousDistance = 2 * tol;
-			for(Map.Entry<Double, Link> entry : closestLinksMap.entrySet()) {
-				// if the distance difference to the previous link is less than tol, add the link as well
-				if(i > maxNLinks && Math.abs(entry.getKey() - previousDistance) >= tol) {
-					break;
-				}
-				if(entry.getKey() > maxLinkDistance) {
-					break;
-				}
-
-				previousDistance = entry.getKey();
-				closestLinks.add(entry.getValue());
-				i++;
-			}
-
-			return closestLinks;
-		}
-	}
-
-	/**
-	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes(Coord, double)},
-	 * fetches all in- and outlinks and sorts them ascending by their
-	 * distance to the coordiantes given. Only returns links with the allowed
-	 * networkTransportMode for the input scheduleTransportMode (defined in
-	 * config). Returns maxNLinks or all links within maxLinkDistance (whichever
-	 * is reached earlier).
-	 * <p>
-	 * <p/>
-	 * Distance Link-Coordinate is calculated via  in {@link org.matsim.core.utils.geometry.CoordUtils#distancePointLinesegment(Coord, Coord, Coord)}).
-	 *
-	 * @param networkImpl           A network implementation (needed
-	 *                              for {@link NetworkImpl#getNearestNodes(Coord, double)}
-	 * @param coord                 the coordinate from which the closest links
-	 *                              are searched
-	 * @param scheduleTransportMode the transport mode of the "current" transitRoute.
-	 *                              The config should define which networkTransportModes
-	 *                              are allowed for this scheduleMode
-	 * @param config                The config defining maxNnodes, search radius etc.
-	 * @return a Set of the closest links
-	 */
-	public static Set<Link> findClosestLinksByMode(NetworkImpl networkImpl, Coord coord, String scheduleTransportMode, PublicTransitMappingConfigGroup config) {
-		Set<Link> closestLinks = new HashSet<>();
-
-		Collection<Node> nearestNodes = networkImpl.getNearestNodes(coord, config.getNodeSearchRadius());
-		SortedMap<Double, Link> closestLinksMap = new TreeMap<>();
-		double incr = 0.001;
-		double toleranceFactor = (config.getLinkDistanceTolerance() < 1 ? 1 : config.getLinkDistanceTolerance());
-		int maxNLinks = config.getMaxNClosestLinks();
-
-		Set<String> networkTransportModes = config.getModeRoutingAssignment().get(scheduleTransportMode);
-
-		if(nearestNodes.size() == 0) {
-			return closestLinks;
-		} else {
-			// check every in- and outlink of each node
-			for(Node node : nearestNodes) {
-				Set<Link> links = new HashSet<>(node.getInLinks().values());
 				links.addAll(node.getOutLinks().values());
+				links.addAll(node.getInLinks().values());
+			}
 
-				double lineSegmentDistance;
+			SortedMap<Double, Set<Link>> closestLinksSortedByDistance = new TreeMap<>();
 
-				for(Link link : links) {
-					// check if link is already in the closestLinks set
-					if(!closestLinksMap.containsValue(link)) {
-						// only use links with a viable network transport mode
-						if(MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), networkTransportModes)) {
-							lineSegmentDistance = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
-
-							// since distance is used as key, we need to ensure the exact distance is not used already
-							while(closestLinksMap.containsKey(lineSegmentDistance))
-								lineSegmentDistance += incr;
-
-							closestLinksMap.put(lineSegmentDistance, link);
-						}
-					}
+			// calculate lineSegmentDistance for all links
+			double tolFactor = (toleranceFactor < 1 ? 1 : toleranceFactor);
+			double maxSoftConstraintDistance = 0.0;
+			for(Link link : links) {
+				// only use links with a viable network transport mode
+				if(networkTransportModes == null || MiscUtils.setsShareMinOneStringEntry(link.getAllowedModes(), networkTransportModes)) {
+					double lineSegmentDistance = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), coord);
+					MapUtils.getSet(lineSegmentDistance, closestLinksSortedByDistance).add(link);
 				}
 			}
 
-			int i = 1;
-			double maxSoftDistance = Double.MAX_VALUE;
-			for(Map.Entry<Double, Link> entry : closestLinksMap.entrySet()) {
-				if(i == maxNLinks) {
-					maxSoftDistance = (entry.getKey() + 2 * incr) * toleranceFactor;
-				}
+			int nLink = 0;
+			for(Map.Entry<Double, Set<Link>> entry : closestLinksSortedByDistance.entrySet()) {
+				if(entry.getKey() > maxLinkDistance) { break; }
 
-				// if the distance difference to the previous link is less than tol, add the link as well
-				if(i > maxNLinks && entry.getKey() > maxSoftDistance) {
-					break;
-				}
-				if(entry.getKey() > config.getMaxStopFacilityDistance()) {
-					break;
-				}
-				closestLinks.add(entry.getValue());
-				i++;
+				// when the link limit is reached, set the soft constraint distance
+				if(nLink < maxNLinks && nLink+nLink+entry.getValue().size() >= maxNLinks) { maxSoftConstraintDistance = entry.getKey() * tolFactor; }
+
+				// check if distance is greater than soft constraint distance
+				if(nLink+entry.getValue().size() > maxNLinks && entry.getKey() > maxSoftConstraintDistance) { break; }
+
+				// if no loop break has been reached, add link to list
+				closestLinks.addAll(entry.getValue());
+				nLink += entry.getValue().size();
 			}
-
-			return closestLinks;
 		}
+		return closestLinks;
 	}
+
 
 
 	/**
