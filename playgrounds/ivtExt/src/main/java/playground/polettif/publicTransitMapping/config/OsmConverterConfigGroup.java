@@ -24,7 +24,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import playground.polettif.publicTransitMapping.osm.OsmMultimodalNetworkReader;
+import playground.polettif.publicTransitMapping.osm.Osm2MultimodalNetworkConverter;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
 
@@ -32,7 +32,7 @@ import java.util.Map;
 
 
 /**
- * Config group for osm conversion {@link OsmMultimodalNetworkReader}
+ * Config group for osm conversion {@link Osm2MultimodalNetworkConverter}
  * @author polettif
  */
 public class OsmConverterConfigGroup extends ReflectiveConfigGroup {
@@ -117,8 +117,10 @@ public class OsmConverterConfigGroup extends ReflectiveConfigGroup {
 	}
 	@StringSetter(OUTPUT_COORDINATE_SYSTEM)
 	public void setOutputCoordinateSystem(String outputCoordinateSystem) {
-		this.outputCoordinateSystem = outputCoordinateSystem;
-		this.coordinateTransformation = TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem);
+		if(outputCoordinateSystem != null) {
+			this.outputCoordinateSystem = outputCoordinateSystem;
+			this.coordinateTransformation = TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem);
+		}
 	}
 
 	public OsmConverterConfigGroup() {

@@ -21,13 +21,13 @@
 
 package playground.polettif.publicTransitMapping.workbench;
 
-import playground.polettif.publicTransitMapping.osm.MultimodalNetworkCreator;
+import playground.polettif.publicTransitMapping.osm.Osm2MultimodalNetworkConverter;
 
 public class Osm2NetworkViaConfig {
 
 	public static void main(String[] args) {
 		String configFile = "C:\\Users\\Flavio\\Desktop\\data\\config\\osmConverter\\uri.xml";
-		MultimodalNetworkCreator.createMultimodalNetworkViaConfig(configFile);
+		Osm2MultimodalNetworkConverter.run(configFile);
 	}
 
 }

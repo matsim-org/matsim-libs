@@ -27,20 +27,24 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;
+import playground.polettif.publicTransitMapping.config.OsmWayParams;
 import playground.polettif.publicTransitMapping.osm.core.OsmParser;
 import playground.polettif.publicTransitMapping.osm.core.OsmParserHandler;
 import playground.polettif.publicTransitMapping.osm.core.TagFilter;
-import playground.polettif.publicTransitMapping.config.OsmWayParams;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
+import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.*;
 
@@ -52,24 +56,26 @@ import java.util.*;
  *
  * @author boescpa
  */
-public class OsmMultimodalNetworkReader {
+public class Osm2MultimodalNetworkConverter {
 
-	private final static Logger log = Logger.getLogger(OsmMultimodalNetworkReader.class);
+	private final static Logger log = Logger.getLogger(Osm2MultimodalNetworkConverter.class);
 
-	private final OsmConverterConfigGroup config;
+	private OsmConverterConfigGroup config;
 
-	/*
-	Maps for nodes, ways and relations
+	/**
+	 *  Maps for nodes, ways and relations
 	 */
 	private Map<Long, OsmParser.OsmNode> nodes;
 	private Map<Long, OsmParser.OsmWay> ways;
 	private Map<Long, OsmParser.OsmRelation> relations;
 	private Map<Long, Set<Long>> relationMembers = new HashMap<>();
-
 	private final Map<Long, Long> wayIds = new HashMap<>();
 
-	/*
-	Maps for unknown entities
+	private Map<String, OsmWayParams> highwayParams = new HashMap<>();
+	private Map<String, OsmWayParams> railwayParams = new HashMap<>();
+
+	/**
+	 *  Maps for unknown entities
 	 */
 	private final Set<String> unknownHighways = new HashSet<>();
 	private final Set<String> unknownRailways = new HashSet<>();
@@ -79,59 +85,119 @@ public class OsmMultimodalNetworkReader {
 	private final Set<String> unknownLanesTags = new HashSet<>();
 	private long id = 0;
 
-	/*
-	Default values
-	 */
-//	private Map<String, Map<String, OsmConverterConfigGroup.WayParams>> wayParams = new HashMap<>();
-	private Map<String, OsmWayParams> highwayParams = new HashMap<>();
-	private Map<String, OsmWayParams> railwayParams = new HashMap<>();
 
-	/*
-	Network and Transformation Object
+	/**
+	 * Network and Transformation Object
 	 */
-	private final Network network;
+	private Network network;
 	private final CoordinateTransformation transformation; // is applied to nodes in OsmParserHandler
 
 	/**
-	 * Creates a new Reader to convert OSM data into a MATSim network.
+	 * Converts an osm file to a MATSim network. The input and output file as well
+	 * as conversion parameters are defined in this file. Run {@link playground.polettif.publicTransitMapping.workbench.CreateDefaultOsmConfig}
+	 * to create a default config.
 	 *
-	 * @param network An empty network where the converted OSM data will be stored.
+	 * @param args [0] the config.xml file
 	 */
-	public OsmMultimodalNetworkReader(final Network network, final CoordinateTransformation transformation) {
-		this(network, transformation, null);
+
+	public static void main(String[] args) {
+		run(args[0]);
 	}
 
 	/**
-	 * Creates a new Reader to convert OSM data into a MATSim network.
+	 * Converts an osm file to a MATSim network. The input and output file as well
+	 * as conversion parameters are defined in this file. Run {@link playground.polettif.publicTransitMapping.workbench.CreateDefaultOsmConfig}
+	 * to create a default config.
+	 *
+	 * @param configFile the config.xml file
 	 */
-	public OsmMultimodalNetworkReader(final Network network, final CoordinateTransformation transformation, OsmConverterConfigGroup config) {
-		this.network = network;
-		this.transformation = transformation;
+	public static void run(String configFile) {
+		new Osm2MultimodalNetworkConverter(configFile).run();
+	}
 
-		if(config == null) {
-			log.info("Using default values.");
-			this.config = OsmConverterConfigGroup.createDefaultConfig();
+	/**
+	 * Converts an osm file with default conversion parameters.
+	 * @param osmFile the osm file
+	 * @param outputNetworkFile the path to the output network file
+	 * @param outputCoordinateSystem output coordinate system (no transformation is applied if <tt>null</tt>)
+	 */
+	public static void run(String osmFile, String outputNetworkFile, String outputCoordinateSystem) {
+		OsmConverterConfigGroup configGroup = OsmConverterConfigGroup.createDefaultConfig();
+		configGroup.setOsmFile(osmFile);
+		configGroup.setOutputNetworkFile(outputNetworkFile);
+		configGroup.setOutputCoordinateSystem(outputCoordinateSystem);
+		new Osm2MultimodalNetworkConverter(configGroup).run();
+	}
 
-		} else {
-			this.config = config;
-			for(ConfigGroup e : config.getParameterSets(OsmWayParams.SET_NAME)) {
-				OsmWayParams w = (OsmWayParams) e;
-				if(w.getOsmKey().equals(OsmTag.HIGHWAY)) {
-					highwayParams.put(w.getOsmValue(), w);
-				} else if(w.getOsmKey().equals(OsmTag.RAILWAY)) {
-					railwayParams.put(w.getOsmValue(), w);
-				}
-//				MapUtils.getMap(w.getOsmKey(), wayParams).put(w.getOsmValue(), w);
-			}
+	/**
+	 * Converts the osm file specified in the config and writes
+	 * the network to a file (also defined in config).
+	 */
+	public void run() {
+		convert();
+		writeNetwork();
+	}
+
+	/**
+	 * Only converts the osm file, does not write the network to a file.
+	 */
+	public void convert() {
+		parse();
+		convertToNetwork();
+		cleanNetwork();
+	}
+
+	/**
+	 * Constructor using default config
+	 */
+	public Osm2MultimodalNetworkConverter() {
+		log.info("Using default config.");
+		this.config = OsmConverterConfigGroup.createDefaultConfig();
+		this.network = NetworkTools.createNetwork();
+		this.transformation = config.getCoordinateTransformation();
+		readWayParams();
+	}
+
+	/**
+	 * Constructor reading config from file.
+	 */
+	public Osm2MultimodalNetworkConverter(final String osmConverterConfigFile) {
+		Config configAll = ConfigUtils.loadConfig(osmConverterConfigFile, new OsmConverterConfigGroup() ) ;
+		this.config = ConfigUtils.addOrGetModule(configAll, OsmConverterConfigGroup.GROUP_NAME, OsmConverterConfigGroup.class);
+		this.network = NetworkTools.createNetwork();
+		this.transformation = config.getCoordinateTransformation();
+		readWayParams();
+	}
+
+	/**
+	 * Constructor using the a OsmCOnverterConfigGroup config.
+	 */
+	public Osm2MultimodalNetworkConverter(final OsmConverterConfigGroup config) {
+		this.config = config;
+		this.network = NetworkTools.createNetwork();
+		this.transformation = config.getCoordinateTransformation();
+		readWayParams();
+	}
+
+	/**
+	 * reads the params from the config to different containers.
+	 */
+	private void readWayParams() {
+		for(ConfigGroup e : config.getParameterSets(OsmWayParams.SET_NAME)) {
+			OsmWayParams w = (OsmWayParams) e;
+			if(w.getOsmKey().equals(OsmTag.HIGHWAY)) {
+				highwayParams.put(w.getOsmValue(), w);
+			} else if(w.getOsmKey().equals(OsmTag.RAILWAY)) {
+				railwayParams.put(w.getOsmValue(), w);
+			} // MapUtils.getMap(w.getOsmKey(), wayParams).put(w.getOsmValue(), w);
 		}
 	}
 
 	/**
-	 * Parses the given osm file and creates a MATSim network from the data.
+	 * Parses the osm file and creates a MATSim network from the data.
 	 * @throws UncheckedIOException
 	 */
-	public void parse(final String osmFilename) throws UncheckedIOException {
-
+	private void parse() throws UncheckedIOException {
 		TagFilter parserWayFilter = new TagFilter();
 		parserWayFilter.add(OsmTag.HIGHWAY);
 		parserWayFilter.add(OsmTag.RAILWAY);
@@ -150,55 +216,23 @@ public class OsmMultimodalNetworkReader {
 		OsmParserHandler handler = new OsmParserHandler();
 		handler.addFilter(null, parserWayFilter, parserRelationFilter);
 		parser.addHandler(handler);
-		parser.readFile(osmFilename);
+		parser.readFile(this.config.getOsmFile());
 
 		this.ways = handler.getWays();
 		this.nodes = handler.getNodes();
 		this.relations = handler.getRelations();
-
-		this.convert();
-
-		log.info("= conversion statistics: ==========================");
-		log.info("MATSim: # nodes created: " + this.network.getNodes().size());
-		log.info("MATSim: # links created: " + this.network.getLinks().size());
-
-		if(this.unknownHighways.size() > 0) {
-			log.info("The following highway-types had no defaults set and were thus NOT converted:");
-			for(String highwayType : this.unknownHighways) {
-				log.info("- \"" + highwayType + "\"");
-			}
-		}
-		if(this.unknownRailways.size() > 0) {
-			log.info("The following railway-types had no defaults set and were thus NOT converted:");
-			for(String railwayType : this.unknownRailways) {
-				log.info("- \"" + railwayType + "\"");
-			}
-		}
-		if(this.unknownPTs.size() > 0) {
-			log.info("The following PT-types had no defaults set and were thus NOT converted:");
-			for(String ptType : this.unknownPTs) {
-				log.info("- \"" + ptType + "\"");
-			}
-		}
-		if(this.unknownWays.size() > 0) {
-			log.info("The way-types with the following tags had no defaults set and were thus NOT converted:");
-			for(String wayType : this.unknownWays) {
-				log.info("- \"" + wayType + "\"");
-			}
-		}
-		log.info("= end of conversion statistics ====================");
 	}
 
 	/**
 	 * Converts the parsed osm data to MATSim nodes and links.
 	 */
-	private void convert() {
+	private void convertToNetwork() {
 		if(this.network instanceof NetworkImpl) {
 			((NetworkImpl) this.network).setCapacityPeriod(3600);
 		}
 
 		// store of which relation a way is part of
-		for(OsmParser.OsmRelation relation : relations.values()) {
+		for(OsmParser.OsmRelation relation : this.relations.values()) {
 			for(OsmParser.OsmRelationMember member : relation.members) {
 				MapUtils.getSet(member.refId, relationMembers).add(relation.id);
 			}
@@ -331,6 +365,36 @@ public class OsmMultimodalNetworkReader {
 		this.nodes.clear();
 		this.ways.clear();
 		this.relations.clear();
+
+		log.info("= conversion statistics: ==========================");
+		log.info("MATSim: # nodes created: " + this.network.getNodes().size());
+		log.info("MATSim: # links created: " + this.network.getLinks().size());
+
+		if(this.unknownHighways.size() > 0) {
+			log.info("The following highway-types had no defaults set and were thus NOT converted:");
+			for(String highwayType : this.unknownHighways) {
+				log.info("- \"" + highwayType + "\"");
+			}
+		}
+		if(this.unknownRailways.size() > 0) {
+			log.info("The following railway-types had no defaults set and were thus NOT converted:");
+			for(String railwayType : this.unknownRailways) {
+				log.info("- \"" + railwayType + "\"");
+			}
+		}
+		if(this.unknownPTs.size() > 0) {
+			log.info("The following PT-types had no defaults set and were thus NOT converted:");
+			for(String ptType : this.unknownPTs) {
+				log.info("- \"" + ptType + "\"");
+			}
+		}
+		if(this.unknownWays.size() > 0) {
+			log.info("The way-types with the following tags had no defaults set and were thus NOT converted:");
+			for(String wayType : this.unknownWays) {
+				log.info("- \"" + wayType + "\"");
+			}
+		}
+		log.info("= end of conversion statistics ====================");
 	}
 
 	/**
@@ -518,6 +582,30 @@ public class OsmMultimodalNetworkReader {
 				this.id++;
 			}
 		}
+	}
+
+	/**
+	 * Runs the network cleaner on the street network.
+	 */
+	private void cleanNetwork() {
+		Network streetNetwork = NetworkTools.filterNetworkByLinkMode(network, Collections.singleton(TransportMode.car));
+		Network restNetwork = NetworkTools.filterNetworkExceptLinkMode(network, Collections.singleton(TransportMode.car));
+		new NetworkCleaner().run(streetNetwork);
+		NetworkTools.integrateNetwork(streetNetwork, restNetwork);
+		this.network = streetNetwork;
+	}
+
+
+	public Network getNetwork() {
+		return this.network;
+	}
+
+	public OsmConverterConfigGroup getConfig() {
+		return config;
+	}
+
+	private void writeNetwork() {
+		NetworkTools.writeNetwork(this.network, this.config.getOutputNetworkFile());
 	}
 
 }
