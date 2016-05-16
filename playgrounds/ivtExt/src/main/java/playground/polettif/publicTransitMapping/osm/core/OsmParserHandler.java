@@ -17,10 +17,12 @@
  * *********************************************************************** */
 
 
-package playground.polettif.publicTransitMapping.osm;
+package playground.polettif.publicTransitMapping.osm.core;
 
 import org.apache.log4j.Logger;
-import playground.polettif.publicTransitMapping.osm.core.*;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmNodeHandler;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmRelationHandler;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmWayHandler;
 
 import java.util.*;
 

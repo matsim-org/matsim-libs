@@ -32,6 +32,10 @@ import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmRelation;
 import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmRelationMember;
 import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmRelationMemberType;
 import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmWay;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmHandler;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmNodeHandler;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmRelationHandler;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmWayHandler;
 
 /**
  * @author mrieser / Senozon AG

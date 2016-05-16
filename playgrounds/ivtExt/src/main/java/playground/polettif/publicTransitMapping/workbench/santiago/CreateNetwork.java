@@ -2,7 +2,7 @@ package playground.polettif.publicTransitMapping.workbench.santiago;
 
 
 import org.matsim.api.core.v01.network.Network;
-import playground.polettif.publicTransitMapping.osm.MultimodalNetworkCreatorPT;
+import playground.polettif.publicTransitMapping.osm.MultimodalNetworkCreator;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.Collections;
@@ -13,7 +13,7 @@ public class CreateNetwork {
 		String base = "E:/data/santiago/";
 
 		// create network from osm
-		MultimodalNetworkCreatorPT.run(base + "osm/santiago_chile.osm", base + "network/santiago_chile_osm.xml.gz", "EPSG:32719");
+		MultimodalNetworkCreator.run(base + "osm/santiago_chile.osm", base + "network/santiago_chile_osm.xml.gz", "EPSG:32719");
 
 
 		// filter provided network

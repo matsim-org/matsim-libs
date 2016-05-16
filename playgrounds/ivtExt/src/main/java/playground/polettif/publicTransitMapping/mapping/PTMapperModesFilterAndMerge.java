@@ -116,11 +116,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		} else {
 			log.info("Mapping files from config...");
 			log.info("Reading schedule and network file...");
-			Scenario mainScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			Network network = mainScenario.getNetwork();
-			new TransitScheduleReader(mainScenario).readFile(config.getScheduleFile());
-			new MatsimNetworkReader(network).readFile(config.getNetworkFile());
-			TransitSchedule mainSchedule = mainScenario.getTransitSchedule();
+			Network network = NetworkTools.loadNetwork(config.getNetworkFile());
+			TransitSchedule mainSchedule = ScheduleTools.loadTransitSchedule(config.getNetworkFile());
 
 			new PTMapperModesFilterAndMerge(mainSchedule, config).mapScheduleToNetwork(network);
 
@@ -432,7 +429,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		log.info("       input    "+nStopFacilities);
 		log.info("       output   "+schedule.getFacilities().size());
 		log.info("       diff.    "+(schedule.getFacilities().size()-nStopFacilities));
-		log.info("       factor   "+(schedule.getFacilities().size()/((double) nStopFacilities)));
 		log.info("    Transit Route statistics:");
 		log.info("       removed  " + routesRemoved);
 		log.info("    Artificial Links:");

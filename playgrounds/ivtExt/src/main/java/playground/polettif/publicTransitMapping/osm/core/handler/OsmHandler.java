@@ -17,15 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.osm.core;
-
-import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmRelation;
+package playground.polettif.publicTransitMapping.osm.core.handler;
 
 /**
+ * Base interface of more specialized handlers for osm data entities.
+ * 
  * @author mrieser / Senozon AG
  */
-public interface OsmRelationHandler extends OsmHandler {
-
-	void handleRelation(final OsmRelation relation);
+public interface OsmHandler {
 
 }

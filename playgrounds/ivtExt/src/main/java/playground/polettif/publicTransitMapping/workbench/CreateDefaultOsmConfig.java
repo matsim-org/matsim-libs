@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +16,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.osm.core;
+package playground.polettif.publicTransitMapping.workbench;
 
-import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmWay;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;
+import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
- * @author mrieser / Senozon AG
+ * Creates a default osmConverter config file.
+ *
+ * @author polettif
  */
-public interface OsmWayHandler extends OsmHandler {
-	
-	void handleWay(final OsmWay way);
+public class CreateDefaultOsmConfig {
 
+	/**
+	 * Creates a default publicTransitMapping config file.
+	 * @param args [0] default config filename
+	 */
+	public static void main(final String[] args) {
+		Config config = ConfigUtils.createConfig();
+
+		config.addModule(OsmConverterConfigGroup.createDefaultConfig());
+
+		Set<String> toRemove = config.getModules().keySet().stream().filter(module -> !module.equals(OsmConverterConfigGroup.GROUP_NAME)).collect(Collectors.toSet());
+		toRemove.forEach(config::removeModule);
+
+		new ConfigWriter(config).write(args[0]);
+	}
 }

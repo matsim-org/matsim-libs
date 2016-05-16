@@ -27,13 +27,18 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.UncheckedIOException;
-import playground.polettif.publicTransitMapping.osm.core.*;
+import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;
+import playground.polettif.publicTransitMapping.osm.core.OsmParser;
+import playground.polettif.publicTransitMapping.osm.core.OsmParserHandler;
+import playground.polettif.publicTransitMapping.osm.core.TagFilter;
+import playground.polettif.publicTransitMapping.config.OsmWayParams;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
 
@@ -47,19 +52,11 @@ import java.util.*;
  *
  * @author boescpa
  */
-public class OsmNetworkReaderWithPT {
+public class OsmMultimodalNetworkReader {
 
-	private final static Logger log = Logger.getLogger(OsmNetworkReaderWithPT.class);
+	private final static Logger log = Logger.getLogger(OsmMultimodalNetworkReader.class);
 
-	/*
-	OSM TAGS
-	*/
-
-	// general tags
-	private static final String MEMBER_ROLE_STOP = "stop";
-	private static final String MEMBER_ROLE_STOP_FORWARD = "stop_forward";
-	private static final String MEMBER_ROLE_STOP_BACKWARD = "stop_backward";
-
+	private final OsmConverterConfigGroup config;
 
 	/*
 	Maps for nodes, ways and relations
@@ -80,156 +77,57 @@ public class OsmNetworkReaderWithPT {
 	private final Set<String> unknownWays = new HashSet<>();
 	private final Set<String> unknownMaxspeedTags = new HashSet<>();
 	private final Set<String> unknownLanesTags = new HashSet<>();
-	private final CoordinateTransformation transformation; // is applied to nodes in OsmParserHandler
 	private long id = 0;
 
 	/*
 	Default values
 	 */
-	private final Map<String, OsmWayDefaults> highwayDefaults = new HashMap<>();
-	private final Map<String, OsmWayDefaults> railwayDefaults = new HashMap<>();
-	private final TagFilter ptFilter = new TagFilter();
+//	private Map<String, Map<String, OsmConverterConfigGroup.WayParams>> wayParams = new HashMap<>();
+	private Map<String, OsmWayParams> highwayParams = new HashMap<>();
+	private Map<String, OsmWayParams> railwayParams = new HashMap<>();
 
 	/*
 	Network and Transformation Object
 	 */
 	private final Network network;
-
-	/*
-	Parse Params
-	 */
-	private boolean keepPaths = false;
-	private boolean scaleMaxSpeed = false;
-	private double maxLinkLength = 500.0;
-	// todo doc if a maxspeed tag looks like "50; 80" or similar, uses the first two digits
-	private boolean guessFreeSpeed = true;
-
+	private final CoordinateTransformation transformation; // is applied to nodes in OsmParserHandler
 
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
 	 *
 	 * @param network An empty network where the converted OSM data will be stored.
 	 */
-	public OsmNetworkReaderWithPT(final Network network, final CoordinateTransformation transformation) {
-		this(network, transformation, true);
+	public OsmMultimodalNetworkReader(final Network network, final CoordinateTransformation transformation) {
+		this(network, transformation, null);
 	}
 
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
-	 *
-	 * @param network            An empty network where the converted OSM data will be stored.
-	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 */
-	public OsmNetworkReaderWithPT(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults) {
+	public OsmMultimodalNetworkReader(final Network network, final CoordinateTransformation transformation, OsmConverterConfigGroup config) {
 		this.network = network;
 		this.transformation = transformation;
 
-		if(useHighwayDefaults) {
-			log.info("Falling back to default values.");
+		if(config == null) {
+			log.info("Using default values.");
+			this.config = OsmConverterConfigGroup.createDefaultConfig();
 
-			// Set highway-defaults (and with it the filter...)
-			this.setHighwayDefaults(OsmValue.MOTORWAY, 2, 120.0 / 3.6, 1.0, 2000, true);
-			this.setHighwayDefaults(OsmValue.MOTORWAY_LINK, 1, 80.0 / 3.6, 1.0, 1500, true);
-			this.setHighwayDefaults(OsmValue.TRUNK, 1, 80.0 / 3.6, 1.0, 2000);
-			this.setHighwayDefaults(OsmValue.TRUNK_LINK, 1, 50.0 / 3.6, 1.0, 1500);
-			this.setHighwayDefaults(OsmValue.PRIMARY, 1, 80.0 / 3.6, 1.0, 1500);
-			this.setHighwayDefaults(OsmValue.PRIMARY_LINK, 1, 60.0 / 3.6, 1.0, 1500);
-			this.setHighwayDefaults(OsmValue.SECONDARY, 1, 60.0 / 3.6, 1.0, 1000);
-			this.setHighwayDefaults(OsmValue.TERTIARY, 1, 50.0 / 3.6, 1.0, 600);
-			this.setHighwayDefaults(OsmValue.MINOR, 1, 40.0 / 3.6, 1.0, 600);
-			this.setHighwayDefaults(OsmValue.UNCLASSIFIED, 1, 50.0 / 3.6, 1.0, 600);
-			this.setHighwayDefaults(OsmValue.RESIDENTIAL, 1, 30.0 / 3.6, 1.0, 600);
-			this.setHighwayDefaults(OsmValue.LIVING_STREET, 1, 15.0 / 3.6, 1.0, 300);
-//			this.setHighwayDefaults(OsmValue.SERVICE, 1, 15.0 / 3.6, 1.0, 200);
-
-			// Set railway-defaults (and with it the filter...)
-			this.setRailwayDefaults(OsmValue.RAIL, 1, 160.0 / 3.6, 1.0, 100);
-			this.setRailwayDefaults(OsmValue.TRAM, 1, 40.0 / 3.6, 1.0, 100, true);
-			this.setRailwayDefaults(OsmValue.LIGHT_RAIL, 1, 80.0 / 3.6, 1.0, 100);
+		} else {
+			this.config = config;
+			for(ConfigGroup e : config.getParameterSets(OsmWayParams.SET_NAME)) {
+				OsmWayParams w = (OsmWayParams) e;
+				if(w.getOsmKey().equals(OsmTag.HIGHWAY)) {
+					highwayParams.put(w.getOsmValue(), w);
+				} else if(w.getOsmKey().equals(OsmTag.RAILWAY)) {
+					railwayParams.put(w.getOsmValue(), w);
+				}
+//				MapUtils.getMap(w.getOsmKey(), wayParams).put(w.getOsmValue(), w);
+			}
 		}
-	}
-
-	public void setMaxLinkLength(double maxLinkLength) {
-		this.maxLinkLength = maxLinkLength;
-	}
-
-	/**
-	 * Sets defaults for converting OSM highway paths into MATSim links, assuming it is no oneway road.
-	 *
-	 * @param highwayType             The type of highway these defaults are for.
-	 * @param lanes                   number of lanes on that road type
-	 * @param freespeed               the free speed vehicles can drive on that road type [meters/second]
-	 * @param freespeedFactor         the factor the freespeed is scaled
-	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
-	 * @see <a href="http://wiki.openstreetmap.org/wiki/Map_Features#Highway">http://wiki.openstreetmap.org/wiki/Map_Features#Highway</a>
-	 */
-	public void setHighwayDefaults(final String highwayType, final double lanes, final double freespeed, final double freespeedFactor, final double laneCapacity_vehPerHour) {
-		setHighwayDefaults(highwayType, lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, false);
-	}
-
-	public void setRailwayDefaults(final String railwayType, final double lanes, final double freespeed,
-								   final double freespeedFactor, final double laneCapacity_vehPerHour) {
-		setRailwayDefaults(railwayType, lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, false);
-	}
-
-
-	/**
-	 * Sets defaults for converting OSM highway paths into MATSim links.
-	 *
-	 * @param highwayType             The type of highway these defaults are for.
-	 * @param lanes                   number of lanes on that road type
-	 * @param freespeed               the free speed vehicles can drive on that road type [meters/second]
-	 * @param freespeedFactor         the factor the freespeed is scaled
-	 * @param laneCapacity_vehPerHour the capacity per lane [veh/h]
-	 * @param oneway                  <code>true</code> to say that this road is a oneway road
-	 */
-	public void setHighwayDefaults(final String highwayType, final double lanes, final double freespeed,
-								   final double freespeedFactor, final double laneCapacity_vehPerHour, final boolean oneway) {
-		this.highwayDefaults.put(highwayType, new OsmWayDefaults(lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
-	}
-
-	public void setRailwayDefaults(final String railwayType,
-								   final double lanes,
-								   final double freespeed,
-								   final double freespeedFactor,
-								   final double laneCapacity_vehPerHour,
-								   final boolean oneway) {
-		this.railwayDefaults.put(railwayType, new OsmWayDefaults(lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
-	}
-
-
-	/**
-	 * Sets whether the detailed geometry of the roads should be retained in the conversion or not.
-	 * Keeping the detailed paths results in a much higher number of nodes and links in the resulting MATSim network.
-	 * Not keeping the detailed paths removes all nodes where only one road passes through, thus only real intersections
-	 * or branchings are kept as nodes. This reduces the number of nodes and links in the network, but can in some rare
-	 * cases generate extremely long links (e.g. for motorways with only a few ramps every few kilometers).
-	 * <p/>
-	 * Defaults to <code>false</code>.
-	 *
-	 * @param keepPaths <code>true</code> to keep all details of the OSM roads
-	 */
-	public void setKeepPaths(final boolean keepPaths) {
-		this.keepPaths = keepPaths;
-	}
-
-	/**
-	 * In case the speed limit allowed does not represent the speed a vehicle can actually realize, e.g. by constrains of
-	 * traffic lights not explicitly modeled, a kind of "average simulated speed" can be used.
-	 * <p/>
-	 * Defaults to <code>false</code>.
-	 *
-	 * @param scaleMaxSpeed <code>true</code> to scale the speed limit down by the value specified by the
-	 *                      {@link #setHighwayDefaults(String, double, double, double, double) defaults}.
-	 */
-	public void setScaleMaxSpeed(final boolean scaleMaxSpeed) {
-		this.scaleMaxSpeed = scaleMaxSpeed;
 	}
 
 	/**
 	 * Parses the given osm file and creates a MATSim network from the data.
-	 *
-	 * @param osmFilename
 	 * @throws UncheckedIOException
 	 */
 	public void parse(final String osmFilename) throws UncheckedIOException {
@@ -316,7 +214,7 @@ public class OsmNetworkReaderWithPT {
 				way.used = false;
 			}
 			// remove service roads without a transit route on them
-			if(!highwayDefaults.containsKey(way.tags.get(OsmTag.HIGHWAY)) && !relationMembers.containsKey(way.id) && !way.tags.containsKey(OsmTag.RAILWAY)) {
+			if(!highwayParams.containsKey(way.tags.get(OsmTag.HIGHWAY)) && !relationMembers.containsKey(way.id) && !way.tags.containsKey(OsmTag.RAILWAY)) {
 				way.used = false;
 			}
 		}
@@ -344,7 +242,7 @@ public class OsmNetworkReaderWithPT {
 		}
 
 		// Clean network:
-		if(!this.keepPaths) {
+		if(!config.getKeepPaths()) {
 			// marked nodes as unused where only one way leads through
 			// but only if this doesn't lead to links longer than MAX_LINKLENGTH
 			for(OsmParser.OsmWay way : this.ways.values()) {
@@ -358,7 +256,7 @@ public class OsmNetworkReaderWithPT {
 						lastNode = node;
 					} else if(node.ways == 1) {
 						length += CoordUtils.calcEuclideanDistance(lastNode.coord, node.coord);
-						if(length <= maxLinkLength) {
+						if(length <= config.getMaxLinkLength()) {
 							node.used = false;
 							lastNode = node;
 						} else {
@@ -450,22 +348,22 @@ public class OsmNetworkReaderWithPT {
 		// load defaults
 		String highway = way.tags.get(OsmTag.HIGHWAY);
 		String railway = way.tags.get(OsmTag.RAILWAY);
-		OsmWayDefaults defaults;
+		OsmWayParams wayValues;
 		if(highway != null) {
-			defaults = this.highwayDefaults.get(highway);
-			if(defaults == null) {
+			wayValues = this.highwayParams.get(highway);
+			if(wayValues == null) {
 				// check if bus route is on link todo bus lane conditions as param?
 				if(way.tags.containsKey(OsmTag.PSV)) {
 					busOnlyLink = true;
-					defaults = highwayDefaults.get(OsmValue.UNCLASSIFIED);
+					wayValues = highwayParams.get(OsmValue.UNCLASSIFIED);
 				} else {
 					this.unknownHighways.add(highway);
 					return;
 				}
 			}
 		} else if(railway != null) {
-			defaults = this.railwayDefaults.get(railway);
-			if(defaults == null) {
+			wayValues = this.railwayParams.get(railway);
+			if(wayValues == null) {
 				this.unknownRailways.add(railway);
 				return;
 			}
@@ -473,11 +371,11 @@ public class OsmNetworkReaderWithPT {
 			this.unknownWays.add(way.tags.values().toString());
 			return;
 		}
-		nofLanes = defaults.lanes;
-		laneCapacity = defaults.laneCapacity;
-		freespeed = defaults.freespeed;
-		freespeedFactor = defaults.freespeedFactor;
-		oneway = defaults.oneway;
+		nofLanes = wayValues.getLanes();
+		laneCapacity = wayValues.getLaneCapacity();
+		freespeed = wayValues.getFreespeed();
+		freespeedFactor = wayValues.getFreespeedFactor();
+		oneway = wayValues.getOneway();
 
 		// check if there are tags that overwrite defaults
 		// - check tag "junction"
@@ -517,7 +415,7 @@ public class OsmNetworkReaderWithPT {
 				freespeed = Double.parseDouble(maxspeedTag) / 3.6; // convert km/h to m/s
 			} catch (NumberFormatException e) {
 				boolean message = true;
-				if(guessFreeSpeed) {
+				if(config.getGuessFreeSpeed()) {
 					try {
 						message = false;
 						freespeed = Double.parseDouble(maxspeedTag.substring(0, 2)) / 3.6;
@@ -549,7 +447,7 @@ public class OsmNetworkReaderWithPT {
 
 		// define the links' capacity and freespeed
 		double capacity = nofLanes * laneCapacity;
-		if(this.scaleMaxSpeed) {
+		if(config.getScaleMaxSpeed()) {
 			freespeed = freespeed * freespeedFactor;
 		}
 
@@ -564,7 +462,7 @@ public class OsmNetworkReaderWithPT {
 			modes.add(TransportMode.pt);
 		}
 
-		if(railway != null && railwayDefaults.containsKey(railway)) {
+		if(railway != null && railwayParams.containsKey(railway)) {
 			modes.add(railway);
 		}
 
@@ -622,21 +520,5 @@ public class OsmNetworkReaderWithPT {
 		}
 	}
 
-	private static class OsmWayDefaults {
-
-		public final double lanes;
-		public final double freespeed;
-		public final double freespeedFactor;
-		public final double laneCapacity;
-		public final boolean oneway;
-
-		public OsmWayDefaults(final double lanes, final double freespeed, final double freespeedFactor, final double laneCapacity, final boolean oneway) {
-			this.lanes = lanes;
-			this.freespeed = freespeed;
-			this.freespeedFactor = freespeedFactor;
-			this.laneCapacity = laneCapacity;
-			this.oneway = oneway;
-		}
-	}
 }
 

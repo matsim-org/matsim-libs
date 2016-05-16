@@ -29,7 +29,7 @@ import java.util.*;
  */
 public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "PublicTransportMap";
+	public static final String GROUP_NAME = "PublicTransitMapping";
 
 	public static final String ARTIFICIAL_LINK_MODE = "artificial";
 
@@ -115,16 +115,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
 		return map;
 	}
-
-
-	/**
-	 * for each schedule transport the following needs to be specified:
-	 * - should it be mapped independently?
-	 * - to which network transport modeRouting it can be mapped
-	 *
-	 * for network transport modeRouting:
-	 * - should it be cleaned up
-	 */
 
 	/**
 	 * References transportModes from the schedule (key) and the

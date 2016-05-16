@@ -17,9 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.osm.core;
+package playground.polettif.publicTransitMapping.osm.core.handler;
 
 import playground.polettif.publicTransitMapping.osm.core.OsmParser.OsmNode;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmHandler;
 
 /**
  * @author mrieser / Senozon AG
