@@ -38,6 +38,7 @@ public class CongestionLinkInfo {
 	
 	private double travelTimeSum = 0.;
 	private double travelTimeLastLeavingAgent = 0.;
+	private double travelTimeMaximum = 0.;
 
 	public CongestionLinkInfo(Id<Link> linkId) {
 		this.linkId = linkId;
@@ -65,6 +66,14 @@ public class CongestionLinkInfo {
 
 	public void setTravelTimeLastLeavingAgent(double travelTimeLastLeavingAgent) {
 		this.travelTimeLastLeavingAgent = travelTimeLastLeavingAgent;
+	}
+
+	public double getTravelTimeMaximum() {
+		return travelTimeMaximum;
+	}
+
+	public void setTravelTimeMaximum(double travelTimeMaximum) {
+		this.travelTimeMaximum = travelTimeMaximum;
 	}
 
 }

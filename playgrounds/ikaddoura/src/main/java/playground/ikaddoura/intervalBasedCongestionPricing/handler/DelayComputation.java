@@ -87,6 +87,9 @@ public class DelayComputation implements LinkEnterEventHandler, LinkLeaveEventHa
 			double travelTimeSum = this.congestionInfo.getCongestionLinkInfos().get(event.getLinkId()).getTravelTimeSum_sec() + traveltimeThisAgent;
 			this.congestionInfo.getCongestionLinkInfos().get(event.getLinkId()).setTravelTimeSum(travelTimeSum);
 			this.congestionInfo.getCongestionLinkInfos().get(event.getLinkId()).setTravelTimeLastLeavingAgent(traveltimeThisAgent);
+			if (traveltimeThisAgent > this.congestionInfo.getCongestionLinkInfos().get(event.getLinkId()).getTravelTimeMaximum()) {
+				this.congestionInfo.getCongestionLinkInfos().get(event.getLinkId()).setTravelTimeMaximum(traveltimeThisAgent);
+			}
 			
 			double freespeedTravelTime = Math.round(congestionInfo.getScenario().getNetwork().getLinks().get(event.getLinkId()).getLength() / congestionInfo.getScenario().getNetwork().getLinks().get(event.getLinkId()).getFreespeed());
 			this.totalDelayPerDay_sec = this.totalDelayPerDay_sec + (traveltimeThisAgent - freespeedTravelTime);

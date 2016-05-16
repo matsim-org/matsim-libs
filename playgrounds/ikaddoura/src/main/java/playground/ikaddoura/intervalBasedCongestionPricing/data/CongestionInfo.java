@@ -39,9 +39,13 @@ public class CongestionInfo {
 
 	// time independent values
 	
-	private final double TIME_BIN_SIZE = 10 * 60.;
+	private final double TIME_BIN_SIZE = 5 * 60.;
 	private final int WRITE_OUTPUT_ITERATION = 1;
-	private final InternalizationApproach INTERNALIZATION_APPROACH = InternalizationApproach.AverageCost;
+	private final InternalizationApproach INTERNALIZATION_APPROACH = InternalizationApproach.MaximumDelay;
+	
+	public enum InternalizationApproach {
+        AverageDelay, LastAgentsDelay, MaximumDelay
+	}
 	
 	private final Scenario scenario;
 	
@@ -87,10 +91,6 @@ public class CongestionInfo {
 
 	public Scenario getScenario() {
 		return scenario;
-	}
-
-	public enum InternalizationApproach {
-        AverageCost, MarginalCost
 	}
 
 }

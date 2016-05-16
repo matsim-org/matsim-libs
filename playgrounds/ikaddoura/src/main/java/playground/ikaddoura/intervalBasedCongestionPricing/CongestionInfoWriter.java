@@ -64,7 +64,10 @@ public class CongestionInfoWriter {
 					+ " ; Average travel time [sec] " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS)
 					+ " ; Travel time last agent [sec] " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS)
 					+ " ; Total delay [sec] " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS)
-					+ " ; Delay last agent [sec] " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+					+ " ; Delay last agent [sec] " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS)
+					+ " ; Maximum travel time [sec] " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS)
+					+ " ; Maximum delay [sec] " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS)
+					);
 			bw.newLine();
 			
 			for (Id<Link> linkId : congestionInfo.getCongestionLinkInfos().keySet()){
@@ -78,6 +81,8 @@ public class CongestionInfoWriter {
 					double freespeedTravelTime_sec = Math.round(congestionInfo.getScenario().getNetwork().getLinks().get(linkId).getLength() / congestionInfo.getScenario().getNetwork().getLinks().get(linkId).getFreespeed());
 					double totalDelay_sec = travelTimeSum_sec - (numberOfAgents * freespeedTravelTime_sec);
 					double delayLastAgent_sec = travelTimeLastLeavingAgent_sec - freespeedTravelTime_sec;
+					double maximumTravelTime_sec = congestionInfo.getCongestionLinkInfos().get(linkId).getTravelTimeMaximum();
+					double maximumDelay_sec = maximumTravelTime_sec - freespeedTravelTime_sec;
 					
 					bw.write(linkId.toString()
 							+ ";" + freespeedTravelTime_sec
@@ -86,7 +91,10 @@ public class CongestionInfoWriter {
 							+ ";" + averageTravelTime_sec
 							+ ";" + travelTimeLastLeavingAgent_sec
 							+ ";" + totalDelay_sec
-							+ ";" + delayLastAgent_sec );
+							+ ";" + delayLastAgent_sec
+							+ ";" + maximumTravelTime_sec
+							+ ";" + maximumDelay_sec
+							);
 					bw.newLine();
 				}
 			}
@@ -129,7 +137,7 @@ public class CongestionInfoWriter {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			
-			bw.write("Iteration ; Total delay [hours] ; Total toll payments [monetary units] ; Total travel time [hours]; Total user benefits [monetary units]");
+			bw.write("Iteration ; Total delay [hours] ; Total toll payments [monetary units] ; Total travel time [hours]; Total user benefits [monetary units]; System welfare [monetary units]");
 			bw.newLine();
 			
 			for (Integer iteration : iteration2totalDelay.keySet()) {
@@ -137,7 +145,8 @@ public class CongestionInfoWriter {
 						+ iteration2totalDelay.get(iteration) / 3600. + " ; "
 						+ iteration2totalTollPayments.get(iteration) + " ; "
 						+ iteration2totalTravelTime.get(iteration) / 3600. + " ; "
-						+ iteration2userBenefits.get(iteration)
+						+ iteration2userBenefits.get(iteration) + ";"
+						+ (iteration2totalTollPayments.get(iteration) + iteration2userBenefits.get(iteration))
 						);
 				bw.newLine();
 			}

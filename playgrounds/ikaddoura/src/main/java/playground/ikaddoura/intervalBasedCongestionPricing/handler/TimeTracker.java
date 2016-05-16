@@ -135,14 +135,18 @@ public class TimeTracker implements LinkLeaveEventHandler {
 				
 				double amount = 0.;
 		
-				if (this.congestionInfo.getINTERNALIZATION_APPROACH().equals(InternalizationApproach.AverageCost)) {
+				if (this.congestionInfo.getINTERNALIZATION_APPROACH().equals(InternalizationApproach.AverageDelay)) {
 					double averageTravelTimePerAgent_sec = this.congestionInfo.getCongestionLinkInfos().get(linkId).getTravelTimeSum_sec() / this.congestionInfo.getCongestionLinkInfos().get(linkId).getLeavingVehicles().size();
 					double averageDelayPerAgent_sec = averageTravelTimePerAgent_sec - freespeedTravelTime_sec;
 					amount = -1.0 * averageDelayPerAgent_sec * vtts_hour / 3600.;
 				
-				} else if (this.congestionInfo.getINTERNALIZATION_APPROACH().equals(InternalizationApproach.MarginalCost)) {
+				} else if (this.congestionInfo.getINTERNALIZATION_APPROACH().equals(InternalizationApproach.LastAgentsDelay)) {
 					double delayLastAgent_sec = this.congestionInfo.getCongestionLinkInfos().get(linkId).getTravelTimeLastLeavingAgent_sec() - freespeedTravelTime_sec;
 					amount = -1.0 * delayLastAgent_sec * vtts_hour / 3600.;
+					
+				} else if (this.congestionInfo.getINTERNALIZATION_APPROACH().equals(InternalizationApproach.MaximumDelay)) {
+					double maximumDelay = this.congestionInfo.getCongestionLinkInfos().get(linkId).getTravelTimeMaximum() - freespeedTravelTime_sec;
+					amount = -1.0 * maximumDelay * vtts_hour / 3600.;
 				
 				} else {
 					throw new RuntimeException("Unknown internalization approach. Aborting...");
