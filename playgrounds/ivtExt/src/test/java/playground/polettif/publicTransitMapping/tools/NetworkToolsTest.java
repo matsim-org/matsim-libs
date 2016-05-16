@@ -110,8 +110,6 @@ public class NetworkToolsTest {
 		network.addLink(linkXA);
 		network.addLink(linkAH);
 		network.addLink(linkYE);
-
-		NetworkTools.writeNetwork(network, "C:/Users/Flavio/Desktop/data/networktoolstest.xml");
 	}
 
 	/*
