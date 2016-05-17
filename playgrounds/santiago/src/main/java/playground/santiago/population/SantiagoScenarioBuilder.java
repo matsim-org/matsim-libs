@@ -98,7 +98,7 @@ public class SantiagoScenarioBuilder {
 	
 //	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
 //	final boolean prepareForModeChoice = false;
-	final String pathForMatsim = "../../../runs-svn/santiago/casoBase4_NP/";
+	final String pathForMatsim = "../../../runs-svn/santiago/casoBase5_NP/";
 	final boolean prepareForModeChoice = true;
 	
 	final int writeStuffInterval = 50;
