@@ -43,11 +43,13 @@ public class NeighboursCreator {
 	private Scenario scenario;
 	private LeastCostPathCalculator pathCalculator;
 	private ScoringFunctionFactory scoringFunctionFactory;
-	private static final Logger logger = Logger.getLogger(NeighboursCreator.class);
+	private final static  Logger logger = Logger.getLogger(NeighboursCreator.class);
 	private CharyparNagelScoringParametersForPerson parametersForPerson;
 	
 	private boolean allowSplittingWorkActivity = false;
 	private HashMap scoreChange;
+	
+	private int level = 1;
 	
 	public NeighboursCreator(StageActivityTypes stageActivityTypes,
 			QuadTree<ActivityFacility> shopFacilityQuadTree, QuadTree<ActivityFacility> leisureFacilityQuadTree,
@@ -65,7 +67,6 @@ public class NeighboursCreator {
 	}
 
 	public void findBestNeighbour(Plan plan) {
-
 		List<Plan> newPlans = new LinkedList<Plan>();
 		
 		newPlans.addAll(getAllChainsWthRemoving(plan));
@@ -73,7 +74,8 @@ public class NeighboursCreator {
 		newPlans.addAll(getAllChainsWthInserting(plan));
 		
 		//we need start and end times of all the activities in order to be able to score the plan
-		updateTimesForScoring(newPlans);
+		updateTimesForScoring(newPlans);		
+	
 		scoreChains(newPlans);
 		
 		double score = plan.getScore();
@@ -86,7 +88,7 @@ public class NeighboursCreator {
 				bestPlan = newPlan;
 				foundBetter = true;
 				score = newPlan.getScore();
-				//this is used for the analysis later on the estimation precission
+				//this is used for the analysis later on the estimation precision
 				scoreChange.put(plan.getPerson().getId().toString(), score);
 			}
 			//logger.info(newPlan.getScore());
@@ -116,8 +118,8 @@ public class NeighboursCreator {
 			
 			}
 		}
-		
-		lastActivity.setEndTime(Time.UNDEFINED_TIME);
+		if (plan.getPlanElements().size() != 1)
+			lastActivity.setEndTime(Time.UNDEFINED_TIME);
 		
 	}
 
@@ -135,6 +137,14 @@ public class NeighboursCreator {
 			double time = 0.0;
 			boolean firstActivity = true;
 			Activity lastActivity = null;
+			
+			if (plan.getPlanElements().size() == 1) {
+				((Activity)plan.getPlanElements().get(0)).setStartTime(0.0);
+				((Activity)plan.getPlanElements().get(0)).setEndTime(24.0 * 3600.0);
+
+			}
+			else {
+			
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					if (!firstActivity) {
@@ -169,13 +179,15 @@ public class NeighboursCreator {
 					}
 				}				
 			}
-			lastActivity.setEndTime(Time.UNDEFINED_TIME);			
+			lastActivity.setEndTime(Time.UNDEFINED_TIME);		
+			}
 		}		
 	}
 	
 
 	/**
 	 * Creates all chains with one swap of the activities in the original plan.
+	 * Not allowing swaps if it leads to having same consecutive activities.
 	 * Updates the end times of the activities affected by the swap.
 	 * 
 	 * @param plan original plan
@@ -197,13 +209,17 @@ public class NeighboursCreator {
 				Activity act1 = tNew.get(outerIndex);
 				Activity act2 = tNew.get(innerIndex);
 				
+				//don't swap if the activities are the same or if it would lead to 
+				//having same consecutive activities
+				if (!act1.getType().equals(act2.getType()) && 
+						!act1.getType().equals(tNew.get(innerIndex + 1).getType()) &&
+						!act1.getType().equals(tNew.get(innerIndex - 1).getType()) && 
+						!act2.getType().equals(tNew.get(outerIndex + 1).getType()) && 
+						!act2.getType().equals(tNew.get(outerIndex - 1).getType())) {
 				
-				if (!act1.getType().equals(act2.getType()) && !act1.getType().equals(tNew.get(innerIndex + 1)) &&
-						!act1.getType().equals(tNew.get(innerIndex - 1)) && !act2.getType().equals(tNew.get(outerIndex + 1)) && 
-						!act2.getType().equals(tNew.get(outerIndex - 1))) {
 					double time = 0.0;
-					double duration1 = act1.getEndTime() - act1.getStartTime();
-					double duration2 = act2.getEndTime() - act2.getStartTime();
+					
+					
 					
 					int index1 = newPlan.getPlanElements().indexOf(act1);
 					int index2 = newPlan.getPlanElements().indexOf(act2);
@@ -212,6 +228,11 @@ public class NeighboursCreator {
 					newPlan.getPlanElements().set(index2, act1);					
 					
 					Activity previousActivity = tNew.get(outerIndex - 1);				
+					
+					double duration1 = act1.getEndTime() - previousActivity.getEndTime()
+							- ((Leg)newPlan.getPlanElements().get(index1 - 1)).getTravelTime(); 
+					double duration2 = act2.getEndTime() - tNew.get(innerIndex - 1).getEndTime() 
+							- ((Leg)newPlan.getPlanElements().get(index2 - 1)).getTravelTime();					
 					
 					//updating the travel times for the affected trips					
 
@@ -230,32 +251,38 @@ public class NeighboursCreator {
 					
 					//updating the end times of the swapped activity
 					time = previousActivity.getEndTime() + travelTime + duration2;
+					
+					double prevTime = previousActivity.getEndTime() + travelTime +  duration1;
 					act2.setEndTime(time);					
 					
 					startCoord = act2.getCoord();
 					endCoord = ((Activity)newPlan.getPlanElements().get(index1 + 2)).getCoord();
 					//the leg that is after the activity with a lower index
 					Leg nextLeg = (Leg) newPlan.getPlanElements().get(index1 + 1);
+					prevTime += nextLeg.getTravelTime();
 					travelTime = estimateTravelTime(startCoord, endCoord, 
 							plan.getPerson(), nextLeg.getDepartureTime(), nextLeg.getMode());
 					nextLeg.setTravelTime(travelTime);
 					if (nextLeg.getRoute() != null) 
 						nextLeg.getRoute().setTravelTime(travelTime);
 					time += travelTime;
-					//if the swaped activities are after each other we don;t have to do anything,
+					
+					//if the swapped activities are after each other we don't have to do anything,
 					//otherwise adapt the travel time of the leg before the activity with a larger index
+					//also adapt the end times of the activities in between 
 					if (innerIndex > outerIndex + 1) {
 						
 						for (int i = outerIndex + 1; i < innerIndex; i++) {
 							
 							Activity currentActivity = tNew.get(i);
-							double durationCurrent = currentActivity.getEndTime() - currentActivity.getStartTime();
-							
+							double durationCurrent = currentActivity.getEndTime() - prevTime;
+							prevTime += currentActivity.getEndTime();
 							currentActivity.setEndTime(time + durationCurrent);
 							time += durationCurrent;
 							
 							Leg leg = (Leg) newPlan.getPlanElements().get(newPlan.getPlanElements().indexOf(currentActivity) + 1);
 							double ttLeg = leg.getTravelTime();
+							prevTime += ttLeg;
 							time += ttLeg;
 						}						
 						
@@ -282,7 +309,10 @@ public class NeighboursCreator {
 					if (nextLeg.getRoute() != null) 
 						nextLeg.getRoute().setTravelTime(travelTime);
 					time += travelTime;
-					for (int i = innerIndex + 1; i < numberOfActivities - 1; i ++) {
+					
+					//update the end times of the activities following the higher index of
+					//the swapped operation
+				/*	for (int i = innerIndex + 1; i < numberOfActivities - 1; i ++) {
 						Activity currentActivity = tNew.get(i);
 						double durationCurrent = currentActivity.getEndTime() - currentActivity.getStartTime();
 						
@@ -293,7 +323,7 @@ public class NeighboursCreator {
 						double ttLeg = leg.getTravelTime();
 						time += ttLeg;
 						
-					}	
+					}	*/
 					newPlans.add(newPlan);
 				}				
 			}			
@@ -417,7 +447,7 @@ public class NeighboursCreator {
 		Activity newActivity = pf.createActivityFromCoord(actType,
 				coord);	
 		
-		newActivity.setEndTime(arrivalTime + params.utilParams.get(actType).getMinimalDuration());
+		newActivity.setEndTime(arrivalTime + params.utilParams.get(actType).getMinimalDuration() * 2);
 
 		newActivity.setFacilityId(facilityId);
 		newActivity.setLinkId(startLinkId);
@@ -435,7 +465,7 @@ public class NeighboursCreator {
 			return newPlans;
 		
 		//look at all the activities (not including first and last) and try to remove it
-		for (int index = 1; index < t.size() - 2; index++) {
+		for (int index = 1; index < t.size() - 1; index++) {
 		
 			Plan newPlan = PlanUtils.createCopy(plan);
 			
@@ -446,10 +476,12 @@ public class NeighboursCreator {
 				continue;
 			int actIndex = plan.getPlanElements().indexOf(t.get(index));
 			double durationRemovedActivity = 0.0;
-			if (t.get(index).getMaximumDuration() != Time.UNDEFINED_TIME)
-				durationRemovedActivity = t.get(index).getMaximumDuration();
-			else
-				durationRemovedActivity = t.get(index).getEndTime() - t.get(index - 1).getEndTime();
+			//if (t.get(index).getMaximumDuration() != Time.UNDEFINED_TIME)
+			//	durationRemovedActivity = t.get(index).getMaximumDuration();
+			//else
+			durationRemovedActivity = t.get(index).getEndTime() - t.get(index - 1).getEndTime();
+			if (durationRemovedActivity < 0.0)
+				durationRemovedActivity = 0.0;
 			Leg previousLeg = ((Leg) newPlan.getPlanElements().get(actIndex - 1));
 			Leg nextLeg = ((Leg) newPlan.getPlanElements().get(actIndex + 1));
 			
@@ -485,8 +517,16 @@ public class NeighboursCreator {
 				
 				double initialEndTime = t.get(index + 1).getEndTime();
 				newPlan.getPlanElements().remove(actIndex);
-				newPlan.getPlanElements().remove(actIndex);
-				((Activity)newPlan.getPlanElements().get(actIndex - 2)).setEndTime(initialEndTime - durationRemovedActivity);
+				if (index != t.size() - 2)
+					newPlan.getPlanElements().remove(actIndex);
+				else
+					newPlan.getPlanElements().remove(actIndex - 1);
+
+				if (initialEndTime != Time.UNDEFINED_TIME)
+					((Activity)newPlan.getPlanElements().get(actIndex - 2)).setEndTime(initialEndTime - durationRemovedActivity);
+				else
+					((Activity)newPlan.getPlanElements().get(actIndex - 2)).setEndTime(Time.UNDEFINED_TIME);
+				
 			}
 			//update traveltimes of the legs
 			int i = 0;
@@ -498,7 +538,10 @@ public class NeighboursCreator {
 					Coord endCoord = ((Activity)newPlan.getPlanElements().get(i + 1)).getCoord();
 					double trTime = estimateTravelTime(startCoord, endCoord, plan.getPerson(), ((Leg) pe).getDepartureTime(), ((Leg) pe).getMode());
 					((Leg) pe).setTravelTime(trTime);
-					((Leg) pe).getRoute().setTravelTime(trTime);
+					if (((Leg)pe).getRoute() != null)
+						((Leg) pe).getRoute().setTravelTime(trTime);
+					else
+						((Leg) pe).setTravelTime(trTime);
 				}
 				i++;
 			}
@@ -564,7 +607,10 @@ public class NeighboursCreator {
 			}
 			scoringFunction.finish();
 			double score = scoringFunction.getScore();
-			plan.setScore(score);
+			if (plan.getPlanElements().size() == 1)
+				plan.setScore(0.0);
+			else
+				plan.setScore(score);
 		}
 	}
 	
