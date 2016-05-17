@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.scripts.capetown;
 
-import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -37,8 +36,6 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAcces
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.AdvantageColumnCalculator;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilityConfigGroup;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure.SimpleNestedLogitModule;
-import playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure.SimpleNestedLogitUtilityConfigGroup;
 import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.router.CachingFreespeedCarRouterModule;
 import playground.ivt.router.lazyschedulebasedmatrix.LazyScheduleBasedMatrixModule;
@@ -56,11 +53,8 @@ public class RunCapeTownAccessibility {
 		final String configFile = args[ 0 ];
 		final String outputDir = args[ 1 ];
 
-		final CapeTownNestedLogitModule module = new CapeTownNestedLogitModule();
-		run( module , configFile , outputDir );
-	}
+		final CapeTownNestedLogitModule modelModule = new CapeTownNestedLogitModule();
 
-	public static void run( Module modelModule , String configFile , String outputDir ) {
 		// Logger.getLogger( Trip.class ).setLevel( Level.TRACE );
 		MoreIOUtils.initOut( outputDir );
 
@@ -96,9 +90,7 @@ public class RunCapeTownAccessibility {
 
 			// TODO store and write results
 			final AccessibilityComputationResult accessibilities = calculator.computeAccessibilities ();
-			if ( modelModule instanceof SimpleNestedLogitModule ) {
-				((SimpleNestedLogitModule) modelModule).stopWatch.printStats( TimeUnit.SECONDS );
-			}
+			modelModule.stopWatch.printStats( TimeUnit.SECONDS );
 			new BasicPersonAccessibilityWriter(
 					scenario,
 					accessibilities,
