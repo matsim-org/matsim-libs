@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -220,72 +221,101 @@ public class PTMapperUtils {
 	/**
 	 * Checks for each child stop facility if the link before or after is closer to the facility
 	 * than its referenced link. If so, the child stop facility is replaced with the one closer
-	 * to the facility coordinates.
+	 * to the facility coordinates.<p/>
+	 * <p/>
+	 * Since all links are part of the route, no rerouting has to be done.
 	 *
 	 * @param schedule
 	 * @param network
 	 */
-	public static void concentrateStopFacilities(TransitSchedule schedule, Network network) {
-		TransitScheduleFactory factory = schedule.getFactory();
+	public static void tightenChildStopFacilities(TransitSchedule schedule, Network network) {
+		log.info("Concentrating child stop facilities...");
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
 				if(transitRoute.getRoute() != null) {
-					Iterator<TransitRouteStop> stopsIterator = transitRoute.getStops().iterator();
+					List<TransitRouteStop> routeStops = transitRoute.getStops();
+					Iterator<TransitRouteStop> stopsIterator = routeStops.iterator();
 
 					List<Id<Link>> linkIdList = ScheduleTools.getLinkIds(transitRoute);
-
 					List<Link> linkList = NetworkTools.getLinksFromIds(network, linkIdList);
 
 					TransitRouteStop currentStop = stopsIterator.next();
+					Id<Link> closerLinkBefore = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(0).getFromNode().getInLinks().values());
+					if(closerLinkBefore != null) {
+						linkIdList.add(0, closerLinkBefore);
+					}
+					currentStop = stopsIterator.next();
 
-					for(int i = 0; i < linkList.size(); i++) {
+					for(int i = 1; i < linkList.size()-1; i++) {
 
-						if(linkIdList.get(i).equals(currentStop.getStopFacility().getLinkId())) {
-							TransitStopFacility currentStopFacility = currentStop.getStopFacility();
-							Collection<Link> precedingLinks = new ArrayList<>();
-							// for first link check all preceding links
-							if(i > 0 && i < linkList.size() - 1) {
-								Link currentLink = linkList.get(i);
-								Link precedingLink = linkList.get(i - 1);
-								Link succeedingLink = linkList.get(i + 1);
+						if(linkList.get(i).getId().equals(currentStop.getStopFacility().getLinkId())) {
 
-								// check if previous link is closer to stop facility
-								double distCurrent = CoordTools.distanceStopFacilityToLink(currentStopFacility, currentLink);
-								double distPrevious = CoordTools.distanceStopFacilityToLink(currentStopFacility, precedingLink);
-								double distNext = CoordTools.distanceStopFacilityToLink(currentStopFacility, succeedingLink);
-
-								String[] split = currentStopFacility.getId().toString().split(suffixChildStopFacilitiesRegex);
-								TransitStopFacility newChildStopFacility;
-
-								if(distPrevious < distCurrent && distPrevious < distNext) {
-									Id<TransitStopFacility> newChildStopFacilityId = Id.create(split[0] + suffixChildStopFacilities + precedingLink.getId(), TransitStopFacility.class);
-									if(schedule.getFacilities().containsKey(newChildStopFacilityId)) {
-										newChildStopFacility = schedule.getFacilities().get(newChildStopFacilityId);
-									} else {
-										newChildStopFacility = factory.createTransitStopFacility(newChildStopFacilityId, currentStopFacility.getCoord(), false);
-										newChildStopFacility.setLinkId(precedingLink.getId());
-										schedule.addStopFacility(newChildStopFacility);
-									}
-									transitRoute.getStop(currentStopFacility).setStopFacility(newChildStopFacility);
-								} else if(distNext < distCurrent) {
-									Id<TransitStopFacility> newChildStopFacilityId = Id.create(split[0] + suffixChildStopFacilities + succeedingLink.getId(), TransitStopFacility.class);
-									if(schedule.getFacilities().containsKey(newChildStopFacilityId)) {
-										newChildStopFacility = schedule.getFacilities().get(newChildStopFacilityId);
-									} else {
-										newChildStopFacility = factory.createTransitStopFacility(newChildStopFacilityId, currentStopFacility.getCoord(), false);
-										newChildStopFacility.setLinkId(succeedingLink.getId());
-										schedule.addStopFacility(newChildStopFacility);
-									}
-									transitRoute.getStop(currentStopFacility).setStopFacility(newChildStopFacility);
-								}
+							if(linkList.get(i).getId().toString().equals("937")) {
+								log.debug("");
 							}
+
+							Set<Link> testSet = new HashSet<>();
+							testSet.add(linkList.get(i));
+							testSet.add(linkList.get(i-1));
+							testSet.add(linkList.get(i+1));
+							useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), testSet);
+							// setCloserStopFacility(schedule, transitRoute, currentStop.getStopFacility(), linkList.get(i), , linkList.get(i + 1));
 							if(stopsIterator.hasNext()) {
 								currentStop = stopsIterator.next();
 							}
 						}
 					}
+					currentStop = routeStops.get(routeStops.size() - 1);
+					Id<Link> closerLinkAfter = useCloserRefLinkForChildStopFacility(schedule, network, transitRoute, currentStop.getStopFacility(), linkList.get(linkList.size() - 1).getToNode().getOutLinks().values());
+					if(closerLinkAfter != null) {
+						linkIdList.add(closerLinkAfter);
+					}
+					transitRoute.setRoute(RouteUtils.createNetworkRoute(linkIdList, network));
 				}
 			}
+		}
+	}
+
+	/**
+	 * If a link of <tt>comparingLinks</tt> is closer to the stop facility than
+	 * its currently referenced link, the closest link is used.
+	 * @param schedule
+	 * @param network
+	 * @param transitRoute
+	 * @param stopFacility
+	 * @param comparingLinks
+	 * @return
+	 */
+	private static Id<Link> useCloserRefLinkForChildStopFacility(TransitSchedule schedule, Network network, TransitRoute transitRoute, TransitStopFacility stopFacility, Collection<? extends Link> comparingLinks) {
+		// check if previous link is closer to stop facility
+		double minDist = CoordTools.distanceStopFacilityToLink(stopFacility, network.getLinks().get(stopFacility.getLinkId()));
+		Link minLink = null;
+
+		for(Link comparingLink : comparingLinks) {
+			double distCompare = CoordTools.distanceStopFacilityToLink(stopFacility, comparingLink);
+			if(distCompare < minDist) {
+				minDist = distCompare;
+				minLink = comparingLink;
+			}
+		}
+
+		if(minLink != null) {
+			TransitStopFacility newChildStopFacility;
+			String[] split = stopFacility.getId().toString().split(suffixChildStopFacilitiesRegex);
+			Id<TransitStopFacility> newChildStopFacilityId = Id.create(split[0] + suffixChildStopFacilities + minLink.getId(), TransitStopFacility.class);
+			if(schedule.getFacilities().containsKey(newChildStopFacilityId)) {
+				newChildStopFacility = schedule.getFacilities().get(newChildStopFacilityId);
+			} else {
+				newChildStopFacility = schedule.getFactory().createTransitStopFacility(newChildStopFacilityId, stopFacility.getCoord(), false);
+				newChildStopFacility.setName(stopFacility.getName());
+				newChildStopFacility.setStopPostAreaId(stopFacility.getStopPostAreaId());
+				newChildStopFacility.setLinkId(minLink.getId());
+				schedule.addStopFacility(newChildStopFacility);
+			}
+			transitRoute.getStop(stopFacility).setStopFacility(newChildStopFacility);
+			return minLink.getId();
+		} else {
+			return null;
 		}
 	}
 
@@ -296,7 +326,7 @@ public class PTMapperUtils {
 	 * networkTransportMode for the input scheduleTransportMode (defined in
 	 * config). Returns maxNLinks or all links within maxLinkDistance (whichever
 	 * is reached earlier).
-	 * <p>
+	 * <p/>
 	 * <p/>
 	 * Distance Link-Coordinate is calculated via  in {@link org.matsim.core.utils.geometry.CoordUtils#distancePointLinesegment(Coord, Coord, Coord)}).
 	 *
@@ -310,7 +340,8 @@ public class PTMapperUtils {
 	 * @param config                The config defining maxNnodes, search radius etc.
 	 * @return a Set of the closest links
 	 */
-	public static List<Link> findClosestLinksByScheduleMode(Network network, Coord coord, String scheduleTransportMode, PublicTransitMappingConfigGroup config) {
+	public static List<Link> findClosestLinksByScheduleMode(Network network, Coord coord, String
+			scheduleTransportMode, PublicTransitMappingConfigGroup config) {
 		return NetworkTools.findClosestLinks(
 				network,
 				coord,

@@ -46,9 +46,9 @@ public class RunZurichScenario {
 
 	public static void main(String[] args) {
 
-		String base = "E:/data/zurich/";
+		String base = "C:/Users/polettif/Desktop/data/zurich/";
 
-		final Config config = ConfigUtils.loadConfig(base + "config.xml", new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
+		final Config config = ConfigUtils.loadConfig(base + "config_okteron.xml", new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

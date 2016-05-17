@@ -60,6 +60,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class PTMapperModesFilterAndMerge extends PTMapper {
 
 	private static final int SAME_LINK_PUNISHMENT = 5;
@@ -376,7 +377,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 * Now that all lines have been routed, it is possible that a route passes
 		 * a link closer to a stop facility than its referenced link.
 		 */
-		PTMapperUtils.concentrateStopFacilities(schedule, network);
+		PTMapperUtils.tightenChildStopFacilities(schedule, network);
 
 		/** [10]
 		 * After all lines created, clean the schedule and network. Removing
