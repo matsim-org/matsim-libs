@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure;
+package playground.ivt.maxess.nestedlogitaccessibility.scripts.capetown;
 
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
@@ -37,6 +37,8 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAcces
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.AdvantageColumnCalculator;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilityConfigGroup;
+import playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure.SimpleNestedLogitModule;
+import playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure.SimpleNestedLogitUtilityConfigGroup;
 import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.router.CachingFreespeedCarRouterModule;
 import playground.ivt.router.lazyschedulebasedmatrix.LazyScheduleBasedMatrixModule;
@@ -49,12 +51,12 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author thibautd
  */
-public class RunSimpleNestedLogitAccessibility {
+public class RunCapeTownAccessibility {
 	public static void main( final String... args ) {
 		final String configFile = args[ 0 ];
 		final String outputDir = args[ 1 ];
 
-		final SimpleNestedLogitModule module = new SimpleNestedLogitModule();
+		final CapeTownNestedLogitModule module = new CapeTownNestedLogitModule();
 		run( module , configFile , outputDir );
 	}
 
@@ -65,7 +67,7 @@ public class RunSimpleNestedLogitAccessibility {
 		try {
 			final Config config = ConfigUtils.loadConfig(
 					configFile,
-					new SimpleNestedLogitUtilityConfigGroup(),
+					new CapeTownNestedLogitModelConfigGroup(),
 					new NestedAccessibilityConfigGroup() );
 			final Scenario scenario = ScenarioUtils.loadScenario( config );
 
