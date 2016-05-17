@@ -26,6 +26,7 @@ import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
 import com.google.inject.util.Modules;
 import com.google.inject.util.Types;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.RoutingModule;
@@ -99,11 +100,8 @@ public class InjectionUtils {
 		// Otherwise MATSim AbstractModules cannot be used...
 		// And the MATSim Injector limits the injector methods one has access to
 		final Injector bootstrapInjector = Guice.createInjector(
-				new Module() {
-					@Override
-					public void configure( Binder binder ) {
-						binder.bind( Config.class ).toInstance( config );
-					}
+				(Module) binder -> {
+					binder.bind( Config.class ).toInstance( config );
 				} );
 
 		for ( Module m : modules ) bootstrapInjector.injectMembers( m );
