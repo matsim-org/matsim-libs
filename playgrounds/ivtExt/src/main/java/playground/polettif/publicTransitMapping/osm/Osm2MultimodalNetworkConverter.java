@@ -49,48 +49,10 @@ import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import java.util.*;
 
 /**
- * org/matsim/core/utils/io/OsmNetworkReader.java extended with the functionality
- * to recognize and tag public transport.
- * <p/>
- * Streaming with org.xml.sax.InputSource had to be removed because of privacy issues.
  *
- * @author boescpa
+ * @author polettif
  */
 public class Osm2MultimodalNetworkConverter {
-
-	private final static Logger log = Logger.getLogger(Osm2MultimodalNetworkConverter.class);
-
-	private OsmConverterConfigGroup config;
-
-	/**
-	 *  Maps for nodes, ways and relations
-	 */
-	private Map<Long, OsmParser.OsmNode> nodes;
-	private Map<Long, OsmParser.OsmWay> ways;
-	private Map<Long, OsmParser.OsmRelation> relations;
-	private Map<Long, Set<Long>> relationMembers = new HashMap<>();
-	private final Map<Long, Long> wayIds = new HashMap<>();
-
-	private Map<String, OsmWayParams> highwayParams = new HashMap<>();
-	private Map<String, OsmWayParams> railwayParams = new HashMap<>();
-
-	/**
-	 *  Maps for unknown entities
-	 */
-	private final Set<String> unknownHighways = new HashSet<>();
-	private final Set<String> unknownRailways = new HashSet<>();
-	private final Set<String> unknownPTs = new HashSet<>();
-	private final Set<String> unknownWays = new HashSet<>();
-	private final Set<String> unknownMaxspeedTags = new HashSet<>();
-	private final Set<String> unknownLanesTags = new HashSet<>();
-	private long id = 0;
-
-
-	/**
-	 * Network and Transformation Object
-	 */
-	private Network network;
-	private final CoordinateTransformation transformation; // is applied to nodes in OsmParserHandler
 
 	/**
 	 * Converts an osm file to a MATSim network. The input and output file as well
@@ -99,7 +61,6 @@ public class Osm2MultimodalNetworkConverter {
 	 *
 	 * @param args [0] the config.xml file
 	 */
-
 	public static void main(String[] args) {
 		run(args[0]);
 	}
@@ -146,6 +107,40 @@ public class Osm2MultimodalNetworkConverter {
 		convertToNetwork();
 		cleanNetwork();
 	}
+
+	private final static Logger log = Logger.getLogger(Osm2MultimodalNetworkConverter.class);
+
+	private OsmConverterConfigGroup config;
+
+	/**
+	 *  Maps for nodes, ways and relations
+	 */
+	private Map<Long, OsmParser.OsmNode> nodes;
+	private Map<Long, OsmParser.OsmWay> ways;
+	private Map<Long, OsmParser.OsmRelation> relations;
+	private Map<Long, Set<Long>> relationMembers = new HashMap<>();
+	private final Map<Long, Long> wayIds = new HashMap<>();
+
+	private Map<String, OsmWayParams> highwayParams = new HashMap<>();
+	private Map<String, OsmWayParams> railwayParams = new HashMap<>();
+
+	/**
+	 *  Maps for unknown entities
+	 */
+	private final Set<String> unknownHighways = new HashSet<>();
+	private final Set<String> unknownRailways = new HashSet<>();
+	private final Set<String> unknownPTs = new HashSet<>();
+	private final Set<String> unknownWays = new HashSet<>();
+	private final Set<String> unknownMaxspeedTags = new HashSet<>();
+	private final Set<String> unknownLanesTags = new HashSet<>();
+	private long id = 0;
+
+
+	/**
+	 * Network and Transformation Object
+	 */
+	private Network network;
+	private final CoordinateTransformation transformation; // is applied to nodes in OsmParserHandler
 
 	/**
 	 * Constructor using default config
