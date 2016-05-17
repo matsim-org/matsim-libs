@@ -22,6 +22,7 @@ package playground.polettif.publicTransitMapping.config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 /**
@@ -336,7 +337,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 */
 	// TODO remove suffix from config file and set as static to ensure other parts of the package work
 	private String suffixChildStopFacilities = ".link:";
-	private String suffixChildStopFacilitiesRegex = "[.]link:";
+	private String suffixRegexEscaped = "[.]link:";
 
 	@StringGetter(SUFFIX_CHILD_STOP_FACILITIES)
 	public String getSuffixChildStopFacilities() {
@@ -346,11 +347,11 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(SUFFIX_CHILD_STOP_FACILITIES)
 	public void setSuffixChildStopFacilities(String suffixChildStopFacilities) {
 		this.suffixChildStopFacilities = suffixChildStopFacilities;
-		this.suffixChildStopFacilitiesRegex = suffixChildStopFacilities.replace(".", "[.]"); // todo regex escape
+		this.suffixRegexEscaped = Pattern.quote(suffixChildStopFacilities);
 	}
 
-	public String getSuffixChildStopFacilitiesRegex() {
-		return suffixChildStopFacilitiesRegex;
+	public String getSuffixRegexEscaped() {
+		return suffixRegexEscaped;
 	}
 
 	/**

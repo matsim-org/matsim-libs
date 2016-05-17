@@ -32,7 +32,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.filter.NetworkFilterManager;
-import org.matsim.core.population.ParallelPopulationReaderMatsimV4Runner;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.MapUtils;
@@ -192,7 +191,7 @@ public class PTMapperThreaded extends PTMapper {
 		 * on their coordinates.
 		 */
 		linkCandidates = PTMapperUtils.generateModeLinkCandidates(schedule, network, config);
-		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixChildStopFacilitiesRegex());
+		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixRegexEscaped());
 
 		/** [3]
 		 * Get network extent to speed up routing outside of network area.
