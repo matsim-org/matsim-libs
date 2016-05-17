@@ -85,8 +85,6 @@ public class PTMapperThreaded extends PTMapper {
 
 	private PseudoRouting[] threads;
 
-	private final int numThreads = 8;
-
 
 	/**
 	 * Constructor.
@@ -171,6 +169,9 @@ public class PTMapperThreaded extends PTMapper {
 		 */
 		networks = new HashMap<>();
 		routers = new ConcurrentHashMap<>();
+		Map<String, Integer> threadAssignment = new HashMap<>();
+		threadAssignment.put(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE, 0);
+		int t=1;
 		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
 			if(!modeAssignment.getValue().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
 				log.info("================================================");
@@ -181,6 +182,14 @@ public class PTMapperThreaded extends PTMapper {
 
 				networks.put(modeAssignment.getKey(), filter.applyFilters());
 				routers.put(modeAssignment.getKey(), new FastAStarRouter(filteredNetwork, config.getPseudoRouteWeightType()));
+
+				if(config.useMultiThreads()) {
+					threadAssignment.put(modeAssignment.getKey(), t++);
+				} else {
+					threadAssignment.put(modeAssignment.getKey(), 0);
+				}
+			} else {
+				threadAssignment.put(modeAssignment.getKey(), 0);
 			}
 		}
 
@@ -212,14 +221,13 @@ public class PTMapperThreaded extends PTMapper {
 		log.info("Calculating pseudoTransitRoutes...");
 
 		// initiate threads
+		int numThreads = threadAssignment.size();
 		threads = new PseudoRouting[numThreads];
 		for(int i = 0; i < numThreads; i++) this.threads[i] = new PseudoRouting();
 
-		int i = 1;
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				threads[i % numThreads].add(transitLine, transitRoute);
-				i++;
+				threads[threadAssignment.get(transitRoute.getTransportMode())].add(transitLine, transitRoute);
 			}
 		}
 

@@ -51,6 +51,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String LINK_DISTANCE_TOLERANCE = "linkDistanceTolerance";
 	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
 	private static final String COMBINE_PT_MODES = "combinePtModes";
+	public static final String MULTI_THREAD = "multiThread";
 
 
 	public PublicTransitMappingConfigGroup() {
@@ -108,6 +109,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(BEELINE_DISTANCE_MAX_FACTOR ,
 				"If all paths between two stops have a length > beelineDistanceMaxFactor * beelineDistance, \n" +
 				"\t\tan artificial link is created.");
+		map.put(MULTI_THREAD,
+				"Defines whether multiple threads should be used (one for each schedule transport mode). Default: true.");
 		map.put(NETWORK_FILE, "Path to the input network file. Not needed if PTMapper is called within another class.");
 		map.put(SCHEDULE_FILE, "Path to the input schedule file. Not needed if PTMapper is called within another class.");
 		map.put(OUTPUT_NETWORK_FILE, "Path to the output network file. Not needed if PTMapper is used within another class.");
@@ -257,6 +260,22 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(LINK_DISTANCE_TOLERANCE)
 	public void setLinkDistanceTolerance(double linkDistanceTolerance) {
 		this.linkDistanceTolerance = linkDistanceTolerance < 1 ? 1 : linkDistanceTolerance;
+	}
+
+	/**
+	 * Defines whehter multiple threads should be used (one for each
+	 * schedule transport mode).
+	 */
+	private boolean multiThread = true;
+
+	@StringGetter(MULTI_THREAD)
+	public boolean useMultiThreads() {
+		return multiThread;
+	}
+
+	@StringSetter(MULTI_THREAD)
+	public void setMultiThread(boolean multiThread) {
+		this.multiThread = multiThread;
 	}
 
 

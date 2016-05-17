@@ -230,6 +230,9 @@ public class NetworkTools {
 	}
 
 
+	/**
+	 * @return the filtered network, input network is not filtered!
+	 */
 	public static Network filterNetworkByLinkMode(Network network, Set<String> transportModes) {
 		NetworkFilterManager filterManager = new NetworkFilterManager(network);
 		filterManager.addLinkFilter(new LinkFilter(transportModes));
@@ -528,8 +531,6 @@ public class NetworkTools {
 	/**
 	 * Sets the free speed of all links with the networkMode to the
 	 * defined value.
-	 *
-	 * @param network
 	 */
 	public static void setFreeSpeedOfLinks(Network network, String networkMode, double freespeedValue) {
 		for(Link link : network.getLinks().values()) {
