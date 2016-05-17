@@ -51,6 +51,7 @@ public class IntervalBasedCongestionPricingRun {
 
 	private static String configFile;
 	private static double sigma;
+	private static boolean runBaseCase;
 	
 	public static void main(String[] args) throws IOException {
 		log.info("Starting simulation run with the following arguments:");
@@ -62,10 +63,14 @@ public class IntervalBasedCongestionPricingRun {
 			
 			sigma = Double.valueOf(args[1]);		
 			log.info("sigma: "+ sigma);
+			
+			runBaseCase = Boolean.valueOf(args[2]);
+			log.info("run base-case: "+ runBaseCase);
 
 		} else {
 			configFile = "../../../runs-svn/intervalBasedCongestionPricing/input/config.xml";
 			sigma = 3.0;
+			runBaseCase = false;
 		}
 
 		IntervalBasedCongestionPricingRun main = new IntervalBasedCongestionPricingRun();
@@ -89,9 +94,9 @@ public class IntervalBasedCongestionPricingRun {
 			}
 		});
 
-		controler.addControlerListener(new IntervalBasedCongestionPricing(scenario));
+		if (!runBaseCase) controler.addControlerListener(new IntervalBasedCongestionPricing(scenario));
+	
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		
 		controler.run();
 		
 		log.info("Analyzing the final iteration...");
