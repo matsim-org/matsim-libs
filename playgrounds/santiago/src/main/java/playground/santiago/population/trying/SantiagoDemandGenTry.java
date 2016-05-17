@@ -39,12 +39,12 @@ public class SantiagoDemandGenTry {
 	
 	private final static Logger log = Logger.getLogger(SantiagoDemandGenTry.class);
 	
-	final String INPUT_FOR_SIMULATION = "../../../runs-svn/santiago/casoBase4_NP/input/";
-	final String OUTPUT_FOR_NEW_INPUT = "../../../runs-svn/santiago/casoBase4_NP/input/new-input/";
+	final String INPUT_FOR_SIMULATION = "../../../runs-svn/santiago/casoBase5_NP/input/";
+	final String OUTPUT_FOR_NEW_INPUT = "../../../runs-svn/santiago/casoBase5_NP/input/new-input/";
 	final String PLANS_FROM_BUILDER = INPUT_FOR_SIMULATION + "plans_final.xml.gz";
 	final String CONFIG_FROM_BUILDER = INPUT_FOR_SIMULATION + "config_final.xml";
 	final String PEOPLE_FILE_FROM_ODS = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/exportedFilesFromDatabase/Normal/Persona.csv";
-	final double PERCENTAGE = 0.1;
+	final double PERCENTAGE = 0.5;
 	
 	public SantiagoDemandGenTry(){
 	}
