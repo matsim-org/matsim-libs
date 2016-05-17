@@ -498,22 +498,13 @@ public class PersonTripCongestionNoiseAnalysis {
 			bw.write("affected noise damage costs (sample size) [monetary units];" + affectedNoiseCost);
 			bw.newLine();
 			
-			bw.write("affected noise damage costs (sample size) [monetary units] (alternative computation);" + noiseHandler.getAffectedNoiseCost());
-			bw.newLine();
-			
 			bw.write("caused noise damage costs (sample size) [monetary units];" + causedNoiseCost);
-			bw.newLine();
-			
-			bw.write("caused noise damage costs (sample size) [monetary units] (alternative computation);" + noiseHandler.getCausedNoiseCost());
 			bw.newLine();
 			
 			bw.write("travel related user benefits (sample size) (including toll payments) [monetary units];" + userBenefits);
 			bw.newLine();
 			
 			bw.write("toll revenues (sample size) [monetary units];" + tollPayments);
-			bw.newLine();
-			
-			bw.write("toll revenues (sample size) [monetary units] (alternative computation);" + basicHandler.getTotalPayments());
 			bw.newLine();
 			
 			double welfare = tollPayments + userBenefits - affectedNoiseCost;
