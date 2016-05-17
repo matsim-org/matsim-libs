@@ -230,6 +230,8 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * returned by the {@link Plan#getPlanElements()} method of a plan. Note
 	 * that the plan will be modified only if the returned list is the internal
 	 * reference!
+	 * <p/>
+	 * Note that this methods returns a unique solution because it expects the activity object references as arguments, which are unique.
 	 *
 	 * @param plan the plan to modify
 	 * @param origin the activity to use as origin. It must be a member of the list of plan elements.
@@ -251,6 +253,8 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 	/**
 	 * Inserts a trip between two activities in a sequence of plan elements.
+	 * <p/>
+	 * Note that this methods returns a unique solution because it expects the activity object references as arguments, which are unique.
 	 * @param plan the sequence of plan elements to modify
 	 * @param origin the activity to use as origin. It must be a member of the list of plan elements.
 	 * @param trip the trip to insert
