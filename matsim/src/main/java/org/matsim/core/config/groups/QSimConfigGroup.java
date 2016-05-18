@@ -79,7 +79,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private VehicleBehavior vehicleBehavior = VehicleBehavior.teleport ;
 	// ---
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
-	public static enum SnapshotStyle { equiDist, queue, withHoles } ;
+	public static enum SnapshotStyle { equiDist, queue, withHoles, withHolesAndShowHoles } ;
 	private SnapshotStyle snapshotStyle = SnapshotStyle.equiDist ;
 
 	// ---
