@@ -16,9 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure;
+package playground.ivt.maxess.nestedlogitaccessibility.scripts.capetown;
 
-import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -27,6 +26,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.router.TripRouterModule;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.XY2Links;
@@ -49,23 +50,20 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author thibautd
  */
-public class RunSimpleNestedLogitAccessibility {
+public class RunCapeTownAccessibility {
 	public static void main( final String... args ) {
 		final String configFile = args[ 0 ];
 		final String outputDir = args[ 1 ];
 
-		final SimpleNestedLogitModule module = new SimpleNestedLogitModule();
-		run( module , configFile , outputDir );
-	}
+		final CapeTownNestedLogitModule modelModule = new CapeTownNestedLogitModule();
 
-	public static void run( Module modelModule , String configFile , String outputDir ) {
 		// Logger.getLogger( Trip.class ).setLevel( Level.TRACE );
 		MoreIOUtils.initOut( outputDir );
 
 		try {
 			final Config config = ConfigUtils.loadConfig(
 					configFile,
-					new SimpleNestedLogitUtilityConfigGroup(),
+					new CapeTownNestedLogitModelConfigGroup(),
 					new NestedAccessibilityConfigGroup() );
 			final Scenario scenario = ScenarioUtils.loadScenario( config );
 
@@ -94,9 +92,7 @@ public class RunSimpleNestedLogitAccessibility {
 
 			// TODO store and write results
 			final AccessibilityComputationResult accessibilities = calculator.computeAccessibilities ();
-			if ( modelModule instanceof SimpleNestedLogitModule ) {
-				((SimpleNestedLogitModule) modelModule).stopWatch.printStats( TimeUnit.SECONDS );
-			}
+			modelModule.stopWatch.printStats( TimeUnit.SECONDS );
 			new BasicPersonAccessibilityWriter(
 					scenario,
 					accessibilities,

@@ -55,10 +55,10 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
-import matsimConnector.congestionpricing.MSACongestionHandler;
-import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
-import matsimConnector.congestionpricing.MSATollDisutilityCalculatorFactory;
-import matsimConnector.congestionpricing.MSATollHandler;
+//import matsimConnector.congestionpricing.MSACongestionHandler;
+//import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
+//import matsimConnector.congestionpricing.MSATollDisutilityCalculatorFactory;
+//import matsimConnector.congestionpricing.MSATollHandler;
 import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 import playground.ikaddoura.intervalBasedCongestionPricing.IntervalBasedCongestionPricing;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
@@ -327,17 +327,21 @@ public final class RunBraessSimulation {
 					new MarginalCongestionPricingContolerListener(scenario, tollHandler, congestionHandler));
 		
 		} else if (PRICING_TYPE.equals(PricingType.GREGOR)){
-			final MSATollHandler tollHandler = new MSATollHandler(scenario);
-			final MSATollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new MSATollDisutilityCalculatorFactory(tollHandler, config.planCalcScore());
-
-			controler.addOverridingModule(new AbstractModule(){
-				@Override
-				public void install() {
-					this.bindCarTravelDisutilityFactory().toInstance( tollDisutilityCalculatorFactory );
-				}
-			}); 
-				
-			controler.addControlerListener(new MSAMarginalCongestionPricingContolerListener(scenario, tollHandler, new MSACongestionHandler(controler.getEvents(), scenario)));
+			
+			throw new RuntimeException("The following lines of code lead to non-compiling code... IK"); // TODO
+			
+//			final MSATollHandler tollHandler = new MSATollHandler(scenario);
+//			final MSATollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new MSATollDisutilityCalculatorFactory(tollHandler, config.planCalcScore());
+//
+//			controler.addOverridingModule(new AbstractModule(){
+//				@Override
+//				public void install() {
+//					this.bindCarTravelDisutilityFactory().toInstance( tollDisutilityCalculatorFactory );
+//				}
+//			}); 
+//				
+//			controler.addControlerListener(new MSAMarginalCongestionPricingContolerListener(scenario, tollHandler, new MSACongestionHandler(controler.getEvents(), scenario)));
+	
 		} else if (PRICING_TYPE.equals(PricingType.FLOWBASED)) {
 			
 			throw new UnsupportedOperationException("Not yet implemented!");

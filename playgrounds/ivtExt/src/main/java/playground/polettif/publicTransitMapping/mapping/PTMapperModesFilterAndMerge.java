@@ -23,17 +23,13 @@ package playground.polettif.publicTransitMapping.mapping;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -64,6 +60,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class PTMapperModesFilterAndMerge extends PTMapper {
 
 	private static final int SAME_LINK_PUNISHMENT = 5;
@@ -117,7 +114,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 			log.info("Mapping files from config...");
 			log.info("Reading schedule and network file...");
 			Network network = NetworkTools.loadNetwork(config.getNetworkFile());
-			TransitSchedule mainSchedule = ScheduleTools.loadTransitSchedule(config.getNetworkFile());
+			TransitSchedule mainSchedule = ScheduleTools.loadTransitSchedule(config.getScheduleFile());
 
 			new PTMapperModesFilterAndMerge(mainSchedule, config).mapScheduleToNetwork(network);
 
@@ -172,7 +169,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 * on their coordinates.
 		 */
 		Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates = PTMapperUtils.generateModeLinkCandidates(schedule, network, config);
-		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixChildStopFacilitiesRegex());
+		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixRegexEscaped());
 
 		/** [3]
 		 * Get network extent to speed up routing outside of network area.
@@ -380,7 +377,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 * Now that all lines have been routed, it is possible that a route passes
 		 * a link closer to a stop facility than its referenced link.
 		 */
-		PTMapperUtils.concentrateStopFacilities(schedule, network);
+		PTMapperUtils.tightenChildStopFacilities(schedule, network);
 
 		/** [10]
 		 * After all lines created, clean the schedule and network. Removing

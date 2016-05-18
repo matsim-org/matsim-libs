@@ -53,6 +53,7 @@ public class TimeTracker implements LinkLeaveEventHandler {
 	private final CongestionInfo congestionInfo;
 	private final EventsManager eventsManager;
 	private final Scenario scenario;
+	private final boolean logDetailInfo = false;
 	
 	private int warnCnt = 0;
 	
@@ -104,10 +105,12 @@ public class TimeTracker implements LinkLeaveEventHandler {
 	
 	private void processTimeBin() {
 		
-		log.info("##################################################");
-		log.info("# Computing congestion for time interval " + Time.writeTime(this.congestionInfo.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
-		log.info("##################################################");
-
+		if (logDetailInfo) {
+			log.info("##################################################");
+			log.info("# Computing congestion for time interval " + Time.writeTime(this.congestionInfo.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
+			log.info("##################################################");
+		}
+		
 		processDelaysForCurrentTimeInterval(); 
 		updateCurrentTimeInterval(); // Set the current time bin to the next one ( current time bin = current time bin + time bin size ).
 		resetCurrentTimeIntervalInfo(); // Reset all time-specific information from the previous time interval.
@@ -181,7 +184,8 @@ public class TimeTracker implements LinkLeaveEventHandler {
 		for (Id<Link> linkId : this.congestionInfo.getCongestionLinkInfos().keySet()) {
 			this.congestionInfo.getCongestionLinkInfos().get(linkId).getLeavingVehicles().clear();
 			this.congestionInfo.getCongestionLinkInfos().get(linkId).setTravelTimeLastLeavingAgent(0.);
-			this.congestionInfo.getCongestionLinkInfos().get(linkId).setTravelTimeSum(0.);;
+			this.congestionInfo.getCongestionLinkInfos().get(linkId).setTravelTimeSum(0.);
+			this.congestionInfo.getCongestionLinkInfos().get(linkId).setTravelTimeMaximum(0.);
 		}		
 	}
 	

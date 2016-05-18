@@ -245,10 +245,10 @@ public class PersonTripAnalysisTest {
 		Assert.assertEquals("Car travel time wrong", 0.5138888888888888, 
 				Double.parseDouble(aggregatedInfos.get(7)[1]), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Total congestion wrong", 0.027777777777777776, 
-				Double.parseDouble(aggregatedInfos.get(13)[1]), MatsimTestUtils.EPSILON);
+				Double.parseDouble(aggregatedInfos.get(12)[1]), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Affected noise cost wrong", 100.0, 
-				Double.parseDouble(aggregatedInfos.get(16)[1]), MatsimTestUtils.EPSILON);
+				Double.parseDouble(aggregatedInfos.get(15)[1]), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Caused noise cost wrong", 100.0, 
-				Double.parseDouble(aggregatedInfos.get(18)[1]), MatsimTestUtils.EPSILON);
+				Double.parseDouble(aggregatedInfos.get(16)[1]), MatsimTestUtils.EPSILON);
 	}
 }
