@@ -190,7 +190,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 						firstHolePosition = distanceOfHoleFromFromNode ;
 						sum = 0 ; // don't include first vehicle
 					}
-<<<<<<< d05e47717fdb1b361284393789113ffa77e7fd91
 					
 					if ( Math.round(distanceOfHoleFromFromNode) == Math.round(curvedLength) ) {
 						// since hole is already created even if vehicle is in buffer, thus excluding such holes in vehicle position updating
