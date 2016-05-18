@@ -67,6 +67,7 @@ public class TaxibusAgentEventHandler
 		if (this.taxibusCustomers.contains(event.getPersonId())) {
 			double travelTime = arrivalTime - departureTime;
 			this.taxibusTripTravelTimes.add(travelTime);
+			this.taxibusCustomers.remove(event.getPersonId());
 		}
 	}
 
