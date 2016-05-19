@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import floetteroed.utilities.tabularfileparser.TabularFileHandler;
 import floetteroed.utilities.tabularfileparser.TabularFileParser;
 
