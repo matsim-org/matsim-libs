@@ -85,6 +85,10 @@ public class IntervalBasedCongestionPricingRun {
 		
 		Controler controler = new Controler(scenario);
 
+		if (config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() == 0.) {
+			log.warn("The monetary distance rate is 0. The randomized router won't work properly...");
+		}
+		
 		final Builder factory = new Builder(TransportMode.car, config.planCalcScore());
 		factory.setSigma(sigma);
 		controler.addOverridingModule(new AbstractModule(){
