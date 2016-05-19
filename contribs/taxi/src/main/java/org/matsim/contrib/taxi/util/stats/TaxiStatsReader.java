@@ -19,28 +19,70 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import org.matsim.contrib.taxi.schedule.TaxiTask;
-import org.matsim.contrib.util.DoubleEnumAdder;
+import java.util.List;
+
+import org.matsim.contrib.util.CSVReaders;
 
 
-public class DailyTaxiStats
-    extends TaxiStats
+public class TaxiStatsReader
 {
-    //public final DescriptiveStatistics passengerWaitTime = new DescriptiveStatistics();
-
-    //needs to be double instead of long due to integer overflow
-    //20k taxis each with 30-h stay tasks would cause an overflow
-    //public final DoubleEnumAdder<TaxiTask.TaxiTaskType> taskTimeSumsByType
-
-    //daily vehicle's empty ratio
-    //public final DescriptiveStatistics vehicleEmptyDriveRatio = new DescriptiveStatistics();
-
-    //daily vehicle's empty ratio
-    //public final DescriptiveStatistics vehicleStayRatio = new DescriptiveStatistics();
-
-    public DailyTaxiStats()
+    public enum Section
     {
-        super("daily", new DoubleEnumAdder<>(TaxiTask.TaxiTaskType.class));
+        PassengerWaitTime, VehicleEmptyDriveRatio, VehicleWaitRatio, TaskTypeTotalDuration;
     }
 
+
+    private final List<String[]> content;
+    private final int hours;
+
+
+    public TaxiStatsReader(String file)
+    {
+        content = CSVReaders.readTSVFile(file);
+        hours = content.size() / Section.values().length - 4;
+    }
+
+
+    public int getHours()
+    {
+        return hours;
+    }
+
+
+    public double getMeanWaitTime(int hour)
+    {
+        return getValue(Section.PassengerWaitTime, hour, 2);
+    }
+
+
+    public double getP95WaitTime(int hour)
+    {
+        return getValue(Section.PassengerWaitTime, hour, 11);
+    }
+
+
+    public double getFleetEmptyDriveRatio(int hour)
+    {
+        return getValue(Section.VehicleEmptyDriveRatio, hour, 1);
+    }
+
+
+    public double getFleetWaitRatio(int hour)
+    {
+        return getValue(Section.VehicleWaitRatio, hour, 1);
+    }
+
+
+    //hour == 0...hours-1 ==> hourly stats
+    //hour == hours ==> daily stats
+    public double getValue(Section section, int hour, int col)
+    {
+        if (hour < 0 || hour > hours) {
+            throw new IllegalArgumentException();
+        }
+
+        int row = section.ordinal() * (hours + 4) + hour + 2;
+
+        return Double.valueOf(content.get(row)[col]);
+    }
 }

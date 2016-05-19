@@ -21,7 +21,7 @@ package playground.michalm.taxi.audiAV;
 
 import java.util.Arrays;
 
-import org.matsim.contrib.taxi.util.stats.HourlyTaxiStatsReader;
+import org.matsim.contrib.taxi.util.stats.TaxiStatsReader;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -68,7 +68,7 @@ public class HourlyTaxiStatsExtractor
         for (String fleet : FLEETS) {
             for (String av : AVS) {
                 String file = path + getId(fleet, av) + "." + iter + ".hourly_stats_new_stats.txt";
-                HourlyTaxiStatsReader r = new HourlyTaxiStatsReader(file);
+                TaxiStatsReader r = new TaxiStatsReader(file);
 
                 header[i] = fleet + "_" + av;
                 for (int h = 0; h <= hours; h++) {
