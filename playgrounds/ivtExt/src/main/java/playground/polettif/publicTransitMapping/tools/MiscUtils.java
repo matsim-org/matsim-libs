@@ -18,9 +18,6 @@
 
 package playground.polettif.publicTransitMapping.tools;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-
 import java.util.*;
 import java.util.stream.Collectors;
 

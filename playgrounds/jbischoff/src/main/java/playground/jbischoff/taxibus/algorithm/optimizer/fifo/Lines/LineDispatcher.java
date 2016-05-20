@@ -27,7 +27,9 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 
+import playground.jbischoff.taxibus.algorithm.TaxibusActionCreator;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
@@ -101,7 +103,7 @@ public class LineDispatcher implements ActivityStartEventHandler {
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		
-		if ((event.getActType().startsWith("Stay")) || (event.getActType().startsWith("Before schedule"))) {
+		if ((event.getActType().equals(TaxibusActionCreator.TAXIBUS_STAY_NAME)) || (event.getActType().startsWith(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE))) {
 
 			if (this.holdingPositions.containsKey(event.getLinkId())) {
 				Id<TaxibusLine> lineId = this.holdingPositions.get(event.getLinkId());

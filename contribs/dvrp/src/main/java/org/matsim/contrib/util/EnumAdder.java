@@ -19,51 +19,22 @@
 
 package org.matsim.contrib.util;
 
-import java.util.*;
-
-import org.apache.commons.lang3.mutable.MutableLong;
-
-
-public class EnumAdder<K extends Enum<K>>
+public interface EnumAdder<K extends Enum<K>, N extends Number>
 {
-    private final EnumMap<K, MutableLong> sums;
+    K[] getKeys();
 
 
-    public EnumAdder(Class<K> clazz)
-    {
-        sums = new EnumMap<>(clazz);
-        for (K e : clazz.getEnumConstants()) {
-            sums.put(e, new MutableLong());
-        }
-    }
+    N get(K e);
 
 
-    public void add(K e, int value)
-    {
-        sums.get(e).add(value);
-    }
+    N getTotal();
 
 
-    public void addAll(EnumAdder<K> enumAdder)
-    {
-        for (Map.Entry<K, MutableLong> e : enumAdder.sums.entrySet()) {
-            sums.get(e.getKey()).add(e.getValue().longValue());
-        }
-    }
+    void increment(K e);
 
 
-    public long getSum(K e)
-    {
-        return sums.get(e).longValue();
-    }
+    void add(K e, Number value);
 
 
-    public long getTotalSum()
-    {
-        long total = 0;
-        for (MutableLong s : sums.values()) {
-            total += s.longValue();
-        }
-        return total;
-    }
+    void addAll(EnumAdder<K, ?> enumAdder);
 }

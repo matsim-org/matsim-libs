@@ -27,7 +27,7 @@ import java.util.*;
  * values negated: {@code PartialSort.add(element, -value)}. Works fine for small k (k << n);
  * otherwise, one should consider a partial version of heapsort or quicksort.
  * <p>
- * More info: {@link http://en.wikipedia.org/wiki/Partial_sorting}
+ * More info: <a href="http://en.wikipedia.org/wiki/Partial_sorting">Partial sorting</a>
  * 
  * @param <T>
  */

@@ -21,13 +21,13 @@
 
 package playground.boescpa.ivtBaseline;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
@@ -50,8 +50,8 @@ public class TestRunIVTBaselineCalibration {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Before
-	public void prepareTests() {
+	@Test
+	public void testScenario() {
 		final String pathToPTLinksToMonitor = utils.getClassInputDirectory() + "ptLinksToMonitor.txt";
 		final String pathToPTStationsToMonitor = utils.getClassInputDirectory() + "ptStationsToMonitor.txt";
 		final String pathToStreetLinksDailyToMonitor = utils.getClassInputDirectory() + "streetLinksDailyToMonitor.txt";
@@ -82,7 +82,7 @@ public class TestRunIVTBaselineCalibration {
 		Config config = ConfigUtils.loadConfig(pathToConfig, new F2LConfigGroup());
 		config.setParam("controler", "outputDirectory", utils.getOutputDirectory() + "output/");
 		// Reduce iterations to one write out interval + 1
-		config.setParam("controler", "lastIteration", "11");
+		config.setParam("controler", "lastIteration", "3");
 		// Set files
 		config.setParam("facilities", "inputFacilitiesFile", pathToFacilities);
 		config.setParam("f2l", "inputF2LFile", pathToF2L);
@@ -106,10 +106,5 @@ public class TestRunIVTBaselineCalibration {
 		String[] argsSim = {pathToConfig, pathToPTLinksToMonitor, pathToPTStationsToMonitor,
 				pathToStreetLinksDailyToMonitor, pathToStreetLinksHourlyToMonitor};
 		RunIVTBaselineCalibration.main(argsSim);
-	}
-
-	@Test
-	public void testScenario() {
-
 	}
 }

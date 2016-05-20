@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure;
 
+import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -35,6 +36,7 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.InjectionUtils;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitAccessibilityCalculator;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.AdvantageColumnCalculator;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
+import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilityConfigGroup;
 import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 import playground.ivt.router.CachingFreespeedCarRouterModule;
 import playground.ivt.router.lazyschedulebasedmatrix.LazyScheduleBasedMatrixModule;
@@ -52,11 +54,19 @@ public class RunSimpleNestedLogitAccessibility {
 		final String configFile = args[ 0 ];
 		final String outputDir = args[ 1 ];
 
+		final SimpleNestedLogitModule module = new SimpleNestedLogitModule();
+		run( module , configFile , outputDir );
+	}
+
+	public static void run( Module modelModule , String configFile , String outputDir ) {
 		// Logger.getLogger( Trip.class ).setLevel( Level.TRACE );
 		MoreIOUtils.initOut( outputDir );
 
 		try {
-			final Config config = ConfigUtils.loadConfig( configFile , new SimpleNestedLogitUtilityConfigGroup() );
+			final Config config = ConfigUtils.loadConfig(
+					configFile,
+					new SimpleNestedLogitUtilityConfigGroup(),
+					new NestedAccessibilityConfigGroup() );
 			final Scenario scenario = ScenarioUtils.loadScenario( config );
 
 			// Todo: put in a scenario provider
@@ -69,7 +79,6 @@ public class RunSimpleNestedLogitAccessibility {
 
 			new XY2Links( carNetwork , scenario.getActivityFacilities() ).run( scenario.getPopulation() );
 
-			final SimpleNestedLogitModule module = new SimpleNestedLogitModule();
 			final NestedLogitAccessibilityCalculator<ModeNests> calculator =
 					InjectionUtils.createCalculator(
 							config,
@@ -81,11 +90,13 @@ public class RunSimpleNestedLogitAccessibility {
 									Arrays.asList(
 											new LazyScheduleBasedMatrixModule(),
 											new CachingFreespeedCarRouterModule() ) ),
-							module );
+							modelModule );
 
 			// TODO store and write results
 			final AccessibilityComputationResult accessibilities = calculator.computeAccessibilities ();
-			module.stopWatch.printStats( TimeUnit.SECONDS );
+			if ( modelModule instanceof SimpleNestedLogitModule ) {
+				((SimpleNestedLogitModule) modelModule).stopWatch.printStats( TimeUnit.SECONDS );
+			}
 			new BasicPersonAccessibilityWriter(
 					scenario,
 					accessibilities,

@@ -47,7 +47,7 @@ public class RunHAFAS2UnmappedMTS {
 
 		new PTScheduleCreatorHAFAS(schedule, vehicles, transformation).createSchedule(args[0]);
 
-		ScheduleTools.writeTransitSchedule(schedule, args[1]+"schedule.xml");
+//		ScheduleTools.writeTransitSchedule(schedule, args[1]+"schedule.xml");
 		new VehicleWriterV1(vehicles).writeFile(args[1]+"vehicles.xml");
 	}
 

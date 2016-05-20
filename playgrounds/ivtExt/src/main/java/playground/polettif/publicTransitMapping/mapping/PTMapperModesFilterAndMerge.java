@@ -23,17 +23,13 @@ package playground.polettif.publicTransitMapping.mapping;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -64,6 +60,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class PTMapperModesFilterAndMerge extends PTMapper {
 
 	private static final int SAME_LINK_PUNISHMENT = 5;
@@ -100,6 +97,15 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		}
 	}
 
+	/**
+	 * Routes the unmapped MATSim Transit Schedule to the network using the file
+	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
+	 * @param configFile the PublicTransitMapping config file
+	 */
+	public static void run(String configFile) {
+		new PTMapperModesFilterAndMerge(configFile).mapFilesFromConfig();
+	}
+
 	@Override
 	public void mapFilesFromConfig() {
 		if(config.getScheduleFile() == null || config.getNetworkFile() == null) {
@@ -107,11 +113,8 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		} else {
 			log.info("Mapping files from config...");
 			log.info("Reading schedule and network file...");
-			Scenario mainScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			Network network = mainScenario.getNetwork();
-			new TransitScheduleReader(mainScenario).readFile(config.getScheduleFile());
-			new MatsimNetworkReader(network).readFile(config.getNetworkFile());
-			TransitSchedule mainSchedule = mainScenario.getTransitSchedule();
+			Network network = NetworkTools.loadNetwork(config.getNetworkFile());
+			TransitSchedule mainSchedule = ScheduleTools.loadTransitSchedule(config.getScheduleFile());
 
 			new PTMapperModesFilterAndMerge(mainSchedule, config).mapScheduleToNetwork(network);
 
@@ -125,12 +128,12 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 					NetworkTools.writeNetwork(filterManager.applyFilters(), config.getOutputStreetNetworkFile());
 				}
 			} else {
+				log.info("");
 				log.info("No output paths defined, schedule and network are not written to files.");
 			}
 
 		}
 	}
-
 
 	@Override
 	public void mapScheduleToNetwork(Network network) {
@@ -139,7 +142,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		log.info("Mapping transit schedule to network...");
 		int nStopFacilities = schedule.getFacilities().size();
 		Set<String> noRoutingWarning = new HashSet<>();
-
 
 		/** [1]
 		 * Create a separate network for all schedule modes and
@@ -167,7 +169,7 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		 * on their coordinates.
 		 */
 		Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates = PTMapperUtils.generateModeLinkCandidates(schedule, network, config);
-
+		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixRegexEscaped());
 
 		/** [3]
 		 * Get network extent to speed up routing outside of network area.
@@ -372,6 +374,12 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		ScheduleTools.routeSchedule(schedule, network, finalRouters);
 
 		/** [9]
+		 * Now that all lines have been routed, it is possible that a route passes
+		 * a link closer to a stop facility than its referenced link.
+		 */
+		PTMapperUtils.tightenChildStopFacilities(schedule, network);
+
+		/** [10]
 		 * After all lines created, clean the schedule and network. Removing
 		 * not used transit links includes removing artificial links that
 		 * needed to be added to the network for routing purposes.
@@ -418,7 +426,6 @@ public class PTMapperModesFilterAndMerge extends PTMapper {
 		log.info("       input    "+nStopFacilities);
 		log.info("       output   "+schedule.getFacilities().size());
 		log.info("       diff.    "+(schedule.getFacilities().size()-nStopFacilities));
-		log.info("       factor   "+(schedule.getFacilities().size()/((double) nStopFacilities)));
 		log.info("    Transit Route statistics:");
 		log.info("       removed  " + routesRemoved);
 		log.info("    Artificial Links:");

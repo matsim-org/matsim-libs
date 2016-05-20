@@ -161,4 +161,24 @@ public class ScheduleCleaner {
 
 		log.info("    "+linksToRemove.size()+" links removed");
 	}
+
+	/**
+	 * Changes the schedule to an unmapped schedule by removes all link sequences
+	 * from a transit schedule and removing referenced links from stop facilities.
+	 * @param schedule
+	 */
+	public static void removeMapping(TransitSchedule schedule) {
+		log.info("... Removing reference links and link sequences from schedule");
+
+		for(TransitStopFacility stopFacility : schedule.getFacilities().values()) {
+			stopFacility.setLinkId(null);
+		}
+
+		for(TransitLine line : schedule.getTransitLines().values()) {
+			for(TransitRoute route : line.getRoutes().values()) {
+				route.setRoute(null);
+			}
+		}
+	}
+
 }

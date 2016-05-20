@@ -14,8 +14,7 @@ import floetteroed.opdyts.DecisionVariableRandomizer;
  * @author Gunnar Flötteröd
  *
  */
-public class FileBasedDecisionVariableRandomzier implements
-		DecisionVariableRandomizer<FileBasedDecisionVariable> {
+public class FileBasedDecisionVariableRandomzier implements DecisionVariableRandomizer<FileBasedDecisionVariable> {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -27,10 +26,8 @@ public class FileBasedDecisionVariableRandomzier implements
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public FileBasedDecisionVariableRandomzier(
-			final String createNewDecisionVariablesCommand,
-			final String originalDecisionVariableFileName,
-			final String newDecisionVariablesFileName) {
+	public FileBasedDecisionVariableRandomzier(final String createNewDecisionVariablesCommand,
+			final String originalDecisionVariableFileName, final String newDecisionVariablesFileName) {
 		this.createNewDecisionVariablesCommand = createNewDecisionVariablesCommand;
 		this.originalDecisionVariableFileName = originalDecisionVariableFileName;
 		this.newDecisionVariablesFileName = newDecisionVariablesFileName;
@@ -43,7 +40,7 @@ public class FileBasedDecisionVariableRandomzier implements
 			FileBasedDecisionVariable originalDecisionVariable) {
 
 		if (originalDecisionVariable != null) {
-			originalDecisionVariable.implementInSimulation();
+			originalDecisionVariable.writeToNewDecisionVariableFile(this.originalDecisionVariableFileName);
 		} else {
 			final File file = new File(this.originalDecisionVariableFileName);
 			if (file.exists()) {
@@ -54,13 +51,10 @@ public class FileBasedDecisionVariableRandomzier implements
 		final Process proc;
 		final int exitVal;
 		try {
-			proc = Runtime.getRuntime().exec(
-					this.createNewDecisionVariablesCommand);
+			proc = Runtime.getRuntime().exec(this.createNewDecisionVariablesCommand);
 			exitVal = proc.waitFor();
 			if (exitVal != 0) {
-				throw new RuntimeException(
-						"Decision variable generation terminated with exit code "
-								+ exitVal + ".");
+				throw new RuntimeException("Decision variable generation terminated with exit code " + exitVal + ".");
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -69,11 +63,9 @@ public class FileBasedDecisionVariableRandomzier implements
 		final List<FileBasedDecisionVariable> result = new LinkedList<>();
 		try {
 			String line;
-			final BufferedReader reader = new BufferedReader(new FileReader(
-					this.newDecisionVariablesFileName));
+			final BufferedReader reader = new BufferedReader(new FileReader(this.newDecisionVariablesFileName));
 			while ((line = reader.readLine()) != null) {
-				result.add(new FileBasedDecisionVariable(line.trim(),
-						this.originalDecisionVariableFileName));
+				result.add(new FileBasedDecisionVariable(line.trim(), this.originalDecisionVariableFileName));
 			}
 			reader.close();
 		} catch (Exception e) {

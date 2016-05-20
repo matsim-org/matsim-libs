@@ -477,9 +477,9 @@ public class CreateAutomatedFDTest {
 
 		double freeSpeedOnLink = 60/3.6;
 		network.createAndAddLink(Id.createLinkId("home"), nodeHome, node1, 25, freeSpeedOnLink, 7200, 1);
-		network.createAndAddLink(Id.createLinkId(0), node1, node2, 1000, freeSpeedOnLink, 1800, 1);
-		network.createAndAddLink(Id.createLinkId(1), node2, node3, 1000, freeSpeedOnLink, 1800, 1);
-		network.createAndAddLink(Id.createLinkId(2), node3, node1, 1000, freeSpeedOnLink, 1800, 1);
+		network.createAndAddLink(Id.createLinkId(0), node1, node2, 1000, freeSpeedOnLink, 1600, 1);
+		network.createAndAddLink(Id.createLinkId(1), node2, node3, 1000, freeSpeedOnLink, 1600, 1);
+		network.createAndAddLink(Id.createLinkId(2), node3, node1, 1000, freeSpeedOnLink, 1600, 1);
 		network.createAndAddLink(Id.createLinkId("work"), node2, nodeWork, 25, freeSpeedOnLink, 7200, 1);
 
 		Set<String> allowedModes = new HashSet<String>();
@@ -514,7 +514,7 @@ public class CreateAutomatedFDTest {
 		flowDataset.addSeries(bikeFlow);
 
 		NumberAxis flowAxis = new NumberAxis("Flow (PCU/h)");
-		flowAxis.setRange(0.0, 2100.0);
+		flowAxis.setRange(0.0, 1400.0);
 
 		XYPlot plot1 = new XYPlot(flowDataset, null, flowAxis, new XYLineAndShapeRenderer(false,true));
 		plot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
@@ -531,7 +531,7 @@ public class CreateAutomatedFDTest {
 		plot2.setRangeAxisLocation(AxisLocation.TOP_OR_LEFT);
 
 		NumberAxis densityAxis = new NumberAxis("Overall density (PCU/km)");
-		densityAxis.setRange(0.0,150.00);
+		densityAxis.setRange(0.0,140.00);
 
 		CombinedDomainXYPlot plot = new CombinedDomainXYPlot(densityAxis);
 		plot.setGap(10.);

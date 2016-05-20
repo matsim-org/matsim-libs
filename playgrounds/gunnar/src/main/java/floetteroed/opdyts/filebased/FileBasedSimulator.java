@@ -25,8 +25,7 @@ public class FileBasedSimulator implements Simulator<FileBasedDecisionVariable> 
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public FileBasedSimulator(final String advanceSimulationCommand,
-			final String newStateFileName) {
+	public FileBasedSimulator(final String advanceSimulationCommand, final String newStateFileName) {
 		this.advanceSimulationCommand = advanceSimulationCommand;
 		this.newStateFileName = newStateFileName;
 	}
@@ -40,8 +39,7 @@ public class FileBasedSimulator implements Simulator<FileBasedDecisionVariable> 
 			proc = Runtime.getRuntime().exec(this.advanceSimulationCommand);
 			exitVal = proc.waitFor();
 			if (exitVal != 0) {
-				throw new RuntimeException(
-						"Simulation terminated with exit code " + exitVal + ".");
+				throw new RuntimeException("Simulation terminated with exit code " + exitVal + ".");
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -52,8 +50,7 @@ public class FileBasedSimulator implements Simulator<FileBasedDecisionVariable> 
 		final List<Double> numbers = new LinkedList<>();
 		try {
 			String line;
-			final BufferedReader reader = new BufferedReader(new FileReader(
-					this.newStateFileName));
+			final BufferedReader reader = new BufferedReader(new FileReader(this.newStateFileName));
 			while ((line = reader.readLine()) != null) {
 				line = line.trim();
 				numbers.add(Double.parseDouble(line));
@@ -62,22 +59,19 @@ public class FileBasedSimulator implements Simulator<FileBasedDecisionVariable> 
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return new FileBasedSimulatorState(numbers.get(0), new Vector(
-				numbers.subList(1, numbers.size())));
+		return new FileBasedSimulatorState(numbers.get(0), new Vector(numbers.subList(1, numbers.size())));
 	}
 
 	// -------------------- IMPLEMENTATION OF Simulator --------------------
 
 	@Override
-	public SimulatorState run(
-			TrajectorySampler<FileBasedDecisionVariable> evaluator) {
+	public SimulatorState run(final TrajectorySampler<FileBasedDecisionVariable> evaluator) {
 		return this.run(evaluator, null);
 	}
 
 	@Override
-	public SimulatorState run(
-			TrajectorySampler<FileBasedDecisionVariable> evaluator,
-			SimulatorState initialState) {
+	public SimulatorState run(final TrajectorySampler<FileBasedDecisionVariable> evaluator,
+			final SimulatorState initialState) {
 		evaluator.initialize();
 		FileBasedSimulatorState newState = null;
 		while (!evaluator.foundSolution()) {

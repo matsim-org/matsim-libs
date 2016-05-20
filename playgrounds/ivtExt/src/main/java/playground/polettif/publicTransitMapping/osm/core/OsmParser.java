@@ -31,7 +31,10 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.UncheckedIOException;
-import playground.polettif.publicTransitMapping.gtfs.GTFSReader;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmHandler;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmNodeHandler;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmRelationHandler;
+import playground.polettif.publicTransitMapping.osm.core.handler.OsmWayHandler;
 
 /**
  * @author mrieser / Senozon AG

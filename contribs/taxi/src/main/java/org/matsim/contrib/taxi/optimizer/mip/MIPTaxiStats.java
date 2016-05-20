@@ -90,12 +90,12 @@ public class MIPTaxiStats
 
     private String statsToString(TaxiStats stats)
     {
-        return stats == null ? "---" : stats.toString();
+        return stats == null ? "---" : (stats.passengerWaitTime.getMean() + "");
     }
 
 
     private TaxiStats calcTaxiStats()
     {
-        return new TaxiStatsCalculator(data.getVehicles().values()).getStats();
+        return new TaxiStatsCalculator(data.getVehicles().values()).getDailyStats();
     }
 }

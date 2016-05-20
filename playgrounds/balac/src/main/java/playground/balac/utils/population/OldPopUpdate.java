@@ -51,7 +51,7 @@ public class OldPopUpdate {
 			
 				bla2.putAttribute(person.getId().toString(), "earliestEndTime_" + a.getType(), 0.0);
 				bla2.putAttribute(person.getId().toString(), "latestStartTime_" + a.getType(), 86400.0);
-				bla2.putAttribute(person.getId().toString(), "minimalDuration_" + a.getType(), 1800.0);
+				bla2.putAttribute(person.getId().toString(), "minimalDuration_" + a.getType(), 900.0);
 					String type = a.getType();
 					if (type.startsWith("home")) {
 						
@@ -91,7 +91,7 @@ public class OldPopUpdate {
 			
 			if (durationhome != 0.0) {
 				bla2.putAttribute(person.getId().toString(), "typicalDuration_home", durationhome);
-				
+
 			}
 		//	if (durationwork != 0.0) {
 			//	bla.putAttribute(person.getId().toString(), "typicalDuration_work", durationwork);

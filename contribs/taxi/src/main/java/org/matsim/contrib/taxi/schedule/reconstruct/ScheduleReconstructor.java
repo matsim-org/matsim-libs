@@ -22,21 +22,21 @@ package org.matsim.contrib.taxi.schedule.reconstruct;
 import java.nio.channels.IllegalSelectorException;
 import java.util.*;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.taxi.data.TaxiData;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.*;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 
 public class ScheduleReconstructor
 {
-    final TaxiData taxiData;
+    final TaxiData taxiData = new TaxiData();
     final Map<Id<Link>, ? extends Link> links;
 
     final Map<Id<Person>, ScheduleBuilder> scheduleBuilders = new LinkedHashMap<>();
@@ -47,9 +47,9 @@ public class ScheduleReconstructor
     private final RequestRecorder requestRecorder;
 
 
-    public ScheduleReconstructor(TaxiData taxiData, Network network, EventsManager eventsManager)
+    @Inject
+    public ScheduleReconstructor(Network network, EventsManager eventsManager)
     {
-        this.taxiData = taxiData;
         links = network.getLinks();
 
         driveRecorder = new DriveRecorder(this);
@@ -58,7 +58,7 @@ public class ScheduleReconstructor
         stayRecorder = new StayRecorder(this);
         eventsManager.addHandler(stayRecorder);
 
-        requestRecorder = new RequestRecorder(this, "taxi");
+        requestRecorder = new RequestRecorder(this, TaxiModule.TAXI_MODE);
         eventsManager.addHandler(requestRecorder);
     }
 
@@ -100,15 +100,11 @@ public class ScheduleReconstructor
     }
 
 
-    public static TaxiData reconstructFromFile(String networkFile, String eventsFile)
+    public static TaxiData reconstructFromFile(Network network, String eventsFile)
     {
-        TaxiData taxiData = new TaxiData();
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
         EventsManager eventsManager = EventsUtils.createEventsManager();
-
-        ScheduleReconstructor reconstructor = new ScheduleReconstructor(taxiData,
-                scenario.getNetwork(), eventsManager);
+        ScheduleReconstructor reconstructor = new ScheduleReconstructor(network,
+                eventsManager);
         new MatsimEventsReader(eventsManager).readFile(eventsFile);
         return reconstructor.getTaxiData();
     }

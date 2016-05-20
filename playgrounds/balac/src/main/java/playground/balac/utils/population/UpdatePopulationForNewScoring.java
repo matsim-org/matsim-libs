@@ -33,34 +33,23 @@ public class UpdatePopulationForNewScoring {
 			int size = plan.getPlanElements().size();
 			int i = 0;
 			
-			for (PlanElement pe : plan.getPlanElements()) {
+		/*	for (PlanElement pe : plan.getPlanElements()) {
 				
 				if (pe instanceof Activity) {
 					
-					if (((Activity) pe).getType().equals("shopping") ||
-							((Activity) pe).getType().equals("leisure") ||
-							((Activity) pe).getType().equals("cb-shop") ||
-							((Activity) pe).getType().equals("cb-leisure") ||
-							((Activity) pe).getType().equals("cb-work") ||
-							((Activity) pe).getType().equals("cb-education")) {
-						
-						((Activity) pe).setStartTime(Time.UNDEFINED_TIME);
-						//((Activity) pe).setEndTime(Time.UNDEFINED_TIME);
-
-					}
-					else {
+					
 						if (i != size - 1) {
 							((Activity) pe).setStartTime(Time.UNDEFINED_TIME);
 							((Activity) pe).setMaximumDuration(Time.UNDEFINED_TIME);
 						}
 					}
-				}
+				
 				i++;
-			}
+			}*/
 			
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(args[2] + "/plans_newscoring_legs_1perc.xml.gz");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(args[2] + "/plans_10perc_fixedtt_2.xml.gz");		
 
 		
 	}

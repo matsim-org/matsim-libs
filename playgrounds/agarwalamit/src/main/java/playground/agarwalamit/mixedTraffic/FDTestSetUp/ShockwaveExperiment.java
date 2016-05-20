@@ -39,7 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class ShockwaveExperiment {
 	
-	private static final String RUN_DIR = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW_kn/";
+	private static final String RUN_DIR = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW/";
 
 	public static void main(String[] args) {
 
@@ -55,7 +55,7 @@ public class ShockwaveExperiment {
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData(inputs);
 		generateFDData.setRunDirectory(RUN_DIR);
-		generateFDData.setReduceDataPointsByFactor(40);
+		generateFDData.setReduceDataPointsByFactor(10);
 		generateFDData.setIsPlottingDistribution(false);
 		generateFDData.setIsUsingLiveOTFVis(isUsingOTFVis);
 		generateFDData.setIsWritingEventsFileForEachIteration(true);
@@ -76,13 +76,13 @@ public class ShockwaveExperiment {
 		double flowCapBefore = desiredLink.getCapacity();
 		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(20.*60.) ;
+			NetworkChangeEvent event = cef.createNetworkChangeEvent(35.*60.) ;
 			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, 0.0)); 
 			event.addLink(desiredLink);
 			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);
 		}
 		{
-			NetworkChangeEvent event = cef.createNetworkChangeEvent(20.*60.+60*5) ;
+			NetworkChangeEvent event = cef.createNetworkChangeEvent(35.*60.+60*5) ;
 			event.setFlowCapacityChange(new ChangeValue(ChangeType.ABSOLUTE, flowCapBefore/3600.)); // value should be in pcu/s
 			event.addLink(desiredLink);
 			((NetworkImpl)sc.getNetwork()).addNetworkChangeEvent(event);

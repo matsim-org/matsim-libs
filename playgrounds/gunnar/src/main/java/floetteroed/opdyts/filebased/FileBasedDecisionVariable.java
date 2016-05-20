@@ -20,24 +20,28 @@ public class FileBasedDecisionVariable implements DecisionVariable {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public FileBasedDecisionVariable(final String decisionVariableId,
-			final String decisionVariableFileName) {
+	public FileBasedDecisionVariable(final String decisionVariableId, final String decisionVariableFileName) {
 		this.decisionVariableId = decisionVariableId;
 		this.newDecisionVariableFileName = decisionVariableFileName;
 	}
 
-	// --------------- IMPLEMENTATION OF DecisionVariable ---------------
+	// -------------------- FILE-BASED FUNCTIONALITY --------------------
 
-	@Override
-	public void implementInSimulation() {
+	public void writeToNewDecisionVariableFile(final String fileName) {
 		try {
-			final PrintWriter writer = new PrintWriter(
-					this.newDecisionVariableFileName);
+			final PrintWriter writer = new PrintWriter(fileName);
 			writer.println(this.decisionVariableId);
 			writer.flush();
 			writer.close();
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	// --------------- IMPLEMENTATION OF DecisionVariable ---------------
+
+	@Override
+	public void implementInSimulation() {
+		this.writeToNewDecisionVariableFile(this.newDecisionVariableFileName);
 	}
 }

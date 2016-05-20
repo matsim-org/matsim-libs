@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import playground.polettif.crossings.parser.Crossing;
 import playground.polettif.crossings.parser.CrossingsParser;
@@ -98,7 +97,7 @@ public class CrossingsHandler implements LinkEnterEventHandler, LinkLeaveEventHa
 
 				// todo create method to get two closest link with identical distance
 				if(crossId == null) {
-					crossId = NetworkTools.findNClosestLinks((NetworkImpl) network, crossing.getCoord(), 300, 2, 400.0).get(0).getId();
+					crossId = NetworkTools.findClosestLinks(network, crossing.getCoord(), 300, 2, 1, null, 400.0).get(0).getId();
 				}
 
 				// calculate time(coordinates of crossing, coordinates of fromNode, train speed, linkEnterTime)

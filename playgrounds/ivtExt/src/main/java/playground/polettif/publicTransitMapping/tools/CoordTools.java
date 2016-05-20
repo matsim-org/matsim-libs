@@ -20,6 +20,7 @@ package playground.polettif.publicTransitMapping.tools;
 
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -64,6 +65,16 @@ public class CoordTools {
 		double newE = lineStart.getX() + Math.round(Math.sin(azLine) * distanceToNewPoint * 1000) / 1000.;
 
 		return new Coord(newE, newN);
+	}
+
+	/**
+	 * Calculates the minimal distance between a stop facility and a link via {@link CoordUtils#distancePointLinesegment}
+	 * @param stopFacility
+	 * @param link
+	 * @return
+	 */
+	public static double distanceStopFacilityToLink(TransitStopFacility stopFacility, Link link) {
+		return CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), stopFacility.getCoord());
 	}
 
 	/**

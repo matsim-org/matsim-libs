@@ -22,7 +22,7 @@ package playground.michalm.demand.aggregator;
 import java.util.Date;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.util.EnumCounter;
+import org.matsim.contrib.util.*;
 import org.matsim.contrib.zone.Zone;
 import org.matsim.contrib.zone.util.ZoneFinder;
 import org.matsim.matrices.*;
@@ -42,7 +42,7 @@ public class DemandAggregator
     private final DateDiscretizer dateDiscretizer;
     private final Matrices matrices = new Matrices();
 
-    private final EnumCounter<TripType> counter = new EnumCounter<>(TripType.class);
+    private final LongEnumAdder<TripType> counter = new LongEnumAdder<>(TripType.class);
 
 
     public DemandAggregator(ZoneFinder zoneFinder, DateDiscretizer dateDiscretizer)
@@ -87,7 +87,7 @@ public class DemandAggregator
     public void printCounters()
     {
         for (TripType type : TripType.values()) {
-            System.out.println(type.name() + " trips:\t" + counter.getCount(type));
+            System.out.println(type.name() + " trips:\t" + counter.get(type));
         }
     }
 

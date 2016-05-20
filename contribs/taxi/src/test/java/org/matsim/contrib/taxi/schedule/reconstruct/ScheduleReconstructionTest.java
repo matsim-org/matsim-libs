@@ -22,7 +22,6 @@ package org.matsim.contrib.taxi.schedule.reconstruct;
 import java.util.*;
 
 import org.junit.*;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -31,30 +30,13 @@ import org.matsim.contrib.taxi.data.*;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.contrib.taxi.schedule.*;
-import org.matsim.contrib.taxi.schedule.reconstruct.ScheduleReconstructor;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.inject.Inject;
-
 
 public class ScheduleReconstructionTest
 {
-    private static class ScheduleReconstructorRegistrar
-    {
-        private ScheduleReconstructor reconstructor;
-
-
-        @Inject
-        public ScheduleReconstructorRegistrar(Network network, EventsManager eventsManager)
-        {
-            reconstructor = new ScheduleReconstructor(new TaxiData(), network, eventsManager);
-        }
-    }
-
-
     @Test
     public void testOneTaxiReconstruction()
     {
@@ -80,13 +62,13 @@ public class ScheduleReconstructionTest
             @Override
             public void install()
             {
-                bind(ScheduleReconstructorRegistrar.class).asEagerSingleton();
+                bind(ScheduleReconstructor.class).asEagerSingleton();
             }
         });
         controler.run();
 
         TaxiData reconstructedTaxiData = controler.getInjector()
-                .getInstance(ScheduleReconstructorRegistrar.class).reconstructor.getTaxiData();
+                .getInstance(ScheduleReconstructor.class).getTaxiData();
         TaxiData taxiData = controler.getInjector().getInstance(TaxiData.class);
         Assert.assertNotEquals(taxiData, reconstructedTaxiData);
 

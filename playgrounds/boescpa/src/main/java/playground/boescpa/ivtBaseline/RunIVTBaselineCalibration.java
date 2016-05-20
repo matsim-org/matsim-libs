@@ -79,7 +79,7 @@ public class RunIVTBaselineCalibration {
 		final Controler controler = new Controler(scenario);
 
 		controler.getConfig().controler().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		connectFacilitiesWithNetwork(controler);
 

@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,57 +19,64 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import java.util.EnumMap;
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
+import org.matsim.contrib.util.*;
 
 
 public class TaxiStats
 {
-    final DescriptiveStatistics passengerWaitTimes = new DescriptiveStatistics();
-    final EnumMap<TaxiTaskType, DescriptiveStatistics> timesByTaskType;
+    public final String id;
+
+    //all requests submissions made within the analyzed time period
+    public final DescriptiveStatistics passengerWaitTime = new DescriptiveStatistics();
+
+    //duration of all task types within a given time period
+    //each vehicle's contribution is between 0 and N s (where N is the length of time period)
+    //(vehicle may not operate all the time)
+    //similar, yet slightly less accurate, results can be obtained by averaging time profile
+    //values in a given time period
+    public final EnumAdder<TaxiTaskType, Long> taskTimeSumsByType = new LongEnumAdder<>(
+            TaxiTaskType.class);
+
+    //all drives that started within the analyzed time period
+    //in the case of hourly stats, expect high variations:
+    //can be 1.0 if a single empty drive started just before the end of this hour;
+    //can also be 0.0 if a single occupied drive started just after the beginning of this hour
+    public final DescriptiveStatistics vehicleEmptyDriveRatio = new DescriptiveStatistics();
+
+    //vehicles' operation may be of different lengths, which may bias these stats
+    //if this effect is not desired, consider using taskTypeSums instead
+    public final DescriptiveStatistics vehicleStayRatio = new DescriptiveStatistics();
 
 
-    public TaxiStats()
+    public TaxiStats(String id)
     {
-        timesByTaskType = new EnumMap<>(TaxiTaskType.class);
-        for (TaxiTaskType t : TaxiTaskType.values()) {
-            timesByTaskType.put(t, new DescriptiveStatistics());
-        }
+        this.id = id;
     }
 
 
-    public void addTask(TaxiTask task)
+    public double getFleetEmptyDriveRatio()
     {
-        double time = task.getEndTime() - task.getBeginTime();
-        timesByTaskType.get(task.getTaxiTaskType()).addValue(time);
-    }
-    
-    
-    public DescriptiveStatistics getPassengerWaitTimes()
-    {
-        return passengerWaitTimes;
-    }
-
-
-    public double getEmptyDriveRatio()
-    {
-        double empty = timesByTaskType.get(TaxiTaskType.EMPTY_DRIVE).getSum();//not mean!
-        double occupied = timesByTaskType.get(TaxiTaskType.OCCUPIED_DRIVE).getSum();//not mean!
+        double empty = taskTimeSumsByType.get(TaxiTaskType.EMPTY_DRIVE).doubleValue();
+        double occupied = taskTimeSumsByType.get(TaxiTaskType.OCCUPIED_DRIVE)
+                .doubleValue();
         return empty / (empty + occupied);
     }
 
 
-    public double getStayTime()
+    public double getFleetStayRatio()
     {
-        return timesByTaskType.get(TaxiTaskType.STAY).getSum();//not mean!
+        double stay = taskTimeSumsByType.get(TaxiTaskType.STAY).doubleValue();
+        double total = taskTimeSumsByType.getTotal().doubleValue();
+        return stay / total;
     }
 
 
-    public DescriptiveStatistics getOccupiedDriveTimes()
+    public double getOccupiedDriveRatio()
     {
-        return timesByTaskType.get(TaxiTaskType.OCCUPIED_DRIVE);
+        double occupied = taskTimeSumsByType.get(TaxiTaskType.OCCUPIED_DRIVE).doubleValue();
+        double total = taskTimeSumsByType.getTotal().doubleValue();
+        return occupied / total;
     }
 }

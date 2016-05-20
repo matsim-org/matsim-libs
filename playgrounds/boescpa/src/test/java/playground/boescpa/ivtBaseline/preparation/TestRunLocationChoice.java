@@ -21,7 +21,6 @@
 
 package playground.boescpa.ivtBaseline.preparation;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -40,14 +39,14 @@ import playground.boescpa.lib.tools.fileCreation.F2LCreator;
 /**
  * @author boescpa
  */
+@Deprecated
 public class TestRunLocationChoice {
 
-	@Rule
+	/*@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Before
-	public void prepareTests() {
-
+	@Test
+	public void testScenario() {
 		final String pathToOnlyStreetNetwork = utils.getClassInputDirectory() + "onlystreetnetwork.xml";
 		final String pathToNetwork = "test/scenarios/pt-tutorial/multimodalnetwork.xml";
 		final String pathToInitialPopulation = utils.getClassInputDirectory() + "population.xml";
@@ -72,7 +71,7 @@ public class TestRunLocationChoice {
 		ChooseSecondaryFacilitiesConfigCreator.main(argsConfig);
 		Config config = ConfigUtils.loadConfig(pathToConfig, new F2LConfigGroup());
 		config.setParam("controler", "outputDirectory", utils.getOutputDirectory() + "output/");
-			// Set files
+		// Set files
 		config.setParam("facilities", "inputFacilitiesFile", pathToFacilities);
 		config.setParam("f2l", "inputF2LFile", pathToF2L);
 		config.setParam("households", "inputFile", "null");
@@ -82,11 +81,11 @@ public class TestRunLocationChoice {
 		config.setParam("plans", "inputPlansFile", pathToPopulation);
 		config.setParam("transit", "transitScheduleFile", pathToSchedule);
 		config.setParam("transit", "vehiclesFile", pathToVehicles);
-			// handle location choice
+		// handle location choice
 		config.setParam("locationchoice", "prefsFile", pathToPrefs);
 		config.setParam("locationchoice", "flexible_types", "shop");
 		config.setParam("locationchoice", "epsilonScaleFactors", "0.3");
-			// Set threads to 1
+		// Set threads to 1
 		config.setParam("global", "numberOfThreads", "1");
 		config.setParam("parallelEventHandling", "numberOfThreads", "1");
 		config.setParam("qsim", "numberOfThreads", "1");
@@ -94,10 +93,5 @@ public class TestRunLocationChoice {
 
 		String[] argsSim = {pathToConfig};
 		RunLocationChoice.main(argsSim);
-	}
-
-	@Test
-	public void testScenario() {
-
-	}
+	}*/
 }

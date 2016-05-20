@@ -73,6 +73,7 @@ public class OTFClientLive {
 					connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
 				}
 
+				
 				GLAutoDrawable canvas = OTFOGLDrawer.createGLCanvas(visconf);
 				OTFClient otfClient = new OTFClient(canvas);
 				otfClient.setServer(server);

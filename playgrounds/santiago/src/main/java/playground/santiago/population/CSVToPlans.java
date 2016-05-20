@@ -140,12 +140,12 @@ public class CSVToPlans {
 		try {
 			String line = reader.readLine();
 			while( (line = reader.readLine()) != null ){
-				String[] splittedLine = line.split(";");
+				String[] splittedLine = line.split(",");
 				String id = splittedLine[idxHogarId];
 				int nVehicles = Integer.parseInt(splittedLine[idxNVeh]);
 				this.hogarId2NVehicles.put(id, nVehicles);
-				String x = splittedLine[idxCoordX].replace("," , ".");
-				String y = splittedLine[idxCoordY].replace("," , ".");
+				String x = splittedLine[idxCoordX]/*.replace("," , ".")*/;
+				String y = splittedLine[idxCoordY]/*.replace("," , ".")*/;
 				this.hogarId2Coord.put(id, new Coord(Double.parseDouble(x), Double.parseDouble(y)));
 				counter++;
 			}
@@ -176,7 +176,7 @@ public class CSVToPlans {
 		try {
 			String line = reader.readLine();
 			while( (line = reader.readLine()) != null ){
-				String[] splittedLine = line.split(";");
+				String[] splittedLine = line.split(",");
 				String hogarId = splittedLine[idxHogarId];
 				String id = splittedLine[idxPersonId];
 				int age = 2012 - Integer.valueOf(splittedLine[idxAge]);
@@ -188,8 +188,8 @@ public class CSVToPlans {
 				Persona persona = new Persona(id, age, sex, drivingLicence, nCars, nViajes);
 				persona.setHomeCoord(this.hogarId2Coord.get(hogarId));
 				
-				String x = splittedLine[idxCoordX].replace("," , ".");
-				String y = splittedLine[idxCoordY].replace("," , ".");
+				String x = splittedLine[idxCoordX]/*.replace("," , ".")*/;
+				String y = splittedLine[idxCoordY]/*.replace("," , ".")*/;
 				if(!x.equals("") && !y.equals("") && !x.equals("0") && !y.equals("0")){
 					persona.setWorkCoord(new Coord(Double.parseDouble(x), Double.parseDouble(y)));
 				}
@@ -230,7 +230,7 @@ public class CSVToPlans {
 		try {
 			String line = reader.readLine();
 			while( (line = reader.readLine()) != null ){
-				String[] splittedLine = line.split(";");
+				String[] splittedLine = line.split(",");
 				
 				String personId = splittedLine[idxPersonId];
 				Persona persona = this.personas.get(personId);
@@ -281,7 +281,7 @@ public class CSVToPlans {
 		try {
 			String line = reader.readLine();
 			while( (line = reader.readLine()) != null ){
-				String[] splittedLine = line.split(";");
+				String[] splittedLine = line.split(",");
 				String personId = splittedLine[idxPersonId];
 				String viajeId = splittedLine[idxViajeId];
 				

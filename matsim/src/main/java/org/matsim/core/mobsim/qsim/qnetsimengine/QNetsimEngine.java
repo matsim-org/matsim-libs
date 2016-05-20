@@ -213,6 +213,7 @@ public class QNetsimEngine implements MobsimEngine {
 		case queue:
 			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
 		case withHoles:
+		case withHolesAndShowHoles:
 			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
 			// ??? kai, nov'15
 			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);

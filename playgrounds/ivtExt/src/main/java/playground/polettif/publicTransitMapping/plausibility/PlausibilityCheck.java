@@ -31,13 +31,17 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.polettif.publicTransitMapping.plausibility.log.*;
 import playground.polettif.publicTransitMapping.tools.CsvTools;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
+import playground.polettif.publicTransitMapping.tools.shp.Schedule2ShapeFileWriter;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -58,20 +62,19 @@ public class PlausibilityCheck {
 
 	public static final String CsvSeparator = ";";
 
+	private static final double PI = Math.PI;
+	private static final double PI2 = 2 * Math.PI;
+
 	public static final String TRAVEL_TIME_WARNING = "TravelTimeWarning";
 	public static final String LOOP_WARNING = "LoopWarning";
 	public static final String DIRECTION_CHANGE_WARNING = "DirectionChangeWarning";
 
-	private Set<PlausibilityWarning> warnings = new HashSet<>();
+	private Set<PlausibilityWarning> allWarnings = new HashSet<>();
 	private Map<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> warningsSchedule = new HashMap<>();
 	private Map<List<Id<Link>>, Set<PlausibilityWarning>> warningsLinkIds = new HashMap<>();
 	private Map<Id<Link>, Set<PlausibilityWarning>> warningsLinks = new HashMap<>();
 
-	private static final double PI = Math.PI;
-	private static final double PI2 = 2 * Math.PI;
-
-	// todo mode dependent threshold
-	private double uTurnAngleThreshold = 0.75 * PI;
+	private Map<String, Double> thresholds;
 
 	private TransitSchedule schedule;
 	private Network network;
@@ -79,8 +82,15 @@ public class PlausibilityCheck {
 	public PlausibilityCheck(TransitSchedule schedule, Network network) {
 		this.schedule = schedule;
 		this.network = network;
+
+		this.thresholds = new HashMap<>();
+		this.thresholds.put("bus", 0.8 * PI);
+		this.thresholds.put("rail", 0.2 * PI);
 	}
 
+	/**
+	 * @param args schedule file, network file, output folder
+	 */
 	public static void main(final String[] args) {
 		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(args[0]);
 		Network network = NetworkTools.loadNetwork(args[1]);
@@ -88,20 +98,12 @@ public class PlausibilityCheck {
 		PlausibilityCheck check = new PlausibilityCheck(schedule, network);
 		check.run();
 
-		/*
-		define output folder
-		raw log file (csv)
-		combined warnings for routes with same stop sequence
-		combined warning (all routes affected by it in one "tag")
-		warning for each link
-		shapefile (one for traveltime, loops and directionChange)
-		get whole loop (link sequence) instead of just nodes
-		 */
-
-//		check.printResultByLink();
 		check.writeCsv(args[2] + "allPlausibilityWarnings.csv");
-//		check.writeCsvResultsByLinkId(args[2] + "plausibilityWarningsLinkIds.csv");
 		check.writeResultShapeFiles(args[2]);
+
+		Schedule2ShapeFileWriter schedule2shp = new Schedule2ShapeFileWriter(schedule, network);
+		schedule2shp.routes2Polylines(args[2]+"Schedule_TransitRoutes.shp");
+		schedule2shp.stopFacilities2Shapes(args[2]+"Schedule_StopFacilities.shp", args[2]+"Schedule_StopFacilities_refLinks.shp");
 	}
 
 	/**
@@ -112,6 +114,9 @@ public class PlausibilityCheck {
 
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+
+				Double directionChangeThreshold = thresholds.get(transitRoute.getTransportMode());
+
 				Iterator<TransitRouteStop> stopsIterator = transitRoute.getStops().iterator();
 
 				List<Link> links = NetworkTools.getLinksFromIds(network, getLinkIds(transitRoute));
@@ -149,10 +154,12 @@ public class PlausibilityCheck {
 					}
 
 					// angle check (check if one link has length 0)
-					double angleDiff = getAzimuthDiff(linkFrom, linkTo);
-					if(Math.abs(angleDiff) > uTurnAngleThreshold && linkFrom.getLength() > 0 && linkTo.getLength() > 0 && angleDiff != PI) {
-						PlausibilityWarning warning = new DirectionChangeWarning(transitLine, transitRoute, linkFrom, linkTo, angleDiff);
-						addWarningToContainers(warning);
+					if(directionChangeThreshold != null) {
+						double angleDiff = getAzimuthDiff(linkFrom, linkTo);
+						if(Math.abs(angleDiff) > directionChangeThreshold && linkFrom.getLength() > 0 && linkTo.getLength() > 0 && angleDiff != PI) {
+							PlausibilityWarning warning = new DirectionChangeWarning(transitLine, transitRoute, linkFrom, linkTo, directionChangeThreshold, angleDiff);
+							addWarningToContainers(warning);
+						}
 					}
 				}
 
@@ -179,12 +186,8 @@ public class PlausibilityCheck {
 	public void writeCsv(String outputFile) {
 		List<String> csvLines = new ArrayList<>();
 		csvLines.add(AbstractPlausibilityWarning.CSV_HEADER);
-		for(Map.Entry<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> e : warningsSchedule.entrySet()) {
-			for(Map.Entry<TransitRoute, Set<PlausibilityWarning>> e2 : e.getValue().entrySet()) {
-				for(PlausibilityWarning warning : e2.getValue()) {
-					csvLines.add(warning.getCsvLine());
-				}
-			}
+		for(PlausibilityWarning w : allWarnings) {
+			csvLines.add(w.getCsvLine());
 		}
 		try {
 			log.info("Writing warnings to csv file " +outputFile +" ...");
@@ -200,7 +203,6 @@ public class PlausibilityCheck {
 		Collection<SimpleFeature> traveltTimeWarningsFeatures = new ArrayList<>();
 		Collection<SimpleFeature> loopWarningsFeatures = new ArrayList<>();
 		Collection<SimpleFeature> directionChangeWarningsFeatures = new ArrayList<>();
-		Map<List<Id<Link>>, SimpleFeature> uniqueFeatures = new HashMap<>();
 
 		PolylineFeatureFactory travelTimeWarningsFF = new PolylineFeatureFactory.Builder()
 				.setName("TravelTimeWarnings")
@@ -208,8 +210,9 @@ public class PlausibilityCheck {
 				.addAttribute("warningIds", String.class)
 				.addAttribute("routeIds", String.class)
 				.addAttribute("linkIds", String.class)
-				.addAttribute("diff_min", Double.class)
-				.addAttribute("diff_max", Double.class)
+				.addAttribute("diff", Double.class)
+				.addAttribute("expected", Double.class)
+				.addAttribute("actual", Double.class)
 				.create();
 
 		PolylineFeatureFactory loopWarningsFF = new PolylineFeatureFactory.Builder()
@@ -236,8 +239,7 @@ public class PlausibilityCheck {
 			boolean createTravelTimeFeature = false;
 			boolean createDirectionChangeFeature = false;
 
-			double diffMin = Double.MAX_VALUE, diffMax = 0.0, azDiff = 0.0;
-
+			double diff = -1, ttExpected = -1, ttActual = -1, azDiff = 0.0;
 
 			Set<Id<PlausibilityWarning>> warningIds = new HashSet<>();
 			Set<String> routeIds = new HashSet<>();
@@ -246,11 +248,14 @@ public class PlausibilityCheck {
 				// Travel Time Warnings
 				if(w instanceof TravelTimeWarning) {
 					createTravelTimeFeature = true;
-					if(w.getDifference() < diffMin) {
-						diffMin = w.getDifference();
+					if(w.getDifference() > diff) {
+						diff = w.getDifference();
 					}
-					if(w.getDifference() > diffMax) {
-						diffMax = w.getDifference();
+					if(w.getExpected() > ttExpected) {
+						ttExpected = w.getExpected();
+					}
+					if(w.getActual() > ttActual) {
+						ttActual = w.getActual();
 					}
 					warningIds.add(w.getId());
 					routeIds.add(w.getTransitLine().getId() + ":" + w.getTransitRoute().getId());
@@ -278,8 +283,9 @@ public class PlausibilityCheck {
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
-				f.setAttribute("diff_min", diffMin);
-				f.setAttribute("diff_max", diffMax);
+				f.setAttribute("diff", diff);
+				f.setAttribute("expected", ttExpected);
+				f.setAttribute("actual", ttActual);
 				traveltTimeWarningsFeatures.add(f);
 			}
 
@@ -304,15 +310,16 @@ public class PlausibilityCheck {
 			}
 		}
 
-		ShapeFileWriter.writeGeometries(traveltTimeWarningsFeatures, outputPath + "TravelTimeWarnings.shp");
-		ShapeFileWriter.writeGeometries(directionChangeWarningsFeatures, outputPath + "DirectionChangeWarnings.shp");
-		ShapeFileWriter.writeGeometries(loopWarningsFeatures, outputPath + "LoopWarnings.shp");
+		ShapeFileWriter.writeGeometries(traveltTimeWarningsFeatures, outputPath + "WarningsTravelTime.shp");
+		ShapeFileWriter.writeGeometries(directionChangeWarningsFeatures, outputPath + "WarningsDirectionChange.shp");
+		ShapeFileWriter.writeGeometries(loopWarningsFeatures, outputPath + "WarningsLoop.shp");
 	}
 
 	/**
 	 * Adds a warning object to the different data containers.
 	 */
 	private void addWarningToContainers(PlausibilityWarning warning) {
+		allWarnings.add(warning);
 		MapUtils.getSet(warning.getTransitRoute(), MapUtils.getMap(warning.getTransitLine(), this.warningsSchedule)).add(warning);
 		MapUtils.getSet(warning.getLinkIds(), warningsLinkIds).add(warning);
 

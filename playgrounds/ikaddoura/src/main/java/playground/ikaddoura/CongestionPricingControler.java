@@ -37,7 +37,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
@@ -232,7 +232,7 @@ public class CongestionPricingControler {
 		controler.run();
 		
 		// analysis
-		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();
 
 	}

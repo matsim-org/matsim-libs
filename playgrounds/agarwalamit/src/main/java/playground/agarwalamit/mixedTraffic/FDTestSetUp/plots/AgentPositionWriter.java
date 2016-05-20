@@ -68,11 +68,12 @@ public class AgentPositionWriter {
 	private final double trackLength = 3000;
 	private final double maxSpeed = 60/3.6;
 	private final Scenario sc;
-	private int warnCount = 0;
+	private int warnCount_higherSpeed = 0;
+	private int warnCount_negativeVehPosition = 0;
 
 	public static void main(String[] args) 
 	{
-		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW_kn/";
+		final String dir = "../../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run313/singleModes/holes/car_SW/";
 		final String networkFile = dir+"/network.xml";
 		final String configFile = dir+"/config.xml";
 		final String prefix = "10";
@@ -195,10 +196,13 @@ public class AgentPositionWriter {
 
 							// prev = 1986 and now = 1980 should not happen however, prev = 2993, now = 6 is possible.
 							//							throw new RuntimeException("Should not happen.");
-							LOGGER.warn("Prev position is "+prevPosition+" and current position is "+ trackPosition+". "
-									+ "\n This is an error coming from simulation which should be fixed in due time."
-									+ " \n For now, setting current position same as prev position.");
-							trackPosition = prevPosition;
+							if(warnCount_negativeVehPosition < 1){
+								warnCount_negativeVehPosition++;
+								LOGGER.warn("Prev position is "+prevPosition+" and current position is "+ trackPosition+". "
+										+ "\n This happens due to filling the holes. I am not sure if this is absolutely right.");
+								LOGGER.warn(Gbl.ONLYONCE);
+							}
+//							trackPosition = prevPosition;
 						} else if ( Math.round(trackPosition) == Math.round(prevPosition) ) {
 
 							// same cycle, but rounding errors, for e.g. first position 933.33 and next position 933.0
@@ -217,7 +221,7 @@ public class AgentPositionWriter {
 						} 
 
 						if( Double.isNaN(velocity)) {
-							velocity = ( trackPosition - prevPosition ) / timegap;	
+							velocity = Math.abs( ( trackPosition - prevPosition ) / timegap );	
 						} else if(velocity < 0. ) {
 							System.err.println("In appropriate speed "+velocity);
 						} 
@@ -225,8 +229,8 @@ public class AgentPositionWriter {
 						if(Math.round(velocity) > Math.round(maxSpeed) ){
 							// sometimes its positioning errors from simulation snapshots
 							if (velocity <= 50.0 ) {
-								if(warnCount<1){
-									warnCount++;
+								if(warnCount_higherSpeed<1){
+									warnCount_higherSpeed++;
 									LOGGER.warn("Velocity is "+velocity+".This comes from the error in positioning "
 											+ "during snapshot generation in the simulation. Setting it to max speed.");
 									LOGGER.warn("Prev and current track positions are " + prevPosition +", " + trackPosition +" and time gap between two snapshots is "+ timegap );
@@ -234,8 +238,8 @@ public class AgentPositionWriter {
 								}
 							} else {
 								LOGGER.info("Prev and current track positions are " + prevPosition +", " + trackPosition +" and time gap between two snapshots is "+ timegap );
-								//LOGGER.error("Velocity is "+velocity+". This is way too high.");
-								throw new RuntimeException("Velocity is "+velocity+". This is way too high.");
+								LOGGER.error("Velocity is "+velocity+". This is way too high.");
+//								throw new RuntimeException("Velocity is "+velocity+". This is way too high.");
 							}
 							velocity = Math.min(velocity, maxSpeed);
 						}

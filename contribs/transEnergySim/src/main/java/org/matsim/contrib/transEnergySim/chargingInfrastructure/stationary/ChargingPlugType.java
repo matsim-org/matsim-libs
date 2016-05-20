@@ -1,3 +1,4 @@
+
 package org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary;
 
 public interface ChargingPlugType {

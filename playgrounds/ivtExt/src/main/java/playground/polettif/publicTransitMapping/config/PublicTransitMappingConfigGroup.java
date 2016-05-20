@@ -22,6 +22,7 @@ package playground.polettif.publicTransitMapping.config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 
 /**
@@ -29,7 +30,7 @@ import java.util.*;
  */
 public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "PublicTransportMap";
+	public static final String GROUP_NAME = "PublicTransitMapping";
 
 	public static final String ARTIFICIAL_LINK_MODE = "artificial";
 
@@ -38,7 +39,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String NODE_SEARCH_RADIUS = "nodeSearchRadius";
 	private static final String PSEUDO_ROUTE_WEIGHT_TYPE = "pseudoRouteWeightType";
 	private static final String MAX_NCLOSEST_LINKS = "maxNClosestLinks";
-	private static final String MAX_STOP_FACILITY_DISTANCE = "maxStopFacilityDistance";
+	private static final String MAX_LINK_CANDIDATE_DISTANCE = "maxLinkCandidateDistance";
 	private static final String PREFIX_ARTIFICIAL = "prefixArtificial";
 	private static final String SUFFIX_CHILD_STOP_FACILITIES = "suffixChildStopFacilities";
 	private static final String BEELINE_DISTANCE_MAX_FACTOR = "beelineDistanceMaxFactor";
@@ -49,7 +50,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String OUTPUT_STREET_NETWORK_FILE = "outputStreetNetworkFile";
 	private static final String LINK_DISTANCE_TOLERANCE = "linkDistanceTolerance";
 	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
-	public static final String COMBINE_PT_MODES = "combinePtModes";
+	private static final String COMBINE_PT_MODES = "combinePtModes";
+	public static final String MULTI_THREAD = "multiThread";
 
 
 	public PublicTransitMappingConfigGroup() {
@@ -83,20 +85,20 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(LINK_DISTANCE_TOLERANCE,
 				"[Link Candidates] After " +MAX_NCLOSEST_LINKS +" link candidates have been found, additional link \n" +
 				"\t\tcandidates within "+LINK_DISTANCE_TOLERANCE+"*(distance to the Nth link) are added to the set.\n" +
-				"\t\tMust be > 1.");
+				"\t\tMust be >= 1.");
 		map.put(PSEUDO_ROUTE_WEIGHT_TYPE,
 				"Defines which link attribute should be used for pseudo route calculations. Default is minimization \n" +
 				"\t\tof travel distance. If high quality information on link travel times is available, travelTime can be \n" +
 				"\t\tused. (Possible values \""+PseudoRouteWeightType.linkLength+"\" and \""+PseudoRouteWeightType.travelTime+"\")");
 		map.put(MAX_NCLOSEST_LINKS,
-				"[Link Candidates] Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
+				"(concerns Link Candidates) Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
 				"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
 				"\t\tfacility coordinates. Default: " + nodeSearchRadius);
 		map.put(NODE_SEARCH_RADIUS,
-				"[Link Candidates] Defines the radius [meter] from a stop facility within nodes are searched. Mainly a maximum \n" +
+				"(concerns Link Candidates)Defines the radius [meter] from a stop facility within nodes are searched. Mainly a maximum \n" +
 				"\t\tvalue for performance.");
-		map.put(MAX_STOP_FACILITY_DISTANCE,
-				"[Link Candidates] The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
+		map.put(MAX_LINK_CANDIDATE_DISTANCE,
+				"(concerns Link Candidates) The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
 		map.put(PREFIX_ARTIFICIAL,
 				"ID prefix used for all artificial links and nodes created during mapping.");
 		map.put(FREESPEED_ARTIFICIAL,
@@ -107,6 +109,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(BEELINE_DISTANCE_MAX_FACTOR ,
 				"If all paths between two stops have a length > beelineDistanceMaxFactor * beelineDistance, \n" +
 				"\t\tan artificial link is created.");
+		map.put(MULTI_THREAD,
+				"Defines whether multiple threads should be used (one for each schedule transport mode). Default: true.");
 		map.put(NETWORK_FILE, "Path to the input network file. Not needed if PTMapper is called within another class.");
 		map.put(SCHEDULE_FILE, "Path to the input schedule file. Not needed if PTMapper is called within another class.");
 		map.put(OUTPUT_NETWORK_FILE, "Path to the output network file. Not needed if PTMapper is used within another class.");
@@ -115,16 +119,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
 		return map;
 	}
-
-
-	/**
-	 * for each schedule transport the following needs to be specified:
-	 * - should it be mapped independently?
-	 * - to which network transport modeRouting it can be mapped
-	 *
-	 * for network transport modeRouting:
-	 * - should it be cleaned up
-	 */
 
 	/**
 	 * References transportModes from the schedule (key) and the
@@ -268,6 +262,22 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		this.linkDistanceTolerance = linkDistanceTolerance < 1 ? 1 : linkDistanceTolerance;
 	}
 
+	/**
+	 * Defines whehter multiple threads should be used (one for each
+	 * schedule transport mode).
+	 */
+	private boolean multiThread = true;
+
+	@StringGetter(MULTI_THREAD)
+	public boolean useMultiThreads() {
+		return multiThread;
+	}
+
+	@StringSetter(MULTI_THREAD)
+	public void setMultiThread(boolean multiThread) {
+		this.multiThread = multiThread;
+	}
+
 
 	/**
 	 * Defines which link attribute should be used for pseudo route
@@ -312,16 +322,16 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * The maximal distance [meter] a link candidate is allowed to have from
 	 * the stop facility.
 	 */
-	private double maxStopFacilityDistance = 80;
+	private double maxLinkCandidateDistance = 80;
 
-	@StringGetter(MAX_STOP_FACILITY_DISTANCE)
-	public double getMaxStopFacilityDistance() {
-		return maxStopFacilityDistance;
+	@StringGetter(MAX_LINK_CANDIDATE_DISTANCE)
+	public double getMaxLinkCandidateDistance() {
+		return maxLinkCandidateDistance;
 	}
 
-	@StringSetter(MAX_STOP_FACILITY_DISTANCE)
-	public void setMaxStopFacilityDistance(double maxStopFacilityDistance) {
-		this.maxStopFacilityDistance = maxStopFacilityDistance;
+	@StringSetter(MAX_LINK_CANDIDATE_DISTANCE)
+	public void setMaxLinkCandidateDistance(double maxLinkCandidateDistance) {
+		this.maxLinkCandidateDistance = maxLinkCandidateDistance;
 	}
 
 	/**
@@ -344,7 +354,9 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * Suffix used for child stop facilities. A number for each child of a
 	 * parent stop facility is appended (i.e. stop0123.fac:2).
 	 */
+	// TODO remove suffix from config file and set as static to ensure other parts of the package work
 	private String suffixChildStopFacilities = ".link:";
+	private String suffixRegexEscaped = "[.]link:";
 
 	@StringGetter(SUFFIX_CHILD_STOP_FACILITIES)
 	public String getSuffixChildStopFacilities() {
@@ -354,6 +366,11 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(SUFFIX_CHILD_STOP_FACILITIES)
 	public void setSuffixChildStopFacilities(String suffixChildStopFacilities) {
 		this.suffixChildStopFacilities = suffixChildStopFacilities;
+		this.suffixRegexEscaped = Pattern.quote(suffixChildStopFacilities);
+	}
+
+	public String getSuffixRegexEscaped() {
+		return suffixRegexEscaped;
 	}
 
 	/**

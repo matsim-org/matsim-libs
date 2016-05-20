@@ -246,8 +246,6 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 
 	@Override
 	public void finish() {
-		if (plan.getPerson().getId().toString().equals("3071716"))
-			System.out.println();
 		// not handling one-activity plan is not a problem as long as
 		// one does not modifies the activity chaining
 		//if (plan.getPlanElements().size() == 1) {
@@ -291,7 +289,7 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 
 		// initialize zero utility durations here for better code readability, because we only need them here
 		if ( !this.zeroUtilityDurations.containsKey(actType) ) {
-			final double zeroUtilityDuration = (typicalDuration/3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / DEFAULT_PRIORITY);
+			final double zeroUtilityDuration = (typicalDuration/3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0)  / DEFAULT_PRIORITY);
 			this.zeroUtilityDurations.put(actType, zeroUtilityDuration);
 		}
 		double utilPerf = 0.0;

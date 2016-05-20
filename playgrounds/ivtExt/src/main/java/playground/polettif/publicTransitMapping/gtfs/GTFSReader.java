@@ -32,6 +32,8 @@ import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.utils.CreateVehiclesForSchedule;
+import org.matsim.vehicles.*;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.polettif.publicTransitMapping.gtfs.containers.*;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
@@ -107,14 +109,39 @@ public class GTFSReader {
 	private Map<String, Shape> shapes = new HashMap<>();
 	private Collection<SimpleFeature> features = new ArrayList<>();
 	private TransitSchedule schedule;
+	private Vehicles vehicles;
 	private TransitScheduleFactory scheduleFactory;
 
 
 	/**
+	 * Reads gtfs files in and converts them to an unmapped
+	 * MATSim Transit Schedule (mts). "Unmapped" means stopFacilities are not
+	 * referenced to links and transit routes do not have routes (link sequences).
+	 * Creates a default vehicles file as well.
+	 * <p/>
+	 *
+	 * @param args	[0] folder where the gtfs files are located (a single zip file is not supported)<br/>
+	 * 				[1]	which service ids should be used. One of the following:<br/>
+	 *                  <ul>
+	 *                  <li>date in the format "yyyymmdd"
+	 *                  <li>"dayWithMostTrips"</li>
+	 *                  <li>"dayWithMostServices"</li>
+	 *                  <li>"mostUsedSingleId"</li>
+	 *                  <li>"all"</li>
+	 *                  </li>
+	 *                  </ul>
+	 * 	 			[2] the output coordinate system. WGS84/identity transformation is used if <code>null</code>.<br/>
+	 * 				[3]	path to the to be generated unmapped transit schedule file.<br/>
+	 * 				[4] path to the to be generated default vehicles file (optional).<p/>
+	 *
 	 * Calls {@link #convertGTFS2MATSimTransitScheduleFile}.
 	 */
 	public static void main(final String[] args) {
-		convertGTFS2MATSimTransitScheduleFile(args[0], args[1], args[2], args[3]);
+		if(args.length == 4) {
+			convertGTFS2MATSimTransitScheduleFile(args[0], args[1], args[2], args[3]);
+		} else if(args.length == 5) {
+			convertGTFS2MATSimTransitScheduleFile(args[0], args[1], args[2], args[3], args[4]);
+		}
 	}
 
 	/**
@@ -123,7 +150,7 @@ public class GTFSReader {
 	 * <p/>
 	 *
 	 * @param gtfsInputPath          folder where the gtfs files are located (a single zip file is not supported)
-	 * @param serviceIdsParam		 which service ids should be used. One of the following:
+	 * @param serviceIdsParam        which service ids should be used. One of the following:
 	 *                               <ul>
 	 *                               <li>date in the format "yyyymmdd"
 	 *                               <li>"dayWithMostTrips"</li>
@@ -141,6 +168,35 @@ public class GTFSReader {
 		ScheduleTools.writeTransitSchedule(gtfsReader.getSchedule(), mtsOutputFile);
 	}
 
+	/**
+	 * Reads gtfs files in and converts them to an unmapped
+	 * MATSim Transit Schedule (mts). "Unmapped" means stopFacilities are not
+	 * referenced to links and transit routes do not have routes (link sequences).
+	 * Creates a default vehicles file as well.
+	 * <p/>
+	 *
+	 * @param gtfsInputPath          folder where the gtfs files are located (a single zip file is not supported)
+	 * @param serviceIdsParam        which service ids should be used. One of the following:
+	 *                               <ul>
+	 *                               <li>date in the format "yyyymmdd"
+	 *                               <li>"dayWithMostTrips"</li>
+	 *                               <li>"dayWithMostServices"</li>
+	 *                               <li>"mostUsedSingleId"</li>
+	 *                               <li>"all"</li>
+	 *                               </li>
+	 *                               </ul>
+	 * @param outputCoordinateSystem the output coordinate system. WGS84/identity transformation is used if <code>null</code>.
+	 * @param mtsOutputFile          path to the (to be generated) unmapped transit schedule file
+	 * @param vehiclesOutputFile     path to the (to be generated) default vehicles file
+	 */
+	public static void convertGTFS2MATSimTransitScheduleFile(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem, String mtsOutputFile, String vehiclesOutputFile) {
+		GTFSReader gtfsReader = new GTFSReader(gtfsInputPath, serviceIdsParam, outputCoordinateSystem);
+
+		ScheduleTools.writeTransitSchedule(gtfsReader.getSchedule(), mtsOutputFile);
+		ScheduleTools.writeVehicles(gtfsReader.getVehicles(), vehiclesOutputFile);
+	}
+
+
 	public static void convertWithShapes(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem, String mtsOutputFile, String outputShapeFile) {
 		GTFSReader gtfsReader = new GTFSReader(gtfsInputPath, serviceIdsParam, outputCoordinateSystem);
 
@@ -150,8 +206,9 @@ public class GTFSReader {
 
 	/**
 	 * Constructor.
+	 *
 	 * @param gtfsInputPath          folder where the gtfs files are located (a single zip file is not supported)
-	 * @param serviceIdsParam		 which service ids should be used. One of the following:
+	 * @param serviceIdsParam        which service ids should be used. One of the following:
 	 *                               <ul>
 	 *                               <li>date in the format "yyyymmdd"
 	 *                               <li>"dayWithMostTrips"</li>
@@ -178,6 +235,10 @@ public class GTFSReader {
 
 	public TransitSchedule getSchedule() {
 		return schedule;
+	}
+
+	public Vehicles getVehicles() {
+		return vehicles;
 	}
 
 	/**
@@ -220,11 +281,10 @@ public class GTFSReader {
 		DepartureIds departureIds = new DepartureIds();
 
 		for(GTFSRoute gtfsRoute : gtfsRoutes.values()) {
-
 			/** [2]
 			 * Create a MTS transitLine for each GTFSRoute
 			 */
-			TransitLine transitLine = scheduleFactory.createTransitLine(Id.create(gtfsRoute.getRouteId(), TransitLine.class));
+			TransitLine transitLine = scheduleFactory.createTransitLine(Id.create(gtfsRoute.getShortName() + "_" + gtfsRoute.getRouteId(), TransitLine.class));
 			schedule.addTransitLine(transitLine);
 			counterLines++;
 
@@ -322,7 +382,12 @@ public class GTFSReader {
 			} // foreach trip
 		} // foreach route
 
-		log.info("    Created "+counterRoutes+" routes on "+counterLines+" lines.");
+		/**
+		 * Create default vehicles.
+		 */
+		vehicles = ScheduleTools.createVehicles(schedule);
+
+		log.info("    Created " + counterRoutes + " routes on " + counterLines + " lines.");
 		log.info("... GTFS converted to an unmapped MATSIM Transit Schedule");
 		log.info("#############################################################");
 	}
@@ -395,9 +460,13 @@ public class GTFSReader {
 		int indexMonday = col.get("monday");
 
 		String[] line = reader.readNext();
-		int i = 1, c=1;
+		int i = 1, c = 1;
 		while(line != null) {
-			if(i == Math.pow(2, c)) { log.info("        # " + i); c++; } i++;
+			if(i == Math.pow(2, c)) {
+				log.info("        # " + i);
+				c++;
+			}
+			i++;
 
 			boolean[] days = new boolean[7];
 			for(int d = 0; d < 7; d++) {
@@ -561,7 +630,10 @@ public class GTFSReader {
 		String[] line = reader.readNext();
 		int i = 1, c = 1;
 		while(line != null) {
-			if(i == Math.pow(2, c)) { log.info("        # " + i); c++; }
+			if(i == Math.pow(2, c)) {
+				log.info("        # " + i);
+				c++;
+			}
 			i++; // just for logging so something happens in the console
 
 			for(GTFSRoute actualGTFSRoute : gtfsRoutes.values()) {

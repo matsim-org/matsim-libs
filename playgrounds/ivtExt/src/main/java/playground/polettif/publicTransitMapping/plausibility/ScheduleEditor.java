@@ -32,16 +32,20 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
-import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
+import playground.polettif.publicTransitMapping.mapping.router.ModeDependentRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
+import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
 
 /**
  * Provides tools for rerouting and adapting schedules via csv.
@@ -50,21 +54,36 @@ import java.util.stream.Collectors;
  */
 public class ScheduleEditor {
 
+
+
 	protected static Logger log = Logger.getLogger(ScheduleEditor.class);
 
-
+	// fields
 	private final Network network;
 	private final TransitSchedule schedule;
 	private final TransitScheduleFactory scheduleFactory;
-	private final Router router;
+	private final Map<String, Router> routers;
 
 	private final Map<String, TransitRoute> transitRoutes;
+	private ParentStops parentStops;
 
-	public ScheduleEditor(Network network, TransitSchedule schedule, Router router) {
-		this.network = network;
+	private static final String SUFFIX_PATTERN = "[.]link:";
+	private static final String SUFFIX = ".link:";
+
+
+	// commands
+	public static final String RR_VIA_LINK = "rerouteViaLink";
+	public static final String RR_FROM_STOP = "rerouteFromStop";
+	public static final String REPLACE_STOP_FACILITY = "replaceStopFacility";
+	public static final String ALL_TRANSIT_ROUTES_ON_LINK = "allTransitRoutesOnLink";
+	public static final String CHANGE_REF_LINK = "changeRefLink";
+	public static final String COMMENT_START = "//";
+
+	public ScheduleEditor(TransitSchedule schedule, Network network, Map<String, Router> routers) {
 		this.schedule = schedule;
+		this.network = network;
 		this.scheduleFactory = schedule.getFactory();
-		this.router = router;
+		this.routers = routers;
 
 		this.transitRoutes = new HashMap<>();
 
@@ -80,11 +99,37 @@ public class ScheduleEditor {
 		*/
 	}
 
-	// commands
-	private final String CHILD_FACILITY_SUFFIX = "[.]link:";
-	private final String REPLACE_STOP_FACILITY = "replaceStopFacility";
-	private final String ALL_TRANSIT_ROUTES_ON_LINK = "allTransitRoutesOnLink";
-	private final String CHANGE_REF_LINK = "changeRefLink";
+	public ScheduleEditor(TransitSchedule schedule, Network network) {
+		this.schedule = schedule;
+		this.network = network;
+		this.scheduleFactory = schedule.getFactory();
+		this.transitRoutes = new HashMap<>();
+		this.parentStops = new ParentStops();
+
+		this.routers = new HashMap<>();
+		log.info("Inferring routers based on schedule transport modes and used network transport modes.");
+		Map<String, Set<String>> modeAssignments = new HashMap<>();
+		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				Set<String> usedNetworkModes = MapUtils.getSet(transitRoute.getTransportMode(), modeAssignments);
+				List<Link> links = NetworkTools.getLinksFromIds(network, getLinkIds(transitRoute));
+				for(Link link : links) {
+					usedNetworkModes.addAll(link.getAllowedModes());
+				}
+			}
+		}
+
+		Map<Set<String>, Router> modeDependentRouters = new HashMap<>();
+		for(Set<String> networkModes : modeAssignments.values()) {
+			if(!modeDependentRouters.containsKey(networkModes)) {
+				modeDependentRouters.put(networkModes, new ModeDependentRouter(network, networkModes));
+			}
+		}
+
+		for(Map.Entry<String, Set<String>> e : modeAssignments.entrySet()) {
+			routers.put(e.getKey(), modeDependentRouters.get(e.getValue()));
+		}
+	}
 
 
 	/*
@@ -101,7 +146,7 @@ public class ScheduleEditor {
 		new MatsimNetworkReader(network).readFile(args[1]);
 		TransitSchedule schedule = sc.getTransitSchedule();
 
-		ScheduleEditor scheduleEditor = new ScheduleEditor(network, schedule, new FastAStarRouter(network));
+		ScheduleEditor scheduleEditor = new ScheduleEditor(schedule, network);
 
 		scheduleEditor.parseCommandCsv(args[2]);
 		ScheduleTools.assignScheduleModesToLinks(schedule, network);
@@ -116,6 +161,7 @@ public class ScheduleEditor {
 
 	/**
 	 * Parses a command file (csv) and runs the commands specified
+	 *
 	 * @param filePath
 	 * @throws IOException
 	 */
@@ -124,77 +170,70 @@ public class ScheduleEditor {
 
 		String[] line = reader.readNext();
 		while(line != null) {
-			cmd(line);
+			runCmdLine(line);
 			line = reader.readNext();
 		}
 		reader.close();
 	}
 
-	private void cmd(String[] cmd) {
+	/**
+	 * executes a command line
+	 */
+	private void runCmdLine(String[] cmd) {
 		TransitRoute transitRoute;
-		Set<TransitRoute> transitRoutes;
-		Id<Link> oldLinkId;
-		Id<Link> newLinkId;
-		Id<TransitStopFacility> oldSFId;
-		Id<TransitStopFacility> newSFId;
-		Id<TransitStopFacility> stopFacilityId;
+		Set<TransitRoute> tmpTransitRoutes;
 
-		if("rrViaLink".equalsIgnoreCase(cmd[0])) {
-			transitRoute = getTransitRoute(cmd[1], cmd[2]);
-			oldLinkId = Id.createLinkId(cmd[3]);
-			newLinkId = Id.createLinkId(cmd[4]);
-			if(transitRoute == null) {
-				throw new IllegalArgumentException("TransitRoute " + cmd[2] + " on TransitLine " + cmd[1] + " not found!");
-			} else {
-				rrViaLink(transitRoute, oldLinkId, newLinkId);
+		/**
+		 * Reroute TransitRoute via new Link
+		 * ["rerouteViaLink"] [TransitLineId] [TransitRouteId] [oldLinkId] [newLinkId]
+		 */
+		if(RR_VIA_LINK.equals(cmd[0])) {
+			rerouteViaLink(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[3]);
+		}
+
+		/**
+		 * Reroute TransitRoute from a given stop facility
+		 * ["rerouteFromStop"] [TransitLineId] [TransitRouteId] [fromStopId] [newLinkId]
+		 */
+		else if(RR_FROM_STOP.equals(cmd[0])) {
+			rerouteFromStop(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[3]);
+		}
+
+		/**
+		 * Changes the refLink of a stopfacility. Effectively creates a new child stop facility.
+		 * ["changeRefLink"] [StopFacilityId] [newlinkId]
+		 * ["changeRefLink"] [TransitLineId] [TransitRouteId] [ParentId] [newlinkId]
+		 * ["changeRefLink"] ["allTransitRoutesOnLink"] [linkId] [ParentId] [newlinkId]
+		 */
+		else if(CHANGE_REF_LINK.equals(cmd[0])) {
+			if(cmd.length == 3) {
+				changeRefLink(cmd[1], cmd[2]);
+			} else if(cmd.length == 5) {
+				switch (cmd[1]) {
+					case ALL_TRANSIT_ROUTES_ON_LINK:
+						tmpTransitRoutes = getTransitRoutesOnLink(Id.createLinkId(cmd[2]));
+						for(TransitRoute tr : tmpTransitRoutes) {
+							changeRefLink(tr, cmd[3], cmd[4]);
+						}
+						break;
+					default:
+						changeRefLink(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[4]);
+				}
 			}
-
-			/*
-			["changeRefLink"] [TransitRoute] [toReplaceId] [replaceWithId]
-		X	["replaceStopFacility"] ["allTransitRoutesOnLink"] [linkId] [toReplaceId] [replaceWithId]
-		X	["replaceStopFacility"] ["allTransitRoutesOnLink"] [linkId] [toReplaceId (ParentStop)] [replaceWithId]
-		X	["replaceStopFacility"] ["allTransitRoutesOnLink"] [firstLinkId] [secondLinkId] [toReplaceId] [replaceWithId]
-			 */
-		} else if(CHANGE_REF_LINK.equals(cmd[0])) {
-			switch(cmd[1]) {
-				case ALL_TRANSIT_ROUTES_ON_LINK :
-					transitRoutes = getTransitRoutesOnLink(Id.createLinkId(cmd[2]));
-					for(TransitRoute tr : transitRoutes) {
-						changeRefLink(tr, cmd[3], cmd[4]);
-					}
-				break;
-				default :
-					changeRefLink(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[4]);
-
-				/*
-				default :
-					transitRoute = getTransitRoute(cmd[1], cmd[2]);
-					oldSFId = Id.create(cmd[3], TransitStopFacility.class);
-					newSFId = Id.create(cmd[4], TransitStopFacility.class);
-					if(transitRoute == null) {
-						throw new IllegalArgumentException("TransitRoute " + cmd[2] + " on TransitLine " + cmd[1] + " not found!");
-					} else {
-						replaceChildStopFacilityInRoute(transitRoute, oldSFId, newSFId);
-					}
-					break;*/
-			}
-
-		} else if("changeRefLink".equals(cmd[0])) {
-			transitRoute = getTransitRoute(cmd[1], cmd[2]);
-			stopFacilityId = Id.create(cmd[3], TransitStopFacility.class);
-			newLinkId = Id.create(cmd[4], Link.class);
-			if(transitRoute == null) {
-				throw new IllegalArgumentException("TransitRoute " + cmd[2] + " on TransitLine " + cmd[1] + " not found!");
-			} else {
-//					changeRefLink(transitRoute, stopFacilityId, newLinkId);
-			}
-		} else if("//".equals(cmd[0].substring(0, 2))) {
+		}
+		/**
+		 * comment
+		 */
+		else if(COMMENT_START.equals(cmd[0].substring(0, 2))) {
 			// comment
 		} else {
 			throw new IllegalArgumentException("Invalid command \"" + cmd[0] + "\"");
 		}
 	}
 
+	/**
+	 * @return the TransitRoute of the schedule based on transit line and transit route as strings
+	 */
 	private TransitRoute getTransitRoute(String transitLineStr, String transitRouteStr) {
 		TransitLine transitLine = schedule.getTransitLines().get(Id.create(transitLineStr, TransitLine.class));
 
@@ -202,23 +241,29 @@ public class ScheduleEditor {
 			throw new IllegalArgumentException("TransitLine " + transitLineStr + " not found!");
 		}
 
-		return transitLine.getRoutes().get(Id.create(transitRouteStr, TransitRoute.class));
+		Id<TransitRoute> transitRouteId = Id.create(transitRouteStr, TransitRoute.class);
+		if(!transitLine.getRoutes().containsKey(transitRouteId)) {
+			throw new IllegalArgumentException("TransitRoute " + transitRouteStr + " not found in Transitline " + transitLineStr + "!");
+		}
+
+		return transitLine.getRoutes().get(transitRouteId);
 	}
 
 	/**
 	 * Reroutes the section between two stops that passes the oldlink via the new link
+	 *
 	 * @param transitRoute
 	 * @param oldLinkId
 	 * @param newLinkId
 	 */
-	public void rrViaLink(TransitRoute transitRoute, Id<Link> oldLinkId, Id<Link> newLinkId) {
+	public void rerouteViaLink(TransitRoute transitRoute, Id<Link> oldLinkId, Id<Link> newLinkId) {
 		List<TransitRouteStop> stopSequence = transitRoute.getStops();
 		List<Id<Link>> linkSequence = transitRoute.getRoute().getLinkIds();
 
 		List<Id<Link>> refLinkIds = stopSequence.stream().map(routeStop -> routeStop.getStopFacility().getLinkId()).collect(Collectors.toList());
 
 		if(refLinkIds.contains(oldLinkId)) {
-			throw new IllegalArgumentException("Link is referenced to a stop facility, rrViaLink cannot be performed. Use changeRefLink instead.");
+			throw new IllegalArgumentException("Link is referenced to a stop facility, rerouteViaLink cannot be performed. Use changeRefLink instead.");
 		} else {
 			int i = 0;
 			TransitRouteStop fromRouteStop = stopSequence.get(i);
@@ -234,16 +279,22 @@ public class ScheduleEditor {
 			}
 		}
 	}
+	public void rerouteViaLink(TransitRoute transitRoute, String oldLinkId, String newLinkId) {
+		rerouteViaLink(transitRoute, Id.createLinkId(oldLinkId), Id.createLinkId(newLinkId));
+	}
 
 	/**
 	 * Reroutes the section after fromRouteStop via the given viaLinkId
+	 *
 	 * @param transitRoute
 	 * @param fromRouteStop
 	 * @param viaLinkId
 	 */
 	public void rerouteFromStop(TransitRoute transitRoute, TransitRouteStop fromRouteStop, Id<Link> viaLinkId) {
+		Router router = routers.get(transitRoute.getTransportMode());
+
 		List<TransitRouteStop> routeStops = transitRoute.getStops();
-		TransitRouteStop toRouteStop = routeStops.get(routeStops.indexOf(fromRouteStop)+1);
+		TransitRouteStop toRouteStop = routeStops.get(routeStops.indexOf(fromRouteStop) + 1);
 
 		Id<Link> cutFromLinkId = fromRouteStop.getStopFacility().getLinkId();
 		Link cutFromLInk = network.getLinks().get(cutFromLinkId);
@@ -272,40 +323,94 @@ public class ScheduleEditor {
 			transitRoute.setRoute(RouteUtils.createNetworkRoute(newLinkSequence, network));
 		}
 	}
+	private void rerouteFromStop(TransitRoute transitRoute, String fromStopFacilityId, String viaLinkId) {
+		rerouteFromStop(transitRoute, getRouteStop(transitRoute, fromStopFacilityId), Id.createLinkId(viaLinkId));
+	}
 
-	private TransitStopFacility getChildStopInRoute(TransitRoute transitRoute, Id<TransitStopFacility> parentStopId) {
-		String parentStopString = parentStopId.toString();
+
+	/**
+	 * @return the stop facility of a transit route that has the given parentId
+	 */
+	private TransitStopFacility getChildStopInRoute(TransitRoute transitRoute, String parentId) {
 		for(TransitRouteStop routeStop : transitRoute.getStops()) {
-			String[] childStopSplit = routeStop.getStopFacility().getId().toString().split(CHILD_FACILITY_SUFFIX);
-			if(parentStopString.equals(childStopSplit[0])) {
+			if(parentId.equals(getParentId(routeStop.getStopFacility()))) {
 				return routeStop.getStopFacility();
 			}
 		}
-		log.warn("No child facility for " + parentStopId + " in Transit Route " + transitRoute + "found.");
-		return null;
+		throw new IllegalArgumentException("No child facility for " + parentId + " found in Transit Route " + transitRoute + ".");
+	}
+
+	/**
+	 * @return the stop facility of a transit route that has the given id
+	 */
+	private TransitStopFacility getStopFacilityInRoute(TransitRoute transitRoute, String stopFacilityId) {
+		return getRouteStop(transitRoute, stopFacilityId).getStopFacility();
+	}
+
+	/**
+	 * @return the TransitRouteStop with that contain the given stop facility
+	 */
+	private TransitRouteStop getRouteStop(TransitRoute transitRoute, String stopFacilityId) {
+		for(TransitRouteStop routeStop : transitRoute.getStops()) {
+			if(stopFacilityId.equals(routeStop.getStopFacility().getId().toString())) {
+				return routeStop;
+			}
+		}
+		throw new IllegalArgumentException("No child facility for " + stopFacilityId + " found in Transit Route " + transitRoute + ".");
+	}
+
+
+	private TransitStopFacility createChildStopIfNeeded(String parentStopIdStr, String newRefLinkId) {
+		Id<TransitStopFacility> parentStopId = createStopFacilityId(parentStopIdStr);
+		Id<TransitStopFacility> newChildStopId = createChildStopFacilityId(parentStopIdStr, newRefLinkId);
+		TransitStopFacility newChildStop = schedule.getFacilities().get(newChildStopId);
+		if(newChildStop == null) {
+			log.warn("StopFacility " + newChildStopId + " not found in schedule. Child facility is created");
+//			newChildStop = createStopFacility(newChildStopId, childStopToReplace.getCoord(), childStopToReplace.getName(), newRefLinkId);
+//			this.schedule.addStopFacility(newChildStop);
+		}
+		return newChildStop;
+	}
+
+	private Id<TransitStopFacility> createChildStopFacilityId(String stopIdStr, String refLinkId) {
+		return Id.create(getParentId(stopIdStr) + SUFFIX + refLinkId, TransitStopFacility.class);
+	}
+
+	private Id<TransitStopFacility> createStopFacilityId(String stopIdStr) {
+		return Id.create(stopIdStr, TransitStopFacility.class);
+	}
+
+	/**
+	 * Changes the reference of a stop facility.
+	 */
+	private void changeRefLink(String stopIdStr, String newRefLinkIdStr) {
+		Id<TransitStopFacility> stopFacilityId = Id.create(stopIdStr, TransitStopFacility.class);
+		TransitStopFacility childStopToReplace = schedule.getFacilities().get(stopFacilityId);
+		Id<TransitStopFacility> newChildStopId = createChildStopFacilityId(stopIdStr, newRefLinkIdStr);
+		Id<Link> newRefLinkId = Id.createLinkId(newRefLinkIdStr);
+
+//		TransitStopFacility newChildStopFacility = createChildStopIfNeeded(childStopToReplace, newRefLinkId, newChildStopId);
+
+		replaceStopFacilityInAllRoutes(stopFacilityId, newChildStopId);
 	}
 
 	/**
 	 * changes the child stop in the given route
 	 */
 	private void changeRefLink(TransitRoute transitRoute, String parentStopIdStr, String newRefLinkIdStr) {
+		String parentId = getParentId(parentStopIdStr);
 		Id<TransitStopFacility> parentStopId = Id.create(parentStopIdStr, TransitStopFacility.class);
 		Id<Link> newRefLinkId = Id.createLinkId(newRefLinkIdStr);
-		Id<TransitStopFacility> newChildStopId = Id.create(parentStopIdStr + CHILD_FACILITY_SUFFIX + newRefLinkIdStr, TransitStopFacility.class);
+		Id<TransitStopFacility> newChildStopId = createChildStopFacilityId(parentStopIdStr, newRefLinkIdStr);
 
-		TransitStopFacility childStopToReplace = getChildStopInRoute(transitRoute, parentStopId);
+		TransitStopFacility childStopToReplace = getChildStopInRoute(transitRoute, parentId);
 		if(childStopToReplace == null) {
 			return;
 		}
 
-		TransitStopFacility childStopReplaceWith = schedule.getFacilities().get(newChildStopId);
-		if(childStopReplaceWith == null) {
-			log.warn("StopFacility " + newChildStopId + " not found in schedule. Child facility is created");
-			childStopReplaceWith = createStopFacility(newChildStopId, childStopToReplace.getCoord(), childStopToReplace.getName(), newRefLinkId);
-			this.schedule.addStopFacility(childStopReplaceWith);
-		}
+		TransitStopFacility childStopReplaceWith = createChildStopIfNeeded(parentStopIdStr, newRefLinkIdStr);
 
-		replaceChildStopFacilityInRoute(transitRoute, childStopToReplace, childStopReplaceWith);
+		replaceStopFacilityInRoute(transitRoute, childStopToReplace, childStopReplaceWith);
 	}
 
 	private TransitStopFacility createStopFacility(Id<TransitStopFacility> facilityId, Coord coord, String name, Id<Link> linkId) {
@@ -318,11 +423,8 @@ public class ScheduleEditor {
 
 	/**
 	 * Replaces a stop facility with another one in the given route. Both ids must exist.
-	 * @param transitRoute
-	 * @param toReplaceId
-	 * @param replaceWithId
 	 */
-	private void replaceChildStopFacilityInRoute(TransitRoute transitRoute, Id<TransitStopFacility> toReplaceId, Id<TransitStopFacility> replaceWithId) {
+	public void replaceStopFacilityInRoute(TransitRoute transitRoute, Id<TransitStopFacility> toReplaceId, Id<TransitStopFacility> replaceWithId) {
 		TransitStopFacility toReplace = schedule.getFacilities().get(toReplaceId);
 		TransitStopFacility replaceWith = schedule.getFacilities().get(replaceWithId);
 
@@ -331,10 +433,13 @@ public class ScheduleEditor {
 		} else if(replaceWith == null) {
 			log.warn("StopFacility " + replaceWithId + " not found in schedule!");
 		}
-		replaceChildStopFacilityInRoute(transitRoute, toReplace, replaceWith);
+		replaceStopFacilityInRoute(transitRoute, toReplace, replaceWith);
 	}
 
-	private void replaceChildStopFacilityInRoute(TransitRoute transitRoute, TransitStopFacility toReplace, TransitStopFacility replaceWith) {
+	/**
+	 * Replaces a stop facility with another one in the given route. Both facilities must exist.
+	 */
+	public void replaceStopFacilityInRoute(TransitRoute transitRoute, TransitStopFacility toReplace, TransitStopFacility replaceWith) {
 		TransitRouteStop routeStopToReplace = transitRoute.getStop(toReplace);
 		if(routeStopToReplace != null) {
 			routeStopToReplace.setStopFacility(replaceWith);
@@ -345,7 +450,8 @@ public class ScheduleEditor {
 	}
 
 	/**
-	 * Replaces a stop facility with another one the whole schedule
+	 * Replaces a stop facility with another one the whole schedule. Both must exist.
+	 *
 	 * @param toReplaceId
 	 * @param replaceWithId
 	 */
@@ -355,7 +461,7 @@ public class ScheduleEditor {
 
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute route : line.getRoutes().values()) {
-				replaceChildStopFacilityInRoute(route, toReplace, replaceWith);
+				replaceStopFacilityInRoute(route, toReplace, replaceWith);
 			}
 		}
 	}
@@ -380,6 +486,7 @@ public class ScheduleEditor {
 	 * of the stop facilities.
 	 */
 	public void refreshTransitRoute(TransitRoute transitRoute) {
+		Router router = routers.get(transitRoute.getTransportMode());
 		List<TransitRouteStop> routeStops = transitRoute.getStops();
 		List<Id<Link>> linkSequence = new ArrayList<>();
 		linkSequence.add(routeStops.get(0).getStopFacility().getLinkId());
@@ -410,4 +517,90 @@ public class ScheduleEditor {
 		transitRoute.setRoute(RouteUtils.createNetworkRoute(linkSequence, network));
 	}
 
+	/**
+	 * Refreshes the schedule.
+	 */
+	private void refreshSchedule() {
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			transitLine.getRoutes().values().forEach(this::refreshTransitRoute);
+		}
+	}
+
+	private String getParentId(String stopFacilityId) {
+		String[] childStopSplit = stopFacilityId.split(SUFFIX_PATTERN);
+		return childStopSplit[0];
+	}
+
+	private String getParentId(TransitStopFacility stopFacility) {
+		return getParentId(stopFacility.getId().toString());
+	}
+
+
+	/**
+	 * Container class for all parent stop facilities
+	 */
+	private class ParentStops {
+
+		Map<String, ParentStopFacility> fac = new HashMap<>();
+
+		public ParentStops() {
+			for(TransitStopFacility stopFacility : schedule.getFacilities().values()) {
+				String parentId = getParentId(stopFacility);
+				if(!fac.containsKey(getParentId(stopFacility))) {
+					fac.put(parentId, new ParentStopFacility(stopFacility));
+				} else {
+					fac.get(parentId).addChildStopFacility(stopFacility);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Container class for parent a stop facility (are most likely
+	 * not actual facilities in the schedule)
+	 */
+	private class ParentStopFacility {
+		String id;
+		String name;
+		Coord coord;
+
+		Map<Id<Link>, TransitStopFacility> children = new HashMap<>();
+
+		public ParentStopFacility(String id, String name, Coord coord) {
+			this.id = id;
+			this.name = name;
+			this.coord = coord;
+		}
+
+		public ParentStopFacility(TransitStopFacility childStopFacility) {
+			this.id = getParentId(childStopFacility);
+			this.name = childStopFacility.getName();
+			this.coord = childStopFacility.getCoord();
+
+			children.put(childStopFacility.getLinkId(), childStopFacility);
+		}
+
+		public void addChildStopFacility(TransitStopFacility childStopFacility) {
+			children.put(childStopFacility.getLinkId(), childStopFacility);
+		}
+
+		/**
+		 * Adds a child stop facility for the given refLink, creates
+		 * a new one if needed.
+		 * @param refLinkId
+		 * @return the childStopFacility
+		 */
+		public TransitStopFacility addChildStopFacility(Id<Link> refLinkId) {
+			Id<TransitStopFacility> newChildStopId = createChildStopFacilityId(id, refLinkId.toString());
+			TransitStopFacility newChildStopFacilty = schedule.getFacilities().get(newChildStopId);
+			if(newChildStopFacilty == null) {
+				newChildStopFacilty = createStopFacility(newChildStopId, this.coord, this.name, refLinkId);
+				newChildStopFacilty.setLinkId(refLinkId);
+				newChildStopFacilty.setStopPostAreaId(this.id);
+				schedule.addStopFacility(newChildStopFacilty);
+			}
+			children.put(newChildStopFacilty.getLinkId(), newChildStopFacilty);
+			return newChildStopFacilty;
+		}
+	}
 }

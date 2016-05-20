@@ -16,6 +16,10 @@ public abstract class AbstractTabularFileHandlerWithHeaderLine implements
 
 	private boolean parsedFirstRow = false;
 
+	protected int getCurrentRowSize() {
+		return this.currentRow.length;
+	}
+	
 	protected String getStringValue(final String label) {
 		return this.currentRow[this.label2index.get(label)];
 	}

@@ -48,8 +48,8 @@ public class CountsIVTBaseline implements StartupListener, IterationEndsListener
 
 	private final PTLinkCountsEventHandler ptLinkCountsEventHandler;
 	private final PTStationCountsEventHandler ptStationCountsEventHandler;
-	private final StreetLinkDailyCountsEventHandler streetLinkDailyCountsEventHandler;
-	private final StreetLinkHourlyCountsEventHandler streetLinkHourlyCountsEventHandler;
+	/*private final StreetLinkDailyCountsEventHandler streetLinkDailyCountsEventHandler;
+	private final StreetLinkHourlyCountsEventHandler streetLinkHourlyCountsEventHandler;*/
 	private final EventsManager events;
 	private final OutputDirectoryHierarchy controlerIO;
 	private final Config config;
@@ -58,12 +58,12 @@ public class CountsIVTBaseline implements StartupListener, IterationEndsListener
 
 	@Inject
 	private CountsIVTBaseline(PTLinkCountsEventHandler ptLinkCountsEventHandler, PTStationCountsEventHandler ptStationCountsEventHandler,
-							  StreetLinkDailyCountsEventHandler streetLinkDailyCountsEventHandler, StreetLinkHourlyCountsEventHandler streetLinkHourlyCountsEventHandler,
+							  //StreetLinkDailyCountsEventHandler streetLinkDailyCountsEventHandler, StreetLinkHourlyCountsEventHandler streetLinkHourlyCountsEventHandler,
 							  EventsManager events, OutputDirectoryHierarchy controlerIO, Config config) {
 		this.ptLinkCountsEventHandler = ptLinkCountsEventHandler;
 		this.ptStationCountsEventHandler = ptStationCountsEventHandler;
-		this.streetLinkDailyCountsEventHandler = streetLinkDailyCountsEventHandler;
-		this.streetLinkHourlyCountsEventHandler = streetLinkHourlyCountsEventHandler;
+		/*this.streetLinkDailyCountsEventHandler = streetLinkDailyCountsEventHandler;
+		this.streetLinkHourlyCountsEventHandler = streetLinkHourlyCountsEventHandler;*/
 		this.events = events;
 		this.controlerIO = controlerIO;
 		this.config = config;
@@ -83,10 +83,10 @@ public class CountsIVTBaseline implements StartupListener, IterationEndsListener
 			this.ptLinkCountsEventHandler.reset(event.getIteration());
 			this.events.addHandler(this.ptStationCountsEventHandler);
 			this.ptStationCountsEventHandler.reset(event.getIteration());
-			this.events.addHandler(this.streetLinkDailyCountsEventHandler);
+			/*this.events.addHandler(this.streetLinkDailyCountsEventHandler);
 			this.streetLinkDailyCountsEventHandler.reset(event.getIteration());
 			this.events.addHandler(this.streetLinkHourlyCountsEventHandler);
-			this.streetLinkHourlyCountsEventHandler.reset(event.getIteration());
+			this.streetLinkHourlyCountsEventHandler.reset(event.getIteration());*/
 		}
 	}
 
@@ -97,10 +97,10 @@ public class CountsIVTBaseline implements StartupListener, IterationEndsListener
 			this.events.removeHandler(this.ptLinkCountsEventHandler);
 			this.ptStationCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "ptStationCounts.csv"));
 			this.events.removeHandler(this.ptStationCountsEventHandler);
-			this.streetLinkDailyCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "streetDailyCounts.csv"));
+			/*this.streetLinkDailyCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "streetDailyCounts.csv"));
 			this.events.removeHandler(this.streetLinkDailyCountsEventHandler);
 			this.streetLinkHourlyCountsEventHandler.write(this.controlerIO.getIterationFilename(event.getIteration(), "streetHourlyCounts.csv"));
-			this.events.removeHandler(this.streetLinkHourlyCountsEventHandler);
+			this.events.removeHandler(this.streetLinkHourlyCountsEventHandler);*/
 		}
 		this.recordCounts = false;
 	}
