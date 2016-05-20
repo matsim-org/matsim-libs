@@ -56,65 +56,42 @@ public class TravelTimeAnalysisExtractor
     {
         header[0] = "hour";
         for (int h = 0; h < hours; h++) {
-            carTTInside[h][0] = h + "";
-            carRidesInside[h][0] = h + "";
-            carTTOutside[h][0] = h + "";
-            carRidesOutside[h][0] = h + "";
-            taxiIVTT[h][0] = h + "";
-            taxiRides[h][0] = h + "";
+            createFirstColumns(h, h + "");
         }
-        carTTInside[hours][0] = "daily";
-        carRidesInside[hours][0] = "daily";
-        carTTOutside[hours][0] = "daily";
-        carRidesOutside[hours][0] = "daily";
-        taxiIVTT[hours][0] = "daily";
-        taxiRides[hours][0] = "daily";
+        createFirstColumns(hours, "daily");
 
-        readData("00.0", "1.0", 1);
-
+        readFile("00.0", "1.0", 1);
         int col = 2;
         for (String fleet : TaxiStatsExtractor.FLEETS) {
             for (String av : TaxiStatsExtractor.AVS) {
-                readData(fleet, av, col++);
+                readFile(fleet, av, col++);
             }
         }
 
         try (CompactCSVWriter writer = new CompactCSVWriter(
                 IOUtils.getBufferedWriter(path + "travelTimeStats_combined.txt"))) {
-            writer.writeNext("carTTInside [s]");
-            writer.writeNext(header);
-            writer.writeAll(Arrays.asList(carTTInside));
-            writer.writeNextEmpty();
-
-            writer.writeNext("carRidesInside");
-            writer.writeNext(header);
-            writer.writeAll(Arrays.asList(carRidesInside));
-            writer.writeNextEmpty();
-
-            writer.writeNext("carTTOutside [s]");
-            writer.writeNext(header);
-            writer.writeAll(Arrays.asList(carTTOutside));
-            writer.writeNextEmpty();
-
-            writer.writeNext("carRidesOutside");
-            writer.writeNext(header);
-            writer.writeAll(Arrays.asList(carRidesOutside));
-            writer.writeNextEmpty();
-
-            writer.writeNext("taxiIVTT [s]");
-            writer.writeNext(header);
-            writer.writeAll(Arrays.asList(taxiIVTT));
-            writer.writeNextEmpty();
-
-            writer.writeNext("taxiRides");
-            writer.writeNext(header);
-            writer.writeAll(Arrays.asList(taxiRides));
-            writer.writeNextEmpty();
+            writeSection(writer, "carTTInside [s]", carTTInside);
+            writeSection(writer, "carRidesInside]", carRidesInside);
+            writeSection(writer, "carTTOutside [s]", carTTOutside);
+            writeSection(writer, "carRidesOutside", carRidesOutside);
+            writeSection(writer, "taxiIVTT [s]", taxiIVTT);
+            writeSection(writer, "taxiRides", taxiRides);
         }
     }
 
 
-    private void readData(String fleet, String av, int col)
+    private void createFirstColumns(int row, String val)
+    {
+        carTTInside[row][0] = val;
+        carRidesInside[row][0] = val;
+        carTTOutside[row][0] = val;
+        carRidesOutside[row][0] = val;
+        taxiIVTT[row][0] = val;
+        taxiRides[row][0] = val;
+    }
+
+
+    private void readFile(String fleet, String av, int col)
     {
         String file = path + TaxiStatsExtractor.getId(fleet, av) + "/travelTimeStats.csv";
         List<String[]> data = CSVReaders.readSemicolonSV(file);
@@ -129,6 +106,15 @@ public class TravelTimeAnalysisExtractor
             taxiIVTT[h][col] = line[COL_taxiIVTT];
             taxiRides[h][col] = line[COL_taxiRides];
         }
+    }
+
+
+    private void writeSection(CompactCSVWriter writer, String name, String[][] data)
+    {
+        writer.writeNext(name);
+        writer.writeNext(header);
+        writer.writeAll(Arrays.asList(data));
+        writer.writeNextEmpty();
     }
 
 
