@@ -116,8 +116,8 @@ public class TransitRouterImpl implements TransitRouter {
         // find possible end stops
         Map<Node, InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toCoord, departureTime);
 
-        if (this.transitLeastCostPathTree.getOrigin() == null ||
-                !this.transitLeastCostPathTree.getOrigin().equals(fromCoord)) {
+        if (this.transitLeastCostPathTree.getFromCoord() == null ||
+                !this.transitLeastCostPathTree.getFromCoord().equals(fromCoord)) {
             this.transitLeastCostPathTree.calcLeastCostPathTree(wrappedFromNodes, person, fromCoord);
         }
 

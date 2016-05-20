@@ -14,23 +14,39 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.pt.router.CustomDataManager;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.pt.router.TransitTravelDisutility;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
 
 /**
  * /**
- * Copied and adjusted from a class in the Matsim core code named TransitLeastCostPathTree to grant extended functionality.
- * In this version over the calcLeastCostpathTree method a Tree is created and
- * Original class description:
  *
- * "A variant of Dijkstra's algorithm for route finding that supports multiple
- * nodes as start and end. Each start/end node can contain a specific cost
- * component that describes the cost to reach that node to find the least cost
- * path to some place not part of the network.T"
+ * Basically this class is the org.matsim.pt.router.MultiNodeDijkstra with improved performance by storing the last
+ * LeastCostPathTree.
+ * Now you can question every route from the specific fromCoord to every other destinations without having to
+ * calculate it once the tree is created.
  *
- * "@author mrieser"
+ * Therefore you have to call calcLeastCostPathTree(fromNodes, person, fromCoord) in order to create and cache the
+ * LeastCostPathTree.
+ * With every next call of getPath(toNodes) you would get the leastCostPath from the fromNodes to the toNodes.
+ *
+ * The fromCoord you passed in calcLeastCostPathTree operates as a primary key to determine if you are working
+ * with the LeastCostPathTree you think you are. You can just pass the original requested origin here.
+ *
+ * Please keep in mind, that its on you to align the query's so all of them routing from the same location are behind
+ * another.
+ *
+ *
+ *      org.matsim.pt.router.MultiNodeDijkstra class description:
+ *
+ *      "A variant of Dijkstra's algorithm for route finding that supports multiple
+ *      nodes as start and end. Each start/end node can contain a specific cost
+ *      component that describes the cost to reach that node to find the least cost
+ *      path to some place not part of the network.T"
+ *
+ *      "@author mrieser"
+ *
  *
  * @author gthunig
  */
@@ -64,7 +80,7 @@ public class TransitLeastCostPathTree {
     private Person person = null;
     private Vehicle vehicle = null;
     private CustomDataManager customDataManager = new CustomDataManager();
-    private Coord origin = null;
+    private Coord fromCoord = null;
     private Map<Node, InitialNode> fromNodes = null;
 
     public TransitLeastCostPathTree(final Network network, final TransitTravelDisutility costFunction, final TravelTime timeFunction) {
@@ -102,12 +118,25 @@ public class TransitLeastCostPathTree {
         }
     }
 
+    /**
+     * Creates and caches a new LeastCostPathTree.
+     *
+     * @param fromNodes
+     *          The nodes that are the next stops to the fromCoord and you like to route from.
+     * @param person
+     *          The person that you want to route for.
+     *          Could easily be null.
+     * @param fromCoord
+     *          Operates as a primary key to determine on whithc LeastCostPathTree you are working on.
+     *          You could just pass the original requested origin here.
+     *          Requestable with (Your-TransitLeastCostPathTree-Object).getFromCoord().
+     */
     @SuppressWarnings("unchecked")
     public void calcLeastCostPathTree(final Map<Node, InitialNode> fromNodes, final Person person, final Coord fromCoord) {
         this.resetNetworkVisited();
         this.person = person;
         this.customDataManager.reset();
-        this.origin = fromCoord;
+        this.fromCoord = fromCoord;
         this.fromNodes = fromNodes;
 
         RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
@@ -123,6 +152,17 @@ public class TransitLeastCostPathTree {
         }
     }
 
+    /**
+     * Method to request the path from the (cached) fromNodes to the passed toNodes.
+     * Should only be requested after calling createTransitLeastCostPathTree().
+     *
+     * @param toNodes
+     *          The nodes that are the next stops to the toCoord and you like to route to.
+     *
+     * @return
+     *          the leastCostPath between the fromNode and the toNode.
+     *          Will be null if the path could not be found.
+     */
     @SuppressWarnings("unchecked")
     public Path getPath(final Map<Node, InitialNode> toNodes) {
 
@@ -160,9 +200,10 @@ public class TransitLeastCostPathTree {
             tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
         }
 
-        if (!fromNodes.keySet().contains(nodes.get(0))) {
-            return null;
-        }
+//      TODO: determine if this code is necessary because it's not in the original code
+//      if (!fromNodes.keySet().contains(nodes.get(0))) {
+//          return null;
+//      }
 
         DijkstraNodeData startNodeData = getData(nodes.get(0));
         DijkstraNodeData toNodeData = getData(minCostNode);
@@ -402,6 +443,12 @@ public class TransitLeastCostPathTree {
         return r;
     }
 
-    public Coord getOrigin() { return origin; }
+    /**
+     * Returns the orignal fromCoord as a primary Key to check if the cached LeastCostPathTree is the one you created
+     * for excactly this fromCoord.
+     *
+     *  @return the fromCoord
+     */
+    public Coord getFromCoord() { return fromCoord; }
 
 }
