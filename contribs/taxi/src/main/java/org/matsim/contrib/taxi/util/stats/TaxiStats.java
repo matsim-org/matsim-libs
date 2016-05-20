@@ -20,7 +20,6 @@
 package org.matsim.contrib.taxi.util.stats;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.util.*;
 

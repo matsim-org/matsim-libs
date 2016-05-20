@@ -29,19 +29,25 @@ import com.opencsv.*;
 
 public class CSVReaders
 {
-    public static List<String[]> readTSVFile(String file)
+    public static List<String[]> readTSV(String file)
     {
-        return readCSVFile(file, '\t');
+        return readFile(file, '\t');
     }
 
 
-    public static List<String[]> readCSVFile(String file)
+    public static List<String[]> readCSV(String file)
     {
-        return readCSVFile(file, CSVParser.DEFAULT_SEPARATOR);
+        return readFile(file, CSVParser.DEFAULT_SEPARATOR);
     }
 
 
-    public static List<String[]> readCSVFile(String file, char separator)
+    public static List<String[]> readSemicolonSV(String file)
+    {
+        return readFile(file, ';');
+    }
+
+
+    public static List<String[]> readFile(String file, char separator)
     {
         try (CSVReader reader = new CSVReader(new FileReader(file), separator)) {
             return reader.readAll();

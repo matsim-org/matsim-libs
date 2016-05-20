@@ -26,7 +26,7 @@ import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.utils.io.IOUtils;
 
 
-public class HourlyTaxiStatsExtractor
+public class TaxiStatsExtractor
 {
     public static final String[] FLEETS = { "02.2", "04.4", "06.6", "08.8", "11.0" };
     public static final String[] AVS = { "1.0", "1.5", "2.0" };

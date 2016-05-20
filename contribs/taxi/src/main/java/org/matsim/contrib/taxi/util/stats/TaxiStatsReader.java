@@ -38,7 +38,7 @@ public class TaxiStatsReader
 
     public TaxiStatsReader(String file)
     {
-        content = CSVReaders.readTSVFile(file);
+        content = CSVReaders.readTSV(file);
         hours = content.size() / Section.values().length - 4;
     }
 
