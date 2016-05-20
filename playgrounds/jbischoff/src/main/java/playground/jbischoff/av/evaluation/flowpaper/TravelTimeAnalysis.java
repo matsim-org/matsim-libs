@@ -75,20 +75,23 @@ public class TravelTimeAnalysis implements PersonDepartureEventHandler, PersonAr
 			double travelTime = event.getTime()-departureTime;
 			int hour = JbUtils.getHour(departureTime);
 			if (event.getPersonId().toString().endsWith("t")){
+			    //car trip inside Berlin
 				this.traveltimePerHourCarInside[hour]+=travelTime;
 				this.departuresPerHourCarInside[hour]++;
 			}
 			else {
+			    //car trip which starts and/or ends in Berlin
 				this.traveltimePerHourCarOutside[hour]+=travelTime;
 				this.departuresPerHourCarOutside[hour]++;
 				
 			}
 		} else if (event.getLegMode().equals("taxi")){
+		    //taxi trip
 			double departureTime = lastTaxiDepartureTime.remove(event.getPersonId());
 			int hour = JbUtils.getHour(departureTime);
 
 			double vehEnterTime = lastTaxiVehicleEnterTime.remove(event.getPersonId());
-			double travelTime = event.getTime() - vehEnterTime;
+			double travelTime = event.getTime() - vehEnterTime;//includes pickup and dropoff (=180 s)
 			this.inVehicleTraveltimePerHourTaxi[hour]+=travelTime;
 			this.departuresPerHourTaxi[hour]++;
 		}
