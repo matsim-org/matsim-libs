@@ -1,4 +1,4 @@
-package floetteroed.opdyts.example.pathological;
+package opdytsintegration.example.pathological;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;

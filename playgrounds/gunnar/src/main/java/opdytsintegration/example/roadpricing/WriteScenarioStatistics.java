@@ -1,4 +1,4 @@
-package floetteroed.opdyts.example.roadpricing;
+package opdytsintegration.example.roadpricing;
 
 import opdytsintegration.DistanceBasedFilter;
 

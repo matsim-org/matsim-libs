@@ -1,4 +1,4 @@
-package floetteroed.opdyts.example.pathological;
+package opdytsintegration.example.pathological;
 
 import static floetteroed.utilities.math.Vector.diff;
 import static floetteroed.utilities.math.Vector.newGaussian;

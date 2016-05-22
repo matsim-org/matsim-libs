@@ -1,4 +1,4 @@
-package floetteroed.opdyts.example.roadpricing;
+package opdytsintegration.example.roadpricing;
 
 import static floetteroed.utilities.math.MathHelpers.draw;
 import static org.matsim.core.gbl.MatsimRandom.getRandom;

@@ -1,4 +1,4 @@
-package floetteroed.opdyts.example.roadpricing;
+package opdytsintegration.example.roadpricing;
 
 import java.util.ArrayList;
 import java.util.Collections;

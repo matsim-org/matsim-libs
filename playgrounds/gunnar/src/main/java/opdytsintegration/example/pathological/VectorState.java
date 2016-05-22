@@ -1,4 +1,4 @@
-package floetteroed.opdyts.example.pathological;
+package opdytsintegration.example.pathological;
 
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.utilities.math.Vector;
