@@ -95,6 +95,10 @@ public class PlausibilityCheck {
 		PlausibilityCheck check = new PlausibilityCheck(schedule, network);
 		check.run();
 
+		if(!args[2].endsWith("/")) {
+			args[2] = args[2] + "/";
+		}
+
 		new File(args[2]+"shp/").mkdir();
 		check.writeCsv(args[2] + "allPlausibilityWarnings.csv");
 		check.writeResultShapeFiles(args[2]+"shp/");
@@ -111,6 +115,7 @@ public class PlausibilityCheck {
 	 * Performs the plausibility check on the schedule
 	 */
 	public void run() {
+		log.info("Starting plausbility check...");
 		AbstractPlausibilityWarning.setNetwork(network);
 
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
@@ -145,7 +150,9 @@ public class PlausibilityCheck {
 						ttActual = 0;
 						previousStop = nextStop;
 						departTime = previousStop.getDepartureOffset();
-						nextStop = stopsIterator.next();
+						if(!nextStop.equals(transitRoute.getStops().get(transitRoute.getStops().size() - 1))) {
+							nextStop = stopsIterator.next();
+						}
 					}
 
 					// loopcheck
@@ -211,7 +218,8 @@ public class PlausibilityCheck {
 				.addAttribute("warningIds", String.class)
 				.addAttribute("routeIds", String.class)
 				.addAttribute("linkIds", String.class)
-				.addAttribute("diff", Double.class)
+				.addAttribute("diff [s]", Double.class)
+				.addAttribute("diff [%]", Double.class)
 				.addAttribute("expected", Double.class)
 				.addAttribute("actual", Double.class)
 				.create();
@@ -240,7 +248,7 @@ public class PlausibilityCheck {
 			boolean createTravelTimeFeature = false;
 			boolean createDirectionChangeFeature = false;
 
-			double diff = -1, ttExpected = -1, ttActual = -1, azDiff = 0.0;
+			double diff = -1, diffPerc = -1, ttExpected = -1, ttActual = -1, azDiff = 0.0;
 
 			Set<Id<PlausibilityWarning>> warningIds = new HashSet<>();
 			Set<String> routeIds = new HashSet<>();
@@ -249,14 +257,11 @@ public class PlausibilityCheck {
 				// Travel Time Warnings
 				if(w instanceof TravelTimeWarning) {
 					createTravelTimeFeature = true;
-					if(w.getDifference() > diff) {
+					if(w.getExpected()/w.getActual() > diff) {
 						diff = w.getDifference();
-					}
-					if(w.getExpected() > ttExpected) {
-						ttExpected = w.getExpected();
-					}
-					if(w.getActual() > ttActual) {
 						ttActual = w.getActual();
+						ttExpected = w.getExpected();
+						diffPerc = ttActual / ttExpected - 1;
 					}
 					warningIds.add(w.getId());
 					routeIds.add(w.getTransitLine().getId() + ":" + w.getTransitRoute().getId());
@@ -284,7 +289,8 @@ public class PlausibilityCheck {
 				f.setAttribute("warningIds", CollectionUtils.idSetToString(warningIds));
 				f.setAttribute("routeIds", CollectionUtils.setToString(routeIds));
 				f.setAttribute("linkIds", CollectionUtils.idSetToString(new HashSet<>(e.getKey())));
-				f.setAttribute("diff", diff);
+				f.setAttribute("diff [s]", diff);
+				f.setAttribute("diff [%]", diffPerc);
 				f.setAttribute("expected", ttExpected);
 				f.setAttribute("actual", ttActual);
 				traveltTimeWarningsFeatures.add(f);

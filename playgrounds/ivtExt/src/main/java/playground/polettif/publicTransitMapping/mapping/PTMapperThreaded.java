@@ -83,7 +83,7 @@ public class PTMapperThreaded extends PTMapper {
 	private double initialMaxPathCost;
 	private Coord[] totalNetworkExtent;
 
-	private PseudoRouting[] threads;
+	private PseudoRouting[] pseudoRoutingThreads;
 
 
 	/**
@@ -208,58 +208,57 @@ public class PTMapperThreaded extends PTMapper {
 				maxExtent * config.getBeelineDistanceMaxFactor() / config.getBeelineFreespeed() :
 				maxExtent * config.getBeelineDistanceMaxFactor());
 
+
 		/** [4]
-		 * Generating and calculating the pseudoTransitRoutes for all transitRoutes.
-		 * If no route on the network can be found (or the scheduelTransportMode
-		 * should not be mapped to the network), artificial links between link
-		 * candidates are created.
+		 * PseudoRouting
+		 * PseudoTransitRoutes for all transit routes are calculated.
 		 */
-		log.info("================================================");
+		log.info("==================================");
 		log.info("Calculating pseudoTransitRoutes...");
 
-		// initiate threads
+		// initiate router
 		Map<Integer, Integer> thr = new HashMap<>();
-		threads = new PseudoRouting[threadCount];
-		for(int i = 0; i < threadCount; i++) this.threads[i] = new PseudoRouting();
+		pseudoRoutingThreads = new PseudoRouting[threadCount];
 
+		for(int i = 0; i < threadCount; i++) {
+			this.pseudoRoutingThreads[i] = new PseudoRouting();
+		}
+
+		// spread transit routes on threads
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				int t = MapUtils.getInteger(threadAssignment.get(transitRoute.getTransportMode()), thr, 0);
 				thr.put(threadAssignment.get(transitRoute.getTransportMode()), ++t);
 				int index = threadAssignment.get(transitRoute.getTransportMode()) + (t % targetNumThreads);
-				threads[index].add(transitLine, transitRoute);
+				pseudoRoutingThreads[index].add(transitLine, transitRoute);
 			}
 		}
 
-		// start threads
-		for(PseudoRouting thread : threads) {
+		// start pseudoRouting
+		for(PseudoRouting thread : pseudoRoutingThreads) {
 			thread.start();
 		}
-
-		// join threads
-		try {
-			for(PseudoRouting thread : threads) {
-				thread.join();
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		for(PseudoRouting thread : pseudoRoutingThreads) {
+			try { thread.join(); } catch (InterruptedException e) { e.printStackTrace(); }
 		}
 
+
 		/** [5]
-		 * Add artificial links to network
+		 * Add artificial links to network (have been defined during pseudoRouting)
 		 */
 		Set<Tuple<LinkCandidate, LinkCandidate>> artificialLinksToBeCreated = new HashSet<>();
-		for(PseudoRouting thread : threads) {
+		for(PseudoRouting thread : pseudoRoutingThreads) {
 			artificialLinksToBeCreated.addAll(thread.getArtificialLinksToBeCreated());
 		}
 		artificialLinksToBeCreated.forEach(this::addArtificialLinkToNetwork);
 
 
 		/** [6]
-		 * Replace the parent stop facilities in the transitRoute routeProfiles
+		 * Replace the parent stop facilities in each transitRoute's routeProfile
 		 * with child StopFacilities. Add the new transitRoutes to the schedule.
 		 */
 		PTMapperUtils.createAndReplaceFacilities(schedule, pseudoTransitRoutes, config.getSuffixChildStopFacilities());
+
 
 		/** [7]
 		 * The final routing should be done on the merged network, so a mode dependent
@@ -281,19 +280,22 @@ public class PTMapperThreaded extends PTMapper {
 		 * Now that all lines have been routed, it is possible that a route passes
 		 * a link closer to a stop facility than its referenced link.
 		 */
-		PTMapperUtils.tightenChildStopFacilities(schedule, network);
+		PTMapperUtils.pullChildStopFacilitiesTogether(schedule, network);
 
 		/** [10]
 		 * After all lines are created, clean the schedule and network. Removing
 		 * not used transit links includes removing artificial links that
 		 * needed to be added to the network for routing purposes.
 		 */
-		log.info("================================================");
+		log.info("=============================");
 		log.info("Clean schedule and network...");
+		// changing the freespeed of the artificial links (value is used in simulations)
 		NetworkTools.setFreeSpeedOfLinks(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE, config.getFreespeedArtificial());
+		// Remove unnecessary parts of schedule
 		int routesRemoved = ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule);
 		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
 		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
+		// change the network transport modes
 		ScheduleTools.assignScheduleModesToLinks(schedule, network);
 		if(config.getCombinePtModes()) {
 			ScheduleTools.replaceNonCarModesWithPT(network);
@@ -302,6 +304,9 @@ public class PTMapperThreaded extends PTMapper {
 		}
 		log.info("Clean schedule and network... done.");
 
+		/**
+		 * Validate the schedule
+		 */
 		log.info("Validating schedule and network...");
 		TransitScheduleValidator.ValidationResult validationResult = TransitScheduleValidator.validateAll(schedule, network);
 		if(validationResult.isValid()) {
@@ -322,6 +327,10 @@ public class PTMapperThreaded extends PTMapper {
 			}
 		}
 
+		log.info("==================================================");
+		log.info("=== Mapping transit schedule to network completed!");
+		log.info("==================================================");
+
 
 		/**
 		 * Statistics
@@ -333,9 +342,7 @@ public class PTMapperThreaded extends PTMapper {
 			}
 		}
 
-		log.info("================================================");
-		log.info("=== Mapping transit schedule to network... done.");
-		log.info("================================================");
+		log.info("");
 		log.info("    Stop Facilities statistics:");
 		log.info("       input    " + nStopFacilities);
 		log.info("       output   " + schedule.getFacilities().size());
@@ -344,6 +351,9 @@ public class PTMapperThreaded extends PTMapper {
 		log.info("       removed  " + routesRemoved);
 		log.info("    Artificial Links:");
 		log.info("       created  " + artificialLinks);
+		log.info("");
+		log.info("    Note: Run PlausibilityCheck for further analysis");
+		log.info("");
 	}
 
 	private void addArtificialLinkToNetwork(Tuple<LinkCandidate, LinkCandidate> tuple) {
@@ -397,6 +407,12 @@ public class PTMapperThreaded extends PTMapper {
 		return newLink;
 	}
 
+	/**
+	 * Generates and calculates the pseudoTransitRoutes for all the queued
+	 * transit routes. If no route on the network can be found (or the
+	 * scheduleTransportMode should not be mapped to the network), artificial
+	 * links between link candidates are stored to be created later.
+	 */
 	public class PseudoRouting extends Thread {
 
 		private Set<Tuple<TransitLine, TransitRoute>> queue = new HashSet<>();
@@ -409,8 +425,6 @@ public class PTMapperThreaded extends PTMapper {
 		@Override
 		public void run() {
 			for(Tuple<TransitLine, TransitRoute> tuple : queue) {
-				log.info(this.getName() +" "+tuple.getSecond());
-
 				TransitLine transitLine = tuple.getFirst();
 				TransitRoute transitRoute = tuple.getSecond();
 
@@ -524,7 +538,6 @@ public class PTMapperThreaded extends PTMapper {
 								!pseudoPathFound) {
 							for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 								for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-//									createArtificialLink(linkCandidateCurrent, linkCandidateNext);
 									artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
 
 									double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateCurrent.getFromNodeCoord());

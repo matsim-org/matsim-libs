@@ -228,7 +228,7 @@ public class PTMapperUtils {
 	 * @param schedule
 	 * @param network
 	 */
-	public static void tightenChildStopFacilities(TransitSchedule schedule, Network network) {
+	public static void pullChildStopFacilitiesTogether(TransitSchedule schedule, Network network) {
 		log.info("Concentrating child stop facilities...");
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
@@ -249,11 +249,6 @@ public class PTMapperUtils {
 					for(int i = 1; i < linkList.size()-1; i++) {
 
 						if(linkList.get(i).getId().equals(currentStop.getStopFacility().getLinkId())) {
-
-							if(linkList.get(i).getId().toString().equals("937")) {
-								log.debug("");
-							}
-
 							Set<Link> testSet = new HashSet<>();
 							testSet.add(linkList.get(i));
 							testSet.add(linkList.get(i-1));
