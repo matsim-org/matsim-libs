@@ -167,10 +167,11 @@ public class PTMapperThreaded extends PTMapper {
 		 * Create a separate network for all schedule modes and
 		 * initiate routers.
 		 */
+		int targetNumThreads = config.getThreads();
 		networks = new HashMap<>();
 		routers = new HashMap<>();
 		Map<String, Integer> threadAssignment = new HashMap<>();
-		int t=1;
+		int threadCount=1;
 		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
 			if(!modeAssignment.getValue().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
 				log.info("================================================");
@@ -182,11 +183,8 @@ public class PTMapperThreaded extends PTMapper {
 				networks.put(modeAssignment.getKey(), filteredNetwork);
 				routers.put(modeAssignment.getKey(), new FastAStarRouter(filteredNetwork, config.getPseudoRouteWeightType()));
 
-				if(config.useMultiThreads()) {
-					threadAssignment.put(modeAssignment.getKey(), t++);
-				} else {
-					threadAssignment.put(modeAssignment.getKey(), 0);
-				}
+				threadAssignment.put(modeAssignment.getKey(), threadCount);
+				threadCount = threadCount + targetNumThreads;
 			} else {
 				threadAssignment.put(modeAssignment.getKey(), 0);
 			}
@@ -220,15 +218,15 @@ public class PTMapperThreaded extends PTMapper {
 		log.info("Calculating pseudoTransitRoutes...");
 
 		// initiate threads
-		int targetNumThreads = 2;
-		int numThreads = (threadAssignment.size()-1)*targetNumThreads;
-		threads = new PseudoRouting[numThreads];
-		for(int i = 0; i < numThreads; i++) this.threads[i] = new PseudoRouting();
+		Map<Integer, Integer> thr = new HashMap<>();
+		threads = new PseudoRouting[threadCount];
+		for(int i = 0; i < threadCount; i++) this.threads[i] = new PseudoRouting();
 
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				int modulo = threadAssignment.get(transitRoute.getTransportMode()) == 0 ? 1 : targetNumThreads;
-				int index = threadAssignment.get(transitRoute.getTransportMode()) % modulo;
+				int t = MapUtils.getInteger(threadAssignment.get(transitRoute.getTransportMode()), thr, 0);
+				thr.put(threadAssignment.get(transitRoute.getTransportMode()), ++t);
+				int index = threadAssignment.get(transitRoute.getTransportMode()) + (t % targetNumThreads);
 				threads[index].add(transitLine, transitRoute);
 			}
 		}
