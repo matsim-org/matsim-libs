@@ -38,6 +38,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Simple helper class to convert shapes.txt from
+ * a gtfs feed to a shapefile.
+ *
+ * @author polettif
+ */
 public class Gtfs2ShapeFile {
 
 	private CoordinateTransformation transformation = new IdentityTransformation();
@@ -48,11 +54,7 @@ public class Gtfs2ShapeFile {
 		features = new ArrayList<>();
 	}
 
-	public static void main(String[] arg) {
-		String[] args = new String[2];
-		args[0] = "C:/Users/polettif/Desktop/data/gtfs/zvv/shapes.txt";
-		args[1] = "C:/Users/polettif/Desktop/output/results_2016-05-04/shp/gtfs.shp";
-
+	public static void main(String[] args) {
 		Gtfs2ShapeFile converter = new Gtfs2ShapeFile();
 		converter.setTransformation(TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus"));
 

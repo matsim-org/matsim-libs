@@ -34,6 +34,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.polettif.boescpa.lib.tools.fileCreation.F2LConfigGroup;
@@ -46,9 +49,10 @@ public class RunZurichScenario {
 
 	public static void main(String[] args) {
 
-		String base = "C:/Users/polettif/Desktop/data/zurich/";
+		String base = "E:/data/zurich/";
+		double percentage = 0.01;
 
-		final Config config = ConfigUtils.loadConfig(base + "config_okteron.xml", new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
+		final Config config = ConfigUtils.loadConfig(base + "config.xml", new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -60,11 +64,16 @@ public class RunZurichScenario {
 		OutputDirectoryLogging.catchLogEntries();
 
 		final Controler controler = new Controler(scenario);
-
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		connectFacilitiesWithNetwork(controler);
+
+
+		Vehicles transitVehicles = scenario.getTransitVehicles();
+		for(VehicleType vt : transitVehicles.getVehicleTypes().values()) {
+			vt.setPcuEquivalents(vt.getPcuEquivalents()*percentage);
+		}
 
 		// We use a time allocation mutator that allows to exclude certain activities.
 		controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());

@@ -39,6 +39,7 @@ import playground.polettif.publicTransitMapping.plausibility.log.*;
 import playground.polettif.publicTransitMapping.tools.*;
 import playground.polettif.publicTransitMapping.tools.shp.Schedule2ShapeFileWriter;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
@@ -94,12 +95,16 @@ public class PlausibilityCheck {
 		PlausibilityCheck check = new PlausibilityCheck(schedule, network);
 		check.run();
 
+		new File(args[2]+"shp/").mkdir();
 		check.writeCsv(args[2] + "allPlausibilityWarnings.csv");
-		check.writeResultShapeFiles(args[2]);
+		check.writeResultShapeFiles(args[2]+"shp/");
 
 		Schedule2ShapeFileWriter schedule2shp = new Schedule2ShapeFileWriter(schedule, network);
-		schedule2shp.routes2Polylines(args[2]+"Schedule_TransitRoutes.shp");
-		schedule2shp.stopFacilities2Shapes(args[2]+"Schedule_StopFacilities.shp", args[2]+"Schedule_StopFacilities_refLinks.shp");
+		schedule2shp.routes2Polylines(args[2]+"shp/Schedule_TransitRoutes.shp");
+		schedule2shp.stopFacilities2Shapes(args[2]+"shp/Schedule_StopFacilities.shp", args[2]+"shp/Schedule_StopFacilities_refLinks.shp");
+
+		// stop facility histogram
+		StopFacilityHistogram.run(schedule, args[2] + "stopfacility_histogram.png");
 	}
 
 	/**
@@ -202,7 +207,7 @@ public class PlausibilityCheck {
 
 		PolylineFeatureFactory travelTimeWarningsFF = new PolylineFeatureFactory.Builder()
 				.setName("TravelTimeWarnings")
-				.setCrs(MGC.getCRS("EPSG:2056"))
+				.setCrs(MGC.getCRS("EPSG:2056")) // todo transformation as param
 				.addAttribute("warningIds", String.class)
 				.addAttribute("routeIds", String.class)
 				.addAttribute("linkIds", String.class)
@@ -338,100 +343,5 @@ public class PlausibilityCheck {
 		Coordinate[] coordinates = new Coordinate[coordList.size()];
 		coordList.toArray(coordinates);
 		return coordinates;
-	}
-
-
-	private void p(Object s) {
-		System.out.println(s);
-	}
-
-
-
-	@Deprecated
-	public void writeCsvResultsBySchedule(String outputFile) {
-		List<String> csvLines = new ArrayList<>();
-		csvLines.add("WarningType" + PlausibilityCheck.CsvSeparator +
-				"TransitLine" + PlausibilityCheck.CsvSeparator +
-				"TransitRoute" + PlausibilityCheck.CsvSeparator +
-				"fromId" + PlausibilityCheck.CsvSeparator +
-				"toId" + PlausibilityCheck.CsvSeparator +
-				"diff" + PlausibilityCheck.CsvSeparator +
-				"expected" + PlausibilityCheck.CsvSeparator +
-				"actual");
-		for(Map.Entry<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> e : warningsSchedule.entrySet()) {
-			for(Map.Entry<TransitRoute, Set<PlausibilityWarning>> e2 : e.getValue().entrySet()) {
-				for(PlausibilityWarning warning : e2.getValue()) {
-					csvLines.add(warning.getCsvLine());
-				}
-			}
-		}
-		try {
-			CsvTools.writeToFile(csvLines, outputFile);
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Deprecated
-	public void writeCsvResultsByLinkId(String outputFile) {
-		List<String> csvLines = new ArrayList<>();
-		for(Map.Entry<Id<Link>, Set<PlausibilityWarning>> e : warningsLinks.entrySet()) {
-			for(PlausibilityWarning warning : e.getValue()) {
-				csvLines.addAll(warning.getCsvLineForEachLink());
-			}
-		}
-
-		try {
-			CsvTools.writeToFile(csvLines, outputFile);
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-	}
-
-
-	public void printSummary() {
-		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
-			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				System.out.println(transitRoute.getId());
-				System.out.println("    tt:   " + TravelTimeWarning.routeStat.get(transitRoute));
-				System.out.println("    loop: " + LoopWarning.routeStat.get(transitRoute));
-				System.out.println("    dir:  " + DirectionChangeWarning.routeStat.get(transitRoute));
-			}
-		}
-	}
-
-	public void printLineSummary() {
-		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
-			System.out.println(transitLine.getId());
-			System.out.println("    tt:   " + TravelTimeWarning.lineStat.get(transitLine));
-			System.out.println("    loop: " + LoopWarning.lineStat.get(transitLine));
-			System.out.println("    dir:  " + DirectionChangeWarning.lineStat.get(transitLine));
-		}
-	}
-
-	@Deprecated
-	public void printResultByTransitRoute() {
-		for(Map.Entry<TransitLine, Map<TransitRoute, Set<PlausibilityWarning>>> e : warningsSchedule.entrySet()) {
-			p("\n#################################\n" + e.getKey().getId());
-			for(Map.Entry<TransitRoute, Set<PlausibilityWarning>> e2 : e.getValue().entrySet()) {
-				p("\t" + e2.getKey().getId());
-				for(PlausibilityWarning l : e2.getValue()) {
-					System.out.println("\t" + l);
-				}
-			}
-		}
-	}
-
-	@Deprecated
-	public void printResultByLink() {
-		for(Map.Entry<Id<Link>, Set<PlausibilityWarning>> e : warningsLinks.entrySet()) {
-			System.out.println("Link " + e.getKey().toString());
-			Set<Tuple<Object, Object>> stopPairs = new HashSet<>();
-			for(PlausibilityWarning warning : e.getValue()) {
-				if(stopPairs.add(warning.getPair())) {
-					System.out.println(warning);
-				}
-			}
-		}
 	}
 }

@@ -515,13 +515,15 @@ public class GTFSReader {
 	/**
 	 * Loads shapes (if available) and puts them in {@link #shapes}. A shape is a sequence of points, i.e. a line.
 	 * <p/>
+	 * Shapes are not used further, see {@link playground.polettif.publicTransitMapping.tools.shp.Gtfs2ShapeFile}
 	 * <br/><br/>
 	 * shapes.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
 	 * Rules for drawing lines on a map to represent a transit organization's routes.
 	 */
 	private void loadShapes() {
-		log.info("Looking for shapes.txt");
 		// shapes are optional
+		/*
+		log.info("Looking for shapes.txt");
 		CSVReader reader;
 		try {
 			reader = new CSVReader(new FileReader(root + GTFSDefinitions.SHAPES.fileName));
@@ -545,6 +547,7 @@ public class GTFSReader {
 		} catch (IOException e) {
 			log.info("...     no shapes file found.");
 		}
+		*/
 	}
 
 	/**

@@ -43,28 +43,31 @@ public class StopFacilityHistogram {
 	private Map<Integer, String> stopFacilityHistogramMap = new TreeMap<>();
 	private double[] stopFacilityHistogram;
 
+	private static final String SUFFIX_PATTERN = "[.]link:";
+	private static final String SUFFIX = ".link:";
+
 	public static void main(final String[] args) {
-		// "C:/Users/polettif/Desktop/output/results_2016-05-04/zurich_gtfs_schedule.xml"
-		// "C:/Users/polettif/Desktop/output/results_2016-05-04/histogram.png"
-		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(args[0]);
+		run(args[0], args[1]);
+	}
 
-		StopFacilityHistogram check = new StopFacilityHistogram(schedule);
+	public static void run(String scheduleFile, String outputPngFile) {
+		new StopFacilityHistogram(ScheduleTools.loadTransitSchedule(scheduleFile)).createPng(outputPngFile);
+	}
 
-		check.calcHistogram(schedule);
-		check.createPng(args[1]);
+	public static void run(TransitSchedule schedule, String outputPngFile) {
+		new StopFacilityHistogram(schedule).createPng(outputPngFile);
 	}
 
 	public StopFacilityHistogram(TransitSchedule schedule) {
 		this.schedule = schedule;
-		calcHistogram(this.schedule);
+		calcHistogram();
 	}
 
-	public void calcHistogram(TransitSchedule schedule) {
+	private void calcHistogram() {
 		Map<String, Integer> stopStat = new TreeMap<>();
 
-
-		for(TransitStopFacility stopFacility : schedule.getFacilities().values()) {
-			String parentFacility = stopFacility.getId().toString().split("[.]link:")[0];
+		for(TransitStopFacility stopFacility : this.schedule.getFacilities().values()) {
+			String parentFacility = stopFacility.getId().toString().split(SUFFIX_PATTERN)[0];
 			int count = MapUtils.getInteger(parentFacility, stopStat, 0);
 			stopStat.put(parentFacility, ++count);
 		}
