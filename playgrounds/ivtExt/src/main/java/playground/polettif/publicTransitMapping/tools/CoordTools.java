@@ -50,6 +50,32 @@ public class CoordTools {
 	}
 
 	/**
+	 * calculates the azimuth difference between the a1->a2 and b1->b2
+	 */
+	public static double getAzimuthDiff(Coord a1, Coord a2, Coord b1, Coord b2) {
+		if(a1.equals(b2)) {
+			return Math.PI;
+		}
+
+		double az1 = getAzimuth(a1, a2);
+		double az2 = getAzimuth(b1, b2);
+		double diff = Math.abs(az2 - az1);
+
+		return (diff > Math.PI ? Math.PI/2 - diff : diff);
+	}
+
+	/**
+	 * calculates the azimuth difference of two links
+	 *
+	 * @param link1
+	 * @param link2
+	 * @return the difference in [rad]
+	 */
+	public static double getAzimuthDiff(Link link1, Link link2) {
+		return getAzimuthDiff(link1.getFromNode().getCoord(), link1.getToNode().getCoord(), link2.getFromNode().getCoord(), link2.getToNode().getCoord());
+	}
+
+	/**
 	 * @return Returns the point on the line between lineStart and lineEnd which
 	 * is closest to refPoint.
 	 */

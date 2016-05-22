@@ -52,7 +52,6 @@ import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * References an unmapped transit schedule to a network. Combines routing of transit routes
@@ -79,9 +78,10 @@ public class PTMapperThreaded extends PTMapper {
 	private Network network;
 	private Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates;
 	private Map<TransitStopFacility, Boolean> stopIsInArea;
-	private ConcurrentHashMap<String, Router> routers;
+	private Map<String, Router> routers;
 	private Map<String, Network> networks;
 	private double initialMaxPathCost;
+	private Coord[] totalNetworkExtent;
 
 	private PseudoRouting[] threads;
 
@@ -168,9 +168,8 @@ public class PTMapperThreaded extends PTMapper {
 		 * initiate routers.
 		 */
 		networks = new HashMap<>();
-		routers = new ConcurrentHashMap<>();
+		routers = new HashMap<>();
 		Map<String, Integer> threadAssignment = new HashMap<>();
-		threadAssignment.put(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE, 0);
 		int t=1;
 		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
 			if(!modeAssignment.getValue().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
@@ -180,7 +179,7 @@ public class PTMapperThreaded extends PTMapper {
 				filter.addLinkFilter(new LinkFilterMode(modeAssignment.getValue()));
 				Network filteredNetwork = filter.applyFilters();
 
-				networks.put(modeAssignment.getKey(), filter.applyFilters());
+				networks.put(modeAssignment.getKey(), filteredNetwork);
 				routers.put(modeAssignment.getKey(), new FastAStarRouter(filteredNetwork, config.getPseudoRouteWeightType()));
 
 				if(config.useMultiThreads()) {
@@ -204,7 +203,7 @@ public class PTMapperThreaded extends PTMapper {
 		/** [3]
 		 * Get network extent to speed up routing outside of network area.
 		 */
-		Coord[] totalNetworkExtent = CoordTools.getExtent(network);
+		totalNetworkExtent = CoordTools.getExtent(network);
 		stopIsInArea = CoordTools.getStopsInAreaBool(schedule, totalNetworkExtent);
 		double maxExtent = CoordUtils.calcEuclideanDistance(totalNetworkExtent[0], totalNetworkExtent[1]);
 		initialMaxPathCost = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ?
@@ -221,13 +220,16 @@ public class PTMapperThreaded extends PTMapper {
 		log.info("Calculating pseudoTransitRoutes...");
 
 		// initiate threads
-		int numThreads = threadAssignment.size();
+		int targetNumThreads = 2;
+		int numThreads = (threadAssignment.size()-1)*targetNumThreads;
 		threads = new PseudoRouting[numThreads];
 		for(int i = 0; i < numThreads; i++) this.threads[i] = new PseudoRouting();
 
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				threads[threadAssignment.get(transitRoute.getTransportMode())].add(transitLine, transitRoute);
+				int modulo = threadAssignment.get(transitRoute.getTransportMode()) == 0 ? 1 : targetNumThreads;
+				int index = threadAssignment.get(transitRoute.getTransportMode()) % modulo;
+				threads[index].add(transitLine, transitRoute);
 			}
 		}
 
@@ -353,8 +355,7 @@ public class PTMapperThreaded extends PTMapper {
 	/**
 	 * Creates a new link between two linkCandidates (or
 	 * more precisely a link connecting the to- and fromNode
-	 * of both linkCandidates). The freespeed of the link is set
-	 * via config.
+	 * of both linkCandidates).<p/>
 	 *
 	 * @return the new link
 	 */
@@ -387,8 +388,10 @@ public class PTMapperThreaded extends PTMapper {
 			newLink = this.network.getFactory().createLink(Id.createLinkId(newLinkIdStr), fromNode,	toNode);
 
 			newLink.setAllowedModes(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
-			newLink.setLength(CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord()));
-			newLink.setFreespeed(0.5); // needs to be set low so busses don't use those links during modeRouting
+			double l = CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord());
+			newLink.setLength(l);
+			// needs to be set low so busses don't use those links during modeRouting.
+			newLink.setFreespeed(0.5);
 			this.network.addLink(newLink);
 
 			artificialLinks.put(key, newLink);
@@ -408,6 +411,8 @@ public class PTMapperThreaded extends PTMapper {
 		@Override
 		public void run() {
 			for(Tuple<TransitLine, TransitRoute> tuple : queue) {
+				log.info(this.getName() +" "+tuple.getSecond());
+
 				TransitLine transitLine = tuple.getFirst();
 				TransitRoute transitRoute = tuple.getSecond();
 
@@ -556,27 +561,4 @@ public class PTMapperThreaded extends PTMapper {
 			return artificialLinksToBeCreated;
 		}
 	}
-
-	/*
-	private class ArtificialLink {
-
-		public LinkCandidate fromLinkCandidate;
-		public LinkCandidate toLinkCandidate;
-
-		public ArtificialLink(LinkCandidate fromLinkCandidate, LinkCandidate toLinkCandidate) {
-			this.fromLinkCandidate = fromLinkCandidate;
-			this.toLinkCandidate = toLinkCandidate;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if(obj instanceof ArtificialLink) {
-				ArtificialLink other = (ArtificialLink) obj;
-				return other.fromLinkCandidate.equals(this.toLinkCandidate) && other.toLinkCandidate.equals(this.toLinkCandidate);
-			} else {
-				return false;
-			}
-		}
-	}
-	*/
 }

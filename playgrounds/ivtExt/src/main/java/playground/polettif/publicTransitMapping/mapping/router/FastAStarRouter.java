@@ -40,7 +40,7 @@ public class FastAStarRouter implements Router {
 	
 	private final LeastCostPathCalculator pathCalculator;
 	private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
-	PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType;
+	private PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType;
 
 	public FastAStarRouter(Network network) {
 		this(network, PublicTransitMappingConfigGroup.PseudoRouteWeightType.linkLength);
@@ -48,15 +48,15 @@ public class FastAStarRouter implements Router {
 
 	public  FastAStarRouter(Network network, PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType) {
 		this.pseudoRouteWeightType = pseudoRouteWeightType;
-		paths = new HashMap<>();
+		this.paths = new HashMap<>();
 
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
 		this.pathCalculator = factory.createPathCalculator(network, this, this);
 
 		// Suppress statements...
-		Logger.getLogger( Dijkstra.class ).setLevel( Level.ERROR );
-		Logger.getLogger( PreProcessEuclidean.class ).setLevel( Level.ERROR );
-		Logger.getLogger( PreProcessLandmarks.class ).setLevel( Level.ERROR );
+		Logger.getLogger(Dijkstra.class).setLevel(Level.ERROR);
+		Logger.getLogger(PreProcessEuclidean.class).setLevel(Level.ERROR);
+		Logger.getLogger(PreProcessLandmarks.class).setLevel(Level.ERROR);
 	}
 
 	@Override

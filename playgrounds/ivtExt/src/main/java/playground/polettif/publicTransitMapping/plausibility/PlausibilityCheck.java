@@ -20,7 +20,6 @@ package playground.polettif.publicTransitMapping.plausibility;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,17 +36,14 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.polettif.publicTransitMapping.plausibility.log.*;
-import playground.polettif.publicTransitMapping.tools.CsvTools;
-import playground.polettif.publicTransitMapping.tools.MiscUtils;
-import playground.polettif.publicTransitMapping.tools.NetworkTools;
-import playground.polettif.publicTransitMapping.tools.ScheduleTools;
+import playground.polettif.publicTransitMapping.tools.*;
 import playground.polettif.publicTransitMapping.tools.shp.Schedule2ShapeFileWriter;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-import static playground.polettif.publicTransitMapping.tools.CoordTools.getAzimuth;
+import static playground.polettif.publicTransitMapping.tools.CoordTools.getAzimuthDiff;
 import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
 
 /**
@@ -155,7 +151,7 @@ public class PlausibilityCheck {
 
 					// angle check (check if one link has length 0)
 					if(directionChangeThreshold != null) {
-						double angleDiff = getAzimuthDiff(linkFrom, linkTo);
+						double angleDiff = CoordTools.getAzimuthDiff(linkFrom, linkTo);
 						if(Math.abs(angleDiff) > directionChangeThreshold && linkFrom.getLength() > 0 && linkTo.getLength() > 0 && angleDiff != PI) {
 							PlausibilityWarning warning = new DirectionChangeWarning(transitLine, transitRoute, linkFrom, linkTo, directionChangeThreshold, angleDiff);
 							addWarningToContainers(warning);
@@ -342,28 +338,6 @@ public class PlausibilityCheck {
 		Coordinate[] coordinates = new Coordinate[coordList.size()];
 		coordList.toArray(coordinates);
 		return coordinates;
-	}
-
-	/**
-	 * calculates the azimuth difference of two links
-	 *
-	 * @param link1
-	 * @param link2
-	 * @return the difference in [rad]
-	 */
-	private static double getAzimuthDiff(Link link1, Link link2) {
-		Coord c1 = link1.getFromNode().getCoord();
-		Coord c2 = link2.getToNode().getCoord();
-
-		if(c1.equals(c2)) {
-			return PI;
-		}
-
-		double az1 = getAzimuth(c1, link1.getToNode().getCoord());
-		double az2 = getAzimuth(link2.getFromNode().getCoord(), c2);
-		double diff = Math.abs(az2 - az1);
-
-		return (diff > PI ? PI2 - diff : diff);
 	}
 
 
