@@ -169,9 +169,6 @@ public class TransitLeastCostPathTree {
     @SuppressWarnings("unchecked")
     public Path getPath(final Map<Node, InitialNode> toNodes) {
 
-        //TODO don't know exactly what augmentIterationId() is doing and if this is the correct use(augment per Request)
-        augmentIterationId();
-
         //find the best node
         double minCost = Double.POSITIVE_INFINITY;
         Node minCostNode = null;
@@ -185,11 +182,9 @@ public class TransitLeastCostPathTree {
                     minCostNode = currentNode;
                 }
             }
-
         }
 
         if (minCostNode == null) {
-            log.trace("No route was found");
             return null;
         }
 
