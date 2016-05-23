@@ -64,7 +64,8 @@ public class TransitLeastCostPathTree {
     /**
      * The network on which we find routes.
      */
-    protected Network network;
+    //TODO changed to final and added a getter for the network doesn't have to be chached twice(like in TransitRouterImpl)
+    protected final Network network;
 
     /**
      * The cost calculator. Provides the cost for each link and time step.
@@ -119,6 +120,7 @@ public class TransitLeastCostPathTree {
     }
 
     /**
+     * TODO changed
      * Creates and caches a new LeastCostPathTree.
      *
      * @param fromNodes
@@ -153,6 +155,7 @@ public class TransitLeastCostPathTree {
     }
 
     /**
+     * TODO changed
      * Method to request the path from the (cached) fromNodes to the passed toNodes.
      * Should only be requested after calling createTransitLeastCostPathTree().
      *
@@ -166,6 +169,7 @@ public class TransitLeastCostPathTree {
     @SuppressWarnings("unchecked")
     public Path getPath(final Map<Node, InitialNode> toNodes) {
 
+        //TODO don't know exactly what augmentIterationId() is doing and if this is the correct use(augment per Request)
         augmentIterationId();
 
         //find the best node
@@ -440,11 +444,19 @@ public class TransitLeastCostPathTree {
     }
 
     /**
+     * TODO changed
      * Returns the orignal fromCoord as a primary Key to check if the cached LeastCostPathTree is the one you created
      * for excactly this fromCoord.
      *
      *  @return the fromCoord
      */
     public Coord getFromCoord() { return fromCoord; }
+
+    /**
+     * TODO changed to final and added a getter for the network doesn't have to be chached twice(like in TransitRouterImpl)
+     *
+     *  @return the network
+     */
+    public Network getNetwork() { return network; }
 
 }
