@@ -40,16 +40,16 @@ public class TravelTimeAnalysisExtractor
     private static final int COL_taxiTT = 7;
     private static final int COL_taxiRides = 8;
 
-    private static final String path = "../../../runs-svn/avsim/flowpaper/";
+    private static final String path = "../../../runs-svn/avsim/flowpaper_0.15fc/";
     private static final int hours = 24;
 
-    private final String[] header = new String[TaxiStatsExtractor.COUNT + 2];
-    private final String[][] carTTInside = new String[hours + 1][TaxiStatsExtractor.COUNT + 2];
-    private final String[][] carRidesInside = new String[hours + 1][TaxiStatsExtractor.COUNT + 2];
-    private final String[][] carTTOutside = new String[hours + 1][TaxiStatsExtractor.COUNT + 2];
-    private final String[][] carRidesOutside = new String[hours + 1][TaxiStatsExtractor.COUNT + 2];
-    private final String[][] taxiIVTT = new String[hours + 1][TaxiStatsExtractor.COUNT + 2];
-    private final String[][] taxiRides = new String[hours + 1][TaxiStatsExtractor.COUNT + 2];
+    private final String[] header = new String[TaxiStatsExtractor.COUNT + 3];
+    private final String[][] carTTInside = new String[hours + 1][TaxiStatsExtractor.COUNT + 3];
+    private final String[][] carRidesInside = new String[hours + 1][TaxiStatsExtractor.COUNT + 3];
+    private final String[][] carTTOutside = new String[hours + 1][TaxiStatsExtractor.COUNT + 3];
+    private final String[][] carRidesOutside = new String[hours + 1][TaxiStatsExtractor.COUNT + 3];
+    private final String[][] taxiIVTT = new String[hours + 1][TaxiStatsExtractor.COUNT + 3];
+    private final String[][] taxiRides = new String[hours + 1][TaxiStatsExtractor.COUNT + 3];
 
 
     private void go()
@@ -60,8 +60,9 @@ public class TravelTimeAnalysisExtractor
         }
         createFirstColumns(hours, "daily");
 
-        readFile("00.0", "1.0", 1);
-        int col = 2;
+        int col = 1;
+        readFile("00.0", "1.0_flowCap100", col++);
+        readFile("00.0", "1.0", col++);
         for (String fleet : TaxiStatsExtractor.FLEETS) {
             for (String av : TaxiStatsExtractor.AVS) {
                 readFile(fleet, av, col++);
