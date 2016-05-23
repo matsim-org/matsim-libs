@@ -27,11 +27,11 @@ import java.util.*;
  * Now you can question every route from the specific fromCoord to every other destinations without having to
  * calculate it once the tree is created.
  *
- * Therefore you have to call calcLeastCostPathTree(fromNodes, person, fromCoord) in order to create and cache the
+ * Therefore you have to call createLeastCostPathTree(fromNodes, person, fromCoord) in order to create and cache the
  * LeastCostPathTree.
  * With every next call of getPath(toNodes) you would get the leastCostPath from the fromNodes to the toNodes.
  *
- * The fromCoord you passed in calcLeastCostPathTree operates as a primary key to determine if you are working
+ * The fromCoord you passed in createLeastCostPathTree operates as a primary key to determine if you are working
  * with the LeastCostPathTree you think you are. You can just pass the original requested origin here.
  *
  * Please keep in mind, that its on you to align the query's so all of them routing from the same location are behind
@@ -132,7 +132,7 @@ public class TransitLeastCostPathTree {
      *          Requestable with (Your-TransitLeastCostPathTree-Object).getFromCoord().
      */
     @SuppressWarnings("unchecked")
-    public void calcLeastCostPathTree(final Map<Node, InitialNode> fromNodes, final Person person, final Coord fromCoord) {
+    public void createLeastCostPathTree(final Map<Node, InitialNode> fromNodes, final Person person, final Coord fromCoord) {
         this.resetNetworkVisited();
         this.person = person;
         this.customDataManager.reset();
@@ -185,6 +185,7 @@ public class TransitLeastCostPathTree {
         }
 
         if (minCostNode == null) {
+            log.trace("No route was found");
             return null;
         }
 
@@ -199,11 +200,6 @@ public class TransitLeastCostPathTree {
             nodes.add(0, tmpLink.getFromNode());
             tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
         }
-
-//      TODO: determine if this code is necessary because it's not in the original code
-//      if (!fromNodes.keySet().contains(nodes.get(0))) {
-//          return null;
-//      }
 
         DijkstraNodeData startNodeData = getData(nodes.get(0));
         DijkstraNodeData toNodeData = getData(minCostNode);

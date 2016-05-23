@@ -118,7 +118,7 @@ public class TransitRouterImpl implements TransitRouter {
 
         if (this.transitLeastCostPathTree.getFromCoord() == null ||
                 !this.transitLeastCostPathTree.getFromCoord().equals(fromCoord)) {
-            this.transitLeastCostPathTree.calcLeastCostPathTree(wrappedFromNodes, person, fromCoord);
+            this.transitLeastCostPathTree.createLeastCostPathTree(wrappedFromNodes, person, fromCoord);
         }
 
         // find routes between start and end stop
