@@ -86,35 +86,45 @@ public class PlausibilityCheck {
 	}
 
 	/**
+	 * Performs a plausibility check on the given schedule and network files
+	 * and writes the results to the output folder.
 	 * @param args schedule file, network file, output folder
 	 */
 	public static void main(final String[] args) {
-		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(args[0]);
-		Network network = NetworkTools.loadNetwork(args[1]);
+		run(args[0], args[1], args[2]);
+	}
+
+	/**
+	 * Performs a plausibility check on the given schedule and network files
+	 * and writes the results to the output folder.
+	 */
+	public static void run(String scheduleFile, String networkFile, String outputFolder) {
+		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(scheduleFile);
+		Network network = NetworkTools.loadNetwork(networkFile);
 
 		PlausibilityCheck check = new PlausibilityCheck(schedule, network);
-		check.run();
+		check.runCheck();
 
-		if(!args[2].endsWith("/")) {
-			args[2] = args[2] + "/";
+		if(!outputFolder.endsWith("/")) {
+			outputFolder = outputFolder + "/";
 		}
 
-		new File(args[2]+"shp/").mkdir();
-		check.writeCsv(args[2] + "allPlausibilityWarnings.csv");
-		check.writeResultShapeFiles(args[2]+"shp/");
+		new File(outputFolder+"shp/").mkdir();
+		check.writeCsv(outputFolder + "allPlausibilityWarnings.csv");
+		check.writeResultShapeFiles(outputFolder+"shp/");
 
 		Schedule2ShapeFileWriter schedule2shp = new Schedule2ShapeFileWriter(schedule, network);
-		schedule2shp.routes2Polylines(args[2]+"shp/Schedule_TransitRoutes.shp");
-		schedule2shp.stopFacilities2Shapes(args[2]+"shp/Schedule_StopFacilities.shp", args[2]+"shp/Schedule_StopFacilities_refLinks.shp");
+		schedule2shp.routes2Polylines(outputFolder+"shp/Schedule_TransitRoutes.shp");
+		schedule2shp.stopFacilities2Shapes(outputFolder+"shp/Schedule_StopFacilities.shp", outputFolder+"shp/Schedule_StopFacilities_refLinks.shp");
 
 		// stop facility histogram
-		StopFacilityHistogram.run(schedule, args[2] + "stopfacility_histogram.png");
+		StopFacilityHistogram.run(schedule, outputFolder + "stopfacility_histogram.png");
 	}
 
 	/**
 	 * Performs the plausibility check on the schedule
 	 */
-	public void run() {
+	public void runCheck() {
 		log.info("Starting plausbility check...");
 		AbstractPlausibilityWarning.setNetwork(network);
 

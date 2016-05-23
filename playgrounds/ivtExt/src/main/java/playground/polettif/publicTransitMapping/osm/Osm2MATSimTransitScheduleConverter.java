@@ -102,7 +102,7 @@ public class Osm2MATSimTransitScheduleConverter {
 	 *             [2] output coordinate system (optional)
 	 */
 	public static void main(final String[] args) {
-		CoordinateTransformation ct = args.length == 3 ? TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus") : null;
+		CoordinateTransformation ct = args.length == 3 ? TransformationFactory.getCoordinateTransformation("WGS84", args[2]) : null;
 		Osm2MATSimTransitScheduleConverter osm2mts = new Osm2MATSimTransitScheduleConverter(ScheduleTools.createSchedule(), ct);
 		osm2mts.parse(args[0]);
 		osm2mts.createSchedule();
@@ -216,13 +216,10 @@ public class Osm2MATSimTransitScheduleConverter {
 
 		// add lines to schedule
 		for(TransitLine transitLine : transitLinesDump.values()) {
-//			if(transitLine.getRoutes().size() > 0) {
 				this.transitSchedule.addTransitLine(transitLine);
-//			}
 		}
 
-		// remove non used facilities to schedule
-		ScheduleCleaner.removeNotUsedStopFacilities(transitSchedule);
+		log.info("MATSim Transit Schedule created.");
 	}
 
 	/**

@@ -70,7 +70,7 @@ public class PTMapperThreaded extends PTMapper {
 
 	private static Counter counterPseudoRouting = new Counter("route # ");
 
-	int artificialId = 0;
+	private int artificialId = 0;
 	private Map<Tuple<LinkCandidate, LinkCandidate>, Link> artificialLinks = new HashMap<>();
 	private Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoTransitRoutes = new HashMap<>();
 	private Map<String, Double> alreadyCalculatedWeight = new HashMap<>();
@@ -125,7 +125,7 @@ public class PTMapperThreaded extends PTMapper {
 	@Override
 	public void mapFilesFromConfig() {
 		if(config.getScheduleFile() == null || config.getNetworkFile() == null) {
-			log.error("Not all input files defined in config.");
+			throw new IllegalArgumentException("Not all input files defined in config.");
 		} else {
 			log.info("Mapping files from config...");
 			log.info("Reading schedule and network file...");
@@ -161,7 +161,6 @@ public class PTMapperThreaded extends PTMapper {
 
 		log.info("Mapping transit schedule to network...");
 		int nStopFacilities = schedule.getFacilities().size();
-		Set<String> noRoutingWarning = new HashSet<>();
 
 		/** [1]
 		 * Create a separate network for all schedule modes and
@@ -195,8 +194,8 @@ public class PTMapperThreaded extends PTMapper {
 		 * with no links within search radius are given a dummy loop link right
 		 * on their coordinates.
 		 */
-		linkCandidates = PTMapperUtils.generateModeLinkCandidates(schedule, network, config);
 		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixRegexEscaped());
+		linkCandidates = PTMapperUtils.generateModeLinkCandidates(schedule, network, config);
 
 		/** [3]
 		 * Get network extent to speed up routing outside of network area.
@@ -250,7 +249,9 @@ public class PTMapperThreaded extends PTMapper {
 		for(PseudoRouting thread : pseudoRoutingThreads) {
 			artificialLinksToBeCreated.addAll(thread.getArtificialLinksToBeCreated());
 		}
-		artificialLinksToBeCreated.forEach(this::addArtificialLinkToNetwork);
+		for(Tuple<LinkCandidate, LinkCandidate> t : artificialLinksToBeCreated) {
+			createArtificialLink(t.getFirst(), t.getSecond());
+		}
 
 
 		/** [6]
@@ -292,7 +293,7 @@ public class PTMapperThreaded extends PTMapper {
 		// changing the freespeed of the artificial links (value is used in simulations)
 		NetworkTools.setFreeSpeedOfLinks(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE, config.getFreespeedArtificial());
 		// Remove unnecessary parts of schedule
-		int routesRemoved = ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule);
+		int routesRemoved = config.getRemoveTransitRoutesWithoutLinkSequences() ? ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule) : 0;
 		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
 		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
 		// change the network transport modes
@@ -312,7 +313,7 @@ public class PTMapperThreaded extends PTMapper {
 		if(validationResult.isValid()) {
 			log.info("Schedule appears valid!");
 		} else {
-			log.info("Schedule is NOT valid!");
+			log.warn("Schedule is NOT valid!");
 		}
 		if(validationResult.getErrors().size() > 0) {
 			log.info("Validation errors:");
@@ -354,10 +355,6 @@ public class PTMapperThreaded extends PTMapper {
 		log.info("");
 		log.info("    Note: Run PlausibilityCheck for further analysis");
 		log.info("");
-	}
-
-	private void addArtificialLinkToNetwork(Tuple<LinkCandidate, LinkCandidate> tuple) {
-		createArtificialLink(tuple.getFirst(), tuple.getSecond());
 	}
 
 	/**
@@ -431,8 +428,7 @@ public class PTMapperThreaded extends PTMapper {
 				String scheduleTransportMode = transitRoute.getTransportMode();
 
 				if(!config.getModeRoutingAssignment().containsKey(scheduleTransportMode)) {
-					log.warn("No routing assignment found for schedule transport mode " + scheduleTransportMode +
-							". Transit routes using this mode are removed from the schedule.");
+					log.warn("No routing assignment found for schedule transport mode " + scheduleTransportMode + ".");
 				} else {
 					Router modeRouter = routers.get(scheduleTransportMode);
 					Network modeNetwork = networks.get(scheduleTransportMode);

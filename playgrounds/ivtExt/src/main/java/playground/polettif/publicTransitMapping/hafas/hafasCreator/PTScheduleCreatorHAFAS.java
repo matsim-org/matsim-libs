@@ -21,13 +21,19 @@
 
 package playground.polettif.publicTransitMapping.hafas.hafasCreator;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import playground.polettif.publicTransitMapping.hafas.DeparturesCreator;
 import playground.polettif.publicTransitMapping.hafas.PTScheduleCreator;
 import playground.polettif.publicTransitMapping.hafas.RouteProfileCreator;
 import playground.polettif.publicTransitMapping.hafas.TransitStopCreator;
+import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.Map;
 import java.util.Set;

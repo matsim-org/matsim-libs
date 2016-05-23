@@ -22,8 +22,16 @@
 package playground.polettif.publicTransitMapping.hafas;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
+import playground.polettif.publicTransitMapping.hafas.hafasCreator.PTScheduleCreatorHAFAS;
+import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 /**
  * Provides the contract to create pt lines (stops and scheduled times, no routes) from an OSM network,
@@ -42,6 +50,21 @@ public abstract class PTScheduleCreator {
 	public PTScheduleCreator(TransitSchedule schedule, Vehicles vehicles) {
 		this.schedule = schedule;
 		this.vehicles = vehicles;
+	}
+
+	public static void main(String[] args) {
+		run(args[0], args[1], args[2]);
+	}
+
+	public static void run(String hafasFolder, String outputFolder, String outputSystem) {
+		TransitSchedule schedule = ScheduleTools.createSchedule();
+		Vehicles vehicles = ScheduleTools.createVehicles(schedule);
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", outputSystem);
+
+		new PTScheduleCreatorHAFAS(schedule, vehicles, transformation).createSchedule(hafasFolder);
+
+		ScheduleTools.writeTransitSchedule(schedule, outputFolder+"schedule.xml");
+		new VehicleWriterV1(vehicles).writeFile(outputFolder+"vehicles.xml");
 	}
 
 	/**

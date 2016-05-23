@@ -184,7 +184,7 @@ public class Osm2MultimodalNetworkConverter {
 				highwayParams.put(w.getOsmValue(), w);
 			} else if(w.getOsmKey().equals(OsmTag.RAILWAY)) {
 				railwayParams.put(w.getOsmValue(), w);
-			} // MapUtils.getMap(w.getOsmKey(), wayParams).put(w.getOsmValue(), w);
+			}
 		}
 	}
 

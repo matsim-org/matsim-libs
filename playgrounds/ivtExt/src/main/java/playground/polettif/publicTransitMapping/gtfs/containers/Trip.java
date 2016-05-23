@@ -34,6 +34,7 @@ public class Trip {
 	
 	//Attributes
 	private final String tripId;
+	private final String serviceId;
 	private final Service service;
 	private final Shape shape;
 	private final String name;
@@ -46,6 +47,7 @@ public class Trip {
 		super();
 		this.tripId = tripId;
 		this.service = service;
+		this.serviceId = service.getId();
 		this.shape = shape;
 		this.name = name;
 		stopTimes = new TreeMap<>();
@@ -132,5 +134,9 @@ public class Trip {
 	 */
 	public String getId() {
 		return tripId;
+	}
+
+	public String getServiceId() {
+		return serviceId;
 	}
 }

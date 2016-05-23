@@ -49,8 +49,8 @@ public class RunZurichScenario {
 
 	public static void main(String[] args) {
 
-		String base = "E:/data/zurich/";
-		double percentage = 0.01;
+		String base = "C:/Users/polettif/Desktop/data/zurich/input/";
+		double percentage = 0.1;
 
 		final Config config = ConfigUtils.loadConfig(base + "config.xml", new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
 

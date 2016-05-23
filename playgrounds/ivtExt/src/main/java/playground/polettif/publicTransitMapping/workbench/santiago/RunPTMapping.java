@@ -19,7 +19,6 @@
 
 package playground.polettif.publicTransitMapping.workbench.santiago;
 
-import playground.polettif.publicTransitMapping.mapping.PTMapperModesFilterAndMerge;
 import playground.polettif.publicTransitMapping.mapping.PTMapperThreaded;
 
 public class RunPTMapping {

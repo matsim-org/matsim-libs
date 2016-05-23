@@ -34,6 +34,8 @@ import java.util.*;
  * components algorithm on a rail network.
  *
  * https://en.wikipedia.org/wiki/Tarjan's_strongly_connected_components_algorithm
+ *
+ * Note: does not really work
  */
 public class TarjanNetworkCleaner {
 

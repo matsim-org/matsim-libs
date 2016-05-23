@@ -20,7 +20,6 @@
 package playground.polettif.publicTransitMapping.workbench.santiago;
 
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import playground.polettif.publicTransitMapping.mapping.PTMapperModesFilterAndMerge;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 

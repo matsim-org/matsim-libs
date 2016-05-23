@@ -27,7 +27,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.polettif.publicTransitMapping.gtfs.GTFSReader;
+import playground.polettif.publicTransitMapping.gtfs.GTFSConverter;
 import playground.polettif.publicTransitMapping.gtfs.containers.GTFSDefinitions;
 import playground.polettif.publicTransitMapping.gtfs.containers.Shape;
 
@@ -66,13 +66,14 @@ public class Gtfs2ShapeFile {
 		converter.convert(args[1]);
 	}
 
+	@Deprecated
 	public void readShapes(String filePath) throws IOException {
 		gtfsShapes = new HashMap<>();
 		CSVReader reader = new CSVReader(new FileReader(filePath));
 
 		String[] header = reader.readNext();
-		Map<String, Integer> col = GTFSReader.getIndices(header, GTFSDefinitions.SHAPES.columns);
-
+//		Map<String, Integer> col = GTFSConverter.getIndices(header, GTFSDefinitions.SHAPES.columns);
+/*
 		String[] line = reader.readNext();
 		while(line != null) {
 			Shape actual = gtfsShapes.get(line[col.get("shape_id")]);
@@ -87,6 +88,7 @@ public class Gtfs2ShapeFile {
 			line = reader.readNext();
 		}
 		reader.close();
+		*/
 	}
 
 	public void convert(String outFile) {

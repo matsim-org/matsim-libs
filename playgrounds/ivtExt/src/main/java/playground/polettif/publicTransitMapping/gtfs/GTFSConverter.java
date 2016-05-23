@@ -32,11 +32,12 @@ import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.vehicles.*;
 import org.opengis.feature.simple.SimpleFeature;
 import playground.polettif.publicTransitMapping.gtfs.containers.*;
+import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
+import playground.polettif.publicTransitMapping.tools.ShapeFileTools;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -55,9 +56,13 @@ import java.util.Map.Entry;
  *
  * @author polettif
  */
-public class GTFSReader {
+public class GTFSConverter {
 
-	private static final Logger log = Logger.getLogger(GTFSReader.class);
+	private static final Logger log = Logger.getLogger(GTFSConverter.class);
+	public static final String SHAPE_ID = "shape_id";
+	public static final String SHAPE_PT_LON = "shape_pt_lon";
+	public static final String SHAPE_PT_LAT = "shape_pt_lat";
+	public static final String SHAPE_PT_SEQUENCE = "shape_pt_sequence";
 
 	// todo await departure time?
 	private boolean defaultAwaitDepartureTime = true;
@@ -111,6 +116,7 @@ public class GTFSReader {
 	private TransitSchedule schedule;
 	private Vehicles vehicles;
 	private TransitScheduleFactory scheduleFactory;
+	private Object usedServiceIds;
 
 
 	/**
@@ -132,15 +138,16 @@ public class GTFSReader {
 	 *                  </ul>
 	 * 	 			[2] the output coordinate system. WGS84/identity transformation is used if <code>null</code>.<br/>
 	 * 				[3]	path to the to be generated unmapped transit schedule file.<br/>
-	 * 				[4] path to the to be generated default vehicles file (optional).<p/>
+	 * 				[4] path to the to be generated default vehicles file.<br/>
+	 * 				[4] path to the to be created shape file (based on shapes.txt if available).<br/>
 	 *
-	 * Calls {@link #convertGTFS2MATSimTransitScheduleFile}.
+	 * Calls {@link #run}.
 	 */
 	public static void main(final String[] args) {
 		if(args.length == 4) {
-			convertGTFS2MATSimTransitScheduleFile(args[0], args[1], args[2], args[3]);
-		} else if(args.length == 5) {
-			convertGTFS2MATSimTransitScheduleFile(args[0], args[1], args[2], args[3], args[4]);
+			run(args[0], args[1], args[2], args[3]);
+		} else if(args.length == 6) {
+			run(args[0], args[1], args[2], args[3], args[4], args[5]);
 		}
 	}
 
@@ -162,10 +169,9 @@ public class GTFSReader {
 	 * @param outputCoordinateSystem the output coordinate system. WGS84/identity transformation is used if <code>null</code>.
 	 * @param mtsOutputFile          path to the (to be generated) unmapped transit schedule file
 	 */
-	public static void convertGTFS2MATSimTransitScheduleFile(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem, String mtsOutputFile) {
-		GTFSReader gtfsReader = new GTFSReader(gtfsInputPath, serviceIdsParam, outputCoordinateSystem);
-
-		ScheduleTools.writeTransitSchedule(gtfsReader.getSchedule(), mtsOutputFile);
+	public static void run(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem, String mtsOutputFile) {
+		GTFSConverter gtfsConverter = new GTFSConverter(gtfsInputPath, serviceIdsParam, outputCoordinateSystem);
+		ScheduleTools.writeTransitSchedule(gtfsConverter.getSchedule(), mtsOutputFile);
 	}
 
 	/**
@@ -188,20 +194,14 @@ public class GTFSReader {
 	 * @param outputCoordinateSystem the output coordinate system. WGS84/identity transformation is used if <code>null</code>.
 	 * @param mtsOutputFile          path to the (to be generated) unmapped transit schedule file
 	 * @param vehiclesOutputFile     path to the (to be generated) default vehicles file
+	 * @param shapeOutputFile        path to the (to be generated) default vehicles file
 	 */
-	public static void convertGTFS2MATSimTransitScheduleFile(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem, String mtsOutputFile, String vehiclesOutputFile) {
-		GTFSReader gtfsReader = new GTFSReader(gtfsInputPath, serviceIdsParam, outputCoordinateSystem);
+	public static void run(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem, String mtsOutputFile, String vehiclesOutputFile, String shapeOutputFile) {
+		GTFSConverter gtfsConverter = new GTFSConverter(gtfsInputPath, serviceIdsParam, outputCoordinateSystem);
 
-		ScheduleTools.writeTransitSchedule(gtfsReader.getSchedule(), mtsOutputFile);
-		ScheduleTools.writeVehicles(gtfsReader.getVehicles(), vehiclesOutputFile);
-	}
-
-
-	public static void convertWithShapes(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem, String mtsOutputFile, String outputShapeFile) {
-		GTFSReader gtfsReader = new GTFSReader(gtfsInputPath, serviceIdsParam, outputCoordinateSystem);
-
-		gtfsReader.writeShapeFile(outputShapeFile);
-		ScheduleTools.writeTransitSchedule(gtfsReader.getSchedule(), mtsOutputFile);
+		ScheduleTools.writeTransitSchedule(gtfsConverter.getSchedule(), mtsOutputFile);
+		ScheduleTools.writeVehicles(gtfsConverter.getVehicles(), vehiclesOutputFile);
+		ShapeFileTools.writeGtfsTripsToFile(gtfsConverter.getGtfsRoutes(), gtfsConverter.getServiceIds(), outputCoordinateSystem, shapeOutputFile);
 	}
 
 	/**
@@ -219,7 +219,7 @@ public class GTFSReader {
 	 *                               </ul>
 	 * @param outputCoordinateSystem the output coordinate system. WGS84/identity transformation is used if <code>null</code>.
 	 */
-	public GTFSReader(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem) {
+	public GTFSConverter(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem) {
 		Service.dateStats.clear();
 		this.schedule = ScheduleTools.createSchedule();
 		this.scheduleFactory = schedule.getFactory();
@@ -239,6 +239,14 @@ public class GTFSReader {
 
 	public Vehicles getVehicles() {
 		return vehicles;
+	}
+
+	public SortedMap<String,GTFSRoute> getGtfsRoutes() {
+		return gtfsRoutes;
+	}
+
+	public Set<String> getServiceIds() {
+		return serviceIds;
 	}
 
 	/**
@@ -383,6 +391,11 @@ public class GTFSReader {
 		} // foreach route
 
 		/**
+		 * Removes stops that are not accessed by any route
+		 */
+		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
+
+		/**
 		 * Create default vehicles.
 		 */
 		vehicles = ScheduleTools.createVehicles(schedule);
@@ -522,7 +535,6 @@ public class GTFSReader {
 	 */
 	private void loadShapes() {
 		// shapes are optional
-		/*
 		log.info("Looking for shapes.txt");
 		CSVReader reader;
 		try {
@@ -535,19 +547,21 @@ public class GTFSReader {
 			while(line != null) {
 				usesShapes = true; // shape file might exists but could be empty
 
-				Shape currentShape = shapes.get(line[col.get("shape_id")]);
+				Shape currentShape = shapes.get(line[col.get(SHAPE_ID)]);
 				if(currentShape == null) {
-					currentShape = new Shape(line[col.get("shape_id")]);
-					shapes.put(line[col.get("shape_id")], currentShape);
+					currentShape = new Shape(line[col.get(SHAPE_ID)]);
+					shapes.put(line[col.get(SHAPE_ID)], currentShape);
 				}
-				currentShape.addPoint(new Coord(Double.parseDouble(line[col.get("shape_pt_lon")]), Double.parseDouble(line[col.get("shape_pt_lat")])), Integer.parseInt(line[col.get("shape_pt_sequence")]));
+				Coord point;
+				point = new Coord(Double.parseDouble(line[col.get(SHAPE_PT_LON)]), Double.parseDouble(line[col.get(SHAPE_PT_LAT)]));
+				currentShape.addPoint(transformation.transform(point), Integer.parseInt(line[col.get(SHAPE_PT_SEQUENCE)]));
 				line = reader.readNext();
 			}
 			log.info("...     shapes.txt loaded");
 		} catch (IOException e) {
 			log.info("...     no shapes file found.");
 		}
-		*/
+
 	}
 
 	/**
@@ -710,7 +724,7 @@ public class GTFSReader {
 	 * @param columnNames array of attributes you need the indices of
 	 * @return the index for each attribute given in columnNames
 	 */
-	public static Map<String, Integer> getIndices(String[] header, String[] columnNames) {
+	private static Map<String, Integer> getIndices(String[] header, String[] columnNames) {
 		Map<String, Integer> indices = new HashMap<>();
 
 		for(String columnName : columnNames) {
@@ -734,27 +748,25 @@ public class GTFSReader {
 	 *
 	 * @param param The date for which all service ids should be looked up.
 	 *              Or the algorithm with which you want to get the service ids.
-	 *              (Currently only <i>mostused</i> and <i>all</i> are implemented).
 	 */
 	private void setServiceIds(String param) {
-		// todo doc param
 		switch (param) {
 			case MOST_USED_SINGLE_ID:
 				String mostUsed = getKeyOfMaxValue(serviceIdsCount);
-				serviceIds = Collections.singleton(mostUsed);
+				this.serviceIds = Collections.singleton(mostUsed);
 				log.info("... Getting most used service ID: " + mostUsed + " (" + serviceIdsCount.get(mostUsed) + " occurences)");
 				break;
 
 			case ALL_SERVICE_IDS:
 				log.info("... Using all service IDs (probably way too much data)");
-				serviceIds = services.keySet();
+				this.serviceIds = services.keySet();
 				break;
 
 			case DAY_WITH_MOST_SERVICES: {
 				LocalDate busiestDate = null;
 				for(Entry<LocalDate, Set<String>> e : Service.dateStats.entrySet()) {
 					if(e.getValue().size() > serviceIds.size()) {
-						serviceIds = e.getValue();
+						this.serviceIds = e.getValue();
 						busiestDate = e.getKey();
 					}
 				}
@@ -773,7 +785,7 @@ public class GTFSReader {
 					}
 					if(nTrips > maxTrips) {
 						maxTrips = nTrips;
-						serviceIds = e.getValue();
+						this.serviceIds = e.getValue();
 						busiestDate = e.getKey();
 					}
 				}
@@ -785,8 +797,8 @@ public class GTFSReader {
 			default:
 				LocalDate checkDate = LocalDate.of(Integer.parseInt(param.substring(0, 4)), Integer.parseInt(param.substring(4, 6)), Integer.parseInt(param.substring(6, 8)));
 
-				serviceIds = getServiceIdsOnDate(checkDate);
-				log.info("        Using service IDs on " + param + ": " + serviceIds.size() + " services.");
+				this.serviceIds = getServiceIdsOnDate(checkDate);
+				log.info("        Using service IDs on " + param + ": " + this.serviceIds.size() + " services.");
 				break;
 		}
 	}
@@ -849,44 +861,5 @@ public class GTFSReader {
 			}
 
 		}
-	}
-
-	public void writeShapeFile(String outFile) {
-		PolylineFeatureFactory ff = new PolylineFeatureFactory.Builder()
-				.setName("gtfs_shapes")
-				.setCrs(MGC.getCRS("EPSG:2056"))
-				.addAttribute("id", String.class)
-				.addAttribute("trip_id", String.class)
-				.addAttribute("trip_name", String.class)
-				.addAttribute("route_id", String.class)
-				.addAttribute("route_name", String.class)
-				.create();
-
-		for(GTFSRoute gtfsRoute : gtfsRoutes.values()) {
-			for(Trip trip : gtfsRoute.getTrips().values()) {
-				boolean useTrip = false;
-				for(String serviceId : serviceIds) {
-					if(trip.getService().equals(services.get(serviceId))) {
-						useTrip = true;
-						break;
-					}
-				}
-
-				if(useTrip) {
-					Shape shape = trip.getShape();
-					if(shape != null) {
-						SimpleFeature f = ff.createPolyline(shape.getCoordinates());
-						f.setAttribute("id", shape.getId());
-						f.setAttribute("trip_id", trip.getId());
-						f.setAttribute("trip_name", trip.getName());
-						f.setAttribute("route_id", gtfsRoute.getRouteId());
-						f.setAttribute("route_name", gtfsRoute.getShortName());
-						features.add(f);
-					}
-				}
-			}
-		}
-
-		ShapeFileWriter.writeGeometries(features, outFile);
 	}
 }

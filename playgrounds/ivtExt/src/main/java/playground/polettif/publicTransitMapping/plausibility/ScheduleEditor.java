@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
 
 /**
- * Provides tools for rerouting and adapting schedules via a csv "command file".
+ * Provides methods for rerouting and adapting schedules via a csv "command file".
  *
  * @author polettif
  */

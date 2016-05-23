@@ -52,6 +52,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
 	private static final String COMBINE_PT_MODES = "combinePtModes";
 	private static final String MULTI_THREAD = "threads";
+	public static final String REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES = "removeTransitRoutesWithoutLinkSequences";
 
 
 	public PublicTransitMappingConfigGroup() {
@@ -82,9 +83,11 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(COMBINE_PT_MODES,
 				"Defines whether at the end of mapping, all non-car link modes (bus, rail, etc) \n" +
 				"\t\tshould be replaced with pt (true) or not. Default: false");
+		map.put(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES,
+				"If true, transit routes without link sequences after mapping are removed from the schedule. Default: false");
 		map.put(LINK_DISTANCE_TOLERANCE,
-				"[Link Candidates] After " +MAX_NCLOSEST_LINKS +" link candidates have been found, additional link \n" +
-				"\t\tcandidates within "+LINK_DISTANCE_TOLERANCE+"*(distance to the Nth link) are added to the set.\n" +
+				"(concerns Link Candidates) After " +MAX_NCLOSEST_LINKS +" link candidates have been found, additional link \n" +
+				"\t\tcandidates within ["+LINK_DISTANCE_TOLERANCE+"] * [distance to the Nth link] are added to the set.\n" +
 				"\t\tMust be >= 1.");
 		map.put(PSEUDO_ROUTE_WEIGHT_TYPE,
 				"Defines which link attribute should be used for pseudo route calculations. Default is minimization \n" +
@@ -93,7 +96,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(MAX_NCLOSEST_LINKS,
 				"(concerns Link Candidates) Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
 				"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
-				"\t\tfacility coordinates. Default: " + nodeSearchRadius);
+				"\t\tfacility coordinates and performance desires. Default: " + maxNClosestLinks);
 		map.put(NODE_SEARCH_RADIUS,
 				"(concerns Link Candidates)Defines the radius [meter] from a stop facility within nodes are searched. Mainly a maximum \n" +
 				"\t\tvalue for performance.");
@@ -107,14 +110,15 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"Suffix used for child stop facilities. The id of the referenced link is appended\n" +
 				"\t\t(i.e. stop0123.link:LINKID20123).");
 		map.put(BEELINE_DISTANCE_MAX_FACTOR ,
-				"If all paths between two stops have a length > beelineDistanceMaxFactor * beelineDistance, \n" +
+				"If all paths between two stops have a [length] > [beelineDistanceMaxFactor] * [beelineDistance], \n" +
 				"\t\tan artificial link is created.");
 		map.put(MULTI_THREAD,
-				"Defines the number of threads that should be used for each schedule transport mode. Default: 2.");
+				"Defines the number of threads that should be used for each schedule transport mode. Default: 2.\n" +
+				"\t\tNote: The actual number of threads is <threads> * <nrOfScheduleTransportModes> + 1");
 		map.put(NETWORK_FILE, "Path to the input network file. Not needed if PTMapper is called within another class.");
 		map.put(SCHEDULE_FILE, "Path to the input schedule file. Not needed if PTMapper is called within another class.");
 		map.put(OUTPUT_NETWORK_FILE, "Path to the output network file. Not needed if PTMapper is used within another class.");
-		map.put(OUTPUT_NETWORK_FILE, "Path to the output car only network file. The inpu multimodal map is filtered. \n" +
+		map.put(OUTPUT_STREET_NETWORK_FILE, "Path to the output car only network file. The input multimodal map is filtered. \n" +
 				"\t\tNot needed if PTMapper is used within another class.");
 		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
 		return map;
@@ -165,6 +169,10 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		if(modeRoutingAssignmentString == null) {
 			this.modeRoutingAssignment = null;
 			return;
+		}
+
+		if(modeRoutingAssignmentString.equals("")) {
+			throw new IllegalArgumentException("No modeRoutingAssignment defined in config!");
 		}
 
 		for(String assignment : modeRoutingAssignmentString.split("\\|")) {
@@ -231,6 +239,22 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
+	 *
+	 */
+	private boolean removeTransitRoutesWithoutLinkSequences = false;
+
+	@StringGetter(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES)
+	public boolean getRemoveTransitRoutesWithoutLinkSequences() {
+		return combinePtModes;
+	}
+
+	@StringSetter(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES)
+	public void setRemoveTransitRoutesWithoutLinkSequences(boolean v) {
+		this.combinePtModes = v;
+	}
+
+
+	/**
 	 * Defines the radius [meter] from a stop facility within nodes are searched.
 	 * Mainly a maximum value for performance.
 	 */
@@ -277,7 +301,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	public void setThreads(int threads) {
 		this.threads = threads;
 	}
-
 
 	/**
 	 * Defines which link attribute should be used for pseudo route
@@ -428,8 +451,11 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	 * Params for filepahts
 	 */
 	@StringGetter(NETWORK_FILE)
-	public String getNetworkFile() {
+	public String getNetworkFileStr() {
 		return this.networkFile == null ? "" : this.networkFile;
+	}
+	public String getNetworkFile() {
+		return this.networkFile;
 	}
 
 	@StringSetter(NETWORK_FILE)
@@ -440,8 +466,11 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringGetter(SCHEDULE_FILE)
-	public String getScheduleFile() {
+	public String getScheduleFileStr() {
 		return this.scheduleFile == null ? "" : this.scheduleFile;
+	}
+	public String getScheduleFile() {
+		return this.scheduleFile;
 	}
 
 	@StringSetter(SCHEDULE_FILE)
@@ -464,8 +493,11 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringGetter(OUTPUT_STREET_NETWORK_FILE)
+	public String getOutputStreetNetworkFileStr() {
+		return this.outputStreetNetworkFile == null ? "" : this.outputStreetNetworkFile;
+	}
 	public String getOutputStreetNetworkFile() {
-		return this.outputStreetNetworkFile == null ? null : this.outputStreetNetworkFile;
+		return this.outputStreetNetworkFile;
 	}
 
 	@StringSetter(OUTPUT_STREET_NETWORK_FILE)
@@ -477,7 +509,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
 	@StringGetter(OUTPUT_SCHEDULE_FILE)
 	public String getOutputScheduleFile() {
-		return this.outputScheduleFile;
+		return this.outputScheduleFile == null ? "" : this.outputScheduleFile;
 	}
 
 	@StringSetter(OUTPUT_SCHEDULE_FILE)

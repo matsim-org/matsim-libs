@@ -16,17 +16,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package playground.polettif.publicTransitMapping.workbench;
 
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import playground.polettif.publicTransitMapping.gtfs.GTFSReader;
-import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
-import playground.polettif.publicTransitMapping.tools.ScheduleTools;
+import playground.polettif.publicTransitMapping.gtfs.GTFSConverter;
+import playground.polettif.publicTransitMapping.hafas.PTScheduleCreator;
+import playground.polettif.publicTransitMapping.osm.Osm2MultimodalNetworkConverter;
+import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
 
-public class RunGTFS2UnmappedMTS {
-	
-	public static void main(final String[] args) {
+/**
+ * Class that shows the different access points of the
+ * PublicTransitMapping package and how to use/run
+ * them.
+ *
+ * @author polettif
+ */
+public class Run {
+
+	public static void main(String[] args) {
+
+	}
+
+	public void gtfs2mts() {
 		String base = "C:/Users/Flavio/Desktop/data/";
 
 		String gtfsPath = base+"gtfs/zvv/";
@@ -34,14 +44,34 @@ public class RunGTFS2UnmappedMTS {
 		String vehiclesFile = base+"vehicles/fromGtfs/zvv_mostServices_vehicles.xml";
 		String shapeFile = base+"gtfs/shp/zvv_mostServices.shp";
 
-		// Load Schedule
-		GTFSReader gtfsReader = new GTFSReader(gtfsPath, GTFSReader.DAY_WITH_MOST_SERVICES, "CH1903_LV03_Plus");
-		gtfsReader.writeShapeFile(shapeFile);
-
-		TransitSchedule schedule = gtfsReader.getSchedule();
-		ScheduleCleaner.removeNotUsedStopFacilities(schedule);
-		ScheduleTools.writeTransitSchedule(schedule, mtsFile);
-
-		ScheduleTools.writeVehicles(gtfsReader.getVehicles(), vehiclesFile);
+		GTFSConverter.run(gtfsPath, GTFSConverter.DAY_WITH_MOST_SERVICES, "CH1903_LV03_Plus", mtsFile);
+		// or
+		GTFSConverter.run(gtfsPath, GTFSConverter.DAY_WITH_MOST_SERVICES, "CH1903_LV03_Plus", mtsFile, vehiclesFile, shapeFile);
 	}
+
+	public void hafas2mts() {
+		String hafasFolder = "";
+		String outputFolder = "";
+		String outputSystem = "CH1903_LV03_Plus";
+
+		PTScheduleCreator.run(hafasFolder, outputFolder, outputSystem);
+	}
+
+	public void osm2network() {
+		String configFile = "";
+		Osm2MultimodalNetworkConverter.run(configFile);
+	}
+
+	public void plausibilityCheck() {
+		String scheduleFile = "";
+		String networkFile = "";
+		String outputFolder = "";
+
+		PlausibilityCheck.run(scheduleFile, networkFile, outputFolder);
+	}
+
+	public void editSchedule() {
+
+	}
+
 }
