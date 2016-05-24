@@ -61,7 +61,7 @@ public class PricingRunner {
 
 	private static final String configFile = "../../../runs-svn/vickreyPricing/input/config.xml";
 	private static final String outputBaseDirectory = "../../../runs-svn/vickreyPricing/output/";
-	private static final PricingApproach pricingApproach = PricingApproach.NoPricing;
+	private static final PricingApproach pricingApproach = PricingApproach.IntervalBasedPricing;
 	
 	public enum PricingApproach {
         NoPricing, IntervalBasedPricing, V3, V10
