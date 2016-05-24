@@ -19,13 +19,13 @@
 
 package playground.polettif.publicTransitMapping.workbench.santiago;
 
-import playground.polettif.publicTransitMapping.mapping.PTMapperThreaded;
+import playground.polettif.publicTransitMapping.mapping.PTMapperPseudoRouting;
 
 public class RunPTMapping {
 
 	public static void main(String[] args) {
 		String base = "E:/data/santiago/";
 //		PTMapperModesFilterAndMerge.run(base+"mts/mappingConfig.xml");
-		PTMapperThreaded.run(base+"mts/mappingConfig.xml");
+		PTMapperPseudoRouting.run(base+"mts/mappingConfig.xml");
 	}
 }

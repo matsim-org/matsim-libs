@@ -23,7 +23,6 @@ package playground.polettif.publicTransitMapping.mapping;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -34,6 +33,9 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 /**
  * Provides the contract for an multithread
  * implementation of public transit mapping.
+ *
+ * Currently redirects to the only implementation
+ * {@link PTMapperPseudoRouting}.
  *
  * @author polettif
  */
@@ -70,7 +72,7 @@ public abstract class PTMapper {
 	 * @param configFile the PublicTransitMapping config file
 	 */
 	public static void run(String configFile) {
-		new PTMapperThreaded(configFile).run();
+		new PTMapperPseudoRouting(configFile).run();
 	}
 
 	/**

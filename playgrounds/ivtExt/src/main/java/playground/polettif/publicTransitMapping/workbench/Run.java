@@ -19,7 +19,7 @@
 package playground.polettif.publicTransitMapping.workbench;
 
 import playground.polettif.publicTransitMapping.gtfs.GTFSConverter;
-import playground.polettif.publicTransitMapping.hafas.PTScheduleCreator;
+import playground.polettif.publicTransitMapping.hafas.HafasConverter;
 import playground.polettif.publicTransitMapping.osm.Osm2MultimodalNetworkConverter;
 import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
 
@@ -54,7 +54,7 @@ public class Run {
 		String outputFolder = "";
 		String outputSystem = "CH1903_LV03_Plus";
 
-		PTScheduleCreator.run(hafasFolder, outputFolder, outputSystem);
+		HafasConverter.run(hafasFolder, outputFolder, outputSystem);
 	}
 
 	public void osm2network() {
