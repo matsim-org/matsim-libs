@@ -20,7 +20,7 @@
 package playground.singapore.springcalibration.run.replanning;
 
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
+import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
@@ -40,7 +40,7 @@ import javax.inject.Provider;
 public class SingaporeLegModeChoicePlanStrategyProvider implements Provider<PlanStrategy> {
 
 	private final GlobalConfigGroup globalConfigGroup;
-	private final ChangeLegModeConfigGroup changeLegModeConfigGroup;
+	private final ChangeModeConfigGroup changeLegModeConfigGroup;
 	private final SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
 	private Provider<TripRouter> tripRouterProvider;
 	private ActivityFacilities activityFacilities;
@@ -50,7 +50,7 @@ public class SingaporeLegModeChoicePlanStrategyProvider implements Provider<Plan
 	@Inject
 	SingaporeLegModeChoicePlanStrategyProvider(
 			GlobalConfigGroup globalConfigGroup, 
-			ChangeLegModeConfigGroup changeLegModeConfigGroup, 
+			ChangeModeConfigGroup changeLegModeConfigGroup, 
 			SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup,
 			ActivityFacilities activityFacilities, 
 			Provider<TripRouter> tripRouterProvider,

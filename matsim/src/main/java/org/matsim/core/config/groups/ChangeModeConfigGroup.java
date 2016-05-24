@@ -5,16 +5,17 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 
-public class ChangeLegModeConfigGroup extends ReflectiveConfigGroup {
+public class ChangeModeConfigGroup extends ReflectiveConfigGroup {
 
-	public final static String CONFIG_MODULE = "changeLegMode";
+//	public final static String CONFIG_MODULE = "changeLegMode";
+	public final static String CONFIG_MODULE = "changeMode";
 	public final static String CONFIG_PARAM_MODES = "modes";
 	public final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
 
 	private String[] modes = new String[] { TransportMode.car, TransportMode.pt };
 	private boolean ignoreCarAvailability = true;
 
-	public ChangeLegModeConfigGroup() {
+	public ChangeModeConfigGroup() {
 		super(CONFIG_MODULE);
 	}
 

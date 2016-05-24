@@ -19,7 +19,7 @@
 
 package org.matsim.core.replanning.strategies;
 
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
+import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -36,12 +36,12 @@ import javax.inject.Provider;
 public class ChangeTripModePlanStrategyProvider implements Provider<PlanStrategy> {
 
 	private final GlobalConfigGroup globalConfigGroup;
-	private final ChangeLegModeConfigGroup changeLegModeConfigGroup;
+	private final ChangeModeConfigGroup changeLegModeConfigGroup;
 	private Provider<TripRouter> tripRouterProvider;
 	private ActivityFacilities activityFacilities;
 
 	@Inject
-    protected ChangeTripModePlanStrategyProvider(GlobalConfigGroup globalConfigGroup, ChangeLegModeConfigGroup changeLegModeConfigGroup, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
+    protected ChangeTripModePlanStrategyProvider(GlobalConfigGroup globalConfigGroup, ChangeModeConfigGroup changeLegModeConfigGroup, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.changeLegModeConfigGroup = changeLegModeConfigGroup;
 		this.activityFacilities = activityFacilities;

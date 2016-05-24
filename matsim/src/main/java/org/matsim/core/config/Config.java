@@ -81,7 +81,7 @@ public class Config implements MatsimExtensionPoint {
 	private TravelTimeCalculatorConfigGroup travelTimeCalculatorConfigGroup = null;
 	private PtCountsConfigGroup ptCounts = null;
 	private VehiclesConfigGroup vehicles = null ;
-	private ChangeLegModeConfigGroup changeLegMode = null;
+	private ChangeModeConfigGroup changeMode = null;
 	private JDEQSimConfigGroup jdeqSim = null;
 
 	private final List<ConfigConsistencyChecker> consistencyCheckers = new ArrayList<ConfigConsistencyChecker>();
@@ -173,8 +173,11 @@ public class Config implements MatsimExtensionPoint {
 		this.vehicles = new VehiclesConfigGroup() ;
 		this.modules.put( VehiclesConfigGroup.GROUP_NAME , this.vehicles ) ;
 
-		this.changeLegMode = new ChangeLegModeConfigGroup();
-		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, this.changeLegMode);
+		this.changeMode = new ChangeModeConfigGroup();
+		this.modules.put(ChangeModeConfigGroup.CONFIG_MODULE, this.changeMode);
+
+		this.modules.put(ChangeLegModeConfigGroup.CONFIG_MODULE, new ChangeLegModeConfigGroup());
+		// only to provide error messages. kai, may'16
 
 		this.jdeqSim = new JDEQSimConfigGroup();
 		this.modules.put(JDEQSimConfigGroup.NAME, this.jdeqSim);
@@ -479,8 +482,8 @@ public class Config implements MatsimExtensionPoint {
 		return this.subtourModeChoice;
 	}
 
-	public ChangeLegModeConfigGroup changeLegMode() {
-		return this.changeLegMode;
+	public ChangeModeConfigGroup changeMode() {
+		return this.changeMode;
 	}
 
 	public JDEQSimConfigGroup jdeqSim() {
