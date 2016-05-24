@@ -153,7 +153,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 					new CountsWriter(counts).write(controlerIO.getOutputFilename(Controler.FILENAME_COUNTS));
 				}
 				else {
-					log.info( "re-projecting counts from "+internalCRS+" to "+inputCRS+" for export" );
+					log.info( "re-projecting counts from "+internalCRS+" back to "+inputCRS+" for export" );
 
 					final CoordinateTransformation transformation =
 							TransformationFactory.getCoordinateTransformation(
@@ -202,7 +202,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 					new TransitScheduleWriter(transitSchedule).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
 				}
 				else {
-					log.info( "re-projecting transit schedule from "+internalCRS+" to "+inputCRS+" for export" );
+					log.info( "re-projecting transit schedule from "+internalCRS+" back to "+inputCRS+" for export" );
 
 					final CoordinateTransformation transformation =
 							TransformationFactory.getCoordinateTransformation(
@@ -232,7 +232,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 				new FacilitiesWriter(activityFacilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
 			}
 			else {
-				log.info( "re-projecting facilities from "+internalCRS+" to "+inputCRS+" for export" );
+				log.info( "re-projecting facilities from "+internalCRS+" back to "+inputCRS+" for export" );
 
 				final CoordinateTransformation transformation =
 						TransformationFactory.getCoordinateTransformation(
@@ -255,7 +255,8 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			new NetworkWriter(network).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
 		}
 		else {
-			log.info( "re-projecting network from "+config.global().getCoordinateSystem()+" to "+config.network().getInputCRS()+" for export" );
+			log.info( "re-projecting network from "+config.global().getCoordinateSystem()+" back to "+config.network().getInputCRS()+" for export" );
+
 			final CoordinateTransformation transformation =
 					TransformationFactory.getCoordinateTransformation(
 							config.global().getCoordinateSystem(),
@@ -274,7 +275,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			new PopulationWriter(population, network).write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
 		}
 		else {
-				log.info( "re-projecting population from "+internalCRS+" to "+inputCRS+" for export" );
+				log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
 
 				final CoordinateTransformation transformation =
 						TransformationFactory.getCoordinateTransformation(
