@@ -23,6 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
+ * Junit Test for the TransitLeastCostPathTree.
+ *
  * @author gabriel.thunig on 23.05.2016.
  */
 public class TransitLeastCostPathTreeTest {
@@ -31,6 +33,10 @@ public class TransitLeastCostPathTreeTest {
     private TransitRouterNetwork network;
     private TransitRouterNetworkTravelTimeAndDisutility travelDisutility;
 
+    /**
+     * Gets executed before each Method.
+     * Instantiates a new TransitLeastCostPathTree object with a sample transitSchedule and default configuration.
+     */
     @Before
     public void instantiateTree() {
         String transitScheduleFile = "../../matsim/examples/pt-tutorial/transitschedule.xml";
@@ -52,11 +58,17 @@ public class TransitLeastCostPathTreeTest {
         tree = new TransitLeastCostPathTree(network, costFunction, timeFunction);
     }
 
+    /**
+     * Check whether the @Before-instantiation is instantiating a TransitLeastCostPathTree-object.
+     */
     @Test
     public void TestTreeInstantiated() {
         Assert.assertNotNull(tree);
     }
 
+    /**
+     * Create a tree and verify it.
+     */
     @Test
     public void TestCreateLeastCostPathTree() {
         Coord fromCoord = new Coord(1050d, 1050d);
@@ -65,6 +77,13 @@ public class TransitLeastCostPathTreeTest {
         Assert.assertEquals("Coords differ.", fromCoord, tree.getFromCoord());
     }
 
+    /**
+     * Get the very next transitNode.
+     * @param person Which person we are routing for. For default leave null.
+     * @param coord The origin of the tree.
+     * @param departureTime The time the person departures at the origin.
+     * @return the next transitNode.
+     */
     private Map<Node, TransitLeastCostPathTree.InitialNode> locateWrappedNearestTransitNode(Person person, Coord coord, double departureTime) {
         TransitRouterNetwork.TransitRouterNetworkNode nearestNode = network.getNearestNode(coord);
         Map<Node, TransitLeastCostPathTree.InitialNode> wrappedNearestNodes = new LinkedHashMap<>();
@@ -75,6 +94,10 @@ public class TransitLeastCostPathTreeTest {
         return wrappedNearestNodes;
     }
 
+    /**
+     * Try to access a path without initially creating the tree.
+     * Should throw a java.lang.NullPointerException.
+     */
     @Test
     public void TestGetPathWithoutTree() {
         Coord toCoord = new Coord(3950d, 1050d);
@@ -88,6 +111,9 @@ public class TransitLeastCostPathTreeTest {
         Assert.assertEquals("java.lang.NullPointerException", exceptionMessage);
     }
 
+    /**
+     * Try to route a standard connection.
+     */
     @Test
     public void TestValidRouting() {
         Coord fromCoord = new Coord(1050d, 1050d);
@@ -103,6 +129,9 @@ public class TransitLeastCostPathTreeTest {
         Assert.assertEquals(540d, pathTime, MatsimTestUtils.EPSILON);
     }
 
+    /**
+     * Try to route a connection with interchange.
+     */
     @Test
     public void TestValidRoutingWithInterchange() {
         Coord fromCoord = new Coord(1050d, 1050d);
