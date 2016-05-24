@@ -200,21 +200,21 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		map.put(STUCK_TIME, STUCK_TIME_STRING );
 
 		{
-			String options = null ;
+			String options = "" ;
 			for ( TrafficDynamics dyn : TrafficDynamics.values() ) {
 				options += dyn + " " ;
 			}
 			map.put(TRAFFIC_DYNAMICS, "options: " + options ) ;
 		}
 		{ 
-			String options = null ;
+			String options = "" ;
 			for ( StarttimeInterpretation ii : StarttimeInterpretation.values() ) {
 				options += ii + " " ;
 			}
 			map.put(SIM_STARTTIME_INTERPRETATION, "Options: " + options ) ;
 		}
 		{
-			String options = null ;
+			String options = "" ;
 			for ( VehicleBehavior behav : VehicleBehavior.values() ) {
 				options += behav + " " ;
 			}
@@ -236,7 +236,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 			map.put(LINK_DYNAMICS, "default: FIFO; options:" + stb ) ;
 		}
 		map.put(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID, "If a route does not reference a vehicle, agents will use the vehicle with the same id as their own.");
-		map.put(USE_DEFAULT_VEHICLES, "[DEPRECATED, use" + VEHICLES_SOURCE + " instead]  If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties.");
+		map.put(USE_DEFAULT_VEHICLES, "[DEPRECATED, use " + VEHICLES_SOURCE + " instead]  If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties.");
 		map.put(USING_THREADPOOL, "if the qsim should use as many runners as there are threads (Christoph's dissertation version)"
 				+ " or more of them, together with a thread pool (seems to be faster in some situations, but is not tested).") ;
 		map.put(FAST_CAPACITY_UPDATE, "normally, the qsim accumulates fractional flows up to one flow unit in every time step.  If this switch is set to true, "
