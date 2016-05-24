@@ -86,8 +86,10 @@ public final class PersonImpl implements Person {
 		return this.id;
 	}
 
-    // Not on interface. Only to be used for demand generation.
 	public void setId(final Id<Person> id) {
+		// Not on interface. Only to be used for demand generation.
+		// yyyy This method is dangerous, since it allows to change the ID of the person while it remains under the old ID in the map.
+		// I think that it can be removed once the copy stuff is sorted out.  kai, may'16
 		testForLocked() ;
 		this.id = id;
 	}
@@ -123,7 +125,7 @@ public final class PersonImpl implements Person {
 		return this.customizableDelegate.getCustomAttributes();
 	}
 
-	public final void setLocked() {
+	final void setLocked() {
 		this.locked = true ;
 		
 		// note that this does NOT lock the add/remove plans logic, but just some fields. kai, dec'15
