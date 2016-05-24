@@ -99,8 +99,8 @@ public class PlausibilityCheck {
 	 * and writes the results to the output folder.
 	 */
 	public static void run(String scheduleFile, String networkFile, String outputFolder) {
-		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(scheduleFile);
-		Network network = NetworkTools.loadNetwork(networkFile);
+		TransitSchedule schedule = ScheduleTools.readTransitSchedule(scheduleFile);
+		Network network = NetworkTools.readNetwork(networkFile);
 
 		PlausibilityCheck check = new PlausibilityCheck(schedule, network);
 		check.runCheck();
@@ -347,8 +347,6 @@ public class PlausibilityCheck {
 
 	/**
 	 * Transforms a list of link ids to an array of coordinates for shp features
-	 *
-	 * @return
 	 */
 	public Coordinate[] linkIdList2Coordinates(List<Id<Link>> linkIdList) {
 		List<Coordinate> coordList = new ArrayList<>();

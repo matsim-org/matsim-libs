@@ -51,7 +51,7 @@ public class StopFacilityHistogram {
 	}
 
 	public static void run(String scheduleFile, String outputPngFile) {
-		new StopFacilityHistogram(ScheduleTools.loadTransitSchedule(scheduleFile)).createPng(outputPngFile);
+		new StopFacilityHistogram(ScheduleTools.readTransitSchedule(scheduleFile)).createPng(outputPngFile);
 	}
 
 	public static void run(TransitSchedule schedule, String outputPngFile) {

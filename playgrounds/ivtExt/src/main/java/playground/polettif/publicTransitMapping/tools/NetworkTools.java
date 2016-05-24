@@ -50,7 +50,7 @@ public class NetworkTools {
 
 	protected static Logger log = Logger.getLogger(NetworkTools.class);
 
-	public static Network loadNetwork(String filePath) {
+	public static Network readNetwork(String filePath) {
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(filePath);
 		return network;
@@ -70,7 +70,7 @@ public class NetworkTools {
 
 	public static void transformNetworkFile(String networkFile, String fromCoordinateSystem, String toCoordinateSystem) {
 		log.info("... Transformig network from " + fromCoordinateSystem + " to " + toCoordinateSystem);
-		Network network = loadNetwork(networkFile);
+		Network network = readNetwork(networkFile);
 		transformNetwork(network, fromCoordinateSystem, toCoordinateSystem);
 		writeNetwork(network, networkFile);
 	}

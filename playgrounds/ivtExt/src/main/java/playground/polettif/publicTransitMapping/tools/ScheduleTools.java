@@ -55,7 +55,7 @@ public class ScheduleTools {
 	/**
 	 * @return the transitSchedule from scheduleFile.
 	 */
-	public static TransitSchedule loadTransitSchedule(String scheduleFile) {
+	public static TransitSchedule readTransitSchedule(String scheduleFile) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readFile(scheduleFile);
 
@@ -256,8 +256,6 @@ public class ScheduleTools {
 
 	/**
 	 * Replaces all non-car link modes with "pt"
-	 *
-	 * @param network
 	 */
 	public static void replaceNonCarModesWithPT(Network network) {
 		log.info("... Replacing all non-car link modes with \"pt\"");

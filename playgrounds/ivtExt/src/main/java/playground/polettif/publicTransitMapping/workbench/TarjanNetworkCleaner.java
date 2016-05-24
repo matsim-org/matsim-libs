@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.misc.Counter;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
@@ -42,7 +41,7 @@ public class TarjanNetworkCleaner {
 	protected static Logger log = Logger.getLogger(TarjanNetworkCleaner.class);
 
 	public static void main(String[] args) {
-		Network network = NetworkTools.loadNetwork("C:/Users/Flavio/Desktop/data/network/multimodal/zurich-plus-mm.xml.gz");
+		Network network = NetworkTools.readNetwork("C:/Users/Flavio/Desktop/data/network/multimodal/zurich-plus-mm.xml.gz");
 
 		network = NetworkTools.filterNetworkByLinkMode(network, Collections.singleton("rail"));
 //		new NetworkCleaner().run(network);

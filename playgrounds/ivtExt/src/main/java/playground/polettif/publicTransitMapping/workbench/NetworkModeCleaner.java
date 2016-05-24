@@ -33,7 +33,7 @@ public class NetworkModeCleaner {
 	public static void main(final String[] args) {
 		String in = "C:/Users/polettif/Desktop/data/network/multimodal/zurich-gtfs.xml.gz";
 		String out = "C:/Users/polettif/Desktop/data/network/multimodal/zurich-gtfs-withoutTram.xml.gz";
-		Network network = NetworkTools.loadNetwork(in);
+		Network network = NetworkTools.readNetwork(in);
 
 		NetworkFilterManager filterManager = new NetworkFilterManager(network);
 		Set<String> modes = new HashSet<>();

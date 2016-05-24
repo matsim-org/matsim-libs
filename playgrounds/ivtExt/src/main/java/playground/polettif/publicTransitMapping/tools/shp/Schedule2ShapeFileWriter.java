@@ -62,8 +62,8 @@ public class Schedule2ShapeFileWriter {
 		args[2] = "E:/output/shp/transitLines.shp";
 		args[3] = "E:/output/shp/stopFacilities.shp";
 		args[4] = "E:/output/shp/refLinks.shp";
-		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(args[0]);
-		Network network = NetworkTools.loadNetwork(args[1]);
+		TransitSchedule schedule = ScheduleTools.readTransitSchedule(args[0]);
+		Network network = NetworkTools.readNetwork(args[1]);
 
 		Schedule2ShapeFileWriter s2s = new Schedule2ShapeFileWriter(schedule, network);
 

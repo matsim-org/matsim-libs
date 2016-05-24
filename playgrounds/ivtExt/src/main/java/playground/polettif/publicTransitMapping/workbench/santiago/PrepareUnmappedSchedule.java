@@ -31,7 +31,7 @@ public class PrepareUnmappedSchedule {
 	public static void main(String[] args) {
 		String base = "C:/Users/Flavio/Desktop/data/santiago/";
 
-		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(base + "input_original/transitschedule_simplified.xml.gz");
+		TransitSchedule schedule = ScheduleTools.readTransitSchedule(base + "input_original/transitschedule_simplified.xml.gz");
 		ScheduleCleaner.removeMapping(schedule);
 		ScheduleTools.writeTransitSchedule(schedule, base+"mts/transitSchedule_unmapped.xml.gz");
 	}

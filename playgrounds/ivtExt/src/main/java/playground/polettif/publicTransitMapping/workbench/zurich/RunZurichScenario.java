@@ -48,28 +48,27 @@ import java.util.Collections;
 public class RunZurichScenario {
 
 	public static void main(String[] args) {
-
-		String base = "C:/Users/polettif/Desktop/data/zurich/input/";
 		double percentage = 0.1;
 
-		final Config config = ConfigUtils.loadConfig(base + "config.xml", new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
+		final Config config = ConfigUtils.loadConfig(args[0], new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// create link references for facilities
-		Network streetNetwork = scenario.getNetwork();
-		F2LCreator.createF2L(scenario.getActivityFacilities(), NetworkTools.filterNetworkByLinkMode(streetNetwork, Collections.singleton(TransportMode.car)), base + "facilitiesLinks.f2l");
-		// This allows to get a log file containing the log messages happening
-		// before controler init.
+		Network network = scenario.getNetwork();
+		F2LCreator.createF2L(scenario.getActivityFacilities(), NetworkTools.filterNetworkByLinkMode(network, Collections.singleton(TransportMode.car)), config.getModule("f2l").getValue("inputF2LFile"));
+
+		// This allows to get a log file containing the log messages happening before controler init.
 		OutputDirectoryLogging.catchLogEntries();
 
+		// initiate controler
 		final Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		connectFacilitiesWithNetwork(controler);
 
-
+		// adapt transti vehicles to scenario percentage
 		Vehicles transitVehicles = scenario.getTransitVehicles();
 		for(VehicleType vt : transitVehicles.getVehicleTypes().values()) {
 			vt.setPcuEquivalents(vt.getPcuEquivalents()*percentage);
@@ -77,11 +76,13 @@ public class RunZurichScenario {
 
 		// We use a time allocation mutator that allows to exclude certain activities.
 		controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
+
 		// We use a specific scoring function, that uses individual preferences for activity durations.
 		controler.setScoringFunctionFactory(
 				new IVTBaselineScoringFunctionFactoryCopy(controler.getScenario(),
 						new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE)));
 
+		// run
 		controler.run();
 	}
 

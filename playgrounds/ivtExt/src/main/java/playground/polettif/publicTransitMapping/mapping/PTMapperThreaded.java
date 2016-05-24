@@ -23,17 +23,14 @@ package playground.polettif.publicTransitMapping.mapping;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -84,80 +81,26 @@ public class PTMapperThreaded extends PTMapper {
 	private Coord[] totalNetworkExtent;
 
 	private PseudoRouting[] pseudoRoutingThreads;
+	private NetworkFactory networkFactory;
 
-
-	/**
-	 * Constructor.
-	 * The given schedule is modified via {@link #mapScheduleToNetwork(Network)}
-	 */
-	public PTMapperThreaded(TransitSchedule schedule, PublicTransitMappingConfigGroup config) {
-		super(schedule, config);
+	protected PTMapperThreaded(PublicTransitMappingConfigGroup config, TransitSchedule schedule, Network network) {
+		super(config, schedule, network);
 	}
 
 	public PTMapperThreaded(String configPath) {
 		super(configPath);
 	}
 
-	/**
-	 * Routes the unmapped MATSim Transit Schedule to the network using the file
-	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
-	 *
-	 * @param args <br/>[0] PublicTransportMap config file<br/>
-	 */
-	public static void main(String[] args) {
-		if(args.length == 1) {
-			new PTMapperThreaded(args[0]).mapFilesFromConfig();
-		} else {
-			System.out.println("Incorrect number of arguments\n[0] config file");
-		}
-	}
-
-	/**
-	 * Routes the unmapped MATSim Transit Schedule to the network using the file
-	 * paths specified in the config. Writes the resulting schedule and network to xml files.<p/>
-	 *
-	 * @param configFile the PublicTransitMapping config file
-	 */
-	public static void run(String configFile) {
-		new PTMapperThreaded(configFile).mapFilesFromConfig();
-	}
-
 	@Override
-	public void mapFilesFromConfig() {
-		if(config.getScheduleFile() == null || config.getNetworkFile() == null) {
-			throw new IllegalArgumentException("Not all input files defined in config.");
-		} else {
-			log.info("Mapping files from config...");
-			log.info("Reading schedule and network file...");
-			Scenario mainScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			Network network = mainScenario.getNetwork();
-			new TransitScheduleReader(mainScenario).readFile(config.getScheduleFile());
-			new MatsimNetworkReader(network).readFile(config.getNetworkFile());
-			TransitSchedule mainSchedule = mainScenario.getTransitSchedule();
-
-			new PTMapperThreaded(mainSchedule, config).mapScheduleToNetwork(network);
-
-			if(config.getOutputNetworkFile() != null && config.getOutputScheduleFile() != null) {
-				log.info("Writing schedule and network to file...");
-				new TransitScheduleWriter(mainSchedule).writeFile(config.getOutputScheduleFile());
-				new NetworkWriter(network).write(config.getOutputNetworkFile());
-				if(config.getOutputStreetNetworkFile() != null) {
-					NetworkFilterManager filterManager = new NetworkFilterManager(network);
-					filterManager.addLinkFilter(new LinkFilterMode(Collections.singleton(TransportMode.car)));
-					NetworkTools.writeNetwork(filterManager.applyFilters(), config.getOutputStreetNetworkFile());
-				}
-			} else {
-				log.info("");
-				log.info("No output paths defined, schedule and network are not written to files.");
-			}
-
+	public void run() {
+		if(schedule == null) {
+			throw new IllegalArgumentException("No schedule defined!");
 		}
-	}
+		else if(network == null) {
+			throw new IllegalArgumentException("No network defined!");
+		}
 
-	@Override
-	public void mapScheduleToNetwork(Network net) {
-		this.networkFactory = net.getFactory();
-		this.network = net;
+		networkFactory = network.getFactory();
 
 		log.info("Mapping transit schedule to network...");
 		int nStopFacilities = schedule.getFacilities().size();
@@ -355,6 +298,21 @@ public class PTMapperThreaded extends PTMapper {
 		log.info("");
 		log.info("    Note: Run PlausibilityCheck for further analysis");
 		log.info("");
+
+		/**
+		 * Write output files if defined in config
+		 */
+		if(config.getOutputNetworkFile() != null && config.getOutputScheduleFile() != null) {
+			log.info("Writing schedule and network to file...");
+			ScheduleTools.writeTransitSchedule(schedule, config.getOutputScheduleFile());
+			NetworkTools.writeNetwork(network, config.getOutputNetworkFile());
+			if(config.getOutputStreetNetworkFile() != null) {
+				NetworkTools.writeNetwork(NetworkTools.filterNetworkByLinkMode(network, Collections.singleton(TransportMode.car)), config.getOutputStreetNetworkFile());
+			}
+		} else {
+			log.info("");
+			log.info("No output paths defined, schedule and network are not written to files.");
+		}
 	}
 
 	/**
