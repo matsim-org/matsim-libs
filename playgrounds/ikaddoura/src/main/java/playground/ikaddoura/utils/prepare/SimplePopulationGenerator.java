@@ -44,7 +44,7 @@ public class SimplePopulationGenerator {
 		
 		final String networkFile = "../../../runs-svn/intervalBasedCongestionPricing/input/network.xml";
 		final String outputDirectory = "../../../runs-svn/intervalBasedCongestionPricing/input/";
-		final int totalDemand = 1000;
+		final int totalDemand = 7200;
 		
 		final File directory = new File(outputDirectory);
 		directory.mkdirs();
@@ -80,13 +80,13 @@ public class SimplePopulationGenerator {
 			Plan plan = this.population.getFactory().createPlan();
 	
 			Activity activity1 = this.population.getFactory().createActivityFromCoord("home", homeCoord);
-			activity1.setEndTime(8 * 3600.);
+			activity1.setEndTime(6.5 * 3600.);
 			plan.addActivity(activity1);
 				
 			plan.addLeg(this.population.getFactory().createLeg(TransportMode.car));
 
 			Activity activity2 = this.population.getFactory().createActivityFromCoord("work", workCoord);
-			activity2.setEndTime(16 * 3600.);
+			activity2.setEndTime(activity1.getEndTime() + 8 * 3600.);
 			plan.addActivity(activity2);
 			
 			plan.addLeg(this.population.getFactory().createLeg(TransportMode.car));
