@@ -65,6 +65,7 @@ public class CapeTownNestedLogitModule extends AbstractModule {
 						cache ),
 				scenario.getActivityFacilities(),
 				scenario.getPopulation().getPersonAttributes(),
+				scenario.getHouseholds(),
 				group.getDistanceBudget() );
 	}
 }
