@@ -19,7 +19,6 @@
 package playground.polettif.publicTransitMapping.tools.shp;
 
 import com.opencsv.CSVReader;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -27,9 +26,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.polettif.publicTransitMapping.gtfs.GTFSConverter;
-import playground.polettif.publicTransitMapping.gtfs.containers.GTFSDefinitions;
-import playground.polettif.publicTransitMapping.gtfs.containers.Shape;
+import playground.polettif.publicTransitMapping.gtfs.lib.Shape;
 
 import java.io.FileReader;
 import java.io.IOException;

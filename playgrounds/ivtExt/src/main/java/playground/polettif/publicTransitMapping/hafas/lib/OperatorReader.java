@@ -19,20 +19,40 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.hafas;
+package playground.polettif.publicTransitMapping.hafas.lib;
 
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * The route profile module interface requires as input a schedule file that contains all transit stops.
- * As output, the module has to generate a schedule file, which contains the transit stops and the PT
- * routes with the stop sequence for each route (route profiles). These route profiles also include
- * the arrival and departure times for each stop of any route profile.
+ * Reads the HAFAS-file BETRIEB_DE and provides the operators in a String-String-Map.
  *
  * @author boescpa
  */
-public interface RouteProfileCreator {
+public class OperatorReader {
 
-	void createRouteProfiles(TransitSchedule schedule, String pathToInputFiles);
+	public static Map<String, String> readOperators(String BETRIEB_DE) {
+		Map<String, String> operators = new HashMap<>();
+		try {
+			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(BETRIEB_DE), "latin1"));
+			String newLine = readsLines.readLine();
+			while (newLine != null) {
+				String abbrevationOperator = newLine.split("\"")[1].replace(" ","");
+				newLine = readsLines.readLine();
+				if (newLine == null) break;
+				String operatorId = newLine.substring(8, 14).trim();
+				operators.put(operatorId, abbrevationOperator);
+				// read the next operator:
+				newLine = readsLines.readLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return operators;
+	}
 
 }

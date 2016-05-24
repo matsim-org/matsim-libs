@@ -19,14 +19,14 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.hafas.hafasCreator;
+package playground.polettif.publicTransitMapping.hafas.lib;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.*;
-import playground.polettif.publicTransitMapping.hafas.HRDFDefinitions;
+import playground.polettif.publicTransitMapping.hafas.HafasDefinitions;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -44,7 +44,7 @@ import java.util.Set;
 public class FPLANReader {
 	protected static Logger log = Logger.getLogger(FPLANReader.class);
 
-	protected static Map<String, Integer> readLines(
+	public static Map<String, Integer> readLines(
 			TransitSchedule schedule, Vehicles vehicles, Set<Integer> bitfeldNummern, Map<String, String> operators, String FPLAN) {
 
 		Map<String, Integer> vehiclesUndefined = new HashMap<>();
@@ -119,16 +119,16 @@ public class FPLANReader {
 								vehicleType = vehicleBuilder.createVehicleType(Id.create(typeId.toString(), VehicleType.class));
 
 								// using default values for vehicle type
-								vehicleType.setLength(HRDFDefinitions.Vehicles.valueOf(typeIdstr).length);
-								vehicleType.setWidth(HRDFDefinitions.Vehicles.valueOf(typeIdstr).width);
-								vehicleType.setAccessTime(HRDFDefinitions.Vehicles.valueOf(typeIdstr).accessTime);
-								vehicleType.setEgressTime(HRDFDefinitions.Vehicles.valueOf(typeIdstr).egressTime);
-								vehicleType.setDoorOperationMode(HRDFDefinitions.Vehicles.valueOf(typeIdstr).doorOperation);
-								vehicleType.setPcuEquivalents(HRDFDefinitions.Vehicles.valueOf(typeIdstr).pcuEquivalents);
+								vehicleType.setLength(HafasDefinitions.Vehicles.valueOf(typeIdstr).length);
+								vehicleType.setWidth(HafasDefinitions.Vehicles.valueOf(typeIdstr).width);
+								vehicleType.setAccessTime(HafasDefinitions.Vehicles.valueOf(typeIdstr).accessTime);
+								vehicleType.setEgressTime(HafasDefinitions.Vehicles.valueOf(typeIdstr).egressTime);
+								vehicleType.setDoorOperationMode(HafasDefinitions.Vehicles.valueOf(typeIdstr).doorOperation);
+								vehicleType.setPcuEquivalents(HafasDefinitions.Vehicles.valueOf(typeIdstr).pcuEquivalents);
 
 								VehicleCapacity vehicleCapacity = vehicleBuilder.createVehicleCapacity();
-								vehicleCapacity.setSeats(HRDFDefinitions.Vehicles.valueOf(typeIdstr).capacitySeats);
-								vehicleCapacity.setStandingRoom(HRDFDefinitions.Vehicles.valueOf(typeIdstr).capacityStanding);
+								vehicleCapacity.setSeats(HafasDefinitions.Vehicles.valueOf(typeIdstr).capacitySeats);
+								vehicleCapacity.setStandingRoom(HafasDefinitions.Vehicles.valueOf(typeIdstr).capacityStanding);
 								vehicleType.setCapacity(vehicleCapacity);
 
 								vehicles.addVehicleType(vehicleType);

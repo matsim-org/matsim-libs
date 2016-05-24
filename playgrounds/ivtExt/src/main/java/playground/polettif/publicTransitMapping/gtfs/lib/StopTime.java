@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Route.java
+ * StopTime.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,72 +18,68 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.gtfs.containers;
+package playground.polettif.publicTransitMapping.gtfs.lib;
 
-import playground.polettif.publicTransitMapping.gtfs.containers.GTFSDefinitions.RouteTypes;
+import java.util.Date;
 
-
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-
-public class GTFSRoute {
-	                           
+/**
+ * Container for GTFS StopTime. Contains stopId, arrivalTime and departureTime
+ */
+public class StopTime {
+	
 	//Attributes
-	private String routeId;
-	private String shortName;
-	private RouteTypes routeType;
-	private SortedMap<String, Trip> trips;
-
+	private Integer sequencePosition;
+	private Date arrivalTime;
+	private Date departureTime;
+	private String stopId;
+	
 	//Methods
 	/**
-	 * @param shortName
-	 * @param routeType
+	 * @param arrivalTime
+	 * @param departureTime
+	 * @param stopId
 	 */
-	public GTFSRoute(String routeId, String shortName, RouteTypes routeType) {
+	public StopTime(Integer sequencePosition, Date arrivalTime, Date departureTime, String stopId) {
 		super();
-		this.routeId = routeId;
-		this.shortName = shortName;
-		this.routeType = routeType;
-		trips = new TreeMap<>();
+		this.sequencePosition = sequencePosition;
+		this.arrivalTime = arrivalTime;
+		this.departureTime = departureTime;
+		this.stopId = stopId;
 	}
 
 	/**
-	 * @return the routeId
+	 * @return the position of the stopTime within the stopSequence
 	 */
-	public String getRouteId() {
-		return routeId;
+	public Integer getSeuencePosition() {
+		return sequencePosition;
 	}
 
 	/**
-	 * @return the shortName
+	 * @return the arrivalTime
 	 */
-	public String getShortName() {
-		return shortName;
+	public Date getArrivalTime() {
+		return arrivalTime;
 	}
 
 	/**
-	 * @return the routeType
+	 * @return the departureTime
 	 */
-	public RouteTypes getRouteType() {
-		return routeType;
+	public Date getDepartureTime() {
+		return departureTime;
 	}
 
 	/**
-	 * @return the trips
+	 * @return the stopId
 	 */
-	public SortedMap<String, Trip> getTrips() {
-		return trips;
+	public String getStopId() {
+		return stopId;
 	}
 
 	/**
-	 * Puts a new trip
-	 * @param key
-	 * @param trip
+	 * @param stopId the stopId to set
 	 */
-	public void putTrip(String key, Trip trip) {
-		trips.put(key, trip);
+	public void setStopId(String stopId) {
+		this.stopId = stopId;
 	}
 	
-
 }

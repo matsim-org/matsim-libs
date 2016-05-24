@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.hafas.hafasCreator;
+package playground.polettif.publicTransitMapping.hafas.lib;
 
 import org.apache.log4j.Logger;
 
@@ -41,7 +41,7 @@ import java.util.Set;
 public class BitfeldAnalyzer {
 	protected static Logger log = Logger.getLogger(BitfeldAnalyzer.class);
 
-	protected static Set<Integer> findBitfeldnumbersOfBusiestDay(String FPLAN, String BITFELD) {
+	public static Set<Integer> findBitfeldnumbersOfBusiestDay(String FPLAN, String BITFELD) {
 		final Set<Integer> bitfeldNummern = new HashSet<>();
 		final int posMaxFVals = find4DayBlockWithMostFVals(FPLAN, BITFELD);
 		try {

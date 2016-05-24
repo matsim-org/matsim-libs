@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Frequency.java
+ * Shape.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,46 +18,66 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.gtfs.containers;
+package playground.polettif.publicTransitMapping.gtfs.lib;
 
-import java.util.Date;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-public class Frequency {
+import com.vividsolutions.jts.geom.Coordinate;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.geotools.MGC;
+
+public class Shape {
 	
 	//Attributes
-	private final Date startTime;
-	private final Date endTime;
-	private final int secondsPerDeparture;
-	
+	/**
+	 * The id
+	 */
+	private String id;
+
+	/**
+	 * The points of the shape
+	 */
+	private SortedMap<Integer,Coord> points;
+	private Coordinate[] coordinates;
+
 	//Methods
 	/**
-	 * @param startTime
-	 * @param endTime
-	 * @param secondsPerDeparture
+	 * Constructs 
 	 */
-	public Frequency(Date startTime, Date endTime, int secondsPerDeparture) {
-		super();
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.secondsPerDeparture = secondsPerDeparture;
+	public Shape(String id) {
+		this.id = id;
+		points = new TreeMap<>();
 	}
+
 	/**
-	 * @return the startTime
+	 * @return the id
 	 */
-	public Date getStartTime() {
-		return startTime;
+	public String getId() {
+		return id;
 	}
+
 	/**
-	 * @return the endTime
+	 * @return the points
 	 */
-	public Date getEndTime() {
-		return endTime;
+	public SortedMap<Integer,Coord> getPoints() {
+		return points;
 	}
+
 	/**
-	 * @return the secondsPerDeparture
+	 * Adds a new point
+	 * @param point
 	 */
-	public int getSecondsPerDeparture() {
-		return secondsPerDeparture;
+	public void addPoint(Coord point, int pos) {
+		points.put(pos,point);
 	}
-	
+
+	public Coordinate[] getCoordinates() {
+		Coordinate[] coordinates = new Coordinate[points.size()];
+		for(Map.Entry<Integer, Coord> entry : points.entrySet()) {
+			coordinates[entry.getKey()-1] = MGC.coord2Coordinate(entry.getValue());
+		}
+		return coordinates;
+	}
 }

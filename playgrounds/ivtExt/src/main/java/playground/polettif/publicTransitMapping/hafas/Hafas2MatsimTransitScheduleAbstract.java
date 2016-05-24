@@ -22,66 +22,62 @@
 package playground.polettif.publicTransitMapping.hafas;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import playground.polettif.publicTransitMapping.hafas.hafasCreator.PTScheduleCreatorHAFAS;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 /**
- * Provides the contract to create pt lines (stops and scheduled times, no routes) from an OSM network,
- * which are corrected by a given schedule-file.
- * The stops are linked to a given network.
+ * Contract class to convert (Swiss) HAFAS data to
+ * an unmapped MATSim Transit Schedule.
  *
- * @author boescpa
+ * @author polettif
  */
-public abstract class PTScheduleCreator {
+public abstract class Hafas2MatsimTransitScheduleAbstract {
 
-	protected static Logger log = Logger.getLogger(PTScheduleCreator.class);
+	protected static Logger log = Logger.getLogger(Hafas2MatsimTransitScheduleAbstract.class);
 
-	private final TransitSchedule schedule;
-	private final Vehicles vehicles;
+	protected final TransitSchedule schedule;
+	protected final Vehicles vehicles;
+	protected final CoordinateTransformation transformation;
 
-	public PTScheduleCreator(TransitSchedule schedule, Vehicles vehicles) {
-		this.schedule = schedule;
-		this.vehicles = vehicles;
-	}
-
+	/**
+	 * Converts all files in <tt>hafasFolder</tt> and writes the output schedule and vehicle file to
+	 * <tt>outputFolder</tt>. Stop Facility coordinates are transformed to <tt>outputCoordinateSystem</tt>.
+	 *
+	 * @param args <br/>
+	 *             [0] hafasFolder<br/>
+	 *             [1] outputFolder<br/>
+	 *             [2] outputCoordinateSystem<br/>
+	 */
 	public static void main(String[] args) {
 		run(args[0], args[1], args[2]);
 	}
 
-	public static void run(String hafasFolder, String outputFolder, String outputSystem) {
+	/**
+	 * Converts all files in <tt>hafasFolder</tt> and writes the output schedule and vehicle file to
+	 * <tt>outputFolder</tt>. Stop Facility coordinates are transformed to <tt>outputCoordinateSystem</tt>.
+	 */
+	public static void run(String hafasFolder, String outputFolder, String outputCoordinateSystem) {
 		TransitSchedule schedule = ScheduleTools.createSchedule();
 		Vehicles vehicles = ScheduleTools.createVehicles(schedule);
-		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", outputSystem);
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem);
 
-		new PTScheduleCreatorHAFAS(schedule, vehicles, transformation).createSchedule(hafasFolder);
+		new HafasConverterImpl(schedule, vehicles, transformation).createSchedule(hafasFolder);
 
 		ScheduleTools.writeTransitSchedule(schedule, outputFolder+"schedule.xml");
-		new VehicleWriterV1(vehicles).writeFile(outputFolder+"vehicles.xml");
+		ScheduleTools.writeVehicles(vehicles, outputFolder+"vehicles.xml");
+	}
+
+	public Hafas2MatsimTransitScheduleAbstract(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
+		this.schedule = schedule;
+		this.vehicles = vehicles;
+		this.transformation = transformation;
 	}
 
 	/**
 	 * This method creates a Transit Schedule which is unlinked to any network, but else complete.
-	 *
-	 * @param pathToInputFiles
 	 */
-	public void createSchedule(String pathToInputFiles) {
-		getTransitStopCreator().createTransitStops(this.schedule, pathToInputFiles);
-		getRouteProfileCreator().createRouteProfiles(this.schedule, pathToInputFiles);
-		getDeparturesCreator().createDepartures(this.schedule, this.vehicles, pathToInputFiles);
-	}
-
-	public abstract TransitStopCreator getTransitStopCreator();
-
-	public abstract RouteProfileCreator getRouteProfileCreator();
-
-	public abstract DeparturesCreator getDeparturesCreator();
-
+	public abstract void createSchedule(String pathToInputFiles);
 }

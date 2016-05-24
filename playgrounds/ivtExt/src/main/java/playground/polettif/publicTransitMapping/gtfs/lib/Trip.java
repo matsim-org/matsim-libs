@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.gtfs.containers;
+package playground.polettif.publicTransitMapping.gtfs.lib;
 
 import java.util.ArrayList;
 import java.util.List;

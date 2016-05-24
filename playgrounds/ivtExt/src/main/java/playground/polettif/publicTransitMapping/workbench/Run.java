@@ -18,8 +18,7 @@
 
 package playground.polettif.publicTransitMapping.workbench;
 
-import playground.polettif.publicTransitMapping.gtfs.GTFSConverter;
-import playground.polettif.publicTransitMapping.hafas.HafasConverter;
+import playground.polettif.publicTransitMapping.hafas.Hafas2MatsimTransitScheduleAbstract;
 import playground.polettif.publicTransitMapping.osm.Osm2MultimodalNetworkConverter;
 import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
 
@@ -44,9 +43,9 @@ public class Run {
 		String vehiclesFile = base+"vehicles/fromGtfs/zvv_mostServices_vehicles.xml";
 		String shapeFile = base+"gtfs/shp/zvv_mostServices.shp";
 
-		GTFSConverter.run(gtfsPath, GTFSConverter.DAY_WITH_MOST_SERVICES, "CH1903_LV03_Plus", mtsFile);
+//		GtfsConverterImpl.run(gtfsPath, GtfsConverterImpl.DAY_WITH_MOST_SERVICES, "CH1903_LV03_Plus", mtsFile);
 		// or
-		GTFSConverter.run(gtfsPath, GTFSConverter.DAY_WITH_MOST_SERVICES, "CH1903_LV03_Plus", mtsFile, vehiclesFile, shapeFile);
+//		GtfsConverterImpl.run(gtfsPath, mtsFile, "CH1903_LV03_Plus", GtfsConverterImpl.DAY_WITH_MOST_SERVICES, vehiclesFile, shapeFile);
 	}
 
 	public void hafas2mts() {
@@ -54,7 +53,7 @@ public class Run {
 		String outputFolder = "";
 		String outputSystem = "CH1903_LV03_Plus";
 
-		HafasConverter.run(hafasFolder, outputFolder, outputSystem);
+		Hafas2MatsimTransitScheduleAbstract.run(hafasFolder, outputFolder, outputSystem);
 	}
 
 	public void osm2network() {

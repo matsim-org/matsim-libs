@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.gtfs.containers;
+package playground.polettif.publicTransitMapping.gtfs.lib;
 
 import org.matsim.api.core.v01.Coord;
 
@@ -51,11 +51,6 @@ public class GTFSStop {
 	private GTFSDefinitions.RouteTypes routeType;
 	
 	//Methods
-	/**
-	 * @param point
-	 * @param name
-	 * @param blocks
-	 */
 	public GTFSStop(Coord point, String name, boolean blocks) {
 		super();
 		this.point = point;

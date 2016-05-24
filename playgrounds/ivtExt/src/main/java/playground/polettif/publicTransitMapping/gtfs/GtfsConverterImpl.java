@@ -25,19 +25,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.PolylineFeatureFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.*;
-import org.opengis.feature.simple.SimpleFeature;
-import playground.polettif.publicTransitMapping.gtfs.containers.*;
+import playground.polettif.publicTransitMapping.gtfs.lib.*;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
-import playground.polettif.publicTransitMapping.tools.ShapeFileTools;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -56,21 +50,13 @@ import java.util.Map.Entry;
  *
  * @author polettif
  */
-public class GTFSConverter {
+public class GtfsConverterImpl extends Gtfs2MatsimTransitScheduleAbstract {
 
-	private static final Logger log = Logger.getLogger(GTFSConverter.class);
-	public static final String SHAPE_ID = "shape_id";
-	public static final String SHAPE_PT_LON = "shape_pt_lon";
-	public static final String SHAPE_PT_LAT = "shape_pt_lat";
-	public static final String SHAPE_PT_SEQUENCE = "shape_pt_sequence";
+	private static final Logger log = Logger.getLogger(GtfsConverterImpl.class);
 
 	// todo await departure time?
 	private boolean defaultAwaitDepartureTime = true;
 
-	/**
-	 * which algorithm should be used to get serviceIds
-	 */
-	private final String serviceIdsAlgorithm;
 	public static final String ALL_SERVICE_IDS = "all";
 	public static final String MOST_USED_SINGLE_ID = "mostUsedSingleId";
 	public static final String DAY_WITH_MOST_TRIPS = "dayWithMostTrips";
@@ -79,7 +65,7 @@ public class GTFSConverter {
 	/**
 	 * Path to the folder where the gtfs files are located
 	 */
-	private final String root;
+	private String root;
 	private CoordinateTransformation transformation = new IdentityTransformation();
 
 	/**
@@ -106,149 +92,20 @@ public class GTFSConverter {
 	 * map for counting how many trips use each serviceId
 	 */
 	private Map<String, Integer> serviceIdsCount = new HashMap<>();
+	private TransitScheduleFactory scheduleFactory;
 
 	// containers for storing gtfs data
-	private Map<String, GTFSStop> gtfsStops = new HashMap<>();
-	private SortedMap<String, GTFSRoute> gtfsRoutes = new TreeMap<>();
-	private Map<String, Service> services = new HashMap<>();
-	private Map<String, Shape> shapes = new HashMap<>();
-	private Collection<SimpleFeature> features = new ArrayList<>();
-	private TransitSchedule schedule;
-	private Vehicles vehicles;
-	private TransitScheduleFactory scheduleFactory;
-	private Object usedServiceIds;
 
 
-	/**
-	 * Reads gtfs files in and converts them to an unmapped
-	 * MATSim Transit Schedule (mts). "Unmapped" means stopFacilities are not
-	 * referenced to links and transit routes do not have routes (link sequences).
-	 * Creates a default vehicles file as well.
-	 * <p/>
-	 *
-	 * @param args	[0] folder where the gtfs files are located (a single zip file is not supported)<br/>
-	 * 				[1]	which service ids should be used. One of the following:<br/>
-	 *                  <ul>
-	 *                  <li>date in the format "yyyymmdd"
-	 *                  <li>"dayWithMostTrips"</li>
-	 *                  <li>"dayWithMostServices"</li>
-	 *                  <li>"mostUsedSingleId"</li>
-	 *                  <li>"all"</li>
-	 *                  </li>
-	 *                  </ul>
-	 * 	 			[2] the output coordinate system. WGS84/identity transformation is used if <code>null</code>.<br/>
-	 * 				[3]	path to the to be generated unmapped transit schedule file.<br/>
-	 * 				[4] path to the to be generated default vehicles file.<br/>
-	 * 				[4] path to the to be created shape file (based on shapes.txt if available).<br/>
-	 *
-	 * Calls {@link #run}.
-	 */
-	public static void main(final String[] args) {
-		if(args.length == 4) {
-			run(args[0], args[1], args[2], args[3]);
-		} else if(args.length == 6) {
-			run(args[0], args[1], args[2], args[3], args[4], args[5]);
-		}
+	public GtfsConverterImpl(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
+		super(schedule, vehicles, transformation);
 	}
 
-	/**
-	 * Reads gtfs files in and converts them to an unmapped MATSim Transit Schedule (mts).
-	 * "Unmapped" means stopFacilities are not referenced to links and transit routes do not have routes (link sequences).
-	 * <p/>
-	 *
-	 * @param gtfsInputPath          folder where the gtfs files are located (a single zip file is not supported)
-	 * @param serviceIdsParam        which service ids should be used. One of the following:
-	 *                               <ul>
-	 *                               <li>date in the format "yyyymmdd"
-	 *                               <li>"dayWithMostTrips"</li>
-	 *                               <li>"dayWithMostServices"</li>
-	 *                               <li>"mostUsedSingleId"</li>
-	 *                               <li>"all"</li>
-	 *                               </li>
-	 *                               </ul>
-	 * @param outputCoordinateSystem the output coordinate system. WGS84/identity transformation is used if <code>null</code>.
-	 * @param mtsOutputFile          path to the (to be generated) unmapped transit schedule file
-	 */
-	public static void run(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem, String mtsOutputFile) {
-		GTFSConverter gtfsConverter = new GTFSConverter(gtfsInputPath, serviceIdsParam, outputCoordinateSystem);
-		ScheduleTools.writeTransitSchedule(gtfsConverter.getSchedule(), mtsOutputFile);
-	}
-
-	/**
-	 * Reads gtfs files in and converts them to an unmapped
-	 * MATSim Transit Schedule (mts). "Unmapped" means stopFacilities are not
-	 * referenced to links and transit routes do not have routes (link sequences).
-	 * Creates a default vehicles file as well.
-	 * <p/>
-	 *
-	 * @param gtfsInputPath          folder where the gtfs files are located (a single zip file is not supported)
-	 * @param serviceIdsParam        which service ids should be used. One of the following:
-	 *                               <ul>
-	 *                               <li>date in the format "yyyymmdd"
-	 *                               <li>"dayWithMostTrips"</li>
-	 *                               <li>"dayWithMostServices"</li>
-	 *                               <li>"mostUsedSingleId"</li>
-	 *                               <li>"all"</li>
-	 *                               </li>
-	 *                               </ul>
-	 * @param outputCoordinateSystem the output coordinate system. WGS84/identity transformation is used if <code>null</code>.
-	 * @param mtsOutputFile          path to the (to be generated) unmapped transit schedule file
-	 * @param vehiclesOutputFile     path to the (to be generated) default vehicles file
-	 * @param shapeOutputFile        path to the (to be generated) default vehicles file
-	 */
-	public static void run(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem, String mtsOutputFile, String vehiclesOutputFile, String shapeOutputFile) {
-		GTFSConverter gtfsConverter = new GTFSConverter(gtfsInputPath, serviceIdsParam, outputCoordinateSystem);
-
-		ScheduleTools.writeTransitSchedule(gtfsConverter.getSchedule(), mtsOutputFile);
-		ScheduleTools.writeVehicles(gtfsConverter.getVehicles(), vehiclesOutputFile);
-		ShapeFileTools.writeGtfsTripsToFile(gtfsConverter.getGtfsRoutes(), gtfsConverter.getServiceIds(), outputCoordinateSystem, shapeOutputFile);
-	}
-
-	/**
-	 * Constructor.
-	 *
-	 * @param gtfsInputPath          folder where the gtfs files are located (a single zip file is not supported)
-	 * @param serviceIdsParam        which service ids should be used. One of the following:
-	 *                               <ul>
-	 *                               <li>date in the format "yyyymmdd"
-	 *                               <li>"dayWithMostTrips"</li>
-	 *                               <li>"dayWithMostServices"</li>
-	 *                               <li>"mostUsedSingleId"</li>
-	 *                               <li>"all"</li>
-	 *                               </li>
-	 *                               </ul>
-	 * @param outputCoordinateSystem the output coordinate system. WGS84/identity transformation is used if <code>null</code>.
-	 */
-	public GTFSConverter(String gtfsInputPath, String serviceIdsParam, String outputCoordinateSystem) {
-		Service.dateStats.clear();
-		this.schedule = ScheduleTools.createSchedule();
-		this.scheduleFactory = schedule.getFactory();
-
-		this.root = gtfsInputPath;
-		this.serviceIdsAlgorithm = serviceIdsParam;
-		if(outputCoordinateSystem != null) {
-			this.transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, outputCoordinateSystem);
-		}
-		loadFiles();
+	public void run(String inputPath, String serviceIdsParam) {
+		loadFiles(inputPath);
+		getServiceIds(serviceIdsParam);
 		convert();
 	}
-
-	public TransitSchedule getSchedule() {
-		return schedule;
-	}
-
-	public Vehicles getVehicles() {
-		return vehicles;
-	}
-
-	public SortedMap<String,GTFSRoute> getGtfsRoutes() {
-		return gtfsRoutes;
-	}
-
-	public Set<String> getServiceIds() {
-		return serviceIds;
-	}
-
 	/**
 	 * Converts the loaded gtfs data to a matsim transit schedule
 	 * <ol>
@@ -262,9 +119,9 @@ public class GTFSConverter {
 	 */
 	private void convert() {
 
-		log.info("Converting to MATSim transit schedule");
+		scheduleFactory = schedule.getFactory();
 
-		setServiceIds(serviceIdsAlgorithm);
+		log.info("Converting to MATSim transit schedule");
 
 		int counterLines = 0;
 		int counterRoutes = 0;
@@ -408,7 +265,8 @@ public class GTFSConverter {
 	/**
 	 * Calls all methods to load the gtfs files
 	 */
-	private void loadFiles() {
+	private void loadFiles(String inputPath) {
+		this.root = inputPath;
 		try {
 			log.info("Loading GTFS files from " + root);
 			loadStops();
@@ -436,15 +294,15 @@ public class GTFSConverter {
 	 */
 	private void loadStops() throws IOException {
 		log.info("Loading stops.txt");
-		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.STOPS.fileName));
+		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.Files.STOPS.fileName));
 		String[] header = reader.readNext(); // read header
-		Map<String, Integer> col = getIndices(header, GTFSDefinitions.STOPS.columns); // get column numbers for required fields
+		Map<String, Integer> col = getIndices(header, GTFSDefinitions.Files.STOPS.columns); // get column numbers for required fields
 
 		String[] line = reader.readNext();
 		while(line != null) {
-			Coord coord = new Coord(Double.parseDouble(line[col.get("stop_lon")]), Double.parseDouble(line[col.get("stop_lat")]));
-			GTFSStop GTFSStop = new GTFSStop(coord, line[col.get("stop_name")], false);
-			gtfsStops.put(line[col.get("stop_id")], GTFSStop);
+			Coord coord = new Coord(Double.parseDouble(line[col.get(GTFSDefinitions.STOP_LON)]), Double.parseDouble(line[col.get(GTFSDefinitions.STOP_LAT)]));
+			GTFSStop GTFSStop = new GTFSStop(coord, line[col.get(GTFSDefinitions.STOP_NAME)], false);
+			gtfsStops.put(line[col.get(GTFSDefinitions.STOP_ID)], GTFSStop);
 
 			line = reader.readNext();
 		}
@@ -465,9 +323,9 @@ public class GTFSConverter {
 	 */
 	private void loadCalendar() throws IOException {
 		log.info("Loading calendar.txt");
-		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.CALENDAR.fileName));
+		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.Files.CALENDAR.fileName));
 		String[] header = reader.readNext();
-		Map<String, Integer> col = getIndices(header, GTFSDefinitions.CALENDAR.columns);
+		Map<String, Integer> col = getIndices(header, GTFSDefinitions.Files.CALENDAR.columns);
 
 		// assuming all days really do follow monday in the file
 		int indexMonday = col.get("monday");
@@ -485,7 +343,7 @@ public class GTFSConverter {
 			for(int d = 0; d < 7; d++) {
 				days[d] = line[indexMonday + d].equals("1");
 			}
-			services.put(line[col.get("service_id")], new Service(line[col.get("service_id")], days, line[col.get("start_date")], line[col.get("end_date")]));
+			services.put(line[col.get(GTFSDefinitions.SERVICE_ID)], new Service(line[col.get(GTFSDefinitions.SERVICE_ID)], days, line[col.get(GTFSDefinitions.START_DATE)], line[col.get(GTFSDefinitions.END_DATE)]));
 
 			line = reader.readNext();
 		}
@@ -506,17 +364,17 @@ public class GTFSConverter {
 	 */
 	private void loadCalendarDates() throws IOException {
 		log.info("Loading calendar_dates.txt");
-		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.CALENDAR_DATES.fileName));
+		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.Files.CALENDAR_DATES.fileName));
 		String[] header = reader.readNext();
-		Map<String, Integer> col = getIndices(header, GTFSDefinitions.CALENDAR_DATES.columns);
+		Map<String, Integer> col = getIndices(header, GTFSDefinitions.Files.CALENDAR_DATES.columns);
 
 		String[] line = reader.readNext();
 		while(line != null) {
-			Service currentService = services.get(line[col.get("service_id")]);
-			if(line[col.get("exception_type")].equals("2"))
-				currentService.addException(line[col.get("date")]);
+			Service currentService = services.get(line[col.get(GTFSDefinitions.SERVICE_ID)]);
+			if(line[col.get(GTFSDefinitions.EXCEPTION_TYPE)].equals("2"))
+				currentService.addException(line[col.get(GTFSDefinitions.DATE)]);
 			else
-				currentService.addAddition(line[col.get("date")]);
+				currentService.addAddition(line[col.get(GTFSDefinitions.DATE)]);
 
 			line = reader.readNext();
 		}
@@ -538,23 +396,23 @@ public class GTFSConverter {
 		log.info("Looking for shapes.txt");
 		CSVReader reader;
 		try {
-			reader = new CSVReader(new FileReader(root + GTFSDefinitions.SHAPES.fileName));
+			reader = new CSVReader(new FileReader(root + GTFSDefinitions.Files.SHAPES.fileName));
 
 			String[] header = reader.readNext();
-			Map<String, Integer> col = getIndices(header, GTFSDefinitions.SHAPES.columns);
+			Map<String, Integer> col = getIndices(header, GTFSDefinitions.Files.SHAPES.columns);
 
 			String[] line = reader.readNext();
 			while(line != null) {
 				usesShapes = true; // shape file might exists but could be empty
 
-				Shape currentShape = shapes.get(line[col.get(SHAPE_ID)]);
+				Shape currentShape = shapes.get(line[col.get(GTFSDefinitions.SHAPE_ID)]);
 				if(currentShape == null) {
-					currentShape = new Shape(line[col.get(SHAPE_ID)]);
-					shapes.put(line[col.get(SHAPE_ID)], currentShape);
+					currentShape = new Shape(line[col.get(GTFSDefinitions.SHAPE_ID)]);
+					shapes.put(line[col.get(GTFSDefinitions.SHAPE_ID)], currentShape);
 				}
 				Coord point;
-				point = new Coord(Double.parseDouble(line[col.get(SHAPE_PT_LON)]), Double.parseDouble(line[col.get(SHAPE_PT_LAT)]));
-				currentShape.addPoint(transformation.transform(point), Integer.parseInt(line[col.get(SHAPE_PT_SEQUENCE)]));
+				point = new Coord(Double.parseDouble(line[col.get(GTFSDefinitions.SHAPE_PT_LON)]), Double.parseDouble(line[col.get(GTFSDefinitions.SHAPE_PT_LAT)]));
+				currentShape.addPoint(transformation.transform(point), Integer.parseInt(line[col.get(GTFSDefinitions.SHAPE_PT_SEQUENCE)]));
 				line = reader.readNext();
 			}
 			log.info("...     shapes.txt loaded");
@@ -575,15 +433,15 @@ public class GTFSConverter {
 	 */
 	private void loadRoutes() throws IOException {
 		log.info("Loading routes.txt");
-		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.ROUTES.fileName));
+		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.Files.ROUTES.fileName));
 		String[] header = reader.readNext();
-		Map<String, Integer> col = getIndices(header, GTFSDefinitions.ROUTES.columns);
+		Map<String, Integer> col = getIndices(header, GTFSDefinitions.Files.ROUTES.columns);
 
 		String[] line = reader.readNext();
 		int i = 0;
 		while(line != null) {
-			GTFSRoute newGtfsRoute = new GTFSRoute(line[col.get("route_id")], line[col.get("route_short_name")], GTFSDefinitions.RouteTypes.values()[Integer.parseInt(line[col.get("route_type")])]);
-			gtfsRoutes.put(line[col.get("route_id")], newGtfsRoute);
+			GTFSRoute newGtfsRoute = new GTFSRoute(line[col.get(GTFSDefinitions.ROUTE_ID)], line[col.get(GTFSDefinitions.ROUTE_SHORT_NAME)], GTFSDefinitions.RouteTypes.values()[Integer.parseInt(line[col.get(GTFSDefinitions.ROUTE_TYPE)])]);
+			gtfsRoutes.put(line[col.get(GTFSDefinitions.ROUTE_ID)], newGtfsRoute);
 
 			line = reader.readNext();
 		}
@@ -603,24 +461,24 @@ public class GTFSConverter {
 	 */
 	private void loadTrips() throws IOException {
 		log.info("Loading trips.txt");
-		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.TRIPS.fileName));
+		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.Files.TRIPS.fileName));
 		String[] header = reader.readNext();
-		Map<String, Integer> col = getIndices(header, GTFSDefinitions.TRIPS.columns);
+		Map<String, Integer> col = getIndices(header, GTFSDefinitions.Files.TRIPS.columns);
 
 		String[] line = reader.readNext();
 		while(line != null) {
 			GTFSRoute GTFSRoute = gtfsRoutes.get(line[col.get("route_id")]);
 			if(usesShapes) {
-				Trip newTrip = new Trip(line[col.get("trip_id")], services.get(line[col.get("service_id")]), shapes.get(line[col.get("shape_id")]), line[col.get("trip_id")]);
-				GTFSRoute.putTrip(line[col.get("trip_id")], newTrip);
+				Trip newTrip = new Trip(line[col.get(GTFSDefinitions.TRIP_ID)], services.get(line[col.get(GTFSDefinitions.SERVICE_ID)]), shapes.get(line[col.get(GTFSDefinitions.SHAPE_ID)]), line[col.get(GTFSDefinitions.TRIP_ID)]);
+				GTFSRoute.putTrip(line[col.get(GTFSDefinitions.TRIP_ID)], newTrip);
 			} else {
-				Trip newTrip = new Trip(line[col.get("trip_id")], services.get(line[col.get("service_id")]), null, line[col.get("trip_id")]);
-				GTFSRoute.putTrip(line[col.get("trip_id")], newTrip);
+				Trip newTrip = new Trip(line[col.get(GTFSDefinitions.TRIP_ID)], services.get(line[col.get(GTFSDefinitions.SERVICE_ID)]), null, line[col.get(GTFSDefinitions.TRIP_ID)]);
+				GTFSRoute.putTrip(line[col.get(GTFSDefinitions.TRIP_ID)], newTrip);
 			}
 
 			// each trip uses one service id, increase statistics accordingly
-			Integer count = MapUtils.getInteger(line[col.get("service_id")], serviceIdsCount, 1);
-			serviceIdsCount.put(line[col.get("service_id")], count + 1);
+			Integer count = MapUtils.getInteger(line[col.get(GTFSDefinitions.SERVICE_ID)], serviceIdsCount, 1);
+			serviceIdsCount.put(line[col.get(GTFSDefinitions.SERVICE_ID)], count + 1);
 
 			line = reader.readNext();
 		}
@@ -640,9 +498,9 @@ public class GTFSConverter {
 	 */
 	private void loadStopTimes() throws IOException {
 		log.info("Loading stop_times.txt");
-		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.STOP_TIMES.fileName));
+		CSVReader reader = new CSVReader(new FileReader(root + GTFSDefinitions.Files.STOP_TIMES.fileName));
 		String[] header = reader.readNext();
-		Map<String, Integer> col = getIndices(header, GTFSDefinitions.STOP_TIMES.columns);
+		Map<String, Integer> col = getIndices(header, GTFSDefinitions.Files.STOP_TIMES.columns);
 
 		String[] line = reader.readNext();
 		int i = 1, c = 1;
@@ -654,15 +512,15 @@ public class GTFSConverter {
 			i++; // just for logging so something happens in the console
 
 			for(GTFSRoute actualGTFSRoute : gtfsRoutes.values()) {
-				Trip trip = actualGTFSRoute.getTrips().get(line[col.get("trip_id")]);
+				Trip trip = actualGTFSRoute.getTrips().get(line[col.get(GTFSDefinitions.TRIP_ID)]);
 				if(trip != null) {
 					try {
 						trip.putStopTime(
-								Integer.parseInt(line[col.get("stop_sequence")]),
-								new StopTime(Integer.parseInt(line[col.get("stop_sequence")]),
-										timeFormat.parse(line[col.get("arrival_time")]),
-										timeFormat.parse(line[col.get("departure_time")]),
-										line[col.get("stop_id")]));
+								Integer.parseInt(line[col.get(GTFSDefinitions.STOP_SEQUENCE)]),
+								new StopTime(Integer.parseInt(line[col.get(GTFSDefinitions.STOP_SEQUENCE)]),
+										timeFormat.parse(line[col.get(GTFSDefinitions.ARRIVAL_TIME)]),
+										timeFormat.parse(line[col.get(GTFSDefinitions.DEPARTURE_TIME)]),
+										line[col.get(GTFSDefinitions.STOP_ID)]));
 					} catch (NumberFormatException | ParseException e) {
 						e.printStackTrace();
 					}
@@ -687,19 +545,19 @@ public class GTFSConverter {
 		// frequencies are optional
 		CSVReader reader;
 		try {
-			reader = new CSVReader(new FileReader(root + GTFSDefinitions.FREQUENCIES.fileName));
+			reader = new CSVReader(new FileReader(root + GTFSDefinitions.Files.FREQUENCIES.fileName));
 			String[] header = reader.readNext();
-			Map<String, Integer> col = getIndices(header, GTFSDefinitions.FREQUENCIES.columns);
+			Map<String, Integer> col = getIndices(header, GTFSDefinitions.Files.FREQUENCIES.columns);
 
 			String[] line = reader.readNext();
 			while(line != null) {
 				usesFrequencies = true;    // frequencies file might exists but could be empty
 
 				for(GTFSRoute actualGTFSRoute : gtfsRoutes.values()) {
-					Trip trip = actualGTFSRoute.getTrips().get(line[col.get("trip_id")]);
+					Trip trip = actualGTFSRoute.getTrips().get(line[col.get(GTFSDefinitions.TRIP_ID)]);
 					if(trip != null) {
 						try {
-							trip.addFrequency(new Frequency(timeFormat.parse(line[col.get("start_time")]), timeFormat.parse(line[col.get("end_time")]), Integer.parseInt(line[col.get("headway_secs")])));
+							trip.addFrequency(new Frequency(timeFormat.parse(line[col.get(GTFSDefinitions.START_TIME)]), timeFormat.parse(line[col.get(GTFSDefinitions.END_TIME)]), Integer.parseInt(line[col.get(GTFSDefinitions.HEADWAY_SECS)])));
 						} catch (NumberFormatException | ParseException e) {
 							e.printStackTrace();
 						}
@@ -749,7 +607,7 @@ public class GTFSConverter {
 	 * @param param The date for which all service ids should be looked up.
 	 *              Or the algorithm with which you want to get the service ids.
 	 */
-	private void setServiceIds(String param) {
+	private void getServiceIds(String param) {
 		switch (param) {
 			case MOST_USED_SINGLE_ID:
 				String mostUsed = getKeyOfMaxValue(serviceIdsCount);

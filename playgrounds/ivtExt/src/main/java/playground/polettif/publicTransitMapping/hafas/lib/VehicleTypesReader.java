@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.hafas.hafasCreator;
+package playground.polettif.publicTransitMapping.hafas.lib;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.VehicleCapacity;

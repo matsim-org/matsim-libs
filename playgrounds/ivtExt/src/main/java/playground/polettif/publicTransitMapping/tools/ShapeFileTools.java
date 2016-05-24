@@ -22,14 +22,11 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.polettif.publicTransitMapping.gtfs.containers.GTFSRoute;
-import playground.polettif.publicTransitMapping.gtfs.containers.Shape;
-import playground.polettif.publicTransitMapping.gtfs.containers.Trip;
+import playground.polettif.publicTransitMapping.gtfs.lib.GTFSRoute;
+import playground.polettif.publicTransitMapping.gtfs.lib.Shape;
+import playground.polettif.publicTransitMapping.gtfs.lib.Trip;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
-import java.util.SortedMap;
+import java.util.*;
 
 /**
  * Provides tools to convert MATSim or gtfs data
@@ -39,7 +36,7 @@ import java.util.SortedMap;
  */
 public class ShapeFileTools {
 
-	public static void writeGtfsTripsToFile(SortedMap<String, GTFSRoute> gtfsRoutes, Set<String> serviceIds, String outputCoordinateSystem, String outFile) {
+	public static void writeGtfsTripsToFile(Map<String, GTFSRoute> gtfsRoutes, Set<String> serviceIds, String outputCoordinateSystem, String outFile) {
 		Collection<SimpleFeature> features = new ArrayList<>();
 
 		PolylineFeatureFactory ff = new PolylineFeatureFactory.Builder()

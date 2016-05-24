@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.hafas.hafasCreator;
+package playground.polettif.publicTransitMapping.hafas.lib;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -27,7 +27,7 @@ import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-import playground.polettif.publicTransitMapping.hafas.HRDFDefinitions;
+import playground.polettif.publicTransitMapping.hafas.HafasDefinitions;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -42,7 +42,7 @@ import java.util.*;
 public class HAFASUtils {
 	protected static Logger log = Logger.getLogger(HAFASUtils.class);
 
-	protected static void removeNonUsedStopFacilities(TransitSchedule schedule) {
+	public static void removeNonUsedStopFacilities(TransitSchedule schedule) {
 		// Collect all used stop facilities:
 		Set<Id<TransitStopFacility>> usedStopFacilities = new HashSet<>();
 		for (TransitLine line : schedule.getTransitLines().values()) {
@@ -65,7 +65,7 @@ public class HAFASUtils {
 		}
 	}
 
-	protected static void cleanVehicles(TransitSchedule schedule, Vehicles vehicles) {
+	public static void cleanVehicles(TransitSchedule schedule, Vehicles vehicles) {
 		final Set<Id<Vehicle>> usedVehicles = new HashSet<>();
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
@@ -88,7 +88,7 @@ public class HAFASUtils {
 
 		final Set<VehicleType> vehicleTypes2Remove = new HashSet<>();
 		for(VehicleType vehicleType : vehicles.getVehicleTypes().values()) {
-			if(!HRDFDefinitions.Vehicles.valueOf(vehicleType.getId().toString()).addToSchedule) {
+			if(!HafasDefinitions.Vehicles.valueOf(vehicleType.getId().toString()).addToSchedule) {
 				vehicleTypes2Remove.add(vehicleType);
 			}
 		}
@@ -97,7 +97,7 @@ public class HAFASUtils {
 		}
 	}
 
-	protected static void cleanDepartures(TransitSchedule schedule) {
+	public static void cleanDepartures(TransitSchedule schedule) {
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				final Set<Double> departureTimes = new HashSet<>();
@@ -117,7 +117,7 @@ public class HAFASUtils {
 		}
 	}
 
-	protected static void uniteSameRoutesWithJustDifferentDepartures(TransitSchedule schedule) {
+	public static void uniteSameRoutesWithJustDifferentDepartures(TransitSchedule schedule) {
 		long totalNumberOfDepartures = 0;
 		long departuresWithChangedSchedules = 0;
 		long totalNumberOfStops = 0;

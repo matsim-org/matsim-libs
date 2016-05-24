@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.hafas.hafasCreator;
+package playground.polettif.publicTransitMapping.hafas.lib;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -28,7 +28,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.hafas.TransitStopCreator;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -38,30 +37,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Reads all stops from HAFAS-BFKOORD_GEO and adds them to the provided TransitSchedule.
+ * Reads all stops from HAFAS-BFKOORD_GEO and adds them as TransitStopFacilities
+ * to the provided TransitSchedule.
  *
  * @author boescpa
  */
-public class StopReader implements TransitStopCreator {
+public class StopReader {
 	protected static Logger log = Logger.getLogger(StopReader.class);
 
 	private final CoordinateTransformation transformation;
-	private TransitSchedule schedule;
-	private TransitScheduleFactory scheduleBuilder;
-	private Map<Coord, String> usedCoordinates = new HashMap<>();
+	private final TransitSchedule schedule;
+	private final TransitScheduleFactory scheduleBuilder;
+	private final Map<Coord, String> usedCoordinates = new HashMap<>();
+	private final String pathToBFKOORD_GEOFile;
 
-	protected StopReader(CoordinateTransformation transformation) {
-		this.transformation = transformation;
-	}
-
-	@Override
-	public void createTransitStops(TransitSchedule schedule, String pathToInputFiles) {
+	public StopReader(TransitSchedule schedule, CoordinateTransformation transformation, String pathToBFKOORD_GEOFile) {
 		this.schedule = schedule;
+		this.transformation = transformation;
 		this.scheduleBuilder = this.schedule.getFactory();
-		readStops(pathToInputFiles + "/BFKOORD_GEO");
+		this.pathToBFKOORD_GEOFile = pathToBFKOORD_GEOFile;
 	}
 
-	private void readStops(String pathToBFKOORD_GEOFile) {
+	public static void run(TransitSchedule schedule, CoordinateTransformation transformation, String pathToBFKOORD_GEOFile) {
+		new StopReader(schedule, transformation, pathToBFKOORD_GEOFile).createStops();
+	}
+
+	private void createStops() {
 		log.info("  Read transit stops...");
 		try {
 			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(pathToBFKOORD_GEOFile), "latin1"));

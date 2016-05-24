@@ -22,10 +22,12 @@ package playground.polettif.publicTransitMapping.hafas;
 import org.matsim.vehicles.VehicleType;
 
 /**
- * Definitions and categories for modes found in hafas files.
+ * Definitions and categories for modes found in hafas files (HRDF)
  * Assignment equivalent to GTFS.
+ *
+ * @author polettif
  */
-public final class HRDFDefinitions {
+public final class HafasDefinitions {
 
 	public enum TransportModes {
 

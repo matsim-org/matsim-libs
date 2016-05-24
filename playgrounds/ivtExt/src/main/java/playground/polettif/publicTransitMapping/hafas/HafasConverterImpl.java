@@ -19,62 +19,35 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.hafas.hafasCreator;
+package playground.polettif.publicTransitMapping.hafas;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import playground.polettif.publicTransitMapping.hafas.DeparturesCreator;
-import playground.polettif.publicTransitMapping.hafas.PTScheduleCreator;
-import playground.polettif.publicTransitMapping.hafas.RouteProfileCreator;
-import playground.polettif.publicTransitMapping.hafas.TransitStopCreator;
-import playground.polettif.publicTransitMapping.tools.ScheduleTools;
+import playground.polettif.publicTransitMapping.hafas.lib.*;
 
 import java.util.Map;
 import java.util.Set;
 
 /**
- * The HAFAS implementation of PTScheduleCreator (using the Swiss-HAFAS-Schedule).
+ * Implementation of Hafas2MATSimTransitSchedule.
  *
  * @author boescpa
  */
-public class PTScheduleCreatorHAFAS extends PTScheduleCreator implements RouteProfileCreator, DeparturesCreator {
+public class HafasConverterImpl extends Hafas2MatsimTransitScheduleAbstract {
 
-	private CoordinateTransformation transformation;
-
-	public PTScheduleCreatorHAFAS(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
-		super(schedule, vehicles);
-		this.transformation = transformation;
+	public HafasConverterImpl(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
+		super(schedule, vehicles, transformation);
 	}
 
 	@Override
-	public TransitStopCreator getTransitStopCreator() {
-		return new StopReader(transformation);
-	}
-
-	@Override
-	public RouteProfileCreator getRouteProfileCreator() {
-		return this;
-	}
-
-	@Override
-	public DeparturesCreator getDeparturesCreator() {
-		return this;
-	}
-
-	@Override
-	public void createRouteProfiles(TransitSchedule schedule, String pathToInputFiles) {
-		// Does nothing as we do in this implementation all in the createDepartures step.
-	}
-
-	@Override
-	public void createDepartures(TransitSchedule schedule, Vehicles vehicles, String pathToInputFiles) {
+	public void createSchedule(String pathToInputFiles) {
 		log.info("Creating the schedule based on HAFAS...");
+
+		// 1. Read and create stop facilities
+		log.info("  Read transit stops...");
+		StopReader.run(schedule, transformation, pathToInputFiles + "BFKOORD_GEO");
+		log.info("  Read transit stops... done.");
 
 		// 1. Read all operators from BETRIEB_DE
 		log.info("  Read operators...");
@@ -83,8 +56,7 @@ public class PTScheduleCreatorHAFAS extends PTScheduleCreator implements RoutePr
 
 		// 2. Read all ids for work-day-routes from HAFAS-BITFELD
 		log.info("  Read bitfeld numbers...");
-		Set<Integer> bitfeldNummern =
-				BitfeldAnalyzer.findBitfeldnumbersOfBusiestDay(pathToInputFiles + "FPLAN", pathToInputFiles + "BITFELD");
+		Set<Integer> bitfeldNummern = BitfeldAnalyzer.findBitfeldnumbersOfBusiestDay(pathToInputFiles + "FPLAN", pathToInputFiles + "BITFELD");
 		log.info("  Read bitfeld numbers... done.");
 
 		// 3. Create all lines from HAFAS-Schedule
@@ -100,4 +72,5 @@ public class PTScheduleCreatorHAFAS extends PTScheduleCreator implements RoutePr
 
 		log.info("Creating the schedule based on HAFAS... done.");
 	}
+
 }

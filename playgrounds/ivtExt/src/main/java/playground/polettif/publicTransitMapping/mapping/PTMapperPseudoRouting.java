@@ -201,9 +201,14 @@ public class PTMapperPseudoRouting extends PTMapper {
 		 * router for each schedule mode is initialized using the same merged network.
 		 */
 		Map<String, Router> finalRouters = new HashMap<>();    // key: ScheduleTransportMode
+		ModeDependentRouter artificialOnlyRouter = new ModeDependentRouter(network, Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
 		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
 			log.info("Creating Router for " + modeAssignment.getKey() + " ...");
-			finalRouters.put(modeAssignment.getKey(), new ModeDependentRouter(network, modeAssignment.getValue()));
+			if(modeAssignment.getValue().size() == 1 && modeAssignment.getValue().contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)) {
+				finalRouters.put(modeAssignment.getKey(), artificialOnlyRouter);
+			} else {
+				finalRouters.put(modeAssignment.getKey(), new ModeDependentRouter(network, modeAssignment.getValue()));
+			}
 		}
 
 		/** [8]
@@ -481,15 +486,17 @@ public class PTMapperPseudoRouting extends PTMapper {
 							!pseudoPathFound) {
 						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-								artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
+								if(!linkCandidateCurrent.getLinkIdStr().equals(linkCandidateNext.getLinkIdStr())) {
+									artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
 
-								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateCurrent.getFromNodeCoord());
+									double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateCurrent.getFromNodeCoord());
 
-								double newPathWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / 0.5 : length);
+									double newPathWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / 0.5 : length);
 
-								PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-								PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight), (i == 0), (i == routeStops.size() - 2));
+									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight), (i == 0), (i == routeStops.size() - 2));
+								}
 							}
 						}
 					}

@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.hafas.hafasCreator;
+package playground.polettif.publicTransitMapping.hafas.lib;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -27,7 +27,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import playground.polettif.publicTransitMapping.hafas.HRDFDefinitions;
+import playground.polettif.publicTransitMapping.hafas.HafasDefinitions;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -90,8 +90,8 @@ public class PtRouteFPLAN {
 		usedVehicleID = typeId.toString();
 
 		if (usedVehicleType != null) {
-			if(HRDFDefinitions.Vehicles.valueOf(usedVehicleType.getId().toString()).addToSchedule) {
-				usedMode = HRDFDefinitions.Vehicles.valueOf(usedVehicleType.getId().toString()).transportMode.modeName;
+			if(HafasDefinitions.Vehicles.valueOf(usedVehicleType.getId().toString()).addToSchedule) {
+				usedMode = HafasDefinitions.Vehicles.valueOf(usedVehicleType.getId().toString()).transportMode.modeName;
 			} else {
 				usedMode = "REMOVE";
 			}
