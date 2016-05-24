@@ -31,32 +31,43 @@ public class OTPMatrixRouter {
     private static final Logger log = LoggerFactory.getLogger(OTPMatrixRouter.class);
 
     //editable constants
-    private final static String INPUT_ROOT = "../../../shared-svn/projects/accessibility_berlin/otp/2016-03-21/";
+//    private final static String INPUT_ROOT = "../../../shared-svn/projects/accessibility_berlin/otp/2016-03-21/";
 //    private final static String INPUT_ROOT = "input/";
-    private final static String GRAPH_NAME = "Graph.obj";
-    private final static String OUTPUT_DIR = "../../../shared-svn/projects/accessibility_berlin/otp/2016-03-21/output_2/";
+//    private final static String GRAPH_NAME = "Graph.obj";
+//    private final static String OUTPUT_DIR = "../../../shared-svn/projects/accessibility_berlin/otp/2016-03-21/output_2/";
 //    private final static String OUTPUT_DIR = "output/";
 
-    private final static String TIME_ZONE_STRING = "Europe/Berlin";
-    private final static String DATE_STRING = "2016-04-01";
-    private final static int DEPARTURE_TIME = 8 * 60 * 60;
+//    private final static String TIME_ZONE_STRING = "Europe/Berlin";
+//    private final static String DATE_STRING = "2016-04-01";
+//    private final static int DEPARTURE_TIME = 8 * 60 * 60;
 
     public static void main(String[] args) {
 
-        List<Individual> fromIndividuals = readIndividuals("stops.txt");
-        List<Individual> toIndividuals = readIndividuals("stops.txt");
+        if (args.length != 7) {
+            log.error("The args schould contain 7 parameters: " +
+                    "1.fromIndividualsFilePath " +
+                    "2.toIndividualsFilePath " +
+                    "3.graphParentDirecoryPath " +
+                    "4.outputDirectory" +
+                    "5.timeZone" +
+                    "6.date" +
+                    "7.departureTime");
+        } else {
+            List<Individual> fromIndividuals = readIndividuals(args[0]);
+            List<Individual> toIndividuals = readIndividuals(args[1]);
 
-        routeMatrix(fromIndividuals, toIndividuals);
+            routeMatrix(fromIndividuals, toIndividuals, args[2], args[3], args[4], args[5], Integer.parseInt(args[6]));
+        }
     }
 
-    private static void mkdir() {
-        if (new File(OUTPUT_DIR).mkdir()) {
-            log.info("Did not found outputRoot at " + OUTPUT_DIR + " Created it as a new directory.");
+    private static void mkdir(String outputDir) {
+        if (new File(outputDir).mkdir()) {
+            log.info("Did not found outputRoot at " + outputDir + " Created it as a new directory.");
         }
     }
 
     private static List<Individual> readIndividuals(String fileName) {
-        CSVReader reader = new CSVReader(INPUT_ROOT + fileName, ",");
+        CSVReader reader = new CSVReader(fileName, ",");
 
         List<Individual> individuals = new ArrayList<>();
         reader.readLine();
@@ -69,7 +80,6 @@ public class OTPMatrixRouter {
             } else {
                 break;
             }
-            //if (individuals.size()>10) break;
             line = reader.readLine() ;
         }
         log.info("Found " + individuals.size() + " coordinates.");
@@ -77,24 +87,25 @@ public class OTPMatrixRouter {
         return individuals;
     }
 
-    private static void routeMatrix(List<Individual> fromindividuals, List<Individual> toindividuals) {
+    private static void routeMatrix(List<Individual> fromindividuals, List<Individual> toindividuals,
+                            String graphDir, String outputDir, String timeZone, String date, int departureTime) {
 
-        buildGraph(INPUT_ROOT);
-        Graph graph = loadGraph(INPUT_ROOT);
+        buildGraph(graphDir);
+        Graph graph = loadGraph(graphDir);
         assert graph != null;
 
-        Calendar calendar = prepareDefaultCalendarSettings();
+        Calendar calendar = prepareCalendarSettings(timeZone, date, departureTime);
 
-        mkdir();
+        mkdir(outputDir);
 
-        routeMatrix(graph, calendar, indexIndividuals(graph, fromindividuals, "fromIDs.csv"), indexIndividuals(graph, toindividuals, "toIDs.csv"), OUTPUT_DIR);
+        routeMatrix(graph, calendar, indexIndividuals(graph, fromindividuals, "fromIDs.csv"), indexIndividuals(graph, toindividuals, "toIDs.csv"), outputDir);
         log.info("Shutdown");
     }
 
-    static boolean buildGraph(String inputRoot) {
-        if (!new File(inputRoot + GRAPH_NAME).exists()) {
-            log.info("No graphfile found. Building the graph from content from: " + new File(inputRoot).getAbsolutePath() + " ...");
-            OTPMain.main(new String[]{"--build", inputRoot});
+    static boolean buildGraph(String graphDir) {
+        if (!new File(graphDir + "Graph.obj").exists()) {
+            log.info("No graphfile found. Building the graph from content from: " + new File(graphDir).getAbsolutePath() + " ...");
+            OTPMain.main(new String[]{"--build", graphDir});
             log.info("Building the graph finished.");
             return true;
         } else {
@@ -106,7 +117,7 @@ public class OTPMatrixRouter {
 
         log.info("Loading the graph...");
         try {
-            Graph graph = Graph.load(new File(inputRoot + GRAPH_NAME), Graph.LoadLevel.FULL);
+            Graph graph = Graph.load(new File(inputRoot + "Graph.obj"), Graph.LoadLevel.FULL);
             log.info("Loading the graph finished.");
             return graph;
         } catch (IOException | ClassNotFoundException e) {
@@ -116,26 +127,26 @@ public class OTPMatrixRouter {
         }
     }
 
-    private static Calendar prepareDefaultCalendarSettings() {
+    private static Calendar prepareCalendarSettings(String timeZone, String date, int departureTime) {
         log.info("Preparing settings for routing...");
         final Calendar calendar = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        TimeZone timeZone = TimeZone.getTimeZone(TIME_ZONE_STRING);
-        df.setTimeZone(timeZone);
-        calendar.setTimeZone(timeZone);
+        TimeZone tZ = TimeZone.getTimeZone(timeZone);
+        df.setTimeZone(tZ);
+        calendar.setTimeZone(tZ);
         try {
-            calendar.setTime(df.parse(DATE_STRING));
+            calendar.setTime(df.parse(date));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        calendar.add(Calendar.SECOND, DEPARTURE_TIME);
+        calendar.add(Calendar.SECOND, departureTime);
         log.info("Preparing settings for routing finished.");
         return calendar;
     }
 
-    private static List<Individual> indexIndividuals(Graph graph, List<Individual> individuals, String fileName) {
+    private static List<Individual> indexIndividuals(Graph graph, List<Individual> individuals, String filePath) {
         log.info("Start indexing vertices and writing them out...");
-        InputsCSVWriter individualsWriter = new InputsCSVWriter(OUTPUT_DIR + fileName, ",");
+        InputsCSVWriter individualsWriter = new InputsCSVWriter(filePath, ",");
         SampleFactory sampleFactory = graph.getSampleFactory();
         for (Individual individual : individuals) {
             individual.sample = sampleFactory.getSample(individual.lon, individual.lat);
