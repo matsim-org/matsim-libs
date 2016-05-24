@@ -161,6 +161,15 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			System.out.flush() ;
 			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
 		}
+		// added may'16
+		if ( config.strategy().getFractionOfIterationsToDisableInnovation()==Double.POSITIVE_INFINITY ) {
+			problem = true ;
+			System.out.flush() ;
+			log.log( lvl, "You have not set fractionOfIterationsToDisableInnovation; vsp default is to set this to 0.8 or similar.  Add the following config lines:" ) ;
+			log.log( lvl, "<module name=\"strategy\">");
+			log.log( lvl, "	<param name=\"fractionOfIterationsToDisableInnovation\" value=\"0.8\" />");
+			log.log( lvl, "</module>");
+		}
 		
 		// added nov'15
 		boolean usingTimeMutator = false ;
