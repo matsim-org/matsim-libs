@@ -50,7 +50,7 @@ public class IntervalBasedCongestionPricingRun {
 	private static final Logger log = Logger.getLogger(IntervalBasedCongestionPricingRun.class);
 
 	private static String configFile;
-	private static double sigma;
+	private static String outputDirectory;
 	private static boolean runBaseCase;
 	
 	public static void main(String[] args) throws IOException {
@@ -61,15 +61,15 @@ public class IntervalBasedCongestionPricingRun {
 			configFile = args[0];		
 			log.info("config file: "+ configFile);
 			
-			sigma = Double.valueOf(args[1]);		
-			log.info("sigma: "+ sigma);
+			outputDirectory = args[1];		
+			log.info("output directory: "+ outputDirectory);
 			
 			runBaseCase = Boolean.valueOf(args[2]);
 			log.info("run base-case: "+ runBaseCase);
 
 		} else {
 			configFile = "../../../runs-svn/intervalBasedCongestionPricing/input/config.xml";
-			sigma = 3.0;
+			outputDirectory = "../../../runs-svn/intervalBasedCongestionPricing/output/intervalBasedInternalization_800/";
 			runBaseCase = false;
 		}
 
@@ -81,6 +81,7 @@ public class IntervalBasedCongestionPricingRun {
 	private void run() {
 
 		Config config = ConfigUtils.loadConfig(configFile);
+		config.controler().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		Controler controler = new Controler(scenario);
@@ -90,7 +91,7 @@ public class IntervalBasedCongestionPricingRun {
 		}
 		
 		final Builder factory = new Builder(TransportMode.car, config.planCalcScore());
-		factory.setSigma(sigma);
+		factory.setSigma(3.0);
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
