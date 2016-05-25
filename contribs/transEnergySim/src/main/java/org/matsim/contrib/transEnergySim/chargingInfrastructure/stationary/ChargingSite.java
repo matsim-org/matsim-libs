@@ -12,6 +12,7 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	abstract Collection<ChargingPlug> getAvailableChargingPlugsOfChargingPlugType(ChargingPlugType desiredType);
 	
 	abstract Collection<ChargingPlug> getAllChargingPlugs();
+	abstract Collection<ChargingPlug> getAllAvailableChargingPlugs();
 	
 	abstract Collection<ChargingPoint> getAllChargingPoints();
 	
@@ -35,7 +36,6 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	double getChargingPriceQuote(double time, double duration, ChargingLevel chargingLevel);
 	
 	ChargingSitePolicy getChargingSitePolicy();
-
 
 	
 }
