@@ -26,4 +26,12 @@ public interface ChargingPoint extends Identifiable<ChargingPoint> {
 	void registerVehicleDeparture(double time, Id<Vehicle> vehicleId);
 	
 	void addChargingPlug(ChargingPlug plug);
+<<<<<<< HEAD
 }
+=======
+<<<<<<< HEAD
+}
+=======
+}
+>>>>>>> updates to interfaces to match latest BEAM framework changes
+>>>>>>> merging

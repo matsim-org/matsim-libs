@@ -16,4 +16,12 @@ public interface ChargingPlug extends Identifiable<ChargingPlug> {
 	
 	void plugVehicle(VehicleWithBattery vehicle, double time);
 	void unPlugVehicle(VehicleWithBattery vehicle, double time);
+<<<<<<< HEAD
 }
+=======
+<<<<<<< HEAD
+}
+=======
+}
+>>>>>>> updates to interfaces to match latest BEAM framework changes
+>>>>>>> merging
