@@ -44,7 +44,7 @@ public abstract class Injector {
 
     private static Logger logger = Logger.getLogger(Injector.class);
 
-    public static com.google.inject.Injector createInjector(final Config config, AbstractModule... modules) {
+    public static com.google.inject.Injector createInjector(final Config config, Module... modules) {
         com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {
             @Override
             public void configure(Binder binder) {
@@ -56,7 +56,7 @@ public abstract class Injector {
         // features to provide. So we create a bootstrapInjector which already has the config
         // and provides it to the MATSim modules.
         List<com.google.inject.Module> guiceModules = new ArrayList<>();
-        for (AbstractModule module : modules) {
+        for (Module module : modules) {
             bootstrapInjector.injectMembers(module);
             guiceModules.add(module);
         }
