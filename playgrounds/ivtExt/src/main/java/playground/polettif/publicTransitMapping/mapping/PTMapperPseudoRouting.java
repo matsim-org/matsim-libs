@@ -45,8 +45,10 @@ import playground.polettif.publicTransitMapping.tools.CoordTools;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
+import playground.polettif.publicTransitMapping.workbench.PseudoRouteExport;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * References an unmapped transit schedule to a network. Combines routing of transit routes
@@ -70,7 +72,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 	// helper variables
 	private int artificialId = 0;
-	private Map<String, Double> alreadyCalculatedWeight = new HashMap<>();
+	private Map<String, Double> alreadyCalculatedWeight = new ConcurrentHashMap<>();
 	private Map<Tuple<LinkCandidate, LinkCandidate>, Link> artificialLinks = new HashMap<>();
 	private Map<TransitStopFacility, Boolean> stopIsInArea;
 	private double initialMaxPathCost;
@@ -86,10 +88,10 @@ public class PTMapperPseudoRouting extends PTMapper {
 	@Override
 	public void run() {
 		if(schedule == null) {
-			throw new IllegalArgumentException("No schedule defined!");
+			throw new RuntimeException("No schedule defined!");
 		}
 		else if(network == null) {
-			throw new IllegalArgumentException("No network defined!");
+			throw new RuntimeException("No network defined!");
 		}
 
 		log.info("Mapping transit schedule to network...");
@@ -158,7 +160,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				if(!config.getModeRoutingAssignment().containsKey(transitRoute.getTransportMode())) {
-					throw new IllegalArgumentException("No routing assignment defined for schedule transport mode " + transitRoute.getTransportMode());
+					throw new RuntimeException("No routing assignment defined for schedule transport mode " + transitRoute.getTransportMode());
 				}
 
 				int t = MapUtils.getInteger(scheduleModeToThreadAssignment.get(transitRoute.getTransportMode()), thr, 0);
@@ -459,7 +461,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 									pseudoPathFound = true;
 									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
 									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, pathCost), (i == 0), (i == routeStops.size() - 2));
+									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, pathCost));
 								}
 							}
 						}
@@ -486,17 +488,15 @@ public class PTMapperPseudoRouting extends PTMapper {
 							!pseudoPathFound) {
 						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
-								if(!linkCandidateCurrent.getLinkIdStr().equals(linkCandidateNext.getLinkIdStr())) {
-									artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
+								artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
 
-									double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateCurrent.getFromNodeCoord());
+								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateCurrent.getFromNodeCoord())+1;
 
-									double newPathWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / 0.5 : length);
+								double newPathWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / 0.5 : length);
 
-									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight), (i == 0), (i == routeStops.size() - 2));
-								}
+								PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+								PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight));
 							}
 						}
 					}
@@ -505,9 +505,23 @@ public class PTMapperPseudoRouting extends PTMapper {
 				/** [4.3]
 				 * Build pseudo network and find shortest path using dijkstra
 				 */
+				// add dummy path to pseudoGraph
+				pseudoGraph.addSourceDummyPaths(0, routeStops.get(0), linkCandidates.get(scheduleTransportMode).get(routeStops.get(0).getStopFacility()));
+				int e = routeStops.size()-1;
+				pseudoGraph.addDestinationDummyPaths(e, routeStops.get(e), linkCandidates.get(scheduleTransportMode).get(routeStops.get(e).getStopFacility()));
+
+				for(PseudoRoutePath p : pseudoGraph.getEdges()) {
+					if(p.getFromPseudoStop().toString().equals("St-Gingolph (Suisse) (496204)")) {
+						log.debug(p);
+					}
+				}
+
+				PseudoRouteExport.run(network, pseudoGraph, "../../output/testPseudo/" + transitRoute.getId() + ".xml.gz");
+
 				dijkstra.run();
 				List<PseudoRouteStop> pseudoStopSequence = MapUtils.getList(transitRoute, MapUtils.getMap(transitLine, pseudoSchedule));
 				LinkedList<PseudoRouteStop> pseudoPath = dijkstra.getShortesPseudoPath();
+
 				if(pseudoPath == null) {
 					log.warn("PseudoRouting could not find a shortest path for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");
 				} else {

@@ -50,9 +50,9 @@ import java.util.Map.Entry;
  *
  * @author polettif
  */
-public class GtfsConverterImpl extends Gtfs2MatsimTransitScheduleAbstract {
+public class GtfsConverter extends Gtfs2TransitSchedule {
 
-	private static final Logger log = Logger.getLogger(GtfsConverterImpl.class);
+	private static final Logger log = Logger.getLogger(GtfsConverter.class);
 
 	// todo await departure time?
 	private boolean defaultAwaitDepartureTime = true;
@@ -97,7 +97,7 @@ public class GtfsConverterImpl extends Gtfs2MatsimTransitScheduleAbstract {
 	// containers for storing gtfs data
 
 
-	public GtfsConverterImpl(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
+	public GtfsConverter(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
 		super(schedule, vehicles, transformation);
 	}
 

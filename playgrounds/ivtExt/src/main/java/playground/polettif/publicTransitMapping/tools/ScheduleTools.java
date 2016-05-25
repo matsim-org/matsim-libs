@@ -129,7 +129,9 @@ public class ScheduleTools {
 
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
-				transitLinkIds.addAll(getLinkIds(transitRoute));
+				if(transitRoute.getRoute() != null) {
+					transitLinkIds.addAll(getLinkIds(transitRoute));
+				}
 			}
 		}
 
@@ -171,41 +173,48 @@ public class ScheduleTools {
 					counterRoute.incCounter();
 
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
-					List<Id<Link>> linkSequence = new ArrayList<>();
+					List<Id<Link>> linkSequence = null;
 
 					// add very first link
-					linkSequence.add(routeStops.get(0).getStopFacility().getLinkId());
+					if(routeStops.get(0).getStopFacility().getLinkId() == null) {
+						linkSequence = new ArrayList<>();
+						linkSequence.add(routeStops.get(0).getStopFacility().getLinkId());
 
-					// route
-					for(int i = 0; i < routeStops.size() - 1; i++) {
-						if(routeStops.get(i).getStopFacility().getLinkId() == null) {
-							log.error("stop facility " + routeStops.get(i).getStopFacility().getName() + " (" + routeStops.get(i).getStopFacility().getId() + " not referenced!");
-						}
-						if(routeStops.get(i + 1).getStopFacility().getLinkId() == null) {
-							log.error("stop facility " + routeStops.get(i - 1).getStopFacility().getName() + " (" + routeStops.get(i + 1).getStopFacility().getId() + " not referenced!");
-						}
+						// route
+						for(int i = 0; i < routeStops.size() - 1; i++) {
+							if(routeStops.get(i).getStopFacility().getLinkId() == null) {
+								log.warn("stop facility " + routeStops.get(i).getStopFacility().getName() + " (" + routeStops.get(i).getStopFacility().getId() + ") not referenced!");
+								linkSequence = null;
+								break;
+							}
+							if(routeStops.get(i + 1).getStopFacility().getLinkId() == null) {
+								log.warn("stop facility " + routeStops.get(i - 1).getStopFacility().getName() + " (" + routeStops.get(i + 1).getStopFacility().getId() + " not referenced!");
+								linkSequence = null;
+								break;
+							}
 
-						Id<Link> currentLinkId = Id.createLinkId(routeStops.get(i).getStopFacility().getLinkId().toString());
+							Id<Link> currentLinkId = Id.createLinkId(routeStops.get(i).getStopFacility().getLinkId().toString());
 
-						Link currentLink = network.getLinks().get(currentLinkId);
-						Link nextLink = network.getLinks().get(routeStops.get(i + 1).getStopFacility().getLinkId());
+							Link currentLink = network.getLinks().get(currentLinkId);
+							Link nextLink = network.getLinks().get(routeStops.get(i + 1).getStopFacility().getLinkId());
 
-						LeastCostPathCalculator.Path leastCostPath = router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode());
+							LeastCostPathCalculator.Path leastCostPath = router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode());
 
-						if(leastCostPath != null) {
-							List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(leastCostPath);
-							if(path != null) {
-								linkSequence.addAll(path);
+							if(leastCostPath != null) {
+								List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(leastCostPath);
+								if(path != null) {
+									linkSequence.addAll(path);
+								} else {
+									linkSequence = null;
+									break;
+								}
 							} else {
 								linkSequence = null;
 								break;
 							}
-						} else {
-							linkSequence = null;
-							break;
-						}
 
-						linkSequence.add(nextLink.getId());
+							linkSequence.add(nextLink.getId());
+						}
 					}
 
 					// add link sequence to schedule
@@ -233,8 +242,10 @@ public class ScheduleTools {
 
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute route : line.getRoutes().values()) {
-				for(Id<Link> linkId : getLinkIds(route)) {
-					MapUtils.getSet(linkId, transitLinkNetworkModes).add(route.getTransportMode());
+				if(route.getRoute() != null) {
+					for(Id<Link> linkId : getLinkIds(route)) {
+						MapUtils.getSet(linkId, transitLinkNetworkModes).add(route.getTransportMode());
+					}
 				}
 			}
 		}
@@ -298,10 +309,12 @@ public class ScheduleTools {
 
 	/**
 	 * @return the list of link ids used by transit routes (first and last
-	 * links are included)
+	 * links are included). Returns an empty list if no links are assigned
+	 * to the route.
 	 */
 	public static List<Id<Link>> getLinkIds(TransitRoute transitRoute) {
 		List<Id<Link>> list = new ArrayList<>();
+		if(transitRoute.getRoute() == null) { return list;	}
 		NetworkRoute networkRoute = transitRoute.getRoute();
 		list.add(networkRoute.getStartLinkId());
 		list.addAll(networkRoute.getLinkIds());

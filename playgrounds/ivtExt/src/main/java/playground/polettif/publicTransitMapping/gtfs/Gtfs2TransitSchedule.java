@@ -37,7 +37,7 @@ import java.util.*;
  *
  * @author polettif
  */
-public class Gtfs2MatsimTransitScheduleAbstract {
+public class Gtfs2TransitSchedule {
 
 	protected TransitSchedule schedule;
 	protected Vehicles vehicles;
@@ -105,7 +105,7 @@ public class Gtfs2MatsimTransitScheduleAbstract {
 		Vehicles vehicles = ScheduleTools.createVehicles(schedule);
 		CoordinateTransformation transformation = outputCoordinateSystem != null ? TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem) : new IdentityTransformation();
 
-		GtfsConverterImpl gtfsConverter = new GtfsConverterImpl(schedule, vehicles, transformation);
+		GtfsConverter gtfsConverter = new GtfsConverter(schedule, vehicles, transformation);
 		gtfsConverter.run(gtfsFolder, serviceIdsParam);
 
 		ScheduleTools.writeTransitSchedule(gtfsConverter.getSchedule(), outputFolder + "schedule.xml.gz");
@@ -113,7 +113,7 @@ public class Gtfs2MatsimTransitScheduleAbstract {
 		ShapeFileTools.writeGtfsTripsToFile(gtfsConverter.getGtfsRoutes(), gtfsConverter.getServiceIds(), outputCoordinateSystem, outputFolder+"shapes.txt");
 	}
 
-	public Gtfs2MatsimTransitScheduleAbstract(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
+	public Gtfs2TransitSchedule(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
 		this.schedule = schedule;
 		this.vehicles = vehicles;
 		this.transformation = transformation;

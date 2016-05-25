@@ -29,7 +29,7 @@ import java.util.*;
  */
 public class DijkstraAlgorithm {
 	
-	private final Set<PseudoRoutePath> edges;
+	private final Collection<PseudoRoutePath> edges;
 	private final PseudoRouteStop destination;
 	private final PseudoRouteStop source;
 	private Set<PseudoRouteStop> settledNodes;
@@ -91,9 +91,9 @@ public class DijkstraAlgorithm {
 		return neighbors;
 	}
 
-	private PseudoRouteStop getMinimum(Set<PseudoRouteStop> pseudoRouteStopes) {
+	private PseudoRouteStop getMinimum(Set<PseudoRouteStop> pseudoRouteStops) {
 		PseudoRouteStop minimum = null;
-		for (PseudoRouteStop pseudoRouteStop : pseudoRouteStopes) {
+		for (PseudoRouteStop pseudoRouteStop : pseudoRouteStops) {
 			if (minimum == null) {
 				minimum = pseudoRouteStop;
 			} else {

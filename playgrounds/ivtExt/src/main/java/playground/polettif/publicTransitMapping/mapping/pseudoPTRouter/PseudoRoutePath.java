@@ -19,6 +19,8 @@
 
 package playground.polettif.publicTransitMapping.mapping.pseudoPTRouter;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.utils.collections.Tuple;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 
@@ -28,14 +30,15 @@ import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfi
  *
  * @author polettif
  */
-public class PseudoRoutePath {
+public class PseudoRoutePath implements Identifiable<PseudoRoutePath> {
 
 	private static PublicTransitMappingConfigGroup config = null;
 
-	private final Tuple<PseudoRouteStop, PseudoRouteStop> id;
+	private final Id<PseudoRoutePath> id;
 	private final PseudoRouteStop from;
 	private final PseudoRouteStop to;
 	private final double weight;
+	private boolean dummy;
 
 	public static void setConfig(PublicTransitMappingConfigGroup configGroup) {
 		config = configGroup;
@@ -46,14 +49,16 @@ public class PseudoRoutePath {
 	}
 
 	public PseudoRoutePath(PseudoRouteStop fromStop, PseudoRouteStop toStop, double weight, boolean dummy) {
-		this.id = new Tuple<>(fromStop, toStop);
+		this.id = Id.create(fromStop.getId() + "->" + toStop.getId(), PseudoRoutePath.class);
 		this.from = fromStop;
 		this.to = toStop;
+		this.dummy = dummy;
 
 		this.weight = weight + (dummy ? 0 : 0.5 * fromStop.getLinkWeight() + 0.5 * toStop.getLinkWeight());
 	}
 
-	public Tuple<PseudoRouteStop, PseudoRouteStop> getId() {
+	@Override
+	public Id<PseudoRoutePath> getId() {
 		return id;
 	}
 
@@ -63,7 +68,7 @@ public class PseudoRoutePath {
 
 	@Override
 	public String toString() {
-		return from.getName()+" -> "+to.getName();
+		return id.toString();
 	}
 
 	public PseudoRouteStop getFromPseudoStop() {
@@ -72,6 +77,28 @@ public class PseudoRoutePath {
 
 	public PseudoRouteStop getToPseudoStop() {
 		return to;
+	}
+
+	public boolean isDummy() {
+		return dummy;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj)
+			return true;
+		if(obj == null)
+			return false;
+		if(getClass() != obj.getClass())
+			return false;
+
+		PseudoRoutePath other = (PseudoRoutePath) obj;
+		if(id == null) {
+			if(other.id != null)
+				return false;
+		} else if(!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 }

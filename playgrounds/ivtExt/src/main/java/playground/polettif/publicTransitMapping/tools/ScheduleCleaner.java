@@ -41,6 +41,12 @@ public class ScheduleCleaner {
 
 	private ScheduleCleaner() {}
 
+	public static void main(String[] args) {
+		TransitSchedule schedule = ScheduleTools.readTransitSchedule(args[0]);
+		removeNotUsedStopFacilities(schedule);
+		ScheduleTools.writeTransitSchedule(schedule, args[0]);
+	}
+
 	/**
 	 * Removes all stop facilities not used by a transit route. Modifies the schedule.
 	 *

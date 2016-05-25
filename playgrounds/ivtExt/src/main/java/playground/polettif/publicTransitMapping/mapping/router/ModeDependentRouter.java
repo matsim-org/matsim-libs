@@ -52,7 +52,9 @@ public class ModeDependentRouter implements Router {
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
 
 	public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
-		routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+		if(!(routingTransportModes.size() == 1 && routingTransportModes.contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE))) {
+			routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+		}
 		this.routingTransportModes = routingTransportModes;
 		paths = new HashMap<>();
 

@@ -34,9 +34,9 @@ import playground.polettif.publicTransitMapping.tools.ScheduleTools;
  *
  * @author polettif
  */
-public abstract class Hafas2MatsimTransitScheduleAbstract {
+public abstract class Hafas2TransitSchedule {
 
-	protected static Logger log = Logger.getLogger(Hafas2MatsimTransitScheduleAbstract.class);
+	protected static Logger log = Logger.getLogger(Hafas2TransitSchedule.class);
 
 	protected final TransitSchedule schedule;
 	protected final Vehicles vehicles;
@@ -64,13 +64,13 @@ public abstract class Hafas2MatsimTransitScheduleAbstract {
 		Vehicles vehicles = ScheduleTools.createVehicles(schedule);
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem);
 
-		new HafasConverterImpl(schedule, vehicles, transformation).createSchedule(hafasFolder);
+		new HafasConverter(schedule, vehicles, transformation).createSchedule(hafasFolder);
 
 		ScheduleTools.writeTransitSchedule(schedule, outputFolder+"schedule.xml");
 		ScheduleTools.writeVehicles(vehicles, outputFolder+"vehicles.xml");
 	}
 
-	public Hafas2MatsimTransitScheduleAbstract(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
+	public Hafas2TransitSchedule(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
 		this.schedule = schedule;
 		this.vehicles = vehicles;
 		this.transformation = transformation;

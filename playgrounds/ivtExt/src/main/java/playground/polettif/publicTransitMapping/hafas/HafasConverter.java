@@ -34,9 +34,9 @@ import java.util.Set;
  *
  * @author boescpa
  */
-public class HafasConverterImpl extends Hafas2MatsimTransitScheduleAbstract {
+public class HafasConverter extends Hafas2TransitSchedule {
 
-	public HafasConverterImpl(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
+	public HafasConverter(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
 		super(schedule, vehicles, transformation);
 	}
 
@@ -49,22 +49,22 @@ public class HafasConverterImpl extends Hafas2MatsimTransitScheduleAbstract {
 		StopReader.run(schedule, transformation, pathToInputFiles + "BFKOORD_GEO");
 		log.info("  Read transit stops... done.");
 
-		// 1. Read all operators from BETRIEB_DE
+		// 2. Read all operators from BETRIEB_DE
 		log.info("  Read operators...");
 		Map<String, String> operators = OperatorReader.readOperators(pathToInputFiles + "BETRIEB_DE");
 		log.info("  Read operators... done.");
 
-		// 2. Read all ids for work-day-routes from HAFAS-BITFELD
+		// 3. Read all ids for work-day-routes from HAFAS-BITFELD
 		log.info("  Read bitfeld numbers...");
 		Set<Integer> bitfeldNummern = BitfeldAnalyzer.findBitfeldnumbersOfBusiestDay(pathToInputFiles + "FPLAN", pathToInputFiles + "BITFELD");
 		log.info("  Read bitfeld numbers... done.");
 
-		// 3. Create all lines from HAFAS-Schedule
+		// 4. Create all lines from HAFAS-Schedule
 		log.info("  Read transit lines...");
 		FPLANReader.readLines(schedule, vehicles, bitfeldNummern, operators, pathToInputFiles + "FPLAN");
 		log.info("  Read transit lines... done.");
 
-		// 4. Clean schedule
+		// 5. Clean schedule
 		HAFASUtils.removeNonUsedStopFacilities(schedule);
 		HAFASUtils.uniteSameRoutesWithJustDifferentDepartures(schedule);
 		HAFASUtils.cleanDepartures(schedule);
