@@ -29,8 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -43,9 +41,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripBasicAnalysisMain;
 import playground.ikaddoura.intervalBasedCongestionPricing.IntervalBasedCongestionPricing;
+import playground.ikaddoura.intervalBasedCongestionPricing.data.CongestionInfo.DelayInternalizationApproach;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV10;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV9;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
@@ -61,10 +61,10 @@ public class PricingRunner {
 
 	private static final String configFile = "../../../runs-svn/vickreyPricing/input/config.xml";
 	private static final String outputBaseDirectory = "../../../runs-svn/vickreyPricing/output/";
-	private static final PricingApproach pricingApproach = PricingApproach.IntervalBasedPricing;
+	private static final PricingApproach pricingApproach = PricingApproach.V9;
 	
-	public enum PricingApproach {
-        NoPricing, IntervalBasedPricing, V3, V10
+	private enum PricingApproach {
+        NoPricing, IntervalBasedMarginalCostPricing, IntervalBasedAverageCostPricing, V3, V9, V10
 	}
 		
 	public static void main(String[] args) throws IOException {		
@@ -97,8 +97,8 @@ public class PricingRunner {
 		if (pricingApproach.equals(PricingApproach.NoPricing)) {
 			log.info(">>> No pricing. Starting a default MATSim run...");
 		
-		} else if (pricingApproach.equals(PricingApproach.IntervalBasedPricing)) {
-			log.info(">>> Congestion Pricing (Interval based)");
+		} else if (pricingApproach.equals(PricingApproach.IntervalBasedMarginalCostPricing)) {
+			log.info(">>> Congestion Pricing (Interval based marginal cost approach)");
 			
 			if (config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() == 0.) {
 				log.warn("The monetary distance rate is 0. The randomized router won't work properly...");
@@ -113,7 +113,40 @@ public class PricingRunner {
 				}
 			});
 			
-			controler.addControlerListener(new IntervalBasedCongestionPricing(scenario));
+//			controler.addControlerListener(new IntervalBasedCongestionPricing(scenario, DelayInternalizationApproach.MaximumDelay, 5 * 60., 10));
+			controler.addControlerListener(new IntervalBasedCongestionPricing(scenario, DelayInternalizationApproach.LastAgentsDelay, 5 * 60., 10));
+			
+		} else if (pricingApproach.equals(PricingApproach.IntervalBasedAverageCostPricing)) {
+			log.info(">>> Congestion Pricing (Interval based average cost approach)");
+			
+			if (config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() == 0.) {
+				log.warn("The monetary distance rate is 0. The randomized router won't work properly...");
+			}
+			
+			final Builder factory = new Builder(TransportMode.car, config.planCalcScore());
+			factory.setSigma(3.0);
+			controler.addOverridingModule(new AbstractModule(){
+				@Override
+				public void install() {
+					this.bindCarTravelDisutilityFactory().toInstance( factory );
+				}
+			});
+			
+			controler.addControlerListener(new IntervalBasedCongestionPricing(scenario, DelayInternalizationApproach.AverageDelay, 5 * 60., 10));
+		
+		} else if (pricingApproach.equals(PricingApproach.V9)) {
+			log.info(">>> Congestion Pricing (V9)");
+
+			TollHandler tollHandler = new TollHandler(controler.getScenario());
+			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler, controler.getConfig().planCalcScore());
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				}
+			});
+
+			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV9(controler.getEvents(), controler.getScenario())));
 		
 		} else if (pricingApproach.equals(PricingApproach.V10)) {
 			log.info(">>> Congestion Pricing (V10)");
