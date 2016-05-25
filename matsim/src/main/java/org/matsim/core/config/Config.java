@@ -316,7 +316,7 @@ public class Config implements MatsimExtensionPoint {
 	 *             if the module or parameter does not exist
 	 * @see #findParam(String, String)
 	 */
-	@Deprecated
+	@Deprecated // use "typed" config group instead
 	public final String getParam(final String moduleName, final String paramName) {
 		ConfigGroup m = this.modules.get(moduleName);
 		if (m == null) {
@@ -344,7 +344,7 @@ public class Config implements MatsimExtensionPoint {
 	 *
 	 * @see #getParam(String, String)
 	 */
-	@Deprecated
+	@Deprecated // use "typed" config group instead
 	public final String findParam(final String moduleName, final String paramName) {
 		ConfigGroup m = this.modules.get(moduleName);
 		if (m == null) {
@@ -382,6 +382,7 @@ public class Config implements MatsimExtensionPoint {
 	 * @param paramName
 	 * @param value
 	 */
+	@Deprecated // use "typed" config group instead
 	public final void setParam(final String moduleName, final String paramName, final String value) {
 		checkIfLocked();
 		ConfigGroup m = this.modules.get(moduleName);
