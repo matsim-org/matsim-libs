@@ -163,7 +163,7 @@ public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 		actStart.setEndTime(departureTime);
 		plan.addActivity(actStart);
 
-		plan.addLeg(new LegImpl("car"));
+		plan.addLeg(new LegImpl(mode));
 
 		ActivityImpl actSA = new ActivityImpl(this.actTag, destFacility.getCoord(), destFacility.getLinkId());
 		actSA.setFacilityId(destFacility.getId());
@@ -172,7 +172,7 @@ public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 		actSA.setEndTime(returnTime);
 		plan.addActivity(actSA);
 
-		plan.addLeg(new LegImpl("car"));
+		plan.addLeg(new LegImpl(mode));
 
 		ActivityImpl actEnd = new ActivityImpl(this.configGroup.getTag() + "Home", origFacility.getCoord(), origFacility.getLinkId());
 		actEnd.setFacilityId(origFacility.getId());

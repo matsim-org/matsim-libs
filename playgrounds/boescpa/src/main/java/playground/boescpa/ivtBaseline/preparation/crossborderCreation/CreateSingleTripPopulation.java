@@ -56,6 +56,7 @@ public abstract class CreateSingleTripPopulation {
 	private final ActivityFacilities bcFacilities = FacilitiesUtils.createActivityFacilities();
 	private final double[] cummulativeDepartureProbability;
 	private final double samplePercentage;
+	protected final String mode;
 	protected final Random random;
 	private int index = 0;
 
@@ -74,6 +75,7 @@ public abstract class CreateSingleTripPopulation {
 		addHomeActivityIfNotInFacilityYet(this.origFacilities);
 		this.cummulativeDepartureProbability = readDepartures(this.configGroup.getPathToCumulativeDepartureProbabilities());
 		this.samplePercentage = this.configGroup.getSamplePercentage();
+		this.mode = this.configGroup.getMode();
 		this.random = new Random(this.configGroup.getRandomSeed());
 	}
 
