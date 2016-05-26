@@ -19,7 +19,7 @@ public class FacilitiesFromBZ12 {
         final String activityType = args[1];
         final String pathToOutputFacilities = args[2];
 
-        final boolean publicFacilities = true;
+        final boolean publicFacilities = false;
 
         final ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
         final ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
