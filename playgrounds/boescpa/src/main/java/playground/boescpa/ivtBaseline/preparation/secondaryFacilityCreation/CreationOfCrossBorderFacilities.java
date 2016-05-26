@@ -22,8 +22,7 @@ public class CreationOfCrossBorderFacilities {
     public static void main(final String[] args) {
         final String pathToCSV = args[0];
         final String pathToOutputFacilities = args[1];
-
-        final boolean publicFacilities = true;
+        final boolean publicFacilities = Boolean.parseBoolean(args[2]);
 
         final ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
         final ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();
