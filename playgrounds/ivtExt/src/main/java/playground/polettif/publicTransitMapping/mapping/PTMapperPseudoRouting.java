@@ -36,6 +36,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.AlternateDijkstra;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.*;
 import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
 import playground.polettif.publicTransitMapping.mapping.router.LinkFilterMode;
@@ -414,6 +415,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 					final double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
 					final double maxAllowedPathCost = beelineDistance * config.getBeelineDistanceMaxFactor();
+					final double baseArtificialLinkLength = maxAllowedPathCost - beelineDistance;
 
 					//Check if one of the two stops is outside the network
 					boolean bothStopsInsideArea = !(!stopIsInArea.get(currentStopFacility) || !stopIsInArea.get(nextStopFacility));
@@ -458,7 +460,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 								 * if the path between two link candidates is viable, add it to the pseudoGraph
 								 */
 								if(pathCost < maxAllowedPathCost) {
-									pseudoPathFound = true;
 									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
 									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
 									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, pathCost));
@@ -468,7 +469,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 					}
 
 					/** [.]
-					 * Create artificial links between two routeStops if:
+					 * Create artificial links between two routeStops. They are normally
+					 * needed if:
 					 * 	 - scheduleMode should use artificial links
 					 *   - one of the two stops is outside the network area
 					 *   - the distance of the route found between the two
@@ -480,17 +482,17 @@ public class PTMapperPseudoRouting extends PTMapper {
 					 * facility and the other linkCandidates).
 					 *
 					 * Note: the actual artificial link is not considered
-					 * during pseudoTransitRoute creation since this would
+					 * during subsequent shortest path searches since this would
 					 * require reinitializing the router.
 					 */
-					if(mapScheduleModeArtificial ||
+				/*	if(mapScheduleModeArtificial ||
 							!bothStopsInsideArea ||
-							!pseudoPathFound) {
+							!pseudoPathFound) {*/
 						for(LinkCandidate linkCandidateCurrent : linkCandidatesCurrent) {
 							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
 								artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
 
-								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateCurrent.getFromNodeCoord())+1;
+								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord())+baseArtificialLinkLength;
 
 								double newPathWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / 0.5 : length);
 
@@ -499,7 +501,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight));
 							}
 						}
-					}
+					//}
 				} // - routeStop loop
 
 				/** [4.3]
@@ -510,17 +512,15 @@ public class PTMapperPseudoRouting extends PTMapper {
 				int e = routeStops.size()-1;
 				pseudoGraph.addDestinationDummyPaths(e, routeStops.get(e), linkCandidates.get(scheduleTransportMode).get(routeStops.get(e).getStopFacility()));
 
-				for(PseudoRoutePath p : pseudoGraph.getEdges()) {
-					if(p.getFromPseudoStop().toString().equals("St-Gingolph (Suisse) (496204)")) {
-						log.debug(p);
-					}
-				}
+				AlternateDijkstra alternateDijkstra = new AlternateDijkstra(pseudoGraph);
 
-				PseudoRouteExport.run(network, pseudoGraph, "../../output/testPseudo/" + transitRoute.getId() + ".xml.gz");
+//				PseudoRouteExport.run(network, pseudoGraph, "../../output/testPseudo/" + transitRoute.getId() + ".xml.gz");
 
-				dijkstra.run();
 				List<PseudoRouteStop> pseudoStopSequence = MapUtils.getList(transitRoute, MapUtils.getMap(transitLine, pseudoSchedule));
-				LinkedList<PseudoRouteStop> pseudoPath = dijkstra.getShortesPseudoPath();
+//				dijkstra.run();
+//				LinkedList<PseudoRouteStop> pseudoPath = dijkstra.getShortesPseudoPath();
+				alternateDijkstra.run();
+				LinkedList<PseudoRouteStop> pseudoPath = alternateDijkstra.getShortestPseudoPath();
 
 				if(pseudoPath == null) {
 					log.warn("PseudoRouting could not find a shortest path for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");

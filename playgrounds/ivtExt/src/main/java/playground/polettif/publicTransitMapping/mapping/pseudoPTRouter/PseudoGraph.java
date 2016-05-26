@@ -49,8 +49,8 @@ public class PseudoGraph {
 	public static final String SOURCE = "SOURCE";
 	public static final String DESTINATION = "DESTINATION";
 
-	public static final PseudoRouteStop SOURCE_PSEUDO_STOP = new PseudoRouteStop(SOURCE);
-	public static final PseudoRouteStop DESTINATION_PSEUDO_STOP = new PseudoRouteStop(DESTINATION);
+	public final PseudoRouteStop SOURCE_PSEUDO_STOP = new PseudoRouteStop(SOURCE);
+	public final PseudoRouteStop DESTINATION_PSEUDO_STOP = new PseudoRouteStop(DESTINATION);
 
 	private final PublicTransitMappingConfigGroup config;
 	private final List<PseudoRoutePath> edges;
@@ -100,11 +100,8 @@ public class PseudoGraph {
 
 	public void addDestinationDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidate> linkCandidates) {
 		for(LinkCandidate lc : linkCandidates) {
-			PseudoRouteStop s = new PseudoRouteStop(order, routeStop, lc);
-			PseudoRoutePath p = new PseudoRoutePath(s, DESTINATION_PSEUDO_STOP, 1.0, true);
-			edges.add(p);
-			log.debug(p.getId() + " added");
-			log.debug(edges.size());
+			edges.add(new PseudoRoutePath(new PseudoRouteStop(order, routeStop, lc), DESTINATION_PSEUDO_STOP, 1.0, true));
+
 		}
 	}
 }
