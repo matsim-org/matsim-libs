@@ -51,6 +51,12 @@ public class ModeDependentRouter implements Router {
     private final LeastCostPathCalculator pathCalculator;
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
 
+	private static PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType = PublicTransitMappingConfigGroup.PseudoRouteWeightType.linkLength;
+
+	public static void setPseudoRouteWeightType(PublicTransitMappingConfigGroup.PseudoRouteWeightType type) {
+		pseudoRouteWeightType = type;
+	}
+
 	public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
 		if(!(routingTransportModes.size() == 1 && routingTransportModes.contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE))) {
 			routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
@@ -104,7 +110,10 @@ public class ModeDependentRouter implements Router {
 	 */
     @Override
     public double getLinkMinimumTravelDisutility(Link link) {
-		return (linkHasRoutingMode(link) ? 1 : 10000) * link.getLength();
+		double length = (linkHasRoutingMode(link) ? 1 : 10000) * link.getLength();
+
+		return (pseudoRouteWeightType.equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / link.getFreespeed() : length);
+
 	}
 
 	/**

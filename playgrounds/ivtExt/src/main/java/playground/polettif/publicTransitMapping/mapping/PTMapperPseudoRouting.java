@@ -66,7 +66,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 	// pseudoRouting
 	private static Counter counterPseudoRouting = new Counter("route # ");
-	private Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule = new HashMap<>();
+	private Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule = new ConcurrentHashMap<>();
 	private Map<String, Network> modeSeparatedNetworks = new HashMap<>();
 	private Map<String, Router> modeSeparatedRouters = new HashMap<>();
 	private Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates;
@@ -203,6 +203,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 		 * The final routing should be done on the merged network, so a mode dependent
 		 * router for each schedule mode is initialized using the same merged network.
 		 */
+		log.info("Initiating final routers to map referenced schedule to the network");
+		ModeDependentRouter.setPseudoRouteWeightType(config.getPseudoRouteWeightType());
 		Map<String, Router> finalRouters = new HashMap<>();    // key: ScheduleTransportMode
 		ModeDependentRouter artificialOnlyRouter = new ModeDependentRouter(network, Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
 		for(Map.Entry<String, Set<String>> modeAssignment : config.getModeRoutingAssignment().entrySet()) {
@@ -235,6 +237,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 		log.info("Clean schedule and network...");
 		// changing the freespeed of the artificial links (value is used in simulations)
 		NetworkTools.setFreeSpeedOfLinks(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE, config.getFreespeedArtificial());
+		NetworkTools.resetLinkLength(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
 		// Remove unnecessary parts of schedule
 		int routesRemoved = config.getRemoveTransitRoutesWithoutLinkSequences() ? ScheduleCleaner.removeTransitRoutesWithoutLinkSequences(schedule) : 0;
 		ScheduleCleaner.removeNotUsedTransitLinks(schedule, network, config.getModesToKeepOnCleanUp());
@@ -351,10 +354,10 @@ public class PTMapperPseudoRouting extends PTMapper {
 			newLink = this.network.getFactory().createLink(Id.createLinkId(newLinkIdStr), fromNode,	toNode);
 
 			newLink.setAllowedModes(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
-			double l = CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord());
+			double l = CoordUtils.calcEuclideanDistance(fromLinkCandidate.getToNodeCoord(), toLinkCandidate.getFromNodeCoord())*config.getBeelineDistanceMaxFactor();
 			newLink.setLength(l);
 			// needs to be set low so busses don't use those links during modeRouting.
-			newLink.setFreespeed(0.5);
+			newLink.setFreespeed(0.1);
 			this.network.addLink(newLink);
 
 			artificialLinks.put(key, newLink);
@@ -415,7 +418,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 					final double beelineDistance = CoordUtils.calcEuclideanDistance(currentStopFacility.getCoord(), nextStopFacility.getCoord());
 					final double maxAllowedPathCost = beelineDistance * config.getBeelineDistanceMaxFactor();
-					final double baseArtificialLinkLength = maxAllowedPathCost - beelineDistance;
 
 					//Check if one of the two stops is outside the network
 					boolean bothStopsInsideArea = !(!stopIsInArea.get(currentStopFacility) || !stopIsInArea.get(nextStopFacility));
@@ -492,7 +494,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 							for(LinkCandidate linkCandidateNext : linkCandidatesNext) {
 								artificialLinksToBeCreated.add(new Tuple<>(linkCandidateCurrent, linkCandidateNext));
 
-								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord())+baseArtificialLinkLength;
+//								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord());
+								double length = maxAllowedPathCost;
 
 								double newPathWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / 0.5 : length);
 
@@ -523,7 +526,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 				LinkedList<PseudoRouteStop> pseudoPath = alternateDijkstra.getShortestPseudoPath();
 
 				if(pseudoPath == null) {
-					log.warn("PseudoRouting could not find a shortest path for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");
+					throw new RuntimeException("PseudoRouting could not find a shortest path for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");
 				} else {
 					pseudoStopSequence.addAll(pseudoPath);
 				}

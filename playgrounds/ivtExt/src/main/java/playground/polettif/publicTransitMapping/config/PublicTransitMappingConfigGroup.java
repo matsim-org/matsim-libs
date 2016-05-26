@@ -410,6 +410,9 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter(BEELINE_DISTANCE_MAX_FACTOR)
 	public void setBeelineDistanceMaxFactor(double beelineDistanceMaxFactor) {
+		if(beelineDistanceMaxFactor < 1) {
+			throw new RuntimeException("beelineDistanceMaxFactor cannnot be less than 1!");
+		}
 		this.beelineDistanceMaxFactor = beelineDistanceMaxFactor;
 	}
 

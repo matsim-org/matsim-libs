@@ -541,6 +541,19 @@ public class NetworkTools {
 	}
 
 	/**
+	 * Resets the link length of all links with the given link Mode
+	 * @param network
+	 * @param networkMode
+	 */
+	public static void resetLinkLength(Network network, String networkMode) {
+		for(Link link : network.getLinks().values()) {
+			if(link.getAllowedModes().contains(networkMode)) {
+				link.setFreespeed(CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
+			}
+		}
+	}
+
+	/**
 	 * Link filters by mode
 	 */
 	private static class LinkFilter implements NetworkLinkFilter {

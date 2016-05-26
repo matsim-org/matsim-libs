@@ -176,7 +176,7 @@ public class ScheduleTools {
 					List<Id<Link>> linkSequence = null;
 
 					// add very first link
-					if(routeStops.get(0).getStopFacility().getLinkId() == null) {
+					if(routeStops.get(0).getStopFacility().getLinkId() != null) {
 						linkSequence = new ArrayList<>();
 						linkSequence.add(routeStops.get(0).getStopFacility().getLinkId());
 
