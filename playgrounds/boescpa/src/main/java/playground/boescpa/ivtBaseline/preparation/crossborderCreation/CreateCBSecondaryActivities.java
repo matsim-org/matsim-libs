@@ -110,22 +110,22 @@ public class CreateCBSecondaryActivities extends CreateSingleTripPopulation {
 		}
 	}
 
-	private List<Tuple<Integer, ActivityFacility>> getFacilityCandidates(ActivityFacility facility, String seondaryActivityType) {
-		List<Tuple<Integer, ActivityFacility>> shopFacilitiesForBC = new ArrayList<>();
-		for (ActivityFacility facilityCandidate : getOrigFacilities().getFacilitiesForActivityType(seondaryActivityType).values()) {
+	private List<Tuple<Integer, ActivityFacility>> getFacilityCandidates(ActivityFacility facility, String secondaryActivityType) {
+		List<Tuple<Integer, ActivityFacility>> facilitiesForBC = new ArrayList<>();
+		for (ActivityFacility facilityCandidate : getOrigFacilities().getFacilitiesForActivityType(secondaryActivityType).values()) {
 			if (!facilityCandidate.getId().toString().contains(BC_TAG) && // we don't want the BC-facilities themselves to be candidates here.
 					CoordUtils.calcEuclideanDistance(facility.getCoord(), facilityCandidate.getCoord()) < MAX_BEELINE_DISTANCE) {
-				if (shopFacilitiesForBC.isEmpty()) {
-					shopFacilitiesForBC.add(new Tuple<>(0, facilityCandidate));
+				if (facilitiesForBC.isEmpty()) {
+					facilitiesForBC.add(new Tuple<>(0, facilityCandidate));
 				} else {
-					int cummulativeProbFacility = shopFacilitiesForBC.get(shopFacilitiesForBC.size()-1).getFirst()
-							+ (int) Math.round(shopFacilitiesForBC.get(shopFacilitiesForBC.size() - 1).getSecond()
-							.getActivityOptions().get(seondaryActivityType).getCapacity());
-					shopFacilitiesForBC.add(new Tuple<>(cummulativeProbFacility, facilityCandidate));
+					int cummulativeProbFacility = facilitiesForBC.get(facilitiesForBC.size()-1).getFirst()
+							+ (int) Math.round(facilitiesForBC.get(facilitiesForBC.size() - 1).getSecond()
+							.getActivityOptions().get(secondaryActivityType).getCapacity());
+					facilitiesForBC.add(new Tuple<>(cummulativeProbFacility, facilityCandidate));
 				}
 			}
 		}
-		return shopFacilitiesForBC;
+		return facilitiesForBC;
 	}
 
 	private ActivityFacility getSAFacility(List<Tuple<Integer, ActivityFacility>> candidates, String saType) {

@@ -117,7 +117,7 @@ public abstract class CreateSingleTripPopulation {
 		}
 		if (random.nextDouble() > samplePercentage) return;
 		// create and add new agent
-		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(this.configGroup.getTag() + "_" + subTag + "_" + index++, Person.class));
+		Person p = org.matsim.core.population.PopulationUtils.createPerson(Id.create(this.configGroup.getTag() + "_" + mode + "_" + subTag + "_" + index++, Person.class));
 		newCBPopulation.addPerson(p);
 		newCBPopulation.getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", this.configGroup.getTag());
 		// store facilities (if not already stored)
