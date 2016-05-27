@@ -7,6 +7,7 @@ import playground.polettif.publicTransitMapping.workbench.PseudoRouteExport;
 
 import java.util.*;
 
+@Deprecated
 public class AlternateDijkstra {
 
 	protected static Logger log = Logger.getLogger(AlternateDijkstra.class);

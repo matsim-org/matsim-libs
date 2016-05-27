@@ -30,6 +30,7 @@ import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfi
  *
  * @author polettif
  */
+@Deprecated
 public class PseudoRoutePath implements Identifiable<PseudoRoutePath> {
 
 	private static PublicTransitMappingConfigGroup config = null;

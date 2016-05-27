@@ -78,7 +78,7 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 	 * @param routeStop
 	 * @param linkCandidate
 	 */
-	public PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
+	/*package*/ PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
 		this.id = Id.create("[" + Integer.toString(order) + "]" + linkCandidate.getId(), PseudoRouteStop.class);
 		this.linkCandidateId = linkCandidate.getId();
 		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLinkIdStr() + ")";

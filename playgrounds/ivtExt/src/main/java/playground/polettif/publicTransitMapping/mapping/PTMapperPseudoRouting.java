@@ -355,12 +355,13 @@ public class PTMapperPseudoRouting extends PTMapper {
 		log.info("    Artificial Links:");
 		log.info("       created  " + artificialLinks);
 		log.info("    Stop Facilities:");
-		log.info("       input    " + nStopFacilities);
-		log.info("       output   " + schedule.getFacilities().size());
-		log.info("       diff.    " + (schedule.getFacilities().size() - nStopFacilities));
-		log.info("       median nr of child facilities created   " + String.format("%.0f", histogram.median()));
-		log.info("       average nr of child facilities created  " + String.format("%.2f", histogram.average()));
-		log.info("       max nr of child facilities created      " + String.format("%.0f", histogram.max()));
+		log.info("       total input   " + nStopFacilities);
+		log.info("       total output  " + schedule.getFacilities().size());
+		log.info("       diff.         " + (schedule.getFacilities().size() - nStopFacilities));
+		log.info("    Child Stop Facilities:");
+		log.info("       median nr created   " + String.format("%.0f", histogram.median()));
+		log.info("       average nr created  " + String.format("%.2f", histogram.average()));
+		log.info("       max nr created      " + String.format("%.0f", histogram.max()));
 		log.info("    Transit Routes:");
 		log.info("       removed from schedule            " + routesRemoved);
 		log.info("       total routes in schedule         " + nRoutes);
@@ -505,8 +506,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 								 * if the path between two link candidates is viable, add it to the pseudoGraph
 								 */
 								if(pathCost < maxAllowedPathCost) {
-									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+									PseudoRouteStop pseudoRouteStopCurrent = PseudoGraph.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+									PseudoRouteStop pseudoRouteStopNext = PseudoGraph.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
 //									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, pathCost));
 									pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, pathCost);
 								}
@@ -523,8 +524,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 									double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord())*config.getBeelineDistanceMaxFactor();
 									double artificialPathCost = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / 0.5 : length);
 
-									PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-									PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+									PseudoRouteStop pseudoRouteStopCurrent = PseudoGraph.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+									PseudoRouteStop pseudoRouteStopNext = PseudoGraph.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
 //									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, artificialPathCost));
 									pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, artificialPathCost);
 								}
@@ -549,8 +550,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 								double length = CoordUtils.calcEuclideanDistance(linkCandidateCurrent.getToNodeCoord(), linkCandidateNext.getFromNodeCoord());
 								double newPathWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / 0.5 : length);
 
-								PseudoRouteStop pseudoRouteStopCurrent = new PseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
-								PseudoRouteStop pseudoRouteStopNext = new PseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
+								PseudoRouteStop pseudoRouteStopCurrent = PseudoGraph.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
+								PseudoRouteStop pseudoRouteStopNext = PseudoGraph.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
 //								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight));
 								pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight);
 							}
@@ -567,9 +568,12 @@ public class PTMapperPseudoRouting extends PTMapper {
 				pseudoGraph.addDestinationDummyPaths(e, routeStops.get(e), linkCandidates.get(scheduleTransportMode).get(routeStops.get(e).getStopFacility()));
 
 				// run Dijkstra
-				AlternateDijkstra alternateDijkstra = new AlternateDijkstra(pseudoGraph);
-				alternateDijkstra.run();
-				LinkedList<PseudoRouteStop> pseudoPath = alternateDijkstra.getShortestPseudoPath();
+//				AlternateDijkstra alternateDijkstra = new AlternateDijkstra(pseudoGraph);
+//				alternateDijkstra.run();
+//				LinkedList<PseudoRouteStop> pseudoPath = alternateDijkstra.getShortestPseudoPath();
+				// run Dijkstra
+				pseudoGraph.runDijkstra();
+				LinkedList<PseudoRouteStop> pseudoPath = pseudoGraph.getShortestPseudoPath();
 
 				if(pseudoPath == null) {
 					log.warn("PseudoGraph has no path from SOURCE to DESTIONATION for transit route " + transitRoute.getId() + " from \"" + routeStops.get(0).getStopFacility().getName() + "\" to \"" + routeStops.get(routeStops.size() - 1).getStopFacility().getName() + "\"");

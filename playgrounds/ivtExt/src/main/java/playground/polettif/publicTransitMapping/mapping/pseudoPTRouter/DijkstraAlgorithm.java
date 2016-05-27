@@ -31,8 +31,8 @@ import java.util.*;
 public class DijkstraAlgorithm {
 	
 	private final Collection<PseudoRoutePath> edges;
-	private final PseudoRouteStop destination;
-	private final PseudoRouteStop source;
+	private  PseudoRouteStop destination;
+	private  PseudoRouteStop source;
 	private Set<PseudoRouteStop> settledNodes;
 	private Set<PseudoRouteStop> unSettledNodes;
 	private Map<PseudoRouteStop, PseudoRouteStop> predecessors;
@@ -40,8 +40,8 @@ public class DijkstraAlgorithm {
 
 	public DijkstraAlgorithm(PseudoGraph graph) {
 		this.edges = graph.getEdges();
-		this.source = graph.getSource();
-		this.destination = graph.getDestination();
+//		this.source = graph.getSource();
+//		this.destination = graph.getDestination();
 	}
 
 	public void run() {
