@@ -52,63 +52,9 @@ import java.util.*;
  *
  * @author polettif
  */
-public class Osm2MultimodalNetworkConverter {
+public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 
-	/**
-	 * Converts an osm file to a MATSim network. The input and output file as well
-	 * as conversion parameters are defined in this file. Run {@link playground.polettif.publicTransitMapping.workbench.CreateDefaultOsmConfig}
-	 * to create a default config.
-	 *
-	 * @param args [0] the config.xml file
-	 */
-	public static void main(String[] args) {
-		run(args[0]);
-	}
-
-	/**
-	 * Converts an osm file to a MATSim network. The input and output file as well
-	 * as conversion parameters are defined in this file. Run {@link playground.polettif.publicTransitMapping.workbench.CreateDefaultOsmConfig}
-	 * to create a default config.
-	 *
-	 * @param configFile the config.xml file
-	 */
-	public static void run(String configFile) {
-		new Osm2MultimodalNetworkConverter(configFile).run();
-	}
-
-	/**
-	 * Converts an osm file with default conversion parameters.
-	 * @param osmFile the osm file
-	 * @param outputNetworkFile the path to the output network file
-	 * @param outputCoordinateSystem output coordinate system (no transformation is applied if <tt>null</tt>)
-	 */
-	public static void run(String osmFile, String outputNetworkFile, String outputCoordinateSystem) {
-		OsmConverterConfigGroup configGroup = OsmConverterConfigGroup.createDefaultConfig();
-		configGroup.setOsmFile(osmFile);
-		configGroup.setOutputNetworkFile(outputNetworkFile);
-		configGroup.setOutputCoordinateSystem(outputCoordinateSystem);
-		new Osm2MultimodalNetworkConverter(configGroup).run();
-	}
-
-	/**
-	 * Converts the osm file specified in the config and writes
-	 * the network to a file (also defined in config).
-	 */
-	public void run() {
-		convert();
-		writeNetwork();
-	}
-
-	/**
-	 * Only converts the osm file, does not write the network to a file.
-	 */
-	public void convert() {
-		parse();
-		convertToNetwork();
-		cleanNetwork();
-	}
-
-	private final static Logger log = Logger.getLogger(Osm2MultimodalNetworkConverter.class);
+	private final static Logger log = Logger.getLogger(OsmMultimodalNetworkConverter.class);
 
 	private OsmConverterConfigGroup config;
 
@@ -135,43 +81,34 @@ public class Osm2MultimodalNetworkConverter {
 	private final Set<String> unknownLanesTags = new HashSet<>();
 	private long id = 0;
 
-
-	/**
-	 * Network and Transformation Object
-	 */
-	private Network network;
-	private final CoordinateTransformation transformation; // is applied to nodes in OsmParserHandler
-
-	/**
-	 * Constructor using default config
-	 */
-	public Osm2MultimodalNetworkConverter() {
-		log.info("Using default config.");
-		this.config = OsmConverterConfigGroup.createDefaultConfig();
-		this.network = NetworkTools.createNetwork();
-		this.transformation = config.getCoordinateTransformation();
-		readWayParams();
-	}
-
 	/**
 	 * Constructor reading config from file.
 	 */
-	public Osm2MultimodalNetworkConverter(final String osmConverterConfigFile) {
-		Config configAll = ConfigUtils.loadConfig(osmConverterConfigFile, new OsmConverterConfigGroup() ) ;
-		this.config = ConfigUtils.addOrGetModule(configAll, OsmConverterConfigGroup.GROUP_NAME, OsmConverterConfigGroup.class);
-		this.network = NetworkTools.createNetwork();
-		this.transformation = config.getCoordinateTransformation();
-		readWayParams();
+	public OsmMultimodalNetworkConverter(final String osmConverterConfigFile) {
+		super(osmConverterConfigFile);
+	}
+
+	public OsmMultimodalNetworkConverter(OsmConverterConfigGroup configGroup) {
+		super(configGroup);
 	}
 
 	/**
-	 * Constructor using the a OsmCOnverterConfigGroup config.
+	 * Converts the osm file specified in the config and writes
+	 * the network to a file (also defined in config).
 	 */
-	public Osm2MultimodalNetworkConverter(final OsmConverterConfigGroup config) {
-		this.config = config;
-		this.network = NetworkTools.createNetwork();
-		this.transformation = config.getCoordinateTransformation();
+	public void run() {
+		convert();
+		writeNetwork();
+	}
+
+	/**
+	 * Only converts the osm file, does not write the network to a file.
+	 */
+	public void convert() {
 		readWayParams();
+		parse();
+		convertToNetwork();
+		cleanNetwork();
 	}
 
 	/**
@@ -588,11 +525,6 @@ public class Osm2MultimodalNetworkConverter {
 		new NetworkCleaner().run(streetNetwork);
 		NetworkTools.integrateNetwork(streetNetwork, restNetwork);
 		this.network = streetNetwork;
-	}
-
-
-	public Network getNetwork() {
-		return this.network;
 	}
 
 	public OsmConverterConfigGroup getConfig() {

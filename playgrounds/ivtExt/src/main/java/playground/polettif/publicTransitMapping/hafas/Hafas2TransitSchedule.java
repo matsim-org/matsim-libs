@@ -70,6 +70,9 @@ public abstract class Hafas2TransitSchedule {
 		ScheduleTools.writeVehicles(vehicles, outputFolder+"vehicles.xml");
 	}
 
+	/**
+	 * Constructor
+	 */
 	public Hafas2TransitSchedule(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
 		this.schedule = schedule;
 		this.vehicles = vehicles;

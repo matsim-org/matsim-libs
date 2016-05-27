@@ -24,7 +24,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import playground.polettif.publicTransitMapping.osm.Osm2MultimodalNetworkConverter;
+import playground.polettif.publicTransitMapping.osm.OsmMultimodalNetworkConverter;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
 
@@ -34,7 +34,7 @@ import java.util.Set;
 
 
 /**
- * Config group for osm conversion {@link Osm2MultimodalNetworkConverter}
+ * Config group for osm conversion {@link OsmMultimodalNetworkConverter}
  * @author polettif
  */
 public class OsmConverterConfigGroup extends ReflectiveConfigGroup {

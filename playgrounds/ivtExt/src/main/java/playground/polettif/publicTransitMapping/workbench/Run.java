@@ -19,7 +19,7 @@
 package playground.polettif.publicTransitMapping.workbench;
 
 import playground.polettif.publicTransitMapping.hafas.Hafas2TransitSchedule;
-import playground.polettif.publicTransitMapping.osm.Osm2MultimodalNetworkConverter;
+import playground.polettif.publicTransitMapping.osm.OsmMultimodalNetworkConverter;
 import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
 
 /**
@@ -58,7 +58,7 @@ public class Run {
 
 	public void osm2network() {
 		String configFile = "";
-		Osm2MultimodalNetworkConverter.run(configFile);
+		OsmMultimodalNetworkConverter.run(configFile);
 	}
 
 	public void plausibilityCheck() {

@@ -27,6 +27,7 @@ import java.util.*;
  *
  * @author polettif
  */
+@Deprecated
 public class DijkstraAlgorithm {
 	
 	private final Collection<PseudoRoutePath> edges;

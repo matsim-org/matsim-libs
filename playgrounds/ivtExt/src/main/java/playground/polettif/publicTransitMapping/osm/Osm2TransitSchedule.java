@@ -30,7 +30,6 @@ import playground.polettif.publicTransitMapping.osm.core.OsmParserHandler;
 import playground.polettif.publicTransitMapping.osm.core.TagFilter;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
-import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.*;
@@ -41,9 +40,9 @@ import java.util.*;
  *
  * @author polettif
  */
-public class Osm2MATSimTransitScheduleConverter {
+public class Osm2TransitSchedule {
 
-	private static final Logger log = Logger.getLogger(Osm2MATSimTransitScheduleConverter.class);
+	private static final Logger log = Logger.getLogger(Osm2TransitSchedule.class);
 
 	private final CoordinateTransformation transformation;
 	private final TransitSchedule transitSchedule;
@@ -63,7 +62,7 @@ public class Osm2MATSimTransitScheduleConverter {
 
 	private int routeNr = 0;
 
-	public Osm2MATSimTransitScheduleConverter(TransitSchedule schedule, CoordinateTransformation transformation) {
+	public Osm2TransitSchedule(TransitSchedule schedule, CoordinateTransformation transformation) {
 		this.transitSchedule = schedule;
 		this.transformation = transformation;
 
@@ -103,7 +102,7 @@ public class Osm2MATSimTransitScheduleConverter {
 	 */
 	public static void main(final String[] args) {
 		CoordinateTransformation ct = args.length == 3 ? TransformationFactory.getCoordinateTransformation("WGS84", args[2]) : null;
-		Osm2MATSimTransitScheduleConverter osm2mts = new Osm2MATSimTransitScheduleConverter(ScheduleTools.createSchedule(), ct);
+		Osm2TransitSchedule osm2mts = new Osm2TransitSchedule(ScheduleTools.createSchedule(), ct);
 		osm2mts.parse(args[0]);
 		osm2mts.createSchedule();
 		osm2mts.writeFile(args[1]);
