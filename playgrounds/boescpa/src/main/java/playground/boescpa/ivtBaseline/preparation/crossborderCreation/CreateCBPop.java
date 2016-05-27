@@ -122,11 +122,27 @@ public class CreateCBPop {
 		cbPtWork.runPopulationCreation();
 		cbPtWork.writeOutput();
 
+		// CB-PT-Transit
+		//	config creation
+		CreateSingleTripPopulationConfigGroup transitPtConfig = configGroup.copy();
+		transitPtConfig.setPathToCumulativeDepartureProbabilities(
+				configGroup.getPathToCumulativeDepartureProbabilities() + "CumulativeProbabilityTransitDeparture.txt");
+		transitPtConfig.setPathToOriginsFile(configGroup.getPathToOriginsFile() + "OD_CB-Agents_Transit_PT.txt");
+		transitPtConfig.setMode("pt");
+		transitPtConfig.setPathToOutput(
+				configGroup.getPathToOutput().substring(0,configGroup.getPathToOutput().indexOf(".xml")) + "_Transit_PT.xml.gz");
+		//	population creation
+		CreateCBTransit cbPtTransit = new CreateCBTransit(transitPtConfig);
+		cbPtTransit.runPopulationCreation();
+		cbPtTransit.writeOutput();
+
+		// MERGE THE POPULATIONS
 		mergeFacilities(pathToOutput_CBPopulation);
 		mergeSubpopulations(transitConfig.getPathToOutput(), saConfig.getPathToOutput(), pathToOutput_CBPopulation);
 		mergeSubpopulations(pathToOutput_CBPopulation, workConfig.getPathToOutput(), pathToOutput_CBPopulation);
 		mergeSubpopulations(pathToOutput_CBPopulation, saPtConfig.getPathToOutput(), pathToOutput_CBPopulation);
 		mergeSubpopulations(pathToOutput_CBPopulation, workPtConfig.getPathToOutput(), pathToOutput_CBPopulation);
+		mergeSubpopulations(pathToOutput_CBPopulation, transitPtConfig.getPathToOutput(), pathToOutput_CBPopulation);
 	}
 
 	private static void mergeFacilities(String pathToOutput_CBPopulation) {
@@ -154,6 +170,11 @@ public class CreateCBPop {
 		ActivityFacilities workPtFacilities = FacilityUtils.readFacilities(
 				pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_Work_PT_Facilities.xml.gz");
 		for (ActivityFacility facility : workPtFacilities.getFacilities().values()) {
+			addFacility(cbFacilities, facility);
+		}
+		ActivityFacilities transitPtFacilities = FacilityUtils.readFacilities(
+				pathToOutput_CBPopulation.substring(0, pathToOutput_CBPopulation.indexOf(".xml")) + "_Transit_PT_Facilities.xml.gz");
+		for (ActivityFacility facility : transitPtFacilities.getFacilities().values()) {
 			addFacility(cbFacilities, facility);
 		}
 
