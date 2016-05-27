@@ -149,13 +149,13 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
         @Override
         public TravelDisutilityFactory get() {
-            RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+            final Config config = scenario.getConfig();
             final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
 //			if (!scheme.getType().equals(RoadPricingScheme.TOLL_TYPE_AREA)) {
                 RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
-                        originalTravelDisutilityFactory, scheme, scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney()
+                        originalTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney()
                 );
-                travelDisutilityFactory.setSigma(rpConfig.getRoutingRandomness());
+                travelDisutilityFactory.setSigma(config.plansCalcRoute().getRoutingRandomness());
                 return travelDisutilityFactory;
 //            } else {
 //                return originalTravelDisutilityFactory;
