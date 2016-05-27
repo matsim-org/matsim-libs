@@ -127,7 +127,6 @@ public class PTMapperUtils {
 	 * @param childStopFacilitySuffix what suffix the child facility should get in the id
 	 */
 	public static void createAndReplaceFacilities(TransitSchedule schedule, Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule, String childStopFacilitySuffix) {
-		log.info("Replacing parent StopFacilities with child StopFacilities...");
 		TransitScheduleFactory scheduleFactory = schedule.getFactory();
 		List<Tuple<TransitLine, TransitRoute>> newRoutes = new ArrayList<>();
 
@@ -229,7 +228,7 @@ public class PTMapperUtils {
 	 * @param network
 	 */
 	public static void pullChildStopFacilitiesTogether(TransitSchedule schedule, Network network) {
-		log.info("Concentrating child stop facilities...");
+		log.info("Pulling child stop facilities...");
 		for(TransitLine line : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : line.getRoutes().values()) {
 				if(transitRoute.getRoute() != null) {

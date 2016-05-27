@@ -215,18 +215,16 @@ public class NetworkTools {
 
 		Coord coord = stopFacility.getCoord();
 
-		Node dummyNode1 = networkFactory.createNode(Id.createNodeId(prefix + stopFacility.getId() + "_node1"), coord);
-		Node dummyNode2 = networkFactory.createNode(Id.createNodeId(prefix + stopFacility.getId() + "_node2"), coord);
-		Link dummyLink = networkFactory.createLink(Id.createLinkId(prefix + stopFacility.getId() + "_link"), dummyNode1, dummyNode2);
+		Node dummyNode = networkFactory.createNode(Id.createNodeId(prefix + stopFacility.getId() + "_node"), coord);
+		Link dummyLink = networkFactory.createLink(Id.createLinkId(prefix + stopFacility.getId() + "_link"), dummyNode, dummyNode);
 
-		dummyLink.setAllowedModes(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
+		dummyLink.setAllowedModes(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET);
 		dummyLink.setLength(5);
 		dummyLink.setFreespeed(freespeed);
 		dummyLink.setCapacity(9999); // todo param default values in config
 
-		if(!network.getNodes().containsKey(dummyNode1.getId())) {
-			network.addNode(dummyNode1);
-			network.addNode(dummyNode2);
+		if(!network.getNodes().containsKey(dummyNode.getId())) {
+			network.addNode(dummyNode);
 			network.addLink(dummyLink);
 		}
 

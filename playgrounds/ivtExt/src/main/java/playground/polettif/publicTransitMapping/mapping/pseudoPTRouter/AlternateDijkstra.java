@@ -66,19 +66,9 @@ public class AlternateDijkstra {
 			return;
 		}
 
-		double incr = 0.01;
+		double incr = 0.001;
 
-//		final PseudoRouteStop source = graph.get(SOURCE_ID);
 		NavigableSet<PseudoRouteStop> queue = new TreeSet<>();
-
-		// set-up vertices
-/*
-		for(PseudoRouteStop v : graph.values()) {
-			while(!queue.add(v)) {
-				v.distToSource -= incr;
-			}
-		}
-*/
 
 		queue.add(graph.get(SOURCE_ID));
 
@@ -86,11 +76,6 @@ public class AlternateDijkstra {
 		while(!queue.isEmpty()) {
 			currentStop = queue.pollFirst(); // vertex with shortest distance (first iteration will return source)
 
-			/*
-			if(currentStop.distToSource == Integer.MAX_VALUE) {
-				break; // we can ignore u (and any other remaining vertices) since they are unreachable
-			}
-*/
 			//look at distances to each neighbour
 			for(Map.Entry<PseudoRouteStop, Double> n : currentStop.neighbours.entrySet()) {
 				neighbour = n.getKey(); //the neighbour in this iteration
@@ -106,32 +91,6 @@ public class AlternateDijkstra {
 				}
 			}
 		}
-
-		NavigableSet<PseudoRouteStop> newQ = new TreeSet<>();
-
-		for(PseudoRouteStop s : graph.values()) {
-			if(s.previous == null && !s.getId().equals(SOURCE_ID)) {
-				newQ.add(s);
-			}
-		}
-
-		if(newQ.size() > 0) {
-			Set<PseudoRouteStop> mentioned = new HashSet<>();
-
-			for(PseudoRouteStop s : graph.values()) {
-				for(PseudoRouteStop n : s.neighbours.keySet()) {
-					mentioned.add(n);
-				}
-			}
-
-			for(PseudoRouteStop s : graph.values()) {
-				if(!mentioned.contains(s) && !s.getId().equals(SOURCE_ID)) {
-					log.debug("break");
-				}
-			}
-		}
-
-
 	}
 
 	/**

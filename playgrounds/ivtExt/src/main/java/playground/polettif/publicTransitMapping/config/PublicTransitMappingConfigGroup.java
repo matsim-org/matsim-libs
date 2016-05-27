@@ -33,6 +33,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "PublicTransitMapping";
 
 	public static final String ARTIFICIAL_LINK_MODE = "artificial";
+	public static final Set<String> ARTIFICIAL_LINK_MODE_AS_SET = Collections.singleton(ARTIFICIAL_LINK_MODE);
 
 	private static final String MODE_ROUTING_ASSIGNMENT ="modeRoutingAssignment";
 	private static final String MODES_TO_KEEP_ON_CLEAN_UP = "modesToKeepOnCleanUp";

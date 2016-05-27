@@ -33,6 +33,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
+import playground.polettif.publicTransitMapping.tools.NetworkTools;
+import playground.polettif.publicTransitMapping.workbench.Run;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,7 +47,9 @@ import java.util.Set;
  * modes are increased. Only uses distance as travel disutility.
  *
  * @author polettif
+ * @deprecated PTMapper uses separate networks for each mode
  */
+@Deprecated
 public class ModeDependentRouter implements Router {
 
 	private final Set<String> routingTransportModes;
@@ -60,17 +64,15 @@ public class ModeDependentRouter implements Router {
 
 	public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
 		this.routingTransportModes = new HashSet<>();
-		if(routingTransportModes != null) this.routingTransportModes.addAll(routingTransportModes);
 		this.routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
+		if(routingTransportModes != null) {
+			this.routingTransportModes.addAll(routingTransportModes);
+		}
+
 		paths = new HashMap<>();
 
-		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
+		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(network, this);
 		this.pathCalculator = factory.createPathCalculator(network, this, this);
-
-		// Suppress statements...
-		Logger.getLogger( Dijkstra.class ).setLevel( Level.ERROR );
-		Logger.getLogger( PreProcessEuclidean.class ).setLevel( Level.ERROR );
-		Logger.getLogger( PreProcessLandmarks.class ).setLevel( Level.ERROR );
 	}
 
     @Override
@@ -82,7 +84,7 @@ public class ModeDependentRouter implements Router {
             }
             return paths.get(nodes);
         } else {
-            return null;
+			throw new RuntimeException("Both nodes are null!");
         }
     }
 

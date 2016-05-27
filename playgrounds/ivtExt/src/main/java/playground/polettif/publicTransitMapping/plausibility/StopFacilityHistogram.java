@@ -41,7 +41,7 @@ public class StopFacilityHistogram {
 	
 	private TransitSchedule schedule;
 	private Map<Integer, String> stopFacilityHistogramMap = new TreeMap<>();
-	private double[] stopFacilityHistogram;
+	private double[] hist;
 
 	private static final String SUFFIX_PATTERN = "[.]link:";
 	private static final String SUFFIX = ".link:";
@@ -74,12 +74,29 @@ public class StopFacilityHistogram {
 
 		Map<String, Integer> stopStatSorted = MiscUtils.sortAscendingByValue(stopStat);
 
-		stopFacilityHistogram = new double[stopStatSorted.size()];
+		hist = new double[stopStatSorted.size()];
 		int i=0;
 		for(Integer value : stopStatSorted.values()) {
-			stopFacilityHistogram[i] = (double) value;
+			hist[i] = (double) value;
 			i++;
 		}
+	}
+
+	public double median() {
+		int m = hist.length / 2;
+		return hist[m];
+	}
+
+	public double average() {
+		double sum = 0;
+		for(double m : hist) {
+			sum += m;
+		}
+		return sum/hist.length;
+	}
+
+	public double max() {
+		return hist[hist.length - 1];
 	}
 
 	public void createCsv(String outputFile) throws FileNotFoundException, UnsupportedEncodingException {
@@ -99,9 +116,7 @@ public class StopFacilityHistogram {
 	 */
 	public void createPng(final String filename) {
 		BarChart chart = new BarChart("Stop Facility Histogram", "", "# of child stop facilities");
-		chart.addSeries("# StopFacilities", stopFacilityHistogram);
+		chart.addSeries("# StopFacilities", hist);
 		chart.saveAsPng(filename, 800, 600);
 	}
-
-
 }

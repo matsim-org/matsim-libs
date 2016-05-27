@@ -77,6 +77,7 @@ public class ScheduleTools {
 	public static void writeTransitSchedule(TransitSchedule schedule, String filePath) {
 		log.info("Writing transit schedule to file " + filePath);
 		new TransitScheduleWriter(schedule).writeFile(filePath);
+		log.info("done.");
 	}
 
 	/**
@@ -213,6 +214,7 @@ public class ScheduleTools {
 								}
 							} else {
 								linkSequence = null;
+								log.warn("no least cost path found");
 								break;
 							}
 
@@ -226,6 +228,8 @@ public class ScheduleTools {
 					} else {
 						log.error("No path found for TransitRoute " + transitRoute.getId() + " on TransitLine " + transitLine.getId());
 					}
+				} else {
+					log.warn("Route " + transitRoute.getId() + " on line " + transitLine.getId() + " has no stop sequence");
 				}
 			}
 		}

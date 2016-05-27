@@ -27,6 +27,7 @@ import java.util.Set;
 /**
  * A Link filter to separate links by allowed transport modes.
  */
+@Deprecated
 public class LinkFilterMode implements NetworkLinkFilter {
 
 	private final Set<String> modes;
