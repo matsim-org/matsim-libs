@@ -660,49 +660,9 @@
 
 	<module name="vspExperimental" >
 
-		<!-- (do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. "car,bike", "car" -->
-		<!-- <param name="chainBasedModes" value="car" /> -->
-		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
-
-		<!-- fraction of iterations at which MSA score averaging is started. The matsim theory department suggests to use this together with switching off choice set innovation (where a similar switch exists), but it has not been tested yet. -->
-		<!-- <param name="fractionOfIterationsToStartScoreMSA" value="null" /> -->
-		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
-
-		<!-- (do not use) Set this filename of MZ05 daily analysis -->
-		<param name="inputMZ05File" value="" />
-
-		<!-- (do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the parameters of the pt interaction activity type.  Doing this now throws an Exception.  If you still insist on doing this, set the following to true. -->
-		<param name="isAbleToOverwritePtInteractionParams" value="false" />
-
-		<param name="isGeneratingBoardingDeniedEvent" value="false" />
-
-		<!-- if an approximation of the opportunity cost of time is included into the radius calculation for location choice.`true' will be faster, but it is an approximation.  Default is `true'; `false' is available for backwards compatibility. -->
-		<param name="isUsingOpportunityCostOfTimeForLocationChoice" value="true" />
-
-		<param name="logitScaleParamForPlansRemoval" value="1.0" />
-
-		<!-- changes MATSim's global time format used in output files. Can be used to enforce writing fractional seconds e.g. in output_plans.  default is `hh:mm:ss' (because of backwards compatibility). see Time.java for possible formats -->
-		<!-- <param name="matsimGlobalTimeformat" value="HH:mm:ss" /> -->
-		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
-
-		<!-- (do not use) set the traffic mode option for subTourModeChoice by Yu -->
-		<!-- <param name="modes" value="car, pt" /> -->
-		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
-
-		<!-- (not tested) will remove plan attributes that are presumably not used, such as activityStartTime. default=false -->
-		<!-- <param name="removingUnnecessaryPlanAttributes" value="false" /> -->
-		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
-
-		<!-- (deprecated, use fractionOfIterationsToStartScoreMSA) first iteration of MSA score averaging. The matsim theory department suggests to use this together with switching of choice set innovation, but it has not been tested yet. -->
-		<!-- <param name="scoreMSAStartsAtIteration" value="null" /> -->
-		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
-
 		<!-- Options: `ignore', `warn', `abort'.  Default: either `ignore' or `warn'.
 		When violating VSP defaults, this results in nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai. -->
-		<param name="vspDefaultsCheckingLevel" value="ignore" />
-
-		<!-- if true then writes output_events in output directory.  default is `false'. Will only work when lastIteration is multiple of events writing interval -->
-		<param name="writingOutputEvents" value="false" />
+		<param name="vspDefaultsCheckingLevel" value="warn" />
 	</module>
 
 <!-- ====================================================================== -->
