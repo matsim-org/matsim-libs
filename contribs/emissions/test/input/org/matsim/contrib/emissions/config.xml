@@ -45,10 +45,12 @@
 		<param name="snapshotFormat" value="" />
 
 		<!-- iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely. -->
-		<param name="writeEventsInterval" value="10" />
+		<!-- <param name="writeEventsInterval" value="10" /> -->
+		<param name="writeEventsInterval" value="5" />
 
 		<!-- iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written -->
-		<param name="writePlansInterval" value="10" />
+		<!-- <param name="writePlansInterval" value="10" /> -->
+		<param name="writePlansInterval" value="5" />
 
 		<!-- iterationNumber % writeSnapshotsInterval == 0 defines in which iterations snapshots are written to a file. `0' disables snapshots writing completely -->
 		<param name="writeSnapshotsInterval" value="1" />
@@ -152,7 +154,7 @@
 
 <!-- ====================================================================== -->
 
-	<module name="locationchoice" >
+	<!-- <module name="locationchoice" >
 		<param name="algorithm" value="bestResponse" />
 		<param name="analysisBinSize" value="20000" />
 		<param name="analysisBoundary" value="200000" />
@@ -181,7 +183,7 @@
 		<param name="travelSpeed_car" value="8.5" />
 		<param name="travelSpeed_pt" value="5.0" />
 		<param name="tt_approximationLevel" value="1" />
-	</module>
+	</module> -->
 
 <!-- ====================================================================== -->
 
@@ -277,7 +279,7 @@
 			<param name="mode" value="car" />
 
 			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-			<param name="monetaryDistanceCostRate" value="0.0" />
+			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 
 		<parameterset type="modeParams" >
@@ -294,7 +296,7 @@
 			<param name="mode" value="pt" />
 
 			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-			<param name="monetaryDistanceCostRate" value="0.0" />
+			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 
 		<parameterset type="modeParams" >
@@ -311,7 +313,7 @@
 			<param name="mode" value="walk" />
 
 			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-			<param name="monetaryDistanceCostRate" value="0.0" />
+			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 
 		<parameterset type="modeParams" >
@@ -328,7 +330,7 @@
 			<param name="mode" value="bike" />
 
 			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-			<param name="monetaryDistanceCostRate" value="0.0" />
+			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 
 		<parameterset type="modeParams" >
@@ -345,7 +347,7 @@
 			<param name="mode" value="other" />
 
 			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-			<param name="monetaryDistanceCostRate" value="0.0" />
+			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 	</module>
 
@@ -376,7 +378,8 @@
 		<param name="beelineDistanceFactor" value="1.3" />
 
 		<!-- All the modes for which the router is supposed to generate network routes (like car) -->
-		<param name="networkModes" value="car,ride" />
+		<!-- <param name="networkModes" value="car,ride" /> -->
+		<param name="networkModes" value="car" />
 
 		<parameterset type="teleportedModeParameters" >
 			<param name="mode" value="bike" />
@@ -508,24 +511,30 @@
 	<module name="scenario" >
 
 		<!-- Set this parameter to true if households should be used, false if not. -->
-		<param name="useHouseholds" value="false" />
+		<!-- <param name="useHouseholds" value="false" /> -->
+		<!-- This switch does not seem to exist anymore. Was on "false" anyways. I outcommend it. dz may'16 -->
 
 		<!-- Set this parameter to true if lanes should be used, false if not. -->
-		<param name="useLanes" value="false" />
+		<!-- <param name="useLanes" value="false" /> -->
+		<!-- This switch does not seem to exist anymore. Was on "false" anyways. I outcommend it. dz may'16 -->
 
 		<!-- Set this parameter to true if signal systems should be used, false if not. -->
-		<param name="useSignalsystems" value="false" />
+		<!-- <param name="useSignalsystems" value="false" /> -->
+		<!-- This does not seem to exist (at this location) anymore. Was on "false" anyways. I outcommend it. dz may'16 -->
 
 		<!-- Set this parameter to true if transit should be simulated, false if not. -->
-		<param name="useTransit" value="false" />
+		<!-- <param name="useTransit" value="false" /> -->
+		<!-- "The useTransit switch has moved to the transit section of the config file." Was on "false" anyways. I outcommend it. dz may'16 -->
 
 		<!-- Set this parameter to true if vehicles should be used, false if not. -->
-		<param name="useVehicles" value="false" />
+		<!-- <param name="useVehicles" value="false" /> -->
+		<!-- "The useVehicles switch is no longer operational.  The file is loaded if the file name is different from null." Was on "false" anyways. I outcommend it. dz may'16 -->
+		
 	</module>
 
 <!-- ====================================================================== -->
 
-	<module name="signalsystems" >
+	<!-- <module name="signalsystems" >
 		<param name="ambertimes" value="null" />
 		<param name="intergreentimes" value="null" />
 		<param name="signalcontrol" value="null" />
@@ -533,7 +542,7 @@
 		<param name="signalsystems" value="null" />
 		<param name="useAmbertimes" value="false" />
 		<param name="useIntergreentimes" value="false" />
-	</module>
+	</module> -->
 
 <!-- ====================================================================== -->
 
@@ -566,10 +575,10 @@
 			<param name="executionPath" value="null" />
 
 			<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-			<param name="moduleName" value="ChangeExpBeta" />
+			<param name="strategyName" value="ChangeExpBeta" />
 
 			<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-			<param name="probability" value="1.0" />
+			<param name="weight" value="1.0" />
 
 			<!-- subpopulation to which the module applies. "null" refers to the default population, that is, the set of persons for which no explicit subpopulation is defined (ie no subpopulation attribute) -->
 			<param name="subpopulation" value="null" />
@@ -652,10 +661,12 @@
 	<module name="vspExperimental" >
 
 		<!-- (do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. "car,bike", "car" -->
-		<param name="chainBasedModes" value="car" />
+		<!-- <param name="chainBasedModes" value="car" /> -->
+		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
 
 		<!-- fraction of iterations at which MSA score averaging is started. The matsim theory department suggests to use this together with switching off choice set innovation (where a similar switch exists), but it has not been tested yet. -->
-		<param name="fractionOfIterationsToStartScoreMSA" value="null" />
+		<!-- <param name="fractionOfIterationsToStartScoreMSA" value="null" /> -->
+		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
 
 		<!-- (do not use) Set this filename of MZ05 daily analysis -->
 		<param name="inputMZ05File" value="" />
@@ -671,16 +682,20 @@
 		<param name="logitScaleParamForPlansRemoval" value="1.0" />
 
 		<!-- changes MATSim's global time format used in output files. Can be used to enforce writing fractional seconds e.g. in output_plans.  default is `hh:mm:ss' (because of backwards compatibility). see Time.java for possible formats -->
-		<param name="matsimGlobalTimeformat" value="HH:mm:ss" />
+		<!-- <param name="matsimGlobalTimeformat" value="HH:mm:ss" /> -->
+		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
 
 		<!-- (do not use) set the traffic mode option for subTourModeChoice by Yu -->
-		<param name="modes" value="car, pt" />
+		<!-- <param name="modes" value="car, pt" /> -->
+		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
 
 		<!-- (not tested) will remove plan attributes that are presumably not used, such as activityStartTime. default=false -->
-		<param name="removingUnnecessaryPlanAttributes" value="false" />
+		<!-- <param name="removingUnnecessaryPlanAttributes" value="false" /> -->
+		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
 
 		<!-- (deprecated, use fractionOfIterationsToStartScoreMSA) first iteration of MSA score averaging. The matsim theory department suggests to use this together with switching of choice set innovation, but it has not been tested yet. -->
-		<param name="scoreMSAStartsAtIteration" value="null" />
+		<!-- <param name="scoreMSAStartsAtIteration" value="null" /> -->
+		<!-- This does not seem to exist anymore. Trying what happens if I outcommend it. dz may'16 -->
 
 		<!-- Options: `ignore', `warn', `abort'.  Default: either `ignore' or `warn'.
 		When violating VSP defaults, this results in nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai. -->
