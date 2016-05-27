@@ -132,7 +132,7 @@ public class CreateCBPop {
 		transitPtConfig.setPathToOutput(
 				configGroup.getPathToOutput().substring(0,configGroup.getPathToOutput().indexOf(".xml")) + "_Transit_PT.xml.gz");
 		//	population creation
-		CreateCBTransit cbPtTransit = new CreateCBTransit(transitPtConfig);
+		CreateCBTransitPT cbPtTransit = new CreateCBTransitPT(transitPtConfig);
 		cbPtTransit.runPopulationCreation();
 		cbPtTransit.writeOutput();
 
