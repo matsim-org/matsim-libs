@@ -19,20 +19,6 @@ public class AlternateDijkstra {
 	private final Map<Id<PseudoRouteStop>, PseudoRouteStop> graph; // mapping of vertex names to Vertex objects, built from a set of Edges
 
 	/**
-	 * One edge of the graph (only used by Graph constructor)
-	 */
-	public static class Edge {
-		public final String v1, v2;
-		public final int dist;
-
-		public Edge(String v1, String v2, int dist) {
-			this.v1 = v1;
-			this.v2 = v2;
-			this.dist = dist;
-		}
-	}
-
-	/**
 	 * Builds a graph from a set of edges
 	 */
 	public AlternateDijkstra(PseudoGraph pseudoGraph) {

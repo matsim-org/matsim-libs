@@ -104,6 +104,10 @@ public class PseudoGraph {
 
 		}
 	}
+
+	public void addPath(PseudoRouteStop pseudoRouteStopCurrent, PseudoRouteStop pseudoRouteStopNext, double pathCost) {
+
+	}
 }
 
 
