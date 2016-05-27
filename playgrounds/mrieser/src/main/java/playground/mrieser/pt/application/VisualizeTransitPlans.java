@@ -156,7 +156,8 @@ public class VisualizeTransitPlans {
 		visConfig.addCoreModules();
 		visConfig.network().setInputFile("vis.network.xml");
 		visConfig.plans().setInputFile("vis.plans.xml");
-		((SimulationConfigGroup) visConfig.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotStyle( SnapshotStyle.queue ) ;;
+//		((SimulationConfigGroup) visConfig.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotStyle( SnapshotStyle.queue ) ;;
+		// the corresponding getter was nowhere used, so setting it should not have an effect.  kai, may'16
 		new ConfigWriter(visConfig).write("vis.config.xml");
 
 	}

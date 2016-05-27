@@ -65,6 +65,8 @@ public class ExternalMobsim implements Mobsim {
 	private Integer iterationNumber = null;
 	protected OutputDirectoryHierarchy controlerIO;
 
+	private SimulationConfigGroup simConfig;
+
 	@Inject
 	public ExternalMobsim(final Scenario scenario, final EventsManager events) {
 		this.scenario = scenario;
@@ -76,8 +78,10 @@ public class ExternalMobsim implements Mobsim {
 		this.plansFileName = "ext_plans.xml";
 		this.eventsFileName = "ext_events.txt";
 		this.configFileName = "ext_config.xml";
+		
+		this.simConfig = ConfigUtils.addOrGetModule(this.scenario.getConfig(), SimulationConfigGroup.GROUP_NAME, SimulationConfigGroup.class ) ;
 
-		this.executable = this.scenario.getConfig().getParam(CONFIG_MODULE, "externalExe");
+		this.executable = this.simConfig.getExternalExe() ;
 	}
 
 	@Override
@@ -100,11 +104,11 @@ public class ExternalMobsim implements Mobsim {
 
 	protected void writeConfig(final String iterationPlansFile, final String iterationEventsFile, final String iterationConfigFile) throws FileNotFoundException, IOException {
 		log.info("writing config for external mobsim");
-		Config simConfig = this.scenario.getConfig();
+		Config thisConfig = this.scenario.getConfig();
 		Config extConfig = new Config();
 		// network
 		ConfigGroup module = extConfig.createModule("network");
-		module.addParam("inputNetworkFile", simConfig.network().getInputFile());
+		module.addParam("inputNetworkFile", thisConfig.network().getInputFile());
 		module.addParam("localInputDTD", "dtd/matsim_v1.dtd");
 		// plans
 		module = extConfig.createModule("plans");
@@ -116,8 +120,8 @@ public class ExternalMobsim implements Mobsim {
 		module.addParam("outputFormat", "matsimTXTv1");
 		// deqsim
 		module = extConfig.createModule(CONFIG_MODULE);
-		module.addParam("startTime", simConfig.getParam(CONFIG_MODULE, "startTime"));
-		module.addParam("endTime", simConfig.getParam(CONFIG_MODULE, "endTime"));
+		module.addParam("startTime", Double.toString( simConfig.getStartTime() ) ) ;
+		module.addParam("endTime", Double.toString( simConfig.getEndTime() ) ) ;
 
 		new ConfigWriter(extConfig).write(iterationConfigFile);
 	}
@@ -169,22 +173,22 @@ public class ExternalMobsim implements Mobsim {
 		writer.close();
 	}
 
-	@SuppressWarnings("unused") /* do now show warnings that this method does not throw any exceptions,
-	as classes inheriting from this class may throw exceptions in their implementation of this method. */
+//	@SuppressWarnings("unused") /* do now show warnings that this method does not throw any exceptions,
+//	as classes inheriting from this class may throw exceptions in their implementation of this method. */
 	protected void runExe(final String iterationConfigFile) throws FileNotFoundException, IOException {
 		String cmd = this.executable + " " + iterationConfigFile;
 		log.info("running command: " + cmd);
 		Gbl.printMemoryUsage();
 		String logfileName = this.controlerIO.getIterationFilename(this.getIterationNumber(), "mobsim.log");
-		int timeout = ((SimulationConfigGroup) this.scenario.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).getExternalTimeOut();
+		int timeout = this.simConfig.getExternalTimeOut() ;
 		int exitcode = ExeRunner.run(cmd, logfileName, timeout);
 		if (exitcode != 0) {
 			throw new RuntimeException("There was a problem running the external mobsim. exit code: " + exitcode);
 		}
 	}
 
-	@SuppressWarnings("unused") /* do now show warnings that this method does not throw any exceptions,
-	as classes inheriting from this class may throw exceptions in their implementation of this method. */
+//	@SuppressWarnings("unused") /* do now show warnings that this method does not throw any exceptions,
+//	as classes inheriting from this class may throw exceptions in their implementation of this method. */
 	protected void readEvents(final String iterationEventsFile) throws FileNotFoundException, IOException {
 		log.info("reading events from external mobsim");
 		new MatsimEventsReader(this.events).readFile(iterationEventsFile);
