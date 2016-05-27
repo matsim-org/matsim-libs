@@ -35,6 +35,7 @@ import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfi
 import playground.polettif.publicTransitMapping.tools.MiscUtils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,10 +59,9 @@ public class ModeDependentRouter implements Router {
 	}
 
 	public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
-		if(!(routingTransportModes.size() == 1 && routingTransportModes.contains(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE))) {
-			routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
-		}
-		this.routingTransportModes = routingTransportModes;
+		this.routingTransportModes = new HashSet<>();
+		if(routingTransportModes != null) this.routingTransportModes.addAll(routingTransportModes);
+		this.routingTransportModes.add(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE);
 		paths = new HashMap<>();
 
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(network, this);
@@ -110,10 +110,9 @@ public class ModeDependentRouter implements Router {
 	 */
     @Override
     public double getLinkMinimumTravelDisutility(Link link) {
-		double length = (linkHasRoutingMode(link) ? 1 : 10000) * link.getLength();
+		double length = (linkHasRoutingMode(link) ? 1 : 100000) * link.getLength();
 
 		return (pseudoRouteWeightType.equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / link.getFreespeed() : length);
-
 	}
 
 	/**

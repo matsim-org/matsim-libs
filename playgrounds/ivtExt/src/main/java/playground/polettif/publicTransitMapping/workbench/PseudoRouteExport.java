@@ -41,7 +41,7 @@ public class PseudoRouteExport {
 
 	}
 
-	public static void run(Network network, PseudoGraph pseudoGraph, String filePath) {
+	public synchronized static void run(Network network, PseudoGraph pseudoGraph, String filePath) {
 		Network pseudoNetwork = NetworkTools.createNetwork();
 		NetworkFactory f = pseudoNetwork.getFactory();
 

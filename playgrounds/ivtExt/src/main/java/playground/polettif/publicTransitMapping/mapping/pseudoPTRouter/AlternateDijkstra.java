@@ -66,25 +66,31 @@ public class AlternateDijkstra {
 			return;
 		}
 
-		final PseudoRouteStop source = graph.get(SOURCE_ID);
-		NavigableSet<PseudoRouteStop> queue = new TreeSet<>(graph.values());
+		double incr = 0.01;
 
-/*		// set-up vertices
+//		final PseudoRouteStop source = graph.get(SOURCE_ID);
+		NavigableSet<PseudoRouteStop> queue = new TreeSet<>();
+
+		// set-up vertices
+/*
 		for(PseudoRouteStop v : graph.values()) {
-			v.previous = v == source ? source : null;
-			v.distToSource = v == source ? 0 : Integer.MAX_VALUE;
-			queue.add(v);
+			while(!queue.add(v)) {
+				v.distToSource -= incr;
+			}
 		}
-		*/
+*/
+
+		queue.add(graph.get(SOURCE_ID));
 
 		PseudoRouteStop currentStop, neighbour;
 		while(!queue.isEmpty()) {
 			currentStop = queue.pollFirst(); // vertex with shortest distance (first iteration will return source)
 
+			/*
 			if(currentStop.distToSource == Integer.MAX_VALUE) {
 				break; // we can ignore u (and any other remaining vertices) since they are unreachable
 			}
-
+*/
 			//look at distances to each neighbour
 			for(Map.Entry<PseudoRouteStop, Double> n : currentStop.neighbours.entrySet()) {
 				neighbour = n.getKey(); //the neighbour in this iteration
@@ -94,10 +100,38 @@ public class AlternateDijkstra {
 					queue.remove(neighbour);
 					neighbour.distToSource = alternateDist;
 					neighbour.previous = currentStop;
-					queue.add(neighbour);
+					while(!queue.add(neighbour)) {
+						neighbour.distToSource -= incr;
+					}
 				}
 			}
 		}
+
+		NavigableSet<PseudoRouteStop> newQ = new TreeSet<>();
+
+		for(PseudoRouteStop s : graph.values()) {
+			if(s.previous == null && !s.getId().equals(SOURCE_ID)) {
+				newQ.add(s);
+			}
+		}
+
+		if(newQ.size() > 0) {
+			Set<PseudoRouteStop> mentioned = new HashSet<>();
+
+			for(PseudoRouteStop s : graph.values()) {
+				for(PseudoRouteStop n : s.neighbours.keySet()) {
+					mentioned.add(n);
+				}
+			}
+
+			for(PseudoRouteStop s : graph.values()) {
+				if(!mentioned.contains(s) && !s.getId().equals(SOURCE_ID)) {
+					log.debug("break");
+				}
+			}
+		}
+
+
 	}
 
 	/**
@@ -114,12 +148,6 @@ public class AlternateDijkstra {
 
 		// check if a path exists
 		if(step.previous == null) {
-			log.error("Destination cannot be reached");
-			for(PseudoRouteStop psr : graph.values()) {
-				if(psr.previous == null) {
-					log.info(psr);
-				}
-			}
 			return null;
 		}
 		path.add(step);

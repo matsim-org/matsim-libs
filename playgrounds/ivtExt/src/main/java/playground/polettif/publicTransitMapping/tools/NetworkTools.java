@@ -210,19 +210,23 @@ public class NetworkTools {
 	 *
 	 * @return the new Link.
 	 */
-	public static Link createArtificialStopFacilityLink(TransitStopFacility stopFacility, Network network, String prefix) {
+	public static Link createArtificialStopFacilityLink(TransitStopFacility stopFacility, Network network, String prefix, double freespeed) {
 		NetworkFactory networkFactory = network.getFactory();
 
 		Coord coord = stopFacility.getCoord();
 
-		Node dummyNode = networkFactory.createNode(Id.createNodeId(prefix + stopFacility.getId() + "_node"), coord);
-		Link dummyLink = networkFactory.createLink(Id.createLinkId(prefix + stopFacility.getId() + "_link"), dummyNode, dummyNode);
+		Node dummyNode1 = networkFactory.createNode(Id.createNodeId(prefix + stopFacility.getId() + "_node1"), coord);
+		Node dummyNode2 = networkFactory.createNode(Id.createNodeId(prefix + stopFacility.getId() + "_node2"), coord);
+		Link dummyLink = networkFactory.createLink(Id.createLinkId(prefix + stopFacility.getId() + "_link"), dummyNode1, dummyNode2);
 
 		dummyLink.setAllowedModes(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE));
-		dummyLink.setLength(1.0);
+		dummyLink.setLength(5);
+		dummyLink.setFreespeed(freespeed);
+		dummyLink.setCapacity(9999); // todo param default values in config
 
-		if(!network.getNodes().containsKey(dummyNode.getId())) {
-			network.addNode(dummyNode);
+		if(!network.getNodes().containsKey(dummyNode1.getId())) {
+			network.addNode(dummyNode1);
+			network.addNode(dummyNode2);
 			network.addLink(dummyLink);
 		}
 
@@ -548,7 +552,8 @@ public class NetworkTools {
 	public static void resetLinkLength(Network network, String networkMode) {
 		for(Link link : network.getLinks().values()) {
 			if(link.getAllowedModes().contains(networkMode)) {
-				link.setFreespeed(CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord()));
+				double l = CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
+				link.setLength(l > 0 ? l : 1);
 			}
 		}
 	}

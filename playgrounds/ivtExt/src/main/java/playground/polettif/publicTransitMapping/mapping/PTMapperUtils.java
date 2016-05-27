@@ -59,7 +59,7 @@ public class PTMapperUtils {
 	/**
 	 * Generates link candidates for all stopFacilities. For stop facilities where
 	 * no link can be found within nodeSearchRadius an artificial node and loop
-	 * link (from and to the new node) is created {@link NetworkTools#createArtificialStopFacilityLink(TransitStopFacility, Network, String)}.
+	 * link (from and to the new node) is created {@link NetworkTools#createArtificialStopFacilityLink(TransitStopFacility, Network, String, double)}.
 	 * For each link candiate a child stop facility is generated and referenced to
 	 * the link. Link candidates for different modes with the same link use the same
 	 * child stop facility. Child stop facilities are not created and added to the schedule!
@@ -99,7 +99,7 @@ public class PTMapperUtils {
 
 							// if no close links are nearby, a loop link is created and referenced to the facility.
 							if(closestLinks.size() == 0) {
-								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial());
+								Link loopLink = NetworkTools.createArtificialStopFacilityLink(stopFacility, network, config.getPrefixArtificial(), config.getFreespeedArtificial());
 								closestLinks.add(loopLink);
 							}
 

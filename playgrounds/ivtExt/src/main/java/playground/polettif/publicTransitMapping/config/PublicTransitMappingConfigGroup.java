@@ -105,7 +105,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(PREFIX_ARTIFICIAL,
 				"ID prefix used for all artificial links and nodes created during mapping.");
 		map.put(FREESPEED_ARTIFICIAL,
-				"The freespeed [m/s] of artificially created links.");
+				"The freespeed [m/s] of artificially created links. This value is the same for all schedule modes.");
 		map.put(SUFFIX_CHILD_STOP_FACILITIES,
 				"Suffix used for child stop facilities. The id of the referenced link is appended\n" +
 				"\t\t(i.e. stop0123.link:LINKID20123).");

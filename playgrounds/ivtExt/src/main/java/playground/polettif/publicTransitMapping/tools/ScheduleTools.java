@@ -167,7 +167,10 @@ public class ScheduleTools {
 
 		for(TransitLine transitLine : schedule.getTransitLines().values()) {
 			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				if(routers.containsKey(transitRoute.getTransportMode()) && transitRoute.getStops().size() > 0) {
+				if(!routers.containsKey(transitRoute.getTransportMode())) {
+					throw new RuntimeException("No router defined for " + transitRoute.getTransportMode());
+				}
+				if(transitRoute.getStops().size() > 0) {
 					Router router = routers.get(transitRoute.getTransportMode());
 
 					counterRoute.incCounter();
