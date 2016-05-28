@@ -71,12 +71,9 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 	}
 
 	/**
-	 * Constructor. All values are stored here as well to make access easier during
+	 * Constructor. All primitive values are stored
+	 * as well to make access easier during
 	 * stop facility replacement.
-	 *
-	 * @param order
-	 * @param routeStop
-	 * @param linkCandidate
 	 */
 	/*package*/ PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
 		this.id = Id.create("[" + Integer.toString(order) + "]" + linkCandidate.getId(), PseudoRouteStop.class);
@@ -99,7 +96,6 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 
 		// link value
 		this.linkWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? linkCandidate.getLinkTravelTime() : linkCandidate.getLinkLength());
-//		this.linkWeight = linkCandidate.getLinkLength();
 	}
 
 	/**
@@ -117,7 +113,6 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 		this.name = id;
 		this.linkCandidateId = null;
 
-		 // MAX_VALUE assumed to be infinity$
 		previous = null;
 
 		this.linkId = null;

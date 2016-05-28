@@ -30,10 +30,11 @@ import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfi
 import java.util.*;
 
 /**
- * A pseudo graph with PseudoRouteStops and PseudoRoutePaths
- * used to calculate the best path and thus link sequence
- * from the first stop to the last stop of a transit route.
+ * A pseudo graph with PseudoRouteStops as nodes  used to
+ * calculate the best path and thus link sequence from the
+ * first stop to the last stop of a transit route.
  * <p/>
+ * The
  *
  * @author polettif
  */
@@ -41,23 +42,20 @@ public class PseudoGraph {
 
 	protected static Logger log = Logger.getLogger(PseudoGraph.class);
 
-	public static final String SOURCE = "SOURCE";
-	public static final String DESTINATION = "DESTINATION";
-	public final Id<PseudoRouteStop> SOURCE_ID = Id.create(SOURCE, PseudoRouteStop.class);
-	public final Id<PseudoRouteStop> DESTINATION_ID = Id.create(DESTINATION, PseudoRouteStop.class);
-
-	public final PseudoRouteStop SOURCE_PSEUDO_STOP = new PseudoRouteStop(SOURCE);
-	public final PseudoRouteStop DESTINATION_PSEUDO_STOP = new PseudoRouteStop(DESTINATION);
+	/*package*/ static final String SOURCE = "SOURCE";
+	/*package*/ static final String DESTINATION = "DESTINATION";
+	private final Id<PseudoRouteStop> SOURCE_ID = Id.create(SOURCE, PseudoRouteStop.class);
+	private final PseudoRouteStop SOURCE_PSEUDO_STOP = new PseudoRouteStop(SOURCE);
+	private final Id<PseudoRouteStop> DESTINATION_ID = Id.create(DESTINATION, PseudoRouteStop.class);
+	private final PseudoRouteStop DESTINATION_PSEUDO_STOP = new PseudoRouteStop(DESTINATION);
 
 	private final PublicTransitMappingConfigGroup config;
-	private final List<PseudoRoutePath> edges;
+
 	private final Map<Id<PseudoRouteStop>, PseudoRouteStop> graph;
 
 	public PseudoGraph(PublicTransitMappingConfigGroup configGroup) {
 		this.config = configGroup;
-		PseudoRoutePath.setConfig(configGroup);
 		PseudoRouteStop.setConfig(configGroup);
-		this.edges = new ArrayList<>();
 		this.graph = new HashMap<>();
 	}
 
@@ -75,7 +73,10 @@ public class PseudoGraph {
 		if(!graph.containsKey(toPseudoStop.getId())) {
 			graph.put(toPseudoStop.getId(), toPseudoStop);
 		}
-		graph.get(fromPseudoStop.getId()).neighbours.put(graph.get(toPseudoStop.getId()), pathWeight);
+
+		double weight = pathWeight + 0.5 * fromPseudoStop.getLinkWeight() + 0.5 * toPseudoStop.getLinkWeight();
+
+		graph.get(fromPseudoStop.getId()).neighbours.put(graph.get(toPseudoStop.getId()), weight);
 	}
 
 	/**
@@ -148,20 +149,14 @@ public class PseudoGraph {
 
 	public void addSourceDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidate> linkCandidates) {
 		for(LinkCandidate lc : linkCandidates) {
-			edges.add(new PseudoRoutePath(SOURCE_PSEUDO_STOP, new PseudoRouteStop(order, routeStop, lc), 1.0, true));
 			addPath(SOURCE_PSEUDO_STOP, new PseudoRouteStop(order, routeStop, lc), 1.0);
 		}
 	}
 
 	public void addDestinationDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidate> linkCandidates) {
 		for(LinkCandidate lc : linkCandidates) {
-			edges.add(new PseudoRoutePath(new PseudoRouteStop(order, routeStop, lc), DESTINATION_PSEUDO_STOP, 1.0, true));
 			addPath(new PseudoRouteStop(order, routeStop, lc), DESTINATION_PSEUDO_STOP, 1.0);
 		}
-	}
-
-	public List<PseudoRoutePath> getEdges() {
-		return edges;
 	}
 }
 

@@ -36,7 +36,9 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.*;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoGraph;
+import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
 import playground.polettif.publicTransitMapping.mapping.router.FastAStarRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 import playground.polettif.publicTransitMapping.plausibility.StopFacilityHistogram;
@@ -46,16 +48,13 @@ import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * References an unmapped transit schedule to a network. Combines routing of transit routes
- * and referencing stopFacilities. Creates additional stop facilities if a stopFacility has
- * more than one plausible link. Artificial links are added to the network if no route can
- * be found.
- * <p/>
- * Creates pseudo paths via all link candidates, chooses the path with the lowest travel time.
- * <p/>
+ * References an unmapped transit schedule to a network. Combines
+ * routing of transit routes and referencing stopFacilities. Additional
+ * stop facilities are created if a stopFacility has more than one
+ * plausible link. Artificial links are added to the network if no
+ * route can be found.
  *
  * @author polettif
  */
@@ -121,7 +120,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 		/** [2]
 		 * Preload the closest links and create LinkCandidates. StopFacilities
 		 * with no links within search radius are given a dummy loop link right
-		 * on their coordinates.
+		 * on their coordinates. Each Link Candidate is a possible new stop facility
+		 * after PseudoRouting.
 		 */
 		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixRegexEscaped());
 		linkCandidates = PTMapperUtils.generateModeLinkCandidates(schedule, network, config);
@@ -134,7 +134,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 		/** [4]
 		 * PseudoRouting
-		 * PseudoTransitRoutes for all transit routes are calculated.
+		 * Initiate and start threads, calculate PseudoTransitRoutes
+		 * for all transit routes.
 		 */
 		log.info("==================================");
 		log.info("Calculating pseudoTransitRoutes...");
@@ -188,7 +189,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 		}
 
 		/**
-		 * Collect pseudoeSchedules from threads
+		 * Collect pseudoSchedules from threads
 		 */
 		final Map<TransitLine, Map<TransitRoute, List<PseudoRouteStop>>> pseudoSchedule = new HashMap<>();
 		for(PseudoRouting thread : pseudoRoutingThreads) {
@@ -218,8 +219,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 		Map<String, Router> finalRouters = new HashMap<>();    // key: ScheduleTransportMode
 
 		// create router for artificial network
-//		NetworkFilterManager artFilter = new NetworkFilterManager(network);
-//		artFilter.addLinkFilter(new LinkFilterMode(Collections.singleton(PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE)));
 		FastAStarRouter artificialOnlyRouter = new FastAStarRouter(NetworkTools.filterNetworkByLinkMode(network, PublicTransitMappingConfigGroup.ARTIFICIAL_LINK_MODE_AS_SET));
 
 		// create router for other mode networks
@@ -232,9 +231,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 				routingTransportModes.addAll(modeAssignment.getValue());
 				log.info("Router for "+routingTransportModes);
 
-//				NetworkFilterManager filter = new NetworkFilterManager(network);
-//				filter.addLinkFilter(new LinkFilterMode(routingTransportModes));
-//				finalRouters.put(modeAssignment.getKey(), new FastAStarRouter(filter.applyFilters()));
 				finalRouters.put(modeAssignment.getKey(), new FastAStarRouter(NetworkTools.filterNetworkByLinkMode(network, routingTransportModes)));
 			}
 		}
@@ -307,8 +303,19 @@ public class PTMapperPseudoRouting extends PTMapper {
 		 */
 		if(config.getOutputNetworkFile() != null && config.getOutputScheduleFile() != null) {
 			log.info("Writing schedule and network to file...");
-			ScheduleTools.writeTransitSchedule(schedule, config.getOutputScheduleFile());
-			NetworkTools.writeNetwork(network, config.getOutputNetworkFile());
+			try {
+				ScheduleTools.writeTransitSchedule(schedule, config.getOutputScheduleFile());
+				NetworkTools.writeNetwork(network, config.getOutputNetworkFile());
+			} catch (Exception e) {
+				log.error("Output directory not found! Trying to write schedule and network file in working directory");
+				double t = System.nanoTime();
+				try {
+					ScheduleTools.writeTransitSchedule(schedule, t+"schedule.xml.gz");
+					NetworkTools.writeNetwork(network, t+"network.xml.gz");
+				} catch (Exception e1) {
+					throw new RuntimeException("Files could not be written in working directory");
+				}
+			}
 			if(config.getOutputStreetNetworkFile() != null) {
 				NetworkTools.writeNetwork(NetworkTools.filterNetworkByLinkMode(network, Collections.singleton(TransportMode.car)), config.getOutputStreetNetworkFile());
 			}
@@ -439,7 +446,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 		@Override
 		public void run() {
 			for(Tuple<TransitLine, TransitRoute> tuple : queue) {
-				TransitLine transitLine = tuple.getFirst();
 				TransitRoute transitRoute = tuple.getSecond();
 
 				String scheduleTransportMode = transitRoute.getTransportMode();
@@ -508,7 +514,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 								if(pathCost < maxAllowedPathCost) {
 									PseudoRouteStop pseudoRouteStopCurrent = PseudoGraph.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
 									PseudoRouteStop pseudoRouteStopNext = PseudoGraph.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-//									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, pathCost));
 									pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, pathCost);
 								}
 								/**
@@ -526,7 +531,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 									PseudoRouteStop pseudoRouteStopCurrent = PseudoGraph.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
 									PseudoRouteStop pseudoRouteStopNext = PseudoGraph.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-//									pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, artificialPathCost));
 									pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, artificialPathCost);
 								}
 							}
@@ -552,7 +556,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 								PseudoRouteStop pseudoRouteStopCurrent = PseudoGraph.createPseudoRouteStop(i, routeStops.get(i), linkCandidateCurrent);
 								PseudoRouteStop pseudoRouteStopNext = PseudoGraph.createPseudoRouteStop(i + 1, routeStops.get(i + 1), linkCandidateNext);
-//								pseudoGraph.addPath(new PseudoRoutePath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight));
 								pseudoGraph.addPath(pseudoRouteStopCurrent, pseudoRouteStopNext, newPathWeight);
 							}
 						}
@@ -567,10 +570,6 @@ public class PTMapperPseudoRouting extends PTMapper {
 				int e = routeStops.size()-1;
 				pseudoGraph.addDestinationDummyPaths(e, routeStops.get(e), linkCandidates.get(scheduleTransportMode).get(routeStops.get(e).getStopFacility()));
 
-				// run Dijkstra
-//				AlternateDijkstra alternateDijkstra = new AlternateDijkstra(pseudoGraph);
-//				alternateDijkstra.run();
-//				LinkedList<PseudoRouteStop> pseudoPath = alternateDijkstra.getShortestPseudoPath();
 				// run Dijkstra
 				pseudoGraph.runDijkstra();
 				LinkedList<PseudoRouteStop> pseudoPath = pseudoGraph.getShortestPseudoPath();

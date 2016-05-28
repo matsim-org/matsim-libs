@@ -214,7 +214,7 @@ public class ScheduleTools {
 								}
 							} else {
 								linkSequence = null;
-								log.warn("no least cost path found");
+								log.error("No path found for TransitRoute " + transitRoute.getId() + " on TransitLine " + transitLine.getId());
 								break;
 							}
 
@@ -225,8 +225,6 @@ public class ScheduleTools {
 					// add link sequence to schedule
 					if(linkSequence != null) {
 						transitRoute.setRoute(RouteUtils.createNetworkRoute(linkSequence, network));
-					} else {
-						log.error("No path found for TransitRoute " + transitRoute.getId() + " on TransitLine " + transitLine.getId());
 					}
 				} else {
 					log.warn("Route " + transitRoute.getId() + " on line " + transitLine.getId() + " has no stop sequence");
