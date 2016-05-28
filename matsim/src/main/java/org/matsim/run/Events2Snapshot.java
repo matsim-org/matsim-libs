@@ -119,10 +119,10 @@ public class Events2Snapshot {
 		MatsimRandom.reset(this.config.global().getRandomSeed());
 		scenario = ScenarioUtils.createScenario(this.config);
 
-		if (((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getSnapshotPeriod() <= 0.0) {
-			System.out.println("The snapshotPeriod must be larger than 0 seconds.");
-			return;
-		}
+//		if (((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getSnapshotPeriod() <= 0.0) {
+//			System.out.println("The snapshotPeriod must be larger than 0 seconds.");
+//			return;
+//		}
 
 		this.network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(this.config.network().getInputFile());
