@@ -155,18 +155,33 @@ public final class SimulationConfigGroup extends ReflectiveConfigGroup {
 
 
 	@StringSetter(START_TIME)
+	public void setStartTime(final String startTime) {
+		this.setStartTime( Time.parseTime(startTime) ) ;
+	}
 	public void setStartTime(final double startTime) {
 		this.startTime = startTime;
 	}
+
 	@StringGetter(START_TIME)
+	public String getStartTimeAsString() {
+		return Time.writeTime(this.startTime) ;
+	}
 	public double getStartTime() {
 		return this.startTime;
 	}
+
 	@StringSetter(END_TIME)
+	public void setEndTime(final String startTime) {
+		this.setEndTime( Time.parseTime(startTime) );
+	}
 	public void setEndTime(final double endTime) {
 		this.endTime = endTime;
 	}
+
 	@StringGetter(END_TIME)
+	public String getEndTimeAsString() {
+		return Time.writeTime(this.endTime ) ;
+	}
 	public double getEndTime() {
 		return this.endTime;
 	}
