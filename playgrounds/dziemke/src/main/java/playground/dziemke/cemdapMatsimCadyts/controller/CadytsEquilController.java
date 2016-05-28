@@ -67,7 +67,7 @@ public class CadytsEquilController {
 		config.addModule( new SimulationConfigGroup() );
 		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStartTime(0);
 		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(0);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(60);
+//		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(60);
 		
 		// counts
 		// String countsFileName = "D:/Workspace/container/examples/equil/input/counts100-200.xml";
