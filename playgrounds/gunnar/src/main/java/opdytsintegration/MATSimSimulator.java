@@ -98,7 +98,7 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 		 * TODO Is this done correctly?
 		 */
 		final Controler controler = new Controler(this.scenario);
-		if (this.modules != null) {
+		if ((this.modules != null) && (this.modules.length > 0)) {
 			// controler.setModules(new
 			// ControlerDefaultsWithRoadPricingModule());
 			controler.setModules(this.modules);
