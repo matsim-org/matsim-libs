@@ -28,7 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -65,7 +65,7 @@ public class ExternalMobsim implements Mobsim {
 	private Integer iterationNumber = null;
 	protected OutputDirectoryHierarchy controlerIO;
 
-	private SimulationConfigGroup simConfig;
+	private ExternalMobimConfigGroup simConfig;
 
 	@Inject
 	public ExternalMobsim(final Scenario scenario, final EventsManager events) {
@@ -79,7 +79,7 @@ public class ExternalMobsim implements Mobsim {
 		this.eventsFileName = "ext_events.txt";
 		this.configFileName = "ext_config.xml";
 		
-		this.simConfig = ConfigUtils.addOrGetModule(this.scenario.getConfig(), SimulationConfigGroup.GROUP_NAME, SimulationConfigGroup.class ) ;
+		this.simConfig = ConfigUtils.addOrGetModule(this.scenario.getConfig(), ExternalMobimConfigGroup.GROUP_NAME, ExternalMobimConfigGroup.class ) ;
 
 		this.executable = this.simConfig.getExternalExe() ;
 	}

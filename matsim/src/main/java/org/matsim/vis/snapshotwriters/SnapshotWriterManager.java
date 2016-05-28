@@ -21,7 +21,7 @@
 package org.matsim.vis.snapshotwriters;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;

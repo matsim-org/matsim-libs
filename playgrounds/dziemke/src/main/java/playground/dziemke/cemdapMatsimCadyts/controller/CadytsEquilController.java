@@ -13,7 +13,7 @@ import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -64,9 +64,9 @@ public class CadytsEquilController {
 //		config.getQSimConfigGroup().setEndTime(0);
 //		config.getQSimConfigGroup().setSnapshotPeriod(60);
 		
-		config.addModule( new SimulationConfigGroup() );
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStartTime(0);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(0);
+		config.addModule( new ExternalMobimConfigGroup() );
+		((ExternalMobimConfigGroup) config.getModule(ExternalMobimConfigGroup.GROUP_NAME)).setStartTime(0);
+		((ExternalMobimConfigGroup) config.getModule(ExternalMobimConfigGroup.GROUP_NAME)).setEndTime(0);
 //		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(60);
 		
 		// counts

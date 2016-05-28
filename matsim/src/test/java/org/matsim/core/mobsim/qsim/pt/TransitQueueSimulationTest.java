@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -184,7 +184,7 @@ public class TransitQueueSimulationTest {
             schedule.addTransitLine(line);
         }
 
-        scenario.getConfig().addModule( new SimulationConfigGroup() );
+        scenario.getConfig().addModule( new ExternalMobimConfigGroup() );
         scenario.getConfig().qsim().setEndTime(1.0*3600); // prevent running the actual simulation
 
         QSim sim = QSimUtils.createDefaultQSim(scenario, EventsUtils.createEventsManager());

@@ -26,12 +26,12 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.Time;
 
-public final class SimulationConfigGroup extends ReflectiveConfigGroup {
+public final class ExternalMobimConfigGroup extends ReflectiveConfigGroup {
 
 	@SuppressWarnings("unused")
-	private final static Logger log = Logger.getLogger(SimulationConfigGroup.class);
+	private final static Logger log = Logger.getLogger(ExternalMobimConfigGroup.class);
 
-	public static final String GROUP_NAME = "simulation";
+	public static final String GROUP_NAME = "externalMobsim";
 
 	private static final String START_TIME = "startTime";
 	private static final String END_TIME = "endTime";
@@ -43,7 +43,7 @@ public final class SimulationConfigGroup extends ReflectiveConfigGroup {
 	private String externalExe = null;
 	private int timeOut = 3600;
 
-	public SimulationConfigGroup() {
+	public ExternalMobimConfigGroup() {
 		super(GROUP_NAME);
 	}
 
@@ -64,7 +64,7 @@ public final class SimulationConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringGetter(START_TIME)
-	public String getStartTimeAsString() {
+	String getStartTimeAsString() {
 		return Time.writeTime(this.startTime) ;
 	}
 	public double getStartTime() {
@@ -80,7 +80,7 @@ public final class SimulationConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringGetter(END_TIME)
-	public String getEndTimeAsString() {
+	String getEndTimeAsString() {
 		return Time.writeTime(this.endTime ) ;
 	}
 	public double getEndTime() {
