@@ -56,8 +56,6 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 
 	private final static Logger log = Logger.getLogger(OsmMultimodalNetworkConverter.class);
 
-	private OsmConverterConfigGroup config;
-
 	/**
 	 *  Maps for nodes, ways and relations
 	 */
@@ -96,6 +94,7 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 	 * Converts the osm file specified in the config and writes
 	 * the network to a file (also defined in config).
 	 */
+	@Override
 	public void run() {
 		convert();
 		writeNetwork();
@@ -104,6 +103,7 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 	/**
 	 * Only converts the osm file, does not write the network to a file.
 	 */
+	@Override
 	public void convert() {
 		readWayParams();
 		parse();
@@ -525,10 +525,6 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 		new NetworkCleaner().run(streetNetwork);
 		NetworkTools.integrateNetwork(streetNetwork, restNetwork);
 		this.network = streetNetwork;
-	}
-
-	public OsmConverterConfigGroup getConfig() {
-		return config;
 	}
 
 	private void writeNetwork() {
