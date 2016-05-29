@@ -28,9 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import opdytsintegration.MATSimSimulator;
-import opdytsintegration.TimeDiscretization;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -50,6 +47,8 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
+import opdytsintegration.MATSimSimulator;
+import opdytsintegration.TimeDiscretization;
 
 public class RunRoadClassification {
 

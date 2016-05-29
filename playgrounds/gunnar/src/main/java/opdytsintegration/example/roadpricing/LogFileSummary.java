@@ -1,7 +1,6 @@
-package floetteroed.opdyts.analysis;
+package opdytsintegration.example.roadpricing;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

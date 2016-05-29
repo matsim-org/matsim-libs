@@ -1,11 +1,6 @@
 package gunnar.ihop2.regent.costwriting;
 
 import static floetteroed.utilities.math.MathHelpers.drawWithoutReplacement;
-import floetteroed.utilities.Time;
-import gunnar.ihop2.integration.MATSimDummy;
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
-import gunnar.ihop2.regent.demandreading.Zone;
-import gunnar.ihop2.utils.LexicographicallyOrderedPositiveNumberStrings;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -28,6 +23,12 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
 import org.matsim.matrices.MatrixUtils;
+
+import floetteroed.utilities.Time;
+import gunnar.ihop2.integration.MATSimDummy;
+import gunnar.ihop2.regent.demandreading.ZonalSystem;
+import gunnar.ihop2.regent.demandreading.Zone;
+import gunnar.ihop2.utils.LexicographicallyOrderedPositiveNumberStrings;
 
 /**
  * 

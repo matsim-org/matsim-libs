@@ -6,7 +6,6 @@ import static gunnar.ihop2.transmodeler.run.TransmodelerMATSim.PATHS_ELEMENT;
 import static gunnar.ihop2.transmodeler.run.TransmodelerMATSim.TRANSMODELERCOMMAND_ELEMENT;
 import static gunnar.ihop2.transmodeler.run.TransmodelerMATSim.TRANSMODELERCONFIG;
 import static gunnar.ihop2.transmodeler.run.TransmodelerMATSim.TRANSMODELERFOLDER_ELEMENT;
-import gunnar.ihop2.transmodeler.tripswriting.TransmodelerTripWriter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,6 +19,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
+import gunnar.ihop2.transmodeler.tripswriting.TransmodelerTripWriter;
 
 /**
  * 

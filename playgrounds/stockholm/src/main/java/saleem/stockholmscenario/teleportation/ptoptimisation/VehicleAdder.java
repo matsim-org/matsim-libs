@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -15,7 +14,6 @@ import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
-import saleem.stockholmscenario.teleportation.ptoptimisation.utils.OptimisationUtils;
 import saleem.stockholmscenario.utils.CollectionUtil;
 
 public class VehicleAdder {

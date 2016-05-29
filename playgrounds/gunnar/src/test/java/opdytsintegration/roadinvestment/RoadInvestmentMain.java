@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import opdytsintegration.MATSimSimulator;
-import opdytsintegration.TimeDiscretization;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
@@ -29,6 +26,8 @@ import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
+import opdytsintegration.MATSimSimulator;
+import opdytsintegration.TimeDiscretization;
 
 /**
  * 

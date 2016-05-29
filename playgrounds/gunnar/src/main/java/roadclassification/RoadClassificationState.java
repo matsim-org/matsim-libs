@@ -2,13 +2,12 @@ package roadclassification;
 
 import java.util.Map;
 
-import opdytsintegration.MATSimState;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 
 import floetteroed.utilities.math.Vector;
+import opdytsintegration.MATSimState;
 
 /**
  * 

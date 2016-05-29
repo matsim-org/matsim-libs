@@ -9,9 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import opdytsintegration.RecursiveCountAverage;
-import opdytsintegration.TimeDiscretization;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -21,13 +18,13 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
-import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 import floetteroed.utilities.DynamicData;
+import opdytsintegration.RecursiveCountAverage;
+import opdytsintegration.TimeDiscretization;
 
 /**
  * 

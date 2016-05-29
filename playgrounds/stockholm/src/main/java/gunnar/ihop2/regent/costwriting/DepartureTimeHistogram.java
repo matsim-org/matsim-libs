@@ -1,7 +1,5 @@
 package gunnar.ihop2.regent.costwriting;
 
-import static floetteroed.utilities.math.Histogram.newHistogramWithUniformBins;
-
 import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,7 +48,7 @@ public class DepartureTimeHistogram {
 			final String actType, final double time_s) {
 		Histogram histogram = actType2timeHist.get(actType);
 		if (histogram == null) {
-			histogram = newHistogramWithUniformBins(this.startTime_s,
+			histogram = Histogram.newHistogramWithUniformBins(this.startTime_s,
 					this.binSize_s, this.binCnt);
 			actType2timeHist.put(actType, histogram);
 		}

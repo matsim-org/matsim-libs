@@ -11,8 +11,6 @@ import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import floetteroed.opdyts.analysis.OptFileReader;
-import floetteroed.opdyts.analysis.OptFileSummary;
 import floetteroed.utilities.Tuple;
 import floetteroed.utilities.math.Covariance;
 import floetteroed.utilities.math.Vector;

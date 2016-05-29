@@ -4,14 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Map;
-
-import opdytsintegration.MATSimState;
-import opdytsintegration.MATSimStateFactory;
-import opdytsintegration.TimeDiscretization;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -29,6 +23,9 @@ import com.google.inject.Inject;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
+import opdytsintegration.MATSimState;
+import opdytsintegration.MATSimStateFactory;
+import opdytsintegration.TimeDiscretization;
 
 /**
  * Identifies the approximately best out of a set of decision variables.

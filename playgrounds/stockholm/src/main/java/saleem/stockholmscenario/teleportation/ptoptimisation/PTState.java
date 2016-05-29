@@ -1,11 +1,9 @@
 package saleem.stockholmscenario.teleportation.ptoptimisation;
 
-import opdytsintegration.MATSimState;
-import opdytsintegration.TimeDiscretization;
-
 import org.matsim.api.core.v01.population.Population;
 
 import floetteroed.utilities.math.Vector;
+import opdytsintegration.MATSimState;
 
 public class PTState extends MATSimState {
 

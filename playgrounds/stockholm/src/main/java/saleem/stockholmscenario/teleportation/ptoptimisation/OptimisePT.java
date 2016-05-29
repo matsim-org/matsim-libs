@@ -2,12 +2,9 @@ package saleem.stockholmscenario.teleportation.ptoptimisation;
 
 import java.util.Set;
 
-import opdytsintegration.TimeDiscretization;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -20,13 +17,14 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 
-import saleem.stockholmscenario.teleportation.PTCapacityAdjusmentPerSample;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
+import opdytsintegration.TimeDiscretization;
+import saleem.stockholmscenario.teleportation.PTCapacityAdjusmentPerSample;
 
 public class OptimisePT {
 	@SuppressWarnings({ "rawtypes", "unused" })

@@ -9,11 +9,10 @@ import java.util.logging.Logger;
 
 import org.matsim.core.gbl.MatsimRandom;
 
-import patryk.popgen2.Building;
-
 import com.vividsolutions.jts.geom.Geometry;
 
 import floetteroed.utilities.math.MathHelpers;
+import patryk.popgen2.Building;
 
 /**
  * 

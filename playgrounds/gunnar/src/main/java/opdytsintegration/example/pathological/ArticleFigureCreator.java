@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
-import floetteroed.opdyts.analysis.LogFileReader;
-import floetteroed.opdyts.analysis.LogFileSummary;
+import opdytsintegration.example.roadpricing.LogFileReader;
+import opdytsintegration.example.roadpricing.LogFileSummary;
 
 /**
  * 
