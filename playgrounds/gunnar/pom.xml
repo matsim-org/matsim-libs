@@ -9,15 +9,11 @@
   <artifactId>gunnar</artifactId>
   <name>gunnar</name>
   <dependencies>
-	<!--
      <dependency>
-  		<groupId>gunnarutilities</groupId>
-  		<artifactId>gunnarutilities</artifactId>
-  		<version>0.0</version>
-  		<scope>system</scope>
-  		<systemPath>${basedir}/libs/utilities.jar</systemPath>	
+  		<groupId>floetteroed.opdyts</groupId>
+  		<artifactId>opdyts</artifactId>
+  		<version>1.0.0</version>
   	</dependency>
-  	-->
   	  	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>roadpricing</artifactId>
