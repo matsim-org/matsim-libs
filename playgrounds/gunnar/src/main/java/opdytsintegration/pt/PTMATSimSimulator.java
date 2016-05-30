@@ -15,7 +15,7 @@ import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import opdytsintegration.MATSimStateFactory;
-import opdytsintegration.TimeDiscretization;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * Created by michaelzilske on 08/10/15.

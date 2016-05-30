@@ -1,4 +1,4 @@
-package opdytsintegration;
+package opdytsintegration.utils;
 
 /**
  * 

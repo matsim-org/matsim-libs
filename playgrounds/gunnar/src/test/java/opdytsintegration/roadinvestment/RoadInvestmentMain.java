@@ -27,7 +27,7 @@ import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.SingleTrajectorySampler;
 import opdytsintegration.MATSimSimulator;
-import opdytsintegration.TimeDiscretization;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 

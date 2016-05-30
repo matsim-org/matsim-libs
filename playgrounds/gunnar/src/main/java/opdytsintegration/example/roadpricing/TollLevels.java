@@ -10,7 +10,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Vector;
-import opdytsintegration.TimeDiscretization;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 

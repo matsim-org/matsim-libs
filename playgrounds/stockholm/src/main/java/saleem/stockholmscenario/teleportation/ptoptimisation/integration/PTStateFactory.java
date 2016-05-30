@@ -5,8 +5,8 @@ import org.matsim.api.core.v01.population.Population;
 import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimState;
 import opdytsintegration.MATSimStateFactory;
-import opdytsintegration.TimeDiscretization;
 import opdytsintegration.pt.PTState;
+import opdytsintegration.utils.TimeDiscretization;
 import saleem.stockholmscenario.teleportation.ptoptimisation.PTSchedule;
 
 public class PTStateFactory implements MATSimStateFactory<PTSchedule>{

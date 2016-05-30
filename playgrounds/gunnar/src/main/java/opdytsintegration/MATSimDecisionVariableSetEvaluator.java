@@ -21,6 +21,8 @@ import com.google.inject.Inject;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
+import opdytsintegration.car.OccupancyAnalyzer;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * Identifies the approximately best out of a set of decision variables.

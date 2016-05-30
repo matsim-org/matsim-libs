@@ -24,7 +24,7 @@ import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimState;
 import opdytsintegration.MATSimStateFactory;
-import opdytsintegration.TimeDiscretization;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * Identifies the approximately best out of a set of decision variables.

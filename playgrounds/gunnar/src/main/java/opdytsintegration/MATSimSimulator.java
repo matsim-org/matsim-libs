@@ -14,6 +14,7 @@ import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * Created by michaelzilske on 08/10/15.

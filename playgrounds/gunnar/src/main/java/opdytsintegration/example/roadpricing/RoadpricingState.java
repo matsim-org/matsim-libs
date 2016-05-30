@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.population.Population;
 
 import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimState;
-import opdytsintegration.TimeDiscretization;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 

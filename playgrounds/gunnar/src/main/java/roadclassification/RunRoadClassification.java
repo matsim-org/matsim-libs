@@ -48,7 +48,7 @@ import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCri
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator;
-import opdytsintegration.TimeDiscretization;
+import opdytsintegration.utils.TimeDiscretization;
 
 public class RunRoadClassification {
 

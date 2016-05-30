@@ -11,8 +11,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
-import opdytsintegration.OccupancyAnalyzer;
-import opdytsintegration.TimeDiscretization;
+import opdytsintegration.car.OccupancyAnalyzer;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 

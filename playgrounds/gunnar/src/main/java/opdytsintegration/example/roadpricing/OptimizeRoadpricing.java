@@ -29,7 +29,7 @@ import floetteroed.utilities.Units;
 import floetteroed.utilities.config.ConfigReader;
 import floetteroed.utilities.math.MathHelpers;
 import opdytsintegration.MATSimSimulator;
-import opdytsintegration.TimeDiscretization;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 

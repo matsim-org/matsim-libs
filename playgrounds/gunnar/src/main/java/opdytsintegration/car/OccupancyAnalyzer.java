@@ -1,4 +1,4 @@
-package opdytsintegration;
+package opdytsintegration.car;
 
 import static java.lang.Math.min;
 
@@ -22,6 +22,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 
 import floetteroed.utilities.DynamicData;
+import opdytsintegration.utils.RecursiveCountAverage;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 

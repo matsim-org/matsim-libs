@@ -23,8 +23,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 import floetteroed.utilities.DynamicData;
-import opdytsintegration.RecursiveCountAverage;
-import opdytsintegration.TimeDiscretization;
+import opdytsintegration.utils.RecursiveCountAverage;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 
