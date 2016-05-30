@@ -16,6 +16,8 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.FacilitiesWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 
 /**
  * @author dziemke
@@ -44,10 +46,11 @@ public class CreateFacilitiiesFileFromShapeFile {
 	
 	
 	private static ActivityFacilities createFacilities(Map<String, SimpleFeature> blocks) {
-		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities("Homes");
+		ActivityFacilities activityFacilities = FacilitiesUtils.createActivityFacilities("Homes"); // adapt name
 		ActivityFacilitiesFactory activityFacilitiesFactory = new ActivityFacilitiesFactoryImpl();
-		for (String blockId : blocks.keySet()) {			
+		for (String blockId : blocks.keySet()) {		
 			Id<ActivityFacility> id = Id.create(blockId, ActivityFacility.class);
+//			Geometry geometry = (Geometry) blocks.get(blockId); // TODO use it; see below
 			Coord coord = CoordUtils.createCoord(120., 130.); // TODO use meaningful coordinates here; use geometry of feature
 			ActivityFacility activityFacility = activityFacilitiesFactory.createActivityFacility(id, coord);
 			activityFacilities.addActivityFacility(activityFacility);
@@ -57,7 +60,7 @@ public class CreateFacilitiiesFileFromShapeFile {
 	
 	
 	private static void writeFacilitiesFile(ActivityFacilities activityFacilities) {
-		FacilitiesWriter fw = new FacilitiesWriter(activityFacilities);
-		fw.write(facilitiesOutputFile);
+		FacilitiesWriter facilitiesWriter = new FacilitiesWriter(activityFacilities);
+		facilitiesWriter.write(facilitiesOutputFile);
 	}
 }
