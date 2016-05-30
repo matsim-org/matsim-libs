@@ -237,12 +237,16 @@ public class QNode implements NetsimNode {
 			log.warn("Cannot move vehicle " + veh.getId() + " from link " + currentLink.getId() + " to link " + nextQLink.getLink().getId());
 			return false ;
 		}
-		if ( !nextQLink.getLink().getAllowedModes().contains( veh.getDriver().getMode() ) ) {
-			log.warn("The link with id " + nextLinkId + " does not allow the current mode, which is " + veh.getDriver().getMode() );
-			return false ;
-			// yyyy is rather nonsensical to get the mode from the driver, not from the vehicle.  However, this seems to be 
-			// how it currently works: network links are defined for modes, not for vehicle types.  kai, may'16
-		}
+//		if ( !nextQLink.getLink().getAllowedModes().contains( veh.getDriver().getMode() ) ) {
+//			final String message = "The link with id " + nextLinkId + " does not allow the current mode, which is " + veh.getDriver().getMode();
+//			throw new RuntimeException( message ) ;
+////			log.warn(message );
+////			return false ;
+//			// yyyy is rather nonsensical to get the mode from the driver, not from the vehicle.  However, this seems to be 
+//			// how it currently works: network links are defined for modes, not for vehicle types.  kai, may'16
+//		}
+		// currently does not work, see MATSIM-533 
+		
 		return true ;
 	}
 
