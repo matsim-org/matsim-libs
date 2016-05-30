@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
@@ -60,14 +62,13 @@ public class ScheduleEditor {
 	private final Network network;
 	private final TransitSchedule schedule;
 	private final TransitScheduleFactory scheduleFactory;
+	private final NetworkFactory networkFactory;
 	private final Map<String, Router> routers;
 
-	private final Map<String, TransitRoute> transitRoutes;
 	private final ParentStops parentStops;
 
 	private static final String SUFFIX_PATTERN = "[.]link:";
 	private static final String SUFFIX = ".link:";
-
 
 	// commands
 	public static final String RR_VIA_LINK = "rerouteViaLink";
@@ -75,23 +76,23 @@ public class ScheduleEditor {
 	public static final String REPLACE_STOP_FACILITY = "replaceStopFacility";
 	public static final String ALL_TRANSIT_ROUTES_ON_LINK = "allTransitRoutesOnLink";
 	public static final String CHANGE_REF_LINK = "changeRefLink";
+	public static final String ADD_LINK = "addLink";
 	public static final String COMMENT_START = "//";
 
 	public ScheduleEditor(TransitSchedule schedule, Network network, Map<String, Router> routers) {
 		this.schedule = schedule;
 		this.network = network;
 		this.scheduleFactory = schedule.getFactory();
+		this.networkFactory = network.getFactory();
 		this.routers = routers;
 		this.parentStops = new ParentStops();
-
-		this.transitRoutes = new HashMap<>();
 	}
 
 	public ScheduleEditor(TransitSchedule schedule, Network network) {
 		this.schedule = schedule;
 		this.network = network;
 		this.scheduleFactory = schedule.getFactory();
-		this.transitRoutes = new HashMap<>();
+		this.networkFactory = network.getFactory();
 		this.parentStops = new ParentStops();
 
 		this.routers = new HashMap<>();
@@ -161,15 +162,16 @@ public class ScheduleEditor {
 	 * executes a command line
 	 */
 	private void runCmdLine(String[] cmd) {
-		TransitRoute transitRoute;
-		Set<TransitRoute> tmpTransitRoutes;
-
 		/**
 		 * Reroute TransitRoute via new Link
 		 * ["rerouteViaLink"] [TransitLineId] [TransitRouteId] [oldLinkId] [newLinkId]
 		 */
 		if(RR_VIA_LINK.equals(cmd[0])) {
-			rerouteViaLink(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[3]);
+			if(cmd.length == 5) {
+				rerouteViaLink(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[4]);
+			} else {
+				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0]);
+			}
 		}
 
 		/**
@@ -177,9 +179,12 @@ public class ScheduleEditor {
 		 * ["rerouteFromStop"] [TransitLineId] [TransitRouteId] [fromStopId] [newLinkId]
 		 */
 		else if(RR_FROM_STOP.equals(cmd[0])) {
-			rerouteFromStop(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[3]);
+			if(cmd.length == 5) {
+				rerouteFromStop(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[4]);
+			} else {
+				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0]);
+			}
 		}
-
 		/**
 		 * Changes the referenced link of a stopfacility. Effectively creates a new child stop facility.
 		 * ["changeRefLink"] [StopFacilityId] [newlinkId]
@@ -192,7 +197,7 @@ public class ScheduleEditor {
 			} else if(cmd.length == 5) {
 				switch (cmd[1]) {
 					case ALL_TRANSIT_ROUTES_ON_LINK:
-						tmpTransitRoutes = getTransitRoutesOnLink(Id.createLinkId(cmd[2]));
+						Set<TransitRoute> tmpTransitRoutes = getTransitRoutesOnLink(Id.createLinkId(cmd[2]));
 						for(TransitRoute tr : tmpTransitRoutes) {
 							changeRefLink(tr, cmd[3], cmd[4]);
 						}
@@ -200,8 +205,25 @@ public class ScheduleEditor {
 					default:
 						changeRefLink(getTransitRoute(cmd[1], cmd[2]), cmd[3], cmd[4]);
 				}
+			} else {
+				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0]);
 			}
 		}
+
+		/**
+		 * Adds a link to the network. Uses the attributes (freespeed, nr of lanes, transportModes)
+		 * of the attributeLink.
+		 * [addLink] [linkId] [fromNodeId] [toNodeId] [attributeLinkId]
+		 */
+		 else if(ADD_LINK.equals(cmd[0])) {
+			if(cmd.length == 5) {
+				addLink(cmd[1], cmd[2], cmd[3], cmd[4]);
+				refreshSchedule();
+			} else {
+				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0]);
+			}
+		}
+
 		/**
 		 * comment
 		 */
@@ -211,6 +233,7 @@ public class ScheduleEditor {
 			throw new IllegalArgumentException("Invalid command \"" + cmd[0] + "\"");
 		}
 	}
+
 
 	/**
 	 * @return the TransitRoute of the schedule based on transit line and transit route as strings
@@ -380,6 +403,31 @@ public class ScheduleEditor {
 		return newTransitStopFacility;
 	}
 
+	/**
+	 * Adds a link to the network. Uses the attributes (freespeed, nr of lanes, transportModes)
+	 * of the attributeLink.
+	 * @param newLinkId
+	 * @param fromNodeId
+	 * @param toNodeId
+	 * @param attributeLinkId
+	 */
+	private void addLink(Id<Link> newLinkId, Id<Node> fromNodeId, Id<Node> toNodeId, Id<Link> attributeLinkId) {
+		Node fromNode = network.getNodes().get(fromNodeId);
+		Node toNode = network.getNodes().get(toNodeId);
+
+		Link newLink = networkFactory.createLink(newLinkId, fromNode, toNode);
+		Link attributeLink = network.getLinks().get(attributeLinkId);
+
+		newLink.setAllowedModes(attributeLink.getAllowedModes());
+		newLink.setCapacity(attributeLink.getCapacity());
+		newLink.setFreespeed(attributeLink.getFreespeed());
+		newLink.setNumberOfLanes(attributeLink.getNumberOfLanes());
+
+		network.addLink(newLink);
+	}
+	private void addLink(String newLinkIdStr, String fromNodeIdStr, String toNodeIdStr, String attributeLinkIdStr) {
+		addLink(Id.createLinkId(newLinkIdStr), Id.createNodeId(fromNodeIdStr), Id.createNodeId(toNodeIdStr), Id.createLinkId(attributeLinkIdStr));
+	}
 
 	/**
 	 * Replaces a stop facility with another one in the given route. Both ids must exist.

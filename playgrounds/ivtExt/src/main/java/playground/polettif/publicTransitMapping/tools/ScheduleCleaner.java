@@ -43,8 +43,15 @@ public class ScheduleCleaner {
 
 	public static void main(String[] args) {
 		TransitSchedule schedule = ScheduleTools.readTransitSchedule(args[0]);
+		removeTransitRoutesWithoutLinkSequences(schedule);
 		removeNotUsedStopFacilities(schedule);
-		ScheduleTools.writeTransitSchedule(schedule, args[0]);
+		if(args.length == 1) {
+			ScheduleTools.writeTransitSchedule(schedule, args[0]);
+		} else if(args.length == 2){
+			ScheduleTools.writeTransitSchedule(schedule, args[1]);
+		} else {
+			throw new IllegalArgumentException("Wrong number of arguments given");
+		}
 	}
 
 	/**
@@ -119,6 +126,9 @@ public class ScheduleCleaner {
 				}
 			}
 		}
+
+		log.info("... " + removed + " transit routes removed");
+
 		return removed;
 	}
 

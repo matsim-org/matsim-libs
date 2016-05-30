@@ -44,6 +44,7 @@ import playground.polettif.publicTransitMapping.osm.core.OsmParserHandler;
 import playground.polettif.publicTransitMapping.osm.core.TagFilter;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
+import playground.polettif.publicTransitMapping.tools.MiscUtils;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.*;
@@ -175,12 +176,9 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 
 		// remove unusable ways
 		for(OsmParser.OsmWay way : ways.values()) {
-			// remove service railways
-			if(way.tags.containsKey(OsmTag.RAILWAY) && way.tags.containsKey(OsmTag.SERVICE)) {
+			if(!highwayParams.containsKey(way.tags.get(OsmTag.HIGHWAY)) && !railwayParams.containsKey(way.tags.get(OsmTag.RAILWAY)) && !relationMembers.containsKey(way.id)) {
 				way.used = false;
-			}
-			// remove service roads without a transit route on them
-			if(!highwayParams.containsKey(way.tags.get(OsmTag.HIGHWAY)) && !relationMembers.containsKey(way.id) && !way.tags.containsKey(OsmTag.RAILWAY)) {
+			} else if(!this.nodes.containsKey(way.nodes.get(0)) || !this.nodes.containsKey(way.nodes.get(way.nodes.size() - 1))) {
 				way.used = false;
 			}
 		}
@@ -196,9 +194,11 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 
 		// check which nodes are used
 		for(OsmParser.OsmWay way : this.ways.values()) {
-			// first and last are counted twice, so they are kept in all cases
-			this.nodes.get(way.nodes.get(0)).ways++;
-			this.nodes.get(way.nodes.get(way.nodes.size() - 1)).ways++;
+			if(this.nodes.containsKey(way.nodes.get(0)) && this.nodes.containsKey(way.nodes.get(way.nodes.size() - 1))) {
+				// first and last are counted twice, so they are kept in all cases
+				this.nodes.get(way.nodes.get(0)).ways++;
+				this.nodes.get(way.nodes.get(way.nodes.size() - 1)).ways++;
+			}
 
 			for(Long nodeId : way.nodes) {
 				OsmParser.OsmNode node = this.nodes.get(nodeId);

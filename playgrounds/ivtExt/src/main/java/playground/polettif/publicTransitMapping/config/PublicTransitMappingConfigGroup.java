@@ -53,7 +53,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
 	private static final String COMBINE_PT_MODES = "combinePtModes";
 	private static final String MULTI_THREAD = "threads";
-	public static final String REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES = "removeTransitRoutesWithoutLinkSequences";
+	private static final String REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES = "removeTransitRoutesWithoutLinkSequences";
 
 
 	public PublicTransitMappingConfigGroup() {
@@ -85,7 +85,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"Defines whether at the end of mapping, all non-car link modes (bus, rail, etc) \n" +
 				"\t\tshould be replaced with pt (true) or not. Default: false");
 		map.put(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES,
-				"If true, transit routes without link sequences after mapping are removed from the schedule. Default: false");
+				"If true, transit routes without link sequences after mapping are removed from the schedule. Default: true");
 		map.put(LINK_DISTANCE_TOLERANCE,
 				"(concerns Link Candidates) After " +MAX_NCLOSEST_LINKS +" link candidates have been found, additional link \n" +
 				"\t\tcandidates within ["+LINK_DISTANCE_TOLERANCE+"] * [distance to the Nth link] are added to the set.\n" +
@@ -242,7 +242,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 *
 	 */
-	private boolean removeTransitRoutesWithoutLinkSequences = false;
+	private boolean removeTransitRoutesWithoutLinkSequences = true;
 
 	@StringGetter(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES)
 	public boolean getRemoveTransitRoutesWithoutLinkSequences() {

@@ -19,6 +19,7 @@
 package playground.polettif.publicTransitMapping.tools.shp;
 
 import com.opencsv.CSVReader;
+import com.vividsolutions.jts.geom.Coordinate;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -96,9 +97,12 @@ public class Gtfs2ShapeFile {
 				.create();
 
 		for(Map.Entry<String, Shape> entry : gtfsShapes.entrySet()) {
+			Coordinate[] coordinates = entry.getValue().getCoordinates();
+			if(coordinates != null) {
 				SimpleFeature f = ff.createPolyline(entry.getValue().getCoordinates());
 				f.setAttribute("id", entry.getKey());
 				features.add(f);
+			}
 		}
 
 		ShapeFileWriter.writeGeometries(features, outFile);

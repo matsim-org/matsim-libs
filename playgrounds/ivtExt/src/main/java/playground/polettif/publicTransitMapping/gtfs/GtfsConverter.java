@@ -25,10 +25,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.Vehicles;
 import playground.polettif.publicTransitMapping.gtfs.lib.*;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
@@ -66,12 +65,6 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 	 * Path to the folder where the gtfs files are located
 	 */
 	private String root;
-	private CoordinateTransformation transformation = new IdentityTransformation();
-
-	/**
-	 * The types of dates that will be represented by the new file
-	 */
-	private Set<String> serviceIds = new HashSet<>();
 
 	/**
 	 * whether the gtfs feed uses frequencies.txt or not
@@ -94,8 +87,17 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 	private Map<String, Integer> serviceIdsCount = new HashMap<>();
 	private TransitScheduleFactory scheduleFactory;
 
-	// containers for storing gtfs data
+	/**
+	 * The types of dates that will be represented by the new file
+	 */
+	protected Set<String> serviceIds = new HashSet<>();
 
+
+	// containers for storing gtfs data
+	protected Map<String, GTFSStop> gtfsStops = new HashMap<>();
+	protected Map<String, GTFSRoute> gtfsRoutes = new TreeMap<>();
+	protected Map<String, Service> services = new HashMap<>();
+	protected Map<String, Shape> shapes = new HashMap<>();
 
 	public GtfsConverter(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
 		super(schedule, vehicles, transformation);
@@ -623,9 +625,13 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 			case DAY_WITH_MOST_SERVICES: {
 				LocalDate busiestDate = null;
 				for(Entry<LocalDate, Set<String>> e : Service.dateStats.entrySet()) {
-					if(e.getValue().size() > serviceIds.size()) {
-						this.serviceIds = e.getValue();
-						busiestDate = e.getKey();
+					try {
+						if(e.getValue().size() > serviceIds.size()) {
+							this.serviceIds = e.getValue();
+							busiestDate = e.getKey();
+						}
+					} catch (Exception e1) {
+						e1.printStackTrace();
 					}
 				}
 				log.info("... Using service IDs of the day with the most services (" + DAY_WITH_MOST_SERVICES + ").");
@@ -669,7 +675,7 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 	}
 
 	public void setTransformation(CoordinateTransformation transformation) {
-		this.transformation = transformation;
+		super.transformation = transformation;
 	}
 
 	public Set<String> getServiceIdsOnDate(LocalDate checkDate) {
@@ -720,4 +726,13 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 
 		}
 	}
+
+	public Map<String, GTFSRoute> getGtfsRoutes() {
+		return gtfsRoutes;
+	}
+
+	public Set<String> getServiceIds() {
+		return serviceIds;
+	}
+
 }

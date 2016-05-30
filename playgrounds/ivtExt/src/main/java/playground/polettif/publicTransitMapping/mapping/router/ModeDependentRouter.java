@@ -47,9 +47,7 @@ import java.util.Set;
  * modes are increased. Only uses distance as travel disutility.
  *
  * @author polettif
- * @deprecated PTMapper uses separate networks for each mode
  */
-@Deprecated
 public class ModeDependentRouter implements Router {
 
 	private final Set<String> routingTransportModes;
@@ -57,10 +55,6 @@ public class ModeDependentRouter implements Router {
     private final Map<Tuple<Node, Node>, LeastCostPathCalculator.Path> paths;
 
 	private static PublicTransitMappingConfigGroup.PseudoRouteWeightType pseudoRouteWeightType = PublicTransitMappingConfigGroup.PseudoRouteWeightType.linkLength;
-
-	public static void setPseudoRouteWeightType(PublicTransitMappingConfigGroup.PseudoRouteWeightType type) {
-		pseudoRouteWeightType = type;
-	}
 
 	public ModeDependentRouter(Network network, Set<String> routingTransportModes) {
 		this.routingTransportModes = new HashSet<>();
@@ -112,9 +106,7 @@ public class ModeDependentRouter implements Router {
 	 */
     @Override
     public double getLinkMinimumTravelDisutility(Link link) {
-		double length = (linkHasRoutingMode(link) ? 1 : 100000) * link.getLength();
-
-		return (pseudoRouteWeightType.equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? length / link.getFreespeed() : length);
+		return (linkHasRoutingMode(link) ? 1 : 100000) * link.getLength() / link.getFreespeed();
 	}
 
 	/**

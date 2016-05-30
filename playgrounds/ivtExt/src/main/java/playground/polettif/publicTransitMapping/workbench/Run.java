@@ -64,9 +64,10 @@ public class Run {
 	public void plausibilityCheck() {
 		String scheduleFile = "";
 		String networkFile = "";
+		String coordinateSystem = "EPSG:2056";
 		String outputFolder = "";
 
-		PlausibilityCheck.run(scheduleFile, networkFile, outputFolder);
+		PlausibilityCheck.run(scheduleFile, networkFile, coordinateSystem, outputFolder);
 	}
 
 	public void editSchedule() {

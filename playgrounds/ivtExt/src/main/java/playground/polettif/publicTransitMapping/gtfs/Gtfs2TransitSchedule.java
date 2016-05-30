@@ -43,11 +43,6 @@ public class Gtfs2TransitSchedule {
 	protected Vehicles vehicles;
 	protected CoordinateTransformation transformation;
 
-	protected Set<String> serviceIds;
-	protected Map<String, GTFSStop> gtfsStops = new HashMap<>();
-	protected Map<String, GTFSRoute> gtfsRoutes = new TreeMap<>();
-	protected Map<String, Service> services = new HashMap<>();
-	protected Map<String, Shape> shapes = new HashMap<>();
 	/**
 	 * Reads gtfs files in and converts them to an unmapped
 	 * MATSim Transit Schedule (mts). "Unmapped" means stopFacilities are not
@@ -92,9 +87,9 @@ public class Gtfs2TransitSchedule {
 	 *                              	and the converted shape files (if available).
 	 * @param serviceIdsParam        	which service ids should be used. One of the following:
 	 *     				             	<ul>
-	 *     				             	<li>date in the format yyyymmdd</li>
+	 *     				             	<li>dayWithMostServices (default)</li>
 	 *     				             	<li>dayWithMostTrips</li>
-	 *     				             	<li>dayWithMostServices</li>
+	 *     				             	<li>date in the format yyyymmdd</li>
 	 *     				             	<li>mostUsedSingleId</li>
 	 *     				             	<li>all</li>
 	 *     				             	</ul>
@@ -106,11 +101,12 @@ public class Gtfs2TransitSchedule {
 		CoordinateTransformation transformation = outputCoordinateSystem != null ? TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem) : new IdentityTransformation();
 
 		GtfsConverter gtfsConverter = new GtfsConverter(schedule, vehicles, transformation);
-		gtfsConverter.run(gtfsFolder, serviceIdsParam);
+		String param = serviceIdsParam == null ? GtfsConverter.DAY_WITH_MOST_SERVICES : serviceIdsParam;
+		gtfsConverter.run(gtfsFolder, param);
 
 		ScheduleTools.writeTransitSchedule(gtfsConverter.getSchedule(), outputFolder + "schedule.xml.gz");
 		ScheduleTools.writeVehicles(gtfsConverter.getVehicles(), outputFolder + "vehicles.xml.gz");
-		ShapeFileTools.writeGtfsTripsToFile(gtfsConverter.getGtfsRoutes(), gtfsConverter.getServiceIds(), outputCoordinateSystem, outputFolder+"shapes.txt");
+		ShapeFileTools.writeGtfsTripsToFile(gtfsConverter.getGtfsRoutes(), gtfsConverter.getServiceIds(), outputCoordinateSystem, outputFolder+"shapes.shp");
 	}
 
 	public Gtfs2TransitSchedule(TransitSchedule schedule, Vehicles vehicles, CoordinateTransformation transformation) {
@@ -124,12 +120,6 @@ public class Gtfs2TransitSchedule {
 	}
 	public Vehicles getVehicles() {
 		return vehicles;
-	}
-	public Map<String,GTFSRoute> getGtfsRoutes() {
-		return gtfsRoutes;
-	}
-	public Set<String> getServiceIds() {
-		return serviceIds;
 	}
 
 }
