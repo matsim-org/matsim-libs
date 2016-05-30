@@ -6,6 +6,7 @@ import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimState;
 import opdytsintegration.MATSimStateFactory;
 import opdytsintegration.TimeDiscretization;
+import opdytsintegration.pt.PTState;
 import saleem.stockholmscenario.teleportation.ptoptimisation.PTSchedule;
 
 public class PTStateFactory implements MATSimStateFactory<PTSchedule>{

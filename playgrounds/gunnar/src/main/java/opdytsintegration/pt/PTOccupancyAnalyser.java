@@ -1,4 +1,4 @@
-package saleem.stockholmscenario.teleportation.ptoptimisation.integration;
+package opdytsintegration.pt;
 
 import static java.lang.Math.min;
 

@@ -1,4 +1,4 @@
-package saleem.stockholmscenario.teleportation.ptoptimisation.integration;
+package opdytsintegration.pt;
 
 import org.matsim.api.core.v01.population.Population;
 
@@ -10,7 +10,7 @@ public class PTState extends MATSimState {
 
 	private final double occupancyScale;
 
-	PTState(final Population population,
+	public PTState(final Population population,
 			final Vector vectorRepresentation,
 			final double occupancyScale) {
 		super(population, vectorRepresentation);

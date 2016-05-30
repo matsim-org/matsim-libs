@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
-import saleem.stockholmscenario.teleportation.ptoptimisation.integration.PTState;
+import opdytsintegration.pt.PTState;
 
 /**
  * Returns the negative sum of the scores of the selected plans of all agents,

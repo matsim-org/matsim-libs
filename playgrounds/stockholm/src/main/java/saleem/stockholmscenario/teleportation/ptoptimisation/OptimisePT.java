@@ -24,8 +24,8 @@ import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCri
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.TimeDiscretization;
+import opdytsintegration.pt.PTMATSimSimulator;
 import saleem.stockholmscenario.teleportation.PTCapacityAdjusmentPerSample;
-import saleem.stockholmscenario.teleportation.ptoptimisation.integration.PTMATSimSimulator;
 import saleem.stockholmscenario.teleportation.ptoptimisation.integration.PTStateFactory;
 
 public class OptimisePT {
