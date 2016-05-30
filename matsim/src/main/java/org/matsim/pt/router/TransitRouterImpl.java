@@ -20,6 +20,12 @@
 
 package org.matsim.pt.router;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -33,13 +39,16 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.*;
-
-import java.util.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Not thread-safe because MultiNodeDijkstra is not. Does not expect the TransitSchedule to change once constructed! michaz '13
@@ -113,11 +122,11 @@ public class TransitRouterImpl implements TransitRouter {
     }
 
     @Override
-    public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
+	    public List<Leg> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime, final Person person) {
         // find possible start stops
-        Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromCoord, departureTime);
+        Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromFacility.getCoord(), departureTime);
         // find possible end stops
-        Map<Node, InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toCoord, departureTime);
+        Map<Node, InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toFacility.getCoord(), departureTime);
 
         // find routes between start and end stops
         Path p = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
@@ -126,13 +135,13 @@ public class TransitRouterImpl implements TransitRouter {
             return null;
         }
 
-        double directWalkCost = getWalkDisutility(person, fromCoord, toCoord);
+        double directWalkCost = getWalkDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
         double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 
         if (directWalkCost < pathCost) {
-            return this.createDirectWalkLegList(null, fromCoord, toCoord);
+            return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
         }
-        return convertPathToLegList(departureTime, p, fromCoord, toCoord, person);
+        return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
     }
 
     private List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord) {

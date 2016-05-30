@@ -32,6 +32,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -128,7 +129,7 @@ public class TransitRouterAStarTest {
 		final TransitRouterConfig transitConfig = new TransitRouterConfig( config );
 
 		final TransitRouterAStar testee = new TransitRouterAStar( config , sc.getTransitSchedule() );
-		final TransitRouter oracle = new TransitRouterImpl( transitConfig , sc.getTransitSchedule() );
+		final TransitRouterImpl oracle = new TransitRouterImpl( transitConfig , sc.getTransitSchedule() );
 
 		final List<Id<ActivityFacility>> facilityIds = new ArrayList<>( sc.getActivityFacilities().getFacilities().keySet() );
 		Collections.sort( facilityIds );
@@ -147,8 +148,8 @@ public class TransitRouterAStarTest {
 
 			final double time = random.nextDouble() * 24 * 3600;
 
-			final List<Leg> testedTrip = testee.calcRoute( orign.getCoord() , destination.getCoord() , time , null );
-			final List<Leg> referenceTrip = oracle.calcRoute( orign.getCoord() , destination.getCoord() , time , null );
+			final List<Leg> testedTrip = testee.calcRoute( new FakeFacility(orign.getCoord()), new FakeFacility(destination.getCoord()), time, null );
+			final List<Leg> referenceTrip = oracle.calcRoute( new FakeFacility(orign.getCoord()), new FakeFacility(destination.getCoord()), time, null );
 
 			assertEquals(
 					"trip from "+orign.getId()+" to "+destination.getId()+" at "+ Time.writeTime( time )

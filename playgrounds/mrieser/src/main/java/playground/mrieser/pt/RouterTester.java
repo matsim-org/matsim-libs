@@ -29,15 +29,16 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.TransitActsRemover;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -114,7 +115,7 @@ public class RouterTester {
 						if (pe instanceof Activity) {
 							Activity act = (Activity) pe;
 							if (prevAct != null) {
-								List<Leg> legs = router.calcRoute(prevAct.getCoord(), act.getCoord(), act.getStartTime(), person);
+								List<Leg> legs = router.calcRoute(new FakeFacility(prevAct.getCoord()), new FakeFacility(act.getCoord()), act.getStartTime(), person);
 								out.write(person.getId() + " " + prevAct.getCoord() + " -> " + act.getCoord() + " @ " + Time.writeTime(act.getStartTime()) + " :\n");
 								if (legs != null) {
 									for (Leg l : legs) {
