@@ -1,4 +1,4 @@
-package saleem.stockholmscenario.teleportation.ptoptimisation;
+package saleem.stockholmscenario.teleportation.ptoptimisation.integration;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,7 +6,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -68,7 +67,6 @@ public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	private Population population;
 
 	@Inject
-	private Network network;
 
 	private PTOccupancyAnalyser occupancyAnalyser = null;
 
@@ -226,25 +224,9 @@ public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 			for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
 				newInstantaneousStateVector.set(i++,
 						this.occupancyAnalyser.getOccupancy_veh(stopId, bin));
-//				System.out.print(this.occupancyAnalyser.getOccupancy_veh(stopId, bin) + "...");
 			}
 			
 		}
-		//To plot waiting passengers
-		double binOccupancy = 0.0;
-		for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
-			for (Id<TransitStopFacility> stopId : this.relevantStopIds) {
-				binOccupancy = binOccupancy + this.occupancyAnalyser.getOccupancy_veh(stopId, bin);
-			}
-			times.add(bin*1.0+1);//0-1 hour is bin zero, so +1 is done to plot hour 1 as bin 1
-			waitingpassengers.add(binOccupancy);
-			binOccupancy = 0;
-			
-		}
-		PlotInfo pinfo = new PlotInfo();
-		pinfo.PlotWaitingPassengers("waitingPassengers.png", times, waitingpassengers);
-		System.out.println("Stuck Agents: " + this.occupancyAnalyser.getTotalStuckOutsideStops());
-		System.out.println("Stuck Agents Left on Stops: " + this.occupancyAnalyser.getTotalLeftOnStopsAtEnd());
 		
 		/*
 		 * (2) Add instantaneous state vector to the list of past state vectors
