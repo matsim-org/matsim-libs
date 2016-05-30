@@ -12,13 +12,15 @@ import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 
 import saleem.stockholmscenario.teleportation.PTCapacityAdjusmentPerSample;
+
 
 public class StockholmP0Controller {
 
 	public static void main(String[] args) {
-		String path = "H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\config - P0.xml";
+		String path = "./ihop2/matsim-input/config - P0.xml";
 //		String path = "H:\\Mike Work\\input\\config.xml";
 		Config config = ConfigUtils.loadConfig(path);
 		config.network().setTimeVariantNetwork(true);
@@ -32,13 +34,18 @@ public class StockholmP0Controller {
 		
 		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
 		StockholmP0Helper sth = new StockholmP0Helper(network);
-		List<String> timednodes = sth.getPretimedNodes("H:\\Matsim\\Stockholm Scenario\\teleportation\\input\\Nodes.csv");
+		String nodesfile = "./ihop2/matsim-input/Nodes.csv";
+		String pretimedxyxcords = "./ihop2/matsim-input/pretimedxyxcords.xy";
+		List<String> timednodes = sth.getPretimedNodes(nodesfile);
 //		List<String> timednodes = sth.getPretimedNodes("H:\\Mike Work\\input\\Nodes2Junctions.csv");
 		Map<String, List<Link>> incominglinks = sth.getInLinksForJunctions(timednodes, network);
 		Map<String, List<Link>> outgoinglinks = sth.getOutLinksForJunctions(timednodes, network);
+		sth.writePretimedNodesCoordinates(nodesfile,pretimedxyxcords);
+		
 		NetworkFactoryImpl nf = network.getFactory();
 		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
 		controler.addControlerListener(new StockholmP0ControlListener(scenario, (NetworkImpl) scenario.getNetwork(), incominglinks, outgoinglinks));
+		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 		controler.run();
 		
 	}
