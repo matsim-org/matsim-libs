@@ -29,7 +29,7 @@ import opdytsintegration.utils.TimeDiscretization;
 /**
  * Identifies the approximately best out of a set of decision variables.
  * 
- * @author Gunnar Flötteröd
+ * @author Muhammad Saleem based on Gunnar Flötteröd
  * 
  * @see DecisionVariable
  *
@@ -44,15 +44,14 @@ public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	private final MATSimStateFactory<U> stateFactory;
 
 	private final TimeDiscretization timeDiscretization;
-	
+
 	ArrayList<Double> times = new ArrayList<Double>();
 	ArrayList<Double> waitingpassengers = new ArrayList<Double>();
-	
+
 	// must be linked to ensure a unique iteration ordering
 	private LinkedHashSet<Id<TransitStopFacility>> relevantStopIds = null;
-	
-	private TransitSchedule schedule=null;
-	
+
+	private TransitSchedule schedule = null;
 
 	private int memory = 1;
 
@@ -81,15 +80,12 @@ public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 	/**
 	 * @see MATSimStateFactory
 	 */
-	public PTMATSimDecisionVariableSetEvaluator(
-			final TrajectorySampler<U> trajectorySampler,
-			final MATSimStateFactory<U> stateFactory,
-			final TimeDiscretization timeDiscretization,
-			final Collection<Id<TransitStopFacility>> relevantStopIds, 
-			TransitSchedule schedule) {
+	public PTMATSimDecisionVariableSetEvaluator(final TrajectorySampler<U> trajectorySampler,
+			final MATSimStateFactory<U> stateFactory, final TimeDiscretization timeDiscretization,
+			final Collection<Id<TransitStopFacility>> relevantStopIds, TransitSchedule schedule) {
 		this.trajectorySampler = trajectorySampler;
 		this.stateFactory = stateFactory;
-		this.schedule=schedule;
+		this.schedule = schedule;
 		this.timeDiscretization = timeDiscretization;
 		if (relevantStopIds == null) {
 			this.relevantStopIds = null;
@@ -203,31 +199,28 @@ public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 		}
 		this.stateList = new LinkedList<Vector>();
 
-		this.occupancyAnalyser = new PTOccupancyAnalyser(this.timeDiscretization,
-				this.relevantStopIds);
-		this.eventsManager.addHandler(this.occupancyAnalyser);		
+		this.occupancyAnalyser = new PTOccupancyAnalyser(this.timeDiscretization, this.relevantStopIds);
+		this.eventsManager.addHandler(this.occupancyAnalyser);
 
 		this.trajectorySampler.initialize();
 	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		
+
 		/*
 		 * (1) Extract the instantaneous state vector.
 		 */
 		final Vector newInstantaneousStateVector = new Vector(
-				this.relevantStopIds.size()
-						* this.timeDiscretization.getBinCnt());
+				this.relevantStopIds.size() * this.timeDiscretization.getBinCnt());
 		int i = 0;
 		for (Id<TransitStopFacility> stopId : this.relevantStopIds) {
 			for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
-				newInstantaneousStateVector.set(i++,
-						this.occupancyAnalyser.getOccupancy_veh(stopId, bin));
+				newInstantaneousStateVector.set(i++, this.occupancyAnalyser.getOccupancy_veh(stopId, bin));
 			}
-			
+
 		}
-		
+
 		/*
 		 * (2) Add instantaneous state vector to the list of past state vectors
 		 * and ensure that the size of this list is equal to what the memory

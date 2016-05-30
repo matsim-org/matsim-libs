@@ -20,10 +20,9 @@ import opdytsintegration.utils.TimeDiscretization;
 /**
  * Created by michaelzilske on 08/10/15.
  * 
- * Modified by Gunnar, starting in December 2015.
+ * @author Muhammad Saleem, based on Gunnar Flötteröd
  */
-public class PTMATSimSimulator<U extends DecisionVariable> implements
-		Simulator<U> {
+public class PTMATSimSimulator<U extends DecisionVariable> implements Simulator<U> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -38,17 +37,15 @@ public class PTMATSimSimulator<U extends DecisionVariable> implements
 	private AbstractModule[] modules = null;
 
 	private int nextControlerRun = 0;
-	
-//	Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities;
+
+	// Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities;
 
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 
 	// -------------------- CONSTRUCTOR --------------------
 
-	public PTMATSimSimulator(final MATSimStateFactory<U> stateFactory,
-			final Scenario scenario,
-			final TimeDiscretization timeDiscretization,
-			final Set<Id<TransitStopFacility>> relevantStopIds, 
+	public PTMATSimSimulator(final MATSimStateFactory<U> stateFactory, final Scenario scenario,
+			final TimeDiscretization timeDiscretization, final Set<Id<TransitStopFacility>> relevantStopIds,
 			final AbstractModule... modules) {
 		this.stateFactory = stateFactory;
 		this.scenario = scenario;
@@ -56,10 +53,8 @@ public class PTMATSimSimulator<U extends DecisionVariable> implements
 		this.relevantStopIds = relevantStopIds;
 		this.modules = modules;
 
-		final String outputDirectory = this.scenario.getConfig().controler()
-				.getOutputDirectory();
-		this.scenario.getConfig().controler()
-				.setOutputDirectory(outputDirectory + "_0");
+		final String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
+		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory + "_0");
 	}
 
 	// TODO NEW
@@ -78,21 +73,17 @@ public class PTMATSimSimulator<U extends DecisionVariable> implements
 		 * are overwritten each time, set iteration-specific output directory
 		 * names.
 		 */
-		String outputDirectory = this.scenario.getConfig().controler()
-				.getOutputDirectory();
-		outputDirectory = outputDirectory.substring(0,
-				outputDirectory.lastIndexOf("_"))
-				+ "_" + this.nextControlerRun;
-		this.scenario.getConfig().controler()
-				.setOutputDirectory(outputDirectory);
+		String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
+		outputDirectory = outputDirectory.substring(0, outputDirectory.lastIndexOf("_")) + "_" + this.nextControlerRun;
+		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory);
 
 		/*
 		 * (2) Create the MATSimDecisionVariableSetEvaluator that is supposed to
 		 * "optimize along" the MATSim run of this iteration.
 		 */
 		final PTMATSimDecisionVariableSetEvaluator<U> matsimDecisionVariableEvaluator = new PTMATSimDecisionVariableSetEvaluator<>(
-				trajectorySampler, this.stateFactory, this.timeDiscretization,
-				this.relevantStopIds, this.scenario.getTransitSchedule());
+				trajectorySampler, this.stateFactory, this.timeDiscretization, this.relevantStopIds,
+				this.scenario.getTransitSchedule());
 		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
 		// matsimDecisionVariableEvaluator.setStandardLogFileName("./opdyts.log");
 
@@ -124,8 +115,7 @@ public class PTMATSimSimulator<U extends DecisionVariable> implements
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				binder().requestInjection(
-						trajectorySampler.getObjectiveFunction());
+				binder().requestInjection(trajectorySampler.getObjectiveFunction());
 			}
 		});
 		controler.setTerminationCriterion(new TerminationCriterion() {
@@ -147,8 +137,7 @@ public class PTMATSimSimulator<U extends DecisionVariable> implements
 	}
 
 	@Override
-	public SimulatorState run(final TrajectorySampler<U> evaluator,
-			final SimulatorState initialState) {
+	public SimulatorState run(final TrajectorySampler<U> evaluator, final SimulatorState initialState) {
 		if (initialState != null) {
 			initialState.implementInSimulation();
 		}

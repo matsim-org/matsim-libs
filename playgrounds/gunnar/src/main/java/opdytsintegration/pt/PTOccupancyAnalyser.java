@@ -31,7 +31,8 @@ import opdytsintegration.utils.TimeDiscretization;
  * @author Mohammad Saleem
  *
  */
-public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler {
+public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler,
+		PersonEntersVehicleEventHandler, PersonStuckEventHandler {
 
 	// -------------------- MEMBERS --------------------
 
@@ -46,19 +47,23 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Trans
 
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
-	private final Map<Id<Person>, Id<TransitStopFacility>> personStops = new HashMap<>();//To maintain person to stop mapping
-	
-	
+	private final Map<Id<Person>, Id<TransitStopFacility>> personStops = new HashMap<>();// To
+																							// maintain
+																							// person
+																							// to
+																							// stop
+																							// mapping
+
 	// -------------------- CONSTRUCTION --------------------
 
 	public PTOccupancyAnalyser(final TimeDiscretization timeDiscretization,
 			final Set<Id<TransitStopFacility>> relevantStops) {
-		this(timeDiscretization.getStartTime_s(), timeDiscretization
-				.getBinSize_s(), timeDiscretization.getBinCnt(), relevantStops);
+		this(timeDiscretization.getStartTime_s(), timeDiscretization.getBinSize_s(), timeDiscretization.getBinCnt(),
+				relevantStops);
 	}
 
-	public PTOccupancyAnalyser(final int startTime_s, final int binSize_s,
-			final int binCnt, final Set<Id<TransitStopFacility>> relevantStops) {
+	public PTOccupancyAnalyser(final int startTime_s, final int binSize_s, final int binCnt,
+			final Set<Id<TransitStopFacility>> relevantStops) {
 		this.occupancies_veh = new DynamicData<>(startTime_s, binSize_s, binCnt);
 		this.relevantStops = relevantStops;
 		this.reset(-1);
@@ -68,8 +73,7 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Trans
 
 	private int lastCompletedBinEndTime() {
 		return this.occupancies_veh.getStartTime_s()
-				+ (this.lastCompletedBin + 1)
-				* this.occupancies_veh.getBinSize_s();
+				+ (this.lastCompletedBin + 1) * this.occupancies_veh.getBinSize_s();
 	}
 
 	private void completeBins(final int lastBinToComplete) {
@@ -78,9 +82,8 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Trans
 			final int lastCompletedBinEndTime = this.lastCompletedBinEndTime();
 			for (Map.Entry<Id<TransitStopFacility>, RecursiveCountAverage> stop2avgEntry : this.stop2avg.entrySet()) {
 				stop2avgEntry.getValue().advanceTo(lastCompletedBinEndTime);
-				this.occupancies_veh.put(stop2avgEntry.getKey(),
-						this.lastCompletedBin, stop2avgEntry.getValue()
-								.getAverage());
+				this.occupancies_veh.put(stop2avgEntry.getKey(), this.lastCompletedBin,
+						stop2avgEntry.getValue().getAverage());
 				stop2avgEntry.getValue().resetTime(lastCompletedBinEndTime);
 			}
 		}
@@ -88,8 +91,7 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Trans
 
 	private void advanceToTime(final int time_s) {
 		final int lastBinToComplete = this.occupancies_veh.bin(time_s) - 1;
-		this.completeBins(min(lastBinToComplete,
-				this.occupancies_veh.getBinCnt() - 1));
+		this.completeBins(min(lastBinToComplete, this.occupancies_veh.getBinCnt() - 1));
 	}
 
 	private RecursiveCountAverage avg(final Id<TransitStopFacility> stop) {
@@ -100,41 +102,43 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Trans
 		}
 		return avg;
 	}
+
 	private boolean relevant(Id<TransitStopFacility> stop) {
-		return ((this.relevantStops == null) || this.relevantStops
-				.contains(stop));
+		return ((this.relevantStops == null) || this.relevantStops.contains(stop));
 	}
 
 	private void registerEntry(final Id<Person> person, final Id<TransitStopFacility> stop, final int time_s) {
 		this.advanceToTime(time_s);
 		this.avg(stop).inc(time_s);
-		this.personStops.put(person, stop);//Register person against the stop
+		this.personStops.put(person, stop);// Register person against the stop
 
 	}
 
 	private void registerExit(final Id<Person> person, final Id<TransitStopFacility> stop, final int time_s) {
 		this.advanceToTime(time_s);
 		this.avg(stop).dec(time_s);
-		this.personStops.remove(person);//Remove person mapping to the stop
+		this.personStops.remove(person);// Remove person mapping to the stop
 	}
 
 	public void advanceToEnd() {
 		this.completeBins(this.occupancies_veh.getBinCnt() - 1);
 	}
 
-	 public Set<Id<TransitStopFacility>> observedStopSetView() {
-		 return Collections.unmodifiableSet(this.occupancies_veh.keySet());
-	 }
-	 
+	public Set<Id<TransitStopFacility>> observedStopSetView() {
+		return Collections.unmodifiableSet(this.occupancies_veh.keySet());
+	}
+
 	// -------------------- CONTENT ACCESS --------------------
 
 	public double getOccupancy_veh(final Id<TransitStopFacility> stop, final int bin) {
 		return this.occupancies_veh.getBinValue(stop, bin);
 	}
-	public int getTotalStuckOutsideStops(){
+
+	public int getTotalStuckOutsideStops() {
 		return this.totalStuck;
 	}
-	public int getTotalLeftOnStopsAtEnd(){
+
+	public int getTotalLeftOnStopsAtEnd() {
 		return this.personStops.size();
 	}
 	// ---------- IMPLEMENTATION OF *EventHandler INTERFACES ----------
@@ -152,31 +156,34 @@ public class PTOccupancyAnalyser implements AgentWaitingForPtEventHandler, Trans
 	@Override
 	public void handleEvent(AgentWaitingForPtEvent event) {
 		Id<TransitStopFacility> stopid = event.getWaitingAtStopId();
-		if(relevant(stopid)){
+		if (relevant(stopid)) {
 			this.registerEntry(event.getPersonId(), stopid, (int) event.getTime());
 		}
 	}
+
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		this.transitDrivers.add(event.getDriverId());
 		this.transitVehicles.add(event.getVehicleId());
 	}
-	
+
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (this.transitDrivers.contains(event.getPersonId()) || !this.transitVehicles.contains(event.getVehicleId())) {
-			return; // ignore transit drivers or persons entering non-transit vehicles
+			return; // ignore transit drivers or persons entering non-transit
+					// vehicles
 		}
 		Id<Person> personId = event.getPersonId();
 		Id<TransitStopFacility> stopId = personStops.get(event.getPersonId());
 		double time = event.getTime();
-		if(relevant(stopId)){
+		if (relevant(stopId)) {
 			this.registerExit(personId, stopId, (int) time);
 		}
 	}
 
 	@Override
-	public void handleEvent(PersonStuckEvent event) {//Just to check stuck people at the end
+	public void handleEvent(PersonStuckEvent event) {// Just to check stuck
+														// people at the end
 		totalStuck++;
 	}
 }
