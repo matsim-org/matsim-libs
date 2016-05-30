@@ -9,11 +9,6 @@
   <artifactId>gunnar</artifactId>
   <name>gunnar</name>
   <dependencies>
-     <dependency>
-  		<groupId>floetteroed.opdyts</groupId>
-  		<artifactId>opdyts</artifactId>
-  		<version>1.0.0</version>
-  	</dependency>
   	  	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>roadpricing</artifactId>
@@ -26,6 +21,16 @@
      	<version>3.4.1</version>
      </dependency>
 
+    <dependency>
+    	<groupId>floetteroed.utilities</groupId>
+    	<artifactId>floetteroed-utilities</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>floetteroed.opdyts</groupId>
+    	<artifactId>opdyts</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
   </dependencies>  
   
 </project>
