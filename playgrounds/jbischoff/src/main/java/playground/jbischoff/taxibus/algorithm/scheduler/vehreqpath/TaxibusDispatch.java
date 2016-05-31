@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -34,29 +35,25 @@ import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusRequest.TaxibusRequestStatus;
 
 
-public class TaxibusVehicleRequestPath 
+public class TaxibusDispatch 
 {
     public final Vehicle vehicle;
     public final Set<TaxibusRequest> requests;
     public final ArrayList<VrpPathWithTravelData> path;
-    private Double t0 = null;
-    private Double arrivalTime = null;
-    private Link initialDestination = null;
+ 
     private double earliestNextDeparture = 0;
     
     double twMax;
     
-    public TaxibusVehicleRequestPath(Vehicle vehicle, TaxibusRequest request, VrpPathWithTravelData path)
+    public TaxibusDispatch(Vehicle vehicle, TaxibusRequest request, VrpPathWithTravelData path)
     {
     	this.requests = new LinkedHashSet<>();
     	this.path = new ArrayList<>();
     	this.requests.add(request);
         this.vehicle = vehicle;
         this.path.add(path);
-        this.t0 = request.getT0();
-        this.arrivalTime = path.getArrivalTime();
         this.earliestNextDeparture = Math.max(request.getT0(), path.getArrivalTime());
-        this.initialDestination = request.getToLink();
+        
         
     }
     
@@ -100,11 +97,15 @@ public class TaxibusVehicleRequestPath
 		}
 	}
 	
-	
-	
-	
-	
-	
+	public void failIfRequestNotUnplannedOrDispatched(){
+		for (TaxibusRequest request : this.requests){
+			 if (request.getStatus() != TaxibusRequestStatus.UNPLANNED){
+				 if	(request.getStatus() != TaxibusRequestStatus.DISPATCHED) {
+				Logger.getLogger(getClass()).error(request.toString() + " S: "+request.getStatus() );
+	            throw new IllegalStateException();
+	        }}
+		}
+	}
 	
     public TreeSet<TaxibusRequest> getPickUpsForLink(Link link){
     	TreeSet<TaxibusRequest> beginningRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);

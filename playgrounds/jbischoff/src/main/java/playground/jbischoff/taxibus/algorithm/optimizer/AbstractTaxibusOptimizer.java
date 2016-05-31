@@ -20,7 +20,6 @@
 package playground.jbischoff.taxibus.algorithm.optimizer;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.TreeSet;
 
 import org.matsim.contrib.dvrp.data.Request;
@@ -68,14 +67,12 @@ public abstract class AbstractTaxibusOptimizer
     	}
     	
         if (requiresReoptimization) {
-            if (doUnscheduleAwaitingRequests) {
-                unscheduleAwaitingRequests();
-            }
+            
 
             for (Vehicle v : optimContext.vrpData.getVehicles().values()) {
                 optimContext.scheduler.updateTimeline((Schedule<TaxibusTask>) v.getSchedule());
             }
-            if (e.getSimulationTime() % 60 == 0){
+            if (e.getSimulationTime() % 1 == 0){
             scheduleUnplannedRequests();
             }
             if (doUnscheduleAwaitingRequests && vehicleDiversion) {
@@ -87,12 +84,7 @@ public abstract class AbstractTaxibusOptimizer
     }
 
 
-    protected void unscheduleAwaitingRequests()
-    {
-        List<TaxibusRequest> removedRequests = optimContext.scheduler
-                .removeAwaitingRequestsFromAllSchedules();
-        unplannedRequests.addAll(removedRequests);
-    }
+ 
 
 
     protected abstract void scheduleUnplannedRequests();
@@ -115,10 +107,11 @@ public abstract class AbstractTaxibusOptimizer
     @Override
     public void nextTask(Schedule<? extends Task> schedule)
     {
-        Schedule<TaxibusTask> taxiSchedule = (Schedule<TaxibusTask>) schedule;
-        optimContext.scheduler.updateBeforeNextTask(taxiSchedule);
+        @SuppressWarnings("unchecked")
+		Schedule<TaxibusTask> taxibusSchedule = (Schedule<TaxibusTask>) schedule;
+        optimContext.scheduler.updateBeforeNextTask(taxibusSchedule);
 
-        TaxibusTask newCurrentTask = taxiSchedule.nextTask();
+        TaxibusTask newCurrentTask = taxibusSchedule.nextTask();
 
         if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
             requiresReoptimization = doReoptimizeAfterNextTask(newCurrentTask);
