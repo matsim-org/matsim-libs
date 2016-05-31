@@ -3,6 +3,8 @@ package saleem.stockholmscenario.teleportation.ptoptimisation;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import opdytsintegration.pt.PTState;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -10,7 +12,7 @@ import org.matsim.api.core.v01.population.Plan;
 
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.SimulatorState;
-import opdytsintegration.pt.PTState;
+
 
 /**
  * Returns the negative sum of the scores of the selected plans of all agents,

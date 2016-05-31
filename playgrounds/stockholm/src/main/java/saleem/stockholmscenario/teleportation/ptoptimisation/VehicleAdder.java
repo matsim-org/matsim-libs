@@ -60,6 +60,7 @@ public class VehicleAdder {
 			ArrayList<Id<Departure>> depadded = new ArrayList<Id<Departure>>();
 			departures = dtm.sortDepartures(departures);//Sort as per time
 			int size = departures.size();
+			Map<Id<Vehicle>, Vehicle> vehinstances = vehicles.getVehicles();
 			for(int i=1;i<size;i++) {//For each departure, there is a "fraction" percent chance to add a new departure
 				if(Math.random()<=fraction){
 					Id<Vehicle> vehid= Id.create("VehAdded"+(int)Math.floor(1000000 * Math.random()), Vehicle.class);

@@ -1,15 +1,17 @@
 package saleem.stockholmscenario.teleportation.ptoptimisation.integration;
 
-import org.matsim.api.core.v01.population.Population;
-
-import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimState;
 import opdytsintegration.MATSimStateFactory;
 import opdytsintegration.pt.PTState;
 import opdytsintegration.utils.TimeDiscretization;
-import saleem.stockholmscenario.teleportation.ptoptimisation.PTSchedule;
 
-public class PTStateFactory implements MATSimStateFactory<PTSchedule>{
+import org.matsim.api.core.v01.population.Population;
+
+import floetteroed.opdyts.DecisionVariable;
+import floetteroed.utilities.math.Vector;
+
+
+public class PTStateFactory implements MATSimStateFactory<DecisionVariable>{
 	private final TimeDiscretization timeDiscretization;
 	private final double occupancyScale;
 
@@ -20,7 +22,7 @@ public class PTStateFactory implements MATSimStateFactory<PTSchedule>{
 	}
 
 	public MATSimState newState(final Population population,
-			final Vector stateVector, final PTSchedule decisionVariable) {
+			final Vector stateVector, final DecisionVariable decisionVariable) {
 			return new PTState(population, stateVector, this.occupancyScale);
 	}
 }
