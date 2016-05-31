@@ -19,14 +19,15 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.analysis;
+package playground.boescpa.analysis.populationAnalysis;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
-import playground.boescpa.lib.tools.PopulationUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -34,42 +35,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * WHAT IS IT FOR?
+ * Analyses trip duration and length for a given plans-file.
  *
  * @author boescpa
  */
-public class PopulationAnalyzer {
-	private final static Logger log = Logger.getLogger(PopulationAnalyzer.class);
+public class TripAnalyzer extends PopulationAnalyzer {
 
-	private final Population population;
 	private final Map<String, long[]> distanceSums = new HashMap<>();
 	private final Map<String, long[]> travelTimes = new HashMap<>();
+	private final String activityType;
 
-	private PopulationAnalyzer(Population population) {
-		this.population = population;
+	public TripAnalyzer(final String activityType) {
+		this.activityType = activityType;
 	}
 
 	public static void main(final String[] args) {
 		final String pop2bAnalyzed = args[0];
 		final String resultsDest = args[1];
-		Population population = PopulationUtils.readPopulation(pop2bAnalyzed);
-		PopulationAnalyzer analyzer = new PopulationAnalyzer(population);
-		analyzer.analyzePopulation();
-		analyzer.writeResults(resultsDest);
+		final String actTypeToAnalyze = args.length > 2 ? args[2] : null;
+		TripAnalyzer tripAnalyzer = new TripAnalyzer(actTypeToAnalyze);
+		PopulationAnalyzer.analyzePopulation(tripAnalyzer, pop2bAnalyzed, resultsDest);
 	}
 
-	private void analyzePopulation() {
-		this.population.getPersons().values().parallelStream().forEach(this::analyzeAgent);
-	}
-
-	private void analyzeAgent(Person person) {
+	@Override
+	final protected void analyzeAgent(Person person) {
 		double formerActEndTime = 0;
 		String mode = null;
 		Coord formerActCoord = null;
 		for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
-				if (activity.getType().equals("work")) {
+				if (activityType == null || activity.getType().equals(activityType)) {
 					classifyTravelTime("total", activity.getStartTime()-formerActEndTime);
 					classifyTravelDist("total", 1.44*CoordUtils.calcEuclideanDistance(formerActCoord, activity.getCoord()));
 					classifyTravelTime(mode, activity.getStartTime()-formerActEndTime);
@@ -124,9 +120,16 @@ public class PopulationAnalyzer {
 		}
 	}
 
-	private void writeResults(String resultsDest) {
+	@Override
+	final protected void writeResults(String resultsDest) {
 		BufferedWriter writer = IOUtils.getBufferedWriter(resultsDest);
 		try {
+			if (activityType == null) {
+				writer.write("TRIP ANALYSIS FOR ALL ACTIVITIES");
+			} else {
+				writer.write("TRIP ANALYSIS FOR " + activityType.toUpperCase() + "-TRIPS");
+			}
+			writer.newLine();
 			for (String mode : distanceSums.keySet()) {
 				log.info(getModeString(mode));
 				writer.newLine();
