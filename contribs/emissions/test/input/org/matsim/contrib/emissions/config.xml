@@ -4,23 +4,7 @@
 
 <!-- ====================================================================== -->
 
-	<module name="TimeAllocationMutator" >
-		<param name="mutationAffectsDuration" value="true" />
-
-		<!-- Default:1800.0; Defines how many seconds a time mutation can maximally shift a time. -->
-		<param name="mutationRange" value="1800.0" />
-	</module>
-
-<!-- ====================================================================== -->
-
 	<module name="controler" >
-
-		<!-- Default=false;  -->
-		<param name="enableLinkToLinkRouting" value="false" />
-
-		<!-- Default=xml; Specifies the file format for writing events. Currently supported: txt, xml.
-		Multiple values can be specified separated by commas (','). -->
-		<param name="eventsFileFormat" value="xml" />
 
 		<!-- Default=0;  -->
 		<param name="firstIteration" value="0" />
@@ -28,21 +12,7 @@
 		<!-- Default=1000;  -->
 		<param name="lastIteration" value="5" />
 
-		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim 
-		Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
-		For 'qsim', add a module 'qsim' to the config. -->
-		<param name="mobsim" value="qsim" />
-
 		<param name="outputDirectory" value="./test/output/" />
-
-		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks -->
-		<param name="routingAlgorithmType" value="Dijkstra" />
-
-		<!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
-		<param name="runId" value="null" />
-
-		<!-- Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'. -->
-		<param name="snapshotFormat" value="" />
 
 		<!-- iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely. -->
 		<!-- <param name="writeEventsInterval" value="10" /> -->
@@ -52,40 +22,6 @@
 		<!-- <param name="writePlansInterval" value="10" /> -->
 		<param name="writePlansInterval" value="5" />
 
-		<!-- iterationNumber % writeSnapshotsInterval == 0 defines in which iterations snapshots are written to a file. `0' disables snapshots writing completely -->
-		<param name="writeSnapshotsInterval" value="1" />
-	</module>
-
-<!-- ====================================================================== -->
-
-	<module name="counts" >
-
-		<!-- Transport modes that will be respected for the counts comparison. 'car' is default, which includes also bussed from the pt simulation module. Use this parameter in combination with 'filterModes' = true! -->
-		<param name="analyzedModes" value="car" />
-
-		<!-- Specifies over how many iterations the link volumes should be averaged that are used for the counts comparison. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for writeCountsInterval -->
-		<param name="averageCountsOverIterations" value="5" />
-
-		<!-- factor by which to re-scale the simulated values.  necessary when simulation runs with something different from 100%.  needs to be adapted manually -->
-		<param name="countsScaleFactor" value="1.0" />
-
-		<!-- distance to distanceFilterCenterNode to include counting stations. The unit of distance is the Euclidean distance implied by the coordinate system -->
-		<param name="distanceFilter" value="null" />
-
-		<!-- node id for center node of distance filter -->
-		<param name="distanceFilterCenterNode" value="null" />
-
-		<!-- If true, link counts from legs performed on modes not included in the 'analyzedModes' parameter are ignored. -->
-		<param name="filterModes" value="false" />
-
-		<!-- input file name to counts package -->
-		<param name="inputCountsFile" value="null" />
-
-		<!-- possible values: `html', `kml', `txt', `all' -->
-		<param name="outputformat" value="txt" />
-
-		<!-- Specifies how often the counts comparison should be calculated and written. -->
-		<param name="writeCountsInterval" value="10" />
 	</module>
 
 <!-- ====================================================================== -->
