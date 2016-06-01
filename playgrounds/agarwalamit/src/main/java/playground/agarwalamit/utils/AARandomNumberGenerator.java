@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
+ * A class to generate random numbers for given discrete probability distribution.
  * @author amit
  */
 
@@ -47,6 +48,7 @@ public class AARandomNumberGenerator {
 	}
 
 	public static void main(String[] args) {
+		// a small example
 		SortedMap<String, Double> xs = new TreeMap<>();
 		xs.put("HBW", 0.45);
 		xs.put("HBE", 0.34);
@@ -57,8 +59,7 @@ public class AARandomNumberGenerator {
 		int upperBound = 42;
 		int totalRequiredNumber = 10;
 		
-		AARandomNumberGenerator rng = new AARandomNumberGenerator(xs);
-		SortedMap<String, List<Integer> > ns = rng.getRandomNumbers(lowerBound, upperBound, totalRequiredNumber);
+		SortedMap<String, List<Integer> > ns = new AARandomNumberGenerator(xs).getRandomNumbers(lowerBound, upperBound, totalRequiredNumber);
 		
 		for (String s : ns.keySet()){
 			System.out.println("For string " +s+ " the zones are "+ ns.get(s).toString());
@@ -66,9 +67,15 @@ public class AARandomNumberGenerator {
 	}
 	
 	
-	public SortedMap<String, List<Integer> > getRandomNumbers(final int lowerBound, final int upperBound, final int numberOfCountsForRandomNumbers){
+	/**
+	 * @param lowerBound
+	 * @param upperBound
+	 * @param requiredRandomNumbers higher is number ==> better is the distribution
+	 * @return
+	 */
+	public SortedMap<String, List<Integer> > getRandomNumbers(final int lowerBound, final int upperBound, final int requiredRandomNumbers){
 		
-		for (int i = 0 ; i < numberOfCountsForRandomNumbers; i++){
+		for (int i = 0 ; i < requiredRandomNumbers; i++){
 			processBoundsAndReturnRndNr(lowerBound, upperBound);
 		}
 		
@@ -87,7 +94,7 @@ public class AARandomNumberGenerator {
 			
 			if (rndPortion <= e.getValue()) { // found interval
 				
-				if(group2RandomNumbers.get(e.getKey())!=null) {// already exists
+				if (group2RandomNumbers.get(e.getKey())!=null) {// already exists
 					group2RandomNumbers.get(e.getKey()).add(rndNrInRange);
 				} else { // first element in the list
 					List<Integer> l  = new ArrayList<>();
