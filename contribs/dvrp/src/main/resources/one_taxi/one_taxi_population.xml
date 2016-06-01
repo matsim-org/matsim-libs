@@ -5,103 +5,103 @@
 
 <!-- ====================================================================== -->
 
-	<person id="taxi_passenger_0" employed="no">
+	<person id="passenger_0" employed="no">
 		<plan selected="yes">
-			<act type="work" link="114" end_time="00:00:00" />
+			<act type="dummy" link="114" end_time="00:00:00" />
 			<leg mode="taxi" dep_time="00:00:00" trav_time="00:01:00" arr_time="00:01:00">
 				<route/>
 			</leg> 
-			<act type="home" link="349"/>
+			<act type="dummy" link="349"/>
 		</plan>
 	</person>
 
-	<person id="taxi_passenger_1" employed="no">
+	<person id="passenger_1" employed="no">
 		<plan selected="yes">
-			<act type="work" link="144" end_time="00:05:00" />
+			<act type="dummy" link="144" end_time="00:05:00" />
 			<leg mode="taxi" dep_time="00:05:00" trav_time="00:01:00" arr_time="00:06:00">
 				<route/>
 			</leg> 
-			<act type="home" link="437"/>
+			<act type="dummy" link="437"/>
 		</plan>
 	</person>
 
-	<person id="taxi_passenger_2" employed="no">
+	<person id="passenger_2" employed="no">
 		<plan selected="yes">
-			<act type="work" link="223" end_time="00:10:00" />
+			<act type="dummy" link="223" end_time="00:10:00" />
 			<leg mode="taxi" dep_time="00:10:00" trav_time="00:01:00" arr_time="00:11:00">
 				<route/>
 			</leg> 
-			<act type="home" link="347"/>
+			<act type="dummy" link="347"/>
 		</plan>
 	</person>
 
-	<person id="taxi_passenger_3" employed="no">
+	<person id="passenger_3" employed="no">
 		<plan selected="yes">
-			<act type="work" link="234" end_time="00:15:00" />
+			<act type="dummy" link="234" end_time="00:15:00" />
 			<leg mode="taxi" dep_time="00:15:00" trav_time="00:01:00" arr_time="00:16:00">
 				<route/>
 			</leg> 
-			<act type="home" link="119"/>
+			<act type="dummy" link="119"/>
 		</plan>
 	</person>
 
-	<person id="taxi_passenger_4" employed="no">
+	<person id="passenger_4" employed="no">
 		<plan selected="yes">
-			<act type="work" link="314" end_time="00:20:00" />
+			<act type="dummy" link="314" end_time="00:20:00" />
 			<leg mode="taxi" dep_time="00:20:00" trav_time="00:01:00" arr_time="00:21:00">
 				<route/>
 			</leg> 
-			<act type="home" link="260"/>
+			<act type="dummy" link="260"/>
 		</plan>
 	</person>
 
-	<person id="taxi_passenger_5" employed="no">
+	<person id="passenger_5" employed="no">
 		<plan selected="yes">
-			<act type="work" link="333" end_time="00:25:00" />
+			<act type="dummy" link="333" end_time="00:25:00" />
 			<leg mode="taxi" dep_time="00:25:00" trav_time="00:01:00" arr_time="00:26:00">
 				<route/>
 			</leg> 
-			<act type="home" link="438"/>
+			<act type="dummy" link="438"/>
 		</plan>
 	</person>
 
-	<person id="taxi_passenger_6" employed="no">
+	<person id="passenger_6" employed="no">
 		<plan selected="yes">
-			<act type="work" link="325" end_time="00:30:00" />
+			<act type="dummy" link="325" end_time="00:30:00" />
 			<leg mode="taxi" dep_time="00:30:00" trav_time="00:01:00" arr_time="00:31:00">
 				<route/>
 			</leg> 
-			<act type="home" link="111"/>
+			<act type="dummy" link="111"/>
 		</plan>
 	</person>
 
-	<person id="taxi_passenger_7" employed="no">
+	<person id="passenger_7" employed="no">
 		<plan selected="yes">
-			<act type="work" link="412" end_time="00:35:00" />
+			<act type="dummy" link="412" end_time="00:35:00" />
 			<leg mode="taxi" dep_time="00:35:00" trav_time="00:01:00" arr_time="00:36:00">
 				<route/>
 			</leg> 
-			<act type="home" link="318"/>
+			<act type="dummy" link="318"/>
 		</plan>
 	</person>
 
-	<person id="taxi_passenger_8" employed="no">
+	<person id="passenger_8" employed="no">
 		<plan selected="yes">
-			<act type="work" link="455" end_time="00:40:00" />
+			<act type="dummy" link="455" end_time="00:40:00" />
 			<leg mode="taxi" dep_time="00:40:00" trav_time="00:01:00" arr_time="00:41:00">
 				<route/>
 			</leg> 
-			<act type="home" link="236"/>
+			<act type="dummy" link="236"/>
 		</plan>
 	</person>
 
-	<person id="taxi_passenger_9" employed="no">
+	<person id="passenger_9" employed="no">
 		<plan selected="yes">
-			<act type="work" link="139" end_time="00:45:00" />
+			<act type="dummy" link="139" end_time="00:45:00" />
 			<leg mode="taxi" dep_time="00:45:00" trav_time="00:01:00" arr_time="00:46:00">
 				<route/>
 			</leg> 
-			<act type="home" link="330"/>
+			<act type="dummy" link="330"/>
 		</plan>
 	</person>
 

@@ -35,12 +35,12 @@ import org.matsim.contrib.signals.model.SignalSystem;
 public abstract class DgAbstractSignalController implements SignalController {
 
 	protected SignalSystem system = null;
-	protected Map<Id, SignalPlan> signalPlans = new HashMap<Id, SignalPlan>();
+	protected Map<Id<SignalPlan>, SignalPlan> signalPlans = new HashMap<>();
 
 	
 	@Override
 	public void addPlan(SignalPlan plan) {
-		this.signalPlans .put(plan.getId(), plan);
+		this.signalPlans.put(plan.getId(), plan);
 	}
 
 	@Override

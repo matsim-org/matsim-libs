@@ -23,7 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -38,10 +38,10 @@ public class BerlinNetworkChangeEvents
     public static void filterEventsWithinBerlin(String allChangeEventsFile,
             String berlinChangeEventsFile)
     {
-        Scenario berlinBrbScenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario berlinBrbScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(berlinBrbScenario.getNetwork()).readFile(BERLIN_BRB_NET_FILE);
 
-        Scenario onlyBerlinScenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario onlyBerlinScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(onlyBerlinScenario.getNetwork()).readFile(ONLY_BERLIN_NET_FILE);
 
         List<NetworkChangeEvent> berlinBrbEvents = new NetworkChangeEventsParser(

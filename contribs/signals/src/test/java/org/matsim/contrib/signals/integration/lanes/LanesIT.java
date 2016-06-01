@@ -42,7 +42,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
 import org.matsim.testcases.MatsimTestUtils;
@@ -143,6 +143,11 @@ public class LanesIT {
 			 * to link 35 with 1200 veh/h (approx. 33.3 %)
 			 * to link 36 with 1800 veh/h to link 36 (approx. 50 %).
 			 */
+			
+			log.info( "link34:" + percent34 );
+			log.info( "link35:" + percent35 );
+			log.info( "link36:" + percent36 );
+			
 //			Assert.assertTrue("", (15.5 < percent34 && percent34 < 17.5));
 //			Assert.assertTrue("", (32.5 < percent35 && percent35 < 34.5));
 //			Assert.assertTrue("", (49.0 < percent36 && percent36 < 51.0));
@@ -151,6 +156,7 @@ public class LanesIT {
 			Assert.assertTrue("", (17.4 < percent34 && percent34 < 17.5));
 			Assert.assertTrue("", (34.5 < percent35 && percent35 < 34.6));
 			Assert.assertTrue("", (47.9 < percent36 && percent36 < 48.0));
+
 		}
 	}
 

@@ -7,7 +7,6 @@ public class ExperiencedPlansModule extends AbstractModule {
 	@Override
 	public void install() {
 		install(new ExperiencedPlanElementsModule());
-		bind(ScoringFunctionsForPopulation.class).asEagerSingleton();
-		bind(ExperiencedPlansService.class).to(ScoringFunctionsForPopulation.class);
+		bind(ExperiencedPlansService.class).to(ExperiencedPlansServiceImpl.class).asEagerSingleton();
 	}
 }

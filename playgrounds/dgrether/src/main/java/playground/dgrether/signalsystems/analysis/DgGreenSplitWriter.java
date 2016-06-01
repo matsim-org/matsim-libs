@@ -25,9 +25,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 
 
 /**
@@ -54,9 +56,9 @@ public class DgGreenSplitWriter {
 		String header = createHeader();
 		writer.append(header);
 		
-		for (Id ssid : greenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
-			Map<Id, DgSignalGroupAnalysisData> signalGroupMap = greenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap();
-			for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGroupMap.entrySet()) {
+		for (Id<SignalSystem> ssid : greenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
+			Map<Id<SignalGroup>, DgSignalGroupAnalysisData> signalGroupMap = greenSplitHandler.getSystemIdAnalysisDataMap().get(ssid).getSystemGroupAnalysisDataMap();
+			for (Entry<Id<SignalGroup>, DgSignalGroupAnalysisData> entry : signalGroupMap.entrySet()) {
 				// logg.info("for signalgroup: "+entry.getKey());
 				for (Entry<SignalGroupState, Double> ee : entry.getValue().getStateTimeMap().entrySet()) {
 					// logg.info(ee.getKey()+": "+ee.getValue());

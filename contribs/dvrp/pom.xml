@@ -1,50 +1,51 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <groupId>org.matsim</groupId>
-    <artifactId>contrib</artifactId>
-    <version>0.8.0-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.matsim.contrib</groupId>
-  <artifactId>dvrp</artifactId>
-  <name>dvrp</name>
-  
-  	<dependencies>
-  	
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>org.matsim</groupId>
+		<artifactId>contrib</artifactId>
+		<version>0.9.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.matsim.contrib</groupId>
+	<artifactId>dvrp</artifactId>
+	<name>dvrp</name>
+
+	<dependencies>
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.4</version>
 		</dependency>
 
-  		<dependency>
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>19.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.freehep</groupId>
 			<artifactId>freehep-graphics2d</artifactId>
 			<version>2.4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.freehep</groupId>
 			<artifactId>freehep-graphicsio-emf</artifactId>
 			<version>2.4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.freehep</groupId>
 			<artifactId>freehep-graphicsio</artifactId>
 			<version>2.4</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -53,7 +54,13 @@
 			<artifactId>commons-math3</artifactId>
 			<version>3.5</version>
 		</dependency>
-  	
-   	</dependencies>
-  
+
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>3.7</version>
+		</dependency>
+
+	</dependencies>
+
 </project>

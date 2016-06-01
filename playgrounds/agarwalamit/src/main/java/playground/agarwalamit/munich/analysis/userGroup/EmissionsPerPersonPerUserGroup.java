@@ -34,9 +34,9 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.emission.EmissionCostFactors;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.benjamin.internalization.EmissionCostFactors;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 

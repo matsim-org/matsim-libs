@@ -35,8 +35,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
@@ -106,15 +108,20 @@ class FareRoutingTestScenario {
 			System.out.println("person " + p.getId().toString() + " planned to go ");
 			Coord from, to;
 			Double departureTime;
-			from = ((Activity) plan.getPlanElements().get(0)).getCoord();
-			to = ((Activity) plan.getPlanElements().get(2)).getCoord();
+			final Activity fromAct = (Activity) plan.getPlanElements().get(0);
+			from = fromAct.getCoord();
+			final Activity toAct = (Activity) plan.getPlanElements().get(2);
+			to = toAct.getCoord();
 			departureTime = ((Leg) plan.getPlanElements().get(1)).getDepartureTime();
 			System.out.println("from " + from.toString()  + " to "+ to.toString() + " at " + departureTime);
 			System.out.println(p.getCustomAttributes().toString());
 			System.out.println();
 			System.out.println("he realized:");
 			
-			for(Leg leg : router.calcRoute(from, to, departureTime, p)){
+			Facility fromFac = new ActivityWrapperFacility( fromAct ) ;
+			Facility toFac = new ActivityWrapperFacility( toAct ) ;
+			
+			for(Leg leg : router.calcRoute(fromFac, toFac, departureTime, p)){
 				System.out.println(leg.toString());
 			}
 			System.out.println();

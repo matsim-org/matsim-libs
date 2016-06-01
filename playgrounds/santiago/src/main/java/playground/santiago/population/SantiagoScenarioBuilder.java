@@ -98,7 +98,7 @@ public class SantiagoScenarioBuilder {
 	
 //	final String pathForMatsim = "../../../runs-svn/santiago/run20/";
 //	final boolean prepareForModeChoice = false;
-	final String pathForMatsim = "../../../runs-svn/santiago/run34/";
+	final String pathForMatsim = "../../../runs-svn/santiago/casoBase10_NP/";
 	final boolean prepareForModeChoice = true;
 	
 	final int writeStuffInterval = 50;
@@ -107,6 +107,9 @@ public class SantiagoScenarioBuilder {
 	final String svnWorkingDir = "../../../shared-svn/projects/santiago/scenario/";
 	final String boundariesInputDir = svnWorkingDir + "inputFromElsewhere/exported_boundaries/";
 	final String databaseFilesDir = svnWorkingDir + "inputFromElsewhere/exportedFilesFromDatabase/";
+	final String allTogether = databaseFilesDir + "All/Original/";
+	final String Normal = databaseFilesDir + "Normal/";
+	final String Summer = databaseFilesDir + "Summer/";
 	final String outputDir = svnWorkingDir + "inputForMATSim/";
 	
 	final String popA0eAX = "A0equalAX";		//Population with first Activity = last Activity
@@ -141,11 +144,11 @@ public class SantiagoScenarioBuilder {
 		CSVToPlans converter = new CSVToPlans(config,
 											  outputDir + "plans/",
 											  boundariesInputDir + "Boundaries_20150428_085038.shp");
-		converter.run(databaseFilesDir + "Hogar.csv",
-					  databaseFilesDir + "Persona.csv",
-					  databaseFilesDir + "Export_Viaje.csv",
-					  databaseFilesDir + "Etapa.csv",
-					  databaseFilesDir + "comunas.csv");
+		converter.run(Normal + "Hogar.csv",
+					  Normal + "Persona.csv",
+					  Normal + "Export_Viaje.csv",
+					  Normal + "Etapa.csv",
+					  Normal + "comunas.csv");
 		
 		Scenario scenarioFromEOD = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(scenarioFromEOD).readFile(outputDir + "plans/plans_eod.xml.gz");
@@ -162,49 +165,49 @@ public class SantiagoScenarioBuilder {
 		double sampleSizeEOD = populationMap.get(popA0eAX).getPersons().size() + populationMap.get(popA0neAX).getPersons().size(); 
 		
 		Scenario scenarioTmp = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population populationTmp = scenarioTmp.getPopulation();
+
 		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0eAx_coords_beforeMidnight.xml.gz");
 		new MatsimPopulationReader(scenarioTmp).readFile(outputDir + "plans/plans_cropped_A0neAx_coords_beforeMidnight.xml.gz");
-		
-		randomizeEndTimes(populationTmp);
+		Population populationTmp = scenarioTmp.getPopulation();
+		//randomizeEndTimes(populationTmp);
 		
 		//finish population
-		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
-		aap.run();
+//		ActivityClassifier aap = new ActivityClassifier(scenarioTmp);
+//		aap.run();
 
 		//add here so the end times will not be randomized
-		addFreightPop(aap.getOutPop());
+		addFreightPop(/*aap.getOutPop()*/populationTmp);
 		
-		new PopulationWriter(aap.getOutPop()).write(outputDir + "plans/plans_final.xml.gz");
+		new PopulationWriter(/*aap.getOutPop()*/populationTmp).write(outputDir + "plans/plans_final.xml.gz");
 				
 		//finish config
-		SortedMap<String, Double> acts = aap.getActivityType2TypicalDuration();
-		setActivityParams(acts, config);
+//		SortedMap<String, Double> acts = aap.getActivityType2TypicalDuration();
+//		setActivityParams(acts, config);
 
 		setCountsParameters(config.counts(), sampleSizeEOD);
 		setQSimParameters(config.qsim(), sampleSizeEOD);
 		new ConfigWriter(config).write(outputDir + "config_final.xml");
 	}
 
-	private void setActivityParams(SortedMap<String, Double> acts, Config config) {
-		for(String act :acts.keySet()){
-			if(act.equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
-				//do nothing
-			} else {
-				ActivityParams params = new ActivityParams();
-				params.setActivityType(act);
-				params.setTypicalDuration(acts.get(act));
-				// Minimum duration is now specified by typical duration.
-//				params.setMinimalDuration(acts.get(act).getSecond());
-				params.setClosingTime(Time.UNDEFINED_TIME);
-				params.setEarliestEndTime(Time.UNDEFINED_TIME);
-				params.setLatestStartTime(Time.UNDEFINED_TIME);
-				params.setOpeningTime(Time.UNDEFINED_TIME);
-				params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
-				config.planCalcScore().addActivityParams(params);
-			}
-		}
-	}
+//	private void setActivityParams(SortedMap<String, Double> acts, Config config) {
+//		for(String act :acts.keySet()){
+//			if(act.equals(PtConstants.TRANSIT_ACTIVITY_TYPE)){
+//				//do nothing
+//			} else {
+//				ActivityParams params = new ActivityParams();
+//				params.setActivityType(act);
+//				params.setTypicalDuration(acts.get(act));
+//				// Minimum duration is now specified by typical duration.
+////				params.setMinimalDuration(acts.get(act).getSecond());
+//				params.setClosingTime(Time.UNDEFINED_TIME);
+//				params.setEarliestEndTime(Time.UNDEFINED_TIME);
+//				params.setLatestStartTime(Time.UNDEFINED_TIME);
+//				params.setOpeningTime(Time.UNDEFINED_TIME);
+//				params.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.relative);
+//				config.planCalcScore().addActivityParams(params);
+//			}
+//		}
+//	}
 
 	/**
 	 * Freight traffic will only be added to population if file exists. Otherwise do nothing.
@@ -647,7 +650,7 @@ public class SantiagoScenarioBuilder {
 	}
 	
 	private void setNetworkParameters(NetworkConfigGroup net){
-		net.setChangeEventInputFile(null);
+		net.setChangeEventsInputFile(null);
 		net.setInputFile(pathForMatsim + "input/network_merged_cl.xml.gz");
 		net.setLaneDefinitionsFile(null);
 		net.setTimeVariantNetwork(false);

@@ -37,6 +37,7 @@ import java.util.*;
 
 class NewControler extends AbstractController implements ControlerI {
 
+	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger(NewControler.class);
 
 	private final Config config;
@@ -54,8 +55,8 @@ class NewControler extends AbstractController implements ControlerI {
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
 
 	@Inject
-	NewControler(Config config, MatsimServices matsimServices, IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling, PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider, PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd, Set<ControlerListener> controlerListenersDeclaredByModules, Collection<Provider<MobsimListener>> mobsimListeners, ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy outputDirectoryHierarchy) {
-		super(stopWatch, matsimServices);
+	NewControler(Config config, ControlerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices, IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling, PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider, PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd, Set<ControlerListener> controlerListenersDeclaredByModules, Collection<Provider<MobsimListener>> mobsimListeners, ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy outputDirectoryHierarchy) {
+		super(controlerListenerManager, stopWatch, matsimServices);
 		this.config = config;
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		this.prepareForSim = prepareForSim;
@@ -72,6 +73,7 @@ class NewControler extends AbstractController implements ControlerI {
 		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
 	}
 
+	@Override
 	public final void run() {
 		super.setupOutputDirectory(outputDirectoryHierarchy);
 		super.run(this.config);

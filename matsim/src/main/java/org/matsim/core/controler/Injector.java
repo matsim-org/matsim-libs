@@ -44,7 +44,7 @@ public abstract class Injector {
 
     private static Logger logger = Logger.getLogger(Injector.class);
 
-    public static com.google.inject.Injector createInjector(final Config config, AbstractModule... modules) {
+    public static com.google.inject.Injector createInjector(final Config config, Module... modules) {
         com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {
             @Override
             public void configure(Binder binder) {
@@ -56,7 +56,7 @@ public abstract class Injector {
         // features to provide. So we create a bootstrapInjector which already has the config
         // and provides it to the MATSim modules.
         List<com.google.inject.Module> guiceModules = new ArrayList<>();
-        for (AbstractModule module : modules) {
+        for (Module module : modules) {
             bootstrapInjector.injectMembers(module);
             guiceModules.add(module);
         }
@@ -64,9 +64,11 @@ public abstract class Injector {
         for (Map.Entry<Key<?>, Binding<?>> entry : realInjector.getBindings().entrySet()) {
       	  Level level = Level.INFO ;
       	  if ( entry.getKey().toString().contains("type=org.matsim") ) {
-              Annotation annotation = entry.getKey().getAnnotation();
-              logger.log( level, entry.getKey().getTypeLiteral() + " " + (annotation != null ? annotation.toString() : ""));
-              logger.log(level, "   -> " + entry.getValue().getProvider());
+      		  Annotation annotation = entry.getKey().getAnnotation();
+      		  logger.log( level, entry.getKey().getTypeLiteral() + " " + (annotation != null ? annotation.toString() : ""));
+      		  logger.log(level, "   -> " + entry.getValue().getProvider());
+      		  logger.log(level, "  ==full==> " + entry.getValue() );
+      		  // yy could probably format the above in a better way. kai, may'16
       	  }
         }
         return realInjector;

@@ -31,7 +31,7 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 
 /**
  * These are the "threads" of the {@link ParallelQNetsimEngine}.  The "run()" method is implicitly called by starting the thread.  

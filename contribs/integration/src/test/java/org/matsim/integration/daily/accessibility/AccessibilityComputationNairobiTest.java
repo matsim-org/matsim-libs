@@ -95,6 +95,8 @@ public class AccessibilityComputationNairobiTest {
 			config.strategy().addStrategySettings(stratSets);
 		}
 		
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+		// yy For a test, "abort" may be too strict.  kai, may'16
 				
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
@@ -113,9 +115,13 @@ public class AccessibilityComputationNairobiTest {
 		assertNotNull(config);
 
 		
-		// Collect activity types
-		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
-		log.info( "found activity types: " + activityTypes );
+
+		// collect activity types
+		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
+		log.warn( "found activity types: " + activityTypes );
+		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
+		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
+
 		
 		// No collection of homes for Nairobi, which necessary for the density layer. Here, the
 		// density layer is based on the network. see below

@@ -34,7 +34,7 @@ import java.util.concurrent.Phaser;
  * @author (of this documentation) nagel
  *
  */
-class QNetsimEngineRunner extends NetElementActivator implements Runnable, Callable<Boolean> {
+class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnable, Callable<Boolean> {
 
 	private double time = 0.0;
 
@@ -60,7 +60,7 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 	 * no concurrent add operation can occur.
 	 * cdobler, sep'14
 	 */
-	private final List<QLinkInternalI> linksList = new LinkedList<>();
+	private final List<QLinkI> linksList = new LinkedList<>();
 
 	/*
 	 * Ensure that nodes and links are only activate during times where we expect it.
@@ -179,12 +179,12 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 	private void moveLinks() {
 		boolean remainsActive;
 		lockLinks = true;
-		QLinkInternalI link;
-		ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
+		QLinkI link;
+		ListIterator<QLinkI> simLinks = this.linksList.listIterator();
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
 
-			remainsActive = link.doSimStep(time);
+			remainsActive = link.doSimStep();
 
 			if (!remainsActive) simLinks.remove();
 		}
@@ -197,7 +197,7 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 	 * cdobler, sep'14
 	 */
 	@Override
-	protected void activateLink(QLinkInternalI link) {
+	protected void registerLinkAsActive(QLinkI link) {
 		if (!lockLinks) linksList.add(link);
 		else throw new RuntimeException("Tried to activate a QLink at a time where this was not allowed. Aborting!");
 	}
@@ -213,7 +213,7 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 	 * cdobler, sep'14
 	 */
 	@Override
-	protected void activateNode(QNode node) {
+	protected void registerNodeAsActive(QNode node) {
 		if (!this.lockNodes) this.nodesQueue.add(node);
 		else throw new RuntimeException("Tried to activate a QNode at a time where this was not allowed. Aborting!");
 	}

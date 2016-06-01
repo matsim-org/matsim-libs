@@ -19,8 +19,13 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collection;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 
 /**
@@ -34,27 +39,36 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
  */
 class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 
-	QueueAgentSnapshotInfoBuilder(Scenario scenario, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
-		super(scenario, agentSnapshotInfoFactory);
+	@Inject
+	QueueAgentSnapshotInfoBuilder(Scenario scenario, SnapshotLinkWidthCalculator linkWidthCalculator) {
+		super(scenario, linkWidthCalculator);
 	}
 
 	@Override
-	public double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink,
-			double overallStorageCapacity) {
-	// the length of a vehicle in visualization
+	public double calculateVehicleSpacing(double curvedLength, double overallStorageCapacity,
+			Collection<? extends VisVehicle> vehs) {
+		// the length of a vehicle in visualization
+		
+		double sum = 0. ;
+		for ( VisVehicle veh : vehs ) {
+			sum += veh.getSizeInEquivalents() ;
+		}
+
 
 		double vehLen = Math.min( 
-		linkLength / (overallStorageCapacity), // number of ``cells''
-		linkLength / (numberOfVehiclesOnLink) ); // the link may be more than ``full'' because of forward squeezing of stuck vehicles
+				curvedLength / overallStorageCapacity , // number of ``cells''
+				curvedLength / sum  // the link may be more than ``full'' because of forward squeezing of stuck vehicles 
+				);
 		
 		return vehLen;
 	}
 	
 
 	@Override
-	public double calculateDistanceOnVectorFromFromNode2(double length, double spacing,
+	public double calculateOdometerDistanceFromFromNode(double curvedLength, double spacing,
 			 double lastDistanceFromFNode, double now, double freespeedTraveltime, double remainingTravelTime) {
 		double distanceFromFNode ;
+		boolean isFirstVehicle = false;
 		
 		if (freespeedTraveltime == 0.0){
 			distanceFromFNode = 0. ;
@@ -62,7 +76,7 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		}
 		else {
 			// we calculate where the vehicle would be with free speed.
-			distanceFromFNode = (1. - (remainingTravelTime / freespeedTraveltime)) * length ;
+			distanceFromFNode = (1. - (remainingTravelTime / freespeedTraveltime)) * curvedLength ;
 			if ( distanceFromFNode < 0. ) {
 				distanceFromFNode = 0. ;
 			}
@@ -70,17 +84,21 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		
 		if (Double.isNaN(lastDistanceFromFNode)) {
 			// (non-object-oriented way of "null" (?))
-			
-			lastDistanceFromFNode = length ;
+			isFirstVehicle = true;
+			lastDistanceFromFNode = curvedLength ;
 		}
 
-		if (distanceFromFNode >= lastDistanceFromFNode - spacing ) { 
+		if (isFirstVehicle && distanceFromFNode >= lastDistanceFromFNode) {
+			// first vehicle can be at the end of the link. amit May 2016
+			// == --> if remainingTravelTime == 0 ; >= remaining travel time is zero or negative. 
+			distanceFromFNode = lastDistanceFromFNode;
+		} else if (distanceFromFNode >= lastDistanceFromFNode - spacing ) {  
 			/* vehicle is already in queue or has to stay behind another vehicle
 			 * -> position it directly after the last position
 			 */
 			distanceFromFNode = lastDistanceFromFNode - spacing;
 		}
-		
+
 		//else just do nothing anymore
 		return distanceFromFNode;
 	}

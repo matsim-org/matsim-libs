@@ -45,7 +45,7 @@ public class JointZones {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		ZoneCollection zones = new ZoneCollection();
+		ZoneCollection zones = new ZoneCollection(null);
 		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.gk3.geojson")));
 		zones.addAll(ZoneGeoJsonIO.parseFeatureCollection(data));
 		data = null;

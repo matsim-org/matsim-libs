@@ -34,13 +34,24 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -88,7 +99,7 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 
 	@Override
 	public Mobsim get() {
-		QSimConfigGroup configGroup = scenario.getConfig().qsim();
+		final QSimConfigGroup configGroup = scenario.getConfig().qsim();
 		if (configGroup == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
@@ -100,10 +111,54 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
+		LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+		/* Add the custom GFIP link speed calculator, but only when required. */
+		if(queueType == QueueType.FIFO){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using basic FIFO link speed calculator. "); 
+			log.info("------------------------------------------------------------------------------");
+			linkSpeedCalculator = new DefaultLinkSpeedCalculator();
+		} else if(queueType == QueueType.BASIC_PASSING){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using basic passing link speed calculator. "); 
+			log.info("------------------------------------------------------------------------------");
+			linkSpeedCalculator = new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType) ;
+		} else if(queueType == QueueType.GFIP_PASSING){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using custom GFIP-link-density-based link speed calculator with passing. "); 
+			log.info("------------------------------------------------------------------------------");
+			linkSpeedCalculator = new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType) ;
+		} else if(queueType == QueueType.GFIP_FIFO){
+			log.info("------------------------------------------------------------------------------");
+			log.info("  Using custom GFIP-link-density-based link speed calculator without passing."); 
+			log.info("------------------------------------------------------------------------------");
+			linkSpeedCalculator = new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType) ;
+		}
+		final LinkSpeedCalculator theLinkSpeedCalculator = linkSpeedCalculator ; // to get this final
+
+		
 		/* This is the crucial part for changing the queue type. */ 
-		NetsimNetworkFactory netsimNetworkFactory = new NetsimNetworkFactory() {
+		QNetworkFactory netsimNetworkFactory = new QNetworkFactory() {
+			private NetsimEngineContext context;
+			private NetsimInternalInterface netsimEngine;
 			@Override
-			public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+			void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
+				double effectiveCellSize = ((NetworkImpl) scenario.getNetwork()).getEffectiveCellSize() ;
+				
+				SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+				linkWidthCalculator.setLinkWidthForVis( configGroup.getLinkWidthForVis() );
+				if (! Double.isNaN(scenario.getNetwork().getEffectiveLaneWidth())){
+					linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
+				}
+				AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+				AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+				
+				this.context = new NetsimEngineContext(eventsManager, effectiveCellSize, agentCounter, snapshotInfoBuilder, configGroup, mobsimTimer, 
+						linkWidthCalculator ) ;
+				this.netsimEngine = netsimEngine1 ;
+			}
+			@Override
+			public QLinkImpl createNetsimLink(final Link link, final QNode toQueueNode) {
 				VehicleQ<QVehicle> vehicleQ = null;
 				switch (queueType) {
 				case FIFO:
@@ -117,37 +172,24 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 				default:
 					throw new RuntimeException("Do not know what VehicleQ to use with queue type " + queueType.toString());
 				}
-				return new QLinkImpl(link, network, toQueueNode, vehicleQ);
+				// vehicleQueue and speedCalculator are at the level of the lane:
+				QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
+				laneBuilder.setVehicleQueue(vehicleQ);
+				laneBuilder.setLinkSpeedCalculator(theLinkSpeedCalculator);
+
+				// insert the lane into the link:
+				QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
+				linkBuilder.setLaneFactory(laneBuilder);
+				return linkBuilder.build(link, toQueueNode) ;
 			}
 			@Override
-			public QNode createNetsimNode(final Node node, QNetwork network) {
-				return new QNode(node, network);
+			public QNode createNetsimNode(final Node node) {
+				QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+				return builder.build( node ) ;
 			}
 		};
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, netsimNetworkFactory);
 		
-		/* Add the custom GFIP link speed calculator, but only when required. */
-		if(queueType == QueueType.FIFO){
-			log.info("------------------------------------------------------------------------------");
-			log.info("  Using basic FIFO link speed calculator. "); 
-			log.info("------------------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new DefaultLinkSpeedCalculator());
-		} else if(queueType == QueueType.BASIC_PASSING){
-			log.info("------------------------------------------------------------------------------");
-			log.info("  Using basic passing link speed calculator. "); 
-			log.info("------------------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType));
-		} else if(queueType == QueueType.GFIP_PASSING){
-			log.info("------------------------------------------------------------------------------");
-			log.info("  Using custom GFIP-link-density-based link speed calculator with passing. "); 
-			log.info("------------------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType));
-		} else if(queueType == QueueType.GFIP_FIFO){
-			log.info("------------------------------------------------------------------------------");
-			log.info("  Using custom GFIP-link-density-based link speed calculator without passing."); 
-			log.info("------------------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(scenario.getVehicles(), qSim, queueType));
-		}
 	
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());

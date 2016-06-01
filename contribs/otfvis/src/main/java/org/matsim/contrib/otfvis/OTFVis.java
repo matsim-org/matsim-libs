@@ -20,6 +20,18 @@
 
 package org.matsim.contrib.otfvis;
 
+import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,16 +54,20 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vis.otfvis.*;
+import org.matsim.vis.otfvis.OTFClientFile;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFEvent2MVI;
+import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.otfvis.PlayPauseMobsimListener;
 import org.matsim.vis.otfvis.handler.FacilityDrawer;
-import org.matsim.vis.snapshotwriters.*;
-
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+import org.matsim.vis.snapshotwriters.VisData;
+import org.matsim.vis.snapshotwriters.VisLink;
+import org.matsim.vis.snapshotwriters.VisMobsim;
+import org.matsim.vis.snapshotwriters.VisNetwork;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 /**
  * A generic starter for the OnTheFly Visualizer that supports
@@ -198,7 +214,15 @@ public class OTFVis {
 			TransitSchedule transitSchedule = scenario.getTransitSchedule();
 			TransitQSimEngine transitEngine = qSim.getTransitEngine();
 			TransitStopAgentTracker agentTracker = transitEngine.getAgentTracker();
-			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getAgentSnapshotInfoFactory();
+			
+//			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getagentsnapshotinfofactory();
+			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
+			linkWidthCalculator.setLinkWidthForVis( config.qsim().getLinkWidthForVis() );
+			if (! Double.isNaN(network.getEffectiveLaneWidth())){
+				linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
+			}
+			AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+			
 			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, snapshotInfoFactory);
 			server.addAdditionalElement(facilityWriter);
 		}
@@ -249,11 +273,6 @@ public class OTFVis {
 					@Override
 					public Network getNetwork() {
 						return scenario.getNetwork();
-					}
-
-					@Override
-					public AgentSnapshotInfoFactory getAgentSnapshotInfoFactory() {
-						return null;
 					}
 				};
 			}

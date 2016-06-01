@@ -28,12 +28,16 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -65,11 +69,24 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import com.google.inject.Provider;
 
+@RunWith(Parameterized.class)
 public class ControlerTest {
 
 	private final static Logger log = Logger.getLogger(ControlerTest.class);
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+	private final boolean isUsingFastCapacityUpdate;
+	
+	public ControlerTest(boolean isUsingFastCapacityUpdate) {
+		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
+	}
+	
+	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
+	public static Collection<Object> parameterObjects () {
+		Object [] capacityUpdates = new Object [] { false, true };
+		return Arrays.asList(capacityUpdates);
+	}
+	
 	@Test
 	public void testScenarioLoading() {
 		// used to use the String[] constructor, but this makes it use the output/equil/ output directory,
@@ -179,6 +196,8 @@ public class ControlerTest {
 		// - make sure we don't use threads, as they are not deterministic
 		config.global().setNumberOfThreads(0);
 
+		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
+		
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
         controler.getConfig().controler().setCreateGraphs(false);
@@ -187,9 +206,14 @@ public class ControlerTest {
 		controler.run();
 
 		// test if we got the right result
-		// the actual result is 151sec, not 150, as each vehicle "loses" 1sec in the buffer
-		assertEquals("TravelTimeCalculator has wrong result",
-				151.0, controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7*3600, null, null), 0.0);
+		if ( this.isUsingFastCapacityUpdate ) {
+			// the actual result is 151sec, not 150, as each vehicle "loses" 1sec in the buffer
+			assertEquals("TravelTimeCalculator has wrong result",
+					150.5, controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7*3600, null, null), 0.0);
+		} else {
+			assertEquals("TravelTimeCalculator has wrong result",
+					151.0, controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7*3600, null, null), 0.0);
+		}
 
 		// now test that the ReRoute-Strategy also knows about these travel times...
 		config.controler().setLastIteration(1);
@@ -205,8 +229,13 @@ public class ControlerTest {
 		controler.run();
 
 		// test that the plans have the correct times
-		assertEquals("ReRoute seems to have wrong travel times.",
-				151.0, ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
+		if ( this.isUsingFastCapacityUpdate ) {
+			assertEquals("ReRoute seems to have wrong travel times.",
+					150.0, ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
+		} else {
+			assertEquals("ReRoute seems to have wrong travel times.",
+					151.0, ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
+		}
 	}
 
 	/**
@@ -220,6 +249,8 @@ public class ControlerTest {
 		final Config config = this.utils.loadConfig(null);
 		config.controler().setLastIteration(0);
 
+		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
+		
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		// create a very simple network with one link only and an empty population
 		Network network = scenario.getNetwork();
@@ -308,6 +339,8 @@ public class ControlerTest {
 		// - make sure we don't use threads, as they are not deterministic
 		config.global().setNumberOfThreads(1);
 
+		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
+		
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
         controler.getConfig().controler().setCreateGraphs(false);
@@ -404,6 +437,8 @@ public class ControlerTest {
 		// - make sure we don't use threads, as they are not deterministic
 		config.global().setNumberOfThreads(1);
 
+		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
+		
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
         controler.getConfig().controler().setCreateGraphs(false);

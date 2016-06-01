@@ -19,12 +19,13 @@
 package playground.johannes.studies.matrix2014.sim.run;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.stats.Discretizer;
-import org.matsim.contrib.common.stats.LinearDiscretizer;
+import org.matsim.contrib.common.stats.FixedBordersDiscretizer;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -34,7 +35,10 @@ import org.matsim.facilities.Facility;
 import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
 import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonian;
 import playground.johannes.studies.matrix2014.sim.AnnealingHamiltonianConfigurator;
-import playground.johannes.synpop.analysis.*;
+import playground.johannes.synpop.analysis.AnalyzerTask;
+import playground.johannes.synpop.analysis.HistogramWriter;
+import playground.johannes.synpop.analysis.PassThroughDiscretizerBuilder;
+import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.gis.*;
 import playground.johannes.synpop.sim.AttributeChangeListener;
@@ -67,15 +71,14 @@ public class GeoDistanceZoneHamiltonian {
         /*
         Create the geo distance discretizer.
          */
-//        TDoubleArrayList borders = new TDoubleArrayList();
-//        borders.add(-1);
-//        for (int d = 2000; d < 10000; d += 2000) borders.add(d);
-//        for (int d = 10000; d < 50000; d += 10000) borders.add(d);
-//        for (int d = 50000; d < 500000; d += 50000) borders.add(d);
-//        for (int d = 500000; d < 1000000; d += 100000) borders.add(d);
-//        borders.add(Double.MAX_VALUE);
-//        Discretizer discretizer = new FixedBordersDiscretizer(borders.toArray());
-        Discretizer discretizer = new StackedDiscreitzer();
+        TDoubleArrayList borders = new TDoubleArrayList();
+        borders.add(-1);
+        for (int d = 2000; d < 10000; d += 2000) borders.add(d);
+        for (int d = 10000; d < 50000; d += 10000) borders.add(d);
+        for (int d = 50000; d < 500000; d += 50000) borders.add(d);
+        for (int d = 500000; d < 1000000; d += 100000) borders.add(d);
+        borders.add(Double.MAX_VALUE);
+        Discretizer discretizer = new FixedBordersDiscretizer(borders.toArray());
         /*
         Index zones
          */
@@ -83,13 +86,8 @@ public class GeoDistanceZoneHamiltonian {
         ZoneCollection zones = ((ZoneData) engine.getDataPool().get(ZoneDataLoader.KEY)).getLayer("nuts3");
         TObjectIntMap<Zone> indices = indexZones(engine.getSimPersons(), facilities, zones);
 
-//        logger.debug("Copy person attribute to leg...");
-//        TaskRunner.run(new CopyPersonAttToLeg(PERSON_ZONE_IDX), engine.getSimPersons());
+        Map<String, Set<Attributable>> simLegsMap = getSimLegs(engine.getSimPersons(), engine.getLegPredicate());
 
-//        TObjectIntIterator<Zone> it = indices.iterator();
-
-//        playground.johannes.synpop.sim.HamiltonianComposite composite = new playground.johannes.synpop.sim.HamiltonianComposite();
-//        AttributeChangeListenerComposite listenerComposite = new AttributeChangeListenerComposite();
         int emptyZones = 0;
 
         logger.debug("Creating zone hamiltonians...");
@@ -102,11 +100,8 @@ public class GeoDistanceZoneHamiltonian {
 
         for (int i = 0; i <= maxKey; i++) {
 
-            Predicate<Segment> pred = PredicateAndComposite.create(
-                    engine.getLegPredicate(),
-                    new LegPersonAttributePredicate(PERSON_ZONE_IDX, String.valueOf(i)));
+            Set<Attributable> simLegs = simLegsMap.get(String.valueOf(i));
 
-            Set<Attributable> simLegs = getCarLegs(engine.getSimPersons(), pred);
             if(simLegs.size() > 0) {
             /*
             Create and add the hamiltonian.
@@ -118,11 +113,9 @@ public class GeoDistanceZoneHamiltonian {
                         discretizer,
                         engine.getUseWeights());
 
-                hamiltonians.add(hamiltonian);
-//                hamiltonian.setPredicate(pred);
+                hamiltonian.setErrorExponent(1.0);
 
-//                composite.addComponent(hamiltonian);
-//                listenerComposite.addComponent(hamiltonian);
+                hamiltonians.add(hamiltonian);
             } else {
                 hamiltonians.add(null);
                 emptyZones++;
@@ -168,7 +161,7 @@ public class GeoDistanceZoneHamiltonian {
     }
 
     private static Set<Attributable> getCarLegs(Set<? extends Person> persons, Predicate<Segment> predicate) {
-        Set<Attributable> legs = new HashSet<>();
+        Set<Attributable> legs = new LinkedHashSet<>();
         for (Person p : persons) {
             Episode e = p.getEpisodes().get(0);
             for (Segment leg : e.getLegs()) {
@@ -177,6 +170,29 @@ public class GeoDistanceZoneHamiltonian {
         }
 
         return legs;
+    }
+
+    private static Map<String, Set<Attributable>> getSimLegs(Set<? extends Person> persons, Predicate<Segment> predicate) {
+        Map<String, Set<Attributable>> legsMap = new LinkedHashMap<>();
+        for (Person p : persons) {
+            String zoneIndex = p.getAttribute(PERSON_ZONE_IDX);
+
+            if(zoneIndex == null) throw new NullPointerException();
+
+            Episode e = p.getEpisodes().get(0);
+            for (Segment leg : e.getLegs()) {
+                if (predicate.test(leg)) {
+                    Set<Attributable> legs = legsMap.get(zoneIndex);
+                    if(legs == null) {
+                        legs = new HashSet<>();
+                        legsMap.put(zoneIndex, legs);
+                    }
+                    legs.add(leg);
+                }
+            }
+        }
+
+        return legsMap;
     }
 
     private static TObjectIntMap indexZones(Set<? extends Person> simPersons, ActivityFacilities facilities,
@@ -220,40 +236,6 @@ public class GeoDistanceZoneHamiltonian {
         ProgressLogger.terminate();
 
         return indices;
-    }
-
-    private static class StackedDiscreitzer implements Discretizer {
-
-        private LinearDiscretizer d2 = new LinearDiscretizer(2000);
-        private LinearDiscretizer d10 = new LinearDiscretizer(10000);
-        private LinearDiscretizer d50 = new LinearDiscretizer(50000);
-        private LinearDiscretizer d100 = new LinearDiscretizer(100000);
-
-        @Override
-        public double discretize(double value) {
-            return getDiscretizer(value).discretize(value);
-        }
-
-        @Override
-        public int index(double value) {
-            return getDiscretizer(value).index(value);
-        }
-
-        @Override
-        public double binWidth(double value) {
-            return getDiscretizer(value).binWidth(value);
-        }
-
-        private Discretizer getDiscretizer(double value) {
-            Discretizer d;
-
-            if(value >= 500000) d = d100;
-            else if(value >= 50000) d = d50;
-            else if(value >= 10000) d = d10;
-            else d = d2;
-
-            return d;
-        }
     }
 
     private static class HamiltonianWrapper implements Hamiltonian, AttributeChangeListener {

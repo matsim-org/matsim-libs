@@ -103,6 +103,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 		// This part would be nicer externalized in a "preprocessed network provider" or smth
 		if ( config.getInputPreprocessedNetwork() == null ) {
 			this.updatePrimaryPreprocess( distr );
+			this.updateSecondaryPreprocess( lowestStoredPrimary );
 			// needed at least in tests (but one could imagine other usecases where this might happen as well)
 			if ( globalConfig.getOutputDirectory() != null ) {
 				new WeightedSocialNetworkWriter().write(preprocess, globalConfig.getOutputDirectory() + "/preprocess-network.xml.gz");
@@ -111,6 +112,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 		}
 		else {
 			this.preprocess = new WeightedSocialNetworkReader().read( config.getInputPreprocessedNetwork() );
+			this.updateSecondaryPreprocess( lowestStoredPrimary );
 		}
 	}
 
@@ -148,29 +150,18 @@ public class PreprocessedModelRunner implements ModelRunner {
 			final int endThreadAgents = i == nThreads ? population.size() : (i + 1) * population.size() / nThreads;
 
 			threads.add(
-				new Runnable() {
-					@Override
-					public void run() {
+					() -> {
 						final TiesWeightDistribution threadDistribution =
 							distributionToFill != null ?
 								new TiesWeightDistribution( distributionToFill.getBinWidth() ) :
 								null;
 
 						final Random random = new Random( randomSeed + threadNumber );
-						// initialize out loop to reduce stress on GC
-						final TIntList potentialAlters = new TIntArrayList( population.size() - startThreadAgents );
 
 						for ( int ego = startThreadAgents; ego < endThreadAgents; ego++ ) {
-							potentialAlters.clear();
-							for ( int pa=ego + 1; pa < population.size(); pa++ ) {
-								potentialAlters.add( pa );
-							}
-
-							int nAltersToConsider = (int) Math.ceil( primarySampleRate * potentialAlters.size() );
-
-							while ( nAltersToConsider-- > 0 && !potentialAlters.isEmpty() ) {
+							for ( int alter=ego + 1; alter < population.size(); alter++ ) {
+								if ( random.nextDouble() > primarySampleRate ) continue;
 								counter.incCounter();
-								final int alter = potentialAlters.removeAt( random.nextInt( potentialAlters.size() ) );
 
 								final double score = utility.getTieUtility( ego , alter );
 
@@ -188,8 +179,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 						}
 
 						if ( distributionToFill != null ) distributionToFill.addCounts( threadDistribution );
-					}
-				} );
+					} );
 		}
 
 		threads.run();
@@ -226,12 +216,10 @@ public class PreprocessedModelRunner implements ModelRunner {
 
 		for ( int i=0; i < nThreads; i++ ) {
 			final int startThreadAgents = i * population.size() / nThreads;
-			final int endThreadAgents = i == nThreads ? population.size() : (i + 1) * population.size() / nThreads;
+			final int endThreadAgents = (i + 1) * population.size() / nThreads;
 
 			threads.add(
-				new Runnable() {
-					@Override
-					public void run() {
+					() -> {
 						final TIntSet friendsOfFriends = new TIntHashSet();
 						for ( int ego = startThreadAgents; ego < endThreadAgents; ego++ ) {
 							counter.incCounter();
@@ -264,8 +252,7 @@ public class PreprocessedModelRunner implements ModelRunner {
 							}
 
 						}
-					}
-				} );
+					} );
 		}
 
 		threads.run();
@@ -307,97 +294,75 @@ public class PreprocessedModelRunner implements ModelRunner {
 
 			final Random random = new Random( randomSeed + 20140107 + i );
 			threads.add(
-					new Runnable() {
-						@Override
-						public void run() {
-							final TIntList potentialAlters = new TIntArrayList();
-							// TODO: modify doublyweighted preprocess to avoid having to do that externally
-							final TIntDoubleMap highestPrimary = new TIntDoubleHashMap();
+					() -> {
+						// TODO: modify doublyweighted preprocess to avoid having to do that externally
+						final TIntDoubleMap highestPrimary = new TIntDoubleHashMap();
 
-							final TIntSet altersSet = new TIntHashSet();
-							final TIntSet altersOfAltersSet = new TIntHashSet();
-							for ( int egoi = startThreadAgents; egoi < endThreadAgents; egoi++ ) {
-								final int ego = egoi;
-								altersSet.clear();
-								preprocess.fillWithAltersOverWeight( altersSet , ego , primaryThreshold );
+						final TIntSet altersSet = new TIntHashSet();
+						final TIntSet altersOfAltersSet = new TIntHashSet();
+						for ( int egoi = startThreadAgents; egoi < endThreadAgents; egoi++ ) {
+							final int ego = egoi;
+							altersSet.clear();
+							preprocess.fillWithAltersOverWeight( altersSet , ego , primaryThreshold );
 
-								// for each friend of friend, search for the highest common
-								// friend utility.
-								highestPrimary.clear();
-								altersSet.forEach( new TIntProcedure() {
-									@Override
-									public boolean execute( final int alter ) {
-										final double alterWeight =
-											utility.getTieUtility(
-													ego,
-													alter );
-										altersOfAltersSet.clear();
-										preprocess.fillWithAltersOverWeight( altersOfAltersSet , alter , primaryThreshold );
+							// for each friend of friend, search for the highest common
+							// friend utility.
+							highestPrimary.clear();
+							altersSet.forEach( alter -> {
+								final double alterWeight =
+									utility.getTieUtility(
+											ego,
+											alter );
+								altersOfAltersSet.clear();
+								preprocess.fillWithAltersOverWeight( altersOfAltersSet , alter , primaryThreshold );
 
-										potentialAlters.clear();
-										altersOfAltersSet.forEach( new TIntProcedure() {
-											@Override
-											public boolean execute( final int fof ) {
-												if ( fof <= ego ) return true; // only consider upper half of matrix
-												if ( altersSet.contains( fof ) ) return true;
-												potentialAlters.add( fof );
-												return true;
-											}
-										} );
+								altersOfAltersSet.forEach( alterOfAlter -> {
+									if ( alterOfAlter <= ego ) return true; // only consider upper half of matrix
+									if ( altersSet.contains( alterOfAlter ) ) return true;
+									if ( random.nextDouble() > secondarySampleRate ) return true;
+									counter.incCounter();
 
-										for ( int remainingChecks = (int) Math.ceil( secondarySampleRate * potentialAlters.size() );
-												remainingChecks > 0 && !potentialAlters.isEmpty();
-												remainingChecks--) {
-											counter.incCounter();
-											final int alterOfAlter = potentialAlters.removeAt( random.nextInt( potentialAlters.size() ) );
-
-											// "utility" of an alter of alter is the min of the
-											// two linked ties, as below this utility it is not an
-											// alter of alter.
-											final double aoaWeight =
-												Math.min(
-														alterWeight,
-														utility.getTieUtility(
-															alter,
-															alterOfAlter ) );
-
-											if ( !highestPrimary.containsKey( alterOfAlter ) ||
-													highestPrimary.get( alterOfAlter ) < aoaWeight ) {
-												highestPrimary.put( alterOfAlter , aoaWeight );
-											}
-										}
-										
-										return true;
-									}
-								} );
-
-								highestPrimary.forEachEntry( new TIntDoubleProcedure() {
-									@Override
-									public boolean execute(
-											final int alterOfAlter,
-											final double lowestUtilityOfAlter ) {
-										final double w2 =
+									// "utility" of an alter of alter is the min of the
+									// two linked ties, as below this utility it is not an
+									// alter of alter.
+									final double aoaWeight =
+										Math.min(
+												alterWeight,
 												utility.getTieUtility(
-													ego,
-													alterOfAlter );
-										preprocessFriendsOfFriends.addMonodirectionalTie(
-												ego,
-												alterOfAlter,
-												lowestUtilityOfAlter,
-												w2 );
+													alter,
+													alterOfAlter ) );
 
-										if ( log.isTraceEnabled() ) {
-											log.trace( "secondary preprocessing: added tie "+ego+"<->"+alterOfAlter+" with weights "+lowestUtilityOfAlter+" and "+w2 );
-										}
-
-										return true;
+									if ( !highestPrimary.containsKey( alterOfAlter ) ||
+											highestPrimary.get( alterOfAlter ) < aoaWeight ) {
+										highestPrimary.put( alterOfAlter , aoaWeight );
 									}
+									return true;
 								} );
 
-								// no tie added to this ego anymore (only monodirectional ties added)
-								// trim storing array to avoid waste of space
-								preprocessFriendsOfFriends.trim( ego );
-							}
+								return true;
+							} );
+
+							highestPrimary.forEachEntry( ( alterOfAlter, lowestUtilityOfAlter ) -> {
+								final double w2 =
+										utility.getTieUtility(
+											ego,
+											alterOfAlter );
+								preprocessFriendsOfFriends.addMonodirectionalTie(
+										ego,
+										alterOfAlter,
+										lowestUtilityOfAlter,
+										w2 );
+
+								if ( log.isTraceEnabled() ) {
+									log.trace( "secondary preprocessing: added tie "+ego+"<->"+alterOfAlter+" with weights "+lowestUtilityOfAlter+" and "+w2 );
+								}
+
+								return true;
+							} );
+
+							// no tie added to this ego anymore (only monodirectional ties added)
+							// trim storing array to avoid waste of space
+							preprocessFriendsOfFriends.trim( ego );
 						}
 					} );
 		}

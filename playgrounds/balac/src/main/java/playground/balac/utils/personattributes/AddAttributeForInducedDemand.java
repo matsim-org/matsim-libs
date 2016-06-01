@@ -29,12 +29,12 @@ public class AddAttributeForInducedDemand {
 			String act = "home";
 			if (bla.getAttribute(p.getId().toString(), "earliestEndTime_leisure") != null)
 				act = act + ",leisure";
-			if (bla.getAttribute(p.getId().toString(), "earliestEndTime_work") != null)
-				act = act + ",work";
-			if (bla.getAttribute(p.getId().toString(), "earliestEndTime_shopping") != null)
-				act = act + ",shopping";
-			if (bla.getAttribute(p.getId().toString(), "earliestEndTime_education") != null)
-				act = act + ",education";
+		//	if (bla.getAttribute(p.getId().toString(), "earliestEndTime_work") != null)
+		//		act = act + ",work";
+			if (bla.getAttribute(p.getId().toString(), "earliestEndTime_shop") != null)
+				act = act + ",shop";
+		//	if (bla.getAttribute(p.getId().toString(), "earliestEndTime_education") != null)
+		//		act = act + ",education";
 			
 			bla.putAttribute(p.getId().toString(), "activities", act);
 			

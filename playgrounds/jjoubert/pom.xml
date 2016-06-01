@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.8.0-SNAPSHOT</version>
+    <version>0.9.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>
@@ -18,7 +18,7 @@
     <dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>roadpricing</artifactId>
-  		<version>0.8.0-SNAPSHOT</version>
+  		<version>0.9.0-SNAPSHOT</version>
   	</dependency>
     <dependency>
     	<groupId>colt</groupId>
@@ -39,7 +39,7 @@
     <dependency>
     	<groupId>playground</groupId>
     	<artifactId>southAfrica</artifactId>
-    	<version>0.8.0-SNAPSHOT</version>
+    	<version>0.9.0-SNAPSHOT</version>
     </dependency>
     <!--<dependency>-->
     	<!--<groupId>javailp</groupId>-->
@@ -59,11 +59,11 @@
     	<groupId>org.jzy3d</groupId>
     	<artifactId>jzy3d-api</artifactId>
     	<version>0.9.1</version>
-	</dependency>
+ 	</dependency>
     <dependency>
     	<groupId>playground</groupId>
     	<artifactId>nmviljoen</artifactId>
-    	<version>0.8.0-SNAPSHOT</version>
+    	<version>0.9.0-SNAPSHOT</version>
     </dependency>
 	<dependency>
 		<groupId>Jama</groupId>
@@ -71,7 +71,22 @@
 		<version>1.0.2</version>
 	</dependency>
 
-</dependencies>
+	<dependency>
+		<groupId>org.matsim.contrib</groupId>
+		<artifactId>matsim-gtfs</artifactId>
+		<version>0.8.0-SNAPSHOT</version>
+	</dependency>
+	<dependency>
+		<groupId>playground</groupId>
+		<artifactId>mrieser</artifactId>
+		<version>0.9.0-SNAPSHOT</version>
+	</dependency>
+	<dependency>
+		<groupId>org.matsim.contrib</groupId>
+		<artifactId>gtfs2matsimtransitschedule</artifactId>
+		<version>0.9.0-SNAPSHOT</version>
+	</dependency>
+  </dependencies>
   <build>
 	<plugins>
 		<plugin>

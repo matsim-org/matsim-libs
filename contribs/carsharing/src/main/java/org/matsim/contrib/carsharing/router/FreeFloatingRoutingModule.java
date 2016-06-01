@@ -23,22 +23,12 @@ public class FreeFloatingRoutingModule implements RoutingModule {
 			Facility toFacility, double departureTime, Person person) {
 		
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
-		
-		/*final Leg leg = new LegImpl( "walk_ff" );
-		GenericRouteImpl route = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
-		leg.setRoute(route);
-		trip.add( leg );*/
-		
+						
 		final Leg leg1 = new LegImpl( "freefloating" );
 		LinkNetworkRouteImpl route1 = new LinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		leg1.setRoute(route1);
 		trip.add( leg1 );	
-		
-		/*final Leg leg2 = new LegImpl( "walk_ff" );
-		GenericRouteImpl route2 = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
-		leg2.setRoute(route);
-		trip.add( leg2 );*/
-		
+						
 		return trip;
 	}
 

@@ -44,12 +44,12 @@ public class IdleTaxiZonalRegistry
     private final Predicate<Vehicle> isIdle;
 
 
-    public IdleTaxiZonalRegistry(ZonalSystem zonalSystem, TaxiScheduler scheduler)
+    public IdleTaxiZonalRegistry(ZonalSystem zonalSystem, TaxiScheduleInquiry scheduleInquiry)
     {
         this.zonalSystem = zonalSystem;
         zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
 
-        isIdle = TaxiSchedulerUtils.createIsIdle(scheduler);
+        isIdle = TaxiSchedulerUtils.createIsIdle(scheduleInquiry);
 
         vehiclesInZones = Maps.newHashMapWithExpectedSize(zonalSystem.getZones().size());
         for (Id<Zone> id : zonalSystem.getZones().keySet()) {

@@ -1,5 +1,9 @@
 language: java
+jdk: oraclejdk8
+install: mvn clean
 script:
+  - cd ${TRAVIS_BUILD_DIR}/matsim && mvn install -DskipTests # Everything needs MATSim
+  - cd ${TRAVIS_BUILD_DIR}/contribs && mvn install -DskipTests # Many of the playgrounds need some of the contribs
   - cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn test --fail-at-end -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 env:
   global:

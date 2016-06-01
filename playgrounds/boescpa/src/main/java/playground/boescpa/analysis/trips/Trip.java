@@ -83,19 +83,19 @@ public class Trip implements Cloneable{
     public static Trip parseTrip(String tripString) {
         String[] tripLine = tripString.split(dl);
         return new Trip(
-                Id.create(tripLine[1], Person.class), //agentId
-                Double.parseDouble(tripLine[2]), // startTime
-                Id.create(tripLine[3], Link.class), // startLinkId
-                Double.parseDouble(tripLine[4]), // startXCoord
-                Double.parseDouble(tripLine[5]), // startYCoord
-                Double.parseDouble(tripLine[6]), // endTime
-                Id.create(tripLine[7], Link.class), // endLinkId
-                Double.parseDouble(tripLine[8]), // endXCoord
-                Double.parseDouble(tripLine[9]), // endYCoord
-                tripLine[10], // mode
-                tripLine[11], // purpose
-                Double.parseDouble(tripLine[12]), // duration
-                Long.parseLong(tripLine[13])); // distance
+                Id.create(tripLine[0], Person.class), //agentId
+                Double.parseDouble(tripLine[1]), // startTime
+                Id.create(tripLine[2], Link.class), // startLinkId
+                Double.parseDouble(tripLine[3]), // startXCoord
+                Double.parseDouble(tripLine[4]), // startYCoord
+                Double.parseDouble(tripLine[5]), // endTime
+                Id.create(tripLine[6], Link.class), // endLinkId
+                Double.parseDouble(tripLine[7]), // endXCoord
+                Double.parseDouble(tripLine[8]), // endYCoord
+                tripLine[9], // mode
+                tripLine[10], // purpose
+                Double.parseDouble(tripLine[11]), // duration
+                Double.parseDouble(tripLine[12])); // distance
     }
 
     public Trip clone() {

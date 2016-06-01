@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.*;
+import playground.boescpa.ivtBaseline.preparation.IVTConfigCreator;
 
 /**
  * WHAT IS IT FOR?
@@ -37,7 +38,7 @@ public class EducationFacilityCreation {
     private static ActivityFacilities createSecondaryFacilities(ActivityFacilities originalFacilities) {
         final ActivityFacilities secondaryFacilities = FacilitiesUtils.createActivityFacilities();
         for (ActivityFacility activityFacility : originalFacilities.getFacilities().values()) {
-            if (activityFacility.getActivityOptions().keySet().contains("education")) {
+            if (activityFacility.getActivityOptions().keySet().contains(IVTConfigCreator.EDUCATION)) {
                 // create new coords
                 Coord coord = new Coord(
                         2000000 + activityFacility.getCoord().getX(),
@@ -47,8 +48,8 @@ public class EducationFacilityCreation {
                         Id.create(activityFacility.getId(), ActivityFacility.class), coord);
                 secondaryFacilities.addActivityFacility(newFacility);
                 // create and add education activity
-                ActivityOption originalEducationActivity = activityFacility.getActivityOptions().get("education");
-                ActivityOption newEducationActivity = factory.createActivityOption("education");
+                ActivityOption originalEducationActivity = activityFacility.getActivityOptions().get(IVTConfigCreator.EDUCATION);
+                ActivityOption newEducationActivity = factory.createActivityOption(IVTConfigCreator.EDUCATION);
                 copyActivityVals(originalEducationActivity, newEducationActivity);
                 newFacility.addActivityOption(newEducationActivity);
             }

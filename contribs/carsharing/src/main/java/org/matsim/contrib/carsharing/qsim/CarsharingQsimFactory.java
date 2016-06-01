@@ -12,7 +12,6 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -35,7 +34,6 @@ public class CarsharingQsimFactory implements Provider<Netsim>{
 
 
 	@Inject private  Scenario sc;
-	@Inject private  Provider<TripRouter> tripRouterProvider;	
 	@Inject private  EventsManager eventsManager;
 	
 	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory ;
@@ -77,13 +75,11 @@ public class CarsharingQsimFactory implements Provider<Netsim>{
 
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(sc.getNetwork(), travelDisutility, travelTime ) ;
 
-		agentFactory = new CarsharingAgentFactory(qSim, sc, tripRouterProvider, carSharingVehicles, pathCalculator);
+		agentFactory = new CarsharingAgentFactory(qSim, sc, carSharingVehicles, pathCalculator);		
 		
-		
-		
-		if (sc.getConfig().network().isTimeVariantNetwork()) {
+		if (sc.getConfig().network().isTimeVariantNetwork()) 
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
-		}
+		
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 		
 		//we need to park carsharing vehicles on the network

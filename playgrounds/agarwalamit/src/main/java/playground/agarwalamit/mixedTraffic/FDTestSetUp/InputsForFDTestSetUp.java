@@ -18,7 +18,9 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic.FDTestSetUp;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,10 +35,12 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
@@ -53,12 +57,15 @@ public class InputsForFDTestSetUp {
 	static final int SUBDIVISION_FACTOR = 1; //all sides of the triangle will be divided into subdivisionFactor links
 	static final double LINK_LENGTH = 1000;//in m, length of one the triangle sides.
 	static final double NO_OF_LANES = 1;
-	static final String HOLE_SPEED = "15";
 	static final double MAX_ACT_END_TIME = 1800.0; // agents departs randomly between 0 and MAX_ACT_END_TIME
 
-	private final double LINK_CAPACITY = 2700; //in PCU/h
+	// using final here, these can be anyways modified in config at any stage
+	private Collection<String> snapshotFormats = new ArrayList<>();
+	private static final double SNAPSHOT_PERIOD = 1.0;
+
+	private final double LINK_CAPACITY = 1600; //in PCU/h
 	private final double END_TIME = 24*3600;
-	private final double FREESPEED = 60.;	//in km/h, maximum authorized velocity on the track
+	private final double FREESPEED_KM_H = 60.;	//maximum authorized velocity on the track
 	private double stuckTime = 10;
 
 	private LinkDynamics linkDynamics = LinkDynamics.FIFO;
@@ -97,20 +104,40 @@ public class InputsForFDTestSetUp {
 		config.qsim().setTrafficDynamics(trafficDynamics);
 		GenerateFundamentalDiagramData.LOG.info("==========The chosen traffic dynamics is "+trafficDynamics+". ==========");
 
-		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		
-		if(trafficDynamics.equals(TrafficDynamics.withHoles)) {
-			config.qsim().setSnapshotStyle(SnapshotStyle.withHoles); // to see holes in OTFVis
-			config.setParam("WITH_HOLE", "HOLE_SPEED", HOLE_SPEED);
-		}
+		if(! snapshotFormats.isEmpty() ) {
+			config.controler().setSnapshotFormat(snapshotFormats);
+			config.qsim().setSnapshotStyle(SnapshotStyle.queue);
+			config.qsim().setSnapshotPeriod(SNAPSHOT_PERIOD);
 
+			if(trafficDynamics.equals(TrafficDynamics.withHoles)) {
+				config.qsim().setSnapshotStyle(SnapshotStyle.withHoles); // to see holes in OTFVis
+			}
+		}
+		
 		if(linkDynamics.equals(LinkDynamics.SeepageQ)){
 			config.qsim().setSeepMode("bike");
 			config.qsim().setSeepModeStorageFree(false);
 			config.qsim().setRestrictingSeepage(true);
 		}
 
-		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
+		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
+
+		// required if using controler
+		ActivityParams home = new ActivityParams("home") ;
+		home.setScoringThisActivityAtAll(false);
+		config.planCalcScore().addActivityParams(home);
+
+		ActivityParams work = new ActivityParams("work") ;
+		work.setScoringThisActivityAtAll(false);
+		config.planCalcScore().addActivityParams(work);
+
+		config.controler().setLastIteration(0);
+
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setCreateGraphs(false);
+		config.controler().setDumpDataAtEnd(false);
+
 		scenario = ScenarioUtils.createScenario(config);
 	}
 
@@ -184,7 +211,7 @@ public class InputsForFDTestSetUp {
 
 			Link link =scenario.getNetwork().getFactory().createLink(Id.createLinkId(i), from, to);
 			link.setCapacity(LINK_CAPACITY);
-			link.setFreespeed(FREESPEED/3.6);
+			link.setFreespeed(FREESPEED_KM_H/3.6);
 			link.setLength(LINK_LENGTH);
 			link.setNumberOfLanes(NO_OF_LANES);
 			link.setAllowedModes(allowedModes);
@@ -195,8 +222,8 @@ public class InputsForFDTestSetUp {
 		//additional startLink and endLink for home and work activities
 		Id<Link> startLinkId = Id.createLinkId("home");
 		Link startLink = scenario.getNetwork().getFactory().createLink( startLinkId, startNode, scenario.getNetwork().getNodes().get(Id.createNodeId(0)));
-		startLink.setCapacity(100*LINK_CAPACITY);
-		startLink.setFreespeed(FREESPEED);
+		startLink.setCapacity(10*LINK_CAPACITY);
+		startLink.setFreespeed(FREESPEED_KM_H/3.6);
 		startLink.setLength(25.);
 		startLink.setNumberOfLanes(1.);
 		startLink.setAllowedModes(allowedModes);
@@ -204,8 +231,8 @@ public class InputsForFDTestSetUp {
 
 		Id<Link> endLinkId = Id.createLinkId("work");
 		Link endLink = scenario.getNetwork().getFactory().createLink(endLinkId, scenario.getNetwork().getNodes().get(Id.createNodeId(SUBDIVISION_FACTOR)), endNode);
-		endLink.setCapacity(100*LINK_CAPACITY);
-		endLink.setFreespeed(FREESPEED);
+		endLink.setCapacity(10*LINK_CAPACITY);
+		endLink.setFreespeed(FREESPEED_KM_H/3.6);
 		endLink.setLength(25.);
 		endLink.setNumberOfLanes(1.);
 		endLink.setAllowedModes(allowedModes);
@@ -264,7 +291,15 @@ public class InputsForFDTestSetUp {
 	public boolean isTimeDependentNetwork() {
 		return isTimeDependentNetwork;
 	}
+	
+	public Collection<String> getSnapshotFormats() {
+		return this.snapshotFormats;
+	}
 
+	public void setSnapshotFormats(Collection<String> snapshotFormats) {
+		this.snapshotFormats = snapshotFormats;
+	}
+	
 	public void setModalSplit(String [] modalSplit) {
 		this.modalSplitInPCU = new Double [modalSplit.length];
 		for (int ii = 0; ii <modalSplit.length; ii ++){

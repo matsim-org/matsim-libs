@@ -14,7 +14,6 @@
  *
  * <h2>Export from HBEFA 3.1</h2>
  * Currently, data from the HBEFA 3.1 Microsoft Access database needs to be exported manually.
- * We are currently testing code to read the database directly from JAVA via <a href="http://jackcess.sourceforge.net/">Jackcess</a>. However, this is not available yet.
  * 
  * Consequently, the following steps within HBEFA 3.1 need still be done manually:
  * <ul>

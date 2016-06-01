@@ -21,89 +21,75 @@ package playground.jbischoff.taxibus.algorithm.passenger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
-import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.*;
+
 
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
-public class TaxibusPassengerEngine extends PassengerEngine {
+public class TaxibusPassengerEngine
+    extends PassengerEngine
+{
 
-	private int abortWarn = 0;
-	public TaxibusPassengerEngine(String mode, EventsManager eventsManager, PassengerRequestCreator requestCreator,
-			VrpOptimizer optimizer, MatsimVrpContext context) {
-		super(mode, eventsManager, requestCreator, optimizer, context);
-	}
-
-	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> fromLinkId) {
-		   {
-		        if (!agent.getMode().equals(mode)) {
-		            return false;
-		        }
-
-		        MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
-
-		        Id<Link> toLinkId = passenger.getDestinationLinkId();
+    private int abortWarn = 0;
 
 
-		        internalInterface.registerAdditionalAgentOnLink(passenger);
-		        PassengerRequest request = advanceRequestStorage.retrieveAdvanceRequest(passenger,
-		                fromLinkId, toLinkId);
+    public TaxibusPassengerEngine(String mode, EventsManager eventsManager,
+            PassengerRequestCreator requestCreator, VrpOptimizer optimizer, VrpData vrpData,
+            Network network)
+    {
+        super(mode, eventsManager, requestCreator, optimizer, vrpData, network);
+    }
 
-		        if (request == null) {
-		        	return false;
-		        	//we don't want immediate requests for Taxibus
-		        	
-		        	//shouldn't we throw here some exception? michal, nov'15
-		        }
-		        else {
-		            PassengerPickupActivity awaitingPickup = awaitingPickupStorage
-		                    .retrieveAwaitingPickup(request);
 
-		            if (awaitingPickup != null) {
-		                awaitingPickup.notifyPassengerIsReadyForDeparture(passenger, now);
-		            }
-		        }
-		        if (request.isRejected()){
-		        	
-		        	if (abortWarn<10) Logger.getLogger(getClass()).error(agent.getId().toString() + " is aborted, no Taxibus was found");
-		        	abortWarn++;
-		        	if (abortWarn==10) Logger.getLogger(getClass()).error("no more aborted taxibus agents will be displayed");
-//		        	agent.setStateToAbort(now);
-		        }
-		        return !request.isRejected();
-		    }
-		
-		
-	}
+    @Override
+    public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> fromLinkId)
+    {
+        if (!agent.getMode().equals(getMode())) {
+            return false;
+        }
 
-	public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId,
-			Id<Link> toLinkId, Double departureTime) {
-		    		        if (departureTime <= now ) {
-		            Logger.getLogger(this.getClass()).info("This is not a call ahead (departure time: "+departureTime+" now: "+now);
-		            departureTime = now+1;
-		        }
+        boolean rejected = (!super.handleDeparture(now, agent, fromLinkId));
 
-		        PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime+1,
-		                now);
-                optimizer.requestSubmitted(request);
+        //FIXME
+        //there is no dismissal of immediate requests; on the other hand, the prior solution was
+        //not perfect(??)
+        //
+        //FIX:
+        //setRejected(true) in RequestCreator if immediate request;
+        //optimizer should ignore rejected requests
+        
+        if (rejected) {
+            if (abortWarn < 10)
+                Logger.getLogger(getClass())
+                        .error(agent.getId().toString() + " is aborted, no Taxibus was found");
+            abortWarn++;
+            if (abortWarn == 10)
+                Logger.getLogger(getClass())
+                        .error("no more aborted taxibus agents will be displayed");
+            //		        	agent.setStateToAbort(now);
+        }
+        	
+        
+        return (!rejected);
+    }
 
-                if (!request.isRejected()) {
-                    advanceRequestStorage.storeAdvanceRequest(request);
-                }
 
-		        return !request.isRejected();
-		    
-		
-	}
+    public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Id<Link> fromLinkId,
+            Id<Link> toLinkId, double departureTime)
+    {
+        
+        if (departureTime <= now) {
+            Logger.getLogger(this.getClass()).info(
+                    "This is not a call ahead (departure time: " + departureTime + " now: " + now);
+            departureTime = now + 1;
+        }
+
+        return super.prebookTrip(now, passenger, fromLinkId, toLinkId, departureTime);
+    }
 }

@@ -98,17 +98,13 @@ public class InjectionUtils {
 			final Module... modules ) {
 		// Otherwise MATSim AbstractModules cannot be used...
 		// And the MATSim Injector limits the injector methods one has access to
-		final Injector bootstrapInjector = Guice.createInjector(
-				new Module() {
-					@Override
-					public void configure( Binder binder ) {
-						binder.bind( Config.class ).toInstance( config );
-					}
-				} );
+		//final Injector bootstrapInjector = Guice.createInjector(
+		//		new ExplodedConfigModule( config ) );
 
-		for ( Module m : modules ) bootstrapInjector.injectMembers( m );
+		//for ( Module m : modules ) bootstrapInjector.injectMembers( m );
 
-		Injector injector = bootstrapInjector.createChildInjector( insertMapBindings( modules ) );
+		//Injector injector = bootstrapInjector.createChildInjector( insertMapBindings( modules ) );
+		final Injector injector = org.matsim.core.controler.Injector.createInjector(config , modules);
 
 		final ParameterizedType newType =
 				Types.newParameterizedType(

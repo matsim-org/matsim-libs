@@ -1,73 +1,61 @@
 package org.matsim.core.config.groups;
 
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.misc.StringUtils;
 
+@Deprecated
 public class ChangeLegModeConfigGroup extends ReflectiveConfigGroup {
 
 	public final static String CONFIG_MODULE = "changeLegMode";
 	public final static String CONFIG_PARAM_MODES = "modes";
 	public final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
 
-	private String[] modes = new String[] { TransportMode.car, TransportMode.pt };
-	private boolean ignoreCarAvailability = true;
 
+	private static final String message = "changeLegMode config group does no longer exist; use changeMode instead";
+
+	@Deprecated
 	public ChangeLegModeConfigGroup() {
 		super(CONFIG_MODULE);
 	}
 
-	public String[] getModes() {
-		return modes;
-	}
-
 	@StringGetter( CONFIG_PARAM_MODES )
+	@Deprecated
 	private String getModesString() {
-		return toString( modes );
+		throw new RuntimeException(message) ;
 	}
 
 	@StringSetter( CONFIG_PARAM_MODES )
+	@Deprecated
 	private void setModes( final String value ) {
-		setModes( toArray( value ) );
+		throw new RuntimeException(message) ;
 	}
 
+	@Deprecated
 	public void setModes( final String[] modes ) {
-		this.modes = modes;
+		throw new RuntimeException(message) ;
 	}
 
 	@StringSetter( CONFIG_PARAM_IGNORECARAVAILABILITY )
+	@Deprecated
 	public void setIgnoreCarAvailability(final boolean value) {
-		this.ignoreCarAvailability = value;
+		throw new RuntimeException(message) ;
 	}
 
 	@StringGetter( CONFIG_PARAM_IGNORECARAVAILABILITY )
+	@Deprecated
 	public boolean getIgnoreCarAvailability() {
-		return ignoreCarAvailability;
+		throw new RuntimeException(message) ;
 	}
 
+	@Deprecated
 	private static String toString( final String[] modes ) {
 		// (not same as toString() because of argument!)
-
-		StringBuilder b = new StringBuilder();
-
-		if (modes.length > 0) b.append( modes[ 0 ] );
-		for (int i=1; i < modes.length; i++) {
-			b.append( ',' );
-			b.append( modes[ i ] );
-		}
-
-		return b.toString();
+		throw new RuntimeException(message) ;
 	}
 
+	@Deprecated
 	private static String[] toArray( final String modes ) {
-		String[] parts = StringUtils.explode(modes, ',');
-
-		for (int i = 0, n = parts.length; i < n; i++) {
-			parts[i] = parts[i].trim().intern();
-		}
-
-		return parts;
+		throw new RuntimeException(message) ;
 	}
 
 

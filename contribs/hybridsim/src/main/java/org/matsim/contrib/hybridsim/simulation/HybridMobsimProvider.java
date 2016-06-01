@@ -37,7 +37,6 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSimExternalNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
 public class HybridMobsimProvider implements Provider<Mobsim>{
@@ -69,11 +68,12 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 		qSim.addActivityHandler(activityEngine);
 
 		ExternalEngine e = new ExternalEngine(this.em, qSim);
-		HybridQSimExternalNetworkFactory eFac = new HybridQSimExternalNetworkFactory(e);
-		this.netFac.putNetsimNetworkFactory("2ext", eFac);
-		this.netFac.putNetsimNetworkFactory("ext2", eFac);
+		this.netFac.setExternalEngine(e);
+//		HybridQSimExternalNetworkFactory eFac = new HybridQSimExternalNetworkFactory(e);
+//		this.netFac.putNetsimNetworkFactory("2ext", eFac);
+//		this.netFac.putNetsimNetworkFactory("ext2", eFac);
 		
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, this.netFac);
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, this.netFac );
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 

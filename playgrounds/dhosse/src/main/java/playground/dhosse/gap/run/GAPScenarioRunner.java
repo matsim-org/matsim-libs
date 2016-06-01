@@ -288,8 +288,9 @@ public class GAPScenarioRunner {
 
 		RoadPricingConfigGroup rp = new RoadPricingConfigGroup();
 		rp.setTollLinksFile("/home/dhosse/roadpricing.xml");
-		rp.setRoutingRandomness(3.);
 		controler.getConfig().addModule(rp);
+
+		controler.getConfig().plansCalcRoute().setRoutingRandomness(3.);
 
 		controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 

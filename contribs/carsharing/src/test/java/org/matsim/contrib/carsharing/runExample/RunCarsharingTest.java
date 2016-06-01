@@ -82,6 +82,7 @@ public class RunCarsharingTest {
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+        config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 
 		// ---
 
@@ -189,9 +190,9 @@ public class RunCarsharingTest {
 					}
 				} else if ( iteration==10 ) {
 					if ( TransportMode.car.equals(legMode) ) {
-						Assert.assertEquals(6, nOfModeLegs );
+						Assert.assertEquals(2, nOfModeLegs );
 					} else if ( "freefloating".equals(legMode) ) {
-						Assert.assertEquals(2, nOfModeLegs ) ;
+						Assert.assertEquals(3, nOfModeLegs ) ;
 					} else if ( "onewaycarsharing".equals(legMode) ) {
 						Assert.assertEquals( 1, nOfModeLegs ) ;
 					} else if ( "twowaycarsharing".equals(legMode) ) {

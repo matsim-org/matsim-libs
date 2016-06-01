@@ -97,7 +97,7 @@ public class PTScheduleCreatorHAFAS extends PTScheduleCreator implements RoutePr
 			log.warn("Undefined vehicle " + vehicleUndefined + " occured in " + vehiclesUndefined.get(vehicleUndefined) + " routes.");
 		}
 
-		// 7. Clean schedule
+		// 6. Clean schedule
 		HAFASUtils.removeNonUsedStopFacilities(schedule);
 		HAFASUtils.uniteSameRoutesWithJustDifferentDepartures(schedule);
 		HAFASUtils.cleanDepartures(schedule);

@@ -21,25 +21,16 @@ package org.matsim.contrib.dvrp.passenger;
 
 import java.util.*;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 
-public class AdvanceRequestStorage
+class AdvanceRequestStorage
 {
     private final Map<Id<Person>, Queue<PassengerRequest>> advanceRequests = new HashMap<>();
-    private final MatsimVrpContext context;
-
-
-    AdvanceRequestStorage(MatsimVrpContext context)
-    {
-        this.context = context;
-    }
 
 
     public void storeAdvanceRequest(PassengerRequest request)
@@ -56,11 +47,8 @@ public class AdvanceRequestStorage
     }
 
 
-    private boolean warningShown = false;
-
-
     public PassengerRequest retrieveAdvanceRequest(MobsimAgent passenger, Id<Link> fromLinkId,
-            Id<Link> toLinkId)
+            Id<Link> toLinkId, double now)
     {
         Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passenger.getId());
 
@@ -79,16 +67,11 @@ public class AdvanceRequestStorage
                     passengerAdvReqs.poll();
                     return req;
                 }
-                else if (context.getTime() > req.getT0()) {
-                    if (!warningShown) {
-                        Logger.getLogger(getClass()).warn("There is an older prebooked request - "
-                                + "seems that the agent has skipped a previously submitted request(??). "
-                                + "This message is shown only once.");
-                        warningShown = true;
-                    }
-                    //TODO michalm: do we have to somehow handle it (and how/where)?
-                    //
-                    //jb: my preference: ignore it. I had it turning up in multiple iterations and it doesnt do a thing (plans are sorted out because they end up being bad anyway)
+                else if (now > req.getT0()) {
+                    //TODO do we have to somehow handle it?
+                    //Currently this is not a problem; we do not have cases of not turning up...
+                    throw new IllegalStateException(
+                            "Seems that the agent has skipped a previously submitted request");
                 }
             }
         }

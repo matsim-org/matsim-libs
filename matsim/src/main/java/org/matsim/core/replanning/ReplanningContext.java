@@ -19,10 +19,6 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-
 /**
  * A partial, inside view of the Controler which is available during replanning.
  * @author michaz

@@ -131,8 +131,14 @@ class CoordUtils {
 		List<Coord> list = new ArrayList<Coord>(); 
 		
 		for(WayNode wayNode : way.getWayNodes()){
-			double xNode = nodeMap.get(wayNode.getNodeId()).getEntity().getLongitude();
-			double yNode = nodeMap.get(wayNode.getNodeId()).getEntity().getLatitude();
+			NodeContainer nc = nodeMap.get(wayNode.getNodeId());
+			if(nc == null){
+				log.error("Oops... some way coords are missing.");
+				throw new RuntimeException("Ensure you pass the 'completeWays=yes' argument when executing osmosis commands.");
+			}
+			Node node = nc.getEntity();
+			double xNode = node.getLongitude();
+			double yNode = node.getLatitude();
 
 			Coord coord = new Coord(xNode, yNode);
 			

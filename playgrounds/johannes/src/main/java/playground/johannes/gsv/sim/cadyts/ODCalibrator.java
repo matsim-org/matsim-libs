@@ -416,7 +416,7 @@ public class ODCalibrator implements PersonDepartureEventHandler, PersonArrivalE
 			set.add(zone);
 		}
 		
-		ZoneCollection mergedZones = new ZoneCollection();
+		ZoneCollection mergedZones = new ZoneCollection(null);
 		
 		for(Entry<String, Set<Zone>> entry : zonesMap.entrySet()) {
 			Set<Zone> set = entry.getValue();

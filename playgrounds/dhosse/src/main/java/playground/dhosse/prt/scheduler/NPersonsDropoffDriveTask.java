@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.schedule.TaxiDriveWithPassengerTask;
+import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
 
-public class NPersonsDropoffDriveTask extends TaxiDriveWithPassengerTask {
+public class NPersonsDropoffDriveTask extends TaxiOccupiedDriveTask {
 
 	private List<TaxiRequest> requests;
 	
@@ -16,7 +16,7 @@ public class NPersonsDropoffDriveTask extends TaxiDriveWithPassengerTask {
 		this.requests = requests;
 		
 		for(TaxiRequest request : requests){
-			request.setDriveWithPassengerTask(this);
+			request.setOccupiedDriveTask(this);
 		}
 		
 	}
@@ -25,7 +25,7 @@ public class NPersonsDropoffDriveTask extends TaxiDriveWithPassengerTask {
     public void removeFromRequest()
     {
 		for(TaxiRequest request : this.requests){
-			request.setDriveWithPassengerTask(null);
+			request.setOccupiedDriveTask(null);
 		}
     }
 
@@ -33,7 +33,7 @@ public class NPersonsDropoffDriveTask extends TaxiDriveWithPassengerTask {
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.DRIVE_OCCUPIED;
+        return TaxiTaskType.OCCUPIED_DRIVE;
     }
 
 

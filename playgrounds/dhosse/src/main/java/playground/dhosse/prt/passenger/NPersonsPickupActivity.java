@@ -2,8 +2,7 @@ package playground.dhosse.prt.passenger;
 
 import java.util.List;
 
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.passenger.PassengerPickupActivity;
+import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.taxi.data.TaxiRequest;

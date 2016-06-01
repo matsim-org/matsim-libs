@@ -594,8 +594,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@Override
 		public Map<String, String> getComments() {
 			final Map<String, String> map = super.getComments();
-			map.put( TYPICAL_DURATION_SCORE_COMPUTATION,  "method to compute score at typical duration.  Use "
-					+ TypicalDurationScoreComputation.uniform + " for backwards compatibility (all activities same score; higher proba to drop long acts).") ;
+			// ---
+			StringBuilder str = new StringBuilder() ;
+			str.append("method to compute score at typical duration.  Options: | ") ;
+			for ( TypicalDurationScoreComputation value : TypicalDurationScoreComputation.values() ) {
+				str.append( value.name() + " | " ) ;
+			}
+			str.append( "Use " + TypicalDurationScoreComputation.uniform.name() + " for backwards compatibility (all activities same score; higher proba to drop long acts)." ) ;
+			map.put( TYPICAL_DURATION_SCORE_COMPUTATION,  str.toString() ) ;
+			// ---
 			return map ;
 		}
 
@@ -766,9 +773,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public static class ModeParams extends ReflectiveConfigGroup implements MatsimParameters {
-		private static final String MONETARY_DISTANCE_RATE = "monetaryDistanceRate";
 
 		final static String SET_TYPE = "modeParams";
+
+		private static final String MONETARY_DISTANCE_RATE = "monetaryDistanceRate";
+		private static final String MARGINAL_UTILITY_OF_TRAVELING = "marginalUtilityOfTraveling_util_hr";
 
 		private String mode = null;
 		private double traveling = -6.0;
@@ -788,11 +797,11 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@Override
 		public Map<String, String> getComments() {
 			final Map<String, String> map = super.getComments();
-			map.put( "marginalUtilityOfTraveling_util_hr", "[utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top " +
+			map.put( MARGINAL_UTILITY_OF_TRAVELING, "[utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top " +
 					"of the opportunity cost of time");
 			map.put( "marginalUtilityOfDistance_util_m", "[utils/m] utility of walking per m, normally negative.  this is " +
 					"on top of the time (dis)utility.") ;
-			map.put("monetaryDistanceCostRate", "[unit_of_money/m] conversion of distance into money. Probably needs to be negative to work." ) ;
+			map.put(MONETARY_DISTANCE_RATE, "[unit_of_money/m] conversion of distance into money. Normally negative." ) ;
 			map.put("constant",  "[utils] alternative-specific constant.  no guarantee that this is used anywhere. " +
 					"default=0 to be backwards compatible for the time being" ) ;
 			return map;
@@ -809,13 +818,13 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return mode;
 		}
 
-		@StringSetter( "marginalUtilityOfTraveling_util_hr" )
+		@StringSetter( MARGINAL_UTILITY_OF_TRAVELING )
 		public void setMarginalUtilityOfTraveling(double traveling) {
 			testForLocked() ;
 			this.traveling = traveling;
 		}
 
-		@StringGetter( "marginalUtilityOfTraveling_util_hr" )
+		@StringGetter( MARGINAL_UTILITY_OF_TRAVELING )
 		public double getMarginalUtilityOfTraveling() {
 			return this.traveling;
 		}
@@ -961,7 +970,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@StringSetter( "subpopulation" )
 		public void setSubpopulation(String subpopulation) {
 			//TODO: handle case of default subpopulation
-			if ( subpopulation != null ) {
+			if ( this.subpopulation != null ) {
 				throw new IllegalStateException( "cannot change subpopulation in a scoring parameter set, as it is used for indexing." );
 			}
 

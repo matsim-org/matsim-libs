@@ -25,8 +25,9 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.testcases.MatsimTestCase;
 
 import playground.jjoubert.CommercialTraffic.Activity;
 import playground.jjoubert.CommercialTraffic.Chain;
@@ -37,7 +38,7 @@ import playground.jjoubert.Utilities.Clustering.DJCluster;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Point;
 
-public class CommercialChainExtractorTest extends MatsimTestCase{
+public class CommercialChainExtractorTest{
 	private Integer t = Integer.valueOf(0);
 
 	/**
@@ -54,15 +55,16 @@ public class CommercialChainExtractorTest extends MatsimTestCase{
 	 *  the result should only be two chains: one with two <i>minor</i> activities, and
 	 *  the other with a single <i>minor</i> activitiy. 
 	 */
+	@Test
 	public void testCommercialChainExtractor(){
 		
 		List<Activity> activities = buildActivityList1();
 		CommercialChainExtractor ce = new CommercialChainExtractor(5);
 		List<Chain> chains = ce.extractChains(activities);
 		
-		assertEquals("Wrong number of chains extracted.", 2, chains.size());
-		assertEquals("Wrong chain extracted", 4, chains.get(0).getActivities().size());
-		assertEquals("Wrong chain extracted", 3, chains.get(1).getActivities().size());
+		Assert.assertEquals("Wrong number of chains extracted.", 2, chains.size());
+		Assert.assertEquals("Wrong chain extracted", 4, chains.get(0).getActivities().size());
+		Assert.assertEquals("Wrong chain extracted", 3, chains.get(1).getActivities().size());
 	}
 	
 	/**
@@ -77,6 +79,7 @@ public class CommercialChainExtractorTest extends MatsimTestCase{
 	 *  Consecutive activities that are in the same cluster are indicated with square
 	 *  brackets.
 	 */
+	@Test
 	public void testActivityThinning(){
 		
 		List<Activity> activities = buildActivityList2();
@@ -94,28 +97,28 @@ public class CommercialChainExtractorTest extends MatsimTestCase{
 		CommercialChainExtractor cce = new CommercialChainExtractor(5);
 		cce.cleanActivityList(activities, qt);
 		
-		assertEquals("Wrong number of activities in the list.", 5, activities.size());
-		assertEquals("Wrong duration for activity 1.", 10, activities.get(0).getDuration());
-		assertEquals("Wrong duration for activity 2.", 2, activities.get(1).getDuration());
-		assertEquals("Wrong duration for activity 3.", 11, activities.get(2).getDuration());
-		assertEquals("Wrong duration for activity 4.", 1, activities.get(3).getDuration());
-		assertEquals("Wrong duration for activity 5.", 11, activities.get(4).getDuration());
+		Assert.assertEquals("Wrong number of activities in the list.", 5, activities.size());
+		Assert.assertEquals("Wrong duration for activity 1.", 10, activities.get(0).getDuration());
+		Assert.assertEquals("Wrong duration for activity 2.", 2, activities.get(1).getDuration());
+		Assert.assertEquals("Wrong duration for activity 3.", 11, activities.get(2).getDuration());
+		Assert.assertEquals("Wrong duration for activity 4.", 1, activities.get(3).getDuration());
+		Assert.assertEquals("Wrong duration for activity 5.", 11, activities.get(4).getDuration());
 		
 		Coordinate c1 = new Coordinate(0,Double.valueOf(1.0/3.0));
 		Coordinate c2 = new Coordinate(5.5,0);
 		Coordinate c3 = new Coordinate(5.5,5);
 		Coordinate c4 = new Coordinate(0,5);
 		
-		assertEquals("Wrong location for activity 1.", true, c1.equals(activities.get(0).getLocation().getCoordinate()));
-		assertEquals("Wrong location for activity 2.", true, c2.equals(activities.get(1).getLocation().getCoordinate()));
-		assertEquals("Wrong location for activity 3.", true, c3.equals(activities.get(2).getLocation().getCoordinate()));
-		assertEquals("Wrong location for activity 4.", true, c4.equals(activities.get(3).getLocation().getCoordinate()));	
-		assertEquals("Wrong location for activity 5.", true, c1.equals(activities.get(4).getLocation().getCoordinate()));	
+		Assert.assertEquals("Wrong location for activity 1.", true, c1.equals(activities.get(0).getLocation().getCoordinate()));
+		Assert.assertEquals("Wrong location for activity 2.", true, c2.equals(activities.get(1).getLocation().getCoordinate()));
+		Assert.assertEquals("Wrong location for activity 3.", true, c3.equals(activities.get(2).getLocation().getCoordinate()));
+		Assert.assertEquals("Wrong location for activity 4.", true, c4.equals(activities.get(3).getLocation().getCoordinate()));	
+		Assert.assertEquals("Wrong location for activity 5.", true, c1.equals(activities.get(4).getLocation().getCoordinate()));	
 
 		// Check that the one chain end is the same as the start of the next chain
 		
 		List<Chain> chains = cce.extractChains(activities);
-		assertEquals("Last major activity of one chain is not the first major activity of the subsequent chain.", true, 
+		Assert.assertEquals("Last major activity of one chain is not the first major activity of the subsequent chain.", true, 
 				chains.get(0).getActivities().get(chains.get(0).getActivities().size()-1).getLocation().getCoordinate().equals(chains.get(1).getActivities().get(0).getLocation().getCoordinate()));
 	}
 	

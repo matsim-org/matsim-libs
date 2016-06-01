@@ -23,12 +23,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.contrib.zone.*;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.core.utils.io.tabularFileParser.*;
 
 import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
@@ -38,8 +35,8 @@ import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
  */
 public class LinesUtils {
 
-	public static LineDispatcher createLineDispatcher(String linesFile, String zonesXml, String zonesShp, MatsimVrpContext context, final TaxibusConfigGroup tbcg){
-		final LineDispatcher dispatcher = new LineDispatcher(context,tbcg);
+	public static LineDispatcher createLineDispatcher(String linesFile, String zonesXml, String zonesShp, VrpData vrpData, final TaxibusConfigGroup tbcg){
+		final LineDispatcher dispatcher = new LineDispatcher(vrpData,tbcg);
 		final Map<Id<Zone>,Zone> zones = Zones.readZones(zonesXml, zonesShp);
 		
 		TabularFileParserConfig config = new TabularFileParserConfig();
@@ -55,7 +52,7 @@ public class LinesUtils {
 				Id<TaxibusLine> id = Id.create(from+"_"+to,TaxibusLine.class);
 				Id<Link> holdingPosition = Id.createLinkId(row[2]);
 				double twMax = Double.parseDouble(row[3]);
-				TaxibusLine line = new TaxibusLineImpl(id,holdingPosition, zones.get(Id.create(from,Zones.class)).getMultiPolygon(), zones.get(Id.create(to,Zones.class)).getMultiPolygon(),twMax,tbcg.getNumberOfVehiclesDispatchedAtSameTime());
+				TaxibusLine line = new TaxibusLineImpl(id,holdingPosition, zones.get(Id.create(from,Zones.class)).getMultiPolygon(), zones.get(Id.create(to,Zones.class)).getMultiPolygon(),twMax,tbcg.getNumberOfVehiclesDispatchedAtSameTime(),tbcg.getVehCap());
 				Id<TaxibusLine> rid = Id.create(to+"_"+from,TaxibusLine.class);
 				
 				line.setReturnRouteId(rid);

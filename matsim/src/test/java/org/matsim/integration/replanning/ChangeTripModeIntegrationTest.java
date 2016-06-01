@@ -61,7 +61,9 @@ public class ChangeTripModeIntegrationTest extends MatsimTestCase {
 		strategySettings.setStrategyName("ChangeTripMode");
 		strategySettings.setWeight(1.0);
 		config.strategy().addStrategySettings(strategySettings);
-		config.setParam("changeLegMode", "modes", "car,walk");
+//		config.setParam("changeMode", "modes", "car,walk");
+		String[] str = {"car","walk"} ;
+		config.changeMode().setModes(str);
 
 		// setup network
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();

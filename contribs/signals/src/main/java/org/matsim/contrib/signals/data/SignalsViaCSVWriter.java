@@ -105,7 +105,7 @@ public class SignalsViaCSVWriter {
 							Double time = signalPlan.getStartTime();
 							if (time == null) {
 								// use start time of the simulation
-								time = scenario.getConfig().qsim().getStartTime() + signalPlan.getOffset();
+								time = scenario.getConfig().qsim().getStartTime();
 							}
 //							log.info("Writing signal states for signal " + signal.getId() + " for the whole simulation time ...");
 							Double endTime = signalPlan.getEndTime();
@@ -113,6 +113,13 @@ public class SignalsViaCSVWriter {
 								// use end time of the simulation
 								endTime = scenario.getConfig().qsim().getEndTime();
 							}
+							// handle case start time = end time
+							if (time.equals(endTime)){
+								// a whole day is meant
+								endTime += 24*3600;
+							}
+							// add the signal plan offset to the start time
+							time += signalPlan.getOffset();
 							while (time <= endTime) {
 								signalsCSVWriter.write(signal.getId() + ";" + signalCoord.getX() + ";" + signalCoord.getY() + ";" + (time + signalGroupSetting.getOnset()) + ";" + SIGNAL_STATE_GREEN);
 								signalsCSVWriter.newLine();
@@ -162,21 +169,25 @@ public class SignalsViaCSVWriter {
 			// vertical link 
 			deltaX = 0;
 			if (toNodeCoord.getY() < fromNodeCoord.getY()){
-				deltaY = -SIGNAL_COORD_NODE_OFFSET;
+				deltaY = -1;
 			} else {
-				deltaY = SIGNAL_COORD_NODE_OFFSET;
+				deltaY = 1;
 			}
 			
 		} else {
 			// this case includes the case when the link is horizontal
 			double m = (toNodeCoord.getY() - fromNodeCoord.getY()) / (toNodeCoord.getX() - fromNodeCoord.getX());
-			deltaX = SIGNAL_COORD_NODE_OFFSET / (Math.sqrt(1 + m * m));
+			deltaX = 1 / (Math.sqrt(1 + m * m));
+			if (toNodeCoord.getX() > fromNodeCoord.getX()){
+				// link is oriented to the right -> coordinates has to be shifted to the left
+				deltaX *= -1;
+			}
 			deltaY = m * deltaX;
 		}
 		
 		// calculate x and y coord where the signal should be drawn
-		double x = toNodeCoord.getX() - deltaX + stepNumber * deltaY * (SIGNAL_COORD_LINK_OFFSET / SIGNAL_COORD_NODE_OFFSET);
-		double y = toNodeCoord.getY() - deltaY - stepNumber * deltaX * (SIGNAL_COORD_LINK_OFFSET / SIGNAL_COORD_NODE_OFFSET);
+		double x = toNodeCoord.getX() + SIGNAL_COORD_NODE_OFFSET * deltaX + stepNumber * SIGNAL_COORD_LINK_OFFSET * deltaY;
+		double y = toNodeCoord.getY() + SIGNAL_COORD_NODE_OFFSET * deltaY - stepNumber * SIGNAL_COORD_LINK_OFFSET * deltaX;
 		
 //		log.info("... done!");
 		return new Coord(x, y);

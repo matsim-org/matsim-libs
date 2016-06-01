@@ -73,6 +73,8 @@ public final class TtCreateBraessNetworkAndLanes {
 	
 	// capacity at the links that all agents have to use
 	private double capFirstLast; // [veh/h]
+	// capacity at middle link
+	private double capZ; // [veh/h]
 	// capacity at all other links
 	private double capMain; // [veh/h]
 	// link length for the inflow links
@@ -115,6 +117,7 @@ public final class TtCreateBraessNetworkAndLanes {
 		if (btuRun){
 			capFirstLast = numberOfPersons;
 			capMain = numberOfPersons;
+			capZ = capMain;
 			inflowLinkLength = 7.5 * 1;
 			linkLengthSmall = 200;
 			linkTTMid = 1;
@@ -122,8 +125,9 @@ public final class TtCreateBraessNetworkAndLanes {
 			linkTTBig = 20;
 			minimalLinkTT = 1;
 		} else {
-			capFirstLast = numberOfPersons;
+			capFirstLast = numberOfPersons + 400;
 			capMain = (numberOfPersons / 2 ) * (1 + capTolerance);
+			capZ = capMain;
 			inflowLinkLength = 7.5 * 1;
 			linkLengthSmall = 1000;
 			linkLengthBig = 10000;
@@ -220,7 +224,7 @@ public final class TtCreateBraessNetworkAndLanes {
 			l = fac.createLink(Id.createLinkId("3_4"),
 				net.getNodes().get(Id.createNodeId(3)),
 				net.getNodes().get(Id.createNodeId(4)));
-			setLinkAttributes(l, capMain, linkLengthSmall, linkTTMid);
+			setLinkAttributes(l, capZ, linkLengthSmall, linkTTMid);
 			net.addLink(l);
 		}
 	
@@ -421,6 +425,10 @@ public final class TtCreateBraessNetworkAndLanes {
 
 	public void setCapTolerance(double capTolerance) {
 		this.capTolerance = capTolerance;
+	}
+
+	public void setCapZ(double capZ) {
+		this.capZ = capZ;
 	}
 
 }

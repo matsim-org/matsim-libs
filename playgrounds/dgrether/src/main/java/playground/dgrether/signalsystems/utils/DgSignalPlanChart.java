@@ -37,7 +37,7 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 
 import playground.dgrether.analysis.charts.DgDefaultAxisBuilder;
 

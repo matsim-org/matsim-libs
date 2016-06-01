@@ -1,8 +1,10 @@
 package playground.gleich.otp_matsim.portland;
 
 
+import com.conveyal.gtfs.GTFSFeed;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.gtfs.GtfsConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
@@ -15,7 +17,7 @@ import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
-import playground.mzilske.gtfs.GtfsConverter;
+import java.time.LocalDate;
 
 /**
  * copy of playground.mzilske/vbb/Convert
@@ -62,10 +64,9 @@ public class Convert {
 		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		// GtfsConverter gtfs = new GtfsConverter("/Users/zilske/gtfs-bvg", scenario, new GeotoolsTransformation("WGS84", CRS));
-		GtfsConverter gtfs = new GtfsConverter("Z:/WinHome/otp-matsim/Portland/gtfs_unzipped", scenario, TransformationFactory.getCoordinateTransformation(
+		GtfsConverter gtfs = new GtfsConverter(GTFSFeed.fromFile("Z:/WinHome/otp-matsim/Portland/gtfs_unzipped"), scenario, TransformationFactory.getCoordinateTransformation(
 				TransformationFactory.WGS84, CRS));
-		gtfs.setCreateShapedNetwork(false); // Shaped network doesn't work yet.
-		gtfs.setDate(20150210);
+		gtfs.setDate(LocalDate.of(2015, 2, 10));
 		gtfs.convert();
 		return scenario;
 	}

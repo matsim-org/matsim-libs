@@ -127,7 +127,7 @@ public class VWRCreateDemand {
 		
 		String wb = "zones/wb.shp";
 //		double scalefactor = 0.05;
-		double scalefactor = 0.1;
+		double scalefactor = 1.0;
 //		double scalefactor = 1.0;
 //		double scalefactor = 0.01;
 		String plansOutputComplete = basedir + "../../input/initial_plans"+scalefactor+".xml.gz";
@@ -178,6 +178,8 @@ public class VWRCreateDemand {
 		createWorkers("WB", "WB", (41470-18313) * config.getScalefactor(), 0.55, 0.2, 0.12, "03103", "03103");
 		createVWWorkers("WB", "03103", 11207, 1260+5328, 658, 0.55, 0.2, 0.12);
 		//		3103	11207	1260	5328	518	18313
+		
+		createWorkers("WB", "BS", 2310 * config.getScalefactor(), 0.8, 0.2, 0.0, "03103", "03101");
 
 		
 		// Wolfsburg, Stadt - Wolfsburg, Stadt | school
@@ -353,77 +355,14 @@ public class VWRCreateDemand {
 
 	
 
-	private void replaceDoubtfulLegsByOtherMode() {
-		for (Person p : scenario.getPopulation().getPersons().values()){
-			for (Plan plan : p.getPlans()){
-				
-				Leg lastleg = null; 
-				Activity lastActivity = null ;
-				boolean personb = random.nextBoolean();
-				for (PlanElement pe : plan.getPlanElements()){
-					if (pe instanceof Activity){
-						if (lastActivity == null){
-							lastActivity = (Activity) pe;
-						}
-						else {
-							Coord lastCoord;
-							if (lastActivity.getCoord() != null){
-							lastCoord = lastActivity.getCoord();
-							}
-							else
-							{
-							Link lastLink = scenario.getNetwork().getLinks().get(lastActivity.getLinkId());	
-							lastCoord = lastLink.getCoord();	
-							}
-							Coord currentCoord;
-							if (((Activity) pe).getCoord()!= null){
-								currentCoord = ((Activity) pe).getCoord();
-							}
-							else
-							{
-								currentCoord = scenario.getNetwork().getLinks().get(((Activity) pe).getLinkId()).getCoord();	
-							}
-							
-							double distance = CoordUtils.calcEuclideanDistance(lastCoord, currentCoord);
-							
-							if (distance>3000&&lastleg.getMode().equals("walk")){
-								lastleg.setMode("pt");
-							} else if (distance>20000&&lastleg.getMode().equals("bike")){
-								lastleg.setMode("pt");
-							}
-							else if (distance<2000&&(lastleg.getMode().equals("pt"))){
-								if (personb == true)  lastleg.setMode("walk");
-								else lastleg.setMode("bike");
-							}
-
-							
-							
-							
-							
-							lastActivity = (Activity) pe;
-						}
-							
-					}
-					else if (pe instanceof Leg){
-						lastleg = (Leg) pe;
-					}
-					
-				}
-				
-			}
-		}
-		
-	}
-
-	
 	private void createVWWorkers(String from, String origin, double flex, double threeshift, double partTime, double carcommuterFactor,
 			double bikecommuterFactor, double walkcommuterFactor){
-		Geometry homeCounty = getCounty(origin);
 		
-		
-		Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
-
 			for (int i = 0; i<=flex*config.getScalefactor(); i++){
+				Geometry homeCounty = getCounty(origin);
+
+				Coord homeC = (origin.equals("03101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+
 				vwWorkerCounter++;
 				commuterCounter++;
 				String mode = drawMode(carcommuterFactor,bikecommuterFactor,walkcommuterFactor);
@@ -431,6 +370,10 @@ public class VWRCreateDemand {
 			
 			}
 			for (int i = 0; i<=partTime*config.getScalefactor(); i++){
+				Geometry homeCounty = getCounty(origin);
+
+				Coord homeC = (origin.equals("03101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+
 				vwWorkerCounter++;
 				commuterCounter++;
 				String mode = drawMode(carcommuterFactor,bikecommuterFactor,walkcommuterFactor);
@@ -438,6 +381,10 @@ public class VWRCreateDemand {
 				
 			}
 			for (int i = 0; i<=threeshift*config.getScalefactor(); i++){
+				Geometry homeCounty = getCounty(origin);
+
+				Coord homeC = (origin.equals("03101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+
 				vwWorkerCounter++;
 				commuterCounter++;
 				String mode = drawMode(carcommuterFactor,bikecommuterFactor,walkcommuterFactor);
@@ -461,7 +408,6 @@ public class VWRCreateDemand {
 			double bikecommuterFactor, double walkcommuterFactor, String origin, String destination) {
 		
 		
-		Geometry homeCounty = getCounty(origin);
 		Geometry commuteDestinationCounty = this.counties.get(destination);
 
 		double walkcommuters = commuters * walkcommuterFactor;
@@ -479,8 +425,9 @@ public class VWRCreateDemand {
 					}
 				}
 			}
+			Geometry homeCounty = getCounty(origin);
 
-			Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+			Coord homeC = (origin.equals("03101"))? findClosestCoordFromMapRandomized(drawRandomPointFromGeometry(homeCounty),this.residential,4): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 
 //			double wvWorkerOrNot = random.nextDouble();
 //			if (to == "WB" && wvWorkerOrNot < 0.6363) {
@@ -548,7 +495,6 @@ public class VWRCreateDemand {
 
 	private void createPupils(String from, String to, double commuters, double carcommuterFactor,
 			double bikecommuterFactor, double walkcommuterFactor, String origin, String destination) {
-		Geometry homeCounty = getCounty(origin);
 		Geometry commuteDestinationCounty = this.counties.get(destination);
 
 		double walkcommuters = commuters * walkcommuterFactor;
@@ -566,8 +512,9 @@ public class VWRCreateDemand {
 					}
 				}
 			}
-			
-			Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+			Geometry homeCounty = getCounty(origin);
+
+			Coord homeC = (origin.equals("03101"))? findClosestCoordFromMapRandomized(drawRandomPointFromGeometry(homeCounty),this.residential,4): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 
 			Coord commuteDestinationC = findClosestCoordFromMap(drawRandomPointFromGeometry(commuteDestinationCounty),
 					this.schools);
@@ -579,7 +526,6 @@ public class VWRCreateDemand {
 
 	private void createStudents(String from, String to, double commuters, double carcommuterFactor,
 			double bikecommuterFactor, double walkcommuterFactor, String origin, String destination) {
-		Geometry homeCounty = getCounty(origin);
 		Geometry commuteDestinationCounty = this.counties.get(destination);
 
 		double walkcommuters = commuters * walkcommuterFactor;
@@ -597,8 +543,9 @@ public class VWRCreateDemand {
 					}
 				}
 			}
+			Geometry homeCounty = getCounty(origin);
 
-			Coord homeC = (origin.equals("3101"))? drawRandomPointFromGeometry(homeCounty): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
+			Coord homeC = (origin.equals("03101"))? findClosestCoordFromMapRandomized(drawRandomPointFromGeometry(homeCounty),this.residential,4): findClosestCoordFromMap(drawRandomPointFromGeometry(homeCounty), this.residential);
 			
 			Coord commuteDestinationC = findClosestCoordFromMap(drawRandomPointFromGeometry(commuteDestinationCounty),
 					this.universities);
@@ -1045,11 +992,12 @@ public class VWRCreateDemand {
 	}
 
 	private Coord drawRandomPointFromGeometry(Geometry g) {
+		Random rnd = MatsimRandom.getLocalInstance();
 		Point p;
 		double x, y;
 		do {
 			x = g.getEnvelopeInternal().getMinX()
-					+ random.nextDouble() * (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());
+					+ rnd.nextDouble() * (g.getEnvelopeInternal().getMaxX() - g.getEnvelopeInternal().getMinX());
 			y = g.getEnvelopeInternal().getMinY()
 					+ random.nextDouble() * (g.getEnvelopeInternal().getMaxY() - g.getEnvelopeInternal().getMinY());
 			p = MGC.xy2Point(x, y);

@@ -144,7 +144,7 @@ public class Plans2Matrix {
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
 		facReader.readFile(args[1]);
 
-		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], args[3]);
+		ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], args[3], null);
 
 		Set<Plan> plans = new HashSet<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {

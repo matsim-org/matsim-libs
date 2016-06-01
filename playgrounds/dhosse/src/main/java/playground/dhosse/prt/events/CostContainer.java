@@ -1,11 +1,9 @@
 package playground.dhosse.prt.events;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.population.Person;
 
 public class CostContainer {

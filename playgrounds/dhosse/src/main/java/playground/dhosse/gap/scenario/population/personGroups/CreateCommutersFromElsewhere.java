@@ -1,10 +1,7 @@
 package playground.dhosse.gap.scenario.population.personGroups;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -26,17 +23,13 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
 
 import playground.dhosse.gap.Global;
 import playground.dhosse.gap.scenario.GAPScenarioBuilder;
-import playground.dhosse.gap.scenario.mid.MiDPersonGroupData;
-import playground.dhosse.gap.scenario.population.io.CommuterDataElement;
 import playground.dhosse.gap.scenario.population.utils.EgapPopulationUtils;
 import playground.dhosse.gap.scenario.population.utils.PlanCreationUtils;
+import playground.dhosse.scenarios.generic.population.io.commuters.CommuterDataElement;
 
 import com.vividsolutions.jts.geom.Geometry;
 

@@ -18,6 +18,11 @@
  * *********************************************************************** */
 package playground.thibautd.router.transitastarlandmarks;
 
+import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -35,6 +40,8 @@ import org.matsim.core.router.util.PieSlicesLandmarker;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.Facility;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
@@ -46,11 +53,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author thibautd
@@ -151,13 +153,12 @@ public class TransitRouterAStar implements TransitRouter {
     private double getWalkDisutility(Person person, Coord coord, Coord toCoord) {
         return travelDisutility.getTravelDisutility( person, coord, toCoord );
     }
-
     @Override
-    public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
+	    public List<Leg> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime, final Person person) {
         // find possible start stops
-        Iterable<MultiNodeAStarLandmarks.InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromCoord, departureTime);
+        Iterable<MultiNodeAStarLandmarks.InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromFacility.getCoord(), departureTime);
         // find possible end stops
-        Iterable<MultiNodeAStarLandmarks.InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toCoord, departureTime);
+        Iterable<MultiNodeAStarLandmarks.InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toFacility.getCoord(), departureTime);
 
         // find routes between start and end stops
         LeastCostPathCalculator.Path p = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
@@ -166,15 +167,15 @@ public class TransitRouterAStar implements TransitRouter {
             return null;
         }
 
-        double directWalkCost = getWalkDisutility(person, fromCoord, toCoord);
+        double directWalkCost = getWalkDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
         double pathCost = p.travelCost +
 				getCost( p.nodes.get( 0 ) , wrappedFromNodes ) +
 				getCost( p.nodes.get( p.nodes.size() - 1 ) , wrappedToNodes );
 
         if (directWalkCost < pathCost) {
-            return this.createDirectWalkLegList(null, fromCoord, toCoord);
+            return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
         }
-        return convertPathToLegList(departureTime, p, fromCoord, toCoord, person);
+        return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
     }
 
 	private double getCost( Node node, Iterable<MultiNodeAStarLandmarks.InitialNode> wrappedToNodes ) {

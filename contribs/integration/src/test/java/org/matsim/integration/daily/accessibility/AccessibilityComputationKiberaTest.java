@@ -92,7 +92,10 @@ public class AccessibilityComputationKiberaTest {
 		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
-		
+
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+		// yy For a test, "abort" may be too strict.  kai, may'16
+
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		
@@ -111,7 +114,7 @@ public class AccessibilityComputationKiberaTest {
 		
 
 		// collect activity types
-		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
+		List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityOptionTypes(scenario);
 		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14

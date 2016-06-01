@@ -1,7 +1,10 @@
 package playground.boescpa.ivtBaseline;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.boescpa.analysis.ActivityAnalyzer;
 import playground.boescpa.analysis.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.analysis.scenarioAnalyzer.eventHandlers.AgentCounter;
@@ -24,30 +27,50 @@ import java.util.List;
  */
 public class AnalyzeIVTBaselineDemand {
 
+	private final String pathToEventsFile;
+	private final Network network;
+	private final Population population;
+	private final int scaleFactor;
+	private final String pathToOutputFolder;
+
+	private AnalyzeIVTBaselineDemand(String pathToEventsFile, Network network, Population population, int scaleFactor, String pathToOutputFolder) {
+		this.pathToEventsFile = pathToEventsFile;
+		this.network = network;
+		this.population = population;
+		this.scaleFactor = scaleFactor;
+		this.pathToOutputFolder = pathToOutputFolder;
+	}
+
     public static void main(final String[] args) {
         final String pathToEventsFile = args[0];
         final Network network = NetworkUtils.readNetwork(args[1]);
         final Population population = PopulationUtils.readPopulation(args[2]);
-        final int scaleFactor = Integer.parseInt(args[3]);
-        final String pathToOutputFolder = args.length > 4 ? args[4] : "";
+		new ObjectAttributesXmlReader(population.getPersonAttributes()).parse(args[3]);
+        final int scaleFactor = Integer.parseInt(args[4]);
+        final String pathToOutputFolder = args.length > 5 ? args[5] : "";
+
+		AnalyzeIVTBaselineDemand analyzeIVTBaselineDemand = new AnalyzeIVTBaselineDemand(
+				pathToEventsFile, network, population, scaleFactor, pathToOutputFolder);
 
         // analyze events
-        runScenarioAnalyzer(network, pathToEventsFile, scaleFactor);
+        analyzeIVTBaselineDemand.analyzeEvents();
 
         // analyze trips
-        TripEventHandler.setAnonymizeTrips(false);
-        List<Trip> origTrips = EventsToTrips.createTripsFromEvents(pathToEventsFile, network);
-        TripWriter.writeTrips(origTrips, pathToOutputFolder + "all_trips.csv");
-        List<Trip> noStuckTrips = TripFilter.removeUnfinishedTrips(origTrips, null);
-        analyzeTrips(noStuckTrips, population, pathToOutputFolder);
+        analyzeIVTBaselineDemand.analyzeTrips();
 
         // analyze population
-        ActivityAnalyzer activityAnalyzer = new ActivityAnalyzer();
-        activityAnalyzer.analyzePopulation(population);
-        activityAnalyzer.printActChainAnalysis(pathToOutputFolder + "actChainAnalysis.csv");
+		analyzeIVTBaselineDemand.analyzePopulation();
     }
 
-    private static void analyzeTrips(List<Trip> origTrips, Population population, String pathToOutputFolder) {
+	private void analyzePopulation() {
+		ActivityAnalyzer activityAnalyzer = new ActivityAnalyzer();
+		activityAnalyzer.analyzePopulation(population);
+		activityAnalyzer.printActChainAnalysis(pathToOutputFolder + "actChainAnalysis.csv");
+	}
+
+	private void analyzeTrips() {
+		List<Trip> origTrips = getNoStuckTrips();
+
         List<Trip> homeTrips = TripFilter.purposeTripFilter(origTrips, "home");
         TripWriter.writeTrips(homeTrips, pathToOutputFolder + "trips_home.csv");
 
@@ -72,7 +95,20 @@ public class AnalyzeIVTBaselineDemand {
         TripWriter.writeTrips(higherEducationTrips, pathToOutputFolder + "trips_higherEducation.csv");
     }
 
-    private static List<Trip> filterTripsForAge(Population population, List<Trip> origTrips, int minAge, int maxAge) {
+	private List<Trip> getNoStuckTrips() {
+		TripEventHandler.setAnonymizeTrips(false);
+		EventsToTrips eventsToTrips = new EventsToTrips(new TripEventHandler(network) {
+			@Override
+			protected boolean agentIsToConsider(Id<Person> personId) {
+				return super.agentIsToConsider(personId) && isToConsider(personId);
+			}
+		});
+		List<Trip> origTrips = eventsToTrips.createTripsFromEvents(pathToEventsFile);
+		TripWriter.writeTrips(origTrips, pathToOutputFolder + "all_trips.csv");
+		return TripFilter.removeUnfinishedTrips(origTrips, null);
+	}
+
+    private List<Trip> filterTripsForAge(Population population, List<Trip> origTrips, int minAge, int maxAge) {
         List<Trip> filteredTrips = new LinkedList<>();
         for (Trip tempTrip : origTrips) {
             if ((int)population.getPersons().get(tempTrip.agentId).getCustomAttributes().get("age") >= minAge
@@ -83,13 +119,28 @@ public class AnalyzeIVTBaselineDemand {
         return Collections.unmodifiableList(filteredTrips);
     }
 
-    private static void runScenarioAnalyzer (Network network, String pathToEventsFile, int scaleFactor) {
+    private void analyzeEvents() {
         try {
             // Analyze the events:
             ScenarioAnalyzerEventHandler[] handlers = {
-                    new AgentCounter(network),
-                    new TripAnalyzer(network),
-                    new TripActivityCrosscorrelator(network),
+                    new AgentCounter(network) {
+						@Override
+						protected boolean isPersonToConsider(Id<Person> personId) {
+							return super.isPersonToConsider(personId) && isToConsider(personId);
+						}
+					},
+                    new TripAnalyzer(network){
+						@Override
+						protected boolean isPersonToConsider(Id<Person> personId) {
+							return super.isPersonToConsider(personId) && isToConsider(personId);
+						}
+					},
+                    new TripActivityCrosscorrelator(network){
+						@Override
+						protected boolean isPersonToConsider(Id<Person> personId) {
+							return super.isPersonToConsider(personId) && isToConsider(personId);
+						}
+					},
             };
             ScenarioAnalyzer scenarioAnalyzer = new ScenarioAnalyzer(pathToEventsFile, scaleFactor, handlers);
             scenarioAnalyzer.analyzeScenario();
@@ -100,5 +151,9 @@ public class AnalyzeIVTBaselineDemand {
             e.printStackTrace();
         }
     }
+
+	private boolean isToConsider(Id<Person> personId) {
+		return population.getPersonAttributes().getAttribute(personId.toString(), "subpopulation") == null;
+	}
 
 }

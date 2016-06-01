@@ -3,8 +3,6 @@ package gunnar.ihop2.transmodeler.run;
 import static saleem.stockholmscenario.utils.StockholmTransformationFactory.WGS84_EPSG3857;
 import static saleem.stockholmscenario.utils.StockholmTransformationFactory.WGS84_SWEREF99;
 import static saleem.stockholmscenario.utils.StockholmTransformationFactory.getCoordinateTransformation;
-import gunnar.ihop2.regent.demandreading.ActivityLocationSampler;
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
 
 import java.util.LinkedHashSet;
 
@@ -21,6 +19,9 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.XY2Links;
+
+import gunnar.ihop2.regent.demandreading.ActivityLocationSampler;
+import gunnar.ihop2.regent.demandreading.ZonalSystem;
 
 /**
  * 

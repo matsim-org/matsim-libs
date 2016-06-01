@@ -12,6 +12,7 @@ import org.matsim.contrib.minibus.performance.raptor.RaptorDisutility;
 import org.matsim.contrib.minibus.performance.raptor.TransitRouterQuadTree;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -40,8 +41,11 @@ public class RaptorExample {
 		Activity act1 = (Activity) person.getSelectedPlan().getPlanElements().get(0);
 		Activity act2 = (Activity) person.getSelectedPlan().getPlanElements().get(2);
 		
-		List<Leg> legListTransitRouter = transitRouter.calcRoute(act1.getCoord(), act2.getCoord(), act1.getEndTime(), person);
-		List<Leg> legListRaptor = raptor.calcRoute(act1.getCoord(), act2.getCoord(), act1.getEndTime(), person);
+		ActivityWrapperFacility fac1 = new ActivityWrapperFacility( act1 ) ;
+		ActivityWrapperFacility fac2 = new ActivityWrapperFacility( act2 ) ;
+		
+		List<Leg> legListTransitRouter = transitRouter.calcRoute(fac1, fac2, act1.getEndTime(), person);
+		List<Leg> legListRaptor = raptor.calcRoute(fac1, fac2, act1.getEndTime(), person);
 		
 		double ttimeTransit = 0.;
 		StringBuffer transitRouteString = new StringBuffer();

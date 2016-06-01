@@ -666,10 +666,10 @@ class MyTableModel extends AbstractTableModel {
 		editable[0][1] = true;
 
 		table[1][0] = "Euklidean length";
-		table[1][1] = Double.toString(activeLink.getEuklideanDistance());
+		table[1][1] = Double.toString(activeLink.getEuklideanLength());
 
 		table[2][0] = "Flow capacity / sec";
-		table[2][1] = Double.toString(activeLink.getFlowCapacity());
+		table[2][1] = Double.toString(activeLink.getFlowCapacityPerSec());
 		//editable[2][1] = true;
 
 		table[3][0] = "Free speed";

@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>playgrounds</artifactId>
-		<version>0.8.0-SNAPSHOT</version>
+		<version>0.9.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>playground</groupId>
@@ -24,17 +24,17 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>locationchoice</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>sergioo</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>pseudosimulation</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>postgresql</groupId>
@@ -54,7 +54,7 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>roadpricing</artifactId>
-			<version>0.8.0-SNAPSHOT</version>
+			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -65,12 +65,12 @@
         <dependency>
         	<groupId>playground</groupId>
         	<artifactId>singapore</artifactId>
-        	<version>0.8.0-SNAPSHOT</version>
+        	<version>0.9.0-SNAPSHOT</version>
         </dependency>
         <dependency>
         	<groupId>org.matsim.contrib</groupId>
         	<artifactId>travelsummary</artifactId>
-        	<version>0.8.0-SNAPSHOT</version>
+        	<version>0.9.0-SNAPSHOT</version>
         </dependency>
 	</dependencies>
 </project>

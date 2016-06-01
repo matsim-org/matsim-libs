@@ -37,21 +37,26 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
 public class EnergyConsumptionModelRicardoFaria2012 extends AbstractInterpolatedEnergyConsumptionModel {
 
 	public EnergyConsumptionModelRicardoFaria2012() {
-		initModell();
+		initModell(1.0); 
+	}
+	
+	// Given the very optimistic Value of the original Ricardo/Faria profile, values are multiplied by a factor here.
+	public EnergyConsumptionModelRicardoFaria2012(double scalefactor) {
+		initModell(scalefactor);
 	}
 
-	private void initModell() {
-		queue.add(new EnergyConsumption(5.555555556, 3.19E+02));
-		queue.add(new EnergyConsumption(8.333333333, 3.10E+02));
-		queue.add(new EnergyConsumption(11.11111111, 3.29E+02));
-		queue.add(new EnergyConsumption(13.88888889, 3.56E+02));
-		queue.add(new EnergyConsumption(16.66666667, 4.14E+02));
-		queue.add(new EnergyConsumption(19.44444444, 4.50E+02));
-		queue.add(new EnergyConsumption(22.22222222, 5.13E+02));
-		queue.add(new EnergyConsumption(25, 5.85E+02));
-		queue.add(new EnergyConsumption(27.77777778, 6.62E+02));
-		queue.add(new EnergyConsumption(30.55555556, 7.52E+02));
-		queue.add(new EnergyConsumption(33.33333333, 8.46E+02));
+	private void initModell(double scalefactor) {
+		queue.add(new EnergyConsumption(5.555555556, scalefactor *3.19E+02));
+		queue.add(new EnergyConsumption(8.333333333, scalefactor *3.10E+02));
+		queue.add(new EnergyConsumption(11.11111111, scalefactor *3.29E+02));
+		queue.add(new EnergyConsumption(13.88888889, scalefactor *3.56E+02));
+		queue.add(new EnergyConsumption(16.66666667, scalefactor *4.14E+02));
+		queue.add(new EnergyConsumption(19.44444444, scalefactor *4.50E+02));
+		queue.add(new EnergyConsumption(22.22222222, scalefactor *5.13E+02));
+		queue.add(new EnergyConsumption(25, scalefactor *5.85E+02));
+		queue.add(new EnergyConsumption(27.77777778, scalefactor *6.62E+02));
+		queue.add(new EnergyConsumption(30.55555556, scalefactor *7.52E+02));
+		queue.add(new EnergyConsumption(33.33333333, scalefactor *8.46E+02));
 	}
 
 }

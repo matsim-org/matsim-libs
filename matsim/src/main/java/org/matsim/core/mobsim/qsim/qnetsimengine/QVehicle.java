@@ -36,7 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * interface to the ``Q'' implementation of the MobsimVehicle.
+ * The ``Q'' implementation of the MobsimVehicle.
  * <p/>
  * Design thoughts:<ul>
  * <li> This needs to be public since the ``Q'' version of the

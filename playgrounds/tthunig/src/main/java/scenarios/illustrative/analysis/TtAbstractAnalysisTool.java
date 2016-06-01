@@ -43,6 +43,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.inject.Inject;
+
 /**
  * Abstract tool to analyze a MATSim simulation of an arbitrary scenario.
  * 
@@ -97,8 +99,8 @@ PersonDepartureEventHandler, LinkEnterEventHandler, PersonStuckEventHandler, Per
 	
 	private int numberOfRoutes;
 
+	@Inject
 	public TtAbstractAnalysisTool() {
-		super();
 		defineNumberOfRoutes();
 		reset(0);
 	}

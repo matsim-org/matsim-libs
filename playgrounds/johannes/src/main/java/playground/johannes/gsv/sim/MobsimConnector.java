@@ -75,7 +75,7 @@ public class MobsimConnector implements Mobsim {
 		
 		Set<Plan> plans = new LinkedHashSet<Plan>(pop.getPersons().size());
 		
-		if (cadytsContext.getODCalibrator() != null && replanCandidates) {
+		if (cadytsContext != null && cadytsContext.getODCalibrator() != null && replanCandidates) {
 			logger.info(String.format("ODCalibrator active, simulating %s persons.", cadytsContext.getODCalibrator().getCandidates().size()));
 			for (Person person : cadytsContext.getODCalibrator().getCandidates()) {
 				plans.add(person.getSelectedPlan());

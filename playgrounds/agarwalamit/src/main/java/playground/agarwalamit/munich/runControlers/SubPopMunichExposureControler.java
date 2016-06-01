@@ -87,7 +87,7 @@ public class SubPopMunichExposureControler {
 		String configFile = args[0];
 		String emissionEfficiencyFactor = args[1];
 		String considerCO2Costs = args[2];
-		String emissionCostFactor = args[3];
+		String emissionCostMultiplicationFactor = args[3];
 
 		String outputDir = args[4];
 		
@@ -160,7 +160,7 @@ public class SubPopMunichExposureControler {
 		Map<Id<Link>, Integer> links2yCells = gt.mapLinks2Ycells(noOfYCells);
 		
 		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
-		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, links2xCells, links2yCells);
+		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostMultiplicationFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, links2xCells, links2yCells);
 		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, 
 				emissionCostModule, config.planCalcScore());
 		

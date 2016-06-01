@@ -30,17 +30,15 @@ import org.matsim.contrib.common.stats.LinearDiscretizer;
 import org.matsim.contrib.common.util.XORShiftRandom;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.facilities.ActivityFacilities;
 import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.sim3.ReplaceActTypes;
-import playground.johannes.studies.matrix2014.analysis.*;
-import playground.johannes.studies.matrix2014.config.MatrixAnalyzerConfigurator;
+import playground.johannes.studies.matrix2014.analysis.AnalyzerTaskGroup;
+import playground.johannes.studies.matrix2014.analysis.NumericLegAnalyzer;
+import playground.johannes.studies.matrix2014.analysis.ZoneMobilityRate;
 import playground.johannes.studies.matrix2014.config.ODCalibratorConfigurator;
 import playground.johannes.studies.matrix2014.gis.TransferZoneAttribute;
 import playground.johannes.studies.matrix2014.gis.ValidateFacilities;
 import playground.johannes.studies.matrix2014.gis.ZoneSetLAU2Class;
-import playground.johannes.studies.matrix2014.matrix.ODPredicate;
-import playground.johannes.studies.matrix2014.matrix.ZoneDistancePredicate;
 import playground.johannes.synpop.analysis.*;
 import playground.johannes.synpop.data.*;
 import playground.johannes.synpop.data.io.PopulationIO;
@@ -299,60 +297,60 @@ public class Simulator {
         ConcurrentAnalyzerTask<Collection<? extends Person>> matrixTasks = new ConcurrentAnalyzerTask<>();
 
 //        ModePredicate modePredicate = new ModePredicate(CommonValues.LEG_MODE_CAR);
-        MatrixComparator mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP")
-                , dataPool, ioContext).load();
-        mAnalyzer.setLegPredicate(DEFAULT_LEG_PREDICATE);
-        mAnalyzer.setUseWeights(USE_WEIGTHS);
-        matrixTasks.addComponent(mAnalyzer);
-
-//        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP-2")
+//        MatrixComparator mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP")
 //                , dataPool, ioContext).load();
-//        mAnalyzer.setPredicate(modePredicate);
-//        mAnalyzer.setUseWeights(true);
-//        task.addComponent(mAnalyzer);
-
-        mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom")
-                , dataPool, ioContext).load();
-        mAnalyzer.setLegPredicate(DEFAULT_LEG_PREDICATE);
-        ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
-        ZoneCollection zones = zoneData.getLayer("tomtom");
-        ODPredicate distPredicate = new ZoneDistancePredicate(zones, 100000);
-        mAnalyzer.setNormPredicate(distPredicate);
-        mAnalyzer.setUseWeights(USE_WEIGTHS);
-        matrixTasks.addComponent(mAnalyzer);
+//        mAnalyzer.setLegPredicate(DEFAULT_LEG_PREDICATE);
+//        mAnalyzer.setUseWeights(USE_WEIGTHS);
+//        matrixTasks.addComponent(mAnalyzer);
+//
+////        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerITP-2")
+////                , dataPool, ioContext).load();
+////        mAnalyzer.setLegPredicate(modePredicate);
+////        mAnalyzer.setUseWeights(true);
+////        task.addComponent(mAnalyzer);
+//
+//        mAnalyzer = (MatrixComparator) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom")
+//                , dataPool, ioContext).load();
+//        mAnalyzer.setLegPredicate(DEFAULT_LEG_PREDICATE);
+//        ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
+//        ZoneCollection zones = zoneData.getLayer("tomtom");
+//        ODPredicate distPredicate = new ZoneDistancePredicate(zones, 100000);
+//        mAnalyzer.setNormPredicate(distPredicate);
+//        mAnalyzer.setUseWeights(USE_WEIGTHS);
+//        matrixTasks.addComponent(mAnalyzer);
 
 //        mAnalyzer = (MatrixAnalyzer) new MatrixAnalyzerConfigurator(config.getModule("matrixAnalyzerTomTom-2")
 //                , dataPool, ioContext).load();
-//        mAnalyzer.setPredicate(modePredicate);
+//        mAnalyzer.setLegPredicate(modePredicate);
 //        mAnalyzer.setODPredicate(distPredicate);
 //        mAnalyzer.setUseWeights(true);
 //        task.addComponent(mAnalyzer);
 
-        ActivityFacilities facilities = ((FacilityData) dataPool.get(FacilityDataLoader.KEY)).getAll();
-        MatrixWriter matrixWriter = new MatrixWriter(facilities, zones, ioContext);
-        matrixWriter.setPredicate(DEFAULT_LEG_PREDICATE);
-        matrixWriter.setUseWeights(USE_WEIGTHS);
-        matrixTasks.addComponent(matrixWriter);
-
-        AnalyzerTaskGroup<Collection<? extends Person>> group = new AnalyzerTaskGroup<>(matrixTasks, ioContext,
-                "matrix");
-        task.addComponent(group);
-
-        task.addComponent(new PopulationWriter(ioContext));
-
-        HistogramWriter histogramWriter = new HistogramWriter(ioContext, new StratifiedDiscretizerBuilder(100, 100));
-        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
-        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new FixedBordersDiscretizer(new double[]{-1,
-                100000, Integer.MAX_VALUE}), "100KM"));
-        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(simDistanceDiscretizer, "sim"));
-
-        FacilityData fData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
-        NumericAnalyzer actDist = new ActDistanceBuilder()
-                .setHistogramWriter(histogramWriter)
-                .setPredicate(DEFAULT_LEG_PREDICATE, DEFAULT_LEG_PREDICATE_NAME)
-                .setUseWeights(USE_WEIGTHS)
-                .build(fData.getAll());
-        task.addComponent(actDist);
+//        ActivityFacilities facilities = ((FacilityData) dataPool.get(FacilityDataLoader.KEY)).getAll();
+//        MatrixWriter matrixWriter = new MatrixWriter(facilities, zones, ioContext);
+//        matrixWriter.setLegPredicate(DEFAULT_LEG_PREDICATE);
+//        matrixWriter.setUseWeights(USE_WEIGTHS);
+//        matrixTasks.addComponent(matrixWriter);
+//
+//        AnalyzerTaskGroup<Collection<? extends Person>> group = new AnalyzerTaskGroup<>(matrixTasks, ioContext,
+//                "matrix");
+//        task.addComponent(group);
+//
+//        task.addComponent(new PopulationWriter(ioContext));
+//
+//        HistogramWriter histogramWriter = new HistogramWriter(ioContext, new StratifiedDiscretizerBuilder(100, 100));
+//        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new LinearDiscretizer(50000), "linear"));
+//        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(new FixedBordersDiscretizer(new double[]{-1,
+//                100000, Integer.MAX_VALUE}), "100KM"));
+//        histogramWriter.addBuilder(new PassThroughDiscretizerBuilder(simDistanceDiscretizer, "sim"));
+//
+//        FacilityData fData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
+//        NumericAnalyzer actDist = new ActDistanceBuilder()
+//                .setHistogramWriter(histogramWriter)
+//                .setLegPredicate(DEFAULT_LEG_PREDICATE, DEFAULT_LEG_PREDICATE_NAME)
+//                .setUseWeights(USE_WEIGTHS)
+//                .build(fData.getAll());
+//        task.addComponent(actDist);
     }
 
     private static UnivariatFrequency buildDistDistrTerm(Set<Person> refPersons, Set<Person>
@@ -416,7 +414,10 @@ public class Simulator {
         @Override
         public double value(double x) throws FunctionEvaluationException {
             double routDist = x / 1000.0;
-            double factor = 0.77 - Math.exp(-0.17 * Math.max(20, routDist) - 1.48);
+//            double factor = 0.77 - Math.exp(-0.017 * Math.max(10, routDist) - 1.48);
+//            double factor = 0.7 - Math.exp(-0.017 * Math.max(10, routDist) - 1.48);
+//            double factor = 0.6 - Math.exp(-0.008 * Math.max(20, routDist) - 2);
+            double factor = 0.55;
             return routDist * factor * 1000;
         }
     }
@@ -460,7 +461,7 @@ public class Simulator {
                 DEFAULT_LEG_PREDICATE_NAME + ".outOfTown", histogramWriter));
 
 //        LegCollector<String> purposeCollector = new LegCollector<>(new AttributeProvider<Segment>(CommonKeys.LEG_PURPOSE));
-//        purposeCollector.setPredicate(modePredicate);
+//        purposeCollector.setLegPredicate(modePredicate);
 //        Set<String> purposes = new HashSet<>(purposeCollector.collect(persons));
 //        purposes.remove(null);
 //        for (String purpose : purposes) {

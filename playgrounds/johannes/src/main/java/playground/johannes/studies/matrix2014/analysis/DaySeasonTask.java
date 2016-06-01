@@ -21,12 +21,11 @@ package playground.johannes.studies.matrix2014.analysis;
 
 import gnu.trove.iterator.TObjectDoubleIterator;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.studies.matrix2014.stats.Histogram;
-import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.synpop.analysis.AttributeProvider;
 import playground.johannes.synpop.analysis.Collector;
 import playground.johannes.synpop.analysis.LegCollector;
+import playground.johannes.synpop.analysis.StatsContainer;
 import playground.johannes.synpop.data.CommonKeys;
 import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.Segment;
@@ -41,10 +40,10 @@ import java.util.Map;
 /**
  * @author johannes
  */
-public class DaySeasonTask extends AnalyzerTask {
+public class DaySeasonTask implements playground.johannes.synpop.analysis.AnalyzerTask<Collection<? extends Person>> {
 
     @Override
-    public void analyze(Collection<? extends Person> persons, Map<String, DescriptiveStatistics> results) {
+    public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
         Collector<String> dayCollector = new LegPersonCollector<>(new AttributeProvider<Person>(CommonKeys.DAY));
         Collector<String> seasonCollector = new LegPersonCollector<>(new AttributeProvider<Person>(MiDKeys
                 .PERSON_MONTH));

@@ -47,7 +47,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
  * @author tthunig
  */
 public final class TtCreateBraessPopulation {
-
+	
 	public enum InitRoutes{
 		ALL, ONLY_MIDDLE, ONLY_OUTER, NONE
 	}
@@ -57,6 +57,7 @@ public final class TtCreateBraessPopulation {
 	
 	private int numberOfPersons; // per hour
 	private int simulationPeriod = 1; // in hours. default is one hour.
+	private double simulationStartTime = 0.0; // seconds from midnight. default is midnight 
 	
 	private boolean simulateInflowCap23 = false;
 	private boolean simulateInflowCap24 = false;
@@ -96,7 +97,8 @@ public final class TtCreateBraessPopulation {
 	 * persons travel from the left to the right through the network as in
 	 * Braess's original paradox.
 	 * 
-	 * All agents start uniformly distributed between 8 and (8 + simulationPeriod) am.
+	 * All agents start uniformly distributed between simulationStartTime and 
+	 * (simulationStartTime + simulationPeriod) am.
 	 * 
 	 * If initRouteSpecification is NONE, all agents are initialized with no initial
 	 * routes. 
@@ -131,8 +133,8 @@ public final class TtCreateBraessPopulation {
 			// create a start activity at link 0_1
 			Activity startAct = population.getFactory()
 					.createActivityFromLinkId("dummy", Id.createLinkId("0_1"));
-			// distribute agents uniformly between 8 and (8 + simulationPeriod) am.
-			startAct.setEndTime(8 * 3600 + (double)(i)/(numberOfPersons * simulationPeriod) * simulationPeriod * 3600);
+			// distribute agents uniformly between simulationStartTime and (simulationStartTime + simulationPeriod) am.
+			startAct.setEndTime(simulationStartTime + (double)(i)/(numberOfPersons * simulationPeriod) * simulationPeriod * 3600);
 		
 			// create a drain activity at link 5_6
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
@@ -313,6 +315,10 @@ public final class TtCreateBraessPopulation {
 
 	public void setSimulationPeriod(int simulationPeriod) {
 		this.simulationPeriod = simulationPeriod;
+	}
+
+	public void setSimulationStartTime(double simulationStartTime) {
+		this.simulationStartTime = simulationStartTime;
 	}
 
 }

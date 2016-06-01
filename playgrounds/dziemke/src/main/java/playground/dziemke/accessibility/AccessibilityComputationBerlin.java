@@ -1,5 +1,6 @@
 package playground.dziemke.accessibility;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,20 +57,20 @@ public class AccessibilityComputationBerlin {
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
 		
-		String travelTimeMatrixFile = "../../matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
-		String travelDistanceMatrixFile = "../../matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
-		String ptStopsFile = "../../matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
-		
+		String travelTimeMatrixFilePT = "../../matsimExamples/countries/za/nmb/regular-pt/travelTimeMatrix_space.csv";
+		String travelDistanceMatrixFilePT = "../../matsimExamples/countries/za/nmb/regular-pt/travelDistanceMatrix_space.csv";
+		String ptStopsFilePT = "../../matsimExamples/countries/za/nmb/regular-pt/ptStops.csv";
 		
 		LogToOutputSaver.setOutputDirectory(outputDirectory);
 		
-
 		// Parameters
+		String crs = TransformationFactory.DHDN_GK4;
+//		String crs = "EPSG:31468"; // = DHDN GK4		
+		
+		// QGis
 		boolean createQGisOutput = true;
 //		boolean includeDensityLayer = true;
 		boolean includeDensityLayer = false;
-		String crs = TransformationFactory.DHDN_GK4;
-//		String crs = "EPSG:31468"; // = DHDN GK4
 //		Double lowerBound = 1.75;
 //		Double upperBound = 7.;
 //		Double lowerBound = 0.;
@@ -84,8 +85,7 @@ public class AccessibilityComputationBerlin {
 		
         double[] mapViewExtent = {4574000-1000, 5802000-1000, 4620000+1000, 5839000+1000};
 				
-				
-		// config and scenario
+		// Config and scenario
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
 		config.network().setInputFile(networkFile);
 		config.facilities().setInputFile(facilitiesFile);
@@ -93,17 +93,14 @@ public class AccessibilityComputationBerlin {
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setLastIteration(0);
 
-
 		final Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 
-
-		// matrix-based pt
+		// Matrix-based pt
 		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-		mbpcg.setPtStopsInputFile(ptStopsFile);
+		mbpcg.setPtStopsInputFile(ptStopsFilePT);
 		mbpcg.setUsingTravelTimesAndDistances(true);
-		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFile);
-		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFile);
-
+		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFilePT);
+		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFilePT);
 
 		// plansClacRoute parameters
 		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
@@ -133,27 +130,24 @@ public class AccessibilityComputationBerlin {
 
 
 		// collect activity types
-		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
-		log.warn( "found activity types: " + activityTypes );
+//		final List<String> activityTypes = AccessibilityRunUtils.collectAllFacilityTypes(scenario);
+//		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
+		List<String> activityTypes = new ArrayList<String>();
+		activityTypes.add("s");
+		log.error("Only using s as activity type to speed up for testing");
 
 		// collect homes
 		String activityFacilityType = FacilityTypes.HOME;
-		final ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, activityFacilityType);
+		final ActivityFacilities homes = AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityFacilityType);
 
-		
-		final Controler controler = new Controler(scenario) ;
+		final Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
+				// Loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each
 				for ( final String actType : activityTypes ) {
-//			if ( !actType.equals("s") ) {
-//				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-//				continue ;
-//			}
-
 					addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
 						@Inject Scenario scenario;
 						@Inject Map<String, TravelTime> travelTimes;
@@ -162,7 +156,7 @@ public class AccessibilityComputationBerlin {
 						@Override
 						public ControlerListener get() {
 							GridBasedAccessibilityControlerListenerV3 listener =
-									new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesOfType(scenario, actType), ptMatrix, config, scenario, travelTimes, travelDisutilityFactories);
+									new GridBasedAccessibilityControlerListenerV3(AccessibilityRunUtils.collectActivityFacilitiesWithOptionOfType(scenario, actType), ptMatrix, config, scenario, travelTimes, travelDisutilityFactories);
 							listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 							listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 							listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
@@ -170,26 +164,22 @@ public class AccessibilityComputationBerlin {
 							listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 
 							listener.addAdditionalFacilityData(homes) ;
-//			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+//							listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 							// Boundaries of Berlin are approx.: 4570000, 4613000, 5836000, 5806000
 							listener.generateGridsAndMeasuringPointsByCustomBoundary(4574000, 5802000, 4620000, 5839000, cellSize);
-//			listener.generateGridsAndMeasuringPointsByCustomBoundary(4590000, 5815000, 4595000, 5820000, cellSize);
-
+//							listener.generateGridsAndMeasuringPointsByCustomBoundary(4590000, 5815000, 4595000, 5820000, cellSize);
 							listener.writeToSubdirectoryWithName(actType);
-
 							listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 							return listener;
 						}
 					});
 				}
-
 			}
 		});
 		
-
 		controler.run();
 			
-		
+		/* Write QGis output */
 		if (createQGisOutput == true) {
 			String osName = System.getProperty("os.name");
 			String workingDirectory = config.controler().getOutputDirectory();

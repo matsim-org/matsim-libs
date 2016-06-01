@@ -20,7 +20,6 @@
 package org.matsim.contrib.taxi.optimizer.zonal;
 
 import org.apache.commons.configuration.Configuration;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 
 
@@ -43,12 +42,5 @@ public class ZonalTaxiOptimizerParams
         zonesXmlFile = optimizerConfig.getString(ZONES_XML_FILE);
         zonesShpFile = optimizerConfig.getString(ZONES_SHP_FILE);
         expansionDistance = optimizerConfig.getDouble(EXPANSION_DISTANCE);
-    }
-    
-    
-    @Override
-    public ZonalTaxiOptimizer createTaxiOptimizer(TaxiOptimizerContext optimContext)
-    {
-        return new ZonalTaxiOptimizer(optimContext);
     }
 }

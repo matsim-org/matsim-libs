@@ -51,17 +51,15 @@ public class LinkImpl implements Link {
 
 	private final Id<Link> id;
 
-	protected Node from = null;
-	protected Node to = null;
+	private Node from = null;
+	private Node to = null;
 
 	private double length = Double.NaN;
-	double freespeed = Double.NaN;
-	double capacity = Double.NaN;
-	double nofLanes = Double.NaN;
+	private double freespeed = Double.NaN;
+	private double capacity = Double.NaN;
+	private double nofLanes = Double.NaN;
 
 	private Set<String> allowedModes = HashSetCache.get(new HashSet<String>());
-
-	private double flowCapacity;
 
 	private String type = null;
 
@@ -115,12 +113,7 @@ public class LinkImpl implements Link {
 	}
 
 	private void calculateFlowCapacity() {
-		this.flowCapacity = this.capacity / getCapacityPeriod();
 		this.checkCapacitiySemantics();
-	}
-
-	double getCapacityPeriod() {
-		return network.getCapacityPeriod();
 	}
 
 	private void checkCapacitiySemantics() {
@@ -240,20 +233,24 @@ public class LinkImpl implements Link {
 		return true;
 	}
 
+	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
 	public double getFreespeedTravelTime() {
 		return getFreespeedTravelTime(Time.UNDEFINED_TIME);
 	}
 
+	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
 	public double getFreespeedTravelTime(final double time) {
 		return this.length / this.freespeed;
 	}
 
-	public double getFlowCapacity() {
-		return getFlowCapacity(Time.UNDEFINED_TIME);
+	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
+	public double getFlowCapacityPerSec() {
+		return getFlowCapacityPerSec(Time.UNDEFINED_TIME);
 	}
 
-	public double getFlowCapacity(final double time) {
-		return this.flowCapacity;
+	@Deprecated // this is a data class; it should do internal computations only in situations where it is difficult to do this elsewhere. kai, mar'16
+	public double getFlowCapacityPerSec(final double time) {
+		return this.capacity / network.getCapacityPeriod();
 	}
 
 	public final String getOrigId() {
@@ -264,13 +261,15 @@ public class LinkImpl implements Link {
 		return this.type;
 	}
 
-	public final double getEuklideanDistance() {
+	public final double getEuklideanLength() {
+		// maybe ok to keep this since it is an expensive computation. kai, mar'16
 		return this.euklideanDist;
 	}
 
 	@Override
 	public double getCapacity() {
-		return getCapacity(Time.UNDEFINED_TIME);
+		return this.capacity;
+//		return getCapacity(Time.UNDEFINED_TIME);
 	}
 
 	@Override
@@ -286,7 +285,8 @@ public class LinkImpl implements Link {
 
 	@Override
 	public double getFreespeed() {
-		return getFreespeed(Time.UNDEFINED_TIME);
+		return this.freespeed;
+//		return getFreespeed(Time.UNDEFINED_TIME);
 	}
 
 	/**
@@ -319,7 +319,8 @@ public class LinkImpl implements Link {
 
 	@Override
 	public double getNumberOfLanes() {
-		return getNumberOfLanes(Time.UNDEFINED_TIME);
+		return this.nofLanes;
+//		return this.getNumberOfLanes(Time.UNDEFINED_TIME);
 	}
 
 	@Override
@@ -383,8 +384,9 @@ public class LinkImpl implements Link {
 		return new Coord((fromXY.getX() + toXY.getX()) / 2.0, (fromXY.getY() + toXY.getY()) / 2.0);
 	}
 
-	public Network getNetwork() {
-		return network;
+	double getCapacityPeriod() {
+		// since the link has a back pointer to network, we can as well provide this here (????)
+		return network.getCapacityPeriod() ;
 	}
 
 	/*package*/ abstract static class HashSetCache {

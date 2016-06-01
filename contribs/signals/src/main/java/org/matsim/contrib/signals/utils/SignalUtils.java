@@ -95,9 +95,21 @@ public class SignalUtils {
 	 * @return the signal plan
 	 */
 	public static SignalPlanData createSignalPlan(SignalControlDataFactory fac, int cycleTime, int offset) {
+		return createSignalPlan(fac, cycleTime, offset, Id.create(1,SignalPlan.class));
+	}
+	
+	/**
+	 * Creates a signal plan with the given cycle time, offset and id.
+	 * 
+	 * @param fac
+	 * @param cycleTime
+	 * @param offset
+	 * @param signalPlanId
+	 * @return the signal plan
+	 */
+	public static SignalPlanData createSignalPlan(SignalControlDataFactory fac, int cycleTime, int offset, Id<SignalPlan> signalPlanId) {
 		
-		SignalPlanData signalPlan = fac.createSignalPlanData(Id.create(1,
-				SignalPlan.class));
+		SignalPlanData signalPlan = fac.createSignalPlanData(signalPlanId);
 		signalPlan.setCycleTime(cycleTime);
 		signalPlan.setOffset(offset);
 		return signalPlan;

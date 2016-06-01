@@ -5,9 +5,11 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -26,26 +28,27 @@ public class PlanFileModifier {
 	private final static Logger log = Logger.getLogger(PlanFileModifier.class);
 	
 	// Parameters
-	static double selectionProbability = 0.5;
+	static double selectionProbability = 1.;
 	static boolean onlyTransferSelectedPlan = true;
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
 	static boolean onlyConsiderPeopleAlwaysGoingByCar = false;
 	static int maxNumberOfAgentsConsidered = 1000000;
-//	static String runId = "run_145";
-//	static int iteration = 150;
+	static String runId = "run_194";
+	static int iteration = 300;
+	static boolean removeLinksAndRoutes = true;
 	
 	
 	// Input and output files
-//	static final String INPUT_PLANS_FILE = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-//			+ "/" + runId + "." + iteration + ".plans.xml.gz";
-//	static final String OUTPUT_PLANS_FILE = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
-//			+ "/" + runId + "." + iteration + ".plans_selected2.xml.gz";
-	static final String INPUT_PLANS_FILE = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/"
-			+ "mstm_run/run_04/siloMatsim/population_2000.xml";
-	static final String OUTPUT_ROOT = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/"
-			+ "mstm_run/run_04/siloMatsim/population_2000_half/";
-	static final String OUTPUT_PLANS_FILE = OUTPUT_ROOT + "population.xml";
+	static final String INPUT_PLANS_FILE = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+			+ "/" + runId + "." + iteration + ".plans.xml.gz";
+	static final String OUTPUT_PLANS_FILE = "../../../runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + iteration
+			+ "/" + runId + "." + iteration + ".plans_selected_no_links_routes.xml.gz";
+//	static final String INPUT_PLANS_FILE = "../../../shared-svn/projects/tum-with-moeckel/data/"
+//			+ "mstm_run/run_04/siloMatsim/population_2000.xml";
+//	static final String OUTPUT_ROOT = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/"
+//			+ "mstm_run/run_04/siloMatsim/population_2000_half/";
+//	static final String OUTPUT_PLANS_FILE = OUTPUT_ROOT + "population.xml";
 	
 	
 //	if (onlyTransferSelectedPlan == true) {
@@ -57,7 +60,7 @@ public class PlanFileModifier {
 	
 	
 	public static void main(String[] args) {
-		LogToOutputSaver.setOutputDirectory(OUTPUT_ROOT);
+//		LogToOutputSaver.setOutputDirectory(OUTPUT_ROOT);
 		
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -117,13 +120,17 @@ public class PlanFileModifier {
 				if (random.nextDouble() <= selectionProbability) {
 					if (considerPerson == true) {
 						Id<Person> id = person.getId();
+						Person person2 = population.getFactory().createPerson(id);
 						
 						if (onlyTransferSelectedPlan == true) {
-							Person person2 = population.getFactory().createPerson(id);
+//							Person person2 = population.getFactory().createPerson(id);
+							if (removeLinksAndRoutes == true) {
+								removeLinksAndRoutes(selectedPlan);
+							}
 							person2.addPlan(selectedPlan);
 							population2.addPerson(person2);
 						} else {
-							Person person2 = population.getFactory().createPerson(id);
+//							Person person2 = population.getFactory().createPerson(id);
 							
 							//int numberOfPlans = person.getPlans().size();
 							for (int i=0; i < numberOfPlans; i++) {
@@ -139,6 +146,9 @@ public class PlanFileModifier {
 								}
 								
 								if (considerPlan == true) {
+									if (removeLinksAndRoutes == true) {
+										removeLinksAndRoutes(plan);
+									}
 									person2.addPlan(plan);
 								}
 							}
@@ -156,5 +166,19 @@ public class PlanFileModifier {
 		
 		log.info("Modified plans file contains " + agentCounter + " agents.");
 		log.info("Modified plans file has been written to " + OUTPUT_PLANS_FILE);
+	}
+	
+	
+	private static void removeLinksAndRoutes(Plan plan) {
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				// remove link
+				((Activity) pe).setLinkId(null);
+			}
+			if (pe instanceof Leg) {
+				// remove route
+				((Leg) pe).setRoute(null);
+			}
+		}
 	}
 }

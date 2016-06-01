@@ -38,6 +38,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringModule;
+import playground.polettif.boescpa.lib.tools.fileCreation.F2LConfigGroup;
 
 import java.io.File;
 
@@ -62,7 +63,8 @@ public class RunZurichScenario {
 				configFile,
 				// this adds a new config group, used by the specific scoring function
 				// we use
-				new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup() );
+				new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup(),
+				new F2LConfigGroup());
 		
 		// This is currently needed for location choice: initializing
 		// the location choice writes K-values files to the output directory, which:

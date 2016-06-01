@@ -24,8 +24,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.contrib.zone.Zone;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -91,7 +91,7 @@ public class ChargerReader
                 + "scenarios/2015_08_only_berlin_v1/chargers_out_of_231_COLD_WINTER_FOSSIL_HEATING_noDeltaSOC.csv";
         double power = 50_000;//50kW 
 
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
         Map<Id<Zone>, Zone> zones = BerlinZoneUtils.readZones(zonesXmlFile, zonesShpFile);

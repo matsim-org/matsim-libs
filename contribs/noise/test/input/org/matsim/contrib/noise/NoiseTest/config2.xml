@@ -33,8 +33,6 @@
 		<param name="removeStuckVehicles" value="true" />
 		<param name="stuckTime" value="36000" />
 		
-		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
-				
 		<param name="flowCapacityFactor" value="1.00" />
 		<param name="storageCapacityFactor" value="1.00" />
 	</module>
@@ -64,7 +62,7 @@
 		<param name="searchRadius" value="1000.0" />
 	</module>
 	
-	<module name="changeLegMode">
+	<module name="changeMode">
 		<param name="modes" value="car,pt,walk" />
 		<param name="ignoreCarAvailability" value="false" />
 	</module>

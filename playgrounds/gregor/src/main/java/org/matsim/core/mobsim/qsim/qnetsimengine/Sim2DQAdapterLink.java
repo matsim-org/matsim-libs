@@ -25,15 +25,15 @@ import org.matsim.api.core.v01.network.Link;
 
 public class Sim2DQAdapterLink {
 	
-	private final QLinkInternalI ql;
+	private final QLinkI ql;
 
-	Sim2DQAdapterLink(QLinkInternalI qLinkImpl) {
+	Sim2DQAdapterLink(QLinkI qLinkImpl) {
 		this.ql = qLinkImpl;
 	}
 
 
 	public boolean isAcceptingFromUpstream() {
-		return this.ql.isAcceptingFromUpstream();
+		return this.ql.getAcceptingQLane().isAcceptingFromUpstream();
 	}
 
 
@@ -44,7 +44,7 @@ public class Sim2DQAdapterLink {
 	
 
 	public void addFromUpstream(QVehicle veh) {
-		this.ql.addFromUpstream(veh);
+		this.ql.getAcceptingQLane().addFromUpstream(veh);
 		
 	}
 }

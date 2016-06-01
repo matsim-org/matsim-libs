@@ -27,11 +27,8 @@ import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.StartupListener;
 
 import com.google.inject.Inject;
 
@@ -41,29 +38,15 @@ import com.google.inject.Inject;
  * @author tthunig
  *
  */
-public class TtListenerToBindGeneralAnalysis implements StartupListener, IterationEndsListener {
+public class TtListenerToBindGeneralAnalysis implements IterationEndsListener {
 
 	private static final Logger log = Logger.getLogger(TtListenerToBindGeneralAnalysis.class);
-	
-	private TtAnalyzedGeneralResultsWriter writer;
 	
 	@Inject
 	private Scenario scenario;
 	
 	@Inject
-	private EventsManager eventsManager;
-	
-	@Inject
-	private TtGeneralAnalysis handler;
-	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		// add the analysis tool as events handler to the events manager
-		eventsManager.addHandler(handler);
-				
-		// prepare the results writer
-		this.writer = new TtAnalyzedGeneralResultsWriter(handler, scenario.getConfig().controler().getOutputDirectory(), scenario.getConfig().controler().getLastIteration());
-	}
+	private TtAnalyzedGeneralResultsWriter writer;
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
@@ -73,6 +56,8 @@ public class TtListenerToBindGeneralAnalysis implements StartupListener, Iterati
 	
 		// handle last iteration
 		if (event.getIteration() == scenario.getConfig().controler().getLastIteration()) {
+			// write spatial analysis
+			writer.writeSpatialAnaylsis(event.getIteration());
 			// close overall writing stream
 			writer.closeAllStreams();
 			// plot overall iteration results
@@ -94,7 +79,11 @@ public class TtListenerToBindGeneralAnalysis implements StartupListener, Iterati
 		log.info("and afterwards: gnuplot " + relativePathToGnuplotScript);
 		
 		try {
-			// "&" splits different commands in one line in windows. Use ";" if you are a linux user.
+			/*
+			 * start the command line ("cmd"),
+			 * execute the commands given by string and separated by "&" (or ";" on a linux machine, respectively),
+			 * terminate the command line afterwards ("/c").
+			 */
 			ProcessBuilder builder = new ProcessBuilder( "cmd", "/c", "cd", pathToSpecificAnalysisDir, "&", "gnuplot", relativePathToGnuplotScript);
 			Process p = builder.start();
 

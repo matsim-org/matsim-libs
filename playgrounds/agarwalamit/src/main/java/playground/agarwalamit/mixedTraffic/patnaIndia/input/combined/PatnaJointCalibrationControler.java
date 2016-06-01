@@ -207,7 +207,7 @@ public class PatnaJointCalibrationControler {
 			modeChoice.setWeight(0.1);
 			config.strategy().addStrategySettings(modeChoice);
 
-			config.changeLegMode().setModes(PatnaUtils.URBAN_ALL_MODES.toArray(new String [PatnaUtils.URBAN_ALL_MODES.size()]));
+			config.changeMode().setModes(PatnaUtils.URBAN_ALL_MODES.toArray(new String [PatnaUtils.URBAN_ALL_MODES.size()]));
 		}
 
 		{//commuters

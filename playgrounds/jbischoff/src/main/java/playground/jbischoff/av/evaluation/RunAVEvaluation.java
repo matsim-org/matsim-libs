@@ -19,6 +19,8 @@
 
 package playground.jbischoff.av.evaluation;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.network.Network;
@@ -28,6 +30,8 @@ import org.matsim.core.network.*;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import playground.jbischoff.av.evaluation.flowpaper.TravelTimeAnalysis;
+import playground.jbischoff.taxi.evaluation.TravelDistanceTimeEvaluator;
 import playground.jbischoff.utils.JbUtils;
 
 /**
@@ -38,25 +42,48 @@ public class RunAVEvaluation {
 
 	public static void main(String[] args) {
 
-		String networkFile = "../../../shared-svn/projects/audi_av/scenario/networkc.xml.gz";
-		String eventsFile = "../../../shared-svn/projects/audi_av/runs/mobiltum/24-11k/nullevents.24-11k.xml.gz";
-		String outputFolder = "../../../shared-svn/projects/audi_av/runs/mobiltum/24-11k/";
+		String networkFile = "D:/runs-svn/avsim/flowpaper/00.0k_AV1.0/00.0k_AV1.0.output_network.xml.gz";
+		
+//		Wolfsburg:
+//		String shapeFile = "../../../shared-svn/projects/vw_rufbus/av_simulation/demand/zones/zones.shp";
+//		Map<String,Geometry> geo = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "plz");
+
+//		Berlin
 		String shapeFile = "../../../shared-svn/projects/audi_av/shp/Planungsraum.shp";
-		Map<String,Geometry> geo = JbUtils.readShapeFileAndExtractGeometry(shapeFile);
+		Map<String,Geometry> geo = JbUtils.readShapeFileAndExtractGeometry(shapeFile, "SCHLUESSEL");
+		
 		Network network = NetworkUtils.createNetwork() ;
 		new MatsimNetworkReader(network).readFile(networkFile);
-		ZoneBasedTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandler = new ZoneBasedTaxiCustomerWaitHandler(network, geo);
-//		TravelDistanceTimeEvaluator travelDistanceTimeEvaluator = new TravelDistanceTimeEvaluator(network, 0);
-		ZoneBasedTaxiStatusAnalysis zoneBasedTaxiStatusAnalysis = new ZoneBasedTaxiStatusAnalysis(network, geo);
 		
+//		List<String> list = Arrays.asList(new String[]{"00.0k_AV1.0", "02.2k_AV1.0", "02.2k_AV1.5","02.2k_AV2.0","04.4k_AV1.0","04.4k_AV1.5",
+//				"04.4k_AV2.0","06.6k_AV1.0","06.6k_AV1.5","06.6k_AV2.0","08.8k_AV1.0","08.8k_AV1.5","08.8k_AV2.0","11.0k_AV1.0","11.0k_AV1.5","11.0k_AV2.0"}); 
+//		List<String> list = Arrays.asList(new String[]{"11.0k_AV1.0"}); 
+//		List<String> list = Arrays.asList(new String[]{"00.0k_AV1.0", "02.2k_AV1.0", "02.2k_AV1.5","02.2k_AV2.0","04.4k_AV1.0","04.4k_AV1.5","04.4k_AV2.0","06.6k_AV1.0"});
+		List<String> list = Arrays.asList(new String[]{"06.6k_AV1.5","06.6k_AV2.0","08.8k_AV1.0","08.8k_AV1.5","08.8k_AV2.0","11.0k_AV1.0","11.0k_AV1.5","11.0k_AV2.0"}); 
+		
+		for (String run : list){
+		System.out.println("run "+ run);
+		ZoneBasedTaxiCustomerWaitHandler zoneBasedTaxiCustomerWaitHandler = new ZoneBasedTaxiCustomerWaitHandler(network, geo);
+		ZoneBasedTaxiStatusAnalysis zoneBasedTaxiStatusAnalysis = new ZoneBasedTaxiStatusAnalysis(network, geo);
+		TravelDistanceTimeEvaluator travelDistanceTimeEvaluator = new TravelDistanceTimeEvaluator(network, 0);
+		TravelTimeAnalysis timeAnalysis = new TravelTimeAnalysis();
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(zoneBasedTaxiCustomerWaitHandler);
-//		events.addHandler(travelDistanceTimeEvaluator);
 		events.addHandler(zoneBasedTaxiStatusAnalysis);
-		new MatsimEventsReader(events).readFile(eventsFile);
-		zoneBasedTaxiCustomerWaitHandler.writeCustomerStats(outputFolder);
-//		travelDistanceTimeEvaluator.writeTravelDistanceStatsToFiles(outputFolder+"distanceStats.txt");
-		zoneBasedTaxiStatusAnalysis.evaluateAndWriteOutput(outputFolder);
+		events.addHandler(travelDistanceTimeEvaluator);
+		events.addHandler(timeAnalysis);
+		
+			String outputFolder = "D:/runs-svn/avsim/flowpaper_0.15fc/"+run+"/";
+			String eventsFile = outputFolder+run+".output_events.xml.gz";
+			
+			new MatsimEventsReader(events).readFile(eventsFile);
+			zoneBasedTaxiCustomerWaitHandler.writeCustomerStats(outputFolder);
+			zoneBasedTaxiStatusAnalysis.evaluateAndWriteOutput(outputFolder);
+			travelDistanceTimeEvaluator.writeTravelDistanceStatsToFiles(outputFolder);
+			timeAnalysis.writeStats(outputFolder);
+		}
+		
+
 		
 	}
 

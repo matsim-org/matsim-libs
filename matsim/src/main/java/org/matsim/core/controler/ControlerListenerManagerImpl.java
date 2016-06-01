@@ -32,7 +32,7 @@ import javax.swing.event.EventListenerList;
  *
  * @author dgrether
  */
-final class ControlerListenerManagerImpl implements ControlerListenerManager {
+public final class ControlerListenerManagerImpl implements ControlerListenerManager {
 
 	private final static Logger log = Logger.getLogger(ControlerListenerManagerImpl.class);
 
@@ -95,7 +95,7 @@ final class ControlerListenerManagerImpl implements ControlerListenerManager {
 	/**
 	 * Notifies all ControlerListeners
 	 */
-	protected void fireControlerStartupEvent() {
+	public void fireControlerStartupEvent() {
 		StartupEvent event = new StartupEvent(this.controler);
 		StartupListener[] listener = this.coreListenerList.getListeners(StartupListener.class);
         for (StartupListener aListener : listener) {
@@ -114,7 +114,7 @@ final class ControlerListenerManagerImpl implements ControlerListenerManager {
 	 * Notifies all ControlerListeners
 	 * @param unexpected Whether the shutdown is unexpected or not.
 	 */
-	protected void fireControlerShutdownEvent(final boolean unexpected) {
+	public void fireControlerShutdownEvent(final boolean unexpected) {
 		ShutdownEvent event = new ShutdownEvent(this.controler, unexpected);
         ShutdownListener[] listener = this.coreListenerList.getListeners(ShutdownListener.class);
         for (ShutdownListener aListener : listener) {
@@ -133,7 +133,7 @@ final class ControlerListenerManagerImpl implements ControlerListenerManager {
 	 * Notifies all ControlerSetupIterationStartsListeners
      *
 	 */
-	protected void fireControlerIterationStartsEvent(final int iteration) {
+	public void fireControlerIterationStartsEvent(final int iteration) {
 		IterationStartsEvent event = new IterationStartsEvent(this.controler, iteration);
 		IterationStartsListener[] listener = this.coreListenerList.getListeners(IterationStartsListener.class);
         for (IterationStartsListener aListener : listener) {
@@ -152,7 +152,7 @@ final class ControlerListenerManagerImpl implements ControlerListenerManager {
 	 * Notifies all ControlerIterationEndsListeners
 	 *
 	 */
-	protected void fireControlerIterationEndsEvent(final int iteration) {
+	public void fireControlerIterationEndsEvent(final int iteration) {
 		IterationEndsEvent event = new IterationEndsEvent(this.controler, iteration);
 		{
 			IterationEndsListener[] listener = this.coreListenerList.getListeners(IterationEndsListener.class);
@@ -175,7 +175,7 @@ final class ControlerListenerManagerImpl implements ControlerListenerManager {
 	 * Notifies all ControlerScoringListeners
 	 *
 	 */
-	protected void fireControlerScoringEvent(final int iteration) {
+	public void fireControlerScoringEvent(final int iteration) {
 		ScoringEvent event = new ScoringEvent(this.controler, iteration);
 		{
 			ScoringListener[] listener = this.coreListenerList.getListeners(ScoringListener.class);
@@ -198,7 +198,7 @@ final class ControlerListenerManagerImpl implements ControlerListenerManager {
 	 * Notifies all ControlerReplanningListeners
 	 *
 	 */
-	protected void fireControlerReplanningEvent(final int iteration) {
+	public void fireControlerReplanningEvent(final int iteration) {
 		ReplanningEvent event = new ReplanningEvent(this.controler, iteration);
 		ReplanningListener[] listener = this.coreListenerList.getListeners(ReplanningListener.class);
         for (ReplanningListener aListener : listener) {
@@ -217,7 +217,7 @@ final class ControlerListenerManagerImpl implements ControlerListenerManager {
 	 * Notifies all ControlerBeforeMobsimListeners
 	 *
 	 */
-	protected void fireControlerBeforeMobsimEvent(final int iteration) {
+	public void fireControlerBeforeMobsimEvent(final int iteration) {
 		BeforeMobsimEvent event = new BeforeMobsimEvent(this.controler, iteration);
 		BeforeMobsimListener[] listener = this.coreListenerList.getListeners(BeforeMobsimListener.class);
         for (BeforeMobsimListener aListener : listener) {
@@ -236,7 +236,7 @@ final class ControlerListenerManagerImpl implements ControlerListenerManager {
 	 * Notifies all ControlerAfterMobsimListeners
 	 *
 	 */
-	protected void fireControlerAfterMobsimEvent(final int iteration) {
+	public void fireControlerAfterMobsimEvent(final int iteration) {
 		AfterMobsimEvent event = new AfterMobsimEvent(this.controler, iteration);
 		AfterMobsimListener[] listener = this.coreListenerList.getListeners(AfterMobsimListener.class);
         for (AfterMobsimListener aListener : listener) {

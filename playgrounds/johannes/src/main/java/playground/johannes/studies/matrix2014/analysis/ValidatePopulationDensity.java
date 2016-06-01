@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import gnu.trove.iterator.TObjectDoubleIterator;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.common.util.ProgressLogger;
 import org.matsim.facilities.ActivityFacilities;
@@ -46,15 +47,20 @@ import java.util.List;
  */
 public class ValidatePopulationDensity implements AnalyzerTask<Collection<? extends Person>> {
 
+    private final static Logger logger = Logger.getLogger(ValidatePopulationDensity.class);
+
     private final ZoneCollection zones;
 
     private final ActivityFacilities facilities;
 
     private FileIOContext ioContext;
 
-    public ValidatePopulationDensity(DataPool dataPool, String layerName) {
+    public final TObjectDoubleMap<Zone> zoneWeights;
+
+    public ValidatePopulationDensity(DataPool dataPool, TObjectDoubleMap<Zone> zoneWeights, String layerName) {
         zones = ((ZoneData) dataPool.get(ZoneDataLoader.KEY)).getLayer(layerName);
         facilities = ((FacilityData) dataPool.get(FacilityDataLoader.KEY)).getAll();
+        this.zoneWeights = zoneWeights;
     }
 
     public void setIoContext(FileIOContext ioContext) {
@@ -90,7 +96,17 @@ public class ValidatePopulationDensity implements AnalyzerTask<Collection<? exte
         TObjectDoubleMap<Zone> refCounts = new TObjectDoubleHashMap<>();
         double refSum = 0;
         for (Zone zone : zones.getZones()) {
-            double inhabs = Double.parseDouble(zone.getAttribute(ZoneData.POPULATION_KEY));
+            double inhabs = 0;
+            String val = zone.getAttribute(ZoneData.POPULATION_KEY);
+            double w = zoneWeights.get(zone);
+            if(val != null) {
+                try {
+                    inhabs = Double.parseDouble(val) * w;
+                } catch (NumberFormatException e) {
+                    logger.debug(e.getLocalizedMessage());
+                }
+            }
+
             refCounts.adjustOrPutValue(zone, inhabs, inhabs);
             refSum += inhabs;
         }
@@ -117,11 +133,11 @@ public class ValidatePopulationDensity implements AnalyzerTask<Collection<? exte
                 for (int i = 0; i < errors.size(); i++) {
                     it.advance();
                     writer.write(it.key().getAttribute(zones.getPrimaryKey()));
-                    writer.newLine();
+                    writer.write("\t");
                     writer.write(String.valueOf(refCounts.get(it.key())));
-                    writer.newLine();
-                    writer.write(String.valueOf(simCounts.get(it.key())));
-                    writer.newLine();
+                    writer.write("\t");
+                    writer.write(String.valueOf(simCounts.get(it.key()) * scale));
+                    writer.write("\t");
                     writer.write(String.valueOf(it.value()));
                     writer.newLine();
                 }

@@ -40,8 +40,10 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.wagonSim.WagonSimConstants;
 import org.matsim.contrib.wagonSim.demand.WagonDataContainer.Wagon;
 import org.matsim.core.config.Config;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -101,7 +103,7 @@ public class WagonToMatsimDemandConverter {
 //
 //		TransitRouter router = routerFactory.createTransitRouter();
 		
-		TransitRouter router = new TransitRouterImplFactory(
+		TransitRouterImpl router = (TransitRouterImpl) new TransitRouterImplFactory(
 				scenario.getTransitSchedule(),
 				new TransitRouterConfig(scenario.getConfig())).get();
 
@@ -138,8 +140,9 @@ public class WagonToMatsimDemandConverter {
 			plan.addLeg(leg);
 			Activity destination = factory.createActivityFromCoord(WagonSimConstants.DESTINATION,scenario.getNetwork().getNodes().get(toNodeId).getCoord());
 			plan.addActivity(destination);
+			final Person person1 = person;
 
-			if (router.calcRoute(origin.getCoord(),destination.getCoord(),wagon.depTime,person) != null) {
+			if (router.calcRoute( new FakeFacility(origin.getCoord()), new FakeFacility(destination.getCoord()), wagon.depTime, person1 ) != null) {
 				population.addPerson(person);
 				wagonAttributes.putAttribute(person.getId().toString(),WagonSimConstants.WAGON_GROSS_WEIGHT,wagon.weight+wagon.weightLoad);
 				wagonAttributes.putAttribute(person.getId().toString(),WagonSimConstants.WAGON_LENGTH,wagon.length);

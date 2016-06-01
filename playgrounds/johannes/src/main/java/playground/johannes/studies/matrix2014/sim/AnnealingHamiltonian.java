@@ -78,6 +78,10 @@ public class AnnealingHamiltonian implements Hamiltonian, MarkovEngineListener {
         this.startIteration = iteration;
     }
 
+    public long getStartIteration() {
+        return startIteration;
+    }
+
     @Override
     public double evaluate(Collection<CachedPerson> population) {
         if(iteration >= startIteration) return theta * delegate.evaluate(population);

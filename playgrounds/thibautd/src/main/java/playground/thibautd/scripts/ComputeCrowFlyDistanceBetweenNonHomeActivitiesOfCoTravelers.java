@@ -54,10 +54,10 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 		final String outFile = args[ 1 ];
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory().setRouteFactory(
+		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactory().setRouteFactory(
 				DriverRoute.class,//JointActingTypes.DRIVER,
 				new DriverRouteFactory() );
-		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory().setRouteFactory(
+		((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getRouteFactory().setRouteFactory(
 				PassengerRoute.class,//JointActingTypes.PASSENGER,
 				new PassengerRouteFactory() );
 		new MatsimPopulationReader( scenario ).readFile( popFile );

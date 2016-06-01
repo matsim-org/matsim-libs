@@ -41,10 +41,10 @@ public class TaxiScheduleChartUtils
         }
     };
 
-    private static final Color DRIVE_OCCUPIED_COLOR = new Color(200, 0, 0);
+    private static final Color OCCUPIED_DRIVE_COLOR = new Color(200, 0, 0);
     private static final Color PICKUP_DROPOFF_COLOR = new Color(0, 0, 200);
 
-    private static final Color DRIVE_EMPTY_COLOR = new Color(100, 0, 0);
+    private static final Color EMPTY_DRIVE_COLOR = new Color(100, 0, 0);
     private static final Color STAY_COLOR = new Color(0, 0, 100);
 
     public static final PaintSelector<TaxiTask> TAXI_PAINT_SELECTOR = new PaintSelector<TaxiTask>() {
@@ -55,11 +55,11 @@ public class TaxiScheduleChartUtils
                 case DROPOFF:
                     return PICKUP_DROPOFF_COLOR;
 
-                case DRIVE_OCCUPIED:
-                    return DRIVE_OCCUPIED_COLOR;
+                case OCCUPIED_DRIVE:
+                    return OCCUPIED_DRIVE_COLOR;
 
-                case DRIVE_EMPTY:
-                    return DRIVE_EMPTY_COLOR;
+                case EMPTY_DRIVE:
+                    return EMPTY_DRIVE_COLOR;
 
                 case STAY:
                     return STAY_COLOR;

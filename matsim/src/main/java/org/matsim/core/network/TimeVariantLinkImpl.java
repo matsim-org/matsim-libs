@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.*;
  * @author illenberger
  *
  */
-class TimeVariantLinkImpl extends LinkImpl {
+public class TimeVariantLinkImpl extends LinkImpl {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -59,11 +59,11 @@ class TimeVariantLinkImpl extends LinkImpl {
     public static TimeVariantLinkImpl createLinkWithFixedIntervalAttributes(final Id<Link> id,
             final Node from, final Node to, final Network network, final double length,
             final double freespeed, final double capacity, final double lanes, final int interval,
-            final int intervalCount) {
+            final int maxTime) {
         return new TimeVariantLinkImpl(id, from, to, network, length, freespeed, capacity, lanes,
-                new FixedIntervalTimeVariantAttribute(interval, intervalCount),
-                new FixedIntervalTimeVariantAttribute(interval, intervalCount),
-                new FixedIntervalTimeVariantAttribute(interval, intervalCount));
+                new FixedIntervalTimeVariantAttribute(interval, maxTime),
+                new FixedIntervalTimeVariantAttribute(interval, maxTime),
+                new FixedIntervalTimeVariantAttribute(interval, maxTime));
     }
 
    
@@ -151,7 +151,7 @@ class TimeVariantLinkImpl extends LinkImpl {
 	 * @return the flow capacity at time <tt>time</tt>.
 	 */
 	@Override
-	public synchronized double getFlowCapacity(final double time) {
+	public synchronized double getFlowCapacityPerSec(final double time) {
 
 		if (variableFlowCapacity.isRecalcRequired()) {
 			recalcFlowCapacity();
@@ -176,7 +176,7 @@ class TimeVariantLinkImpl extends LinkImpl {
 	 */
 	@Override
 	public synchronized double getCapacity(final double time) {
-		return getFlowCapacity() * getCapacityPeriod();
+		return getFlowCapacityPerSec(time) * getCapacityPeriod();
 	}
 
 
@@ -207,16 +207,16 @@ class TimeVariantLinkImpl extends LinkImpl {
 
 	
 	private synchronized void recalcFreespeed() {
-	    variableFreespeed.recalc(changeEvents, TimeVariantAttribute.FREESPEED_GETTER, freespeed);
+	    variableFreespeed.recalc(changeEvents, TimeVariantAttribute.FREESPEED_GETTER, this.getFreespeed() );
 	}
 
 	private synchronized void recalcFlowCapacity() {
-	    double baseFlowCapacity = this.capacity / getCapacityPeriod();
+	    double baseFlowCapacity = this.getCapacity() / getCapacityPeriod();
 	    variableFlowCapacity.recalc(changeEvents, TimeVariantAttribute.FLOW_CAPACITY_GETTER, baseFlowCapacity);
 	}
 
 	private synchronized void recalcLanes() {
-		variableLanes.recalc(changeEvents, TimeVariantAttribute.LANES_GETTER, nofLanes);
+		variableLanes.recalc(changeEvents, TimeVariantAttribute.LANES_GETTER, this.getNumberOfLanes() );
 	}
 }
 

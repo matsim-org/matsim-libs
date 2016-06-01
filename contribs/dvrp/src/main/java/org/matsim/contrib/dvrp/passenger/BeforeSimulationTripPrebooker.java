@@ -21,6 +21,8 @@ package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -46,6 +48,10 @@ public class BeforeSimulationTripPrebooker
     }
 
 
+    /**
+     * TODO Note that in MATSim leg departure times may be meaningless; the only thing that truly
+     * matters is the activity end time. kai, jul'14
+     */
     @Override
     public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e)
     {
@@ -61,7 +67,11 @@ public class BeforeSimulationTripPrebooker
                         Leg leg = (Leg)elem;
 
                         if (leg.getMode().equals(mode)) {
-                            passengerEngine.prebookTrip(0, (MobsimPassengerAgent)mobsimAgent, leg);
+                            Id<Link> fromLinkId = leg.getRoute().getStartLinkId();
+                            Id<Link> toLinkId = leg.getRoute().getEndLinkId();
+                            double departureTime = leg.getDepartureTime();
+                            passengerEngine.prebookTrip(0, (MobsimPassengerAgent)mobsimAgent,
+                                    fromLinkId, toLinkId, departureTime);
                         }
                     }
                 }

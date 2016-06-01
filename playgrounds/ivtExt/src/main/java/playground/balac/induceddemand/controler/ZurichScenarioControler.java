@@ -1,6 +1,9 @@
 package playground.balac.induceddemand.controler;
 
-import com.google.inject.name.Names;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -10,25 +13,27 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializ
 import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-import org.matsim.pt.PtConstants;
+
+import com.google.inject.name.Names;
+
 import playground.balac.induceddemand.config.ActivityStrategiesConfigGroup;
 import playground.balac.induceddemand.controler.listener.ActivitiesAnalysisListener;
-import playground.balac.induceddemand.strategies.RandomActivitiesSwaperStrategy;
-import playground.balac.induceddemand.strategies.RemoveRandomActivityStrategy;
-import playground.balac.induceddemand.strategies.insertactivity.InsertRandomActivityWithLocationChoiceStrategy;
+import playground.balac.induceddemand.strategies.activitychainmodifier.ActivityChainModifierStrategy;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
-
-import java.io.File;
+import playground.ivt.matsim2030.scoring.MATSim2010ScoringModule;
+import playground.polettif.boescpa.lib.tools.fileCreation.F2LConfigGroup;
 
 /**
  * 
@@ -71,18 +76,13 @@ public class ZurichScenarioControler {
 		controler.getConfig().controler().setOverwriteFileSetting(
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles  );
 
-		connectFacilitiesWithNetwork( controler );
+		//connectFacilitiesWithNetwork( controler );
 
 		initializeLocationChoice( controler );
 		initializeActivityStrategies(scenario, controler);
-		controler.addControlerListener(new ActivitiesAnalysisListener(scenario));
 		// We use a specific scoring function, that uses individual preferences
 		// for activity durations.
-		controler.setScoringFunctionFactory(
-			new MATSim2010ScoringFunctionFactory(
-					controler.getScenario(),
-					new StageActivityTypesImpl(
-						PtConstants.TRANSIT_ACTIVITY_TYPE ) ) ); 	
+		controler.addOverridingModule( new MATSim2010ScoringModule() );
 
 		controler.run();
 	}
@@ -91,7 +91,7 @@ public class ZurichScenarioControler {
 		
 		final QuadTreeRebuilder<ActivityFacility> shopFacilitiesQuadTree = new QuadTreeRebuilder<ActivityFacility>();
 		
-		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shopping").values()) {
+		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shop").values()) {
 			
 			shopFacilitiesQuadTree.put(af.getCoord(), af);
 		}
@@ -106,6 +106,7 @@ public class ZurichScenarioControler {
 		final QuadTree<ActivityFacility> shoping = shopFacilitiesQuadTree.getQuadTree();		
 		
 		final QuadTree<ActivityFacility> leisure = leisureFacilitiesQuadTree.getQuadTree();		
+		HashMap<String, Double> scoreChange = new HashMap<String, Double>();
 
 		controler.addOverridingModule(new AbstractModule() {
 
@@ -118,18 +119,23 @@ public class ZurichScenarioControler {
 				bind(QuadTree.class)
 				.annotatedWith(Names.named("leisureQuadTree"))
 				.toInstance(leisure);
+				bind(HashMap.class)
+				.annotatedWith(Names.named("scoreChangeMap"))
+				.toInstance(scoreChange);
 			}
 			
 		});		
-		
+		controler.addControlerListener(new ActivitiesAnalysisListener(sc, scoreChange));
+
 		controler.addOverridingModule( new AbstractModule() {
 			@Override
 			public void install() {
-				this.addPlanStrategyBinding("InsertRandomActivityWithLocationChoiceStrategy").to( InsertRandomActivityWithLocationChoiceStrategy.class ) ;
+			//	this.addPlanStrategyBinding("InsertRandomActivityWithLocationChoiceStrategy").to( InsertRandomActivityWithLocationChoiceStrategy.class ) ;
 
-				this.addPlanStrategyBinding("RandomActivitiesSwaperStrategy").to( RandomActivitiesSwaperStrategy.class ) ;
+			//	this.addPlanStrategyBinding("RandomActivitiesSwaperStrategy").to( RandomActivitiesSwaperStrategy.class ) ;
 				
-				this.addPlanStrategyBinding("RemoveRandomActivityStrategy").to( RemoveRandomActivityStrategy.class ) ;
+			//	this.addPlanStrategyBinding("RemoveRandomActivityStrategy").to( RemoveRandomActivityStrategy.class ) ;
+				this.addPlanStrategyBinding("ActivityChainModifierStrategy").to(ActivityChainModifierStrategy.class);
 
 			}
 		});	

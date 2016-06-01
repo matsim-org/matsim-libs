@@ -30,7 +30,7 @@ public class SrVTripParserStarter {
 
 	public static void main(String[] args) throws IOException {
 		String inputFile = "D:/Workspace/container/demand/input/srv/W2008_Berlin2.dat";
-		SrVTripParser parser = new SrVTripParser();
+		SrV2008TripParser parser = new SrV2008TripParser();
 		parser.parse(inputFile);	
 	}
 

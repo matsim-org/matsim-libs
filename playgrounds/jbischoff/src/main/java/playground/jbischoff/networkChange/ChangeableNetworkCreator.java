@@ -28,9 +28,9 @@ public class ChangeableNetworkCreator {
 	private List<NetworkChangeEvent> networkChangeEvents;
 	private final int ENDTIME = 30*3600;
 	private final int TIMESTEP = 15*60;
-	private final String NETWORKFILE = "C:/Users/Joschka/Documents/runs-svn/bvg.run132.25pct/bvg.run132.25pct.output_network.xml.gz";
-	private final String EVENTSFILE =  "C:/Users/Joschka/Documents/runs-svn/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.xml.gz";
-	private final String CHANGEFILE = "test.xml";
+	private final String NETWORKFILE = "D:/runs-svn/braunschweig/output/bs05/output_network.xml.gz";
+	private final String EVENTSFILE =  "D:/runs-svn/braunschweig/output/bs05/output_events.xml.gz";
+	private final String CHANGEFILE = "D:/runs-svn/braunschweig/output/bs05/bs05changeEvents.xml.gz";
 
 	private final double MINIMUMFREESPEED = 3;
 
@@ -55,7 +55,9 @@ public class ChangeableNetworkCreator {
 	public void createNetworkChangeEvents(Network network, TravelTimeCalculator tcc2) {
 		NetworkChangeEventFactory factory = new NetworkChangeEventFactoryImpl();
 		for (Link l : network.getLinks().values()){
-			if (l.getId().toString().startsWith("pt")) continue;
+			if ((l.getAllowedModes().size() == 1) && l.getAllowedModes().contains("pt"))				
+				continue;
+			
 			double length = l.getLength();
 			double previousTravelTime=l.getLength()/l.getFreespeed()	;	
 			

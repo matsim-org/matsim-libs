@@ -3,8 +3,10 @@ package playground.dziemke.analysis;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.households.Household;
 
@@ -12,42 +14,48 @@ import playground.dziemke.cemdapMatsimCadyts.Zone;
 
 
 public class Trip {
+	public static final Logger log = Logger.getLogger(Trip.class);
+
 	private Id<Household> householdId;
 	private Id<Person> personId;
 	private Id<Trip> tripId;
 	private String activityEndActType;
 	private Id<Link> departureLinkId;
 	private Id<Zone> departureZoneId;
-	private double departureTime;
+	private double departureTime_s;
 	private String departureLegMode;
 	private List<Id<Link>> links = new LinkedList<Id<Link>>();
 	private int useHouseholdCar;
 	private int useOtherCar;
 	private int useHouseholdCarPool;
 	private int useOtherCarPool;
-	//private int mode;
 	private String mode;
-	private double distanceBeeline;
-	private double distanceRoutedFastest;
-	private double distanceRoutedShortest;
-	private double speed;
-	private double duration;
+	private double distanceBeelineFromSurvey_m; // TODO
+	private double distanceRoutedFastestFromSurvey_m;
+	private double distanceRoutedShortestFromSurvey_m;
+	private double speedFromSurvey_m_s;
+	private double durationFromSurvey_s;
 	private Id<Link> arrivalLinkId;
 	private Id<Zone> arrivalZoneId;
-	private double arrivalTime;
+	private double arrivalTime_s;
 	private String arrivalLegMode;
 	private String activityStartActType;
 	private boolean tripComplete = false;
 	
 	private double weight;
 	
+	//
+	private Double distanceBeelineByCalculation_m = Double.NaN;
+	private Double distanceRoutedByCalculation_m = Double.NaN;
+	//
 	
-	// constructor
+	
+	/* Default constructor */
 	public Trip() {
 	}
 
 	
-	// get and set methods
+	/* Get and set methods */
 	public Id<Household> getHouseholdId() {
 		return this.householdId;
 	}
@@ -97,12 +105,12 @@ public class Trip {
 		this.departureZoneId = departureZoneId;
 	}
 	
-	public double getDepartureTime() {
-		return this.departureTime;
+	public double getDepartureTime_s() {
+		return this.departureTime_s;
 	}
 
-	public void setDepartureTime(double departureTime) {
-		this.departureTime = departureTime;
+	public void setDepartureTime_s(double departureTime_s) {
+		this.departureTime_s = departureTime_s;
 	}
 		
 	public String getDepartureLegMode() {
@@ -153,54 +161,52 @@ public class Trip {
 		this.useOtherCarPool = useOtherCarPool;
 	}
 	
-	//public int getMode() {
 	public String getMode() {
 		return this.mode;
 	}
 
-	//public void setMode(int mode) {
 	public void setMode(String mode) {
 		this.mode = mode;
 	}
 	
-	public double getDistanceBeeline() {
-		return this.distanceBeeline;
+	public double getDistanceBeelineFromSurvey_m() {
+		return this.distanceBeelineFromSurvey_m;
 	}
 
-	public void setDistanceBeeline(double distanceBeeline) {
-		this.distanceBeeline = distanceBeeline;
+	public void setDistanceBeelineFromSurvey_m(double distanceBeelineFromSurvey_m) {
+		this.distanceBeelineFromSurvey_m = distanceBeelineFromSurvey_m;
 	}
 	
-	public double getDistanceRoutedFastest() {
-		return this.distanceRoutedFastest;
+	public double getDistanceRoutedFastestFromSurvey_m() {
+		return this.distanceRoutedFastestFromSurvey_m;
 	}
 
-	public void setDistanceRoutedFastest(double distanceRoutedFastest) {
-		this.distanceRoutedFastest = distanceRoutedFastest;
+	public void setDistanceRoutedFastestFromSurvey_m(double distanceRoutedFastestFromSurvey_m) {
+		this.distanceRoutedFastestFromSurvey_m = distanceRoutedFastestFromSurvey_m;
 	}
 	
-	public double getDistanceRoutedShortest() {
-		return this.distanceRoutedShortest;
+	public double getDistanceRoutedShortestFromSurvey_m() {
+		return this.distanceRoutedShortestFromSurvey_m;
 	}
 
-	public void setDistanceRoutedShortest(double distanceRoutedShortest) {
-		this.distanceRoutedShortest = distanceRoutedShortest;
+	public void setDistanceRoutedShortestFromSurvey_m(double distanceRoutedShortestFromSurvey_m) {
+		this.distanceRoutedShortestFromSurvey_m = distanceRoutedShortestFromSurvey_m;
 	}
 	
-	public double getSpeed() {
-		return this.speed;
+	public double getSpeedFromSurvey_m_s() {
+		return this.speedFromSurvey_m_s;
 	}
 
-	public void setSpeed(double speed) {
-		this.speed = speed;
+	public void setSpeedFromSurvey_m_s(double speedFromSurvey_m_s) {
+		this.speedFromSurvey_m_s = speedFromSurvey_m_s;
 	}
 	
-	public double getDuration() {
-		return this.duration;
+	public double getDurationFromSurvey_s() {
+		return this.durationFromSurvey_s;
 	}
 
-	public void setDuration(double duration) {
-		this.duration = duration;
+	public void setDurationFromSurvey_s(double durationFromSurvey_s) {
+		this.durationFromSurvey_s = durationFromSurvey_s;
 	}
 	
 	public Id<Link> getArrivalLinkId() {
@@ -219,12 +225,12 @@ public class Trip {
 		this.arrivalZoneId = arrivalZoneId;
 	}
 		
-	public double getArrivalTime() {
-		return this.arrivalTime;
+	public double getArrivalTime_s() {
+		return this.arrivalTime_s;
 	}
 
-	public void setArrivalTime(double arrivalTime) {
-		this.arrivalTime = arrivalTime;
+	public void setArrivalTime_s(double arrivalTime) {
+		this.arrivalTime_s = arrivalTime;
 	}
 	
 	public String getArrivalLegMode() {
@@ -257,5 +263,90 @@ public class Trip {
 
 	public void setWeight(double weight) {
 		this.weight = weight;
+	}
+	
+	
+	public double getDistanceBeelineByCalculation_m(Network network) {
+		if (distanceBeelineByCalculation_m.isNaN()) {
+			calculateBeelineDistance_m(network);
+		}
+		return distanceBeelineByCalculation_m;
+	}
+	
+	public double getDurationByCalculation_s(){
+		return arrivalTime_s - departureTime_s;
+	}
+	
+	public double getDistanceRoutedByCalculation_m(Network network) {
+		if (distanceRoutedByCalculation_m.isNaN()) {
+			calculateRoutedDistance_m(network);
+		}
+		return distanceRoutedByCalculation_m;
+	}
+	
+	 public String toString() {
+		return "householdId = " + householdId
+				+ " -- personId = " + personId
+				+ " -- tripId = "+ tripId
+				+ " -- activityEndActType = " + activityEndActType
+				+ " -- departureLinkId = " + departureLinkId
+//	private Id<Zone> departureZoneId;
+//	private double departureTime_s;
+//	private String departureLegMode;
+//	private List<Id<Link>> links = new LinkedList<Id<Link>>();
+//	private int useHouseholdCar;
+//	private int useOtherCar;
+//	private int useHouseholdCarPool;
+//	private int useOtherCarPool;
+//	private String mode;
+//	private double distanceBeelineFromSurvey_m; // TODO
+//	private double distanceRoutedFastest_m;
+//	private double distanceRoutedShortestFromSurvey_m;
+//	private double speedFromSurvey_m_s;
+//	private double durationFromSurvey_s;
+//	private Id<Link> arrivalLinkId;
+//	private Id<Zone> arrivalZoneId;
+//	private double arrivalTime_s;
+//	private String arrivalLegMode;
+//	private String activityStartActType;
+//	private boolean tripComplete = false;
+	+ " -- weight = " + weight;
+//	private Double distanceBeelineByCalculation_m = Double.NaN;
+//	private Double distanceRoutedByCalculation_m = Double.NaN;activityEndActType;	 
+	 }
+
+
+	private void calculateBeelineDistance_m(Network network) {
+    	Link departureLink = network.getLinks().get(departureLinkId);
+    	Link arrivalLink = network.getLinks().get(arrivalLinkId);
+
+    	// TODO use coords of toNode instead of center coord of link
+    	double arrivalCoordX_m = arrivalLink.getCoord().getX();
+    	double arrivalCoordY_m = arrivalLink.getCoord().getY();
+    	double departureCoordX_m = departureLink.getCoord().getX();
+    	double departureCoordY_m = departureLink.getCoord().getY();
+    	
+    	// TODO use CoordUtils.calcEuclideanDistance instead
+    	double horizontalDistance_m = Math.abs(departureCoordX_m - arrivalCoordX_m);
+    	double verticalDistance_m = Math.abs(departureCoordY_m - arrivalCoordY_m);
+
+    	this.distanceBeelineByCalculation_m = Math.sqrt(horizontalDistance_m * horizontalDistance_m 
+    			+ verticalDistance_m * verticalDistance_m);
+	}
+	
+	
+	private void calculateRoutedDistance_m(Network network) {
+		double tripDistance_m = 0.;
+		if (links.isEmpty()) {
+			log.warn("List of links is empty.");
+		}
+		for (int i = 0; i < links.size(); i++) {
+			Id<Link> linkId = links.get(i);
+			Link link = network.getLinks().get(linkId);
+			double length_m = link.getLength();
+			tripDistance_m = tripDistance_m + length_m;
+		}
+		this.distanceRoutedByCalculation_m = tripDistance_m;
+		// TODO here, the distances from activity to link and link to activity are missing!
 	}
 }

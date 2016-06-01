@@ -19,28 +19,28 @@
  * *********************************************************************** */
 package playground.jbischoff.taxibus.run.configuration;
 
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.VrpData;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+import org.matsim.contrib.dvrp.data.VrpDataImpl;
+import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.population.algorithms.PermissibleModesCalculator;
+
+import com.google.inject.util.Providers;
 
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LineDispatcher;
 import playground.jbischoff.taxibus.algorithm.optimizer.fifo.Lines.LinesUtils;
 import playground.jbischoff.taxibus.algorithm.passenger.TaxibusPassengerOrderManager;
-import playground.jbischoff.taxibus.run.sim.TaxibusPermissibleModesCalculatorImpl;
 import playground.jbischoff.taxibus.run.sim.TaxibusQSimProvider;
 import playground.jbischoff.taxibus.run.sim.TaxibusServiceRoutingModule;
-import playground.jbischoff.taxibus.scenario.strategies.TaxibusAndWOBScenarioPermissibleModesCalculator;
 
 /**
  * @author jbischoff
  *
  */
 public class ConfigBasedTaxibusLaunchUtils {
-		private MatsimVrpContextImpl context;
 		private Controler controler;
 		
 		
@@ -54,31 +54,44 @@ public class ConfigBasedTaxibusLaunchUtils {
 	public  void initiateTaxibusses(){
 		//this is done exactly once per simulation
 		
-		
-		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) controler.getScenario().getConfig().getModule("taxibusConfig");
-      	context = new MatsimVrpContextImpl();
-		context.setScenario(controler.getScenario());
-		VrpData vrpData = VrpLauncherUtils.initVrpData(context, tbcg.getVehiclesFile());
-		
-		final LineDispatcher dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),context,tbcg);	
-		final TaxibusPassengerOrderManager orderManager = new TaxibusPassengerOrderManager();
-		
-		
-		
-		context.setVrpData(vrpData);	 
-           
+		Scenario scenario = controler.getScenario();
+		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup) scenario.getConfig().getModule("taxibusConfig");
+        final VrpData vrpData = new VrpDataImpl();
+        new VehicleReader(scenario.getNetwork(), vrpData).parse(tbcg.getVehiclesFile());
+        final TaxibusPassengerOrderManager orderManager;
+        final LineDispatcher dispatcher;
+		if (tbcg.getAlgorithmConfig().endsWith("ine")){
+			dispatcher = LinesUtils.createLineDispatcher(tbcg.getLinesFile(), tbcg.getZonesXmlFile(), tbcg.getZonesShpFile(),vrpData,tbcg);}
+		else  {
+			dispatcher = null;}
+		if (tbcg.isPrebookTrips()){	
+		orderManager = new TaxibusPassengerOrderManager();
+		} else {
+			orderManager = null;
+		}
+		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
+        controler.addOverridingModule(new DynQSimModule<>(TaxibusQSimProvider.class));
+
 		controler.addOverridingModule(new AbstractModule() {
 			
 			@Override
 			public void install() {
-				
+				if (dispatcher!=null){
 				addEventHandlerBinding().toInstance(dispatcher);
-				addEventHandlerBinding().toInstance(orderManager);
-				bindMobsim().toProvider(TaxibusQSimProvider.class);
-				addRoutingModuleBinding("taxibus").toInstance(new TaxibusServiceRoutingModule(controler));
-				bind(TaxibusPassengerOrderManager.class).toInstance(orderManager);
-				bind(MatsimVrpContext.class).toInstance(context);
 				bind(LineDispatcher.class).toInstance(dispatcher);
+				}
+				else {
+					bind(LineDispatcher.class).toProvider(Providers.of(null));
+				}
+				if (orderManager!=null){
+				addEventHandlerBinding().toInstance(orderManager);
+				bind(TaxibusPassengerOrderManager.class).toInstance(orderManager);
+				}else {
+					bind(TaxibusPassengerOrderManager.class).toProvider(Providers.of(null));
+				}
+				
+				addRoutingModuleBinding("taxibus").toInstance(new TaxibusServiceRoutingModule(controler));
+				bind(VrpData.class).toInstance(vrpData);
 
 			}
 		});

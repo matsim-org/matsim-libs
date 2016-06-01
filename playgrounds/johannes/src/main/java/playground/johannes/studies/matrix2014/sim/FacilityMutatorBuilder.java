@@ -19,7 +19,9 @@
 package playground.johannes.studies.matrix2014.sim;
 
 import playground.johannes.synpop.data.CommonKeys;
-import playground.johannes.synpop.gis.*;
+import playground.johannes.synpop.gis.DataPool;
+import playground.johannes.synpop.gis.FacilityData;
+import playground.johannes.synpop.gis.FacilityDataLoader;
 import playground.johannes.synpop.sim.*;
 import playground.johannes.synpop.sim.data.ActivityFacilityConverter;
 import playground.johannes.synpop.sim.data.Converters;
@@ -70,10 +72,14 @@ public class FacilityMutatorBuilder implements MutatorBuilder {
 
 //        RandomFacilityGenerator generator = new RandomFacilityGenerator(facilityData);
 //        LocalFacilityGenerator generator = new LocalFacilityGenerator(facilityData, random);
-        ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
-        ZoneCollection zones = zoneData.getLayer("nuts3");
-        ProximityFacilityGenerator generator = new ProximityFacilityGenerator(facilityData, zones, proximityProba,
-                random);
+
+//        ZoneData zoneData = (ZoneData) dataPool.get(ZoneDataLoader.KEY);
+//        ZoneCollection zones = zoneData.getLayer("nuts3");
+//        ProximityFacilityGenerator generator = new ProximityFacilityGenerator(facilityData, zones, proximityProba,
+//                random);
+
+        SegmentedFacilityGenerator generator = new SegmentedFacilityGenerator(dataPool, "modena", random);
+        generator.setLocalSegmentProbability(proximityProba);
         for(String type : blacklist) {
             generator.addToBlacklist(type);
         }

@@ -100,8 +100,8 @@ public class TransferZoneAttribute {
     }
 
     public static void main(String args[]) throws IOException {
-        ZoneCollection source = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/zones/geojson/de.lau2.gk3.geojson", "ID");
-        ZoneCollection target = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/zones/geojson/modena.de.gk3.geojson", "NO");
+        ZoneCollection source = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/zones/geojson/de.lau2.gk3.geojson", "ID", null);
+        ZoneCollection target = ZoneGeoJsonIO.readFromGeoJSON("/home/johannes/gsv/gis/zones/geojson/modena.de.gk3.geojson", "NO", null);
         new ZoneSetLAU2Class().apply(source);
         new TransferZoneAttribute().apply(source, target, MiDKeys.PERSON_LAU2_CLASS);
         String data = ZoneGeoJsonIO.toJson(target.getZones());

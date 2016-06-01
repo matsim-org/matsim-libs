@@ -42,7 +42,6 @@ public class NetworkMerger {
 	public static Network mergeNetworks(final Network networkA, final Network networkB) {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
 		final Network mergedNetwork = scenario.getNetwork();
 		final NetworkFactory factory = mergedNetwork.getFactory();
 

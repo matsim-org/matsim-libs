@@ -8,3 +8,6 @@ target
 output
 /test
 src/main/java/.gitignore
+/output_fastCapacityUpdate_false/
+/output_fastCapacityUpdate_true/
+/nullevents.xml.gz

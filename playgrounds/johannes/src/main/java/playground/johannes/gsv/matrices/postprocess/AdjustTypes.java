@@ -68,7 +68,7 @@ public class AdjustTypes {
     public static void main(String args[]) throws IOException {
         BufferedReader reader = IOUtils.getBufferedReader(args[0]);
         BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
-        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], "NO");
+        ZoneCollection zones = ZoneGeoJsonIO.readFromGeoJSON(args[2], "NO", null);
 
         dayLabels = new ArrayList<>(5);
         dayLabels.add("1");

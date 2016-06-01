@@ -18,15 +18,10 @@
  * *********************************************************************** */
 package playground.johannes.studies.matrix2014.analysis;
 
-import org.matsim.facilities.ActivityFacilities;
-import playground.johannes.studies.matrix2014.matrix.MatrixBuilder;
 import playground.johannes.synpop.analysis.AnalyzerTask;
 import playground.johannes.synpop.analysis.FileIOContext;
-import playground.johannes.synpop.analysis.Predicate;
 import playground.johannes.synpop.analysis.StatsContainer;
 import playground.johannes.synpop.data.Person;
-import playground.johannes.synpop.data.Segment;
-import playground.johannes.synpop.gis.ZoneCollection;
 import playground.johannes.synpop.matrix.NumericMatrix;
 import playground.johannes.synpop.matrix.NumericMatrixIO;
 
@@ -43,26 +38,15 @@ public class MatrixWriter implements AnalyzerTask<Collection<? extends Person>> 
 
     private final FileIOContext ioContext;
 
-    private boolean useWeights;
 
-    private Predicate<Segment> predicate;
-
-    public MatrixWriter(ActivityFacilities facilities, ZoneCollection zones, FileIOContext ioContext) {
-        matrixBuilder = new MatrixBuilder(facilities, zones);
+    public MatrixWriter(MatrixBuilder builder, FileIOContext ioContext) {
+        matrixBuilder = builder;
         this.ioContext = ioContext;
-    }
-
-    public void setPredicate(Predicate<Segment> predicate) {
-        this.predicate = predicate;
-    }
-
-    public void setUseWeights(boolean useWeights) {
-        this.useWeights = useWeights;
     }
 
     @Override
     public void analyze(Collection<? extends Person> persons, List<StatsContainer> containers) {
-        NumericMatrix matrix = matrixBuilder.build(persons, predicate, useWeights);
+        NumericMatrix matrix = matrixBuilder.build(persons);
 
         try {
             NumericMatrixIO.write(matrix, String.format("%s/matrix.txt.gz", ioContext.getPath()));

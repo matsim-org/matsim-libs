@@ -23,19 +23,22 @@ package playground.boescpa.ivtBaseline;
 
 import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.controler.*;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.PtConstants;
 import playground.boescpa.ivtBaseline.counts.*;
 import playground.boescpa.lib.tools.fileCreation.F2LConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
+
+import java.io.File;
 
 import static playground.boescpa.ivtBaseline.RunIVTBaseline.connectFacilitiesWithNetwork;
 
@@ -53,23 +56,34 @@ public class RunIVTBaselineCalibration {
 		final String configFile = args[0];
 		final String pathToPTLinksMonitorList = args[1];
 		final String pathToPTStationsMonitorList = args[2];
-		final String pathToStreetLinksDailyToMonitor = args[3];
-		final String pathToStreetLinksHourlyToMonitor = args[4];
+		/*final String pathToStreetLinksDailyToMonitor = args[3];
+		final String pathToStreetLinksHourlyToMonitor = args[4];*/
 
 		// This allows to get a log file containing the log messages happening
 		// before controler init.
 		OutputDirectoryLogging.catchLogEntries();
 
 		// It is suggested to use the config created by playground/boescpa/baseline/ConfigCreator.java.
-		final Config config = ConfigUtils.loadConfig(configFile, new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
+		final Config config = ConfigUtils.loadConfig(configFile, new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup(), new DestinationChoiceConfigGroup());
+
+		// This is currently needed for location choice: initializing
+		// the location choice writes K-values files to the output directory, which:
+		// - fails if the directory does not exist
+		// - makes the controler crash latter if the unsafe setOverwriteFiles( true )
+		// is not called.
+		// This ensures that we get safety with location choice working as expected,
+		// before we sort this out and definitely kick out setOverwriteFiles.
+		createEmptyDirectoryOrFailIfExists(config.controler().getOutputDirectory());
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scenario);
 
 		controler.getConfig().controler().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		connectFacilitiesWithNetwork(controler);
+
+		initializeLocationChoice(controler);
 
 		// We use a time allocation mutator that allows to exclude certain activities.
 		controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
@@ -91,17 +105,33 @@ public class RunIVTBaselineCalibration {
 				bind(String.class)
 						.annotatedWith(Names.named("pathToPTStationsToMonitor"))
 						.toInstance(pathToPTStationsMonitorList);
-				this.bind(StreetLinkDailyCountsEventHandler.class);
+				/*this.bind(StreetLinkDailyCountsEventHandler.class);
 				bind(String.class)
 						.annotatedWith(Names.named("pathToStreetLinksDailyToMonitor"))
 						.toInstance(pathToStreetLinksDailyToMonitor);
 				this.bind(StreetLinkHourlyCountsEventHandler.class);
 				bind(String.class)
 						.annotatedWith(Names.named("pathToStreetLinksHourlyToMonitor"))
-						.toInstance(pathToStreetLinksHourlyToMonitor);
+						.toInstance(pathToStreetLinksHourlyToMonitor);*/
 			}
 		});
 
 		controler.run();
+	}
+
+	private static void initializeLocationChoice(MatsimServices controler) {
+		Scenario scenario = controler.getScenario();
+		DestinationChoiceBestResponseContext lcContext =
+				new DestinationChoiceBestResponseContext(scenario);
+		lcContext.init();
+		controler.addControlerListener(new DestinationChoiceInitializer(lcContext));
+	}
+
+	private static void createEmptyDirectoryOrFailIfExists(String directory) {
+		File file = new File( directory +"/" );
+		if ( file.exists() && file.list().length > 0 ) {
+			throw new UncheckedIOException( "Directory "+directory+" exists and is not empty!" );
+		}
+		file.mkdirs();
 	}
 }

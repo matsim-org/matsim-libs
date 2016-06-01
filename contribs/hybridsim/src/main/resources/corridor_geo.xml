@@ -1,33 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <geometry version="0.5" caption="second life" unit="m"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:noNamespaceSchemaLocation="http://xsd.jupedsim.org/jps_geometry.xsd">
-	<rooms>
-		<room id="0" caption="hall">
-			<subroom id="0" closed="0" class="subroom">
-				<polygon caption="wall">
-					<vertex px="10.0" py="0.0" />
-					<vertex px="0.0" py="0.0" />
-					<vertex px="0.0" py="2.0" />
-					<vertex px="10.0" py="2.0" />
-				</polygon>
-			</subroom>
-		</room>
-	</rooms>
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="http://xsd.jupedsim.org/jps_geometry.xsd">
+    <rooms>
+        <room id="0" caption="hall">
+            <subroom id="0" closed="0" class="subroom">
+                <polygon caption="wall">
+                    <vertex px="200.0" py="109.35"/>
+                    <vertex px="113.85" py="109.35"/>
+                </polygon>
+                <polygon caption="wall">
+                    <vertex px="113.85" py="110.85"/>
+                    <vertex px="200.0" py="110.85"/>
+                </polygon>
+            </subroom>
+        </room>
+    </rooms>
 
-	<transitions>
-		<!-- exits like crossings but between rooms or to outside (room with index
-			= -1) -->
-		<transition id="0" caption="exit" type="emergency"
-			room1_id="0" subroom1_id="0" room2_id="-1" subroom2_id="-1">
-			<vertex px="10.0" py="0.0" />
-			<vertex px="10.0" py="2.0" />
-		</transition>
-		<transition id="1" caption="entrance" type="emergency"
-					room1_id="0" subroom1_id="0" room2_id="-1" subroom2_id="-1">
-			<vertex px="0.0" py="0.0" />
-			<vertex px="0.0" py="2.0" />
-		</transition>
-	</transitions>
+    <transitions>
+        <!-- exits like crossings but between rooms or to outside (room with index
+            = -1) -->
+        <transition id="0" caption="exit" type="emergency"
+                    room1_id="0" subroom1_id="0" room2_id="-1" subroom2_id="-1">
+            <vertex px="200.0" py="109.35"/>
+            <vertex px="200.0" py="110.85"/>
+        </transition>
+        <transition id="1" caption="entrance" type="emergency"
+                    room1_id="0" subroom1_id="0" room2_id="-1" subroom2_id="-1">
+            <vertex px="113.85" py="110.85"/>
+            <vertex px="113.85" py="109.35"/>
+        </transition>
+    </transitions>
 </geometry>

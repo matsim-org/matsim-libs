@@ -156,8 +156,16 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startLink(final Attributes atts) {
-		Node fromNode = this.network.getNodes().get(Id.create(atts.getValue("from"), Node.class));
-		Node toNode = this.network.getNodes().get(Id.create(atts.getValue("to"), Node.class));
+		final String fromNodeStr = atts.getValue("from");
+		Node fromNode = this.network.getNodes().get(Id.create(fromNodeStr, Node.class));
+		if ( fromNode==null ) {
+			throw new RuntimeException("node id given by link cannot be dereferenced; node label=" + fromNodeStr ) ;
+		}
+		final String toNodeStr = atts.getValue("to");
+		Node toNode = this.network.getNodes().get(Id.create(toNodeStr, Node.class));
+		if ( toNode==null ) {
+			throw new RuntimeException("node id given by link cannot be dereferenced; node label=" + toNodeStr ) ;
+		}
 		Link l = this.network.getFactory().createLink(Id.create(atts.getValue("id"), Link.class), fromNode, toNode);
 		l.setLength(Double.parseDouble(atts.getValue("length")));
 		l.setFreespeed(Double.parseDouble(atts.getValue("freespeed")));

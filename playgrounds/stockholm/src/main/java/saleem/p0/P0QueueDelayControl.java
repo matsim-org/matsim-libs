@@ -227,7 +227,7 @@ public class P0QueueDelayControl implements LinkLeaveEventHandler, LinkEnterEven
 	   capacity4 = link4.getCapacity();
 	   //double factor = 200/(iter+1);//To make the capacity change dependent on number of day/iteration
 	   double factor = 200;
-	   ((LinkImpl)link4).getFlowCapacity();
+	   ((LinkImpl)link4).getFlowCapacityPerSec();
 	   double abs = Math.abs(p2-p4);
 	   //-100 for starting from start of time bin,  (iter+1)/1000 + Math.random()/10000 for ordering the events based on iteration number as well as limiting it from exceptions due to two events on same time
 	   if (p2>p4 && factor2<0.8 && ctevents<iter){

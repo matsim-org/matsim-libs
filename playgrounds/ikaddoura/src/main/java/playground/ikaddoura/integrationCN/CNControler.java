@@ -41,7 +41,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.MutableScenario;
 
-import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripCongestionNoiseAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
 import playground.ikaddoura.router.VTTSCongestionTollTimeDistanceTravelDisutilityFactory;
@@ -317,7 +317,7 @@ public class CNControler {
 		controler.run();
 		
 		// analysis
-		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain(controler.getConfig().controler().getOutputDirectory());
+		PersonTripCongestionNoiseAnalysisMain analysis = new PersonTripCongestionNoiseAnalysisMain(controler.getConfig().controler().getOutputDirectory());
 		analysis.run();
 	}
 	

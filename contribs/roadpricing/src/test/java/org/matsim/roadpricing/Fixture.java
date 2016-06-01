@@ -223,6 +223,7 @@ import junit.framework.TestCase;
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore scoring = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
+		scoring.beginIteration(0);
 		sim.run();
 		scoring.finish();
 

@@ -54,8 +54,8 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.utils.misc.Time;
@@ -526,11 +526,6 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	@Override
 	public MobsimTimer getSimTimer() {
 		return this.simTimer;
-	}
-
-	/*package*/ MobsimEngine getNetsimEngine() {
-		// For a test
-		return this.netEngine;
 	}
 
 	public void addMobsimEngine(MobsimEngine mobsimEngine) {

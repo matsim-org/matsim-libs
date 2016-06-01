@@ -21,6 +21,8 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
+import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -62,7 +64,7 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 			this.initToLinkIdSignalStates();
 		}
 		this.toLinkIdSignalStates.put(toLinkId, state);
-		if (this.checkGreen(state)){
+		if (checkGreen(state)){
 			this.linkGreen = true;
 		}
 		else {
@@ -76,7 +78,7 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 		}
 	}
 
-	private boolean checkGreen(SignalGroupState state) {
+	private static boolean checkGreen(SignalGroupState state) {
 		return (state.equals(SignalGroupState.GREEN) || state.equals(SignalGroupState.REDYELLOW) || state.equals(SignalGroupState.OFF));
 	}
 
@@ -86,9 +88,9 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 	
 	public boolean isLinkGreenForToLink(Id<Link> toLinkId){
 		if (this.allToLinksState != null) {
-			return this.checkGreen(this.allToLinksState);
+			return checkGreen(this.allToLinksState);
 		}
-		return this.checkGreen(this.toLinkIdSignalStates.get(toLinkId));
+		return checkGreen(this.toLinkIdSignalStates.get(toLinkId));
 	}
 	
 	@Override

@@ -18,8 +18,7 @@ public class FacilitiesFromBZ12 {
         final String pathToCSV = args[0];
         final String activityType = args[1];
         final String pathToOutputFacilities = args[2];
-
-        final boolean publicFacilities = true;
+        final boolean publicFacilities = Boolean.parseBoolean(args[3]);
 
         final ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
         final ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();

@@ -51,7 +51,7 @@ public class MergeZoneAttributes {
 
 		ZoneCollection deZones = ZoneEsriShapeIO.read("/home/johannes/gsv/gis/vg250-ew_3112.gk3.shape.ebenen/vg250-ew_ebenen/vg250_krs.shp");
 
-		ZoneCollection newCollection = new ZoneCollection();
+		ZoneCollection newCollection = new ZoneCollection(null);
 
 		for (Zone gsvZone : gsvZones.getZones()) {
 			if (gsvZone.getAttribute("NUTS0_CODE").equalsIgnoreCase("DE")) {

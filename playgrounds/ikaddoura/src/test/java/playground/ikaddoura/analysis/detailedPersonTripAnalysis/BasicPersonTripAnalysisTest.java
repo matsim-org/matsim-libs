@@ -28,7 +28,7 @@ import playground.tschlenther.createNetwork.ForkNetworkCreator;
  */
 public class BasicPersonTripAnalysisTest {
 	
-	private static final Logger log = Logger.getLogger(PersonTripAnalysisMain.class);
+	private static final Logger log = Logger.getLogger(PersonTripCongestionNoiseAnalysisMain.class);
 
 	private static final boolean printResults = false;
 	

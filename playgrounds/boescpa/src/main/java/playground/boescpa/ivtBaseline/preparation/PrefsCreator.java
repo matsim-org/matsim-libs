@@ -31,7 +31,7 @@ public class PrefsCreator {
     private final static Logger log = Logger.getLogger(PrefsCreator.class);
     private final static Random random = new Random(37835409);
 
-    protected enum actCharacteristics {
+    public enum actCharacteristics {
         HOME, REMOTE_HOME, WORK, REMOTE_WORK, EDUCATION, LEISURE, SHOP, ESCORT_KIDS, ESCORT_OTHER;
 
         public double getMinDur() {
@@ -111,7 +111,7 @@ public class PrefsCreator {
                         ActivityImpl act = (ActivityImpl) pe;
                         actChain = actChain.concat(actCharacteristics.valueOf(act.getType().toUpperCase()).getAbbr());
                         actStartTime = (act.getStartTime() > 0) ? act.getStartTime() : 0;
-                        actEndTime = (act.getEndTime() > 0) ? act.getEndTime() : 30*3600;
+                        actEndTime = (act.getEndTime() > 0) ? act.getEndTime() : 24*3600;
                         actDuration = actEndTime - actStartTime;
                         switch (act.getType()) {
                             case HOME:
@@ -228,9 +228,7 @@ public class PrefsCreator {
 
     private static void setTimeBudgetAsHomeDuration(ObjectAttributes prefs, double timeBudget, Person p) {
         // assign remaining timeBudget to home activities
-        double typicalHomeDuration = timeBudget;
-
-        prefs.putAttribute(p.getId().toString(), "typicalDuration_home", typicalHomeDuration);
+        prefs.putAttribute(p.getId().toString(), "typicalDuration_home", timeBudget);
         prefs.putAttribute(p.getId().toString(), "minimalDuration_home", 0.5 * 3600.0);
         prefs.putAttribute(p.getId().toString(), "earliestEndTime_home", 0.0 * 3600.0);
         prefs.putAttribute(p.getId().toString(), "latestStartTime_home", 24.0 * 3600.0);
@@ -355,7 +353,7 @@ public class PrefsCreator {
         return timeBudget;
     }
 
-    protected static ObjectAttributes getObjectAttributes(String pathToInputPrefs) {
+    private static ObjectAttributes getObjectAttributes(String pathToInputPrefs) {
         ObjectAttributes prefs = new ObjectAttributes();
         ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(prefs);
         reader.parse(pathToInputPrefs);

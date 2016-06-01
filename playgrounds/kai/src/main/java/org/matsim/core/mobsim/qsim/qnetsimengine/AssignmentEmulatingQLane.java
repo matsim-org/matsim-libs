@@ -37,12 +37,14 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
-import org.matsim.core.network.LinkImpl;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.vis.VisLinkWLanes;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.VisData;
 
 /**
  * 
@@ -66,7 +68,6 @@ class AssignmentEmulatingQLane extends QLaneI {
 	 * null if the link is not signalized
 	 */
 	final AbstractQLink qLink;
-	private final QNetwork network ;
 	private final Id id;
 	/**
 	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
@@ -92,17 +93,27 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 	private Map<Id,Double> vehEnterTimeMap = new HashMap<Id,Double>() ;
 
+	private final NetsimEngineContext context;
+
+	private final NetsimInternalInterface netsimEngine;
+
+	private final LinkSpeedCalculator linkSpeedCalculator;
+
 
 	
-	AssignmentEmulatingQLane(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id id ) {
+	AssignmentEmulatingQLane(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id id, 
+			NetsimEngineContext context, NetsimInternalInterface netsimEngine2, LinkSpeedCalculator linkSpeedCalculator ) {
 		this.id = id ;
 		this.qLink = qLinkImpl;
-		this.network = qLinkImpl.network ;
 		this.vehQueue = vehicleQueue ;
+		this.context = context;
+		this.netsimEngine = netsimEngine2;
+		this.linkSpeedCalculator = linkSpeedCalculator;
 
 	}
 	@Override
-	public final void addFromWait(final QVehicle veh, final double now) {
+	public final void addFromWait(final QVehicle veh) {
+		double now = context.getSimTimer().getTimeOfDay() ;
 		addToBuffer(veh, now);
 	}
 	
@@ -116,12 +127,8 @@ class AssignmentEmulatingQLane extends QLaneI {
 	}
 
 	@Override
-	public final void updateRemainingFlowCapacity() {
-		// not doing anything
-	}
-
-	@Override
-	public boolean doSimStep(final double now ) {
+	public boolean doSimStep( ) {
+		double now = context.getSimTimer().getTimeOfDay() ;
 		this.moveLaneToBuffer(now);
 		return true ;
 	}
@@ -145,7 +152,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 			if ( driver instanceof AbstractTransitDriverAgent ) {
 				AbstractTransitDriverAgent transitDriver = (AbstractTransitDriverAgent) driver ;
-			HandleTransitStopResult handleTransitStop = qLink.transitQLink.handleTransitStop(now, veh, transitDriver, qLink.link.getId());
+			HandleTransitStopResult handleTransitStop = qLink.getTransitQLink().handleTransitStop(now, veh, transitDriver, qLink.getLink().getId());
 			if (handleTransitStop == HandleTransitStopResult.accepted) {
 				// vehicle has been accepted into the transit vehicle queue of the link.
 				removeVehicleFromQueue(now) ;
@@ -177,7 +184,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 	private final void letVehicleArrive(final double now, QVehicle veh) {
 		qLink.addParkedVehicle(veh);
-		network.simEngine.letVehicleArrive(veh);
+		netsimEngine.letVehicleArrive(veh);
 		qLink.makeVehicleAvailableToNextDriver(veh, now);
 		// remove _after_ processing the arrival to keep link active
 		removeVehicleFromQueue( now ) ;
@@ -194,14 +201,6 @@ class AssignmentEmulatingQLane extends QLaneI {
 	@Override
 	public final boolean isAcceptingFromUpstream() {
 		return true ; // we always accept
-	}
-
-	@Override
-	public final void recalcTimeVariantAttributes( final double now) {
-		freespeedTravelTime = this.length / qLink.getLink().getFreespeed(now);
-		if (Double.isNaN(freespeedTravelTime)) {
-			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
-		}
 	}
 
 	@Override
@@ -227,14 +226,15 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 	@Override
 	public final QVehicle popFirstVehicle() {
-		double now = qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = context.getSimTimer().getTimeOfDay() ;
+
 		QVehicle veh = buffer.poll();
 		if (this.generatingEvents) {
-			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
+			this.context.getEventsManager().processEvent(new LaneLeaveEvent(
 					now, veh.getId(), this.qLink.getLink().getId(), this.getId()
 			));
 		}
-		qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
+		context.getEventsManager().processEvent(new LinkLeaveEvent(
 				now, veh.getId(), this.qLink.getLink().getId()
 		));
 		return veh;
@@ -247,32 +247,34 @@ class AssignmentEmulatingQLane extends QLaneI {
 	
 	@Override
 	public final void clearVehicles() {
-		double now = qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = context.getSimTimer().getTimeOfDay() ;
 
 		for (QVehicle veh : vehQueue) {
-			qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
+			context.getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
-			qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
-			qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
+			context.getAgentCounter().incLost();
+			context.getAgentCounter().decLiving();
 		}
 		vehQueue.clear();
 
 		for (QVehicle veh : buffer) {
-			qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
+			context.getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
-			qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
-			qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
+			context.getAgentCounter().incLost();
+			context.getAgentCounter().decLiving();
 		}
 		buffer.clear();
 	}
 
 	@Override
 	public final void addFromUpstream(final QVehicle veh) {
-		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = context.getSimTimer().getTimeOfDay() ;
+
+		
 		qLink.activateLink();
 		this.vehEnterTimeMap.put( veh.getId(), now ) ;
 		
-		double linkTravelTime = this.length / this.network.simEngine.getLinkSpeedCalculator().getMaximumVelocity(veh, this.qLink.link, now);
+		double linkTravelTime = this.length / linkSpeedCalculator.getMaximumVelocity(veh, this.qLink.getLink(), now);
 		// yyyyyy needs to be replaced by density-dependent travel time. kai, jul'14
 		System.exit(-1) ;
 		
@@ -301,7 +303,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 		vehQueue.add(veh);
 
 		if (this.generatingEvents) {
-			this.qLink.network.simEngine.getMobsim().getEventsManager()
+			context.getEventsManager()
 			.processEvent(new LaneEnterEvent(now, veh.getId(), this.qLink.getLink().getId(), this.getId()));
 		}
 	}
@@ -329,50 +331,33 @@ class AssignmentEmulatingQLane extends QLaneI {
 		this.vehQueue.addFirst(veh) ;
 	}
 
-	final void changeLength(final double laneLengthMeters, double now) {
-		this.length = laneLengthMeters;
-		this.freespeedTravelTime = this.length / this.qLink.getLink().getFreespeed();
-		if (Double.isNaN(this.freespeedTravelTime)) {
-			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a lane. Please check the attributes lane length and freespeed of link!");
-		}
-		// be defensive (might now be called twice):
-		this.recalcTimeVariantAttributes(now);
-	}
-	
 	@Override
-	public final void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) {
+	public final void changeUnscaledFlowCapacityPerSecond( final double val ) {
 		// irrelevant so we ignore it
-		
-		// be defensive (someone might assume that this also pulls in the free speed)
-		this.recalcTimeVariantAttributes(now);
 	}
 	
 	@Override
-	public final void changeEffectiveNumberOfLanes( final double val, final double now ) {
+	public final void changeEffectiveNumberOfLanes( final double val ) {
 		// this variable will not do anything so we will ignore it.
-
-		// be defensive (maybe someone calls the above function and assumes it also pulls the speed)
-		this.recalcTimeVariantAttributes(now);
 	}
 	
+	@Override
+	public
 	Id getId() {
 		// need this so we can generate lane events although we do not need them here. kai, sep'13
 		// yyyy would probably be better to have this as a final variable set during construction. kai, sep'13
-		return this.qLink.link.getId() ;
+		return this.qLink.getLink().getId() ;
 	}
 
-	class VisDataImpl implements VisData {
+	class VisDataImpl implements QLaneI.VisData {
 
 
 		private VisLinkWLanes otfLink;
 
 		@Override
-		public final Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
-			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = AssignmentEmulatingQLane.this.network.simEngine.getAgentSnapshotInfoBuilder();
-
+		public final Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions, double now ) {
 			double numberOfVehiclesDriving = AssignmentEmulatingQLane.this.buffer.size() + AssignmentEmulatingQLane.this.vehQueue.size();
 			if (numberOfVehiclesDriving > 0) {
-				double now = AssignmentEmulatingQLane.this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 				Link link = AssignmentEmulatingQLane.this.qLink.getLink();
 //				double spacing = snapshotInfoBuilder.calculateVehicleSpacing(AssignmentEmulatingQLane.this.length, numberOfVehiclesDriving,
 //						AssignmentEmulatingQLane.this.getStorageCapacity(), AssignmentEmulatingQLane.this.bufferStorageCapacity);
@@ -381,11 +366,11 @@ class AssignmentEmulatingQLane extends QLaneI {
 
 				double lastDistanceFromFromNode = Double.NaN;
 				for (QVehicle veh : AssignmentEmulatingQLane.this.buffer){
-					lastDistanceFromFromNode = createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now,
+					lastDistanceFromFromNode = createAndAddVehiclePositionAndReturnDistance(positions, context.snapshotInfoBuilder, now,
 							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
 				}
 				for (QVehicle veh : AssignmentEmulatingQLane.this.vehQueue) {
-					lastDistanceFromFromNode = createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now,
+					lastDistanceFromFromNode = createAndAddVehiclePositionAndReturnDistance(positions, context.snapshotInfoBuilder, now,
 							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
 				}
 			}
@@ -398,22 +383,22 @@ class AssignmentEmulatingQLane extends QLaneI {
 				double spacing, double freespeedTraveltime, QVehicle veh)
 		{
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
-			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(AssignmentEmulatingQLane.this.length, spacing, 
+			lastDistanceFromFromNode = snapshotInfoBuilder.calculateOdometerDistanceFromFromNode(AssignmentEmulatingQLane.this.length, spacing, 
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
-			Integer lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+			Integer lane = VisUtils.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 //			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, 
 //					AssignmentEmulatingQLane.this.inverseFlowCapacityPerTimeStep, now, link.getFreespeed());
 			double speedValue = AssignmentEmulatingQLane.this.freespeedTravelTime 
 					/ ( veh.getEarliestLinkExitTime() - AssignmentEmulatingQLane.this.vehEnterTimeMap.get(veh.getId()) ) ;
 			if ( speedValue>1. ) { speedValue=1. ; }
 			if (this.otfLink != null){
-				snapshotInfoBuilder.positionAgentOnLink(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
-						AssignmentEmulatingQLane.this.length, this.otfLink.getEuklideanDistance(), veh, 
-						lastDistanceFromFromNode, lane, speedValue);
+				snapshotInfoBuilder.positionAgentGivenDistanceFromFNode(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
+						AssignmentEmulatingQLane.this.length, veh, lastDistanceFromFromNode, 
+						lane, speedValue);
 			}
 			else {
-				snapshotInfoBuilder.positionAgentOnLink(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
-						AssignmentEmulatingQLane.this.length, ((LinkImpl)link).getEuklideanDistance() , veh, lastDistanceFromFromNode, lane, speedValue);
+				snapshotInfoBuilder.positionAgentGivenDistanceFromFNode(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
+						AssignmentEmulatingQLane.this.length, veh , lastDistanceFromFromNode, lane, speedValue);
 			}
 			return lastDistanceFromFromNode;
 		}
@@ -424,7 +409,7 @@ class AssignmentEmulatingQLane extends QLaneI {
 	}
 
 	@Override
-	double getSimulatedFlowCapacity() {
+	double getSimulatedFlowCapacityPerTimeStep() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
@@ -436,6 +421,15 @@ class AssignmentEmulatingQLane extends QLaneI {
 	@Override
 	boolean hasGreenForToLink(Id toLinkId) {
 		return true ;
+	}
+	@Override
+	void changeSpeedMetersPerSecond( double val ) {
+		throw new RuntimeException("not implemented") ;
+	}
+	@Override
+	double getLoadIndicator() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 
 }
