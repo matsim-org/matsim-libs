@@ -33,6 +33,7 @@ import floetteroed.utilities.math.Vector;
  * 
  * @see DecisionVariable
  *
+ * @deprecated Use MATSimDecisionVariableSetEvaluator instead.
  */
 public class PTMATSimDecisionVariableSetEvaluator<U extends DecisionVariable>
 implements StartupListener, IterationEndsListener, ShutdownListener {
@@ -221,7 +222,7 @@ int i = 0;
 for (Id<TransitStopFacility> stopId : this.relevantStopIds) {
 	for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
 		newInstantaneousStateVector.set(i++,
-				this.occupancyAnalyser.getOccupancy_veh(stopId, bin));
+				this.occupancyAnalyser.getCount(stopId, bin));
 	}
 	
 }

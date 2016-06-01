@@ -2,9 +2,6 @@ package saleem.stockholmscenario.teleportation.ptoptimisation;
 
 import java.util.Set;
 
-import opdytsintegration.pt.PTMATSimSimulator;
-import opdytsintegration.utils.TimeDiscretization;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -20,14 +17,18 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 
-import saleem.stockholmscenario.teleportation.PTCapacityAdjusmentPerSample;
-import saleem.stockholmscenario.teleportation.ptoptimisation.integration.PTStateFactory;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
+import opdytsintegration.MATSimSimulator;
+import opdytsintegration.MATSimStateFactoryImpl;
+import opdytsintegration.pt.PTMATSimSimulator;
+import opdytsintegration.utils.TimeDiscretization;
+import saleem.stockholmscenario.teleportation.PTCapacityAdjusmentPerSample;
+import saleem.stockholmscenario.teleportation.ptoptimisation.integration.PTStateFactory;
 
 
 public class OptimisePT {
@@ -75,14 +76,17 @@ public class OptimisePT {
 		
 		
 //		Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = scenario.getTransitSchedule().getFacilities();
-		final Set<Id<TransitStopFacility>> relevantStopIds = scenario.getTransitSchedule().getFacilities().keySet();
+		// final Set<Id<TransitStopFacility>> relevantStopIds = scenario.getTransitSchedule().getFacilities().keySet();
 		final double occupancyScale = 1;
 		
 		
 		@SuppressWarnings("unchecked")		
-		final PTMATSimSimulator<PTSchedule> matsimSimulator = new PTMATSimSimulator(
-				new PTStateFactory(timeDiscretization, occupancyScale), scenario, timeDiscretization,
-				relevantStopIds,  module);
+		final MATSimSimulator<PTSchedule> matsimSimulator = new MATSimSimulator(
+				new MATSimStateFactoryImpl<>(),
+//				new PTStateFactory(timeDiscretization, occupancyScale), 
+				scenario, timeDiscretization,
+				// null, relevantStopIds,  
+				module);
 		final RandomSearch<PTSchedule> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer, ptschedule,
 				convergenceCriterion, maxRandomSearchIterations,

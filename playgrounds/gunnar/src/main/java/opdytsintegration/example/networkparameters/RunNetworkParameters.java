@@ -89,7 +89,7 @@ public class RunNetworkParameters {
 		 * decision variable and its random variation.
 		 */
 
-		int maxIterations = 20;
+		int maxIterations = 10;
 		int averageIterations = maxIterations / 2;
 		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(maxIterations,
 				averageIterations);
@@ -120,7 +120,7 @@ public class RunNetworkParameters {
 		 * trial decision variables should be as large as memory allows.
 		 */
 
-		int numberOfTrialDecisionVariables = 64;
+		int numberOfTrialDecisionVariables = 4;
 		final DecisionVariableRandomizer<NetworkParameters> randomizer = new NetworkParametersRandomizer(
 				numberOfTrialDecisionVariables);
 
@@ -141,7 +141,7 @@ public class RunNetworkParameters {
 		 */
 
 		final MATSimSimulator<NetworkParameters> matsim = new MATSimSimulator<NetworkParameters>(stateFactory, scenario,
-				timeDiscretization, null);
+				timeDiscretization);
 
 		/*
 		 * Further parameters needed to run the optimization.
@@ -152,7 +152,7 @@ public class RunNetworkParameters {
 		 */
 
 		final NetworkParameters initialDecisionVariable = new NetworkParameters(scenario.getNetwork());
-		int maxSearchIterations = 5;
+		int maxSearchIterations = 3;
 
 		/*
 		 * Create the search algorithm.

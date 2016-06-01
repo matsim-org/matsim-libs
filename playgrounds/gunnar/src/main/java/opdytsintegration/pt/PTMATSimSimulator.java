@@ -14,6 +14,7 @@ import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
+import opdytsintegration.MATSimDecisionVariableSetEvaluator;
 import opdytsintegration.MATSimStateFactory;
 import opdytsintegration.utils.TimeDiscretization;
 
@@ -21,6 +22,8 @@ import opdytsintegration.utils.TimeDiscretization;
  * Created by michaelzilske on 08/10/15.
  * 
  * @author Muhammad Saleem, based on Gunnar Flötteröd
+ * 
+ * @deprecated
  */
 public class PTMATSimSimulator<U extends DecisionVariable> implements Simulator<U> {
 
@@ -81,9 +84,14 @@ public class PTMATSimSimulator<U extends DecisionVariable> implements Simulator<
 		 * (2) Create the MATSimDecisionVariableSetEvaluator that is supposed to
 		 * "optimize along" the MATSim run of this iteration.
 		 */
-		final PTMATSimDecisionVariableSetEvaluator<U> matsimDecisionVariableEvaluator = new PTMATSimDecisionVariableSetEvaluator<>(
-				trajectorySampler, this.stateFactory, this.timeDiscretization, this.relevantStopIds,
-				this.scenario.getTransitSchedule());
+		final MATSimDecisionVariableSetEvaluator<U> matsimDecisionVariableEvaluator = new MATSimDecisionVariableSetEvaluator<>(
+				trajectorySampler, this.stateFactory, this.timeDiscretization);
+		if (this.relevantStopIds != null) {
+			matsimDecisionVariableEvaluator.enablePT(this.relevantStopIds);
+		} 
+//		else {
+//			matsimDecisionVariableEvaluator.enablePT(this.scenario.getTransitSchedule());
+//		}
 		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
 		// matsimDecisionVariableEvaluator.setStandardLogFileName("./opdyts.log");
 

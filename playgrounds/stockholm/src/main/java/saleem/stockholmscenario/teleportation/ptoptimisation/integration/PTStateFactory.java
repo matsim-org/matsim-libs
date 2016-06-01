@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Population;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Vector;
 
-
+@Deprecated
 public class PTStateFactory implements MATSimStateFactory<DecisionVariable>{
 	private final TimeDiscretization timeDiscretization;
 	private final double occupancyScale;

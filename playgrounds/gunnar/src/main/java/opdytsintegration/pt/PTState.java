@@ -7,6 +7,8 @@ import opdytsintegration.MATSimState;
 
 /**
  * @author Muhammad Saleem
+ * 
+ * @deprecated
  */
 public class PTState extends MATSimState {
 

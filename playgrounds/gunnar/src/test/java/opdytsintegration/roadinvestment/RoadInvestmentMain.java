@@ -96,7 +96,7 @@ class RoadInvestmentMain {
 
 		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
 		Simulator system = new MATSimSimulator(stateFactory, scenario,
-				new TimeDiscretization(5 * 3600, 10 * 60, 18), null);
+				new TimeDiscretization(5 * 3600, 10 * 60, 18)); // , null, null);
 		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
 
 		Map<DecisionVariable, Double> decVar2objFct = new LinkedHashMap<>();
@@ -126,7 +126,7 @@ class RoadInvestmentMain {
 
 		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
 		Simulator system = new MATSimSimulator(stateFactory, scenario,
-				new TimeDiscretization(5 * 3600, 10 * 60, 18), null);
+				new TimeDiscretization(5 * 3600, 10 * 60, 18)); // , null, null);
 		final RoadInvestmentObjectiveFunction objectiveFunction = new RoadInvestmentObjectiveFunction();
 
 		Map<DecisionVariable, Double> decVar2objFct = new LinkedHashMap<>();
@@ -178,7 +178,7 @@ class RoadInvestmentMain {
 
 		Simulator system = new MATSimSimulator(// decisionVariables,
 				stateFactory, scenario, new TimeDiscretization(5 * 3600,
-						10 * 60, 18), null);
+						10 * 60, 18)); // , null, null);
 		DecisionVariableRandomizer<RoadInvestmentDecisionVariable> randomizer = new DecisionVariableRandomizer<RoadInvestmentDecisionVariable>() {
 			// public RoadInvestmentDecisionVariable newRandomDecisionVariable()
 			// {
