@@ -1,11 +1,16 @@
 package org.matsim.contrib.accessibility;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.RoutingModule;
 import org.matsim.facilities.ActivityFacility;
 
 /**
@@ -13,6 +18,7 @@ import org.matsim.facilities.ActivityFacility;
  */
 public class MatrixBasedPtAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
 	private final PtMatrix ptMatrix;
+	private final RoutingModule routingModule = null ;
 
 	private Node fromNode = null;
 
@@ -54,15 +60,25 @@ public class MatrixBasedPtAccessibilityContributionCalculator implements Accessi
                     + "the pt accessibility computation, or extend the Java code so that it works for this situation.") ;
         }
 		final Node destinationNode = destination.getNearestNode();
-
-		// travel time with pt:
-		double ptTravelTime_h	 = ptMatrix.getPtTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
-		// total walking time including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
-		double ptTotalWalkTime_h =ptMatrix.getTotalWalkTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
-		// total travel distance including walking and pt distance from/to origin/destination location:
-		double ptTravelDistance_meter=ptMatrix.getTotalWalkTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
-		// total walk distance  including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
-		double ptTotalWalkDistance_meter=ptMatrix.getPtTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
+		double ptTravelTime_h = 0 ;
+		double ptTotalWalkTime_h = 0 ;
+		double ptTravelDistance_meter = 0 ;
+		double ptTotalWalkDistance_meter = 0;
+		if ( ptMatrix != null ) {
+			// travel time with pt:
+			ptTravelTime_h	 = ptMatrix.getPtTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
+			// total walking time including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
+			ptTotalWalkTime_h =ptMatrix.getTotalWalkTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
+			// total travel distance including walking and pt distance from/to origin/destination location:
+			ptTravelDistance_meter=ptMatrix.getTotalWalkTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
+			// total walk distance  including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
+			ptTotalWalkDistance_meter=ptMatrix.getPtTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
+		} else if ( routingModule != null ) {
+			 List<? extends PlanElement> result = routingModule.calcRoute( null, null, 0., null ) ;
+			 Leg accessWalkLeg = (Leg) result.get(0) ;
+			 ptTotalWalkTime_h += accessWalkLeg.getRoute().getTravelTime() / 3600 ;
+			 throw new RuntimeException("this execution path is not yet finished") ;
+		}
 
 		double ptDisutility = constPt + (ptTotalWalkTime_h * betaWalkTT) + (ptTravelTime_h * betaPtTT) + (ptTotalWalkDistance_meter * betaWalkTD) + (ptTravelDistance_meter * betaPtTD);
 		return destination.getSum() * Math.exp(this.logitScaleParameter * ptDisutility);
