@@ -13,6 +13,7 @@ public class OptimizableParking extends PublicParking {
 	private double costPerHourNormal = 0.5;
 	private double costPerHourPeak = 0.5;
 	private boolean highTariff = false;
+	private Id<PC2Parking> parkingId;
 	public OptimizableParking(Id<PC2Parking> id, int capacity, Coord coord, 
 			ParkingCostModel parkingCostModel, String groupName, double costPerHourNormal,
 			double costPerHourPeak, boolean highTariff){
@@ -20,11 +21,15 @@ public class OptimizableParking extends PublicParking {
 		this.costPerHourNormal = costPerHourNormal;
 		this.costPerHourPeak = costPerHourPeak;
 		this.highTariff = highTariff;
+		this.parkingId = id;
 	}	
 	@Override
 	public double getCost(Id<Person> personId, double arrivalTime, double parkingDurationInSecond){
 		if (this.costPerHourNormal == 0.0)
 			return 0.0;
+		
+		if (parkingId.toString().contains("gp"))
+			return this.costPerHourNormal * parkingDurationInSecond / (60 * 60);
 		if (this.highTariff) {
 			
 			if (parkingDurationInSecond < 30 * 60){
