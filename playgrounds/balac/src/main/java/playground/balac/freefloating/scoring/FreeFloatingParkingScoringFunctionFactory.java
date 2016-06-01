@@ -19,7 +19,6 @@ import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParame
 import com.google.inject.Inject;
 
 import playground.balac.allcsmodestest.scoring.KtiActivtyWithoutPenaltiesScoring;
-import playground.ivt.analysis.scoretracking.ScoreTrackingListener;
 
 public class FreeFloatingParkingScoringFunctionFactory implements ScoringFunctionFactory{
 
