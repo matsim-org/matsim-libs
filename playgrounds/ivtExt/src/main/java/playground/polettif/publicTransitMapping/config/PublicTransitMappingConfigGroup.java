@@ -52,6 +52,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String LINK_DISTANCE_TOLERANCE = "linkDistanceTolerance";
 	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
 	private static final String COMBINE_PT_MODES = "combinePtModes";
+	private static final String ADD_PT_MODE = "addPtMode";
 	private static final String MULTI_THREAD = "threads";
 	private static final String REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES = "removeTransitRoutesWithoutLinkSequences";
 
@@ -84,6 +85,9 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(COMBINE_PT_MODES,
 				"Defines whether at the end of mapping, all non-car link modes (bus, rail, etc) \n" +
 				"\t\tshould be replaced with pt (true) or not. Default: false");
+		map.put(ADD_PT_MODE,
+				"Adds the mode \"pt\" is added to all links used by public transit after mapping if true. \n" +
+				"\t\tIs not executed if "+COMBINE_PT_MODES+" is true. Default: false");
 		map.put(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES,
 				"If true, transit routes without link sequences after mapping are removed from the schedule. Default: true");
 		map.put(LINK_DISTANCE_TOLERANCE,
@@ -239,6 +243,19 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		this.combinePtModes = v;
 	}
 
+
+	private boolean addPtMode = false;
+
+	@StringGetter(ADD_PT_MODE)
+	public boolean getAddPtMode() {
+		return addPtMode;
+	}
+
+	@StringSetter(ADD_PT_MODE)
+	public void setAddPtMode(boolean addPtMode) {
+		this.addPtMode = addPtMode;
+	}
+
 	/**
 	 *
 	 */
@@ -246,12 +263,12 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 
 	@StringGetter(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES)
 	public boolean getRemoveTransitRoutesWithoutLinkSequences() {
-		return combinePtModes;
+		return removeTransitRoutesWithoutLinkSequences;
 	}
 
 	@StringSetter(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES)
 	public void setRemoveTransitRoutesWithoutLinkSequences(boolean v) {
-		this.combinePtModes = v;
+		this.removeTransitRoutesWithoutLinkSequences = v;
 	}
 
 

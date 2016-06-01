@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.tools.shp;
+package playground.polettif.publicTransitMapping.tools;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
@@ -31,8 +31,6 @@ import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.pt.transitSchedule.api.*;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.polettif.publicTransitMapping.tools.NetworkTools;
-import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.util.*;
 
@@ -41,34 +39,57 @@ import java.util.*;
  *
  * @author polettif
  */
-public class Schedule2ShapeFileWriter {
+public class ScheduleShapeFileWriter {
 
-	private static final Logger log = Logger.getLogger(Schedule2ShapeFileWriter.class);
+	private static final Logger log = Logger.getLogger(ScheduleShapeFileWriter.class);
 
 	private final TransitSchedule schedule;
 	private final Network network;
 
 	private Map<TransitStopFacility, Set<Id<TransitRoute>>> routesOnStopFacility = new HashMap<>();
 
-	public Schedule2ShapeFileWriter(final TransitSchedule schedule, final Network network) {
+	public ScheduleShapeFileWriter(final TransitSchedule schedule, final Network network) {
 		this.schedule = schedule;
 		this.network = network;
 	}
 
-	public static void main(final String[] arg) {
-		String[] args = new String[5];
-		args[0] = "E:/output/PublicTransitMapping/uri_schedule.xml";
-		args[1] = "E:/output/PublicTransitMapping/uri_network.xml";
-		args[2] = "E:/output/shp/transitLines.shp";
-		args[3] = "E:/output/shp/stopFacilities.shp";
-		args[4] = "E:/output/shp/refLinks.shp";
-		TransitSchedule schedule = ScheduleTools.readTransitSchedule(args[0]);
-		Network network = NetworkTools.readNetwork(args[1]);
+	/**
+	 * Converts the given schedule based on the given network
+	 * to GIS shape files.
+	 *
+	 * @param args	[0] input schedule
+	 *              [1] input network
+	 *              [2] output folder
+	 */
+	public static void main(final String[] args) {
+		if(args.length == 3) {
+			run(args[0], args[1], args[2]);
+		}
+	}
 
-		Schedule2ShapeFileWriter s2s = new Schedule2ShapeFileWriter(schedule, network);
+	/**
+	 * Converts the given schedule based on the given network
+	 * to GIS shape files.
+	 *
+	 * @param scheduleFile	input schedule
+	 * @param networkFile   input network
+	 * @param outputFolder  output folder
+	 */
+	public static void run(String scheduleFile, String networkFile, String outputFolder) {
+		TransitSchedule schedule = ScheduleTools.readTransitSchedule(scheduleFile);
+		Network network = NetworkTools.readNetwork(networkFile);
 
-		s2s.routes2Polylines(args[2]);
-		s2s.stopFacilities2Shapes(args[3], args[4]);
+		ScheduleShapeFileWriter s2s = new ScheduleShapeFileWriter(schedule, network);
+
+		s2s.routes2Polylines(outputFolder+"transitLines.shp");
+		s2s.stopFacilities2Shapes(outputFolder+"stopFacilities.shp", "refLinks.shp");
+	}
+
+	public static void run(TransitSchedule schedule, Network network, String outputFolder) {
+		ScheduleShapeFileWriter s2s = new ScheduleShapeFileWriter(schedule, network);
+
+		s2s.routes2Polylines("transitLines.shp");
+		s2s.stopFacilities2Shapes("stopFacilities.shp", "refLinks.shp");
 	}
 
 	public void stopFacilities2Shapes(String pointOutputFile, String lineOutputFile) {

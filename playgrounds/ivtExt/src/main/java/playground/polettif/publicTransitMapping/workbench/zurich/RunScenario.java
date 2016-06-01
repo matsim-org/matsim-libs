@@ -44,18 +44,18 @@ import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 import java.util.Collections;
 
-public class RunZurichScenario {
+public class RunScenario {
 
 	public static void main(String[] args) {
-		double percentage = 0.1;
+		double percentage = Double.parseDouble(args[1]);
 
 		final Config config = ConfigUtils.loadConfig(args[0], new BlackListedTimeAllocationMutatorConfigGroup(), new F2LConfigGroup());
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// create link references for facilities
-		Network network = scenario.getNetwork();
-		F2LCreator.createF2L(scenario.getActivityFacilities(), NetworkTools.filterNetworkByLinkMode(network, Collections.singleton(TransportMode.car)), config.getModule("f2l").getValue("inputF2LFile"));
+//		Network network = scenario.getNetwork();
+//		F2LCreator.createF2L(scenario.getActivityFacilities(), NetworkTools.filterNetworkByLinkMode(network, Collections.singleton(TransportMode.car)), config.getModule("f2l").getValue("inputF2LFile"));
 
 		// This allows to get a log file containing the log messages happening before controler init.
 		OutputDirectoryLogging.catchLogEntries();

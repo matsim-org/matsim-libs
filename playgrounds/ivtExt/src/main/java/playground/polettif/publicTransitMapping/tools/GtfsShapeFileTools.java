@@ -34,7 +34,7 @@ import java.util.*;
  *
  * @author polettif
  */
-public class ShapeFileTools {
+public class GtfsShapeFileTools {
 
 	public static void writeGtfsTripsToFile(Map<String, GTFSRoute> gtfsRoutes, Set<String> serviceIds, String outputCoordinateSystem, String outFile) {
 		Collection<SimpleFeature> features = new ArrayList<>();

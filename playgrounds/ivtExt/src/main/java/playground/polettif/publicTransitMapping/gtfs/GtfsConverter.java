@@ -61,6 +61,9 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 	public static final String DAY_WITH_MOST_TRIPS = "dayWithMostTrips";
 	public static final String DAY_WITH_MOST_SERVICES = "dayWithMostServices";
 
+	LocalDate dateUsed = null;
+
+
 	/**
 	 * Path to the folder where the gtfs files are located
 	 */
@@ -260,6 +263,7 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 		vehicles = ScheduleTools.createVehicles(schedule);
 
 		log.info("    Created " + counterRoutes + " routes on " + counterLines + " lines.");
+		log.info("    Used ");
 		log.info("... GTFS converted to an unmapped MATSIM Transit Schedule");
 		log.info("#############################################################");
 	}
@@ -373,11 +377,14 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 		String[] line = reader.readNext();
 		while(line != null) {
 			Service currentService = services.get(line[col.get(GTFSDefinitions.SERVICE_ID)]);
-			if(line[col.get(GTFSDefinitions.EXCEPTION_TYPE)].equals("2"))
-				currentService.addException(line[col.get(GTFSDefinitions.DATE)]);
-			else
-				currentService.addAddition(line[col.get(GTFSDefinitions.DATE)]);
-
+			if(currentService != null) {
+				if(line[col.get(GTFSDefinitions.EXCEPTION_TYPE)].equals("2"))
+					currentService.addException(line[col.get(GTFSDefinitions.DATE)]);
+				else
+					currentService.addAddition(line[col.get(GTFSDefinitions.DATE)]);
+			} else {
+				throw new RuntimeException("Service id \"" + line[col.get(GTFSDefinitions.SERVICE_ID)] + "\" not defined in calendar.txt");
+			}
 			line = reader.readNext();
 		}
 
@@ -388,7 +395,6 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 	/**
 	 * Loads shapes (if available) and puts them in {@link #shapes}. A shape is a sequence of points, i.e. a line.
 	 * <p/>
-	 * Shapes are not used further, see {@link playground.polettif.publicTransitMapping.tools.shp.Gtfs2ShapeFile}
 	 * <br/><br/>
 	 * shapes.txt <i>[https://developers.google.com/transit/gtfs/reference]</i><br/>
 	 * Rules for drawing lines on a map to represent a transit organization's routes.
@@ -623,19 +629,18 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 				break;
 
 			case DAY_WITH_MOST_SERVICES: {
-				LocalDate busiestDate = null;
 				for(Entry<LocalDate, Set<String>> e : Service.dateStats.entrySet()) {
 					try {
 						if(e.getValue().size() > serviceIds.size()) {
 							this.serviceIds = e.getValue();
-							busiestDate = e.getKey();
+							dateUsed = e.getKey();
 						}
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
 				}
 				log.info("... Using service IDs of the day with the most services (" + DAY_WITH_MOST_SERVICES + ").");
-				log.info("    " + serviceIds.size() + " services on " + busiestDate);
+				log.info("    " + serviceIds.size() + " services on " + dateUsed);
 				break;
 			}
 
