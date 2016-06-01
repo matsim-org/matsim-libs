@@ -22,6 +22,7 @@ package playground.agarwalamit.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -39,11 +40,13 @@ public class AARandomNumberGenerator {
 	private static SortedMap<String, Double> groupProbs ;
 	private static SortedMap<String, Double> cummulativeGroupProbabilities =  new TreeMap<>() ;
 	private static SortedMap<String, List<Integer> > group2RandomNumbers = new TreeMap<>(); 
-
+	private final Random rnd;
+	
 	private static final Logger LOG = Logger.getLogger(AARandomNumberGenerator.class);
 
 	public AARandomNumberGenerator(final SortedMap<String, Double> groupProbabilities){
 		groupProbs = groupProbabilities;
+		rnd = MatsimRandom.getRandom();
 		getCummulativeDistribution();
 	}
 
@@ -85,7 +88,7 @@ public class AARandomNumberGenerator {
 	private void processBoundsAndReturnRndNr(final int lowerBound, final int upperBound){
 		
 		// this number lies between the lower, upper bounds
-		int rndNrInRange = lowerBound  + MatsimRandom.getRandom().nextInt( upperBound- lowerBound + 1);
+		int rndNrInRange = lowerBound  + this.rnd.nextInt( upperBound- lowerBound + 1);
 		
 		// based on above number, find where it lies on a line with lower bound = 0 and upper bounds = 1 i.e. converting betwen 0,1
 		double rndPortion = Double.valueOf( rndNrInRange - lowerBound ) / Double.valueOf( upperBound - lowerBound);
