@@ -44,11 +44,11 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-import playground.balac.freefloating.scoring.FreeFloatingParkingScoringFunctionFactory;
 import playground.wrashid.ABMT.rentParking.ParkingCostModelZH;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.priceoptimization.infrastracture.OptimizableParking;
+import playground.wrashid.parkingChoice.priceoptimization.scoring.FreeFloatingParkingScoringFunctionFactory;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZone;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
@@ -106,24 +106,27 @@ public class SetupParkingForOptimizationScenario {
 					else {
 						CityZone closestZone = cityZones.getClosestZone(parking.getCoord());
 						
-						if (MatsimRandom.getRandom().nextInt(100)<closestZone.getPctNonFreeParking()){
-						
-							if (highTariffParkingZone.isInHighTariffZone(parking.getCoord())){
-								cost = 3.0;
-							} else {
+						if (MatsimRandom.getRandom().nextInt(100) < closestZone.getPctNonFreeParking()){						
+							
+							if (highTariffParkingZone.isInHighTariffZone(parking.getCoord()))
+								cost = 1.5;
+							else
 								cost = 0.5;
-							}
+							
 						}
+						else
+							cost = 0.0;
 						
 					}
 					publicParking = new OptimizableParking(Id.create(parking.getId(), 
 							org.matsim.contrib.parking.PC2.infrastructure.PC2Parking.class), 
-							parking.getIntCapacity(), parking.getCoord(),pcm,groupName,cost);
+							parking.getIntCapacity(), parking.getCoord(), pcm, groupName, cost, cost,
+							highTariffParkingZone.isInHighTariffZone(parking.getCoord()));
 				}
 				else {
 					publicParking = new PublicParking(Id.create(parking.getId(), 
 						org.matsim.contrib.parking.PC2.infrastructure.PC2Parking.class), 
-						parking.getIntCapacity(), parking.getCoord(),pcm,groupName);
+						parking.getIntCapacity(), parking.getCoord(), pcm, groupName);
 				}
 				publicParkings.add(publicParking);
 			} else {
