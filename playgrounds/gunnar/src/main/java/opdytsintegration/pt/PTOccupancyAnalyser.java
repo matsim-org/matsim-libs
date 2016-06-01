@@ -42,9 +42,9 @@ public class PTOccupancyAnalyser extends MATSimCountingStateAnalyzer<TransitStop
 	// private int lastCompletedBin = -1;
 	private int totalStuck = 0;
 
-	private final Set<Id<Person>> transitDrivers = new HashSet<>();
-	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
-	private final Map<Id<Person>, Id<TransitStopFacility>> personStops = new HashMap<>();
+	private Set<Id<Person>> transitDrivers = new HashSet<>();
+	private Set<Id<Vehicle>> transitVehicles = new HashSet<>();
+	private Map<Id<Person>, Id<TransitStopFacility>> personStops = new HashMap<>();
 	// To maintain person to stop mapping
 
 	// -------------------- CONSTRUCTION --------------------
@@ -156,9 +156,20 @@ public class PTOccupancyAnalyser extends MATSimCountingStateAnalyzer<TransitStop
 		// this.occupancies_veh.clear();
 		// this.stop2avg.clear();
 		// this.lastCompletedBin = -1;
-		this.transitDrivers.clear();
-		this.transitVehicles.clear();
-		this.personStops.clear();
+		if(this.transitDrivers==null) {
+			this.transitDrivers = new HashSet<Id<Person>>();
+		}else{
+			this.transitDrivers.clear();
+		}
+		if(this.transitVehicles==null) {
+			this.transitVehicles = new HashSet<Id<Vehicle>>();
+		}else{
+			this.transitVehicles.clear();
+		}
+		if(this.personStops==null) {
+			this.personStops = new HashMap<Id<Person>, Id<TransitStopFacility>>();
+		}else{
+			this.personStops.clear();		}
 	}
 
 	@Override
