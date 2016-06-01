@@ -128,8 +128,8 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
     public static enum DefaultSelector { KeepLastSelected, BestScore, ChangeExpBeta, SelectExpBeta, SelectRandom, SelectPathSizeLogit }
 
-    public static enum DefaultStrategy { ReRoute, TimeAllocationMutator, ChangeLegMode, TimeAllocationMutator_ReRoute, 
-    	ChangeSingleLegMode, ChangeSingleTripMode, SubtourModeChoice, ChangeTripMode, TripSubtourModeChoice }
+    public static enum DefaultStrategy { ReRoute, TimeAllocationMutator, @Deprecated ChangeLegMode, TimeAllocationMutator_ReRoute, 
+    	@Deprecated ChangeSingleLegMode, ChangeSingleTripMode, @Deprecated SubtourModeChoice, ChangeTripMode, TripSubtourModeChoice }
     
     // yyyy Why are the following always implementing Providers of the full implementations, and not just the interface 
     // (i.e. Provider<GenericPlanSelector<Plan,Person>)?  kai, jan'15
