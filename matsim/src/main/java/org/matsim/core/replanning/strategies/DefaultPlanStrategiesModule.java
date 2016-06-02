@@ -122,7 +122,7 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
             log.error( DefaultStrategy.ChangeSingleLegMode+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.ChangeSingleTripMode+" instead." );
         }
         if ( usedStrategyNames.contains( DefaultStrategy.SubtourModeChoice.toString() ) ) {
-            log.error( DefaultStrategy.SubtourModeChoice+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.TripSubtourModeChoice+" instead." );
+            log.error( DefaultStrategy.TripSubtourModeChoice+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.SubtourModeChoice+" instead." );
         }
     }
 
