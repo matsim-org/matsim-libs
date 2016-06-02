@@ -72,7 +72,7 @@ public abstract class AbstractTaxibusOptimizer
             for (Vehicle v : optimContext.vrpData.getVehicles().values()) {
                 optimContext.scheduler.updateTimeline((Schedule<TaxibusTask>) v.getSchedule());
             }
-            if (e.getSimulationTime() % 1 == 0){
+            if (e.getSimulationTime() % 60 == 0){
             scheduleUnplannedRequests();
             }
             if (doUnscheduleAwaitingRequests && vehicleDiversion) {

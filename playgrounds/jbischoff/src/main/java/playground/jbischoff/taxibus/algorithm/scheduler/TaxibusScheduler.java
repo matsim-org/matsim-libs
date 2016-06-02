@@ -292,9 +292,8 @@ public class TaxibusScheduler {
 				continue;
 			double t3 = Math.max(beginTime, req.getT0()) + params.pickupDuration;
 			bestSched.addTask(new TaxibusPickupTask(beginTime, t3, req));
-			// log.info("schedule pickup" +
-			// req.getPassenger().getId().toString() + " at link
-			// "+req.getFromLink().getId());
+//			 log.info("schedule pickup" +
+//			 req.getPassenger().getId().toString() + " at link "+req.getFromLink().getId());
 			onBoard.add(req);
 			beginTime = t3;
 			pickedUp.add(req);

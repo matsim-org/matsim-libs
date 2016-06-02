@@ -169,7 +169,7 @@ public class SharedTaxiDispatchFinder {
 					if (way221+firstToSecondPickup.travelTime < bestSharedTravelTime){
 							TaxibusDispatch dispatch = new TaxibusDispatch(veh, firstRequest, VrpPaths.createPath(firstRequest.getFromLink(), req.getFromLink(), currTime + optimContext.tbcg.getPickupDuration(), firstToSecondPickup, optimContext.travelTime));
 							dispatch.addRequestAndPath(req, VrpPaths.createPath(req.getFromLink(), req.getToLink(), currTime + firstToSecondPickup.travelTime + 2* optimContext.tbcg.getPickupDuration(), currentDirectPath, optimContext.travelTime));
-							dispatch.addPath(VrpPaths.createPath(firstRequest.getToLink(), req.getToLink(),  currTime + firstToSecondPickup.travelTime + currentDirectPath.travelTime + 2* optimContext.tbcg.getPickupDuration() +  optimContext.tbcg.getDropoffDuration(), secondDestToFirstDest, optimContext.travelTime));
+							dispatch.addPath(VrpPaths.createPath( req.getToLink(), firstRequest.getToLink(),  currTime + firstToSecondPickup.travelTime + currentDirectPath.travelTime + 2* optimContext.tbcg.getPickupDuration() +  optimContext.tbcg.getDropoffDuration(), secondDestToFirstDest, optimContext.travelTime));
 							bestSharedPath = dispatch;
 							if (dispatch.getLastPathAdded().getArrivalTime()<veh.getT1()){
 								bestSharedPath = dispatch;

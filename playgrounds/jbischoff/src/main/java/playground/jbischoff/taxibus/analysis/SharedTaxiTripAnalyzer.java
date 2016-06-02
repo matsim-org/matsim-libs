@@ -58,11 +58,13 @@ public class SharedTaxiTripAnalyzer
 		implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
 
-	private Map<Id<Vehicle>, Integer> vehicles;
+	private Map<Id<Vehicle>, List<Id<Person>>> vehicles2pax;
 	private Map<Id<Person>, Double> departureTime;
 	private Map<Id<Person>, Double> enterTime;
 	private List<String> ridesLog;
 	private List<String> ridesPerIteration = new ArrayList<>();
+	private Map<Id<Person>, Integer> paxPerRide;
+
 
 	private double totalWaittime = 0;
 	private double totalRidetime = 0;
@@ -80,11 +82,11 @@ public class SharedTaxiTripAnalyzer
 
 	@Override
 	public void reset(int iteration) {
-		this.vehicles = new HashMap<>();
+		this.vehicles2pax = new HashMap<>();
 		this.departureTime = new HashMap<>();
 		this.enterTime = new HashMap<>();
 		this.ridesLog = new ArrayList<>();
-
+		this.paxPerRide = new HashMap<>();
 		totalWaittime = 0;
 		totalRidetime = 0;
 		totalRides = 0;
@@ -99,8 +101,9 @@ public class SharedTaxiTripAnalyzer
 				double arrivalTime = event.getTime();
 				double rideTime = arrivalTime - enterTime;
 				double waitTime = enterTime - departureTime;
+				int paxOnBoard = this.paxPerRide.remove(event.getPersonId());
 				String row = (int) departureTime + ";" + event.getPersonId().toString() + ";" + (int) enterTime + ";"
-						+ (int) arrivalTime + ";" + (int) waitTime + ";" + (int) rideTime;
+						+ (int) arrivalTime + ";" + (int) waitTime + ";" + (int) rideTime+";"+paxOnBoard;
 				this.ridesLog.add(row);
 
 				this.totalRides++;
@@ -124,9 +127,9 @@ public class SharedTaxiTripAnalyzer
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		if (isTrackedVehicle(event.getVehicleId())) {
 			if (!isDriverAgent(event.getPersonId(), event.getVehicleId())) {
-				Integer pax = this.vehicles.get(event.getVehicleId());
-				pax--;
-				this.vehicles.put(event.getVehicleId(), pax);
+				 this.vehicles2pax.get(event.getVehicleId()).remove(event.getPersonId());
+				
+				
 			}
 		}
 
@@ -136,9 +139,12 @@ public class SharedTaxiTripAnalyzer
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (isTrackedVehicle(event.getVehicleId())) {
 			if (!isDriverAgent(event.getPersonId(), event.getVehicleId())) {
-				Integer pax = this.vehicles.get(event.getVehicleId());
-				pax++;
-				this.vehicles.put(event.getVehicleId(), pax);
+				List <Id<Person>> paxOnBoard = this.vehicles2pax.get(event.getVehicleId());
+				 paxOnBoard.add(event.getPersonId());
+				 int paxno = paxOnBoard.size();
+				 for (Id<Person> pax : paxOnBoard){
+					 this.paxPerRide.put(pax, paxno);
+				 }
 				this.enterTime.put(event.getPersonId(), event.getTime());
 			}
 		}
@@ -146,7 +152,7 @@ public class SharedTaxiTripAnalyzer
 	}
 
 	private boolean isTrackedVehicle(Id<Vehicle> vid) {
-		return this.vehicles.containsKey(vid);
+		return this.vehicles2pax.containsKey(vid);
 	}
 
 	private boolean isDriverAgent(Id<Person> pid, Id<Vehicle> vehicleId) {
@@ -160,14 +166,14 @@ public class SharedTaxiTripAnalyzer
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		if (event.getActType().startsWith(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
-			this.vehicles.put(Id.createVehicleId(event.getPersonId().toString()), new Integer(0));
+			this.vehicles2pax.put(Id.createVehicleId(event.getPersonId().toString()), new ArrayList<Id<Person>>());
 		}
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		if (event.getActType().startsWith(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)) {
-			this.vehicles.remove(Id.createVehicleId(event.getPersonId().toString()), new Integer(0));
+			this.vehicles2pax.remove(Id.createVehicleId(event.getPersonId().toString()), new Integer(0));
 		}
 
 	}
@@ -176,7 +182,7 @@ public class SharedTaxiTripAnalyzer
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try {
 
-			bw.write("DepartureTime;Person;EnterTime;ArrivalTime;WaitTime;RideTime");
+			bw.write("DepartureTime;Person;EnterTime;ArrivalTime;WaitTime;RideTime;MaxPaxOnBoard");
 			for (String row : this.ridesLog) {
 				bw.newLine();
 				bw.write(row);
