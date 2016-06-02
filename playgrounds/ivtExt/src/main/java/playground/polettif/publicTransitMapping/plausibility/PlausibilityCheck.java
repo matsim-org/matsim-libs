@@ -71,7 +71,6 @@ public class PlausibilityCheck {
 	public static final String CsvSeparator = ";";
 
 	private static final double PI = Math.PI;
-	private static final double PI2 = 2 * Math.PI;
 
 	public static final String TRAVEL_TIME_WARNING = "TravelTimeWarning";
 	public static final String LOOP_WARNING = "LoopWarning";
@@ -111,10 +110,10 @@ public class PlausibilityCheck {
 	/**
 	 * Performs a plausibility check on the given schedule and network files
 	 * and writes the results to the output folder.
-	 * @param scheduleFile
-	 * @param networkFile
+	 * @param scheduleFile the schedule file
+	 * @param networkFile network file
 	 * @param coordinateSystem A name used by {@link MGC}. Use EPSG:* code to avoid problems.
-	 * @param outputFolder
+	 * @param outputFolder the output folder where all csv and shapefiles are written
 	 */
 	public static void run(String scheduleFile, String networkFile, String coordinateSystem, String outputFolder) {
 		setLogLevels();
@@ -136,6 +135,7 @@ public class PlausibilityCheck {
 			outputFolder = outputFolder + "/";
 		}
 
+		new File(outputFolder).mkdir();
 		new File(outputFolder+"shp/").mkdir();
 		new File(outputFolder+"shp/schedule/").mkdir();
 		new File(outputFolder+"shp/warnings/").mkdir();
@@ -160,7 +160,6 @@ public class PlausibilityCheck {
 	 * Performs the plausibility check on the schedule
 	 */
 	public void runCheck() {
-		log.info("Starting plausbility check...");
 		AbstractPlausibilityWarning.setNetwork(network);
 
 		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
@@ -395,6 +394,7 @@ public class PlausibilityCheck {
 	}
 
 	private static void setLogLevels() {
+		Logger.getLogger(MGC.class).setLevel(Level.ERROR);
 		Logger.getLogger(MatsimFileTypeGuesser.class).setLevel(Level.ERROR);
 		Logger.getLogger(MatsimNetworkReader.class).setLevel(Level.ERROR);
 		Logger.getLogger(NetworkImpl.class).setLevel(Level.ERROR);

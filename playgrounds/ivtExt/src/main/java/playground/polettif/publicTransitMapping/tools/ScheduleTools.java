@@ -148,8 +148,9 @@ public class ScheduleTools {
 	}
 
 	/**
-	 * Generates link sequences for all transit routes in the schedule, modifies the schedule.
-	 * All stopFacilities used by a route must have a link referenced.
+	 * Generates link sequences (network route) for all transit routes in
+	 * the schedule, modifies the schedule. All stopFacilities used by a
+	 * route must have a link referenced.
 	 *
 	 * @param schedule where transitRoutes should be routed
 	 * @param network  the network where the routes should be routed
@@ -179,9 +180,9 @@ public class ScheduleTools {
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
 					List<Id<Link>> linkSequence = null;
 
-					// add very first link
 					if(routeStops.get(0).getStopFacility().getLinkId() != null) {
-						linkSequence = new ArrayList<>();
+						// add very first link
+						linkSequence = new LinkedList<>();
 						linkSequence.add(routeStops.get(0).getStopFacility().getLinkId());
 
 						// route
@@ -207,7 +208,14 @@ public class ScheduleTools {
 							if(leastCostPath != null) {
 								List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(leastCostPath);
 								if(path != null) {
+									List<Id<Link>> previous = new LinkedList<>(linkSequence);
 									linkSequence.addAll(path);
+
+									if(!linkSequence.subList(0, linkSequence.size()-path.size()).equals(previous)) {
+										log.warn(transitRoute.getId() + ": link sequence not equal");
+										log.info(linkSequence.subList(0, linkSequence.size() - path.size()).size() + " <> " + previous.size());
+									}
+
 								} else {
 									linkSequence = null;
 									break;

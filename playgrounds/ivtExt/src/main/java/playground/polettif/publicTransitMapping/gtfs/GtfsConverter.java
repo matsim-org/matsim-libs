@@ -263,7 +263,7 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 		vehicles = ScheduleTools.createVehicles(schedule);
 
 		log.info("    Created " + counterRoutes + " routes on " + counterLines + " lines.");
-		log.info("    Used ");
+		log.info("    Day " + dateUsed);
 		log.info("... GTFS converted to an unmapped MATSIM Transit Schedule");
 		log.info("#############################################################");
 	}
@@ -645,7 +645,6 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 			}
 
 			case DAY_WITH_MOST_TRIPS: {
-				LocalDate busiestDate = null;
 				int maxTrips = 0;
 				for(Entry<LocalDate, Set<String>> e : Service.dateStats.entrySet()) {
 					int nTrips = 0;
@@ -655,18 +654,18 @@ public class GtfsConverter extends Gtfs2TransitSchedule {
 					if(nTrips > maxTrips) {
 						maxTrips = nTrips;
 						this.serviceIds = e.getValue();
-						busiestDate = e.getKey();
+						dateUsed = e.getKey();
 					}
 				}
 				log.info("... Using service IDs of the day with the most trips (" + DAY_WITH_MOST_TRIPS + ").");
-				log.info("    " + maxTrips + " trips and " + serviceIds.size() + " services on " + busiestDate);
+				log.info("    " + maxTrips + " trips and " + serviceIds.size() + " services on " + dateUsed);
 				break;
 			}
 
 			default:
-				LocalDate checkDate = LocalDate.of(Integer.parseInt(param.substring(0, 4)), Integer.parseInt(param.substring(4, 6)), Integer.parseInt(param.substring(6, 8)));
+				dateUsed = LocalDate.of(Integer.parseInt(param.substring(0, 4)), Integer.parseInt(param.substring(4, 6)), Integer.parseInt(param.substring(6, 8)));
 
-				this.serviceIds = getServiceIdsOnDate(checkDate);
+				this.serviceIds = getServiceIdsOnDate(dateUsed);
 				log.info("        Using service IDs on " + param + ": " + this.serviceIds.size() + " services.");
 				break;
 		}

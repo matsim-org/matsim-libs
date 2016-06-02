@@ -94,7 +94,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 		}
 
 		setLogLevels();
-		try { log.addAppender(new FileAppender(new SimpleLayout(), config.getOutputScheduleFile()+".log"));
+		try {
+			if(config.getOutputScheduleFile() != null) log.addAppender(new FileAppender(new SimpleLayout(), config.getOutputScheduleFile()+".log"));
 		} catch (IOException e) { e.printStackTrace(); }
 
 		log.info("Mapping transit schedule to network...");

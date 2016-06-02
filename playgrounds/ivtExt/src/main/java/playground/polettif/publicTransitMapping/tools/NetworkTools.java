@@ -76,10 +76,11 @@ public class NetworkTools {
 	}
 
 	/**
-	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes(Coord, double)},
+	 * Returns the nearest link for the given coordinate.
+	 * Looks for nodes within search radius of coord (using {@link NetworkImpl#getNearestNodes},
 	 * fetches all in- and outlinks returns the link with the smallest distance
 	 * to the given coordinate. If there are two opposite links, the link with
-	 * the coordinate on the right side is returned.<p/>
+	 * the coordinate on its right side is returned.<p/>
 	 *
 	 * @param network (instance of NetworkImpl)
 	 * @param coord   the coordinate
@@ -89,7 +90,6 @@ public class NetworkTools {
 			NetworkImpl networkImpl = (NetworkImpl) network;
 			double nodeSearchRadius = 200.0;
 
-			Set<Link> visitedLinks = new HashSet<>();
 			Link closestLink = null;
 			double minDistance = Double.MAX_VALUE;
 
@@ -292,12 +292,10 @@ public class NetworkTools {
 
 	/**
 	 * Checks if a link sequence has loops (i.e. the same link is passed twice).
-	 *
-	 * @param links
 	 */
-	public static boolean linkSequenceHasLoops(List<Link> links) {
-		Set tmpSet = new HashSet<>(links);
-		return tmpSet.size() < links.size();
+	public static boolean linkSequenceHasLoops(List<Link> linkSequence) {
+		Set tmpSet = new HashSet<>(linkSequence);
+		return tmpSet.size() < linkSequence.size();
 	}
 
 
@@ -360,12 +358,9 @@ public class NetworkTools {
 	}
 
 	/**
-	 * Integrates network B into network A. Network
+	 * Integrates <tt>network B</tt> into <tt>network A</tt>. Network
 	 * A contains all links and nodes of both networks
 	 * after integration.
-	 *
-	 * @param networkA
-	 * @param networkB
 	 */
 	public static void integrateNetwork(final Network networkA, final Network networkB) {
 		final NetworkFactory factory = networkA.getFactory();
@@ -544,8 +539,6 @@ public class NetworkTools {
 
 	/**
 	 * Resets the link length of all links with the given link Mode
-	 * @param network
-	 * @param networkMode
 	 */
 	public static void resetLinkLength(Network network, String networkMode) {
 		for(Link link : network.getLinks().values()) {

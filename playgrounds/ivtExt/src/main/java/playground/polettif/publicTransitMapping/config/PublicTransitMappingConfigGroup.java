@@ -20,6 +20,7 @@
 package playground.polettif.publicTransitMapping.config;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.MapUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -56,7 +57,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String MULTI_THREAD = "threads";
 	private static final String REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES = "removeTransitRoutesWithoutLinkSequences";
 
-
 	public PublicTransitMappingConfigGroup() {
 		super(GROUP_NAME);
 
@@ -68,6 +68,10 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private String outputNetworkFile = null;
 	private String outputStreetNetworkFile = null;
 	private String outputScheduleFile = null;
+
+	public static PublicTransitMappingConfigGroup createDefaultConfig() {
+		return new PublicTransitMappingConfigGroup();
+	}
 
 	@Override
 	public final Map<String, String> getComments() {
@@ -190,6 +194,10 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		}
 	}
 
+	public void addModeRoutingAssignment(String key, String value) {
+		Set<String> set = MapUtils.getSet(key, this.modeRoutingAssignment);
+		set.add(value);
+	}
 
 	/**
 	 * All links that do not have a transit route on them are removed, except
@@ -319,6 +327,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	public void setThreads(int threads) {
 		this.threads = threads;
 	}
+
+
 
 	/**
 	 * Defines which link attribute should be used for pseudo route
@@ -528,8 +538,12 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		return old;
 	}
 
-	@StringGetter(OUTPUT_SCHEDULE_FILE)
 	public String getOutputScheduleFile() {
+		return this.outputScheduleFile;
+	}
+
+	@StringGetter(OUTPUT_SCHEDULE_FILE)
+	public String getOutputScheduleFileStr() {
 		return this.outputScheduleFile == null ? "" : this.outputScheduleFile;
 	}
 
