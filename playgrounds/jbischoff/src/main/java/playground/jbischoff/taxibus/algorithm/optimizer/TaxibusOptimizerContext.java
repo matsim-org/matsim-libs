@@ -33,7 +33,7 @@ public class TaxibusOptimizerContext
         this.travelDisutility = travelDisutility;
         this.scheduler = scheduler;
 
-        this.workingDirectory = workingDirectory;
+        this.workingDirectory = scenario.getConfig().controler().getOutputDirectory();
         this.tbcg = tbcg;
     }
 }

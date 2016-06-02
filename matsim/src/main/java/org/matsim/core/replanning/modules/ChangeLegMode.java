@@ -50,6 +50,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author mrieser
  */
+@Deprecated // better use ChangeTripMode
 public class ChangeLegMode extends AbstractMultithreadedModule {
 
 	// (I made the above static final variables public so they can be used in scripts-in-java. kai, jun'15)
@@ -57,12 +58,14 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 	private String[] availableModes;
 	private boolean ignoreCarAvailability;
 
+	@Deprecated // better use ChangeTripMode
 	public ChangeLegMode(final GlobalConfigGroup globalConfigGroup, ChangeModeConfigGroup changeLegModeConfigGroup) {
 		super(globalConfigGroup.getNumberOfThreads());
 		this.availableModes = changeLegModeConfigGroup.getModes();
 		this.ignoreCarAvailability = changeLegModeConfigGroup.getIgnoreCarAvailability();
 	}
 	
+	@Deprecated // better use ChangeTripMode
 	public ChangeLegMode(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty) {
 		super(nOfThreads);
 		this.availableModes = modes.clone();

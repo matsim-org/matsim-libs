@@ -1,8 +1,5 @@
 package saleem.stockholmscenario.teleportation.ptoptimisation;
 
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -14,7 +11,6 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 
 import floetteroed.opdyts.DecisionVariableRandomizer;
@@ -25,10 +21,8 @@ import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator;
 import opdytsintegration.MATSimStateFactoryImpl;
-import opdytsintegration.pt.PTMATSimSimulator;
 import opdytsintegration.utils.TimeDiscretization;
 import saleem.stockholmscenario.teleportation.PTCapacityAdjusmentPerSample;
-import saleem.stockholmscenario.teleportation.ptoptimisation.integration.PTStateFactory;
 
 
 public class OptimisePT {

@@ -43,7 +43,7 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 
 	// dijkstra
 	public final Map<PseudoRouteStop, Double> neighbours = new HashMap<>();
-	public double distToSource = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity$
+	public double distToSource = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity
 	public PseudoRouteStop previous = null;
 
 	private final double linkWeight;

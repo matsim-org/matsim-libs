@@ -21,7 +21,10 @@
 
 package playground.polettif.publicTransitMapping.mapping;
 
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.SimpleLayout;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -47,6 +50,8 @@ import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
+import java.io.IOException;
+import java.text.DateFormat;
 import java.util.*;
 
 /**
@@ -89,6 +94,9 @@ public class PTMapperPseudoRouting extends PTMapper {
 		}
 
 		setLogLevels();
+		try { log.addAppender(new FileAppender(new SimpleLayout(), config.getOutputScheduleFile()+".log"));
+		} catch (IOException e) { e.printStackTrace(); }
+
 		log.info("Mapping transit schedule to network...");
 		int nStopFacilities = schedule.getFacilities().size();
 
@@ -270,7 +278,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 		ScheduleTools.assignScheduleModesToLinks(schedule, network);
 		if(config.getCombinePtModes()) {
 			ScheduleTools.replaceNonCarModesWithPT(network);
-		} else {
+		} else if (config.getAddPtMode()){
 			ScheduleTools.addPTModeToNetwork(schedule, network);
 		}
 
@@ -308,7 +316,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 				NetworkTools.writeNetwork(network, config.getOutputNetworkFile());
 			} catch (Exception e) {
 				log.error("Output directory not found! Trying to write schedule and network file in working directory");
-				double t = System.nanoTime();
+				double t = System.nanoTime()/1000000;
 				try {
 					ScheduleTools.writeTransitSchedule(schedule, t+"schedule.xml.gz");
 					NetworkTools.writeNetwork(network, t+"network.xml.gz");
@@ -594,12 +602,12 @@ public class PTMapperPseudoRouting extends PTMapper {
 	}
 
 	private static void setLogLevels() {
-		org.apache.log4j.Logger.getLogger(org.matsim.core.router.Dijkstra.class).setLevel(Level.ERROR); // suppress no route found warnings
-		org.apache.log4j.Logger.getLogger(org.matsim.core.network.NetworkImpl.class).setLevel(Level.WARN);
-		org.apache.log4j.Logger.getLogger(org.matsim.core.network.filter.NetworkFilterManager.class).setLevel(Level.WARN);
-		org.apache.log4j.Logger.getLogger(org.matsim.core.router.util.PreProcessDijkstra.class).setLevel(Level.WARN);
-		org.apache.log4j.Logger.getLogger(org.matsim.core.router.util.PreProcessDijkstra.class).setLevel(Level.WARN);
-		org.apache.log4j.Logger.getLogger(org.matsim.core.router.util.PreProcessEuclidean.class).setLevel(Level.WARN);
-		org.apache.log4j.Logger.getLogger(org.matsim.core.router.util.PreProcessLandmarks.class).setLevel(Level.WARN);
+		Logger.getLogger(org.matsim.core.router.Dijkstra.class).setLevel(Level.ERROR); // suppress no route found warnings
+		Logger.getLogger(org.matsim.core.network.NetworkImpl.class).setLevel(Level.WARN);
+		Logger.getLogger(org.matsim.core.network.filter.NetworkFilterManager.class).setLevel(Level.WARN);
+		Logger.getLogger(org.matsim.core.router.util.PreProcessDijkstra.class).setLevel(Level.WARN);
+		Logger.getLogger(org.matsim.core.router.util.PreProcessDijkstra.class).setLevel(Level.WARN);
+		Logger.getLogger(org.matsim.core.router.util.PreProcessEuclidean.class).setLevel(Level.WARN);
+		Logger.getLogger(org.matsim.core.router.util.PreProcessLandmarks.class).setLevel(Level.WARN);
 	}
 }
