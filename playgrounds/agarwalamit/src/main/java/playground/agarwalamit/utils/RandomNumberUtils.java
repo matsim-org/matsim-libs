@@ -29,6 +29,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
@@ -67,13 +68,31 @@ public class RandomNumberUtils {
 		List<Integer> numbers = new ArrayList<>(); 
 
 
-		for (int i=0; i< totalRequiredNumber ; i++) {
-			numbers.add(getRNFromInverseTransformation(10));
+//		for (int i=0; i< totalRequiredNumber ; i++) {
+//			numbers.add(getRNFromInverseTransformation(10));
+//		}
+//
+//		for (int i=0; i<= 10 ; i++) {
+//			System.out.println(i+" is "+Collections.frequency(numbers, i));
+//		}
+		
+		SortedMap<String, Double> inMap = new TreeMap<>();
+		inMap.put("car", 0.1);
+		inMap.put("bike", 0.4);
+		inMap.put("pt", 0.2);
+		inMap.put("walk", 0.3);
+		RandomNumberUtils.getRandomStringsFromDiscreteDistribution(inMap, 10);
+		
+		// alternatively
+		List<String> modesTesting = new ArrayList<>();
+		for(int ii = 0; ii<10; ii++){
+			modesTesting.add(RandomNumberUtils.getRandomStringFromDiscreteDistribution(inMap));
 		}
-
-		for (int i=0; i<= 10 ; i++) {
-			System.out.println(i+" is "+Collections.frequency(numbers, i));
+		
+		for (String s : inMap.keySet()){
+			LOG.info("Share of "+s+" in input and output -- "+ inMap.get(s)+" and "+ Collections.frequency(modesTesting, s)/10.);
 		}
+		
 	}
 
 	/**
@@ -150,9 +169,15 @@ public class RandomNumberUtils {
 				idx++;
 			}
 		}
+		//shuffle uniformly 
+		List<String> outArray = Arrays.asList( RandomNumberUtils.shuffleUniformly(strs) ); 
+
+		//cross check and print
+		for (String s : probs.keySet()){
+			LOG.info("Share of "+s+" in input and output -- "+ probs.get(s)+" and "+ Collections.frequency(outArray, s)/sum);
+		}
 		
-		// shuffle uniformly and return 
-		return Arrays.asList( RandomNumberUtils.shuffleUniformly(strs) );
+		return outArray;
 	}
 	
 	/**
@@ -160,11 +185,13 @@ public class RandomNumberUtils {
 	 */
 	public static String [] shuffleUniformly(final String [] inArray){
 		int length = inArray.length;
-		String [] shuffledArray = new String [length];
+		String [] shuffledArray = inArray;
 		
         for (int i = 0; i < length; i++) {
             int r = i + rnd.nextInt(length-i);  // a random number between i and length-1
-            shuffledArray[i] = inArray[r];
+            String tempVal = shuffledArray[i];
+            shuffledArray[i] = shuffledArray[r];
+            shuffledArray[r] = tempVal;
         }
 		return shuffledArray;
 	}
