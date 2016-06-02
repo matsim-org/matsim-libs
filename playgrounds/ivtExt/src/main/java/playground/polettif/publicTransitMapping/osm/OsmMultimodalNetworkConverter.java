@@ -134,6 +134,7 @@ public class OsmMultimodalNetworkConverter extends Osm2MultimodalNetwork {
 		TagFilter parserWayFilter = new TagFilter();
 		parserWayFilter.add(OsmTag.HIGHWAY);
 		parserWayFilter.add(OsmTag.RAILWAY);
+		parserWayFilter.addException(OsmTag.SERVICE);
 
 		TagFilter parserRelationFilter = new TagFilter();
 		parserRelationFilter.add(OsmTag.ROUTE, OsmValue.BUS);
