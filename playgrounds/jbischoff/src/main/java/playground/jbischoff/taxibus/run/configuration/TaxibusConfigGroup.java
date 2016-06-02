@@ -14,7 +14,6 @@ public class TaxibusConfigGroup extends ConfigGroup {
 
 	private static final String VEHICLES_FILE = "vehiclesFile";
 	private static final String TAXI_RANKS_FILE = "ranksFile";
-	private static final String OUTPUT_DIRECTORY = "outputDir";
 	private static final String ALGORITHM = "algorithm";
 	private static final String PICKUP_DURATION = "pickupDuration";
 	private static final String DROPOFF_DURATION = "dropoffDuration";
@@ -71,8 +70,6 @@ public class TaxibusConfigGroup extends ConfigGroup {
 			this.vehiclesFile = value;
 		} else if (TAXI_RANKS_FILE.equals(key)) {
 			this.ranksFile = value;
-		} else if (OUTPUT_DIRECTORY.equals(key)) {
-			this.outputDir = value;
 		} else if (ALGORITHM.equals(key)) {
 			this.algorithm = value;
 		} else if (PICKUP_DURATION.equals(key)) {
@@ -100,7 +97,6 @@ public class TaxibusConfigGroup extends ConfigGroup {
 		} else if (PREBOOK.equals(key)) {
 			this.prebookTrips= Boolean.parseBoolean(value);
 		}
-
 		else {
 			log.error("unknown parameter: " + key + "...");
 		}
@@ -114,7 +110,6 @@ public class TaxibusConfigGroup extends ConfigGroup {
 
 		map.put(VEHICLES_FILE, this.vehiclesFile);
 		map.put(TAXI_RANKS_FILE, this.ranksFile);
-		map.put(OUTPUT_DIRECTORY, this.outputDir);
 		map.put(ALGORITHM, algorithm);
 		map.put(OTFVIS, Boolean.toString(otfvis));
 		map.put(LINES, linesFile);
@@ -136,7 +131,6 @@ public class TaxibusConfigGroup extends ConfigGroup {
 
 		map.put(VEHICLES_FILE, "Taxi Vehicles file");
 		map.put(TAXI_RANKS_FILE, "Taxi rank file; optional if you don't use ranks");
-		map.put(OUTPUT_DIRECTORY, "Output directory for taxi stats");
 		map.put(ALGORITHM, "Taxibus algorithms: Possible parameters are line, multipleLine, sharedTaxi (...)");
 		map.put(PREBOOK,"Defines whether trips are prebooked at simulation / activity start");
 		map.put(OTFVIS, "show simulation in OTFVis");

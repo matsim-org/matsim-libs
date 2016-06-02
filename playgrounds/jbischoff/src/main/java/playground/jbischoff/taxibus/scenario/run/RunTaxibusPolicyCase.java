@@ -171,6 +171,7 @@ public class RunTaxibusPolicyCase {
 			double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
 			this.score += legScore;
 			
+			
 		}
 
 
