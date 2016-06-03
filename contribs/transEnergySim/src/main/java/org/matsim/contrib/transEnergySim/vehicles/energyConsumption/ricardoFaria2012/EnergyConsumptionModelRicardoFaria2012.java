@@ -36,6 +36,9 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
  */
 public class EnergyConsumptionModelRicardoFaria2012 extends AbstractInterpolatedEnergyConsumptionModel {
 
+	//TODO discuss how to return a simplified consumption for range estimation purposes
+	private double averageEnergyConsumptionPerMeterTraveled = 4.14E+02;
+	
 	public EnergyConsumptionModelRicardoFaria2012() {
 		initModell(1.0); 
 	}
@@ -59,4 +62,8 @@ public class EnergyConsumptionModelRicardoFaria2012 extends AbstractInterpolated
 		queue.add(new EnergyConsumption(33.33333333, scalefactor *8.46E+02));
 	}
 
+	@Override
+	public double getEnergyConsumptionRateInJoulesPerMeter() {
+		return averageEnergyConsumptionPerMeterTraveled;
+	}
 }

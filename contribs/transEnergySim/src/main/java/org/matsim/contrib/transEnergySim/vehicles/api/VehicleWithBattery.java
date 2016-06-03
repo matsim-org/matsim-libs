@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.MathLib;
+import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.ChargingPlugType;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 /**
@@ -47,6 +48,7 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 
 	protected EnergyConsumptionModel electricDriveEnergyConsumptionModel;
 	protected Id<Vehicle> vehicleId;
+	private boolean isBEV = true; //TODO set this based on vehicle type
 
 	public double getRequiredEnergyInJoules() {
 		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules() - socInJoules;
@@ -75,10 +77,8 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	public double chargeVehicle(double energyChargeInJoule) {
 		if (!ignoreOverCharging) {
 			socInJoules += energyChargeInJoule;
-			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100)
-					&& socInJoules > getUsableBatteryCapacityInJoules()) {
-				DebugLib.stopSystemAndReportInconsistency(
-						"the car has been overcharged soc(" + socInJoules + ") > battery capacity (" + getUsableBatteryCapacityInJoules() + ")");
+			if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 1000) && socInJoules > getUsableBatteryCapacityInJoules()) {
+				DebugLib.stopSystemAndReportInconsistency("the car has been overcharged soc(" + socInJoules + ") > battery capacity (" + getUsableBatteryCapacityInJoules() + ")");
 			}
 		}
 		
@@ -110,5 +110,24 @@ public abstract class VehicleWithBattery extends AbstractVehicle {
 	public double calcEndCharingTimeOfVehicle(double curTime, double chargerPowerInWatt){
 		return curTime + getRequiredEnergyInJoules()/chargerPowerInWatt;
 	}
-	
+
+	public double getMaxChargingPowerInKW(ChargingPlugType plugType) {
+		switch(plugType.getNominalLevel()){
+			case 1:
+				return 1.5;
+			case 2:
+				return 6.7;
+			case 3:
+				return 50;
+		}
+		return 0.0;
+	}
+
+	public double getRemainingRangeInMeters() {
+		return this.socInJoules / this.electricDriveEnergyConsumptionModel.getEnergyConsumptionRateInJoulesPerMeter();
+	}
+
+	public Double isBEV() {
+		return this.isBEV ? 1.0 : 0.0;
+	}
 }

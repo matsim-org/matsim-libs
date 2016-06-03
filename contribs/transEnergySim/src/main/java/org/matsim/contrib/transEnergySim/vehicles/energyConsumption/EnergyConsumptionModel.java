@@ -37,5 +37,5 @@ public interface EnergyConsumptionModel {
 	
 	public abstract double getEnergyConsumptionForLinkInJoule(double drivenDistanceInMeters, double maxSpeedOnLink, double averageSpeedDriven);
 
-	
+	public abstract double getEnergyConsumptionRateInJoulesPerMeter();
 }

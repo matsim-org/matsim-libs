@@ -33,9 +33,11 @@ public interface ChargingSite extends Identifiable<ChargingSite> {
 	
 	double getParkingPriceQuote(double time, double duration);
 	
-	double getChargingPriceQuote(double time, double duration, ChargingLevel chargingLevel);
+	double getChargingPriceQuote(double time, double duration, ChargingPlugType plugType);
 	
 	ChargingSitePolicy getChargingSitePolicy();
+
+	abstract Collection<ChargingPlugType> getAllAvailableChargingPlugTypes();
 
 	
 }
