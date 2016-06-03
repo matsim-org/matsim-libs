@@ -29,15 +29,15 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * A class to generate pseudo random numbers for given discrete probability distribution and 
- * random 
+ * other distributions. 
  * 
+ * This will use random from MatsimRandom.
  * 
- * http://introcs.cs.princeton.edu/java/stdlib/StdRandom.java.html
+ * A good overview of some other possibilities -- http://introcs.cs.princeton.edu/java/stdlib/StdRandom.java.html
  * 
  * @author amit
  */
@@ -47,35 +47,22 @@ public class RandomNumberUtils {
 	private static final Random rnd = MatsimRandom.getRandom();
 	private static final Logger LOG = Logger.getLogger(RandomNumberUtils.class);
 
+	private RandomNumberUtils(){}
+	
 	public static void main(String[] args) {
-		// a small example
-		SortedMap<String, Double> xs = new TreeMap<>();
-		xs.put("HBW", 0.45);
-		xs.put("HBE", 0.34);
-		xs.put("HBS", 0.04);
-		xs.put("HBO", 0.17);
-
-		int lowerBound = 27;
-		int upperBound = 42;
 		int totalRequiredNumber = 100;
-
-		//		SortedMap<String, List<Integer> > ns = new AARandomNumberGenerator(xs).getRandomNumbers(lowerBound, upperBound, totalRequiredNumber);
-		//
-		//		for (String s : ns.keySet()){
-		//			System.out.println("For string " +s+ " the zones are "+ ns.get(s).toString());
-		//		}
-
-		List<Integer> numbers = new ArrayList<>(); 
-
-
-//		for (int i=0; i< totalRequiredNumber ; i++) {
-//			numbers.add(getRNFromInverseTransformation(10));
-//		}
-//
-//		for (int i=0; i<= 10 ; i++) {
-//			System.out.println(i+" is "+Collections.frequency(numbers, i));
-//		}
 		
+		// example - 1
+		List<Integer> numbers = new ArrayList<>(); 
+		for (int i=0; i< totalRequiredNumber ; i++) {
+			numbers.add(RandomNumberUtils.getRNFromInverseTransformation(10));
+		}
+
+		for (int i=0; i<= 10 ; i++) {
+			System.out.println(i+" is "+Collections.frequency(numbers, i));
+		}
+		
+		//example - 2
 		SortedMap<String, Double> inMap = new TreeMap<>();
 		inMap.put("car", 0.1);
 		inMap.put("bike", 0.4);
@@ -83,16 +70,31 @@ public class RandomNumberUtils {
 		inMap.put("walk", 0.3);
 		RandomNumberUtils.getRandomStringsFromDiscreteDistribution(inMap, 10);
 		
-		// alternatively
+		// example - 3
 		List<String> modesTesting = new ArrayList<>();
 		for(int ii = 0; ii<10; ii++){
 			modesTesting.add(RandomNumberUtils.getRandomStringFromDiscreteDistribution(inMap));
 		}
 		
+		// compare example - 2 and example - 3
 		for (String s : inMap.keySet()){
 			LOG.info("Share of "+s+" in input and output -- "+ inMap.get(s)+" and "+ Collections.frequency(modesTesting, s)/10.);
 		}
-		
+	}
+	
+	public static Random getRandom() {
+		//this will allow to use the other default calls within Random
+		return rnd;
+	}
+	
+	/**
+	 * @param lowerBound inclusive
+	 * @param upperBound inclusive
+	 * @return
+	 */
+	public static int getUniformlyRandomNumber(int lowerBound, int upperBound){
+		if (upperBound < lowerBound) throw new IllegalArgumentException("Upper bound is smaller than lower bound. Aborting...");
+		return lowerBound + rnd.nextInt(upperBound - lowerBound + 1);
 	}
 
 	/**
@@ -109,15 +111,12 @@ public class RandomNumberUtils {
 			randomInt -= i;
 			linearRandomNumber++;
 		}
-
 		return linearRandomNumber;
 	}
 
 	public static double getRNNormallyDistributed(final double mean, final double standardDeviation){
-
 		return rnd.nextGaussian() * standardDeviation + mean ;
 	}
-
 
 	/**
 	 * @param discreteDistribution
@@ -127,7 +126,7 @@ public class RandomNumberUtils {
 		//Checks
 		double sum = MapUtils.doubleValueSum(discreteDistribution);
 		SortedMap<String, Double> probs = new TreeMap<>();
-		if (sum <= 0. ) throw new RuntimeException("Sum of the values for given distribution is "+sum+". Aborting ...");
+		if (sum <= 0. ) throw new IllegalArgumentException("Sum of the values for given distribution is "+sum+". Aborting ...");
 		else if (sum != 1 ) {
 			LOG.warn("Sum of the values for given distribution is not equal to one. Converting them ...");
 			probs.putAll( MapUtils.getDoublePercentShare( discreteDistribution ) );
@@ -154,7 +153,7 @@ public class RandomNumberUtils {
 		//Checks
 		double sum = MapUtils.doubleValueSum(discreteDistribution);
 		SortedMap<String, Double> probs = new TreeMap<>();
-		if (sum <= 0. ) throw new RuntimeException("Sum of the values for given distribution is "+sum+". Aborting ...");
+		if (sum <= 0. ) throw new IllegalArgumentException("Sum of the values for given distribution is "+sum+". Aborting ...");
 		else if (sum != 1 ) {
 			LOG.warn("Sum of the values for given distribution is not equal to one. Converting them ...");
 			probs.putAll( MapUtils.getDoublePercentShare( discreteDistribution ) );
@@ -176,7 +175,6 @@ public class RandomNumberUtils {
 		for (String s : probs.keySet()){
 			LOG.info("Share of "+s+" in input and output -- "+ probs.get(s)+" and "+ Collections.frequency(outArray, s)/sum);
 		}
-		
 		return outArray;
 	}
 	
@@ -195,39 +193,4 @@ public class RandomNumberUtils {
         }
 		return shuffledArray;
 	}
-
-
-//	/**
-//	 * @param lowerBound inclusive
-//	 * @param upperBound inclusive
-//	 * @param requiredRandomNumbers higher is number ==> better is the distribution
-//	 * @return
-//	 */
-//	public SortedMap<String, List<Integer> > getRandomNumbers(final int lowerBound, final int upperBound, final int requiredRandomNumbers){
-//		SortedMap<String, List<Integer> > group2RandomNumbers = new TreeMap<>(); 
-//
-//		for (int i = 0 ; i < requiredRandomNumbers; i++){
-//			// this number lies between the lower, upper bounds
-//			int rndNrInRange = lowerBound  + this.rnd.nextInt( upperBound- lowerBound + 1);
-//
-//			// based on above number, find where it lies on a line with lower bound = 0 and upper bounds = 1 i.e. converting betwen 0,1
-//			double rndPortion = Double.valueOf( rndNrInRange - lowerBound ) / Double.valueOf( upperBound - lowerBound);
-//
-//			for( Entry<String, Double> e: cummulativeGroupProbabilities.entrySet() ) {
-//
-//				if (rndPortion <= e.getValue()) { // found interval
-//
-//					if (group2RandomNumbers.get(e.getKey())!=null) {// already exists
-//						group2RandomNumbers.get(e.getKey()).add(rndNrInRange);
-//					} else { // first element in the list
-//						List<Integer> l  = new ArrayList<>();
-//						l.add(rndNrInRange);
-//						group2RandomNumbers.put(e.getKey(), l);
-//					}
-//					break;
-//				}
-//			}
-//		}
-//		return group2RandomNumbers;
-//	}
 }

@@ -19,9 +19,7 @@
 
 package playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.calibration;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -30,19 +28,18 @@ import java.util.TreeMap;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils.PatnaUrbanActivityTypes;
+import playground.agarwalamit.utils.RandomNumberUtils;
 
 /**
- * A class to impute the data for nonSlum (between 27-42 wards) based on the HBW data of these zones.
+ * A class to get the data for nonSlum (between 27-42 wards) based on the other data (HBW data for these zones is available). 
  * All the tables referred in the comments are taken from PatnaCMP.
  * 
+ * <li> Total plans for HBE, HBS, HBO are calculated from number of HBW trip diaries and share of each type in total population for urban </li>
+ * 
  * Importantly, I think, the two process
- * <li> 
- * generating an unknown number/mode randomly one by one based on the distribution during usage and,
- * </li>
- * <li>
- * first generate all random numbers/mode based on the distribution, pick one from the group before using;
- * </li>
- * will give two different outcomes. Thus, using the later because it will be more close to given distribution.
+ * <li> generating an unknown number/mode randomly one by one based on the distribution during usage and, </li>
+ * <li> first generate all random numbers/mode, shuffle them randomly, pick one from the group before using; </li>
+ * will give two different outcomes. Thus, using the later because it will be more consistent to given distribution.
  * 
  * @author amit
  */
@@ -55,14 +52,14 @@ public class PatnaNonSlumDataCalibrator {
 
 	private final int TOTAL_PLANS_REQUIRED;
 
-	private final double REQUIRED_HBE_PLANS_SHARE ;
-	private final double REQUIRED_HBS_PLANS_SHARE ;
-	private final double REQUIRED_HBO_PLANS_SHARE ;
+	private final int REQUIRED_HBE_PLANS ;
+	private final int REQUIRED_HBS_PLANS ;
+	private final int REQUIRED_HBO_PLANS ;
 
 	private final int LOWER_BOUND ;
 	private final int UPPER_BOUND ;
 
-	
+
 	public PatnaNonSlumDataCalibrator () {
 
 		// for zones 27-42 only HBW trips are available (812 plans), PatnaCMP gives share of HBW, HBE, HBS and HBO -- 45%, 34%, 4% and 17%
@@ -70,11 +67,11 @@ public class PatnaNonSlumDataCalibrator {
 
 		TOTAL_PLANS_REQUIRED = 992;
 
-		//out of 1804, HBE = 613; HBS = 72, HBO = 307 ==> HBE =0.62, HBS = 0.07, HBO = 0.31
+		//out of 1804, HBE = 613; HBS = 72, HBO = 307 
 
-		REQUIRED_HBE_PLANS_SHARE = 0.62;  
-		REQUIRED_HBS_PLANS_SHARE = 0.07;
-		REQUIRED_HBO_PLANS_SHARE = 0.31;
+		REQUIRED_HBE_PLANS = 613;  
+		REQUIRED_HBS_PLANS = 72;
+		REQUIRED_HBO_PLANS = 307;
 
 		// origin zone range
 		LOWER_BOUND = 27;
@@ -83,124 +80,118 @@ public class PatnaNonSlumDataCalibrator {
 
 	public static void main(String[] args) {
 		String outputFile = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
-//		new PatnaNonSlumDataCalibrator().processForZone27To42(outputFile);
+		new PatnaNonSlumDataCalibrator().processForZone27To42(outputFile);
 	}
-	
+
 	/**
 	 * Since no data is available between 27 to 42 zones for non slum. We get it from the available stats.
 	 */
-//	public void processForZone27To42(String outputFile) {
-//
-//		SortedMap<String, List<Integer> > originZones = new TreeMap<>();
-//		{ // origin zones == between 27 to 42
-//			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-//			groupNumbers.put(HBE, REQUIRED_HBE_PLANS_SHARE);
-//			groupNumbers.put(HBS, REQUIRED_HBS_PLANS_SHARE);
-//			groupNumbers.put(HBO, REQUIRED_HBO_PLANS_SHARE);
-//			AARandomNumberGenerator aarng = new AARandomNumberGenerator(groupNumbers);
-//			originZones = aarng.getRandomNumbers(LOWER_BOUND, UPPER_BOUND, TOTAL_PLANS_REQUIRED);
-//		}
-//
-//		List<Integer> destinationZones = new ArrayList<>();
-//		{//destination zones == can be anything between 1 to 72.
-//			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-//			groupNumbers.put("DESTINATION", 1.0);
-//			AARandomNumberGenerator aarng = new AARandomNumberGenerator(groupNumbers);
-//			destinationZones = aarng.getRandomNumbers(1, 72, TOTAL_PLANS_REQUIRED).get("DESTINATION");
-//		}
-//
-//		// modes == can be anything from urban_all_modes, however, it is complicated if we use beeline distance distribution
-//		// or let simulation do the beeline correction ...
-//
-//		//see table 5-14 in PatnaCMP for following
-//		List<String> modes = new ArrayList<>();
-//
-//		{// HBE --> car 1, motorbike 9, bike 30, pt 37 and walk 22
-//			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-//			groupNumbers.put("car", 1.);
-//			groupNumbers.put("motorbike", 9.);
-//			groupNumbers.put("bike", 30.);
-//			groupNumbers.put("pt", 37.);
-//			groupNumbers.put("walk", 22.);
-//			AARandomNumberGenerator aarng = new AARandomNumberGenerator(groupNumbers);
-//			modes.addAll( aarng.getRandomDistribution( (int) Math.round(TOTAL_PLANS_REQUIRED * REQUIRED_HBE_PLANS_SHARE) ) );
-//		}
-//		{// HBS --> car 10, motorbike 28, bike 34, pt 8 and walk 20
-//			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-//			groupNumbers.put("car", 10.);
-//			groupNumbers.put("motorbike", 28.);
-//			groupNumbers.put("bike", 34.);
-//			groupNumbers.put("pt", 8.);
-//			groupNumbers.put("walk", 20.);
-//			AARandomNumberGenerator aarng = new AARandomNumberGenerator(groupNumbers);
-//			modes.addAll( aarng.getRandomDistribution( (int) Math.round(TOTAL_PLANS_REQUIRED * REQUIRED_HBS_PLANS_SHARE) ) );
-//		}
-//		{// HBO --> car 3, motorbike 12, bike 24, pt 34 and walk 27
-//			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-//			groupNumbers.put("car", 3.);
-//			groupNumbers.put("motorbike", 12.);
-//			groupNumbers.put("bike", 24.);
-//			groupNumbers.put("pt", 34.);
-//			groupNumbers.put("walk", 27.);
-//			AARandomNumberGenerator aarng = new AARandomNumberGenerator(groupNumbers);
-//			modes.addAll( aarng.getRandomDistribution( (int) Math.round(TOTAL_PLANS_REQUIRED * REQUIRED_HBO_PLANS_SHARE) ) );
-//		}
-//
-//		// daily cost == can be anything between 1 to 5; see Table 5-8
-//		// nonSlum; (interval -share) 1-22, 2-52, 3-14, 4-8, 5-3
-//		List<String> dailyCostInterval = new ArrayList<>();
-//		{
-//			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-//			groupNumbers.put("1", 0.22);
-//			groupNumbers.put("2", 0.52);
-//			groupNumbers.put("3", 0.14);
-//			groupNumbers.put("4", 0.08);
-//			groupNumbers.put("5", 0.03);
-//			AARandomNumberGenerator aarng = new AARandomNumberGenerator(groupNumbers);
-//			dailyCostInterval = aarng.getRandomDistribution(TOTAL_PLANS_REQUIRED);
-//		}
-//
-//		// incomeInterval == can be anything between 1 to 7; see Table 5-7
-//		// nonSlum; (interval - cummulative) 1 - 1, 2- 2, 3 -23, 4-50, 5-68, 6-81, 7-100
-//		List<String> incomeInterval = new ArrayList<>();
-//		{
-//			SortedMap<String, Double> groupNumbers = new TreeMap<>();
-//			groupNumbers.put("1", 0.01);
-//			groupNumbers.put("2", 0.02);
-//			groupNumbers.put("3", 0.23);
-//			groupNumbers.put("4", 0.50);
-//			groupNumbers.put("5", 0.68);
-//			groupNumbers.put("6", 0.81);
-//			groupNumbers.put("7", 1.0);
-//			AARandomNumberGenerator aarng = new AARandomNumberGenerator(groupNumbers);
-//			incomeInterval = aarng.getRandomDistribution(TOTAL_PLANS_REQUIRED);
-//		}
-//
-//		// now write the data
-//		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
-//		try {
-//			for(PatnaDemandLabels label : PatnaDemandLabels.values()) {
-//				writer.write(label.toString()+"\t");
-//			}
-//			writer.newLine();
-//
-//			int index = 0;
-//			for(String tripPurpose : originZones.keySet() ) {
-//				for (int ii : originZones.get(tripPurpose) ) {
-//					writer.write("NA\tNA\tNA\tNA\tNA\t");//all NA's
-//					writer.write(incomeInterval.get(index)+"\t");
-//					writer.write(dailyCostInterval.get(index)+"\t");
-//					writer.write(ii+"\t");
-//					writer.write(destinationZones.get(index)+"\t");
-//					writer.write(tripPurpose+"\t");
-//					writer.write(modes.get(index)+"\t");
-//					writer.write("NA\n");	
-//					index++;
-//				}
-//			}
-//			writer.close();
-//		} catch (Exception e) {
-//			throw new RuntimeException("Data is not writtern. Reason "+ e);
-//		}
-//	}
+	public void processForZone27To42(String outputFile) {
+
+		List<Integer> originZones = new ArrayList<Integer>(); // order is maintained and we know the numbers
+		{ // origin zones == between 27 to 42
+
+			for (int idx = 0; idx < TOTAL_PLANS_REQUIRED; idx++) {
+				originZones.add(RandomNumberUtils.getUniformlyRandomNumber(LOWER_BOUND, UPPER_BOUND));
+			}
+		}
+
+		List<Integer> destinationZones = new ArrayList<>();
+		{//destination zones == can be anything between 1 to 72.
+			for (int idx = 0; idx < TOTAL_PLANS_REQUIRED; idx++) {
+				destinationZones.add(RandomNumberUtils.getUniformlyRandomNumber(1, 72));
+			}
+		}
+
+		// modes == can be anything from urban_all_modes, however, it is complicated if we use beeline distance distribution
+		// or let simulation do the beeline correction ...
+
+		//see table 5-14 in PatnaCMP for following
+		List<String> modes = new ArrayList<>();
+
+		{// HBE --> car 1, motorbike 9, bike 30, pt 37 and walk 22
+			SortedMap<String, Double> groupNumbers = new TreeMap<>();
+			groupNumbers.put("car", 1.);
+			groupNumbers.put("motorbike", 9.);
+			groupNumbers.put("bike", 30.);
+			groupNumbers.put("pt", 37.);
+			groupNumbers.put("walk", 22.);
+			modes.addAll( RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, REQUIRED_HBE_PLANS ) );
+		}
+		{// HBS --> car 10, motorbike 28, bike 34, pt 8 and walk 20
+			SortedMap<String, Double> groupNumbers = new TreeMap<>();
+			groupNumbers.put("car", 10.);
+			groupNumbers.put("motorbike", 28.);
+			groupNumbers.put("bike", 34.);
+			groupNumbers.put("pt", 8.);
+			groupNumbers.put("walk", 20.);
+			modes.addAll( RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, REQUIRED_HBS_PLANS ) );
+		}
+		{// HBO --> car 3, motorbike 12, bike 24, pt 34 and walk 27
+			SortedMap<String, Double> groupNumbers = new TreeMap<>();
+			groupNumbers.put("car", 3.);
+			groupNumbers.put("motorbike", 12.);
+			groupNumbers.put("bike", 24.);
+			groupNumbers.put("pt", 34.);
+			groupNumbers.put("walk", 27.);
+			modes.addAll( RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, REQUIRED_HBO_PLANS ) );
+		}
+
+		// daily cost == can be anything between 1 to 5; see Table 5-8
+		// nonSlum; (interval -share) 1-22, 2-52, 3-14, 4-8, 5-3
+		List<String> dailyCostInterval = new ArrayList<>();
+		{
+			SortedMap<String, Double> groupNumbers = new TreeMap<>();
+			groupNumbers.put("1", 0.22);
+			groupNumbers.put("2", 0.52);
+			groupNumbers.put("3", 0.14);
+			groupNumbers.put("4", 0.08);
+			groupNumbers.put("5", 0.03);
+			dailyCostInterval = RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, TOTAL_PLANS_REQUIRED);
+		}
+
+		// incomeInterval == can be anything between 1 to 7; see Table 5-7
+		// nonSlum; (interval - cummulative) 1 - 1, 2- 2, 3 -23, 4-50, 5-68, 6-81, 7-100
+		List<String> incomeInterval = new ArrayList<>();
+		{
+			SortedMap<String, Double> groupNumbers = new TreeMap<>();
+			groupNumbers.put("1", 0.01);
+			groupNumbers.put("2", 0.02);
+			groupNumbers.put("3", 0.23);
+			groupNumbers.put("4", 0.50);
+			groupNumbers.put("5", 0.68);
+			groupNumbers.put("6", 0.81);
+			groupNumbers.put("7", 1.0);
+			incomeInterval = RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, TOTAL_PLANS_REQUIRED);
+		}
+
+		// now write the data
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
+		try {
+			for(PatnaDemandLabels label : PatnaDemandLabels.values()) {
+				writer.write(label.toString()+"\t");
+			}
+			writer.newLine();
+
+			for( int index = 0; index< originZones.size(); index++ ) {
+				writer.write( "NA\tNA\tNA\tNA\tNA\t" ); //all NA's
+				writer.write( incomeInterval.get( index ) + "\t" );
+				writer.write( dailyCostInterval.get( index ) + "\t" );
+				writer.write( originZones.get( index ) + "\t" );
+				writer.write( destinationZones.get( index ) + "\t" );
+
+				String tripPurpose ;
+				if( index < REQUIRED_HBE_PLANS ) tripPurpose = HBE;
+				else if( index < REQUIRED_HBE_PLANS + REQUIRED_HBS_PLANS ) tripPurpose = HBS;
+				else tripPurpose = HBO;
+
+				writer.write( tripPurpose + "\t");
+				writer.write( modes.get(index) + "\t");
+				writer.write( "NA\n" );	
+			}
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not writtern. Reason "+ e);
+		}
+	}
 }
