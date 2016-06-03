@@ -23,12 +23,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.*;
+import playground.polettif.publicTransitMapping.config.ManualLinkCandidates;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.LinkCandidate;
 import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
@@ -223,9 +225,6 @@ public class PTMapperUtils {
 	 * to the facility coordinates.<p/>
 	 * <p/>
 	 * Since all links are part of the route, no rerouting has to be done.
-	 *
-	 * @param schedule
-	 * @param network
 	 */
 	public static void pullChildStopFacilitiesTogether(TransitSchedule schedule, Network network) {
 		log.info("Pulling child stop facilities...");
@@ -273,12 +272,6 @@ public class PTMapperUtils {
 	/**
 	 * If a link of <tt>comparingLinks</tt> is closer to the stop facility than
 	 * its currently referenced link, the closest link is used.
-	 * @param schedule
-	 * @param network
-	 * @param transitRoute
-	 * @param stopFacility
-	 * @param comparingLinks
-	 * @return
 	 */
 	private static Id<Link> useCloserRefLinkForChildStopFacility(TransitSchedule schedule, Network network, TransitRoute transitRoute, TransitStopFacility stopFacility, Collection<? extends Link> comparingLinks) {
 		// check if previous link is closer to stop facility
@@ -342,5 +335,34 @@ public class PTMapperUtils {
 				config.getNodeSearchRadius(), config.getMaxNClosestLinks(), config.getLinkDistanceTolerance(), config.getModeRoutingAssignment().get(scheduleTransportMode),
 				config.getMaxLinkCandidateDistance()
 		);
+	}
+
+	/**
+	 * adds manually defined link candidates from config (if available)
+	 */
+	public static void addManualLinkCandidates(TransitSchedule schedule, Network network, Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates, PublicTransitMappingConfigGroup config) {
+		for(ConfigGroup e : config.getParameterSets(ManualLinkCandidates.SET_NAME)) {
+			ManualLinkCandidates manualCandidates = (ManualLinkCandidates) e;
+			Set<String> modes = manualCandidates.getModes();
+			TransitStopFacility parentStopFacility = schedule.getFacilities().get(manualCandidates.getStopFacilityId());
+
+			if(manualCandidates.replaceCandidates()) {
+				for(String mode : modes) {
+					Set<LinkCandidate> newLinkCandidates = new HashSet<>();
+					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
+						newLinkCandidates.add(new LinkCandidate(network.getLinks().get(linkId), parentStopFacility));
+					}
+					MapUtils.getMap(mode, linkCandidates).put(parentStopFacility, newLinkCandidates);
+				}
+			} else {
+				for(String mode : modes) {
+					Set<LinkCandidate> currentLinkCandidatesCs = MapUtils.getSet(parentStopFacility, MapUtils.getMap(mode, linkCandidates));
+					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
+						currentLinkCandidatesCs.add(new LinkCandidate(network.getLinks().get(linkId), parentStopFacility));
+					}
+				}
+			}
+		}
+
 	}
 }

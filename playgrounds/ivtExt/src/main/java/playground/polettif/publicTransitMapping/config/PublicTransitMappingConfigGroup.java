@@ -19,6 +19,7 @@
 
 package playground.polettif.publicTransitMapping.config;
 
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.MapUtils;
 
@@ -131,6 +132,17 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"\t\tNot needed if PTMapper is used within another class.");
 		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
 		return map;
+	}
+
+
+	@Override
+	public ConfigGroup createParameterSet(final String type) {
+		switch(type) {
+			case ManualLinkCandidates.SET_NAME :
+				return new ManualLinkCandidates();
+			default:
+				throw new IllegalArgumentException("Unknown parameterset name!");
+		}
 	}
 
 	/**

@@ -134,6 +134,11 @@ public class PTMapperPseudoRouting extends PTMapper {
 		PTMapperUtils.setSuffixChildStopFacilities(config.getSuffixChildStopFacilities(), config.getSuffixRegexEscaped());
 		linkCandidates = PTMapperUtils.generateModeLinkCandidates(schedule, network, config);
 
+		/**
+		 * Add manually set link candidates from config
+		 */
+		PTMapperUtils.addManualLinkCandidates(schedule, network, linkCandidates, config);
+
 		/** [3]
 		 * Get network extent to speed up routing outside of network area.
 		 */

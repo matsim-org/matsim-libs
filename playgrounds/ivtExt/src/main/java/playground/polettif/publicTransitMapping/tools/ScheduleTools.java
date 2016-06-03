@@ -204,14 +204,8 @@ public class ScheduleTools {
 						if(leastCostPath != null) {
 							List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(leastCostPath);
 							if(path != null) {
-								List<Id<Link>> previous = new LinkedList<>(linkIdSequence);
 								linkIdSequence.addAll(path);
-
-								if(!linkIdSequence.subList(0, linkIdSequence.size()-path.size()).equals(previous)) {
-									log.warn(transitRoute.getId() + ": link sequence not equal");
-									log.info(linkIdSequence.subList(0, linkIdSequence.size() - path.size()).size() + " <> " + previous.size());
-								}
-
+								linkIdSequence.add(nextLink.getId());
 							} else {
 								linkIdSequence = null;
 								break;
@@ -221,8 +215,6 @@ public class ScheduleTools {
 							log.error("No path found for TransitRoute " + transitRoute.getId() + " on TransitLine " + transitLine.getId());
 							break;
 						}
-
-						linkIdSequence.add(nextLink.getId());
 					} // -for stops
 
 					// add link sequence to schedule
