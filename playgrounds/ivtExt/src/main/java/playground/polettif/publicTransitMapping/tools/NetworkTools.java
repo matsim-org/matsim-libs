@@ -36,10 +36,17 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
+import playground.polettif.publicTransitMapping.mapping.router.ModeDependentRouter;
+import playground.polettif.publicTransitMapping.mapping.router.Router;
 
 import java.util.*;
+
+import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
 
 /**
  * Provides Tools for analysing and manipulating networks.
@@ -49,6 +56,8 @@ import java.util.*;
 public class NetworkTools {
 
 	protected static Logger log = Logger.getLogger(NetworkTools.class);
+
+	private NetworkTools() {}
 
 	public static Network readNetwork(String filePath) {
 		Network network = NetworkUtils.createNetwork();
@@ -547,6 +556,39 @@ public class NetworkTools {
 				link.setLength(l > 0 ? l : 1);
 			}
 		}
+	}
+
+	/**
+	 * Creates mode dependent routers based on the actual network modes used.
+	 * @param schedule
+	 * @param network
+	 * @return
+	 */
+	public static Map<String, Router> guessRouters(TransitSchedule schedule, Network network) {
+		Map<String, Set<String>> modeAssignments = new HashMap<>();
+		for(TransitLine transitLine : schedule.getTransitLines().values()) {
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				Set<String> usedNetworkModes = MapUtils.getSet(transitRoute.getTransportMode(), modeAssignments);
+				List<Link> links = getLinksFromIds(network, getLinkIds(transitRoute));
+				for(Link link : links) {
+					usedNetworkModes.addAll(link.getAllowedModes());
+				}
+			}
+		}
+
+		Map<Set<String>, Router> modeDependentRouters = new HashMap<>();
+		for(Set<String> networkModes : modeAssignments.values()) {
+			if(!modeDependentRouters.containsKey(networkModes)) {
+				modeDependentRouters.put(networkModes, new ModeDependentRouter(network, networkModes));
+			}
+		}
+
+		Map<String, Router> routers = new HashMap<>();
+
+		for(Map.Entry<String, Set<String>> e : modeAssignments.entrySet()) {
+			routers.put(e.getKey(), modeDependentRouters.get(e.getValue()));
+		}
+		return routers;
 	}
 
 	/**

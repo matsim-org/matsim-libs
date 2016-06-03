@@ -16,28 +16,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.polettif.publicTransitMapping.plausibility;
+package playground.polettif.publicTransitMapping.editor;
 
 import com.opencsv.CSVReader;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.pt.transitSchedule.api.*;
 import playground.polettif.publicTransitMapping.mapping.PTMapperUtils;
-import playground.polettif.publicTransitMapping.mapping.router.ModeDependentRouter;
 import playground.polettif.publicTransitMapping.mapping.router.Router;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
@@ -47,22 +40,21 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getLinkIds;
-
 /**
  * Provides methods for rerouting and adapting schedules via a csv "command file".
  *
  * @author polettif
  */
-public class ScheduleEditor {
+public class BasicScheduleEditor implements ScheduleEditor {
 
-	protected static Logger log = Logger.getLogger(ScheduleEditor.class);
+	protected static Logger log = Logger.getLogger(RunScheduleEditor.class);
 
 	// fields
 	private final Network network;
 	private final TransitSchedule schedule;
 	private final TransitScheduleFactory scheduleFactory;
 	private final NetworkFactory networkFactory;
+
 	private final Map<String, Router> routers;
 
 	private final ParentStops parentStops;
@@ -74,12 +66,14 @@ public class ScheduleEditor {
 	public static final String RR_VIA_LINK = "rerouteViaLink";
 	public static final String RR_FROM_STOP = "rerouteFromStop";
 	public static final String REPLACE_STOP_FACILITY = "replaceStopFacility";
+	public static final String REFRESH_TRANSIT_ROUTE = "refreshTransitRoute";
 	public static final String ALL_TRANSIT_ROUTES_ON_LINK = "allTransitRoutesOnLink";
 	public static final String CHANGE_REF_LINK = "changeRefLink";
 	public static final String ADD_LINK = "addLink";
+
 	public static final String COMMENT_START = "//";
 
-	public ScheduleEditor(TransitSchedule schedule, Network network, Map<String, Router> routers) {
+	public BasicScheduleEditor(TransitSchedule schedule, Network network, Map<String, Router> routers) {
 		this.schedule = schedule;
 		this.network = network;
 		this.scheduleFactory = schedule.getFactory();
@@ -88,57 +82,24 @@ public class ScheduleEditor {
 		this.parentStops = new ParentStops();
 	}
 
-	public ScheduleEditor(TransitSchedule schedule, Network network) {
+
+	public BasicScheduleEditor(TransitSchedule schedule, Network network) {
 		this.schedule = schedule;
 		this.network = network;
 		this.scheduleFactory = schedule.getFactory();
 		this.networkFactory = network.getFactory();
 		this.parentStops = new ParentStops();
 
-		this.routers = new HashMap<>();
 		log.info("Guessing routers based on schedule transport modes and used network transport modes.");
-		Map<String, Set<String>> modeAssignments = new HashMap<>();
-		for(TransitLine transitLine : this.schedule.getTransitLines().values()) {
-			for(TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				Set<String> usedNetworkModes = MapUtils.getSet(transitRoute.getTransportMode(), modeAssignments);
-				List<Link> links = NetworkTools.getLinksFromIds(network, getLinkIds(transitRoute));
-				for(Link link : links) {
-					usedNetworkModes.addAll(link.getAllowedModes());
-				}
-			}
-		}
-
-		Map<Set<String>, Router> modeDependentRouters = new HashMap<>();
-		for(Set<String> networkModes : modeAssignments.values()) {
-			if(!modeDependentRouters.containsKey(networkModes)) {
-				modeDependentRouters.put(networkModes, new ModeDependentRouter(network, networkModes));
-			}
-		}
-
-		for(Map.Entry<String, Set<String>> e : modeAssignments.entrySet()) {
-			routers.put(e.getKey(), modeDependentRouters.get(e.getValue()));
-		}
+		this.routers = NetworkTools.guessRouters(schedule, network);
 	}
 
-
-	public static void main(String[] args) throws IOException {
-		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Network network = sc.getNetwork();
-		new TransitScheduleReader(sc).readFile(args[0]);
-		new MatsimNetworkReader(network).readFile(args[1]);
-		TransitSchedule schedule = sc.getTransitSchedule();
-
-		ScheduleEditor scheduleEditor = new ScheduleEditor(schedule, network);
-
-		scheduleEditor.parseCommandCsv(args[2]);
-		ScheduleTools.assignScheduleModesToLinks(schedule, network);
-		scheduleEditor.writeFiles(args[3], args[4]);
+	public Network getNetwork() {
+		return network;
 	}
 
-	private void writeFiles(String outputScheduleFile, String outputNetworkFile) {
-		log.info("Writing schedule and network to file...");
-		new TransitScheduleWriter(schedule).writeFile(outputScheduleFile);
-		new NetworkWriter(network).write(outputNetworkFile);
+	public TransitSchedule getSchedule() {
+		return schedule;
 	}
 
 	/**
@@ -152,7 +113,8 @@ public class ScheduleEditor {
 
 		String[] line = reader.readNext();
 		while(line != null) {
-			runCmdLine(line);
+			log.info(line);
+			executeCmdLine(line);
 			line = reader.readNext();
 		}
 		reader.close();
@@ -161,7 +123,7 @@ public class ScheduleEditor {
 	/**
 	 * executes a command line
 	 */
-	private void runCmdLine(String[] cmd) {
+	public void executeCmdLine(String[] cmd) {
 		/**
 		 * Reroute TransitRoute via new Link
 		 * ["rerouteViaLink"] [TransitLineId] [TransitRouteId] [oldLinkId] [newLinkId]
@@ -219,6 +181,18 @@ public class ScheduleEditor {
 			if(cmd.length == 5) {
 				addLink(cmd[1], cmd[2], cmd[3], cmd[4]);
 				refreshSchedule();
+			} else {
+				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0]);
+			}
+		}
+
+		/**
+		 * Refreshes the given transit route (reroute all paths between referenced stop facility links)
+		 * [refreshTransitRoute] [transitLineId] [transitRouteId]
+		 */
+		else if(REFRESH_TRANSIT_ROUTE.equals(cmd[0])) {
+			if(cmd.length == 3) {
+				refreshTransitRoute(getTransitRoute(cmd[1], cmd[2]));
 			} else {
 				throw new IllegalArgumentException("Incorrect number of arguments for " + cmd[0]);
 			}
@@ -288,11 +262,11 @@ public class ScheduleEditor {
 	}
 
 	/**
-	 * Reroutes the section after fromRouteStop via the given viaLinkId
 	 *
-	 * @param transitRoute
-	 * @param fromRouteStop
-	 * @param viaLinkId
+	 * @param transitRoute  the transit route
+	 * @param fromRouteStop the section of the route from this routeStop to the subsequent
+	 *                      routeStop is rerouted
+	 * @param viaLinkId		the section is routed via this link
 	 */
 	public void rerouteFromStop(TransitRoute transitRoute, TransitRouteStop fromRouteStop, Id<Link> viaLinkId) {
 		Router router = routers.get(transitRoute.getTransportMode());
@@ -354,32 +328,45 @@ public class ScheduleEditor {
 	/**
 	 * @return the TransitRouteStop with that contain the given stop facility
 	 */
-	private TransitRouteStop getRouteStop(TransitRoute transitRoute, String stopFacilityId) {
+	public TransitRouteStop getRouteStop(TransitRoute transitRoute, Id<TransitStopFacility> stopFacilityId) {
 		for(TransitRouteStop routeStop : transitRoute.getStops()) {
-			if(stopFacilityId.equals(routeStop.getStopFacility().getId().toString())) {
+			if(stopFacilityId.equals(routeStop.getStopFacility().getId())) {
 				return routeStop;
 			}
 		}
 		throw new IllegalArgumentException("No child facility for " + stopFacilityId + " found in Transit Route " + transitRoute + ".");
 	}
+	private TransitRouteStop getRouteStop(TransitRoute transitRoute, String stopFacilityIdStr) {
+		return getRouteStop(transitRoute, createStopFacilityId(stopFacilityIdStr));
+	}
 
 
+	/**
+	 * Creates a standard child facility id
+	 */
 	private Id<TransitStopFacility> createChildStopFacilityId(String stopIdStr, String refLinkId) {
 		return Id.create(getParentId(stopIdStr) + SUFFIX + refLinkId, TransitStopFacility.class);
 	}
 
-	private Id<TransitStopFacility> createStopFacilityId(String stopIdStr) {
-		return Id.create(stopIdStr, TransitStopFacility.class);
+	/**
+	 * Shortcut to create a stop facility id
+	 */
+	private Id<TransitStopFacility> createStopFacilityId(String stopFacilityIdStr) {
+		return Id.create(stopFacilityIdStr, TransitStopFacility.class);
 	}
 
 	/**
 	 * Changes the reference of a stop facility (for all routes)
 	 */
-	private void changeRefLink(String stopIdStr, String newRefLinkIdStr) {
-		TransitStopFacility oldStopFacility = schedule.getFacilities().get(Id.create(stopIdStr, TransitStopFacility.class));
+	public void changeRefLink(Id<TransitStopFacility> stopFacilityId, Id<Link> newRefLinkId) {
+		TransitStopFacility oldStopFacility = schedule.getFacilities().get(stopFacilityId);
+		TransitStopFacility newChildStopFacility = parentStops.getChildStopFacility(getParentId(stopFacilityId), newRefLinkId.toString());
+		replaceStopFacilityInAllRoutes(oldStopFacility, newChildStopFacility);
+	}
 
-		TransitStopFacility newChildStopFacility = parentStops.getChildStopFacility(getParentId(stopIdStr), newRefLinkIdStr);
-
+	private void changeRefLink(String stopFacilityIdStr, String newRefLinkIdStr) {
+		TransitStopFacility oldStopFacility = schedule.getFacilities().get(createStopFacilityId(stopFacilityIdStr));
+		TransitStopFacility newChildStopFacility = parentStops.getChildStopFacility(getParentId(stopFacilityIdStr), newRefLinkIdStr);
 		replaceStopFacilityInAllRoutes(oldStopFacility, newChildStopFacility);
 	}
 
@@ -396,7 +383,7 @@ public class ScheduleEditor {
 	/**
 	 * creates a new stop facility and adds it to the schedule
 	 */
-	private TransitStopFacility createStopFacility(Id<TransitStopFacility> facilityId, Coord coord, String name, Id<Link> linkId) {
+	public TransitStopFacility createStopFacility(Id<TransitStopFacility> facilityId, Coord coord, String name, Id<Link> linkId) {
 		TransitStopFacility newTransitStopFacility = scheduleFactory.createTransitStopFacility(facilityId, coord, false);
 		newTransitStopFacility.setName(name);
 		newTransitStopFacility.setLinkId(linkId);
@@ -411,17 +398,20 @@ public class ScheduleEditor {
 	 * @param toNodeId
 	 * @param attributeLinkId
 	 */
-	private void addLink(Id<Link> newLinkId, Id<Node> fromNodeId, Id<Node> toNodeId, Id<Link> attributeLinkId) {
+	public void addLink(Id<Link> newLinkId, Id<Node> fromNodeId, Id<Node> toNodeId, Id<Link> attributeLinkId) {
 		Node fromNode = network.getNodes().get(fromNodeId);
 		Node toNode = network.getNodes().get(toNodeId);
 
 		Link newLink = networkFactory.createLink(newLinkId, fromNode, toNode);
-		Link attributeLink = network.getLinks().get(attributeLinkId);
 
-		newLink.setAllowedModes(attributeLink.getAllowedModes());
-		newLink.setCapacity(attributeLink.getCapacity());
-		newLink.setFreespeed(attributeLink.getFreespeed());
-		newLink.setNumberOfLanes(attributeLink.getNumberOfLanes());
+		if(attributeLinkId != null) {
+			Link attributeLink = network.getLinks().get(attributeLinkId);
+
+			newLink.setAllowedModes(attributeLink.getAllowedModes());
+			newLink.setCapacity(attributeLink.getCapacity());
+			newLink.setFreespeed(attributeLink.getFreespeed());
+			newLink.setNumberOfLanes(attributeLink.getNumberOfLanes());
+		}
 
 		network.addLink(newLink);
 	}
@@ -528,8 +518,8 @@ public class ScheduleEditor {
 		}
 	}
 
-	private String getParentId(String stopFacilityId) {
-		String[] childStopSplit = stopFacilityId.split(SUFFIX_PATTERN);
+	private String getParentId(String stopFacilityIdStr) {
+		String[] childStopSplit = stopFacilityIdStr.split(SUFFIX_PATTERN);
 		return childStopSplit[0];
 	}
 
@@ -537,6 +527,9 @@ public class ScheduleEditor {
 		return getParentId(stopFacility.getId().toString());
 	}
 
+	private String getParentId(Id<TransitStopFacility> stopFacility) {
+		return getParentId(stopFacility.toString());
+	}
 
 	/**
 	 * Container class for all parent stop facilities
@@ -560,8 +553,12 @@ public class ScheduleEditor {
 			return fac.get(parentId);
 		}
 
-		private TransitStopFacility getChildStopFacility(String parentId, String newRefLinkIdStr) {
-			return fac.get(parentId).getChildStopFacility(newRefLinkIdStr);
+		private TransitStopFacility getChildStopFacility(String parentIdStr, String newRefLinkIdStr) {
+			return fac.get(parentIdStr).getChildStopFacility(newRefLinkIdStr);
+		}
+
+		private TransitStopFacility getChildStopFacility(Id<TransitStopFacility> parentId, Id<Link> newRefLinkId) {
+			return fac.get(parentId.toString()).getChildStopFacility(newRefLinkId);
 		}
 	}
 

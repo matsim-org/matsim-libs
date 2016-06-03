@@ -24,7 +24,7 @@ package playground.polettif.publicTransitMapping.mapping;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
+import org.apache.log4j.PatternLayout;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,7 +51,6 @@ import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.*;
 
 /**
@@ -95,7 +94,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 
 		setLogLevels();
 		try {
-			if(config.getOutputScheduleFile() != null) log.addAppender(new FileAppender(new SimpleLayout(), config.getOutputScheduleFile()+".log"));
+			if(config.getOutputScheduleFile() != null) log.addAppender(new FileAppender(new PatternLayout(), config.getOutputScheduleFile()+".log"));
 		} catch (IOException e) { e.printStackTrace(); }
 
 		log.info("Mapping transit schedule to network...");
@@ -316,8 +315,8 @@ public class PTMapperPseudoRouting extends PTMapper {
 				ScheduleTools.writeTransitSchedule(schedule, config.getOutputScheduleFile());
 				NetworkTools.writeNetwork(network, config.getOutputNetworkFile());
 			} catch (Exception e) {
-				log.error("Output directory not found! Trying to write schedule and network file in working directory");
-				double t = System.nanoTime()/1000000;
+				log.error("Cannot write to output directory! Trying to write schedule and network file in working directory");
+				long t = System.nanoTime()/1000000;
 				try {
 					ScheduleTools.writeTransitSchedule(schedule, t+"schedule.xml.gz");
 					NetworkTools.writeNetwork(network, t+"network.xml.gz");

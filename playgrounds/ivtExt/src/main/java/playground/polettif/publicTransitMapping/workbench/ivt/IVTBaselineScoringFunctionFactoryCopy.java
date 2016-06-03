@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.polettif.publicTransitMapping.workbench.zurich;
+package playground.polettif.publicTransitMapping.workbench.ivt;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

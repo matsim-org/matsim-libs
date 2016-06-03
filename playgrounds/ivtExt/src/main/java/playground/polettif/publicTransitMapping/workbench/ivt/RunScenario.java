@@ -17,11 +17,9 @@
  * *********************************************************************** */
 
 
-package playground.polettif.publicTransitMapping.workbench.zurich;
+package playground.polettif.publicTransitMapping.workbench.ivt;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -39,10 +37,6 @@ import org.matsim.vehicles.Vehicles;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.polettif.boescpa.lib.tools.fileCreation.F2LConfigGroup;
-import playground.polettif.boescpa.lib.tools.fileCreation.F2LCreator;
-import playground.polettif.publicTransitMapping.tools.NetworkTools;
-
-import java.util.Collections;
 
 public class RunScenario {
 

@@ -49,8 +49,7 @@ public class ScheduleTools {
 
 	protected static Logger log = Logger.getLogger(ScheduleTools.class);
 
-	private ScheduleTools() {
-	}
+	private ScheduleTools() {}
 
 	/**
 	 * @return the transitSchedule from scheduleFile.
@@ -178,67 +177,63 @@ public class ScheduleTools {
 					counterRoute.incCounter();
 
 					List<TransitRouteStop> routeStops = transitRoute.getStops();
-					List<Id<Link>> linkSequence = null;
+					List<Id<Link>> linkIdSequence = new LinkedList<>();
 
-					if(routeStops.get(0).getStopFacility().getLinkId() != null) {
-						// add very first link
-						linkSequence = new LinkedList<>();
-						linkSequence.add(routeStops.get(0).getStopFacility().getLinkId());
-
-						// route
-						for(int i = 0; i < routeStops.size() - 1; i++) {
-							if(routeStops.get(i).getStopFacility().getLinkId() == null) {
-								log.warn("stop facility " + routeStops.get(i).getStopFacility().getName() + " (" + routeStops.get(i).getStopFacility().getId() + ") not referenced!");
-								linkSequence = null;
-								break;
-							}
-							if(routeStops.get(i + 1).getStopFacility().getLinkId() == null) {
-								log.warn("stop facility " + routeStops.get(i - 1).getStopFacility().getName() + " (" + routeStops.get(i + 1).getStopFacility().getId() + " not referenced!");
-								linkSequence = null;
-								break;
-							}
-
-							Id<Link> currentLinkId = Id.createLinkId(routeStops.get(i).getStopFacility().getLinkId().toString());
-
-							Link currentLink = network.getLinks().get(currentLinkId);
-							Link nextLink = network.getLinks().get(routeStops.get(i + 1).getStopFacility().getLinkId());
-
-							LeastCostPathCalculator.Path leastCostPath = router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode());
-
-							if(leastCostPath != null) {
-								List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(leastCostPath);
-								if(path != null) {
-									List<Id<Link>> previous = new LinkedList<>(linkSequence);
-									linkSequence.addAll(path);
-
-									if(!linkSequence.subList(0, linkSequence.size()-path.size()).equals(previous)) {
-										log.warn(transitRoute.getId() + ": link sequence not equal");
-										log.info(linkSequence.subList(0, linkSequence.size() - path.size()).size() + " <> " + previous.size());
-									}
-
-								} else {
-									linkSequence = null;
-									break;
-								}
-							} else {
-								linkSequence = null;
-								log.error("No path found for TransitRoute " + transitRoute.getId() + " on TransitLine " + transitLine.getId());
-								break;
-							}
-
-							linkSequence.add(nextLink.getId());
+					// route
+					for(int i = 0; i < routeStops.size() - 1; i++) {
+						if(routeStops.get(i).getStopFacility().getLinkId() == null) {
+							log.warn("stop facility " + routeStops.get(i).getStopFacility().getName() + " (" + routeStops.get(i).getStopFacility().getId() + ") not referenced!");
+							linkIdSequence = null;
+							break;
 						}
-					}
+						if(routeStops.get(i + 1).getStopFacility().getLinkId() == null) {
+							log.warn("stop facility " + routeStops.get(i - 1).getStopFacility().getName() + " (" + routeStops.get(i + 1).getStopFacility().getId() + " not referenced!");
+							linkIdSequence = null;
+							break;
+						}
+
+						// add very first link
+						if(i == 0) linkIdSequence.add(routeStops.get(0).getStopFacility().getLinkId());
+
+						Id<Link> currentLinkId = routeStops.get(i).getStopFacility().getLinkId();
+						Link currentLink = network.getLinks().get(currentLinkId);
+						Link nextLink = network.getLinks().get(routeStops.get(i + 1).getStopFacility().getLinkId());
+
+						LeastCostPathCalculator.Path leastCostPath = router.calcLeastCostPath(currentLink.getToNode(), nextLink.getFromNode());
+
+						if(leastCostPath != null) {
+							List<Id<Link>> path = PTMapperUtils.getLinkIdsFromPath(leastCostPath);
+							if(path != null) {
+								List<Id<Link>> previous = new LinkedList<>(linkIdSequence);
+								linkIdSequence.addAll(path);
+
+								if(!linkIdSequence.subList(0, linkIdSequence.size()-path.size()).equals(previous)) {
+									log.warn(transitRoute.getId() + ": link sequence not equal");
+									log.info(linkIdSequence.subList(0, linkIdSequence.size() - path.size()).size() + " <> " + previous.size());
+								}
+
+							} else {
+								linkIdSequence = null;
+								break;
+							}
+						} else {
+							linkIdSequence = null;
+							log.error("No path found for TransitRoute " + transitRoute.getId() + " on TransitLine " + transitLine.getId());
+							break;
+						}
+
+						linkIdSequence.add(nextLink.getId());
+					} // -for stops
 
 					// add link sequence to schedule
-					if(linkSequence != null) {
-						transitRoute.setRoute(RouteUtils.createNetworkRoute(linkSequence, network));
+					if(linkIdSequence != null) {
+						transitRoute.setRoute(RouteUtils.createNetworkRoute(linkIdSequence, network));
 					}
 				} else {
 					log.warn("Route " + transitRoute.getId() + " on line " + transitLine.getId() + " has no stop sequence");
 				}
-			}
-		}
+			} // -route
+		} // -line
 		log.info("Routing all routes with referenced links... done");
 	}
 
