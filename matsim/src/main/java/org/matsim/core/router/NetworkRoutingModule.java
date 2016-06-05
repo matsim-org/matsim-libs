@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.RouteFactoryImpl;
@@ -77,6 +78,9 @@ public final class NetworkRoutingModule implements RoutingModule {
 			final Person person) {
 		Leg newLeg = populationFactory.createLeg( mode );
 		newLeg.setDepartureTime( departureTime );
+		
+		Gbl.assertNotNull(fromFacility);
+		Gbl.assertNotNull(toFacility);
 
 		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
 		Link toLink = this.network.getLinks().get(toFacility.getLinkId());

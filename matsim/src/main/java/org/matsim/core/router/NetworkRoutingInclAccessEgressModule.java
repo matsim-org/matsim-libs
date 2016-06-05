@@ -109,6 +109,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
+		
+		Gbl.assertNotNull(fromFacility);
+		Gbl.assertNotNull(toFacility);
 
 		Link accessActLink = null ;
 		if ( fromFacility.getLinkId()!=null ) {

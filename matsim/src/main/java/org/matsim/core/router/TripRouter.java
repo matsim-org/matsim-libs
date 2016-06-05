@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 
@@ -150,6 +151,9 @@ public final class TripRouter implements MatsimExtensionPoint {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
+		
+		Gbl.assertNotNull( fromFacility );
+		Gbl.assertNotNull( toFacility );
 		
 		RoutingModule module = routingModules.get( mainMode );
 
