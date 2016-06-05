@@ -127,7 +127,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime); // yyyy why int?  kai, dec'15
 			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route, this.network));
+			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.network));
 			leg.setRoute(route);
 			travTime = (int) path.travelTime; // yyyy why int?  kai, dec'15
 		} else {
