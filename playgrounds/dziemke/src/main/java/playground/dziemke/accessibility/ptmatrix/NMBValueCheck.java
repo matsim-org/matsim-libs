@@ -1,5 +1,9 @@
 package playground.dziemke.accessibility.ptmatrix;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -14,15 +18,13 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.pt.router.FakeFacility;
 import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.router.TransitRouterConfig;
-import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterImpl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import playground.dziemke.accessibility.ptmatrix.TransitLeastCostPathRouting.TransitRouterImpl;
 
 /**
  * @author gabriel
@@ -70,7 +72,7 @@ public class NMBValueCheck {
         inverseCoord = new Coord(coordinateTransformation.transform(coord4).getY(), coordinateTransformation.transform(coord4).getY());
         System.out.println("coord4 = " + inverseCoord);
 
-        List<Leg> legList = transitRouter.calcRoute(coord3, coord4, departureTime, null);
+        List<Leg> legList = transitRouter.calcRoute(new FakeFacility(coord3), new FakeFacility(coord4), departureTime, null);
 
         double travelTime = 0.;
         double travelDistance = 0.;

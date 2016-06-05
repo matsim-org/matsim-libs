@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
@@ -32,9 +31,11 @@ class PTScheduleRandomiser implements DecisionVariableRandomizer<PTSchedule> {
 		Vehicles vehicles = this.ptschedule.vehicles;
 		final List<PTSchedule> result = new ArrayList<>(2);
 		//Ensuring two independent copies of the existing schedule, and not changing with in the current schedule
-//		result.add(adapter.updateScheduleAdd(scenario, adapter.deepCopyVehicles(vehicles), adapter.deepCopyTransitSchedule(schedule)));//Randomly add vehicles
-//		result.add(adapter.updateScheduleRemove(scenario, adapter.deepCopyVehicles(vehicles), adapter.deepCopyTransitSchedule(schedule)));//Randomly remove vehicles
-		result.add(adapter.updateScheduleDeleteRoute(scenario, adapter.deepCopyTransitSchedule(schedule)));//Randomly delete routes
+		result.add(adapter.updateScheduleAdd(scenario, adapter.deepCopyVehicles(vehicles), adapter.deepCopyTransitSchedule(schedule)));//Randomly add vehicles
+		result.add(adapter.updateScheduleRemove(scenario, adapter.deepCopyVehicles(vehicles), adapter.deepCopyTransitSchedule(schedule)));//Randomly remove vehicles
+//		result.add(adapter.updateScheduleAddRoute(scenario, adapter.deepCopyVehicles(vehicles), adapter.deepCopyTransitSchedule(schedule)));//Randomly delete routes
+//		result.add(adapter.updateScheduleDeleteRoute(scenario, adapter.deepCopyVehicles(vehicles), adapter.deepCopyTransitSchedule(schedule)));//Randomly delete routes
+//		result.add(adapter.updateScheduleDeleteRoute(scenario, adapter.deepCopyVehicles(vehicles), adapter.deepCopyTransitSchedule(schedule)));//Randomly delete routes
 		
 
 		str = str + vehicles.getVehicles().size() + "		" +

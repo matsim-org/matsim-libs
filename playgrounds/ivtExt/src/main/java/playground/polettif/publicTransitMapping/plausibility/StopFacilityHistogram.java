@@ -40,8 +40,8 @@ import java.util.*;
 public class StopFacilityHistogram {
 	
 	private TransitSchedule schedule;
-	private Map<Integer, String> stopFacilityHistogramMap = new TreeMap<>();
-	private double[] stopFacilityHistogram;
+	private Map<String, Integer> histMap = new TreeMap<>();
+	private double[] hist;
 
 	private static final String SUFFIX_PATTERN = "[.]link:";
 	private static final String SUFFIX = ".link:";
@@ -72,22 +72,41 @@ public class StopFacilityHistogram {
 			stopStat.put(parentFacility, ++count);
 		}
 
-		Map<String, Integer> stopStatSorted = MiscUtils.sortAscendingByValue(stopStat);
+		histMap = MiscUtils.sortAscendingByValue(stopStat);
 
-		stopFacilityHistogram = new double[stopStatSorted.size()];
+		hist = new double[histMap.size()];
 		int i=0;
-		for(Integer value : stopStatSorted.values()) {
-			stopFacilityHistogram[i] = (double) value;
+		for(Integer value : histMap.values()) {
+			hist[i] = (double) value;
 			i++;
 		}
 	}
 
+	public double median() {
+		int m = hist.length / 2;
+		return hist[m];
+	}
+
+	public double average() {
+		double sum = 0;
+		for(double m : hist) {
+			sum += m;
+		}
+		return sum/hist.length;
+	}
+
+	public double max() {
+		return hist[hist.length - 1];
+	}
+
 	public void createCsv(String outputFile) throws FileNotFoundException, UnsupportedEncodingException {
 		Map<Tuple<Integer, Integer>, String> stopStatCsv = new HashMap<>();
-		int i=1;
-		for(Map.Entry<Integer, String> e : stopFacilityHistogramMap.entrySet()) {
-			stopStatCsv.put(new Tuple<>(i, 1), e.getValue());
-			stopStatCsv.put(new Tuple<>(i, 2), e.getKey().toString());
+		stopStatCsv.put(new Tuple<>(1, 1), "parent stop id");
+		stopStatCsv.put(new Tuple<>(1, 2), "nr of child stop facilities");
+		int i=2;
+		for(Map.Entry<String, Integer> e : histMap.entrySet()) {
+			stopStatCsv.put(new Tuple<>(i, 1), e.getKey());
+			stopStatCsv.put(new Tuple<>(i, 2), e.getValue().toString());
 			i++;
 		}
 
@@ -99,9 +118,7 @@ public class StopFacilityHistogram {
 	 */
 	public void createPng(final String filename) {
 		BarChart chart = new BarChart("Stop Facility Histogram", "", "# of child stop facilities");
-		chart.addSeries("# StopFacilities", stopFacilityHistogram);
+		chart.addSeries("# StopFacilities", hist);
 		chart.saveAsPng(filename, 800, 600);
 	}
-
-
 }

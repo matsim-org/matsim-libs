@@ -40,28 +40,14 @@ public class RoadPricingConfigGroup extends ReflectiveConfigGroup {
 	private static final String TOLL_LINKS_FILE = "tollLinksFile";
 	private String tollLinksFile = null;
 
-	private static final String RANDOMNESS = "routingRandomness" ;
-	private double routingRandomness = 3. ;
-
 	public RoadPricingConfigGroup() {
 		super(GROUP_NAME);
 	}
 
-	@StringGetter(RANDOMNESS)
-	public double getRoutingRandomness() {
-		return routingRandomness;
-	}
-	@StringSetter(RANDOMNESS)
-	public void setRoutingRandomness(double routingRandomness) {
-		this.routingRandomness = routingRandomness;
-	}
 
     @Override
     public Map<String, String> getComments() {
         Map<String,String> map = super.getComments();
-        map.put(RANDOMNESS, "strength of the randomness for the utility of money in routing under toll.  "
-        		+ "Leads to Pareto-optimal route with randomly drawn money-vs-other-attributes tradeoff. "
-        		+ "Technically the width parameter of a log-normal distribution. 3.0 seems to be a good value. " ) ;
         return map;
     }
 

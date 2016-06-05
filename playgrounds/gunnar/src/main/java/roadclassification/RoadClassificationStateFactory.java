@@ -6,9 +6,6 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import opdytsintegration.MATSimState;
-import opdytsintegration.MATSimStateFactory;
-
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -18,6 +15,8 @@ import org.matsim.counts.Counts;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Vector;
+import opdytsintegration.MATSimState;
+import opdytsintegration.MATSimStateFactory;
 
 /**
  * 

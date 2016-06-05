@@ -15,7 +15,12 @@
 
         <!--<protobuf.input.directory>/Users/laemmel/svn/codesprint/matsim/contribs/protobuf/src/main/proto/</protobuf.input.directory>-->
         <protobuf.input.directory>${project.basedir}/src/main/proto</protobuf.input.directory>
-        <protobuf.output.directory>${project.build.directory}/generated-sources</protobuf.output.directory>
+        <protobuf.output.directory>"${project.build.directory}/generated-sources"</protobuf.output.directory>
+
+	<!-- It fails because ${project.build.directory} has spaces in it,
+	and other commands (presumably from the protobuf side) cannot
+	deal with that.  I don't know what the solution is; trying
+	around ... kai, jun'16 -->
 
         <!-- library versions -->
         <build-helper-maven-plugin.version>1.9.1</build-helper-maven-plugin.version>

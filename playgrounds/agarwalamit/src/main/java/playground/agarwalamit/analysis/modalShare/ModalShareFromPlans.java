@@ -93,7 +93,7 @@ public class ModalShareFromPlans implements ModalShare{
 			this.mode2numberOflegs.put(mode, noOfLegs);
 		}
 		
-		this.mode2PctOflegs = MapUtils.getPercentShare(this.mode2numberOflegs);
+		this.mode2PctOflegs = MapUtils.getIntPercentShare(this.mode2numberOflegs);
 	}
 
 	@Override

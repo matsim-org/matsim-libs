@@ -27,17 +27,14 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
- * A pseudo graph with PseudoRouteStops and PseudoRoutePaths
- * used to calculate the best path and thus link sequence
- * from the first stop to the last stop of a transit route.
+ * A pseudo graph with PseudoRouteStops as nodes  used to
+ * calculate the best path and thus link sequence from the
+ * first stop to the last stop of a transit route.
  * <p/>
- * Used by {@link DijkstraAlgorithm}
+ * The
  *
  * @author polettif
  */
@@ -45,63 +42,120 @@ public class PseudoGraph {
 
 	protected static Logger log = Logger.getLogger(PseudoGraph.class);
 
-
-	public static final String SOURCE = "SOURCE";
-	public static final String DESTINATION = "DESTINATION";
-
-	public final PseudoRouteStop SOURCE_PSEUDO_STOP = new PseudoRouteStop(SOURCE);
-	public final PseudoRouteStop DESTINATION_PSEUDO_STOP = new PseudoRouteStop(DESTINATION);
+	/*package*/ static final String SOURCE = "SOURCE";
+	/*package*/ static final String DESTINATION = "DESTINATION";
+	private final Id<PseudoRouteStop> SOURCE_ID = Id.create(SOURCE, PseudoRouteStop.class);
+	private final PseudoRouteStop SOURCE_PSEUDO_STOP = new PseudoRouteStop(SOURCE);
+	private final Id<PseudoRouteStop> DESTINATION_ID = Id.create(DESTINATION, PseudoRouteStop.class);
+	private final PseudoRouteStop DESTINATION_PSEUDO_STOP = new PseudoRouteStop(DESTINATION);
 
 	private final PublicTransitMappingConfigGroup config;
-	private final List<PseudoRoutePath> edges;
+
+	private final Map<Id<PseudoRouteStop>, PseudoRouteStop> graph;
 
 	public PseudoGraph(PublicTransitMappingConfigGroup configGroup) {
 		this.config = configGroup;
-		PseudoRoutePath.setConfig(configGroup);
 		PseudoRouteStop.setConfig(configGroup);
-		this.edges = new ArrayList<>();
+		this.graph = new HashMap<>();
 	}
 
-	public List<PseudoRoutePath> getEdges() {
-		return edges;
-	}
-
-	public void addPath(PseudoRoutePath pseudoRoutePath) {
-		edges.add(pseudoRoutePath);
-	}
-
-	public PseudoRouteStop getSource() {
-		return SOURCE_PSEUDO_STOP;
-	}
-
-	public PseudoRouteStop getDestination() {
-		return DESTINATION_PSEUDO_STOP;
+	public static PseudoRouteStop createPseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
+		return new PseudoRouteStop(order, routeStop, linkCandidate);
 	}
 
 	/**
-	 * debug
+	 * Add a path between two pseudoStops
 	 */
-	public boolean pathExists(TransitStopFacility currentStopFacility, TransitStopFacility nextStopFacility) {
-		for(PseudoRoutePath e : edges) {
-			if(!e.getFromPseudoStop().getId().equals("SOURCE") && !e.getFromPseudoStop().getId().equals("DESTINATION") && !e.getToPseudoStop().getId().equals("SOURCE") && !e.getToPseudoStop().getId().equals("DESTINATION")) {
-				if(e.getFromPseudoStop().getParentStopFacilityId().equals(currentStopFacility.getId().toString()) && e.getToPseudoStop().getParentStopFacilityId().equals(nextStopFacility.getId().toString())) {
-					return true;
+	public void addPath(PseudoRouteStop fromPseudoStop, PseudoRouteStop toPseudoStop, double pathWeight) {
+		if(!graph.containsKey(fromPseudoStop.getId())) {
+			graph.put(fromPseudoStop.getId(), fromPseudoStop);
+		}
+		if(!graph.containsKey(toPseudoStop.getId())) {
+			graph.put(toPseudoStop.getId(), toPseudoStop);
+		}
+
+		double weight = pathWeight + 0.5 * fromPseudoStop.getLinkWeight() + 0.5 * toPseudoStop.getLinkWeight();
+
+		graph.get(fromPseudoStop.getId()).neighbours.put(graph.get(toPseudoStop.getId()), weight);
+	}
+
+	/**
+	 * Runs dijkstra using a specified source vertex
+	 */
+	public void runDijkstra() {
+		if(!graph.containsKey(SOURCE_ID)) {
+			System.err.printf("Graph doesn't contain dummy PseudoRouteStop \"%s\"\n", SOURCE_ID);
+			return;
+		}
+
+		double incr = 0.001;
+
+		NavigableSet<PseudoRouteStop> queue = new TreeSet<>();
+
+		queue.add(graph.get(SOURCE_ID));
+
+		PseudoRouteStop currentStop, neighbour;
+		while(!queue.isEmpty()) {
+			currentStop = queue.pollFirst(); // vertex with shortest distance (first iteration will return source)
+
+			//look at distances to each neighbour
+			for(Map.Entry<PseudoRouteStop, Double> n : currentStop.neighbours.entrySet()) {
+				neighbour = n.getKey(); //the neighbour in this iteration
+
+				final double alternateDist = currentStop.distToSource + n.getValue();
+				if(alternateDist < neighbour.distToSource) { // shorter path to neighbour found
+					queue.remove(neighbour);
+					neighbour.distToSource = alternateDist;
+					neighbour.previous = currentStop;
+					while(!queue.add(neighbour)) {
+						neighbour.distToSource -= incr;
+					}
 				}
 			}
 		}
-		return false;
+	}
+
+	/**
+	 * Prints a path from the source to the specified vertex
+	 */
+	public LinkedList<PseudoRouteStop> getShortestPseudoPath() {
+		if(!graph.containsKey(DESTINATION_ID)) {
+			System.err.printf("Graph doesn't contain end PseudoRouteStop \"%s\"\n", DESTINATION_ID);
+			return null;
+		}
+
+		PseudoRouteStop step = graph.get(DESTINATION_ID);
+		LinkedList<PseudoRouteStop> path = new LinkedList<>();
+
+		// check if a path exists
+		if(step.previous == null) {
+			return null;
+		}
+		path.add(step);
+		while(!step.getId().equals(SOURCE_ID)) {
+			step = step.previous;
+			path.add(step);
+		}
+
+		// Put it into the correct order
+		Collections.reverse(path);
+
+		// remove dummies
+		path.removeFirst();
+		path.removeLast();
+
+		return path;
 	}
 
 	public void addSourceDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidate> linkCandidates) {
 		for(LinkCandidate lc : linkCandidates) {
-			edges.add(new PseudoRoutePath(SOURCE_PSEUDO_STOP, new PseudoRouteStop(order, routeStop, lc), 1.0, true));
+			addPath(SOURCE_PSEUDO_STOP, new PseudoRouteStop(order, routeStop, lc), 1.0);
 		}
 	}
 
 	public void addDestinationDummyPaths(int order, TransitRouteStop routeStop, Set<LinkCandidate> linkCandidates) {
 		for(LinkCandidate lc : linkCandidates) {
-			edges.add(new PseudoRoutePath(new PseudoRouteStop(order, routeStop, lc), DESTINATION_PSEUDO_STOP, 1.0, true));
-
+			addPath(new PseudoRouteStop(order, routeStop, lc), DESTINATION_PSEUDO_STOP, 1.0);
 		}
 	}
 }

@@ -1,12 +1,11 @@
 package opdytsintegration.roadinvestment;
 
-import floetteroed.opdyts.DecisionVariable;
-import opdytsintegration.MATSimState;
-import opdytsintegration.MATSimStateFactory;
-
 import org.matsim.api.core.v01.population.Population;
 
+import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Vector;
+import opdytsintegration.MATSimState;
+import opdytsintegration.MATSimStateFactory;
 
 /**
  * 

@@ -1,12 +1,12 @@
 package opdytsintegration.example.roadpricing;
 
-import opdytsintegration.DistanceBasedFilter;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
+
+import opdytsintegration.utils.DistanceBasedFilter;
 
 /**
  * 

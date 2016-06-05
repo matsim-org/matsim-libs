@@ -3,8 +3,6 @@ package opdytsintegration.example.roadpricing;
 import java.util.ArrayList;
 import java.util.List;
 
-import opdytsintegration.TimeDiscretization;
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -12,6 +10,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Vector;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 

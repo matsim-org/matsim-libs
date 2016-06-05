@@ -26,7 +26,6 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
 
-import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import cadyts.utilities.misc.StreamFlushHandler;
 import floetteroed.utilities.SimpleLogFormatter;
 import floetteroed.utilities.Time;
@@ -40,6 +39,7 @@ import gunnar.ihop2.regent.costwriting.TripCostMatrices;
 import gunnar.ihop2.regent.demandreading.PopulationCreator;
 import gunnar.ihop2.regent.demandreading.ZonalSystem;
 import gunnar.ihop2.scaper.ScaperPopulationCreator;
+import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 
 /**
  * 

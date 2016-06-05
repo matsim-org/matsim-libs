@@ -1,10 +1,10 @@
 package gunnar.ihop2.regent;
 
-import gunnar.ihop2.regent.demandreading.RegentPopulationReader;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import gunnar.ihop2.regent.demandreading.RegentPopulationReader;
 
 /**
  * 

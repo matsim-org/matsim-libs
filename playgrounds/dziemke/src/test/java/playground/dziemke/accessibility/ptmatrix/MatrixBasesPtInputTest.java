@@ -74,24 +74,24 @@ public class MatrixBasesPtInputTest {
 		TransitScheduleReader transitScheduleReader = new TransitScheduleReader(scenario);
 		transitScheduleReader.readFile(transitScheduleFile);
 		
-		Map<Id<Coord>, Coord> ptMatrixLocationsMap = new HashMap<>();
-		
-		for (TransitStopFacility transitStopFacility: scenario.getTransitSchedule().getFacilities().values()) {
-			Id<Coord> id = Id.create(transitStopFacility.getId(), Coord.class);
-			Coord coord = transitStopFacility.getCoord();
-			ptMatrixLocationsMap.put(id, coord);
-		}
+//		Map<Id<Coord>, Coord> ptMatrixLocationsMap = new HashMap<>();
+//		
+//		for (TransitStopFacility transitStopFacility: scenario.getTransitSchedule().getFacilities().values()) {
+//			Id<Coord> id = Id.create(transitStopFacility.getId(), Coord.class);
+//			Coord coord = transitStopFacility.getCoord();
+//			ptMatrixLocationsMap.put(id, coord);
+//		}
 				
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 		networkReader.readFile(networkFile);
 
-		MatrixBasedPtInputUtils.createStopsFile(ptMatrixLocationsMap, outputRoot + "ptStops.csv", ",");
+		MatrixBasedPtInputUtils.createStopsFile(scenario.getTransitSchedule().getFacilities(), outputRoot + "ptStops.csv", ",");
 		
 		// The locationFacilitiesMap is passed twice: Once for origins and once for destinations.
 		// In other uses the two maps may be different -- thus the duplication here.
         log.info("Start matrix-computation...");
-		ThreadedMatrixCreator tmc = new ThreadedMatrixCreator(scenario, ptMatrixLocationsMap, 
-				ptMatrixLocationsMap, departureTime, outputRoot, " ", 1);
+		ThreadedMatrixCreator tmc = new ThreadedMatrixCreator(scenario, scenario.getTransitSchedule().getFacilities(), 
+				scenario.getTransitSchedule().getFacilities(), departureTime, outputRoot, " ", 1);
 
         //waiting for the output to be written
         try {

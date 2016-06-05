@@ -51,12 +51,12 @@ public final class PatnaUtils {
 	public enum PatnaUrbanActivityTypes {
 		home, work, educational, social, other, unknown;
 	}
-	
+
 	public static final Collection <String> URBAN_MAIN_MODES = Arrays.asList("car","motorbike","bike");
 	public static final Collection <String> URBAN_ALL_MODES = Arrays.asList("car","motorbike","bike","pt","walk");
-	
+
 	public static final Collection <String> EXT_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck");
-	
+
 	public static final Collection <String> ALL_MAIN_MODES = Arrays.asList("car","motorbike","bike","truck_ext","car_ext","motorbike_ext","bike_ext");
 	public static final Collection <String> ALL_MODES = Arrays.asList("car_ext","motorbike_ext","truck_ext","bike_ext","pt","walk","car","motorbike","bike");
 
@@ -89,5 +89,23 @@ public final class PatnaUtils {
 			final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(travelMode));
 			scenario.getVehicles().addVehicle(vehicle);
 		}
+	}
+
+	public static int getIncomeInterval(final double income){
+		if (income < 500 ) return 1;
+		else if(income < 1000) return 2;
+		else if(income < 3000) return 3;
+		else if(income < 5000) return 4;
+		else if(income < 7500) return 5;
+		else if(income < 10000) return 6;
+		else return 7;
+	}
+	
+	public static int getDailyExpenditure(final double dailyTransportCost){
+		if (dailyTransportCost < 10 ) return 1;
+		else if(dailyTransportCost < 25) return 2;
+		else if(dailyTransportCost < 50) return 3;
+		else if(dailyTransportCost < 100) return 4;
+		else return 5;
 	}
 }

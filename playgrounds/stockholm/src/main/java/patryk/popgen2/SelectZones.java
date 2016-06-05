@@ -1,7 +1,5 @@
 package patryk.popgen2;
 
-import gunnar.ihop2.regent.demandreading.Zone;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -12,6 +10,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
+
+import gunnar.ihop2.regent.demandreading.Zone;
 
 public class SelectZones {
 	private String polygonFile;

@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
  */
 public class MiscUtils {
 
+	private MiscUtils() {}
+
 	/**
 	 * @return true, if two sets (e.g. scheduleTransportModes and
 	 * networkTransportModes) have at least one identical entry.

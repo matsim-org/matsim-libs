@@ -21,6 +21,7 @@ package org.matsim.contrib.emissions.example;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 /**
  * @author nagel
@@ -31,10 +32,16 @@ public class RunEmissionToolOnlineExampleTest {
 	/**
 	 * Test method for {@link org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample#main(java.lang.String[])}.
 	 */
+	@SuppressWarnings("static-method")
 	@Test
 	public final void testMain() {
 		try {
-			RunEmissionToolOnlineExample.main(null);
+			RunEmissionToolOnlineExample tool = new RunEmissionToolOnlineExample(null) ;
+
+			tool.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			// otherwise the test fails on jenkins
+
+			tool.run();
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
 			fail("something did not work" ) ;

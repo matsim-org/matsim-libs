@@ -1,11 +1,5 @@
 package sergio;
 
-import floetteroed.utilities.Tuple;
-import floetteroed.utilities.TupleIteratorWithExclusions;
-import floetteroed.utilities.math.MathHelpers;
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
-import gunnar.ihop2.regent.demandreading.Zone;
-
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Random;
@@ -20,6 +14,12 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
+
+import floetteroed.utilities.Tuple;
+import floetteroed.utilities.TupleIteratorWithExclusions;
+import floetteroed.utilities.math.MathHelpers;
+import gunnar.ihop2.regent.demandreading.ZonalSystem;
+import gunnar.ihop2.regent.demandreading.Zone;
 
 /**
  * 

@@ -19,7 +19,9 @@
 
 package playground.polettif.publicTransitMapping.config;
 
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.MapUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -33,6 +35,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "PublicTransitMapping";
 
 	public static final String ARTIFICIAL_LINK_MODE = "artificial";
+	public static final Set<String> ARTIFICIAL_LINK_MODE_AS_SET = Collections.singleton(ARTIFICIAL_LINK_MODE);
 
 	private static final String MODE_ROUTING_ASSIGNMENT ="modeRoutingAssignment";
 	private static final String MODES_TO_KEEP_ON_CLEAN_UP = "modesToKeepOnCleanUp";
@@ -51,9 +54,9 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String LINK_DISTANCE_TOLERANCE = "linkDistanceTolerance";
 	private static final String FREESPEED_ARTIFICIAL = "freespeedArtificialLinks";
 	private static final String COMBINE_PT_MODES = "combinePtModes";
+	private static final String ADD_PT_MODE = "addPtMode";
 	private static final String MULTI_THREAD = "threads";
-	public static final String REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES = "removeTransitRoutesWithoutLinkSequences";
-
+	private static final String REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES = "removeTransitRoutesWithoutLinkSequences";
 
 	public PublicTransitMappingConfigGroup() {
 		super(GROUP_NAME);
@@ -66,6 +69,10 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private String outputNetworkFile = null;
 	private String outputStreetNetworkFile = null;
 	private String outputScheduleFile = null;
+
+	public static PublicTransitMappingConfigGroup createDefaultConfig() {
+		return new PublicTransitMappingConfigGroup();
+	}
 
 	@Override
 	public final Map<String, String> getComments() {
@@ -83,8 +90,11 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(COMBINE_PT_MODES,
 				"Defines whether at the end of mapping, all non-car link modes (bus, rail, etc) \n" +
 				"\t\tshould be replaced with pt (true) or not. Default: false");
+		map.put(ADD_PT_MODE,
+				"Adds the mode \"pt\" is added to all links used by public transit after mapping if true. \n" +
+				"\t\tIs not executed if "+COMBINE_PT_MODES+" is true. Default: false");
 		map.put(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES,
-				"If true, transit routes without link sequences after mapping are removed from the schedule. Default: false");
+				"If true, transit routes without link sequences after mapping are removed from the schedule. Default: true");
 		map.put(LINK_DISTANCE_TOLERANCE,
 				"(concerns Link Candidates) After " +MAX_NCLOSEST_LINKS +" link candidates have been found, additional link \n" +
 				"\t\tcandidates within ["+LINK_DISTANCE_TOLERANCE+"] * [distance to the Nth link] are added to the set.\n" +
@@ -105,7 +115,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		map.put(PREFIX_ARTIFICIAL,
 				"ID prefix used for all artificial links and nodes created during mapping.");
 		map.put(FREESPEED_ARTIFICIAL,
-				"The freespeed [m/s] of artificially created links.");
+				"The freespeed [m/s] of artificially created links. This value is the same for all schedule modes.");
 		map.put(SUFFIX_CHILD_STOP_FACILITIES,
 				"Suffix used for child stop facilities. The id of the referenced link is appended\n" +
 				"\t\t(i.e. stop0123.link:LINKID20123).");
@@ -122,6 +132,17 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"\t\tNot needed if PTMapper is used within another class.");
 		map.put(OUTPUT_SCHEDULE_FILE, "Path to the output schedule file. Not needed if PTMapper is used within another class.");
 		return map;
+	}
+
+
+	@Override
+	public ConfigGroup createParameterSet(final String type) {
+		switch(type) {
+			case ManualLinkCandidates.SET_NAME :
+				return new ManualLinkCandidates();
+			default:
+				throw new IllegalArgumentException("Unknown parameterset name!");
+		}
 	}
 
 	/**
@@ -185,6 +206,10 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		}
 	}
 
+	public void addModeRoutingAssignment(String key, String value) {
+		Set<String> set = MapUtils.getSet(key, this.modeRoutingAssignment);
+		set.add(value);
+	}
 
 	/**
 	 * All links that do not have a transit route on them are removed, except
@@ -238,19 +263,32 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		this.combinePtModes = v;
 	}
 
+
+	private boolean addPtMode = false;
+
+	@StringGetter(ADD_PT_MODE)
+	public boolean getAddPtMode() {
+		return addPtMode;
+	}
+
+	@StringSetter(ADD_PT_MODE)
+	public void setAddPtMode(boolean addPtMode) {
+		this.addPtMode = addPtMode;
+	}
+
 	/**
 	 *
 	 */
-	private boolean removeTransitRoutesWithoutLinkSequences = false;
+	private boolean removeTransitRoutesWithoutLinkSequences = true;
 
 	@StringGetter(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES)
 	public boolean getRemoveTransitRoutesWithoutLinkSequences() {
-		return combinePtModes;
+		return removeTransitRoutesWithoutLinkSequences;
 	}
 
 	@StringSetter(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES)
 	public void setRemoveTransitRoutesWithoutLinkSequences(boolean v) {
-		this.combinePtModes = v;
+		this.removeTransitRoutesWithoutLinkSequences = v;
 	}
 
 
@@ -301,6 +339,8 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	public void setThreads(int threads) {
 		this.threads = threads;
 	}
+
+
 
 	/**
 	 * Defines which link attribute should be used for pseudo route
@@ -510,8 +550,12 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		return old;
 	}
 
-	@StringGetter(OUTPUT_SCHEDULE_FILE)
 	public String getOutputScheduleFile() {
+		return this.outputScheduleFile;
+	}
+
+	@StringGetter(OUTPUT_SCHEDULE_FILE)
+	public String getOutputScheduleFileStr() {
 		return this.outputScheduleFile == null ? "" : this.outputScheduleFile;
 	}
 

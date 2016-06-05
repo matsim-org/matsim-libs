@@ -5,9 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import opdytsintegration.MATSimSimulator;
-import opdytsintegration.TimeDiscretization;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -31,6 +28,8 @@ import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import floetteroed.utilities.Units;
 import floetteroed.utilities.config.ConfigReader;
 import floetteroed.utilities.math.MathHelpers;
+import opdytsintegration.MATSimSimulator;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 
@@ -178,7 +177,8 @@ class OptimizeRoadpricing {
 		final MATSimSimulator<TollLevels> matsimSimulator = new MATSimSimulator<>(
 				new RoadpricingStateFactory(timeDiscretization, occupancyScale,
 						tollScale), scenario, timeDiscretization,
-				relevantLinkIds, roadpricingModule);
+				// relevantLinkIds, null, 
+				roadpricingModule);
 		matsimSimulator
 				.setScoringFunctionFactory(new RandomizedCharyparNagelScoringFunctionFactory(
 						scenario));

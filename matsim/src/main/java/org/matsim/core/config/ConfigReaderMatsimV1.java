@@ -26,7 +26,7 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
@@ -80,8 +80,8 @@ import org.xml.sax.InputSource;
 		  //if there are type safe optional modules they have to be added here
 		  if (name.equals(QSimConfigGroup.GROUP_NAME)){
 		    this.currmodule = this.config.qsim();
-		  } else if ( name.equals(SimulationConfigGroup.GROUP_NAME) ) {
-			  this.currmodule = new SimulationConfigGroup() ;
+		  } else if ( name.equals(ExternalMobimConfigGroup.GROUP_NAME) ) {
+			  this.currmodule = new ExternalMobimConfigGroup() ;
 			  this.config.addModule(this.currmodule);
 		  }
 		  //it must be a not type safe generic module

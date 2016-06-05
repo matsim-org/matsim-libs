@@ -39,8 +39,8 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 
 	// ---
 
-	private static final String INPUT_MZ05_FILE = "inputMZ05File";
-	private String inputMZ05File = "";
+//	private static final String INPUT_MZ05_FILE = "inputMZ05File";
+//	private String inputMZ05File = "";
 
 	// ---
 
@@ -139,19 +139,19 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 				"Options: | " + options + ".  When violating VSP defaults, this results in " +
 		"nothing, logfile infos, logfile warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
 
-		map.put(INPUT_MZ05_FILE, "(do not use) Set this filename of MZ05 daily analysis");
+//		map.put(INPUT_MZ05_FILE, "(do not use) Set this filename of MZ05 daily analysis");
 
 		return map;
 	}
-	@StringGetter(INPUT_MZ05_FILE)
-	public String getInputMZ05File() {
-		return this.inputMZ05File;
-	}
-	@StringSetter(INPUT_MZ05_FILE)
-	public void setInputMZ05File(final String inputMZ05File) {
-		testForLocked() ;
-		this.inputMZ05File = inputMZ05File;
-	}
+//	@StringGetter(INPUT_MZ05_FILE)
+//	public String getInputMZ05File() {
+//		return this.inputMZ05File;
+//	}
+//	@StringSetter(INPUT_MZ05_FILE)
+//	public void setInputMZ05File(final String inputMZ05File) {
+//		testForLocked() ;
+//		this.inputMZ05File = inputMZ05File;
+//	}
 	@StringGetter(WRITING_OUTPUT_EVENTS)
 	public boolean isWritingOutputEvents() {
 		return this.writingOutputEvents ;

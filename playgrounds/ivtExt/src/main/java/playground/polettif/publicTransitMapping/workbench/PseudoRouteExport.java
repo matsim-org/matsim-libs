@@ -19,18 +19,6 @@
 package playground.polettif.publicTransitMapping.workbench;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoGraph;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRoutePath;
-import playground.polettif.publicTransitMapping.mapping.pseudoPTRouter.PseudoRouteStop;
-import playground.polettif.publicTransitMapping.tools.NetworkTools;
-
-import java.util.List;
 
 public class PseudoRouteExport {
 
@@ -40,14 +28,14 @@ public class PseudoRouteExport {
 	public static void main(final String[] args) {
 
 	}
-
-	public static void run(Network network, PseudoGraph pseudoGraph, String filePath) {
+/*
+	public synchronized static void run(Network network, OnlyPseudoGraph onlyPseudoGraph, String filePath) {
 		Network pseudoNetwork = NetworkTools.createNetwork();
 		NetworkFactory f = pseudoNetwork.getFactory();
 
-		List<PseudoRoutePath> edges = pseudoGraph.getEdges();
+		List<PseudoGraph.PseudoRoutePath> edges = pseudoGraph.getEdges();
 
-		for(PseudoRoutePath path : edges) {
+		for(PseudoGraph.PseudoRoutePath path : edges) {
 			if(!path.isDummy()) {
 				PseudoRouteStop fromStop = path.getFromPseudoStop();
 				PseudoRouteStop toStop = path.getToPseudoStop();
@@ -73,6 +61,7 @@ public class PseudoRouteExport {
 		}
 
 		NetworkTools.writeNetwork(pseudoNetwork, filePath);
-	}
 
+	}
+*/
 }

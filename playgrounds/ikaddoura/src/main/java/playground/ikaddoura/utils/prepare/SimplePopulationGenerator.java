@@ -52,7 +52,7 @@ public class SimplePopulationGenerator {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 
-		String populationFile = outputDirectory + "population_" + totalDemand + "agents.xml";
+		String populationFile = outputDirectory + "population_" + totalDemand + "trips.xml";
 		
 		SimplePopulationGenerator pG = new SimplePopulationGenerator(scenario);
 		pG.writePopulation(totalDemand, populationFile);
@@ -86,13 +86,13 @@ public class SimplePopulationGenerator {
 			plan.addLeg(this.population.getFactory().createLeg(TransportMode.car));
 
 			Activity activity2 = this.population.getFactory().createActivityFromCoord("work", workCoord);
-			activity2.setEndTime(activity1.getEndTime() + 8 * 3600.);
+//			activity2.setEndTime(activity1.getEndTime() + 8 * 3600.);
 			plan.addActivity(activity2);
 			
-			plan.addLeg(this.population.getFactory().createLeg(TransportMode.pt));
-
-			Activity activity3 = this.population.getFactory().createActivityFromCoord("home", homeCoord);
-			plan.addActivity(activity3);
+//			plan.addLeg(this.population.getFactory().createLeg(TransportMode.pt));
+//
+//			Activity activity3 = this.population.getFactory().createActivityFromCoord("home", homeCoord);
+//			plan.addActivity(activity3);
 			
 			person.addPlan(plan);
 			this.population.addPerson(person);

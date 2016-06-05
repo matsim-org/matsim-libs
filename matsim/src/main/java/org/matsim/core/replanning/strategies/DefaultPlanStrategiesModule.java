@@ -121,15 +121,15 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
         if ( usedStrategyNames.contains( DefaultStrategy.ChangeSingleLegMode.toString() ) ) {
             log.error( DefaultStrategy.ChangeSingleLegMode+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.ChangeSingleTripMode+" instead." );
         }
-        if ( usedStrategyNames.contains( DefaultStrategy.SubtourModeChoice.toString() ) ) {
-            log.error( DefaultStrategy.SubtourModeChoice+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.TripSubtourModeChoice+" instead." );
+        if ( usedStrategyNames.contains( DefaultStrategy.TripSubtourModeChoice.toString() ) ) {
+            log.error( DefaultStrategy.TripSubtourModeChoice+" replanning strategy does not exist anymore. Please use "+DefaultStrategy.SubtourModeChoice+" instead." );
         }
     }
 
     public static enum DefaultSelector { KeepLastSelected, BestScore, ChangeExpBeta, SelectExpBeta, SelectRandom, SelectPathSizeLogit }
 
-    public static enum DefaultStrategy { ReRoute, TimeAllocationMutator, ChangeLegMode, TimeAllocationMutator_ReRoute, 
-    	ChangeSingleLegMode, ChangeSingleTripMode, SubtourModeChoice, ChangeTripMode, TripSubtourModeChoice }
+    public static enum DefaultStrategy { ReRoute, TimeAllocationMutator, @Deprecated ChangeLegMode, TimeAllocationMutator_ReRoute, 
+    	@Deprecated ChangeSingleLegMode, ChangeSingleTripMode, SubtourModeChoice, ChangeTripMode, @Deprecated TripSubtourModeChoice }
     
     // yyyy Why are the following always implementing Providers of the full implementations, and not just the interface 
     // (i.e. Provider<GenericPlanSelector<Plan,Person>)?  kai, jan'15

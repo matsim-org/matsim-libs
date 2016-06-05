@@ -43,7 +43,7 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 
 	// dijkstra
 	public final Map<PseudoRouteStop, Double> neighbours = new HashMap<>();
-	public double distToSource = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity$
+	public double distToSource = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity
 	public PseudoRouteStop previous = null;
 
 	private final double linkWeight;
@@ -71,14 +71,11 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 	}
 
 	/**
-	 * Constructor. All values are stored here as well to make access easier during
+	 * Constructor. All primitive values are stored
+	 * as well to make access easier during
 	 * stop facility replacement.
-	 *
-	 * @param order
-	 * @param routeStop
-	 * @param linkCandidate
 	 */
-	public PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
+	/*package*/ PseudoRouteStop(int order, TransitRouteStop routeStop, LinkCandidate linkCandidate) {
 		this.id = Id.create("[" + Integer.toString(order) + "]" + linkCandidate.getId(), PseudoRouteStop.class);
 		this.linkCandidateId = linkCandidate.getId();
 		this.name = routeStop.getStopFacility().getName() + " (" + linkCandidate.getLinkIdStr() + ")";
@@ -99,7 +96,6 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 
 		// link value
 		this.linkWeight = (config.getPseudoRouteWeightType().equals(PublicTransitMappingConfigGroup.PseudoRouteWeightType.travelTime) ? linkCandidate.getLinkTravelTime() : linkCandidate.getLinkLength());
-//		this.linkWeight = linkCandidate.getLinkLength();
 	}
 
 	/**
@@ -117,7 +113,6 @@ public class PseudoRouteStop implements Identifiable<PseudoRouteStop>, Comparabl
 		this.name = id;
 		this.linkCandidateId = null;
 
-		 // MAX_VALUE assumed to be infinity$
 		previous = null;
 
 		this.linkId = null;

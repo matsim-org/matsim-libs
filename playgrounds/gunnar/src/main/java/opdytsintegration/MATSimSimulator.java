@@ -1,5 +1,6 @@
 package opdytsintegration;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -9,19 +10,20 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.TerminationCriterion;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
+import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * Created by michaelzilske on 08/10/15.
  * 
  * Modified by Gunnar, starting in December 2015.
  */
-public class MATSimSimulator<U extends DecisionVariable> implements
-		Simulator<U> {
+public class MATSimSimulator<U extends DecisionVariable> implements Simulator<U> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -33,6 +35,8 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 
 	private final Set<Id<Link>> relevantLinkIds;
 
+	private final Set<Id<TransitStopFacility>> relevantStopIds;
+
 	private AbstractModule[] modules = null;
 
 	private int nextControlerRun = 0;
@@ -41,21 +45,30 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 
 	// -------------------- CONSTRUCTOR --------------------
 
-	public MATSimSimulator(final MATSimStateFactory<U> stateFactory,
-			final Scenario scenario,
+	public MATSimSimulator(final MATSimStateFactory<U> stateFactory, final Scenario scenario,
 			final TimeDiscretization timeDiscretization,
-			final Set<Id<Link>> relevantLinkIds,
+			// final Set<Id<Link>> relevantLinkIds,
+			// final Set<Id<TransitStopFacility>> relevantStopIds,
 			final AbstractModule... modules) {
 		this.stateFactory = stateFactory;
 		this.scenario = scenario;
 		this.timeDiscretization = timeDiscretization;
-		this.relevantLinkIds = relevantLinkIds;
+		if ((scenario.getNetwork() != null) && (scenario.getNetwork().getLinks() != null)
+				&& (scenario.getNetwork().getLinks().size() > 0)) {
+			this.relevantLinkIds = new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet());
+		} else {
+			this.relevantLinkIds = null;
+		}
+		if ((scenario.getTransitSchedule() != null) && (scenario.getTransitSchedule().getFacilities() != null)
+				&& (scenario.getTransitSchedule().getFacilities().size() > 0)) {
+			this.relevantStopIds = new LinkedHashSet<>(scenario.getTransitSchedule().getFacilities().keySet());
+		} else {
+			this.relevantStopIds = null;
+		}
 		this.modules = modules;
 
-		final String outputDirectory = this.scenario.getConfig().controler()
-				.getOutputDirectory();
-		this.scenario.getConfig().controler()
-				.setOutputDirectory(outputDirectory + "_0");
+		final String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
+		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory + "_0");
 	}
 
 	// TODO NEW
@@ -74,21 +87,25 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 		 * are overwritten each time, set iteration-specific output directory
 		 * names.
 		 */
-		String outputDirectory = this.scenario.getConfig().controler()
-				.getOutputDirectory();
-		outputDirectory = outputDirectory.substring(0,
-				outputDirectory.lastIndexOf("_"))
-				+ "_" + this.nextControlerRun;
-		this.scenario.getConfig().controler()
-				.setOutputDirectory(outputDirectory);
+		String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
+		outputDirectory = outputDirectory.substring(0, outputDirectory.lastIndexOf("_")) + "_" + this.nextControlerRun;
+		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory);
 
 		/*
 		 * (2) Create the MATSimDecisionVariableSetEvaluator that is supposed to
 		 * "optimize along" the MATSim run of this iteration.
 		 */
 		final MATSimDecisionVariableSetEvaluator<U> matsimDecisionVariableEvaluator = new MATSimDecisionVariableSetEvaluator<>(
-				trajectorySampler, this.stateFactory, this.timeDiscretization,
-				this.relevantLinkIds);
+				trajectorySampler, this.stateFactory, this.timeDiscretization);
+		// car
+		if (this.relevantLinkIds != null) {
+			matsimDecisionVariableEvaluator.enableCarTraffic(this.relevantLinkIds);
+		}
+		// pt
+		if (this.relevantStopIds != null) {
+			matsimDecisionVariableEvaluator.enablePT(this.relevantStopIds);
+		}
+
 		matsimDecisionVariableEvaluator.setMemory(1); // TODO make configurable
 		// matsimDecisionVariableEvaluator.setStandardLogFileName("./opdyts.log");
 
@@ -98,7 +115,7 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 		 * TODO Is this done correctly?
 		 */
 		final Controler controler = new Controler(this.scenario);
-		if (this.modules != null) {
+		if ((this.modules != null) && (this.modules.length > 0)) {
 			// controler.setModules(new
 			// ControlerDefaultsWithRoadPricingModule());
 			controler.setModules(this.modules);
@@ -120,8 +137,7 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				binder().requestInjection(
-						trajectorySampler.getObjectiveFunction());
+				binder().requestInjection(trajectorySampler.getObjectiveFunction());
 			}
 		});
 		controler.setTerminationCriterion(new TerminationCriterion() {
@@ -143,8 +159,7 @@ public class MATSimSimulator<U extends DecisionVariable> implements
 	}
 
 	@Override
-	public SimulatorState run(final TrajectorySampler<U> evaluator,
-			final SimulatorState initialState) {
+	public SimulatorState run(final TrajectorySampler<U> evaluator, final SimulatorState initialState) {
 		if (initialState != null) {
 			initialState.implementInSimulation();
 		}

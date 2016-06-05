@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.Vehicle;
-
 public class CollectionUtil<Type> {
 	public ArrayList<Type> toArrayList(Iterator<Type> iter){
 		ArrayList<Type> arraylist = new ArrayList<Type>();
