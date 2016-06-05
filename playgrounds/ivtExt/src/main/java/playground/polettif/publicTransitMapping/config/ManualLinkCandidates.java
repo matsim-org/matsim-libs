@@ -31,35 +31,44 @@ import java.util.Set;
 public class ManualLinkCandidates extends ReflectiveConfigGroup implements MatsimParameters {
 
 	public final static String SET_NAME = "manualLinkCandidates";
-	public static final String LINK_IDS = "linkIds";
-	public static final String MODES = "modes";
-	public static final String STOP_FACILITY_ID = "stopFacilityId";
-	public static final String REPLACE = "replace";
+
+	private static final String LINK_IDS = "links";
+	private static final String MODES = "modes";
+	private static final String STOP_FACILITY = "stopFacility";
+	private static final String REPLACE = "replace";
 
 	private Id<TransitStopFacility> stopFacilityId;
 	private Set<String> modes = new HashSet<>();
 	private Set<Id<Link>> linkIds = new HashSet<>();
-	private boolean replace = false;
+	private boolean replace = true;
 
 	public ManualLinkCandidates() {
 		super(SET_NAME);
 	}
 
+	public ManualLinkCandidates(String stopFacilityId, String modes, String linkIds) {
+		super(SET_NAME);
+		setStopFacilityIdStr(stopFacilityId);
+		setModesStr(modes);
+		setLinkIdsStr(linkIds);
+		this.replace = true;
+	}
+
 	/**
 	 * stop facility id
 	 */
-	@StringGetter(STOP_FACILITY_ID)
+	@StringGetter(STOP_FACILITY)
 	public String getStopFacilityIdStr() {
 		return stopFacilityId.toString();
 	}
 	public Id<TransitStopFacility> getStopFacilityId() {
 		return stopFacilityId;
 	}
-	@StringSetter(STOP_FACILITY_ID)
-	public void setStopFacilityId(String stopFacilityIdStr) {
+	@StringSetter(STOP_FACILITY)
+	public void setStopFacilityIdStr(String stopFacilityIdStr) {
 		this.stopFacilityId = Id.create(stopFacilityIdStr, TransitStopFacility.class);
 	}
-	public void setStopFacilityId(Id<TransitStopFacility> stopFacilityId) {
+	public void setStopFacilityIdStr(Id<TransitStopFacility> stopFacilityId) {
 		this.stopFacilityId = stopFacilityId;
 	}
 
@@ -93,7 +102,7 @@ public class ManualLinkCandidates extends ReflectiveConfigGroup implements Matsi
 		return linkIds;
 	}
 
-	@StringGetter(LINK_IDS)
+	@StringSetter(LINK_IDS)
 	public void setLinkIdsStr(String linkIds) {
 		for(String linkIdStr : CollectionUtils.stringToSet(linkIds)) {
 			this.linkIds.add(Id.createLinkId(linkIdStr));
@@ -107,8 +116,8 @@ public class ManualLinkCandidates extends ReflectiveConfigGroup implements Matsi
 	public boolean replaceCandidates() {
 		return replace;
 	}
-	@StringGetter(REPLACE)
-	public void setReplace(boolean v) {
+	@StringSetter(REPLACE)
+	public void setReplaceCandidates(boolean v) {
 		this.replace = v;
 	}
 }

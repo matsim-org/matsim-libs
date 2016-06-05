@@ -122,7 +122,11 @@ public class ScheduleShapeFileWriter {
 			Link refLink = network.getLinks().get(stopFacility.getLinkId());
 
 			Coordinate[] coordinates = new Coordinate[2];
-			coordinates[0] = MGC.coord2Coordinate(refLink.getFromNode().getCoord());
+			try {
+				coordinates[0] = MGC.coord2Coordinate(refLink.getFromNode().getCoord());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			coordinates[1] = MGC.coord2Coordinate(refLink.getToNode().getCoord());
 
 			SimpleFeature pf = pointFeatureFactory.createPoint(MGC.coord2Coordinate(stopFacility.getCoord()));
@@ -170,7 +174,7 @@ public class ScheduleShapeFileWriter {
 				Coordinate[] coordinates = getCoordinatesFromRoute(transitRoute);
 
 				if(coordinates == null) {
-					log.error("No links found for route " + transitRoute.getId() + " on line " + transitLine.getId());
+					log.warn("No links found for route " + transitRoute.getId() + " on line " + transitLine.getId());
 				} else {
 					SimpleFeature f = ff.createPolyline(coordinates);
 					f.setAttribute("line", transitLine.getId().toString());
@@ -188,17 +192,20 @@ public class ScheduleShapeFileWriter {
 		List<Coordinate> coordList = new ArrayList<>();
 		List<Id<Link>> linkList = ScheduleTools.getLinkIds(transitRoute);
 
-		for(Id<Link> linkId : linkList) {
-			if(network.getLinks().containsKey(linkId)) {
-				coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkId).getFromNode().getCoord()));
-			} else {
-				log.warn("Link " + linkId + " not found in network");
-				return null;
+		if(linkList.size() > 0) {
+			for(Id<Link> linkId : linkList) {
+				if(network.getLinks().containsKey(linkId)) {
+					coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkId).getFromNode().getCoord()));
+				} else {
+					log.warn("Link " + linkId + " not found in network");
+					return null;
+				}
 			}
-		}
-		coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkList.get(linkList.size()-1)).getToNode().getCoord()));
-		Coordinate[] returnArray = new Coordinate[coordList.size()];
+			coordList.add(MGC.coord2Coordinate(network.getLinks().get(linkList.get(linkList.size() - 1)).getToNode().getCoord()));
+			Coordinate[] returnArray = new Coordinate[coordList.size()];
 
-		return coordList.toArray(returnArray);
+			return coordList.toArray(returnArray);
+		}
+		return null;
 	}
 }

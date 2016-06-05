@@ -343,26 +343,29 @@ public class PTMapperUtils {
 	public static void addManualLinkCandidates(TransitSchedule schedule, Network network, Map<String, Map<TransitStopFacility, Set<LinkCandidate>>> linkCandidates, PublicTransitMappingConfigGroup config) {
 		for(ConfigGroup e : config.getParameterSets(ManualLinkCandidates.SET_NAME)) {
 			ManualLinkCandidates manualCandidates = (ManualLinkCandidates) e;
-			Set<String> modes = manualCandidates.getModes();
-			TransitStopFacility parentStopFacility = schedule.getFacilities().get(manualCandidates.getStopFacilityId());
 
-			if(manualCandidates.replaceCandidates()) {
-				for(String mode : modes) {
-					Set<LinkCandidate> newLinkCandidates = new HashSet<>();
-					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
-						newLinkCandidates.add(new LinkCandidate(network.getLinks().get(linkId), parentStopFacility));
-					}
-					MapUtils.getMap(mode, linkCandidates).put(parentStopFacility, newLinkCandidates);
-				}
+			Set<String> modes = manualCandidates.getModes();
+			if(modes.size() == 0) {
+				modes = linkCandidates.keySet();
+			}
+
+			TransitStopFacility parentStopFacility = schedule.getFacilities().get(manualCandidates.getStopFacilityId());
+			if(parentStopFacility == null) {
+				log.warn("stopFacility id " + manualCandidates.getStopFacilityId() + " not available in schedule. Manual link candidates are ignored.");
 			} else {
 				for(String mode : modes) {
-					Set<LinkCandidate> currentLinkCandidatesCs = MapUtils.getSet(parentStopFacility, MapUtils.getMap(mode, linkCandidates));
+					Set<LinkCandidate> lcSet = (manualCandidates.replaceCandidates() ? new HashSet<>() : MapUtils.getSet(parentStopFacility, MapUtils.getMap(mode, linkCandidates)));
 					for(Id<Link> linkId : manualCandidates.getLinkIds()) {
-						currentLinkCandidatesCs.add(new LinkCandidate(network.getLinks().get(linkId), parentStopFacility));
+						Link link = network.getLinks().get(linkId);
+						if(link == null) {
+							log.warn("link " + manualCandidates.getStopFacilityId() + " not found in network.");
+						} else {
+							lcSet.add(new LinkCandidate(link, parentStopFacility));
+						}
 					}
+					MapUtils.getMap(mode, linkCandidates).put(parentStopFacility, lcSet);
 				}
 			}
 		}
-
 	}
 }

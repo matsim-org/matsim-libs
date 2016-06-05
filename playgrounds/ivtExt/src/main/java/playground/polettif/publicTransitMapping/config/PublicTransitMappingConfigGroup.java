@@ -19,10 +19,14 @@
 
 package playground.polettif.publicTransitMapping.config;
 
+import com.opencsv.CSVReader;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.MapUtils;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -57,6 +61,7 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	private static final String ADD_PT_MODE = "addPtMode";
 	private static final String MULTI_THREAD = "threads";
 	private static final String REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES = "removeTransitRoutesWithoutLinkSequences";
+	private static final String MANUAL_LINK_CANDIDATE_CSV_FILE = "manualLinkCandidateCsvFile";
 
 	public PublicTransitMappingConfigGroup() {
 		super(GROUP_NAME);
@@ -79,37 +84,37 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		Map<String, String> map = super.getComments();
 		map.put(MODE_ROUTING_ASSIGNMENT,
 				"References transportModes from the schedule (key) and the allowed transportModes of a link from \n" +
-				"\t\the network (values). Schedule transport modes not defined here are not mapped at all and routes \n" +
-				"\t\tusing them are removed. One schedule transport mode can be mapped to multiple network transport \n" +
-				"\t\tmodes, the latter have to be separated by \",\". To map a schedule transport mode independently \n" +
-				"\t\tfrom the network use \"artificial\". Assignments are separated by \"|\" (case sensitive). \n" +
-				"\t\tExample: \"bus:bus,car | rail:rail,light_rail\"");
+						"\t\the network (values). Schedule transport modes not defined here are not mapped at all and routes \n" +
+						"\t\tusing them are removed. One schedule transport mode can be mapped to multiple network transport \n" +
+						"\t\tmodes, the latter have to be separated by \",\". To map a schedule transport mode independently \n" +
+						"\t\tfrom the network use \"artificial\". Assignments are separated by \"|\" (case sensitive). \n" +
+						"\t\tExample: \"bus:bus,car | rail:rail,light_rail\"");
 		map.put(MODES_TO_KEEP_ON_CLEAN_UP,
 				"All links that do not have a transit route on them are removed, except the ones \n" +
-				"\t\tlisted in this set (typically only car). Separated by comma.");
+						"\t\tlisted in this set (typically only car). Separated by comma.");
 		map.put(COMBINE_PT_MODES,
 				"Defines whether at the end of mapping, all non-car link modes (bus, rail, etc) \n" +
-				"\t\tshould be replaced with pt (true) or not. Default: false");
+						"\t\tshould be replaced with pt (true) or not. Default: false");
 		map.put(ADD_PT_MODE,
 				"Adds the mode \"pt\" is added to all links used by public transit after mapping if true. \n" +
-				"\t\tIs not executed if "+COMBINE_PT_MODES+" is true. Default: false");
+						"\t\tIs not executed if "+COMBINE_PT_MODES+" is true. Default: false");
 		map.put(REMOVE_TRANSIT_ROUTES_WITHOUT_LINK_SEQUENCES,
 				"If true, transit routes without link sequences after mapping are removed from the schedule. Default: true");
 		map.put(LINK_DISTANCE_TOLERANCE,
 				"(concerns Link Candidates) After " +MAX_NCLOSEST_LINKS +" link candidates have been found, additional link \n" +
-				"\t\tcandidates within ["+LINK_DISTANCE_TOLERANCE+"] * [distance to the Nth link] are added to the set.\n" +
-				"\t\tMust be >= 1.");
+						"\t\tcandidates within ["+LINK_DISTANCE_TOLERANCE+"] * [distance to the Nth link] are added to the set.\n" +
+						"\t\tMust be >= 1.");
 		map.put(PSEUDO_ROUTE_WEIGHT_TYPE,
 				"Defines which link attribute should be used for pseudo route calculations. Default is minimization \n" +
-				"\t\tof travel distance. If high quality information on link travel times is available, travelTime can be \n" +
-				"\t\tused. (Possible values \""+PseudoRouteWeightType.linkLength+"\" and \""+PseudoRouteWeightType.travelTime+"\")");
+						"\t\tof travel distance. If high quality information on link travel times is available, travelTime can be \n" +
+						"\t\tused. (Possible values \""+PseudoRouteWeightType.linkLength+"\" and \""+PseudoRouteWeightType.travelTime+"\")");
 		map.put(MAX_NCLOSEST_LINKS,
 				"(concerns Link Candidates) Number of link candidates considered for all stops, depends on accuracy of stops and desired \n" +
-				"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
-				"\t\tfacility coordinates and performance desires. Default: " + maxNClosestLinks);
+						"\t\tperformance. Somewhere between 4 and 10 seems reasonable, depending on the accuracy of the stop \n" +
+						"\t\tfacility coordinates and performance desires. Default: " + maxNClosestLinks);
 		map.put(NODE_SEARCH_RADIUS,
 				"(concerns Link Candidates)Defines the radius [meter] from a stop facility within nodes are searched. Mainly a maximum \n" +
-				"\t\tvalue for performance.");
+						"\t\tvalue for performance.");
 		map.put(MAX_LINK_CANDIDATE_DISTANCE,
 				"(concerns Link Candidates) The maximal distance [meter] a link candidate is allowed to have from the stop facility.");
 		map.put(PREFIX_ARTIFICIAL,
@@ -118,13 +123,13 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 				"The freespeed [m/s] of artificially created links. This value is the same for all schedule modes.");
 		map.put(SUFFIX_CHILD_STOP_FACILITIES,
 				"Suffix used for child stop facilities. The id of the referenced link is appended\n" +
-				"\t\t(i.e. stop0123.link:LINKID20123).");
+						"\t\t(i.e. stop0123.link:LINKID20123).");
 		map.put(BEELINE_DISTANCE_MAX_FACTOR ,
 				"If all paths between two stops have a [length] > [beelineDistanceMaxFactor] * [beelineDistance], \n" +
-				"\t\tan artificial link is created.");
+						"\t\tan artificial link is created.");
 		map.put(MULTI_THREAD,
 				"Defines the number of threads that should be used for each schedule transport mode. Default: 2.\n" +
-				"\t\tNote: The actual number of threads is <threads> * <nrOfScheduleTransportModes> + 1");
+						"\t\tNote: The actual number of threads is <threads> * <nrOfScheduleTransportModes> + 1");
 		map.put(NETWORK_FILE, "Path to the input network file. Not needed if PTMapper is called within another class.");
 		map.put(SCHEDULE_FILE, "Path to the input schedule file. Not needed if PTMapper is called within another class.");
 		map.put(OUTPUT_NETWORK_FILE, "Path to the output network file. Not needed if PTMapper is used within another class.");
@@ -341,7 +346,6 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 
-
 	/**
 	 * Defines which link attribute should be used for pseudo route
 	 * calculations. Default is link length (linkLength). If high quality
@@ -489,6 +493,40 @@ public class PublicTransitMappingConfigGroup extends ReflectiveConfigGroup {
 		modeRoutingAssignment.keySet().forEach(scheduleModes::add);
 		return scheduleModes;
 	}
+
+	/**
+	 * Manual link candidate csv
+	 */
+	private String manualLinkCandidateCsvFile = null;
+
+	@StringGetter(MANUAL_LINK_CANDIDATE_CSV_FILE)
+	public String getManualLinkCandidateCsvFileStr() {
+		return this.manualLinkCandidateCsvFile== null ? "" : this.manualLinkCandidateCsvFile;
+	}
+	public String getManualLinkCandidateCsvFile() {
+		return this.manualLinkCandidateCsvFile;
+	}
+
+	@StringSetter(MANUAL_LINK_CANDIDATE_CSV_FILE)
+	public void setManualLinkCandidateCsvFile(String file) {
+		this.manualLinkCandidateCsvFile = file;
+	}
+
+	public void loadManualLinkCandidatesCsv() {
+		try {
+			CSVReader reader = new CSVReader(new FileReader(manualLinkCandidateCsvFile), ';');
+
+			String[] line = new String[0];
+			while(line != null) {
+				this.addParameterSet(new ManualLinkCandidates(line[0], line[1], line[2]));
+				line = reader.readNext();
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 
 	/**
 	 * Params for filepahts

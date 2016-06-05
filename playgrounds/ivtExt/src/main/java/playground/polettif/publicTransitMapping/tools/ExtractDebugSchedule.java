@@ -42,6 +42,8 @@ public class ExtractDebugSchedule {
 					TransitLine line = debug.getFactory().createTransitLine(tl.getId());
 					line.addRoute(tr);
 
+					debug.addTransitLine(line);
+
 					for(TransitRouteStop rs : tr.getStops()) {
 						debug.addStopFacility(rs.getStopFacility());
 					}

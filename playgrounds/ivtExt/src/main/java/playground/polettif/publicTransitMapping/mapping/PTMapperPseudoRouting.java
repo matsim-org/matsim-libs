@@ -137,6 +137,7 @@ public class PTMapperPseudoRouting extends PTMapper {
 		/**
 		 * Add manually set link candidates from config
 		 */
+		if(config.getManualLinkCandidateCsvFile() != null) { config.loadManualLinkCandidatesCsv(); }
 		PTMapperUtils.addManualLinkCandidates(schedule, network, linkCandidates, config);
 
 		/** [3]
