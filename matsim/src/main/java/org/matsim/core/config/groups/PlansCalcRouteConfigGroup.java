@@ -66,7 +66,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private Double beelineDistanceFactor = 1.3 ;
 
-	private boolean insertingAccessEgressWalk = true ;
+	private boolean insertingAccessEgressWalk = false ;
 
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_TYPE = "teleportedModeParameters";
