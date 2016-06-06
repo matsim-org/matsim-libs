@@ -64,7 +64,7 @@ public abstract class Hafas2TransitSchedule {
 		Vehicles vehicles = ScheduleTools.createVehicles(schedule);
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", outputCoordinateSystem);
 
-		new HafasConverter(schedule, vehicles, transformation).createSchedule(hafasFolder);
+		new HafasConverterLines(schedule, vehicles, transformation).createSchedule(hafasFolder);
 
 		ScheduleTools.writeTransitSchedule(schedule, outputFolder+"schedule.xml");
 		ScheduleTools.writeVehicles(vehicles, outputFolder+"vehicles.xml");

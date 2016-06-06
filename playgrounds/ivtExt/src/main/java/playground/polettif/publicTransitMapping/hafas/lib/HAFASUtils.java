@@ -93,7 +93,8 @@ public class HAFASUtils {
 			}
 		}
 		for (VehicleType vehicleType : vehicleTypes2Remove) {
-				vehicles.removeVehicleType(vehicleType.getId());
+			// TODO implement vehicle removal correctly
+//				vehicles.removeVehicleType(vehicleType.getId());
 		}
 	}
 
