@@ -21,6 +21,7 @@ package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.google.inject.Inject;
 import gnu.trove.iterator.TDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.map.TObjectDoubleMap;
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.LogSumExpCalculator;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
@@ -90,10 +92,40 @@ public class CorrectedUtilityCreator<N extends Enum<N>> {
 
 	private class IterationInformation {
 		private final TObjectDoubleMap<Id<Person>> individualOmegas = new TObjectDoubleHashMap<>();
+		private final TObjectDoubleMap<Id<ActivityFacility>> facilitiesOmegas = new TObjectDoubleHashMap<>();
 		private final Set<Id<ActivityFacility>> constrainedExPost = new HashSet<>();
+
+		IterationInformation( Demand<?> demand ) {
+			for ( Id<Person> personId : scenario.getPopulation().getPersons().keySet() ) {
+				individualOmegas.put( personId , 1 );
+			}
+			updateFacilitiesOmega( demand );
+			updateConstrained( demand );
+		}
 
 		void updateConstrained( final Demand<?> demand ) {
 			throw new UnsupportedOperationException(  );
+		}
+
+		void updateFacilitiesOmega( final Demand<?> demand ) {
+			final Map<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> demandPerFacility = demand.getDemandPerFacility();
+
+			for ( Map.Entry<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> entry : demandPerFacility.entrySet() ) {
+				double numerator = 0;
+				double denominator = 0;
+
+				for ( TObjectDoubleIterator<Id<Person>> iterator = entry.getValue().iterator();
+						iterator.hasNext();
+						iterator.advance()) {
+					final Id<Person> person = iterator.key();
+					final double proba = iterator.value();
+
+					numerator += individualOmegas.get( person ) * proba;
+					denominator += proba;
+				}
+
+				facilitiesOmegas.put( entry.getKey() , numerator / denominator );
+			}
 		}
 
 		void updateIndividualOmegas(

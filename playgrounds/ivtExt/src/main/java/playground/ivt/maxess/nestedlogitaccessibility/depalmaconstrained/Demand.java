@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.LogSumExpCalculator;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
@@ -34,6 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static javax.swing.UIManager.put;
+
 /**
  * @author thibautd
  */
@@ -42,6 +45,7 @@ class Demand<N extends Enum<N>> {
 	private final Map<Id<Person>, Map<String, TObjectDoubleMap<Id<ActivityFacility>>>> probas = new HashMap<>();
 
 	private final TObjectDoubleMap<Id<ActivityFacility>> demands = new TObjectDoubleHashMap<>();
+	private final Map<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> demandPerFacility = new HashMap<>();
 
 	public Demand( final NestedLogitModel<N> model, final Scenario scenario ) {
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {
@@ -60,6 +64,22 @@ class Demand<N extends Enum<N>> {
 						return true;
 					} );
 				} );
+
+		probas.entrySet().stream()
+				.forEach( entry -> {
+					if ( entry.getValue().size() != 1 ) throw new UnsupportedOperationException();
+					final TObjectDoubleMap<Id<ActivityFacility>> facilities = entry.getValue().values().stream().findAny().get();
+					facilities.forEachEntry( (facility , proba) -> {
+						TObjectDoubleMap<Id<Person>> m = demandPerFacility.get( facility );
+
+						if ( m == null ) {
+							m = new TObjectDoubleHashMap<>();
+							demandPerFacility.put( facility , m );
+						}
+						m.put( entry.getKey() , proba );
+						return true;
+					} );
+				} );
 	}
 
 	public double getDemand( final Id<ActivityFacility> facilityId ) {
@@ -71,6 +91,10 @@ class Demand<N extends Enum<N>> {
 		if ( situations.size() != 1 ) throw new IllegalStateException( "unhandled size "+situations.size() );
 
 		return situations.values().iterator().next();
+	}
+
+	public Map<Id<ActivityFacility>, TObjectDoubleMap<Id<Person>>> getDemandPerFacility() {
+		return demandPerFacility;
 	}
 
 	private Map<String, TObjectDoubleMap<Id<ActivityFacility>>> computeChoiceProbas(
