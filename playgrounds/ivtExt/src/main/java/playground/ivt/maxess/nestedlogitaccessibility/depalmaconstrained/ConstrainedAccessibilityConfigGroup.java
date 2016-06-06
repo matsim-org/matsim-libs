@@ -16,43 +16,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.maxess.nestedlogitaccessibility.framework;
+package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained;
 
-import com.google.inject.Inject;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author thibautd
  */
-public class NestedLogitModel<N extends Enum<N>> {
-	private final double mu;
-	private final Utility<N> utility;
-	private final ChoiceSetIdentifier<N> choiceSetIdentifier;
+public class ConstrainedAccessibilityConfigGroup extends ReflectiveConfigGroup {
+	public static final String GROUP_NAME = "constrainedAccessibility";
 
-	@Inject
-	public NestedLogitModel(
-			final Utility<N> utility,
-			final ChoiceSetIdentifier<N> choiceSetIdentifier ) {
-		this( 1 , utility , choiceSetIdentifier );
+	private double capacityScalingFactor = 1;
+
+	public ConstrainedAccessibilityConfigGroup( ) {
+		super( GROUP_NAME );
 	}
 
-	public NestedLogitModel(
-			final double mu,
-			final Utility<N> utility,
-			final ChoiceSetIdentifier<N> choiceSetIdentifier ) {
-		this.mu = mu;
-		this.utility = utility;
-		this.choiceSetIdentifier = choiceSetIdentifier;
+	@StringGetter("capacityScalingFactor")
+	public double getCapacityScalingFactor() {
+		return capacityScalingFactor;
 	}
 
-	public ChoiceSetIdentifier<N> getChoiceSetIdentifier() {
-		return choiceSetIdentifier;
-	}
+	@StringSetter("capacityScalingFactor")
+	public void setCapacityScalingFactor( final double capacityScalingFactor ) {
+		if ( capacityScalingFactor <= 0 || capacityScalingFactor > 1 ) {
+			throw new IllegalArgumentException( "capacity scaling factor must be between 0 and 1" );
+		}
 
-	public double getMu() {
-		return mu;
-	}
-
-	public Utility<N> getUtility() {
-		return utility;
+		this.capacityScalingFactor = capacityScalingFactor;
 	}
 }
