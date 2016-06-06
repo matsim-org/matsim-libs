@@ -27,7 +27,7 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -61,7 +61,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		MatsimServices controler = event.getServices() ;
 
 		TravelTime ttc = controler.getLinkTravelTimes();
-		LeastCostPathTree st = new LeastCostPathTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder( TransportMode.car, controler.getConfig().planCalcScore() ).createTravelDisutility(ttc));
+		LeastCostPathTree st = new LeastCostPathTree(ttc, new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, controler.getConfig().planCalcScore() ).createTravelDisutility(ttc));
 
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		double dpTime = 8.*3600 ;

@@ -39,13 +39,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -614,7 +613,7 @@ public class VTTSspecificRouterTest {
 		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile1 ) );
 		final Controler controler = new Controler( scenario );
 
-		final Builder factory = new Builder( TransportMode.car, controler.getConfig().planCalcScore() );
+		final RandomizingTimeDistanceTravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, controler.getConfig().planCalcScore() );
 		factory.setSigma(3.0);
 
 		controler.addOverridingModule(new AbstractModule(){

@@ -56,7 +56,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -205,7 +205,7 @@ public class HITSAnalyserPostgresqlSummary {
 
 		// now for car
 
-		TravelDisutility travelDisutility = new Builder( TransportMode.car, scenario.getConfig().planCalcScore() )
+		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, scenario.getConfig().planCalcScore() )
 				.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes());
 		carCongestedDijkstra = new Dijkstra(scenario.getNetwork(), travelDisutility,
 				travelTimeCalculator.getLinkTravelTimes());

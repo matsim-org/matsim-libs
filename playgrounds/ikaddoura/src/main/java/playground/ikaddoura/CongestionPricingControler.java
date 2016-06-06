@@ -35,7 +35,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility.Builder;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisMain;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
@@ -130,7 +130,7 @@ public class CongestionPricingControler {
 
 			if (router.equals("standard")) {
 
-				final Builder factory = new Builder( TransportMode.car, config.planCalcScore() );
+				final RandomizingTimeDistanceTravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
 				factory.setSigma(sigma);
 				controler.addOverridingModule(new AbstractModule(){
 					@Override
@@ -164,7 +164,7 @@ public class CongestionPricingControler {
 			
 			if (router.equals("standard")) {
 
-				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(new Builder( TransportMode.car, config.planCalcScore() ), tollHandler, config.planCalcScore());
+				final CongestionTollTimeDistanceTravelDisutilityFactory factory = new CongestionTollTimeDistanceTravelDisutilityFactory(new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ), tollHandler, config.planCalcScore());
 				factory.setSigma(sigma);
 				
 				controler.addOverridingModule(new AbstractModule() {

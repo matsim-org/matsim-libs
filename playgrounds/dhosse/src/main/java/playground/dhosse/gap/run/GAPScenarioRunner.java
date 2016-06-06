@@ -51,7 +51,7 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -258,7 +258,7 @@ public class GAPScenarioRunner {
 								.getConfig().planCalcScore()));
 				addTravelDisutilityFactoryBinding(TransportMode.ride)
 						.toInstance(
-								new RandomizingTimeDistanceTravelDisutility.Builder(
+								new RandomizingTimeDistanceTravelDisutilityFactory(
 										TransportMode.ride, config.planCalcScore()));
 				addRoutingModuleBinding(TransportMode.ride)
 						.toProvider(
@@ -367,7 +367,7 @@ public class GAPScenarioRunner {
 										.plansCalcRoute()));
 						addTravelDisutilityFactoryBinding(mode)
 								.toInstance(
-										new RandomizingTimeDistanceTravelDisutility.Builder(
+										new RandomizingTimeDistanceTravelDisutilityFactory(
 												mode, controler.getConfig().planCalcScore()));
 						addRoutingModuleBinding(mode)
 								.toProvider(
@@ -381,7 +381,7 @@ public class GAPScenarioRunner {
 										.plansCalcRoute()));
 						addTravelDisutilityFactoryBinding(mode)
 								.toInstance(
-										new RandomizingTimeDistanceTravelDisutility.Builder(
+										new RandomizingTimeDistanceTravelDisutilityFactory(
 												mode, controler.getConfig().planCalcScore()));
 						addRoutingModuleBinding(mode)
 								.toProvider(
