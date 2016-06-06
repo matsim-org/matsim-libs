@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.calibration;
+package playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.scenarioSetup;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
@@ -27,6 +27,7 @@ import java.util.TreeMap;
 
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.scenarioSetup.PatnaCalibrationUtils.PatnaDemandLabels;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils.PatnaUrbanActivityTypes;
 import playground.agarwalamit.utils.RandomNumberUtils;
 
@@ -44,7 +45,7 @@ import playground.agarwalamit.utils.RandomNumberUtils;
  * @author amit
  */
 
-public class PatnaNonSlumDataCalibrator {
+public class PatnaNonSlumDemandCalibrator {
 
 	private final String HBE = PatnaUrbanActivityTypes.educational.toString();
 	private final String HBS = PatnaUrbanActivityTypes.social.toString();
@@ -60,7 +61,7 @@ public class PatnaNonSlumDataCalibrator {
 	private final int UPPER_BOUND ;
 
 
-	public PatnaNonSlumDataCalibrator () {
+	public PatnaNonSlumDemandCalibrator () {
 
 		// for zones 27-42 only HBW trips are available (812 plans), PatnaCMP gives share of HBW, HBE, HBS and HBO -- 45%, 34%, 4% and 17%
 		// 812 plans are 45% of x; thus x = 1804; requiredPlans = 992
@@ -80,7 +81,7 @@ public class PatnaNonSlumDataCalibrator {
 
 	public static void main(String[] args) {
 		String outputFile = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
-		new PatnaNonSlumDataCalibrator().processForZone27To42(outputFile);
+		new PatnaNonSlumDemandCalibrator().processForZone27To42(outputFile);
 	}
 
 	/**
@@ -156,12 +157,12 @@ public class PatnaNonSlumDataCalibrator {
 		{
 			SortedMap<String, Double> groupNumbers = new TreeMap<>();
 			groupNumbers.put("1", 0.01);
-			groupNumbers.put("2", 0.02);
-			groupNumbers.put("3", 0.23);
-			groupNumbers.put("4", 0.50);
-			groupNumbers.put("5", 0.68);
-			groupNumbers.put("6", 0.81);
-			groupNumbers.put("7", 1.0);
+			groupNumbers.put("2", 0.01);
+			groupNumbers.put("3", 0.21);
+			groupNumbers.put("4", 0.27);
+			groupNumbers.put("5", 0.18);
+			groupNumbers.put("6", 0.13);
+			groupNumbers.put("7", 0.19);
 			incomeInterval = RandomNumberUtils.getRandomStringsFromDiscreteDistribution(groupNumbers, TOTAL_PLANS_REQUIRED);
 		}
 

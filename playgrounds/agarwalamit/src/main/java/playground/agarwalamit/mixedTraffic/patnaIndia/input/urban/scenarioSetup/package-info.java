@@ -16,25 +16,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.calibration;
-
 /**
-* @author amit
-*/
-
-public enum PatnaDemandLabels {
-	ward, // residence
-	member, // household size
-	sex, age, occupation, //pretty obvious
-	monthlyInc, // current monthly income, splitted into several intervals 
-	dailyCost, // current daily transport cost, splitted into several intervals
-	originWard, // origin
-	destiWard, //destination
-	purpose,  // HBW, HBE, HBS, HBO, see PatnaUrbanActivityTypes
-	mode, // travel mode
-	freq // trip fequency
-}
-
-
-	
+ * Most likely, it contains the data calibration codes and explanations. 
+ * Therefore, most of things are not reusable for other scenarios.
+ * 
+ * @author amit
+ *
+ */
+package playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.scenarioSetup;
