@@ -98,7 +98,7 @@ public class OTPMatrixRouter {
 
         mkdir(outputDir);
 
-        routeMatrix(graph, calendar, indexIndividuals(graph, fromindividuals, "fromIDs.csv"), indexIndividuals(graph, toindividuals, "toIDs.csv"), outputDir);
+        routeMatrix(graph, calendar, indexIndividuals(graph, fromindividuals, outputDir+"fromIDs.csv"), indexIndividuals(graph, toindividuals, outputDir+"toIDs.csv"), outputDir);
         log.info("Shutdown");
     }
 
