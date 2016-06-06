@@ -71,9 +71,9 @@ public class PSSControlerDumbCharging extends PSSControler {
 	}
 	
 	public void prepareMATSimIterations(){
-		// use the right Controler (read parameter
-		Config config = ConfigUtils.loadConfig(configFilePath, new ParametersPSF());
-		String tempStringValue = config.findParam(ParametersPSF.PSF_MODULE, "main.inputEventsForSimulationPath");
+//		// use the right Controler (read parameter
+//		Config config = ConfigUtils.loadConfig(configFilePath, new ParametersPSF());
+		String tempStringValue = getConfig().findParam(ParametersPSF.PSF_MODULE, "main.inputEventsForSimulationPath");
 		if (tempStringValue != null) {
 			// ATTENTION, this does not work at the moment, because the read
 			// link from the
@@ -81,13 +81,13 @@ public class PSSControlerDumbCharging extends PSSControler {
 			// handlers...
 			//
 			// (As far as I can tell, the above lines come from Rashid, in 2011. kai, sep'2015) 
-			controler = new EventReadControler(config, tempStringValue).getControler();
+			controler = new EventReadControler(getConfig(), tempStringValue).getControler();
 			ParametersPSF2.isEventsFileBasedControler=true;
 			
 			setDumbScoringFunctionFactory(controler);
 			
 		} else {
-			controler = new Controler(config);
+			controler = new Controler(getConfig());
 		}
 
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );

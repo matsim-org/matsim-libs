@@ -36,6 +36,10 @@ public class AdvancedTest extends MatsimTestCase {
 
 	private void initTest(String configFile) {
 		Config config = loadConfig(configFile);
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// too many things don't work with access/egress walk true. kai, jun'16
+
 		ConfigUtils.addOrGetModule(config, ParametersPSF.PSF_MODULE, ParametersPSF.class);
 		controler = new Controler(config);
 
