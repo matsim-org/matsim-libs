@@ -95,7 +95,7 @@ public final class RunBraessSimulation {
 
 	/* population parameter */
 	
-	private static final int NUMBER_OF_PERSONS = 2000; // per hour
+	private static final int NUMBER_OF_PERSONS = 3600; // per hour
 	private static final int SIMULATION_PERIOD = 1; // in hours
 	private static final double SIMULATION_START_TIME = 0.0; // seconds from midnight
 	
@@ -103,13 +103,16 @@ public final class RunBraessSimulation {
 	// initial score for all initial plans
 	private static final Double INIT_PLAN_SCORE = null;
 
-	/// defines which kind of signals should be used
+	// defines which kind of signals should be used
 	private static final SignalControlType SIGNAL_TYPE = SignalControlType.NONE;
+	// if SignalControlType SIGNAL4_X_Seconds_Z is used, SECONDS_Z_GREEN gives the green time for Z
+	private static final int SECONDS_Z_GREEN = 1;
+	
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
 	
 	// defines which kind of pricing should be used
-	private static final PricingType PRICING_TYPE = PricingType.INTERVALBASED;
+	private static final PricingType PRICING_TYPE = PricingType.V9;
 	public enum PricingType{
 		NONE, V3, V4, V7, V8, V9, V10, FLOWBASED, GREGOR, INTERVALBASED
 	}
@@ -155,7 +158,7 @@ public final class RunBraessSimulation {
 			config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 			
 			// set travelTimeBinSize (only has effect if reRoute is used)
-			config.travelTimeCalculator().setTraveltimeBinSize( 10 );
+			config.travelTimeCalculator().setTraveltimeBinSize( 900 );
 			
 			config.travelTimeCalculator().setTravelTimeCalculatorType(
 					TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
@@ -420,6 +423,7 @@ public final class RunBraessSimulation {
 		TtCreateBraessSignals signalsCreator = new TtCreateBraessSignals(scenario);
 		signalsCreator.setLaneType(LANE_TYPE);
 		signalsCreator.setSignalType(SIGNAL_TYPE);
+		signalsCreator.setSecondsZGreen(SECONDS_Z_GREEN);
 		signalsCreator.createSignals();
 	}
 
@@ -550,11 +554,8 @@ public final class RunBraessSimulation {
 			case ONE_SECOND_SO:
 				runName += "_1sSO";
 				break;
-			case SIGNAL4_ONE_SECOND_SO:
-				runName += "_S4_1sSO";
-				break;
-			case SIGNAL4_ONE_SECOND_Z:
-				runName += "_S4_1sZ";
+			case SIGNAL4_X_SECOND_Z:
+				runName += "_S4_" + SECONDS_Z_GREEN + "sZ";
 				break;
 			case SIGNAL4_SYLVIA_V2Z:
 				runName += "_S4_Sylvia_V2Z";

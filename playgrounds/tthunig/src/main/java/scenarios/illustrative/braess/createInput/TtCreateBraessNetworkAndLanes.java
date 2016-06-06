@@ -125,7 +125,7 @@ public final class TtCreateBraessNetworkAndLanes {
 			linkTTBig = 20;
 			minimalLinkTT = 1;
 		} else {
-			capFirstLast = numberOfPersons + 400;
+			capFirstLast = numberOfPersons + 400; // TODO check
 			capMain = (numberOfPersons / 2 ) * (1 + capTolerance);
 			if (capZ == 0.0) capZ = capMain; // use the default capacity if it is 0.0
 			inflowLinkLength = 7.5 * 1;
@@ -217,6 +217,7 @@ public final class TtCreateBraessNetworkAndLanes {
 					net.getNodes().get(Id.createNodeId(2)),
 					net.getNodes().get(Id.createNodeId(4)));
 			setLinkAttributes(l, capMain, linkLengthBig, linkTTBig);
+//			setLinkAttributes(l, capMain, linkLengthSmall, linkTTBig); // TODO check
 			net.addLink(l);
 		}
 		
@@ -232,6 +233,7 @@ public final class TtCreateBraessNetworkAndLanes {
 				net.getNodes().get(Id.createNodeId(3)),
 				net.getNodes().get(Id.createNodeId(5)));
 		setLinkAttributes(l, capMain, linkLengthBig, linkTTBig);
+//		setLinkAttributes(l, capMain, linkLengthSmall, linkTTBig); // TODO check
 		net.addLink(l);
 		
 		if (simulateInflowCap){
