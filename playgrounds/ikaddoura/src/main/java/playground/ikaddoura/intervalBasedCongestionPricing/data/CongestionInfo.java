@@ -39,11 +39,11 @@ public class CongestionInfo {
 
 	// time independent values
 	
-	private final double TIME_BIN_SIZE = 5 * 60.;
-	private final int WRITE_OUTPUT_ITERATION = 10;
-	private final InternalizationApproach INTERNALIZATION_APPROACH = InternalizationApproach.MaximumDelay;
+	private double timeBinSize = 5 * 60.;
+	private int writeOutputIteration = 10;
+	private DelayInternalizationApproach internalizationApproach = DelayInternalizationApproach.MaximumDelay;
 	
-	public enum InternalizationApproach {
+	public enum DelayInternalizationApproach {
         AverageDelay, LastAgentsDelay, MaximumDelay
 	}
 	
@@ -56,9 +56,33 @@ public class CongestionInfo {
 	
 	private double currentTimeBinEndTime;
 	
-	public CongestionInfo(Scenario scenario) {
-		currentTimeBinEndTime = TIME_BIN_SIZE;
+	/**
+	 * Do not use the default parameters.
+	 * 
+	 * @param scenario
+	 * @param approach
+	 * @param timeBinSize
+	 * @param writeOutputIteration
+	 */
+	public CongestionInfo(Scenario scenario, DelayInternalizationApproach approach, double timeBinSize, int writeOutputIteration) {
+
 		this.scenario = scenario;
+
+		this.internalizationApproach = approach;
+		this.timeBinSize = timeBinSize;
+		this.writeOutputIteration = writeOutputIteration;
+		
+		currentTimeBinEndTime = timeBinSize;
+	}
+	
+	/**
+	 * Uses the default parameters
+	 * 
+	 * @param scenario
+	 */
+	public CongestionInfo(Scenario scenario) {
+		this.scenario = scenario;
+		currentTimeBinEndTime = timeBinSize;
 	}
 
 	public double getCurrentTimeBinEndTime() {
@@ -74,19 +98,19 @@ public class CongestionInfo {
 	}
 
 	public int getWRITE_OUTPUT_ITERATION() {
-		return WRITE_OUTPUT_ITERATION;
+		return writeOutputIteration;
 	}
 
 	public double getTIME_BIN_SIZE() {
-		return TIME_BIN_SIZE;
+		return timeBinSize;
 	}
 
 	public Map<Id<Vehicle>, Id<Person>> getVehicleId2personId() {
 		return vehicleId2personId;
 	}
 	
-	public InternalizationApproach getINTERNALIZATION_APPROACH() {
-		return INTERNALIZATION_APPROACH;
+	public DelayInternalizationApproach getINTERNALIZATION_APPROACH() {
+		return internalizationApproach;
 	}
 
 	public Scenario getScenario() {

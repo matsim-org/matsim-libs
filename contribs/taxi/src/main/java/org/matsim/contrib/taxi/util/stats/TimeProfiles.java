@@ -24,12 +24,11 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.data.*;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
-import org.matsim.contrib.taxi.scheduler.TaxiSchedulerUtils;
+import org.matsim.contrib.taxi.scheduler.*;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
-import org.matsim.contrib.util.*;
+import org.matsim.contrib.util.LongEnumAdder;
 
 import com.google.common.collect.Iterables;
 
@@ -53,15 +52,15 @@ public class TimeProfiles
     }
 
 
-    public static ProfileCalculator<Integer> createIdleVehicleCounter(
-            final TaxiOptimizerContext optimContext)
+    public static ProfileCalculator<Integer> createIdleVehicleCounter(final VrpData taxiData,
+            final TaxiScheduleInquiry scheduleInquiry)
     {
         return new ProfileCalculator<Integer>() {
             @Override
             public Integer calcCurrentPoint()
             {
-                return Iterables.size(Iterables.filter(optimContext.taxiData.getVehicles().values(),
-                        TaxiSchedulerUtils.createIsIdle(optimContext.scheduler)));
+                return Iterables.size(Iterables.filter(taxiData.getVehicles().values(),
+                        TaxiSchedulerUtils.createIsIdle(scheduleInquiry)));
             }
         };
     }

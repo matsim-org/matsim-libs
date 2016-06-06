@@ -2,13 +2,14 @@ package gunnar.ihop2.transmodeler.networktransformation;
 
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.newUnidirectionalId;
 import static gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.unquote;
-import floetteroed.utilities.tabularfileparser.AbstractTabularFileHandlerWithHeaderLine;
-import floetteroed.utilities.tabularfileparser.TabularFileParser;
-import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.DIR;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import floetteroed.utilities.tabularfileparser.AbstractTabularFileHandlerWithHeaderLine;
+import floetteroed.utilities.tabularfileparser.TabularFileParser;
+import gunnar.ihop2.transmodeler.networktransformation.Transmodeler2MATSimNetwork.DIR;
 
 /**
  * 

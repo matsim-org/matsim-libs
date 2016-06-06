@@ -30,8 +30,7 @@ import org.matsim.vehicles.Vehicle;
  * @author mrieser / senozon
  */
 public class TransitRouterCustomDataTest {
-
-	@Test
+	 @Test
 	public void testCustomDataIntegration() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().transit().setUseTransit(true);
@@ -52,7 +51,7 @@ public class TransitRouterCustomDataTest {
 		TransitRouterImpl router = new TransitRouterImpl(trConfig, new PreparedTransitSchedule(scenario.getTransitSchedule()), transitNetwork, transitRouterNetworkTravelTimeAndDisutility, disutility);
 
 		double x = -100;
-		List<Leg> legs = router.calcRoute(new Coord(x, (double) 0), new Coord((double) 3100, (double) 0), 5.9*3600, null);
+		List<Leg> legs = router.calcRoute(new FakeFacility( new Coord(x, (double) 0)), new FakeFacility( new Coord((double) 3100, (double) 0)), 5.9*3600, null);
 		Assert.assertEquals(1, legs.size());
 		
 		/* the following is not really nice as a test, but I had to somehow

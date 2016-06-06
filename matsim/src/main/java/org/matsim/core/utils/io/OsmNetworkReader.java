@@ -199,6 +199,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			} else {
 				parser.parse(osmFilename);
 			}
+			log.info("done loading data");
 		}
 		convert();
 		log.info("= conversion statistics: ==========================");
@@ -280,14 +281,17 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	/**
 	 * Defines a new hierarchy layer by specifying a rectangle and the hierarchy level to which highways will be converted.
 	 *
-	 * @param coordNWLat The latitude of the north western corner of the rectangle.
-	 * @param coordNWLon The longitude of the north western corner of the rectangle.
-	 * @param coordSELat The latitude of the south eastern corner of the rectangle.
-	 * @param coordSELon The longitude of the south eastern corner of the rectangle.
+	 * @param coordNWNorthing The latitude of the north western corner of the rectangle.
+	 * @param coordNWEasting The longitude of the north western corner of the rectangle.
+	 * @param coordSENorthing The latitude of the south eastern corner of the rectangle.
+	 * @param coordSEEasting The longitude of the south eastern corner of the rectangle.
 	 * @param hierarchy Layer specifying the hierarchy of the layers starting with 1 as the top layer.
 	 */
-	public void setHierarchyLayer(final double coordNWLat, final double coordNWLon, final double coordSELat, final double coordSELon, final int hierarchy) {
-		this.hierarchyLayers.add(new OsmFilter(this.transform.transform(new Coord(coordNWLon, coordNWLat)), this.transform.transform(new Coord(coordSELon, coordSELat)), hierarchy));
+	public void setHierarchyLayer(final double coordNWNorthing, final double coordNWEasting, final double coordSENorthing, final double coordSEEasting, final int hierarchy) {
+		this.hierarchyLayers.add(new OsmFilterImpl(this.transform.transform(new Coord(coordNWEasting, coordNWNorthing)), this.transform.transform(new Coord(coordSEEasting, coordSENorthing)), hierarchy));
+	}
+	public void setHierarchyLayer(final int hierarchy) {
+		this.hierarchyLayers.add(new GeographicallyNonrestrictingOsmFilterImpl(hierarchy));
 	}
 
 	/**
@@ -306,6 +310,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			((NetworkImpl) this.network).setCapacityPeriod(3600);
 		}
 
+		log.info("Remove ways that have at least one node that was not read previously ...");
+		// yy I _think_ this is what it does.  kai, may'16
 		Iterator<Entry<Long, OsmWay>> it = this.ways.entrySet().iterator();
 		while (it.hasNext()) {
 			Entry<Long, OsmWay> entry = it.next();
@@ -316,8 +322,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				}
 			}
 		}
+		log.info("... done removing ways that have at least one node that was not read previously.");
 
-		// check which nodes are used
+		log.info("Mark OSM nodes that shoud be kept ...");
 		for (OsmWay way : this.ways.values()) {
 			String highway = way.tags.get(TAG_HIGHWAY);
 			if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
@@ -345,15 +352,19 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				}
 			}
 		}
+		log.info("... done marking OSM nodes that shoud be kept.");
 
 		if (!this.keepPaths) {
-			// marked nodes as unused where only one way leads through
+
+			log.info("Mark nodes as unused where only one way leads through ...") ;
 			for (OsmNode node : this.nodes.values()) {
 				if (node.ways == 1) {
 					node.used = false;
 				}
 			}
-			// verify we did not mark nodes as unused that build a loop
+			log.info("... done marking nodes as unused where only one way leads through.") ;
+
+			log.info("Verify we did not mark nodes as unused that build a loop ...") ;
 			for (OsmWay way : this.ways.values()) {
 				String highway = way.tags.get(TAG_HIGHWAY);
 				if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
@@ -364,7 +375,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 						OsmNode node = this.nodes.get(way.nodes.get(i));
 						if (node.used) {
 							if (prevRealNode == node) {
-								/* We detected a loop between to "real" nodes.
+								/* We detected a loop between two "real" nodes.
 								 * Set some nodes between the start/end-loop-node to "used" again.
 								 * But don't set all of them to "used", as we still want to do some network-thinning.
 								 * I decided to use sqrt(.)-many nodes in between...
@@ -383,18 +394,20 @@ public class OsmNetworkReader implements MatsimSomeReader {
 					}
 				}
 			}
+			log.info("... done verifying that we did not mark nodes as unused that build a loop.") ;
 
 		}
 
-		// create the required nodes
+		log.info("Create the required nodes ...") ;
 		for (OsmNode node : this.nodes.values()) {
 			if (node.used) {
 				Node nn = this.network.getFactory().createNode(Id.create(node.id, Node.class), node.coord);
 				this.network.addNode(nn);
 			}
 		}
+		log.info("... done creating the required nodes.");
 
-		// create the links
+		log.info( "Create the links ...") ;
 		this.id = 1;
 		for (OsmWay way : this.ways.values()) {
 			String highway = way.tags.get(TAG_HIGHWAY);
@@ -433,6 +446,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				}
 			}
 		}
+		log.info("... done creating the links.");
 
 		// free up memory
 		this.nodes.clear();
@@ -574,17 +588,21 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		}
 	}
 
-	private static class OsmFilter {
+	private static interface OsmFilter {
+		boolean coordInFilter( final Coord coord, final int hierarchyLevel ) ;
+	}
+	private static class OsmFilterImpl implements OsmFilter {
 		private final Coord coordNW;
 		private final Coord coordSE;
 		private final int hierarchy;
 
-		public OsmFilter(final Coord coordNW, final Coord coordSE, final int hierarchy) {
+		OsmFilterImpl(final Coord coordNW, final Coord coordSE, final int hierarchy) {
 			this.coordNW = coordNW;
 			this.coordSE = coordSE;
 			this.hierarchy = hierarchy;
 		}
 
+		@Override
 		public boolean coordInFilter(final Coord coord, final int hierarchyLevel){
 			if(this.hierarchy < hierarchyLevel){
 				return false;
@@ -592,6 +610,20 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 			return ((this.coordNW.getX() < coord.getX() && coord.getX() < this.coordSE.getX()) &&
 				(this.coordNW.getY() > coord.getY() && coord.getY() > this.coordSE.getY()));
+		}
+	}
+	private static class GeographicallyNonrestrictingOsmFilterImpl implements OsmFilter {
+		private final int hierarchy;
+		GeographicallyNonrestrictingOsmFilterImpl(final int hierarchy) {
+			this.hierarchy = hierarchy;
+		}
+
+		@Override
+		public boolean coordInFilter(final Coord coord, final int hierarchyLevel){
+			if(this.hierarchy < hierarchyLevel){
+				return false;
+			}
+			return true ;
 		}
 	}
 
@@ -741,7 +773,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 					if (used) {
 						if (this.collectNodes) {
 							for (long id : this.currentWay.nodes) {
-								this.nodes.put(id, new OsmNode(id, new Coord((double) 0, (double) 0)));
+								this.nodes.put(id, new OsmNode(id, new Coord(0, 0)));
 							}
 						} else if (this.loadWays) {
 							this.ways.put(this.currentWay.id, this.currentWay);

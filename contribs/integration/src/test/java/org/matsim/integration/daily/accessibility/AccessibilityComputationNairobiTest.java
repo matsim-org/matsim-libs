@@ -95,6 +95,8 @@ public class AccessibilityComputationNairobiTest {
 			config.strategy().addStrategySettings(stratSets);
 		}
 		
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+		// yy For a test, "abort" may be too strict.  kai, may'16
 				
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		

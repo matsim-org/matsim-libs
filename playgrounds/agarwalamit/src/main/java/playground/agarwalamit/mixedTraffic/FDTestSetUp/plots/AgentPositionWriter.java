@@ -297,7 +297,7 @@ public class AgentPositionWriter {
 
 			if ( Math.abs( distFromNodeAndPoint + distPointAndToNode - distFromNodeAndToNode ) < 0.01) { 
 				// 0.01 to ignore rounding errors, In general, if AC + CB = AB, C lies on AB
-				distFromFromNode = Math.round(distFromNodeAndPoint*100)/100; 
+				distFromFromNode = Math.round(distFromNodeAndPoint*100) / 100.0; 
 				linkId = Double.valueOf( l.getId().toString() );
 				break;
 			}

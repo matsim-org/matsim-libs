@@ -2,6 +2,11 @@ package playground.polettif.publicTransitMapping.config;
 
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Defines link attributes for converting OSM highway paths
@@ -26,6 +31,8 @@ public class OsmWayParams extends ReflectiveConfigGroup implements MatsimParamet
 	private double laneCapacity;
 	/** true to say that this road is a oneway road  **/
 	private boolean oneway;
+	/** defines the allowed transport modes for the link  **/
+	private Set<String> allowedTransportModes;
 
 	/**
 	 * Constructors
@@ -34,7 +41,7 @@ public class OsmWayParams extends ReflectiveConfigGroup implements MatsimParamet
 		super(SET_NAME);
 	}
 
-	public OsmWayParams(String osmValue, String osmKey, double lanes, double freespeed, double freespeedFactor, double laneCapacity, boolean oneway) {
+	public OsmWayParams(String osmValue, String osmKey, double lanes, double freespeed, double freespeedFactor, double laneCapacity, boolean oneway, Set<String> allowedTransportModes) {
 		super(SET_NAME);
 		this.osmKey = osmKey;
 		this.osmValue = osmValue;
@@ -43,6 +50,7 @@ public class OsmWayParams extends ReflectiveConfigGroup implements MatsimParamet
 		this.freespeedFactor = freespeedFactor;
 		this.laneCapacity = laneCapacity;
 		this.oneway = oneway;
+		this.allowedTransportModes = allowedTransportModes;
 	}
 
 	@StringGetter("osmValue")
@@ -114,5 +122,24 @@ public class OsmWayParams extends ReflectiveConfigGroup implements MatsimParamet
 	@StringSetter("oneway")
 	public void setOneway(boolean oneway) {
 		this.oneway = oneway;
+	}
+
+
+	public Set<String> getAllowedTransportModes() {
+		return this.allowedTransportModes;
+	}
+
+	public void setAllowedTransportModes(Set<String> allowedTransportModes) {
+		this.allowedTransportModes = allowedTransportModes;
+	}
+
+	@StringGetter("allowedTransportModes")
+	private String getAllowedTransportModesString() {
+		return CollectionUtils.setToString(allowedTransportModes);
+	}
+
+	@StringSetter("allowedTransportModes")
+	private void setAllowedTransportModesString(String allowedTransportModesString) {
+		this.allowedTransportModes = CollectionUtils.stringToSet(allowedTransportModesString);
 	}
 }

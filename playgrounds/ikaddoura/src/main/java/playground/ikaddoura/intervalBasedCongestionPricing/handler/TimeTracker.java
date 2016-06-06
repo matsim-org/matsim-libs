@@ -36,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.ikaddoura.intervalBasedCongestionPricing.CongestionInfoWriter;
 import playground.ikaddoura.intervalBasedCongestionPricing.data.CongestionInfo;
-import playground.ikaddoura.intervalBasedCongestionPricing.data.CongestionInfo.InternalizationApproach;
+import playground.ikaddoura.intervalBasedCongestionPricing.data.CongestionInfo.DelayInternalizationApproach;
 
 /**
  * The centerpiece of the interval-based congestion pricing approach.
@@ -138,16 +138,16 @@ public class TimeTracker implements LinkLeaveEventHandler {
 				
 				double amount = 0.;
 		
-				if (this.congestionInfo.getINTERNALIZATION_APPROACH().equals(InternalizationApproach.AverageDelay)) {
+				if (this.congestionInfo.getINTERNALIZATION_APPROACH().equals(DelayInternalizationApproach.AverageDelay)) {
 					double averageTravelTimePerAgent_sec = this.congestionInfo.getCongestionLinkInfos().get(linkId).getTravelTimeSum_sec() / this.congestionInfo.getCongestionLinkInfos().get(linkId).getLeavingVehicles().size();
 					double averageDelayPerAgent_sec = averageTravelTimePerAgent_sec - freespeedTravelTime_sec;
 					amount = -1.0 * averageDelayPerAgent_sec * vtts_hour / 3600.;
 				
-				} else if (this.congestionInfo.getINTERNALIZATION_APPROACH().equals(InternalizationApproach.LastAgentsDelay)) {
+				} else if (this.congestionInfo.getINTERNALIZATION_APPROACH().equals(DelayInternalizationApproach.LastAgentsDelay)) {
 					double delayLastAgent_sec = this.congestionInfo.getCongestionLinkInfos().get(linkId).getTravelTimeLastLeavingAgent_sec() - freespeedTravelTime_sec;
 					amount = -1.0 * delayLastAgent_sec * vtts_hour / 3600.;
 					
-				} else if (this.congestionInfo.getINTERNALIZATION_APPROACH().equals(InternalizationApproach.MaximumDelay)) {
+				} else if (this.congestionInfo.getINTERNALIZATION_APPROACH().equals(DelayInternalizationApproach.MaximumDelay)) {
 					double maximumDelay = this.congestionInfo.getCongestionLinkInfos().get(linkId).getTravelTimeMaximum() - freespeedTravelTime_sec;
 					amount = -1.0 * maximumDelay * vtts_hour / 3600.;
 				

@@ -1,8 +1,5 @@
 package gunnar.tryout;
 
-import gunnar.ihop2.regent.demandreading.ZonalSystem;
-import gunnar.ihop2.regent.demandreading.Zone;
-
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Iterator;
@@ -23,6 +20,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import gunnar.ihop2.regent.demandreading.ZonalSystem;
+import gunnar.ihop2.regent.demandreading.Zone;
 import saleem.stockholmscenario.utils.StockholmTransformationFactory;
 import sergio.AssignmentMatrixColumnInventor;
 import sergio.Trip;

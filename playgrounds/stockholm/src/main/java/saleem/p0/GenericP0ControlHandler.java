@@ -89,7 +89,7 @@ public class GenericP0ControlHandler implements BasicEventHandler{
 		bintime=0;
 		Iterator<Link> iterator = this.inLinks.iterator();
 		totalDelayLinks = new LinkedHashMap<Id<Link>, Double>();
-		this.events=new ArrayList<NetworkChangeEvent>(); //To run without setiteration should be called with 0 from control listener, and comment out this line
+		this.events=new ArrayList<NetworkChangeEvent>(); //To run without P0, setiteration should be called with 0 from control listener, and comment out this line
 		this.changeeventtimes=new ArrayList<Double>(); 
 		avgDelayLinks = new LinkedHashMap<Id<Link>, Double>();
 		totalVehCountsLinks = new LinkedHashMap<Id<Link>, Double>();

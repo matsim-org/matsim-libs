@@ -21,15 +21,15 @@ package org.matsim.pt.router;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.facilities.Facility;
 
 /**
  * @author mrieser
  */
 public interface TransitRouter {
 
-	public abstract List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person);
+	public abstract List<Leg> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime, final Person person);
 
 }

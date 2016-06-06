@@ -51,8 +51,8 @@ public class NoiseCalculationOfflineMaryland {
 
 	public static void main(String[] args) {
 
-		runDirectory = "../../../runs-svn/silo/maryland/run_09/run_12_2001/";
-		outputDirectory = "../../../runs-svn/silo/maryland/run_09/run_12_2001/noise_3";
+		runDirectory = "../../../runs-svn/silo/maryland/run_09/matsim/year_2001/";
+		outputDirectory = "../../../runs-svn/silo/maryland/run_09/matsim/year_2001/noise_dc/";
 		receiverPointGap = 100.;
 		lastIteration = 20;
 
@@ -65,8 +65,8 @@ public class NoiseCalculationOfflineMaryland {
 		
 
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
-		config.network().setInputFile(runDirectory + "run_12_2001.output_network.xml.gz");
-		config.plans().setInputFile(runDirectory + "run_12_2001.output_plans.xml.gz");
+		config.network().setInputFile(runDirectory + "year_2001.output_network.xml.gz");
+		config.plans().setInputFile(runDirectory + "year_2001.output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(lastIteration);
 
@@ -81,11 +81,17 @@ public class NoiseCalculationOfflineMaryland {
 //		double yMin = 4312000.;
 //		double xMax = 373000.;
 //		double yMax = 4320000.;
-//
-//		noiseParameters.setReceiverPointsGridMinX(xMin);
-//		noiseParameters.setReceiverPointsGridMinY(yMin);
-//		noiseParameters.setReceiverPointsGridMaxX(xMax);
-//		noiseParameters.setReceiverPointsGridMaxY(yMax);
+		
+		// DC coordinates
+		double xMin = 305000.;
+		double yMin = 4295000.;
+		double xMax = 342000.;
+		double yMax = 4323000.;
+
+		noiseParameters.setReceiverPointsGridMinX(xMin);
+		noiseParameters.setReceiverPointsGridMinY(yMin);
+		noiseParameters.setReceiverPointsGridMaxX(xMax);
+		noiseParameters.setReceiverPointsGridMaxY(yMax);
 
 		//		 Activity Types
 		String[] consideredActivitiesForDamages = {"home","work"};
@@ -143,7 +149,7 @@ public class NoiseCalculationOfflineMaryland {
 		merger.setWorkingDirectory(workingDirectories);
 		merger.setLabel(labels);
 		merger.setOutputFormat(OutputFormat.xyt);
-		merger.setThreshold(-1.); // Kai uses "1" here
+		merger.setThreshold(1.); // Kai uses "1" here; before I had "-1" here
 		merger.run();
 	}
 }

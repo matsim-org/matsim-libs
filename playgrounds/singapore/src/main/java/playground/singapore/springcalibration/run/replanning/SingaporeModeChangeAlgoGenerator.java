@@ -22,7 +22,7 @@ package playground.singapore.springcalibration.run.replanning;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
+import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
@@ -43,7 +43,7 @@ public class SingaporeModeChangeAlgoGenerator extends AbstractMultithreadedModul
 	private SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
 
 	public SingaporeModeChangeAlgoGenerator(final GlobalConfigGroup globalConfigGroup, 
-			ChangeLegModeConfigGroup changeLegModeConfigGroup, 
+			ChangeModeConfigGroup changeLegModeConfigGroup, 
 			SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup,
 			Population population, 
 			TaxiUtils taxiUtils) {

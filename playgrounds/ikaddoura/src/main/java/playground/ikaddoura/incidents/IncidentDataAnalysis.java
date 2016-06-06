@@ -57,20 +57,25 @@ public class IncidentDataAnalysis {
 //	private String crs = TransformationFactory.WGS84_UTM33N;
 	
 	private String inputDirectory = "../../../shared-svn/studies/ihab/incidents/server/output-berlin/";
-	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin_2016-04-27_a/";
+//	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin_2016-05-19_a/";
+	private String outputDirectory = "../../../shared-svn/studies/ihab/incidents/analysis/output-berlin_2016-05-19_b/";
 	
 	private boolean writeCSVFileForEachXMLFile = false;
 	
 	private boolean writeAllTrafficItems2ShapeFile = false;
 	
 	private boolean writeDaySpecificTrafficItems2ShapeFile = true;
-	private String shpFileStartDateTime = "2016-02-11";
-	private String shpFileEndDateTime = "2016-03-26";
+//	private String shpFileStartDateTime = "2016-02-11";
+//	private String shpFileEndDateTime = "2016-03-26";
+	private String shpFileStartDateTime = "2016-03-29";
+	private String shpFileEndDateTime = "2016-05-18";
 	
 	private boolean writeNetworkChangeEventFiles = true;
-	private String networkChangeEventStartDateTime = "2016-02-11";
-	private String networkChangeEventEndDateTime = "2016-03-26";
-		
+//	private String networkChangeEventStartDateTime = "2016-02-11";
+//	private String networkChangeEventEndDateTime = "2016-03-26";
+	private String networkChangeEventStartDateTime = "2016-03-29";
+	private String networkChangeEventEndDateTime = "2016-05-18";
+	
 // ##################################################################
 	
 	private final Map<String, TrafficItem> trafficItems = new HashMap<>();

@@ -35,21 +35,21 @@ import com.google.common.collect.Maps;
 public class TaxiStatsCalculator
 {
     private final int hours;
-    private final HourlyTaxiStats[] hourlyStats;
-    private final DailyTaxiStats dailyStats = new DailyTaxiStats();
+    private final TaxiStats[] hourlyStats;
+    private final TaxiStats dailyStats = new TaxiStats("daily");
     private final Map<String, TaxiStats> taxiStats;
 
 
     public TaxiStatsCalculator(Iterable<? extends Vehicle> vehicles)
     {
         hours = calcHours(vehicles);
-        hourlyStats = new HourlyTaxiStats[hours];
+        hourlyStats = new TaxiStats[hours];
         for (int h = 0; h < hours; h++) {
-            hourlyStats[h] = new HourlyTaxiStats(h);
+            hourlyStats[h] = new TaxiStats(h + "");
         }
 
         Map<String, TaxiStats> allStats = Maps.newLinkedHashMapWithExpectedSize(hours + 1);
-        for (HourlyTaxiStats s : hourlyStats) {
+        for (TaxiStats s : hourlyStats) {
             allStats.put(s.id, s);
         }
         allStats.put(dailyStats.id, dailyStats);
@@ -81,13 +81,13 @@ public class TaxiStatsCalculator
     }
 
 
-    public HourlyTaxiStats getHourlyStats(int hour)
+    public TaxiStats getHourlyStats(int hour)
     {
         return hourlyStats[hour];
     }
 
 
-    public DailyTaxiStats getDailyStats()
+    public TaxiStats getDailyStats()
     {
         return dailyStats;
     }
@@ -101,7 +101,7 @@ public class TaxiStatsCalculator
         }
 
         @SuppressWarnings("unchecked")
-        LongEnumAdder<TaxiTask.TaxiTaskType>[] vehicleHourlySums = new LongEnumAdder[hours];
+        LongEnumAdder<TaxiTaskType>[] vehicleHourlySums = new LongEnumAdder[hours];
         int hourIdx = hour(schedule.getBeginTime());
 
         for (TaxiTask t : schedule.getTasks()) {
@@ -134,12 +134,12 @@ public class TaxiStatsCalculator
     }
 
 
-    private void includeTaskIntoHourlySums(LongEnumAdder<TaxiTask.TaxiTaskType>[] hourlySums, int hour,
+    private void includeTaskIntoHourlySums(LongEnumAdder<TaxiTaskType>[] hourlySums, int hour,
             TaxiTask task, double fromTime, double toTime)
     {
         if (fromTime < toTime) {
             if (hourlySums[hour] == null) {
-                hourlySums[hour] = new LongEnumAdder<>(TaxiTask.TaxiTaskType.class);
+                hourlySums[hour] = new LongEnumAdder<>(TaxiTaskType.class);
             }
             hourlySums[hour].add(task.getTaxiTaskType(), (long)(toTime - fromTime));
         }
@@ -151,7 +151,7 @@ public class TaxiStatsCalculator
         LongEnumAdder<TaxiTaskType> vehicleDailySums = new LongEnumAdder<>(TaxiTaskType.class);
 
         for (int h = 0; h < hours; h++) {
-            LongEnumAdder<TaxiTask.TaxiTaskType> vhs = vehicleHourlySums[h];
+            LongEnumAdder<TaxiTaskType> vhs = vehicleHourlySums[h];
             if (vhs != null && vhs.getLongTotal() > 0) {
                 updateTaxiStats(hourlyStats[h], vhs);
                 vehicleDailySums.addAll(vhs);

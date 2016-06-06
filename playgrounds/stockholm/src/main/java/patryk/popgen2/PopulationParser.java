@@ -1,7 +1,5 @@
 package patryk.popgen2;
 
-import gunnar.ihop2.regent.demandreading.Zone;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -9,6 +7,8 @@ import java.util.HashMap;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+
+import gunnar.ihop2.regent.demandreading.Zone;
 
 public class PopulationParser implements TabularFileHandler {
 	

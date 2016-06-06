@@ -198,8 +198,9 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 						consumableHoles.put( distanceOfHoleFromFromNode, hole ) ;
 					}
 
+					if ( QSimConfigGroup.SnapshotStyle.withHolesAndShowHoles==scenario.getConfig().qsim().getSnapshotStyle() ) {
 					addHolePosition( positions, distanceOfHoleFromFromNode, hole, curvedLength, upstreamCoord, downstreamCoord ) ;
-//					consumableHoles.put( distanceOfHoleFromFromNode, hole ) ;
+					}
 				}
 				final double spaceConsumptionOfHoles = sum*spacingOfOnePCE;
 				final double spaceAvailableForHoles = distanceOfHoleFromFromNode - firstHolePosition;

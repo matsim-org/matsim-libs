@@ -162,16 +162,12 @@ public class SubpopRoadPricingModule extends AbstractModule {
         @Override
         public TravelDisutilityFactory get() {
         	
-            RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, 
-            		RoadPricingConfigGroup.GROUP_NAME, 
-            		RoadPricingConfigGroup.class);
-            
             final TravelDisutilityFactory originalTravelDisutilityFactory = new SubpopTravelDisutilityFactory(parameters, TransportMode.car);
             log.info("getting TravelDisutilityFactory");
             
             SubpopRoadPricingTravelDisutilityFactory travelDisutilityFactory = new SubpopRoadPricingTravelDisutilityFactory(
                     originalTravelDisutilityFactory, scheme, parameters);
-            travelDisutilityFactory.setSigma(rpConfig.getRoutingRandomness());
+            travelDisutilityFactory.setSigma(config.plansCalcRoute().getRoutingRandomness());
             return travelDisutilityFactory;
         }
     }

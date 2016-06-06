@@ -42,18 +42,27 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunEmissionToolOnlineExample {
 
 	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config.xml";
-
-	public static void main(String[] args) {
-		Config config ;
-		if ( args.length==0 ) {
+	
+	private final Config config ;
+	
+	public RunEmissionToolOnlineExample( String[] args ) {
+		if ( args==null || args.length==0 ) {
 			config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
 		} else {
 			config = ConfigUtils.loadConfig( args[0], new EmissionsConfigGroup());
 		}
+	}	
+	public final void run() {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		controler.addControlerListener(new EmissionControlerListener());
 		controler.run();
+	}
+	public static void main(String[] args) {
+		new RunEmissionToolOnlineExample(args).run();
+	}
+	public final Config getConfig() {
+		return this.config;
 	}
 
 }

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author (of javadoc) nagel
  */
 public interface Facility<T extends Facility<?>> extends BasicLocation<T>, Identifiable<T>, Customizable {
-	// yy we might consider to not further differentiate the different facility types in id space.  Then it could just be
+	// yyyyyy we might consider to not further differentiate the different facility types in id space.  Then it could just be
 	//   interface Facility extends BasicLocation<Facility>, ...
 	// kai, dec'15
 

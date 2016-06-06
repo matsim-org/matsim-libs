@@ -104,6 +104,9 @@ public class AccessibilityComputationCapeTownTest {
 		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		accessibilityConfigGroup.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+		
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+		// yy For a test, "abort" may be too strict.  kai, may'16
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 

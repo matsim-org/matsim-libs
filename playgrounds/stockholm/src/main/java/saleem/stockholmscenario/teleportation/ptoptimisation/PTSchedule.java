@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -15,11 +14,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
-import saleem.stockholmscenario.utils.CollectionUtil;
 import floetteroed.opdyts.DecisionVariable;
+import saleem.stockholmscenario.utils.CollectionUtil;
 
 public class PTSchedule implements DecisionVariable{
 	TransitSchedule schedule;

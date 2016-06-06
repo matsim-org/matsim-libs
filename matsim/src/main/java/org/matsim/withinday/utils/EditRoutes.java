@@ -33,13 +33,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.RouteFactoryImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactoryImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
@@ -51,6 +50,10 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
+/**
+ * @author nagel
+ *
+ */
 public class EditRoutes {
 	/*
 	 * Design thoughts while adding access/egress walk legs to car trips:
@@ -75,10 +78,17 @@ public class EditRoutes {
 
 	public EditRoutes(){} // for backwards compatibility
 
+	@Deprecated // use ctor with population factory (no need to pass non-API route factory as argument). kai, may'16
 	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, RouteFactoryImpl routeFactory ) {
 		this.network = network ;
 		this.pathCalculator = pathCalculator ;
 		this.routeFactories = routeFactory ;
+	}
+
+	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, PopulationFactory popFactory ) {
+		this.network = network ;
+		this.pathCalculator = pathCalculator ;
+		this.routeFactories = ((PopulationFactoryImpl) popFactory).getRouteFactory() ;
 	}
 
 	/**
@@ -141,18 +151,18 @@ public class EditRoutes {
 		return true;
 	}
 
-	/**
-	 * Re-plans a future route. The route is given by its leg. It is expected that the
-	 * leg's route is not null and that the start- and end link Ids are set properly.
-	 * 
-	 * If the start- and or end-location of the leg have changed, use relocateFutureLegRoute(...)!
-	 * 
-	 * @return true when replacing the route worked, false when something went wrong
-	 */
-	@Deprecated // switch this to relocateFutureTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
-	public static boolean replanFutureLegRoute(Leg leg, Person person, Network network, TripRouter tripRouter) {
-		return relocateFutureLegRoute( leg, leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), person, network, tripRouter ) ;
-	}
+//	/**
+//	 * Re-plans a future route. The route is given by its leg. It is expected that the
+//	 * leg's route is not null and that the start- and end link Ids are set properly.
+//	 * 
+//	 * If the start- and or end-location of the leg have changed, use relocateFutureLegRoute(...)!
+//	 * 
+//	 * @return true when replacing the route worked, false when something went wrong
+//	 */
+//	@Deprecated // switch this to relocateFutureTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
+//	public static boolean replanFutureLegRoute(Leg leg, Person person, Network network, TripRouter tripRouter) {
+//		return relocateFutureLegRoute( leg, leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), person, network, tripRouter ) ;
+//	}
 
 	/**
 	 * Re-plans a future route. The route is given by its leg. It is expected that the
@@ -166,13 +176,26 @@ public class EditRoutes {
 		return relocateFutureLegRoute( leg, leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), person ) ;
 	}
 
+	
+	/** Convenience method, to be consistent with earlier syntax.  kai, may'16
+	 * @param trip
+	 * @param plan
+	 * @param mainMode
+	 * @param departureTime
+	 * @param network
+	 * @param tripRouter
+	 */
+	public static boolean relocateFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
+		return replanFutureTrip( trip,  plan,  mainMode,  departureTime,  network,  tripRouter) ;
+	}
+
 	/**
 	 * In contrast to the other replanFutureLegRoute(...) method, the leg at the given index is replaced
 	 * by a new one. This is e.g. necessary when replacing a pt trip which might consists of multiple legs
 	 * and pt_interaction activities.  
 	 * This might become the future default approach.
 	 */
-	public static boolean replanFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
+		public static boolean replanFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
 
 		Person person = plan.getPerson();
 

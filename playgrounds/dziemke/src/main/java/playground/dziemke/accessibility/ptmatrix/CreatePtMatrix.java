@@ -113,6 +113,9 @@ public class CreatePtMatrix {
                 }
             }
         }
+        
+        throw new RuntimeException("since the class is deprecated, I refrain from fixing the below (change from coords to facs). kai, may'16") ;
+        /*
 
 //        MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
 //        networkReader.readFile(networkFile);
@@ -134,6 +137,7 @@ public class CreatePtMatrix {
 
         final long timeEnd = System.currentTimeMillis();
         System.out.println("Elapsed Time: " + (timeEnd - timeStart) + " millisec.");
+        */
     }
 
 }

@@ -50,8 +50,7 @@ public class IntervalBasedCongestionPricingRun {
 	private static final Logger log = Logger.getLogger(IntervalBasedCongestionPricingRun.class);
 
 	private static String configFile;
-	private static double sigma;
-	private static boolean runBaseCase;
+	private static String outputDirectory;
 	
 	public static void main(String[] args) throws IOException {
 		log.info("Starting simulation run with the following arguments:");
@@ -61,16 +60,12 @@ public class IntervalBasedCongestionPricingRun {
 			configFile = args[0];		
 			log.info("config file: "+ configFile);
 			
-			sigma = Double.valueOf(args[1]);		
-			log.info("sigma: "+ sigma);
-			
-			runBaseCase = Boolean.valueOf(args[2]);
-			log.info("run base-case: "+ runBaseCase);
+			outputDirectory = args[1];		
+			log.info("output directory: "+ outputDirectory);
 
 		} else {
 			configFile = "../../../runs-svn/intervalBasedCongestionPricing/input/config.xml";
-			sigma = 3.0;
-			runBaseCase = false;
+			outputDirectory = "../../../runs-svn/intervalBasedCongestionPricing/output/intervalBasedInternalization_800/";
 		}
 
 		IntervalBasedCongestionPricingRun main = new IntervalBasedCongestionPricingRun();
@@ -81,12 +76,17 @@ public class IntervalBasedCongestionPricingRun {
 	private void run() {
 
 		Config config = ConfigUtils.loadConfig(configFile);
+		config.controler().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		Controler controler = new Controler(scenario);
 
+		if (config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() == 0.) {
+			log.warn("The monetary distance rate is 0. The randomized router won't work properly...");
+		}
+		
 		final Builder factory = new Builder(TransportMode.car, config.planCalcScore());
-		factory.setSigma(sigma);
+		factory.setSigma(3.0);
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
@@ -94,7 +94,7 @@ public class IntervalBasedCongestionPricingRun {
 			}
 		});
 
-		if (!runBaseCase) controler.addControlerListener(new IntervalBasedCongestionPricing(scenario));
+		controler.addControlerListener(new IntervalBasedCongestionPricing(scenario));
 	
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();

@@ -41,9 +41,19 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class NoiseOfflineCalculationCottbus {
 	
-	private static String runDirectory = "../../../public-svn/matsim/scenarios/countries/de/cottbus/cottbus-with-pt/output/cb02/";
-	private static String outputDirectory = "../../../public-svn/matsim/scenarios/countries/de/cottbus/cottbus-with-pt/output/cb02/noise-analysis/";
-	private static int lastIteration = 100;
+//	private static String runDirectory = "../../../lehre-svn/lehrveranstaltungen/L011_abv/2016_ss/UE/Ausgabedateien/MATSim_Kurs_Planfall/1/output/cb-ha01/";
+//	private static String outputDirectory = "../../../lehre-svn/lehrveranstaltungen/L011_abv/2016_ss/UE/Ausgabedateien/MATSim_Kurs_Planfall/1/output/cb-ha01/noise-analysis/";
+
+//	private static String runDirectory = "../../../lehre-svn/lehrveranstaltungen/L011_abv/2016_ss/UE/Ausgabedateien/MATSim_Kurs_Planfall/2/Planfall/";
+//	private static String outputDirectory = "../../../lehre-svn/lehrveranstaltungen/L011_abv/2016_ss/UE/Ausgabedateien/MATSim_Kurs_Planfall/2/Planfall/noise-analysis/";
+	
+	private static String runDirectory = "../../../lehre-svn/lehrveranstaltungen/L011_abv/2016_ss/UE/Ausgabedateien/MATSim_Kurs_Planfall/3/output/";
+	private static String outputDirectory = "../../../lehre-svn/lehrveranstaltungen/L011_abv/2016_ss/UE/Ausgabedateien/MATSim_Kurs_Planfall/3/output/noise-analysis/";
+
+//	private static String runDirectory = "../../../public-svn/matsim/scenarios/countries/de/cottbus/cottbus-with-pt/output/cb02/";
+//	private static String outputDirectory = "../../../public-svn/matsim/scenarios/countries/de/cottbus/cottbus-with-pt/output/cb02/noise-analysis-25-baseCase/";
+	
+	private static int lastIteration = 50;
 				
 	public static void main(String[] args) {
 	
@@ -54,7 +64,7 @@ public class NoiseOfflineCalculationCottbus {
 		config.controler().setLastIteration(lastIteration);		
 						
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
-		noiseParameters.setReceiverPointGap(100.);
+		noiseParameters.setReceiverPointGap(25.); // 25.
 		noiseParameters.setTimeBinSizeNoiseComputation(3600.);
 		
 		String[] consideredActivitiesForDamages = {"home", "work"};

@@ -53,7 +53,7 @@ public class DynRoutingModule
         leg.setTravelTime(Double.NaN);
         leg.setRoute(route);
 
-        return Arrays.asList(leg);
+        return Collections.singletonList(leg);
     }
 
 

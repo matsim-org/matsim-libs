@@ -48,6 +48,14 @@ public class RunTaxiBenchmark
     {
         final TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
         Config config = ConfigUtils.loadConfig(configFile, taxiCfg);
+        createControler(config, runs).run();
+
+    }
+
+
+    public static Controler createControler(Config config, int runs)
+    {
+        TaxiConfigGroup taxiCfg = (TaxiConfigGroup)config.getModule(TaxiConfigGroup.GROUP_NAME);
         config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
         config.checkConsistency();
 
@@ -70,7 +78,7 @@ public class RunTaxiBenchmark
             };
         });
 
-        controler.run();
+        return controler;
     }
 
 

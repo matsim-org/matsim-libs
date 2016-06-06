@@ -40,51 +40,73 @@ import java.util.*;
 public class StopFacilityHistogram {
 	
 	private TransitSchedule schedule;
-	private Map<Integer, String> stopFacilityHistogramMap = new TreeMap<>();
-	private double[] stopFacilityHistogram;
+	private Map<String, Integer> histMap = new TreeMap<>();
+	private double[] hist;
+
+	private static final String SUFFIX_PATTERN = "[.]link:";
+	private static final String SUFFIX = ".link:";
 
 	public static void main(final String[] args) {
-		// "C:/Users/polettif/Desktop/output/results_2016-05-04/zurich_gtfs_schedule.xml"
-		// "C:/Users/polettif/Desktop/output/results_2016-05-04/histogram.png"
-		TransitSchedule schedule = ScheduleTools.loadTransitSchedule(args[0]);
+		run(args[0], args[1]);
+	}
 
-		StopFacilityHistogram check = new StopFacilityHistogram(schedule);
+	public static void run(String scheduleFile, String outputPngFile) {
+		new StopFacilityHistogram(ScheduleTools.readTransitSchedule(scheduleFile)).createPng(outputPngFile);
+	}
 
-		check.calcHistogram(schedule);
-		check.createPng(args[1]);
+	public static void run(TransitSchedule schedule, String outputPngFile) {
+		new StopFacilityHistogram(schedule).createPng(outputPngFile);
 	}
 
 	public StopFacilityHistogram(TransitSchedule schedule) {
 		this.schedule = schedule;
-		calcHistogram(this.schedule);
+		calcHistogram();
 	}
 
-	public void calcHistogram(TransitSchedule schedule) {
+	private void calcHistogram() {
 		Map<String, Integer> stopStat = new TreeMap<>();
 
-
-		for(TransitStopFacility stopFacility : schedule.getFacilities().values()) {
-			String parentFacility = stopFacility.getId().toString().split("[.]link:")[0];
+		for(TransitStopFacility stopFacility : this.schedule.getFacilities().values()) {
+			String parentFacility = stopFacility.getId().toString().split(SUFFIX_PATTERN)[0];
 			int count = MapUtils.getInteger(parentFacility, stopStat, 0);
 			stopStat.put(parentFacility, ++count);
 		}
 
-		Map<String, Integer> stopStatSorted = MiscUtils.sortAscendingByValue(stopStat);
+		histMap = MiscUtils.sortAscendingByValue(stopStat);
 
-		stopFacilityHistogram = new double[stopStatSorted.size()];
+		hist = new double[histMap.size()];
 		int i=0;
-		for(Integer value : stopStatSorted.values()) {
-			stopFacilityHistogram[i] = (double) value;
+		for(Integer value : histMap.values()) {
+			hist[i] = (double) value;
 			i++;
 		}
 	}
 
+	public double median() {
+		int m = hist.length / 2;
+		return hist[m];
+	}
+
+	public double average() {
+		double sum = 0;
+		for(double m : hist) {
+			sum += m;
+		}
+		return sum/hist.length;
+	}
+
+	public double max() {
+		return hist[hist.length - 1];
+	}
+
 	public void createCsv(String outputFile) throws FileNotFoundException, UnsupportedEncodingException {
 		Map<Tuple<Integer, Integer>, String> stopStatCsv = new HashMap<>();
-		int i=1;
-		for(Map.Entry<Integer, String> e : stopFacilityHistogramMap.entrySet()) {
-			stopStatCsv.put(new Tuple<>(i, 1), e.getValue());
-			stopStatCsv.put(new Tuple<>(i, 2), e.getKey().toString());
+		stopStatCsv.put(new Tuple<>(1, 1), "parent stop id");
+		stopStatCsv.put(new Tuple<>(1, 2), "nr of child stop facilities");
+		int i=2;
+		for(Map.Entry<String, Integer> e : histMap.entrySet()) {
+			stopStatCsv.put(new Tuple<>(i, 1), e.getKey());
+			stopStatCsv.put(new Tuple<>(i, 2), e.getValue().toString());
 			i++;
 		}
 
@@ -96,9 +118,7 @@ public class StopFacilityHistogram {
 	 */
 	public void createPng(final String filename) {
 		BarChart chart = new BarChart("Stop Facility Histogram", "", "# of child stop facilities");
-		chart.addSeries("# StopFacilities", stopFacilityHistogram);
+		chart.addSeries("# StopFacilities", hist);
 		chart.saveAsPng(filename, 800, 600);
 	}
-
-
 }
