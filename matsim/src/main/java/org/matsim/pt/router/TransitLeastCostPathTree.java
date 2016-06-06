@@ -104,7 +104,7 @@ public class TransitLeastCostPathTree {
 		//create tree
 		this.resetNetworkVisited();
 		this.person = person;
-//TODO		this.customDataManager.reset();
+		this.customDataManager.reset();
 		this.fromNodes = fromNodes;
 
 		RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
@@ -281,20 +281,20 @@ public class TransitLeastCostPathTree {
 			final RouterPriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost) {
 
-//TODO        this.customDataManager.initForLink(l);
+        this.customDataManager.initForLink(l);
         double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, this.person, this.vehicle);
         double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle, this.customDataManager);
         DijkstraNodeData data = getData(n);
         double nCost = data.getCost();
         if (!data.isVisited(getIterationId())) {
             visitNode(n, data, pendingNodes, currTime + travelTime, currCost + travelCost, l);
-//TODO            this.customDataManager.storeTmpData();
+            this.customDataManager.storeTmpData();
             return true;
         }
         double totalCost = currCost + travelCost;
         if (totalCost < nCost) {
             revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
-//TODO            this.customDataManager.storeTmpData();
+            this.customDataManager.storeTmpData();
             return true;
         }
 
