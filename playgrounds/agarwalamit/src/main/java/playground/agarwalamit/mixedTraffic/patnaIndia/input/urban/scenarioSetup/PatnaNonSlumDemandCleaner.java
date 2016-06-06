@@ -32,6 +32,7 @@ import java.util.TreeMap;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.input.urban.scenarioSetup.PatnaCalibrationUtils.PatnaDemandLabels;
+import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaUtils.PatnaUrbanActivityTypes;
 import playground.agarwalamit.utils.RandomNumberUtils;
 
@@ -51,15 +52,17 @@ public class PatnaNonSlumDemandCleaner {
 	}
 
 	public static void main(String[] args) {
-		String inputFile1 = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/nonSlum_27-42_uncleanedData.txt"; 
-		String inputFile2 = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/nonSlum_restZones_uncleanedData.txt"; 
+		String inputFile1 = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/raw_uncleanData/nonSlum_27-42_uncleanedData.txt"; 
+		String inputFile2 = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/raw_uncleanData/nonSlum_restZones_uncleanedData.txt";
+		String inputFile3 = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/nonSlum_27-42_imputed.txt";
+		
 		String outFile = "../../../../repos/shared-svn/projects/patnaIndia/inputs/tripDiaryDataIncome/nonSlum_allZones_cleanedData.txt";
 
 		PatnaNonSlumDemandCleaner pdfc = new PatnaNonSlumDemandCleaner(outFile);
-		pdfc.run(inputFile1, inputFile2);
+		pdfc.run(inputFile1, inputFile2, inputFile3);
 	}
 
-	public void run (String inputFile1, String inputFile2){
+	public void run (String inputFile1, String inputFile2, String inputFile3){
 		this.writer = IOUtils.getBufferedWriter(this.outFile);
 
 		try {
@@ -75,6 +78,7 @@ public class PatnaNonSlumDemandCleaner {
 
 		readZonesFileAndWriteData(inputFile1, true);
 		readZonesFileAndWriteData(inputFile2, false);
+		readZonesFileAndWriteData(inputFile3, false); // this is cleaned file. However, good to just add it to the same file.
 
 		try{
 			writer.close();
@@ -173,6 +177,8 @@ public class PatnaNonSlumDemandCleaner {
 
 				if (mode.equals("9999")) {
 					mode = randomModes.remove(0); // always take what is on top.
+				} else if (PatnaUtils.ALL_MODES.contains(mode)) {
+					// nothing to do.
 				} else if (Integer.valueOf(mode) <= 9 ) {
 					mode = PatnaCalibrationUtils.getTravelModeFromCode(mode);
 				}
