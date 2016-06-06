@@ -148,7 +148,7 @@ public class TransitLeastCostPathTree {
 			DijkstraNodeData data = getData(currentNode);
 			InitialNode initData = toNodes.get(currentNode);
 			double cost = data.getCost() + initData.initialCost;
-			if (cost != 0.0 || fromNodes.containsKey(currentNode)) {
+			if (data.getCost() != 0.0 || fromNodes.containsKey(currentNode)) {
 				if (cost < minCost) {
 					minCost = cost;
 					minCostNode = currentNode;
