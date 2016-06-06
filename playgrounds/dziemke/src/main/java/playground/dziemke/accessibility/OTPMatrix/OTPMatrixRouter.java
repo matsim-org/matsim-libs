@@ -225,17 +225,16 @@ public class OTPMatrixRouter {
         List<State> states = eval(spt, toIndividual.sample);
 
         long elapsedTime = Long.MAX_VALUE;
-        double distance = Double.MAX_VALUE;
+        double distance = 0;
 
         for (State state : states) {
             Edge backEdge = state.getBackEdge();
             if (backEdge != null && backEdge.getFromVertex() != null) {
-                distance += backEdge.getDistance();
-                elapsedTime = state.getActiveTime();
+				distance += backEdge.getDistance();
+				elapsedTime = state.getActiveTime();
             }
         }
-
-        //write output
+		//write output
         timeWriter.writeField(elapsedTime);
         distanceWriter.writeField(distance);
     }
