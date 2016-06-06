@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.cadyts.general;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -29,10 +27,12 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import java.util.Map;
+
 /**
  * @author nagel
  */
-public class CadytsPlanChanger<T> implements PlanSelector {
+public class CadytsPlanChanger<T> implements PlanSelector<Plan, Person> {
 
 	private final double beta ;
 	private double cadytsWeight = 1.0;

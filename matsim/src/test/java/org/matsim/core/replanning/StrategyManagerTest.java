@@ -20,14 +20,6 @@
 
 package org.matsim.core.replanning;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -42,10 +34,13 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class StrategyManagerTest {
 
@@ -390,7 +385,7 @@ public class StrategyManagerTest {
 
 		private int counter = 0;
 
-		protected StrategyCounter(final GenericPlanSelector<Plan, Person> selector) {
+		protected StrategyCounter(final PlanSelector<Plan, Person> selector) {
 			planStrategyDelegate = new PlanStrategyImpl( selector ) ;
 		}
 
@@ -439,7 +434,7 @@ public class StrategyManagerTest {
 	 *
 	 * @author mrieser
 	 */
-	static private class TestPlanSelector implements PlanSelector {
+	static private class TestPlanSelector implements PlanSelector<Plan, Person> {
 
 		public TestPlanSelector() {
 		}
