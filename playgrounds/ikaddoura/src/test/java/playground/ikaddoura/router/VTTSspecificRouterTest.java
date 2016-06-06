@@ -81,6 +81,10 @@ public class VTTSspecificRouterTest {
 		
 		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS.xml";
 		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile1 ) );
+		
+		scenario.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// for "true" would have to locate activities such that walk access/egress is zero. kai, jun'16
+		
 		final Controler controler = new Controler( scenario );
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
 		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()) ;
@@ -255,6 +259,10 @@ public class VTTSspecificRouterTest {
 		
 		final String configFile = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost.xml";
 		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		
+		scenario.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// for "true" would have to locate activities such that walk access/egress is zero. kai, jun'16
+		
 		final Controler controler = new Controler( scenario );
 		final VTTSHandler vttsHandler = new VTTSHandler(controler.getScenario());
 		final VTTSTimeDistanceTravelDisutilityFactory factory = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler, controler.getConfig().planCalcScore()) ;
@@ -348,6 +356,10 @@ public class VTTSspecificRouterTest {
 				
 		final String configFile = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_noDistanceCost.xml";
 		final Scenario scenario = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile ) );
+		
+		scenario.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// for "true" would have to locate activities such that walk access/egress is zero. kai, jun'16
+		
 		final Controler controler = new Controler( scenario );
 		final Map<Id<Vehicle>, Set<Id<Link>>> vehicleId2linkIds = new HashMap<>();
 		
@@ -475,6 +487,10 @@ public class VTTSspecificRouterTest {
 		
 		final String configFile1 = testUtils.getPackageInputDirectory() + "vttsSpecificRouter/configVTTS_withDistanceCost_largePopulation_1.xml";
 		final Scenario scenario1 = ScenarioUtils.loadScenario( testUtils.loadConfig( configFile1 ) );
+		
+		scenario1.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// for "true" would have to locate activities such that walk access/egress is zero. kai, jun'16
+		
 		final Controler controler1 = new Controler( scenario1 );
 		final VTTSHandler vttsHandler1 = new VTTSHandler(controler1.getScenario());
 		final VTTSTimeDistanceTravelDisutilityFactory factory1 = new VTTSTimeDistanceTravelDisutilityFactory(vttsHandler1, controler1.getConfig().planCalcScore()) ;
