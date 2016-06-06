@@ -63,6 +63,7 @@ import scenarios.illustrative.analysis.TtAbstractAnalysisTool;
 import scenarios.illustrative.analysis.TtAnalyzedResultsWriter;
 import scenarios.illustrative.analysis.TtListenerToBindAndWriteAnalysis;
 import scenarios.illustrative.braess.analysis.TtAnalyzeBraess;
+import utils.ModifyPopulation;
 
 /**
  * @author tthunig
@@ -72,7 +73,7 @@ public class TtRunCapAdopForBraess {
 	
 	private static final Logger LOG = Logger.getLogger(TtRunCapAdopForBraess.class);
 	
-	private static final int flowValueStepSize = 5;
+	private static final int flowValueStepSize = 2;
 	private static final int iterationNumberPerStep = 100;
 	private static final boolean REUSE_PLANS = false;
 	
@@ -84,13 +85,15 @@ public class TtRunCapAdopForBraess {
 
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
-	private static final double SIGMA = 3.0;
+	private static final double SIGMA = 0.0;
 
 	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/capacityAdoption/";
 
 	private static final String INPUT_BASE_DIR = "../../../shared-svn/projects/cottbus/data/scenarios/braess_scenario/cap4000-1800_noSignals/";
 	private static final String NETWORK_FILE = INPUT_BASE_DIR + "network.xml";
-	private static final String PLANS_FILE = INPUT_BASE_DIR + "plans.xml";
+	private static final String PLANS_FILE = INPUT_BASE_DIR + "plans.xml"; // without init routes
+	
+	private static final int STOP_CRITERION = 10;
 	
 	public static void main(String[] args) {
 	
@@ -134,30 +137,33 @@ public class TtRunCapAdopForBraess {
 		int i = 0;
 		
 		// start loop. adopt scenario while stable state is not reached
-		while (!stableState) {
+		while (!stableState && i < STOP_CRITERION) {
+			
+			i++;
+			
 			// run basic scenario with changed capacities
 			controlerBasic.run();
 			
 			Network networkBasic = controlerBasic.getScenario().getNetwork();
-			int currentFirstIteration = controlerBasic.getScenario().getConfig().controler().getFirstIteration();
-			int currentLastIteration = controlerBasic.getScenario().getConfig().controler().getLastIteration();
 			
 			// write current network of the basic scenario to file
-			new NetworkWriter(networkBasic).write(createOutputDirName("comparison") + "network" + currentFirstIteration + ".xml");
+			new NetworkWriter(networkBasic).write(createOutputDirName("comparison") + "network" + i + ".xml");
 			// prepare file for comparison of link flows
-			CompFileWriter compFileWriter = new CompFileWriter(currentFirstIteration);
+			CompFileWriter compFileWriter = new CompFileWriter(i);
 						
 			// adopt iteration numbers for the next loop
-			controlerBasic.getScenario().getConfig().controler().setFirstIteration(currentLastIteration + 1);
-			controlerBasic.getScenario().getConfig().controler().setLastIteration(currentLastIteration + iterationNumberPerStep);
-			// TODO does this change anything? the scenario is not loaded again afterwards...
-			if (REUSE_PLANS) {
-				// use last plans for the next iteration
-				controlerBasic.getScenario().getConfig().plans().setInputFile(controlerBasic.getScenario().getConfig().controler().getOutputDirectory() + "output_plans.xml.gz");
-			} else {
-				// use plans without routes from the beginning
-				controlerBasic.getScenario().getConfig().plans().setInputFile(PLANS_FILE);
-			}
+//			controlerBasic.getScenario().getConfig().controler().setFirstIteration(currentLastIteration + 1);
+//			controlerBasic.getScenario().getConfig().controler().setLastIteration(currentLastIteration + iterationNumberPerStep);
+			/* TODO does this change anything? the scenario is not loaded again afterwards...
+			otherwise: delete all plans exept the first. delete the route */
+//			if (REUSE_PLANS) {
+//				// use last plans for the next iteration
+////				controlerBasic.getScenario().getConfig().plans().setInputFile(controlerBasic.getScenario().getConfig().controler().getOutputDirectory() + "output_plans.xml.gz");
+//			} else {
+//				// use plans without routes from the beginning
+////				controlerBasic.getScenario().getConfig().plans().setInputFile(PLANS_FILE);
+//				ModifyPopulation.removeRoutesLeaveFirstPlan(controlerBasic.getScenario().getPopulation());
+//			}
 			
 			// prepare determination of the link with the maximum flow value difference
 			int maxNegativeFlowValueDiff = 0;
@@ -180,30 +186,34 @@ public class TtRunCapAdopForBraess {
 			}
 			
 			if (maxNegativeFlowValueDiffLink == null){
-				// stop the process if flow values do not differ
-				continue;
+				// stop the process if flow values do not differ anymore
+				break;
 			}
+			
+			// create a new controler (alternative to delete plans. make sure that no informations (like travel times) are left from the previous run)
+			Config newConfig = controlerBasic.getConfig();
+			String prevDir = newConfig.controler().getOutputDirectory();
+			String newDir = prevDir.substring(0, prevDir.length()-1) + "_" + i;
+			newConfig.controler().setOutputDirectory(newDir);
+			Scenario newScenario = ScenarioUtils.loadScenario(newConfig);
+			Network newNetwork = newScenario.getNetwork();
 			
 			// adopt capacity of link with maximal flow value difference
 			double capacitySummand = maxNegativeFlowValueDiff / flowValueStepSize;
-			double previousCapacity = networkBasic.getLinks().get(maxNegativeFlowValueDiffLink).getCapacity();
+			double previousCapacity = newNetwork.getLinks().get(maxNegativeFlowValueDiffLink).getCapacity();
 			double newCapacity = previousCapacity + capacitySummand;
 			if (newCapacity < 1){
 				newCapacity = 1;
 			}
-			networkBasic.getLinks().get(maxNegativeFlowValueDiffLink).setCapacity(newCapacity);
-			LOG.warn("link: " + maxNegativeFlowValueDiffLink + "\t flow diff: " + maxNegativeFlowValueDiff + "\t prev cap: " + previousCapacity + "\t new cap: " + newCapacity);
+			newNetwork.getLinks().get(maxNegativeFlowValueDiffLink).setCapacity(newCapacity);
+			LOG.info("link: " + maxNegativeFlowValueDiffLink + "\t flow diff: " + maxNegativeFlowValueDiff + "\t prev cap: " + previousCapacity + "\t new cap: " + newCapacity);
 			
 			// check stop criterion
 			if (capacitySummand > -1) {
 				stableState = true;
 			}
 			
-			i++;
-			// stop the process if it does not stop itself after a specific number of loops
-			if (i > 10) {
-				stableState = true;
-			}			
+			controlerBasic = new Controler(newScenario);
 		}
 		
 		// close writing streams and plot summarized analysis
@@ -251,17 +261,17 @@ public class TtRunCapAdopForBraess {
 			config.controler().setLastIteration(iterationNumberPerStep - 1);
 		}
 		
-		config.planCalcScore().setBrainExpBeta( 20 );
+		config.planCalcScore().setBrainExpBeta( 2 );
 		
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
+		config.travelTimeCalculator().setTraveltimeBinSize( 900 );
 		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
 		
 		// define strategies:
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultStrategy.ReRoute.toString());
-			strat.setWeight(0.05);
+			strat.setWeight(0.1);
 			strat.setDisableAfter(config.controler().getLastIteration() - 50);
 			config.strategy().addStrategySettings(strat);
 		}
